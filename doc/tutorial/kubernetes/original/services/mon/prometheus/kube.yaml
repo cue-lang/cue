@@ -3,25 +3,24 @@ kind: Service
 metadata:
   annotations:
     prometheus.io/scrape: 'true'
-  labels:
-    name: prometheus
   name: prometheus
-spec:
-  selector:
+  labels:
     app: prometheus
+spec:
   type: NodePort
   ports:
   - name: main
-    protocol: TCP
     port: 9090
+    protocol: TCP
     nodePort: 30900
+  selector:
+    app: prometheus
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: prometheus
 spec:
-  replicas: 1
   strategy:
     rollingUpdate:
       maxSurge: 0
@@ -30,6 +29,7 @@ spec:
   selector:
     matchLabels:
       app: prometheus
+  replicas: 1
   template:
     metadata:
       name: prometheus
@@ -39,14 +39,14 @@ spec:
         prometheus.io.scrape: "true"
     spec:
       containers:
-      - name: prometheus
-        image: prom/prometheus:v2.4.3
+      - image: prom/prometheus:v2.4.3
         args:
           - '--config.file=/etc/prometheus/prometheus.yml'
           - '--web.external-url=https://prometheus.example.com'
         ports:
         - name: web
           containerPort: 9090
+        name: prometheus
         volumeMounts:
         - name: config-volume
           mountPath: /etc/prometheus

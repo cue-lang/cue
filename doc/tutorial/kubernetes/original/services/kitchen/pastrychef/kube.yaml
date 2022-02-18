@@ -4,18 +4,18 @@ metadata:
   name: pastrychef
   labels:
     app: pastrychef
-    component: kitchen
     domain: prod
+    component: kitchen
 spec:
   ports:
   - port: 8080
-    targetPort: 8080
     protocol: TCP
+    targetPort: 8080
     name: client
   selector:
     app: pastrychef
-    component: kitchen
     domain: prod
+    component: kitchen
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,12 +25,12 @@ spec:
   replicas: 1
   template:
     metadata:
-      labels:
-        app: pastrychef
-        component: kitchen
-        domain: prod
       annotations:
         prometheus.io.scrape: "true"
+      labels:
+        app: pastrychef
+        domain: prod
+        component: kitchen
     spec:
       volumes:
       - name: pastrychef-disk
@@ -41,8 +41,7 @@ spec:
         secret:
           secretName: secrets
       containers:
-      - name: pastrychef
-        image: gcr.io/myproj/pastrychef:v0.1.15
+      - image: gcr.io/myproj/pastrychef:v0.1.15
         volumeMounts:
         - name:  pastrychef-disk
           mountPath: /logs
@@ -60,6 +59,7 @@ spec:
           "-etcd=etcd:2379",
           "-recovery-overlap=10000"
         ]
+        name: pastrychef
         livenessProbe:
           httpGet:
             path: /debug/health

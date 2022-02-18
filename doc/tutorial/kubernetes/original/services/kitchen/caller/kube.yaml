@@ -4,13 +4,13 @@ metadata:
   name: caller
   labels:
     app: caller
-    component: kitchen
     domain: prod
+    component: kitchen
 spec:
   ports:
   - port: 8080
-    targetPort: 8080
     protocol: TCP
+    targetPort: 8080
     name: client
   selector:
     app: caller
@@ -24,12 +24,12 @@ spec:
   replicas: 3
   template:
     metadata:
-      labels:
-        app: caller
-        component: kitchen
-        domain: prod
       annotations:
         prometheus.io.scrape: "true"
+      labels:
+        app: caller
+        domain: prod
+        component: kitchen
     spec:
       volumes:
       - name: ssd-caller
@@ -44,8 +44,7 @@ spec:
         secret:
           secretName: secrets
       containers:
-      - name: caller
-        image: gcr.io/myproj/caller:v0.20.14
+      - image: gcr.io/myproj/caller:v0.20.14
         volumeMounts:
         - name: ssd-caller
           mountPath: /logs
@@ -66,6 +65,7 @@ spec:
           "-logdir=/logs",
           "-event-server=events:7788",
         ]
+        name: caller
         livenessProbe:
           httpGet:
             path: /debug/health

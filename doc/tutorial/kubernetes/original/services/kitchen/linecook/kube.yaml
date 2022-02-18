@@ -4,18 +4,18 @@ metadata:
   name: linecook
   labels:
     app: linecook
-    component: kitchen
     domain: prod
+    component: kitchen
 spec:
   ports:
   - port: 8080
-    targetPort: 8080
     protocol: TCP
+    targetPort: 8080
     name: client
   selector:
     app: linecook
-    component: kitchen
     domain: prod
+    component: kitchen
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,12 +25,12 @@ spec:
   replicas: 1
   template:
     metadata:
-      labels:
-        app: linecook
-        component: kitchen
-        domain: prod
       annotations:
         prometheus.io.scrape: "true"
+      labels:
+        app: linecook
+        domain: prod
+        component: kitchen
     spec:
       volumes:
       - name: linecook-disk
@@ -41,8 +41,7 @@ spec:
         secret:
           secretName: secrets
       containers:
-      - name: linecook
-        image: gcr.io/myproj/linecook:v0.1.42
+      - image: gcr.io/myproj/linecook:v0.1.42
         volumeMounts:
         - name:  linecook-disk
           mountPath: /logs
@@ -60,6 +59,7 @@ spec:
           "-reconnect-delay", "1h",
           "-recovery-overlap", "100000"
         ]
+        name: linecook
         livenessProbe:
           httpGet:
             path: /debug/health

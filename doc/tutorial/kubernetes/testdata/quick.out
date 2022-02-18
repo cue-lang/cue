@@ -1746,7 +1746,6 @@ service: {
                 "prometheus.io/path":   "/metrics"
             }
             labels: {
-                name:      "alertmanager"
                 app:       "alertmanager"
                 domain:    "prod"
                 component: "mon"
@@ -1761,7 +1760,6 @@ service: {
             }]
             selector: {
                 app:       "alertmanager"
-                name:      "alertmanager"
                 domain:    "prod"
                 component: "mon"
             }
@@ -2070,7 +2068,6 @@ service: {
                 "prometheus.io/scrape": "true"
             }
             labels: {
-                name:      "prometheus"
                 app:       "prometheus"
                 domain:    "prod"
                 component: "mon"
@@ -2087,7 +2084,6 @@ service: {
             }]
             selector: {
                 app:       "prometheus"
-                name:      "prometheus"
                 domain:    "prod"
                 component: "mon"
             }

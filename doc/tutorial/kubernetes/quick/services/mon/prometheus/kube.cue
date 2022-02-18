@@ -1,10 +1,7 @@
 package kube
 
 service: prometheus: {
-	metadata: {
-		annotations: "prometheus.io/scrape": "true"
-		labels: name:                        "prometheus"
-	}
+	metadata: annotations: "prometheus.io/scrape": "true"
 	spec: {
 		type: "NodePort"
 		ports: [{

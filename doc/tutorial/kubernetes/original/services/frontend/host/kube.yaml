@@ -4,18 +4,18 @@ metadata:
   name: host
   labels:
     app: host
-    component: frontend
     domain: prod
+    component: frontend
 spec:
   ports:
   - port: 7080
-    targetPort: 7080
     protocol: TCP
+    targetPort: 7080
     name: client
   selector:
     app: host
-    component: frontend
     domain: prod
+    component: frontend
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,17 +25,17 @@ spec:
   replicas: 2
   template:
     metadata:
-      labels:
-        app: host
-        component: frontend
-        domain: prod
       annotations:
         prometheus.io.scrape: "true"
+      labels:
+        app: host
+        domain: prod
+        component: frontend
     spec:
       containers:
-      - name: host
-        image: gcr.io/myproj/host:v0.1.10
+      - image: gcr.io/myproj/host:v0.1.10
         ports:
         - containerPort: 7080
+        name: host
         args: [
         ]

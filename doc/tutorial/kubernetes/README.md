@@ -92,7 +92,7 @@ into CUE.
 ```
 $ cd services
 $ cue import ./...
-must specify package name with the -p flag
+path, list, or files flag needed to handle multiple objects in file ./services/frontend/bartender/kube.yaml
 ```
 
 Since we have multiple packages and files, we need to specify the package to
@@ -100,7 +100,7 @@ which they should belong.
 
 ```
 $ cue import ./... -p kube
-path, list, or files flag needed to handle multiple objects in file "./frontend/bartender/kube.yaml"
+path, list, or files flag needed to handle multiple objects in file ./services/frontend/bartender/kube.yaml
 ```
 
 Many of the files contain more than one Kubernetes object.
@@ -334,17 +334,17 @@ other a user of the template will want to specify.
 
 Let's compare the result of merging our new template to our original snapshot.
 
+<!-- TODO: fix error output below once https://cuelang.org/issues/1533 is fixed -->
+
 ```
 $ cue eval ./... -c > snapshot2
---- ./mon/alertmanager
-service.alertmanager.metadata.labels.component: incomplete value (string):
-    ./kube.cue:11:24
-service.alertmanager.spec.selector.component: incomplete value (string):
-    ./kube.cue:11:24
-deployment.alertmanager.spec.template.metadata.labels.component: incomplete value (string):
-    ./kube.cue:36:28
-service."node-exporter".metadata.labels.component: incomplete value (string):
-    ./kube.cue:11:24
+// /workdir/services/mon/alertmanager
+deployment.alertmanager.spec.template.metadata.labels.component: incomplete value string
+service.alertmanager.metadata.labels.component: incomplete value string
+service.alertmanager.spec.selector.component: incomplete value string
+// /workdir/services/mon/nodeexporter
+service."node-exporter".metadata.labels.component: incomplete value string
+service."node-exporter".spec.selector.component: incomplete value string
 ...
 ```
 
@@ -370,7 +370,8 @@ EOF
 
 ```
 # set the component label to our new top-level field
-$ sed -i.bak 's/component:.*string/component: #Component/' kube.cue && rm kube.cue.bak
+$ sed -i.bak 's/component:.*string/component: #Component/' kube.cue
+$ rm kube.cue.bak
 
 # add the new top-level field to our previous template definitions
 $ cat <<EOF >> kube.cue
@@ -406,11 +407,12 @@ $ cp snapshot2 snapshot
 The corresponding boilerplate can now be removed with `cue trim`.
 
 ```
-$ find . | grep kube.cue | xargs wc | tail -1
+$ find . | grep kube.cue | xargs wc -l | tail -1
     1792    3616   34815 total
+ 1887 total
 $ cue trim ./...
-$ find . | grep kube.cue | xargs wc | tail -1
-    1223    2374   22903 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1312 total
 ```
 
 `cue trim` removes configuration from files that is already generated
@@ -421,8 +423,8 @@ The following is proof that nothing changed semantically:
 
 ```
 $ cue eval -c ./... > snapshot2
-$ diff snapshot snapshot2 | wc
-       0       0       0
+$ diff snapshot snapshot2 | wc -l
+0
 ```
 
 We can do better, though.
@@ -571,8 +573,8 @@ Then we run trim to further reduce our configuration:
 
 ```
 $ cue trim ./...
-$ find . | grep kube.cue | xargs wc | tail -1
-    1129    2270   22073 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1242 total
 ```
 This is after removing the rewritten and now redundant deployment definition.
 
@@ -606,13 +608,20 @@ deployment: breaddispatcher: spec: template: {
         "prometheus.io.scrape": "true"
         "prometheus.io.port":   "7080"
     }
-$ find . | grep kube.cue | xargs wc | tail -1
-     975    2116   20264 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1090 total
 ```
 
 Another 150 lines lost!
 Collapsing lines like this can improve the readability of a configuration
 by removing considerable amounts of punctuation.
+
+We save the result as the new baseline:
+
+```
+cue eval -c ./... > snapshot2
+cp snapshot2 snapshot
+```
 
 
 ### Repeat for several subdirectories
@@ -650,11 +659,25 @@ $ cue fmt ./frontend
 
 # check differences
 $ cue eval -c ./... > snapshot2
-$ diff snapshot snapshot2
-368a369
->                             prometheus.io.port:   "7080"
-577a579
->                             prometheus.io.port:   "8080"
+$ diff -wu snapshot snapshot2
+--- snapshot	2022-02-18 11:47:53.480063388 +0000
++++ snapshot2	2022-02-18 11:47:54.444165162 +0000
+@@ -188,6 +188,7 @@
+                 metadata: {
+                     annotations: {
+                         "prometheus.io.scrape": "true"
++                        "prometheus.io.port":   "7080"
+                     }
+                     labels: {
+                         app:       "host"
+@@ -327,6 +328,7 @@
+                 metadata: {
+                     annotations: {
+                         "prometheus.io.scrape": "true"
++                        "prometheus.io.port":   "8080"
+                     }
+                     labels: {
+                         app:       "valeter"
 $ cp snapshot2 snapshot
 ```
 
@@ -662,14 +685,21 @@ Two lines with annotations added, improving consistency.
 
 ```
 $ cue trim -s ./frontend/...
-$ find . | grep kube.cue | xargs wc | tail -1
-     931    2052   19624 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1046 total
 ```
 
-Another 40 lines removed.
+Another 40 odd lines removed.
 We may have gotten used to larger reductions, but at this point there is just
 not much left to remove: in some of the frontend files there are only 4 lines
 of configuration left.
+
+We save the result as the new baseline:
+
+```
+cue eval -c ./... > snapshot2
+cp snapshot2 snapshot
+```
 
 
 #### Directory `kitchen`
@@ -781,7 +811,7 @@ $ find . | grep kube.cue | xargs wc | tail -1
      807    1862   17190 total
 ```
 
-The diff shows that we added the `_hadDisks` option, but otherwise reveals no
+The diff shows that we added the `_hasDisks` option, but otherwise reveals no
 differences.
 We also reduced the configuration by a sizeable amount once more.
 

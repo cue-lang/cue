@@ -4,8 +4,8 @@ metadata:
   name: watcher
   labels:
     app: watcher
-    component: infra
     domain: prod
+    component: infra
 spec:
   type: LoadBalancer
   loadBalancerIP: 1.2.3.4. # static ip

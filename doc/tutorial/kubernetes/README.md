@@ -92,7 +92,7 @@ into CUE.
 ```
 $ cd services
 $ cue import ./...
-must specify package name with the -p flag
+path, list, or files flag needed to handle multiple objects in file ./services/frontend/bartender/kube.yaml
 ```
 
 Since we have multiple packages and files, we need to specify the package to
@@ -100,7 +100,7 @@ which they should belong.
 
 ```
 $ cue import ./... -p kube
-path, list, or files flag needed to handle multiple objects in file "./frontend/bartender/kube.yaml"
+path, list, or files flag needed to handle multiple objects in file ./services/frontend/bartender/kube.yaml
 ```
 
 Many of the files contain more than one Kubernetes object.
@@ -334,17 +334,17 @@ other a user of the template will want to specify.
 
 Let's compare the result of merging our new template to our original snapshot.
 
+<!-- TODO: fix error output below once https://cuelang.org/issues/1533 is fixed -->
+
 ```
 $ cue eval ./... -c > snapshot2
---- ./mon/alertmanager
-service.alertmanager.metadata.labels.component: incomplete value (string):
-    ./kube.cue:11:24
-service.alertmanager.spec.selector.component: incomplete value (string):
-    ./kube.cue:11:24
-deployment.alertmanager.spec.template.metadata.labels.component: incomplete value (string):
-    ./kube.cue:36:28
-service."node-exporter".metadata.labels.component: incomplete value (string):
-    ./kube.cue:11:24
+// /workdir/services/mon/alertmanager
+deployment.alertmanager.spec.template.metadata.labels.component: incomplete value string
+service.alertmanager.metadata.labels.component: incomplete value string
+service.alertmanager.spec.selector.component: incomplete value string
+// /workdir/services/mon/nodeexporter
+service."node-exporter".metadata.labels.component: incomplete value string
+service."node-exporter".spec.selector.component: incomplete value string
 ...
 ```
 
@@ -370,7 +370,8 @@ EOF
 
 ```
 # set the component label to our new top-level field
-$ sed -i.bak 's/component:.*string/component: #Component/' kube.cue && rm kube.cue.bak
+$ sed -i.bak 's/component:.*string/component: #Component/' kube.cue
+$ rm kube.cue.bak
 
 # add the new top-level field to our previous template definitions
 $ cat <<EOF >> kube.cue

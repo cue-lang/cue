@@ -89,11 +89,13 @@ s3:  strings.ContainsAny(str, "dd")
   s1: (_|_){
     // [incomplete] s1: invalid interpolation: non-concrete value string (type string):
     //     ./in.cue:13:5
+    //     ./in.cue:17:6
   }
   s2: (string){ strings.ContainsAny("dd") }
   s3: (_|_){
     // [incomplete] error in call to strings.ContainsAny: non-concrete value string:
     //     ./in.cue:15:5
+    //     ./in.cue:17:6
   }
   str: (string){ string }
   num: (number){ <4 }

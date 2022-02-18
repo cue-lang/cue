@@ -92,7 +92,8 @@ x:
   #V: (#struct){
     s: (string){ string }
     out: (_|_){
-      // [incomplete] cannot convert incomplete value "string" to JSON
+      // [incomplete] cannot convert incomplete value "string" to JSON:
+      //     ./in.cue:20:7
     }
   }
   #U: (#struct){

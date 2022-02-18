@@ -5,6 +5,7 @@ cmp stderr expect-stderr
 -- expect-stderr --
 invalid interpolation: non-concrete value string (type string):
     ./file.cue:12:1
+    ./file.cue:3:5
 -- file.cue --
 #X: {
 	x: string

@@ -117,6 +117,7 @@ wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:1:9
 wrongType: cannot use int (type int) as type bool:
     ./in.cue:10:2
+    ./in.cue:1:15
 
 Result:
 (_|_){
@@ -133,6 +134,7 @@ Result:
   wrongType: (_|_){
     // [eval] wrongType: cannot use int (type int) as type bool:
     //     ./in.cue:10:2
+    //     ./in.cue:1:15
   }
   incomplete: (_|_){
     // [incomplete] incomplete: undefined field: d:

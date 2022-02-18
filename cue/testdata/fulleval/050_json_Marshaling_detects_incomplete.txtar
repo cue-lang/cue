@@ -25,7 +25,8 @@ b: json.Marshal(foo)
 -- out/eval --
 (struct){
   a: (_|_){
-    // [incomplete] cannot convert incomplete value "string" to JSON
+    // [incomplete] cannot convert incomplete value "string" to JSON:
+    //     ./in.cue:3:21
   }
   foo: (struct){
     a: (int){ 3 }

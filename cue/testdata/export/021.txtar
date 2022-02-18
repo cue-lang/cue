@@ -46,7 +46,8 @@ a: {
 (struct){
   b: (struct){
     idx: (_|_){
-      // [incomplete] b.idx: invalid non-ground value string (must be concrete string)
+      // [incomplete] b.idx: invalid non-ground value string (must be concrete string):
+      //     ./in.cue:4:8
     }
     str: (string){ string }
     a: (struct){

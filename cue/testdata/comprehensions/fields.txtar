@@ -41,6 +41,7 @@ issue560: {
       tags_map: (_|_){
         // [incomplete] error in call to strings.Split: non-concrete value string:
         //     ./in.cue:14:25
+        //     ./in.cue:12:19
         "{a}": (string){ string }
       }
     }

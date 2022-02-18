@@ -68,12 +68,12 @@ jobs:
       - if: ${{ github.ref == 'refs/heads/master' }}
         name: Set go build tags
         run: go env -w GOFLAGS=-tags=long
-      - if: matrix.go-version == '1.16.10' && matrix.os != 'windows-2019'
+      - if: matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'
         name: Generate
         run: go generate ./...
       - name: Test
         run: go test ./...
-      - if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}
+      - if: ${{ matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}
         name: Test with -race
         run: go test -race ./...
       - name: gorelease check

@@ -81,7 +81,7 @@ test: _#bashWorkflow & {
 				_#goGenerate,
 				_#goTest,
 				_#goTestRace & {
-					if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+					if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 				},
 				_#goReleaseCheck,
 				_#checkGitClean,
@@ -383,7 +383,7 @@ _#goGenerate: _#step & {
 	run:  "go generate ./..."
 	// The Go version corresponds to the precise version specified in
 	// the matrix. Skip windows for now until we work out why re-gen is flaky
-	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os != '\(_#windowsMachine)'"
+	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os == '\(_#linuxMachine)'"
 }
 
 _#goTest: _#step & {

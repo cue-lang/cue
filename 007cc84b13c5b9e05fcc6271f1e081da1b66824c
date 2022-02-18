@@ -33,6 +33,24 @@
       "message": "Nit: formatting of this file in the archive (for readability in Gerrit at least)",
       "revId": "007cc84b13c5b9e05fcc6271f1e081da1b66824c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5091bab6_b17ae952",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-18T11:51:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8abb5191_c38ba7e7",
+      "revId": "007cc84b13c5b9e05fcc6271f1e081da1b66824c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

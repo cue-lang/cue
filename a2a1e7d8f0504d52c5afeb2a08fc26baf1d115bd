@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90996305_640a9d9a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-18T15:37:59Z",
+      "side": 1,
+      "message": "LGTM with Format doc string fix",
+      "revId": "a2a1e7d8f0504d52c5afeb2a08fc26baf1d115bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

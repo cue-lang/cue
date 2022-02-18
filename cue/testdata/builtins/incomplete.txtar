@@ -208,12 +208,12 @@ Result:
       transformed: (_|_){
         // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
         //     ./in.cue:59:22
-        //     ./in.cue:58:9
+        //     ./in.cue:58:16
       }
       joined: (_|_){
         // [incomplete] incompleteArgStringList.#a.0: non-concrete value string in operand to +:
         //     ./in.cue:59:22
-        //     ./in.cue:58:9
+        //     ./in.cue:58:16
       }
     }
   }
@@ -232,18 +232,18 @@ Result:
     x: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
       //     ./in.cue:71:8
-      //     ./in.cue:72:5
+      //     ./in.cue:72:8
     }
     y: (_){ _ }
     decimal: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
       //     ./in.cue:71:8
-      //     ./in.cue:72:5
+      //     ./in.cue:72:8
     }
     str: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
       //     ./in.cue:71:8
-      //     ./in.cue:72:5
+      //     ./in.cue:72:8
     }
   }
   badListType: (_|_){

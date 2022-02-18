@@ -95,9 +95,11 @@ o3.a: conflicting values "baz" and "foo":
     ./in.cue:20:24
 a3.a: invalid value "bar" (out of bound =~"oo"):
     ./in.cue:8:5
+    ./in.cue:7:5
     ./in.cue:12:14
 a3.a: invalid value "bar" (out of bound =~"fo"):
     ./in.cue:9:5
+    ./in.cue:7:5
     ./in.cue:12:14
 stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
     ./in.cue:31:17
@@ -126,9 +128,11 @@ Result:
     a: (_|_){
       // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
       //     ./in.cue:8:5
+      //     ./in.cue:7:5
       //     ./in.cue:12:14
       // a3.a: invalid value "bar" (out of bound =~"fo"):
       //     ./in.cue:9:5
+      //     ./in.cue:7:5
       //     ./in.cue:12:14
     }
     b: (string){ =~"oo" }

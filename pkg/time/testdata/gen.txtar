@@ -9,6 +9,7 @@ t3: time.Unix(1500000000, 123456)
 -- out/time --
 Errors:
 t2: invalid value "no time" (does not satisfy time.Time): error in call to time.Time: invalid time "no time":
+    ./in.cue:4:5
     ./in.cue:4:17
 
 Result:

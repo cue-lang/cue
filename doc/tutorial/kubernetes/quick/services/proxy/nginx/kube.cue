@@ -13,6 +13,8 @@ deployment: nginx: spec: {
 				configMap: name: "nginx"
 			}]
 			containers: [{
+				// Put nginx last so it will be linked with previous two containers during
+				// testing.
 				image: "nginx:1.11.10-alpine"
 				ports: [{
 					containerPort: 80

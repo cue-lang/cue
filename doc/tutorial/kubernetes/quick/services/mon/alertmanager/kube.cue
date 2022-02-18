@@ -1,19 +1,13 @@
 package kube
 
 service: alertmanager: {
-	metadata: {
-		annotations: {
-			"prometheus.io/scrape": "true"
-			"prometheus.io/path":   "/metrics"
-		}
-		labels: name: "alertmanager"
+	metadata: annotations: {
+		"prometheus.io/scrape": "true"
+		"prometheus.io/path":   "/metrics"
 	}
-	spec: {
-		// type: ClusterIP
-		ports: [{
-			name: "main"
-		}]
-	}
+	spec: ports: [{
+		name: "main"
+	}]
 }
 deployment: alertmanager: spec: {
 	selector: matchLabels: app: "alertmanager"

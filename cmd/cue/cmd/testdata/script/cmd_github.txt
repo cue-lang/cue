@@ -195,12 +195,12 @@ jobs:
       - if: ${{ github.ref == 'refs/heads/master' }}
         name: Set go build tags
         run: go env -w GOFLAGS=-tags=long
-      - if: matrix.go-version == '1.16.10' && matrix.os != 'windows-2019'
+      - if: matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'
         name: Generate
         run: go generate ./...
       - name: Test
         run: go test ./...
-      - if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}
+      - if: ${{ matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}
         name: Test with -race
         run: go test -race ./...
       - name: gorelease check
@@ -1128,7 +1128,7 @@ test: _#bashWorkflow & {
 				_#tags: "long"
 				if:     "${{ \(_#isMaster) }}"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
-				if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
 		}
 		mark_ci_success: {
@@ -1367,7 +1367,7 @@ _#goGenerate: _#step & {
 	run:  "go generate ./..."
 	// The Go version corresponds to the precise version specified in
 	// the matrix. Skip windows for now until we work out why re-gen is flaky
-	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os != '\(_#windowsMachine)'"
+	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os == '\(_#linuxMachine)'"
 }
 _#goTest: _#step & {
 	name: "Test"

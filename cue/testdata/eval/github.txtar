@@ -57,7 +57,7 @@ test: _#bashWorkflow & {
 				_#tags: "long"
 				if:     "${{ \(_#isMaster) }}"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
-				if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
 		}
 		mark_ci_success: {
@@ -296,7 +296,7 @@ _#goGenerate: _#step & {
 	run:  "go generate ./..."
 	// The Go version corresponds to the precise version specified in
 	// the matrix. Skip windows for now until we work out why re-gen is flaky
-	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os != '\(_#windowsMachine)'"
+	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os == '\(_#linuxMachine)'"
 }
 _#goTest: _#step & {
 	name: "Test"
@@ -1122,7 +1122,7 @@ import "strings"
               5: (#struct){
                 name: (string){ "Generate" }
                 run: (string){ "go generate ./..." }
-                if: (string){ "matrix.go-version == '1.16.10' && matrix.os != 'windows-2019'" }
+                if: (string){ "matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'" }
               }
               6: (#struct){
                 name: (string){ "Test" }
@@ -1131,7 +1131,7 @@ import "strings"
               7: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
-                if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}" }
+                if: (string){ "${{ matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}" }
               }
               8: (#struct){
                 name: (string){ "gorelease check" }
@@ -1639,7 +1639,7 @@ import "strings"
           5: (#struct){
             name: (string){ "Generate" }
             run: (string){ "go generate ./..." }
-            if: (string){ "matrix.go-version == '1.16.10' && matrix.os != 'windows-2019'" }
+            if: (string){ "matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'" }
           }
           6: (#struct){
             name: (string){ "Test" }
@@ -1648,7 +1648,7 @@ import "strings"
           7: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
-            if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}" }
+            if: (string){ "${{ matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}" }
           }
           8: (#struct){
             name: (string){ "gorelease check" }
@@ -2151,7 +2151,7 @@ import "strings"
   _#goGenerate(:ci): (#struct){
     name: (string){ "Generate" }
     run: (string){ "go generate ./..." }
-    if: (string){ "matrix.go-version == '1.16.10' && matrix.os != 'windows-2019'" }
+    if: (string){ "matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'" }
   }
   _#goTest(:ci): (#struct){
     name: (string){ "Test" }
@@ -2247,7 +2247,7 @@ import "strings"
           〈4;_#goGenerate〉,
           〈4;_#goTest〉,
           (〈4;_#goTestRace〉 & {
-            if: "${{ \(〈4;_#isMaster〉) || \(〈4;_#isCLCITestBranch〉) && matrix.go-version == '\(〈5;_#latestStableGo〉)' && matrix.os == '\(〈5;_#linuxMachine〉)' }}"
+            if: "${{ matrix.go-version == '\(〈5;_#latestStableGo〉)' && matrix.os == '\(〈5;_#linuxMachine〉)' }}"
           }),
           〈4;_#goReleaseCheck〉,
           〈4;_#checkGitClean〉,
@@ -2531,7 +2531,7 @@ import "strings"
   _#goGenerate: (〈0;_#step〉 & {
     name: "Generate"
     run: "go generate ./..."
-    if: "matrix.go-version == '\(〈1;_#codeGenGo〉)' && matrix.os != '\(〈1;_#windowsMachine〉)'"
+    if: "matrix.go-version == '\(〈1;_#codeGenGo〉)' && matrix.os == '\(〈1;_#linuxMachine〉)'"
   })
   _#goTest: (〈0;_#step〉 & {
     name: "Test"

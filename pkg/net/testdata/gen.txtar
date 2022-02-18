@@ -26,6 +26,7 @@ t20: net.IPCIDR("172.16.12.3")
 -- out/net --
 Errors:
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
+    ./in.cue:11:5
     ./in.cue:11:16
 error in call to net.JoinHostPort: invalid host [192, 30, 4]:
     ./in.cue:9:5

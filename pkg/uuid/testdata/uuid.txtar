@@ -30,8 +30,10 @@ toInt: a: uuid.ToInt(sha1.a)
 -- out/uuid --
 Errors:
 invalid.a: invalid value "052EF62D-7223-58B6-A551-C1DEEE46D401" (does not satisfy uuid.Valid): invalid UUID "052EF62D-7223-58B6-A551-C1DEEE46D401":
+    ./in.cue:13:8
     ./in.cue:14:8
 invalid.b: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid UUID "052ef62d_7223_58b6_a551_c1deee46d401":
+    ./in.cue:16:8
     ./in.cue:17:8
 
 Result:

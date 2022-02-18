@@ -260,9 +260,10 @@ func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 func appendNodePositions(a []token.Pos, n Node) []token.Pos {
 	if p := pos(n); p != token.NoPos {
 		a = append(a, p)
-	} else if v, ok := n.(*Vertex); ok {
+	}
+	if v, ok := n.(*Vertex); ok {
 		for _, c := range v.Conjuncts {
-			a = appendNodePositions(a, c.x)
+			a = appendNodePositions(a, c.Elem())
 		}
 	}
 	return a

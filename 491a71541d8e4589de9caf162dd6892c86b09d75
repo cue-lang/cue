@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca665b43_a0e464c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-18T06:05:11Z",
+      "side": 1,
+      "message": "Thanks for submitting this CL, Scott.\n\nThe build is failing because a generated file, pkg/tool/cli/pkg.go, is stale. You can either fix this by hand\n\n-\t\tkind:     \"tool/cli.Ask\"\n+\t\t$id:      \"tool/cli.Ask\"\n\n(where the + annotation is what it should be) \n\nor, using go1.16.10 (for safety\u0027s sake, given that\u0027s what\u0027s used in the build matrix) run the following:\n\n$ go generate ./pkg/tool/cli\n\nThat should give the same result.",
+      "revId": "491a71541d8e4589de9caf162dd6892c86b09d75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

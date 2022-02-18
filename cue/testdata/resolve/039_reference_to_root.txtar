@@ -87,7 +87,7 @@ wp: v & {
     d: (_|_){
       // [incomplete] c.d: non-concrete value int in operand to +:
       //     ./in.cue:4:5
-      //     ./in.cue:1:5
+      //     ./in.cue:1:8
     }
   }
   x: (struct){
@@ -95,7 +95,7 @@ wp: v & {
     c: (_|_){
       // [incomplete] x.c: non-concrete value int in operand to +:
       //     ./in.cue:8:5
-      //     ./in.cue:7:2
+      //     ./in.cue:7:5
     }
   }
   y: (struct){
@@ -107,7 +107,7 @@ wp: v & {
     c: (_|_){
       // [incomplete] v.c: non-concrete value int in operand to +:
       //     ./in.cue:16:5
-      //     ./in.cue:15:2
+      //     ./in.cue:15:5
     }
   }
   w: (struct){
@@ -115,7 +115,7 @@ wp: v & {
     c: (_|_){
       // [incomplete] w.c: non-concrete value int in operand to +:
       //     ./in.cue:16:5
-      //     ./in.cue:15:2
+      //     ./in.cue:15:5
     }
   }
   wp: (struct){
@@ -123,7 +123,7 @@ wp: v & {
     c: (_|_){
       // [incomplete] wp.c: non-concrete value int in operand to +:
       //     ./in.cue:16:5
-      //     ./in.cue:15:2
+      //     ./in.cue:15:5
     }
   }
 }

@@ -47,7 +47,6 @@ reference "#D1" not found:
 -- expect-stderr5 --
 field not allowed: Z:
     ./test.json:4:3
-    ./vector.cue:3:1
     ./vector.cue:3:6
 X: conflicting values 1 and float (mismatched types int and float):
     ./test.json:2:8

@@ -139,11 +139,22 @@ func timeFormat(value, layout string) (bool, error) {
 	return true, nil
 }
 
-// Format defines a type string that must adhere to a certain layout.
+// FormatString defines a type string that must adhere to a certain layout.
 //
 // See Parse for a description on layout strings.
 func Format(value, layout string) (bool, error) {
 	return timeFormat(value, layout)
+}
+
+// FormatString returns a textual representation of the time value formatted
+// according to the layout defined by the argument. See Parse for more
+// information on the layout string.
+func FormatString(layout, value string) (string, error) {
+	t, err := time.Parse(time.RFC3339Nano, value)
+	if err != nil {
+		return "", err
+	}
+	return t.Format(layout), nil
 }
 
 // Parse parses a formatted string and returns the time value it represents.
@@ -194,4 +205,36 @@ func Parse(layout, value string) (string, error) {
 func Unix(sec int64, nsec int64) string {
 	t := time.Unix(sec, nsec)
 	return t.UTC().Format(time.RFC3339Nano)
+}
+
+// Parts holds individual parts of a parsed time stamp.
+type Parts struct {
+	Year   int `json:"year"`
+	Month  int `json:"month"`
+	Day    int `json:"day"`
+	Hour   int `json:"hour"`
+	Minute int `json:"minute"`
+
+	// Second is equal to div(Nanosecond, 1_000_000_000)
+	Second     int `json:"second"`
+	Nanosecond int `json:"nanosecond"`
+}
+
+// Split parses a time string into its individual parts.
+func Split(t string) (*Parts, error) {
+	st, err := time.Parse(time.RFC3339Nano, t)
+	if err != nil {
+		return nil, err
+	}
+	year, month, day := st.Date()
+	return &Parts{
+		Year:   year,
+		Month:  int(month),
+		Day:    day,
+		Hour:   st.Hour(),
+		Minute: st.Minute(),
+
+		Second:     st.Second(),
+		Nanosecond: st.Nanosecond(),
+	}, nil
 }

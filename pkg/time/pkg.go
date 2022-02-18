@@ -181,6 +181,19 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "FormatString",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			layout, value := c.String(0), c.String(1)
+			if c.Do() {
+				c.Ret, c.Err = FormatString(layout, value)
+			}
+		},
+	}, {
 		Name: "Parse",
 		Params: []internal.Param{
 			{Kind: adt.StringKind},
@@ -204,6 +217,18 @@ var pkg = &internal.Package{
 			sec, nsec := c.Int64(0), c.Int64(1)
 			if c.Do() {
 				c.Ret = Unix(sec, nsec)
+			}
+		},
+	}, {
+		Name: "Split",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.TopKind,
+		Func: func(c *internal.CallCtxt) {
+			t := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = Split(t)
 			}
 		},
 	}},

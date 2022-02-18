@@ -130,7 +130,7 @@ func Time(s string) (bool, error) {
 }
 
 func timeFormat(value, layout string) (bool, error) {
-	_, err := time.Parse(layout, value)
+	_, err := time.ParseInLocation(layout, value, nil)
 	if err != nil {
 		// Use our own error, the time package's error as the Go error is too
 		// confusing within this context.
@@ -175,17 +175,11 @@ func Format(value, layout string) (bool, error) {
 // location and zone in the returned time. Otherwise it records the time as
 // being in a fabricated location with time fixed at the given zone offset.
 //
-// When parsing a time with a zone abbreviation like MST, if the zone abbreviation
-// has a defined offset in the current location, then that offset is used.
-// The zone abbreviation "UTC" is recognized as UTC regardless of location.
-// If the zone abbreviation is unknown, Parse records the time as being
-// in a fabricated location with the given zone abbreviation and a zero offset.
-// This choice means that such a time can be parsed and reformatted with the
-// same layout losslessly, but the exact instant used in the representation will
-// differ by the actual zone offset. To avoid such problems, prefer time layouts
-// that use a numeric zone offset, or use ParseInLocation.
+// Parse currently does not support zone abbreviations like MST. All are
+// interpreted as UTC.
 func Parse(layout, value string) (string, error) {
-	t, err := time.Parse(layout, value)
+	// TODO: support named variadic argument "location:" to pass in a location.
+	t, err := time.ParseInLocation(layout, value, nil)
 	if err != nil {
 		return "", err
 	}

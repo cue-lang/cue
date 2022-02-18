@@ -1238,6 +1238,7 @@ import "strings"
             res: (_|_){
               // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
               //     ./workflows.cue:127:9
+              //     ./workflows.cue:124:14
             }
           }
         }
@@ -1314,6 +1315,7 @@ import "strings"
           if: (_|_){
             // [incomplete] workflows.1.schema._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
             //     ./workflows.cue:138:14
+            //     ./workflows.cue:136:14
           }
         }
         name: (string){ "Repository Dispatch" }
@@ -1755,6 +1757,7 @@ import "strings"
         res: (_|_){
           // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
           //     ./workflows.cue:127:9
+          //     ./workflows.cue:124:14
         }
       }
     }
@@ -1828,6 +1831,7 @@ import "strings"
       if: (_|_){
         // [incomplete] repository_dispatch._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
         //     ./workflows.cue:138:14
+        //     ./workflows.cue:136:14
       }
     }
     name: (string){ "Repository Dispatch" }
@@ -2127,6 +2131,7 @@ import "strings"
     run: (_|_){
       // [incomplete] _#setGoBuildTags.run: invalid interpolation: non-concrete value string (type string):
       //     ./workflows.cue:261:10
+      //     ./workflows.cue:259:10
     }
   }
   _#installGo(:ci): (#struct){

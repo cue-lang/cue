@@ -42,7 +42,7 @@ func TestValidate(t *testing.T) {
 		#foo: { use: string }
 		`,
 		lookup: "#foo",
-		out:    "incomplete\n#foo.use: incomplete value string",
+		out:    "incomplete\n#foo.use: incomplete value string:\n    test:2:16",
 	}, {
 		desc: "definitions not considered for completeness",
 		cfg:  &Config{Concrete: true},
@@ -171,7 +171,7 @@ y: conflicting values 4 and 2:
 			a: int
 		}
 		`,
-		out: "incomplete\nx.a: incomplete value int",
+		out: "incomplete\nx.a: incomplete value int:\n    test:3:7",
 	}, {
 		desc: "pick up non-concrete value in default",
 		cfg:  &Config{Concrete: true},

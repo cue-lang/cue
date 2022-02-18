@@ -73,7 +73,8 @@ Val:
         //     ./in.cue:11:11
       }
       foobar: (_|_){
-        // [incomplete] cannot convert incomplete value "string" to JSON
+        // [incomplete] cannot convert incomplete value "string" to JSON:
+        //     ./in.cue:6:21
       }
     }
   }

@@ -12,7 +12,8 @@ c: { for x in top {} }
   }
   top: (_){ _ }
   a: (_|_){
-    // [incomplete] a: incomplete bool: bool
+    // [incomplete] a: incomplete bool: bool:
+    //     ./in.cue:1:7
   }
   b: (_|_){
     // [incomplete] b: undefined field: foo:

@@ -133,6 +133,9 @@ module: "example.com"
 	v.Finalize(ctx)
 	adt.Verbosity = 0
 
+	// b := validate.Validate(ctx, v, &validate.Config{Concrete: true})
+	// t.Log(errors.Details(b.Err, nil))
+
 	t.Error(debug.NodeString(r, v, nil))
 
 	t.Log(ctx.Stats())

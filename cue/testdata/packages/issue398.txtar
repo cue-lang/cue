@@ -2,16 +2,21 @@
 module: "example.com"
 -- foo.cue --
 package foo
+
 import "example.com/pkg:bar"
+
 bar
 zz: 3
 -- pkg/bar.cue --
 package bar
+
 import "example.com/pkg:baz"
+
 baz
 yy: 2
 -- pkg/baz.cue --
 package baz
+
 xx: 1
 -- out/eval --
 (struct){

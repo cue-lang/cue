@@ -4,9 +4,8 @@ src: [{foo: 3}]
 for k, v in src
 let y = v.foo
 if y > 3 {
-    x: [k, v, y]
+	x: [k, v, y]
 }
-
 -- out/resolve/in --
 3[src]:  Scope: 0[<nil>]           Node: 0[]
 6[foo]:  Scope: 0[<nil>]           Node: 0[]
@@ -25,7 +24,6 @@ if y > 3 {
 -- issue946.cue --
 x: {for a in a {}}
 y: {for aa in a {}}
-
 -- out/resolve/issue946 --
 3[x]:   Scope: 0[<nil>] Node: 0[]
 6[a]:   Scope: 0[<nil>] Node: 0[]

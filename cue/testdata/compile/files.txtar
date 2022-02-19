@@ -3,7 +3,6 @@
 package repro
 
 a: []
-
 -- out.cue --
 package repro
 

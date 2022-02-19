@@ -1,30 +1,30 @@
 #FindHiddenTasks: true
 -- in.cue --
 root: {
-    a: {
-        $id: "valToOut"
-        val: "foo"
-        out: string
-    }
-    _b: {
-        $id: "valToOut"
-        $after: a
-        val: "bar"
-        out: string
-    }
-    c: {
-        $id: "valToOut"
-        out: a.out + _b.out
-    }
-    // These tasks should _not_ run, because they are definitions.
-    _#c: {
-        $id: "valToOut"
-        out: c.out + "baz"
-    }
-    #d: {
-        $id: "valToOut"
-        out: c.out + "baz"
-    }
+	a: {
+		$id: "valToOut"
+		val: "foo"
+		out: string
+	}
+	_b: {
+		$id:    "valToOut"
+		$after: a
+		val:    "bar"
+		out:    string
+	}
+	c: {
+		$id: "valToOut"
+		out: a.out + _b.out
+	}
+	// These tasks should _not_ run, because they are definitions.
+	_#c: {
+		$id: "valToOut"
+		out: c.out + "baz"
+	}
+	#d: {
+		$id: "valToOut"
+		out: c.out + "baz"
+	}
 }
 -- out/run/errors --
 -- out/run/t0 --

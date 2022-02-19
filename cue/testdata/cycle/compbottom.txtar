@@ -31,222 +31,221 @@
 import "regexp"
 
 simple: {
-    #message: #"^(message: (?P<message>.*))?$"#
+	#message: #"^(message: (?P<message>.*))?$"#
 
+	p1: {
+		X: "message: hello"
+		#aux: {
+			if Y.message == _|_ {
+				message: ""
+			}
+			if Y.message != _|_ {
+				message: "message: " + Y.message
+			}
+		}
 
-    p1: {
-        X: "message: hello"
-        #aux: {
-            if Y.message == _|_ {
-                message: ""
-            }
-            if Y.message != _|_ {
-                message: "message: " + Y.message
-            }
-        }
+		Y: regexp.FindNamedSubmatch(#message, X)
+		X: #aux.message
+	}
 
-        Y: regexp.FindNamedSubmatch(#message, X)
-        X: #aux.message
-    }
+	p2: {
+		#aux: {
+			if Y.message == _|_ {
+				message: ""
+			}
+			if Y.message != _|_ {
+				message: "message: " + Y.message
+			}
+		}
 
-    p2: {
-        #aux: {
-            if Y.message == _|_ {
-                message: ""
-            }
-            if Y.message != _|_ {
-                message: "message: " + Y.message
-            }
-        }
+		X: "message: hello"
+		Y: regexp.FindNamedSubmatch(#message, X)
+		X: #aux.message
+	}
 
-        X: "message: hello"
-        Y: regexp.FindNamedSubmatch(#message, X)
-        X: #aux.message
-    }
+	p3: {
+		#aux: {
+			if Y.message == _|_ {
+				message: ""
+			}
+			if Y.message != _|_ {
+				message: "message: " + Y.message
+			}
+		}
 
-    p3: {
-        #aux: {
-            if Y.message == _|_ {
-                message: ""
-            }
-            if Y.message != _|_ {
-                message: "message: " + Y.message
-            }
-        }
+		Y: regexp.FindNamedSubmatch(#message, X)
+		X: "message: hello"
+		X: #aux.message
+	}
 
-        Y: regexp.FindNamedSubmatch(#message, X)
-        X: "message: hello"
-        X: #aux.message
-    }
+	p4: {
+		X: #aux.message
+		#aux: {
+			if Y.message == _|_ {
+				message: ""
+			}
+			if Y.message != _|_ {
+				message: "message: " + Y.message
+			}
+		}
 
-    p4: {
-        X: #aux.message
-        #aux: {
-            if Y.message == _|_ {
-                message: ""
-            }
-            if Y.message != _|_ {
-                message: "message: " + Y.message
-            }
-        }
+		Y: regexp.FindNamedSubmatch(#message, X)
+		X: "message: hello"
+	}
 
-        Y: regexp.FindNamedSubmatch(#message, X)
-        X: "message: hello"
-    }
+	p5: {
+		#aux: {
+			if Y.message == _|_ {
+				message: ""
+			}
+			if Y.message != _|_ {
+				message: "message: " + Y.message
+			}
+		}
 
-    p5: {
-        #aux: {
-            if Y.message == _|_ {
-                message: ""
-            }
-            if Y.message != _|_ {
-                message: "message: " + Y.message
-            }
-        }
+		X: #aux.message
+		Y: regexp.FindNamedSubmatch(#message, X)
+		X: "message: hello"
+	}
 
-        X: #aux.message
-        Y: regexp.FindNamedSubmatch(#message, X)
-        X: "message: hello"
-    }
+	p6: {
+		#aux: {
+			if Y.message == _|_ {
+				message: ""
+			}
+			if Y.message != _|_ {
+				message: "message: " + Y.message
+			}
+		}
 
-    p6: {
-        #aux: {
-            if Y.message == _|_ {
-                message: ""
-            }
-            if Y.message != _|_ {
-                message: "message: " + Y.message
-            }
-        }
-
-        Y: regexp.FindNamedSubmatch(#message, X)
-        X: #aux.message
-        X: "message: hello"
-    }
+		Y: regexp.FindNamedSubmatch(#message, X)
+		X: #aux.message
+		X: "message: hello"
+	}
 }
 
 medium: {
-    #userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"#
+	#userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"#
 
-    p1: {
-        Y: {
-            userinfo: "user"
-            host: "example.com"
-        }
+	p1: {
+		Y: {
+			userinfo: "user"
+			host:     "example.com"
+		}
 
-        X: #X.userinfo + #X.host
+		X: #X.userinfo + #X.host
 
-        #X: {
-            if Y.userinfo == _|_ {
-                userinfo: ""
-            }
-            if Y.userinfo != _|_ {
-                userinfo: Y.userinfo + "@"
-            }
+		#X: {
+			if Y.userinfo == _|_ {
+				userinfo: ""
+			}
+			if Y.userinfo != _|_ {
+				userinfo: Y.userinfo + "@"
+			}
 
-            host: Y.host
-        }
+			host: Y.host
+		}
 
-        Y: {
-            if #Y.userinfo != _|_ {
-                userinfo: #Y.userinfo
-            }
+		Y: {
+			if #Y.userinfo != _|_ {
+				userinfo: #Y.userinfo
+			}
 
-            host: #Y.host
-        }
+			host: #Y.host
+		}
 
-        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
-    }
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
+	}
 
-    p2: {
-        X: #X.userinfo + #X.host
+	p2: {
+		X: #X.userinfo + #X.host
 
-        Y: {
-            userinfo: "user"
-            host: "example.com"
-        }
+		Y: {
+			userinfo: "user"
+			host:     "example.com"
+		}
 
-        #X: {
-            if Y.userinfo == _|_ {
-                userinfo: ""
-            }
-            if Y.userinfo != _|_ {
-                userinfo: Y.userinfo + "@"
-            }
+		#X: {
+			if Y.userinfo == _|_ {
+				userinfo: ""
+			}
+			if Y.userinfo != _|_ {
+				userinfo: Y.userinfo + "@"
+			}
 
-            host: Y.host
-        }
+			host: Y.host
+		}
 
-        Y: {
-            if #Y.userinfo != _|_ {
-                userinfo: #Y.userinfo
-            }
+		Y: {
+			if #Y.userinfo != _|_ {
+				userinfo: #Y.userinfo
+			}
 
-            host: #Y.host
-        }
+			host: #Y.host
+		}
 
-        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
-    }
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
+	}
 
-    p3: {
-        X: #X.userinfo + #X.host
+	p3: {
+		X: #X.userinfo + #X.host
 
-        #X: {
-            if Y.userinfo == _|_ {
-                userinfo: ""
-            }
-            if Y.userinfo != _|_ {
-                userinfo: Y.userinfo + "@"
-            }
+		#X: {
+			if Y.userinfo == _|_ {
+				userinfo: ""
+			}
+			if Y.userinfo != _|_ {
+				userinfo: Y.userinfo + "@"
+			}
 
-            host: Y.host
-        }
+			host: Y.host
+		}
 
-        Y: {
-            userinfo: "user"
-            host: "example.com"
-        }
+		Y: {
+			userinfo: "user"
+			host:     "example.com"
+		}
 
-        Y: {
-            if #Y.userinfo != _|_ {
-                userinfo: #Y.userinfo
-            }
+		Y: {
+			if #Y.userinfo != _|_ {
+				userinfo: #Y.userinfo
+			}
 
-            host: #Y.host
-        }
+			host: #Y.host
+		}
 
-        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
-    }
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
+	}
 
-    p4: {
-        X: #X.userinfo + #X.host
+	p4: {
+		X: #X.userinfo + #X.host
 
-        #X: {
-            if Y.userinfo == _|_ {
-                userinfo: ""
-            }
-            if Y.userinfo != _|_ {
-                userinfo: Y.userinfo + "@"
-            }
+		#X: {
+			if Y.userinfo == _|_ {
+				userinfo: ""
+			}
+			if Y.userinfo != _|_ {
+				userinfo: Y.userinfo + "@"
+			}
 
-            host: Y.host
-        }
+			host: Y.host
+		}
 
-        Y: {
-            if #Y.userinfo != _|_ {
-                userinfo: #Y.userinfo
-            }
+		Y: {
+			if #Y.userinfo != _|_ {
+				userinfo: #Y.userinfo
+			}
 
-            host: #Y.host
-        }
+			host: #Y.host
+		}
 
-        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+		#Y: regexp.FindNamedSubmatch(#userHostPort, X)
 
-        Y: {
-            userinfo: "user"
-            host: "example.com"
-        }
-    }
+		Y: {
+			userinfo: "user"
+			host:     "example.com"
+		}
+	}
 }
 -- out/eval --
 (struct){

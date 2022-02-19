@@ -1,137 +1,136 @@
 -- in.cue --
-a: *1 | int
+a:  *1 | int
 aa: *1 | *2 | int
 
 b: {
 	name: "int"
-	val: int
+	val:  int
 } | {
 	name: "str"
-	val: string
+	val:  string
 }
 
-d: b & { val: 3 }
-c: b & { name: "int", val: 3 }
-e: b & { val: "foo" }
-f: b & { name: "str", val: 3 }
+d: b & {val:  3}
+c: b & {name: "int", val: 3}
+e: b & {val:  "foo"}
+f: b & {name: "str", val: 3}
 
 // Disjunct elimination based on type.
 e1: {
-  a: null | {bar: 2}
-  b: (a&{}).bar
+	a: null | {bar: 2}
+	b: (a & {}).bar
 }
 
 d1: {
-  a: (null | {c: 1}) & {}
-  b: {} & (null | {c: 1})
+	a: (null | {c:      1}) & {}
+	b: {} & (null | {c: 1})
 }
 
 d2: {
-  a: ([...] | {c: 1}) & {}
-  b: {} & ([...] | {c: 1})
+	a: ([...] | {c:      1}) & {}
+	b: {} & ([...] | {c: 1})
 }
 
 d3: {
-  a: (string | {c: 1}) & {}
-  b: {} & (string | {c: 1})
+	a: (string | {c:      1}) & {}
+	b: {} & (string | {c: 1})
 }
 
 d4: {
-  a: (string | {c: 1}) & {}
-  b: {} & (string | {c: 1})
+	a: (string | {c:      1}) & {}
+	b: {} & (string | {c: 1})
 }
 
 d5: {
-  a: (number | {c: 1}) & {}
-  b: {} & (number | {c: 1})
+	a: (number | {c:      1}) & {}
+	b: {} & (number | {c: 1})
 }
 
 d6: {
-  a: (int | {c: 1}) & {}
-  b: {} & (int | {c: 1})
+	a: (int | {c:      1}) & {}
+	b: {} & (int | {c: 1})
 }
 
 t10: {
-    schema: test
-    schema: string | {name: string}
-    #A: {string | {name: string}}
+	schema: test
+	schema: string | {name: string}
+	#A: {string | {name: string}}
 
-    test: name: "Test"
-    test: #A
+	test: name: "Test"
+	test: #A
 }
 
 t10: {
-    schema: string | {name: string}
-    schema: test
-    #A: {string | {name: string}}
+	schema: string | {name: string}
+	schema: test
+	#A: {string | {name: string}}
 
-    test: name: "Test"
-    test: #A
+	test: name: "Test"
+	test: #A
 }
 
 t10: {
-    #A: {string | {name: string}}
+	#A: {string | {name: string}}
 
-    test: name: "Test"
-    test: #A
+	test: name: "Test"
+	test: #A
 
-    schema: string | {name: string}
-    schema: test
+	schema: string | {name: string}
+	schema: test
 }
 
 t11: {
-    a: #A
-    a: b
+	a: #A
+	a: b
 
-    b: #A & ["b"]
-    #A: ["a" | "b"] | {}
+	b:  #A & ["b"]
+	#A: ["a" | "b"] | {}
 }
 
 t11: {
-    b: #A & ["b"]
-    #A: ["a" | "b"] | {}
+	b:  #A & ["b"]
+	#A: ["a" | "b"] | {}
 
-    a: b
-    a: #A
+	a: b
+	a: #A
 }
 
 cross: {
-    a: *"word" | string
-    a:  string | *"word"
+	a: *"word" | string
+	a: string | *"word"
 }
 
-
 d100: {
-  // Should we allow a selector to imply a struct or list? Would be convenient.
-  // This would be a spec change. Disallow for now.
-  i: null | {bar: 2}
-  j: i.bar
+	// Should we allow a selector to imply a struct or list? Would be convenient.
+	// This would be a spec change. Disallow for now.
+	i: null | {bar: 2}
+	j: i.bar
 }
 
 issue641: {
-    #A: {
-      type: "a"
-      x:    ""
-    }
+	#A: {
+		type: "a"
+		x:    ""
+	}
 
-    #B: {
-      type: "b"
-      x:    string
-    }
+	#B: {
+		type: "b"
+		x:    string
+	}
 
-    #C: {
-      b: #A | #B
-    }
+	#C: {
+		b: #A | #B
+	}
 
-    e: [string]: #C & {
-      b: #A | #B
-    }
+	e: [string]: #C & {
+		b: #A | #B
+	}
 
-    e: foobar: #C & {
-      b: #B & {
-        x: "foobar"
-      }
-    }
+	e: foobar: #C & {
+		b: #B & {
+			x: "foobar"
+		}
+	}
 }
 -- out/eval --
 Errors:
@@ -139,11 +138,11 @@ f: 2 errors in empty disjunction:
 f.name: conflicting values "int" and "str":
     ./in.cue:5:8
     ./in.cue:15:4
-    ./in.cue:15:16
+    ./in.cue:15:15
 f.val: conflicting values 3 and string (mismatched types int and string):
-    ./in.cue:9:7
+    ./in.cue:9:8
     ./in.cue:15:4
-    ./in.cue:15:28
+    ./in.cue:15:27
 
 Result:
 (_|_){
@@ -174,17 +173,17 @@ Result:
     // f.name: conflicting values "int" and "str":
     //     ./in.cue:5:8
     //     ./in.cue:15:4
-    //     ./in.cue:15:16
+    //     ./in.cue:15:15
     // f.val: conflicting values 3 and string (mismatched types int and string):
-    //     ./in.cue:9:7
+    //     ./in.cue:9:8
     //     ./in.cue:15:4
-    //     ./in.cue:15:28
+    //     ./in.cue:15:27
     name: (string){ "str" }
     val: (_|_){
       // [eval] f.val: conflicting values 3 and string (mismatched types int and string):
-      //     ./in.cue:9:7
+      //     ./in.cue:9:8
       //     ./in.cue:15:4
-      //     ./in.cue:15:28
+      //     ./in.cue:15:27
     }
   }
   e1: (struct){
@@ -273,7 +272,7 @@ Result:
       }) }
     j: (_|_){
       // [incomplete] d100.j: unresolved disjunction null | {bar:2} (type (null|struct)):
-      //     ./in.cue:107:6
+      //     ./in.cue:106:5
     }
   }
   issue641: (struct){

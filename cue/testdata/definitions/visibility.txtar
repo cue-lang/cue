@@ -3,11 +3,11 @@
 	name: string
 }
 foo: #foo & {
-    // These should all be allowed.
-    _name: "foo"
-    _#name: "bar"
+	// These should all be allowed.
+	_name:  "foo"
+	_#name: "bar"
 
-    #name: "baz"
+	#name: "baz"
 }
 -- out/eval --
 (struct){

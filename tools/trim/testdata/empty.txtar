@@ -5,11 +5,11 @@ deployment: [ID=string]: {
 }
 
 deployment: alertmanager: {
-    empty: {}
-    volumes: [{
-        name: "alertmanager"
-        emptyDir: {}
-    }]
+	empty: {}
+	volumes: [{
+		name: "alertmanager"
+		emptyDir: {}
+	}]
 }
 -- out/trim --
 == in.cue

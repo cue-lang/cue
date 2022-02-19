@@ -3,40 +3,39 @@
 -- in.cue --
 import "encoding/yaml"
 
-t1: yaml.Validate("a: 2\n---\na: 4", {a:<3})
-t2: yaml.Validate("a: 2\n---\na: 4", {a:<5})
-t3: yaml.Validate("a: 2\n", {a:<5, b:int})
-t4: yaml.ValidatePartial("a: 2\n---\na: 4", {a:<3})
-t5: yaml.ValidatePartial("a: 2\n---\na: 4", {a:<5})
-t6: yaml.ValidatePartial("a: 2\n", {a:<5, b:int})
-t7: yaml.MarshalStream([{a: 1}, {b: 2}])
-t8: yaml.Marshal({b: int | *2})
-t9: yaml.MarshalStream([{a: 1}, {b: int | *2}])
+t1: yaml.Validate("a: 2\n---\na: 4", {a:        <3})
+t2: yaml.Validate("a: 2\n---\na: 4", {a:        <5})
+t3: yaml.Validate("a: 2\n", {a:                 <5, b: int})
+t4: yaml.ValidatePartial("a: 2\n---\na: 4", {a: <3})
+t5: yaml.ValidatePartial("a: 2\n---\na: 4", {a: <5})
+t6: yaml.ValidatePartial("a: 2\n", {a:          <5, b:  int})
+t7: yaml.MarshalStream([{a:                     1}, {b: 2}])
+t8: yaml.Marshal({b:                            int | *2})
+t9: yaml.MarshalStream([{a:                     1}, {b: int | *2}])
 
 unmarshalStream: {
-	t1: yaml.UnmarshalStream("a: 1\n---\nb: 2")
-	t1: yaml.UnmarshalStream('a: 1\n---\nb: 2')
+	t1:    yaml.UnmarshalStream("a: 1\n---\nb: 2")
+	t1:    yaml.UnmarshalStream('a: 1\n---\nb: 2')
 	empty: yaml.UnmarshalStream('')
 	empty: yaml.UnmarshalStream("")
-	nums: yaml.UnmarshalStream('1\n---\n2')
-	nums: yaml.UnmarshalStream("1\n---\n2")
+	nums:  yaml.UnmarshalStream('1\n---\n2')
+	nums:  yaml.UnmarshalStream("1\n---\n2")
 	null1: yaml.UnmarshalStream('1\n---\n---\n2')
 	null1: yaml.UnmarshalStream("1\n---\n---\n2")
 	null2: yaml.UnmarshalStream('1\n---\n---\n2')
 	null2: yaml.UnmarshalStream("1\n---\n---\n2")
 }
-
 -- out/yaml --
 Errors:
 a: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
     ./in.cue:3:5
-    ./in.cue:3:41
+    ./in.cue:3:49
     yaml.Validate:3:5
 b: error in call to encoding/yaml.Validate: incomplete value int:
     ./in.cue:5:5
 a: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3):
     ./in.cue:6:5
-    ./in.cue:6:48
+    ./in.cue:6:49
     yaml.ValidatePartial:3:5
 
 Result:

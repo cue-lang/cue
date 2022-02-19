@@ -1,7 +1,7 @@
 #Issue: 1299
 
 -- in.cue --
-if true {
+ if true {
 	a_map: {
 		"first": {}
 	}
@@ -9,8 +9,8 @@ if true {
 
 a_map: {
 	if true {
-        // keep. TODO: allow this to be removed if the dominator includes all
-        // fields unconditionally.
+		// keep. TODO: allow this to be removed if the dominator includes all
+		// fields unconditionally.
 		"second": true
 	}
 }

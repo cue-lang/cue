@@ -1,18 +1,18 @@
 -- in.cue --
 root: {
-    a: {
-        $id: "valToOut"
-        $after: c.$id
-    }
-    b: {
-        $id: "valToOut"
-        $after: a.$id
-        out: "foo"
-    }
-    c: {
-        $id: "valToOut"
-        in: b.out
-    }
+	a: {
+		$id:    "valToOut"
+		$after: c.$id
+	}
+	b: {
+		$id:    "valToOut"
+		$after: a.$id
+		out:    "foo"
+	}
+	c: {
+		$id: "valToOut"
+		in:  b.out
+	}
 }
 -- out/run/errors --
 error: cyclic task dependency:
@@ -20,9 +20,9 @@ error: cyclic task dependency:
 	task root.c refers to
 	task root.b refers to
 	task root.a:
-    ./testdata/in.cue:2:5
-    ./testdata/in.cue:6:5
-    ./testdata/in.cue:11:5
+    ./testdata/in.cue:2:2
+    ./testdata/in.cue:6:2
+    ./testdata/in.cue:11:2
 -- out/run/t0 --
 graph TD
   t0("root.a [Waiting]")

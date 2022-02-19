@@ -1,18 +1,18 @@
 #IgnoreConcrete: true
 -- in.cue --
 root: {
-    t1: {
-        $id:   "sequenced"
-        seq:   1
-        text:  t2.value
-        value: "v"
-    }
-    t2: {
-        $id:   "sequenced"
-        seq:   2
-        text:  t1.value
-        value: "v"
-    }
+	t1: {
+		$id:   "sequenced"
+		seq:   1
+		text:  t2.value
+		value: "v"
+	}
+	t2: {
+		$id:   "sequenced"
+		seq:   2
+		text:  t1.value
+		value: "v"
+	}
 }
 -- out/run/errors --
 -- out/run/t0 --

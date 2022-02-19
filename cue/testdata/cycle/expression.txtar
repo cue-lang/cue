@@ -1,101 +1,100 @@
 -- in.cue --
 t1: a: {
-    a1: a0 + 2
-    b1: a1 - 2
-    a0: X
-    X: b1
-    X: 5.0
+	a1: a0 + 2
+	b1: a1 - 2
+	a0: X
+	X:  b1
+	X:  5.0
 }
 
 t1: b: {
-    X: 5.0
-    a1: a0 + 2
-    b1: a1 - 2
-    a0: X
-    X: b1
+	X:  5.0
+	a1: a0 + 2
+	b1: a1 - 2
+	a0: X
+	X:  b1
 }
 
 t1: c: {
-    a1: a0 + 2
-    b1: a1 - 2
-    X: 5.0
-    a0: X
-    X: b1
+	a1: a0 + 2
+	b1: a1 - 2
+	X:  5.0
+	a0: X
+	X:  b1
 }
 
 t1: c: {
-    b1: a1 - 2
-    a1: a0 + 2
-    X: 5.0
-    a0: X
-    X: b1
+	b1: a1 - 2
+	a1: a0 + 2
+	X:  5.0
+	a0: X
+	X:  b1
 }
 
 t1: c: {
-    b1: a1 - 2
-    X: 5.0
-    a1: a0 + 2
-    a0: X
-    X: b1
+	b1: a1 - 2
+	X:  5.0
+	a1: a0 + 2
+	a0: X
+	X:  b1
 }
 
 t1total: {
-    for _, v in t1 { v }
+	for _, v in t1 {v}
 }
 
 // Issue #622
 t2: a: {
-    a0: X
-    a1: a0 * 2
-    Y: a1
+	a0: X
+	a1: a0 * 2
+	Y:  a1
 
-    b0: Y
-    b1: b0 / 2
-    X: b1
+	b0: Y
+	b1: b0 / 2
+	X:  b1
 
-    X: 5.0
+	X: 5.0
 }
 
 t2: b: {
-    b0: Y
-    b1: b0 / 2
-    X: b1
+	b0: Y
+	b1: b0 / 2
+	X:  b1
 
-    a0: X
-    a1: a0 * 2
-    Y: a1
+	a0: X
+	a1: a0 * 2
+	Y:  a1
 
-    X: 5.0
+	X: 5.0
 }
 
 t2: c: {
-    b0: Y
-    b1: b0 / 2
-    X: b1
+	b0: Y
+	b1: b0 / 2
+	X:  b1
 
-    X: 5.0
+	X: 5.0
 
-    a0: X
-    a1: a0 * 2
-    Y: a1
+	a0: X
+	a1: a0 * 2
+	Y:  a1
 }
 
 t2: d: {
-    b0: Y
-    b1: b0 / 2
-    X: b1
+	b0: Y
+	b1: b0 / 2
+	X:  b1
 
-    a0: X
-    a1: a0 * 2
-    Y: a1
+	a0: X
+	a1: a0 * 2
+	Y:  a1
 
-    X: 5.0
+	X: 5.0
 }
 
 t2total: {
-    for _, v in t2 { v }
+	for _, v in t2 {v}
 }
-
 -- out/eval --
 (struct){
   t1: (struct){

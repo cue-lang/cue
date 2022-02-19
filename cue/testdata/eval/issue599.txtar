@@ -2,62 +2,62 @@
 package deps
 
 a: {
-    #A: {
-        n: string
-        depends_on: [...#AnyA]
-    }
+	#A: {
+		n: string
+		depends_on: [...#AnyA]
+	}
 
-    #AnyA: {
-        n: string
-        depends_on: [...#AnyA]
-        ...
-    }
+	#AnyA: {
+		n: string
+		depends_on: [...#AnyA]
+		...
+	}
 
-    #A1: {
-        #A
-        x: int
-        y: z: string // Comment to avoid error
-    }
+	#A1: {
+		#A
+		x: int
+		y: z: string // Comment to avoid error
+	}
 
-    #A2: {
-        #A
-        i: string
-    }
+	#A2: {
+		#A
+		i: string
+	}
 
-    s: [Name=string]: #AnyA & { n: Name }
+	s: [Name=string]: #AnyA & {n: Name}
 
-    s: foo: #A1 & {
-        x: 10
-        y: z: "z" // Comment to avoid error
-    }
+	s: foo: #A1 & {
+		x: 10
+		y: z: "z" // Comment to avoid error
+	}
 
-    s: bar: #A2 & {
-        i: "hello bar"
-        depends_on: [s.foo]
-    }
+	s: bar: #A2 & {
+		i: "hello bar"
+		depends_on: [s.foo]
+	}
 }
 
 b: {
-    #A: {
-        f: {...}
-    }
+	#A: {
+		f: {...}
+	}
 
-    #A1: {
-        #A
-        // f: {...} // Uncomment to fix
-    }
+	#A1: {
+		#A
+		// f: {...} // Uncomment to fix
+	}
 
-    #C: {
-        d: {...}
-    }
+	#C: {
+		d: {...}
+	}
 
-    s: [string]: #A1
+	s: [string]: #A1
 
-    s: foo: {
-        f: #C & {
-            d: foo: "bar"
-        }
-    }
+	s: foo: {
+		f: #C & {
+			d: foo: "bar"
+		}
+	}
 }
 -- out/eval --
 (struct){

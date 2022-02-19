@@ -1,5 +1,5 @@
 -- in.cue --
-let X = Y
+ let X = Y
 let Y = c + d
 
 a: b: X

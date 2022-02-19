@@ -17,16 +17,15 @@
 import "time"
 
 FormatDuration: [...{
-    arg: int
-    out: time.FormatDuration(arg)
+	arg: int
+	out: time.FormatDuration(arg)
 }]
 
 FormatDuration: [
-    {arg: 10920000000000},
-    {arg: 5000000000},
-    {arg: 600000000},
+	{arg: 10920000000000},
+	{arg: 5000000000},
+	{arg: 600000000},
 ]
-
 -- out/time --
 FormatDuration: [{
 	arg: 10920000000000

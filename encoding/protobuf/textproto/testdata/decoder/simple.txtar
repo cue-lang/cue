@@ -2,21 +2,20 @@
 -- foo.cue --
 #MyEnum: "Default" | "Variant1" | "Variant100"
 
-f1:       string
-f2:       int64
-fa:       [...uint64]
-fb:       [...int32]
-fc:       [...number]
-pairs:    [...#Pair]
-bbbb:     bytes // optional
+f1: string
+f2: int64
+fa: [...uint64]
+fb: [...int32]
+fc: [...number]
+pairs: [...#Pair]
+bbbb: bytes // optional
 
 //    extensions 100 to max;
 
 #Pair: {
-    key:   string
-    value: string
+	key:   string
+	value: string
 }
-
 -- input.textproto --
 f1: "dsfadsafsaf"
 f2: 234 # value comment

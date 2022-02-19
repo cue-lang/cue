@@ -1,12 +1,13 @@
 -- in.cue --
 import "list"
+
 #d: {
 	#x: string
 	result: [#x]
 }
 #foo: {
 	X=#x: _
-	y: list.FlattenN((#d & {#x: X}).result, 1)
+	y:    list.FlattenN((#d & {#x: X}).result, 1)
 }
 r: #foo & {
 	#x: "hello"

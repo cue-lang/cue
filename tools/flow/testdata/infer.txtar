@@ -1,22 +1,22 @@
 #InferTasks: true
 -- in.cue --
 top0: {
-    $id: "valToOut"
+	$id: "valToOut"
 }
 top1: {
-    $id: "valToOut"
-    $after: top0
+	$id:    "valToOut"
+	$after: top0
 }
 
 top3: {
-    $id: string // not a task
+	$id: string // not a task
 }
 
 root: {
-    t1: {
-        $id: "valToOut"
-        $after: [top1, top3]
-    }
+	t1: {
+		$id: "valToOut"
+		$after: [top1, top3]
+	}
 }
 -- out/run/errors --
 -- out/run/t0 --

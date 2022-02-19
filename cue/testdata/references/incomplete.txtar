@@ -1,40 +1,39 @@
 -- in.cue --
 comprehensions: {
-    a: {}
-    b: {
-        if a.b {
-        }
-    }
-    c: {
-        for x in a.b { x }
-    }
+	a: {}
+	b: {
+		if a.b {
+		}
+	}
+	c: {
+		for x in a.b {x}
+	}
 }
 
 openStruct: {
-    a: {}
-    b: a.c
+	a: {}
+	b: a.c
 }
 
 selectFromTop: {
-    top: _
-    a: top.foo
+	top: _
+	a:   top.foo
 }
 
 indexOnTop: {
-    top: _
-    a: top[2]
+	top: _
+	a:   top[2]
 }
 
 incompleteIndex: {
-    top: _
-    a: [1][top]
+	top: _
+	a:   [1][top]
 }
-
 -- out/eval --
 Errors:
 incompleteIndex.a: invalid index top (invalid type _):
-    ./in.cue:29:8
-    ./in.cue:29:12
+    ./in.cue:29:7
+    ./in.cue:29:11
 
 Result:
 (_|_){
@@ -44,11 +43,11 @@ Result:
     }
     b: (_|_){
       // [incomplete] comprehensions.b: undefined field: b:
-      //     ./in.cue:4:14
+      //     ./in.cue:4:8
     }
     c: (_|_){
       // [incomplete] comprehensions.c: undefined field: b:
-      //     ./in.cue:8:20
+      //     ./in.cue:8:14
     }
   }
   openStruct: (struct){
@@ -56,21 +55,21 @@ Result:
     }
     b: (_|_){
       // [incomplete] openStruct.b: undefined field: c:
-      //     ./in.cue:14:10
+      //     ./in.cue:14:7
     }
   }
   selectFromTop: (struct){
     top: (_){ _ }
     a: (_|_){
       // [incomplete] selectFromTop.a: top.foo undefined as top is incomplete (type _):
-      //     ./in.cue:19:8
+      //     ./in.cue:19:7
     }
   }
   indexOnTop: (struct){
     top: (_){ _ }
     a: (_|_){
       // [incomplete] indexOnTop.a: top[2] undefined as top is incomplete (type _):
-      //     ./in.cue:24:8
+      //     ./in.cue:24:7
     }
   }
   incompleteIndex: (_|_){
@@ -78,8 +77,8 @@ Result:
     top: (_){ _ }
     a: (_|_){
       // [eval] incompleteIndex.a: invalid index top (invalid type _):
-      //     ./in.cue:29:8
-      //     ./in.cue:29:12
+      //     ./in.cue:29:7
+      //     ./in.cue:29:11
     }
   }
 }

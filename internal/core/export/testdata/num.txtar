@@ -2,14 +2,14 @@
 import "strings"
 
 floats: {
-    a: 3.
-    b: float & 3.
+	a: 3.0
+	b: float & 3.0
 }
 numbers: {
-    a: number
-    a: 3
-    b: number
-    b: 3.
+	a: number
+	a: 3
+	b: number
+	b: 3.0
 }
 -- out/definition --
 floats: {

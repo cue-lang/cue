@@ -1,9 +1,9 @@
 -- in.cue --
 c: #R & {
-    w: [{}, {b: int}]
+	w: [{}, {b: int}]
 }
 #R: {
-    w: [{}, ...]
+	w: [{}, ...]
 }
 -- out/eval --
 (struct){

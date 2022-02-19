@@ -1,38 +1,38 @@
 -- in.cue --
 circularIf: {
-    #list: {
-        tail: #list | *null
-        if tail != null {
-        }
-    }
+	#list: {
+		tail: #list | *null
+		if tail != null {
+		}
+	}
 }
 
 circularFor: {
-    #list: {
-        tail: #list | *null
-        for x in tail != null {
-        }
-    }
+	#list: {
+		tail: #list | *null
+		for x in tail != null {
+		}
+	}
 }
 
 // Print a bit more sensible error message than "empty disjunction" here.
 // Issue #465
 userError: {
-    a: string | *_|_
-    if a != "" {
-    }
+	a: string | *_|_
+	if a != "" {
+	}
 }
 
 intField: {
 	for i, _ in [1, 2] {
 		(i): {
 		}
-	  }
+	}
 }
 -- out/eval --
 Errors:
 circularFor.#list: invalid operand tail != null (found bool, want list or struct):
-    ./in.cue:12:18
+    ./in.cue:12:12
 intField: integer fields not supported:
     ./in.cue:27:4
 
@@ -50,14 +50,14 @@ Result:
     // [eval]
     #list: (_|_){
       // [eval] circularFor.#list: invalid operand tail != null (found bool, want list or struct):
-      //     ./in.cue:12:18
+      //     ./in.cue:12:12
       tail: (null){ null }
     }
   }
   userError: (_|_){
     // [incomplete] userError: non-concrete value string in operand to !=:
-    //     ./in.cue:21:8
-    //     ./in.cue:20:8
+    //     ./in.cue:21:5
+    //     ./in.cue:20:5
     a: (string){ string }
   }
   intField: (_|_){

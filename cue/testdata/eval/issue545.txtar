@@ -4,39 +4,37 @@ title: Simplification of validators.
 package main
 
 import (
-    "strings"
-    "time"
+	"strings"
+	"time"
 )
 
 t1: {
-    #Test: {
-        #HTTP:  =~"^http://"
-        #SSH:   !~"^ssh://"
-        #USER:  strings.MinRunes(3)
-        source: #HTTP | #SSH | #USER | #Test
-    }
+	#Test: {
+		#HTTP:  =~"^http://"
+		#SSH:   !~"^ssh://"
+		#USER:  strings.MinRunes(3)
+		source: #HTTP | #SSH | #USER | #Test
+	}
 
-    foo: #Test & {
-        source: "http://blablabla"
-    }
+	foo: #Test & {
+		source: "http://blablabla"
+	}
 
-    bar: #Test & {
-        source: foo
-    }
+	bar: #Test & {
+		source: foo
+	}
 }
 
 t2: {
-    str: "foo"
-    a: =~str
-    b: =~"foo"
-    c: a & b & a & b
+	str: "foo"
+	a:   =~str
+	b:   =~"foo"
+	c:   a & b & a & b
 
-    d: time.Time
-    e: time.Time()
-    f: d & e & d & e
+	d: time.Time
+	e: time.Time()
+	f: d & e & d & e
 }
-
-
 -- out/eval --
 (struct){
   t1: (struct){

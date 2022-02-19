@@ -1,25 +1,25 @@
 -- in.cue --
 list: [2, 3]
-a: [ 3, for x in list { x }, for x in list { x } ]
-b: [ 3, if true { 3 }, for x in list if x > 2 { x } ]
+a: [ 3, for x in list {x}, for x in list {x}]
+b: [ 3, if true {3}, for x in list if x > 2 {x}]
 
 issue574: {
-    greet: true
-    bye:   true
+	greet: true
+	bye:   true
 
-    message1: [
-     if greet { "hello" },
-     "how are you doing?",
-     "bye",
-    ]
+	message1: [
+		if greet {"hello"},
+		"how are you doing?",
+		"bye",
+	]
 
-    message2: [
-        if !greet { "hello" },
-        "how are you doing?",
-        if bye {
-            "bye"
-        },
-    ]
+	message2: [
+		if !greet {"hello"},
+		"how are you doing?",
+		if bye {
+			"bye"
+		},
+	]
 }
 -- out/eval --
 (struct){

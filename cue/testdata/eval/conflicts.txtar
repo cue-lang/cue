@@ -3,32 +3,31 @@ i: int
 s: string
 
 t0: {
-    v: i & s
+	v: i & s
 }
 
 t1: {
-    #d1: {
-        a: b: 3
-    }
+	#d1: {
+		a: b: 3
+	}
 
-    #d2: {
-        a: b: 4
-    }
+	#d2: {
+		a: b: 4
+	}
 
-    x: #d1 & #d2
+	x: #d1 & #d2
 }
-
 -- out/eval --
 Errors:
 t0.v: conflicting values int and string (mismatched types int and string):
     ./in.cue:1:4
     ./in.cue:2:4
-    ./in.cue:5:12
+    ./in.cue:5:9
 t1.x.a.b: conflicting values 4 and 3:
-    ./in.cue:10:15
-    ./in.cue:14:15
-    ./in.cue:17:8
-    ./in.cue:17:14
+    ./in.cue:10:9
+    ./in.cue:14:9
+    ./in.cue:17:5
+    ./in.cue:17:11
 
 Result:
 (_|_){
@@ -41,7 +40,7 @@ Result:
       // [eval] t0.v: conflicting values int and string (mismatched types int and string):
       //     ./in.cue:1:4
       //     ./in.cue:2:4
-      //     ./in.cue:5:12
+      //     ./in.cue:5:9
     }
   }
   t1: (_|_){
@@ -62,10 +61,10 @@ Result:
         // [eval]
         b: (_|_){
           // [eval] t1.x.a.b: conflicting values 4 and 3:
-          //     ./in.cue:10:15
-          //     ./in.cue:14:15
-          //     ./in.cue:17:8
-          //     ./in.cue:17:14
+          //     ./in.cue:10:9
+          //     ./in.cue:14:9
+          //     ./in.cue:17:5
+          //     ./in.cue:17:11
         }
       }
     }

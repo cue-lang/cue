@@ -1,53 +1,52 @@
 -- in.cue --
 a: close({
-    a: b: int
+	a: b: int
 })
 
-b: a & { x: int } // err
-c: a & { a: c: int } // okay (non-recursive close)
+b: a & {x:    int} // err
+c: a & {a: c: int} // okay (non-recursive close)
 
 inDisjunctions: {
-    x: [string]: #Def
-    #Def: [string]: {
-        a: b: true
-        let X = a
-        close({uint: a: b: X.b}) | close({string: a: b: true})
-    }
-    x: socket: string: {}
-    x: syslog: x.socket
-    x: syslog: xxx: {}
+	x: [string]: #Def
+	#Def: [string]: {
+		a: b: true
+		let X = a
+		close({uint: a: b: X.b}) | close({string: a: b: true})
+	}
+	x: socket: string: {}
+	x: syslog: x.socket
+	x: syslog: xxx: {}
 }
 
 issue642: {
-    test: close({
-        a: _
-        b: x: _
-    } & {
-        [string]: y: _
-    })
+	test: close({
+		a: _
+		b: x: _
+	} & {
+		[string]: y: _
+	})
 
-    test: a: x: _
-    test: b: x: _
+	test: a: x: _
+	test: b: x: _
 }
 
 // Issue 642
 withSubfields: {
-    test: close({
-        a: _
-        b: x: _
-        [string]: y: _
-    })
+	test: close({
+		a: _
+		b: x:        _
+		[string]: y: _
+	})
 
-    test: a: x: _
-    test: b: x: _
+	test: a: x: _
+	test: b: x: _
 }
-
 -- out/eval --
 Errors:
 b: field not allowed: x:
     ./in.cue:1:10
     ./in.cue:5:4
-    ./in.cue:5:10
+    ./in.cue:5:9
 
 Result:
 (_|_){
@@ -66,7 +65,7 @@ Result:
       // [eval] b: field not allowed: x:
       //     ./in.cue:1:10
       //     ./in.cue:5:4
-      //     ./in.cue:5:10
+      //     ./in.cue:5:9
     }
   }
   c: (#struct){

@@ -6,7 +6,6 @@ a: 1
 c: 2
 e: 3
 g: 4
-
 -- b.cue --
 b: 1 // unanchored
 c: 2

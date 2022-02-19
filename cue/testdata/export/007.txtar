@@ -1,10 +1,10 @@
 -- in.cue --
 {
-  #a: {b: 2.0, s: "abc"}
-  b: #a.b
-  c: #a.c
-  d: #a["d"]
-  e: #a.t[2:3]
+	#a: {b: 2.0, s: "abc"}
+	b: #a.b
+	c: #a.c
+	d: #a["d"]
+	e: #a.t[2:3]
 }
 -- out/def --
 #a: {
@@ -32,11 +32,11 @@ e: _|_ // undefined field "t"
 -- out/eval --
 Errors:
 c: undefined field: c:
-    ./in.cue:4:9
+    ./in.cue:4:8
 d: undefined field: d:
-    ./in.cue:5:9
+    ./in.cue:5:8
 e: undefined field: t:
-    ./in.cue:6:9
+    ./in.cue:6:8
 
 Result:
 (_|_){
@@ -48,14 +48,14 @@ Result:
   b: (float){ 2.0 }
   c: (_|_){
     // [eval] c: undefined field: c:
-    //     ./in.cue:4:9
+    //     ./in.cue:4:8
   }
   d: (_|_){
     // [eval] d: undefined field: d:
-    //     ./in.cue:5:9
+    //     ./in.cue:5:8
   }
   e: (_|_){
     // [eval] e: undefined field: t:
-    //     ./in.cue:6:9
+    //     ./in.cue:6:8
   }
 }

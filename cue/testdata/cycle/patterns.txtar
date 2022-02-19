@@ -2,14 +2,13 @@ Lots of cycle-reference goodness.
 
 -- in.cue --
 [!~"^[.]"]: c
-a: b
+a:          b
 b: [string]: int
-c: a: int
+c: a:        int
 [string]: c
-a: b
+a:        b
 b: [string]: int
-c: a: int
-
+c: a:        int
 -- out/eval --
 (struct){
   a: (struct){

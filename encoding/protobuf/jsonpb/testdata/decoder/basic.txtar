@@ -2,21 +2,20 @@
 a: int
 
 strings: {
-    c: string
-    d: "foo" | "bar"
+	c: string
+	d: "foo" | "bar"
 }
 
 lists: {
-    e: [...int]
-    f: [int, int]
-    g: [int, int, ...int]
-    h: [int, int]
+	e: [...int]
+	f: [int, int]
+	g: [int, int, ...int]
+	h: [int, int]
 }
 
 structs: [string]: {
-    a: int
+	a: int
 }
-
 -- data.json --
 {
     "a": "44",
@@ -49,7 +48,7 @@ lists: {
 	f: ["2"]
 	g: ["3", "4", "5"]
 	h: ["3", "4", "5"] // Last element should not be rewritten!
-},
+}
 structs: {
 	field: {
 		a: "1"

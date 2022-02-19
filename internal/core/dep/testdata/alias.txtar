@@ -1,5 +1,7 @@
+# TODO(fmt): line 1 let incorrectly indented: cuelang.org/issue/1544
+
 -- in.cue --
-let X = Y
+ let X = Y
 let Y = c + d
 
 a: b: X

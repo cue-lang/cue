@@ -1,16 +1,16 @@
 -- in.cue --
 #top: 4
 sub: {
-    #sub: 5
-    a: {
-        3
-        #foo: 4
-    }
-    b: {
-        [1, 2]
-        #bar: 5
-        #baz: "foo"
-    }
+	#sub: 5
+	a: {
+		3
+		#foo: 4
+	}
+	b: {
+		[1, 2]
+		#bar: 5
+		#baz: "foo"
+	}
 }
 
 issue718: {

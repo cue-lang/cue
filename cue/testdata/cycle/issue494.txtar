@@ -1,7 +1,7 @@
 -- in.cue --
-_Q : [{pos: 0},{pos: 1}]
+_Q: [{pos: 0}, {pos: 1}]
 
-a: [rn=string]:  _Q[0:len(a[rn])]
+a: [rn=string]: _Q[0:len(a[rn])]
 a: ben: [{}]
 
 b: [rn=string]: _Q[0:1]
@@ -10,20 +10,19 @@ b: ben: [{}]
 c: [rn=string]: [...{l: len(a[rn])}]
 c: ben: [{}]
 
-#d: [rn=string]:  [...{pos:uint}] & _Q[0:len(#d[rn])]
+#d: [rn=string]: [...{pos: uint}] & _Q[0:len(#d[rn])]
 #d: ben: [{}]
 
 d: #d
 
-e: [rn=string]:  _Q[0:len(a[rn])+1]
+e: [rn=string]: _Q[0 : len(a[rn])+1]
 e: ben: [{}, ...]
 
-f: [rn=string]:  _Q[0:len(a[rn])+1]
+f: [rn=string]: _Q[0 : len(a[rn])+1]
 f: ben: [{}]
 
-g: [rn=string]:  _Q[0:len(a[rn])]
+g: [rn=string]: _Q[0:len(a[rn])]
 g: ben: [{}, {}]
-
 -- out/eval --
 Errors:
 f.ben: incompatible list lengths (1 and 2)

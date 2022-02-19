@@ -1,7 +1,7 @@
 -- in.cue --
 #Artifact: {
-  body: _
-  other: [string]: int
+	body: _
+	other: [string]: int
 }
 
 #App:  #Artifact
@@ -9,7 +9,7 @@
 
 #Both: #App | #Atom
 
-t1: #Both  & {body: 3}
+t1: #Both & {body: 3}
 -- out/eval --
 (struct){
   #Artifact: (#struct){

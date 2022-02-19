@@ -1,26 +1,26 @@
 -- in.cue --
-a: { b: 2, c: int }
+a: {b: 2, c: int}
 
-wrongConcreteType:  {
+wrongConcreteType: {
 	if a.b {
 		2
 	}
 }
 
-wrongType:  {
+wrongType: {
 	if a.c {
 		2
 	}
 }
 
-incomplete:  {
+incomplete: {
 	if a.d {
 		2
 	}
 }
 
-incomplete:  {
-    list: [1, 2, 3]
+incomplete: {
+	list: [1, 2, 3]
 	for x in list if a.d {
 		x
 	}
@@ -28,28 +28,27 @@ incomplete:  {
 
 // Issue #809
 useDefault: {
-    a: {
-        x: *"foo" | string
-        if x != _|_ {
-             y: x
-        }
-    }
+	a: {
+		x: *"foo" | string
+		if x != _|_ {
+			y: x
+		}
+	}
 
-    issue809: {
-        #A: {
-                a: string
-                b: *a | string
-        }
+	issue809: {
+		#A: {
+			a: string
+			b: *a | string
+		}
 
-        s: [Name=string]: #A & { a: Name }
-        s: bar: _
+		s: [Name=string]: #A & {a: Name}
+		s: bar:           _
 
-        foo: [
-                for _, a in s if a.b != _|_ {a},
-        ]
-    }
+		foo: [
+			for _, a in s if a.b != _|_ {a},
+		]
+	}
 }
-
 -- out/compile --
 --- in.cue
 {
@@ -114,10 +113,10 @@ useDefault: {
 Errors:
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
-    ./in.cue:1:9
+    ./in.cue:1:8
 wrongType: cannot use int (type int) as type bool:
     ./in.cue:10:2
-    ./in.cue:1:15
+    ./in.cue:1:14
 
 Result:
 (_|_){
@@ -129,12 +128,12 @@ Result:
   wrongConcreteType: (_|_){
     // [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
     //     ./in.cue:4:2
-    //     ./in.cue:1:9
+    //     ./in.cue:1:8
   }
   wrongType: (_|_){
     // [eval] wrongType: cannot use int (type int) as type bool:
     //     ./in.cue:10:2
-    //     ./in.cue:1:15
+    //     ./in.cue:1:14
   }
   incomplete: (_|_){
     // [incomplete] incomplete: undefined field: d:

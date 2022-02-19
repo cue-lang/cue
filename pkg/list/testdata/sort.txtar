@@ -3,32 +3,31 @@
 import "list"
 
 t1: {
-    l: ["c","b","a"]
-    ls: list.Sort(l, list.Ascending)
-    il: list.IsSorted(l, list.Ascending)
-    ils: list.IsSorted(ls, list.Ascending)
+	l: ["c", "b", "a"]
+	ls:  list.Sort(l, list.Ascending)
+	il:  list.IsSorted(l, list.Ascending)
+	ils: list.IsSorted(ls, list.Ascending)
 }
 
 t2: {
-    l: ["c","b","a"]
-    il: list.IsSorted(l, list.Ascending)
+	l: ["c", "b", "a"]
+	il: list.IsSorted(l, list.Ascending)
 
-    ls: list.Sort(l, list.Ascending)
-    ils: list.IsSorted(ls, list.Ascending)
+	ls:  list.Sort(l, list.Ascending)
+	ils: list.IsSorted(ls, list.Ascending)
 }
 
 t3: {
-    L: ["c","b","a", "e", "d"]
-    l: list.Take(L, 4)
-    il: list.IsSorted(l, list.Ascending)
+	L: ["c", "b", "a", "e", "d"]
+	l:  list.Take(L, 4)
+	il: list.IsSorted(l, list.Ascending)
 
-    ls: list.Sort(l, list.Ascending)
-    ils: list.IsSorted(ls, list.Ascending)
+	ls:  list.Sort(l, list.Ascending)
+	ils: list.IsSorted(ls, list.Ascending)
 
-    l2: l
-    l3: ls
+	l2: l
+	l3: ls
 }
-
 -- out/list --
 t1: {
 	l: ["c", "b", "a"]

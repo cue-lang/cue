@@ -15,7 +15,7 @@
 -- in.cue --
 import "path"
 
-joinOK: path.Join(["a", "b"], "aix")
+joinOK:  path.Join(["a", "b"], "aix")
 joinErr: path.Join(["a", "b"], "foo")
 -- out/path --
 Errors:

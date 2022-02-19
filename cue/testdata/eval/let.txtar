@@ -1,28 +1,28 @@
 -- in.cue --
-let A = 3 * 3
+ let A = 3 * 3
 let B = A + A
 let C = B + B
 let D = C + C
 let E = D + D
 let F = E + E
 b: {
-    let G = F + F
-    let H = G + G
-    let I = H + H
-    let J = I + I
-    let K = J + J
-    let L = K + K
-    let M = L + L
-    let N = M + M
-    let O = N + N
-    let P = O + O
-    let Q = P + P
-    let R = Q + Q
-    let S = R + R
-    let T = S + S
+	let G = F + F
+	let H = G + G
+	let I = H + H
+	let J = I + I
+	let K = J + J
+	let L = K + K
+	let M = L + L
+	let N = M + M
+	let O = N + N
+	let P = O + O
+	let Q = P + P
+	let R = Q + Q
+	let S = R + R
+	let T = S + S
 
-    a: T
-    b: F
+	a: T
+	b: F
 }
 -- out/eval --
 (struct){

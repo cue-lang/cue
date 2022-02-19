@@ -1,8 +1,7 @@
 -- in.cue --
 b: X={
-    c: X.a
+	c: X.a
 }
-
 -- out/resolve/in --
 3[b]:  Scope: 0[<nil>]      Node: 0[]
 5[X]:  Scope: 0[<nil>]      Node: 0[]

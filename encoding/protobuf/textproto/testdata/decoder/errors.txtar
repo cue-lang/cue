@@ -2,7 +2,6 @@
 # This is a protobuf bug. Can't do much about it.
 -- errors.cue --
 a: int
-
 -- input.textproto --
 
 // Silent nights

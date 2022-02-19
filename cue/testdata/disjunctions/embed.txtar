@@ -4,63 +4,62 @@
 // make it resolve to `{a: 2}`.
 
 default: {
-    y: *1 | {a: 2}
-    y
+	y: *1 | {a: 2}
+	y
 }
 
 unambiguous: {
-    y: 1 | {a: 2}
-    y
+	y: 1 | {a: 2}
+	y
 }
 
 forDefault: {
-    y: *1 | {a: 2}
-    for x in [1] {y}
+	y: *1 | {a: 2}
+	for x in [1] {y}
 }
 
 // Carry over default to first disjunct.
 openDefault: {
-    #y: *1 | {a: 2}
-    #y
+	#y: *1 | {a: 2}
+	#y
 }
 
 openAmbiguous: {
-    #y: 1 | {a: 2}
-    #y
+	#y: 1 | {a: 2}
+	#y
 }
 
 forceStruct: {
-    #y: 1 | {a: 2}
-    #y
-    {}
+	#y: 1 | {a: 2}
+	#y
+	{}
 }
 
 defaultsMulti: {
-    a: {
-        #def: {
-            *{} | {a: string} | {b: string}
-            *{} | {c: string} | {d: string}
-        }
+	a: {
+		#def: {
+			*{} | {a: string} | {b: string}
+			*{} | {c: string} | {d: string}
+		}
 
-        a: #def & {a: "foo"}
-    }
+		a: #def & {a: "foo"}
+	}
 
-    b: {
-        #def: {
-            *{} | {a: string} | {b: string}
-            *{} | {c: string} | {d: string}
-            *{} | {d: string} | {e: string}
-        }
+	b: {
+		#def: {
+			*{} | {a: string} | {b: string}
+			*{} | {c: string} | {d: string}
+			*{} | {d: string} | {e: string}
+		}
 
-        a: #def & {a: "foo", e: "bar"}
-    }
+		a: #def & {a: "foo", e: "bar"}
+	}
 }
 
 nested: {
 	a: 1 | 2 | *(
 		(3 | 4 | *( 5 | 6 | *7)) & ( 3 | 4 | ( *7 | 8 )))
 }
-
 -- out/eval --
 (struct){
   default: (struct){

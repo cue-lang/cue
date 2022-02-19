@@ -1,7 +1,7 @@
 -- in.cue --
 // Note: in dynamic mode, [d] does not get picked up
 // because the disjunction is not resolved.
-a: b: [ d, ...e ] & [ 1, 2, ... ]
+a: b: [ d, ...e] & [ 1, 2, ...]
 
 d: int
 e: int

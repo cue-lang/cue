@@ -2,54 +2,53 @@
 import "encoding/yaml"
 
 issue700: {
-    a:y: "y"
-    test1: *a.x | 1
-    test2: *a.y | 1
+	a: y: "y"
+	test1: *a.x | 1
+	test2: *a.y | 1
 }
 
 lookup: {
-    x: {
-        name: "Hello"
-    }
-    y: x.a
-    ok1:      *x.a  |  x
-    ok2:       x    | *x.a
-    ok3:       x.a  | *x
-    ok4:      *x    |  x.a
-    ok5:       x    |  x.a
-    ok5:       x.a  |  x
-    allFail1:  x.a  |  x.b
-    allFail2:  x.a  |  x.b
+	x: {
+		name: "Hello"
+	}
+	y:        x.a
+	ok1:      *x.a | x
+	ok2:      x | *x.a
+	ok3:      x.a | *x
+	ok4:      *x | x.a
+	ok5:      x | x.a
+	ok5:      x.a | x
+	allFail1: x.a | x.b
+	allFail2: x.a | x.b
 }
 
 func: {
-    s: string
-    ok1: yaml.MarshalStream(s) | yaml.Marshal(s)
+	s:   string
+	ok1: yaml.MarshalStream(s) | yaml.Marshal(s)
 }
 
 issue782: {
-    a: {
-        inner:         string
-        interpolation: *"\(inner)" | string
-        interpolation: "override"
-    }
-    b: {
-        inner:         string
-        interpolation: string | *"\(inner)"
-        interpolation: "override"
-    }
-    c: {
-        inner:         string
-        interpolation: "\(inner)" | string
-        interpolation: "override"
-    }
-    d: {
-        inner:         string
-        interpolation: string | "\(inner)"
-        interpolation: "override"
-    }
+	a: {
+		inner:         string
+		interpolation: *"\(inner)" | string
+		interpolation: "override"
+	}
+	b: {
+		inner:         string
+		interpolation: string | *"\(inner)"
+		interpolation: "override"
+	}
+	c: {
+		inner:         string
+		interpolation: "\(inner)" | string
+		interpolation: "override"
+	}
+	d: {
+		inner:         string
+		interpolation: string | "\(inner)"
+		interpolation: "override"
+	}
 }
-
 -- out/eval --
 (struct){
   issue700: (struct){
@@ -65,7 +64,7 @@ issue782: {
     }
     y: (_|_){
       // [incomplete] lookup.y: undefined field: a:
-      //     ./in.cue:13:10
+      //     ./in.cue:13:14
     }
     ok1: (struct){
       name: (string){ "Hello" }
@@ -85,12 +84,12 @@ issue782: {
     allFail1: (_|_){
       // [incomplete] lookup.allFail1: 1 errors in empty disjunction:
       // lookup.allFail1: undefined field: a:
-      //     ./in.cue:20:18
+      //     ./in.cue:20:14
     }
     allFail2: (_|_){
       // [incomplete] lookup.allFail2: 1 errors in empty disjunction:
       // lookup.allFail2: undefined field: a:
-      //     ./in.cue:21:18
+      //     ./in.cue:21:14
     }
   }
   func: (struct){
@@ -98,7 +97,7 @@ issue782: {
     ok1: (_|_){
       // [incomplete] func.ok1: 1 errors in empty disjunction:
       // func.ok1: non-concrete argument 0:
-      //     ./in.cue:26:10
+      //     ./in.cue:26:7
     }
   }
   issue782: (struct){

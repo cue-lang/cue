@@ -3,15 +3,15 @@
 -- in.cue --
 import "net"
 
-t1: net.FQDN & "foo.bar."
-t2: net.FQDN("foo.bararararararararararararararararararararararararararararararararara")
-t3: net.SplitHostPort("[::%lo0]:80")
-t4: net.JoinHostPort("example.com", "80")
-t5: net.JoinHostPort("2001:db8::1", 80)
-t6: net.JoinHostPort([192,30,4,2], 80)
-t7: net.JoinHostPort([192, 30, 4], 80)
-t8: net.IP("23.23.23.23")
-t9: net.IPv4 & "23.23.23.2333"
+t1:  net.FQDN & "foo.bar."
+t2:  net.FQDN("foo.bararararararararararararararararararararararararararararararararara")
+t3:  net.SplitHostPort("[::%lo0]:80")
+t4:  net.JoinHostPort("example.com", "80")
+t5:  net.JoinHostPort("2001:db8::1", 80)
+t6:  net.JoinHostPort([192, 30, 4, 2], 80)
+t7:  net.JoinHostPort([192, 30, 4], 80)
+t8:  net.IP("23.23.23.23")
+t9:  net.IPv4 & "23.23.23.2333"
 t10: net.IP("23.23.23.23")
 t11: net.IP("2001:db8::1")
 t12: net.IPv4("2001:db8::1")
@@ -26,9 +26,9 @@ t20: net.IPCIDR("172.16.12.3")
 -- out/net --
 Errors:
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
-    ./in.cue:11:16
+    ./in.cue:11:17
 error in call to net.JoinHostPort: invalid host [192, 30, 4]:
-    ./in.cue:9:5
+    ./in.cue:9:6
 t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
     ./in.cue:15:6
     ./in.cue:15:19

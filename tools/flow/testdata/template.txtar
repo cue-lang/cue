@@ -5,7 +5,7 @@ import "tool/exec"
 foo: {
 	$id: "tool/http.Do"
 
-    method: "GET"
+	method: "GET"
 	url:    string
 
 	request: body: *bytes | string

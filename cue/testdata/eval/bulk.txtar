@@ -2,7 +2,7 @@
 a: {
 	foo: a: 1
 	[X = =~"foo"]: {
-		b: 1
+		b:    1
 		name: X
 	}
 }
@@ -13,31 +13,30 @@ d: a & {
 }
 
 t1: {
-  #a: {
-    [>"e" & <"z"]: int
-  }
-  b: #a & { f: 4 }
-  c: #a & { z: 4 }
+	#a: {
+		[>"e" & <"z"]: int
+	}
+	b: #a & {f: 4}
+	c: #a & {z: 4}
 }
 
 t2: {
-  #a: {
-    ["x" | "y"]: int
-  }
-  b: #a & { x: 4 }
-  c: #a & { z: 4 }
+	#a: {
+		["x" | "y"]: int
+	}
+	b: #a & {x: 4}
+	c: #a & {z: 4}
 }
-
 -- out/eval --
 Errors:
 t1.c: field not allowed: z:
-    ./in.cue:15:7
-    ./in.cue:19:6
-    ./in.cue:19:13
+    ./in.cue:15:6
+    ./in.cue:19:5
+    ./in.cue:19:11
 t2.c: field not allowed: z:
-    ./in.cue:23:7
-    ./in.cue:27:6
-    ./in.cue:27:13
+    ./in.cue:23:6
+    ./in.cue:27:5
+    ./in.cue:27:11
 
 Result:
 (_|_){
@@ -72,9 +71,9 @@ Result:
       // [eval]
       z: (_|_){
         // [eval] t1.c: field not allowed: z:
-        //     ./in.cue:15:7
-        //     ./in.cue:19:6
-        //     ./in.cue:19:13
+        //     ./in.cue:15:6
+        //     ./in.cue:19:5
+        //     ./in.cue:19:11
       }
     }
   }
@@ -89,9 +88,9 @@ Result:
       // [eval]
       z: (_|_){
         // [eval] t2.c: field not allowed: z:
-        //     ./in.cue:23:7
-        //     ./in.cue:27:6
-        //     ./in.cue:27:13
+        //     ./in.cue:23:6
+        //     ./in.cue:27:5
+        //     ./in.cue:27:11
       }
     }
   }

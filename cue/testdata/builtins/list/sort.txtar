@@ -1,8 +1,7 @@
 -- in.cue --
 import "list"
 
-a: list.Sort([2, 3, 1, 4], {x:_, y:_, less: x<y})
-
+a: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
 -- out/eval --
 (struct){
   a: (#list){

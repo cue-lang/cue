@@ -7,14 +7,13 @@ m: "1": "one"
 // Doc 1
 intMap: _ @protobuf(1,map[int]string)
 // Doc 2
-intMap: { "1": "one" }
+intMap: {"1": "one"}
 // Doc 3 (seems not to be supported by proto)
 intMap: "2": "two"
 intMap: {
-  // Doc inner (seems not to be supported by proto)
-  "3": "three"
+	// Doc inner (seems not to be supported by proto)
+	"3": "three"
 }
-
 -- out/encode --
 m: {
   key: "foo"

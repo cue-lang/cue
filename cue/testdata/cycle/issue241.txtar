@@ -2,28 +2,27 @@
 #Value: 0 | 1
 
 foo: #Value
-foo: != bar
+foo: !=bar
 bar: #Value
-bar: != foo
+bar: !=foo
 
 #Value: 0 | 1
 
 Foo: #Value
-Foo: != Bar
+Foo: !=Bar
 Bar: #Value
-Bar: != Foo
+Bar: !=Foo
 Bar: 0
 
-cell: a:  0 | 1
-cell: a:  != cell.b
-cell: b:  0 | 1
-cell: b:  != cell.a
-cell: a:  0
-cell: b:  _
+cell: a: 0 | 1
+cell: a: !=cell.b
+cell: b: 0 | 1
+cell: b: !=cell.a
+cell: a: 0
+cell: b: _
 
 a: cell.a
 b: cell.b
-
 -- out/eval --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }

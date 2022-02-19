@@ -3,7 +3,7 @@
 
 // direct
 a: [X=string]: X
-a: bar: _
+a: bar:        _
 
 // in struct
 b: [X=string]: {X}
@@ -20,70 +20,68 @@ d: bar: {}
 
 // nested
 e: [X=string]: [Y=string]: X + Y
-e: foo: bar: _
+e: foo: bar:               _
 
 // Field aliases
 
 bar: 3
 f1: C="foo\(bar)": {
-    name: "xx"
-    foo: C.name
+	name: "xx"
+	foo:  C.name
 }
 
 // nested
 f1: D="foo\(bar)": E="foo\(bar)baz": {
-    name: "xx"
-    a: D["foo\(bar)baz"].name
-    b: E.name
+	name: "xx"
+	a:    D["foo\(bar)baz"].name
+	b:    E.name
 }
 
 // Combo
 
 c1: C="foo\(bar)": [D=string]: {
-    name: D
-    foo: C.x.name
+	name: D
+	foo:  C.x.name
 }
 c1: foo3: x: _
 
 emptyLabel: {
-    "": 1
-    a: emptyLabel[""]
+	"": 1
+	a:  emptyLabel[""]
 }
 
 underscore: a: {
-    // Issue #1454
-    foo: #Foo
-    foo: "_": "bar"
-    #Foo: [=~""]: string
+	// Issue #1454
+	foo: #Foo
+	foo: "_":     "bar"
+	#Foo: [=~""]: string
 }
 
 underscore: c: {
-    foo: "_": "any"
-    foo: [=~""]: string
+	foo: "_":    "any"
+	foo: [=~""]: string
 }
 
 underscore: d: {
-    bar: "_": "any"
-    #bar: [string]: string
-    bar: #bar
+	bar: "_":       "any"
+	#bar: [string]: string
+	bar: #bar
 }
 
 underscore: e: {
-    baz: "_h": "any"
-    #baz: [=~"_"]: string
-    baz: #baz
+	baz: "_h":     "any"
+	#baz: [=~"_"]: string
+	baz: #baz
 }
-
 
 // TODO: support. Also not yet supported in old implementation.
 // c10: {
-// 	C=[string]: {
-// 		name: "x"
-// 		foo: C.name
-// 	}
+//  C=[string]: {
+//   name: "x"
+//   foo: C.name
+//  }
 // }
 // c2: c1 & { x: _ }
-
 -- out/eval --
 (struct){
   a: (struct){

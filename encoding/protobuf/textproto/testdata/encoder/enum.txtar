@@ -1,15 +1,20 @@
 -- schema.cue --
-enum: [string]:
-    { "foo", #enumValue: 1 } |
-    { "bar", #enumValue: 2 } @protobuf(1,Enum)
+enum: {
+	[string]:
+		{"foo", #enumValue: 1} |
+		{"bar", #enumValue: 2} @protobuf(1,Enum)
+}
 
-defEnum: [string]: #FOO | #BAR @protobuf(2,Enum)
+defEnum: {
+	[string]: #FOO | #BAR @protobuf(2,Enum)
+}
 
 #FOO: 1
 #BAR: 2
 
-
-typeEnum: [string]: #Enum @protobuf(3,Enum)
+typeEnum: {
+	[string]: #Enum @protobuf(3,Enum)
+}
 
 #Enum: #FOO | #BAR | 3
 
@@ -18,14 +23,11 @@ typeEnum: [string]: #Enum @protobuf(3,Enum)
 //     { 1, @symbol(foo) } |
 //     { 2, @symbol(bar) }
 
-
 singleEnum: #single @protobuf(3,Enum)
 
 #single: 1
 
-badEnum: { string, #enumValue: 1 } | { "two", #enumValue: 2 }
-
-
+badEnum: {string, #enumValue: 1} | {"two", #enumValue: 2}
 -- value.cue --
 enum: asIs: "foo"
 
@@ -43,7 +45,6 @@ typeEnum: baz: 3
 // symbolEnum: baz: "baz"
 
 singleEnum: 1
-
 -- out/jsonpb --
 enum: asIs:        "foo"
 enum: asIsUnknown: "foobar"

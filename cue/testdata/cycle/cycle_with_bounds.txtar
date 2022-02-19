@@ -2,9 +2,9 @@
 #Value: int
 
 foo: #Value
-foo: != bar
+foo: !=bar
 bar: #Value
-bar: != foo
+bar: !=foo
 
 bar: 0
 foo: 1

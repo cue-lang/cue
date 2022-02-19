@@ -12,13 +12,13 @@ keepPatternConstraintRoot: {
 
 // TODO(additional): add once implemented
 // keepAdditionalRoots: {
-// 	if true {
-//		deployment: "name": {spec: [1]}
-//	}
+//  if true {
+//   deployment: "name": {spec: [1]}
+//  }
 //
-//	deployment: name: spec: [1]
+// deployment: name: spec: [1]
 //
-//	deployment: [string]: spec: [1]
+// deployment: [string]: spec: [1]
 // }
 
 keepPatternConstraintRootSolo: {
@@ -52,8 +52,6 @@ keepPatternConstraintRootDef: {
 
 	deployment: [string]: spec: []
 }
-
-
 -- out/trim --
 == in.cue
 keepPatternConstraintRoot: {

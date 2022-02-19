@@ -5,13 +5,13 @@ package foobar
 
 // A Foo fooses stuff.
 Foo: {
-    // field1 is an int.
-    field1: int
+	// field1 is an int.
+	field1: int
 
-    field2: int
+	field2: int
 
-    // duplicate field comment
-    dup3: int
+	// duplicate field comment
+	dup3: int
 }
 
 // foos are instances of Foo.
@@ -19,31 +19,30 @@ foos: [string]: Foo
 
 // My first little foo.
 foos: MyFoo: {
-    // local field comment.
-    field1: 0
+	// local field comment.
+	field1: 0
 
-    // Dangling comment.
+	// Dangling comment.
 
-    // other field comment.
-    field2: 1
+	// other field comment.
+	field2: 1
 
-    // duplicate field comment
-    dup3: int
+	// duplicate field comment
+	dup3: int
 }
 
 bar: {
-    // comment from bar on field 1
-    field1: int
-    // comment from bar on field 2
-    field2: int // don't include this
+	// comment from bar on field 1
+	field1: int
+	// comment from bar on field 2
+	field2: int // don't include this
 }
 
 baz: bar & {
-    // comment from baz on field 1
-    field1: int
-    field2: int
+	// comment from baz on field 1
+	field1: int
+	field2: int
 }
-
 -- out.txt --
 -- out/doc --
 []

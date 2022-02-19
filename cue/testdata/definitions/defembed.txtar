@@ -1,6 +1,6 @@
 -- in.cue --
 a: {
-    #A
+	#A
 }
 
 a: c: 1
@@ -10,7 +10,7 @@ a: c: 1
 Errors:
 a: field not allowed: c:
     ./in.cue:1:4
-    ./in.cue:2:5
+    ./in.cue:2:2
     ./in.cue:5:4
     ./in.cue:7:5
 
@@ -23,7 +23,7 @@ Result:
     c: (_|_){
       // [eval] a: field not allowed: c:
       //     ./in.cue:1:4
-      //     ./in.cue:2:5
+      //     ./in.cue:2:2
       //     ./in.cue:5:4
       //     ./in.cue:7:5
     }

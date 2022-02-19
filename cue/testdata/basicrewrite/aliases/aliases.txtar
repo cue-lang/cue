@@ -5,9 +5,9 @@ t0: {
 	_out: _b
 }
 t1: {
-    _a: b
-    let b = c
-    c=d: 3
+	_a: b
+	let b = c
+	c=d: 3
 }
 -- out/compile --
 --- in.cue

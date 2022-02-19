@@ -1,63 +1,62 @@
 -- in.cue --
-
 self: {
-    fail: {
-        a: {
-            if a.b == _|_ {
-                b: 1
-            }
-        }
-    }
-    isConcreteFail: {
-        a: {
-            if a.b == _|_ {
-                b: 1
-            }
-            b: int
-        }
-    }
-    isNotConcrete: {
-        a: {
-            if a.b != _|_ {
-                b: 1
-            }
-            b: int
-        }
-    }
+	fail: {
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+		}
+	}
+	isConcreteFail: {
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+			b: int
+		}
+	}
+	isNotConcrete: {
+		a: {
+			if a.b != _|_ {
+				b: 1
+			}
+			b: int
+		}
+	}
 }
 
 mutual: {
 	noConflicts: {
-		a: { if b.foo == _|_ { new: "" } }
-		b: { if a.bar == _|_ { new: "" } }
+		a: {if b.foo == _|_ {new: ""}}
+		b: {if a.bar == _|_ {new: ""}}
 	}
 
 	mutualCycleFail: {
-		b: { if a.bar == _|_ { foo: "" } }
-		a: { if b.foo == _|_ { bar: "" } }
+		b: {if a.bar == _|_ {foo: ""}}
+		a: {if b.foo == _|_ {bar: ""}}
 	}
 
-    brokenCycleSuccess: {
-		a: { if b.foo == _|_ { foo: "" } }
-		b: { if a.bar == _|_ { bar: "" } }
-        a: bar: ""
+	brokenCycleSuccess: {
+		a: {if b.foo == _|_ {foo: ""}}
+		b: {if a.bar == _|_ {bar: ""}}
+		a: bar: ""
 	}
 
 	oneDirectionalConflictFail: {
-        p1: {
-            a: { if b.foo == _|_ { bar: "" } }
-            b: { if a.bar == _|_ { new: "" } }
-        }
-        p2: {
-            a: { if b.foo == _|_ { new: "" } }
-            b: { if a.bar == _|_ { foo: "" } }
-        }
+		p1: {
+			a: {if b.foo == _|_ {bar: ""}}
+			b: {if a.bar == _|_ {new: ""}}
+		}
+		p2: {
+			a: {if b.foo == _|_ {new: ""}}
+			b: {if a.bar == _|_ {foo: ""}}
+		}
 	}
 
 	oneDirectionalBrokenConflictSuccess: {
-		a: { if b.foo == _|_ { bar: "" } }
-		b: { if a.bar == _|_ { new: "" } }
-        b: foo: ""
+		a: {if b.foo == _|_ {bar: ""}}
+		b: {if a.bar == _|_ {new: ""}}
+		b: foo: ""
 	}
 }
 
@@ -87,16 +86,16 @@ sameStruct: {
 	defCloseSuccess: {
 		#Example: {
 			raises?: {
-				runtime?:     string
+				runtime?: string
 			}
-		
+
 			if raises == _|_ {
 				ret?: _
 			}
 		}
 
 		expr: #Example & {
-		   ret: 2
+			ret: 2
 		}
 	}
 }
@@ -121,11 +120,11 @@ nestedChain: {
 			#E: x: true
 		}
 		#E: [_]: bool
-		#E: x: true
+		#E: x:   true
 	}
 
-  // TODO: the current algorithm does _not_ handle checking fields that were
-  // not added in certain situations.
+	// TODO: the current algorithm does _not_ handle checking fields that were
+	// not added in certain situations.
 	doubleAddfail: {
 		if #E.x == _|_ {
 			#E: y: true

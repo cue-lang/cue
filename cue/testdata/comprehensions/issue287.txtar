@@ -1,12 +1,12 @@
 -- in.cue --
-if #E["x"] != _|_ {
+ if #E["x"] != _|_ {
 	#E: y: true
 }
 if #E["y"] != _|_ {
 	z: true
 }
 #E: [_]: bool
-#E: x: true
+#E: x:   true
 -- out/eval --
 (struct){
   #E: (#struct){

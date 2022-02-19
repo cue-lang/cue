@@ -1,12 +1,12 @@
 -- in.cue --
 a: {
-    {{
-      b
-      c
-      d: b
-      e: c
-    }}
-    c: {}
+	{{
+		b
+		c
+		d: b
+		e: c
+	}}
+	c: {}
 }
 b: {
 
@@ -18,9 +18,9 @@ c: s
 // the one before.
 d: [s]: 3
 
-e: { }
-e & { // Is this allowed? Probably not as per comprehension rule (ref fixes.)
-    e: {}
+e: {}
+e & {// Is this allowed? Probably not as per comprehension rule (ref fixes.)
+	e: {}
 }
 
 {X=["foo"]: b: X | null}
@@ -30,11 +30,10 @@ let B = {open: int}
 f: B
 
 schema: {
-		next:  _schema_1
+	next: _schema_1
 }
 
 let _schema_1 = schema
-
 -- out/compile --
 --- in.cue
 {

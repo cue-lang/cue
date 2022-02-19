@@ -1,7 +1,7 @@
 # Issue #590
 
 -- in.cue --
-let X = 1 + 1
+ let X = 1 + 1
 #Foo: X
 -- x.cue --
 x: string
@@ -18,19 +18,18 @@ let Y = x
 y: Y
 -- issue593.cue --
 cfgs: [ for crd in ["one", "two"] {
-        metadata: {
-                name: crd
-        }
+	metadata: {
+		name: crd
+	}
 }]
 for cfg in cfgs {
-        let filepath = "kind-\(cfg.name)"
-        files: {
-                "\(filepath)": {
-                        patches: cfg
-                }
-        }
+	let filepath = "kind-\(cfg.name)"
+	files: {
+		"\(filepath)": {
+			patches: cfg
+		}
+	}
 }
-
 -- for.cue --
 comprehension: {
 	for cfg in [{a: "one"}] {
@@ -40,7 +39,6 @@ comprehension: {
 		}
 	}
 }
-
 -- scope.cue --
 scoped: {
 	_args: required: 1
@@ -69,8 +67,6 @@ scoped: {
 		a: [{Args.required}]
 	}
 }
-
-
 -- incomplete.cue --
 complete: {
 	let A = run.a
@@ -124,18 +120,17 @@ unresolvedDisjunction: {
 		{"*": {}} |
 		{"bool": #TypeBool & {_args: required: Args.required}}
 	}
-	
+
 	#TypeBool: {
 		_args: required: bool
 		let Args = _args
-	
+
 		if !Args.required {
 			// `default` sets the default value.
 			default: bool | null
 		}
 	}
 }
-
 -- out/definition --
 
 let X = 1 + 1

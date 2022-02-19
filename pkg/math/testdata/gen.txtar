@@ -3,12 +3,12 @@
 -- in.cue --
 import "math"
 
-t1: math.Pi
-t2: math.Floor(math.Pi)
-t3: math.Pi(3)
-t6: math.Jacobi(1000, 2000)
-t7: math.Jacobi(1000, 201)
-t8: math.Asin(2.0e400)
+t1:  math.Pi
+t2:  math.Floor(math.Pi)
+t3:  math.Pi(3)
+t6:  math.Jacobi(1000, 2000)
+t7:  math.Jacobi(1000, 201)
+t8:  math.Asin(2.0e400)
 t16: math.Pow(8, 4)
 t17: math.Pow10(4)
 t18: math.Signbit(-4)
@@ -26,12 +26,12 @@ t33: math.Dim(5, 7.2)
 -- out/math --
 Errors:
 t3: cannot call non-function math.Pi (type float):
-    ./in.cue:5:5
+    ./in.cue:5:6
 error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000:
-    ./in.cue:6:5
+    ./in.cue:6:6
 t8: cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up:
-    ./in.cue:8:5
-    ./in.cue:8:15
+    ./in.cue:8:6
+    ./in.cue:8:16
 
 Result:
 t1:  3.14159265358979323846264338327950288419716939937510582097494459

@@ -3,15 +3,15 @@
 -- in.cue --
 import "strings"
 
-t1: strings.Join(["Hello", "World!"], " ")
-t2: strings.Join([1, 2], " ")
-t3: strings.ByteAt("a", 0)
-t4: strings.ByteSlice("Hello", 2, 5)
-t5: strings.SliceRunes("✓ Hello", 0, 3)
-t6: strings.Runes("Café")
-t7: strings.ToCamel("AlphaBeta")
-t8: strings.ToTitle("alpha")
-t9: strings.MaxRunes(3) & "foo"
+t1:  strings.Join(["Hello", "World!"], " ")
+t2:  strings.Join([1, 2], " ")
+t3:  strings.ByteAt("a", 0)
+t4:  strings.ByteSlice("Hello", 2, 5)
+t5:  strings.SliceRunes("✓ Hello", 0, 3)
+t6:  strings.Runes("Café")
+t7:  strings.ToCamel("AlphaBeta")
+t8:  strings.ToTitle("alpha")
+t9:  strings.MaxRunes(3) & "foo"
 t10: strings.MaxRunes(3) & "quux"
 t11: strings.MinRunes(1) & "e"
 t12: strings.MaxRunes(0) & "e"
@@ -23,8 +23,8 @@ t17: strings.MinRunes(10) & "hello"
 -- out/strings --
 Errors:
 t2: invalid list element 0 in argument 0 to call: cannot use value 1 (int) as string:
-    ./in.cue:4:5
-    ./in.cue:4:19
+    ./in.cue:4:6
+    ./in.cue:4:20
 t10: invalid value "quux" (does not satisfy strings.MaxRunes(3)):
     ./in.cue:12:6
     ./in.cue:12:23

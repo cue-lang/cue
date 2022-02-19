@@ -4,106 +4,105 @@
 import "strings"
 
 intEmbed: {
-    a1: {
-        2
-    }
-    a2: {
-        v: {
-            3
-            #foo: a2.v + 1
-        }
-        w: v
-        x: v.#foo
-    }
-    a3: a1 + a2.v
+	a1: {
+		2
+	}
+	a2: {
+		v: {
+			3
+			#foo: a2.v + 1
+		}
+		w: v
+		x: v.#foo
+	}
+	a3: a1 + a2.v
 }
 
 listEmbed: {
-    a1: {
-        2
-    }
-    b3: {
-        [1, 2]
-        #foo: 1
-    }
-    b4: b3 + b3
-    b5: b3[1]
-    b6: b3[5]
-    b7: b4[a1] // 1
+	a1: {
+		2
+	}
+	b3: {
+		[1, 2]
+		#foo: 1
+	}
+	b4: b3 + b3
+	b5: b3[1]
+	b6: b3[5]
+	b7: b4[a1] // 1
 }
 
 stringEmbed: {
-    s1: {
-        "foo"
-        #bar: "bar"
-    }
-    s2: [ s1, { s1.#bar, #baz: 4 } ]
-    s3: strings.Join(s2, "--")
+	s1: {
+		"foo"
+		#bar: "bar"
+	}
+	s2: [ s1, {s1.#bar, #baz: 4}]
+	s3: strings.Join(s2, "--")
 }
 
-
 outPattern: {
-    sum: {
-        out: #a + #b
-        #a: int
-        #b: int
-    }
-    used: sum&{#a: 1, #b: 3}
+	sum: {
+		out: #a + #b
+		#a:  int
+		#b:  int
+	}
+	used: sum & {#a: 1, #b: 3}
 }
 
 arithmetic: {
-    sum: {
-        #a + #b
-        #a: int
-        #b: int
-    }
-    a1: (sum&{_, #a: 1, #b: 3}) + 2
-    a2: 2 + (sum&{_, #a: 1, #b: 3})
-    a3: 2 + (2 + (sum&{_, #a: 1, #b: 3}))
+	sum: {
+		#a + #b
+		#a: int
+		#b: int
+	}
+	a1: (sum & {_, #a:          1, #b: 3}) + 2
+	a2: 2 + (sum & {_, #a:      1, #b: 3})
+	a3: 2 + (2 + (sum & {_, #a: 1, #b: 3}))
 }
 
 defCheck: {
-    a: {
-      #def: 1
-    }
-    b: a.#def
+	a: {
+		#def: 1
+	}
+	b: a.#def
 }
 
 optionalExists: {
-    string | {
-        value?: string
+	string | {
+		value?: string
 
-        if value != _|_ {
-            other: int
-        }
-    }
+		if value != _|_ {
+			other: int
+		}
+	}
 }
 
 optionalCheck: {
-    thing: string | {
-        value?: string
+	thing: string | {
+		value?: string
 
-        if value != _|_ {
-            other: int
-        }
-    }
+		if value != _|_ {
+			other: int
+		}
+	}
 
-    thing: {
-        value: "some string"
-        other: 3
-    }
+	thing: {
+		value: "some string"
+		other: 3
+	}
 }
 
 hidden: {
-    issue794: {
-        _foo: "foo"
-        [_foo]
-    }
+	issue794: {
+		_foo: "foo"
+		[_foo]
+	}
 }
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
-    ./in.cue:28:12
+    ./in.cue:28:9
 
 Result:
 (_|_){
@@ -140,7 +139,7 @@ Result:
     b5: (int){ 2 }
     b6: (_|_){
       // [eval] listEmbed.b6: invalid list index 5 (out of bounds):
-      //     ./in.cue:28:12
+      //     ./in.cue:28:9
     }
     b7: (int){ 1 }
   }
@@ -165,8 +164,8 @@ Result:
     sum: (struct){
       out: (_|_){
         // [incomplete] outPattern.sum.out: non-concrete value int in operand to +:
-        //     ./in.cue:44:14
-        //     ./in.cue:45:9
+        //     ./in.cue:43:8
+        //     ./in.cue:44:3
       }
       #a: (int){ int }
       #b: (int){ int }
@@ -180,8 +179,8 @@ Result:
   arithmetic: (struct){
     sum: (_|_){
       // [incomplete] arithmetic.sum: non-concrete value int in operand to +:
-      //     ./in.cue:53:9
-      //     ./in.cue:54:9
+      //     ./in.cue:52:3
+      //     ./in.cue:53:3
       #a: (int){ int }
       #b: (int){ int }
     }

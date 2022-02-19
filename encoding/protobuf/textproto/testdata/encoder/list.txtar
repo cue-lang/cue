@@ -1,13 +1,13 @@
 -- value.cue --
 // List comment
-intList: [ 1, 2, 3 ]
+intList: [ 1, 2, 3]
 
 structList: [{
-    foo: 1
-    bar: 2
+	foo: 1
+	bar: 2
 }, {
-    foo: 3
-    bar: 4
+	foo: 3
+	bar: 4
 }]
 -- out/encode --
 # List comment

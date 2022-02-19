@@ -2,54 +2,54 @@
 import "list"
 
 repeat: {
-    [string]: {x: _, n: int, v: list.Repeat(x, n)}
+	[string]: {x: _, n: int, v: list.Repeat(x, n)}
 
-    t1: {x: [], n: 0}
-    t2: {x: [1], n: 0}
+	t1: {x: [], n: 0}
+	t2: {x: [1], n: 0}
 
-    t3: {x: [1], n: 1}
-    t4: {x: [1, 2], n: 1}
+	t3: {x: [1], n: 1}
+	t4: {x: [1, 2], n: 1}
 
-    t5: {x: [], n: 3}
-    t6: {x: [1, 2], n: 3}
-    t7: {x: [1, 2, 3, 4], n: 3}
+	t5: {x: [], n: 3}
+	t6: {x: [1, 2], n: 3}
+	t7: {x: [1, 2, 3, 4], n: 3}
 
-    t8: {x: [1],  n: -1}
+	t8: {x: [1], n: -1}
 }
 concat: {
-    [string]: {x: _, v: list.Concat(x)}
+	[string]: {x: _, v: list.Concat(x)}
 
-    t1: x: []
-    t2: x: [[]]
+	t1: x: []
+	t2: x: [[]]
 
-    t3: x: [[1]]
-    t4: x: [[1, 2]]
-    t5: x: [[1], [2]]
+	t3: x: [[1]]
+	t4: x: [[1, 2]]
+	t5: x: [[1], [2]]
 
-    t6: x: [[1, 2], [3, 4]]
+	t6: x: [[1, 2], [3, 4]]
 
-    t7: x: 1
-    t8: x: [1, [2]]
+	t7: x: 1
+	t8: x: [1, [2]]
 }
 unique: {
 	issue797: {
 		mylst: [
-			{ foo: "bar" },
-			{ foo: "baz" }
+			{foo: "bar"},
+			{foo: "baz"},
 		]
 
-		_testmylst: list.UniqueItems & [for x in mylst { x.foo } ]
+		_testmylst: list.UniqueItems & [ for x in mylst {x.foo}]
 	}
 }
 -- out/list --
 Errors:
 error in call to list.Repeat: negative count:
-    ./in.cue:4:33
+    ./in.cue:4:30
 error in call to list.Concat: cannot use value 1 (type int) as list:
-    ./in.cue:19:25
-    ./in.cue:31:13
+    ./in.cue:19:22
+    ./in.cue:31:10
 concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
-    ./in.cue:30:12
+    ./in.cue:30:9
 
 Result:
 repeat: {

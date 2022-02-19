@@ -1,14 +1,13 @@
 -- in.cue --
-	a: 1
-	b: a + 1
-	d: {
-		x: _
-		y: b + x
-	}
-	e: d & {
-		x: 5
-	}
-
+a: 1
+b: a + 1
+d: {
+	x: _
+	y: b + x
+}
+e: d & {
+	x: 5
+}
 -- out/eval --
 (struct){
   a: (int){ 1 }
@@ -17,8 +16,8 @@
     x: (_){ _ }
     y: (_|_){
       // [incomplete] d.y: non-concrete value _ in operand to +:
-      //     ./in.cue:5:6
-      //     ./in.cue:4:3
+      //     ./in.cue:5:5
+      //     ./in.cue:4:2
     }
   }
   e: (struct){

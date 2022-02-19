@@ -15,27 +15,27 @@ a3: b: c: 100*A3[0] + A3[0]
 
 a4list: [{4}]
 let A4 = a4list
-a4: [ for x in A4 { v: 404 } ]
+a4: [ for x in A4 {v: 404}]
 
 a5list: [{5}]
 let A5 = a5list
-a5: b: [ for x in A5 { v: 505 } ]
+a5: b: [ for x in A5 {v: 505}]
 
 a6list: [{6}]
 let A6 = a6list
-a6: b: c: [ for x in A6 { v: 606 } ]
+a6: b: c: [ for x in A6 {v: 606}]
 
 a7list: [{7}]
 let A7 = a7list
-a7: { for x in A7 { v: 707 } }
+a7: {for x in A7 {v: 707}}
 
 a8list: [{8}]
 let A8 = a8list
-a8: b: { for x in A8 { v: 808 } }
+a8: b: {for x in A8 {v: 808}}
 
 a9list: [{9}]
 let A9 = a9list
-a9: b: c: { for x in A9 { v: 909 } }
+a9: b: c: {for x in A9 {v: 909}}
 
 // Issue #609:
 // When a let value resolved to an incomplete value, it should pass this
@@ -43,39 +43,38 @@ a9: b: c: { for x in A9 { v: 909 } }
 // a gobbling of this incomplete status. The problem seemed to be not
 // exclusive to the use of let, though.
 incompleteLet: {
-    input: [1,2,3,4,5]
+	input: [1, 2, 3, 4, 5]
 
-    last: {
-        min: list.Min(input)
-        max: list.Max(input)
-    }
+	last: {
+		min: list.Min(input)
+		max: list.Max(input)
+	}
 
-    bar: {
-        let mn = last.min
-        let mx = list.max
+	bar: {
+		let mn = last.min
+		let mx = list.max
 
-        min: mn
-        max: mx
-    }
+		min: mn
+		max: mx
+	}
 
-    x: {
-        if list.max < 0 {
-        }
-    }
+	x: {
+		if list.max < 0 {
+		}
+	}
 }
 issue1116: {
-  a: {
-    #a: ["a", "b"]
-    let List = #a
-    List[len(List)-1]
-  }
-  b: {
-    let List = #a
-    List[len(List)-1]
-    #a: ["a", "b"]
-  }
+	a: {
+		#a: ["a", "b"]
+		let List = #a
+		List[len(List)-1]
+	}
+	b: {
+		let List = #a
+		List[len(List)-1]
+		#a: ["a", "b"]
+	}
 }
-
 -- out/compile --
 --- in.cue
 {
@@ -302,12 +301,12 @@ issue1116: {
       min: (int){ 1 }
       max: (_|_){
         // [incomplete] incompleteLet.bar.max: undefined field: max:
-        //     ./in.cue:54:23
+        //     ./in.cue:54:17
       }
     }
     x: (_|_){
       // [incomplete] incompleteLet.x: undefined field: max:
-      //     ./in.cue:61:17
+      //     ./in.cue:61:11
     }
   }
   issue1116: (struct){

@@ -1,16 +1,16 @@
 -- in.cue --
 root: {
-    a: {
-        $id: "failure"
-        val: "foo"
-        out: string
-    }
-    b: {
-        $id: "valToOut"
-        $after: a
-        val: "bar"
-        out: string
-    }
+	a: {
+		$id: "failure"
+		val: "foo"
+		out: string
+	}
+	b: {
+		$id:    "valToOut"
+		$after: a
+		val:    "bar"
+		out:    string
+	}
 }
 -- out/run/errors --
 error: task failed: failure

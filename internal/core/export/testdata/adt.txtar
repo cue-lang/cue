@@ -9,8 +9,8 @@ d1: "foo\(bar)": int
 bar: "bar"
 
 d2: C="foo\(bar)": {
-    name: "xx"
-    foo: C.name
+	name: "xx"
+	foo:  C.name
 }
 
 bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
@@ -34,13 +34,13 @@ l5: [1, 3] & {
 }
 
 #foo: int
-l6: [1, #foo] & {
+l6:   [1, #foo] & {
 	[1, 3]
 
 	#foo: int
 }
 
-n1: 1.0
+n1:  1.0
 n10: 10
 
 // Ignored comment.
@@ -50,51 +50,52 @@ t: true
 
 // Dangling comment.
 
-e1: <n1
-e2: >n1 & <n10
-e3: l4[2]
-e4: l4[2:3]
-e5: e1 + e2 - e3
-e6: !t
-e7: !t || !false
+e1:  <n1
+e2:  >n1 & <n10
+e3:  l4[2]
+e4:  l4[2:3]
+e5:  e1 + e2 - e3
+e6:  !t
+e7:  !t || !false
 e8?: !false
 
 m1: {[string]: uint} & {
-    // this is a pattern constraint
-    {[string]: int} & {[string]: int64}
-    // foo is an optional field
-    foo?: 3
+	// this is a pattern constraint
+	{[string]: int} & {[string]: int64}
 
-    // Dangling comment.
+	// foo is an optional field
+	foo?: 3
 
-    // bar is a field
-    bar: 4
+	// Dangling comment.
 
-    // a comment too many.
+	// bar is a field
+	bar: 4
 
-    ...
+	// a comment too many.
+
+	...
 }
 
 if true {
-    x: int
+	x: int
 }
 
 y1: {
-    src: [1, 2, 3]
-    for i, v in src for j, w in src if i < j {
-        "foo\(i)": v
-        "bar\(j)": w
-    }
+	src: [1, 2, 3]
+	for i, v in src for j, w in src if i < j {
+		"foo\(i)": v
+		"bar\(j)": w
+	}
 
-    for i, v in src {
-        "foo\(i)": v
-    }
+	for i, v in src {
+		"foo\(i)": v
+	}
 
 	x: [
 		for x in src
 		let y = x {
 			y
-		}
+		},
 	]
 }
 
@@ -121,7 +122,6 @@ errorListDef: {
 
 	#Def: 1
 }
-
 -- out/definition --
 import mystrings "strings"
 

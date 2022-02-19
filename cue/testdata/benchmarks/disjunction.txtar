@@ -24,7 +24,6 @@ x: [_]: f: *1 | int
 x: [_]: f: *1 | int
 x: [_]: f: *1 | int
 
-
 x: a0: {}
 -- out/compile --
 --- in.cue

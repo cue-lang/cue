@@ -1,56 +1,55 @@
 -- in.cue --
 domToSub: {
-    foo: [string]: a: *1 | int
-    foo: b: a: 1
+	foo: [string]: a: *1 | int
+	foo: b: a:        1
 }
 
 // Issue #759
 subToDom: {
-    #maybeString: {ip?: string}
-    something: ip: *"default" | string
-    something: #maybeString
+	#maybeString: {ip?: string}
+	something: ip: *"default" | string
+	something: #maybeString
 }
 
 // references to definitions of a disjunction should be resolved and counted
 // as dominator nodes.
 resolveDefaults: {
-    #monitor: {
-        kind: "a"
-    } | {
-        kind: "b"
-    }
+	#monitor: {
+		kind: "a"
+	} | {
+		kind: "b"
+	}
 
-    monitor: #monitor
+	monitor: #monitor
 
-    monitor: kind: "a"
+	monitor: kind: "a"
 }
 
 issue781: {
-    #monitor_check: {
-        check_name:      string
-        check_interval?: string
-    }
+	#monitor_check: {
+		check_name:      string
+		check_interval?: string
+	}
 
-    #monitor_check: {
-        check_type: "nginx_config"
-        } | {
-        check_type: "docker_running"
-        vars: {
-            container_name: string
-        }
-    }
+	#monitor_check: {
+		check_type: "nginx_config"
+	} | {
+		check_type: "docker_running"
+		vars: {
+			container_name: string
+		}
+	}
 
+	monitor: {
+		checks: [...#monitor_check]
+	}
 
-    monitor: {
-        checks: [...#monitor_check]
-    }
-
-    monitor: {
-        checks: [{
-            check_type: "nginx_config"
-            check_name: "nginx_config"
-        }]
-    }
+	monitor: {
+		checks: [{
+			check_type: "nginx_config"
+			check_name: "nginx_config"
+		}]
+	}
 }
 
 // Issue #801
@@ -59,12 +58,12 @@ issue781: {
 // to be erased, as the exact match is only there because subordinate value
 // was first used to select the default.
 dontEraseDefaultSelection: {
-    rule: _#Rule & {
-        verbs: [ "c" ]
-    }
-    _#Rule: {
-        verbs: *["a", "b"] | ["c"]
-    }
+	rule: _#Rule & {
+		verbs: [ "c"]
+	}
+	_#Rule: {
+		verbs: *["a", "b"] | ["c"]
+	}
 }
 -- out/trim --
 == in.cue

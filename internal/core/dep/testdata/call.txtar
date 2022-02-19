@@ -2,7 +2,7 @@
 import "encoding/json"
 
 // The reference to string needs to be included even for Visit.
-a: b: json.Marshal({ #a: str })
+a: b: json.Marshal({#a: str})
 
 str: "x:y:z"
 -- out/dependencies/field --

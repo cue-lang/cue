@@ -1,13 +1,12 @@
 -- in.cue --
-
 a: [{a: 1}, {b: 2 & 3}]
 
-b: [ for x in a { x } ]
+b: [ for x in a {x}]
 -- out/eval --
 Errors:
 a.1.b: conflicting values 3 and 2:
-    ./in.cue:2:17
-    ./in.cue:2:21
+    ./in.cue:1:17
+    ./in.cue:1:21
 
 Result:
 (_|_){
@@ -21,15 +20,15 @@ Result:
       // [eval]
       b: (_|_){
         // [eval] a.1.b: conflicting values 3 and 2:
-        //     ./in.cue:2:17
-        //     ./in.cue:2:21
+        //     ./in.cue:1:17
+        //     ./in.cue:1:21
       }
     }
   }
   b: (_|_){
     // [eval] a.1.b: conflicting values 3 and 2:
-    //     ./in.cue:2:17
-    //     ./in.cue:2:21
+    //     ./in.cue:1:17
+    //     ./in.cue:1:21
   }
 }
 -- out/compile --

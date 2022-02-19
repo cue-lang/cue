@@ -1,29 +1,28 @@
 -- in.cue --
 s: string
 
-e1: s + s
-e2: >"bar" & s // okay
-e3: >s & "foo" // okay
+e1:  s + s
+e2:  >"bar" & s // okay
+e3:  >s & "foo" // okay
 e3b: >s
 
 e4: >e1 & s
 e5: <e5 & s
 
 E: {
-  a: c-b
-  b: c-a
-  c: a+b & >=5
+	a: c - b
+	b: c - a
+	c: a+b & >=5
 }
 
-a: int
+a:    int
 okay: (>10 & <a) + 3
-
 -- out/eval --
 (struct){
   s: (string){ string }
   e1: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:5
+    //     ./in.cue:3:6
     //     ./in.cue:1:1
   }
   e2: (string){ >"bar" }
@@ -31,7 +30,7 @@ okay: (>10 & <a) + 3
   e3b: (string){ string }
   e4: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:5
+    //     ./in.cue:3:6
     //     ./in.cue:1:1
   }
   e5: (_|_){
@@ -40,17 +39,17 @@ okay: (>10 & <a) + 3
   E: (struct){
     a: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:12:6
+      //     ./in.cue:12:5
     }
     b: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:13:6
+      //     ./in.cue:13:5
     }
     c: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:12:6
+      //     ./in.cue:12:5
       // cycle error:
-      //     ./in.cue:13:6
+      //     ./in.cue:13:5
     }
   }
   a: (int){ int }

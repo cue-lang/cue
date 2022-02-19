@@ -2,22 +2,20 @@
 a: [...#D]
 
 #D: {
-    a: int @protobuf(1,int64)
+	a: int @protobuf(1,int64)
 }
 
 b: [1, ...] // Don't include schema fields if not in value
 
 c: [{a: 1}, ...]
 c: [...#D]
-
 -- value.cue --
 // Hello
 a: [
-    {a: 1},
+	{a: 1},
 ]
 
 c: [{a: 1}, {a: 2}]
-
 -- out/jsonpb --
 // Hello
 a: [

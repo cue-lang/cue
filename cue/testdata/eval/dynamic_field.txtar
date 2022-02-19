@@ -10,23 +10,23 @@ X="\(b)": {
 c: X
 
 withError: {
-    issue799: {key: int32} & {"\(1&2)": 123}
+	issue799: {key: int32} & {"\(1 & 2)": 123}
 }
 
 parenExprRefParent: {
-  a: (x): {}
-  x: "foo"
+	a: (x): {}
+	x: "foo"
 }
 parenExprRefEqual: {
-  (x): {}
-  x: "foo"
+	(x): {}
+	x: "foo"
 }
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:
+    ./in.cue:12:28
     ./in.cue:12:31
-    ./in.cue:12:34
-    ./in.cue:12:36
+    ./in.cue:12:35
 
 Result:
 (_|_){
@@ -41,9 +41,9 @@ Result:
     // [eval]
     issue799: (_|_){
       // [eval] invalid interpolation: conflicting values 2 and 1:
+      //     ./in.cue:12:28
       //     ./in.cue:12:31
-      //     ./in.cue:12:34
-      //     ./in.cue:12:36
+      //     ./in.cue:12:35
       key: (int){ &(>=-2147483648, <=2147483647, int) }
     }
   }

@@ -6,7 +6,7 @@
 -- x.cue --
 fieldAlias: simple: {
 	X="a-b": 4
-	foo: X
+	foo:     X
 
 	bar?: Y
 
@@ -16,12 +16,12 @@ fieldAlias: simple: {
 valueAlias: merge: {
 	// Merge fields, rename alias to avoid conflict.
 	// TODO: merged values can still be simplified.
-	value: X={ #value: X.b, b: 2 }
-	value: Y={ #value: Y.b, b: 2, v: X: 3 }
+	value: X={#value: X.b, b: 2}
+	value: Y={#value: Y.b, b: 2, v: X: 3}
 }
 
 valueAlias: selfRef: struct: {
-	a: b: X={ #foo: X.b, b: 2 }
+	a: b: X={#foo: X.b, b: 2}
 }
 
 valueAlias: selfRefValue: struct: {
@@ -45,16 +45,15 @@ issue1308: {
 	let _xA = 1
 	sub: [{_A: _xA}]
 }
-
 -- y.cue --
 fieldAlias: cross: {
 	baz: 3
 	X="d-2": E=[D="cue"]: C="foo\(baz)": {
 		name: "xx"
-		foo: C.name
-		bar: X
-		baz: D
-		qux: E
+		foo:  C.name
+		bar:  X
+		baz:  D
+		qux:  E
 	}
 }
 -- out/definition --

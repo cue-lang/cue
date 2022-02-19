@@ -2,7 +2,6 @@
 import "struct"
 
 v: {a: struct.MaxFields(2) & {}}.a
-
 -- out/eval --
 (struct){
   v: (struct){

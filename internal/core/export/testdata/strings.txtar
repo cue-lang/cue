@@ -1,8 +1,8 @@
 -- in.cue --
 a: """
-    multi
-    line
-    """
+	multi
+	line
+	"""
 
 b: "message: \(a)!"
 
@@ -14,7 +14,6 @@ bin2: '''
 	multi
 	\(b)
 	'''
-
 -- out/definition --
 a: """
 	multi

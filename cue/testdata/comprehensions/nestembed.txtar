@@ -5,17 +5,17 @@ import "list"
 
 DeleteThis: ["this", "that"]
 useful_infra: {
-	gcp:  cluters:   10
-	aws:  clusters:  20
+	gcp: cluters:   10
+	aws: clusters:  20
 	this: clusters: 1
 	that: clusters: 2
 }
 New_infra: {
-    for k,v in useful_infra {
-        if !list.Contains(DeleteThis, k) {
-            "\(k)": v
-        }
-    }
+	for k, v in useful_infra {
+		if !list.Contains(DeleteThis, k) {
+			"\(k)": v
+		}
+	}
 }
 -- out/eval --
 (struct){

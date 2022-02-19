@@ -3,21 +3,21 @@
 package x
 
 #C1: {
-  name: string
+	name: string
 }
 
 #C2: {
-  #C1
-  age: int
+	#C1
+	age: int
 }
 
 c1: #C1 & {
-  name: "cueckoo"
+	name: "cueckoo"
 }
 
 c2: #C2 & {
-  c1
-  age: 5
+	c1
+	age: 5
 }
 -- out/eval --
 (struct){

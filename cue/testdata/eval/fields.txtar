@@ -1,9 +1,9 @@
 -- in.cue --
 bulkToSelf: {
-    a: {
-        foo: [string]: int
-        foo: bar: "3" // error
-    }
+	a: {
+		foo: [string]: int
+		foo: bar:      "3" // error
+	}
 }
 -- out/compile --
 --- in.cue
@@ -22,8 +22,8 @@ bulkToSelf: {
 -- out/eval --
 Errors:
 bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
-    ./in.cue:3:24
-    ./in.cue:4:19
+    ./in.cue:3:18
+    ./in.cue:4:18
 
 Result:
 (_|_){
@@ -36,8 +36,8 @@ Result:
         // [eval]
         bar: (_|_){
           // [eval] bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
-          //     ./in.cue:3:24
-          //     ./in.cue:4:19
+          //     ./in.cue:3:18
+          //     ./in.cue:4:18
         }
       }
     }

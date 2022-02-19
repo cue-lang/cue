@@ -1,8 +1,8 @@
 -- in.cue --
 a: {
-    foo?: int
+	foo?: int
 
-    b: foo
+	b: foo
 }
 -- out/compile --
 --- in.cue
@@ -17,7 +17,7 @@ a: {
   a: (struct){
     b: (_|_){
       // [incomplete] a.b: cannot reference optional field: foo:
-      //     ./in.cue:4:8
+      //     ./in.cue:4:5
     }
   }
 }

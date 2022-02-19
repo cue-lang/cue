@@ -4,9 +4,9 @@ Issue #553
 a: "foo"
 b: "boo"
 commands: {
-    #c: {
-        help: "help!"
-    }
+	#c: {
+		help: "help!"
+	}
 }
 out: """
     a is \(a)

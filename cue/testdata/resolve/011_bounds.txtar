@@ -43,19 +43,19 @@ s23e: >0.0 & <2.0     // no simplification
 s30: >0 & int
 
 floats: {
-    [string]: float
-    f1:  <10.0 & <=5.0
-    f2:  <=10.0 & <5.0
-    f3:  <1.1 & <=1.1
-    f4:  <=1.1 & <=1.1
-    f5:  >1.1 & >=1.1
-    f6:  >=1.1 & >1.1
-    f7:  >=1.1 & <=1.1
+	[string]: float
+	f1:       <10.0 & <=5.0
+	f2:       <=10.0 & <5.0
+	f3:       <1.1 & <=1.1
+	f4:       <=1.1 & <=1.1
+	f5:       >1.1 & >=1.1
+	f6:       >=1.1 & >1.1
+	f7:       >=1.1 & <=1.1
 
-    issue1310: >=2.1 & <=1.0
-    fe2: >2.1 & <=2.1
+	issue1310: >=2.1 & <=1.0
+	fe2:       >2.1 & <=2.1
 
-    fe3: float & >2 & <=3
+	fe3: float & >2 & <=3
 }
 
 e1: null & !=null
@@ -189,11 +189,11 @@ e9: conflicting values >"a" and <1 (mismatched types string and number):
     ./in.cue:64:5
     ./in.cue:64:12
 floats.fe2: incompatible bounds >2.1 and <=2.1:
-    ./in.cue:51:10
-    ./in.cue:51:17
+    ./in.cue:51:13
+    ./in.cue:51:20
 floats.issue1310: incompatible bounds >=2.1 and <=1.0:
-    ./in.cue:50:16
-    ./in.cue:50:24
+    ./in.cue:50:13
+    ./in.cue:50:21
 e3: invalid value 1 (out of bound >1):
     ./in.cue:58:5
     ./in.cue:58:10
@@ -245,13 +245,13 @@ Result:
     f7: (number){ 1.1 }
     issue1310: (_|_){
       // [eval] floats.issue1310: incompatible bounds >=2.1 and <=1.0:
-      //     ./in.cue:50:16
-      //     ./in.cue:50:24
+      //     ./in.cue:50:13
+      //     ./in.cue:50:21
     }
     fe2: (_|_){
       // [eval] floats.fe2: incompatible bounds >2.1 and <=2.1:
-      //     ./in.cue:51:10
-      //     ./in.cue:51:17
+      //     ./in.cue:51:13
+      //     ./in.cue:51:20
     }
     fe3: (float){ &(>2, <=3, float) }
   }

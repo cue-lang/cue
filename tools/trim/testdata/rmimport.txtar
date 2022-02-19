@@ -15,14 +15,13 @@ import (
 )
 
 #Def: {
-    y: 5
+	y: 5
 }
 
 x: #Def
 x: y: a.A
 -- cue.mod/module.cue --
 module: "example.com/blah"
-
 -- out/trim --
 == b.cue
 package b

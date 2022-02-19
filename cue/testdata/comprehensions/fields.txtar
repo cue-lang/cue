@@ -2,32 +2,31 @@ Issue #560
 
 -- cue.mod/module.cue --
 module: "example.com"
-
 -- in.cue --
 import "strings"
 
 dynamic: {
-    for _, s in ["foo"] {
-        (s):       1
-        "\(s)bar": 2
-    }
+	for _, s in ["foo"] {
+		(s):       1
+		"\(s)bar": 2
+	}
 }
 
 issue560: {
-    #User: {
-        tags_str: string
-        tags_map: {
-            for k, v in strings.Split(tags_str, " ") {
-                "\(v)": string
-            }
-            "{a}": string
-        }
-    }
+	#User: {
+		tags_str: string
+		tags_map: {
+			for k, v in strings.Split(tags_str, " ") {
+				"\(v)": string
+			}
+			"{a}": string
+		}
+	}
 
-    user: {
-        #User
-        tags_str: "b {c}"
-    }
+	user: {
+		#User
+		tags_str: "b {c}"
+	}
 }
 -- out/eval --
 (struct){
@@ -40,7 +39,7 @@ issue560: {
       tags_str: (string){ string }
       tags_map: (_|_){
         // [incomplete] error in call to strings.Split: non-concrete value string:
-        //     ./in.cue:14:25
+        //     ./in.cue:14:16
         "{a}": (string){ string }
       }
     }

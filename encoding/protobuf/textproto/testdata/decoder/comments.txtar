@@ -7,10 +7,9 @@ b: [...int]
 c: [...int32]
 m: [...#Msg]
 #Msg: {
-    x: string
-    y: string
+	x: string
+	y: string
 }
-
 -- input.textproto --
 # file comment
 

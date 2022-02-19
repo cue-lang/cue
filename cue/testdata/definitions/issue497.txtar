@@ -1,14 +1,13 @@
 -- in.cue --
-#A : _
+#A: _
 
 #N: #A & {
-  f: j: {
-    n: "hi"
-  }
+	f: j: {
+		n: "hi"
+	}
 }
 
 l: #N
-
 -- out/eval --
 (struct){
   #A: (_){ _ }

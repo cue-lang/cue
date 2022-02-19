@@ -2,10 +2,9 @@
 import "path"
 
 issues1025: {
-    p: *"hello" | string
-    q: path.Join([p], path.Unix)
+	p: *"hello" | string
+	q: path.Join([p], path.Unix)
 }
-
 -- out/path --
 issues1025: {
 	p: *"hello" | string

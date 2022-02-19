@@ -1,10 +1,10 @@
 -- in.cue --
 a: b: {
-    { [pattern]:  c }
-    { "\(name)": c }
-    regular:    c
-    optional?:  c
-    ...
+	{[pattern]: c}
+	{"\(name)": c}
+	regular:   c
+	optional?: c
+	...
 }
 
 pattern: =~"^Foo"

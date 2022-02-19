@@ -3,30 +3,30 @@ package compile
 
 import "list"
 
-dis1: "dev"|"prd"
-dis2: *"dev"|"prd"
+dis1: "dev" | "prd"
+dis2: *"dev" | "prd"
 
 con1: string
 let con2 = string
 
-ok0: [string]: string
-ok1: [name=string]: string
-ok2: [con1]: string
-ok3: [con2]: string
-ok4: ["foo"]: string
-ok5: [1]: string      // disallowed in evaluator
-ok6: [name=1]: string // disallowed in evaluator
-ok7: [dis1]: string
-ok8: [dis2]: string
-ok9: [name=dis2]: string
-ok10: [{foo: "bar"}]: string               // disallowed in evaluator
-ok11: [list.FlattenN([string], 1)]: string // disallowed in evaluator
+ok0: [string]:                      string
+ok1: [name=string]:                 string
+ok2: [con1]:                        string
+ok3: [con2]:                        string
+ok4: ["foo"]:                       string
+ok5: [1]:                           string // disallowed in evaluator
+ok6: [name=1]:                      string // disallowed in evaluator
+ok7: [dis1]:                        string
+ok8: [dis2]:                        string
+ok9: [name=dis2]:                   string
+ok10: [{foo:                        "bar"}]: string // disallowed in evaluator
+ok11: [list.FlattenN([string], 1)]: string   // disallowed in evaluator
 
-bad1: [for x in [1,2,3] {x}]: string
+bad1: [ for x in [1, 2, 3] {x}]: string
 
 disallowTopAsLabel: {
-  _: 1
-  a: _ // Should not compile to a reference.
+	_: 1
+	a: _ // Should not compile to a reference.
 }
 
 // TODO: disallow dollar as label? This is according to the spec, but it
@@ -37,15 +37,15 @@ disallowTopAsLabel: {
 // }
 
 saneReferencesInComprehensions: {
-  for _ in [1] {
-      a: _  // Should not compile to a reference.
-  }
+	for _ in [1] {
+		a: _ // Should not compile to a reference.
+	}
 }
 -- out/compile --
 bad1: comprehension values not allowed in this position:
-    ./in.cue:24:8
+    ./in.cue:24:9
 disallowTopAsLabel: cannot use _ as label:
-    ./in.cue:27:3
+    ./in.cue:27:2
 --- in.cue
 {
   dis1: ("dev"|"prd")
@@ -108,6 +108,6 @@ disallowTopAsLabel: cannot use _ as label:
 }
 -- out/eval --
 bad1: comprehension values not allowed in this position:
-    ./in.cue:24:8
+    ./in.cue:24:9
 disallowTopAsLabel: cannot use _ as label:
-    ./in.cue:27:3
+    ./in.cue:27:2

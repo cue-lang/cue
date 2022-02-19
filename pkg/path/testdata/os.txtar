@@ -21,126 +21,124 @@ import "path"
 
 // Test these OSes for all tests below.
 {
-    [string]: {
-        unix:    _
-        plan9:   _
-        windows: _
-    }
+	[string]: {
+		unix:    _
+		plan9:   _
+		windows: _
+	}
 }
 
 Split: [OS=#AnyOS]: [ARG=string]: path.Split(ARG, OS)
-Split: default:     [ARG=string]: path.Split(ARG)
-Split: default:     Split.unix
+Split: default: [ARG=string]:     path.Split(ARG)
+Split: default: Split.unix
 Split: [_]: {
-    "/foo/bar/baz":       _
-    "a/b":                _
-    "//host/share/foo":   _
-    #"\\host\share\foo"#: _
-    "c:/foo/bar":         _
-    #"c:\foo\bar"#:       _
+	"/foo/bar/baz":         _
+	"a/b":                  _
+	"//host/share/foo":     _
+	"\\\\host\\share\\foo": _
+	"c:/foo/bar":           _
+	"c:\\foo\\bar":         _
 }
 
 SplitList: [OS=string]: [ARG=string]: path.SplitList(ARG, OS)
 SplitList: [_]: {
-    "a:b":      _
-    "a\u0000b": _
-    "a;b":      _
+	"a:b":      _
+	"a\u0000b": _
+	"a;b":      _
 }
 
 Clean: [OS=#AnyOS]: [ARG=string]: path.Clean(ARG, OS)
-Clean: default:     [ARG=string]: path.Clean(ARG)
-Clean: default:     Clean.unix
+Clean: default: [ARG=string]:     path.Clean(ARG)
+Clean: default: Clean.unix
 Clean: [_]: {
-    "abc//def//ghi":      _
-    #"c:\abc\def\..\.."#: _
+	"abc//def//ghi":        _
+	"c:\\abc\\def\\..\\..": _
 }
 
 Slash: [OS=string]: [ARG=string]: {
-    to:   path.ToSlash(ARG, OS)
-    from: path.FromSlash(ARG, OS)
+	to:   path.ToSlash(ARG, OS)
+	from: path.FromSlash(ARG, OS)
 
-    // should roundtrip
-    to:   path.ToSlash(from, OS)
-    from: path.FromSlash(to, OS)
+	// should roundtrip
+	to:   path.ToSlash(from, OS)
+	from: path.FromSlash(to, OS)
 }
 Slash: [_]: {
-    "":      _
-    "/":     _
-    "/a/b":  _
-    "/a//b": _
+	"":      _
+	"/":     _
+	"/a/b":  _
+	"/a//b": _
 }
 
 Ext: [OS=#AnyOS]: [ARG=string]: path.Ext(ARG, OS)
-Ext: default:     [ARG=string]: path.Ext(ARG)
-Ext: default:     Ext.unix
+Ext: default: [ARG=string]:     path.Ext(ARG)
+Ext: default: Ext.unix
 Ext: [_]: {
-    // Same for all OS-es
-    "path.go":    ".go"
-    "path.pb.go": ".go"
-    "a.dir/b":    ""
-    "a.dir/b.go": ".go"
-    "a.dir/":     ""
+	// Same for all OS-es
+	"path.go":    ".go"
+	"path.pb.go": ".go"
+	"a.dir/b":    ""
+	"a.dir/b.go": ".go"
+	"a.dir/":     ""
 
-    // Differs on Windows.
-    "a.dir\\foo": _
+	// Differs on Windows.
+	"a.dir\\foo": _
 }
 
 Resolve: [OS=#AnyOS]: [A1=_]: [A2=_]: path.Resolve(A1, A2, OS)
-Resolve: default:     [A1=_]: [A2=_]: path.Resolve(A1, A2)
-Resolve: default:     Resolve.unix
+Resolve: default: [A1=_]: [A2=_]:     path.Resolve(A1, A2)
+Resolve: default: Resolve.unix
 Resolve: [_]: {
-    "a/b/c": "d/e":   _
-    "/a/b":  "/c/d":  _
-    "c:/a":  #"d:\"#: _
+	"a/b/c": "d/e": _
+	"/a/b": "/c/d": _
+	"c:/a": "d:\\": _
 
-    "//home/user/foo": "bar":             _
-    "//home/user/foo": "//other/abs/foo": _
+	"//home/user/foo": "bar":             _
+	"//home/user/foo": "//other/abs/foo": _
 }
 
 IsAbs: [OS=#AnyOS]: [ARG=string]: path.IsAbs(ARG, OS)
-IsAbs: default:     [ARG=string]: path.IsAbs(ARG)
-IsAbs: default:     IsAbs.unix
+IsAbs: default: [ARG=string]:     path.IsAbs(ARG)
+IsAbs: default: IsAbs.unix
 IsAbs: [_]: {
-    "":     _
-    "/a":   _
-    "a":    _
-    "c:":   _
-    "c:/":  _
-    "c:\\": _
+	"":     _
+	"/a":   _
+	"a":    _
+	"c:":   _
+	"c:/":  _
+	"c:\\": _
 
-    "//home/user/foo": _
+	"//home/user/foo": _
 }
 
-
-Volume: [OS=string]:   [ARG=string]: path.VolumeName(ARG, OS)
-Volume: [!="windows"]: [string]:     "" // non-windows is always ""
+Volume: [OS=string]: [ARG=string]: path.VolumeName(ARG, OS)
+Volume: [!="windows"]: [string]:   "" // non-windows is always ""
 Volume: [_]: {
-    "c:/foo/bar": _
-    "c:":         _
-    "2:":         _
-    "":           _
+	"c:/foo/bar": _
+	"c:":         _
+	"2:":         _
+	"":           _
 
-    #"\\\host"#:          _
-    #"\\\host\"#:         _
-    #"\\\host\share"#:    _
-    #"\\\host\\share"#:   _
-    #"\\host"#:           _
-    #"//host"#:           _
-    #"\\host\"#:          _
-    #"//host/"#:          _
-    #"\\host\share"#:     _
-    #"//host/share"#:     _
-    #"\\host\share\"#:    _
-    #"//host/share/"#:    _
-    #"\\host\share\foo"#: _
-    #"//host/share/foo"#: _
+	"\\\\\\host":           _
+	"\\\\\\host\\":         _
+	"\\\\\\host\\share":    _
+	"\\\\\\host\\\\share":  _
+	"\\\\host":             _
+	"//host":               _
+	"\\\\host\\":           _
+	"//host/":              _
+	"\\\\host\\share":      _
+	"//host/share":         _
+	"\\\\host\\share\\":    _
+	"//host/share/":        _
+	"\\\\host\\share\\foo": _
+	"//host/share/foo":     _
 
-    #"\\host\share\\foo\\\bar\\\\baz"#: _
-    #"//host/share//foo///bar////baz"#: _
-    #"\\host\share\foo\..\bar"#:        _
-    #"//host/share/foo/../bar"#:        _
+	"\\\\host\\share\\\\foo\\\\\\bar\\\\\\\\baz": _
+	"//host/share//foo///bar////baz":             _
+	"\\\\host\\share\\foo\\..\\bar":              _
+	"//host/share/foo/../bar":                    _
 }
-
 -- out/path --
 #OSes: ["unix", "windows", "plan9"]
 #AnyOS: "unix" | "windows" | "plan9"

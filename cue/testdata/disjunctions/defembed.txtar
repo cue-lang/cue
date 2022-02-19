@@ -3,31 +3,30 @@ Interaction between defaults, embedding and disjunctions.
 // TODO: at the moment, using a default will select it.
 -- in.cue --
 x: {
-    // All of these resolve to *2 | 3
-    m1: (1 | (*2 | 3)) & (>=2 & <=3)
-    m2: (1 | (*2 | 3)) & (2 | 3)
-    m3: (*1 | *(*2 | 3)) & (2 | 3)
+	// All of these resolve to *2 | 3
+	m1: (1 | (*2 | 3)) & (>=2 & <=3)
+	m2: (1 | (*2 | 3)) & (2 | 3)
+	m3: (*1 | *(*2 | 3)) & (2 | 3)
 }
 y1: x & {
-    {m4: x.m1+x.m2+x.m3}
+	{m4: x.m1 + x.m2 + x.m3}
 }
 y2: {
-    x
-    {m4: y2.m1+y2.m2+y2.m3}
+	x
+	{m4: y2.m1 + y2.m2 + y2.m3}
 }
 Y=y3: {
-    x
-    {m4: Y.m1+Y.m2+Y.m3}
+	x
+	{m4: Y.m1 + Y.m2 + Y.m3}
 }
 y4: x & {
-    {m4: y4.m1+y4.m2+y4.m3}
+	{m4: y4.m1 + y4.m2 + y4.m3}
 }
 
 // Second disjunct in embedding is not possible because of previous declaration
 // of `b`, so it should be resolved to {a: 1}.
 b: (*"a" | "b") | "c"
 {a: b} | {b: int}
-
 -- out/eval --
 (struct){
   x: (struct){

@@ -2,50 +2,50 @@
 // Allow lookup in partially evaluated struct as long as the end result is
 // concrete.
 A: {
-    a: {
-        parent: ""
-        children: [ for k, v in A if v.parent == k { k } ]
-    }
-    b: {
-        parent: "a"
-        children: [ for k, v in A if v.parent == k { k } ]
-    }
+	a: {
+		parent: ""
+		children: [ for k, v in A if v.parent == k {k}]
+	}
+	b: {
+		parent: "a"
+		children: [ for k, v in A if v.parent == k {k}]
+	}
 }
 
 // This should result in an incomplete error (a reference cycle error classifies
 // as incomplete).
 B: {
-    a: {
-        parent: ""
-        children: [ for k, v in B for _, w in v.children { k } ]
-    }
+	a: {
+		parent: ""
+		children: [ for k, v in B for _, w in v.children {k}]
+	}
 }
 
 // Issue #486
 Issue486: {
-    A: {
-        a: {
-            parent: ""
-            children: [...string]
-        }
-        b: {
-            parent: "a"
-            children: [...string]
-        }
-        c: {
-            parent: "b"
-            children: [...string]
-        }
-    }
+	A: {
+		a: {
+			parent: ""
+			children: [...string]
+		}
+		b: {
+			parent: "a"
+			children: [...string]
+		}
+		c: {
+			parent: "b"
+			children: [...string]
+		}
+	}
 
-    A: [Name=string]: {
-        children: [
-            for k, v in A
-            if v.parent == Name {
-                k
-            }
-        ]
-    }
+	A: [Name=string]: {
+		children: [
+			for k, v in A
+			if v.parent == Name {
+				k
+			},
+		]
+	}
 }
 -- out/eval --
 (struct){
@@ -66,7 +66,7 @@ Issue486: {
       parent: (string){ "" }
       children: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:19:47
+        //     ./in.cue:19:41
       }
     }
   }

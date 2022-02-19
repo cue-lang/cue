@@ -17,9 +17,8 @@ a: [{
 #A: annotations?: [string]: string
 
 b: #B
-b: bb: c: 2 // c can be removed, bb not.
+b: bb: c:   2 // c can be removed, bb not.
 #B: bb?: c: 2
-
 -- out/trim --
 == a.cue
 package pkg

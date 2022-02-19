@@ -1,11 +1,9 @@
 -- map.cue --
 map: {[string]: int} @protobuf(1,map[string]int)
 
-
 implicit: [string]: string
 
 intMap: {[string]: int} @protobuf(1,map[int]int)
-
 -- input.textproto --
 map: {
     key: "foo"

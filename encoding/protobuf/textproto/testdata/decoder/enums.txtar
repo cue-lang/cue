@@ -1,8 +1,8 @@
 -- foo.cue --
 #MyEnum:
-    #Val1 |
-    #Val2 |
-    #Val3
+	#Val1 |
+	#Val2 |
+	#Val3
 
 #Val1: 1
 #Val2: 2
@@ -10,7 +10,6 @@
 
 a0: #MyEnum
 a1: [...#MyEnum]
-
 -- input.textproto --
 a0: Val1
 a1: Val1

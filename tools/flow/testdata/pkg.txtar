@@ -8,21 +8,21 @@ User: "sub"
 import "example.org/test/sub"
 
 root: {
-    a: {
-        $id: "valToOut"
-        val: "foo \(sub.User)"
-        out: string
-    }
-    b: {
-        $id: "valToOut"
-        $after: a
-        val: "bar"
-        out: string
-    }
-    c: {
-        $id: "valToOut"
-        out: a.out + b.out
-    }
+	a: {
+		$id: "valToOut"
+		val: "foo \(sub.User)"
+		out: string
+	}
+	b: {
+		$id:    "valToOut"
+		$after: a
+		val:    "bar"
+		out:    string
+	}
+	c: {
+		$id: "valToOut"
+		out: a.out + b.out
+	}
 }
 -- out/run/errors --
 -- out/run/t0 --

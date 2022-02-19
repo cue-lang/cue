@@ -1,14 +1,14 @@
 -- in.cue --
 top: {
-    a: {_}
-    b: _
+	a: {_}
+	b: _
 }
 
 scalar: {
-    a: {string}
-    b: string
-    c: {{{number}}}
-    d: number
+	a: {string}
+	b: string
+	c: {{{number}}}
+	d: number
 }
 -- out/eval --
 (struct){

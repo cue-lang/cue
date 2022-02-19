@@ -1,31 +1,31 @@
 -- in.cue --
-#T : {
-  config: _ 
-  body: _
-  mas: [string]: {
-    cfg: _
-    _link: #T
-    link: _link & {config: cfg}
-  }
+#T: {
+	config: _
+	body:   _
+	mas: [string]: {
+		cfg:   _
+		_link: #T
+		link:  _link & {config: cfg}
+	}
 }
 
 #a: #T & {
-  config: a: int
-  body: config.a
-  mas: one: {
-    cfg: b: config.a
-    _link: {
-      config: b: int
-      body: config.b 
-      mas: two : {
-        cfg: c: config.b 
-        _link: {
-          config: c: int 
-          body: config.c
-        }
-      }
-    }
-  }
+	config: a: int
+	body: config.a
+	mas: one: {
+		cfg: b: config.a
+		_link: {
+			config: b: int
+			body: config.b
+			mas: two: {
+				cfg: c: config.b
+				_link: {
+					config: c: int
+					body: config.c
+				}
+			}
+		}
+	}
 }
 
 a: #a & {config: a: 34}

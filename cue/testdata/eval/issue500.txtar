@@ -10,7 +10,7 @@ b: strings.Join(["t", "e", "s", "t"][1:], "")
 c: ["t", "e", "s", "t"][1:]
 d: strings.Join(c, "")
 
-e: strings.Join(["a"] + ["b"], "")
+e: strings.Join(["a"]+["b"], "")
 
 f: ["a"] + ["b"]
 g: strings.Join(f, "")
@@ -19,7 +19,6 @@ h: strings.Join(3*["a"], "")
 
 i: 3 * ["b"]
 j: strings.Join(i, "")
-
 -- out/eval --
 (struct){
   a: (string){ "est" }

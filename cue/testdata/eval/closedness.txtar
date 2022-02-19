@@ -2,60 +2,59 @@
 
 -- in.cue --
 #E: {
-    c: int
+	c: int
 }
 #A: {
-    b: int
-    q: {
-        #E
-        d: int
-    }
+	b: int
+	q: {
+		#E
+		d: int
+	}
 }
 a: #A & {
-    b: 3
-    q: {
-        c: 2
-        e: 43
-    }
+	b: 3
+	q: {
+		c: 2
+		e: 43
+	}
 }
 
 // `a` is evaluated through the comprehension first. Ensure that
 // this does not bypass closedness checks.
 issue852: {
-  #A: {
-    [=~"^a-z$"]: string
-  }
+	#A: {
+		[=~"^a-z$"]: string
+	}
 
-  a: #A
+	a: #A
 
-  a: Foo: "foo"
+	a: Foo: "foo"
 
-  for k, v in a {
-    b: "\(k)": v
-  }
+	for k, v in a {
+		b: "\(k)": v
+	}
 }
 
 dynamic: {
-  #D: {
-    key:   "foo"
-    (key): int
-  }
-  d: #D & { foo: 3 }
+	#D: {
+		key:   "foo"
+		(key): int
+	}
+	d: #D & {foo: 3}
 }
-
 -- out/eval --
 Errors:
 a.q: field not allowed: e:
     ./in.cue:1:5
-    ./in.cue:6:8
-    ./in.cue:7:9
+    ./in.cue:6:5
+    ./in.cue:7:3
     ./in.cue:11:4
-    ./in.cue:15:9
+    ./in.cue:15:3
 issue852.a: field not allowed: Foo:
-    ./in.cue:30:15
-    ./in.cue:22:7
-    ./in.cue:26:6
-    ./in.cue:28:6
+    ./in.cue:30:14
+    ./in.cue:22:6
+    ./in.cue:26:5
+    ./in.cue:28:5
 
 Result:
 (_|_){
@@ -80,29 +79,29 @@ Result:
       e: (_|_){
         // [eval] a.q: field not allowed: e:
         //     ./in.cue:1:5
-        //     ./in.cue:6:8
-        //     ./in.cue:7:9
+        //     ./in.cue:6:5
+        //     ./in.cue:7:3
         //     ./in.cue:11:4
-        //     ./in.cue:15:9
+        //     ./in.cue:15:3
       }
     }
   }
   issue852: (_|_){
     // [eval] issue852.a: field not allowed: Foo:
-    //     ./in.cue:30:15
-    //     ./in.cue:22:7
-    //     ./in.cue:26:6
-    //     ./in.cue:28:6
+    //     ./in.cue:30:14
+    //     ./in.cue:22:6
+    //     ./in.cue:26:5
+    //     ./in.cue:28:5
     #A: (#struct){
     }
     a: (_|_){
       // [eval]
       Foo: (_|_){
         // [eval] issue852.a: field not allowed: Foo:
-        //     ./in.cue:30:15
-        //     ./in.cue:22:7
-        //     ./in.cue:26:6
-        //     ./in.cue:28:6
+        //     ./in.cue:30:14
+        //     ./in.cue:22:6
+        //     ./in.cue:26:5
+        //     ./in.cue:28:5
       }
     }
   }

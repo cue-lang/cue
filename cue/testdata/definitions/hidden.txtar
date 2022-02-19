@@ -2,43 +2,40 @@ cue eval ./pkg:foo
 
 -- cue.mod/module.cue --
 module: "example.com"
-
 -- in.cue --
 package foo
 
 import "example.com/pkg"
 
 #def: {
-  _name: d: int
+	_name: d: int
 }
 
-d: pkg.#D & { _name: d: int, _val: f: 4 }
+d: pkg.#D & {_name: d: int, _val: f: 4}
 
 // TODO: this should fail, as the _name restricting it is in this
 // package.
 e: pkg.#D & #def & {
-  // This should fail as c is disallowed by the _name defined
-  // in this package
-  _name: c: int
+	// This should fail as c is disallowed by the _name defined
+	// in this package
+	_name: c: int
 
-  // This should not fail, as this is a different _val
-  _val: g: int
+	// This should not fail, as this is a different _val
+	_val: g: int
 }
 
-f: pkg.#D & { _val: f: 4 }
+f: pkg.#D & {_val: f: 4}
 g: f._val
-
 -- pkg/bar.cue --
 package pkg
 
-#D: { _val: f: 3 }
-
+#D: {_val: f: 3}
 -- out/eval --
 Errors:
 e._name: field not allowed: c:
-    ./in.cue:6:10
+    ./in.cue:6:9
     ./in.cue:13:13
-    ./in.cue:16:10
+    ./in.cue:16:9
 
 Result:
 (_|_){
@@ -69,9 +66,9 @@ Result:
       d: (int){ int }
       c: (_|_){
         // [eval] e._name: field not allowed: c:
-        //     ./in.cue:6:10
+        //     ./in.cue:6:9
         //     ./in.cue:13:13
-        //     ./in.cue:16:10
+        //     ./in.cue:16:9
       }
     }
     _val(:foo): (struct){

@@ -8,65 +8,64 @@ b2: int & <5.5
 b3: <10 & <=5
 b4: >=20 & >20
 b5: >=21 & >20
-b6: int & >5 & <= 6
+b6: int & >5 & <=6
 
 simplifyExpr: {
-    less1: <(<3)
-    less2: <(<=3)
-    less3: <=(<3)
-    less4: <=(<=3)
-    less5: <(!=3)
-    less6: <=(!=3)
+	less1: <(<3)
+	less2: <(<=3)
+	less3: <=(<3)
+	less4: <=(<=3)
+	less5: <(!=3)
+	less6: <=(!=3)
 
-    gtr1: >(>3)
-    gtr2: >(>=3)
-    gtr3: >=(>3)
-    gtr4: >=(>=3)
-    gtr5: >(!=3)
-    gtr6: >=(!=3)
+	gtr1: >(>3)
+	gtr2: >(>=3)
+	gtr3: >=(>3)
+	gtr4: >=(>=3)
+	gtr5: >(!=3)
+	gtr6: >=(!=3)
 
-    lg1: <(>3)
-    lg2: <(>=3)
-    lg3: <=(>3)
-    lg4: <=(>=3)
+	lg1: <(>3)
+	lg2: <(>=3)
+	lg3: <=(>3)
+	lg4: <=(>=3)
 
-    gl1: >(<3)
-    gl2: >(<=3)
-    gl3: >=(<3)
-    gl4: >=(<=3)
+	gl1: >(<3)
+	gl2: >(<=3)
+	gl3: >=(<3)
+	gl4: >=(<=3)
 
-    ne1: !=(!=3)
-    ne2: !=(<3)
-    ne3: !=(<=3)
-    ne4: !=(>3)
-    ne5: !=(>=3)
+	ne1: !=(!=3)
+	ne2: !=(<3)
+	ne3: !=(<=3)
+	ne4: !=(>3)
+	ne5: !=(>=3)
 
-    s: string
-    n: number
-    i: int
-    f: float
-    b: bytes
-    basic1: <(i)
-    basic2: >(n)
-    basic3: >=(s)
-    basic4: <=(f)
-    basic5: <=(b)
+	s:      string
+	n:      number
+	i:      int
+	f:      float
+	b:      bytes
+	basic1: <(i)
+	basic2: >(n)
+	basic3: >=(s)
+	basic4: <=(f)
+	basic5: <=(b)
 
-    // Do NOT interpret this the same as `!= type`.
-    bne1: !=(s)
-    bne2: !=(n)
-    bne3: !=(n)
-    bne4: !=(i)
-    bne5: !=(b)
+	// Do NOT interpret this the same as `!= type`.
+	bne1: !=(s)
+	bne2: !=(n)
+	bne3: !=(n)
+	bne4: !=(i)
+	bne5: !=(b)
 
-    e1: <(=~"foo")
-    e2: >(null)
+	e1: <(=~"foo")
+	e2: >(null)
 }
-
 -- out/eval --
 Errors:
 simplifyExpr.e2: cannot use null for bound >:
-    ./in.cue:62:11
+    ./in.cue:62:8
 
 Result:
 (_|_){
@@ -119,31 +118,31 @@ Result:
     basic5: (bytes){ bytes }
     bne1: (_|_){
       // [incomplete] simplifyExpr.bne1: non-concrete value s for bound !=:
-      //     ./in.cue:55:14
+      //     ./in.cue:55:11
     }
     bne2: (_|_){
       // [incomplete] simplifyExpr.bne2: non-concrete value n for bound !=:
-      //     ./in.cue:56:14
+      //     ./in.cue:56:11
     }
     bne3: (_|_){
       // [incomplete] simplifyExpr.bne3: non-concrete value n for bound !=:
-      //     ./in.cue:57:14
+      //     ./in.cue:57:11
     }
     bne4: (_|_){
       // [incomplete] simplifyExpr.bne4: non-concrete value i for bound !=:
-      //     ./in.cue:58:14
+      //     ./in.cue:58:11
     }
     bne5: (_|_){
       // [incomplete] simplifyExpr.bne5: non-concrete value b for bound !=:
-      //     ./in.cue:59:14
+      //     ./in.cue:59:11
     }
     e1: (_|_){
       // [incomplete] simplifyExpr.e1: non-concrete value =~"foo" for bound <:
-      //     ./in.cue:61:11
+      //     ./in.cue:61:8
     }
     e2: (_|_){
       // [eval] simplifyExpr.e2: cannot use null for bound >:
-      //     ./in.cue:62:11
+      //     ./in.cue:62:8
     }
   }
 }

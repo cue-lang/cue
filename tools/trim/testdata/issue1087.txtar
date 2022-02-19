@@ -5,7 +5,7 @@ configs: {
 }
 
 shared: {
-	param: string
+	param:   string
 	derived: configs[param]
 }
 

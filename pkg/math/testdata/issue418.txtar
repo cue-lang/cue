@@ -2,21 +2,21 @@
 import "math"
 
 a: {
-    x: 32.45
-    y: int
-    y: math.Round(x)
+	x: 32.45
+	y: int
+	y: math.Round(x)
 }
 
 b: {
-    x: 32.45
-    y: int
-    y: math.Log(x)
+	x: 32.45
+	y: int
+	y: math.Log(x)
 }
 -- out/math --
 Errors:
 b.y: conflicting values int and 3.47970044315009900124277 (mismatched types int and float):
-    ./in.cue:11:8
-    ./in.cue:12:8
+    ./in.cue:11:5
+    ./in.cue:12:5
 
 Result:
 a: {

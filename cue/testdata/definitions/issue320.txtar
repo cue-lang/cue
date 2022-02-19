@@ -4,7 +4,7 @@
 	#More
 }
 
-#More: [=~ "^x-"]: _
+#More: [=~"^x-"]: _
 
 foo: #Foo & {
 	x: "hello"

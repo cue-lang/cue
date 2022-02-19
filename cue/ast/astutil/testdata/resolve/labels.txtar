@@ -2,15 +2,14 @@
 [X=string]: name: X
 a: X
 
-Z=[string]: { x: string, y: Z.x }
+Z=[string]: {x: string, y: Z.x}
 c: Z
 
 // `_` should not resolve.
 _: 1
 x: _
 
-for _ in [1] { a: _ }
-
+for _ in [1] {a: _}
 -- out/resolve/in --
 4[X]:       Scope: 0[<nil>]       Node: 0[]
 5[string]:  Scope: 0[<nil>]       Node: 0[]

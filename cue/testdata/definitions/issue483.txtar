@@ -1,14 +1,14 @@
 -- in.cue --
 out: {
-        instance
+	instance
 }
 instance: #Type & {
-        alpha: bravo: charlie: true
+	alpha: bravo: charlie: true
 }
 #Type: #Root & {
-        alpha?: bravo?: charlie?: bool
+	alpha?: bravo?: charlie?: bool
 }
-#Root: { ... }
+#Root: {...}
 -- out/eval --
 (struct){
   out: (#struct){

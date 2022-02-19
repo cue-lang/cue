@@ -6,7 +6,6 @@ a: "t"
 
 b: _|_
 b: "t"
-
 -- out/eval --
 Errors:
 explicit error (_|_ literal) in source:

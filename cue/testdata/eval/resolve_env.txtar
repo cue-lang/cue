@@ -1,13 +1,13 @@
 -- in.cue --
 a: {
-  d: int
-  b: {
-    c: d
-  }
+	d: int
+	b: {
+		c: d
+	}
 }
 x: {
-  d: 2
-  b: a.b.c // should be int, not 2
+	d: 2
+	b: a.b.c // should be int, not 2
 }
 a1: y: 5
 a1: a2: a3: a4: a5: a1.y

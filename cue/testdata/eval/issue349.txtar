@@ -1,13 +1,13 @@
 -- in.cue --
 ex: {
-  "aaa": "aaa",
-  "list": "list",
-  "zzz": "zzz",
-  "AAA": "AAA",
-  "html": "html",
-  "HTML": "html",
-  "ZZZ": "ZZZ",
-  "Html": "html",
+	"aaa":  "aaa"
+	"list": "list"
+	"zzz":  "zzz"
+	"AAA":  "AAA"
+	"html": "html"
+	"HTML": "html"
+	"ZZZ":  "ZZZ"
+	"Html": "html"
 }
 -- out/eval --
 (struct){

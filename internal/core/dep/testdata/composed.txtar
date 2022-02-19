@@ -1,11 +1,11 @@
 -- in.cue --
 t1: {$id: "foo"} & {
-        ref: t1.stdout
-        cmd: ["sh", "-c", "echo hello"]
-        stdout: string
+	ref: t1.stdout
+	cmd: ["sh", "-c", "echo hello"]
+	stdout: string
 }
 a: b: {$id: "foo"} & {
-    text: t1.stdout
+	text: t1.stdout
 }
 -- out/dependencies/field --
 -- out/dependencies/all --

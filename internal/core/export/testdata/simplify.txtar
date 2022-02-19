@@ -3,7 +3,7 @@ import "strings"
 
 x: [string]: int64
 x: {
-    y: int
+	y: int
 }
 s: strings.MinRunes(4) & strings.MaxRunes(7)
 -- out/definition --

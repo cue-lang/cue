@@ -1,9 +1,8 @@
 -- in.cue --
 a: 12
 #Controller: settings: {
-    controller: #Controller
+	controller: #Controller
 }
-
 -- out/eval --
 Errors:
 #Controller.settings.controller: structural cycle

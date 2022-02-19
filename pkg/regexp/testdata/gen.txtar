@@ -3,15 +3,15 @@
 -- in.cue --
 import "regexp"
 
-t1: regexp.Find(#"f\w\w"#, "afoot")
-t2: regexp.Find(#"f\w\w"#, "bar")
-t3: regexp.FindAll(#"f\w\w"#, "afoot afloat from", 2)
-t4: regexp.FindAll(#"f\w\w"#, "bla bla", -1)
-t5: regexp.FindSubmatch(#"f(\w)(\w)"#, "afloat afoot from")
-t6: regexp.FindAllSubmatch(#"f(\w)(\w)"#, "afloat afoot from", -1)
-t7: regexp.FindAllSubmatch(#"f(\w)(\w)"#, "aglom", -1)
-t8: regexp.FindNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from")
-t9: regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", -1)
+t1:  regexp.Find(#"f\w\w"#, "afoot")
+t2:  regexp.Find(#"f\w\w"#, "bar")
+t3:  regexp.FindAll(#"f\w\w"#, "afoot afloat from", 2)
+t4:  regexp.FindAll(#"f\w\w"#, "bla bla", -1)
+t5:  regexp.FindSubmatch(#"f(\w)(\w)"#, "afloat afoot from")
+t6:  regexp.FindAllSubmatch(#"f(\w)(\w)"#, "afloat afoot from", -1)
+t7:  regexp.FindAllSubmatch(#"f(\w)(\w)"#, "aglom", -1)
+t8:  regexp.FindNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from")
+t9:  regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", -1)
 t10: regexp.FindAllNamedSubmatch(#"f(?P<A>optional)?"#, "fbla", -1)
 t11: regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "aglom", -1)
 t12: regexp.Valid & "valid"
@@ -28,11 +28,11 @@ Errors:
 t13: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`:
     ./in.cue:15:21
 error in call to regexp.Find: no match:
-    ./in.cue:4:5
+    ./in.cue:4:6
 error in call to regexp.FindAll: no match:
-    ./in.cue:6:5
+    ./in.cue:6:6
 error in call to regexp.FindAllSubmatch: no match:
-    ./in.cue:9:5
+    ./in.cue:9:6
 error in call to regexp.FindAllNamedSubmatch: no match:
     ./in.cue:13:6
 

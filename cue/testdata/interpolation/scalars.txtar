@@ -4,12 +4,12 @@ bool1: "1+1=2:  \(true)"
 bool2: "1+1=1:  \(false)"
 
 // one replacement character
-b1: 'a\xED\x95a'
+b1:      'a\xED\x95a'
 bytes1s: "\(b1)"
 bytes1b: '\(b1)'
 
 // two replacement characters
-b2: 'a\x80\x95a'
+b2:      'a\x80\x95a'
 bytes2s: "\(b2)"
 bytes2b: '\(b2)'
 

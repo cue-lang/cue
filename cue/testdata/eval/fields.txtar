@@ -5,6 +5,9 @@ bulkToSelf: {
         foo: bar: "3" // error
     }
 }
+intField: {
+	(2): string
+}
 -- out/compile --
 --- in.cue
 {
@@ -18,12 +21,17 @@ bulkToSelf: {
       }
     }
   }
+  intField: {
+    2: string
+  }
 }
 -- out/eval --
 Errors:
 bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
     ./in.cue:3:24
     ./in.cue:4:19
+intField: integer fields not supported:
+    ./in.cue:8:3
 
 Result:
 (_|_){
@@ -41,5 +49,10 @@ Result:
         }
       }
     }
+  }
+  intField: (_|_){
+    // [eval] intField: integer fields not supported:
+    //     ./in.cue:8:3
+    2: (string){ string }
   }
 }

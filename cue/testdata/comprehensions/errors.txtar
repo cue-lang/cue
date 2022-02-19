@@ -22,10 +22,19 @@ userError: {
     if a != "" {
     }
 }
+
+intField: {
+	for i, _ in [1, 2] {
+		(i): {
+		}
+	  }
+}
 -- out/eval --
 Errors:
 circularFor.#list: invalid operand tail != null (found bool, want list or struct):
     ./in.cue:12:18
+intField: integer fields not supported:
+    ./in.cue:27:4
 
 Result:
 (_|_){
@@ -51,6 +60,14 @@ Result:
     //     ./in.cue:20:8
     a: (string){ string }
   }
+  intField: (_|_){
+    // [eval] intField: integer fields not supported:
+    //     ./in.cue:27:4
+    0: (struct){
+    }
+    1: (struct){
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -70,5 +87,13 @@ Result:
   userError: {
     a: (string|*_|_(explicit error (_|_ literal) in source))
     if (〈0;a〉 != "") {}
+  }
+  intField: {
+    for i, _ in [
+      1,
+      2,
+    ] {
+      〈1;i〉: {}
+    }
   }
 }

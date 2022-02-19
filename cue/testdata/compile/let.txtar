@@ -1,64 +1,64 @@
 -- in.cue --
 a: {
-    let X = Y
-    let Y = c
+	let X = Y
+	let Y = c
 
-    b: X
-    c: 5
+	b: X
+	c: 5
 }
 
 b: {
-    let X = Y
-    let Y = X
+	let X = Y
+	let Y = X
 
-    b: X
-    c: 5
+	b: X
+	c: 5
 }
 
 fieldOffset: {
-    a: {
-        p1: {
-            let X = { value: Y }
-            let Y = 2
-            x: X
-        }
-        p2: {
-            x: X
-            let Y = 2
-            let X = { value: Y }
-        }
-    }
-    b:  {
-        p1: {
-            let X = { x: y: Y }
-            let Y = 2
-            x: X
-        }
-        p2: {
-            x: X
-            let Y = 2
-            let X = { x: y: Y }
-        }
-    }
+	a: {
+		p1: {
+			let X = {value: Y}
+			let Y = 2
+			x: X
+		}
+		p2: {
+			x: X
+			let Y = 2
+			let X = {value: Y}
+		}
+	}
+	b: {
+		p1: {
+			let X = {x: y: Y}
+			let Y = 2
+			x: X
+		}
+		p2: {
+			x: X
+			let Y = 2
+			let X = {x: y: Y}
+		}
+	}
 }
 
 issue767: {
-    #Foo: {
-      let _#bar = {
-            value: ""
-      }
-      let _#volmnts = {
-            x: _#baz.value
-      }
-      let _#baz = {
-        _#bar
-      }
-      out: _#volmnts
-    }
+	#Foo: {
+		let _#bar = {
+			value: ""
+		}
+		let _#volmnts = {
+			x: _#baz.value
+		}
+		let _#baz = {
+			_#bar
+		}
+		out: _#volmnts
+	}
 }
 -- out/compile --
 b.let[]: cyclic references in let clause or alias:
-    ./in.cue:10:13
+    ./in.cue:10:10
 --- in.cue
 {
   a: {
@@ -95,4 +95,4 @@ b.let[]: cyclic references in let clause or alias:
 }
 -- out/eval --
 b.let[]: cyclic references in let clause or alias:
-    ./in.cue:10:13
+    ./in.cue:10:10

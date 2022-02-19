@@ -2,19 +2,19 @@
 a: 1
 b: a + 1
 d: {
-  x: _
-  y: b + x
+	x: _
+	y: b + x
 }
 e: d & {
-  x: 5
+	x: 5
 }
 f: {
-  a: "foo-bar": 3
-  b: a."foo-bar"
+	a: "foo-bar": 3
+	b: a."foo-bar"
 }
 g: {
-  a: "foo-bar": c: 3
-  b: a."foo-bar".c
+	a: "foo-bar": c: 3
+	b: a."foo-bar".c
 }
 -- out/eval --
 (struct){
@@ -24,8 +24,8 @@ g: {
     x: (_){ _ }
     y: (_|_){
       // [incomplete] d.y: non-concrete value _ in operand to +:
-      //     ./in.cue:5:6
-      //     ./in.cue:4:6
+      //     ./in.cue:5:5
+      //     ./in.cue:4:5
     }
   }
   e: (struct){

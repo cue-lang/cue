@@ -1,23 +1,23 @@
 -- in.cue --
 #a: {
-    val: string
-    result: string
+	val:    string
+	result: string
 }
 
 a: #a & {
-    val: *"default" | string
-    result: *"not-matched" | string
-    if (val == "match") {
-        result: "matched"
-    }
+	val:    *"default" | string
+	result: *"not-matched" | string
+	if (val == "match") {
+		result: "matched"
+	}
 }
 
 match: a & {
-    val: "match"
+	val: "match"
 }
 
 not: a & {
-    val: "other"
+	val: "other"
 }
 -- out/eval --
 (struct){

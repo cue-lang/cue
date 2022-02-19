@@ -3,10 +3,10 @@
 
 -- in.cue --
 A: #Task
-B: #steps: #Script & { mount: [A] }
-C: #steps: #Script & { mount: [B] }
+B: #steps: #Script & {mount: [A]}
+C: #steps: #Script & {mount: [B]}
 
-#Script: { mount: [...#Task] }
+#Script: {mount: [...#Task]}
 
 #Task: {
 	// Without the proper constructs, repeating the below results
@@ -19,7 +19,7 @@ C: #steps: #Script & { mount: [B] }
 	...
 }
 
-#ref: {a:1} | {b:2}
+#ref: {a: 1} | {b: 2}
 -- out/eval --
 (struct){
   A: (#struct){ |((#struct){

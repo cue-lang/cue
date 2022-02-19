@@ -2,24 +2,23 @@ cue eval ./pkg:foo
 
 -- cue.mod/module.cue --
 module: "example.com"
-
 -- in.cue --
 package foo
 
 import "example.com/pkg:bar"
+
 bar
 z: 3
-
 -- pkg/bar.cue --
 package bar
 
 import "example.com/pkg:baz"
+
 foo: {
-    baz
-    y: 2
+	baz
+	y: 2
 }
 foo
-
 -- pkg/baz.cue --
 package baz
 

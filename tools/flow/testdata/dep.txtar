@@ -12,15 +12,15 @@ indirectTaskRoot: root.indirectTaskValueReference
 
 root: {
 	a: {
-        b: 3
-    }
+		b: 3
+	}
 
 	concreteValueInGeneratedSubfield: {
 		x: {
 			// reference in value of comprehension.
-            // Even though the referenced value is concrete, we still consider
-            // this to be a dependency.
-			for x in [1] { foo: a.b }
+			// Even though the referenced value is concrete, we still consider
+			// this to be a dependency.
+			for x in [1] {foo: a.b}
 		}
 		index: int
 	}
@@ -31,7 +31,7 @@ root: {
 
 	taskRootReference: {
 		$after: indexReference
-		x: 3
+		x:      3
 	}
 
 	indirectTaskValueReference: {
@@ -45,15 +45,15 @@ root: {
 	}
 
 	incompleteComprehensionSource: {
-		x: { for x in indirectTaskRootReference.incomplete {} }
+		x: {for x in indirectTaskRootReference.incomplete {}}
 	}
 
 	incompleteList: {
-		x: [ for x in [1] { incompleteComprehensionSource.x } ]
+		x: [ for x in [1] {incompleteComprehensionSource.x}]
 	}
 
 	incompleteGeneratedStruct: {
-		x: { for x in [1] { foo: incompleteList.x } }
+		x: {for x in [1] {foo: incompleteList.x}}
 	}
 }
 -- out/run/errors --

@@ -3,10 +3,9 @@ a: b + 100
 b: a - 100
 a: 200
 
-
-c: d & { b: 2 }
+c: d & {b: 2}
 d: e
-e: { a: 1 }
+e: {a: 1}
 e: c
 -- out/eval --
 (struct){

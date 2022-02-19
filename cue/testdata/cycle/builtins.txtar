@@ -8,65 +8,65 @@ import "regexp"
 // builtin, effectively the entire struct needs to be evaluated and special care
 // should be taking to not evaluate too early.
 builtinCyclePerm0: {
-    X: "example.com"
+	X: "example.com"
 
-    Y: {
-        #components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
-        host: #components.host
-    }
+	Y: {
+		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
+		host:        #components.host
+	}
 
-    X: Y.host
+	X: Y.host
 }
 
 builtinCyclePerm1: {
-    X: Y.host
+	X: Y.host
 
-    Y: {
-        #components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
-        host: #components.host
-    }
+	Y: {
+		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
+		host:        #components.host
+	}
 
-    X: "example.com"
+	X: "example.com"
 }
 
 builtinCyclePerm2: {
-    Y: {
-        #components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
-        host: #components.host
-    }
+	Y: {
+		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
+		host:        #components.host
+	}
 
-    X: Y.host
-    X: "example.com"
+	X: Y.host
+	X: "example.com"
 }
 
 builtinCyclePerm3: {
-    Y: {
-        #components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
-        host: #components.host
-    }
+	Y: {
+		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
+		host:        #components.host
+	}
 
-    X: "example.com"
-    X: Y.host
+	X: "example.com"
+	X: Y.host
 }
 
 builtinCyclePerm4: {
-    X: "example.com"
-    X: Y.host
+	X: "example.com"
+	X: Y.host
 
-    Y: {
-        #components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
-        host: #components.host
-    }
+	Y: {
+		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
+		host:        #components.host
+	}
 }
 
 builtinCyclePerm5: {
-    X: Y.host
-    X: "example.com"
+	X: Y.host
+	X: "example.com"
 
-    Y: {
-        #components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
-        host: #components.host
-    }
+	Y: {
+		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
+		host:        #components.host
+	}
 }
 -- out/eval --
 (struct){

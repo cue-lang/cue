@@ -4,8 +4,6 @@ nan: number
 
 t: bool
 f: bool
-
-
 -- input.textproto --
 inf: inf
 nan: nan

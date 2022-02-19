@@ -1,10 +1,10 @@
 -- in.cue --
 cond: bool
-src:  {}
-top:  _
-a: [ if cond {} ]
-b: [ for x in src.foo {} ]
-c: { for x in top {} }
+src: {}
+top: _
+a: [ if cond {}]
+b: [ for x in src.foo {}]
+c: {for x in top {}}
 -- out/eval --
 (struct){
   cond: (bool){ bool }
@@ -21,7 +21,7 @@ c: { for x in top {} }
   }
   c: (_|_){
     // [incomplete] c: cannot range over top (incomplete type _):
-    //     ./in.cue:6:15
+    //     ./in.cue:6:14
   }
 }
 -- out/compile --

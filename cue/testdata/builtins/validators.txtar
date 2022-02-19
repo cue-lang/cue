@@ -1,64 +1,63 @@
 -- in.cue --
 import (
-    "struct"
-    "encoding/json"
+	"struct"
+	"encoding/json"
 )
-
 
 // non-monotonic builtins must fail with an "incomplete" error if there
 // is a possibility the constraint can get resolved by becoming more specific.
 incompleteError1: {
-    MyType: {
-            kv: struct.MinFields(1)
-    }
+	MyType: {
+		kv: struct.MinFields(1)
+	}
 
-    foo: MyType & {
-            kv: joel: "testing"
-    }
+	foo: MyType & {
+		kv: joel: "testing"
+	}
 }
 
 incompleteError2: {
-    MyType: {
-            kv: [string]: string
-            kv: struct.MinFields(1)
-    }
+	MyType: {
+		kv: [string]: string
+		kv: struct.MinFields(1)
+	}
 
-    foo: MyType & {
-            kv: joel: "testing"
-    }
+	foo: MyType & {
+		kv: joel: "testing"
+	}
 }
 
 incompleteError3: {
-    t: string
-    t: json.Validate(string)
+	t: string
+	t: json.Validate(string)
 }
 
 uniqueConstrains1: {
-    t: string
-    t: json.Validate(string)
-    t: json.Validate(string)
+	t: string
+	t: json.Validate(string)
+	t: json.Validate(string)
 }
 
 uniqueConstrains2: {
-    t: struct.MaxFields(1)
-    t: struct.MaxFields(1)
+	t: struct.MaxFields(1)
+	t: struct.MaxFields(1)
 }
 
 violation: {
-    #MyType: {
-            kv: [string]: string
-            kv: struct.MinFields(1)
-    }
+	#MyType: {
+		kv: [string]: string
+		kv: struct.MinFields(1)
+	}
 
-    foo: #MyType & {
-            kv: joel: "testing"
-            kv: tony: "testing"
-    }
+	foo: #MyType & {
+		kv: joel: "testing"
+		kv: tony: "testing"
+	}
 }
 
 conjuncts: {
-    kv: struct.MinFields(1)
-    kv: struct.MaxFields(3)
+	kv: struct.MinFields(1)
+	kv: struct.MaxFields(3)
 }
 
 // TODO: stripe off conflicting pairs
@@ -70,42 +69,41 @@ conjuncts: {
 // Builtins with bool return that can be used as validator.
 
 bareBuiltin: {
-    a: json.Valid
-    a: json.Valid
+	a: json.Valid
+	a: json.Valid
 }
 
 bareBuiltinCheck: {
-    a: json.Valid
-    a: "3"
+	a: json.Valid
+	a: "3"
 }
 
 builtinValidator: {
-    a: json.Valid()
-    a: json.Valid()
+	a: json.Valid()
+	a: json.Valid()
 }
 
 builtinValidatorCheck: {
-    a: json.Valid()
-    a: "3"
+	a: json.Valid()
+	a: "3"
 }
 
 callOfCallToValidator: {
-    a: json.Valid
-    b: a()
-    e: b() // not allowed
-    e: "5"
+	a: json.Valid
+	b: a()
+	e: b() // not allowed
+	e: "5"
 }
 
 validatorAsFunction: {
-    a: json.Valid
-    b: a("3")
-    c: json.Valid("3")
+	a: json.Valid
+	b: a("3")
+	c: json.Valid("3")
 }
-
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:
-    ./in.cue:94:8
+    ./in.cue:93:5
 
 Result:
 (_|_){
@@ -124,9 +122,9 @@ Result:
     MyType: (struct){
       kv: (_|_){
         // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
-        //     ./in.cue:22:17
-        //     ./in.cue:21:17
-        //     ./in.cue:22:34
+        //     ./in.cue:21:7
+        //     ./in.cue:20:7
+        //     ./in.cue:21:24
       }
     }
     foo: (struct){
@@ -148,9 +146,9 @@ Result:
     #MyType: (#struct){
       kv: (_|_){
         // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
-        //     ./in.cue:49:17
-        //     ./in.cue:48:17
-        //     ./in.cue:49:34
+        //     ./in.cue:48:7
+        //     ./in.cue:47:7
+        //     ./in.cue:48:24
       }
     }
     foo: (#struct){
@@ -181,7 +179,7 @@ Result:
     b: ((string|bytes)){ "encoding/json".Valid() }
     e: (_|_){
       // [eval] callOfCallToValidator.e: cannot call previously called validator b:
-      //     ./in.cue:94:8
+      //     ./in.cue:93:5
     }
   }
   validatorAsFunction: (struct){

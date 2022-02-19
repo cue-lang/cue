@@ -1,6 +1,7 @@
--- in.cue --
+# TODO(fmt): first line indented when it should not be: cuelang.org/issue/722
 
-// cycle is a structural cycle
+-- in.cue --
+		// cycle is a structural cycle
 cycle: a: cycle
 
 // reference to outside structural cycle
@@ -34,9 +35,6 @@ s4b: x: {} | s4b
 
 s5a: x: s5a | []
 s5b: x: [] | s5b
-
-
-
 -- out/eval --
 Errors:
 cycle.a: structural cycle

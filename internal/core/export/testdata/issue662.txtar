@@ -1,11 +1,11 @@
 
 -- uplot.cue --
 #LineConfig: {
-  lineColor?: string
+	lineColor?: string
 }
 
 #GraphFieldConfig: #LineConfig & {
-  drawStyle?: int
+	drawStyle?: int
 }
 -- out/definition --
 #LineConfig: {

@@ -3,15 +3,15 @@
 -- in.cue --
 import "list"
 
-t1: list.Avg([1, 2, 3, 4])
-t2: list.Avg([])
-t3: list.Avg("foo")
-t4: list.Drop([1, 2, 3, 4], 0)
-t5: list.Drop([1, 2, 3, 4], 2)
-t6: list.Drop([1, 2, 3, 4], 10)
-t7: list.Drop([1, 2, 3, 4], -1)
-t8: list.FlattenN([1, [[2, 3], []], [4]], -1)
-t9: list.FlattenN([1, [[2, 3], []], [4]], 0)
+t1:  list.Avg([1, 2, 3, 4])
+t2:  list.Avg([])
+t3:  list.Avg("foo")
+t4:  list.Drop([1, 2, 3, 4], 0)
+t5:  list.Drop([1, 2, 3, 4], 2)
+t6:  list.Drop([1, 2, 3, 4], 10)
+t7:  list.Drop([1, 2, 3, 4], -1)
+t8:  list.FlattenN([1, [[2, 3], []], [4]], -1)
+t9:  list.FlattenN([1, [[2, 3], []], [4]], 0)
 t10: list.FlattenN([1, [[2, 3], []], [4]], 1)
 t11: list.FlattenN([1, [[2, 3], []], [4]], 2)
 t12: list.FlattenN([[1, 2] | *[]], -1)
@@ -40,13 +40,13 @@ t34: list.Slice([1, 2, 3, 4], 3, 1)
 t35: list.Slice([1, 2, 3, 4], 5, 5)
 t36: list.Slice([1, 2, 3, 4], 1, 5)
 t37: list.Sort([], list.Ascending)
-t38: list.Sort([2, 3, 1, 4], {x:_, y:_, less: x<y})
-t39: list.SortStable([{a:2,v:1}, {a:1,v:2}, {a:1,v:3}], {
-			x:_,
-			y:_,
-			less: (x.a < y.a)
-		})
-t40: list.Sort([{a:1}, {b:2}], list.Ascending)
+t38: list.Sort([2, 3, 1, 4], {x: _, y: _, less: x < y})
+t39: list.SortStable([{a:        2, v: 1}, {a:  1, v: 2}, {a: 1, v: 3}], {
+	x:    _
+	y:    _
+	less: (x.a < y.a)
+})
+t40: list.Sort([{a: 1}, {b: 2}], list.Ascending)
 t41: list.SortStrings(["b", "a"])
 t42: list.SortStrings([1, 2])
 t43: list.Sum([1, 2, 3, 4])
@@ -60,15 +60,15 @@ t50: list.MinItems([1, 2, 3, 4], 2)
 t51: list.MinItems([1, 2, 3, 4], 5)
 t52: list.MaxItems([1, 2, 3, 4], 5)
 t53: list.MaxItems([1, 2, 3, 4], 2)
-t54: list.Sort([{a:1}, {b:2}], list.Ascending)
+t54: list.Sort([{a: 1}, {b: 2}], list.Ascending)
 -- out/list --
 Errors:
 error in call to list.Avg: empty list:
-    ./in.cue:4:5
+    ./in.cue:4:6
 t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
-    ./in.cue:5:14
+    ./in.cue:5:15
 error in call to list.Drop: negative index:
-    ./in.cue:9:5
+    ./in.cue:9:6
 error in call to list.FlattenN: cannot use value "foo" (type string) as list:
     ./in.cue:15:6
     ./in.cue:15:20

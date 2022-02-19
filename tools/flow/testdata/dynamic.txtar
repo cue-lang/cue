@@ -1,32 +1,32 @@
 -- in.cue --
 root: {
-    a: {
-        $id: "list"
-        out: [...int]
-    }
-    middle: {
-        for x in a.out if x > 1 {
-            "la\(x)": {
-                $id: "sequenced"
-                seq: x
-                val: "foo\(x)"
-            }
-        }
-    }
-    // Run this after all generated tasks (so far)
-    b: {
-        $id: "list"
-        $after: [ for x in middle { x } ]
-        out: [...int]
-    }
-    after: {
-        for x in b.out if x > 1 {
-            "lb\(x)": {
-                $id: "valToOut"
-                val: "foo\(x)"
-            }
-        }
-    }
+	a: {
+		$id: "list"
+		out: [...int]
+	}
+	middle: {
+		for x in a.out if x > 1 {
+			"la\(x)": {
+				$id: "sequenced"
+				seq: x
+				val: "foo\(x)"
+			}
+		}
+	}
+	// Run this after all generated tasks (so far)
+	b: {
+		$id: "list"
+		$after: [ for x in middle {x}]
+		out: [...int]
+	}
+	after: {
+		for x in b.out if x > 1 {
+			"lb\(x)": {
+				$id: "valToOut"
+				val: "foo\(x)"
+			}
+		}
+	}
 }
 -- out/run/errors --
 -- out/run/t0 --

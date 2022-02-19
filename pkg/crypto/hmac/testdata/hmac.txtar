@@ -1,5 +1,8 @@
+# TODO(fmt): spurious extra newline between import declarations: cuelang.org/issue/1545
+
 -- in.cue --
 import "crypto/hmac"
+
 import "encoding/hex"
 
 t1: hex.Encode(hmac.Sign(hmac.SHA1, hex.Decode("303132333435363738393a3b3c3d3e3f40414243"), "Sample #2"))

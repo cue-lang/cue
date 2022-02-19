@@ -18,7 +18,7 @@ parse: {
 	t2: time.Parse(time.RFC3339Date, "2021-02-19")
 
 	_layout: "01/02 03:04:05PM '06 -0700"
-	t3: time.Parse(_layout, _layout)
+	t3:      time.Parse(_layout, _layout)
 }
 
 split: {

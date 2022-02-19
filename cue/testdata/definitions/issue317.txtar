@@ -18,23 +18,23 @@ s: #T & {
 
 #Container: {
 	Env: [Name=string]: {
-			name:  string
-			value: string
+		name:  string
+		value: string
 	}
 }
 #Deployment: {
-        #Containers: [Name=string]: #Container
-        containers: [ for c in #Containers { c } ] // Problem is here.
+	#Containers: [Name=string]: #Container
+
+	containers: [ for c in #Containers {c}] // Problem is here.
 }
 Something: {
-        #Deployment
-        #Containers: {
-                // Does not allow entries other than value. Either add ... or embed
-                "a thing": Env: foobar: value: "foo"
-        }
+	#Deployment
+	#Containers: {
+		// Does not allow entries other than value. Either add ... or embed
+		"a thing": Env: foobar: value: "foo"
+	}
 }
 x: Something & #Deployment
-
 -- out/eval --
 (struct){
   #T: (#struct){

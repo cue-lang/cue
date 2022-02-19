@@ -1,21 +1,21 @@
 -- in.cue --
-b: { for k, v in a { "\(k)": v+1 } }
-a: { b: 1, c: 2 }
+b: {for k, v in a {"\(k)": v + 1}}
+a: {b: 1, c: 2}
 
-x: { for k, v in y { "\(k)": v } }
+x: {for k, v in y {"\(k)": v}}
 y: {} // check that empty struct after reference works.
 
-k: { for v in e { v } }
+k: {for v in e {v}}
 e: int
 
 comprehensionBinds: {
-    a: { for _ in [1] { a: _ } }
-    b: { for _, _ in [1] { a: _ } }
+	a: {for _ in [1] {a: _}}
+	b: {for _, _ in [1] {a: _}}
 }
 -- out/eval --
 Errors:
 k: invalid operand e (found int, want list or struct):
-    ./in.cue:7:15
+    ./in.cue:7:14
 
 Result:
 (_|_){
@@ -34,7 +34,7 @@ Result:
   }
   k: (_|_){
     // [eval] k: invalid operand e (found int, want list or struct):
-    //     ./in.cue:7:15
+    //     ./in.cue:7:14
   }
   e: (int){ int }
   comprehensionBinds: (struct){

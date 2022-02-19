@@ -269,13 +269,6 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				prefix: path.Join("out", x.Name),
 			}
 
-			for _, f := range a.Files {
-				// TODO: not entirely correct.
-				if strings.HasPrefix(f.Name, tc.prefix) {
-					tc.hasGold = true
-				}
-			}
-
 			if tc.HasTag("skip") {
 				t.Skip()
 			}
@@ -287,9 +280,32 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				t.Skip(msg)
 			}
 
+			update := false
+
+			for i, f := range a.Files {
+
+				// TODO: not entirely correct.
+				if strings.HasPrefix(f.Name, tc.prefix) {
+					tc.hasGold = true
+				}
+
+				// Ensure CUE files are formatted (or format them)
+				if !strings.HasSuffix(f.Name, ".cue") {
+					continue
+				}
+				if ff, err := format.Source(f.Data); err == nil {
+					if bytes.Equal(f.Data, ff) {
+						continue
+					}
+					if cuetest.FormatTxtar {
+						update = true
+						a.Files[i].Data = ff
+					}
+				}
+			}
+
 			f(tc)
 
-			update := false
 			for _, sub := range tc.outFiles {
 				var gold *txtar.File
 				for i, f := range a.Files {

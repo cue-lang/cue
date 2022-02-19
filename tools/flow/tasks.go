@@ -187,6 +187,11 @@ func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
 
 	for ; n != nil; n = n.Parent {
 		if c.cfg.IgnoreConcrete && n.IsConcrete() {
+			n.Finalize(c.opCtx)
+			// The dep package may add a Finalized Vertex with a nil BasevValue.
+			if n.BaseValue == nil {
+				return nil
+			}
 			if k := n.BaseValue.Kind(); k != adt.StructKind && k != adt.ListKind {
 				return nil
 			}

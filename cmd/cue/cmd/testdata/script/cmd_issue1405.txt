@@ -1,0 +1,41 @@
+exec cue cmd alias ./alias_tool.cue
+cmp stdout stdout-golden
+
+-- alias_tool.cue --
+import (
+	"tool/exec"
+	"text/template"
+)
+
+command: alias: {
+	rendered: template.Execute(t, instance & {
+		enabled: true
+	})
+
+    echo: exec.Run & {
+		cmd: ["echo", rendered]
+	}
+}
+
+t: """
+	# {{ .name }}
+	"""
+
+#base: {
+	enabled: bool | *false
+	name:    string
+	value?:  int
+}
+
+#combined: X=#base & {
+	name: "OK"
+	if X.enabled {
+		value: 123456
+	}
+}
+
+instance: #combined & {
+	enabled: true
+}
+-- stdout-golden --
+# OK

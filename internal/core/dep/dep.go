@@ -95,6 +95,7 @@ func VisitFields(c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
 var empty *adt.Vertex
 
 func init() {
+	// TODO: Consider setting a non-nil BaseValue.
 	empty = &adt.Vertex{}
 	empty.UpdateStatus(adt.Finalized)
 }

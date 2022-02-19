@@ -1,27 +1,27 @@
 -- in.cue --
 root: {
-    a: {
-        $id: "sequenced"
-        seq: 2 // terminate at t2
-        val: "foo"
-        out: string
-    }
-    b: {
-        $id: "sequenced"
-        seq: 3 // terminate at t3
-        val: "bar"
-        out: string
-    }
-    c: {
-        $id: "sequenced"
-        seq: 1 // terminate at t1
-        val: "baz"
-        out: string
-    }
-    d: {
-        $id: "valToOut"
-        out: a.out + b.out + c.out
-    }
+	a: {
+		$id: "sequenced"
+		seq: 2 // terminate at t2
+		val: "foo"
+		out: string
+	}
+	b: {
+		$id: "sequenced"
+		seq: 3 // terminate at t3
+		val: "bar"
+		out: string
+	}
+	c: {
+		$id: "sequenced"
+		seq: 1 // terminate at t1
+		val: "baz"
+		out: string
+	}
+	d: {
+		$id: "valToOut"
+		out: a.out + b.out + c.out
+	}
 }
 -- out/run/errors --
 -- out/run/t0 --

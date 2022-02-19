@@ -4,23 +4,23 @@ given: {
 	USD: GBP: 3.0
 }
 hydrated: {
-	for k,v in given {
-		for k1,r in v {
-			"\(k)": "\(k)":  1.0
+	for k, v in given {
+		for k1, r in v {
+			"\(k)": "\(k)":   1.0
 			"\(k1)": "\(k1)": 1.0
-			"\(k)": "\(k1)": r
-			"\(k1)": "\(k)": number
+			"\(k)": "\(k1)":  r
+			"\(k1)": "\(k)":  number
 		}
 	}
 }
 
 foo: {
-    a: 10
-    if a < 20 {
-        if a < 50 {
-            b: 20
-        }
-    }
+	a: 10
+	if a < 20 {
+		if a < 50 {
+			b: 20
+		}
+	}
 }
 -- out/eval --
 (struct){

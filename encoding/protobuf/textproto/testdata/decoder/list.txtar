@@ -14,8 +14,6 @@ int3: [...int]
 string1: [...string]
 
 float1: [...number]
-
-
 -- input.textproto --
 empty1: []
 empty2: [ # foo

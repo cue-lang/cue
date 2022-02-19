@@ -4,19 +4,17 @@ package foo
 import "acme.com/pkg"
 
 a: pkg.#A
-a: _val: 3
+a: _val:  3
 a: _#val: 6
 -- cue.mod/module.cue --
 module: "acme.com"
-
 -- pkg/pkg.cue --
 package pkg
 
 #A: {
-    _val: 4
+	_val:  4
 	_#val: 5
 }
-
 -- out/definition --
 package foo
 

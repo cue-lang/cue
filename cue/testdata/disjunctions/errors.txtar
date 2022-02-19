@@ -1,59 +1,58 @@
 -- in.cue --
 issue570: {
-    results: #DecodeOutput
-    results: result: "hello"
+	results: #DecodeOutput
+	results: result: "hello"
 
-    #Output: {
-        result: _
-    } | {
-        error: string
-    }
+	#Output: {
+		result: _
+	} | {
+		error: string
+	}
 
-    #DecodeOutput: #Output & {
-        result?: [... string]
-        ...
-    }
+	#DecodeOutput: #Output & {
+		result?: [... string]
+		...
+	}
 }
 
 issue516: {
-    #Def: {
-        match: metrics: string: {}
-    } | {}
+	#Def: {
+		match: metrics: string: {}
+	} | {}
 
-    x: #Def
-    x: match: metrics: "foo": {}
+	x: #Def
+	x: match: metrics: "foo": {}
 }
 
 // issue #465
 explicitDefaultError: {
-    a: string | *_|_
+	a: string | *_|_
 
-    if a != "" {
-    }
+	if a != "" {
+	}
 }
-
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:
 issue516.x: field not allowed: match:
-    ./in.cue:20:9
-    ./in.cue:22:8
-    ./in.cue:23:8
+    ./in.cue:20:6
+    ./in.cue:22:5
+    ./in.cue:23:5
 issue516.x.match.metrics: field not allowed: foo:
-    ./in.cue:19:25
-    ./in.cue:22:8
-    ./in.cue:23:24
+    ./in.cue:19:19
+    ./in.cue:22:5
+    ./in.cue:23:21
 issue570.results: 2 errors in empty disjunction:
 issue570.results: field not allowed: result:
-    ./in.cue:2:14
-    ./in.cue:3:14
-    ./in.cue:7:9
-    ./in.cue:11:20
-    ./in.cue:12:9
+    ./in.cue:2:11
+    ./in.cue:3:11
+    ./in.cue:7:6
+    ./in.cue:11:17
+    ./in.cue:12:3
 issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-    ./in.cue:2:14
-    ./in.cue:3:22
-    ./in.cue:12:18
+    ./in.cue:2:11
+    ./in.cue:3:19
+    ./in.cue:12:12
 
 Result:
 (_|_){
@@ -63,22 +62,22 @@ Result:
     results: (_|_){
       // [eval] issue570.results: 2 errors in empty disjunction:
       // issue570.results: field not allowed: result:
-      //     ./in.cue:2:14
-      //     ./in.cue:3:14
-      //     ./in.cue:7:9
-      //     ./in.cue:11:20
-      //     ./in.cue:12:9
+      //     ./in.cue:2:11
+      //     ./in.cue:3:11
+      //     ./in.cue:7:6
+      //     ./in.cue:11:17
+      //     ./in.cue:12:3
       // issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
-      //     ./in.cue:2:14
-      //     ./in.cue:3:22
-      //     ./in.cue:12:18
+      //     ./in.cue:2:11
+      //     ./in.cue:3:19
+      //     ./in.cue:12:12
       result: (_|_){
         // [eval] issue570.results: field not allowed: result:
-        //     ./in.cue:2:14
-        //     ./in.cue:3:14
-        //     ./in.cue:7:9
-        //     ./in.cue:11:20
-        //     ./in.cue:12:9
+        //     ./in.cue:2:11
+        //     ./in.cue:3:11
+        //     ./in.cue:7:6
+        //     ./in.cue:11:17
+        //     ./in.cue:12:3
       }
       error: (string){ string }
     }
@@ -108,25 +107,25 @@ Result:
     x: (_|_){
       // [eval] issue516.x: 2 errors in empty disjunction:
       // issue516.x: field not allowed: match:
-      //     ./in.cue:20:9
-      //     ./in.cue:22:8
-      //     ./in.cue:23:8
+      //     ./in.cue:20:6
+      //     ./in.cue:22:5
+      //     ./in.cue:23:5
       // issue516.x.match.metrics: field not allowed: foo:
-      //     ./in.cue:19:25
-      //     ./in.cue:22:8
-      //     ./in.cue:23:24
+      //     ./in.cue:19:19
+      //     ./in.cue:22:5
+      //     ./in.cue:23:21
       match: (_|_){
         // [eval] issue516.x: field not allowed: match:
-        //     ./in.cue:20:9
-        //     ./in.cue:22:8
-        //     ./in.cue:23:8
+        //     ./in.cue:20:6
+        //     ./in.cue:22:5
+        //     ./in.cue:23:5
       }
     }
   }
   explicitDefaultError: (_|_){
     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    //     ./in.cue:30:8
-    //     ./in.cue:28:5
+    //     ./in.cue:30:5
+    //     ./in.cue:28:2
     a: (string){ string }
   }
 }

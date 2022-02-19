@@ -23,41 +23,40 @@ Join: unix:    _
 Join: windows: _
 
 Join: [OS=string]: [...{
-    arg: [...string]
+	arg: [...string]
 
-    out: path.Join(arg, OS)
+	out: path.Join(arg, OS)
 }]
 
 Join: [_]: [
-    {arg: ["a", "b"]},
-    {arg: ["a/b", "c/d"]},
+	{arg: ["a", "b"]},
+	{arg: ["a/b", "c/d"]},
 
-    {arg: ["/"]},
-    {arg: ["a"]},
+	{arg: ["/"]},
+	{arg: ["a"]},
 
-    {arg: ["a", "b"]},
-    {arg: ["a", ""]},
-    {arg: ["", "b"]},
-    {arg: ["/", "a"]},
-    {arg: ["/", "a/b"]},
-    {arg: ["/", ""]},
-    {arg: ["//", "a"]},
+	{arg: ["a", "b"]},
+	{arg: ["a", ""]},
+	{arg: ["", "b"]},
+	{arg: ["/", "a"]},
+	{arg: ["/", "a/b"]},
+	{arg: ["/", ""]},
+	{arg: ["//", "a"]},
 
-    {arg: ["directory", "file"]},
+	{arg: ["directory", "file"]},
 
-    {arg: [#"C:\Windows\"#, #"System32"#]},
-    {arg: [#"C:\Windows\"#, #""#]},
-    {arg: [#"C:\"#, #"Windows"#]},
-    {arg: [#"C:"#, #"a\b"#]},
-    {arg: [#"C:"#, #"a"#, #"b"#]},
-    {arg: [#"C:"#, #""#, #""#, #"b"#]},
-    {arg: [#"C:"#, #""#]},
-    {arg: [#"C:"#, #""#, #""#]},
-    {arg: [#"C:."#, #"a"#]},
-    {arg: [#"C:a"#, #"b"#]},
-    {arg: [#"\\host\share"#, #"foo"#]},
+	{arg: [#"C:\Windows\"#, #"System32"#]},
+	{arg: [#"C:\Windows\"#, #""#]},
+	{arg: [#"C:\"#, #"Windows"#]},
+	{arg: [#"C:"#, #"a\b"#]},
+	{arg: [#"C:"#, #"a"#, #"b"#]},
+	{arg: [#"C:"#, #""#, #""#, #"b"#]},
+	{arg: [#"C:"#, #""#]},
+	{arg: [#"C:"#, #""#, #""#]},
+	{arg: [#"C:."#, #"a"#]},
+	{arg: [#"C:a"#, #"b"#]},
+	{arg: [#"\\host\share"#, #"foo"#]},
 ]
-
 -- out/path --
 joinSingle: "a/b"
 Join: {

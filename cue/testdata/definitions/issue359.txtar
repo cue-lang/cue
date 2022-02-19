@@ -1,39 +1,38 @@
 -- in.cue --
 #simple: {
-  peso: *1|int
-  edad: *2|int
+	peso: *1 | int
+	edad: *2 | int
 }
 
 // Second struct is not considered closed, as expected
 good: #simple & {
-  peso: 4
+	peso: 4
 }
 
-
 #complex: {
-  things: [string]: #simple
+	things: [string]: #simple
 }
 
 // Still, no closedness issue in the second struct
 #many: #complex & {
-  things: hola: peso: 2
-  things: sol: peso: 3
+	things: hola: peso: 2
+	things: sol: peso:  3
 }
 
 // Inner struct in second struct IS considered closed: why?
-bad: #many  & {
-  things: hola: peso: 2
+bad: #many & {
+	things: hola: peso: 2
 }
 
 // non-definition equivalent
 many: #complex & {
-  things: hola: peso: 2
-  things: sol: peso: 3
+	things: hola: peso: 2
+	things: sol: peso:  3
 }
 
 // Now inner struct on second struct is NOT considered closed
-notbad: many  & {
-  things: hola: peso: 2
+notbad: many & {
+	things: hola: peso: 2
 }
 -- out/eval --
 (struct){

@@ -4,12 +4,12 @@
 import "text/tabwriter"
 
 t1: tabwriter.Write("""
-			a\tb\tc
-			aaa\tbb\tvv
-			""")
+	a\tb\tc
+	aaa\tbb\tvv
+	""")
 t2: tabwriter.Write([
-				"a\tb\tc",
-				"aaa\tbb\tvv"])
+	"a\tb\tc",
+	"aaa\tbb\tvv"])
 -- out/tabwriter --
 t1: """
 	a   b  c

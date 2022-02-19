@@ -1,6 +1,5 @@
 -- in.cue --
-
-// cycle is a structural cycle
+		// cycle is a structural cycle
 cycle: a: cycle
 
 // reference to outside structural cycle
@@ -34,9 +33,6 @@ s4b: x: {} | s4b
 
 s5a: x: s5a | []
 s5b: x: [] | s5b
-
-
-
 -- out/eval --
 Errors:
 cycle.a: structural cycle

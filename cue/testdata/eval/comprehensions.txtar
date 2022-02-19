@@ -1,7 +1,7 @@
 -- in.cue --
 import "strings"
 
-a: { x: 10, y: 100, z: 50 }
+a: {x: 10, y: 100, z: 50}
 b: {
 	for k, v in a if v <= 50 {
 		"\(k)": v
@@ -17,20 +17,19 @@ b: {
 }
 
 c: {
-  for k, v in a let y = v+10 if y > 50 {
-    "\(k)": y
-  }
+	for k, v in a let y = v + 10 if y > 50 {
+		"\(k)": y
+	}
 }
 
 A: X: run: "dfoo"
 
 if true {
 	A: X: {
-		run: string
-		files: "\(strings.Join([ run ], "\n"))"
+		run:   string
+		files: "\(strings.Join([ run], "\n"))"
 	}
 }
-
 -- out/eval --
 (struct){
   a: (struct){

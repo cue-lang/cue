@@ -2,76 +2,75 @@
 
 -- in.cue --
 elipsis: {
-    test1: {
-        string
-        #foo: "bar"
-    }
+	test1: {
+		string
+		#foo: "bar"
+	}
 
-    #Def: {
-        ...
-        #foo: string
-        _
-    }
-    check: test1 & #Def
+	#Def: {
+		...
+		#foo: string
+		_
+	}
+	check: test1 & #Def
 }
 
 bulk: {
-    test1: {
-        string
-        #foo: "bar"
-    }
+	test1: {
+		string
+		#foo: "bar"
+	}
 
-    #Def: {
-        [string]: int
-        #foo: string
-        _
-    }
-    check: test1 & #Def
+	#Def: {
+		[string]: int
+		#foo:     string
+		_
+	}
+	check: test1 & #Def
 }
 
 optional: {
-    test1: {
-        string
-        #foo: "bar"
-    }
+	test1: {
+		string
+		#foo: "bar"
+	}
 
-    #Def: {
-        bar?: int
-        #foo: string
-        _
-    }
-    check: test1 & #Def
+	#Def: {
+		bar?: int
+		#foo: string
+		_
+	}
+	check: test1 & #Def
 }
 
 issue783: {
-    test1: {
-        string
-        #foo: "bar"
-    }
+	test1: {
+		string
+		#foo: "bar"
+	}
 
-    test2: {
-        hello: "world"
-        #foo: "bar"
-    }
+	test2: {
+		hello: "world"
+		#foo:  "bar"
+	}
 
+	#Def1: {
+		...
+		#foo: string
+	} | {
+		string
+		#foo: string
+	}
+	check1a: test1 & #Def1
+	check1b: test2 & #Def1
 
-    #Def1: {
-        ...
-        #foo: string
-    } | {
-        string
-        #foo: string
-    }
-    check1a: test1 & #Def1
-    check1b: test2 & #Def1
-
-    #Def2: {
-        ...
-        #foo: string
-        _
-    }
-    check2a: test1 & #Def2
-    check2b: test2 & #Def2
+	#Def2: {
+		...
+		#foo: string
+		_
+	}
+	check2a: test1 & #Def2
+	check2b: test2 & #Def2
 }
 -- out/eval --
 (struct){

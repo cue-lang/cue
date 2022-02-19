@@ -1,43 +1,41 @@
 # This file tests disjunctions used as operands.
 
 -- in.cue --
-
-list: *[1] | [2]
+list:      *[1] | [2]
 condition: *true | false
-num: *1 | 2
-object: *{ a: 1 } | { a: 2 }
+num:       *1 | 2
+object:    *{a: 1} | {a: 2}
 
 forLoop: [
-  for e in list {
-    "count: \(e)"
-  }
+	for e in list {
+		"count: \(e)"
+	},
 ]
 
 conditional: {
-    if condition {
-        a: 3
-    }
-    if num < 5 {
-        b: 3
-    }
+	if condition {
+		a: 3
+	}
+	if num < 5 {
+		b: 3
+	}
 }
 
 selector: {
-    a: object.a
+	a: object.a
 }
 
 index: {
-    a: list[0]
+	a: list[0]
 }
 
 binOp: {
-    a: num + 4
+	a: num + 4
 }
 
 unaryOp: {
-    a: -num
+	a: -num
 }
-
 -- out/eval --
 (struct){
   list: (list){ |(*(#list){

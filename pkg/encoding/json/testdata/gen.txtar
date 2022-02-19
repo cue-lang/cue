@@ -3,8 +3,8 @@
 -- in.cue --
 import "encoding/json"
 
-t1: json.Validate("{\"a\":10}", {b:string})
-t2: json.Validate("{\"a\":10}", {a:<3})
+t1: json.Validate("{\"a\":10}", {b: string})
+t2: json.Validate("{\"a\":10}", {a: <3})
 t3: json.Valid("1")
 t4: json.Compact("[1, 2]")
 t5: json.Indent(#"{"a": 1, "b": 2}"#, "", "  ")
@@ -17,19 +17,18 @@ t8: {
 t9: json.MarshalStream([{a: 1}, {b: int | *2}])
 
 unmarshalStream: {
-	t1: json.UnmarshalStream(#"{"a": 1}{"b": 2}"#)
-	t1: json.UnmarshalStream(#'{"a": 1}{"b": 2}'#)
+	t1:    json.UnmarshalStream(#"{"a": 1}{"b": 2}"#)
+	t1:    json.UnmarshalStream(#'{"a": 1}{"b": 2}'#)
 	empty: json.UnmarshalStream('')
 	empty: json.UnmarshalStream("")
-	nums: json.UnmarshalStream('1 2')
-	nums: json.UnmarshalStream("1 2")
+	nums:  json.UnmarshalStream('1 2')
+	nums:  json.UnmarshalStream("1 2")
 }
-
 -- out/json --
 Errors:
 a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
     ./in.cue:4:5
-    ./in.cue:4:36
+    ./in.cue:4:37
     json.Validate:1:6
 
 Result:

@@ -1,21 +1,11 @@
 Issue #721
 
 -- in.cue --
-// allow front-style commas
-a
-: { "key": "value"
-, "key2"
-: "value2"
-}
-
-, b: [
-    0
-,   1
-,       2
-        ,3,
-    4
-
-    , 5
+		// allow front-style commas
+a: {"key": "value", "key2": "value2"
+}, b: [
+	0, 1, 2, 3,
+	4, 5,
 ]
 -- out/compile --
 --- in.cue

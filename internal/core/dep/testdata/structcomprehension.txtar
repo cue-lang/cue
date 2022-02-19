@@ -1,10 +1,10 @@
 -- in.cue --
 a: b: {
-    for i, x in c
-    let y = x
-    if y > 0 {
-        "\(e)\(i)": x + d
-    }
+	for i, x in c
+	let y = x
+	if y > 0 {
+		"\(e)\(i)": x + d
+	}
 }
 
 c: [1, 2]

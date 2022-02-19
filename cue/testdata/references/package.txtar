@@ -1,6 +1,5 @@
 -- cue.mod/module.cue --
 module: "example.com"
-
 -- in.cue --
 package exitcode
 
@@ -11,7 +10,6 @@ import (
 a: 1
 
 incomplete: pkg.Settings
-
 -- cue.mod/pkg/foo.com/example/example.cue --
 package example
 
@@ -21,7 +19,6 @@ package example
 // Issue #550
 blah: Settings.anyKey
 Settings: {}
-
 -- out/ --
 
 -- out/eval --

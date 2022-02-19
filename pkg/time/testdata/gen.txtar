@@ -16,9 +16,8 @@ parse: {
 	t1: time.Parse(time.RFC822, "01 Jul 21 17:54 EDT")
 
 	_layout: "01/02 03:04:05PM '06 -0700"
-	t2: time.Parse(_layout, _layout)
+	t2:      time.Parse(_layout, _layout)
 }
-
 -- out/time --
 Errors:
 t2: invalid value "no time" (does not satisfy time.Time): error in call to time.Time: invalid time "no time":

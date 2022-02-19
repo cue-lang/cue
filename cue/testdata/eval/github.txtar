@@ -337,7 +337,6 @@ _#tempCueckooGitDir: """
 _#curl: "curl -f -s"
 -- cue.mod/module.cue --
 module: "mod.com"
-
 -- cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue --
 package json
 
@@ -858,7 +857,7 @@ import "strings"
 						...
 					} | #expressionSyntax) & {
 						{[=~"^(in|ex)clude$" & !~"^()$"]: [...{
-											[string]: #configuration
+							[string]: #configuration
 						}] & [_, ...]}
 						{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...]}
 					}

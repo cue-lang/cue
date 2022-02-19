@@ -1,6 +1,6 @@
 -- in.cue --
 range1: {
-	min: *1 | int
+	min:   *1 | int
 	range: >min
 	range: 8
 }
@@ -9,7 +9,7 @@ range2: {
 	max: int & >min
 }
 rg: range2 & {
-//	min: 1
+	//   min: 1
 	max: 8
 }
 -- out/eval --

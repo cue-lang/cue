@@ -1958,6 +1958,9 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 			continue
 		}
 		f = ctx.Label(d.field.Key, v)
+		if f.IsInt() {
+			n.addErr(ctx.NewPosf(pos(d.field.Key), "integer fields not supported"))
+		}
 		n.insertField(f, MakeConjunct(d.env, d.field, d.id))
 	}
 

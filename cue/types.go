@@ -1107,12 +1107,33 @@ func (v Value) Err() error {
 }
 
 // Pos returns position information.
+//
+// Use v.Expr to get positions for all conjuncts and disjuncts.
 func (v Value) Pos() token.Pos {
-	if v.v == nil || v.Source() == nil {
+	if v.v == nil {
 		return token.NoPos
 	}
-	pos := v.Source().Pos()
-	return pos
+
+	if src := v.Source(); src != nil {
+		if pos := src.Pos(); pos != token.NoPos {
+			return pos
+		}
+	}
+	// Pick the most-concrete field.
+	var p token.Pos
+	for _, c := range v.v.Conjuncts {
+		x := c.Elem()
+		pp := pos(x)
+		if pp == token.NoPos {
+			continue
+		}
+		p = pp
+		// Prefer struct conjuncts with actual fields.
+		if s, ok := x.(*adt.StructLit); ok && len(s.Fields) > 0 {
+			break
+		}
+	}
+	return p
 }
 
 // TODO: IsFinal: this value can never be changed.

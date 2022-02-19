@@ -2918,6 +2918,51 @@ func TestReferencePath(t *testing.T) {
 	}
 }
 
+func TestPos(t *testing.T) {
+	testCases := []struct {
+		value string
+		pos   string
+	}{{
+		value: `
+a: string
+a: "foo"`,
+		pos: "3:4",
+	}, {
+		value: `
+a: x: string
+a: x: "x"`,
+		pos: "2:4",
+	}, {
+		// Prefer struct conjuncts with actual fields.
+		value: `
+a: [string]: string
+a: x: "x"`,
+		pos: "3:4",
+	}, {
+		value: `
+a: [string]: [string]: string
+a: x: y: "x"`,
+		pos: "3:4",
+	}, {
+		value: `
+a: [string]: [string]: [string]: string
+a: x: y: z: "x"`,
+		pos: "3:4",
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			var c Context
+			c.runtime().Init()
+			v := c.CompileString(tc.value)
+			v = v.LookupPath(ParsePath("a"))
+			pos := v.Pos().String()
+			if pos != tc.pos {
+				t.Errorf("got %v; want %v", pos, tc.pos)
+			}
+		})
+	}
+}
+
 func TestPathCorrection(t *testing.T) {
 	testCases := []struct {
 		input  string

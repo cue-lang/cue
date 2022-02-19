@@ -274,6 +274,33 @@ func TestValueType(t *testing.T) {
 		kind:           StructKind, // Can determine a valid struct already.
 		incompleteKind: StructKind,
 		concrete:       true,
+	}, {
+		value: `v: #Foo
+		#Foo: {
+			name: string,
+			...
+		}`,
+		kind:           StructKind,
+		incompleteKind: StructKind,
+		concrete:       true,
+	}, {
+		value: `v: #Foo
+			#Foo: {
+				name: string,
+			}`,
+		kind:           StructKind,
+		incompleteKind: StructKind,
+		concrete:       true,
+		closed:         true,
+	}, {
+		value: `v: #Foo | int
+		#Foo: {
+			name: string,
+			}`,
+		incompleteKind: StructKind | IntKind,
+		// Hard to tell what is correct here, but For backwards compatibility,
+		// this is false.
+		closed: false,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

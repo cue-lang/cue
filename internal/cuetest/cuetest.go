@@ -34,6 +34,8 @@ const (
 	// tracker conditions (e.g. [golang.org/issues/1234]) to be considered
 	// non-issues.
 	envNonIssues = "CUE_NON_ISSUES"
+
+	envFormatTxtar = "CUE_FORMAT_TXTAR"
 )
 
 var (
@@ -54,6 +56,10 @@ var (
 // testscript.Params.UpdateGoldenFiles. See the docs for
 // testscript.Params.UpdateGoldenFiles for more details.
 var UpdateGoldenFiles = os.Getenv(envUpdate) != ""
+
+// FormatTxtar ensures that .cue files in txtar test archives are well
+// formatted, updating the archive as required prior to running a test.
+var FormatTxtar = os.Getenv(envFormatTxtar) != ""
 
 // Condition adds support for CUE-specific testscript conditions within
 // testscript scripts. Supported conditions include:

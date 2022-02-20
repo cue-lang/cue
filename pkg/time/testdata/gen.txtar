@@ -15,8 +15,10 @@ parse: {
 	t1: time.Parse(time.RFC822, "01 Jul 21 17:54 EST")
 	t1: time.Parse(time.RFC822, "01 Jul 21 17:54 EDT")
 
+	t2: time.Parse(time.RFC3339Date, "2021-02-19")
+
 	_layout: "01/02 03:04:05PM '06 -0700"
-	t2: time.Parse(_layout, _layout)
+	t3: time.Parse(_layout, _layout)
 }
 
 -- out/time --
@@ -31,6 +33,7 @@ t2: _|_ // t2: invalid value "no time" (does not satisfy time.Time): error in ca
 t3: "2017-07-14T02:40:00.000123456Z"
 parse: {
 	t1: "2021-07-01T17:54:00Z"
-	t2: "2006-01-02T22:04:05Z"
+	t2: "2021-02-19T00:00:00Z"
+	t3: "2006-01-02T22:04:05Z"
 }
 

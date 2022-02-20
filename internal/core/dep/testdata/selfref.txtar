@@ -1,0 +1,29 @@
+#Issue: 1405
+-- in.cue --
+a: {
+	command: alias: {
+		// TODO: fix inner referene.
+		val: (instance & { enabled: true }).value
+		echo: cmd: val
+	}
+
+	#base: {
+		enabled: bool | *false
+		value?:  string
+	}
+
+	#combined: X=#base & {
+		if X.enabled {
+			value: "123456"
+		}
+	}
+
+	instance: #combined & { enabled: true }
+}
+-- out/dependencies/field --
+-- out/dependencies/all --
+-- out/dependencies/dynamic --
+value
+a.command.alias.val
+a.#base
+a.#combined

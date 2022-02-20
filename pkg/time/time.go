@@ -130,7 +130,7 @@ func Time(s string) (bool, error) {
 }
 
 func timeFormat(value, layout string) (bool, error) {
-	_, err := time.ParseInLocation(layout, value, nil)
+	_, err := time.ParseInLocation(layout, value, time.UTC)
 	if err != nil {
 		// Use our own error, the time package's error as the Go error is too
 		// confusing within this context.
@@ -178,8 +178,9 @@ func Format(value, layout string) (bool, error) {
 // Parse currently does not support zone abbreviations like MST. All are
 // interpreted as UTC.
 func Parse(layout, value string) (string, error) {
-	// TODO: support named variadic argument "location:" to pass in a location.
-	t, err := time.ParseInLocation(layout, value, nil)
+	// TODO: should we support locations? The result will be non-hermetic.
+	// See comments on github.com/cue-lang/cue/issues/1522.
+	t, err := time.ParseInLocation(layout, value, time.UTC)
 	if err != nil {
 		return "", err
 	}

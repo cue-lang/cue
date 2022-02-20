@@ -170,16 +170,11 @@ func Format(value, layout string) (bool, error) {
 //
 // In the absence of a time zone indicator, Parse returns a time in UTC.
 //
-// When parsing a time with a zone offset like -0700, if the offset corresponds
-// to a time zone used by the current location (Local), then Parse uses that
-// location and zone in the returned time. Otherwise it records the time as
-// being in a fabricated location with time fixed at the given zone offset.
-//
 // Parse currently does not support zone abbreviations like MST. All are
 // interpreted as UTC.
 func Parse(layout, value string) (string, error) {
 	// TODO: support named variadic argument "location:" to pass in a location.
-	t, err := time.ParseInLocation(layout, value, nil)
+	t, err := time.ParseInLocation(layout, value, time.UTC)
 	if err != nil {
 		return "", err
 	}

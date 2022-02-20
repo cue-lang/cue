@@ -14,6 +14,7 @@ parse: {
 	t1: time.Parse(time.RFC822, "01 Jul 21 17:54 PDT")
 	t1: time.Parse(time.RFC822, "01 Jul 21 17:54 EST")
 	t1: time.Parse(time.RFC822, "01 Jul 21 17:54 EDT")
+	t1: time.Parse("2006-01-02 15:04", "2021-07-01 17:54")
 
 	_layout: "01/02 03:04:05PM '06 -0700"
 	t2: time.Parse(_layout, _layout)

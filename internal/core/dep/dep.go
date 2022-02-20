@@ -95,6 +95,7 @@ func VisitFields(c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
 var empty *adt.Vertex
 
 func init() {
+	// TODO: Consider setting a non-nil BaseValue.
 	empty = &adt.Vertex{}
 	empty.UpdateStatus(adt.Finalized)
 }
@@ -222,7 +223,7 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	}
 
 	if ref, _ := c.ctxt.Resolve(env, r); ref != nil {
-		if ref != c.node {
+		if ref != c.node && ref != empty {
 			d := Dependency{
 				Node:      ref,
 				Reference: r,

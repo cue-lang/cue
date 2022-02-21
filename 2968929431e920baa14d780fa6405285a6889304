@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83d90a50_c8de7b47",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-21T11:41:36Z",
+      "side": 1,
+      "message": "LGTM. The K8s tutorial looks better on the back of this change, too.",
+      "revId": "2968929431e920baa14d780fa6405285a6889304",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f49eb2b_64b954b7",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-21T11:41:36Z",
+      "side": 1,
+      "message": "Looks debugging related but harmless so ignoring.",
+      "revId": "2968929431e920baa14d780fa6405285a6889304",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

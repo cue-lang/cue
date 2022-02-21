@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b610221_766b8260",
+        "filename": "cue/testdata/builtins/incomplete.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-21T11:38:33Z",
+      "side": 1,
+      "message": "The space vs tab issue strikes again 😊\n\nThe CUE in this txtar is not formatted with cue fmt. Lines are space indented. Which means that error messages, like this one, look \"off\" for someone expecting the column positions to be calculated in terms of tabs. \n\nI\u0027ve mailed a mini stack of CLs via https://review.gerrithub.io/c/cue-lang/cue/+/533494/ to see what you think. This CL could be rebased on top of that, or else I could land it after your stack. It feels like we would benefit from not relying on manually formatting stuff.",
+      "revId": "5495978fcce5e41e17adc5d178450af5f1def975",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aeefdae8_4fcf8cae",
+        "filename": "cue/testdata/builtins/issue299.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-21T11:38:33Z",
+      "side": 1,
+      "message": "Nice fix :)",
+      "revId": "5495978fcce5e41e17adc5d178450af5f1def975",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c0f1178_67672f0f",
+        "filename": "cue/testdata/builtins/validators.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-21T11:38:33Z",
+      "side": 1,
+      "message": "Spaces vs tabs again 😊",
+      "revId": "5495978fcce5e41e17adc5d178450af5f1def975",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

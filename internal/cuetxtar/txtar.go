@@ -300,6 +300,8 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					if cuetest.FormatTxtar {
 						update = true
 						a.Files[i].Data = ff
+					} else {
+						t.Errorf("%s::%s is not formatted", filepath.Join(root, fullpath), f.Name)
 					}
 				}
 			}

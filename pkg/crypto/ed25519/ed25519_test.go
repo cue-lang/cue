@@ -21,6 +21,7 @@ import (
 	"os"
 	"testing"
 
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/pkg/internal/builtintest"
 )
@@ -75,9 +76,14 @@ func updateGoldenFiles(t *testing.T) {
 		)
 	}
 
+	fInputs, err := format.Source(inputs.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	var buf bytes.Buffer
 	fmt.Fprintln(&buf, "-- in.cue --")
-	fmt.Fprintln(&buf, inputs.String())
+	fmt.Fprint(&buf, string(fInputs))
 	if err := os.WriteFile("testdata/gen.txtar", buf.Bytes(), 0666); err != nil {
 		t.Fatal(err)
 	}

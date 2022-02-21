@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b44d6fb1_069dbb18",
+        "filename": "pkg/time/time.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-21T11:53:52Z",
+      "side": 1,
+      "message": "As discussed, I think we should only do so if we can find a mechanism by which the location database etc is passed in by the user.",
+      "revId": "7dee004cede051334c420abf34712b6a47e0f600",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

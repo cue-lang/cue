@@ -289,7 +289,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					tc.hasGold = true
 				}
 
-				// Format CUE files as required
+				// Format CUE files as required, and enforce they are formatted
 				if tc.HasTag("noformat") || !strings.HasSuffix(f.Name, ".cue") {
 					continue
 				}
@@ -300,6 +300,8 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					if cuetest.FormatTxtar {
 						update = true
 						a.Files[i].Data = ff
+					} else {
+						t.Errorf("%s::%s is not formatted", filepath.Join(root, fullpath), f.Name)
 					}
 				}
 			}

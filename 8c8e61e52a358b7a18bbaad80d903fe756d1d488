@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "216b802b_60c04596",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-21T12:06:58Z",
+      "side": 1,
+      "message": "Thanks for the CL. We\u0027re just in the process of preparing for v0.4.3 and so will revisit this shortly.",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

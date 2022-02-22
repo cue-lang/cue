@@ -16,6 +16,24 @@
       "message": "Super nit: might be worth rewriting this in terms of the alternative proposed in the deprecation.",
       "revId": "29306367cab0ac6641f68215312f067a2dec62af",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e48e18b9_b7039cb5",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1151,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:13:11Z",
+      "side": 1,
+      "message": "These changes are subtle, so preferably in a separate CL.",
+      "parentUuid": "a15c69eb_08c2f7e6",
+      "revId": "29306367cab0ac6641f68215312f067a2dec62af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

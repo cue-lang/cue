@@ -195,6 +195,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b541f701_533d4afc",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-02-22T16:52:07Z",
+      "side": 1,
+      "message": "Should a separate CL introduce similar protections in other functions?",
+      "parentUuid": "d91c52af_77535fc0",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "41f665b4_9122a72e",
         "filename": "tools/flow/flow.go",
         "patchSetId": 1
@@ -224,6 +242,24 @@
       "side": 1,
       "message": "As this is an inherently concurrent API, I think it is a nice protection. But either way.\n\nGood point about Terminated. Probably better to just have a synchronized done boolean.\n\nNote that Value() ultimately needs to call a Mutex anyway to get the Value during running. So it is not wasted effort to add this.",
       "parentUuid": "41f665b4_9122a72e",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "188deea1_3836b6e3",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-02-22T16:52:07Z",
+      "side": 1,
+      "message": "Is there \"value\" in getting the Value after New but before Run?\n\nIt might be nice to inspect what was created before running. This also seems to be in line with the other functions which say \"don\u0027t access this while running\".",
+      "parentUuid": "9f931781_e37e2037",
       "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

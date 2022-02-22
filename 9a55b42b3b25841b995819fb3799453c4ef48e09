@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8e02293_fdf2d9f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-22T15:25:43Z",
+      "side": 1,
+      "message": "Initially I though about checking that all tasks are in terminated state and panic if not. But as the loop might add more tasks based on previously run tasks it doesn\u0027t seem reliable to do it like this. \n\nFor simplicity I\u0027ve reused the tasks states in the controller as I believe this is only a temporary restriction.",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

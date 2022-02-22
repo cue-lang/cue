@@ -89,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7bf25ffc_2c6a9b6c",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-22T16:11:10Z",
+      "side": 1,
+      "message": "You\u0027d want to protect state because of potential concurrent use of Run() and Value() ?",
+      "parentUuid": "8dc3f794_8bc81ab1",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "41aa8c47_e5e48c63",
         "filename": "tools/flow/flow.go",
         "patchSetId": 1
@@ -118,6 +136,24 @@
       "side": 1,
       "message": "How would that be simpler?\n\nThe state could just be a boolean, though. No need to have Ready-Running-Terminated.",
       "parentUuid": "41aa8c47_e5e48c63",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a94448d_0fa8d69f",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-22T16:11:10Z",
+      "side": 1,
+      "message": "Right",
+      "parentUuid": "b1f15c69_911484dd",
       "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

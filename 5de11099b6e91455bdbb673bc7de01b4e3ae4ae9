@@ -16,6 +16,24 @@
       "message": "We shouldn\u0027t always enforce that files are formatted. For instance, when testing formatting itself. So there should be some option to disable formatting.",
       "revId": "5de11099b6e91455bdbb673bc7de01b4e3ae4ae9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "956f7aea_547a1989",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T10:50:00Z",
+      "side": 1,
+      "message": "Yep, hopefully that\u0027s covered by the #noformat tag (next line condition)?",
+      "parentUuid": "8d742268_fa4cbae4",
+      "revId": "5de11099b6e91455bdbb673bc7de01b4e3ae4ae9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

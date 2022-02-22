@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0c8cef8_613d9008",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1019161
+      },
+      "writtenOn": "2022-02-22T16:33:39Z",
+      "side": 1,
+      "message": "This looks good to me! I like the simplicity of it, and protecting the Value with a mutex for now seems like a good idea. We can always remove the restriction in the future when the evaluator can better handle it.",
+      "revId": "b92232457e3ece3c0009502b3c254d6eab900b5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

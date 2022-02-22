@@ -53,5 +53,4 @@ Y: conflicting values 2 and float (mismatched types int and float):
     ./vector.cue:5:8
 Z: field not allowed: Z:
     ./test.json:4:3
-    ./vector.cue:3:1
     ./vector.cue:3:6

@@ -674,6 +674,10 @@ Result:
     a: (_|_){
       // [cycle] fail.a: cycle with field a.b:
       //     ./in.cue:26:6
+      b: (_|_){
+        // [cycle] fail.a: cycle with field a.b:
+        //     ./in.cue:26:6
+      }
     }
   }
   embed: (_|_){
@@ -796,6 +800,10 @@ Result:
     #a: (_|_){
       // [incomplete] xx.#a: incomplete bool: bool:
       //     ./in.cue:162:6
+      c: (_|_){
+        // [incomplete] xx.#a: incomplete bool: bool:
+        //     ./in.cue:162:6
+      }
       b: (bool){ bool }
     }
     x: (#struct){
@@ -906,6 +914,11 @@ Result:
         // [incomplete] closedCheck.t1.#D: non-concrete value string in operand to !=:
         //     ./in.cue:246:6
         //     ./in.cue:245:6
+        e: (_|_){
+          // [incomplete] closedCheck.t1.#D: non-concrete value string in operand to !=:
+          //     ./in.cue:246:6
+          //     ./in.cue:245:6
+        }
         d: (string){ string }
       }
     }
@@ -954,6 +967,11 @@ Result:
   }
   voidElimination: (struct){
     t1: (struct){
+      a: (_|_){
+        // [incomplete] voidElimination.t1.a: operand b of '!' not concrete (was bool):
+        //     ./in.cue:303:7
+        b: (bool){ bool }
+      }
     }
     t2: (struct){
       components: (struct){

@@ -43,6 +43,10 @@ y: _|_ // field "c" not allowed in closed struct
   #a: (_|_){
     // [incomplete] #a: incomplete bool: bool:
     //     ./in.cue:5:5
+    c: (_|_){
+      // [incomplete] #a: incomplete bool: bool:
+      //     ./in.cue:5:5
+    }
     b: (bool){ bool }
   }
   x: (#struct){

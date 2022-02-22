@@ -331,6 +331,7 @@ unresolvedDisjunction: {
 [unresolvedDisjunction]
 [unresolvedDisjunction #TypePrimitive]
 [unresolvedDisjunction #TypeBool]
+[unresolvedDisjunction #TypeBool default]
 [unresolvedDisjunction #TypeBool _args]
 [unresolvedDisjunction #TypeBool _args required]
 -- out/value --

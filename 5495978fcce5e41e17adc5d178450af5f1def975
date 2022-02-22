@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "887421e8_be689207",
+        "filename": "cue/testdata/builtins/incomplete.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:08:06Z",
+      "side": 1,
+      "message": "The stack needs some fixes, but otherwise seems like a good approach.",
+      "parentUuid": "7b610221_766b8260",
+      "revId": "5495978fcce5e41e17adc5d178450af5f1def975",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aeefdae8_4fcf8cae",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19c7ce70_5b82407a",
+        "filename": "cue/testdata/builtins/issue299.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:08:06Z",
+      "side": 1,
+      "message": ":)",
+      "parentUuid": "aeefdae8_4fcf8cae",
+      "revId": "5495978fcce5e41e17adc5d178450af5f1def975",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2c0f1178_67672f0f",
@@ -48,6 +84,24 @@
       "writtenOn": "2022-02-21T11:38:33Z",
       "side": 1,
       "message": "Spaces vs tabs again 😊",
+      "revId": "5495978fcce5e41e17adc5d178450af5f1def975",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48cfed16_064ed61d",
+        "filename": "cue/testdata/builtins/validators.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:08:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2c0f1178_67672f0f",
       "revId": "5495978fcce5e41e17adc5d178450af5f1def975",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "LGTM - with the one thought/suggestion in my comment. i.e. we could rebase this on my stack, otherwise, I could easily land my stack later (assuming we\u0027re happy with the approach)",
       "revId": "a629625c5b773812047ebf80d76a9e9a3ebd8671",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "191f4178_239ac996",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:08:06Z",
+      "side": 1,
+      "message": "I\u0027m happy with your stack maybe, except that it needs some fixes before it can get in. So it may be easier to submit this now and land yours later.",
+      "parentUuid": "c4eac8b5_8fe8711a",
+      "revId": "a629625c5b773812047ebf80d76a9e9a3ebd8671",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

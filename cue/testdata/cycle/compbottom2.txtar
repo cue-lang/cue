@@ -210,6 +210,10 @@ nestedChain: {
       a: (_|_){
         // [cycle] self.fail.a: cycle with field a.b:
         //     ./in.cue:6:7
+        b: (_|_){
+          // [cycle] self.fail.a: cycle with field a.b:
+          //     ./in.cue:6:7
+        }
       }
     }
     isConcreteFail: (struct){
@@ -379,6 +383,10 @@ nestedChain: {
       #E: (_|_){
         // [cycle] nestedChain.cycleFail: cycle with field #E.y:
         //     ./in.cue:168:6
+        x: (_|_){
+          // [cycle] nestedChain.cycleFail: cycle with field #E.y:
+          //     ./in.cue:168:6
+        }
       }
     }
     brokenCycleSuccess: (struct){
@@ -394,6 +402,10 @@ nestedChain: {
         // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
         //     ./in.cue:189:6
         y: (bool){ true }
+        x: (_|_){
+          // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
+          //     ./in.cue:189:6
+        }
       }
     }
     trippleSuccess: (struct){

@@ -435,6 +435,10 @@ large: {
       #X: (_|_){
         // [cycle] medium.p3.#X: cycle with field Y.port:
         //     ./in.cue:114:7
+        port: (_|_){
+          // [cycle] medium.p3.#X: cycle with field Y.port:
+          //     ./in.cue:114:7
+        }
       }
     }
     p4: (struct){
@@ -445,6 +449,10 @@ large: {
       #X: (_|_){
         // [cycle] medium.p4.#X: cycle with field Y.port:
         //     ./in.cue:134:7
+        port: (_|_){
+          // [cycle] medium.p4.#X: cycle with field Y.port:
+          //     ./in.cue:134:7
+        }
       }
       #Y: (_|_){
         // [incomplete] medium.p4.#Y: undefined field: port:
@@ -529,9 +537,14 @@ large: {
     }
     p3: (struct){
       X: (string){ "user@example.com" }
-      #X: (#struct){
+      #X: (_|_){
+        // [cycle] large.p3.Y: undefined field: port:
+        //     ./in.cue:308:10
         userinfo: (string){ "user@" }
-        port: (string){ "" }
+        port: (_|_){
+          // [cycle] large.p3.Y: undefined field: port:
+          //     ./in.cue:308:10
+        }
         host: (string){ "example.com" }
       }
       Y: (struct){
@@ -551,9 +564,14 @@ large: {
     }
     p4: (struct){
       X: (string){ "user@example.com" }
-      #X: (#struct){
+      #X: (_|_){
+        // [cycle] large.p4.Y: undefined field: port:
+        //     ./in.cue:351:10
         userinfo: (string){ "user@" }
-        port: (string){ "" }
+        port: (_|_){
+          // [cycle] large.p4.Y: undefined field: port:
+          //     ./in.cue:351:10
+        }
         host: (string){ "example.com" }
       }
       #Y: (#struct){

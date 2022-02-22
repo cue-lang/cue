@@ -68,6 +68,7 @@ package flow
 
 import (
 	"context"
+	"sync"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -163,6 +164,9 @@ type Controller struct {
 	context    context.Context
 	cancelFunc context.CancelFunc
 
+	mut  *sync.Mutex
+	done bool
+
 	// keys maps task keys to their index. This allows a recreation of the
 	// Instance while retaining the original task indices.
 	//
@@ -210,6 +214,7 @@ func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 
 		taskCh: make(chan *Task),
 		keys:   map[string]*Task{},
+		mut:    &sync.Mutex{},
 	}
 
 	if cfg != nil {
@@ -227,7 +232,31 @@ func (c *Controller) Run(ctx context.Context) error {
 	defer c.cancelFunc()
 
 	c.runLoop()
+
+	// NOTE: track state here as runLoop might add more tasks to the flow
+	// during the execution so checking current tasks state may not be
+	// accurate enough to determine that the flow is terminated.
+	// This is used to determine if the controller value can be retrieved.
+	// When the controller value is safe to be read concurrently this tracking
+	// can be removed.
+	c.mut.Lock()
+	defer c.mut.Unlock()
+	c.done = true
+
 	return c.errs
+}
+
+// Value returns the value managed by the controller.
+//
+// It is safe to use the value only after Run() has returned.
+// It panics if the flow is running.
+func (c *Controller) Value() cue.Value {
+	c.mut.Lock()
+	defer c.mut.Unlock()
+	if !c.done {
+		panic("can't retrieve value before flow has terminated")
+	}
+	return c.inst
 }
 
 // A State indicates the state of a Task.

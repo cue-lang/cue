@@ -33,6 +33,24 @@
       "message": "Interesting that this gets reported as `fatalChild.0` because it\u0027s not actually correct. Instead it\u0027s the 0th element of first argument to the builtin whose value we are trying to assign to the x field in `fatalChild`. I guess this falls into the category of \"better error messages\" later, and outside the scope of this change.",
       "revId": "a61c7d4dd6cad710c7abb6834fb0d396e9b5d0cd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed6f0c34_e8fc0567",
+        "filename": "cue/testdata/builtins/all.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:19:22Z",
+      "side": 1,
+      "message": "Yeah, it is a bit outside the scope. Probably the parent is not linked up correctly.\n\nIt looks like an incorrect Vertex is registered in the OpContext.",
+      "parentUuid": "8c4a24ac_8f8a694d",
+      "revId": "a61c7d4dd6cad710c7abb6834fb0d396e9b5d0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cba6dcf_c1407b1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "This needs a few fixes:\nThere is at least one file where the non-standard formatting was intentional.\n\nThere are a bunch of files were formatting is off. It may be good to add a \n// TODO(fmt): reason\nthere so that we can identify these messages (for some files I did not add a todo if the case was covered elsewhere). In some of these cases the formatting becomes so ugly that it may be better to use the #nofmt option.",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4eb15af6_0c798e7e",
+        "filename": "cue/testdata/cycle/disjunction.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "Add a TODO to address improper formatting",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b59842f2_c8c50642",
+        "filename": "cue/testdata/cycle/issue242.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "Wow!\n\nAdd TODO to get rid off support for ::!!",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cfdc54f_2e3a5d9a",
+        "filename": "encoding/protobuf/jsonpb/testdata/decoder/null.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "TODO: faulty indent.",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dba025eb_7d355aa0",
+        "filename": "internal/core/dep/testdata/alias.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "TODO: faulty indent",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45b3a663_74d580fd",
+        "filename": "pkg/crypto/hmac/testdata/hmac.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "TODO: Spurious extra newline.",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e886c879_4dd00eb6",
+        "filename": "pkg/encoding/yaml/testdata/gen.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "TODO: spurious alignment",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9897bba6_972f8ff9",
+        "filename": "tools/trim/testdata/comprehensions.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 1,
+      "message": "TODO: spurious indentation",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f068744e_dfa0fde5",
+        "filename": "cue/testdata/compile/json.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 0,
+      "message": "add #nofmt",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ff965cb_aac59619",
+        "filename": "cue/testdata/compile/json.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 0,
+      "message": "It looks like this was intentionally ill-formatted.",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3dd6a585_d4571cee",
+        "filename": "cue/testdata/definitions/issue419.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 0,
+      "message": "Add TODO: comma improperly elided?",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f25c7a5_a815742c",
+        "filename": "pkg/path/testdata/os.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 0,
+      "message": "probably add #nofmt. With TODO: strips escaped values.",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcf163aa_d525daaf",
+        "filename": "tools/trim/testdata/constraintroots.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:04:47Z",
+      "side": 0,
+      "message": "TODO: faulty tab replacement.",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

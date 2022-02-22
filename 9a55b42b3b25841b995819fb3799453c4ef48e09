@@ -35,6 +35,40 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5018b598_2dea247b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:45:28Z",
+      "side": 1,
+      "message": "Looks good generally.\n\nstate needs to be synchronized,though. Best is to add a test to expose this race and then fix it.",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5525690c_18fcaaf6",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:45:28Z",
+      "side": 1,
+      "message": "This should be synchronized, either using a mutex, atomic or chan.\n\nAdding a test that calls Value in a different Go routine would cause a race with go test --race.",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41aa8c47_e5e48c63",

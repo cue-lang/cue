@@ -16,6 +16,142 @@
       "message": "Thanks for the CL. We\u0027re just in the process of preparing for v0.4.3 and so will revisit this shortly.",
       "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b3a6b72_c135d8d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "Git change! But we did intend to support FS at some point.\n\nSome early comments: \n\nThe introduction of the xWithSource functions is generating both a lot of noise, making it hard to see the FS changes. \n\nNote that with Git\u0027s interactive rebase it is easy in Gerrit to have a set \"CL train\", a set of dependent CLs that each focus on a certain change. Also bug changes and removing dead code would best be put in a separate CL.\n\nBut either way, the additional API surface is also unnecessary. I am already not a fan of the old-style API, so I rather come up with a new API that gets rid of the interface{} argument altogether.\n\nBut for now I would just reuse the old functions.\n\nThere are a lot of ToSlash/FromSlash changes. This is very tricky to change. Surely enough, Windows compatibility is broken by this change.\n",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75e2a850_395a6fd2",
+        "filename": "cue/filesystem/osfs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "Licence, documentation, etc.\n\nWhat is the purpose of this package?\n\nAny reasons why this is not an internal package?\n\nAt the very least, it doesn\u0027t seem like this belongs at the top level.",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fce4c836_e472278e",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "Where did this come from?",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76a995ee_9a32680c",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "This is a breaking change.",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7624412f_0f7d4589",
+        "filename": "cue/load/config.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 284,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "Needs Documentation. How does this work? How do I create an overlay with fs.FS.",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b711f50_b922e938",
+        "filename": "cue/parser/interface.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "In general, we should not double the API surface like this. The `parser.ParseFile` interface is a bad one to begin with, and we should strive to get rid of it, rather than introducing an almost identical API. The API was copied from the Go libraries, but are now believed (also by the Go team with the benefit of hindsight) to be of pour design.",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fd34be5_34a8bf15",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "If this was a bug fix it should be handled in a separate CL.",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74986242_f797a914",
+        "filename": "internal/third_party/yaml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 1,
+      "message": "Doesn\u0027t this change the behavior of the API?\n\nOr are you relying on it being an internal package? Seems saver to isolate in a separate CL so that any issues can easily be bisected.",
+      "revId": "8c8e61e52a358b7a18bbaad80d903fe756d1d488",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

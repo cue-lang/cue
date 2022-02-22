@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "294d2812_418d0455",
+        "filename": "cue/load/search.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 446,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:29:06Z",
+      "side": 0,
+      "message": "Is this dead code? Should be removed in separate CL.",
+      "revId": "b1edc14dfe1867f9d8ba57c5c34ce15b5a258f00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

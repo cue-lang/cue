@@ -162,6 +162,7 @@ type Controller struct {
 	opCtx      *adt.OpContext
 	context    context.Context
 	cancelFunc context.CancelFunc
+	state      State
 
 	// keys maps task keys to their index. This allows a recreation of the
 	// Instance while retaining the original task indices.
@@ -210,6 +211,7 @@ func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 
 		taskCh: make(chan *Task),
 		keys:   map[string]*Task{},
+		state:  Ready,
 	}
 
 	if cfg != nil {
@@ -226,8 +228,27 @@ func (c *Controller) Run(ctx context.Context) error {
 	c.context, c.cancelFunc = context.WithCancel(ctx)
 	defer c.cancelFunc()
 
+	// NOTE: track state here as runLoop might add more tasks to the flow
+	// during the execution so checking current tasks state may not be
+	// accurate enough to determine that the flow is terminated.
+	// This is used to determine if the controller value can be retrieved.
+	// When the controller value is safe to be read concurrently this tracking
+	// can be removed.
+	c.state = Running
 	c.runLoop()
+	c.state = Terminated
 	return c.errs
+}
+
+// Value returns the value managed by the controller.
+//
+// It is safe to use the value only after Run() has returned.
+// It panics if the flow is running.
+func (c *Controller) Value() cue.Value {
+	if c.state == Running {
+		panic("can't retrieve value when flow is running")
+	}
+	return c.inst
 }
 
 // A State indicates the state of a Task.

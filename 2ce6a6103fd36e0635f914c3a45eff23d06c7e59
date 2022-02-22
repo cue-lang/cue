@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb2c4c52_ea1a2453",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "All changes made, issues raised as required. \n\nPTAL.",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4eb15af6_0c798e7e",
@@ -31,6 +48,24 @@
       "writtenOn": "2022-02-22T11:04:47Z",
       "side": 1,
       "message": "Add a TODO to address improper formatting",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c50f1afd_83ed5aeb",
+        "filename": "cue/testdata/cycle/disjunction.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eb15af6_0c798e7e",
       "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21044b16_644d24df",
+        "filename": "cue/testdata/cycle/issue242.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b59842f2_c8c50642",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cfdc54f_2e3a5d9a",
@@ -65,6 +118,24 @@
       "writtenOn": "2022-02-22T11:04:47Z",
       "side": 1,
       "message": "TODO: faulty indent.",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c95b09c_2dfa3b37",
+        "filename": "encoding/protobuf/jsonpb/testdata/decoder/null.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6cfdc54f_2e3a5d9a",
       "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +157,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c7fe45b_2d8cd58f",
+        "filename": "internal/core/dep/testdata/alias.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dba025eb_7d355aa0",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "45b3a663_74d580fd",
@@ -99,6 +188,24 @@
       "writtenOn": "2022-02-22T11:04:47Z",
       "side": 1,
       "message": "TODO: Spurious extra newline.",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9899ce11_1501d729",
+        "filename": "pkg/crypto/hmac/testdata/hmac.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "45b3a663_74d580fd",
       "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +227,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "892ad9b2_318aa991",
+        "filename": "pkg/encoding/yaml/testdata/gen.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e886c879_4dd00eb6",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9897bba6_972f8ff9",
@@ -133,6 +258,24 @@
       "writtenOn": "2022-02-22T11:04:47Z",
       "side": 1,
       "message": "TODO: spurious indentation",
+      "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca824adc_9e6efab1",
+        "filename": "tools/trim/testdata/comprehensions.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9897bba6_972f8ff9",
       "revId": "2ce6a6103fd36e0635f914c3a45eff23d06c7e59",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

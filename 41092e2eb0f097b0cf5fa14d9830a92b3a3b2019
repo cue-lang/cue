@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b67f6bf1_c258fe51",
+        "filename": "cue/testdata/compile/json.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "f068744e_dfa0fde5",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ff965cb_aac59619",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-02-22T11:04:47Z",
       "side": 0,
       "message": "It looks like this was intentionally ill-formatted.",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f11d36e3_caf4c00a",
+        "filename": "cue/testdata/compile/json.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 0,
+      "message": "Thanks for that catch, will go through and double check others too.",
+      "parentUuid": "3ff965cb_aac59619",
       "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "688105af_102a93d3",
+        "filename": "cue/testdata/definitions/issue419.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 0,
+      "message": "I think this diff is correct, no? i.e. now that it is formatted, the comma has been added. Which makes sense, because it makes future additions to the list (on new lines) trivial.",
+      "parentUuid": "3dd6a585_d4571cee",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9f25c7a5_a815742c",
         "filename": "pkg/path/testdata/os.txtar",
         "patchSetId": 5
@@ -65,6 +119,24 @@
       "writtenOn": "2022-02-22T11:04:47Z",
       "side": 0,
       "message": "probably add #nofmt. With TODO: strips escaped values.",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac97d873_1e503c18",
+        "filename": "pkg/path/testdata/os.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "9f25c7a5_a815742c",
       "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -82,6 +154,24 @@
       "writtenOn": "2022-02-22T11:04:47Z",
       "side": 0,
       "message": "TODO: faulty tab replacement.",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1cea6c91_34d7f9d3",
+        "filename": "tools/trim/testdata/constraintroots.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T16:59:06Z",
+      "side": 0,
+      "message": "Good spot. This is actually an old issue: https://cuelang.org/issue/1040.",
+      "parentUuid": "bcf163aa_d525daaf",
       "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

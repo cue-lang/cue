@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8dc3f794_8bc81ab1",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:55:49Z",
+      "side": 1,
+      "message": "BTW. Note that the Value, even though read-only and thread-safe after returned, should also be protected. So using a Mutex may make future changes easier.",
+      "parentUuid": "5525690c_18fcaaf6",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "41aa8c47_e5e48c63",
         "filename": "tools/flow/flow.go",
         "patchSetId": 1
@@ -82,6 +100,24 @@
       "writtenOn": "2022-02-22T15:37:56Z",
       "side": 1,
       "message": "Should a \"Task\" state be reused for the controller?",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1f15c69_911484dd",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:55:49Z",
+      "side": 1,
+      "message": "How would that be simpler?\n\nThe state could just be a boolean, though. No need to have Ready-Running-Terminated.",
+      "parentUuid": "41aa8c47_e5e48c63",
       "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +141,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d91c52af_77535fc0",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:55:49Z",
+      "side": 1,
+      "message": "I think panicking is safer though, as it prevents introducing subtle bugs down the road.",
+      "parentUuid": "5d5cf50b_713ed305",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "41f665b4_9122a72e",
         "filename": "tools/flow/flow.go",
         "patchSetId": 1
@@ -116,6 +170,24 @@
       "writtenOn": "2022-02-22T15:37:56Z",
       "side": 1,
       "message": "Why do this check and panic? The other restricted functions do not do this and only warn within the comments. I expected this CL to be much smaller, limited to a single function and doc string.\n\nIf this stays, I would expect it to check !\u003d Terminated if it is only supposed to be called after Run has returned.",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f931781_e37e2037",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T15:55:49Z",
+      "side": 1,
+      "message": "As this is an inherently concurrent API, I think it is a nice protection. But either way.\n\nGood point about Terminated. Probably better to just have a synchronized done boolean.\n\nNote that Value() ultimately needs to call a Mutex anyway to get the Value during running. So it is not wasted effort to add this.",
+      "parentUuid": "41f665b4_9122a72e",
       "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

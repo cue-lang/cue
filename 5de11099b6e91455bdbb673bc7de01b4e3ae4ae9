@@ -34,6 +34,24 @@
       "parentUuid": "8d742268_fa4cbae4",
       "revId": "5de11099b6e91455bdbb673bc7de01b4e3ae4ae9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea218eab_a8120faf",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-22T11:19:41Z",
+      "side": 1,
+      "message": "Scratch that. Looked at CLs in reverse order.:)",
+      "parentUuid": "8d742268_fa4cbae4",
+      "revId": "5de11099b6e91455bdbb673bc7de01b4e3ae4ae9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

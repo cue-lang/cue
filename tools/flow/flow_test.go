@@ -22,6 +22,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -93,6 +94,43 @@ func TestFlow(t *testing.T) {
 	})
 }
 
+func TestFlowValuePanic(t *testing.T) {
+	f := `
+    root: {
+        a: {
+            $id: "slow"
+            out: string
+        }
+    }
+    `
+	ctx := cuecontext.New()
+	v := ctx.CompileString(f)
+
+	start := make(chan bool, 1)
+
+	cfg := &flow.Config{Root: cue.ParsePath("root")}
+	c := flow.New(cfg, v, taskFunc)
+
+	defer func() {
+		if r := recover(); r == nil {
+			t.Errorf("Value() did not panic")
+		}
+	}()
+
+	go func() {
+		start <- true
+		c.Run(context.TODO())
+	}()
+
+	<-start
+
+	// Wait for the flow to be running
+	// The task sleeps for 10 Milliseconds
+	time.Sleep(5 * time.Millisecond)
+	// Should trigger a panic as the flow is not terminated
+	c.Value()
+}
+
 func taskFunc(v cue.Value) (flow.Runner, error) {
 	switch name, err := v.Lookup("$id").String(); name {
 	default:
@@ -127,6 +165,13 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 	case "list":
 		return flow.RunnerFunc(func(t *flow.Task) error {
 			t.Fill(map[string][]int{"out": []int{1, 2}})
+			return nil
+		}), nil
+
+	case "slow":
+		return flow.RunnerFunc(func(t *flow.Task) error {
+			time.Sleep(10 * time.Millisecond)
+			t.Fill(map[string]string{"out": "finished"})
 			return nil
 		}), nil
 

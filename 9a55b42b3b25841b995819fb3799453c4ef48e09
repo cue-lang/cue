@@ -16,6 +16,74 @@
       "message": "Initially I though about checking that all tasks are in terminated state and panic if not. But as the loop might add more tasks based on previously run tasks it doesn\u0027t seem reliable to do it like this. \n\nFor simplicity I\u0027ve reused the tasks states in the controller as I believe this is only a temporary restriction.",
       "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17784b63_661e7a30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-02-22T15:37:56Z",
+      "side": 1,
+      "message": "A few thoughts, I think this could be a smaller CL.",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41aa8c47_e5e48c63",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-02-22T15:37:56Z",
+      "side": 1,
+      "message": "Should a \"Task\" state be reused for the controller?",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d5cf50b_713ed305",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 235,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-02-22T15:37:56Z",
+      "side": 1,
+      "message": "This wouldn\u0027t be required if we match the behavior of other \"restricted\" functions, which is to say, leave it up to the user to be careful until CUE is better about concurrency.",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41f665b4_9122a72e",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 248,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-02-22T15:37:56Z",
+      "side": 1,
+      "message": "Why do this check and panic? The other restricted functions do not do this and only warn within the comments. I expected this CL to be much smaller, limited to a single function and doc string.\n\nIf this stays, I would expect it to check !\u003d Terminated if it is only supposed to be called after Run has returned.",
+      "revId": "9a55b42b3b25841b995819fb3799453c4ef48e09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

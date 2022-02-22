@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92ed788d_424044d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T15:58:39Z",
+      "side": 1,
+      "message": "Adding a note to self: ensure that the tools part of the guide does not reference kind in any way.",
+      "revId": "61448d6ddd8f9d2e375a32c9f09e994935de09d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

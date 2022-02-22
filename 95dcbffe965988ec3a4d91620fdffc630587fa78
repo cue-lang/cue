@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3fb871ed_39d14f15",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-22T17:08:33Z",
+      "side": 1,
+      "message": "PTAL. I\u0027ve rebased this against your submitted changes and everything still looks good in the offline preguide-based guide I have. ",
+      "revId": "95dcbffe965988ec3a4d91620fdffc630587fa78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

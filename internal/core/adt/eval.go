@@ -618,7 +618,18 @@ func (n *nodeContext) incompleteErrors() *Bottom {
 		err = CombineErrors(nil, err, d.err)
 	}
 	for _, c := range n.comprehensions {
+		if c.err == nil {
+			continue
+		}
+		// TODO: Current flow doesn't handle adding errors to parents well.
+		//       Fix this, though, as this is a more appropriate location to
+		//       report the error.
+		// if c.node != nil {
+		// 	c.node.AddErr(n.ctx, c.err)
+		// 	continue
+		// }
 		err = CombineErrors(nil, err, c.err)
+		n.node.arcType = arcMember
 
 		// TODO: use this code once possible.
 		//

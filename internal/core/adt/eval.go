@@ -2021,22 +2021,23 @@ func (n *nodeContext) injectDynamic() {
 		return
 	}
 
-	for progress := true; progress; {
-		// TODO: collect fields added by expressions and only insert them
-		// after all expressions are evaluated.
-		exprs := n.exprs
-		sz := len(exprs)
-		n.exprs = n.exprs[:0]
-		for _, x := range exprs {
-			n.addExprConjunct(x.c)
-		}
+	n.injectDynamicFields()
 
-		progress = len(n.exprs) < sz
-
-		progress = progress || n.injectComprehensions(&(n.comprehensions))
+	// Do expressions after comprehensions, as comprehensions can never
+	// refer to embedded scalars, whereas expressions may refer to generated
+	// fields if we were to allow attributes to be defined alongside
+	// scalars.
+	exprs := n.exprs
+	n.exprs = n.exprs[:0]
+	for _, x := range exprs {
+		n.addExprConjunct(x.c)
 	}
 
-	n.injectDynamicFields()
+	n.injectComprehensions(&(n.comprehensions))
+
+	// No progress, report error later if needed: unification with
+	// disjuncts may resolve this later later on.
+	return
 }
 
 // injectDynamicFields evaluates and inserts dynamic declarations.

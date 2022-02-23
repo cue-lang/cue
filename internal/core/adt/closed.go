@@ -209,10 +209,21 @@ func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 	if c.closeInfo != nil {
 		span = c.span
 	}
-	c.closeInfo = &closeInfo{
-		parent:   c.closeInfo,
-		location: x,
-		span:     span,
+	found := false
+	if !isDef {
+		// TODO: make this work for non-definitions too.
+		for p := c.closeInfo; p != nil; p = p.parent {
+			if p.location == x && p.span == span {
+				found = true
+			}
+		}
+	}
+	if !found {
+		c.closeInfo = &closeInfo{
+			parent:   c.closeInfo,
+			location: x,
+			span:     span,
+		}
 	}
 	if isDef {
 		c.mode = closeDef

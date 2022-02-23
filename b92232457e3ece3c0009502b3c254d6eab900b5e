@@ -16,6 +16,23 @@
       "message": "This looks good to me! I like the simplicity of it, and protecting the Value with a mutex for now seems like a good idea. We can always remove the restriction in the future when the evaluator can better handle it.",
       "revId": "b92232457e3ece3c0009502b3c254d6eab900b5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6a9a3f4_d50d5fca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-02-23T01:35:23Z",
+      "side": 1,
+      "message": "LGTM, excited to see this land in the next release",
+      "revId": "b92232457e3ece3c0009502b3c254d6eab900b5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

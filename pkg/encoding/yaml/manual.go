@@ -26,7 +26,7 @@ import (
 )
 
 // Marshal returns the YAML encoding of v.
-func Marshal(v cue.Value) (string, error) {
+func Marshal(v cue.Value, opts ...cue.Option) (string, error) {
 	if err := v.Validate(cue.Concrete(true)); err != nil {
 		if err := v.Validate(); err != nil {
 			return "", err
@@ -35,13 +35,14 @@ func Marshal(v cue.Value) (string, error) {
 		// messages can be passed.
 		return "", internal.ErrIncomplete
 	}
-	n := v.Syntax(cue.Final(), cue.Concrete(true))
+	opts = append([]cue.Option{cue.Final(), cue.Concrete(true)}, opts...)
+	n := v.Syntax(opts...)
 	b, err := cueyaml.Encode(n)
 	return string(b), err
 }
 
 // MarshalStream returns the YAML encoding of v.
-func MarshalStream(v cue.Value) (string, error) {
+func MarshalStream(v cue.Value, opts ...cue.Option) (string, error) {
 	// TODO: return an io.Reader and allow asynchronous processing.
 	iter, err := v.List()
 	if err != nil {
@@ -61,7 +62,8 @@ func MarshalStream(v cue.Value) (string, error) {
 			// messages can be passed.
 			return "", internal.ErrIncomplete
 		}
-		n := v.Syntax(cue.Final(), cue.Concrete(true))
+		opts = append([]cue.Option{cue.Final(), cue.Concrete(true)}, opts...)
+		n := v.Syntax(opts...)
 		b, err := cueyaml.Encode(n)
 		if err != nil {
 			return "", err

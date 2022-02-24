@@ -182,7 +182,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 			}
 			streamed = true
 
-			str, err := yaml.Marshal(v)
+			str, err := yaml.Marshal(v, cue.Docs(e.cfg.PreserveComments))
 			if err != nil {
 				return err
 			}

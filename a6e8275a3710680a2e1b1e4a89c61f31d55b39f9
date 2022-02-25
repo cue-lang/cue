@@ -16,6 +16,24 @@
       "message": "Looks good. A small test would be great. It is a bit finicky, with the panics, so let me know if you need help with that.",
       "revId": "a6e8275a3710680a2e1b1e4a89c61f31d55b39f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4f5b0f8_905e4872",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-25T13:30:32Z",
+      "side": 1,
+      "message": "Added a test to check Value() panics as intended\n\ngo test -race -v ./tools/flow/ -run TestFlowValue -count\u003d50\n\nWorks reliably for me\n\nI know working with timings is not the best, let me know if you thought about something else",
+      "parentUuid": "8eef43a1_740f7fb5",
+      "revId": "a6e8275a3710680a2e1b1e4a89c61f31d55b39f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4402e66a_773687c4",
+        "filename": "cue/testdata/definitions/issue419.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-25T11:53:11Z",
+      "side": 0,
+      "message": "Ah, what I was getting at is that the LHS was incorrect, so that we need to record this improper CUE. But in CUE this is correct, of course. I was confused with Go, where the equivalent would require a comma.",
+      "parentUuid": "688105af_102a93d3",
+      "revId": "41092e2eb0f097b0cf5fa14d9830a92b3a3b2019",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f25c7a5_a815742c",

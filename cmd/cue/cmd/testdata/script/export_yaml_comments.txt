@@ -1,4 +1,4 @@
-cue export --preserve-comments --out yaml ./hello
+cue export --out yaml ./hello
 cmp stdout expect-stdout
 -- expect-stdout --
 # cloud-config

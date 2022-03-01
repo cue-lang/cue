@@ -35,6 +35,10 @@ var pkg = &internal.Package{
 		$id:    *"tool/http.Do" | "http"
 		method: string
 		url:    string
+		tls: {
+			verify:  *true | bool
+			caCert?: bytes | string
+		}
 		request: {
 			body?: bytes | string
 			header: {

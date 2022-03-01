@@ -25,6 +25,14 @@ Do: {
 	method: string
 	url:    string // TODO: make url.URL type
 
+	tls: {
+		// Whether the server certificate must be validated.
+		verify: *true | bool
+		// PEM encoded certificate(s) to validate the server certificate.
+		// If not set the CA bundle of the system is used.
+		caCert?: bytes | string
+	}
+
 	request: {
 		body?: bytes | string
 		header: [string]:  string | [...string]

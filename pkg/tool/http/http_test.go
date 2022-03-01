@@ -15,12 +15,77 @@
 package http
 
 import (
+	"encoding/pem"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/task"
+	"cuelang.org/go/internal/value"
 )
+
+func newTLSServer() *httptest.Server {
+	server := httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		resp := `{"foo": "bar"}`
+		w.Write([]byte(resp))
+	}))
+	return server
+}
+
+func parse(t *testing.T, kind, expr string) cue.Value {
+	t.Helper()
+
+	x, err := parser.ParseExpr("test", expr)
+	if err != nil {
+		t.Fatal(err)
+	}
+	var r cue.Runtime
+	i, err := r.CompileExpr(x)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return value.UnifyBuiltin(i.Value(), kind)
+}
+
+func TestTLS(t *testing.T) {
+	s := newTLSServer()
+	defer s.Close()
+
+	v1 := parse(t, "tool/http.Get", fmt.Sprintf(`{url: "%s"}`, s.URL))
+	_, err := (*httpCmd).Run(nil, &task.Context{Obj: v1})
+	if err == nil {
+		t.Fatal("http call should have failed")
+	}
+
+	v2 := parse(t, "tool/http.Get", fmt.Sprintf(`{url: "%s", tls: verify: false}`, s.URL))
+	_, err = (*httpCmd).Run(nil, &task.Context{Obj: v2})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	publicKeyBlock := pem.Block{
+		Type:  "PUBLIC KEY",
+		Bytes: s.Certificate().Raw,
+	}
+	publicKeyPem := pem.EncodeToMemory(&publicKeyBlock)
+
+	v3 := parse(t, "tool/http.Get", fmt.Sprintf(`
+    {
+        url: "%s"
+        tls: caCert: '''
+%s
+'''
+    }`, s.URL, publicKeyPem))
+
+	_, err = (*httpCmd).Run(nil, &task.Context{Obj: v3})
+	if err != nil {
+		t.Fatal(err)
+	}
+}
 
 func TestParseHeaders(t *testing.T) {
 	req := `

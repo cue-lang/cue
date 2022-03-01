@@ -19,11 +19,15 @@ package http
 
 import (
 	"bytes"
+	"crypto/tls"
+	"crypto/x509"
+	"encoding/pem"
 	"io"
 	"io/ioutil"
 	"net/http"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
 )
 
@@ -43,8 +47,9 @@ func newHTTPCmd(v cue.Value) (task.Runner, error) {
 func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	var header, trailer http.Header
 	var (
-		method = ctx.String("method")
-		u      = ctx.String("url")
+		method    = ctx.String("method")
+		u         = ctx.String("url")
+		tlsVerify = ctx.BoolPath(cue.ParsePath("tls.verify"))
 	)
 	var r io.Reader
 	if obj := ctx.Obj.Lookup("request"); obj.Exists() {
@@ -63,8 +68,48 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 			return nil, err
 		}
 	}
+
+	var caCert []byte
+	caCertValue := ctx.Obj.LookupPath(cue.ParsePath("tls.caCert"))
+	if caCertValue.Exists() {
+		caCert, err = caCertValue.Bytes()
+		if err != nil {
+			return nil, errors.Wrapf(err, caCertValue.Pos(), "invalid bytes value")
+		}
+	}
+
 	if ctx.Err != nil {
 		return nil, ctx.Err
+	}
+
+	transport := http.DefaultTransport.(*http.Transport).Clone()
+	transport.TLSClientConfig = &tls.Config{}
+
+	if !tlsVerify {
+		transport.TLSClientConfig.InsecureSkipVerify = true
+	}
+	if tlsVerify && len(caCert) > 0 {
+		pool := x509.NewCertPool()
+		for {
+			block, rest := pem.Decode(caCert)
+			if block == nil {
+				break
+			}
+			if block.Type == "PUBLIC KEY" {
+				c, err := x509.ParseCertificate(block.Bytes)
+				if err != nil {
+					return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to parse caCert")
+				}
+				pool.AddCert(c)
+			}
+			caCert = rest
+		}
+		transport.TLSClientConfig.RootCAs = pool
+	}
+
+	client := &http.Client{
+		Transport: transport,
+		// TODO: timeout
 	}
 
 	req, err := http.NewRequest(method, u, r)
@@ -74,10 +119,8 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	req.Header = header
 	req.Trailer = trailer
 
-	// TODO:
-	//  - retry logic
-	//  - TLS certs
-	resp, err := http.DefaultClient.Do(req)
+	// TODO: retry logic
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, err
 	}

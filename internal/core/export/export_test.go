@@ -214,6 +214,22 @@ func TestGenerated(t *testing.T) {
 		out: ``, // empty file
 	}, {
 		in: func(r *adt.OpContext) (adt.Expr, error) {
+			n := 1.2
+			v := ctx.Encode(n)
+			_, x := value.ToInternal(v)
+			return x, nil
+		},
+		out: `1.2`,
+	}, {
+		in: func(r *adt.OpContext) (adt.Expr, error) {
+			n := float64(3)
+			v := ctx.Encode(n)
+			_, x := value.ToInternal(v)
+			return x, nil
+		},
+		out: `3`,
+	}, {
+		in: func(r *adt.OpContext) (adt.Expr, error) {
 			v := &adt.Vertex{}
 			v.SetValue(r, adt.Finalized, &adt.StructMarker{})
 			return v, nil

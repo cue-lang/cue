@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"github.com/cockroachdb/apd/v2"
 )
 
 func (e *exporter) bareValue(v adt.Value) ast.Expr {
@@ -269,7 +270,7 @@ func (e *exporter) num(n *adt.Num, orig []adt.Conjunct) *ast.BasicLit {
 		return b
 	}
 	kind := token.FLOAT
-	if n.K&adt.IntKind != 0 {
+	if n.K&adt.IntKind != 0 || int53Representable(n.X) {
 		kind = token.INT
 	}
 	s := n.X.String()
@@ -277,6 +278,14 @@ func (e *exporter) num(n *adt.Num, orig []adt.Conjunct) *ast.BasicLit {
 		s += "."
 	}
 	return &ast.BasicLit{Kind: kind, Value: s}
+}
+
+func int53Representable(d apd.Decimal) bool {
+	i, err := d.Int64()
+	if err != nil {
+		return false
+	}
+	return -(1<<53) <= i && i <= (1<<53)
 }
 
 func (e *exporter) string(n *adt.String, orig []adt.Conjunct) *ast.BasicLit {

@@ -36,7 +36,7 @@ import (
 type Instance struct {
 	ctxt *Context
 
-	BuildFiles    []*File // files to be inclduded in the build
+	BuildFiles    []*File // files to be included in the build
 	IgnoredFiles  []*File // files excluded for this build
 	OrphanedFiles []*File // recognized file formats not part of any build
 	InvalidFiles  []*File // could not parse these files

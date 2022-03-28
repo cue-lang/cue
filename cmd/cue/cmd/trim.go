@@ -112,7 +112,7 @@ func runTrim(cmd *Command, args []string) error {
 
 	for i, inst := range binst {
 		root := instances[i]
-		err := trim.Files(inst.Files, root, &trim.Config{
+		err := trim.Files(inst.Files, root.Value(), &trim.Config{
 			Trace: flagTrace.Bool(cmd),
 		})
 		if err != nil {

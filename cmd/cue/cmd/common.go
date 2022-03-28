@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
@@ -127,9 +128,11 @@ type buildPlan struct {
 	cmd   *Command
 	insts []*build.Instance
 
+	ctx *cue.Context
+
 	// instance is a pre-compiled instance, which exists if value files are
 	// being processed, which may require a schema to decode.
-	instance *cue.Instance
+	instance *instance
 
 	cfg *config
 
@@ -170,12 +173,12 @@ func (b *buildPlan) instances() iterator {
 	case len(b.insts) > 0:
 		i = &instanceIterator{
 			inst: b.instance,
-			a:    buildInstances(b.cmd, b.insts, false),
+			a:    buildInstances(b.ctx, b.cmd, b.insts, false),
 			i:    -1,
 		}
 	default:
 		i = &instanceIterator{
-			a: []*cue.Instance{b.instance},
+			a: []*instance{b.instance},
 			i: -1,
 		}
 		b.instance = nil
@@ -193,16 +196,23 @@ func (b *buildPlan) instances() iterator {
 type iterator interface {
 	scan() bool
 	value() cue.Value
-	instance() *cue.Instance // may return nil
-	file() *ast.File         // may return nil
+	file() *ast.File // may return nil
 	err() error
 	close()
-	id() string
+	id() string // may return ""
 }
 
+type instance struct {
+	id  string
+	err error
+	val cue.Value
+}
+
+func (i *instance) Value() cue.Value { return i.val }
+
 type instanceIterator struct {
-	inst *cue.Instance
-	a    []*cue.Instance
+	inst *instance
+	a    []*instance
 	i    int
 	e    error
 }
@@ -221,17 +231,15 @@ func (i *instanceIterator) value() cue.Value {
 	}
 	return v
 }
-func (i *instanceIterator) instance() *cue.Instance {
-	if i.i >= len(i.a) {
-		return nil
-	}
-	return i.a[i.i]
-}
 func (i *instanceIterator) file() *ast.File { return nil }
-func (i *instanceIterator) id() string      { return i.a[i.i].Dir }
+func (i *instanceIterator) id() string {
+	if i.i > len(i.a) {
+		return ""
+	}
+	return i.a[i.i].id
+}
 
 type streamingIterator struct {
-	r   *cue.Runtime
 	b   *buildPlan
 	cfg *encoding.Config
 	a   []*decoderInfo
@@ -247,23 +255,12 @@ func newStreamingIterator(b *buildPlan) *streamingIterator {
 		a:   b.orphaned,
 		b:   b,
 	}
-
-	// TODO: use orphanedSchema
-	i.r = &cue.Runtime{}
-	if v := b.encConfig.Schema; v.Exists() {
-		i.r = value.ConvertToRuntime(v.Context())
-	}
-
 	return i
 }
 
-func (i *streamingIterator) file() *ast.File         { return i.f }
-func (i *streamingIterator) value() cue.Value        { return i.v }
-func (i *streamingIterator) instance() *cue.Instance { return nil }
-
-func (i *streamingIterator) id() string {
-	return ""
-}
+func (i *streamingIterator) file() *ast.File  { return i.f }
+func (i *streamingIterator) value() cue.Value { return i.v }
+func (i *streamingIterator) id() string       { return "" }
 
 func (i *streamingIterator) scan() bool {
 	if i.e != nil {
@@ -294,12 +291,12 @@ func (i *streamingIterator) scan() bool {
 
 	// compose value
 	i.f = i.dec.File()
-	inst, err := i.r.CompileFile(i.f)
-	if err != nil {
+	v := i.b.ctx.BuildFile(i.f)
+	if err := v.Err(); err != nil {
 		i.e = err
 		return false
 	}
-	i.v = inst.Value()
+	i.v = v
 	if schema := i.b.encConfig.Schema; schema.Exists() {
 		i.e = schema.Err()
 		if i.e == nil {
@@ -307,7 +304,7 @@ func (i *streamingIterator) scan() bool {
 			i.e = i.v.Err()
 		}
 		if i.e != nil {
-			if err = i.v.Validate(); err != nil {
+			if err := i.v.Validate(); err != nil {
 				// Validate should always be non-nil, but just in case.
 				i.e = err
 			}
@@ -355,22 +352,17 @@ func (i *expressionIter) scan() bool {
 	return true
 }
 
-func (i *expressionIter) file() *ast.File         { return nil }
-func (i *expressionIter) instance() *cue.Instance { return nil }
+func (i *expressionIter) file() *ast.File { return nil }
 
 func (i *expressionIter) value() cue.Value {
 	if len(i.expr) == 0 {
 		return i.iter.value()
 	}
 	v := i.iter.value()
-	path := ""
-	if inst := i.iter.instance(); inst != nil {
-		path = inst.ID()
-	}
 	return v.Context().BuildExpr(i.expr[i.i],
 		cue.Scope(v),
 		cue.InferBuiltins(true),
-		cue.ImportPath(path),
+		cue.ImportPath(i.iter.id()),
 	)
 }
 
@@ -398,7 +390,12 @@ func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err e
 	}
 	cfg.loadCfg.Stdin = cmd.InOrStdin()
 
-	p = &buildPlan{cfg: cfg, cmd: cmd, importing: cfg.loadCfg.DataFiles}
+	p = &buildPlan{
+		ctx:       cuecontext.New(),
+		cfg:       cfg,
+		cmd:       cmd,
+		importing: cfg.loadCfg.DataFiles,
+	}
 
 	if err := p.parseFlags(); err != nil {
 		return nil, err
@@ -634,17 +631,20 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			// of errors is correct.
 			// See https://github.com/cue-lang/cue/issues/1483.
 			inst := buildInstances(
+				p.ctx,
 				p.cmd,
 				[]*build.Instance{schema},
 				true)[0]
 
-			if inst.Err != nil {
+			if inst.err != nil {
 				return nil, err
 			}
 			p.instance = inst
 			p.encConfig.Schema = inst.Value()
 			if p.schema != nil {
-				v := inst.Eval(p.schema)
+				v := p.ctx.BuildExpr(p.schema,
+					cue.InferBuiltins(true),
+					cue.Scope(inst.Value()))
 				if err := v.Err(); err != nil {
 					return nil, v.Validate()
 				}
@@ -731,29 +731,34 @@ func (b *buildPlan) parseFlags() (err error) {
 	return nil
 }
 
-func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []*cue.Instance {
+func buildInstances(ctx *cue.Context, cmd *Command, binst []*build.Instance, ignoreErrors bool) []*instance {
 	// TODO:
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
-	instances := cue.Build(binst)
-	for _, inst := range instances {
-		// TODO: consider merging errors of multiple files, but ensure
-		// duplicates are removed.
-		exitIfErr(cmd, inst, inst.Err, true)
+	instances, err := ctx.BuildInstances(binst)
+	exitIfErr(cmd, nil, err, true)
+
+	insts := make([]*instance, len(instances))
+	for i, v := range instances {
+		insts[i] = &instance{
+			id:  binst[i].ID(),
+			err: binst[i].Err,
+			val: v,
+		}
 	}
 
 	// TODO: remove ignoreErrors flag and always return here, leaving it up to
 	// clients to check for errors down the road.
 	if ignoreErrors || flagIgnore.Bool(cmd) {
-		return instances
+		return insts
 	}
 
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitIfErr(cmd, inst, inst.Value().Validate(), !flagIgnore.Bool(cmd))
+		exitIfErr(cmd, nil, inst.Validate(), !flagIgnore.Bool(cmd))
 	}
-	return instances
+	return insts
 }
 
 func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance, error) {

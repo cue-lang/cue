@@ -22,6 +22,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/diff"
@@ -97,7 +98,8 @@ func runTrim(cmd *Command, args []string) error {
 	if binst == nil {
 		return nil
 	}
-	instances := buildInstances(cmd, binst, false)
+	ctx := cuecontext.New()
+	instances := buildInstances(ctx, cmd, binst, false)
 
 	dst := flagOutFile.String(cmd)
 	if dst != "" && dst != "-" && !flagForce.Bool(cmd) {
@@ -112,7 +114,7 @@ func runTrim(cmd *Command, args []string) error {
 
 	for i, inst := range binst {
 		root := instances[i]
-		err := trim.Files(inst.Files, root, &trim.Config{
+		err := trim.Files(inst.Files, root.Value(), &trim.Config{
 			Trace: flagTrace.Bool(cmd),
 		})
 		if err != nil {
@@ -127,7 +129,7 @@ func runTrim(cmd *Command, args []string) error {
 
 	cfg := *defaultConfig.loadCfg
 	cfg.Overlay = overlay
-	tinsts := buildInstances(cmd, load.Instances(args, &cfg), false)
+	tinsts := buildInstances(ctx, cmd, load.Instances(args, &cfg), false)
 	if len(tinsts) != len(binst) {
 		return errors.New("unexpected number of new instances")
 	}

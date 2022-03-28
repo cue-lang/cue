@@ -47,9 +47,8 @@ func newHTTPCmd(v cue.Value) (task.Runner, error) {
 func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	var header, trailer http.Header
 	var (
-		method    = ctx.String("method")
-		u         = ctx.String("url")
-		tlsVerify = ctx.BoolPath(cue.ParsePath("tls.verify"))
+		method = ctx.String("method")
+		u      = ctx.String("url")
 	)
 	var r io.Reader
 	if obj := ctx.Obj.Lookup("request"); obj.Exists() {
@@ -75,6 +74,15 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		caCert, err = caCertValue.Bytes()
 		if err != nil {
 			return nil, errors.Wrapf(err, caCertValue.Pos(), "invalid bytes value")
+		}
+	}
+
+	tlsVerify := true
+	tlsVerifyValue := ctx.Obj.LookupPath(cue.ParsePath("tls.verify"))
+	if tlsVerifyValue.Exists() {
+		tlsVerify, err = tlsVerifyValue.Bool()
+		if err != nil {
+			return nil, errors.Wrapf(err, tlsVerifyValue.Pos(), "invalid bool value")
 		}
 	}
 

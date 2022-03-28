@@ -22,6 +22,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -81,7 +83,11 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		SilenceUsage: true,
 	}
 
-	c := &Command{Command: cmd, root: cmd}
+	c := &Command{
+		Command: cmd,
+		root:    cmd,
+		ctx:     cuecontext.New(),
+	}
 
 	cmdCmd := newCmdCmd(c)
 	c.cmd = cmdCmd
@@ -153,6 +159,8 @@ type Command struct {
 
 	// Subcommands
 	cmd *cobra.Command
+
+	ctx *cue.Context
 
 	hasErr bool
 }

@@ -78,16 +78,6 @@ func (c *Context) Bytes(field string) []byte {
 	return value
 }
 
-func (c *Context) BoolPath(path cue.Path) bool {
-	f := c.Obj.LookupPath(path)
-	value, err := f.Bool()
-	if err != nil {
-		c.addErr(f, err, "invalid bool argument")
-		return false
-	}
-	return value
-}
-
 func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interface{}) {
 
 	err := &taskError{

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e703f83_5a44e9aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-03-29T06:45:23Z",
+      "side": 1,
+      "message": "Should I revert https://review.gerrithub.io/c/cue-lang/cue/+/533845/4/cmd/cue/cmd/testdata/script/cmd_http.txt also ?\n\nThis patch would make the original test pass",
+      "revId": "e581cf02a8cadfabbe2275482163f6052d702c37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

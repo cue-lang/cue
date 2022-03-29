@@ -196,7 +196,7 @@ Examples:
   }
 
   # include all files as list elements
-  $ cue import -f -list -foo.yaml
+  $ cue import -f --list foo.yaml
   $ cat foo.cue
   [{
       kind: "Service"

@@ -33,6 +33,24 @@
       "message": "I wonder here whether the caller should be providing a context via the cmd passed in?",
       "revId": "341364cd3fa31f240e9e4646248f876fe00e4f54",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f44109db_79262d83",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-03-30T16:00:33Z",
+      "side": 1,
+      "message": "Makes total sense. Much better. Done.",
+      "parentUuid": "d7cb9327_b20cff62",
+      "revId": "341364cd3fa31f240e9e4646248f876fe00e4f54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

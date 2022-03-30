@@ -65,8 +65,7 @@ jobs:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
-      - if: ${{ github.ref == 'refs/heads/master' }}
-        name: Set go build tags
+      - name: Set go build tags
         run: go env -w GOFLAGS=-tags=long
       - if: matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'
         name: Generate

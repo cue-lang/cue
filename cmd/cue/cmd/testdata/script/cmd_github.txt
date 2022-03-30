@@ -192,8 +192,7 @@ jobs:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
-      - if: ${{ github.ref == 'refs/heads/master' }}
-        name: Set go build tags
+      - name: Set go build tags
         run: go env -w GOFLAGS=-tags=long
       - if: matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'
         name: Generate
@@ -1126,7 +1125,7 @@ test: _#bashWorkflow & {
 			"runs-on": "${{ matrix.os }}"
 			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#setGoBuildTags & {
 				_#tags: "long"
-				if:     "${{ \(_#isMaster) }}"
+				// if:     "${{ \(_#isMaster) }}"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
 				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]

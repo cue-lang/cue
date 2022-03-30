@@ -57,7 +57,7 @@ test: _#bashWorkflow & {
 			"runs-on": "${{ matrix.os }}"
 			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#setGoBuildTags & {
 				_#tags: "long"
-				if:     "${{ \(_#isMaster) }}"
+				// if:     "${{ \(_#isMaster) }}"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
 				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
@@ -1118,7 +1118,6 @@ import "strings"
                 _#tags(:ci): (string){ "long" }
                 name: (string){ "Set go build tags" }
                 run: (string){ "go env -w GOFLAGS=-tags=long" }
-                if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
               }
               5: (#struct){
                 name: (string){ "Generate" }
@@ -1637,7 +1636,6 @@ import "strings"
             _#tags(:ci): (string){ "long" }
             name: (string){ "Set go build tags" }
             run: (string){ "go env -w GOFLAGS=-tags=long" }
-            if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
           }
           5: (#struct){
             name: (string){ "Generate" }
@@ -2248,7 +2246,6 @@ import "strings"
           〈4;_#cacheGoModules〉,
           (〈4;_#setGoBuildTags〉 & {
             _#tags: "long"
-            if: "${{ \(〈4;_#isMaster〉) }}"
           }),
           〈4;_#goGenerate〉,
           〈4;_#goTest〉,

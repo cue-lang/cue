@@ -76,7 +76,7 @@ test: _#bashWorkflow & {
 				_#cacheGoModules,
 				_#setGoBuildTags & {
 					_#tags: "long"
-					if:     "${{ \(_#isMaster) }}"
+					// if:     "${{ \(_#isMaster) }}"
 				},
 				_#goGenerate,
 				_#goTest,

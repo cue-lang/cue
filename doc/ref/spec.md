@@ -2872,9 +2872,9 @@ SourceFile = { attribute "," } [ PackageClause "," ] { ImportDecl "," } { Declar
 ```
 
 ```
-"Hello \(place)!"
+"Hello \(#place)!"
 
-place: "world"
+#place: "world"
 
 // Outputs "Hello world!"
 ```

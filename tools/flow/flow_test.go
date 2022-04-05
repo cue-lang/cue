@@ -101,30 +101,38 @@ func TestFlowValuePanic(t *testing.T) {
             $id: "slow"
             out: string
         }
+        b: {
+            $id:    "slow"
+			$after: a
+            out:    string
+        }
     }
     `
 	ctx := cuecontext.New()
 	v := ctx.CompileString(f)
 
-	start := make(chan bool, 1)
+	ch := make(chan bool, 1)
 
-	cfg := &flow.Config{Root: cue.ParsePath("root")}
+	cfg := &flow.Config{
+		Root: cue.ParsePath("root"),
+		UpdateFunc: func(c *flow.Controller, t *flow.Task) error {
+			ch <- true
+			return nil
+		},
+	}
+
 	c := flow.New(cfg, v, taskFunc)
 
 	defer func() { recover() }()
 
-	go func() {
-		start <- true
-		c.Run(context.TODO())
-	}()
+	go c.Run(context.TODO())
 
-	<-start
-
-	// Wait for the flow to be running
-	// The task sleeps for 10 Milliseconds
-	time.Sleep(5 * time.Millisecond)
-	// Should trigger a panic as the flow is not terminated
+	// Call Value amidst two task runs. This should trigger a panic as the flow
+	// is not terminated.
+	<-ch
 	c.Value()
+	<-ch
+
 	t.Errorf("Value() did not panic")
 }
 

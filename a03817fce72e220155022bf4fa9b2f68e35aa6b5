@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3dd3960_7a14be75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-04-05T12:40:49Z",
+      "side": 1,
+      "message": "Looks like this is much better\n\nDidn\u0027t think of using UpdateFunc for synchronization",
+      "revId": "a03817fce72e220155022bf4fa9b2f68e35aa6b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

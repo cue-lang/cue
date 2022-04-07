@@ -248,15 +248,15 @@ func TestX(t *testing.T) {
 		t.Skip()
 	}
 
-	rt := cue.Runtime{}
-	inst, err := rt.Compile("", in)
-	if err != nil {
+	rt := cuecontext.New()
+	v := rt.CompileString(in)
+	if err := v.Err(); err != nil {
 		t.Fatal(err)
 	}
 
 	c := flow.New(&flow.Config{
 		Root: cue.ParsePath("root"),
-	}, inst, taskFunc)
+	}, v, taskFunc)
 
 	t.Error(mermaidGraph(c))
 

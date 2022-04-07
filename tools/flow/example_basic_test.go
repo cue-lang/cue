@@ -6,12 +6,13 @@ import (
 	"log"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/tools/flow"
 )
 
 func Example() {
-	var r cue.Runtime
-	inst, err := r.Compile("example.cue", `
+	ctx := cuecontext.New()
+	v := ctx.CompileString(`
 	a: {
 		input: "world"
 		output: string
@@ -21,10 +22,10 @@ func Example() {
 		output: string
 	}
 	`)
-	if err != nil {
+	if err := v.Err(); err != nil {
 		log.Fatal(err)
 	}
-	controller := flow.New(nil, inst, ioTaskFunc)
+	controller := flow.New(nil, v, ioTaskFunc)
 	if err := controller.Run(context.Background()); err != nil {
 		log.Fatal(err)
 	}

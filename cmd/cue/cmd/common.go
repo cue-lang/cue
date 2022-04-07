@@ -66,8 +66,6 @@ var defaultConfig = config{
 	},
 }
 
-var runtime = &cue.Runtime{}
-
 var inTest = false
 
 func exitIfErr(cmd *Command, inst *cue.Instance, err error, fatal bool) {

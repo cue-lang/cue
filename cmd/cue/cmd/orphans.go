@@ -192,8 +192,9 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 				return nil, errors.Wrapf(err, token.NoPos,
 					"invalid combination of input files")
 			}
-			inst, err := runtime.CompileFile(f)
-			if err != nil {
+			ctx := b.cmd.ctx
+			inst := ctx.BuildFile(f)
+			if err := inst.Err(); err != nil {
 				return nil, err
 			}
 
@@ -206,7 +207,10 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 					if p, ok := x.(*ast.ParenExpr); ok {
 						x = p.X // unwrap for better error messages
 					}
-					switch l := inst.Eval(x); l.Kind() {
+					l := ctx.BuildExpr(x,
+						cue.InferBuiltins(true),
+						cue.Scope(inst))
+					switch l.Kind() {
 					case cue.StringKind, cue.IntKind:
 						label = l.Syntax().(ast.Label)
 

@@ -80,7 +80,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	genLine = "//go:generate go run cuelang.org/go/internal/cmd/qgo " + strings.Join(os.Args[1:], " ")
+	genLine = "// Generated with go run cuelang.org/go/internal/cmd/qgo " + strings.Join(os.Args[1:], " ")
 
 	args := flag.Args()
 	if len(args) == 0 {

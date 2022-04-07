@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate go run cuelang.org/go/internal/cmd/qgo -exclude=Rune$,Func$,^Map$,Special$,EqualFold,Byte,Title$,ToValidUTF8,All$ extract strings
+// Generated with go run cuelang.org/go/internal/cmd/qgo -exclude=Rune$,Func$,^Map$,Special$,EqualFold,Byte,Title$,ToValidUTF8,All$ extract strings
 
 package strings
 

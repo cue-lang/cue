@@ -12,7 +12,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20201118171849-f6a6b3f636fc
-	github.com/rogpeppe/go-internal v1.8.0
+	github.com/rogpeppe/go-internal v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.2.2

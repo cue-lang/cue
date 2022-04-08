@@ -404,6 +404,7 @@ func extract(cmd *Command, args []string) error {
 		for _, e := range p.Errors {
 			switch e.Kind {
 			case packages.ParseError, packages.TypeError:
+				// TODO: Consider making this behavior an option.
 			default:
 				errs = append(errs, fmt.Sprintf("\t%s: %v", p.PkgPath, e))
 			}
@@ -679,7 +680,13 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			mapNamed := false
 			underlying := e.pkg.TypesInfo.TypeOf(v.Type)
 			if b, ok := underlying.Underlying().(*types.Basic); ok && b.Kind() != types.String {
-				mapNamed = true
+				switch b.Kind() {
+				case types.Invalid:
+					continue
+				case types.String:
+				default:
+					mapNamed = true
+				}
 			}
 
 			switch tn, ok := e.pkg.TypesInfo.Defs[v.Name].(*types.TypeName); {

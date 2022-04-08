@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b60c818b_dd121aab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-08T16:42:25Z",
+      "side": 1,
+      "message": "LGTM assuming trybots and unity are good on this new patchset",
+      "revId": "8eca80ce71da7991b7413e9cef573031d863589d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

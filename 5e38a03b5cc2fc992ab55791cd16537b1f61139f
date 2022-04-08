@@ -16,6 +16,24 @@
       "message": "Could/should this check not be moved further up, to ~682? I think (although it\u0027s been some time since I looked at this code) that the underlying type should be the same here and there. And given we are already inspecting the underlying type on 682 we could perform the \"invalid\" check there?",
       "revId": "5e38a03b5cc2fc992ab55791cd16537b1f61139f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "470948ce_2f1b1c0c",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 688,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-08T16:18:42Z",
+      "side": 1,
+      "message": "Good point. Done",
+      "parentUuid": "3de15656_7f00c36f",
+      "revId": "5e38a03b5cc2fc992ab55791cd16537b1f61139f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

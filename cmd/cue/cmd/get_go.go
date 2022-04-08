@@ -404,6 +404,7 @@ func extract(cmd *Command, args []string) error {
 		for _, e := range p.Errors {
 			switch e.Kind {
 			case packages.ParseError, packages.TypeError:
+				// TODO: Consider making this behavior an option.
 			default:
 				errs = append(errs, fmt.Sprintf("\t%s: %v", p.PkgPath, e))
 			}
@@ -684,7 +685,12 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 
 			switch tn, ok := e.pkg.TypesInfo.Defs[v.Name].(*types.TypeName); {
 			case ok:
-				if altType := e.altType(tn.Type()); altType != nil {
+				t := tn.Type()
+				b, ok := t.Underlying().(*types.Basic)
+				if ok && b.Kind() == types.Invalid {
+					continue
+				}
+				if altType := e.altType(t); altType != nil {
 					// TODO: add the underlying tag as a Go tag once we have
 					// proper string escaping for CUE.
 					a = append(a, e.def(x.Doc, name, altType, true))

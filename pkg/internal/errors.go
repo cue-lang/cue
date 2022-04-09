@@ -77,21 +77,15 @@ func (c *CallCtxt) invalidArgType(arg adt.Value, i int, typ string, err error) {
 		c.Err = b
 		return
 	}
-	v, ok := arg.(adt.Value)
 	// TODO: make these permanent errors if the value did not originate from
 	// a reference.
-	if !ok {
-		c.errf(nil,
-			"cannot use incomplete value %s as %s in argument %d to %s",
-			arg, typ, i, c.Name())
-	}
 	if err != nil {
 		c.errf(err,
 			"cannot use %s (type %s) as %s in argument %d to %s",
-			arg, v.Kind(), typ, i, c.Name())
+			arg, arg.Kind(), typ, i, c.Name())
 	} else {
 		c.errf(err,
 			"cannot use %s (type %s) as %s in argument %d to %s",
-			arg, v.Kind(), typ, i, c.Name())
+			arg, arg.Kind(), typ, i, c.Name())
 	}
 }

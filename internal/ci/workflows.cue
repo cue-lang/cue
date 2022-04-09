@@ -227,7 +227,7 @@ release: _#bashWorkflow & {
 				with: "fetch-depth": 0
 			},
 			_#installGo & {
-				with: "go-version": _#latestStableGo
+				with: "go-version": _#pinnedReleaseGo
 			},
 			_#step & {
 				name: "Setup qemu"
@@ -326,11 +326,20 @@ _#bashWorkflow: json.#Workflow & {
 _#job:  ((json.#Workflow & {}).jobs & {x: _}).x
 _#step: ((_#job & {steps:                 _}).steps & [_])[0]
 
-// We use the latest go1.16 for code generation
-_#codeGenGo: "1.16.10"
+// We use the oldest supported Go version for code generation.
+// TODO(mvdan): now that we don't use qgo via go:generate,
+// we should try to use latestStableGo for code generation,
+// which is closer to how developers will run go generate.
+_#codeGenGo: "1.16.x"
 
-// Use a specific latest version for release builds
-_#latestStableGo: "1.17.3"
+// Use the latest Go version for extra checks,
+// such as running tests with the data race detector.
+_#latestStableGo: "1.18.x"
+
+// Use a specific latest version for release builds.
+// Note that we don't want ".x" for the sake of reproducibility,
+// so we instead pin a specific Go release.
+_#pinnedReleaseGo: "1.18.1"
 
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
@@ -339,7 +348,7 @@ _#windowsMachine: "windows-2019"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": [_#codeGenGo, _#latestStableGo]
+		"go-version": [_#codeGenGo, "1.17.x", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -354,21 +363,20 @@ _#setGoBuildTags: _#step & {
 
 _#installGo: _#step & {
 	name: "Install Go"
-	uses: "actions/setup-go@v2"
+	uses: "actions/setup-go@v3"
 	with: {
 		"go-version": *"${{ matrix.go-version }}" | string
-		stable:       false
 	}
 }
 
 _#checkoutCode: _#step & {
 	name: "Checkout code"
-	uses: "actions/checkout@v2"
+	uses: "actions/checkout@v3"
 }
 
 _#cacheGoModules: _#step & {
 	name: "Cache Go modules"
-	uses: "actions/cache@v2"
+	uses: "actions/cache@v3"
 	with: {
 		path: "~/go/pkg/mod"
 		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3295684b_6bba730b",
+        "filename": "pkg/internal/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-09T07:44:33Z",
+      "side": 0,
+      "message": "Did this TODO refer only to the error that I removed, or also to the other two that are still around?",
+      "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

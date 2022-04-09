@@ -169,7 +169,7 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 
 	case "list":
 		return flow.RunnerFunc(func(t *flow.Task) error {
-			t.Fill(map[string][]int{"out": []int{1, 2}})
+			t.Fill(map[string][]int{"out": {1, 2}})
 			return nil
 		}), nil
 

@@ -15,11 +15,11 @@
 package protobuf
 
 import (
+	"fmt"
 	"strings"
 	"text/scanner"
 
 	"github.com/emicklei/proto"
-	"golang.org/x/xerrors"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -28,7 +28,7 @@ import (
 // failf panics with a marked error that can be intercepted upon returning
 // from parsing.
 func failf(pos scanner.Position, format string, args ...interface{}) {
-	panic(protoError{pos, xerrors.Errorf(format, args...)})
+	panic(protoError{pos, fmt.Errorf(format, args...)})
 }
 
 func fail(pos scanner.Position, err error) {

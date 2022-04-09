@@ -254,7 +254,7 @@ f4: {
 func TestEncodeAST(t *testing.T) {
 	comment := func(s string) *ast.CommentGroup {
 		return &ast.CommentGroup{List: []*ast.Comment{
-			&ast.Comment{Text: "// " + s},
+			{Text: "// " + s},
 		}}
 	}
 	testCases := []struct {

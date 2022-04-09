@@ -3,7 +3,7 @@
 #
 # Note: all the non-golden files below are updated automatically by
 # the internal/ci updateTxtarTests CUE command (with the exception
-# of the cue.mod/module.cue file).
+# of the cue.mod/module file).
 
 # TODO: drop cd when we solve cuelang.org/issue/708
 cd internal/ci
@@ -62,14 +62,13 @@ jobs:
         shell: bash
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
-          go-version: 1.17.3
-          stable: false
+          go-version: 1.18.1
       - name: Setup qemu
         uses: docker/setup-qemu-action@v1
       - name: Set up Docker Buildx
@@ -160,8 +159,9 @@ jobs:
       fail-fast: false
       matrix:
         go-version:
-          - 1.16.10
-          - 1.17.3
+          - 1.16.x
+          - 1.17.x
+          - 1.18.x
         os:
           - ubuntu-18.04
           - macos-10.15
@@ -180,14 +180,13 @@ jobs:
           EOD
           chmod 600 ~/.netrc
       - name: Install Go
-        uses: actions/setup-go@v2
+        uses: actions/setup-go@v3
         with:
           go-version: ${{ matrix.go-version }}
-          stable: false
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Cache Go modules
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
@@ -195,12 +194,12 @@ jobs:
       - if: ${{ github.ref == 'refs/heads/master' }}
         name: Set go build tags
         run: go env -w GOFLAGS=-tags=long
-      - if: matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'
+      - if: matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-18.04'
         name: Generate
         run: go generate ./...
       - name: Test
         run: go test ./...
-      - if: ${{ matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}
+      - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-18.04' }}
         name: Test with -race
         run: go test -race ./...
       - name: gorelease check
@@ -1239,7 +1238,7 @@ release: _#bashWorkflow & {
 		steps: [_#checkoutCode & {
 			with: "fetch-depth": 0
 		}, _#installGo & {
-			with: "go-version": _#latestStableGo
+			with: "go-version": "1.18.1"
 		}, _#step & {
 			name: "Setup qemu"
 			uses: "docker/setup-qemu-action@v1"
@@ -1319,18 +1318,22 @@ _#step: ((_#job & {
 	steps: _
 }).steps & [_])[0]
 
-// We use the latest go1.16 for code generation
-_#codeGenGo: "1.16.10"
+// We use the oldest supported Go version for code generation.
+// TODO(mvdan): now that we don't use qgo via go:generate,
+// we should try to use latestStableGo for code generation,
+// which is closer to how developers will run go generate.
+_#codeGenGo: "1.16.x"
 
-// Use a specific latest version for release builds
-_#latestStableGo: "1.17.3"
+// Use the latest Go version for extra checks,
+// such as running tests with the data race detector.
+_#latestStableGo: "1.18.x"
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
 _#windowsMachine: "windows-2019"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": [_#codeGenGo, _#latestStableGo]
+		"go-version": [_#codeGenGo, "1.17.x", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -1341,19 +1344,16 @@ _#setGoBuildTags: _#step & {
 }
 _#installGo: _#step & {
 	name: "Install Go"
-	uses: "actions/setup-go@v2"
-	with: {
-		"go-version": *"${{ matrix.go-version }}" | string
-		stable:       false
-	}
+	uses: "actions/setup-go@v3"
+	with: "go-version": *"${{ matrix.go-version }}" | string
 }
 _#checkoutCode: _#step & {
 	name: "Checkout code"
-	uses: "actions/checkout@v2"
+	uses: "actions/checkout@v3"
 }
 _#cacheGoModules: _#step & {
 	name: "Cache Go modules"
-	uses: "actions/cache@v2"
+	uses: "actions/cache@v3"
 	with: {
 		path: "~/go/pkg/mod"
 		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"

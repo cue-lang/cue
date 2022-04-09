@@ -1163,7 +1163,7 @@ func (n *nodeContext) getValidators() BaseValue {
 		v = &BasicType{K: n.kind}
 
 	case 1:
-		v = a[0].(Value) // remove cast
+		v = a[0]
 
 	default:
 		v = &Conjunction{Values: a}

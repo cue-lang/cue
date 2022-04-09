@@ -251,17 +251,17 @@ _#step: ((_#job & {
 }).steps & [_])[0]
 
 // We use the latest go1.16 for code generation
-_#codeGenGo: "1.16.10"
+_#codeGenGo: "1.16.15"
 
 // Use a specific latest version for release builds
-_#latestStableGo: "1.17.3"
+_#latestStableGo: "1.18.1"
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
 _#windowsMachine: "windows-2019"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": [_#codeGenGo, _#latestStableGo]
+		"go-version": [_#codeGenGo, "1.17.9", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -272,19 +272,16 @@ _#setGoBuildTags: _#step & {
 }
 _#installGo: _#step & {
 	name: "Install Go"
-	uses: "actions/setup-go@v2"
-	with: {
-		"go-version": *"${{ matrix.go-version }}" | string
-		stable:       false
-	}
+	uses: "actions/setup-go@v3"
+	with: "go-version": *"${{ matrix.go-version }}" | string
 }
 _#checkoutCode: _#step & {
 	name: "Checkout code"
-	uses: "actions/checkout@v2"
+	uses: "actions/checkout@v3"
 }
 _#cacheGoModules: _#step & {
 	name: "Cache Go modules"
-	uses: "actions/cache@v2"
+	uses: "actions/cache@v3"
 	with: {
 		path: "~/go/pkg/mod"
 		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"
@@ -1077,8 +1074,9 @@ import "strings"
               "fail-fast": (bool){ false }
               matrix: (#struct){
                 "go-version": (#list){
-                  0: (string){ "1.16.10" }
-                  1: (string){ "1.17.3" }
+                  0: (string){ "1.16.15" }
+                  1: (string){ "1.17.9" }
+                  2: (string){ "1.18.1" }
                 }
                 os: (#list){
                   0: (string){ "ubuntu-18.04" }
@@ -1095,19 +1093,18 @@ import "strings"
               }
               1: (#struct){
                 name: (string){ "Install Go" }
-                uses: (string){ "actions/setup-go@v2" }
+                uses: (string){ "actions/setup-go@v3" }
                 with: (#struct){
                   "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
-                  stable: (bool){ false }
                 }
               }
               2: (#struct){
                 name: (string){ "Checkout code" }
-                uses: (string){ "actions/checkout@v2" }
+                uses: (string){ "actions/checkout@v3" }
               }
               3: (#struct){
                 name: (string){ "Cache Go modules" }
-                uses: (string){ "actions/cache@v2" }
+                uses: (string){ "actions/cache@v3" }
                 with: (#struct){
                   path: (string){ "~/go/pkg/mod" }
                   key: (string){ "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}" }
@@ -1123,7 +1120,7 @@ import "strings"
               5: (#struct){
                 name: (string){ "Generate" }
                 run: (string){ "go generate ./..." }
-                if: (string){ "matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'" }
+                if: (string){ "matrix.go-version == '1.16.15' && matrix.os == 'ubuntu-18.04'" }
               }
               6: (#struct){
                 name: (string){ "Test" }
@@ -1132,7 +1129,7 @@ import "strings"
               7: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
-                if: (string){ "${{ matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}" }
+                if: (string){ "${{ matrix.go-version == '1.18.1' && matrix.os == 'ubuntu-18.04' }}" }
               }
               8: (#struct){
                 name: (string){ "gorelease check" }
@@ -1370,17 +1367,16 @@ import "strings"
             steps: (#list){
               0: (#struct){
                 name: (string){ "Checkout code" }
-                uses: (string){ "actions/checkout@v2" }
+                uses: (string){ "actions/checkout@v3" }
                 with: (#struct){
                   "fetch-depth": (int){ 0 }
                 }
               }
               1: (#struct){
                 name: (string){ "Install Go" }
-                uses: (string){ "actions/setup-go@v2" }
+                uses: (string){ "actions/setup-go@v3" }
                 with: (#struct){
-                  "go-version": (string){ "1.17.3" }
-                  stable: (bool){ false }
+                  "go-version": (string){ "1.18.1" }
                 }
               }
               2: (#struct){
@@ -1596,8 +1592,9 @@ import "strings"
           "fail-fast": (bool){ false }
           matrix: (#struct){
             "go-version": (#list){
-              0: (string){ "1.16.10" }
-              1: (string){ "1.17.3" }
+              0: (string){ "1.16.15" }
+              1: (string){ "1.17.9" }
+              2: (string){ "1.18.1" }
             }
             os: (#list){
               0: (string){ "ubuntu-18.04" }
@@ -1614,19 +1611,18 @@ import "strings"
           }
           1: (#struct){
             name: (string){ "Install Go" }
-            uses: (string){ "actions/setup-go@v2" }
+            uses: (string){ "actions/setup-go@v3" }
             with: (#struct){
               "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
-              stable: (bool){ false }
             }
           }
           2: (#struct){
             name: (string){ "Checkout code" }
-            uses: (string){ "actions/checkout@v2" }
+            uses: (string){ "actions/checkout@v3" }
           }
           3: (#struct){
             name: (string){ "Cache Go modules" }
-            uses: (string){ "actions/cache@v2" }
+            uses: (string){ "actions/cache@v3" }
             with: (#struct){
               path: (string){ "~/go/pkg/mod" }
               key: (string){ "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}" }
@@ -1642,7 +1638,7 @@ import "strings"
           5: (#struct){
             name: (string){ "Generate" }
             run: (string){ "go generate ./..." }
-            if: (string){ "matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'" }
+            if: (string){ "matrix.go-version == '1.16.15' && matrix.os == 'ubuntu-18.04'" }
           }
           6: (#struct){
             name: (string){ "Test" }
@@ -1651,7 +1647,7 @@ import "strings"
           7: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
-            if: (string){ "${{ matrix.go-version == '1.17.3' && matrix.os == 'ubuntu-18.04' }}" }
+            if: (string){ "${{ matrix.go-version == '1.18.1' && matrix.os == 'ubuntu-18.04' }}" }
           }
           8: (#struct){
             name: (string){ "gorelease check" }
@@ -1883,17 +1879,16 @@ import "strings"
         steps: (#list){
           0: (#struct){
             name: (string){ "Checkout code" }
-            uses: (string){ "actions/checkout@v2" }
+            uses: (string){ "actions/checkout@v3" }
             with: (#struct){
               "fetch-depth": (int){ 0 }
             }
           }
           1: (#struct){
             name: (string){ "Install Go" }
-            uses: (string){ "actions/setup-go@v2" }
+            uses: (string){ "actions/setup-go@v3" }
             with: (#struct){
-              "go-version": (string){ "1.17.3" }
-              stable: (bool){ false }
+              "go-version": (string){ "1.18.1" }
             }
           }
           2: (#struct){
@@ -2105,8 +2100,8 @@ import "strings"
   }
   _#step(:ci): (#struct){
   }
-  _#codeGenGo(:ci): (string){ "1.16.10" }
-  _#latestStableGo(:ci): (string){ "1.17.3" }
+  _#codeGenGo(:ci): (string){ "1.16.15" }
+  _#latestStableGo(:ci): (string){ "1.18.1" }
   _#linuxMachine(:ci): (string){ "ubuntu-18.04" }
   _#macosMachine(:ci): (string){ "macos-10.15" }
   _#windowsMachine(:ci): (string){ "windows-2019" }
@@ -2114,8 +2109,9 @@ import "strings"
     "fail-fast": (bool){ false }
     matrix: (#struct){
       "go-version": (#list){
-        0: (string){ "1.16.10" }
-        1: (string){ "1.17.3" }
+        0: (string){ "1.16.15" }
+        1: (string){ "1.17.9" }
+        2: (string){ "1.18.1" }
       }
       os: (#list){
         0: (string){ "ubuntu-18.04" }
@@ -2135,19 +2131,18 @@ import "strings"
   }
   _#installGo(:ci): (#struct){
     name: (string){ "Install Go" }
-    uses: (string){ "actions/setup-go@v2" }
+    uses: (string){ "actions/setup-go@v3" }
     with: (#struct){
       "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
-      stable: (bool){ false }
     }
   }
   _#checkoutCode(:ci): (#struct){
     name: (string){ "Checkout code" }
-    uses: (string){ "actions/checkout@v2" }
+    uses: (string){ "actions/checkout@v3" }
   }
   _#cacheGoModules(:ci): (#struct){
     name: (string){ "Cache Go modules" }
-    uses: (string){ "actions/cache@v2" }
+    uses: (string){ "actions/cache@v3" }
     with: (#struct){
       path: (string){ "~/go/pkg/mod" }
       key: (string){ "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}" }
@@ -2157,7 +2152,7 @@ import "strings"
   _#goGenerate(:ci): (#struct){
     name: (string){ "Generate" }
     run: (string){ "go generate ./..." }
-    if: (string){ "matrix.go-version == '1.16.10' && matrix.os == 'ubuntu-18.04'" }
+    if: (string){ "matrix.go-version == '1.16.15' && matrix.os == 'ubuntu-18.04'" }
   }
   _#goTest(:ci): (#struct){
     name: (string){ "Test" }
@@ -2489,8 +2484,8 @@ import "strings"
   }).steps & [
     _,
   ])[0]
-  _#codeGenGo: "1.16.10"
-  _#latestStableGo: "1.17.3"
+  _#codeGenGo: "1.16.15"
+  _#latestStableGo: "1.18.1"
   _#linuxMachine: "ubuntu-18.04"
   _#macosMachine: "macos-10.15"
   _#windowsMachine: "windows-2019"
@@ -2499,6 +2494,7 @@ import "strings"
     matrix: {
       "go-version": [
         〈3;_#codeGenGo〉,
+        "1.17.9",
         〈3;_#latestStableGo〉,
       ]
       os: [
@@ -2515,19 +2511,18 @@ import "strings"
   })
   _#installGo: (〈0;_#step〉 & {
     name: "Install Go"
-    uses: "actions/setup-go@v2"
+    uses: "actions/setup-go@v3"
     with: {
       "go-version": (*"${{ matrix.go-version }}"|string)
-      stable: false
     }
   })
   _#checkoutCode: (〈0;_#step〉 & {
     name: "Checkout code"
-    uses: "actions/checkout@v2"
+    uses: "actions/checkout@v3"
   })
   _#cacheGoModules: (〈0;_#step〉 & {
     name: "Cache Go modules"
-    uses: "actions/cache@v2"
+    uses: "actions/cache@v3"
     with: {
       path: "~/go/pkg/mod"
       key: "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"

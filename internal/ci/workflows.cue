@@ -327,10 +327,10 @@ _#job:  ((json.#Workflow & {}).jobs & {x: _}).x
 _#step: ((_#job & {steps:                 _}).steps & [_])[0]
 
 // We use the latest go1.16 for code generation
-_#codeGenGo: "1.16.10"
+_#codeGenGo: "1.16.15"
 
 // Use a specific latest version for release builds
-_#latestStableGo: "1.17.3"
+_#latestStableGo: "1.18.1"
 
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
@@ -339,7 +339,7 @@ _#windowsMachine: "windows-2019"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": [_#codeGenGo, _#latestStableGo]
+		"go-version": [_#codeGenGo, "1.17.9", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -354,21 +354,20 @@ _#setGoBuildTags: _#step & {
 
 _#installGo: _#step & {
 	name: "Install Go"
-	uses: "actions/setup-go@v2"
+	uses: "actions/setup-go@v3"
 	with: {
 		"go-version": *"${{ matrix.go-version }}" | string
-		stable:       false
 	}
 }
 
 _#checkoutCode: _#step & {
 	name: "Checkout code"
-	uses: "actions/checkout@v2"
+	uses: "actions/checkout@v3"
 }
 
 _#cacheGoModules: _#step & {
 	name: "Cache Go modules"
-	uses: "actions/cache@v2"
+	uses: "actions/cache@v3"
 	with: {
 		path: "~/go/pkg/mod"
 		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"

@@ -19,7 +19,6 @@ import (
 	"os"
 	pathpkg "path"
 	"path/filepath"
-	goruntime "runtime"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -628,14 +627,4 @@ func (c Config) findRoot(dir string) string {
 		}
 		abs = d
 	}
-}
-
-func home() string {
-	env := "HOME"
-	if goruntime.GOOS == "windows" {
-		env = "USERPROFILE"
-	} else if goruntime.GOOS == "plan9" {
-		env = "home"
-	}
-	return os.Getenv(env)
 }

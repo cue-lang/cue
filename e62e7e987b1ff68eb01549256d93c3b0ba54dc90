@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f69c1309_d24e81ef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-12T08:44:36Z",
+      "side": 1,
+      "message": "Not strictly necessary, but maybe add Issue #1619.",
+      "revId": "e62e7e987b1ff68eb01549256d93c3b0ba54dc90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

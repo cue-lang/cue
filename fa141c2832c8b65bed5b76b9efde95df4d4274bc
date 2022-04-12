@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7daadd1_1fc2edf0",
+        "filename": "internal/encoding/json/encode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-12T08:44:36Z",
+      "side": 0,
+      "message": "Are these included intentionally?",
+      "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

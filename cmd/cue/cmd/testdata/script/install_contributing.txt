@@ -14,7 +14,6 @@ env GOPROXY=https://proxy.golang.org
 ! exists $WORK/gopath/bin/git-codereview
 
 # Install
-env GO111MODULE=on
-go get golang.org/x/review/git-codereview
+go install golang.org/x/review/git-codereview@latest
 exec $WORK/gopath/bin/git-codereview help
 stdout 'Git-codereview is a git helper'

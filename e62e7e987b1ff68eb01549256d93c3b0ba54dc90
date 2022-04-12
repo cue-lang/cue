@@ -16,6 +16,24 @@
       "message": "Not strictly necessary, but maybe add Issue #1619.",
       "revId": "e62e7e987b1ff68eb01549256d93c3b0ba54dc90",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2d4b01b_1a4e06b1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-12T08:54:16Z",
+      "side": 1,
+      "message": "I\u0027d say not, because the -s changes are unrelated to Go 1.18 :) I\u0027ll send a follow-up CL for this, I just wanted to keep this one smaller.",
+      "parentUuid": "f69c1309_d24e81ef",
+      "revId": "e62e7e987b1ff68eb01549256d93c3b0ba54dc90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

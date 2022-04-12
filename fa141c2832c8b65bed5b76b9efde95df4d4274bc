@@ -16,6 +16,24 @@
       "message": "Are these included intentionally?",
       "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04322c72_74e7d21d",
+        "filename": "internal/encoding/json/encode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-12T08:54:16Z",
+      "side": 0,
+      "message": "Yup, that\u0027s the -s flag removing redundant types.",
+      "parentUuid": "f7daadd1_1fc2edf0",
+      "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

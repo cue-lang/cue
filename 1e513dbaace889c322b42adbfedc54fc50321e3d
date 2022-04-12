@@ -16,6 +16,23 @@
       "message": "Paul, you authored this test - did I miss something here?",
       "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9affcc18_2e683fb0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-12T13:36:22Z",
+      "side": 1,
+      "message": "Hmm, I totally forgot to do the Signed-Off-By bit here, but nothing failed. Why is that?",
+      "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

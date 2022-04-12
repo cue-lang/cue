@@ -1,7 +1,6 @@
 # Test that we get a sensible error message when there is a type
 # checking error in the package that is being 'cue get go'-ed.
 
-[!go1.16] skip 'Only relevant for Go 1.16 and above'
 [golang.org/issue/44287] skip
 
 cue get go --local

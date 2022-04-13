@@ -33,6 +33,42 @@
       "message": "Hmm, I totally forgot to do the Signed-Off-By bit here, but nothing failed. Why is that?",
       "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54515b6f_d834455d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-13T10:17:21Z",
+      "side": 1,
+      "message": "Known issue that we\u0027ve raised with the GerritHub folks. Admins are not checked, but this is a bug. Might be prudent to put a quick CI check in there for now to catch this...",
+      "parentUuid": "9affcc18_2e683fb0",
+      "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c375374_4697dacd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-13T10:17:21Z",
+      "side": 1,
+      "message": "It\u0027s been a while since I looked at this. \n\nThe intent, from memory, was to have all generated files be compared against golden files. \n\nSo that would be the only thing to check with the files that you propose deleting. Is it instead the case that they _should_ be golden files and added to the comparison at the top?",
+      "parentUuid": "64a02096_abdc588f",
+      "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

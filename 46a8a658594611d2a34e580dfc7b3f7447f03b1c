@@ -16,6 +16,40 @@
       "message": "LGTM but I\u0027ll let @myitcv have the final word.",
       "revId": "46a8a658594611d2a34e580dfc7b3f7447f03b1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "540186e1_5035fd1a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-13T10:06:00Z",
+      "side": 1,
+      "message": "My only question is about 1.18.\n\nCan also give a quick run through offline on how the test setup works for CI workflows.",
+      "revId": "46a8a658594611d2a34e580dfc7b3f7447f03b1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ec76ebe_3078e543",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-13T10:06:00Z",
+      "side": 1,
+      "message": "Wasn\u0027t the intention to also add 1.18 into the matrix?\n\ni.e. have 1.16.x, 1.17.x and 1.18.x \"for some time\" then drop 1.16.x?",
+      "revId": "46a8a658594611d2a34e580dfc7b3f7447f03b1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

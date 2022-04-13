@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd94e974_2a01fbbb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-13T10:08:42Z",
+      "side": 1,
+      "message": "Also need to mark that this closes https://github.com/cue-lang/cue/pull/1549.",
+      "revId": "4ca6ce2ed34c3e12d0add5d71930c77d54a7cfed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1a98a52_29750117",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-13T10:08:42Z",
+      "side": 1,
+      "message": "LGTM. The flow we follow is to approve the PR on GitHub, then we can reference that approval and \"self approve\" here in Gerrit. It should be impossible to accidentally submit a PR on GitHub FWIW. ",
+      "revId": "4ca6ce2ed34c3e12d0add5d71930c77d54a7cfed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -24,6 +24,10 @@ import (
 )
 
 const (
+	// envLong is used to indicate that long tests should be run.
+	// Note that it is not the equivalent of not supplying -short.
+	envLong = "CUE_LONG"
+
 	// envUpdate is used in the definition of UpdateGoldenFiles
 	envUpdate = "CUE_UPDATE"
 
@@ -50,6 +54,8 @@ var (
 		regexp.MustCompile(`^cuelang\.org/issues?/\d+$`),
 	}
 )
+
+var Long = os.Getenv(envLong) != ""
 
 // UpdateGoldenFiles determines whether testscript scripts should update txtar
 // archives in the event of cmp failures. It corresponds to

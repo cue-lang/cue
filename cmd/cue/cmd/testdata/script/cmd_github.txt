@@ -192,8 +192,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
       - if: ${{ github.ref == 'refs/heads/master' }}
-        name: Set go build tags
-        run: go env -w GOFLAGS=-tags=long
+        run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-18.04'
         name: Generate
         run: go generate ./...
@@ -1123,9 +1122,9 @@ test: _#bashWorkflow & {
 			needs:     "start"
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
-			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#setGoBuildTags & {
-				_#tags: "long"
-				if:     "${{ \(_#isMaster) }}"
+			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#step & {
+				if:  "${{ \(_#isMaster) }}"
+				run: "echo CUE_LONG=true >> $GITHUB_ENV"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
 				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
@@ -1341,11 +1340,6 @@ _#testStrategy: {
 		"go-version": [_#codeGenGo, "1.17.x", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
-}
-_#setGoBuildTags: _#step & {
-	_#tags: string
-	name:   "Set go build tags"
-	run:    "go env -w GOFLAGS=-tags=\(_#tags)"
 }
 _#installGo: _#step & {
 	name: "Install Go"

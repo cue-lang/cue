@@ -24,7 +24,8 @@ import (
 )
 
 const (
-	// envUpdate is used in the definition of UpdateGoldenFiles
+	envLong = "CUE_LONG"
+
 	envUpdate = "CUE_UPDATE"
 
 	// envNonIssues can be set to a regular expression which indicates what
@@ -51,10 +52,15 @@ var (
 	}
 )
 
+// Long determines whether long tests should be run.
+// It is controlled by setting CUE_LONG to a non-empty string like "true".
+// Note that it is not the equivalent of not supplying -short.
+var Long = os.Getenv(envLong) != ""
+
 // UpdateGoldenFiles determines whether testscript scripts should update txtar
-// archives in the event of cmp failures. It corresponds to
-// testscript.Params.UpdateGoldenFiles. See the docs for
-// testscript.Params.UpdateGoldenFiles for more details.
+// archives in the event of cmp failures.
+// It is controlled by setting CUE_UPDATE to a non-empty string like "true".
+// It corresponds to testscript.Params.UpdateGoldenFiles; see its docs for details.
 var UpdateGoldenFiles = os.Getenv(envUpdate) != ""
 
 // FormatTxtar ensures that .cue files in txtar test archives are well

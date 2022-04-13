@@ -50,6 +50,24 @@
       "message": "Wasn\u0027t the intention to also add 1.18 into the matrix?\n\ni.e. have 1.16.x, 1.17.x and 1.18.x \"for some time\" then drop 1.16.x?",
       "revId": "46a8a658594611d2a34e580dfc7b3f7447f03b1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7df89528_eb8c2db5",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-13T10:09:41Z",
+      "side": 1,
+      "message": "Yup, I can do that. When I sent this CL, I was simply fixing up what was already there; I wasn\u0027t yet aware that Marcel was working on support for 1.18.",
+      "parentUuid": "6ec76ebe_3078e543",
+      "revId": "46a8a658594611d2a34e580dfc7b3f7447f03b1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

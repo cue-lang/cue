@@ -51,6 +51,24 @@
       "message": "I imagine you\u0027d be fine with me ACKing these comments within reason, given that you did the +2, but just in case I\u0027ll ask you to confirm this time :) ",
       "revId": "e62e7e987b1ff68eb01549256d93c3b0ba54dc90",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e54375e_58aac41e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-13T08:58:04Z",
+      "side": 1,
+      "message": "Yes. It was just to make you aware, but if it is intended, all is good.",
+      "parentUuid": "615917f3_390b18e6",
+      "revId": "e62e7e987b1ff68eb01549256d93c3b0ba54dc90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

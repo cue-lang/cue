@@ -74,9 +74,9 @@ test: _#bashWorkflow & {
 				_#installGo,
 				_#checkoutCode,
 				_#cacheGoModules,
-				_#setGoBuildTags & {
-					_#tags: "long"
-					if:     "${{ \(_#isMaster) }}"
+				_#step & {
+					if:  "${{ \(_#isMaster) }}"
+					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,
 				_#goTest,
@@ -351,14 +351,6 @@ _#testStrategy: {
 		"go-version": [_#codeGenGo, "1.17.x", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
-}
-
-_#setGoBuildTags: _#step & {
-	_#tags: string
-	name:   "Set go build tags"
-	run:    """
-		go env -w GOFLAGS=-tags=\(_#tags)
-		"""
 }
 
 _#installGo: _#step & {

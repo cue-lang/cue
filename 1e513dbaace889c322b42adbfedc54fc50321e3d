@@ -69,6 +69,42 @@
       "parentUuid": "64a02096_abdc588f",
       "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23935d30_23d64fd8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-13T14:25:23Z",
+      "side": 1,
+      "message": "Not as far as I can see; for instance, we\u0027re removing pkg1/alias_go_gen.cue, and pkg1/alias_go_gen.cue.golden already exists. The cmp happens, as you\u0027d expect, like:\n\n    cmp ./pkg1/alias_go_gen.cue ./pkg1/alias_go_gen.cue.golden",
+      "parentUuid": "0c375374_4697dacd",
+      "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc7e4fdc_19285136",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-13T14:25:23Z",
+      "side": 1,
+      "message": "Ack, added it to https://github.com/cue-lang/cue/issues/1630.",
+      "parentUuid": "54515b6f_d834455d",
+      "revId": "1e513dbaace889c322b42adbfedc54fc50321e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c19b5042_de065879",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-04-13T09:01:54Z",
+      "side": 1,
+      "message": "LGTM but I\u0027ll let @myitcv have the final word.",
+      "revId": "46a8a658594611d2a34e580dfc7b3f7447f03b1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

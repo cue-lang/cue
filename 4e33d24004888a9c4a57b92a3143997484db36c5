@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6976b5fb_b53b76e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-13T09:46:58Z",
+      "side": 1,
+      "message": "SGTM with the understanding of what you said via chat:\n\n\u003e The idea here is that by now there is enough manual tailoring in packages that we shouldn\u0027t be generating it from Go core anymore and rather use the conversion tool on a one-off basis.\n\nPerhaps include that in the commit message for reference?\n\nMy only other nit is that I wonder how one would now opt into running these commands occasionally. By copy-pasting from the comments into a shell? I wonder if there might be a nicer option, like hiding the go:generate lines behind a \"qgo_generate\" build tag.",
+      "revId": "4e33d24004888a9c4a57b92a3143997484db36c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

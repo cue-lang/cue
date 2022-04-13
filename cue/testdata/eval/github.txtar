@@ -55,9 +55,9 @@ test: _#bashWorkflow & {
 			needs:     "start"
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
-			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#setGoBuildTags & {
-				_#tags: "long"
-				if:     "${{ \(_#isMaster) }}"
+			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#step & {
+				if:  "${{ \(_#isMaster) }}"
+				run: "echo CUE_LONG=true >> $GITHUB_ENV"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
 				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
@@ -273,11 +273,6 @@ _#testStrategy: {
 		"go-version": [_#codeGenGo, "1.17.x", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
-}
-_#setGoBuildTags: _#step & {
-	_#tags: string
-	name:   "Set go build tags"
-	run:    "go env -w GOFLAGS=-tags=\(_#tags)"
 }
 _#installGo: _#step & {
 	name: "Install Go"
@@ -1121,10 +1116,8 @@ import "strings"
                 }
               }
               4: (#struct){
-                _#tags(:ci): (string){ "long" }
-                name: (string){ "Set go build tags" }
-                run: (string){ "go env -w GOFLAGS=-tags=long" }
                 if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
+                run: (string){ "echo CUE_LONG=true >> $GITHUB_ENV" }
               }
               5: (#struct){
                 name: (string){ "Generate" }
@@ -1639,10 +1632,8 @@ import "strings"
             }
           }
           4: (#struct){
-            _#tags(:ci): (string){ "long" }
-            name: (string){ "Set go build tags" }
-            run: (string){ "go env -w GOFLAGS=-tags=long" }
             if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
+            run: (string){ "echo CUE_LONG=true >> $GITHUB_ENV" }
           }
           5: (#struct){
             name: (string){ "Generate" }
@@ -2130,15 +2121,6 @@ import "strings"
       }
     }
   }
-  _#setGoBuildTags(:ci): (#struct){
-    _#tags(:ci): (string){ string }
-    name: (string){ "Set go build tags" }
-    run: (_|_){
-      // [incomplete] _#setGoBuildTags.run: invalid interpolation: non-concrete value string (type string):
-      //     ./workflows.cue:270:10
-      //     ./workflows.cue:268:10
-    }
-  }
   _#installGo(:ci): (#struct){
     name: (string){ "Install Go" }
     uses: (string){ "actions/setup-go@v3" }
@@ -2251,9 +2233,9 @@ import "strings"
           〈4;_#installGo〉,
           〈4;_#checkoutCode〉,
           〈4;_#cacheGoModules〉,
-          (〈4;_#setGoBuildTags〉 & {
-            _#tags: "long"
+          (〈4;_#step〉 & {
             if: "${{ \(〈4;_#isMaster〉) }}"
+            run: "echo CUE_LONG=true >> $GITHUB_ENV"
           }),
           〈4;_#goGenerate〉,
           〈4;_#goTest〉,
@@ -2515,11 +2497,6 @@ import "strings"
       ]
     }
   }
-  _#setGoBuildTags: (〈0;_#step〉 & {
-    _#tags: string
-    name: "Set go build tags"
-    run: "go env -w GOFLAGS=-tags=\(〈0;_#tags〉)"
-  })
   _#installGo: (〈0;_#step〉 & {
     name: "Install Go"
     uses: "actions/setup-go@v3"

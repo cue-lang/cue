@@ -66,8 +66,7 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
       - if: ${{ github.ref == 'refs/heads/master' }}
-        name: Set go build tags
-        run: go env -w GOFLAGS=-tags=long
+        run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-18.04'
         name: Generate
         run: go generate ./...

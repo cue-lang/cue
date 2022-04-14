@@ -307,7 +307,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 				// references to bind to these illegally.
 				// We need this kind of administration anyway to detect
 				// illegal name clashes, and it allows giving better error
-				// messages. This puts the burdon on clients of this library
+				// messages. This puts the burden on clients of this library
 				// to detect illegal usage, though.
 				name, err := ast.ParseIdent(a.Ident)
 				if err == nil {

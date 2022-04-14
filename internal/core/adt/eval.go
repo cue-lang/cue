@@ -610,7 +610,7 @@ func (n *nodeContext) incompleteErrors() *Bottom {
 //
 // In practice this should not be a problem: when disjuncts originate
 // from the same disjunct, they will have the same StructInfos, and thus
-// Equal is able to equate them even in the precense of optional field.
+// Equal is able to equate them even in the presence of optional field.
 // In general, combining any limited set of disjuncts will soon reach
 // a fixed point where duplicate elements can be eliminated this way.
 //
@@ -1757,7 +1757,7 @@ func (n *nodeContext) addStruct(
 	n.updateCyclicStatus(env) // to handle empty structs.
 
 	// NOTE: This is a crucial point in the code:
-	// Unification derferencing happens here. The child nodes are set to
+	// Unification dereferencing happens here. The child nodes are set to
 	// an Environment linked to the current node. Together with the De Bruijn
 	// indices, this determines to which Vertex a reference resolves.
 
@@ -1811,7 +1811,7 @@ func (n *nodeContext) addStruct(
 			n.addExprConjunct(MakeConjunct(childEnv, x, id))
 
 		case *OptionalField, *BulkOptionalField, *Ellipsis:
-			// Nothing to do here. Note that the precense of these fields do not
+			// Nothing to do here. Note that the presence of these fields do not
 			// excluded embedded scalars: only when they match actual fields
 			// does it exclude those.
 

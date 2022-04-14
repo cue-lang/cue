@@ -508,7 +508,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext) Value {
 	// evaluation strategy that makes nodes increasingly more specific.
 	//
 	// For instance, a completely different implementation would be to allow
-	// the precense of a concrete value to ignore incomplete errors.
+	// the presence of a concrete value to ignore incomplete errors.
 	//
 	// TODO: consider an alternative approach.
 	switch y := v.(type) {

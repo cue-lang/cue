@@ -795,7 +795,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					panic(fmt.Errorf("failed to parse %v: %v", sv, err))
 				}
 
-				// Use orignal Go value if compatible with CUE (octal is okay)
+				// Use the original Go value if compatible with CUE (octal is okay)
 				if b, ok := cv.(*cueast.BasicLit); ok {
 					if b.Kind == cuetoken.INT && val != "" && val[0] != '\'' {
 						b.Value = val

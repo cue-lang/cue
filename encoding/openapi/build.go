@@ -469,7 +469,7 @@ outer:
 
 	if op == cue.NoOp && len(args) == 1 {
 		// TODO: this is to deal with default value removal. This may change
-		// whe we completely separate default values from values.
+		// when we completely separate default values from values.
 		a = append(a, args...)
 	} else if op != splitBy {
 		a = append(a, v)

@@ -2096,7 +2096,7 @@ func Concrete(concrete bool) Option {
 	}
 }
 
-// DisallowCycles forces validation in the precense of cycles, even if
+// DisallowCycles forces validation in the presence of cycles, even if
 // non-concrete values are allowed. This is implied by Concrete(true).
 func DisallowCycles(disallow bool) Option {
 	return func(p *options) { p.disallowCycles = disallow }

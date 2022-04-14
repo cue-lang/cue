@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "177be529_8ae8fcc2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-14T08:54:49Z",
+      "side": 1,
+      "message": "With Marcel and Rog we agreed to disable the time test and punt that bug for now, to unblock the release - people will be using the CUE libraries with Go 1.18.x even if we release with Go 1.17 anyway. The right fix is probably to fork the time package to do exactly what we want, but we don\u0027t want to block v0.4.3 on that.",
+      "revId": "53a531001f5ad04024f79071e92fec978578d551",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

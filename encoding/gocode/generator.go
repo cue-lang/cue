@@ -79,7 +79,7 @@ const defaultPrefix = "cuegen"
 //
 // Generate will not generate any code for fields that have no go attribute
 // and that are not exported or for which there is no namesake Go type.
-// If the go attribute has the special value '-' as its name it wil be dropped
+// If the go attribute has the special value '-' as its name it will be dropped
 // as well. In all other cases Generate will generate Go code, even if the
 // resulting code will not compile. For instance, Generate will generate Go
 // code even if the user defines a Go type in the attribute that does not

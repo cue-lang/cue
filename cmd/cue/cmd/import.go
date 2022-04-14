@@ -551,7 +551,7 @@ func (h *hoister) hoist(f *ast.File) {
 				return false
 			}
 
-			// found a replacable string
+			// found a replaceable string
 			dataField := h.uniqueName(name, "_", "cue_")
 
 			f.Value = ast.NewCall(

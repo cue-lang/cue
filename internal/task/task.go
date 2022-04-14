@@ -52,8 +52,6 @@ func (c *Context) Int64(field string) int64 {
 	f := c.Obj.Lookup(field)
 	value, err := f.Int64()
 	if err != nil {
-		// TODO: use v for position for now, as f has not yet a
-		// position associated with it.
 		c.addErr(f, err, "invalid integer argument")
 		return 0
 	}
@@ -64,8 +62,6 @@ func (c *Context) String(field string) string {
 	f := c.Obj.Lookup(field)
 	value, err := f.String()
 	if err != nil {
-		// TODO: use v for position for now, as f has not yet a
-		// position associated with it.
 		c.addErr(f, err, "invalid string argument")
 		return ""
 	}

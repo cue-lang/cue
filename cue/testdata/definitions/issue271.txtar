@@ -1,7 +1,7 @@
 -- in.cue --
 #T: [_]: _
 #T: close({"a": string})
-x: #T
+x:  #T
 x: {
 	a: "hello"
 	b: "foo"
@@ -11,7 +11,7 @@ Errors:
 x: field not allowed: b:
     ./in.cue:1:5
     ./in.cue:2:11
-    ./in.cue:3:4
+    ./in.cue:3:5
     ./in.cue:6:2
 
 Result:
@@ -27,7 +27,7 @@ Result:
       // [eval] x: field not allowed: b:
       //     ./in.cue:1:5
       //     ./in.cue:2:11
-      //     ./in.cue:3:4
+      //     ./in.cue:3:5
       //     ./in.cue:6:2
     }
   }

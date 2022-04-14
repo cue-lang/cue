@@ -1,26 +1,25 @@
 -- in.cue --
-let X = {}
+ let X = {}
 
 [Y="foo"]: 3
-a: Y
+a:         Y
 
 "\(b)" :: 3
-b: "foo"
+b:        "foo"
 
 c: {}
-for x in c { a: E }
+for x in c {a: E}
 
-Z1=[Z2=string]: Z1+Z2
-
+Z1=[Z2=string]: Z1 + Z2
 -- out/compile --
 unreferenced alias or let clause X:
-    ./in.cue:1:1
+    ./in.cue:1:2
 a: reference "Y" not found:
-    ./in.cue:4:4
+    ./in.cue:4:12
 definitions not supported for interpolations:
     ./in.cue:6:1
 for[].a: reference "E" not found:
-    ./in.cue:10:17
+    ./in.cue:10:16
 --- in.cue
 {
   ["foo"]: 3

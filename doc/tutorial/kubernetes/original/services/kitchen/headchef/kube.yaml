@@ -4,18 +4,18 @@ metadata:
   name: headchef
   labels:
     app: headchef
-    component: kitchen
     domain: prod
+    component: kitchen
 spec:
   ports:
   - port: 8080
-    targetPort: 8080
     protocol: TCP
+    targetPort: 8080
     name: client
   selector:
     app: headchef
-    component: kitchen
     domain: prod
+    component: kitchen
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,12 +25,12 @@ spec:
   replicas: 1
   template:
     metadata:
-      labels:
-        app: headchef
-        component: kitchen
-        domain: prod
       annotations:
         prometheus.io.scrape: "true"
+      labels:
+        app: headchef
+        domain: prod
+        component: kitchen
     spec:
       volumes:
       - name: headchef-disk
@@ -41,8 +41,7 @@ spec:
         secret:
           secretName: headchef-secrets
       containers:
-      - name: headchef
-        image: gcr.io/myproj/headchef:v0.2.16
+      - image: gcr.io/myproj/headchef:v0.2.16
         volumeMounts:
         - name:  headchef-disk
           mountPath: /logs
@@ -56,6 +55,7 @@ spec:
           "-logdir=/logs",
           "-event-server=events:7788",
         ]
+        name: headchef
         livenessProbe:
           httpGet:
             path: /debug/health

@@ -1,47 +1,43 @@
 -- in.cue --
-quo1:  quo(5, 2)   // 2
-quo2:  quo(5, -2)  // -2
-quo3:  quo(-5, 2)  // -2
-quo4:  quo(-5, -2) // 2
+quo1: quo(5, 2)   // 2
+quo2: quo(5, -2)  // -2
+quo3: quo(-5, 2)  // -2
+quo4: quo(-5, -2) // 2
 
 quoDivByZero: quo(2, 0)
 
 quoTypeError1: quo(2.0, 1)
 quoTypeError2: quo(2, 1.0)
 
-
-rem1:  rem(5, 2)   // 1
-rem2:  rem(5, -2)  // 1
-rem3:  rem(-5, 2)  // -1
-rem4:  rem(-5, -2) // -1
+rem1: rem(5, 2)   // 1
+rem2: rem(5, -2)  // 1
+rem3: rem(-5, 2)  // -1
+rem4: rem(-5, -2) // -1
 
 remDivByZero: rem(2, 0)
 
 remTypeError1: rem(2.0, 1)
 remTypeError2: rem(2, 1.0)
 
-
-div1:  div(5, 2)   // 2
-div2:  div(5, -2)  // -2
-div3:  div(-5, 2)  // -3
-div4:  div(-5, -2) // 3
+div1: div(5, 2)   // 2
+div2: div(5, -2)  // -2
+div3: div(-5, 2)  // -3
+div4: div(-5, -2) // 3
 
 divDivByZero: div(2, 0)
 
 divTypeError1: div(2.0, 1)
 divTypeError2: div(2, 1.0)
 
-
-mod1:  mod(5, 2)   // 1
-mod2:  mod(5, -2)  // 1
-mod3:  mod(-5, 2)  // 1
-mod4:  mod(-5, -2) // 1
+mod1: mod(5, 2)   // 1
+mod2: mod(5, -2)  // 1
+mod3: mod(-5, 2)  // 1
+mod4: mod(-5, -2) // 1
 
 modDivByZero: mod(2, 0)
 
 modTypeError1: mod(2.0, 1)
 modTypeError2: mod(2, 1.0)
-
 -- out/eval --
 Errors:
 quoDivByZero: division by zero:
@@ -51,23 +47,23 @@ quoTypeError1: cannot use 2.0 (type float) as int in argument 1 to quo:
 quoTypeError2: cannot use 1.0 (type float) as int in argument 2 to quo:
     ./in.cue:9:23
 remDivByZero: division by zero:
-    ./in.cue:17:15
+    ./in.cue:16:15
 remTypeError1: cannot use 2.0 (type float) as int in argument 1 to rem:
-    ./in.cue:19:20
+    ./in.cue:18:20
 remTypeError2: cannot use 1.0 (type float) as int in argument 2 to rem:
-    ./in.cue:20:23
+    ./in.cue:19:23
 divDivByZero: division by zero:
-    ./in.cue:28:15
+    ./in.cue:26:15
 divTypeError1: cannot use 2.0 (type float) as int in argument 1 to div:
-    ./in.cue:30:20
+    ./in.cue:28:20
 divTypeError2: cannot use 1.0 (type float) as int in argument 2 to div:
-    ./in.cue:31:23
+    ./in.cue:29:23
 modDivByZero: division by zero:
-    ./in.cue:39:15
+    ./in.cue:36:15
 modTypeError1: cannot use 2.0 (type float) as int in argument 1 to mod:
-    ./in.cue:41:20
+    ./in.cue:38:20
 modTypeError2: cannot use 1.0 (type float) as int in argument 2 to mod:
-    ./in.cue:42:23
+    ./in.cue:39:23
 
 Result:
 (_|_){
@@ -94,15 +90,15 @@ Result:
   rem4: (int){ -1 }
   remDivByZero: (_|_){
     // [eval] remDivByZero: division by zero:
-    //     ./in.cue:17:15
+    //     ./in.cue:16:15
   }
   remTypeError1: (_|_){
     // [eval] remTypeError1: cannot use 2.0 (type float) as int in argument 1 to rem:
-    //     ./in.cue:19:20
+    //     ./in.cue:18:20
   }
   remTypeError2: (_|_){
     // [eval] remTypeError2: cannot use 1.0 (type float) as int in argument 2 to rem:
-    //     ./in.cue:20:23
+    //     ./in.cue:19:23
   }
   div1: (int){ 2 }
   div2: (int){ -2 }
@@ -110,15 +106,15 @@ Result:
   div4: (int){ 3 }
   divDivByZero: (_|_){
     // [eval] divDivByZero: division by zero:
-    //     ./in.cue:28:15
+    //     ./in.cue:26:15
   }
   divTypeError1: (_|_){
     // [eval] divTypeError1: cannot use 2.0 (type float) as int in argument 1 to div:
-    //     ./in.cue:30:20
+    //     ./in.cue:28:20
   }
   divTypeError2: (_|_){
     // [eval] divTypeError2: cannot use 1.0 (type float) as int in argument 2 to div:
-    //     ./in.cue:31:23
+    //     ./in.cue:29:23
   }
   mod1: (int){ 1 }
   mod2: (int){ 1 }
@@ -126,15 +122,15 @@ Result:
   mod4: (int){ 1 }
   modDivByZero: (_|_){
     // [eval] modDivByZero: division by zero:
-    //     ./in.cue:39:15
+    //     ./in.cue:36:15
   }
   modTypeError1: (_|_){
     // [eval] modTypeError1: cannot use 2.0 (type float) as int in argument 1 to mod:
-    //     ./in.cue:41:20
+    //     ./in.cue:38:20
   }
   modTypeError2: (_|_){
     // [eval] modTypeError2: cannot use 1.0 (type float) as int in argument 2 to mod:
-    //     ./in.cue:42:23
+    //     ./in.cue:39:23
   }
 }
 -- out/compile --

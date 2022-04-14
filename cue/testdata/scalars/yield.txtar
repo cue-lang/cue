@@ -1,31 +1,31 @@
 // Issue #729
 -- in.cue --
 ifScalar: {
-    _#cond: true
+	_#cond: true
 
-    if _#cond {5}
+	if _#cond {5}
 }
 
 ifScalarConflict: {
-    _#cond: true
+	_#cond: true
 
-    if _#cond {5}
+	if _#cond {5}
 
-    "soo"
+	"soo"
 }
 
 ifScalarNested: {
-    _#cond: true
+	_#cond: true
 
-    if _#cond {{{5}}}
+	if _#cond {{{5}}}
 
 }
 -- out/eval --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
-    ./in.cue:10:5
-    ./in.cue:10:16
-    ./in.cue:12:5
+    ./in.cue:10:2
+    ./in.cue:10:13
+    ./in.cue:12:2
 
 Result:
 (_|_){
@@ -36,9 +36,9 @@ Result:
   }
   ifScalarConflict: (_|_){
     // [eval] ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):
-    //     ./in.cue:10:5
-    //     ./in.cue:10:16
-    //     ./in.cue:12:5
+    //     ./in.cue:10:2
+    //     ./in.cue:10:13
+    //     ./in.cue:12:2
     _#cond: (bool){ true }
   }
   ifScalarNested: (int){

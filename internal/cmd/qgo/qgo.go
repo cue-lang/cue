@@ -168,7 +168,8 @@ func extract(args []string) {
 			if lastPkg != p.Name {
 				flushFile()
 				lastPkg = p.Name
-				fmt.Fprintln(w, copyright)
+				fmt.Fprint(w, copyright)
+				fmt.Fprintln(w)
 				fmt.Fprintln(w, genLine)
 				fmt.Fprintln(w)
 				fmt.Fprintf(w, "package %s\n", pkgName())

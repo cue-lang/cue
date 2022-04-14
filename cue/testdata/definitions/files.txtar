@@ -20,14 +20,12 @@ light: #theme & {
 #Config: {
 	console: dark | *light
 }
-
 -- box.cue --
 package foo
 
 #Config & {
 	console: dark
 }
-
 -- out/eval --
 (#struct){
   #theme: (#struct){

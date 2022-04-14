@@ -24,23 +24,6 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-func lastError(p *build.Instance) *PackageError {
-	if p == nil {
-		return nil
-	}
-	switch v := p.Err.(type) {
-	case *PackageError:
-		return v
-	}
-	return nil
-}
-
-func report(p *build.Instance, err *PackageError) {
-	if err != nil {
-		p.ReportError(err)
-	}
-}
-
 // A PackageError describes an error loading information about a package.
 type PackageError struct {
 	ImportStack    []string  // shortest path from package named on command line to this one

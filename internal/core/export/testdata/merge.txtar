@@ -1,6 +1,6 @@
 -- in.cue --
 #A: {
-    _
+	_
 	#a: string
 }
 
@@ -9,15 +9,15 @@
 #G: {_}
 
 #B: #A & {
-	{ 2, #def: 3 }
+	{2, #def: 3}
 	2
 	#E & #F
 	#f: int
-    {
-        _
-        #bar: int
-        #G
-    }
+	{
+		_
+		#bar: int
+		#G
+	}
 
 }
 -- out/definition --

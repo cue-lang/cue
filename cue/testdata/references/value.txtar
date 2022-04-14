@@ -4,13 +4,12 @@ structShorthand: X={b: 3, c: X.b}
 // Note that X and Y are subtly different, as they have different bindings:
 // one binds to the field, the other to the value. In this case, that does not
 // make a difference.
-fieldAndValue: X=foo: Y={ 3, #sum: X + Y }
+fieldAndValue: X=foo: Y={3, #sum: X + Y}
 
-valueCycle: b: X=3+X
+valueCycle: b: X=3 + X
 
 // Issue #1003
 listValueAlias: X = [1, 2, X[0]]
-
 -- out/eval --
 (struct){
   structShorthand: (struct){

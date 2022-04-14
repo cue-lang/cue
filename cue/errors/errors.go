@@ -29,7 +29,6 @@ import (
 	"strings"
 
 	"github.com/mpvl/unique"
-	"golang.org/x/xerrors"
 
 	"cuelang.org/go/cue/token"
 )
@@ -43,7 +42,7 @@ func New(msg string) error {
 // Unwrap returns the result of calling the Unwrap method on err, if err
 // implements Unwrap. Otherwise, Unwrap returns nil.
 func Unwrap(err error) error {
-	return xerrors.Unwrap(err)
+	return errors.Unwrap(err)
 }
 
 // Is reports whether any error in err's chain matches target.
@@ -51,7 +50,7 @@ func Unwrap(err error) error {
 // An error is considered to match a target if it is equal to that target or if
 // it implements a method Is(error) bool such that Is(target) returns true.
 func Is(err, target error) bool {
-	return xerrors.Is(err, target)
+	return errors.Is(err, target)
 }
 
 // As finds the first error in err's chain that matches the type to which target
@@ -64,7 +63,7 @@ func Is(err, target error) bool {
 // The As method should set the target to its value and return true if err
 // matches the type to which target points.
 func As(err error, target interface{}) bool {
-	return xerrors.As(err, target)
+	return errors.As(err, target)
 }
 
 // A Message implements the error interface as well as Message to allow
@@ -119,7 +118,7 @@ type Error interface {
 // by relevance when possible and with duplicates removed.
 func Positions(err error) []token.Pos {
 	e := Error(nil)
-	if !xerrors.As(err, &e) {
+	if !errors.As(err, &e) {
 		return nil
 	}
 
@@ -153,7 +152,7 @@ func (s byPos) Less(i, j int) bool { return comparePos(s[i], s[j]) == -1 }
 
 // Path returns the path of an Error if err is of that type.
 func Path(err error) []string {
-	if e := Error(nil); xerrors.As(err, &e) {
+	if e := Error(nil); errors.As(err, &e) {
 		return e.Path()
 	}
 	return nil
@@ -326,7 +325,7 @@ type list []Error
 
 func (p list) Is(err, target error) bool {
 	for _, e := range p {
-		if xerrors.Is(e, target) {
+		if errors.Is(e, target) {
 			return true
 		}
 	}
@@ -335,7 +334,7 @@ func (p list) Is(err, target error) bool {
 
 func (p list) As(err error, target interface{}) bool {
 	for _, e := range p {
-		if xerrors.As(e, target) {
+		if errors.As(e, target) {
 			return true
 		}
 	}
@@ -567,7 +566,7 @@ func writeErr(w io.Writer, err Error) {
 	}
 
 	for {
-		u := xerrors.Unwrap(err)
+		u := errors.Unwrap(err)
 
 		printed := false
 		msg, args := err.Msg()

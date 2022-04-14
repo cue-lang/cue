@@ -1,41 +1,41 @@
 -- references.cue --
-
 missingField: {
-    a: {}
-    r: a.b
+	a: {}
+	r: a.b
 }
 
 missingFieldClosed: {
-    #a: {}
-    r: #a.b
+	#a: {}
+	r: #a.b
 }
 
 missingFieldNested: {
-    a: {}
-    // Must refer to `b` in error
-    r: a.b.c
+	a: {}
+	// Must refer to `b` in error
+	r: a.b.c
 }
 
 missingFieldNestedClosed: {
-    #a: {}
-    // Must refer to `d` in error
-    r: #a.d.c
+	#a: {}
+
+	// Must refer to `d` in error
+	r: #a.d.c
 }
 
 missingFieldNestedInInterpolation: {
-    a: {}
-    // Must refer to `b` in error
-    r1: "\(a.b.c)"
-    // Must refer to `d` in error: in case only one error is shown for a
-    // a location, ensure it doesn't alphabetically sort and pick `c` instead.
-    r2: "\(a.d.c)"
+	a: {}
+	// Must refer to `b` in error
+	r1: "\(a.b.c)"
+	// Must refer to `d` in error: in case only one error is shown for a
+	// a location, ensure it doesn't alphabetically sort and pick `c` instead.
+	r2: "\(a.d.c)"
 }
 -- out/eval --
 Errors:
 missingFieldClosed.r: undefined field: b:
-    ./references.cue:9:11
+    ./references.cue:8:8
 missingFieldNestedClosed.r: undefined field: d:
-    ./references.cue:21:11
+    ./references.cue:21:8
 
 Result:
 (_|_){
@@ -45,7 +45,7 @@ Result:
     }
     r: (_|_){
       // [incomplete] missingField.r: undefined field: b:
-      //     ./references.cue:4:10
+      //     ./references.cue:3:7
     }
   }
   missingFieldClosed: (_|_){
@@ -54,7 +54,7 @@ Result:
     }
     r: (_|_){
       // [eval] missingFieldClosed.r: undefined field: b:
-      //     ./references.cue:9:11
+      //     ./references.cue:8:8
     }
   }
   missingFieldNested: (struct){
@@ -62,7 +62,7 @@ Result:
     }
     r: (_|_){
       // [incomplete] missingFieldNested.r: undefined field: b:
-      //     ./references.cue:15:10
+      //     ./references.cue:14:7
     }
   }
   missingFieldNestedClosed: (_|_){
@@ -71,7 +71,7 @@ Result:
     }
     r: (_|_){
       // [eval] missingFieldNestedClosed.r: undefined field: d:
-      //     ./references.cue:21:11
+      //     ./references.cue:21:8
     }
   }
   missingFieldNestedInInterpolation: (struct){
@@ -79,13 +79,13 @@ Result:
     }
     r1: (_|_){
       // [incomplete] missingFieldNestedInInterpolation.r1: invalid interpolation: undefined field: b:
-      //     ./references.cue:27:9
-      //     ./references.cue:27:14
+      //     ./references.cue:27:6
+      //     ./references.cue:27:11
     }
     r2: (_|_){
       // [incomplete] missingFieldNestedInInterpolation.r2: invalid interpolation: undefined field: d:
-      //     ./references.cue:30:9
-      //     ./references.cue:30:14
+      //     ./references.cue:30:6
+      //     ./references.cue:30:11
     }
   }
 }

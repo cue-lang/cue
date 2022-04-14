@@ -1,27 +1,27 @@
 -- in.cue --
 package x
 
-somelist: [...string] | * []
+somelist: [...string] | *[]
 // Works just fine
 foo: [
-  for e in somelist {
-    "hello foo: \(e)"
-  }
+	for e in somelist {
+		"hello foo: \(e)"
+	},
 ]
 
 otherlist: ["something"]
 // Works fine as well
 z: [
-  for e in otherlist {
-    "hello z: \(e)"
-  }
+	for e in otherlist {
+		"hello z: \(e)"
+	},
 ]
 
-extlist: [...string] | * ["something"]
+extlist: [...string] | *["something"]
 bar: [
-  for e in extlist {
-    "hello bar: \(e)"
-  }
+	for e in extlist {
+		"hello bar: \(e)"
+	},
 ]
 -- out/eval --
 (struct){

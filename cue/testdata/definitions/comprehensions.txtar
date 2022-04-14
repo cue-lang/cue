@@ -1,18 +1,18 @@
 -- in.cue --
 issue595: {
-    // NOTE: this should eval with an EVAL error, not
-    // an incomplete error. See Issue #595.
-    #cfgs: [{
-        name: "foo"
-    }]
-    for cfg in #cfgs {
-        files: cfg.nam
-    }
+	// NOTE: this should eval with an EVAL error, not
+	// an incomplete error. See Issue #595.
+	#cfgs: [{
+		name: "foo"
+	}]
+	for cfg in #cfgs {
+		files: cfg.nam
+	}
 }
 -- out/eval --
 Errors:
 issue595.files: undefined field: nam:
-    ./in.cue:8:20
+    ./in.cue:8:14
 
 Result:
 (_|_){
@@ -26,7 +26,7 @@ Result:
     }
     files: (_|_){
       // [eval] issue595.files: undefined field: nam:
-      //     ./in.cue:8:20
+      //     ./in.cue:8:14
     }
   }
 }

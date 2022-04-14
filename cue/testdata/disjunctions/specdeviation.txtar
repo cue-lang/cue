@@ -16,7 +16,6 @@ Proof:
     p: 2  | int                   // value after removing default.
 
 -- in.cue --
-
 Q: *1 | int
 q: *Q | int // 1 as expected
 
@@ -31,38 +30,37 @@ r: (*3 | (*1 | 2)) & (1 | 2)
 // outer disjunction.
 s: (3 | (*1 | 2)) & (1 | 2)
 
-s1: #Size & { min: 5 }
+s1: #Size & {min: 5}
 
-#Size : {
-    max: >min | *min
-    res: uint | * 0
-    min: >res | *(1 + res)
+#Size: {
+	max: >min | *min
+	res: uint | *0
+	min: >res | *(1 + res)
 }
 
 staged: {
-    c: ("a" | "b") & (*(*"a" | string) | string)
-    d: (*(*"a" | string) | string) & ("a" | "b")
+	c: ("a" | "b") & (*(*"a" | string) | string)
+	d: (*(*"a" | string) | string) & ("a" | "b")
 }
 
 issue763a: {
-  #A: {
-    v: "a" | "b" | "c" // change to string to fix
-  }
+	#A: {
+		v: "a" | "b" | "c" // change to string to fix
+	}
 
-  h: [string]: #A
+	h: [string]: #A
 
-  h: [=~"^b"]: #A & {
-    v: *h.a.v | string
-  }
+	h: [=~"^b"]: #A & {
+		v: *h.a.v | string
+	}
 
-  h: a: {
-    v: *"a" | string
-  }
+	h: a: {
+		v: *"a" | string
+	}
 
-  h: baa: _
-  h: boo: _
+	h: baa: _
+	h: boo: _
 }
-
 -- out/eval --
 (struct){
   Q: (int){ |(*(int){ 1 }, (int){ int }) }

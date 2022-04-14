@@ -1,20 +1,20 @@
 -- in.cue --
 root: {
-    a: {
-        $id: "valToOut"
-        val: "foo"
-        out: string
-    }
-    b: {
-        $id: "valToOut"
-        $after: a
-        val: "bar"
-        out: string
-    }
-    c: {
-        $id: "valToOut"
-        out: a.out + b.out
-    }
+	a: {
+		$id: "valToOut"
+		val: "foo"
+		out: string
+	}
+	b: {
+		$id:    "valToOut"
+		$after: a
+		val:    "bar"
+		out:    string
+	}
+	c: {
+		$id: "valToOut"
+		out: a.out + b.out
+	}
 }
 -- out/run/errors --
 -- out/run/t0 --

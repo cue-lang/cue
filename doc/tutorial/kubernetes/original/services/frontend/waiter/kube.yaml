@@ -3,14 +3,14 @@ kind: Service
 metadata:
   name: waiter
   labels:
-    component: frontend
     app: waiter
     domain: prod
+    component: frontend
 spec:
   ports:
   - port: 7080
-    targetPort: 7080
     protocol: TCP
+    targetPort: 7080
     name: client
   selector:
     app: waiter
@@ -23,16 +23,16 @@ spec:
   replicas: 5
   template:
     metadata:
-      labels:
-        component: frontend
-        app: waiter
-        domain: prod
       annotations:
         prometheus.io.scrape: "true"
         prometheus.io.port: "7080"
+      labels:
+        app: waiter
+        domain: prod
+        component: frontend
     spec:
       containers:
-      - name: waiter
-        image: gcr.io/myproj/waiter:v0.3.0
+      - image: gcr.io/myproj/waiter:v0.3.0
+        name: waiter
         ports:
         - containerPort: 7080

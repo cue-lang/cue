@@ -1,32 +1,31 @@
 -- in.cue --
 service: [ID=string]: {
-    ports: [...{
-        protocol: *"TCP" | "UDP"
-        extra: 3
-    }]
+	ports: [...{
+		protocol: *"TCP" | "UDP"
+		extra:    3
+	}]
 }
 
 service: a: {
-    ports: [{
-        name:     "a"
-        protocol: "TCP"
-        key: "bar"
-    }]
+	ports: [{
+		name:     "a"
+		protocol: "TCP"
+		key:      "bar"
+	}]
 }
 
 service: a: {
-    ports: [{
-        protocol: "TCP"
-        key: "bar"
-    }]
+	ports: [{
+		protocol: "TCP"
+		key:      "bar"
+	}]
 }
 
 service: a: {
-    ports: [{
-        extra: 3
-    }]
+	ports: [{
+		extra: 3
+	}]
 }
-
 -- out/trim --
 == in.cue
 service: [ID=string]: {

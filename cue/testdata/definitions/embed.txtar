@@ -14,77 +14,76 @@ deployment: foo: spec: replicas: 1
 #TypeMeta: {}
 
 recloseSimple: {
-  #foo: {}
-  a: {#foo} & {b: int}
+	#foo: {}
+	a: {#foo} & {b: int}
 }
 
 // Reclosing
 reclose1: {
-  #D: {
-    x: int
-    y: int
-  }
-  #a: {
-    #D
-    b: {
-      c: int
-    }
-  }
+	#D: {
+		x: int
+		y: int
+	}
+	#a: {
+		#D
+		b: {
+			c: int
+		}
+	}
 
-  z: #a.b
-  z: d: 3 // don't allow this
+	z: #a.b
+	z: d: 3 // don't allow this
 }
 
 reclose2: {
-  #D: {
-    x: int
-    y: int
-  }
-  a: {
-    #D
-    b: { // keep open
-      c: int
-    }
-  }
+	#D: {
+		x: int
+		y: int
+	}
+	a: {
+		#D
+		b: {// keep open
+			c: int
+		}
+	}
 
-  z: a.b
-  z: d: 3 // allow this
+	z: a.b
+	z: d: 3 // allow this
 }
 
 reclose3: {
-  #Step: {
-    (#A | #B)
-    #Common
-  }
-  #Common: {
-    Name: string
-  }
-  #A: {
-    #Common
-    Something: int
-  }
-  #B: {
-    #Common
-    Else: int
-  }
-  x: #Step
-  x: #A & {
-    Name:      "a"
-    Something: 4
-  }
+	#Step: {
+		(#A | #B)
+		#Common
+	}
+	#Common: {
+		Name: string
+	}
+	#A: {
+		#Common
+		Something: int
+	}
+	#B: {
+		#Common
+		Else: int
+	}
+	x: #Step
+	x: #A & {
+		Name:      "a"
+		Something: 4
+	}
 }
-
 -- out/eval --
 Errors:
 reclose1.z: field not allowed: d:
-    ./in.cue:28:8
-    ./in.cue:33:6
-    ./in.cue:34:6
+    ./in.cue:28:6
+    ./in.cue:33:5
+    ./in.cue:34:5
 recloseSimple.a: field not allowed: b:
-    ./in.cue:16:9
+    ./in.cue:16:8
+    ./in.cue:17:5
     ./in.cue:17:6
-    ./in.cue:17:7
-    ./in.cue:17:16
+    ./in.cue:17:15
 
 Result:
 (_|_){
@@ -114,10 +113,10 @@ Result:
       // [eval]
       b: (_|_){
         // [eval] recloseSimple.a: field not allowed: b:
-        //     ./in.cue:16:9
+        //     ./in.cue:16:8
+        //     ./in.cue:17:5
         //     ./in.cue:17:6
-        //     ./in.cue:17:7
-        //     ./in.cue:17:16
+        //     ./in.cue:17:15
       }
     }
   }
@@ -139,9 +138,9 @@ Result:
       c: (int){ int }
       d: (_|_){
         // [eval] reclose1.z: field not allowed: d:
-        //     ./in.cue:28:8
-        //     ./in.cue:33:6
-        //     ./in.cue:34:6
+        //     ./in.cue:28:6
+        //     ./in.cue:33:5
+        //     ./in.cue:34:5
       }
     }
   }

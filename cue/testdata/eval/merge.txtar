@@ -4,20 +4,20 @@ TODO: allow dynamic fields
 -- in.cue --
 key: "app01"
 manifests: [
-    {
-    deployment: #map: [string]: { name: string, image: string, desc: string }
-    deployment: #map: "\(key)": name: "app01"
-    },
-    {
-        deployment: #map: app01: image: "image01"
-        // TODO: allow
-        // deployment: #map: "\("app03")": image: "image01"
-    }
+	{
+		deployment: #map: [string]: {name: string, image: string, desc: string}
+		deployment: #map: "\(key)": name: "app01"
+	},
+	{
+		deployment: #map: app01: image: "image01"
+		// TODO: allow
+		// deployment: #map: "\("app03")": image: "image01"
+	},
 ]
 // unify
 results: _
 for _, manifest in manifests {
-    results: manifest
+	results: manifest
 }
 -- out/eval --
 (struct){

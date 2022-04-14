@@ -1,8 +1,7 @@
 -- in.cue --
 X=a: int
-b: a
-c: X
-
+b:   a
+c:   X
 -- out/resolve/in --
 4[X]:   Scope: 0[<nil>]     Node: 0[]
 5[a]:   Scope: 0[<nil>]     Node: 0[]
@@ -13,11 +12,10 @@ c: X
 12[X]:  Scope: 1[*ast.File] Node: 2[X=a: int]
 
 -- dynamic.cue --
-X=("foo"):  int
-Y="\(X)":   string
-a: X
-b: Y
-
+X=("foo"): int
+Y="\(X)":  string
+a:         X
+b:         Y
 -- out/resolve/dynamic --
 4[X]:       Scope: 0[<nil>]     Node: 0[]
 5[int]:     Scope: 0[<nil>]     Node: 0[]

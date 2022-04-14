@@ -1,0 +1,48 @@
+#Issue: 1596
+
+cue eval . instance.json
+cmp stdout expect-stdout-eval
+
+cue def  . instance.json
+cmp stdout expect-stdout-def
+
+cue vet  . instance.json
+
+-- cue.mod/module.cue --
+module: "example.com/config"
+
+-- components/widget.cue --
+package widget
+
+#Widget: {
+        model: string
+        explicit: "literal string"
+}
+
+-- config.cue --
+package config
+
+import (
+	"example.com/config/components:widget"
+)
+
+w: widget.#Widget
+
+-- instance.json --
+{
+  "w": {
+    "model": "retroencabulator"
+  }
+}
+
+-- expect-stdout-eval --
+w: {
+    model:    "retroencabulator"
+    explicit: "literal string"
+}
+-- expect-stdout-def --
+import "example.com/config/components:widget"
+
+w: widget.#Widget & {
+	model: "retroencabulator"
+}

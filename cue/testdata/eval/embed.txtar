@@ -1,31 +1,30 @@
 -- in.cue --
 #A: {
-    Common
-    ...
+	Common
+	...
 }
 
 Common: {
-    a: int
-    b: int
+	a: int
+	b: int
 }
 
 x: #A
 x: {
-    c: int
+	c: int
 }
 
 #B: {
-    if true {
-        a: int
-    }
-    ...
+	if true {
+		a: int
+	}
+	...
 }
 
 y: #B
 y: {
-    c: int
+	c: int
 }
-
 -- out/eval --
 (struct){
   #A: (#struct){

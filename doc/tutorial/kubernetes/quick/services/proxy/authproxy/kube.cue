@@ -13,7 +13,6 @@ deployment: authproxy: spec: {
 				args: [
 					"--config=/etc/authproxy/authproxy.cfg",
 				]
-
 				volumeMounts: [{
 					name:      "config-volume"
 					mountPath: "/etc/authproxy"

@@ -3,7 +3,6 @@
 	a:      "foo"
 	"\(a)": 3
 }
-
 -- out/eval --
 (struct){
   #A: (#struct){

@@ -1,16 +1,16 @@
 -- in.cue --
 a: d: {
-    #base
-    #info: {...}
-    Y: #info.X
+	#base
+	#info: {...}
+	Y: #info.X
 }
 
 #base: {
-    #info: {...}
+	#info: {...}
 }
 
 a: [Name=string]: {#info: {
-    X: "foo"
+	X: "foo"
 }}
 -- out/eval --
 (struct){

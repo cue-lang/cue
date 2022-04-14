@@ -4,24 +4,25 @@ cmp stdout cmd_http.out
 {"data":"I'll be back!","when":"now"}
 
 -- task_tool.cue --
-
 package home
+
+import (
+	h "tool/http"
+	"tool/cli"
+)
 
 command: http: {
 	task: testserver: {
 		kind: "testserver"
 		url:  string
 	}
-	task: http: {
-		kind:   "http"
-		method: "POST"
+	task: http: h.Post & {
 		url:    task.testserver.url
 
 		request: body:  "I'll be back!"
 		response: body: string // TODO: allow this to be a struct, parsing the body.
 	}
-	task: print: {
-		kind: "print"
+	task: print: cli.Print & {
 		text: task.http.response.body
 	}
 }

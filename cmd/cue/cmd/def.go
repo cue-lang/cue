@@ -61,8 +61,6 @@ func runDef(cmd *Command, args []string) error {
 		var err error
 		if f := iter.file(); f != nil {
 			err = e.EncodeFile(f)
-		} else if i := iter.instance(); i != nil {
-			err = e.EncodeInstance(iter.instance())
 		} else {
 			err = e.Encode(iter.value())
 		}

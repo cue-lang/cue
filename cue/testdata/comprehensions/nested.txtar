@@ -1,5 +1,6 @@
 -- in.cue --
 package kube
+
 service: "node-exporter": {
 	spec: {
 		ports: [{
@@ -30,7 +31,7 @@ service: [ID=string]: {
 		}]
 	}
 }
-deployment: [ID=string]: { }
+deployment: [ID=string]: {}
 deployment: [ID=_]: _spec & {}
 _spec: {
 	_name: string
@@ -72,7 +73,7 @@ for k, v in deployment {
         }
         selector: (_|_){
           // [incomplete] service."node-exporter".spec.selector: undefined field: metadata:
-          //     ./in.cue:47:35
+          //     ./in.cue:48:35
         }
       }
     }

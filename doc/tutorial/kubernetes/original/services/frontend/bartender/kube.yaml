@@ -3,19 +3,19 @@ kind: Service
 metadata:
   name: bartender
   labels:
-    component: frontend
     app: bartender
     domain: prod
+    component: frontend
 spec:
   ports:
   - port: 7080
-    targetPort: 7080
     protocol: TCP
+    targetPort: 7080
     name: client
   selector:
-    component: frontend
     app: bartender
     domain: prod
+    component: frontend
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,18 +25,18 @@ spec:
   replicas: 1
   template:
     metadata:
-      labels:
-        component: frontend
-        app: bartender
-        domain: prod
       annotations:
         prometheus.io.scrape: "true"
         prometheus.io.port: "7080"
+      labels:
+        app: bartender
+        domain: prod
+        component: frontend
     spec:
       containers:
-      - name: bartender
-        image: gcr.io/myproj/bartender:v0.1.34
+      - image: gcr.io/myproj/bartender:v0.1.34
         ports:
         - containerPort: 7080
+        name: bartender
         args: [
         ]

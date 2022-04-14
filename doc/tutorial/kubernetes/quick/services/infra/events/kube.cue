@@ -37,7 +37,6 @@ deployment: events: spec: {
 					"-key=/etc/ssl/server.key",
 					"-grpc=:7788",
 				]
-
 				volumeMounts: [{
 					mountPath: "/etc/ssl"
 					name:      "secret-volume"

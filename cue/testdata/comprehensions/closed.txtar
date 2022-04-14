@@ -1,43 +1,43 @@
 -- in.cue --
 dynamicTop: {
-    #D: {
-        for k, v in {foo: 123} {(k): v}
-    }
+	#D: {
+		for k, v in {foo: 123} {(k): v}
+	}
 }
 
 // Issue #1404
 dynamicDepth1: {
-    #D: {
-        a: foo: 123
-        b: {for k, v in a {(k): v}}
-    }
+	#D: {
+		a: foo: 123
+		b: {for k, v in a {(k): v}}
+	}
 }
 
 allowed: {
-    #D: {
-        if true {
-            d: int
-        }
-    }
+	#D: {
+		if true {
+			d: int
+		}
+	}
 
-    vErr: #D & { d: 5 }
+	vErr: #D & {d: 5}
 }
 
 disallowed: {
-    #D: {
-        if false {
-            d: int
-        }
-    }
+	#D: {
+		if false {
+			d: int
+		}
+	}
 
-    vErr: #D & { d: 5 }
+	vErr: #D & {d: 5}
 }
 -- out/eval --
 Errors:
 disallowed.vErr: field not allowed: d:
-    ./in.cue:26:9
-    ./in.cue:32:11
-    ./in.cue:32:18
+    ./in.cue:26:6
+    ./in.cue:32:8
+    ./in.cue:32:14
 
 Result:
 (_|_){
@@ -73,9 +73,9 @@ Result:
       // [eval]
       d: (_|_){
         // [eval] disallowed.vErr: field not allowed: d:
-        //     ./in.cue:26:9
-        //     ./in.cue:32:11
-        //     ./in.cue:32:18
+        //     ./in.cue:26:6
+        //     ./in.cue:32:8
+        //     ./in.cue:32:14
       }
     }
   }

@@ -3,7 +3,6 @@ a: 1
 b: 1 + 2
 c: 3 - 1
 d: 5 rem 3
-
 -- out/eval --
 (struct){
   a: (int){ 1 }

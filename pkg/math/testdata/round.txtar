@@ -24,14 +24,13 @@ floor0: math.Floor(math.Pi)
 floor1: math.Floor(2.9)
 floor2: math.Floor(-2.2)
 floor3: math.Floor(2900)
-floor4: math.Floor(29E2)
+floor4: math.Floor(29e2)
 
 ceil0: math.Ceil(2.5)
 ceil1: math.Ceil(-2.2)
 
 trunc0: math.Trunc(2.5)
 trunc1: math.Trunc(-2.9)
-
 -- out/math --
 Errors:
 error in call to math.MultipleOf: division by zero:

@@ -50,7 +50,7 @@ func Drop(x []cue.Value, n int) ([]cue.Value, error) {
 //       extensions are introduced, which may provide flatten functionality
 //       natively.
 //
-// // Flatten reports a flattend sequence of the list xs by expanding any elements
+// // Flatten reports a flattened sequence of the list xs by expanding any elements
 // // that are lists.
 // //
 // // For instance:
@@ -86,7 +86,7 @@ func Drop(x []cue.Value, n int) ([]cue.Value, error) {
 // 	return flatten(xs)
 // }
 
-// FlattenN reports a flattend sequence of the list xs by expanding any elements
+// FlattenN reports a flattened sequence of the list xs by expanding any elements
 // depth levels deep. If depth is negative all elements are expanded.
 //
 // For instance:

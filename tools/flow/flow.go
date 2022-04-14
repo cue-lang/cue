@@ -270,7 +270,7 @@ func (c *Controller) Value() cue.Value {
 //       Terminated
 //
 // A Task may move from Waiting to Terminating if one of
-// the tasks on which it dependends fails.
+// the tasks on which it depends fails.
 //
 // NOTE: transitions from Running to Waiting are currently not supported. In
 // the future this may be possible if a task depends on continuously running

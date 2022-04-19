@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "28c21753_b2a2a34b",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1136,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-19T13:42:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94d139cb_55764f23",
+      "revId": "5e33abc5524191e75edf13285e2488d2f7f73eaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "299b4639_a941529c",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-04-19T11:24:02Z",
       "side": 1,
       "message": "keep consistent indentation?",
+      "revId": "5e33abc5524191e75edf13285e2488d2f7f73eaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73554ef6_80a3ce1e",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txt",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-19T13:42:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "299b4639_a941529c",
       "revId": "5e33abc5524191e75edf13285e2488d2f7f73eaa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

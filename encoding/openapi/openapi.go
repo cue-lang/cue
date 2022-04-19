@@ -92,7 +92,12 @@ func Generate(inst *cue.Instance, c *Config) (*ast.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	top, err := c.compose(inst, all)
+	paths, err := paths(c, inst)
+	if err != nil {
+		return nil, err
+	}
+
+	top, err := c.compose(inst, all, paths)
 	if err != nil {
 		return nil, err
 	}
@@ -108,7 +113,12 @@ func (g *Generator) All(inst *cue.Instance) (*OrderedMap, error) {
 	if err != nil {
 		return nil, err
 	}
-	top, err := g.compose(inst, all)
+	paths, err := paths(g, inst)
+	if err != nil {
+		return nil, err
+	}
+
+	top, err := g.compose(inst, all, paths)
 	return (*OrderedMap)(top), err
 }
 
@@ -125,7 +135,7 @@ func toCUE(name string, x interface{}) (v ast.Expr, err error) {
 
 }
 
-func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit) (x *ast.StructLit, err error) {
+func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit, paths *ast.StructLit) (x *ast.StructLit, err error) {
 
 	var errs errors.Error
 
@@ -133,7 +143,7 @@ func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit) (x *ast.Str
 	var info *ast.StructLit
 
 	for i, _ := inst.Value().Fields(cue.Definitions(true)); i.Next(); {
-		if i.IsDefinition() {
+		if i.IsDefinition() || strings.HasPrefix(i.Label(), "$") {
 			continue
 		}
 		label := i.Label()
@@ -210,7 +220,7 @@ func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit) (x *ast.Str
 	return ast.NewStruct(
 		"openapi", ast.NewString(c.Version),
 		"info", info,
-		"paths", ast.NewStruct(),
+		"paths", paths,
 		"components", ast.NewStruct("schemas", schemas),
 	), errs
 }

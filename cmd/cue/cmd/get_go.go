@@ -1132,6 +1132,8 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		switch t := x.String(); t {
 		case "uintptr":
 			return e.ident("uint64", false)
+		case "byte":
+			return e.ident("uint8", false)
 		default:
 			return e.ident(t, false)
 		}

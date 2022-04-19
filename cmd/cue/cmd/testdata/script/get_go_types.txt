@@ -63,6 +63,8 @@ type Foozer struct {
 
 	exclude int
 
+    Ptr uintptr
+
 	// Time is mapped to CUE's internal type.
 	Time time.Time
 
@@ -394,6 +396,7 @@ import (
 	AnyJSON:     _                  @go(,json.Marshaler)
 	AnyText:     string             @go(,encoding.TextMarshaler)
 	bar?:        int & >10          @go(Bar)
+	Ptr:         uint64             @go(,uintptr)
 
 	// Time is mapped to CUE's internal type.
 	Time:    time.Time

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eeb4ff83_06aa2df2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-19T10:42:06Z",
+      "side": 1,
+      "message": "Eugh, I re-generated with tip rather than 1.18, sorry for the massive gofmt spam. Undoing that...",
+      "revId": "a7b08f5cd121b64f00e59c15ab44148c07e061c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

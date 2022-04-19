@@ -46,6 +46,8 @@ type buildContext struct {
 	fieldFilter   *regexp.Regexp
 	evalDepth     int // detect cycles when resolving references
 
+	paths *OrderedMap
+
 	schemas *OrderedMap
 
 	// Track external schemas.
@@ -68,8 +70,88 @@ type externalType struct {
 }
 
 type oaSchema = OrderedMap
+type pathOperations = OrderedMap
 
 type typeFunc func(b *builder, a cue.Value)
+
+func paths(g *Generator, inst *cue.Instance) (paths *ast.StructLit, err error) {
+	var fieldFilter *regexp.Regexp
+	if g.FieldFilter != "" {
+		fieldFilter, err = regexp.Compile(g.FieldFilter)
+		if err != nil {
+			return nil, errors.Newf(token.NoPos, "invalid field filter: %v", err)
+		}
+
+		// verify that certain elements are still passed.
+		for _, f := range strings.Split(
+			"version,title,allOf,anyOf,not,enum,Schema/properties,Schema/items"+
+				"nullable,type", ",") {
+			if fieldFilter.MatchString(f) {
+				return nil, errors.Newf(token.NoPos, "field filter may not exclude %q", f)
+			}
+		}
+	}
+
+	c := buildContext{
+		inst:         inst,
+		instExt:      inst,
+		refPrefix:    "components/schemas",
+		expandRefs:   g.ExpandReferences,
+		structural:   g.ExpandReferences,
+		nameFunc:     g.ReferenceFunc,
+		descFunc:     g.DescriptionFunc,
+		paths:        &OrderedMap{},
+		schemas:      &OrderedMap{},
+		externalRefs: map[string]*externalType{},
+		fieldFilter:  fieldFilter,
+	}
+
+	switch g.Version {
+	case "3.0.0":
+		c.exclusiveBool = true
+	case "3.1.0":
+	default:
+		return nil, errors.Newf(token.NoPos, "unsupported version %s", g.Version)
+	}
+
+	defer func() {
+		switch x := recover().(type) {
+		case nil:
+		case *openapiError:
+			err = x
+		default:
+			panic(x)
+		}
+	}()
+
+	i, err := inst.Value().Fields(cue.Definitions(true))
+	if err != nil {
+		return nil, err
+	}
+	for i.Next() {
+		label := i.Label()
+
+		if i.IsDefinition() || !strings.HasPrefix(label, "$") || c.isInternal(label) {
+			continue
+		}
+
+		label = label[1:]
+		ref := c.makeRef(inst, []string{label})
+		if ref == "" {
+			continue
+		}
+		c.paths.Set(ref, c.buildPath(i.Value()))
+	}
+
+	a := c.paths.Elts
+	sort.Slice(a, func(i, j int) bool {
+		x, _, _ := ast.LabelName(a[i].(*ast.Field).Label)
+		y, _, _ := ast.LabelName(a[j].(*ast.Field).Label)
+		return x < y
+	})
+
+	return (*ast.StructLit)(c.paths), c.errs
+}
 
 func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err error) {
 	var fieldFilter *regexp.Regexp
@@ -101,6 +183,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		structural:   g.ExpandReferences,
 		nameFunc:     g.ReferenceFunc,
 		descFunc:     g.DescriptionFunc,
+		paths:        &OrderedMap{},
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 		fieldFilter:  fieldFilter,
@@ -146,6 +229,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		if ref == "" {
 			continue
 		}
+		println(ref, label)
 		c.schemas.Set(ref, c.build(label, i.Value()))
 	}
 
@@ -180,6 +264,10 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 	return (*ast.StructLit)(c.schemas), c.errs
 }
 
+func (c *buildContext) buildPath(v cue.Value) *ast.StructLit {
+	return newRootPathBuilder(c).path(v)
+}
+
 func (c *buildContext) build(name string, v cue.Value) *ast.StructLit {
 	return newCoreBuilder(c).schema(nil, name, v)
 }
@@ -210,6 +298,13 @@ func (b *builder) checkArgs(a []cue.Value, n int) {
 	if len(a)-1 != n {
 		b.failf(a[0], "%v must be used with %d arguments", a[0], len(a)-1)
 	}
+}
+
+func (pb *PathBuilder) path(v cue.Value) *ast.StructLit {
+	str, _ := v.Lookup("description").String()
+	desc_str := ast.NewString(str)
+
+	return ast.NewStruct("description", desc_str)
 }
 
 func (b *builder) schema(core *builder, name string, v cue.Value) *ast.StructLit {
@@ -1093,6 +1188,12 @@ func (b *builder) bytes(v cue.Value) {
 	}
 }
 
+type PathBuilder struct {
+	ctx         *buildContext
+	description string
+	operations  *pathOperations
+}
+
 type builder struct {
 	ctx          *buildContext
 	typ          string
@@ -1110,6 +1211,10 @@ type builder struct {
 	keys       []string
 	properties map[string]*builder
 	items      *builder
+}
+
+func newRootPathBuilder(c *buildContext) *PathBuilder {
+	return &PathBuilder{ctx: c}
 }
 
 func newRootBuilder(c *buildContext) *builder {

@@ -65,6 +65,8 @@ type Foozer struct {
 
 	Ptr uintptr
 
+	Byte byte
+
 	// Time is mapped to CUE's internal type.
 	Time time.Time
 
@@ -81,6 +83,7 @@ type Foozer struct {
 	Array1 [5]int
 	Array2 [5]interface{}
 	Array3 *[5]json.Marshaler
+	Array4 [5]byte
 
 	Intf  Interface `protobuf:"varint,2,name=intf"`
 	Intf2 interface{}
@@ -397,6 +400,7 @@ import (
 	AnyText:     string             @go(,encoding.TextMarshaler)
 	bar?:        int & >10          @go(Bar)
 	Ptr:         uint64             @go(,uintptr)
+	Byte:        uint8              @go(,byte)
 
 	// Time is mapped to CUE's internal type.
 	Time:    time.Time
@@ -412,6 +416,7 @@ import (
 	Array1:  5 * [int]    @go(,[5]int)
 	Array2:  5 * [_]      @go(,[5]interface{})
 	Array3?: null | 5*[_] @go(,*[5]json.Marshaler)
+	Array4:  bytes        @go(,[5]byte)
 	Intf:    #Interface   @protobuf(2,varint,name=intf)
 	Intf2:   _            @go(,interface{})
 	Intf3: {

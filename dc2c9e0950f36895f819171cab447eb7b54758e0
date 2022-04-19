@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45841a8e_5b549429",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1023,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-19T16:29:49Z",
+      "side": 0,
+      "message": "did you mean to remove this line? the TODO seems to be cut off now.",
+      "revId": "dc2c9e0950f36895f819171cab447eb7b54758e0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

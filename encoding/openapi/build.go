@@ -300,11 +300,21 @@ func (b *builder) checkArgs(a []cue.Value, n int) {
 	}
 }
 
-func (pb *PathBuilder) path(v cue.Value) *ast.StructLit {
-	str, _ := v.Lookup("description").String()
-	desc_str := ast.NewString(str)
+func (pb *PathBuilder) pathDescription(v cue.Value) {
+	description, err := v.String()
+	if err != nil {
+		description = ""
+	}
+	pb.description = ast.NewString(description)
+}
 
-	return ast.NewStruct("description", desc_str)
+func (pb *PathBuilder) path(v cue.Value) *ast.StructLit {
+
+	pb.pathDescription(v.Lookup("description"))
+	pb.securityList(v.Lookup("security"))
+
+	return ast.NewStruct("description", pb.description,
+		"security", pb.security)
 }
 
 func (b *builder) schema(core *builder, name string, v cue.Value) *ast.StructLit {
@@ -994,6 +1004,17 @@ func (b *builder) array(v cue.Value) {
 	}
 }
 
+func (pb *PathBuilder) securityList(v cue.Value) {
+	items := []ast.Expr{}
+
+	for i, _ := v.List(); i.Next(); {
+		items = append(items, pb.decode(i.Value()))
+	}
+
+	pb.security = ast.NewList(items...)
+
+}
+
 func (b *builder) listCap(v cue.Value) {
 	switch op, a := v.Expr(); op {
 	case cue.LessThanOp:
@@ -1190,8 +1211,9 @@ func (b *builder) bytes(v cue.Value) {
 
 type PathBuilder struct {
 	ctx         *buildContext
-	description string
+	description *ast.BasicLit
 	operations  *pathOperations
+	security    *ast.ListLit
 }
 
 type builder struct {
@@ -1418,6 +1440,11 @@ func (b *builder) inta(v cue.Value, offset int64) ast.Expr {
 }
 
 func (b *builder) decode(v cue.Value) ast.Expr {
+	v, _ = v.Default()
+	return v.Syntax(cue.Final()).(ast.Expr)
+}
+
+func (pb *PathBuilder) decode(v cue.Value) ast.Expr {
 	v, _ = v.Default()
 	return v.Syntax(cue.Final()).(ast.Expr)
 }

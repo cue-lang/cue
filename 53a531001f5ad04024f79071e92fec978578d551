@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e504f95_e1767c28",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_github.txt",
+        "patchSetId": 4
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-19T10:39:42Z",
+      "side": 1,
+      "message": "Ah, the file was wrong, not the comment. Fixed up.",
+      "parentUuid": "9f3febd5_dfdfe90e",
+      "revId": "53a531001f5ad04024f79071e92fec978578d551",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36a13111_d94a2098",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-04-19T10:19:27Z",
       "side": 1,
       "message": "I would keep using an indirection here, like before, so that all version can be modified in a single place.",
+      "revId": "53a531001f5ad04024f79071e92fec978578d551",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51f5c695_8eab119e",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-19T10:39:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36a13111_d94a2098",
       "revId": "53a531001f5ad04024f79071e92fec978578d551",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

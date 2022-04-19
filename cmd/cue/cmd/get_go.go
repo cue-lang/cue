@@ -1020,7 +1020,6 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 		// Check for builtin packages.
 		// TODO: replace these literal types with a reference to the fixed
-		// builtin type.
 		switch obj.Type().String() {
 		case "time.Time":
 			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
@@ -1130,7 +1129,12 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 
 	case *types.Basic:
-		return e.ident(x.String(), false)
+		switch t := x.String(); t {
+		case "uintptr":
+			return e.ident("uint64", false)
+		default:
+			return e.ident(t, false)
+		}
 
 	case *types.Interface:
 		return e.ident("_", false)

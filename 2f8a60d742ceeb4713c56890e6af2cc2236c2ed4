@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c465b5e4_9c6d9953",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-20T14:39:33Z",
+      "side": 1,
+      "message": "This is ready again after some conflicts, if either of you is up for an easy review :) ",
+      "revId": "2f8a60d742ceeb4713c56890e6af2cc2236c2ed4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

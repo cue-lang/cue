@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "89025753_b547c61f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-20T09:06:33Z",
+      "side": 1,
+      "message": "[5]byte should probably be of type bytes with a length constraint. But what you do here is consistent with [5]uint8 and how the internal conversion code works.",
+      "revId": "a73866be538a01093c54ca20ff58bd6f13ba286a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

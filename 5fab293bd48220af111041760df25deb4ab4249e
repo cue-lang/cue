@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcb48893_86bb5cdc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-20T09:20:12Z",
+      "side": 1,
+      "message": "LGTM. FWIW I test goreleaser using:\n\n    goreleaser --snapshot --skipdist --rm-dist\n    \nhttps://github.com/goreleaser/goreleaser/issues/2355 contains the history of our \"ask\" for a more specific test command for goreleaser, one that we could then use as part of CI. Because the issue right now is that we don\u0027t have any check on our goreleaser incantation until release time. ",
+      "revId": "5fab293bd48220af111041760df25deb4ab4249e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

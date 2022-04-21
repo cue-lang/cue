@@ -28,20 +28,11 @@ foo: {
 	nocodec2: "1234"
 	nocodec3: "null"
 	nocodec4: "true"
-	nocodec5: yaml656e63.Marshal(_cue_nocodec5)
-	let _cue_nocodec5 = ["a-z"]
-	nocodec6: yaml656e63.Marshal(_cue_nocodec6)
-	let _cue_nocodec6 = {
-		a: 123
-	}
-	nocodec7: yaml656e63.Marshal(_cue_nocodec7)
-	let _cue_nocodec7 = ["a-z"]
-	nocodec8: yaml656e63.Marshal(_cue_nocodec8)
-	let _cue_nocodec8 = ["a"]
-	nocodec9: yaml656e63.Marshal(_cue_nocodec9)
-	let _cue_nocodec9 = {
-		a: 1, b: 2
-	}
+	nocodec5: "[a-z]+"
+	nocodec6: "a: 123"
+	nocodec7: "[a-z]+"
+	nocodec8: "[a]"
+	nocodec9: "{a: 1, b: 2}"
 }
 -- import/data.json --
 {

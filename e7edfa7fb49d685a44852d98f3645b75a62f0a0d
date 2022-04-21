@@ -16,6 +16,24 @@
       "message": "A bit on the fence on this one, but I see how it will be hard to justify converting this and it seem unusual YAML.",
       "revId": "e7edfa7fb49d685a44852d98f3645b75a62f0a0d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36ff7e64_43d4b049",
+        "filename": "cmd/cue/cmd/testdata/script/import_hoiststr.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-04-21T16:05:57Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b63b81dc_ad506524",
+      "revId": "e7edfa7fb49d685a44852d98f3645b75a62f0a0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b63b81dc_ad506524",
+        "filename": "cmd/cue/cmd/testdata/script/import_hoiststr.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-21T16:01:53Z",
+      "side": 1,
+      "message": "A bit on the fence on this one, but I see how it will be hard to justify converting this and it seem unusual YAML.",
+      "revId": "e7edfa7fb49d685a44852d98f3645b75a62f0a0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

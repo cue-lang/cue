@@ -1,61 +1,64 @@
-cue import -o - -f --list -l '"\(strings.ToLower(kind))": "\(name)":' --recursive ./import
-cmp stdout expect-stdout
-
-cue import -o - -f --list -l 'strings.ToLower(kind)' -l name --recursive ./import
+cue import -o - --recursive ./import/data.json
 cmp stdout expect-stdout
 -- expect-stdout --
-import json656e63 "encoding/json"
+import (
+	json656e63 "encoding/json"
+	yaml656e63 "encoding/yaml"
+)
 
-service: {
-	booster: [{
-		kind: "Service"
-		name: "booster"
-	}]
-	"supplement\nfoo": [{
-		kind: "Service"
-		name: """
-			supplement
-			foo
-			"""
-		json: json656e63.Marshal(_cue_json)
-		let _cue_json = [1, 2]
-	}]
+foo: {
+	name:  "something"
+	json1: json656e63.Marshal(_cue_json1)
+	let _cue_json1 = [1, 2]
+	json2: json656e63.Marshal(_cue_json2)
+	let _cue_json2 = {
+		key: "value"
+	}
+	yaml1: yaml656e63.Marshal(_cue_yaml1)
+	let _cue_yaml1 = {
+		a: "b"
+		c: "d"
+	}
+	yaml2: yaml656e63.Marshal(_cue_yaml2)
+	let _cue_yaml2 = [
+		"one",
+		"two",
+	]
+	nocodec1: "\"str\""
+	nocodec2: "1234"
+	nocodec3: "null"
+	nocodec4: "true"
+	nocodec5: yaml656e63.Marshal(_cue_nocodec5)
+	let _cue_nocodec5 = ["a-z"]
+	nocodec6: yaml656e63.Marshal(_cue_nocodec6)
+	let _cue_nocodec6 = {
+		a: 123
+	}
+	nocodec7: yaml656e63.Marshal(_cue_nocodec7)
+	let _cue_nocodec7 = ["a-z"]
+	nocodec8: yaml656e63.Marshal(_cue_nocodec8)
+	let _cue_nocodec8 = ["a"]
+	nocodec9: yaml656e63.Marshal(_cue_nocodec9)
+	let _cue_nocodec9 = {
+		a: 1, b: 2
+	}
 }
-deployment: booster: [{
-	kind:     "Deployment"
-	name:     "booster"
-	replicas: 1
-}]
--- import/services.cue --
-service: [{
-	kind: "Service"
-	name: "booster"
-}, {
-	kind: "Service"
-	name: """
-		supplement
-		foo
-		"""
-	json: "[1, 2]"
-}]
-deployment: [{
-	kind:     "Deployment"
-	name:     "booster"
-	replicas: 1
-}]
--- import/services.jsonl --
+-- import/data.json --
 {
-    "kind": "Service",
-    "name": "booster"
+    "foo": {
+        "name": "something",
+        "json1": "[1, 2]",
+        "json2": "{\"key\": \"value\"}",
+        "yaml1": "a: b\nc: d",
+        "yaml2": "- one\n- two",
+        "nocodec1": "\"str\"",
+        "nocodec2": "1234",
+        "nocodec3": "null",
+        "nocodec4": "true",
+        "nocodec5": "[a-z]+",
+        "nocodec6": "a: 123",
+        "nocodec7": "[a-z]+",
+        "nocodec8": "[a]",
+        "nocodec9": "{a: 1, b: 2}"
+    }
 }
-{
-    "kind": "Deployment",
-    "name": "booster",
-    "replicas": 1
-}
-{
-    "kind": "Service",
-    "name": "supplement\nfoo",
-    "json": "[1, 2]"
-}
--- cue.mod --

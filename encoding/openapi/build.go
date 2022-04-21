@@ -183,7 +183,6 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		structural:   g.ExpandReferences,
 		nameFunc:     g.ReferenceFunc,
 		descFunc:     g.DescriptionFunc,
-		paths:        &OrderedMap{},
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 		fieldFilter:  fieldFilter,
@@ -265,7 +264,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 }
 
 func (c *buildContext) buildPath(v cue.Value) *ast.StructLit {
-	return newRootPathBuilder(c).path(v)
+	return newRootPathBuilder(c).buildPath(v)
 }
 
 func (c *buildContext) build(name string, v cue.Value) *ast.StructLit {
@@ -305,16 +304,71 @@ func (pb *PathBuilder) pathDescription(v cue.Value) {
 	if err != nil {
 		description = ""
 	}
-	pb.description = ast.NewString(description)
+	pb.path.Set("description", ast.NewString(description))
 }
 
-func (pb *PathBuilder) path(v cue.Value) *ast.StructLit {
+func (pb *PathBuilder) operation(v cue.Value) {
+	operations := &OrderedMap{}
+	for i, _ := v.Value().Fields(cue.Definitions(false)); i.Next(); {
+		// searching http status
+		label, err := strconv.Atoi(i.Label())
+		if err != nil {
+			continue
+		}
 
-	pb.pathDescription(v.Lookup("description"))
-	pb.securityList(v.Lookup("security"))
+		// add an error for wrong http status?
+		if label > 599 || label < 100 {
+			continue
+		}
 
-	return ast.NewStruct("description", pb.description,
-		"security", pb.security)
+		responseStruct := Response(i.Value(), pb.ctx)
+		operations.Set(strconv.Itoa(label), responseStruct)
+
+	}
+
+	label, _ := v.Label()
+	pb.path.Set(label, operations)
+}
+
+func isPathLabel(s string) bool {
+	pathLabels := map[string]bool{"description": true,
+		"security": true,
+		"get":      true,
+		"put":      true,
+		"post":     true,
+		"delete":   true,
+		"options":  true,
+		"head":     true,
+		"patch":    true,
+		"trace":    true}
+	_, ok := pathLabels[s]
+	return ok
+}
+
+func (pb *PathBuilder) buildPath(v cue.Value) *ast.StructLit {
+
+	for i, _ := v.Value().Fields(cue.Definitions(true)); i.Next(); {
+		label := i.Label()
+
+		if !isPathLabel(label) {
+			continue
+		}
+
+		switch label {
+		case "description":
+			pb.pathDescription(v.Lookup("description"))
+		case "security":
+			pb.securityList(v.Lookup("security"))
+		case "get", "put", "post", "delete", "options", "head", "patch", "trace":
+			pb.operation(v.Lookup(label))
+
+		}
+
+	}
+
+	//return ast.NewStruct("description", pb.description,
+	//	"security", pb.security)
+	return (*ast.StructLit)(pb.path)
 }
 
 func (b *builder) schema(core *builder, name string, v cue.Value) *ast.StructLit {
@@ -1011,8 +1065,8 @@ func (pb *PathBuilder) securityList(v cue.Value) {
 		items = append(items, pb.decode(i.Value()))
 	}
 
-	pb.security = ast.NewList(items...)
-
+	//pb.security = ast.NewList(items...)
+	pb.path.Set("security", ast.NewList(items...))
 }
 
 func (b *builder) listCap(v cue.Value) {
@@ -1214,6 +1268,8 @@ type PathBuilder struct {
 	description *ast.BasicLit
 	operations  *pathOperations
 	security    *ast.ListLit
+
+	path *OrderedMap
 }
 
 type builder struct {
@@ -1236,7 +1292,8 @@ type builder struct {
 }
 
 func newRootPathBuilder(c *buildContext) *PathBuilder {
-	return &PathBuilder{ctx: c}
+	return &PathBuilder{ctx: c,
+		path: &OrderedMap{}}
 }
 
 func newRootBuilder(c *buildContext) *builder {

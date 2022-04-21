@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58693f09_00cd8c39",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-04-21T15:46:30Z",
+      "side": 1,
+      "message": "You can just write Fixes #1443 (and does this work?).",
+      "revId": "5c3d1a714ec27ad0d633f4e06eafa7872292a49e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

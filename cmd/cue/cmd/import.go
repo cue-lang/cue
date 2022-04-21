@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -581,6 +582,13 @@ func tryParse(str string) (s ast.Expr, pkg string) {
 			return nil, ""
 		}
 		return expr, "json"
+	}
+	// When a string has no newlines, never treat it as
+	// YAML because there's too much risk of false positives
+	// with regular-expressions or other such syntax.
+	// See issue 1443.
+	if bytes.IndexByte(b, '\n') == -1 {
+		return nil, ""
 	}
 
 	if expr, err := yaml.Unmarshal("", b); err == nil {

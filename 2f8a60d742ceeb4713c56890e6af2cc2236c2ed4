@@ -50,6 +50,24 @@
       "message": "Doc comment?",
       "revId": "2f8a60d742ceeb4713c56890e6af2cc2236c2ed4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c512e423_57b87815",
+        "filename": "internal/cuetest/cuetest.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-22T16:11:21Z",
+      "side": 1,
+      "message": "I was a bit split here. envLong already documents this. Am I meant to duplicate the same text? I would personally drop the docs on envLong and envUpdate, and instead document Long and UpdateGoldenFiles. I can do that if it sounds good.",
+      "parentUuid": "d07c8520_afbf3f21",
+      "revId": "2f8a60d742ceeb4713c56890e6af2cc2236c2ed4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -23,8 +23,10 @@ import (
 
 	"github.com/stretchr/testify/assert"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 func TestExtract(t *testing.T) {
@@ -149,4 +151,62 @@ func toString(w *bytes.Buffer, e ast.Expr, err error) {
 		return
 	}
 	fmt.Fprint(w, string(b))
+}
+
+func TestValidate(t *testing.T) {
+	testCases := []struct {
+		name      string
+		in        string
+		evaluator string
+		want      string
+	}{{
+		name:      "mismatch",
+		in:        `{"a": 32}`,
+		evaluator: `{"a": 33}`,
+		want:      "a: conflicting values 32 and 33",
+	}, {
+		name:      "w",
+		in:        `{"a": 32}`,
+		evaluator: `{"a": 32}`,
+	}, {
+		name:      "invalid JSON",
+		in:        `{"a: 32}`,
+		evaluator: `{"a": 33}`,
+		want:      "invalid JSON",
+	}, {
+		name: "Should fail since a is less than 5",
+		in:   `{"a":["1", "2","3"], "b":["4", "5"]}`,
+		evaluator: `
+		if len("a") < 5 {
+			errorHere: string
+			errorHere: 5
+		}
+		`,
+		want: "conflicting values string and 5",
+	}, {
+		name: "Should fail since a.items is less than 4",
+		in:   `{"a": { "items": ["1", "2", "3"], "nonitems": ["4", "5"]}}`,
+		evaluator: `
+		if len("a"."items") < 4 {
+			errorHere: string
+			errorHere: 4
+		}
+		`,
+		want: "conflicting values string and 4",
+	}}
+	for _, tc := range testCases {
+		r := (*cue.Context)(runtime.New())
+		v := r.CompileString(tc.evaluator)
+
+		err := Validate([]byte(tc.in), v)
+		if tc.want != "" {
+			if err == nil {
+				t.Errorf("Did not get an error, wanted %s", tc.want)
+			} else if !strings.Contains(err.Error(), tc.want) {
+				t.Errorf("Unexpected error, want: %s got: %s", tc.want, err.Error())
+			}
+		} else if err != nil {
+			t.Errorf("Unexpected error, wanted none, got: %s", err.Error())
+		}
+	}
 }

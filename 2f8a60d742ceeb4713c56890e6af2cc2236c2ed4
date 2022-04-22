@@ -68,6 +68,24 @@
       "parentUuid": "d07c8520_afbf3f21",
       "revId": "2f8a60d742ceeb4713c56890e6af2cc2236c2ed4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90f51e0a_5c9a4dc7",
+        "filename": "internal/cuetest/cuetest.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-22T16:14:58Z",
+      "side": 1,
+      "message": "Agreed. I was more thinking about the (granted limited) number of places that Long would be used. Better that be documented than the unexported const that it references.",
+      "parentUuid": "c512e423_57b87815",
+      "revId": "2f8a60d742ceeb4713c56890e6af2cc2236c2ed4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

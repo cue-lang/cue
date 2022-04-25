@@ -34,6 +34,24 @@
       "parentUuid": "3295684b_6bba730b",
       "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "065bd5f8_9726573f",
+        "filename": "pkg/internal/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-04-25T10:25:10Z",
+      "side": 0,
+      "message": "My take is that the comment referred to all the errors because it used the plural form of \"error\". I don\u0027t fully understand the content of the TODO though (I\u0027m not sure exactly what it means to be a \"permanent error\", and I can only guess at why originating from a reference might make an error less permanent)",
+      "parentUuid": "549c25bd_99b2f46a",
+      "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -8,6 +8,7 @@ t2: strconv.FormatFloat(3.02, 300, 4, 64)
 t3: strconv.FormatFloat(3.02, -1, 4, 64)
 t4: strconv.FormatFloat(3.02, 1.0, 4, 64)
 t5: strconv.FormatBool(true)
+t6: strconv.FormatFloat(0.0, 102, -1, 64)
 -- out/strconv --
 Errors:
 t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
@@ -24,4 +25,5 @@ t2: _|_ // t2: int 300 overflows byte in argument 1 in call to strconv.FormatFlo
 t3: _|_ // t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
 t4: _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
 t5: "true"
+t6: "0"
 

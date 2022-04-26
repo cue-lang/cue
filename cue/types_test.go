@@ -427,6 +427,14 @@ func TestFloat(t *testing.T) {
 		fmt:     'g',
 		kind:    IntKind,
 	}, {
+		value:   "0.0",
+		float:   "0.0",
+		mant:    "0",
+		exp:     -1,
+		float64: 0.0,
+		fmt:     'g',
+		kind:    FloatKind,
+	}, {
 		value:   "1.0",
 		float:   "1.0",
 		mant:    "10",

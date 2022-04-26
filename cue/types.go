@@ -539,6 +539,9 @@ func (v Value) Float64() (float64, error) {
 	if err != nil {
 		return 0, err
 	}
+	if n.X.IsZero() {
+		return 0.0, nil
+	}
 	if n.X.Negative {
 		if n.X.Cmp(smallestNegFloat64) == 1 {
 			return -0, ErrAbove

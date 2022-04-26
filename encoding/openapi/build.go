@@ -228,7 +228,6 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		if ref == "" {
 			continue
 		}
-		println(ref, label)
 		c.schemas.Set(ref, c.build(label, i.Value()))
 	}
 
@@ -316,9 +315,8 @@ func (pb *PathBuilder) operation(v cue.Value) {
 			continue
 		}
 
-		// add an error for wrong http status?
 		if label > 599 || label < 100 {
-			continue
+			pb.failf(v, "wrong HTTP Status code %v", label)
 		}
 
 		responseStruct := Response(i.Value(), pb.ctx)
@@ -330,29 +328,18 @@ func (pb *PathBuilder) operation(v cue.Value) {
 	pb.path.Set(label, operations)
 }
 
-func isPathLabel(s string) bool {
-	pathLabels := map[string]bool{"description": true,
-		"security": true,
-		"get":      true,
-		"put":      true,
-		"post":     true,
-		"delete":   true,
-		"options":  true,
-		"head":     true,
-		"patch":    true,
-		"trace":    true}
-	_, ok := pathLabels[s]
-	return ok
+func (pb *PathBuilder) failf(v cue.Value, format string, args ...interface{}) {
+	panic(&openapiError{
+		errors.NewMessage(format, args),
+		pb.ctx.path,
+		v.Pos(),
+	})
 }
 
 func (pb *PathBuilder) buildPath(v cue.Value) *ast.StructLit {
 
 	for i, _ := v.Value().Fields(cue.Definitions(true)); i.Next(); {
 		label := i.Label()
-
-		if !isPathLabel(label) {
-			continue
-		}
 
 		switch label {
 		case "description":
@@ -361,13 +348,12 @@ func (pb *PathBuilder) buildPath(v cue.Value) *ast.StructLit {
 			pb.securityList(v.Lookup("security"))
 		case "get", "put", "post", "delete", "options", "head", "patch", "trace":
 			pb.operation(v.Lookup(label))
-
+		default:
+			pb.failf(i.Value(), "unsupported field \"%v\" for path struct", label)
 		}
 
 	}
 
-	//return ast.NewStruct("description", pb.description,
-	//	"security", pb.security)
 	return (*ast.StructLit)(pb.path)
 }
 
@@ -1264,11 +1250,7 @@ func (b *builder) bytes(v cue.Value) {
 }
 
 type PathBuilder struct {
-	ctx         *buildContext
-	description *ast.BasicLit
-	operations  *pathOperations
-	security    *ast.ListLit
-
+	ctx  *buildContext
 	path *OrderedMap
 }
 

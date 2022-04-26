@@ -5,7 +5,7 @@ name: Repository Dispatch
   - repository_dispatch
 jobs:
   runtrybot:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash

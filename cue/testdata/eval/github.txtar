@@ -264,9 +264,9 @@ _#latestStableGo: "1.18.x"
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
 _#pinnedReleaseGo: "1.18.1"
-_#linuxMachine:    "ubuntu-18.04"
-_#macosMachine:    "macos-10.15"
-_#windowsMachine:  "windows-2019"
+_#linuxMachine:    "ubuntu-20.04"
+_#macosMachine:    "macos-11"
+_#windowsMachine:  "windows-2022"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
@@ -1053,7 +1053,7 @@ import "strings"
         }
         jobs: (#struct){
           start: (#struct){
-            "runs-on": (string){ "ubuntu-18.04" }
+            "runs-on": (string){ "ubuntu-20.04" }
             steps: (#list){
               0: (#struct){
                 name: (string){ "Write netrc file for cueckoo Gerrithub" }
@@ -1083,9 +1083,9 @@ import "strings"
                   2: (string){ "1.18.x" }
                 }
                 os: (#list){
-                  0: (string){ "ubuntu-18.04" }
-                  1: (string){ "macos-10.15" }
-                  2: (string){ "windows-2019" }
+                  0: (string){ "ubuntu-20.04" }
+                  1: (string){ "macos-11" }
+                  2: (string){ "windows-2022" }
                 }
               }
             }
@@ -1122,7 +1122,7 @@ import "strings"
               5: (#struct){
                 name: (string){ "Generate" }
                 run: (string){ "go generate ./..." }
-                if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-18.04'" }
+                if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
               }
               6: (#struct){
                 name: (string){ "Test" }
@@ -1131,7 +1131,7 @@ import "strings"
               7: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
-                if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-18.04' }}" }
+                if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}" }
               }
               8: (#struct){
                 name: (string){ "gorelease check" }
@@ -1159,7 +1159,7 @@ import "strings"
             }
           }
           mark_ci_success: (#struct){
-            "runs-on": (string){ "ubuntu-18.04" }
+            "runs-on": (string){ "ubuntu-20.04" }
             if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
             needs: (string){ "test" }
             steps: (#list){
@@ -1179,7 +1179,7 @@ import "strings"
             }
           }
           delete_build_branch: (#struct){
-            "runs-on": (string){ "ubuntu-18.04" }
+            "runs-on": (string){ "ubuntu-20.04" }
             if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}" }
             needs: (string){ "test" }
             steps: (#list){
@@ -1285,7 +1285,7 @@ import "strings"
         }
         jobs: (#struct){
           runtrybot: (#struct){
-            "runs-on": (string){ "ubuntu-18.04" }
+            "runs-on": (string){ "ubuntu-20.04" }
             _#type(:ci): (string){ "runtrybot" }
             if: (string){ "${{ github.event.client_payload.type == 'runtrybot' }}" }
             steps: (#list){
@@ -1308,7 +1308,7 @@ import "strings"
         _#runtrybot(:ci): (string){ "runtrybot" }
         _#unity(:ci): (string){ "unity" }
         _#dispatchJob(:ci): (#struct){
-          "runs-on": (string){ "ubuntu-18.04" }
+          "runs-on": (string){ "ubuntu-20.04" }
           _#type(:ci): (string){ string }
           if: (_|_){
             // [incomplete] workflows.1.schema._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
@@ -1365,7 +1365,7 @@ import "strings"
         }
         jobs: (#struct){
           goreleaser: (#struct){
-            "runs-on": (string){ "ubuntu-18.04" }
+            "runs-on": (string){ "ubuntu-20.04" }
             steps: (#list){
               0: (#struct){
                 name: (string){ "Checkout code" }
@@ -1490,7 +1490,7 @@ import "strings"
         }
         jobs: (#struct){
           push: (#struct){
-            "runs-on": (string){ "ubuntu-18.04" }
+            "runs-on": (string){ "ubuntu-20.04" }
             steps: (#list){
               0: (#struct){
                 name: (string){ "Rebuild tip.cuelang.org" }
@@ -1569,7 +1569,7 @@ import "strings"
     }
     jobs: (#struct){
       start: (#struct){
-        "runs-on": (string){ "ubuntu-18.04" }
+        "runs-on": (string){ "ubuntu-20.04" }
         steps: (#list){
           0: (#struct){
             name: (string){ "Write netrc file for cueckoo Gerrithub" }
@@ -1599,9 +1599,9 @@ import "strings"
               2: (string){ "1.18.x" }
             }
             os: (#list){
-              0: (string){ "ubuntu-18.04" }
-              1: (string){ "macos-10.15" }
-              2: (string){ "windows-2019" }
+              0: (string){ "ubuntu-20.04" }
+              1: (string){ "macos-11" }
+              2: (string){ "windows-2022" }
             }
           }
         }
@@ -1638,7 +1638,7 @@ import "strings"
           5: (#struct){
             name: (string){ "Generate" }
             run: (string){ "go generate ./..." }
-            if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-18.04'" }
+            if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
           }
           6: (#struct){
             name: (string){ "Test" }
@@ -1647,7 +1647,7 @@ import "strings"
           7: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
-            if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-18.04' }}" }
+            if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}" }
           }
           8: (#struct){
             name: (string){ "gorelease check" }
@@ -1675,7 +1675,7 @@ import "strings"
         }
       }
       mark_ci_success: (#struct){
-        "runs-on": (string){ "ubuntu-18.04" }
+        "runs-on": (string){ "ubuntu-20.04" }
         if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
         needs: (string){ "test" }
         steps: (#list){
@@ -1695,7 +1695,7 @@ import "strings"
         }
       }
       delete_build_branch: (#struct){
-        "runs-on": (string){ "ubuntu-18.04" }
+        "runs-on": (string){ "ubuntu-20.04" }
         if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}" }
         needs: (string){ "test" }
         steps: (#list){
@@ -1798,7 +1798,7 @@ import "strings"
     }
     jobs: (#struct){
       runtrybot: (#struct){
-        "runs-on": (string){ "ubuntu-18.04" }
+        "runs-on": (string){ "ubuntu-20.04" }
         _#type(:ci): (string){ "runtrybot" }
         if: (string){ "${{ github.event.client_payload.type == 'runtrybot' }}" }
         steps: (#list){
@@ -1821,7 +1821,7 @@ import "strings"
     _#runtrybot(:ci): (string){ "runtrybot" }
     _#unity(:ci): (string){ "unity" }
     _#dispatchJob(:ci): (#struct){
-      "runs-on": (string){ "ubuntu-18.04" }
+      "runs-on": (string){ "ubuntu-20.04" }
       _#type(:ci): (string){ string }
       if: (_|_){
         // [incomplete] repository_dispatch._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
@@ -1875,7 +1875,7 @@ import "strings"
     }
     jobs: (#struct){
       goreleaser: (#struct){
-        "runs-on": (string){ "ubuntu-18.04" }
+        "runs-on": (string){ "ubuntu-20.04" }
         steps: (#list){
           0: (#struct){
             name: (string){ "Checkout code" }
@@ -1997,7 +1997,7 @@ import "strings"
     }
     jobs: (#struct){
       push: (#struct){
-        "runs-on": (string){ "ubuntu-18.04" }
+        "runs-on": (string){ "ubuntu-20.04" }
         steps: (#list){
           0: (#struct){
             name: (string){ "Rebuild tip.cuelang.org" }
@@ -2103,9 +2103,9 @@ import "strings"
   _#codeGenGo(:ci): (string){ "1.16.x" }
   _#latestStableGo(:ci): (string){ "1.18.x" }
   _#pinnedReleaseGo(:ci): (string){ "1.18.1" }
-  _#linuxMachine(:ci): (string){ "ubuntu-18.04" }
-  _#macosMachine(:ci): (string){ "macos-10.15" }
-  _#windowsMachine(:ci): (string){ "windows-2019" }
+  _#linuxMachine(:ci): (string){ "ubuntu-20.04" }
+  _#macosMachine(:ci): (string){ "macos-11" }
+  _#windowsMachine(:ci): (string){ "windows-2022" }
   _#testStrategy(:ci): (#struct){
     "fail-fast": (bool){ false }
     matrix: (#struct){
@@ -2115,9 +2115,9 @@ import "strings"
         2: (string){ "1.18.x" }
       }
       os: (#list){
-        0: (string){ "ubuntu-18.04" }
-        1: (string){ "macos-10.15" }
-        2: (string){ "windows-2019" }
+        0: (string){ "ubuntu-20.04" }
+        1: (string){ "macos-11" }
+        2: (string){ "windows-2022" }
       }
     }
   }
@@ -2144,7 +2144,7 @@ import "strings"
   _#goGenerate(:ci): (#struct){
     name: (string){ "Generate" }
     run: (string){ "go generate ./..." }
-    if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-18.04'" }
+    if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
   }
   _#goTest(:ci): (#struct){
     name: (string){ "Test" }
@@ -2479,9 +2479,9 @@ import "strings"
   _#codeGenGo: "1.16.x"
   _#latestStableGo: "1.18.x"
   _#pinnedReleaseGo: "1.18.1"
-  _#linuxMachine: "ubuntu-18.04"
-  _#macosMachine: "macos-10.15"
-  _#windowsMachine: "windows-2019"
+  _#linuxMachine: "ubuntu-20.04"
+  _#macosMachine: "macos-11"
+  _#windowsMachine: "windows-2022"
   _#testStrategy: {
     "fail-fast": false
     matrix: {

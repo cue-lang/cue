@@ -341,9 +341,9 @@ _#latestStableGo: "1.18.x"
 // so we instead pin a specific Go release.
 _#pinnedReleaseGo: "1.18.1"
 
-_#linuxMachine:   "ubuntu-18.04"
-_#macosMachine:   "macos-10.15"
-_#windowsMachine: "windows-2019"
+_#linuxMachine:   "ubuntu-20.04"
+_#macosMachine:   "macos-11"
+_#windowsMachine: "windows-2022"
 
 _#testStrategy: {
 	"fail-fast": false

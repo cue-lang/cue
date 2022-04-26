@@ -10,7 +10,7 @@ name: Test
   pull_request: {}
 jobs:
   start:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash
@@ -37,9 +37,9 @@ jobs:
           - 1.17.x
           - 1.18.x
         os:
-          - ubuntu-18.04
-          - macos-10.15
-          - windows-2019
+          - ubuntu-20.04
+          - macos-11
+          - windows-2022
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -67,12 +67,12 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
       - if: ${{ github.ref == 'refs/heads/master' }}
         run: echo CUE_LONG=true >> $GITHUB_ENV
-      - if: matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-18.04'
+      - if: matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'
         name: Generate
         run: go generate ./...
       - name: Test
         run: go test ./...
-      - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-18.04' }}
+      - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}
         name: Test with -race
         run: go test -race ./...
       - name: gorelease check
@@ -90,7 +90,7 @@ jobs:
         name: Post any failures for this matrix entry
         run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"TryBot-Result\":-1}}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   mark_ci_success:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
     needs: test
     defaults:
@@ -108,7 +108,7 @@ jobs:
       - name: Update Gerrit CL message with success message
         run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"TryBot-Result\":1}}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   delete_build_branch:
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-20.04
     if: ${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}
     needs: test
     defaults:

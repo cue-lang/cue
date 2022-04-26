@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c90d6bd6_b5039063",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-26T19:52:27Z",
+      "side": 1,
+      "message": "It would be great if I remembered to re-generate the files, right?",
+      "revId": "1c42efa1713c093ce0efabb8d8edabca9e3b777a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -12,6 +12,7 @@ t6: strconv.FormatInt(170_141_183_460_469_231_731_687_303_715_884_105_728, 10)
 t7: strconv.FormatInt(64, 16)
 t8: strconv.FormatUint(170_141_183_460_469_231_731_687_303_715_884_105_728, 10)
 t9: strconv.FormatUint(61, 62)
+t10: strconv.FormatFloat(0.0, 102, -1, 64)
 -- out/strconv --
 Errors:
 t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
@@ -23,13 +24,14 @@ t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
     ./in.cue:6:31
 
 Result:
-t1: "40"
-t2: _|_ // t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat
-t3: _|_ // t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
-t4: _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
-t5: "true"
-t6: "170141183460469231731687303715884105728"
-t7: "40"
-t8: "170141183460469231731687303715884105728"
-t9: "Z"
+t1:  "40"
+t2:  _|_ // t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat
+t3:  _|_ // t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
+t4:  _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
+t5:  "true"
+t6:  "170141183460469231731687303715884105728"
+t7:  "40"
+t8:  "170141183460469231731687303715884105728"
+t9:  "Z"
+t10: "0"
 

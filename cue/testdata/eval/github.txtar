@@ -55,7 +55,7 @@ test: _#bashWorkflow & {
 			needs:     "start"
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
-			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#step & {
+			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#earlyChecks, _#cacheGoModules, _#step & {
 				if:  "${{ \(_#isMaster) }}"
 				run: "echo CUE_LONG=true >> $GITHUB_ENV"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
@@ -282,6 +282,26 @@ _#installGo: _#step & {
 _#checkoutCode: _#step & {
 	name: "Checkout code"
 	uses: "actions/checkout@v3"
+}
+_#earlyChecks: _#step & {
+	name: "Early git and code sanity checks"
+	run: """
+		# Ensure the recent commit messages have Signed-off-by headers.
+		# TODO: Remove once this is enforced for admins too;
+		# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229
+		# TODO: Our --max-count here is just 1, because we've made mistakes very
+		# recently. Increase it to 5 or 10 soon, to also cover CL chains.
+		for commit in $(git rev-list --max-count=1 HEAD); do
+			if ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then
+				echo -e "\nRecent commit is lacking Signed-off-by:\n"
+				git show --quiet $commit
+				exit 1
+			fi
+		done
+		"""
+	// These checks don't vary based on the Go version or OS,
+	// so we only need to run them on one of the matrix jobs.
+	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 }
 _#cacheGoModules: _#step & {
 	name: "Cache Go modules"
@@ -1107,6 +1127,11 @@ import "strings"
                 uses: (string){ "actions/checkout@v3" }
               }
               3: (#struct){
+                name: (string){ "Early git and code sanity checks" }
+                run: (string){ "# Ensure the recent commit messages have Signed-off-by headers.\n# TODO: Remove once this is enforced for admins too;\n# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229\n# TODO: Our --max-count here is just 1, because we've made mistakes very\n# recently. Increase it to 5 or 10 soon, to also cover CL chains.\nfor commit in $(git rev-list --max-count=1 HEAD); do\n\tif ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then\n\t\techo -e \"\nRecent commit is lacking Signed-off-by:\n\"\n\t\tgit show --quiet $commit\n\t\texit 1\n\tfi\ndone" }
+                if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
+              }
+              4: (#struct){
                 name: (string){ "Cache Go modules" }
                 uses: (string){ "actions/cache@v3" }
                 with: (#struct){
@@ -1115,38 +1140,38 @@ import "strings"
                   "restore-keys": (string){ "${{ runner.os }}-${{ matrix.go-version }}-go-" }
                 }
               }
-              4: (#struct){
+              5: (#struct){
                 if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
                 run: (string){ "echo CUE_LONG=true >> $GITHUB_ENV" }
               }
-              5: (#struct){
+              6: (#struct){
                 name: (string){ "Generate" }
                 run: (string){ "go generate ./..." }
                 if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
               }
-              6: (#struct){
+              7: (#struct){
                 name: (string){ "Test" }
                 run: (string){ "go test ./..." }
               }
-              7: (#struct){
+              8: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
                 if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}" }
               }
-              8: (#struct){
+              9: (#struct){
                 name: (string){ "gorelease check" }
                 run: (string){ "go run golang.org/x/exp/cmd/gorelease" }
               }
-              9: (#struct){
+              10: (#struct){
                 name: (string){ "Check that git is clean post generate and tests" }
                 run: (string){ "test -z \"$(git status --porcelain)\" || (git status; git diff; false)" }
               }
-              10: (#struct){
+              11: (#struct){
                 name: (string){ "Pull this commit through the proxy on master" }
                 run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
                 if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
               }
-              11: (#struct){
+              12: (#struct){
                 if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
                 name: (string){ "Post any failures for this matrix entry" }
                 run: (string){ "curl -f -s -n -H \"Content-Type: application/json\" --request POST --data \"{\\\"tag\\\":\\\"trybot\\\",\\\"message\\\":\\\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\\\",\\\"labels\\\":{\\\"TryBot-Result\\\":-1}}\" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
@@ -1623,6 +1648,11 @@ import "strings"
             uses: (string){ "actions/checkout@v3" }
           }
           3: (#struct){
+            name: (string){ "Early git and code sanity checks" }
+            run: (string){ "# Ensure the recent commit messages have Signed-off-by headers.\n# TODO: Remove once this is enforced for admins too;\n# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229\n# TODO: Our --max-count here is just 1, because we've made mistakes very\n# recently. Increase it to 5 or 10 soon, to also cover CL chains.\nfor commit in $(git rev-list --max-count=1 HEAD); do\n\tif ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then\n\t\techo -e \"\nRecent commit is lacking Signed-off-by:\n\"\n\t\tgit show --quiet $commit\n\t\texit 1\n\tfi\ndone" }
+            if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
+          }
+          4: (#struct){
             name: (string){ "Cache Go modules" }
             uses: (string){ "actions/cache@v3" }
             with: (#struct){
@@ -1631,38 +1661,38 @@ import "strings"
               "restore-keys": (string){ "${{ runner.os }}-${{ matrix.go-version }}-go-" }
             }
           }
-          4: (#struct){
+          5: (#struct){
             if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
             run: (string){ "echo CUE_LONG=true >> $GITHUB_ENV" }
           }
-          5: (#struct){
+          6: (#struct){
             name: (string){ "Generate" }
             run: (string){ "go generate ./..." }
             if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
           }
-          6: (#struct){
+          7: (#struct){
             name: (string){ "Test" }
             run: (string){ "go test ./..." }
           }
-          7: (#struct){
+          8: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
             if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}" }
           }
-          8: (#struct){
+          9: (#struct){
             name: (string){ "gorelease check" }
             run: (string){ "go run golang.org/x/exp/cmd/gorelease" }
           }
-          9: (#struct){
+          10: (#struct){
             name: (string){ "Check that git is clean post generate and tests" }
             run: (string){ "test -z \"$(git status --porcelain)\" || (git status; git diff; false)" }
           }
-          10: (#struct){
+          11: (#struct){
             name: (string){ "Pull this commit through the proxy on master" }
             run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
             if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
           }
-          11: (#struct){
+          12: (#struct){
             if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
             name: (string){ "Post any failures for this matrix entry" }
             run: (string){ "curl -f -s -n -H \"Content-Type: application/json\" --request POST --data \"{\\\"tag\\\":\\\"trybot\\\",\\\"message\\\":\\\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\\\",\\\"labels\\\":{\\\"TryBot-Result\\\":-1}}\" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
@@ -2132,6 +2162,11 @@ import "strings"
     name: (string){ "Checkout code" }
     uses: (string){ "actions/checkout@v3" }
   }
+  _#earlyChecks(:ci): (#struct){
+    name: (string){ "Early git and code sanity checks" }
+    run: (string){ "# Ensure the recent commit messages have Signed-off-by headers.\n# TODO: Remove once this is enforced for admins too;\n# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229\n# TODO: Our --max-count here is just 1, because we've made mistakes very\n# recently. Increase it to 5 or 10 soon, to also cover CL chains.\nfor commit in $(git rev-list --max-count=1 HEAD); do\n\tif ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then\n\t\techo -e \"\nRecent commit is lacking Signed-off-by:\n\"\n\t\tgit show --quiet $commit\n\t\texit 1\n\tfi\ndone" }
+    if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
+  }
   _#cacheGoModules(:ci): (#struct){
     name: (string){ "Cache Go modules" }
     uses: (string){ "actions/cache@v3" }
@@ -2232,6 +2267,7 @@ import "strings"
           〈4;_#writeNetrcFile〉,
           〈4;_#installGo〉,
           〈4;_#checkoutCode〉,
+          〈4;_#earlyChecks〉,
           〈4;_#cacheGoModules〉,
           (〈4;_#step〉 & {
             if: "${{ \(〈4;_#isMaster〉) }}"
@@ -2507,6 +2543,11 @@ import "strings"
   _#checkoutCode: (〈0;_#step〉 & {
     name: "Checkout code"
     uses: "actions/checkout@v3"
+  })
+  _#earlyChecks: (〈0;_#step〉 & {
+    name: "Early git and code sanity checks"
+    run: "# Ensure the recent commit messages have Signed-off-by headers.\n# TODO: Remove once this is enforced for admins too;\n# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229\n# TODO: Our --max-count here is just 1, because we've made mistakes very\n# recently. Increase it to 5 or 10 soon, to also cover CL chains.\nfor commit in $(git rev-list --max-count=1 HEAD); do\n\tif ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then\n\t\techo -e \"\nRecent commit is lacking Signed-off-by:\n\"\n\t\tgit show --quiet $commit\n\t\texit 1\n\tfi\ndone"
+    if: "matrix.go-version == '\(〈1;_#latestStableGo〉)' && matrix.os == '\(〈1;_#linuxMachine〉)'"
   })
   _#cacheGoModules: (〈0;_#step〉 & {
     name: "Cache Go modules"

@@ -73,6 +73,7 @@ test: _#bashWorkflow & {
 				_#writeNetrcFile,
 				_#installGo,
 				_#checkoutCode,
+				_#earlyChecks,
 				_#cacheGoModules,
 				_#step & {
 					if:  "${{ \(_#isMaster) }}"
@@ -364,6 +365,27 @@ _#installGo: _#step & {
 _#checkoutCode: _#step & {
 	name: "Checkout code"
 	uses: "actions/checkout@v3"
+}
+
+_#earlyChecks: _#step & {
+	name: "Early git and code sanity checks"
+	run: """
+		# Ensure the recent commit messages have Signed-off-by headers.
+		# TODO: Remove once this is enforced for admins too;
+		# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229
+		# TODO: Our --max-count here is just 1, because we've made mistakes very
+		# recently. Increase it to 5 or 10 soon, to also cover CL chains.
+		for commit in $(git rev-list --max-count=1 HEAD); do
+			if ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then
+				echo -e "\nRecent commit is lacking Signed-off-by:\n"
+				git show --quiet $commit
+				exit 1
+			fi
+		done
+		"""
+	// These checks don't vary based on the Go version or OS,
+	// so we only need to run them on one of the matrix jobs.
+	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 }
 
 _#cacheGoModules: _#step & {

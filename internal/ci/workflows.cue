@@ -84,7 +84,6 @@ test: _#bashWorkflow & {
 				_#goTestRace & {
 					if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 				},
-				_#goReleaseCheck,
 				_#checkGitClean,
 				_#pullThroughProxy,
 				_#failCLBuild,
@@ -416,11 +415,6 @@ _#goTest: _#step & {
 _#goTestRace: _#step & {
 	name: "Test with -race"
 	run:  "go test -race ./..."
-}
-
-_#goReleaseCheck: _#step & {
-	name: "gorelease check"
-	run:  "go run golang.org/x/exp/cmd/gorelease"
 }
 
 _#checkGitClean: _#step & {

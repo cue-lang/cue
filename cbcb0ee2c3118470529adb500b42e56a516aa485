@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "068fb754_6c6d6b5b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T14:28:38Z",
+      "side": 1,
+      "message": "LGTM still. We need to fix Gerrit to not drop my +2... because you didn\u0027t change \"anything\"",
+      "revId": "cbcb0ee2c3118470529adb500b42e56a516aa485",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

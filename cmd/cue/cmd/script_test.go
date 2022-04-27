@@ -47,6 +47,10 @@ const (
 func TestLatest(t *testing.T) {
 	root := filepath.Join("testdata", "script")
 	filepath.Walk(root, func(fullpath string, info os.FileInfo, err error) error {
+		if err != nil {
+			t.Error(err)
+			return nil
+		}
 		if !strings.HasSuffix(fullpath, ".txt") ||
 			strings.HasPrefix(filepath.Base(fullpath), "fix") {
 			return nil

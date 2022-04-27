@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11a07909_8475e2c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T12:24:19Z",
+      "side": 1,
+      "message": "LGTM after you sign the commit ;-)",
+      "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b58d59cb_4bd66d9b",
@@ -32,6 +49,24 @@
       "side": 1,
       "message": "Maybe, but I\u0027m not convinced - the start job doesn\u0027t have a git checkout, and that alone is already in the order of seconds to run. And I want earlyChecks to also include other cheap and commonly-failing checks in the future, like gofmt - which will also need installGo. So I think it\u0027s nicer in the long term to have it here.",
       "parentUuid": "b58d59cb_4bd66d9b",
+      "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c8a6e5d_fd3342d9",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T12:24:19Z",
+      "side": 1,
+      "message": "Great point. I\u0027m happy with that.",
+      "parentUuid": "038225ff_25337259",
       "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40851d97_29c7f375",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T12:24:19Z",
+      "side": 1,
+      "message": "Makes sense. I definitely don\u0027t have any strong opinions here, and there is certainly no harm to this approach.",
+      "parentUuid": "45604717_ac3bc483",
+      "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3a1a31f4_d91ebfc9",
@@ -84,6 +137,24 @@
       "writtenOn": "2022-04-27T06:47:51Z",
       "side": 1,
       "message": "See comment above about putting this in the \"start\" job",
+      "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b13bf36_f53e11a1",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T12:24:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a1a31f4_d91ebfc9",
       "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

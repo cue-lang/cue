@@ -190,11 +190,10 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
-// An OpContext implements CUE's unification operation. It's operations only
-// operation on values that are created with the Runtime with which an OpContext
-// is associated. An OpContext is not goroutine save and only one goroutine may
+// An OpContext implements CUE's unification operation. It only
+// operates on values that are created with the Runtime with which an OpContext
+// is associated. An OpContext is not goroutine safe and only one goroutine may
 // use an OpContext at a time.
-//
 type OpContext struct {
 	Runtime
 	Format func(Node) string

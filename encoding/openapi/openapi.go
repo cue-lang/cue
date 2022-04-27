@@ -143,7 +143,7 @@ func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit, paths *ast.
 	var info *ast.StructLit
 
 	for i, _ := inst.Value().Fields(cue.Definitions(true)); i.Next(); {
-		if i.IsDefinition() || strings.HasPrefix(i.Label(), "$") {
+		if i.IsDefinition() || strings.HasPrefix(i.Label(), "$/") {
 			continue
 		}
 		label := i.Label()

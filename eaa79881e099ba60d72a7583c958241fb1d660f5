@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31ef8370_26c13c8c",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-04-27T15:56:22Z",
+      "side": 1,
+      "message": "good point! fixed now, I think.",
+      "parentUuid": "342a8726_2942cc9b",
+      "revId": "eaa79881e099ba60d72a7583c958241fb1d660f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "083acb81_e3aaaf8f",

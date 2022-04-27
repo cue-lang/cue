@@ -131,7 +131,7 @@ func paths(g *Generator, inst *cue.Instance) (paths *ast.StructLit, err error) {
 	for i.Next() {
 		label := i.Label()
 
-		if i.IsDefinition() || !strings.HasPrefix(label, "$") || c.isInternal(label) {
+		if i.IsDefinition() || !strings.HasPrefix(label, "$/") || c.isInternal(label) {
 			continue
 		}
 
@@ -306,13 +306,13 @@ func (pb *PathBuilder) pathDescription(v cue.Value) {
 	pb.path.Set("description", ast.NewString(description))
 }
 
-func (pb *PathBuilder) operation(v cue.Value) {
-	operations := &OrderedMap{}
+func (pb *PathBuilder) responses(v cue.Value) *ast.StructLit {
+	responses := &OrderedMap{}
 	for i, _ := v.Value().Fields(cue.Definitions(false)); i.Next(); {
 		// searching http status
 		label, err := strconv.Atoi(i.Label())
 		if err != nil {
-			continue
+			pb.failf(v, "%v is no HTTP Status code", label)
 		}
 
 		if label > 599 || label < 100 {
@@ -320,12 +320,38 @@ func (pb *PathBuilder) operation(v cue.Value) {
 		}
 
 		responseStruct := Response(i.Value(), pb.ctx)
-		operations.Set(strconv.Itoa(label), responseStruct)
+		responses.Set(strconv.Itoa(label), responseStruct)
 
 	}
 
+	return (*ast.StructLit)(responses)
+}
+
+func (pb *PathBuilder) operation(v cue.Value) {
+	/*
+		operations := &OrderedMap{}
+		for i, _ := v.Value().Fields(cue.Definitions(false)); i.Next(); {
+			// searching http status
+			label, err := strconv.Atoi(i.Label())
+			if err != nil {
+				continue
+			}
+
+			if label > 599 || label < 100 {
+				pb.failf(v, "wrong HTTP Status code %v", label)
+			}
+
+			responseStruct := Response(i.Value(), pb.ctx)
+			operations.Set(strconv.Itoa(label), responseStruct)
+
+		}
+	*/
+	operation := &OrderedMap{}
+	responses := pb.responses(v.Lookup("responses"))
+	operation.Set("responses", responses)
+
 	label, _ := v.Label()
-	pb.path.Set(label, operations)
+	pb.path.Set(label, operation)
 }
 
 func (pb *PathBuilder) failf(v cue.Value, format string, args ...interface{}) {

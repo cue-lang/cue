@@ -51,6 +51,24 @@
       "message": "Please also add the following cases (not go strings):\n\n##\"\"# \"##\n\n##\"\"\"\n\"\"\"#\n\"\"\"##`",
       "revId": "eaa79881e099ba60d72a7583c958241fb1d660f5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ab6df9b_d682ad46",
+        "filename": "cue/scanner/scanner_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-04-27T16:05:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "083acb81_e3aaaf8f",
+      "revId": "eaa79881e099ba60d72a7583c958241fb1d660f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

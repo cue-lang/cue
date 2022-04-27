@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b58d59cb_4bd66d9b",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T06:47:51Z",
+      "side": 1,
+      "message": "Perhaps we put this in the \"start\" job so that we don\u0027t kick off the entire matrix and fail early?",
+      "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fb95700_9b688c81",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T06:47:51Z",
+      "side": 1,
+      "message": "Won\u0027t the equivalent of \"git log -1\" always be sufficient? Because we use cherry pick as a strategy, there won\u0027t be a danger of \"pulling in\" multiple commits that are bad. Instead the CI checks for each CL will catch the commit that represents that CL being bad.",
+      "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a1a31f4_d91ebfc9",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-27T06:47:51Z",
+      "side": 1,
+      "message": "See comment above about putting this in the \"start\" job",
+      "revId": "d0a4f1023c3ae026c2a8227119b2252dedd6ecec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

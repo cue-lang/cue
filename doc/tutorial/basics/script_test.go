@@ -19,6 +19,10 @@ import (
 // even if still valid in backwards compatibility mode.
 func TestLatest(t *testing.T) {
 	filepath.Walk(".", func(fullpath string, info os.FileInfo, err error) error {
+		if err != nil {
+			t.Error(err)
+			return nil
+		}
 		if !strings.HasSuffix(fullpath, ".txt") {
 			return nil
 		}

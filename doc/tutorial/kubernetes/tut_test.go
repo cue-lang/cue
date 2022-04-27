@@ -240,6 +240,9 @@ func TestTutorial(t *testing.T) {
 
 	// Compare the output in the temp directory with the quick output.
 	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		if err != nil {
+			t.Fatal(err)
+		}
 		if filepath.Ext(path) != ".cue" {
 			return nil
 		}

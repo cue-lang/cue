@@ -226,6 +226,42 @@ const (
 	indented // element was indented.
 )
 
+func (ws whiteSpace) String() string {
+	if ws == ignore {
+		return "ignore"
+	}
+	var buf strings.Builder
+	for i := 0; i < 20; i++ {
+		wsi := whiteSpace(1 << i)
+		if (ws & wsi) != 0 {
+			if buf.Len() > 0 {
+				buf.WriteByte(',')
+			}
+			if s := wsNames[wsi]; s != "" {
+				buf.WriteString(s)
+			} else {
+				fmt.Fprintf(&buf, "1<<%d", i)
+			}
+		}
+	}
+	return buf.String()
+}
+
+var wsNames = map[whiteSpace]string{
+	blank:      "blank",
+	vtab:       "vtab",
+	noblank:    "noblank",
+	nooverride: "nooverride",
+	comma:      "comma",
+	trailcomma: "trailcomma",
+	newline:    "newline",
+	formfeed:   "formfeed",
+	newsection: "newsection",
+	indent:     "indent",
+	unindent:   "unindent",
+	indented:   "indented",
+}
+
 type frame struct {
 	cg  []*ast.CommentGroup
 	pos int8

@@ -43,6 +43,7 @@ type Config struct {
 	Raw     bool
 }
 
+// WriteNode writes a string representation of the node to w.
 func WriteNode(w io.Writer, i adt.StringIndexer, n adt.Node, config *Config) {
 	if config == nil {
 		config = &Config{}
@@ -56,6 +57,10 @@ func WriteNode(w io.Writer, i adt.StringIndexer, n adt.Node, config *Config) {
 	}
 }
 
+// NodeString returns a string representation of the given node.
+// The StringIndexer value i is used to translate elements of n to strings.
+// Commonly available implementations of StringIndexer include *adt.OpContext
+// and *runtime.Runtime.
 func NodeString(i adt.StringIndexer, n adt.Node, config *Config) string {
 	b := &strings.Builder{}
 	WriteNode(b, i, n, config)

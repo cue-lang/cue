@@ -218,8 +218,6 @@ jobs:
       - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}
         name: Test with -race
         run: go test -race ./...
-      - name: gorelease check
-        run: go run golang.org/x/exp/cmd/gorelease
       - name: Check that git is clean post generate and tests
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
       - if: ${{ github.ref == 'refs/heads/master' }}
@@ -1144,7 +1142,7 @@ test: _#bashWorkflow & {
 				run: "echo CUE_LONG=true >> $GITHUB_ENV"
 			}, _#goGenerate, _#goTest, _#goTestRace & {
 				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
-			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
+			}, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
 		}
 		mark_ci_success: {
 			"runs-on": _#linuxMachine
@@ -1412,10 +1410,6 @@ _#goTest: _#step & {
 _#goTestRace: _#step & {
 	name: "Test with -race"
 	run:  "go test -race ./..."
-}
-_#goReleaseCheck: _#step & {
-	name: "gorelease check"
-	run:  "go run golang.org/x/exp/cmd/gorelease"
 }
 _#checkGitClean: _#step & {
 	name: "Check that git is clean post generate and tests"

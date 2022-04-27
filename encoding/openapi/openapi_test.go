@@ -155,6 +155,10 @@ func TestParseDefinitions(t *testing.T) {
 		in:     "simple-path.cue",
 		out:    "simple-path.json",
 		config: defaultConfig,
+	}, {
+		in:     "no-content-path.cue",
+		out:    "no-content-path.json",
+		config: defaultConfig,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {

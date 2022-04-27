@@ -830,8 +830,16 @@ scanAgain:
 				quote.numChar = 1
 				tok, lit = s.scanString(offs, quote)
 			case 1:
-				s.checkHashCount(offs, quote)
-				tok, lit = token.STRING, string(s.src[offs:s.offset])
+				// A single leading quote is part of the string when there's a hash,
+				// e.g. #""hello""#
+				// but not when the next character is a hash
+				// e.g. #""#
+				if quote.numHash > 0 && s.ch != '#' {
+					tok, lit = s.scanString(offs, quote)
+				} else {
+					s.checkHashCount(offs, quote)
+					tok, lit = token.STRING, string(s.src[offs:s.offset])
+				}
 			case 2:
 				quote.numChar = 3
 				switch s.ch {

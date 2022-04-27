@@ -62,7 +62,9 @@ func (rb *ResponseObjectBuilder) buildResponse(v cue.Value) *ast.StructLit {
 	//rb.mediaTypes.Set("description", description)
 
 	response.Set("description", description)
-	response.Set("content", rb.mediaTypes)
+	if rb.mediaTypes.len() != 0 {
+		response.Set("content", rb.mediaTypes)
+	}
 
 	return (*ast.StructLit)(response)
 }

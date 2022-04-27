@@ -52,6 +52,24 @@
       "parentUuid": "549c25bd_99b2f46a",
       "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7d66a57_b2ee0f92",
+        "filename": "pkg/internal/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-27T11:53:53Z",
+      "side": 0,
+      "message": "Sounds like we\u0027re both guessing that the TODO should stay. That\u0027s probably best in terms of being conservative, anyway. Merging as I don\u0027t think we need to loop in Marcel or Paul for such a small cleanup.",
+      "parentUuid": "065bd5f8_9726573f",
+      "revId": "fa141c2832c8b65bed5b76b9efde95df4d4274bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

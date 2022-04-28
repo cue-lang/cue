@@ -27,7 +27,7 @@ The CUE tooling, layered on top of CUE, provides
 a general purpose scripting language for creating scripts as well as
 simple servers, also expressed in CUE.
 
-CUE was designed with cloud configuration, and related systems, in mind,
+CUE was designed with cloud configuration and related systems in mind,
 but is not limited to this domain.
 It derives its formalism from relational programming languages.
 This formalism allows for managing and reasoning over large amounts of
@@ -41,7 +41,7 @@ CUE has a lot of similarities with the Go language. This document draws heavily
 from the Go specification as a result.
 
 CUE draws its influence from many languages.
-Its main influences were BCL/ GCL (internal to Google),
+Its main influences were BCL/GCL (internal to Google),
 LKB (LinGO), Go, and JSON.
 Others are Swift, Typescript, Javascript, Prolog, NCL (internal to Google),
 Jsonnet, HCL, Flabbergast, Nix, JSONPath, Haskell, Objective-C, and Python.
@@ -71,16 +71,17 @@ in increasing precedence:
 {}  repetition (0 to n times)
 ```
 
+TODO(FIXME): what are "terminals"? they do not appear to be defined.
+
 Lower-case production names are used to identify lexical tokens. Non-terminals
-are in CamelCase. Lexical tokens are enclosed in double quotes "" or back quotes
-``.
+are in CamelCase. Lexical tokens are enclosed in double quotes `""` or back
+quotes ` `` `.
 
-The form a … b represents the set of characters from a through b as
-alternatives. The horizontal ellipsis … is also used elsewhere in the spec to
+The form `a … b` represents the set of characters from a through b as
+alternatives. The horizontal ellipsis `…` is also used elsewhere in the spec to
 informally denote various enumerations or code snippets that are not further
-specified. The character … (as opposed to the three characters ...) is not a
-token of the CUE language.
-
+specified. The character `…` is not a token of the CUE language,
+as opposed to the three characters `...`.
 
 ## Source code representation
 
@@ -95,7 +96,7 @@ Each code point is distinct; for instance, upper and lower case letters are
 different characters.
 
 Implementation restriction: For compatibility with other tools, a compiler may
-disallow the NUL character (U+0000) in the source text.
+disallow the `NUL` character (U+0000) in the source text.
 
 Implementation restriction: For compatibility with other tools, a compiler may
 ignore a UTF-8-encoded byte order mark (U+FEFF) if it is the first Unicode code
@@ -116,13 +117,13 @@ unicode_digit  = /* a Unicode code point classified as "Number, decimal digit" *
 
 In The Unicode Standard 8.0, Section 4.5 "General Category" defines a set of
 character categories.
-CUE treats all characters in any of the Letter categories Lu, Ll, Lt, Lm, or Lo
-as Unicode letters, and those in the Number category Nd as Unicode digits.
+CUE treats all characters in any of the Letter categories `Lu`, `Ll`, `Lt`, `Lm`,
+or `Lo` as Unicode letters, and those in the Number category `Nd` as Unicode digits.
 
 
 ### Letters and digits
 
-The underscore character _ (U+005F) is considered a letter.
+The underscore character `_` (U+005F) is considered a letter.
 
 ```
 letter        = unicode_letter | "_" | "$" .
@@ -136,8 +137,9 @@ hex_digit     = "0" … "9" | "A" … "F" | "a" … "f" .
 ## Lexical elements
 
 ### Comments
+
 Comments serve as program documentation.
-CUE supports line comments that start with the character sequence //
+CUE supports line comments that start with the character sequence `//`
 and stop at the end of the line.
 
 A comment cannot start inside a string literal or inside a comment.
@@ -157,8 +159,13 @@ next token is the longest sequence of characters that form a valid token.
 
 ### Commas
 
-The formal grammar uses commas "," as terminators in a number of productions.
+The formal grammar uses commas `,` as terminators in a number of productions.
 CUE programs may omit most of these commas using the following two rules:
+
+TODO(FIXME): says "two rules", but there are three paragraphs, where only the
+first seems like a rule. The second seems like a note rather than a rule, given
+that it starts with "although", and the third seems like another note about the
+rest of the document.
 
 When the input is broken into tokens, a comma is automatically inserted into
 the token stream immediately after a line's final token if that token is
@@ -213,7 +220,7 @@ Some identifiers are [predeclared](#predeclared-identifiers).
 ### Keywords
 
 CUE has a limited set of keywords.
-In addition, CUE reserves all identifiers starting with `__`(double underscores)
+In addition, CUE reserves all identifiers starting with `__` (double underscores)
 as keywords.
 These are typically targets of pre-declared identifiers.
 
@@ -302,10 +309,10 @@ exponent    = ( "e" | "E" ) [ "+" | "-" ] decimals .
 ```
 
 An _integer literal_ is a sequence of digits representing an integer value.
-An optional prefix sets a non-decimal base: 0o for octal,
-0x or 0X for hexadecimal, and 0b for binary.
-In hexadecimal literals, letters a-f and A-F represent values 10 through 15.
-All integers allow interstitial underscores "_";
+An optional prefix sets a non-decimal base: `0o` for octal,
+`0x` or `0X` for hexadecimal, and `0b` for binary.
+In hexadecimal literals, letters `a … f` and `A … F` represent values 10 through 15.
+All integers allow interstitial underscores `_`;
 these have no meaning and are solely for readability.
 
 Integer literals may have an SI or IEC multiplier.
@@ -315,7 +322,7 @@ towards zero if it is not an integer.
 
 ```
 42
-1.5G    // 1_000_000_000
+1.5G    // 1_500_000_000
 1.3Ki   // 1.3 * 1024 = trunc(1331.2) = 1331
 170_141_183_460_469_231_731_687_303_715_884_105_727
 0xBad_Face
@@ -372,17 +379,32 @@ Byte sequences are a sequence of bytes.
 
 String and byte sequence literals are character sequences between,
 respectively, double and single quotes, as in `"bar"` and `'bar'`.
-Within the quotes, any character may appear except newline and,
-respectively, unescaped double or single quote.
+Within the quotes, any character may appear except newlines and,
+respectively, unescaped double or single quotes.
 String literals may only be valid UTF-8.
 Byte sequences may contain any sequence of bytes.
 
 Several escape sequences allow arbitrary values to be encoded as ASCII text.
 An escape sequence starts with an _escape delimiter_, which is `\` by default.
 The escape delimiter may be altered to be `\` plus a fixed number of
-hash symbols `#`
-by padding the start and end of a string or byte sequence literal
-with this number of hash symbols.
+hash symbols `#` by padding the start and end of a string or byte sequence
+literal with this number of hash symbols.
+
+TODO(FIXME): perhaps explain why backslash plus hash symbols is needed, ideally
+with an intuitive example. I can see one example below in the form of
+
+	#"This is not an \(interpolation)"#
+	#"This is an \#(interpolation)"#
+	#"The sequence "\U0001F604" renders as \#U0001F604."#
+
+but presumably one can just write
+
+	"This is not an \\(interpolation)"
+	"This is an \(interpolation)"
+	"The sequence \"\\U0001F604\" renders as \U0001F604."
+
+the last one does get a bit gnarly, so perhaps it's a good enough example,
+but also note how none of the strings get longer.
 
 There are four ways to represent the integer value as a numeric constant: `\x`
 followed by exactly two hexadecimal digits; `\u` followed by exactly four
@@ -407,8 +429,7 @@ represent individual bytes of the resulting string; all other escapes represent
 the (possibly multi-byte) UTF-8 encoding of individual characters.
 Thus inside a string literal `\377` and `\xFF` represent a single byte of
 value `0xFF=255`, while `ÿ`, `\u00FF`, `\U000000FF` and `\xc3\xbf` represent
-the two bytes `0xc3 0xbf` of the UTF-8
-encoding of character `U+00FF`.
+the two bytes `0xc3 0xbf` of the UTF-8 encoding of character `U+00FF`.
 
 ```
 \a   U+0007 alert or bell
@@ -463,7 +484,7 @@ the string value.
 'a\000\xab'
 '\007'
 '\377'
-'\xa'        // illegal: too few hexadecimal digits
+'\xa'        // illegal: too few hexadecimal digits TODO(FIXME): what is this comment aligning with?
 "\n"
 "\""
 'Hello, world!\n'
@@ -482,8 +503,8 @@ the string value.
 These examples all represent the same string:
 
 ```
-"日本語"                                 // UTF-8 input text
-'日本語'                                 // UTF-8 input text as byte sequence
+"日本語"                                // UTF-8 input text
+'日本語'                                // UTF-8 input text as byte sequence
 "\u65e5\u672c\u8a9e"                    // the explicit Unicode code points
 "\U000065e5\U0000672c\U00008a9e"        // the explicit Unicode code points
 '\xe6\x97\xa5\xe6\x9c\xac\xe8\xaa\x9e'  // the explicit UTF-8 bytes
@@ -501,7 +522,7 @@ Multiline strings and byte sequences respectively start with
 a triple double quote (`"""`) or triple single quote (`'''`),
 immediately followed by a newline, which is discarded from the string contents.
 The string is closed by a matching triple quote, which must be by itself
-on a newline, preceded by optional whitespace.
+on a new line, preceded by optional whitespace.
 The newline preceding the closing quote is discarded from the string contents.
 The whitespace before a closing triple quote must appear before any non-empty
 line after the opening quote and will be removed from each of these
@@ -540,6 +561,8 @@ Support for other values:
 
 ## Values
 
+TODO(FIXME): link to the Structs section?
+
 In addition to simple values like `"hello"` and `42.0`, CUE has _structs_.
 A struct is a map from labels to values, like `{a: 42.0, b: "hello"}`.
 Structs are CUE's only way of building up complex values;
@@ -553,7 +576,15 @@ denoted `a ⊑ b`, if `b == a` or `b` is more general than `a`,
 that is if `a` orders before `b` in the partial order
 (`⊑` is _not_ a CUE operator).
 We also say that `b` _subsumes_ `a` in this case.
-In graphical terms, `b` is "above" `a` in the lattice.
+In graphical terms, `b` is *above* `a` in the lattice.
+
+TODO(FIXME): trying to understand a lattice from this paragraph makes my brain
+hurt a bit; I think some visual aid would help.
+https://en.wikipedia.org/wiki/Lattice_(order)#Examples has some good diagrams.
+Bonus points if we use one that also includes "top" and "bottom".
+Note how we might even be able to do this without embedding a PNG:
+https://github.blog/2022-02-14-include-diagrams-markdown-files-mermaid/
+https://gohugo.io/content-management/diagrams/
 
 At the top of the lattice is the single ancestor of all values, called
 _top_, denoted `_` in CUE.
@@ -564,21 +595,21 @@ A bottom value usually indicates an error.
 Bottom is an instance of every value.
 
 An _atom_ is any value whose only instances are itself and bottom.
-Examples of atoms are `42.0`, `"hello"`, `true`, `null`.
+Examples of atoms are `42.0`, `"hello"`, `true`, and `null`.
 
-A value is _concrete_ if it is either an atom, or a struct all of whose
-field values are themselves concrete, recursively.
+A value is _concrete_ if it is either an atom, or a struct whose field values
+are all themselves concrete, recursively.
 
 CUE's values also include what we normally think of as types, like `string` and
 `float`.
-But CUE does not distinguish between types and values; only the
-relationship of values in the lattice is important.
-Each CUE "type" subsumes the concrete values that one would normally think
+CUE does not distinguish between types and values;
+only the relationship of values in the lattice is important.
+Each CUE *type* subsumes the concrete values that one would normally think
 of as part of that type.
-For example, "hello" is an instance of `string`, and `42.0` is an instance of
+For example, `"hello"` is an instance of `string`, and `42.0` is an instance of
 `float`.
-In addition to `string` and `float`, CUE has `null`, `int`, `bool` and `bytes`.
-We informally call these CUE's "basic types".
+In addition to `string` and `float`, CUE has `null`, `int`, `bool`, and `bytes`.
+We informally call these CUE's *basic types*.
 
 
 ```
@@ -617,7 +648,7 @@ These all follow from the definition of unification:
 - The unification of a value with bottom is always bottom.
 
 Unification in CUE is a [binary expression](#operands), written `a & b`.
-It is commutative and associative.
+It is commutative, associative, and idempotent.
 As a consequence, order of evaluation is irrelevant, a property that is key
 to many of the constructs in the CUE language as well as the tooling layered
 on top of it.
@@ -722,6 +753,13 @@ Intuitively, when an expression needs to be resolved for an operation other
 than unification or disjunction,
 non-starred elements are dropped in favor of starred ones if the starred ones
 do not resolve to bottom.
+
+TODO(FIXME): I wonder to what degree a CUE user needs to understand and remember
+these rules, or what a value-default pair is. They make sense once I've read and
+thought about them for a bit, but they surely weren't intuitive to me at first.
+I personally find it easier to start with an intuitive definition, some
+practical examples, and only then refer to the rules if any of the examples
+don't behave like one had understood the intuitive definition.
 
 To define the unification and disjunction operation we use the notation
 `⟨v⟩` to denote a CUE value `v` that is not associated with a default
@@ -834,6 +872,10 @@ the token `_|_`.
 Bottom is an instance of every other value.
 Any evaluation error is represented as bottom.
 
+TODO(FIXME): "associate error strings" has not been explained or defined yet,
+and neither "associate error" nor "error strings" appear elsewhere in the doc.
+This probably needs an anchor link.
+
 Implementations may associate error strings with different instances of bottom;
 logically they all remain the same value.
 
@@ -844,8 +886,12 @@ bottom_lit = "_|_" .
 
 ### Top
 
+TODO(FIXME): Note how Top and Bottom were already defined as part of the Values
+section. Are these duplicated? Should the Values section reduce its amount of
+text and link to the Top/Bottom sections instead?
+
 Top is represented by the underscore character `_`, lexically an identifier.
-Unifying any value `v` with top results `v` itself.
+Unifying any value `v` with top results in `v` itself.
 
 ```
 Expr        Result
@@ -902,12 +948,14 @@ They are two distinct types.
 Both are instances instances of a generic `number` type.
 
 <!--
+TODO: would be nice to make this a rendered diagram with Mermaid.
+
                     number
                    /      \
                 int      float
 -->
 
-The predeclared number, integer, decimal floating-point types are
+The predeclared number, integer, and decimal floating-point types are
 `number`, `int` and `float`; they are defined types.
 <!--
 TODO: should we drop float? It is somewhat preciser and probably a good idea
@@ -929,14 +977,14 @@ representation with limited precision.
 That said, every implementation must:
 
 - Represent integer values with at least 256 bits.
-- Represent floating-point values, with a mantissa of at least 256 bits and
+- Represent floating-point values with a mantissa of at least 256 bits and
 a signed binary exponent of at least 16 bits.
 - Give an error if unable to represent an integer value precisely.
 - Give an error if unable to represent a floating-point value due to overflow.
 - Round to the nearest representable value if unable to represent
 a floating-point value due to limits on precision.
 These requirements apply to the result of any expression except for builtin
-functions for which an unusual loss of precision must be explicitly documented.
+functions, for which an unusual loss of precision must be explicitly documented.
 
 
 ### Strings
@@ -966,6 +1014,12 @@ as a single comparison.
 
 For any [comparison operator](#comparison-operators) `op` except `==`,
 `op a` is the disjunction of every `x` such that `x op a`.
+
+TODO(FIXME): it took me a minute to understand what was meant by "infinite
+disjunction". How about an example, such as:
+
+For example, `int & >= 2` can be defined via an infinite disjunction like
+`int & (2|3|4|5|6|7|…)
 
 ```
 2 & >=2 & <=5           // 2, where 2 is either an int or float.
@@ -1038,6 +1092,10 @@ It could be a role of vet checkers to identify such cases (and suggest users
 to explicitly use `_|_` to discard a field, for instance).
 -->
 
+TODO(FIXME): this paragraph first says "multiple", then "two", which is confusing.
+Also, I fail to parse "the same properties as defined as the unification".
+Is there one "as" too many?
+
 Syntactically, a field is marked as optional by following its label with a `?`.
 The question mark is not part of the field name.
 A struct literal may contain multiple fields with
@@ -1071,6 +1129,9 @@ When unifying structs `a` and `b`,
 a pattern constraint `[p]: v` declared in `a`
 defines that the value `v` should unify with any field in the resulting struct `c`
 whose label unifies with pattern `p`.
+
+TODO(FIXME): what exactly is a "pattern"? It's not properly defined; can it be
+any CUE expression?
 
 <!-- TODO: Update grammar and support this.
 A pattern constraints with a pattern preceded by `...` indicates
@@ -1204,9 +1265,11 @@ nameMap: [string]: {
 
 nameMap: hank: { firstName: "Hank" }
 ```
+
 The optional field set defined by `nameMap` matches every field,
 in this case just `hank`, and unifies the associated constraint
 with the matched field, resulting in:
+
 ```
 nameMap: hank: {
     firstName: "Hank"
@@ -1352,11 +1415,14 @@ All other fields are _regular_.
 Definitions and hidden fields are not emitted when converting a CUE program
 to data and are never required to be concrete.
 
+TODO(FIXME): it's not clear why we want referencing definitions to automatically
+close them. perhaps we could summarize the reason here.
+
 Referencing a definition will recursively [close](#closed-structs) it.
 That is, a referenced definition will not unify with a struct
 that would add a field anywhere within the definition that it does not
 already define or explicitly allow with a pattern constraint or `...`.
-[Embeddings](#embedding) allow bypassing this check.
+[Embedding](#embedding) allows bypassing this check.
 
 If referencing a definition would always result in an error, implementations
 may report this inconsistency at the point of its declaration.
@@ -1532,10 +1598,16 @@ foo: { value: 1 } // outputs: foo: { name: "foo", value: 1 }
 
 #### Let declarations
 
+TODO(FIXME): the _foo_ format for definitions isn't used consistently
+
 _Let declarations_ bind an identifier to an expression.
 The identifier is visible within the [scope](#declarations-and-scopes)
 in which it is declared.
 The identifier must be unique within its scope.
+
+TODO(FIXME): reading this section alone, I do not understand how let
+declarations are different from definitions or aliases. Perhaps add a note or
+examples.
 
 ```
 let x = expr
@@ -1651,12 +1723,18 @@ expected in these cases.
 
 ## Declarations and Scopes
 
+TODO(FIXME): decls and scopes are mentioned multiple times above; perhaps this
+section should be moved higher up.
+
 
 ### Blocks
 
 A _block_ is a possibly empty sequence of declarations.
 The braces of a struct literal `{ ... }` form a block, but there are
 others as well:
+
+TODO(FIXME): given that CUE is inspired by Go and also has the notion of a
+package, I'm surprised to see there is such a thing as a file block.
 
 - The _universe block_ encompasses all CUE source text.
 - Each [package](#modules-instances-and-packages) has a _package block_
@@ -1714,7 +1792,7 @@ of the predefined identifier, prefixed with `__`.
 
 ```
 Functions
-len       close and or
+len close and or
 
 Types
 null      The null type and value
@@ -1779,7 +1857,7 @@ foo:   string  // visible outside mypackage
 
 Given a set of identifiers, an identifier is called unique if it is different
 from every other in the set, after applying normalization following
-Unicode Annex #31.
+Unicode Annex #31. TODO(FIXME): link to the annex?
 Two identifiers are different if they are spelled differently
 or if they appear in different packages and are not exported.
 Otherwise, they are the same.
@@ -1822,6 +1900,8 @@ to these directly.
 
 ### Let declarations
 
+TODO(FIXME): why are there two "Let declarations" sections?
+
 Within a struct, a let clause binds an identifier to the given expression.
 
 Within the scope of the identifier, the identifier refers to the
@@ -1844,7 +1924,7 @@ requested at the application level.
 
 Operands denote the elementary values in an expression.
 An operand may be a literal, a (possibly qualified) identifier denoting
-field, alias, or let declaration, or a parenthesized expression.
+a field, alias, or let declaration, or a parenthesized expression.
 
 ```
 Operand     = Literal | OperandName | "(" Expression ")" .
@@ -2054,6 +2134,8 @@ for `a` of list type:
 
 for `a` of struct type:
 
+TODO(FIXME): what is the difference between a.foo and a["foo"] for a struct?
+
 - the index `x` unified with `string` must be concrete.
 - the value of the regular and non-optional field named `x` of struct `a`,
   if this field exists
@@ -2065,6 +2147,9 @@ for `a` of struct type:
 [ 1, 2 ][2]     // _|_
 [ 1, 2, ...][2] // _|_
 ```
+
+TODO(FIXME): note that value-default pairs use the <x|y> syntax elsewhere, but
+not here - we probably want to be consistent.
 
 Both the operand and index value may be a value-default pair.
 ```
@@ -2110,6 +2195,8 @@ operand.
 
 Operands of unary and binary expressions may be associated with a default using
 the following
+
+TODO(FIXME): the following... what? only examples follow.
 
 <!--
 ```
@@ -2237,7 +2324,7 @@ operands must be null.
 The equality operators `==` and `!=` apply to operands that are comparable.
 The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered.
 The matching operators `=~` and `!~` apply to a string and regular
-expression operand.
+expression operands.
 These terms and the result of the comparisons are defined as follows:
 
 - Null is comparable with itself and any other type.
@@ -2249,7 +2336,7 @@ These terms and the result of the comparisons are defined as follows:
   for binary coded decimals in the IEEE-754-2008 standard.
 - Floating point numbers may be compared with integers.
 - String and bytes values are comparable and ordered lexically byte-wise.
-- Struct are not comparable.
+- Struct are not comparable. TODO(FIXME): slight surprise coming from Go: is there a reason for it?
 - Lists are not comparable.
 - The regular expression syntax is the one accepted by RE2,
   described in https://github.com/google/re2/wiki/Syntax,
@@ -2445,16 +2532,14 @@ c3: T({ a: {b: 0} })  // _|_  // field a.b does not unify (0 & 1..10)
 
 Calls can be made to core library functions, called builtins.
 Given an expression `f` of function type F,
-```
-f(a1, a2, … an)
-```
-calls `f` with arguments a1, a2, … an. Arguments must be expressions
+
+	f(a1, a2, … an)
+
+calls `f` with arguments `a1, a2, … an`. Arguments must be expressions
 of which the values are an instance of the parameter types of `F`
 and are evaluated before the function is called.
 
-```
-a: math.Atan2(x, y)
-```
+	a: math.Atan2(x, y)
 
 In a function call, the function value and arguments are evaluated in the usual
 order.
@@ -2537,7 +2622,7 @@ expressions with their string representation.
 String interpolation may be used in single- and double-quoted strings, as well
 as their multiline equivalent.
 
-A placeholder consists of "\\(" followed by an expression and a ")".
+A placeholder consists of `\(` followed by an expression and `)`.
 The expression is evaluated in the scope within which the string is defined.
 
 The result of the expression is substituted as follows:

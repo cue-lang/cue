@@ -28,7 +28,14 @@ func TestUnquote(t *testing.T) {
 		{`'Hello'`, "Hello", nil},
 		{`'Hellø'`, "Hellø", nil},
 		{`"""` + "\n\t\tHello\n\t\t" + `"""`, "Hello", nil},
+		{`"""` + "\r\n\tHello\r\n\n\t" + `"""`, "Hello\n", nil},
 		{"'''\n\t\tHello\n\t\t'''", "Hello", nil},
+		{`"""` + "\n\tHello \\\n\tworld\n\t" + `"""`, "Hello world", nil},
+		{`"""` + "\r\n\tHello \\\r\n\tworld\r\n\t" + `"""`, "Hello world", nil},
+		{`"""` + "\none \\\ntwo \\\nthree\n" + `"""`, "one two three", nil},
+		{`"""` + "\nHello\\\n" + `"""`, "", errEscapedLastNewline},
+		{`"""` + "\n\tHello\\\n\t" + `"""`, "", errEscapedLastNewline},
+		{`"""` + "\r\n\tHello\\\r\n\t" + `"""`, "", errEscapedLastNewline},
 		{"'''\n\t\tHello\n\n\t\t'''", "Hello\n", nil},
 		{"'''\n\n\t\tHello\n\t\t'''", "\nHello", nil},
 		{"'''\n\n\n\n\t\t'''", "\n\n", nil},
@@ -103,6 +110,7 @@ func TestUnquote(t *testing.T) {
 		{`#"Hello"`, "", errUnmatchedQuote},
 		{`#"Hello'#`, "", errUnmatchedQuote},
 		{`#""" """#`, "", errMissingNewline},
+		{`"""` + "\r\n\tHello \\\r", "", errUnmatchedQuote},
 
 		// TODO: should this be legal?
 		{`#"""#`, "", errMissingNewline},
@@ -110,7 +118,7 @@ func TestUnquote(t *testing.T) {
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%s", i, tc.in), func(t *testing.T) {
 			if got, err := Unquote(tc.in); err != tc.err {
-				t.Errorf("error: got %q; want %q", err, tc.err)
+				t.Errorf("error: got %#v; want %#v", err, tc.err)
 			} else if got != tc.out {
 				t.Errorf("value: got %q; want %q", got, tc.out)
 			}

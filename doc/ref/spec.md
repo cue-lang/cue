@@ -428,8 +428,8 @@ The escape `\(` is used as an escape for string interpolation.
 A `\(` must be followed by a valid CUE Expression, followed by a `)`.
 
 A backslash at the end of a line elides the line terminator that follows it.
-This may not escape the final newline inside a multiline string (that
-newline is already implicitly elided).
+This may not escape the final newline inside a multiline string: that
+newline is already implicitly elided.
 
 All other sequences starting with a backslash are illegal inside literals.
 

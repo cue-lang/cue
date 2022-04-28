@@ -54,6 +54,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "50153d9a_0105ace8",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d11954d7_cfa785e3",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9dc36bd5_034046b4",
         "filename": "doc/ref/spec.md",
         "patchSetId": 1
@@ -105,6 +123,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "0b8663bf_58354e03",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 877,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db63a895_0c1758a2",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2dc03abf_0a92308d",
         "filename": "doc/ref/spec.md",
         "patchSetId": 1
@@ -137,6 +173,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6721e47_9be9f2a7",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1103,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "734ab543_937712f5",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f8a7f26_a3679a27",
@@ -150,6 +204,30 @@
       "writtenOn": "2022-04-28T12:42:01Z",
       "side": 1,
       "message": "Rog: does it actually need to *be* type string? it could be top. what is the right terminology.\n\nAlso, this works, as does [123]:\n\n```\nx: {\n\t[true]: \"hello\"\n\ta: string\n}\n\nx: a: \"hello\"\n```",
+      "range": {
+        "startLine": 1126,
+        "startChar": 11,
+        "endLine": 1126,
+        "endChar": 25
+      },
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e901550_39893c8b",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1126,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "For Roger to create an issue.",
+      "parentUuid": "5f8a7f26_a3679a27",
       "range": {
         "startLine": 1126,
         "startChar": 11,
@@ -183,6 +261,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9911391f_e12eee17",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "26947133_35e2b487",
+      "range": {
+        "startLine": 1127,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 5
+      },
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cf0ab656_d3c09fa5",
@@ -206,6 +308,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e7c10df_177321c3",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1604,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cf0ab656_d3c09fa5",
+      "range": {
+        "startLine": 1604,
+        "startChar": 15,
+        "endLine": 1604,
+        "endChar": 36
+      },
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "418c808a_16f76951",
@@ -219,6 +345,24 @@
       "writtenOn": "2022-04-28T12:42:01Z",
       "side": 1,
       "message": "maybe don\u0027t move it, just link to it? Up to Marcel.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d518110e_893cb4a9",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1727,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "Dan to add links.",
+      "parentUuid": "418c808a_16f76951",
       "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

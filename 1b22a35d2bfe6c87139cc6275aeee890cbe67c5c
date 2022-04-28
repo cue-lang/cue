@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c770a80_064cedec",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 2136,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T16:33:05Z",
+      "side": 1,
+      "message": "Roger to file a bug about this \"not OK\" case?",
+      "revId": "1b22a35d2bfe6c87139cc6275aeee890cbe67c5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

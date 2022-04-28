@@ -1,0 +1,294 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc525786_c9fe7703",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Notes from the first review with Roger. Second version coming up.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3134c8d4_647e08a9",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "another option, since it\u0027s not CUE syntax: *a … b*\n\nor \"a … b\", as in English\n\nupdate: Go spec uses the equivalent of back quotes for all of these, so keep it",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d11954d7_cfa785e3",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 407,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "probably just move the interpolation example further up here.\n\nRog: also an example with more than one hash.\n\nRog: what happens if you get a leading quote? clarify given issue https://github.com/cue-lang/cue/issues/1649",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dc36bd5_034046b4",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Discussed with Rog: when defining, don\u0027t link to itself and just use cursive. When referring to a definition elsewhere, link and don\u0027t bother with cursive.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b39c3db7_37465490",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Rog: this should probably then define \"value-default pair\".",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db63a895_0c1758a2",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 877,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Rog: when an implementation displays a bottom value, it may display a message specific to the associated error that happened.\n\nDan: I read this part as if the user could associate errors with bottom, but that is not available yet.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dc03abf_0a92308d",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 892,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Have the Values section link to the Top/Bottom sections.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "734ab543_937712f5",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1103,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "TODO: rewrite these three lines with Marcel",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f8a7f26_a3679a27",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1126,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Rog: does it actually need to *be* type string? it could be top. what is the right terminology.\n\nAlso, this works, as does [123]:\n\n```\nx: {\n\t[true]: \"hello\"\n\ta: string\n}\n\nx: a: \"hello\"\n```",
+      "range": {
+        "startLine": 1126,
+        "startChar": 11,
+        "endLine": 1126,
+        "endChar": 25
+      },
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26947133_35e2b487",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Rog: unifies?",
+      "range": {
+        "startLine": 1127,
+        "startChar": 0,
+        "endLine": 1127,
+        "endChar": 5
+      },
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf0ab656_d3c09fa5",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1604,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Rog: visible *only* within the scope.",
+      "range": {
+        "startLine": 1604,
+        "startChar": 15,
+        "endLine": 1604,
+        "endChar": 36
+      },
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "418c808a_16f76951",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1727,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "maybe don\u0027t move it, just link to it? Up to Marcel.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "908337ca_f6a0f8fd",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "and also link back to the definition of this tuple syntax.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2f2e21b_4d448995",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2219,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "also the same value-default pair syntax.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17237ee1_16a04442",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2339,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Ask marcel if it\u0027s worth explaining some of the reasons why. Otherwise just drop.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8c70a8a_3ceb4351",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2625,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-28T12:42:01Z",
+      "side": 1,
+      "message": "Rog: an escaped bracket, like `\\(` or `\\#(`",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -132,6 +132,7 @@ var testTokens = [...]elt{
 	{token.STRING, "##\"\"\"\n\"\"\"#\n\"\"\"##", literal},
 	{token.STRING, `##"####"##`, literal},
 	{token.STRING, `#"foobar"#`, literal},
+	{token.STRING, `#" """#`, literal},
 	{token.STRING, `#"\r"#`, literal},
 	{token.STRING, `#"\("#`, literal},
 	{token.STRING, `#"\q"#`, literal},

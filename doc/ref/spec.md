@@ -427,6 +427,10 @@ encoding of character `U+00FF`.
 The escape `\(` is used as an escape for string interpolation.
 A `\(` must be followed by a valid CUE Expression, followed by a `)`.
 
+A backslash at the end of a line elides the line terminator that follows it.
+This may not escape the final newline inside a multiline string: that
+newline is already implicitly elided.
+
 All other sequences starting with a backslash are illegal inside literals.
 
 ```
@@ -516,7 +520,8 @@ To include it is suffices to escape one of the quotes.
     out of itself
 
     bass
-    picking bugs
+    picking \
+    bugs
     off the moon
         — Nick Virgilio, Selected Haiku, 1988
     """

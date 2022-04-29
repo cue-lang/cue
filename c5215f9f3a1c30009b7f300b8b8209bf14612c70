@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d83d3685_65c97ca8",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-04-29T14:19:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4b84c0be_52a7909c",
+      "revId": "c5215f9f3a1c30009b7f300b8b8209bf14612c70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "07961dd4_42bb0022",
@@ -31,6 +49,30 @@
       "writtenOn": "2022-04-27T15:45:04Z",
       "side": 1,
       "message": "remove \"The\"?",
+      "range": {
+        "startLine": 61,
+        "startChar": 3,
+        "endLine": 61,
+        "endChar": 6
+      },
+      "revId": "c5215f9f3a1c30009b7f300b8b8209bf14612c70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe9fd0c2_47d79261",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-04-29T14:19:23Z",
+      "side": 1,
+      "message": "I went with \"The StringIndexer value i\".",
+      "parentUuid": "07961dd4_42bb0022",
       "range": {
         "startLine": 61,
         "startChar": 3,

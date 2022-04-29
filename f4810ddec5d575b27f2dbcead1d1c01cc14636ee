@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a756e01_b9a47ab4",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-04-29T05:08:13Z",
+      "side": 1,
+      "message": "Drive by comment given that I was in this part of the spec. Does this line actually belong here? Isn\u0027t this a decision taken by tooling? i.e. it is a decision taken by cmd/cue that hidden fields are not emitted by default.",
+      "revId": "f4810ddec5d575b27f2dbcead1d1c01cc14636ee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

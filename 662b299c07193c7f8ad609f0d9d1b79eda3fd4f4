@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa66e026_9512a591",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-04-29T20:54:51Z",
+      "side": 1,
+      "message": "nit: extra space",
+      "range": {
+        "startLine": 289,
+        "startChar": 6,
+        "endLine": 289,
+        "endChar": 7
+      },
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -72,6 +72,11 @@ func DefaultTagVars() map[string]TagVar {
 				return ast.NewString(runtime.GOOS), nil
 			},
 		},
+		"arch": {
+			Func: func() (ast.Expr, error) {
+				return ast.NewString(runtime.GOARCH), nil
+			},
+		},
 		"cwd": {
 			Func: func() (ast.Expr, error) {
 				return varToString(os.Getwd())

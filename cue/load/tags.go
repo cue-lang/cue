@@ -88,6 +88,11 @@ func DefaultTagVars() map[string]TagVar {
 				return ast.NewLit(token.INT, string(hx[:])), nil
 			},
 		},
+		"arch": {
+			Func: func() (ast.Expr, error) {
+				return ast.NewString(runtime.GOARCH), nil
+			},
+		},
 	}
 }
 

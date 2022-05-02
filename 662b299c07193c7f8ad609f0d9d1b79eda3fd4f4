@@ -3,6 +3,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "386e21b6_b094c47e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-02T16:54:39Z",
+      "side": 1,
+      "message": "Was this already defined in the spec? If not the spec should be updated too.",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de337d10_0c1cbcc4",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-02T16:54:39Z",
+      "side": 1,
+      "message": "Ah, that might have caused some confusion. 😊",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ea2372c_5cf6f355",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-02T16:54:39Z",
+      "side": 1,
+      "message": "At this point I would probably make it a switch. Only consideration may be performance. But I guess the outer `if c \u003c 0` even if moving to a switch.",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aa66e026_9512a591",
         "filename": "cue/literal/string.go",
         "patchSetId": 2
@@ -20,6 +71,40 @@
         "endLine": 289,
         "endChar": 7
       },
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7873719b_d2ea4a3e",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-02T16:54:39Z",
+      "side": 1,
+      "message": "This would be simpler if we allowed `\\r` as a newline in and off itself (like Swift does).\nBut that\u0027s for later (and a spec change). It would support C64 and friends, though.  :)\n\nSee also https://en.wikipedia.org/wiki/Newline.",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3679f7ae_58cb3cd6",
+        "filename": "cue/literal/string_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-02T16:54:39Z",
+      "side": 1,
+      "message": "Maybe a case where multiple newlines are stripped, like:\n\"\"\"\none \\\ntwo \\\nthree\n\"\"\"",
       "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

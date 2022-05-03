@@ -104,6 +104,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c3a8538_db940ff2",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 767,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-03T08:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b39c3db7_37465490",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db63a895_0c1758a2",
@@ -367,6 +385,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebb37475_3b68c2a8",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1727,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-03T08:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d518110e_893cb4a9",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "908337ca_f6a0f8fd",
@@ -384,6 +420,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d76eacc8_8fa68080",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-03T08:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "908337ca_f6a0f8fd",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2f2e21b_4d448995",
@@ -397,6 +451,24 @@
       "writtenOn": "2022-04-28T12:42:01Z",
       "side": 1,
       "message": "also the same value-default pair syntax.",
+      "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a5137a2_da0cc782",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2219,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-03T08:37:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2f2e21b_4d448995",
       "revId": "d2c83de4483aadc8e1a12d9048934d1b816d00c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

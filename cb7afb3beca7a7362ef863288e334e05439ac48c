@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9796ee06_883bea17",
+        "filename": "pkg/strconv/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-03T22:01:42Z",
+      "side": 1,
+      "message": "This will support any value mod 256 that matches one of the value.",
+      "revId": "cb7afb3beca7a7362ef863288e334e05439ac48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b862d4f8_549f5a1c",
+        "filename": "pkg/strconv/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-03T22:01:42Z",
+      "side": 1,
+      "message": "s/adt.TopKind/adt.IntKind|adt.StringKind/ ?",
+      "revId": "cb7afb3beca7a7362ef863288e334e05439ac48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

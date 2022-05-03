@@ -380,7 +380,7 @@ func (g *generator) goKind(expr ast.Expr) string {
 	}
 }
 
-func (g *generator) goToCUE(expr ast.Expr) (cueKind string) {
+func (g *generator) goToCUE(expr ast.Expr, isArg bool) (cueKind string) {
 	// TODO: detect list and structs types for return values.
 	switch k := g.goKind(expr); k {
 	case "error":
@@ -395,6 +395,10 @@ func (g *generator) goToCUE(expr ast.Expr) (cueKind string) {
 		"uint", "byte", "uint8", "uint16", "uint32", "uint64",
 		"bigInt":
 		cueKind += "adt.IntKind"
+	case "formatChar":
+		// This is a
+		// The only way that
+		cueKind += "adt.ByteOrStringKind"
 	case "float64", "bigRat", "bigFloat", "decimal":
 		cueKind += "adt.NumKind"
 	case "list", "decimalList", "stringList":

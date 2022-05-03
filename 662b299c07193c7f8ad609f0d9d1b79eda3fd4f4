@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c0475be_a401cac8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-03T12:35:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "386e21b6_b094c47e",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de337d10_0c1cbcc4",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00545e13_bac85c02",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-03T12:35:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "de337d10_0c1cbcc4",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ea2372c_5cf6f355",
@@ -48,6 +84,24 @@
       "writtenOn": "2022-05-02T16:54:39Z",
       "side": 1,
       "message": "At this point I would probably make it a switch. Only consideration may be performance. But I guess the outer `if c \u003c 0` even if moving to a switch.",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fae01be1_03502ba1",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-03T12:35:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ea2372c_5cf6f355",
       "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +129,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb7c19a8_21a7e50d",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-03T12:35:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa66e026_9512a591",
+      "range": {
+        "startLine": 289,
+        "startChar": 6,
+        "endLine": 289,
+        "endChar": 7
+      },
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7873719b_d2ea4a3e",
@@ -92,6 +170,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b010b0aa_163f8241",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 441,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-03T12:35:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "7873719b_d2ea4a3e",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3679f7ae_58cb3cd6",
@@ -105,6 +201,24 @@
       "writtenOn": "2022-05-02T16:54:39Z",
       "side": 1,
       "message": "Maybe a case where multiple newlines are stripped, like:\n\"\"\"\none \\\ntwo \\\nthree\n\"\"\"",
+      "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6c1a383_13771fca",
+        "filename": "cue/literal/string_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-03T12:35:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3679f7ae_58cb3cd6",
       "revId": "662b299c07193c7f8ad609f0d9d1b79eda3fd4f4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

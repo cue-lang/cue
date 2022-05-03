@@ -1,6 +1,8 @@
 package openapi
 
 import (
+	"regexp"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 )
@@ -52,7 +54,9 @@ func (rb *ResponseObjectBuilder) buildResponse(v cue.Value) *ast.StructLit {
 	contentStruct := v.Lookup("content")
 	for i, _ := contentStruct.Value().Fields(cue.Definitions(false)); i.Next(); {
 		label := i.Label()
-		if !isMediaType(label) {
+		matched, _ := regexp.MatchString(`([^\s]+)[/]([^\s]+)`, label)
+
+		if !matched {
 			continue
 		}
 		rb.mediaType(i.Value())

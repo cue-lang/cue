@@ -159,6 +159,10 @@ func TestParseDefinitions(t *testing.T) {
 		in:     "no-content-path.cue",
 		out:    "no-content-path.json",
 		config: defaultConfig,
+	}, {
+		in:     "multiple-responses-path.cue",
+		out:    "multiple-responses-path.json",
+		config: defaultConfig,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {
@@ -263,4 +267,36 @@ func TestX(t *testing.T) {
 	var out = &bytes.Buffer{}
 	_ = json.Indent(out, b, "", "   ")
 	t.Error(out.String())
+}
+
+func TestExpectedError(t *testing.T) {
+	defaultConfig := &openapi.Config{}
+	testCases := []struct {
+		in, out string
+		config  *openapi.Config
+		err     string
+	}{{
+		in:     "wrong-http-status.cue",
+		config: defaultConfig,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.out, func(t *testing.T) {
+			filename := filepath.FromSlash(tc.in)
+
+			inst := cue.Build(load.Instances([]string{filename}, &load.Config{
+				Dir: "./testdata",
+			}))[0]
+			if inst.Err != nil {
+				t.Fatal(errors.Details(inst.Err, nil))
+			}
+
+			_, err := openapi.Gen(inst, tc.config)
+			if err == nil {
+				t.Fatal("expected error")
+				return
+			}
+		})
+	}
+
 }

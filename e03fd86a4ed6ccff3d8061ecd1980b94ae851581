@@ -16,6 +16,24 @@
       "message": "I prefer not using parentheses, for instance \n\nstring, as that newline is already implicitly elided.\n\nor\n\nstring. That newline is already implicitly elided.\n\nor \n\nstring: that newline is already implicitly elided.",
       "revId": "e03fd86a4ed6ccff3d8061ecd1980b94ae851581",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d6cae6a_29207866",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-03T12:35:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1009f93b_6d1a2f8d",
+      "revId": "e03fd86a4ed6ccff3d8061ecd1980b94ae851581",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

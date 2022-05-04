@@ -1,0 +1,413 @@
+-- in.cue --
+// A simple discriminated element
+#AC: {
+	k: "simple"
+	d: #C
+}
+
+// A recursive discriminated element
+#AS: {
+	k: "complex"
+	d: #S
+}
+
+#R: {
+	a: #AC | #AS
+}
+
+// The structure of the recursive element
+#S: {
+	n: string
+	r: [string]: #R
+}
+
+// The structure of the simple element
+#C: {
+	n: string
+}
+
+#sub: {
+	$p=#p: #AS
+	dict: [string]: _
+
+	for rn, rd in $p.d.r if rd.a.k == "complex" {
+		let subs = #sub & {#p: rd.a}
+		for sn, sd in subs.dict {
+			dict: "\(rn)_\(sn)": sd
+		}
+	}
+	for rn, rd in $p.d.r if rd.a.k == "simple" {
+		dict: "\(rn)": rd
+	}
+}
+
+// Data
+_test: {
+	c1: #AC
+	c1: d: {
+		n: "c1"
+	}
+
+
+	s3: #AS
+	s3: d: {
+		n: "s3"
+		r: r1: a:c1
+	}
+
+	s2: #AS
+	s2: d: {
+		n: "s2"
+		r: {
+			r1: a: c1
+			r2: a: s3
+		}
+	}
+
+	s1: #AS
+	s1: d: {
+		n: "s1"
+		r: {
+			r1: a: c1
+			r2: a: s2
+		}
+	}
+}
+
+//  Test
+
+out: #sub & {#p: _test.s1}
+-- out/compile --
+--- in.cue
+{
+  #AC: {
+    k: "simple"
+    d: 〈1;#C〉
+  }
+  #AS: {
+    k: "complex"
+    d: 〈1;#S〉
+  }
+  #R: {
+    a: (〈1;#AC〉|〈1;#AS〉)
+  }
+  #S: {
+    n: string
+    r: {
+      [string]: 〈2;#R〉
+    }
+  }
+  #C: {
+    n: string
+  }
+  #sub: {
+    #p: 〈1;#AS〉
+    dict: {
+      [string]: _
+    }
+    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "complex") {
+      for sn, sd in 〈0;let subs〉.dict {
+        dict: {
+          "\(〈4;rn〉)_\(〈2;sn〉)": 〈2;sd〉
+        }
+      }
+    }
+    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "simple") {
+      dict: {
+        "\(〈2;rn〉)": 〈2;rd〉
+      }
+    }
+  }
+  _test: {
+    c1: 〈1;#AC〉
+    c1: {
+      d: {
+        n: "c1"
+      }
+    }
+    s3: 〈1;#AS〉
+    s3: {
+      d: {
+        n: "s3"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+        }
+      }
+    }
+    s2: 〈1;#AS〉
+    s2: {
+      d: {
+        n: "s2"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+          r2: {
+            a: 〈4;s3〉
+          }
+        }
+      }
+    }
+    s1: 〈1;#AS〉
+    s1: {
+      d: {
+        n: "s1"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+          r2: {
+            a: 〈4;s2〉
+          }
+        }
+      }
+    }
+  }
+  out: (〈0;#sub〉 & {
+    #p: 〈1;_test〉.s1
+  })
+}
+-- out/eval --
+(struct){
+  #AC: (#struct){
+    k: (string){ "simple" }
+    d: (#struct){
+      n: (string){ string }
+    }
+  }
+  #AS: (#struct){
+    k: (string){ "complex" }
+    d: (#struct){
+      n: (string){ string }
+      r: (#struct){
+      }
+    }
+  }
+  #R: (#struct){
+    a: (#struct){ |((#struct){
+        k: (string){ "simple" }
+        d: (#struct){
+          n: (string){ string }
+        }
+      }, (#struct){
+        k: (string){ "complex" }
+        d: (#struct){
+          n: (string){ string }
+          r: (#struct){
+          }
+        }
+      }) }
+  }
+  #S: (#struct){
+    n: (string){ string }
+    r: (#struct){
+    }
+  }
+  #C: (#struct){
+    n: (string){ string }
+  }
+  #sub: (#struct){
+    dict: (#struct){
+    }
+    #p: (#struct){
+      k: (string){ "complex" }
+      d: (#struct){
+        n: (string){ string }
+        r: (#struct){
+        }
+      }
+    }
+  }
+  _test: (struct){
+    c1: (#struct){
+      k: (string){ "simple" }
+      d: (#struct){
+        n: (string){ "c1" }
+      }
+    }
+    s3: (#struct){
+      k: (string){ "complex" }
+      d: (#struct){
+        n: (string){ "s3" }
+        r: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              k: (string){ "simple" }
+              d: (#struct){
+                n: (string){ "c1" }
+              }
+            }
+          }
+        }
+      }
+    }
+    s2: (#struct){
+      k: (string){ "complex" }
+      d: (#struct){
+        n: (string){ "s2" }
+        r: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              k: (string){ "simple" }
+              d: (#struct){
+                n: (string){ "c1" }
+              }
+            }
+          }
+          r2: (#struct){
+            a: (#struct){
+              k: (string){ "complex" }
+              d: (#struct){
+                n: (string){ "s3" }
+                r: (#struct){
+                  r1: (#struct){
+                    a: (#struct){
+                      k: (string){ "simple" }
+                      d: (#struct){
+                        n: (string){ "c1" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    s1: (#struct){
+      k: (string){ "complex" }
+      d: (#struct){
+        n: (string){ "s1" }
+        r: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              k: (string){ "simple" }
+              d: (#struct){
+                n: (string){ "c1" }
+              }
+            }
+          }
+          r2: (#struct){
+            a: (#struct){
+              k: (string){ "complex" }
+              d: (#struct){
+                n: (string){ "s2" }
+                r: (#struct){
+                  r1: (#struct){
+                    a: (#struct){
+                      k: (string){ "simple" }
+                      d: (#struct){
+                        n: (string){ "c1" }
+                      }
+                    }
+                  }
+                  r2: (#struct){
+                    a: (#struct){
+                      k: (string){ "complex" }
+                      d: (#struct){
+                        n: (string){ "s3" }
+                        r: (#struct){
+                          r1: (#struct){
+                            a: (#struct){
+                              k: (string){ "simple" }
+                              d: (#struct){
+                                n: (string){ "c1" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  out: (#struct){
+    dict: (#struct){
+      r1: (#struct){
+        a: (#struct){
+          k: (string){ "simple" }
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+        }
+      }
+      r2_r1: (#struct){
+        a: (#struct){
+          k: (string){ "simple" }
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+        }
+      }
+      r2_r2_r1: (#struct){
+        a: (#struct){
+          k: (string){ "simple" }
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+        }
+      }
+    }
+    #p: (#struct){
+      k: (string){ "complex" }
+      d: (#struct){
+        n: (string){ "s1" }
+        r: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              k: (string){ "simple" }
+              d: (#struct){
+                n: (string){ "c1" }
+              }
+            }
+          }
+          r2: (#struct){
+            a: (#struct){
+              k: (string){ "complex" }
+              d: (#struct){
+                n: (string){ "s2" }
+                r: (#struct){
+                  r1: (#struct){
+                    a: (#struct){
+                      k: (string){ "simple" }
+                      d: (#struct){
+                        n: (string){ "c1" }
+                      }
+                    }
+                  }
+                  r2: (#struct){
+                    a: (#struct){
+                      k: (string){ "complex" }
+                      d: (#struct){
+                        n: (string){ "s3" }
+                        r: (#struct){
+                          r1: (#struct){
+                            a: (#struct){
+                              k: (string){ "simple" }
+                              d: (#struct){
+                                n: (string){ "c1" }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

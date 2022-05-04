@@ -1,0 +1,840 @@
+-- in.cue --
+// Not a cycle: the structure in x (c) only triggers one further
+// instantiation of y, but not enough to trigger another round.
+safeCycle: simple2: {
+	y: [string]: b: c: y
+	x: y
+	x: c: y
+}
+
+// Not a cycle: the structure in x (c) only triggers one further
+// instantiation of y, but not enough to trigger another round.
+safeCycle: long1: {
+	y: [string]: b: y
+	x: y
+	x: c: b: e: b: c: _
+}
+
+// Not a cycle: the structure in x (c) only triggers one further
+// instantiation of y, but not enough to trigger another round.
+safeCycle: long2: {
+	a: [string]: b: a
+	x: a
+	x: c: b: c: b: c: {}
+}
+
+// noCyclePattern is similar to the above cases, but involving more patterns
+// and various lengths.
+noCyclePattern: _
+
+noCyclePattern: t1: {
+	#D: [string]: #D
+	a: {}
+	[string]: #D
+	[string]: b: c: {}
+}
+
+noCyclePattern: t2: {
+	#D: [string]: x: #D
+	a: {}
+	[string]: #D
+	[string]: b: x: c: {}
+}
+
+noCyclePattern: t3: {
+	_D: [string]: _T
+	_T: x: _D
+	[string]: _D
+	[string]: b: x: c: {}
+	a: {}
+}
+
+noCyclePattern: t4: {
+	_D: [string]: x: _T
+	_T: y: _D
+	[string]: _D
+	[string]: b: x: {}
+	a: {}
+}
+
+noCyclePattern: t5: {
+	_D: [string]: x: _T
+	_T: y: _D
+	[string]: _D
+	[string]: b: x: y: c: x: {}
+	a: {}
+}
+
+// This example also has an embedding, in which case it should still behave
+// the same.
+noCyclePattern: t6: {
+	#D: [string]: #E
+
+	#E: t: #T
+
+	#T: {
+		{ object: #S }
+	}
+
+	#S: y: #D
+	[string]: x: #D
+	[string]: x: r: t: object: y: foo: t: object: {
+	}
+	bar: {}
+}
+
+// Cycle: x cyclic. The pattern constraint should not be seen as
+// "adding new structure", thereby permitting the cycle.
+noCancelSelfInvoke: t1: {
+	y: [string]: b: y
+	x: y
+	x: c: x
+}
+
+
+// Even though these cycles cross pattern boundaries, they are still structural
+// cycles as the reference includes a field that triggers the pattern.
+selfTriggerCycle: _
+
+selfTriggerCycle: t1: {
+	a: #T
+	#T: {
+		[string]: #T
+		b: {}
+	}
+}
+
+selfTriggerCycle: t2: {
+	#T: [string]: X={
+		a: X
+	}
+	b: #T
+	b: c: {}
+}
+
+selfTriggerCycle: long1: {
+	// The long string of nested fields will initially exempt the structural
+	// cycle, but they will eventually run out, causing the cycle to be
+	// triggered.
+	a: [string]: b: a     // -> record conjunct from pattern per field.
+	a: c: b: c: b: c: {}  // -> track if any of the fields is not a cycle.
+}
+
+selfTriggerCycle: issue1503: {
+	a: #T & {
+		a: one: link: a: two: {}
+	}
+	#T: {
+		a: [string]: link: #T
+		a: b: {}
+	}
+}
+
+mutuallyTriggeringCycle: t1: {
+	// Even though y itself, as well as each of the x fields are not cyclic,
+	// the combination of the two x conjuncts are, as the b fields of y will
+	// trigger the pattern constraints in an interleaved fashion.
+	y: [string]: b: y
+	x: y
+	x: c: y
+}
+
+-- out/compile --
+--- in.cue
+{
+  safeCycle: {
+    simple2: {
+      y: {
+        [string]: {
+          b: {
+            c: 〈3;y〉
+          }
+        }
+      }
+      x: 〈0;y〉
+      x: {
+        c: 〈1;y〉
+      }
+    }
+  }
+  safeCycle: {
+    long1: {
+      y: {
+        [string]: {
+          b: 〈2;y〉
+        }
+      }
+      x: 〈0;y〉
+      x: {
+        c: {
+          b: {
+            e: {
+              b: {
+                c: _
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  safeCycle: {
+    long2: {
+      a: {
+        [string]: {
+          b: 〈2;a〉
+        }
+      }
+      x: 〈0;a〉
+      x: {
+        c: {
+          b: {
+            c: {
+              b: {
+                c: {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  noCyclePattern: _
+  noCyclePattern: {
+    t1: {
+      #D: {
+        [string]: 〈1;#D〉
+      }
+      a: {}
+      [string]: 〈0;#D〉
+      [string]: {
+        b: {
+          c: {}
+        }
+      }
+    }
+  }
+  noCyclePattern: {
+    t2: {
+      #D: {
+        [string]: {
+          x: 〈2;#D〉
+        }
+      }
+      a: {}
+      [string]: 〈0;#D〉
+      [string]: {
+        b: {
+          x: {
+            c: {}
+          }
+        }
+      }
+    }
+  }
+  noCyclePattern: {
+    t3: {
+      _D: {
+        [string]: 〈1;_T〉
+      }
+      _T: {
+        x: 〈1;_D〉
+      }
+      [string]: 〈0;_D〉
+      [string]: {
+        b: {
+          x: {
+            c: {}
+          }
+        }
+      }
+      a: {}
+    }
+  }
+  noCyclePattern: {
+    t4: {
+      _D: {
+        [string]: {
+          x: 〈2;_T〉
+        }
+      }
+      _T: {
+        y: 〈1;_D〉
+      }
+      [string]: 〈0;_D〉
+      [string]: {
+        b: {
+          x: {}
+        }
+      }
+      a: {}
+    }
+  }
+  noCyclePattern: {
+    t5: {
+      _D: {
+        [string]: {
+          x: 〈2;_T〉
+        }
+      }
+      _T: {
+        y: 〈1;_D〉
+      }
+      [string]: 〈0;_D〉
+      [string]: {
+        b: {
+          x: {
+            y: {
+              c: {
+                x: {}
+              }
+            }
+          }
+        }
+      }
+      a: {}
+    }
+  }
+  noCyclePattern: {
+    t6: {
+      #D: {
+        [string]: 〈1;#E〉
+      }
+      #E: {
+        t: 〈1;#T〉
+      }
+      #T: {
+        {
+          object: 〈2;#S〉
+        }
+      }
+      #S: {
+        y: 〈1;#D〉
+      }
+      [string]: {
+        x: 〈1;#D〉
+      }
+      [string]: {
+        x: {
+          r: {
+            t: {
+              object: {
+                y: {
+                  foo: {
+                    t: {
+                      object: {}
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      bar: {}
+    }
+  }
+  noCancelSelfInvoke: {
+    t1: {
+      y: {
+        [string]: {
+          b: 〈2;y〉
+        }
+      }
+      x: 〈0;y〉
+      x: {
+        c: 〈1;x〉
+      }
+    }
+  }
+  selfTriggerCycle: _
+  selfTriggerCycle: {
+    t1: {
+      a: 〈0;#T〉
+      #T: {
+        [string]: 〈1;#T〉
+        b: {}
+      }
+    }
+  }
+  selfTriggerCycle: {
+    t2: {
+      #T: {
+        [string]: {
+          a: 〈1〉
+        }
+      }
+      b: 〈0;#T〉
+      b: {
+        c: {}
+      }
+    }
+  }
+  selfTriggerCycle: {
+    long1: {
+      a: {
+        [string]: {
+          b: 〈2;a〉
+        }
+      }
+      a: {
+        c: {
+          b: {
+            c: {
+              b: {
+                c: {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  selfTriggerCycle: {
+    issue1503: {
+      a: (〈0;#T〉 & {
+        a: {
+          one: {
+            link: {
+              a: {
+                two: {}
+              }
+            }
+          }
+        }
+      })
+      #T: {
+        a: {
+          [string]: {
+            link: 〈3;#T〉
+          }
+        }
+        a: {
+          b: {}
+        }
+      }
+    }
+  }
+  mutuallyTriggeringCycle: {
+    t1: {
+      y: {
+        [string]: {
+          b: 〈2;y〉
+        }
+      }
+      x: 〈0;y〉
+      x: {
+        c: 〈1;y〉
+      }
+    }
+  }
+}
+-- out/eval --
+Errors:
+mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
+noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
+noCancelSelfInvoke.t1.x.c.c: structural cycle
+selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+selfTriggerCycle.issue1503.a.a.b.link.a.b.link.a.b.link: structural cycle
+selfTriggerCycle.issue1503.a.a.one.link.a.b.link.a.b.link: structural cycle
+selfTriggerCycle.issue1503.a.a.one.link.a.two.link.a.b.link.a.b.link: structural cycle
+selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+selfTriggerCycle.t1.#T.b.b: structural cycle
+selfTriggerCycle.t1.a.b.b.b: structural cycle
+selfTriggerCycle.t2.b.c.a: structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  safeCycle: (struct){
+    simple2: (struct){
+      y: (struct){
+      }
+      x: (struct){
+        c: (struct){
+          b: (struct){
+            c: (struct){
+            }
+            b: (struct){
+              c: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+    long1: (struct){
+      y: (struct){
+      }
+      x: (struct){
+        c: (struct){
+          b: (struct){
+            e: (struct){
+              b: (struct){
+                c: (struct){
+                  b: (struct){
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    long2: (struct){
+      a: (struct){
+      }
+      x: (struct){
+        c: (struct){
+          b: (struct){
+            c: (struct){
+              b: (struct){
+                c: (struct){
+                  b: (struct){
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  noCyclePattern: (struct){
+    t1: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        b: (#struct){
+          c: (#struct){
+          }
+        }
+      }
+    }
+    t2: (struct){
+      #D: (#struct){
+      }
+      a: (#struct){
+        b: (#struct){
+          x: (#struct){
+            c: (#struct){
+              x: (#struct){
+              }
+            }
+          }
+        }
+      }
+    }
+    t3: (struct){
+      _D: (struct){
+      }
+      _T: (struct){
+        x: (struct){
+        }
+      }
+      a: (struct){
+        b: (struct){
+          x: (struct){
+            c: (struct){
+              x: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+    t4: (struct){
+      _D: (struct){
+      }
+      _T: (struct){
+        y: (struct){
+        }
+      }
+      a: (struct){
+        b: (struct){
+          x: (struct){
+            y: (struct){
+            }
+          }
+        }
+      }
+    }
+    t5: (struct){
+      _D: (struct){
+      }
+      _T: (struct){
+        y: (struct){
+        }
+      }
+      a: (struct){
+        b: (struct){
+          x: (struct){
+            y: (struct){
+              c: (struct){
+                x: (struct){
+                  y: (struct){
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    t6: (struct){
+      #D: (#struct){
+      }
+      #E: (#struct){
+        t: (#struct){
+          object: (#struct){
+            y: (#struct){
+            }
+          }
+        }
+      }
+      #T: (#struct){
+        object: (#struct){
+          y: (#struct){
+          }
+        }
+      }
+      #S: (#struct){
+        y: (#struct){
+        }
+      }
+      bar: (struct){
+        x: (#struct){
+          r: (#struct){
+            t: (#struct){
+              object: (#struct){
+                y: (#struct){
+                  foo: (#struct){
+                    t: (#struct){
+                      object: (#struct){
+                        y: (#struct){
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  noCancelSelfInvoke: (_|_){
+    // [structural cycle]
+    t1: (_|_){
+      // [structural cycle]
+      y: (struct){
+      }
+      x: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          c: (_|_){
+            // [structural cycle] noCancelSelfInvoke.t1.x.c.c: structural cycle
+          }
+          b: (_|_){
+            // [structural cycle]
+            b: (_|_){
+              // [structural cycle]
+              b: (_|_){
+                // [structural cycle] noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  selfTriggerCycle: (_|_){
+    // [structural cycle]
+    t1: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle]
+            b: (_|_){
+              // [structural cycle] selfTriggerCycle.t1.a.b.b.b: structural cycle
+            }
+          }
+        }
+      }
+      #T: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle] selfTriggerCycle.t1.#T.b.b: structural cycle
+          }
+        }
+      }
+    }
+    t2: (_|_){
+      // [structural cycle]
+      #T: (#struct){
+      }
+      b: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          a: (_|_){
+            // [structural cycle] selfTriggerCycle.t2.b.c.a: structural cycle
+          }
+        }
+      }
+    }
+    long1: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle]
+            c: (_|_){
+              // [structural cycle]
+              b: (_|_){
+                // [structural cycle]
+                c: (_|_){
+                  // [structural cycle]
+                  b: (_|_){
+                    // [structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    issue1503: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle]
+              a: (_|_){
+                // [structural cycle]
+                b: (_|_){
+                  // [structural cycle]
+                  link: (_|_){
+                    // [structural cycle]
+                    a: (_|_){
+                      // [structural cycle]
+                      b: (_|_){
+                        // [structural cycle]
+                        link: (_|_){
+                          // [structural cycle] selfTriggerCycle.issue1503.a.a.b.link.a.b.link.a.b.link: structural cycle
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          one: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle]
+              a: (_|_){
+                // [structural cycle]
+                two: (_|_){
+                  // [structural cycle]
+                  link: (_|_){
+                    // [structural cycle]
+                    a: (_|_){
+                      // [structural cycle]
+                      b: (_|_){
+                        // [structural cycle]
+                        link: (_|_){
+                          // [structural cycle]
+                          a: (_|_){
+                            // [structural cycle]
+                            b: (_|_){
+                              // [structural cycle]
+                              link: (_|_){
+                                // [structural cycle] selfTriggerCycle.issue1503.a.a.one.link.a.two.link.a.b.link.a.b.link: structural cycle
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+                b: (_|_){
+                  // [structural cycle]
+                  link: (_|_){
+                    // [structural cycle]
+                    a: (_|_){
+                      // [structural cycle]
+                      b: (_|_){
+                        // [structural cycle]
+                        link: (_|_){
+                          // [structural cycle] selfTriggerCycle.issue1503.a.a.one.link.a.b.link.a.b.link: structural cycle
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      #T: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle] selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
+            }
+          }
+        }
+      }
+    }
+  }
+  mutuallyTriggeringCycle: (_|_){
+    // [structural cycle]
+    t1: (_|_){
+      // [structural cycle]
+      y: (struct){
+      }
+      x: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle]
+            b: (_|_){
+              // [structural cycle]
+              b: (_|_){
+                // [structural cycle]
+                b: (_|_){
+                  // [structural cycle]
+                  b: (_|_){
+                    // [structural cycle] mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

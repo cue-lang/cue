@@ -216,6 +216,7 @@ type OpContext struct {
 	freeListNode *nodeContext
 
 	e         *Environment
+	ci        CloseInfo
 	src       ast.Node
 	errs      *Bottom
 	positions []Node // keep track of error positions
@@ -239,7 +240,7 @@ type OpContext struct {
 
 	// inDisjunct indicates that non-monotonic checks should be skipped.
 	// This is used if we want to do some extra work to eliminate disjunctions
-	// early. The result of unificantion should be thrown away if this check is
+	// early. The result of unification should be thrown away if this check is
 	// used.
 	//
 	// TODO: replace this with a mechanism to determine the correct set (per
@@ -392,12 +393,14 @@ type frame struct {
 	env *Environment
 	err *Bottom
 	src ast.Node
+	ci  CloseInfo
 }
 
 func (c *OpContext) PushState(env *Environment, src ast.Node) (saved frame) {
 	saved.env = c.e
 	saved.err = c.errs
 	saved.src = c.src
+	saved.ci = c.ci
 
 	c.errs = nil
 	if src != nil {
@@ -408,11 +411,30 @@ func (c *OpContext) PushState(env *Environment, src ast.Node) (saved frame) {
 	return saved
 }
 
+func (c *OpContext) PushConjunct(x Conjunct) (saved frame) {
+	src := x.Expr().Source()
+
+	saved.env = c.e
+	saved.err = c.errs
+	saved.src = c.src
+	saved.ci = c.ci
+
+	c.errs = nil
+	if src != nil {
+		c.src = src
+	}
+	c.e = x.Env
+	c.ci = x.CloseInfo
+
+	return saved
+}
+
 func (c *OpContext) PopState(s frame) *Bottom {
 	err := c.errs
 	c.e = s.env
 	c.errs = s.err
 	c.src = s.src
+	c.ci = s.ci
 	return err
 }
 
@@ -433,8 +455,8 @@ func (c *OpContext) PopArc(saved *Vertex) {
 //
 // Should only be used to insert Conjuncts. TODO: perhaps only return Conjuncts
 // and error.
-func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
-	s := c.PushState(env, r.Source())
+func (c *OpContext) Resolve(x Conjunct, r Resolver) (*Vertex, *Bottom) {
+	s := c.PushConjunct(x)
 
 	arc := r.resolve(c, Partial)
 
@@ -580,8 +602,9 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 	return val, true
 }
 
-func (c *OpContext) evaluateRec(env *Environment, x Expr, state VertexStatus) Value {
-	s := c.PushState(env, x.Source())
+func (c *OpContext) evaluateRec(v Conjunct, state VertexStatus) Value {
+	x := v.Expr()
+	s := c.PushConjunct(v)
 
 	val := c.evalState(x, state)
 	if val == nil {

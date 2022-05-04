@@ -323,7 +323,7 @@ func appendToList(a list, err Error) list {
 // The zero value for an list is an empty list ready to use.
 type list []Error
 
-func (p list) Is(err, target error) bool {
+func (p list) Is(target error) bool {
 	for _, e := range p {
 		if errors.Is(e, target) {
 			return true
@@ -332,7 +332,7 @@ func (p list) Is(err, target error) bool {
 	return false
 }
 
-func (p list) As(err error, target interface{}) bool {
+func (p list) As(target interface{}) bool {
 	for _, e := range p {
 		if errors.As(e, target) {
 			return true

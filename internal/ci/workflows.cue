@@ -81,6 +81,7 @@ test: _#bashWorkflow & {
 				},
 				_#goGenerate,
 				_#goTest,
+				_#goCheck,
 				_#goTestRace & {
 					if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 				},
@@ -410,6 +411,18 @@ _#goGenerate: _#step & {
 _#goTest: _#step & {
 	name: "Test"
 	run:  "go test ./..."
+}
+
+_#goCheck: _#step & {
+	// These checks can vary between platforms, as different code can be built
+	// based on GOOS and GOARCH build tags.
+	// However, CUE does not have any such build tags yet, and we don't use
+	// dependencies that vary wildly between platforms.
+	// For now, to save CI resources, just run the checks on one matrix job.
+	// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
+	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+	name: "Check"
+	run:  "go vet ./..."
 }
 
 _#goTestRace: _#step & {

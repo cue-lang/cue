@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73ab1cd8_9d88e750",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-04T18:35:13Z",
+      "side": 1,
+      "message": "CC Marcel in case my assumption about As/Is is wrong.",
+      "revId": "0af91b749424aec8ddf783bd247cd999199d7263",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

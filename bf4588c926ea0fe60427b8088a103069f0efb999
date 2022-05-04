@@ -16,6 +16,24 @@
       "message": "Comment that this case is `terminatedByQuote` OR make it explicit by making it a case and moving wasEscapedNewline to if.\n\nMaking it a separate case will have the additional advantage, I think, that\n1) the `if stripNL` below can be moved to this block, and\n2) the `stripNL` in the terminatedByExpr case above can be removed.\n\nThis simplifies the number of cases the user has to consider.",
       "revId": "bf4588c926ea0fe60427b8088a103069f0efb999",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84a44af2_4d9a0169",
+        "filename": "cue/literal/string.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-04T11:26:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "edf1de39_cd817be8",
+      "revId": "bf4588c926ea0fe60427b8088a103069f0efb999",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

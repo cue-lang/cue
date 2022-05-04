@@ -1,0 +1,136 @@
+-- x.cue --
+inline: small: {
+	f: {
+		n: int
+		out: (f & {"n": n - 1}).out
+	}
+}
+
+inline: medium: {
+	f2:  (f & {n: 2}).out
+	fRec: {nn: int, out: (f & {n: nn}).out}
+	f: {
+		n: int
+		out: (fRec & {nn: n - 1}).out
+	}
+}
+
+inline: patterns: {
+	f: n: (f & {n: {}}).n
+	f: n: {}
+	[string]: {n: {}}
+	f: [string]: {}
+	f: {}
+}
+-- out/compile --
+--- x.cue
+{
+  inline: {
+    small: {
+      f: {
+        n: int
+        out: (〈1;f〉 & {
+          n: (〈1;n〉 - 1)
+        }).out
+      }
+    }
+  }
+  inline: {
+    medium: {
+      f2: (〈0;f〉 & {
+        n: 2
+      }).out
+      fRec: {
+        nn: int
+        out: (〈1;f〉 & {
+          n: 〈1;nn〉
+        }).out
+      }
+      f: {
+        n: int
+        out: (〈1;fRec〉 & {
+          nn: (〈1;n〉 - 1)
+        }).out
+      }
+    }
+  }
+  inline: {
+    patterns: {
+      f: {
+        n: (〈1;f〉 & {
+          n: {}
+        }).n
+      }
+      f: {
+        n: {}
+      }
+      [string]: {
+        n: {}
+      }
+      f: {
+        [string]: {}
+      }
+      f: {}
+    }
+  }
+}
+-- out/eval --
+Errors:
+structural cycle:
+    ./x.cue:4:9
+structural cycle:
+    ./x.cue:10:24
+structural cycle:
+    ./x.cue:18:9
+
+Result:
+(_|_){
+  // [structural cycle]
+  inline: (_|_){
+    // [structural cycle]
+    small: (_|_){
+      // [structural cycle]
+      f: (_|_){
+        // [structural cycle]
+        n: (int){ int }
+        out: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:4:9
+        }
+      }
+    }
+    medium: (_|_){
+      // [structural cycle]
+      f2: (_|_){
+        // [structural cycle] structural cycle:
+        //     ./x.cue:10:24
+      }
+      fRec: (_|_){
+        // [structural cycle]
+        nn: (int){ int }
+        out: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:10:24
+        }
+      }
+      f: (_|_){
+        // [structural cycle]
+        n: (int){ int }
+        out: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:10:24
+        }
+      }
+    }
+    patterns: (_|_){
+      // [structural cycle]
+      f: (_|_){
+        // [structural cycle]
+        n: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:18:9
+        }
+      }
+    }
+  }
+}

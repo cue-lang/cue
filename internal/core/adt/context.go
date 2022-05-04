@@ -285,11 +285,6 @@ func spawn(env *Environment, node *Vertex) *Environment {
 	return &Environment{
 		Up:     env,
 		Vertex: node,
-
-		// Copy cycle data.
-		Cyclic: env.Cyclic,
-		Deref:  env.Deref,
-		Cycles: env.Cycles,
 	}
 }
 

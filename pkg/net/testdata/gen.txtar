@@ -23,6 +23,10 @@ t17: net.ToIP16("127.0.0.1")
 t18: net.IPCIDR("192.168.1.0/24")
 t19: net.IPCIDR("2001:db8:a0b:12f0::1/32")
 t20: net.IPCIDR("172.16.12.3")
+t21: net.PathEscape("foo/bar")
+t22: net.PathUnescape("foo%2Fbar")
+t23: net.QueryEscape("f%o")
+t24: net.QueryUnescape("f%25o")
 -- out/net --
 Errors:
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
@@ -57,4 +61,8 @@ t17: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 127, 0, 0, 1]
 t18: true
 t19: true
 t20: _|_ // t20: error in call to net.IPCIDR: invalid CIDR address: 172.16.12.3
+t21: "foo%2Fbar"
+t22: "foo/bar"
+t23: "f%25o"
+t24: "f%o"
 

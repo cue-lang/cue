@@ -1180,8 +1180,9 @@ func (x *BinaryExpr) Source() ast.Node {
 func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
-		// Anonymous Arc
-		v := &Vertex{Conjuncts: []Conjunct{{env, x, CloseInfo{}}}}
+		v := &Vertex{Conjuncts: []Conjunct{
+			makeAnonymousConjunct(env, x),
+		}}
 		c.Unify(v, Finalized)
 		return v
 	}

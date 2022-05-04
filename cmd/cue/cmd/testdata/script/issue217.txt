@@ -24,7 +24,7 @@ x: {
 #A: string | [#A]
 -- eval-stdout --
 x: {
-    a: string
-    b: string
+    a: string | [string]
+    b: string | [string]
 }
 #A: string

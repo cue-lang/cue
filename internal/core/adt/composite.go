@@ -91,37 +91,6 @@ type Environment struct {
 	// TODO(perf): make the following public fields a shareable struct as it
 	// mostly is going to be the same for child nodes.
 
-	// Cyclic indicates a structural cycle was detected for this conjunct or one
-	// of its ancestors.
-	Cyclic bool
-
-	// Deref keeps track of nodes that should dereference to Vertex. It is used
-	// for detecting structural cycle.
-	//
-	// The detection algorithm is based on Tomabechi's quasi-destructive graph
-	// unification. This detection requires dependencies to be resolved into
-	// fully dereferenced vertices. This is not the case in our algorithm:
-	// the result of evaluating conjuncts is placed into dereferenced vertices
-	// _after_ they are evaluated, but the Environment still points to the
-	// non-dereferenced context.
-	//
-	// In order to be able to detect structural cycles, we need to ensure that
-	// at least one node that is part of a cycle in the context in which
-	// conjunctions are evaluated dereferences correctly.
-	//
-	// The only field necessary to detect a structural cycle, however, is
-	// the Status field of the Vertex. So rather than dereferencing a node
-	// proper, it is sufficient to copy the Status of the dereferenced nodes
-	// to these nodes (will always be EvaluatingArcs).
-	Deref []*Vertex
-
-	// Cycles contains vertices for which cycles are detected. It is used
-	// for tracking self-references within structural cycles.
-	//
-	// Unlike Deref, Cycles is not incremented with child nodes.
-	// TODO: Cycles is always a tail end of Deref, so this can be optimized.
-	Cycles []*Vertex
-
 	cache map[Expr]Value
 }
 
@@ -192,13 +161,6 @@ type Vertex struct {
 
 	// arcType indicates the level of optionality of this arc.
 	arcType arcType
-
-	// EvalCount keeps track of temporary dereferencing during evaluation.
-	// If EvalCount > 0, status should be considered to be EvaluatingArcs.
-	EvalCount int32
-
-	// SelfCount is used for tracking self-references.
-	SelfCount int32
 
 	// BaseValue is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
@@ -331,9 +293,6 @@ func (s VertexStatus) String() string {
 }
 
 func (v *Vertex) Status() VertexStatus {
-	if v.EvalCount > 0 {
-		return EvaluatingArcs
-	}
 	return v.status
 }
 
@@ -748,7 +707,9 @@ func (v *Vertex) addConjunct(c Conjunct) {
 		v.arcType = arcMember
 	}
 	for _, x := range v.Conjuncts {
-		if x == c {
+		// TODO: disregard certain fields from comparison (e.g. Refs)?
+		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo && x.x == c.x {
+			// if x == c {
 			return
 		}
 	}
@@ -766,7 +727,7 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		CloseInfo: ci,
 	}
 	for _, t := range v.Structs {
-		if *t == info {
+		if *t == info { // check for different identity.
 			return t
 		}
 	}

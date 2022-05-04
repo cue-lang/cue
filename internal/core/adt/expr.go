@@ -1189,7 +1189,7 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		v := &Vertex{Conjuncts: []Conjunct{
-			makeAnonymousConjunct(env, x),
+			makeAnonymousConjunct(env, x, c.ci.Refs),
 		}}
 		c.Unify(v, Finalized)
 		return v

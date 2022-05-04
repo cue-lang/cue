@@ -111,6 +111,8 @@ type CloseInfo struct {
 	IsClosed   bool
 	IsOptional bool
 	FieldTypes OptionalType
+
+	CycleInfo
 }
 
 func (c CloseInfo) Location() Node {

@@ -19,6 +19,7 @@ fib: {
 fib2:  (fib & {n: 2}).out
 fib7:  (fib & {n: 7}).out
 fib12: (fib & {n: 12}).out
+
 -- out/def --
 // This indirection is needed to avoid binding references to fib
 // within fib to the instantiated version.
@@ -81,6 +82,8 @@ fib12: 144
 -- out/eval --
 Errors:
 structural cycle:
+    ./in.cue:3:25
+structural cycle:
     ./in.cue:8:9
 
 Result:
@@ -119,10 +122,14 @@ Result:
   fib2: (int){ 1 }
   fib7: (_|_){
     // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+    // structural cycle:
     //     ./in.cue:8:9
   }
   fib12: (_|_){
     // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+    // structural cycle:
     //     ./in.cue:8:9
   }
 }

@@ -237,7 +237,7 @@ func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *ad
 			doms.AddConjunct(c)
 		default:
 			if r, ok := c.Elem().(adt.Resolver); ok {
-				x, _ := t.ctx.Resolve(c.Env, r)
+				x, _ := t.ctx.Resolve(c, r)
 				// Even if this is not a dominator now, descendants will be.
 				if x != nil && x.Label.IsDef() {
 					for _, c := range x.Conjuncts {

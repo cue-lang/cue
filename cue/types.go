@@ -657,7 +657,7 @@ func Dereference(v Value) Value {
 	}
 
 	ctx := v.ctx()
-	n, b := ctx.Resolve(c.Env, r)
+	n, b := ctx.Resolve(c, r)
 	if b != nil {
 		return newErrValue(v, b)
 	}

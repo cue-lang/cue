@@ -810,24 +810,6 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	n.node.UpdateStatus(Finalized)
 }
 
-func assertStructuralCycle(n *nodeContext) bool {
-	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
-		n.node.BaseValue = CombineErrors(nil,
-			n.node.Value(),
-			&Bottom{
-				Code:  StructuralCycleError,
-				Err:   n.ctx.Newf("structural cycle"),
-				Value: n.node.Value(),
-				// TODO: probably, this should have the referenced arc.
-			})
-		// Don't process Arcs. This is mostly to ensure that no Arcs with
-		// an Unprocessed status remain in the output.
-		n.node.Arcs = nil
-		return true
-	}
-	return false
-}
-
 // TODO: this is now a sentinel. Use a user-facing error that traces where
 // the cycle originates.
 var cycle = &Bottom{
@@ -1634,45 +1616,6 @@ func isDef(x Expr) bool {
 	return false
 }
 
-// updateCyclicStatus looks for proof of non-cyclic conjuncts to override
-// a structural cycle.
-func (n *nodeContext) updateCyclicStatus(env *Environment) {
-	if env == nil || !env.Cyclic {
-		n.hasNonCycle = true
-	}
-}
-
-func updateCyclic(c Conjunct, cyclic bool, deref *Vertex, a []*Vertex) Conjunct {
-	env := c.Env
-	switch {
-	case env == nil:
-		if !cyclic && deref == nil {
-			return c
-		}
-		env = &Environment{Cyclic: cyclic}
-	case deref == nil && env.Cyclic == cyclic && len(a) == 0:
-		return c
-	default:
-		// The conjunct may still be in use in other fields, so we should
-		// make a new copy to mark Cyclic only for this case.
-		e := *env
-		e.Cyclic = e.Cyclic || cyclic
-		env = &e
-	}
-	if deref != nil || len(a) > 0 {
-		cp := make([]*Vertex, 0, len(a)+1)
-		cp = append(cp, a...)
-		if deref != nil {
-			cp = append(cp, deref)
-		}
-		env.Deref = cp
-	}
-	if deref != nil {
-		env.Cycles = append(env.Cycles, deref)
-	}
-	return MakeConjunct(env, c.Elem(), c.CloseInfo)
-}
-
 func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) {
 	n.updateCyclicStatus(env)
 
@@ -1903,13 +1846,6 @@ func (n *nodeContext) addStruct(
 	// an Environment linked to the current node. Together with the De Bruijn
 	// indices, this determines to which Vertex a reference resolves.
 
-	// TODO(perf): consider using environment cache:
-	// var childEnv *Environment
-	// for _, s := range n.nodeCache.sub {
-	// 	if s.Up == env {
-	// 		childEnv = s
-	// 	}
-	// }
 	childEnv := &Environment{
 		Up:     env,
 		Vertex: n.node,

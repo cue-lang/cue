@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "528937aa_35e9374f",
+        "filename": "pkg/strconv/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-04T11:31:40Z",
+      "side": 1,
+      "message": "Yes, technically, but in practice we only allow exactly the int values that are OK. We could be more defensive if you\u0027d prefer, but I\u0027m not sure it\u0027s worth it. WDYT?\n\nI added a comment in the meantime.",
+      "parentUuid": "9796ee06_883bea17",
+      "revId": "cb7afb3beca7a7362ef863288e334e05439ac48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b862d4f8_549f5a1c",
         "filename": "pkg/strconv/manual.go",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2022-05-03T22:01:42Z",
       "side": 1,
       "message": "s/adt.TopKind/adt.IntKind|adt.StringKind/ ?",
+      "revId": "cb7afb3beca7a7362ef863288e334e05439ac48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b63c492_4123eb6b",
+        "filename": "pkg/strconv/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-04T11:31:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b862d4f8_549f5a1c",
       "revId": "cb7afb3beca7a7362ef863288e334e05439ac48c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

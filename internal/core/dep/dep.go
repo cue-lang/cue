@@ -228,7 +228,7 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 		return
 	}
 
-	if ref, _ := c.ctxt.Resolve(env, r); ref != nil {
+	if ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r); ref != nil {
 		if ref != c.node && ref != empty {
 			d := Dependency{
 				Node:      ref,

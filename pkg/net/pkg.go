@@ -225,5 +225,53 @@ var pkg = &internal.Package{
 				c.Ret, c.Err = IPString(ip)
 			}
 		},
+	}, {
+		Name: "PathEscape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret = PathEscape(s)
+			}
+		},
+	}, {
+		Name: "PathUnescape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = PathUnescape(s)
+			}
+		},
+	}, {
+		Name: "QueryEscape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret = QueryEscape(s)
+			}
+		},
+	}, {
+		Name: "QueryUnescape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			s := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = QueryUnescape(s)
+			}
+		},
 	}},
 }

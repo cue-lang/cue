@@ -105,7 +105,7 @@ func TestX(t *testing.T) {
 module: "mod.test"
 
 -- in.cue --
-	`
+`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
 		t.Skip()
@@ -126,8 +126,8 @@ module: "mod.test"
 
 	// t.Error(debug.NodeString(r, v, nil))
 	// eval.Debug = true
-
 	adt.Verbosity = 1
+
 	e := eval.New(r)
 	ctx := e.NewContext(v)
 	v.Finalize(ctx)

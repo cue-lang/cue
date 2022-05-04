@@ -204,9 +204,9 @@ func (s *scope) insert(name string, n, link ast.Node) {
 				if _, ok := existing.node.(*ast.ImportSpec); ok {
 					return
 					// TODO:
-					s.errFn(n.Pos(), "conflicting declaration %s\n"+
-						"\tprevious declaration at %s",
-						name, existing.node.Pos())
+					// s.errFn(n.Pos(), "conflicting declaration %s\n"+
+					// 	"\tprevious declaration at %s",
+					// 	name, existing.node.Pos())
 				} else {
 					s.errFn(n.Pos(), "alias %q redeclared in same scope", name)
 				}

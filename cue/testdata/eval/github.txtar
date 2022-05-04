@@ -58,7 +58,7 @@ test: _#bashWorkflow & {
 			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#earlyChecks, _#cacheGoModules, _#step & {
 				if:  "${{ \(_#isMaster) }}"
 				run: "echo CUE_LONG=true >> $GITHUB_ENV"
-			}, _#goGenerate, _#goTest, _#goTestRace & {
+			}, _#goGenerate, _#goTest, _#goCheck, _#goTestRace & {
 				if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 			}, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
 		}
@@ -324,6 +324,17 @@ _#goGenerate: _#step & {
 _#goTest: _#step & {
 	name: "Test"
 	run:  "go test ./..."
+}
+_#goCheck: _#step & {
+	// These checks can vary between platforms, as different code can be built
+	// based on GOOS and GOARCH build tags.
+	// However, CUE does not have any such build tags yet, and we don't use
+	// dependencies that vary wildly between platforms.
+	// For now, to save CI resources, just run the checks on one matrix job.
+	// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
+	if:   "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+	name: "Check"
+	run:  "go vet ./..."
 }
 _#goTestRace: _#step & {
 	name: "Test with -race"
@@ -1150,20 +1161,25 @@ import "strings"
                 run: (string){ "go test ./..." }
               }
               8: (#struct){
+                if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
+                name: (string){ "Check" }
+                run: (string){ "go vet ./..." }
+              }
+              9: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
                 if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}" }
               }
-              9: (#struct){
+              10: (#struct){
                 name: (string){ "Check that git is clean post generate and tests" }
                 run: (string){ "test -z \"$(git status --porcelain)\" || (git status; git diff; false)" }
               }
-              10: (#struct){
+              11: (#struct){
                 name: (string){ "Pull this commit through the proxy on master" }
                 run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
                 if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
               }
-              11: (#struct){
+              12: (#struct){
                 if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
                 name: (string){ "Post any failures for this matrix entry" }
                 run: (string){ "curl -f -s -n -H \"Content-Type: application/json\" --request POST --data \"{\\\"tag\\\":\\\"trybot\\\",\\\"message\\\":\\\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\\\",\\\"labels\\\":{\\\"TryBot-Result\\\":-1}}\" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
@@ -1667,20 +1683,25 @@ import "strings"
             run: (string){ "go test ./..." }
           }
           8: (#struct){
+            if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
+            name: (string){ "Check" }
+            run: (string){ "go vet ./..." }
+          }
+          9: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
             if: (string){ "${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}" }
           }
-          9: (#struct){
+          10: (#struct){
             name: (string){ "Check that git is clean post generate and tests" }
             run: (string){ "test -z \"$(git status --porcelain)\" || (git status; git diff; false)" }
           }
-          10: (#struct){
+          11: (#struct){
             name: (string){ "Pull this commit through the proxy on master" }
             run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
             if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
           }
-          11: (#struct){
+          12: (#struct){
             if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
             name: (string){ "Post any failures for this matrix entry" }
             run: (string){ "curl -f -s -n -H \"Content-Type: application/json\" --request POST --data \"{\\\"tag\\\":\\\"trybot\\\",\\\"message\\\":\\\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\\\",\\\"labels\\\":{\\\"TryBot-Result\\\":-1}}\" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
@@ -2173,6 +2194,11 @@ import "strings"
     name: (string){ "Test" }
     run: (string){ "go test ./..." }
   }
+  _#goCheck(:ci): (#struct){
+    if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
+    name: (string){ "Check" }
+    run: (string){ "go vet ./..." }
+  }
   _#goTestRace(:ci): (#struct){
     name: (string){ "Test with -race" }
     run: (string){ "go test -race ./..." }
@@ -2259,6 +2285,7 @@ import "strings"
           }),
           〈4;_#goGenerate〉,
           〈4;_#goTest〉,
+          〈4;_#goCheck〉,
           (〈4;_#goTestRace〉 & {
             if: "${{ matrix.go-version == '\(〈5;_#latestStableGo〉)' && matrix.os == '\(〈5;_#linuxMachine〉)' }}"
           }),
@@ -2549,6 +2576,11 @@ import "strings"
   _#goTest: (〈0;_#step〉 & {
     name: "Test"
     run: "go test ./..."
+  })
+  _#goCheck: (〈0;_#step〉 & {
+    if: "matrix.go-version == '\(〈1;_#latestStableGo〉)' && matrix.os == '\(〈1;_#linuxMachine〉)'"
+    name: "Check"
+    run: "go vet ./..."
   })
   _#goTestRace: (〈0;_#step〉 & {
     name: "Test with -race"

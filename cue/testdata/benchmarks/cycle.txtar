@@ -1,0 +1,60 @@
+-- in.cue --
+sameValues: SmustBeF: {
+	T: string | F
+	F: x: T
+	S: F
+}
+
+sameValues: CmustBeA: {
+	A: x: [ string | A ]
+	C: A
+}
+-- out/compile --
+--- in.cue
+{
+  sameValues: {
+    SmustBeF: {
+      T: (string|〈0;F〉)
+      F: {
+        x: 〈1;T〉
+      }
+      S: 〈0;F〉
+    }
+  }
+  sameValues: {
+    CmustBeA: {
+      A: {
+        x: [
+          (string|〈2;A〉),
+        ]
+      }
+      C: 〈0;A〉
+    }
+  }
+}
+-- out/eval --
+(struct){
+  sameValues: (struct){
+    SmustBeF: (struct){
+      T: (string){ string }
+      F: (struct){
+        x: (string){ string }
+      }
+      S: (struct){
+        x: (string){ string }
+      }
+    }
+    CmustBeA: (struct){
+      A: (struct){
+        x: (#list){
+          0: (string){ string }
+        }
+      }
+      C: (struct){
+        x: (#list){
+          0: (string){ string }
+        }
+      }
+    }
+  }
+}

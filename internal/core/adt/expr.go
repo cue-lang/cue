@@ -888,7 +888,11 @@ func (x *LetReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 		panic("nil expression")
 	}
 	// Anonymous arc.
-	return &Vertex{Parent: nil, Label: label, Conjuncts: []Conjunct{{e, x.X, CloseInfo{}}}}
+	return &Vertex{
+		Parent:    e.Vertex,
+		Label:     label,
+		Conjuncts: []Conjunct{{e, x.X, CloseInfo{}}},
+	}
 }
 
 func (x *LetReference) evaluate(c *OpContext) Value {
@@ -1189,7 +1193,7 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		v := &Vertex{Conjuncts: []Conjunct{
-			makeAnonymousConjunct(env, x),
+			makeAnonymousConjunct(env, x, c.ci.Refs),
 		}}
 		c.Unify(v, Finalized)
 		return v

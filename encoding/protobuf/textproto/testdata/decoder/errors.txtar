@@ -1,5 +1,5 @@
-# The error in input.textproto (wrong comment style) is going undetected.
-# This is a protobuf bug. Can't do much about it.
+# The textpbfmt library spots the error (wrong comment style),
+# but note how its error message is somewhat confusing.
 -- errors.cue --
 a: int
 -- input.textproto --
@@ -8,4 +8,4 @@ a: int
 a: 1
 
 -- out/decode --
-
+textproto: parser encountered unexpected : character (should be whitespace, or a ,; separator)

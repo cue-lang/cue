@@ -73,6 +73,7 @@ a: "dsfadsafsaf" // line comment
 // doc comment b
 b: [
 	// pre-elem comment
+	// doc elem 0
 	123, // elem 0 line comment
 
 	// trailing elem 0

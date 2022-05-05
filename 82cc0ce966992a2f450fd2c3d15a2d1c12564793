@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "952ce697_f3a8d662",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-05T13:22:25Z",
+      "side": 1,
+      "message": "cc Marcel to review dependency bump.",
+      "revId": "82cc0ce966992a2f450fd2c3d15a2d1c12564793",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

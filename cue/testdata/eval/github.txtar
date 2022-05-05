@@ -250,12 +250,6 @@ _#step: ((_#job & {
 	steps: _
 }).steps & [_])[0]
 
-// We use the oldest supported Go version for code generation.
-// TODO(mvdan): now that we don't use qgo via go:generate,
-// we should try to use latestStableGo for code generation,
-// which is closer to how developers will run go generate.
-_#codeGenGo: "1.16.x"
-
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
 _#latestStableGo: "1.18.x"
@@ -270,7 +264,7 @@ _#windowsMachine:  "windows-2022"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": [_#codeGenGo, "1.17.x", _#latestStableGo]
+		"go-version": ["1.17.x", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -319,7 +313,7 @@ _#goGenerate: _#step & {
 	run:  "go generate ./..."
 	// The Go version corresponds to the precise version specified in
 	// the matrix. Skip windows for now until we work out why re-gen is flaky
-	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os == '\(_#linuxMachine)'"
+	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 }
 _#goTest: _#step & {
 	name: "Test"
@@ -1105,9 +1099,8 @@ import "strings"
               "fail-fast": (bool){ false }
               matrix: (#struct){
                 "go-version": (#list){
-                  0: (string){ "1.16.x" }
-                  1: (string){ "1.17.x" }
-                  2: (string){ "1.18.x" }
+                  0: (string){ "1.17.x" }
+                  1: (string){ "1.18.x" }
                 }
                 os: (#list){
                   0: (string){ "ubuntu-20.04" }
@@ -1154,7 +1147,7 @@ import "strings"
               6: (#struct){
                 name: (string){ "Generate" }
                 run: (string){ "go generate ./..." }
-                if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
+                if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
               }
               7: (#struct){
                 name: (string){ "Test" }
@@ -1627,9 +1620,8 @@ import "strings"
           "fail-fast": (bool){ false }
           matrix: (#struct){
             "go-version": (#list){
-              0: (string){ "1.16.x" }
-              1: (string){ "1.17.x" }
-              2: (string){ "1.18.x" }
+              0: (string){ "1.17.x" }
+              1: (string){ "1.18.x" }
             }
             os: (#list){
               0: (string){ "ubuntu-20.04" }
@@ -1676,7 +1668,7 @@ import "strings"
           6: (#struct){
             name: (string){ "Generate" }
             run: (string){ "go generate ./..." }
-            if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
+            if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
           }
           7: (#struct){
             name: (string){ "Test" }
@@ -2139,7 +2131,6 @@ import "strings"
   }
   _#step(:ci): (#struct){
   }
-  _#codeGenGo(:ci): (string){ "1.16.x" }
   _#latestStableGo(:ci): (string){ "1.18.x" }
   _#pinnedReleaseGo(:ci): (string){ "1.18.1" }
   _#linuxMachine(:ci): (string){ "ubuntu-20.04" }
@@ -2149,9 +2140,8 @@ import "strings"
     "fail-fast": (bool){ false }
     matrix: (#struct){
       "go-version": (#list){
-        0: (string){ "1.16.x" }
-        1: (string){ "1.17.x" }
-        2: (string){ "1.18.x" }
+        0: (string){ "1.17.x" }
+        1: (string){ "1.18.x" }
       }
       os: (#list){
         0: (string){ "ubuntu-20.04" }
@@ -2188,7 +2178,7 @@ import "strings"
   _#goGenerate(:ci): (#struct){
     name: (string){ "Generate" }
     run: (string){ "go generate ./..." }
-    if: (string){ "matrix.go-version == '1.16.x' && matrix.os == 'ubuntu-20.04'" }
+    if: (string){ "matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'" }
   }
   _#goTest(:ci): (#struct){
     name: (string){ "Test" }
@@ -2522,7 +2512,6 @@ import "strings"
   }).steps & [
     _,
   ])[0]
-  _#codeGenGo: "1.16.x"
   _#latestStableGo: "1.18.x"
   _#pinnedReleaseGo: "1.18.1"
   _#linuxMachine: "ubuntu-20.04"
@@ -2532,7 +2521,6 @@ import "strings"
     "fail-fast": false
     matrix: {
       "go-version": [
-        〈3;_#codeGenGo〉,
         "1.17.x",
         〈3;_#latestStableGo〉,
       ]
@@ -2571,7 +2559,7 @@ import "strings"
   _#goGenerate: (〈0;_#step〉 & {
     name: "Generate"
     run: "go generate ./..."
-    if: "matrix.go-version == '\(〈1;_#codeGenGo〉)' && matrix.os == '\(〈1;_#linuxMachine〉)'"
+    if: "matrix.go-version == '\(〈1;_#latestStableGo〉)' && matrix.os == '\(〈1;_#linuxMachine〉)'"
   })
   _#goTest: (〈0;_#step〉 & {
     name: "Test"

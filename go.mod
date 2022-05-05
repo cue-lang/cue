@@ -4,14 +4,14 @@ go 1.17
 
 require (
 	github.com/cockroachdb/apd/v2 v2.0.1
-	github.com/emicklei/proto v1.6.15
-	github.com/google/go-cmp v0.4.0
+	github.com/emicklei/proto v1.10.0
+	github.com/google/go-cmp v0.5.7
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.2.0
 	github.com/kr/pretty v0.1.0
 	github.com/kylelemons/godebug v1.1.0
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
-	github.com/protocolbuffers/txtpbfmt v0.0.0-20201118171849-f6a6b3f636fc
+	github.com/protocolbuffers/txtpbfmt v0.0.0-20220428173112-74888fd59c2b
 	github.com/rogpeppe/go-internal v1.8.1
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
@@ -29,6 +29,7 @@ require (
 	github.com/inconshreveable/mousetrap v1.0.0 // indirect
 	github.com/kr/text v0.1.0 // indirect
 	github.com/lib/pq v1.0.0 // indirect
+	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
 	github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect

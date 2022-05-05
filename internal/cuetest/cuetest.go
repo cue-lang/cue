@@ -79,7 +79,6 @@ var FormatTxtar = os.Getenv(envFormatTxtar) != ""
 // [cuelang.org/issue/N] - evaluates to true unless CUE_NON_ISSUES
 // is set to a regexp that matches the condition, i.e. cuelang.org/issue/N
 // in this case
-//
 func Condition(cond string) (bool, error) {
 	isIssue, nonIssue, err := checkIssueCondition(cond)
 	if err != nil {
@@ -98,6 +97,8 @@ func Condition(cond string) (bool, error) {
 // IssueSkip causes the test t to be skipped unless the issue identified
 // by s is deemed to be a non-issue by CUE_NON_ISSUES.
 func IssueSkip(t *testing.T, s string) {
+	t.Helper()
+
 	isIssue, nonIssue, err := checkIssueCondition(s)
 	if err != nil {
 		t.Fatal(err)

@@ -16,6 +16,23 @@
       "message": "CC Marcel in case my assumption about As/Is is wrong.",
       "revId": "0af91b749424aec8ddf783bd247cd999199d7263",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9ff6768_4e8125ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-05T11:53:44Z",
+      "side": 1,
+      "message": "LGTM thanks!",
+      "revId": "0af91b749424aec8ddf783bd247cd999199d7263",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

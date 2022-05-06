@@ -176,8 +176,8 @@ that matches the commit author. This line asserts the Developer Certificate of O
 
 When committing, use the `--signoff` (or `-s`) flag:
 
-```
-git commit -s
+```console
+$ git commit -s
 ```
 
 You can also [set up a prepare-commit-msg git
@@ -222,13 +222,13 @@ is extensive so we will not cover that ground here.
 Before making any changes it's a good idea to verify that you have a stable
 baseline by running the tests:
 
-```
+```console
 $ go test ./...
 ```
 
 Then make your planned changes and create a commit from the staged changes:
 
-```
+```console
 # Edit files
 $ git add file1 file2
 $ git commit -s
@@ -243,7 +243,7 @@ You’ve written and tested your code, but before sending code out for review, r
 all the tests from the root of the repository to ensure the changes don’t break
 other packages or programs:
 
-```
+```console
 $ go test ./...
 ```
 
@@ -272,7 +272,7 @@ The easiest way to maintain a single commit is to amend an existing commit.
 Rather misleadingly, this doesn't actually amend a commit, but instead creates a
 new commit which is the result of combining the last commit and any new changes:
 
-```
+```console
 # PR is submitted, feedback received. Time to make some changes!
 
 $ git add file1 file2   # stage the files we have added/removed/changed
@@ -342,14 +342,14 @@ using your chosen e-mail address.  You can either configure Git globally (as a
 default for all projects), or locally (for a single specific project).  You can
 check the current configuration with this command:
 
-```
+```console
 $ git config --global user.email  # check current global config
 $ git config user.email           # check current local config
 ```
 
 To change the configured address:
 
-```
+```console
 $ git config --global user.email name@example.com   # change global config
 $ git config user.email name@example.com            # change local config
 ```
@@ -389,7 +389,7 @@ changes to Gerrit.
 
 Install the `git-codereview` command by running,
 
-```
+```console
 $ go install golang.org/x/review/git-codereview@master
 ```
 
@@ -397,7 +397,7 @@ Make sure `git-codereview` is installed in your shell `PATH`, so that the
 `git` command can find it.
 Check that
 
-```
+```console
 $ git codereview help
 ```
 
@@ -412,7 +412,8 @@ directory.
 
 Visit https://review.gerrithub.io/admin/repos/cue-lang/cue, then click "SSH" or
 "HTTP" depending on which authentication mechanism you configured in step 2.
-Then copy and run the corresponding "Clone" command.
+Then copy and run the corresponding "Clone" command. Make sure not to use
+"ANONYMOUS HTTP", as that will not work with `git-codereview` command. 
 
 ## Sending a change via GerritHub
 
@@ -425,7 +426,7 @@ changes.
 
 With a working directory of your local clone of the CUE repository, run the tests:
 
-```
+```console
 $ go test ./...
 ```
 
@@ -435,7 +436,7 @@ Each CUE change must be made in a branch, created from the `master` branch.  You
 can use the normal `git` commands to create a branch and stage changes:
 
 
-```
+```console
 $ git checkout -b mybranch
 $ [edit files...]
 $ git add [files...]
@@ -444,13 +445,13 @@ $ git add [files...]
 To commit changes, instead of `git commit -s`, use `git codereview change -s`.
 
 
-```
+```console
 $ git codereview change -s
 (opens $EDITOR)
 ```
 
 You can edit the commit description in your favorite editor as usual.  The
-`git` `codereview` `change` command will automatically add a unique Change-Id
+`git codereview change` command will automatically add a unique Change-Id
 line near the bottom.  That line is used by Gerrit to match successive uploads
 of the same change.  Do not edit or delete it.  A Change-Id looks like this:
 
@@ -459,8 +460,8 @@ of the same change.  Do not edit or delete it.  A Change-Id looks like this:
 Change-Id: I2fbdbffb3aab626c4b6f56348861b7909e3e8990
 ```
 
-The tool also checks that you've run `go` `fmt` over the source code, and that
-the commit message follows the suggested format.
+The `git-codereview` command also checks that you've run `go fmt` over the
+source code, and that the commit message follows the suggested format.
 
 
 If you need to edit the files again, you can stage the new changes and re-run
@@ -483,7 +484,7 @@ all the tests for the whole tree to ensure the changes don't break other
 packages or programs:
 
 
-```
+```console
 $ go test ./...
 ```
 
@@ -495,7 +496,7 @@ This is done with the `mail` sub-command which, despite its name, doesn't
 directly mail anything; it just sends the change to Gerrit:
 
 
-```
+```console
 $ git codereview mail
 ```
 
@@ -509,7 +510,7 @@ remote:   https://review.gerrithub.io/99999 math: improved Sin, Cos and Tan prec
 ```
 
 If you get an error instead, see the ["Troubleshooting mail
-errors"](#troubleshotting-mail-errors).
+errors"](#troubleshooting-gerrithub-mail-errors).
 
 
 ### Step 5: Revise changes after a review
@@ -526,7 +527,7 @@ branch you previously created, add them to the Git staging area, and then amend
 the commit with `git codereview change`:
 
 
-```
+```console
 $ git codereview change -s     # amend current commit
 (open $EDITOR)
 $ git codereview mail          # send new changes to Gerrit
@@ -780,7 +781,7 @@ Do not update the copyright year on files that you change.
 
 ### Troubleshooting GerritHub mail errors
 
-The most common way that the `git` `codereview` `mail` command fails is because
+The most common way that the `git codereview mail` command fails is because
 the e-mail address in the commit does not match the one that you used during the
 registration process.
 
@@ -800,21 +801,21 @@ registered with.  To change the e-mail address to ensure this doesn't happen
 again, run:
 
 
-```
+```console
 $ git config user.email email@address.com
 ```
 
 Then change the commit to use this alternative e-mail address with this command:
 
 
-```
+```console
 $ git commit --amend --author="Author Name &lt;email@address.com&gt;"
 ```
 
 Then retry by running:
 
 
-```
+```console
 $ git codereview mail
 ```
 
@@ -834,7 +835,7 @@ install` will be installed in the `bin/go` in your home directory by default.
 If you're changing the CUE APIs or code, you can test the results in just
 this package directory.
 
-```
+```console
 $ cd $CUEDIR/cue
 $ [make changes...]
 $ go test
@@ -843,7 +844,7 @@ $ go test
 You don't need to build a new cue tool to test it.
 Instead you can run the tests from the root.
 
-```
+```console
 $ cd $CUEDIR
 $ go test ./...
 ```
@@ -857,7 +858,7 @@ You can specify a reviewer or CC interested parties using the `-r` or `-cc`
 options.  Both accept a comma-separated list of e-mail addresses:
 
 
-```
+```console
 $ git codereview mail -r joe@cuelang.org -cc mabel@example.com,math-nuts@swtch.com
 ```
 
@@ -868,12 +869,12 @@ While you were working, others might have submitted changes to the repository.
 To update your local branch, run
 
 
-```
+```console
 $ git codereview sync
 ```
 
 (Under the covers this runs
-`git` `pull` `-r`.)
+`git pull -r`.)
 
 
 
@@ -888,7 +889,7 @@ right corner, copy the "Checkout" command and run it from your local Git repo.
 It will look something like this:
 
 
-```
+```console
 $ git fetch https://review.gerrithub.io/a/cue-lang/cue refs/changes/67/519567/1 && git checkout FETCH_HEAD
 ```
 
@@ -901,7 +902,7 @@ The `git-codereview` command can be run directly from the shell
 by typing, for instance,
 
 
-```
+```console
 $ git codereview sync
 ```
 
@@ -909,7 +910,7 @@ but it is more convenient to set up aliases for `git-codereview`'s own
 subcommands, so that the above becomes,
 
 
-```
+```console
 $ git sync
 ```
 
@@ -941,7 +942,7 @@ To send out a group of dependent changes, keep each change as a different commit
 under the same branch, and then run:
 
 
-```
+```console
 $ git codereview mail HEAD
 ```
 

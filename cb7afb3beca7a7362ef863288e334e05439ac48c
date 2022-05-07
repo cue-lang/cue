@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "533750e4_92f31d46",
+        "filename": "pkg/strconv/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-07T10:30:21Z",
+      "side": 1,
+      "message": "there is already a test case for that AFAICS.",
+      "parentUuid": "158ccfa9_8c58dbe0",
+      "revId": "cb7afb3beca7a7362ef863288e334e05439ac48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b862d4f8_549f5a1c",

@@ -123,6 +123,21 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "FormatFloat",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			f, fmt, prec, bitSize := c.Float64(0), c.Byte(1), c.Int(2), c.Int(3)
+			if c.Do() {
+				c.Ret = FormatFloat(f, fmt, prec, bitSize)
+			}
+		},
+	}, {
 		Name: "FormatUint",
 		Params: []internal.Param{
 			{Kind: adt.IntKind},

@@ -8,23 +8,20 @@ t2: strconv.FormatFloat(3.02, 300, 4, 64)
 t3: strconv.FormatFloat(3.02, -1, 4, 64)
 t4: strconv.FormatFloat(3.02, 1.0, 4, 64)
 t5: strconv.FormatBool(true)
-t6: strconv.FormatFloat(3.5, "g", -1, 64)
-t7: strconv.FormatFloat(3.5, 102, 3, 64)
 -- out/strconv --
 Errors:
-t2: cannot use 300 as "b" | "e" | "E" | "f" | "g" | "G" | "x" | "X" | 98 | 101 | 69 | 102 | 103 | 71 | 120 | 88 in argument 2 to strconv.FormatFloat:
-    ./in.cue:4:31
-t3: cannot use -1 as "b" | "e" | "E" | "f" | "g" | "G" | "x" | "X" | 98 | 101 | 69 | 102 | 103 | 71 | 120 | 88 in argument 2 to strconv.FormatFloat:
+t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
+    ./in.cue:4:5
+t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat:
+    ./in.cue:5:5
     ./in.cue:5:31
-t4: cannot use 1.0 (type float) as (int|string) in argument 2 to strconv.FormatFloat:
+t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
     ./in.cue:6:31
 
 Result:
 t1: "40"
-t2: _|_ // t2: cannot use 300 as "b" | "e" | "E" | "f" | "g" | "G" | "x" | "X" | 98 | 101 | 69 | 102 | 103 | 71 | 120 | 88 in argument 2 to strconv.FormatFloat
-t3: _|_ // t3: cannot use -1 as "b" | "e" | "E" | "f" | "g" | "G" | "x" | "X" | 98 | 101 | 69 | 102 | 103 | 71 | 120 | 88 in argument 2 to strconv.FormatFloat
-t4: _|_ // t4: cannot use 1.0 (type float) as (int|string) in argument 2 to strconv.FormatFloat
+t2: _|_ // t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat
+t3: _|_ // t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
+t4: _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
 t5: "true"
-t6: "3.5"
-t7: "3.500"
 

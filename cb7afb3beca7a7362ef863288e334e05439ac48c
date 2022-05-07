@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "158ccfa9_8c58dbe0",
+        "filename": "pkg/strconv/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-05-07T08:58:39Z",
+      "side": 1,
+      "message": "Ah, I see. No real need to be defensive if it is otherwise checked. Perhaps add a test for that case.",
+      "parentUuid": "528937aa_35e9374f",
+      "revId": "cb7afb3beca7a7362ef863288e334e05439ac48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b862d4f8_549f5a1c",
         "filename": "pkg/strconv/manual.go",
         "patchSetId": 2

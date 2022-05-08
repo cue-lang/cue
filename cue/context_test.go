@@ -16,7 +16,6 @@ package cue_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -99,7 +98,7 @@ bar: [
 `
 
 	a := txtar.Parse([]byte(in))
-	dir, _ := ioutil.TempDir("", "*")
+	dir := t.TempDir()
 	instance := cuetxtar.Load(a, dir)[0]
 	if instance.Err != nil {
 		t.Fatal(instance.Err)
@@ -125,7 +124,7 @@ bar: [
 `
 
 	a := txtar.Parse([]byte(in))
-	dir, _ := ioutil.TempDir("", "*")
+	dir := t.TempDir()
 	instance := cuetxtar.Load(a, dir)[0]
 
 	// Normally, this should be checked, however, this is explicitly

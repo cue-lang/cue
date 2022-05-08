@@ -48,11 +48,7 @@ func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
 		perm    = 0700
 	)
 
-	tmp, err := ioutil.TempDir("", "testWinSplitListTestIsValid")
-	if err != nil {
-		t.Fatalf("TempDir failed: %v", err)
-	}
-	defer goos.RemoveAll(tmp)
+	tmp := t.TempDir()
 
 	for i, d := range tt.result {
 		if d == "" {

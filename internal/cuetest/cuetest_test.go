@@ -1,7 +1,6 @@
 package cuetest
 
 import (
-	"os"
 	"testing"
 )
 
@@ -30,7 +29,7 @@ func TestCondition(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			os.Setenv(envNonIssues, c.env)
+			t.Setenv(envNonIssues, c.env)
 			got, err := Condition(c.con)
 			if got != c.want {
 				t.Errorf("expected %v; got %v", c.want, got)
@@ -85,7 +84,7 @@ func TestCheckIssueCondition(t *testing.T) {
 	}
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			os.Setenv(envNonIssues, c.env)
+			t.Setenv(envNonIssues, c.env)
 			isIssue, nonIssue, err := checkIssueCondition(c.con)
 			if isIssue != c.isIssue {
 				t.Errorf("expected isIssue %v; got %v", c.isIssue, isIssue)

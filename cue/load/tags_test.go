@@ -16,8 +16,6 @@ package load
 
 import (
 	"bytes"
-	"io/ioutil"
-	"os"
 	"path/filepath"
 	"testing"
 
@@ -43,8 +41,7 @@ func stringVar(s string) TagVar {
 }
 
 func TestTags(t *testing.T) {
-	dir, _ := ioutil.TempDir("", "")
-	defer os.RemoveAll(dir)
+	dir := t.TempDir()
 
 	testCases := []struct {
 		in  string

@@ -41,7 +41,7 @@ func TestGetenv(t *testing.T) {
 		{"CUEOSTESTNUMD", "not a num"},
 		{"CUEOSTESTMULTI", "10"},
 	} {
-		os.Setenv(p[0], p[1])
+		t.Setenv(p[0], p[1])
 	}
 
 	config := `{

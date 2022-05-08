@@ -16,7 +16,6 @@ package cue_test
 
 import (
 	"bytes"
-	"io/ioutil"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -163,7 +162,7 @@ _d: 3
 		`
 
 	a := txtar.Parse([]byte(in))
-	dir, _ := ioutil.TempDir("", "*")
+	dir := t.TempDir()
 	instance := cuetxtar.Load(a, dir)[0]
 	if instance.Err != nil {
 		t.Fatal(instance.Err)

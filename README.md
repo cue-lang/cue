@@ -54,7 +54,6 @@ data can be simplified by removing values implied by such detailed definitions.
 The merging of these two concepts enables
 many tasks to be handled in a principled way.
 
-
 Constraints provide a simple and well-defined, yet powerful, alternative
 to inheritance,
 a common source of complexity with configuration languages.

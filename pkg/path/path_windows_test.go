@@ -48,11 +48,7 @@ func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
 		perm    = 0700
 	)
 
-	tmp, err := ioutil.TempDir("", "testWinSplitListTestIsValid")
-	if err != nil {
-		t.Fatalf("TempDir failed: %v", err)
-	}
-	defer goos.RemoveAll(tmp)
+	tmp := t.TempDir()
 
 	for i, d := range tt.result {
 		if d == "" {
@@ -68,12 +64,12 @@ func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
 			t.Errorf("%d,%d: %#q already exists", ti, i, d)
 			return
 		}
-		if err = goos.MkdirAll(dd, perm); err != nil {
+		if err := goos.MkdirAll(dd, perm); err != nil {
 			t.Errorf("%d,%d: MkdirAll(%#q) failed: %v", ti, i, dd, err)
 			return
 		}
 		fn, data := Join([]string{dd, cmdfile}, Windows), []byte("@echo "+d+"\r\n")
-		if err = ioutil.WriteFile(fn, data, perm); err != nil {
+		if err := ioutil.WriteFile(fn, data, perm); err != nil {
 			t.Errorf("%d,%d: WriteFile(%#q) failed: %v", ti, i, fn, err)
 			return
 		}

@@ -131,9 +131,7 @@ func TestX(t *testing.T) {
 		}
 	}
 
-	tmpdir, err := ioutil.TempDir("", "cue-script")
-	check(err)
-	defer os.Remove(tmpdir)
+	tmpdir := t.TempDir()
 
 	a, err := txtar.ParseFile(filepath.FromSlash(path))
 	check(err)

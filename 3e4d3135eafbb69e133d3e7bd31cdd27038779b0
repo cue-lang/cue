@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1edd82b6_ba56f0d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-09T14:02:24Z",
+      "side": 1,
+      "message": "LGTM with one vague gripe that can be fixed any time...",
+      "revId": "3e4d3135eafbb69e133d3e7bd31cdd27038779b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8903d73c_9241c6ea",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 837,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-09T14:02:24Z",
+      "side": 1,
+      "message": "FWIW I\u0027d love to see a doc comment on one of these `Logf` methods. This one maybe not so important because it\u0027s just a simple wrapper, but it would be nice to know roughly what `OpContext.Logf` is supposed to do without tracing through the code.",
+      "range": {
+        "startLine": 837,
+        "startChar": 0,
+        "endLine": 837,
+        "endChar": 64
+      },
+      "revId": "3e4d3135eafbb69e133d3e7bd31cdd27038779b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

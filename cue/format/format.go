@@ -249,7 +249,7 @@ func init() {
 
 func (f *formatter) print(a ...interface{}) {
 	for _, x := range a {
-		f.Print(x)
+		f.Print(x, f.current.pos)
 		switch x.(type) {
 		case string, token.Token: // , *syntax.BasicLit, *syntax.Ident:
 			f.current.pos++
@@ -314,7 +314,7 @@ func (f *formatter) visitComments(until int8) {
 	printed := false
 	for ; len(c.cg) > 0 && c.cg[0].Position <= until; c.cg = c.cg[1:] {
 		if printed {
-			f.Print(newsection)
+			f.Print(newsection, f.current.pos)
 		}
 		printed = true
 		f.printComment(c.cg[0])
@@ -322,28 +322,28 @@ func (f *formatter) visitComments(until int8) {
 }
 
 func (f *formatter) printComment(cg *ast.CommentGroup) {
-	f.Print(cg)
+	f.Print(cg, f.current.pos)
 
 	printBlank := false
 	if cg.Doc && len(f.output) > 0 {
-		f.Print(newline)
+		f.Print(newline, f.current.pos)
 		printBlank = true
 	}
 	for _, c := range cg.List {
 		isEnd := strings.HasPrefix(c.Text, "//")
 		if !printBlank {
 			if isEnd {
-				f.Print(vtab)
+				f.Print(vtab, f.current.pos)
 			} else {
-				f.Print(blank)
+				f.Print(blank, f.current.pos)
 			}
 		}
-		f.Print(c.Slash)
-		f.Print(c)
+		f.Print(c.Slash, f.current.pos)
+		f.Print(c, f.current.pos)
 		if isEnd {
-			f.Print(newline)
+			f.Print(newline, f.current.pos)
 			if cg.Doc {
-				f.Print(nooverride)
+				f.Print(nooverride, f.current.pos)
 			}
 		}
 	}

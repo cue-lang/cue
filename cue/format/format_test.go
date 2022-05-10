@@ -198,6 +198,7 @@ var data = []entry{
 	{"expressions.input", "expressions.golden", 0},
 	{"values.input", "values.golden", 0},
 	{"imports.input", "imports.golden", sortImps},
+	{"indentation.input", "indentation.golden", 0},
 }
 
 func TestFiles(t *testing.T) {

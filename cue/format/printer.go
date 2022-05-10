@@ -73,7 +73,7 @@ func (p *printer) lineFor(pos token.Pos) int {
 	return pos.Line()
 }
 
-func (p *printer) Print(v interface{}) {
+func (p *printer) Print(v interface{}, pos int8) {
 	var (
 		impliedComma = false
 		isLit        bool
@@ -204,6 +204,10 @@ func (p *printer) Print(v interface{}) {
 		p.lastTok = token.COMMENT
 
 	case whiteSpace:
+		if pos == 0 && x == blank {
+			p.allowed &^= blank
+			return
+		}
 		p.allowed |= x
 		return
 

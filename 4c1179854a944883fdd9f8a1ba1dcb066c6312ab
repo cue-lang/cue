@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee82c980_c0a27fd5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:35:16Z",
+      "side": 1,
+      "message": "LGTM with one minor nit, thanks!",
+      "revId": "4c1179854a944883fdd9f8a1ba1dcb066c6312ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6d2cf99_39af98d3",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:35:16Z",
+      "side": 1,
+      "message": "The comment is no longer quite right. Maybe \"always trims\" ? Or just remove it?",
+      "revId": "4c1179854a944883fdd9f8a1ba1dcb066c6312ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

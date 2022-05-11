@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "acf10c23_0bdd496b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T16:06:16Z",
+      "side": 1,
+      "message": "LGTM AFAICS, with one minor thought. As suggested, I won\u0027t spend too much time trying to understand what\u0027s going on the in the existing implementation here 😊",
+      "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d20562ec_1bd3aebf",
+        "filename": "cmd/cue/cmd/testdata/script/vet_embed.txt",
+        "patchSetId": 17
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T16:06:16Z",
+      "side": 1,
+      "message": "This seems a bit stuttery. I wonder we could omit the final `: fieldname:` if it\u0027s the same as the last segment of the the path?\n\nc: field not allowed\n\nseems a bit nicer to me.",
+      "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1036c75b_9ca7e191",
+        "filename": "cue/testdata/fulleval/035_optionals_with_label_filters.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T16:06:16Z",
+      "side": 1,
+      "message": "Out of interest, is this the only test result that\u0027s actually changed as a result of the code changing (other than the noise from the message getting a path prefix) ?",
+      "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

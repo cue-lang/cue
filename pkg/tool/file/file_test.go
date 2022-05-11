@@ -127,9 +127,9 @@ func TestCreate(t *testing.T) {
 }
 
 func TestGlob(t *testing.T) {
-	v := parse(t, "tool/file.Glob", fmt.Sprintf(`{
+	v := parse(t, "tool/file.Glob", `{
 		glob: "testdata/input.*"
-	}`))
+	}`)
 	got, err := (*cmdGlob).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)

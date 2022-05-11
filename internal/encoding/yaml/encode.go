@@ -364,9 +364,7 @@ func addDocs(n ast.Node, h, f *yaml.Node) {
 // that comments with empty lines get properly converted.
 func docToYAML(c *ast.CommentGroup) string {
 	s := c.Text()
-	if strings.HasSuffix(s, "\n") { // always true
-		s = s[:len(s)-1]
-	}
+	s = strings.TrimSuffix(s, "\n") // always trims
 	lines := strings.Split(s, "\n")
 	for i, l := range lines {
 		if l == "" {

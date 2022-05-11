@@ -171,9 +171,7 @@ func (s *state) makeCUERef(n cue.Value, u *url.URL) ast.Expr {
 
 				base := path.Base(p)
 				if !ast.IsValidIdent(base) {
-					if strings.HasSuffix(base, ".json") {
-						base = base[:len(base)-len(".json")]
-					}
+					base = strings.TrimSuffix(base, ".json")
 					if !ast.IsValidIdent(base) {
 						// Find something more clever to do there. For now just
 						// pick "schema" as the package name.

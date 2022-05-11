@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d904078_e9ce080f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 26
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "LGTM with some thoughts on making the tests a bit more accessible by adding comments, and one tiny code suggestion.",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc55d7bd_fad42337",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "Could you elaborate a bit more on this, and why the enclosing struct is named \"fail\" ?",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "189a10bb_97c4c146",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "I wonder if it would be worth adding a few words of commentary on each of these cases explaining what is supposed to be happening. For example, I\u0027d naively think that this would be an error because #C1.p is never present and #C1 is closed, but it\u0027s not easy to know if that\u0027s intended behaviour or not.\n\nParticularly with the fact that the output is automatically generated, it\u0027s not easy to tell what\u0027s working as intended and what\u0027s not.\n\nParticularly with cases that currently yield errors but should not, it would be nice to say which cases don\u0027t work but shouldn\u0027t, or vice versa (it\u0027s quite laborious cross-checking this file against out/eval to see)",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa4b39f7_6df5b6d9",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "Could use `for s in [\"foo\"]` unless there\u0027s some particular reason not to?",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bded6d30_6c961f07",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "What does this mean?",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5f71cd4_235951df",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "Out of interest, why is this `b12a` when there don\u0027t seem to be any other b1, b2, etc ?",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fec5e658_ce305335",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "I don\u0027t get why c and a.b are useful in this particular example",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7afd71f3_2c2e5621",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 26
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T15:46:42Z",
+      "side": 1,
+      "message": "return early when src\u003d\u003dnil ?",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

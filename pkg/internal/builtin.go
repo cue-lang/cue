@@ -75,9 +75,11 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 
 		f := ctx.StringLabel(b.Name) // never starts with _
 		// n := &node{baseValue: newBase(imp.Path)}
-		var v adt.Expr = toBuiltin(ctx, b)
+		var v adt.Expr
 		if b.Const != "" {
 			v = mustParseConstBuiltin(ctx, b.Name, b.Const)
+		} else {
+			v = toBuiltin(ctx, b)
 		}
 		st.Decls = append(st.Decls, &adt.Field{
 			Label: f,

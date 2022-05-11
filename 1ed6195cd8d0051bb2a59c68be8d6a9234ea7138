@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ac5697a_ef9719b1",
+        "filename": "cue/context_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-11T14:38:23Z",
+      "side": 0,
+      "message": "and it wasn\u0027t even removed, right?",
+      "revId": "1ed6195cd8d0051bb2a59c68be8d6a9234ea7138",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

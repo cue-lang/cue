@@ -16,6 +16,24 @@
       "message": "and it wasn\u0027t even removed, right?",
       "revId": "1ed6195cd8d0051bb2a59c68be8d6a9234ea7138",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4b25d96_5cd0b7c6",
+        "filename": "cue/context_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-11T14:48:01Z",
+      "side": 0,
+      "message": "Correct; I imagine we never noticed the temp dir leak as it\u0027s relatively small.",
+      "parentUuid": "6ac5697a_ef9719b1",
+      "revId": "1ed6195cd8d0051bb2a59c68be8d6a9234ea7138",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

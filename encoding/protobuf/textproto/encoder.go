@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/encoding/protobuf/pbinternal"
 
-	"github.com/protocolbuffers/txtpbfmt/ast"
 	pbast "github.com/protocolbuffers/txtpbfmt/ast"
 	"github.com/protocolbuffers/txtpbfmt/parser"
 )
@@ -125,7 +124,7 @@ func (e *encoder) encodeMsg(parent *pbast.Node, v cue.Value) {
 				default:
 					key = &pbast.Node{
 						Name:   "key",
-						Values: []*ast.Value{{Value: i.Label()}},
+						Values: []*pbast.Value{{Value: i.Label()}},
 					}
 				}
 				n.Children = append(n.Children, key)

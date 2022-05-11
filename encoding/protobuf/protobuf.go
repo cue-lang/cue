@@ -248,9 +248,7 @@ func (b *Extractor) Files() (files []*ast.File, err error) {
 	}
 
 	for _, p := range instances {
-		for _, f := range p.Files {
-			files = append(files, f)
-		}
+		files = append(files, p.Files...)
 	}
 	return files, nil
 }

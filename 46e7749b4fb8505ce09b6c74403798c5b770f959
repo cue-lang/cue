@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e15d4c7d_38ac53ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-11T16:10:49Z",
+      "side": 1,
+      "message": "This is the kind of thing I had in mind when I told you I had some ideas aroudn the use of go/packages, Paul :) I also think we could remove it entirely from the \"init interfaces\" part, but that will be another CL.",
+      "revId": "46e7749b4fb8505ce09b6c74403798c5b770f959",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

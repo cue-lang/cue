@@ -334,10 +334,8 @@ func initInterfaces() (err error) {
 	}
 
 	cfg := &packages.Config{
-		Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles |
-			packages.NeedImports | packages.NeedTypes | packages.NeedTypesSizes |
-			packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedDeps,
-		Dir: filepath.Join(tmpDir),
+		Mode: packages.NeedTypes | packages.NeedTypesInfo,
+		Dir:  filepath.Join(tmpDir),
 	}
 
 	p, err := packages.Load(cfg, fullPkgPath)
@@ -404,9 +402,9 @@ func extract(cmd *Command, args []string) error {
 	root := binst.Root
 
 	cfg := &packages.Config{
-		Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles |
-			packages.NeedImports | packages.NeedTypes | packages.NeedTypesSizes |
-			packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedDeps |
+		Mode: packages.NeedName | packages.NeedCompiledGoFiles |
+			packages.NeedImports | packages.NeedTypes |
+			packages.NeedSyntax | packages.NeedTypesInfo |
 			packages.NeedModule,
 	}
 	pkgs, err := packages.Load(cfg, args...)

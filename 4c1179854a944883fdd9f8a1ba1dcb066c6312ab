@@ -33,6 +33,24 @@
       "message": "The comment is no longer quite right. Maybe \"always trims\" ? Or just remove it?",
       "revId": "4c1179854a944883fdd9f8a1ba1dcb066c6312ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "598c1531_74cc0f39",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-11T15:41:10Z",
+      "side": 1,
+      "message": "\"always trims\" done",
+      "parentUuid": "d6d2cf99_39af98d3",
+      "revId": "4c1179854a944883fdd9f8a1ba1dcb066c6312ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

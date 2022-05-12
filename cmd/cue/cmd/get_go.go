@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"embed"
 	"fmt"
 	"go/ast"
 	"go/token"
@@ -280,104 +279,78 @@ func (e *extractor) usedPkg(pkg string) {
 	e.usedPkgs[pkg] = true
 }
 
-const cueGoMod = `
-module cuelang.org/go
+var (
+	typeAny   = types.NewInterfaceType(nil, nil).Complete() // interface{}
+	typeBytes = types.NewSlice(types.Typ[types.Byte])       // []byte
+	typeError = types.Universe.Lookup("error").Type()       // error
+)
 
-go 1.14
-`
+// Note that we can leave positions, packages, and parameter/result names empty.
+// They are not used by go/types.Implements.
 
-//go:embed interfaces/*.go
-var interfacesFS embed.FS
-
-func initInterfaces() (err error) {
-	// tempdir needed for overlay
-	tmpDir, err := ioutil.TempDir("", "cuelang")
-	if err != nil {
-		return err
-	}
-
-	defer func() {
-		rerr := os.RemoveAll(tmpDir)
-		if err == nil {
-			err = rerr
-		}
-	}()
-
-	// write the cuelang go.mod
-	err = ioutil.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte(cueGoMod), 0666)
-	if err != nil {
-		return err
-	}
-
-	entries, err := interfacesFS.ReadDir("interfaces")
-	if err != nil {
-		return err
-	}
-	localPkgPath := "cmd/cue/cmd/interfaces"
-	fullPkgPath := "cuelang.org/go/" + localPkgPath
-	for _, entry := range entries {
-		name := entry.Name()
-
-		fn := filepath.Join(tmpDir, filepath.FromSlash(localPkgPath), name)
-		dir := filepath.Dir(fn)
-		if err := os.MkdirAll(dir, 0777); err != nil {
-			return err
-		}
-		contents, err := interfacesFS.ReadFile(path.Join("interfaces", name))
-		if err != nil {
-			return err
-		}
-
-		if err := ioutil.WriteFile(fn, contents, 0666); err != nil {
-			return err
-		}
-	}
-
-	cfg := &packages.Config{
-		Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles |
-			packages.NeedImports | packages.NeedTypes | packages.NeedTypesSizes |
-			packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedDeps,
-		Dir: filepath.Join(tmpDir),
-	}
-
-	p, err := packages.Load(cfg, fullPkgPath)
-	if err != nil {
-		return fmt.Errorf("error loading embedded %s package: %w", fullPkgPath, err)
-	}
-	if len(p[0].Errors) > 0 {
-		var buf bytes.Buffer
-		for _, e := range p[0].Errors {
-			fmt.Fprintf(&buf, "\t%v\n", e)
-		}
-		return fmt.Errorf("error loading embedded %s package:\n%s", fullPkgPath, buf.String())
-	}
-
-	for e, tt := range p[0].TypesInfo.Types {
-		if n, ok := tt.Type.(*types.Named); ok && n.String() == "error" {
-			continue
-		}
-		if tt.Type.Underlying().String() == "interface{}" {
-			continue
-		}
-
-		switch tt.Type.Underlying().(type) {
-		case *types.Interface:
-			file := p[0].Fset.Position(e.Pos()).Filename
-			switch filepath.Base(file) {
-			case "top.go":
-				toTop = append(toTop, tt.Type)
-			case "text.go":
-				toString = append(toString, tt.Type)
-			}
-		}
-	}
-	return nil
+func typeMethod(name string, params, results []types.Type) *types.Func {
+	return types.NewFunc(token.NoPos, nil, name, typeSignature(name, params, results))
 }
 
-var (
-	toTop    []types.Type
-	toString []types.Type
-)
+func typeSignature(name string, params, results []types.Type) *types.Signature {
+	paramVars := make([]*types.Var, len(params))
+	for i, param := range params {
+		paramVars[i] = types.NewParam(token.NoPos, nil, "", param)
+	}
+	resultVars := make([]*types.Var, len(results))
+	for i, result := range results {
+		resultVars[i] = types.NewParam(token.NoPos, nil, "", result)
+	}
+	return types.NewSignature(
+		nil,
+		types.NewTuple(paramVars...),
+		types.NewTuple(resultVars...),
+		false,
+	)
+}
+
+// TODO(mvdan): Shouldn't we only consider a Go type "top" if it implements both
+// marshal/unmarhal methods of JSON or YAML?
+
+// Note that we record these interfaces without names, so they will show up in
+// the logs like "interface{MarshalJSON() ([]uint8, error)}" rather than
+// encoding/json.Marshaler. We could construct named types if need be.
+
+var toTop = []*types.Interface{
+	// json.Marshaler: interface { MarshalJSON() ([]byte, error) }
+	types.NewInterfaceType([]*types.Func{
+		typeMethod("MarshalJSON", nil, []types.Type{typeBytes, typeError}),
+	}, nil).Complete(),
+
+	// json.Unmarshaler: interface { UnmarshalJSON([]byte) error }
+	types.NewInterfaceType([]*types.Func{
+		typeMethod("UnmarshalJSON", []types.Type{typeBytes}, []types.Type{typeError}),
+	}, nil).Complete(),
+
+	// yaml.Marshaler: interface { MarshalYAML() (interface{}, error) }
+	types.NewInterfaceType([]*types.Func{
+		typeMethod("MarshalYAML", nil, []types.Type{typeAny, typeError}),
+	}, nil).Complete(),
+
+	// yaml.Unmarshaler: interface { UnmarshalYAML(func(interface{}) error) error }
+	types.NewInterfaceType([]*types.Func{
+		typeMethod("UnmarshalYAML", []types.Type{
+			typeSignature("", []types.Type{typeAny}, []types.Type{typeError}),
+		}, []types.Type{typeError}),
+	}, nil).Complete(),
+}
+
+var toString = []*types.Interface{
+	// encoding.TextMarshaler: interface { MarshalText() ([]byte, error) }
+	types.NewInterfaceType([]*types.Func{
+		typeMethod("MarshalText", nil, []types.Type{typeBytes, typeError}),
+	}, nil).Complete(),
+
+	// encoding.TextUnmarshaler: interface { UnmarshalText([]byte) error }
+	types.NewInterfaceType([]*types.Func{
+		typeMethod("UnmarshalText", []types.Type{typeBytes}, []types.Type{typeError}),
+	}, nil).Complete(),
+}
 
 // TODO:
 // - consider not including types with any dropped fields.
@@ -395,10 +368,6 @@ func extract(cmd *Command, args []string) error {
 	// and where for some reason the
 	// determine module root:
 	binst := loadFromArgs(cmd, []string{"."}, nil)[0]
-
-	if err := initInterfaces(); err != nil {
-		return err
-	}
 
 	// TODO: require explicitly set root.
 	root := binst.Root
@@ -721,7 +690,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					e.logf("    Dropped declaration %v of unsupported type %v", name, typ)
 					continue
 				}
-				if s := e.altType(types.NewPointer(typ)); s != nil {
+				if s := e.altType(typ); s != nil {
 					a = append(a, e.def(x.Doc, name, s, true))
 					break
 				}
@@ -840,26 +809,32 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 
 func shortTypeName(t types.Type) string {
 	if n, ok := t.(*types.Named); ok {
-		return n.Obj().Name()
+		return n.Obj().String() // fully qualified, e.g. "foo/bar.Baz"
 	}
-	return t.String()
+	return t.String() // anonymous, e.g. "interface{Method() []byte}"
 }
 
 func (e *extractor) altType(typ types.Type) cueast.Expr {
+	// We need to check whether T or *T implement each interface I.
+	// Typically we would just need to check whether *T implements I,
+	// as the method set of *T includes the method set of T,
+	// but that doesn't work when T is an interface type.
+	// See https://go.dev/ref/spec#Method_sets.
+	//
+	// TODO(mvdan): perhaps check with T when it's an interface,
+	// and with *T otherwise, avoiding double calls to types.Implements.
 	ptr := types.NewPointer(typ)
-	for _, x := range toTop {
-		i := x.Underlying().(*types.Interface)
-		if types.Implements(typ, i) || types.Implements(ptr, i) {
+	for _, iface := range toTop {
+		if types.Implements(typ, iface) || types.Implements(ptr, iface) {
 			t := shortTypeName(typ)
-			e.logf("    %v implements %s; setting type to _", t, x)
+			e.logf("    %v implements %s; setting type to _", t, iface)
 			return e.ident("_", false)
 		}
 	}
-	for _, x := range toString {
-		i := x.Underlying().(*types.Interface)
-		if types.Implements(typ, i) || types.Implements(ptr, i) {
+	for _, iface := range toString {
+		if types.Implements(typ, iface) || types.Implements(ptr, iface) {
 			t := shortTypeName(typ)
-			e.logf("    %v implements %s; setting type to string", t, x)
+			e.logf("    %v implements %s; setting type to string", t, iface)
 			return e.ident("string", false)
 		}
 	}

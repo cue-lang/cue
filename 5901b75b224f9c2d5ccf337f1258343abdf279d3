@@ -258,6 +258,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80e65e43_2bace12a",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-12T20:48:46Z",
+      "side": 1,
+      "message": "first time I\u0027d hear about such a linter for what it\u0027s worth.",
+      "parentUuid": "2607fda2_bc742db3",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "459e2897_e004084d",
         "filename": "internal/core/adt/comprehension.go",
         "patchSetId": 36

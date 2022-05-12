@@ -16,6 +16,448 @@
       "message": "Also fixed https://github.com/cue-lang/cue/issues/1686",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef303c86_a7a537c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "A bunch of comments on my initial pass, mostly just questions, with a few surface nits too. I\u0027m still trying to absorb the abstractions involved.",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffa86f99_e6b71c01",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "What does \"by p\" mean here? Is it meaning \"by\" as in \"next to p in the source code\" or something else?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f6eeb98_8f844fb7",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Seems like this should still be tabs to match the rest of the file.",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df7d61d9_c0fd111a",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "// explicitly specifies a value for fail.a.b\n\n?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66a8baf9_348c875d",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f56a8ed_a4cce1b5",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "I found the comments on the tests above very helpful. Should this be an incomplete error too or not?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d975621e_925f0eb4",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Doc comment?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02f0990a_c4fb6e98",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Is this actually valid CUE? At least with current CUE semantics, it doesn\u0027t seem like `b` is in scope here.",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39fa303c_d486f61a",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "\"*that* belong to a struct\", presumably?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ae6d65c_21e21c95",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Is this the node that contains the comprehension? Maybe worth adding a doc comment? (and to the other fields - I find comments on fields very helpful).",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "88eb443c_059ff828",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "This is an odd comment - how is Bottom a runtime?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba5d7be5_7392b2cd",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "\"its\" is a bit ambiguous here. Is it talking about the node\u0027s children, or the comprehension\u0027s children?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "777cbf8d_a80b540d",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "FWIW when putting multiple args on separate lines, I think it reads a bit more nicely when they\u0027re all consistently on their own line:\n\nfunc (n *nodeContext) insertComprehension(\n\tenv *Environment,\n\tc *Comprehension,\n\tci CloseInfo,\n) {\n\n:shrug:",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2607fda2_bc742db3",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Interesting. I didn\u0027t know that linters complained about not initializing all fields. That seems unusual in Go where fields are commonly left zero at init time.",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "459e2897_e004084d",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "if _, ok :\u003d d.(*Field); !ok {\n\n?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74de07ee_d50ac809",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Maybe avoid the need to indirect all everywhere by doing:\n\nfunc (n *nodeContext) injectComprehensions(allp *[]envYield) (progress bool) {\n     all :\u003d *allp\n     ...\n     *allp \u003d all[:k]\n}\n\nThat said, I don\u0027t really understand why this is even a separate argument. AFAICS the only call to the injectComprehensions method passes in n.comprehensions, so why not lose the argument and then it\u0027s clearer that this is all about mutating the receiver?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9653b99e_b97ecdfc",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "What are the plans here? Maybe add a TODO to uncomment this block if appropriate?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3aa7d05a_d40d31d8",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Maybe move this inside the block above?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5184e89d_9e7fedb5",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "I _think_ I understand what\u0027s going on here, but a doc comment could make that clearer.",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af0375e8_afad0890",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "remove, since it clearly isn\u0027t actually necessary?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "155af67b_e5f0281b",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "evaluates the Yielder inside the given comprehension ?\nIt would be nice to document the other parameters too - for example, it\u0027s not clear to me how the node relates to the comprehension (or the environment either, given that an environment also contains a Vertex).",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d7b58af_1f7000e5",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 623,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Is this a TODO?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ede77ea6_5a7bd3f3",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 1269,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Maybe mention what \"expectError\" signifies here?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf7df30a_a9dd9d6b",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 1648,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "doc comment?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6a012b4_42d8645a",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Why this change, out of interest?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04ecbc0e_f0c78e8b",
+        "filename": "internal/core/dep/testdata/structcomprehension.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 1,
+      "message": "Should this still be using tabs?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

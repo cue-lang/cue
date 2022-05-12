@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bfdcff5_4c6b3ae2",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 680,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-12T17:34:16Z",
+      "side": 0,
+      "message": "I like all this red!",
+      "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

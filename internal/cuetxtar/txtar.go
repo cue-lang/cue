@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
@@ -242,12 +243,11 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 	root := x.Root
 
-	err = filepath.Walk(root, func(fullpath string, info os.FileInfo, err error) error {
+	err = filepath.WalkDir(root, func(fullpath string, entry fs.DirEntry, err error) error {
 		if err != nil {
-			t.Fatal(err)
+			return err
 		}
-
-		if info.IsDir() || filepath.Ext(fullpath) != ".txtar" {
+		if entry.IsDir() || filepath.Ext(fullpath) != ".txtar" {
 			return nil
 		}
 

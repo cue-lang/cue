@@ -1,6 +1,7 @@
 package basics
 
 import (
+	"io/fs"
 	"os"
 	"path"
 	"path/filepath"
@@ -18,10 +19,9 @@ import (
 // TestLatest checks that the examples match the latest language standard,
 // even if still valid in backwards compatibility mode.
 func TestLatest(t *testing.T) {
-	filepath.Walk(".", func(fullpath string, info os.FileInfo, err error) error {
+	if err := filepath.WalkDir(".", func(fullpath string, entry fs.DirEntry, err error) error {
 		if err != nil {
-			t.Error(err)
-			return nil
+			return err
 		}
 		if !strings.HasSuffix(fullpath, ".txt") {
 			return nil
@@ -29,8 +29,7 @@ func TestLatest(t *testing.T) {
 
 		a, err := txtar.ParseFile(fullpath)
 		if err != nil {
-			t.Error(err)
-			return nil
+			return err
 		}
 
 		for _, f := range a.Files {
@@ -46,12 +45,14 @@ func TestLatest(t *testing.T) {
 			})
 		}
 		return nil
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestScript(t *testing.T) {
-	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if info.IsDir() {
+	if err := filepath.WalkDir(".", func(path string, entry fs.DirEntry, err error) error {
+		if entry.IsDir() {
 			return filepath.SkipDir
 		}
 		testscript.Run(t, testscript.Params{
@@ -59,7 +60,9 @@ func TestScript(t *testing.T) {
 			UpdateScripts: cuetest.UpdateGoldenFiles,
 		})
 		return nil
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestMain(m *testing.M) {

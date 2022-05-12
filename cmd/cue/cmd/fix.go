@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -117,8 +118,8 @@ func runFixAll(cmd *Command, args []string) error {
 }
 
 func appendDirs(a []string, base string) []string {
-	_ = filepath.Walk(base, func(path string, fi os.FileInfo, err error) error {
-		if err == nil && fi.IsDir() && path != base {
+	_ = filepath.WalkDir(base, func(path string, entry fs.DirEntry, err error) error {
+		if err == nil && entry.IsDir() && path != base {
 			short := filepath.ToSlash(path[len(base)+1:])
 			if strings.ContainsAny(short, "/") {
 				a = append(a, short)

@@ -20,6 +20,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"log"
 	"os"
@@ -209,7 +210,7 @@ func TestTutorial(t *testing.T) {
 
 	if cuetest.UpdateGoldenFiles {
 		// Remove all old cue files.
-		err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		err := filepath.WalkDir(".", func(path string, entry fs.DirEntry, err error) error {
 			if isCUE(path) {
 				if err := os.Remove(path); err != nil {
 					t.Fatal(err)
@@ -221,7 +222,7 @@ func TestTutorial(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		err = filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
 			if isCUE(path) {
 				dst := path[len(dir)+1:]
 				err := os.MkdirAll(filepath.Dir(dst), 0755)
@@ -239,7 +240,7 @@ func TestTutorial(t *testing.T) {
 	}
 
 	// Compare the output in the temp directory with the quick output.
-	err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	err = filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			t.Fatal(err)
 		}

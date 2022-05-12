@@ -19,6 +19,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
@@ -46,10 +47,9 @@ const (
 // even if still valid in backwards compatibility mode.
 func TestLatest(t *testing.T) {
 	root := filepath.Join("testdata", "script")
-	filepath.Walk(root, func(fullpath string, info os.FileInfo, err error) error {
+	if err := filepath.WalkDir(root, func(fullpath string, entry fs.DirEntry, err error) error {
 		if err != nil {
-			t.Error(err)
-			return nil
+			return err
 		}
 		if !strings.HasSuffix(fullpath, ".txt") ||
 			strings.HasPrefix(filepath.Base(fullpath), "fix") {
@@ -58,8 +58,7 @@ func TestLatest(t *testing.T) {
 
 		a, err := txtar.ParseFile(fullpath)
 		if err != nil {
-			t.Error(err)
-			return nil
+			return err
 		}
 		if bytes.HasPrefix(a.Comment, []byte("!")) {
 			return nil
@@ -81,7 +80,9 @@ func TestLatest(t *testing.T) {
 			})
 		}
 		return nil
-	})
+	}); err != nil {
+		t.Fatal(err)
+	}
 }
 
 func TestScript(t *testing.T) {

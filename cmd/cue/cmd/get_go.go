@@ -22,6 +22,7 @@ import (
 	"go/token"
 	"go/types"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path"
@@ -591,11 +592,11 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error {
 	for _, o := range p.CompiledGoFiles {
 		root := filepath.Dir(o)
-		err := filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
+		err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
 			if err != nil {
 				return err
 			}
-			if fi.IsDir() && path != root {
+			if entry.IsDir() && path != root {
 				return filepath.SkipDir
 			}
 			if filepath.Ext(path) != ".cue" {

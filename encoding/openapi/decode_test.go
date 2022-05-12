@@ -16,8 +16,8 @@ package openapi_test
 
 import (
 	"bytes"
+	"io/fs"
 	"io/ioutil"
-	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -41,8 +41,10 @@ import (
 //
 // Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {
-	err := filepath.Walk("testdata/script", func(fullpath string, info os.FileInfo, err error) error {
-		_ = err
+	err := filepath.WalkDir("testdata/script", func(fullpath string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
+		}
 		if !strings.HasSuffix(fullpath, ".txtar") {
 			return nil
 		}

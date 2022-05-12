@@ -17,6 +17,7 @@ package protobuf
 import (
 	"bytes"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -121,8 +122,8 @@ func TestBuild(t *testing.T) {
 		gotFiles[rel] = f
 	}
 
-	_ = filepath.Walk("testdata/istio.io/api", func(path string, fi os.FileInfo, err error) error {
-		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".cue") {
+	_ = filepath.WalkDir("testdata/istio.io/api", func(path string, entry fs.DirEntry, err error) error {
+		if err != nil || entry.IsDir() || !strings.HasSuffix(path, ".cue") {
 			return err
 		}
 

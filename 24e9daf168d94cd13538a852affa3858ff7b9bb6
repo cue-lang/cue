@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17c556ff_2f3f1eba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-12T16:49:53Z",
+      "side": 1,
+      "message": "FYI Paul, this is part 2 of the go/packages cleanup. Done for now :) ",
+      "revId": "24e9daf168d94cd13538a852affa3858ff7b9bb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

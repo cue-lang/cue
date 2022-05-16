@@ -347,7 +347,28 @@ func (pb *PathBuilder) operation(v cue.Value) {
 		}
 	*/
 	operation := &OrderedMap{}
+	var security *ast.ListLit
+
+	if v.Lookup("description").Exists() {
+		description, err := v.Lookup("description").String()
+		if err != nil {
+			description = ""
+		}
+		operation.Set("description", description)
+	}
+
+	if v.Lookup("security").Exists() {
+		security = pb.securityList(v.Lookup("security"))
+	} else if pb.security != nil {
+		security = pb.security
+	}
+	if security != nil {
+		operation.Set("security", security)
+
+	}
+
 	responses := pb.responses(v.Lookup("responses"))
+
 	operation.Set("responses", responses)
 
 	label, _ := v.Label()
@@ -371,7 +392,7 @@ func (pb *PathBuilder) buildPath(v cue.Value) *ast.StructLit {
 		case "description":
 			pb.pathDescription(v.Lookup("description"))
 		case "security":
-			pb.securityList(v.Lookup("security"))
+			pb.security = pb.securityList(v.Lookup("security"))
 		case "get", "put", "post", "delete", "options", "head", "patch", "trace":
 			pb.operation(v.Lookup(label))
 		default:
@@ -1070,15 +1091,15 @@ func (b *builder) array(v cue.Value) {
 	}
 }
 
-func (pb *PathBuilder) securityList(v cue.Value) {
+func (pb *PathBuilder) securityList(v cue.Value) *ast.ListLit {
 	items := []ast.Expr{}
 
 	for i, _ := v.List(); i.Next(); {
 		items = append(items, pb.decode(i.Value()))
 	}
 
-	//pb.security = ast.NewList(items...)
-	pb.path.Set("security", ast.NewList(items...))
+	return ast.NewList(items...)
+	//pb.path.Set("security", ast.NewList(items...))
 }
 
 func (b *builder) listCap(v cue.Value) {
@@ -1278,6 +1299,8 @@ func (b *builder) bytes(v cue.Value) {
 type PathBuilder struct {
 	ctx  *buildContext
 	path *OrderedMap
+
+	security *ast.ListLit
 }
 
 type builder struct {

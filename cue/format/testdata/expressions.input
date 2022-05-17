@@ -227,4 +227,7 @@ package expressions
         "foo-bar".
                 b
     f: 2
+
+    "contains		tabs": 123
+    @jsonschema(foo="contains		tabs")
 }

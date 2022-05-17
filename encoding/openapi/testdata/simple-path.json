@@ -6,12 +6,19 @@
    },
    "paths": {
       "/ping": {
-         "security": [
-            "token",
-            "user"
-         ],
          "description": "Ping endpoint",
          "get": {
+            "description": "Returns pong",
+            "security": [
+               {
+                  "type": [
+                     "http"
+                  ],
+                  "scheme": [
+                     "basic"
+                  ]
+               }
+            ],
             "responses": {
                "200": {
                   "description": "",

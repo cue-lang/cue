@@ -1,5 +1,8 @@
 "$/ping": {
-  security: ["token", "user"]
+  security: [{
+      "type": ["http"],
+      "scheme": ["basic"]
+    }]
   description: "Ping endpoint"
   get: {
       description: "Returns pong"

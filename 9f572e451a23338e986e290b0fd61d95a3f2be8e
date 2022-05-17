@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0b3abb9_e10fd0f4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020176
+      },
+      "writtenOn": "2022-05-17T14:10:48Z",
+      "side": 1,
+      "message": "Replicated tests passed using https://github.com/cue-lang/cue/issues/1040#:~:text\u003dcuelang/cue%231040%20(comment)",
+      "revId": "9f572e451a23338e986e290b0fd61d95a3f2be8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

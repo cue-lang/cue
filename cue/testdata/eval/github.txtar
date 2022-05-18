@@ -55,7 +55,9 @@ test: _#bashWorkflow & {
 			needs:     "start"
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
-			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#earlyChecks, _#cacheGoModules, _#step & {
+			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode & {
+				with: ref: "${{ github.event.pull_request.head.sha }}"
+			}, _#earlyChecks, _#cacheGoModules, _#step & {
 				if:  "${{ \(_#isMaster) }}"
 				run: "echo CUE_LONG=true >> $GITHUB_ENV"
 			}, _#goGenerate, _#goTest, _#goCheck, _#goTestRace & {
@@ -1125,6 +1127,9 @@ import "strings"
               2: (#struct){
                 name: (string){ "Checkout code" }
                 uses: (string){ "actions/checkout@v3" }
+                with: (#struct){
+                  ref: (string){ "${{ github.event.pull_request.head.sha }}" }
+                }
               }
               3: (#struct){
                 name: (string){ "Early git and code sanity checks" }
@@ -1261,8 +1266,8 @@ import "strings"
             }
             res: (_|_){
               // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-              //     ./workflows.cue:127:9
-              //     ./workflows.cue:124:14
+              //     ./workflows.cue:129:9
+              //     ./workflows.cue:126:14
             }
           }
         }
@@ -1338,8 +1343,8 @@ import "strings"
           _#type(:ci): (string){ string }
           if: (_|_){
             // [incomplete] workflows.1.schema._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
+            //     ./workflows.cue:140:14
             //     ./workflows.cue:138:14
-            //     ./workflows.cue:136:14
           }
         }
         name: (string){ "Repository Dispatch" }
@@ -1646,6 +1651,9 @@ import "strings"
           2: (#struct){
             name: (string){ "Checkout code" }
             uses: (string){ "actions/checkout@v3" }
+            with: (#struct){
+              ref: (string){ "${{ github.event.pull_request.head.sha }}" }
+            }
           }
           3: (#struct){
             name: (string){ "Early git and code sanity checks" }
@@ -1782,8 +1790,8 @@ import "strings"
         }
         res: (_|_){
           // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-          //     ./workflows.cue:127:9
-          //     ./workflows.cue:124:14
+          //     ./workflows.cue:129:9
+          //     ./workflows.cue:126:14
         }
       }
     }
@@ -1856,8 +1864,8 @@ import "strings"
       _#type(:ci): (string){ string }
       if: (_|_){
         // [incomplete] repository_dispatch._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
+        //     ./workflows.cue:140:14
         //     ./workflows.cue:138:14
-        //     ./workflows.cue:136:14
       }
     }
     name: (string){ "Repository Dispatch" }
@@ -2266,7 +2274,11 @@ import "strings"
         steps: [
           〈4;_#writeNetrcFile〉,
           〈4;_#installGo〉,
-          〈4;_#checkoutCode〉,
+          (〈4;_#checkoutCode〉 & {
+            with: {
+              ref: "${{ github.event.pull_request.head.sha }}"
+            }
+          }),
           〈4;_#earlyChecks〉,
           〈4;_#cacheGoModules〉,
           (〈4;_#step〉 & {

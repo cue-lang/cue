@@ -72,7 +72,13 @@ test: _#bashWorkflow & {
 			steps: [
 				_#writeNetrcFile,
 				_#installGo,
-				_#checkoutCode,
+				_#checkoutCode & {
+					// "pull_request" builds will by default use a merge commit,
+					// testing the PR's HEAD merged on top of the master branch.
+					// For consistency with Gerrit, avoid that merge commit entirely.
+					// This doesn't affect "push" builds, which never used merge commits.
+					with: ref: "${{ github.event.pull_request.head.sha }}"
+				},
 				_#earlyChecks,
 				_#cacheGoModules,
 				_#step & {

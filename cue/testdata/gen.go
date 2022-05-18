@@ -49,7 +49,7 @@ func main() {
 	log.SetFlags(log.Lshortfile)
 
 	cfg := &packages.Config{
-		Mode: packages.NeedSyntax | packages.NeedTypesInfo,
+		Mode: packages.NeedSyntax | packages.NeedTypes | packages.NeedTypesInfo,
 
 		Tests: true,
 	}

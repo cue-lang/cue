@@ -70,7 +70,6 @@ type externalType struct {
 }
 
 type oaSchema = OrderedMap
-type pathOperations = OrderedMap
 
 type typeFunc func(b *builder, a cue.Value)
 

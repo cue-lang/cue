@@ -17,20 +17,6 @@ func newResponseBuilder(c *buildContext) *ResponseObjectBuilder {
 	return &ResponseObjectBuilder{ctx: c, mediaTypes: &OrderedMap{}}
 }
 
-func isMediaType(s string) bool {
-	mediaTypes := map[string]bool{"application/json": true,
-		"application/xml":                   true,
-		"application/x-www-form-urlencoded": true,
-		"multipart/form-data":               true,
-		"text/plain":                        true,
-		"text/html":                         true,
-		"application/pdf":                   true,
-		"image/png":                         true}
-
-	_, ok := mediaTypes[s]
-	return ok
-}
-
 func (rb *ResponseObjectBuilder) mediaType(v cue.Value) {
 	schema := &OrderedMap{}
 	schemaStruct := rb.ctx.build("schema", v.Lookup("schema"))
@@ -52,9 +38,10 @@ func (rb *ResponseObjectBuilder) buildResponse(v cue.Value) *ast.StructLit {
 	rb.description = description
 
 	contentStruct := v.Lookup("content")
+	r, _ := regexp.Compile(`([^\s]+)[/]([^\s]+)`)
 	for i, _ := contentStruct.Value().Fields(cue.Definitions(false)); i.Next(); {
 		label := i.Label()
-		matched, _ := regexp.MatchString(`([^\s]+)[/]([^\s]+)`, label)
+		matched := r.MatchString(label)
 
 		if !matched {
 			continue

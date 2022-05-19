@@ -160,10 +160,19 @@ func TestParseDefinitions(t *testing.T) {
 		out:    "no-content-path.json",
 		config: defaultConfig,
 	}, {
-		in:     "multiple-responses-path.cue",
-		out:    "multiple-responses-path.json",
+		in:     "path-with-ref.cue",
+		out:    "path-with-ref.json",
 		config: defaultConfig,
-	}}
+	}, {
+		in:     "path-multiple-operations.cue",
+		out:    "path-multiple-operations.json",
+		config: defaultConfig,
+	},
+		{
+			in:     "multiple-responses-path.cue",
+			out:    "multiple-responses-path.json",
+			config: defaultConfig,
+		}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {
 			filename := filepath.FromSlash(tc.in)

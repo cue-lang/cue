@@ -116,9 +116,17 @@ func TestTutorial(t *testing.T) {
 				redirect = cmd[p+1:]
 				cmd = cmd[:p]
 			}
+			if p := strings.Index(cmd, " | tee"); p > 0 {
+				teeArgs := cmd[p+1:]
+				redirect = strings.Split(teeArgs, " ")[0] // Only take the first argument of tee
+				cmd = cmd[:p]
+			}
 
 			logf(t, "$ %s", cmd)
 			switch cmd = strings.TrimSpace(cmd); {
+			case strings.HasPrefix(cmd, "#"):
+				// Comment only, ignore and skip
+				continue
 			case strings.HasPrefix(cmd, "cat"):
 				if input == "" {
 					break

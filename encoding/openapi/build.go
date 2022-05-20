@@ -327,24 +327,6 @@ func (pb *PathBuilder) responses(v cue.Value) *ast.StructLit {
 }
 
 func (pb *PathBuilder) operation(v cue.Value) {
-	/*
-		operations := &OrderedMap{}
-		for i, _ := v.Value().Fields(cue.Definitions(false)); i.Next(); {
-			// searching http status
-			label, err := strconv.Atoi(i.Label())
-			if err != nil {
-				continue
-			}
-
-			if label > 599 || label < 100 {
-				pb.failf(v, "wrong HTTP Status code %v", label)
-			}
-
-			responseStruct := Response(i.Value(), pb.ctx)
-			operations.Set(strconv.Itoa(label), responseStruct)
-
-		}
-	*/
 	operation := &OrderedMap{}
 	var security *ast.ListLit
 
@@ -1098,7 +1080,6 @@ func (pb *PathBuilder) securityList(v cue.Value) *ast.ListLit {
 	}
 
 	return ast.NewList(items...)
-	//pb.path.Set("security", ast.NewList(items...))
 }
 
 func (b *builder) listCap(v cue.Value) {

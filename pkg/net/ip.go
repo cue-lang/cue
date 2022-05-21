@@ -194,6 +194,13 @@ func UnspecifiedIP(ip cue.Value) bool {
 
 // ToIP4 converts a given IP address, which may be a string or a list, to its
 // 4-byte representation.
+//
+//	in: ip: #IPAddr
+//	out: #Octets
+//
+// }
+//
+//cue:func {
 func ToIP4(ip cue.Value) ([]uint, error) {
 	ipdata := netGetIP(ip)
 	if ipdata == nil {

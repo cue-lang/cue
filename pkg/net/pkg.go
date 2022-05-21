@@ -226,4 +226,8 @@ var pkg = &internal.Package{
 			}
 		},
 	}},
+	CUE: `{
+	#IPAddr: string | bytes | #Octets
+	#Octets: [...int & >=0 & <=255]
+}`,
 }

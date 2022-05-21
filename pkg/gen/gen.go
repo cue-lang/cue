@@ -218,7 +218,9 @@ func (g *generator) processGo(filename string) error {
 				panic(fmt.Errorf("gen %s: unexpected spec of type %s", filename, x.Tok))
 			}
 		case *ast.FuncDecl:
-			g.genFunc(x)
+			if x.Body != nil && ast.IsExported(x.Name.Name) && x.Recv == nil {
+				g.genFunc(x)
+			}
 		}
 	}
 	return nil
@@ -273,27 +275,9 @@ func (g *generator) toValue(x ast.Expr) constant.Value {
 //fill in the parameter number...
 //or transform to list with one member
 
-func cueDecl(cg *ast.CommentGroup) string {
-	inCUE := false
-	var cueText strings.Builder
-	for _, c := range cg.List {
-		if !inCUE {
-			inCUE = c.Text == "//cue"
-			continue
-		}
-		if !strings.HasPrefix(c.Text, "//") {
-			// TODO support /* */ comments
-			continue
-		}
-		cueText.WriteString(c.Text[2:])
-		cueText.WriteByte('\n')
-	}
-	return cueText.String()
-}
-
 func (g *generator) genFunc(x *ast.FuncDecl) {
-	if x.Body == nil || !ast.IsExported(x.Name.Name) {
-		return
+	if c := cueDecl(x.Doc); c != "" {
+		log.Printf("cue decl for %s: %q", x.Name.Name, c)
 	}
 	types := []string{}
 	if x.Type.Results != nil {
@@ -306,9 +290,6 @@ func (g *generator) genFunc(x *ast.FuncDecl) {
 				types = append(types, g.goKind(f.Type))
 			}
 		}
-	}
-	if x.Recv != nil {
-		return
 	}
 	if n := len(types); n != 1 && (n != 2 || types[1] != "error") {
 		fmt.Printf("Dropped func %s.%s: must have one return value or a value and an error %v\n", g.cuePkgPath, x.Name.Name, types)
@@ -363,6 +344,42 @@ func (g *generator) genFunc(x *ast.FuncDecl) {
 	} else {
 		fmt.Fprintf(g.w, "c.Ret, c.Err = %s(%s)", x.Name.Name, argList)
 	}
+}
+
+func cueDeclFromComment(cg *ast.CommentGroup) string {
+	inCUE := false
+	var cueText strings.Builder
+	for _, c := range cg.List {
+		if !inCUE {
+			if !strings.HasPrefix(c.Text, "//cue:") {
+				continue
+			}
+			txt := strings.TrimPrefix(c.Text, "//cue:")
+			what, rest, _ := cut(txt, " ")
+			switch what {
+			case "func":
+				if rest != "" {
+					fmt.Fprintln(&cueText, rest)
+				}
+			default:
+				panic(fmt.Errorf("unrecognized cue: comment directive: %q", c.Text))
+				// TODO support "constraint" too.
+			}
+			inCUE = true
+			continue
+		}
+		if !strings.HasPrefix(c.Text, "//") {
+			// TODO support /* */ comments
+			continue
+		}
+		cueText.WriteString(c.Text[2:])
+		cueText.WriteByte('\n')
+	}
+	decl := cueText.String()
+	// parse decl.
+	// make sure it unifies with the expected schema
+	// unify it with the CUE map for each function
+
 }
 
 func (g *generator) goKind(expr ast.Expr) string {
@@ -485,4 +502,12 @@ func loadCUEPackage(ctx *cue.Context, dir string, pkgPath string) (cue.Value, er
 func newContext() *cue.Context {
 	r := runtime.New()
 	return (*cue.Context)(r)
+}
+
+// strings.Cut
+func cut(s, sep string) (before, after string, found bool) {
+	if i := strings.Index(s, sep); i >= 0 {
+		return s[:i], s[i+len(sep):], true
+	}
+	return s, "", false
 }

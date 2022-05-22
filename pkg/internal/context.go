@@ -73,7 +73,7 @@ func (c *CallCtxt) Int8(i int) int8   { return int8(c.intValue(i, 8, "int8")) }
 func (c *CallCtxt) Int16(i int) int16 { return int16(c.intValue(i, 16, "int16")) }
 func (c *CallCtxt) Int32(i int) int32 { return int32(c.intValue(i, 32, "int32")) }
 func (c *CallCtxt) Rune(i int) rune   { return rune(c.intValue(i, 32, "rune")) }
-func (c *CallCtxt) Int64(i int) int64 { return int64(c.intValue(i, 64, "int64")) }
+func (c *CallCtxt) Int64(i int) int64 { return int64(c.intValue(i, 128, "int128")) }
 
 func (c *CallCtxt) intValue(i, bits int, typ string) int64 {
 	arg := c.args[i]

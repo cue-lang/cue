@@ -145,7 +145,7 @@ var pkg = &internal.Package{
 		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
-			i, base := c.Uint64(0), c.Int(1)
+			i, base := c.BigInt(0), c.Int(1)
 			if c.Do() {
 				c.Ret = FormatUint(i, base)
 			}
@@ -158,7 +158,7 @@ var pkg = &internal.Package{
 		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
-			i, base := c.Int64(0), c.Int(1)
+			i, base := c.BigInt(0), c.Int(1)
 			if c.Do() {
 				c.Ret = FormatInt(i, base)
 			}

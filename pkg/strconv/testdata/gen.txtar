@@ -8,6 +8,10 @@ t2: strconv.FormatFloat(3.02, 300, 4, 64)
 t3: strconv.FormatFloat(3.02, -1, 4, 64)
 t4: strconv.FormatFloat(3.02, 1.0, 4, 64)
 t5: strconv.FormatBool(true)
+t6: strconv.FormatInt(170_141_183_460_469_231_731_687_303_715_884_105_728, 10)
+t7: strconv.FormatInt(64, 16)
+t8: strconv.FormatUint(170_141_183_460_469_231_731_687_303_715_884_105_728, 10)
+t9: strconv.FormatUint(61, 62)
 -- out/strconv --
 Errors:
 t2: int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
@@ -24,4 +28,8 @@ t2: _|_ // t2: int 300 overflows byte in argument 1 in call to strconv.FormatFlo
 t3: _|_ // t3: cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
 t4: _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
 t5: "true"
+t6: "170141183460469231731687303715884105728"
+t7: "40"
+t8: "170141183460469231731687303715884105728"
+t9: "Z"
 

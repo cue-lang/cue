@@ -176,9 +176,12 @@ func (f *formatter) walkSpecList(list []*ast.ImportSpec) {
 
 func (f *formatter) walkClauseList(list []ast.Clause, ws whiteSpace) {
 	f.before(nil)
-	for _, x := range list {
+	for i, x := range list {
 		f.before(x)
-		f.print(ws)
+		// Only print the whitespace between the clauses.
+		if i > 0 {
+			f.print(ws)
+		}
 		f.clause(x)
 		f.after(x)
 	}
@@ -699,6 +702,7 @@ func (f *formatter) clause(clause ast.Clause) {
 		f.markUnindentLine()
 
 	case *ast.LetClause:
+		// TODO(mvdan): why do we handle LetClause in both the clause and decl methods?
 		f.print(n.Let, token.LET, blank, nooverride)
 		f.print(indent)
 		f.expr(n.Ident)

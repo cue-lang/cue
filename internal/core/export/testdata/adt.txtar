@@ -200,7 +200,7 @@ y1: {
 	for i, v in src {
 		"foo\(i)": v
 	}
-	x: [ for x in src let y = x {
+	x: [for x in src let y = x {
 		y
 	}]
 }

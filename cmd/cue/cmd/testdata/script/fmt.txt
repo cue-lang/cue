@@ -1,5 +1,16 @@
 ! cue fmt ./fmt
 cmp stderr expect-stderr
+
+cd issue_1544
+cp if.cue if.cue.golden
+cp let.cue let.cue.golden
+cp for.cue for.cue.golden
+cue fmt .
+cmp if.cue if.cue.golden
+cmp let.cue let.cue.golden
+cmp for.cue for.cue.golden
+cd ..
+
 -- expect-stderr --
 expected 'STRING', found '.':
     ./fmt/error.cue:1:9
@@ -9,3 +20,14 @@ import a.b "foo"
 a: 2
 bb: 3
 -- fmt/cue.mod --
+-- issue_1544/if.cue --
+if true {
+	x: 5
+}
+-- issue_1544/let.cue --
+let x = 5
+y: x
+-- issue_1544/for.cue --
+for v in ["a", "b"] {
+	(v): v
+}

@@ -16,6 +16,23 @@
       "message": "CC Marcel in case you think the formatting change is not desirable.",
       "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e8fe369_f46b1a01",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-24T15:28:51Z",
+      "side": 1,
+      "message": "I was confused by the name \"mayCombine\", as the return booleans are true if the combining requires blank spaces. I would have guessed the opposite given the name.",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

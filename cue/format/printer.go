@@ -425,9 +425,18 @@ func (p *printer) writeByte(ch byte, n int) {
 	p.pos.Column += n
 }
 
+// TODO(mvdan): mayCombine as a name was carried over from Go,
+// but it doesn't really make sense as a name for our logic here,
+// since we return true when either side must use a blank space.
+
 func mayCombine(prev, next token.Token) (before, after bool) {
 	s := next.String()
 	if 'a' <= s[0] && s[0] < 'z' {
+		if prev == token.ILLEGAL {
+			// If we're printing the first token,
+			// we don't need a blank space before it.
+			return false, true
+		}
 		return true, true
 	}
 	switch prev {

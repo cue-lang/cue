@@ -37,6 +37,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8e0a52c5_8077b30f",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1020202
+      },
+      "writtenOn": "2022-05-25T03:44:29Z",
+      "side": 1,
+      "message": "I have the same question here since it\u0027s kinda strange if you have to fix two places for different clauses.",
+      "range": {
+        "startLine": 705,
+        "startChar": 0,
+        "endLine": 705,
+        "endChar": 1
+      },
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e8fe369_f46b1a01",
         "filename": "cue/format/printer.go",
         "patchSetId": 1

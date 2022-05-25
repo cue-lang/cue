@@ -19,19 +19,8 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 )
 
-type Value struct {
-	R *runtime.Runtime
-	V *adt.Vertex
-}
-
-type Interface interface {
-	Core(v *Value)
-}
-
-func CastValue(t *Value, x interface{}) bool {
-	c, ok := x.(Interface)
-	if ok {
-		c.Core(t)
-	}
-	return ok
-}
+// ToInternal converts the value x to internal form from
+// a cue.Value. If it's not a cue.Value, it returns nil, nil.
+// This is initialized by the top level cue package to avoid
+// a cyclic dependency from the evaluation logic.
+var ToInternal func(x interface{}) (*runtime.Runtime, *adt.Vertex)

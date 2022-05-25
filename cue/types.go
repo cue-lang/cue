@@ -220,7 +220,6 @@ func unwrapJSONError(err error) errors.Error {
 }
 
 // An Iterator iterates over values.
-//
 type Iterator struct {
 	val   Value
 	idx   *runtime.Runtime
@@ -269,7 +268,6 @@ func (i *Iterator) Selector() Selector {
 
 // Label reports the label of the value if i iterates over struct fields and ""
 // otherwise.
-//
 //
 // Slated to be deprecated: use i.Selector().String(). Note that this will give
 // more accurate string representations.
@@ -600,10 +598,13 @@ func (v valueScope) Parent() compile.Scope {
 
 type hiddenValue = Value
 
-// Core is for internal use only.
-func (v hiddenValue) Core(x *types.Value) {
-	x.V = v.v
-	x.R = v.idx
+func init() {
+	types.ToInternal = func(x interface{}) (*runtime.Runtime, *adt.Vertex) {
+		if x, ok := x.(Value); ok {
+			return x.idx, x.v
+		}
+		return nil, nil
+	}
 }
 
 func newErrValue(v Value, b *adt.Bottom) Value {
@@ -1680,7 +1681,6 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 //
 // Any reference in v referring to the value at the given path will resolve to x
 // in the newly created value. The resulting value is not validated.
-//
 func (v Value) FillPath(p Path, x interface{}) Value {
 	if v.v == nil {
 		// TODO: panic here?

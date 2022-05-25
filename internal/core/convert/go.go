@@ -224,9 +224,9 @@ func isNil(x reflect.Value) bool {
 }
 
 func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
-	if t := (&types.Value{}); types.CastValue(t, x) {
+	if _, v := types.ToInternal(x); v != nil {
+		return v
 		// TODO: panic if nto the same runtime.
-		return t.V
 	}
 	src := ctx.Source()
 	switch v := x.(type) {

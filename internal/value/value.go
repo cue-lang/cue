@@ -38,9 +38,7 @@ func ConvertToContext(r *cue.Runtime) *cue.Context {
 }
 
 func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
-	var t types.Value
-	v.Core(&t)
-	return t.R, t.V
+	return types.ToInternal(v)
 }
 
 // Make wraps cue.MakeValue.

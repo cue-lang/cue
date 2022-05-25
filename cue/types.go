@@ -598,12 +598,13 @@ func (v valueScope) Parent() compile.Scope {
 	return valueScope(p)
 }
 
-type hiddenValue = Value
-
-// Core is for internal use only.
-func (v hiddenValue) Core(x *types.Value) {
-	x.V = v.v
-	x.R = v.idx
+func init() {
+	types.ToInternal = func(x interface{}) (*runtime.Runtime, *adt.Vertex) {
+		if x, ok := x.(Value); ok {
+			return x.idx, x.v
+		}
+		return nil, nil
+	}
 }
 
 func newErrValue(v Value, b *adt.Bottom) Value {
@@ -872,6 +873,11 @@ func stripNonDefaults(expr adt.Expr) (r adt.Expr, stripped bool) {
 		return x, false
 	}
 }
+
+// hiddenValue is used to hide deprecated methods, relying on the
+// fact that godoc doesn't show methods defined on unexported aliases
+// of exported types.
+type hiddenValue = Value
 
 // Label reports he label used to obtain this value from the enclosing struct.
 //

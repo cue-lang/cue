@@ -102,7 +102,7 @@ const FromArgsUsage = `
    selects all packages named foo in the any subdirectory of the current
    working directory.
 
-   3. An import path referring to a directory within the current module
+3. An import path referring to a directory within the current module
 
    All CUE files in that directory, and all the ancestor directories up to the
    module root (if applicable), with a package name corresponding to the base
@@ -150,8 +150,7 @@ type Config struct {
 	//         in the _ package.
 	Package string
 
-	// Dir is the directory in which to run the build system's query tool
-	// that provides information about the packages.
+	// Dir is the directory from which to load packages.
 	// If Dir is empty, the tool is run in the current directory.
 	Dir string
 

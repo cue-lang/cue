@@ -16,6 +16,23 @@
       "message": "Marcel, note that this updates the txtpbfmt dependency, which you mentioned is somewhat fragile. Are you OK with the change? I guess we can always try it for a few weeks and revert or fork if we find significant regressions.",
       "revId": "d521e0ec19cff60f5e179848ab306bf0439b00f6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1372134b_28669aab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-26T14:55:16Z",
+      "side": 1,
+      "message": "For the sake of not sitting around, I\u0027m going to submit this for now. We can always undo the txtpbfmt upgrade or start our vendor/fork, as already discussed last week.\n\nFor completeness, the txtpbfmt upgrade brings these 39 commits: https://github.com/protocolbuffers/txtpbfmt/compare/f6a6b3f636fc...74888fd59c2b. Nothing jumps out to me in terms of breaking changes.",
+      "revId": "d521e0ec19cff60f5e179848ab306bf0439b00f6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

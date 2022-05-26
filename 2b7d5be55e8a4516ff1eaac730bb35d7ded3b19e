@@ -60,6 +60,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "21b8dbf3_9403384b",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-26T09:13:20Z",
+      "side": 1,
+      "message": "yep indeed! I don\u0027t want to refactor this in the same CL, but I\u0027m leaving the TODO to perhaps look at it later.",
+      "parentUuid": "8e0a52c5_8077b30f",
+      "range": {
+        "startLine": 705,
+        "startChar": 0,
+        "endLine": 705,
+        "endChar": 1
+      },
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e8fe369_f46b1a01",
         "filename": "cue/format/printer.go",
         "patchSetId": 1

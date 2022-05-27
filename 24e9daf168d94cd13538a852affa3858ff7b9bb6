@@ -33,6 +33,23 @@
       "message": "LGTM. Thanks for the very detailed commit message explaining the background and what we will need to do in the future in case we land on a json/v2-like approach.",
       "revId": "24e9daf168d94cd13538a852affa3858ff7b9bb6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1024787d_97855a87",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-27T21:29:07Z",
+      "side": 1,
+      "message": "I\u0027ll need to fix the conflicts caused by the go/packages revert :) thanks for the review!",
+      "revId": "24e9daf168d94cd13538a852affa3858ff7b9bb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

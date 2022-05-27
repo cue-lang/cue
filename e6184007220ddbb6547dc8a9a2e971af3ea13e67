@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "387fdafb_04fdcca2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-27T19:29:09Z",
+      "side": 1,
+      "message": "@rytswd@gmail.com thanks for this. I will have a look through asap.\n\nFYI - I have been working on automating the upkeep of this guide (command output etc) in https://github.com/cue-examples/kubernetes-tutorial. This will allow us to properly make the guide part of CI.\n",
+      "revId": "e6184007220ddbb6547dc8a9a2e971af3ea13e67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,23 @@
       "message": "FYI Paul, this is part 2 of the go/packages cleanup. Done for now :) ",
       "revId": "24e9daf168d94cd13538a852affa3858ff7b9bb6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "380b7f61_d76099f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-27T20:37:46Z",
+      "side": 1,
+      "message": "LGTM. Thanks for the very detailed commit message explaining the background and what we will need to do in the future in case we land on a json/v2-like approach.",
+      "revId": "24e9daf168d94cd13538a852affa3858ff7b9bb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

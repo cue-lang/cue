@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5de1ed94_ba316a61",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-27T19:34:52Z",
+      "side": 1,
+      "message": "It\u0027s true this workflow runs for PRs, but it also runs as a result of runtrybot:\n\nhttps://github.com/cue-lang/cue/blob/31be9e32f88c1442cfe0e5f2cdb546ad89ee2415/internal/ci/workflows.cue#L52-L55",
+      "revId": "a17d757f8487500e02287659fd79e3cf5ddb7f15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "404c6e49_531c50d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-27T19:34:52Z",
+      "side": 1,
+      "message": "Sorry for the delay. LGTM with one question",
+      "revId": "a17d757f8487500e02287659fd79e3cf5ddb7f15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35425f1b_740b6a19",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-27T19:34:52Z",
+      "side": 1,
+      "message": "Just to confirm my understanding: you say this doesn\u0027t affect \"push\" builds, we therefore don\u0027t need to make this conditional based on the type of the build? i.e. for push builds, like the trybots for this CL, it has no effect?",
+      "revId": "a17d757f8487500e02287659fd79e3cf5ddb7f15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1f69730_18363547",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-27T20:03:43Z",
+      "side": 1,
+      "message": "This doesn\u0027t read quite right to me because it implies the package(s) in the directory will be loaded. But that\u0027s not strictly true, because it\u0027s the combination of the directory, the pattern arguments, plus the Package string, that determines what will be loaded. Perhaps the wording needs to talk about the Dir being the root from which the patterns are interpreted? As you can tell, I\u0027m not feeling particularly creative today :)",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

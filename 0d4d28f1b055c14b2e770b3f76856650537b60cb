@@ -16,6 +16,23 @@
       "message": "Thanks for your patience on this, Ryota!",
       "revId": "0d4d28f1b055c14b2e770b3f76856650537b60cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb6bee64_435a2de8",
+        "filename": "doc/contribute.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-29T20:18:58Z",
+      "side": 1,
+      "message": "funnily enough, upstream Go wants to quote commands as separate words, like `go` `fmt` rather than `go fmt`. You will see that sprinkled around the Go module docs and Go spec. I personally do not agree, so I\u0027m fine with this change :)",
+      "revId": "0d4d28f1b055c14b2e770b3f76856650537b60cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,6 +18,8 @@ import (
 	"path"
 	"encoding/yaml"
 	"tool/file"
+
+	"cuelang.org/go/internal/ci/workflows"
 )
 
 // For the commands below, note we use simple yet hacky path resolution, rather
@@ -35,7 +37,7 @@ import (
 command: genworkflows: {
 	_goos: string @tag(os,var=os)
 
-	for w in workflows {
+	for w in workflows.workflows {
 		"\(w.file)": file.Create & {
 			_dir:     path.FromSlash("../../.github/workflows", path.Unix)
 			filename: path.Join([_dir, w.file], _goos)

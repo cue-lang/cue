@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "9a688717_6cfbdfbc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-29T20:16:39Z",
+      "side": 1,
+      "message": "Yeah, I had that clear in my mind but I misspoke in the commit message. Will edit it to clarify, and then submit.",
+      "parentUuid": "5de1ed94_ba316a61",
+      "revId": "a17d757f8487500e02287659fd79e3cf5ddb7f15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "404c6e49_531c50d3",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -48,6 +66,24 @@
       "writtenOn": "2022-05-27T19:34:52Z",
       "side": 1,
       "message": "Just to confirm my understanding: you say this doesn\u0027t affect \"push\" builds, we therefore don\u0027t need to make this conditional based on the type of the build? i.e. for push builds, like the trybots for this CL, it has no effect?",
+      "revId": "a17d757f8487500e02287659fd79e3cf5ddb7f15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ed0f319_6c0abbda",
+        "filename": "internal/ci/workflows.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-29T20:16:39Z",
+      "side": 1,
+      "message": "Correct. This is why in the commit message, I say I tested that pushing to a branch still works the same as before.",
+      "parentUuid": "35425f1b_740b6a19",
       "revId": "a17d757f8487500e02287659fd79e3cf5ddb7f15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

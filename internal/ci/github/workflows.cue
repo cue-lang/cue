@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ci
+package github
 
 import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
@@ -420,7 +420,7 @@ _#goCheck: _#step & {
 	// dependencies that vary wildly between platforms.
 	// For now, to save CI resources, just run the checks on one matrix job.
 	// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+	if:   "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 	name: "Check"
 	run:  "go vet ./..."
 }

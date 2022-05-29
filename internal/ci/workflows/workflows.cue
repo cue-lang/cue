@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ci
+package workflows
 
 import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
@@ -250,7 +250,9 @@ release: _#bashWorkflow & {
 			_#step & {
 				name: "Run GoReleaser"
 				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
-				uses: "goreleaser/goreleaser-action@v2"
+				run: #"""
+					go run github.com/goreleaser/goreleaser@v1.8.2 release
+					"""#
 				with: {
 					args:    "release --rm-dist"
 					version: "v1.8.2"
@@ -414,7 +416,7 @@ _#goCheck: _#step & {
 	// dependencies that vary wildly between platforms.
 	// For now, to save CI resources, just run the checks on one matrix job.
 	// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+	if:   "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 	name: "Check"
 	run:  "go vet ./..."
 }

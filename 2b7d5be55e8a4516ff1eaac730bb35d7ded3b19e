@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5029e3f1_2878b684",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-29T20:34:10Z",
+      "side": 1,
+      "message": "Sounds good! I\u0027ll wait to hear if this formatting change is acceptable or not. Rog, you may also have an opinion :)",
+      "parentUuid": "0a3a2571_0530135d",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e0a52c5_8077b30f",

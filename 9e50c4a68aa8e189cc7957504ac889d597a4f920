@@ -16,6 +16,24 @@
       "message": "This doesn\u0027t read quite right to me because it implies the package(s) in the directory will be loaded. But that\u0027s not strictly true, because it\u0027s the combination of the directory, the pattern arguments, plus the Package string, that determines what will be loaded. Perhaps the wording needs to talk about the Dir being the root from which the patterns are interpreted? As you can tell, I\u0027m not feeling particularly creative today :)",
       "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca903fe8_6bf0e696",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-29T20:29:32Z",
+      "side": 1,
+      "message": "Yeah, you\u0027re right that this simplistic wording can be misunderstood.\n\nI\u0027m not a huge fan of using the word \"pattern\", because the docs make no mention of it otherwise. \"cue help inputs\" doesn\u0027t either. Borrowing from that help page, and also replacing \"packages\" with \"instances\" to be more precise, how about:\n\n\u003e Dir is the directory from which CUE instances start being loaded.\n\u003e For example, rooted import paths beginning with \".\" are relative to this directory.\n\u003e If Dir is empty, the current directory is used.",
+      "parentUuid": "b1f69730_18363547",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

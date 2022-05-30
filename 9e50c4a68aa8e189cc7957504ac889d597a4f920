@@ -34,6 +34,41 @@
       "parentUuid": "b1f69730_18363547",
       "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41b4f385_d940fed0",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-30T15:47:33Z",
+      "side": 1,
+      "message": "How about:\n\u003e Dir is used as the base directory for relative import paths (paths starting with \"./\")\n\nIs it used for anything else?",
+      "parentUuid": "ca903fe8_6bf0e696",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30b97fca_bc3af1e3",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-30T15:47:33Z",
+      "side": 1,
+      "message": "Don\u0027t you want to remove this line?",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

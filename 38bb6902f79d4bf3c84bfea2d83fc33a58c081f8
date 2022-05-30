@@ -16,6 +16,40 @@
       "message": "I almost decided against doing this, but I couldn\u0027t resist removing an unnecessary dependency, even if it\u0027s only for the tests :) ",
       "revId": "38bb6902f79d4bf3c84bfea2d83fc33a58c081f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa8d8954_aca9a381",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-30T16:16:25Z",
+      "side": 1,
+      "message": "I\u0027m not entirely convinced about this  change. The original `TestX` was very specialised but this is much less so. The `cue/cmd/cue` package uses a certain of global variables that don\u0027t look to me like they\u0027re necessarily thread safe (for example `runtime`, `defaultConfig`). I think some thought is needed about what this is actually needed for and whether some other kind of solution might work better.",
+      "revId": "38bb6902f79d4bf3c84bfea2d83fc33a58c081f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96c371c6_4743d656",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-05-30T16:16:25Z",
+      "side": 1,
+      "message": "Isn\u0027t this inherently racy when tests are run in parallel (which testscript always does) ?",
+      "revId": "38bb6902f79d4bf3c84bfea2d83fc33a58c081f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

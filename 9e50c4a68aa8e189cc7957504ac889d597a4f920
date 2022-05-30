@@ -92,6 +92,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7cf57654_204342f4",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-30T16:12:12Z",
+      "side": 1,
+      "message": "I don\u0027t oppose replacing \"import path\" from all the inputs and load docs, but that feels like a much larger CL than \"fix the Dir docs to not reference a query tool\" :) \n\nIf someone wants to do that CL now and replace mine, that\u0027s also fine. If not, perhaps we can track that in the issue tracker so we don\u0027t forget.",
+      "parentUuid": "d19db34c_de1edf8d",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30b97fca_bc3af1e3",
         "filename": "cue/load/config.go",
         "patchSetId": 2

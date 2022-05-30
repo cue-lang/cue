@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11845dfb_f9c5302b",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-30T14:27:05Z",
+      "side": 0,
+      "message": "My understanding this stripping of the `exec ` prefix is critical. Because TestX is used as a harness for testscript repros that are submitted via issues. In that situation, \"exec cue ...\" is the incantation used to call cue. So this pre-processing of a testscript file is at least part of the story.",
+      "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

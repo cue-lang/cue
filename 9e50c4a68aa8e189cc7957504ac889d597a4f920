@@ -74,6 +74,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d19db34c_de1edf8d",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-05-30T15:53:15Z",
+      "side": 1,
+      "message": "Interesting that \"go help packages\" refers to them as import paths as well, even though relative imports do not work in module mode. \n\nPerhaps we want to steer clear of the word \"import\" because CUE does not support relative imports.",
+      "parentUuid": "41b4f385_d940fed0",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30b97fca_bc3af1e3",
         "filename": "cue/load/config.go",
         "patchSetId": 2

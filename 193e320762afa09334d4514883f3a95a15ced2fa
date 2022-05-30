@@ -34,6 +34,24 @@
       "parentUuid": "11845dfb_f9c5302b",
       "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cc53253_b20878e0",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-30T14:42:49Z",
+      "side": 0,
+      "message": "I messed up the -run syntax in the second command by the way, it would be more like:\n\n    sed -i -e \u0027s/exec cue/cue/\u0027 testdata/scripts/foobar.txt \u0026\u0026 TESTSCRIPT_SAME_PROCESS\u003dtrue go test -run TestScript/foobar",
+      "parentUuid": "c5dfb693_74c95dfb",
+      "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

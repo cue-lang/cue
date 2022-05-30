@@ -6,7 +6,6 @@ require (
 	github.com/cockroachdb/apd/v2 v2.0.1
 	github.com/emicklei/proto v1.10.0
 	github.com/google/go-cmp v0.5.7
-	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.2.0
 	github.com/kr/pretty v0.1.0
 	github.com/kylelemons/godebug v1.1.0

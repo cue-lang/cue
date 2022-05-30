@@ -15,11 +15,9 @@
 package cmd
 
 import (
-	"bufio"
 	"bytes"
 	"context"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -27,7 +25,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
@@ -84,11 +81,28 @@ func TestLatest(t *testing.T) {
 	})
 }
 
+// testscriptSameProcess allows TestScript to run a single script,
+// but running CUE commands in the same process to help debugging.
+// This is done by running CUE via Params.Cmds; see the conditionals below.
+// Also note that this makes the first CUE command fail and stop the script.
+//
+// Usage: TESTSCRIPT_SAME_PROCESS=true go test -run ScriptDebug/^eval_e$
+var testscriptSameProcess = os.Getenv("TESTSCRIPT_SAME_PROCESS") == "true"
+
 func TestScript(t *testing.T) {
 	srv, err := goproxytest.NewServer(filepath.Join("testdata", "mod"), "")
 	if err != nil {
 		t.Fatalf("cannot start proxy: %v", err)
 	}
+
+	if testscriptSameProcess {
+		cwd, err := os.Getwd()
+		if err != nil {
+			t.Fatal(err)
+		}
+		defer func() { _ = os.Chdir(cwd) }()
+	}
+
 	p := testscript.Params{
 		Dir:           filepath.Join("testdata", "script"),
 		UpdateScripts: cuetest.UpdateGoldenFiles,
@@ -105,9 +119,25 @@ func TestScript(t *testing.T) {
 				"GONOSUMDB=*", // GOPROXY is a private proxy
 				homeEnvName()+"="+home,
 			)
+
+			if testscriptSameProcess {
+				_ = os.Chdir(e.WorkDir)
+			}
 			return nil
 		},
 		Condition: cuetest.Condition,
+	}
+	if testscriptSameProcess {
+		p.Cmds = make(map[string]func(ts *testscript.TestScript, neg bool, args []string))
+		p.Cmds["cue"] = func(ts *testscript.TestScript, neg bool, args []string) {
+			c, err := New(args)
+			ts.Check(err)
+			b := &bytes.Buffer{}
+			c.SetOutput(b)
+			err = c.Run(context.Background())
+			// Always create an error to show
+			ts.Fatalf("%s: %s", err, b.String())
+		}
 	}
 	if err := gotooltest.Setup(&p); err != nil {
 		t.Fatal(err)
@@ -115,70 +145,12 @@ func TestScript(t *testing.T) {
 	testscript.Run(t, p)
 }
 
-// TestScriptDebug takes a single testscript file and then runs it within the
-// same process so it can be used for debugging. It runs the first cue command
-// it finds.
-//
-// Usage Comment out t.Skip() and set file to test.
-func TestX(t *testing.T) {
-	t.Skip()
-	const path = "./testdata/script/eval_e.txt"
-
-	check := func(err error) {
-		t.Helper()
-		if err != nil {
-			t.Fatal(err)
-		}
-	}
-
-	tmpdir := t.TempDir()
-
-	a, err := txtar.ParseFile(filepath.FromSlash(path))
-	check(err)
-
-	for _, f := range a.Files {
-		name := filepath.Join(tmpdir, f.Name)
-		check(os.MkdirAll(filepath.Dir(name), 0777))
-		check(ioutil.WriteFile(name, f.Data, 0666))
-	}
-
-	cwd, err := os.Getwd()
-	check(err)
-	defer func() { _ = os.Chdir(cwd) }()
-	_ = os.Chdir(tmpdir)
-
-	for s := bufio.NewScanner(bytes.NewReader(a.Comment)); s.Scan(); {
-		cmd := s.Text()
-		cmd = strings.TrimLeft(cmd, "! ")
-		if strings.HasPrefix(cmd, "exec ") {
-			cmd = cmd[len("exec "):]
-		}
-		if !strings.HasPrefix(cmd, "cue ") {
-			continue
-		}
-
-		args, err := shlex.Split(cmd)
-		check(err)
-
-		c, err := New(args[1:])
-		check(err)
-		b := &bytes.Buffer{}
-		c.SetOutput(b)
-		err = c.Run(context.Background())
-		// Always create an error to show
-		t.Error(err, "\n", b.String())
-		return
-	}
-	t.Fatal("NO COMMAND FOUND")
-}
-
 func TestMain(m *testing.M) {
-	// Setting inTest causes filenames printed in error messages
-	// to be normalized so the output looks the same on Unix
-	// as Windows.
-	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": MainTest,
-	}))
+	cmds := make(map[string]func() int)
+	if !testscriptSameProcess {
+		cmds["cue"] = MainTest
+	}
+	os.Exit(testscript.RunMain(m, cmds))
 }
 
 // homeEnvName extracts the logic from os.UserHomeDir to get the

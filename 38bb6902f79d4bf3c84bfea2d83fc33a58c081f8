@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38773d9d_a377fc4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-30T14:02:58Z",
+      "side": 1,
+      "message": "I almost decided against doing this, but I couldn\u0027t resist removing an unnecessary dependency, even if it\u0027s only for the tests :) ",
+      "revId": "38bb6902f79d4bf3c84bfea2d83fc33a58c081f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

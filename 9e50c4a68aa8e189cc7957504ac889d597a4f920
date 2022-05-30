@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7349fa64_c0b57fd6",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-30T15:52:05Z",
+      "side": 1,
+      "message": "I\u0027m not 100% sure, and even if true today it might not be in the future, which is why I went with \"for example\" instead :) Happy for any of you to call the shot here, I just don\u0027t know cue/load super well yet.\n\nFYI, \"relative import paths\" is not a concept in CUE, \"cue help inputs\" calls them \"rooted paths\", which is why I used that wording in my last suggestion.",
+      "parentUuid": "41b4f385_d940fed0",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30b97fca_bc3af1e3",
         "filename": "cue/load/config.go",
         "patchSetId": 2
@@ -67,6 +85,24 @@
       "writtenOn": "2022-05-30T15:47:33Z",
       "side": 1,
       "message": "Don\u0027t you want to remove this line?",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05eb8304_d7202f52",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-30T15:52:05Z",
+      "side": 1,
+      "message": "I would say not; we should still document what happens when the string is empty. See my last suggestion, in the other thread, which says:\n\n\u003e If Dir is empty, the current directory is used.",
+      "parentUuid": "30b97fca_bc3af1e3",
       "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "My understanding this stripping of the `exec ` prefix is critical. Because TestX is used as a harness for testscript repros that are submitted via issues. In that situation, \"exec cue ...\" is the incantation used to call cue. So this pre-processing of a testscript file is at least part of the story.",
       "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5dfb693_74c95dfb",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-30T14:41:31Z",
+      "side": 0,
+      "message": "You\u0027re right that I missed this detail.\n\nExactly why do we want to strip the \"exec\" in that scenario? Is it to make sure we use the same CUE version we\u0027re developing, or to use in-process-debugging tools like pprof? If it\u0027s just the former, I imagine one could do:\n\n    go install cuelang.org/go/cmd/cue \u0026\u0026 testscript test.txtar\n\nOr, to not require \"go install\" and use the same process:\n\n    sed -i -e \u0027s/exec cue/cue/\u0027 test.txtar \u0026\u0026 TESTSCRIPT_SAME_PROCESS\u003dtrue go test -run TestScript test.txtar\n\nI guess we could implement that last option as part of TESTSCRIPT_SAME_PROCESS, though testscript currently does not take anything like an io/fs.FS, so we\u0027d have to use a temp dir to rewrite the test script.\n\nOne way or another, I still think the old method is worse long term - for example, it ignores any non-CUE commands like cp or mv, so many non-trivial scripts simply won\u0027t work.",
+      "parentUuid": "11845dfb_f9c5302b",
+      "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

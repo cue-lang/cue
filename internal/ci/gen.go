@@ -14,6 +14,5 @@
 
 package ci
 
-//go:generate go run cuelang.org/go/cmd/cue cmd vendorgithubschema ./vendor
+//go:generate go run cuelang.org/go/cmd/cue cmd importjsonschema ./vendor
 //go:generate go run cuelang.org/go/cmd/cue cmd genworkflows
-//go:generate go run cuelang.org/go/cmd/cue cmd updateTxtarTests

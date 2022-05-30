@@ -16,6 +16,24 @@
       "message": "LGTM, thanks!",
       "revId": "0a530015b219fc3b400fcaa7fe10c835257f7b88",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da2b62ff_e42f7b08",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019759
+      },
+      "writtenOn": "2022-05-30T17:20:45Z",
+      "side": 1,
+      "message": "Thanks!\nThis was my first contribution to cue.",
+      "parentUuid": "a3da1858_24676d33",
+      "revId": "0a530015b219fc3b400fcaa7fe10c835257f7b88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -70,6 +70,24 @@
       "parentUuid": "c5dfb693_74c95dfb",
       "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a1c64ef_0c2175b2",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-30T15:18:05Z",
+      "side": 0,
+      "message": "Ah, I see. So perhaps it could be called like:\n\n    TESTSCRIPT_DEBUG\u003dfoobar.txt go test -run TestScript\n\nThe DEBUG env var would:\n\n1) Copy the testscript file into a temporary directory\n2) Replace \"exec cue\" with \"cue\" with search and replace\n3) Run testscript on the temporary directory with the \"same process\" mode I implemented here\n\nThe result will be pretty similar to what I understand Marcel\u0027s current workflow to be, but it will use native testscript, so we\u0027ll support pretty much any testscript and not just trivial ones.\n\nI\u0027ll wait for him to give a quick review of this approach once he feels better, before I change the CL :)",
+      "parentUuid": "9e2faf1c_a72a7fe8",
+      "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,26 +18,23 @@ import (
 	"path"
 
 	"tool/exec"
-	"tool/file"
 	"tool/http"
-	"tool/os"
 )
 
-// vendorgithubschema vendors a "cue import"-ed version of the JSONSchema that
+// _cueCmd defines the command that is run to run cmd/cue.
+// This is factored out in order that the cue-github-actions
+// project which "vendors" the various workflow-related
+// packages can specify "cue" as the value so that unity
+// tests can specify the cmd/cue binary to use.
+_cueCmd: string | *"go run cuelang.org/go/cmd/cue@v0.4.3" @tag(cue_cmd)
+
+// For the commands below, note we use simple yet hacky path resolution, rather
+// than anything that might derive the module root using go list or similar, in
+// order that we have zero dependencies.
+
+// importjsonschema vendors a CUE-imported version of the JSONSchema that
 // defines GitHub workflows into the main module's cue.mod/pkg.
-//
-// See internal/ci/gen.go for details on how this step fits into the sequence
-// of generating our CI workflow definitions, and updating various txtar tests
-// with files from that process.
-//
-// Until we have a resolution for cuelang.org/issue/704 and
-// cuelang.org/issue/708 this must be run from the internal/ci package. At
-// which point we can switch to using _#modroot.
-//
-// This also explains why the ../../ relative path specification below appear
-// wrong in the context of the containing directory internal/ci/vendor.
-command: vendorgithubschema: {
-	goos:          _#goos
+command: importjsonschema: {
 	getJSONSchema: http.Get & {
 		request: body: ""
 
@@ -45,47 +42,9 @@ command: vendorgithubschema: {
 		// https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/github-workflow.json
 		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/6fe4707b9d1c5d45cfc8d5b6d56968e65d2bdc38/src/schemas/json/github-workflow.json"
 	}
-	// Write the JSON schema to an encoding/jsonschema txtar test
-	// that verifies (at go test time) that we can import this
-	// JSON schema definition, independently of having to re-run
-	// go generate (which is expensive and yet another command
-	// to have to remember to run)
-	updateEncodingJSONSchemaTxtarTest: exec.Run & {
-		_relpath: path.FromSlash("../../encoding/jsonschema/testdata/github.txtar", "unix")
-		_path:    path.Join([_relpath], goos.GOOS)
+	import: exec.Run & {
+		_outpath: path.FromSlash("../../cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue", "unix")
 		stdin:    getJSONSchema.response.body
-		cmd:      "go run cuelang.org/go/internal/ci/updatetxtar - \(_path) workflow.json"
+		cmd:      "\(_cueCmd) import -f -p json -l #Workflow: -o \(_outpath) jsonschema: -"
 	}
-	importJSONSchema: exec.Run & {
-		stdin:  getJSONSchema.response.body
-		cmd:    "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - -o -"
-		stdout: string
-	}
-	// vendorGitHubWorkflowSchema writes the imported schema to the cue.mod/pkg
-	// hierarchy for the GitHub workflow package. This vendored
-	// package is then referenced in the internal/ci package
-	// when defining workflows.
-	vendorGitHubWorkflowSchema: file.Create & {
-		_path:    path.FromSlash("../../cue.mod/pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue", "unix")
-		filename: path.Join([_path], goos.GOOS)
-		contents: importJSONSchema.stdout
-	}
-}
-
-// _#modroot is a common helper to get the module root
-//
-// TODO: use once we have a solution to cuelang.org/issue/704.
-// This will then allow us to remove the use of .. below.
-_#modroot: exec.Run & {
-	cmd:    "go list -m -f {{.Dir}}"
-	stdout: string
-}
-
-// Until we have the ability to inject contextual information
-// we need to pass in GOOS explicitly. Either by environment
-// variable (which we get for free when this is used via go generate)
-// or via a tag in the case you want to manually run the CUE
-// command.
-_#goos: os.Getenv & {
-	GOOS: *"unix" | string @tag(os)
 }

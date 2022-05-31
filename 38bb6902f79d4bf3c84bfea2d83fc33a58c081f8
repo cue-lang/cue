@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "685b50a3_47b201ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-31T12:30:11Z",
+      "side": 1,
+      "message": "You\u0027re right about the parallelism, and the newly suggested method wouldn\u0027t have that problem. See https://review.gerrithub.io/c/cue-lang/cue/+/538992/comments/11845dfb_f9c5302b. Any thoughts on it?",
+      "parentUuid": "fa8d8954_aca9a381",
+      "revId": "38bb6902f79d4bf3c84bfea2d83fc33a58c081f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "96c371c6_4743d656",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-05-30T16:16:25Z",
       "side": 1,
       "message": "Isn\u0027t this inherently racy when tests are run in parallel (which testscript always does) ?",
+      "revId": "38bb6902f79d4bf3c84bfea2d83fc33a58c081f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b666aa5f_a58cdbc7",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-05-31T12:30:11Z",
+      "side": 1,
+      "message": "Yup, well spotted. I intended for this to be used for a single test (see the usage example above), but it\u0027s still a footgun. The new mechanism that I discussed with Paul wouldn\u0027t have this problem, because it would be restricted to a single testscript file.",
+      "parentUuid": "96c371c6_4743d656",
       "revId": "38bb6902f79d4bf3c84bfea2d83fc33a58c081f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

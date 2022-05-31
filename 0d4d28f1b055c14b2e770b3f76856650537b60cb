@@ -33,6 +33,24 @@
       "message": "funnily enough, upstream Go wants to quote commands as separate words, like `go` `fmt` rather than `go fmt`. You will see that sprinkled around the Go module docs and Go spec. I personally do not agree, so I\u0027m fine with this change :)",
       "revId": "0d4d28f1b055c14b2e770b3f76856650537b60cb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac00a5db_af6716d8",
+        "filename": "doc/contribute.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 463,
+      "author": {
+        "id": 1020182
+      },
+      "writtenOn": "2022-05-31T11:22:29Z",
+      "side": 1,
+      "message": "Oh I didn\u0027t know about that! I think it makes sense from the Go repo point of view, as they provide all of those commands / subcommands in their code base - making it clear that each part has some dedicated code to handle.\n\nFor tool dependency like this one, it is often easier to see, and copy/paste when the command is in a single code backticks - which I think you are on the same page as well :)\n\nThanks for your insight anyways though!",
+      "parentUuid": "bb6bee64_435a2de8",
+      "revId": "0d4d28f1b055c14b2e770b3f76856650537b60cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": []

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c5e1c5b_8e72464c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020182
+      },
+      "writtenOn": "2022-05-31T11:22:29Z",
+      "side": 1,
+      "message": "Thanks for the review, happy to land my first contribution to CUE community 🎉",
+      "revId": "193e320762afa09334d4514883f3a95a15ced2fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

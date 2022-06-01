@@ -16,6 +16,24 @@
       "message": "@rytswd@gmail.com thanks for this. I will have a look through asap.\n\nFYI - I have been working on automating the upkeep of this guide (command output etc) in https://github.com/cue-examples/kubernetes-tutorial. This will allow us to properly make the guide part of CI.\n",
       "revId": "e6184007220ddbb6547dc8a9a2e971af3ea13e67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1127f59d_c9337792",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020182
+      },
+      "writtenOn": "2022-06-01T16:21:00Z",
+      "side": 1,
+      "message": "Thanks for the share, I wasn\u0027t aware of that repo! I\u0027d find thorough testing using the actual commands and checking output of each file would be the best, rather than trying to mock some CLI behaviours. If you want me to make more changes in this repo as well, I\u0027d be happy to 👍 (Is it on GerritHub?)",
+      "parentUuid": "387fdafb_04fdcca2",
+      "revId": "e6184007220ddbb6547dc8a9a2e971af3ea13e67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

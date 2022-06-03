@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b9e185a_383748ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-03T11:09:26Z",
+      "side": 1,
+      "message": "FYI this change introduces some large changes in unity which we will need to understand. These changes are _not_ \"resolved\" by the use of CUE_DEBUG_SORT_ARCS\u003d2. i.e. in the chain after \"use per-field comprehensions\" this is the first CL which breaks unity.",
+      "revId": "fb6e2bb809672773029ffd21391b0c69a662c38d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -87,6 +87,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ef9f438_bdf86616",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 36
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-03T10:57:23Z",
+      "side": 1,
+      "message": "The trybot failure here appears to be known about, because the next CL in the chain does not fail, and includes the relevant changes to the two test files that fail:\n\n    $ git diff\n    diff --git a/cmd/cue/cmd/testdata/script/eval_flags.txt b/cmd/cue/cmd/testdata/script/eval_flags.txt\n    index 0b8dab5c..b0e47022 100644\n    --- a/cmd/cue/cmd/testdata/script/eval_flags.txt\n    +++ b/cmd/cue/cmd/testdata/script/eval_flags.txt\n    @@ -53,5 +53,4 @@ Y: conflicting values 2 and float (mismatched types int and float):\n         ./vector.cue:5:8\n     Z: field not allowed: Z:\n         ./test.json:4:3\n    -    ./vector.cue:3:1\n         ./vector.cue:3:6\n    diff --git a/cmd/cue/cmd/testdata/script/vet_expr.txt b/cmd/cue/cmd/testdata/script/vet_expr.txt\n    index b78113ec..be6b6904 100644\n    --- a/cmd/cue/cmd/testdata/script/vet_expr.txt\n    +++ b/cmd/cue/cmd/testdata/script/vet_expr.txt\n    @@ -2,7 +2,8 @@\n     cmp stderr expect-stderr\n\n     -- expect-stderr --\n    -translations.hello.lang: incomplete value string\n    +translations.hello.lang: incomplete value string:\n    +    ./vet.cue:3:11\n     skip: field not allowed: skip:\n         ./data.yaml:20:1\n         ./vet.cue:1:8\n\n",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ffa86f99_e6b71c01",

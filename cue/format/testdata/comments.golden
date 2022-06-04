@@ -75,9 +75,9 @@ list1: [
 
 	// Another comment
 	{
-	}
+	},
 
-	// Comment 3,
+	// Comment 3
 ]
 
 list2: [

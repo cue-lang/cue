@@ -255,7 +255,6 @@ func (f *formatter) print(a ...interface{}) {
 			f.current.pos++
 		}
 	}
-	f.visitComments(f.current.pos)
 }
 
 func (f *formatter) formfeed() whiteSpace {

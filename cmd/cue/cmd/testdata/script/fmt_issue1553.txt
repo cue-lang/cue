@@ -1,0 +1,8 @@
+exec cue fmt x.cue
+cp x.cue x1.cue
+exec cue fmt x.cue
+cmp x.cue x1.cue
+-- x.cue --
+[
+    {} //
+]

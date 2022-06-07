@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25a3cb42_a30fa80a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-07T13:52:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b0e8fb88_1cc52f75",
+      "revId": "4ceef5fbc3d0a8775b27b2307dc954efb8d41e7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b7b07bd_f6acb0d0",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "776d8934_daf49398",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-07T13:52:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b7b07bd_f6acb0d0",
+      "revId": "4ceef5fbc3d0a8775b27b2307dc954efb8d41e7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5adfea61_0060022b",
@@ -48,6 +84,24 @@
       "writtenOn": "2022-06-07T13:44:51Z",
       "side": 1,
       "message": "should probably go? you said they were personal notes.",
+      "revId": "4ceef5fbc3d0a8775b27b2307dc954efb8d41e7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59058431_9b3aee3e",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-07T13:52:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5adfea61_0060022b",
       "revId": "4ceef5fbc3d0a8775b27b2307dc954efb8d41e7a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

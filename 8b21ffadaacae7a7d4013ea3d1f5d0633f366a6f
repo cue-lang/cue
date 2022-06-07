@@ -16,6 +16,24 @@
       "message": "A suggestion for an alternate commit message:\n\ninternal/encoding: always validate when exporting\n\nThe Value.Validate method was not called when Encoder.interpret\nis non-nil, which meant that validation errors were being ignored.\nThis explains the difference between errors being reported when exporting\nto JSON (nil interpret field) and OpenAPI (non-nil interpret field), and\nmay well be fixing other use cases too.\n\nWe fix this by calling Validate in both cases.",
       "revId": "8b21ffadaacae7a7d4013ea3d1f5d0633f366a6f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7bbada4_23a85ae3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-07T13:30:25Z",
+      "side": 1,
+      "message": "Done, thank you!",
+      "parentUuid": "381d9df0_48405a06",
+      "revId": "8b21ffadaacae7a7d4013ea3d1f5d0633f366a6f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -308,8 +308,16 @@ func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err er
 	}
 	// Delay opening the file until we can write it to completion. This will
 	// prevent clobbering the file in case of a crash.
+	// We also avoid overwriting the file if the buffer is empty,
+	// which can happen if we encountered an error while formatting.
+	// This works well enough for now, as encodings like CUE always end with a
+	// newline, so even zero data still formats as one newline character.
+	// Perhaps we need to reconsider this in the future.
 	b := &bytes.Buffer{}
 	fn := func() error {
+		if b.Len() == 0 {
+			return nil
+		}
 		return ioutil.WriteFile(path, b.Bytes(), 0644)
 	}
 	return b, fn, nil

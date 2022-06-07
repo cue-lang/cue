@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0e8fb88_1cc52f75",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-07T13:44:51Z",
+      "side": 1,
+      "message": "nit: either \"the pkg/gen package\" or just \"pkg/gen\".",
+      "revId": "4ceef5fbc3d0a8775b27b2307dc954efb8d41e7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b7b07bd_f6acb0d0",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-07T13:44:51Z",
+      "side": 1,
+      "message": "explain why?",
+      "revId": "4ceef5fbc3d0a8775b27b2307dc954efb8d41e7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5adfea61_0060022b",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-07T13:44:51Z",
+      "side": 1,
+      "message": "should probably go? you said they were personal notes.",
+      "revId": "4ceef5fbc3d0a8775b27b2307dc954efb8d41e7a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f90c492_bd35d63a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T13:16:23Z",
+      "side": 1,
+      "message": "As you pointed out to me earlier today, it\u0027s nicer to keep code movement separate from code changes 😊, but I have gone through and manually inspected the changes side by side, and I don\u0027t see any significant differences, so all LGTM, thanks. ",
+      "revId": "d58cd1382e3500a021ce082f87988ecc6ee039f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f753f28_4faab31e",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T13:16:23Z",
+      "side": 1,
+      "message": "Would it be possible to do the code move independently without changing the logic too, so we can see the diff? (AFAICS, assertStructuralCycle has changed but updateCyclic has not, but it\u0027s a bit hard to be sure)",
+      "revId": "d58cd1382e3500a021ce082f87988ecc6ee039f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81af2c3c_ef332a5b",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1173,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T13:16:23Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem related to the rest of the CL.",
+      "revId": "d58cd1382e3500a021ce082f87988ecc6ee039f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

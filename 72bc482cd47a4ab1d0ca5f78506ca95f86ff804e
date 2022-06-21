@@ -16,6 +16,24 @@
       "message": "I like all this red!",
       "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66c61c47_941e9294",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 680,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 0,
+      "message": "Ack",
+      "parentUuid": "0bfdcff5_4c6b3ae2",
+      "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

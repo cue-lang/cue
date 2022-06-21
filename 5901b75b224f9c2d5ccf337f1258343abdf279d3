@@ -121,6 +121,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aeabb783_ffe56403",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Not entirely sure what I intended, but adjusted comment.",
+      "parentUuid": "ffa86f99_e6b71c01",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f6eeb98_8f844fb7",
@@ -134,6 +152,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "Seems like this should still be tabs to match the rest of the file.",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac890234_f7f540a6",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done. This was a result of Paul doing formatting in parallel",
+      "parentUuid": "3f6eeb98_8f844fb7",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -155,6 +191,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eaf86c9f_c9cd422f",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df7d61d9_c0fd111a",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66a8baf9_348c875d",
@@ -168,6 +222,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "ditto",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb27ef9a_acf021e5",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66a8baf9_348c875d",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -189,6 +261,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5691a31_2d661680",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f56a8ed_a4cce1b5",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d975621e_925f0eb4",
@@ -202,6 +292,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "Doc comment?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4be210cc_aaf91d19",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d975621e_925f0eb4",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -223,6 +331,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d40bc99_6705b3ac",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "02f0990a_c4fb6e98",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "39fa303c_d486f61a",
@@ -236,6 +362,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "\"*that* belong to a struct\", presumably?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff7f580a_4a7cc9a6",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "39fa303c_d486f61a",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -257,6 +401,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c0a2df3_3cc390a4",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2ae6d65c_21e21c95",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "88eb443c_059ff828",
@@ -270,6 +432,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "This is an odd comment - how is Bottom a runtime?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb3d187a_74d85003",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88eb443c_059ff828",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -291,6 +471,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98cc768b_2fd4b910",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba5d7be5_7392b2cd",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "777cbf8d_a80b540d",
@@ -304,6 +502,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "FWIW when putting multiple args on separate lines, I think it reads a bit more nicely when they\u0027re all consistently on their own line:\n\nfunc (n *nodeContext) insertComprehension(\n\tenv *Environment,\n\tc *Comprehension,\n\tci CloseInfo,\n) {\n\n:shrug:",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9e628b3_28551712",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "777cbf8d_a80b540d",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -343,6 +559,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f26a8c1_a9713da9",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Linters are fairly buggy for me.",
+      "parentUuid": "80e65e43_2bace12a",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "459e2897_e004084d",
@@ -356,6 +590,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "if _, ok :\u003d d.(*Field); !ok {\n\n?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42dfcdd0_d93c975c",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "459e2897_e004084d",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -377,6 +629,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "83cccf13_e55d9604",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "It is separate because historically `if` and `for` comprehensions were in separate []envYield slices. We may still do so in the future.\n\nI generally think using such a helper variable is bug prone. In fact, when I adjusted it using your suggesting it introduced a bug!",
+      "parentUuid": "74de07ee_d50ac809",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9653b99e_b97ecdfc",
@@ -390,6 +660,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "What are the plans here? Maybe add a TODO to uncomment this block if appropriate?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb43fa39_9b5f6e8d",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9653b99e_b97ecdfc",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -411,6 +699,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f016882_7f9eb9b7",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 259,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3aa7d05a_d40d31d8",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5184e89d_9e7fedb5",
@@ -424,6 +730,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "I _think_ I understand what\u0027s going on here, but a doc comment could make that clearer.",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfb264d3_b2804408",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5184e89d_9e7fedb5",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -445,6 +769,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6203497_424c6a41",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af0375e8_afad0890",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "155af67b_e5f0281b",
@@ -458,6 +800,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "evaluates the Yielder inside the given comprehension ?\nIt would be nice to document the other parameters too - for example, it\u0027s not clear to me how the node relates to the comprehension (or the environment either, given that an environment also contains a Vertex).",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7758b880_0f0b2a10",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 471,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "155af67b_e5f0281b",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -479,6 +839,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73c18223_32e5a95f",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 623,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4d7b58af_1f7000e5",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ede77ea6_5a7bd3f3",
@@ -492,6 +870,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "Maybe mention what \"expectError\" signifies here?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f725458d_468aad31",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 1269,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ede77ea6_5a7bd3f3",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -513,6 +909,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f20297ac_989840a0",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 1648,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf7df30a_a9dd9d6b",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6a012b4_42d8645a",
@@ -530,6 +944,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbb6fa8a_c9606b0d",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 36
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "For computed comprehensions (those pushed down void fields), the value is not a struct, but rather a field. This is done for error reporting purposes, IIRC. As such, the field needs to be \"unwrapped\" to get to the expression.",
+      "parentUuid": "e6a012b4_42d8645a",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "04ecbc0e_f0c78e8b",
@@ -543,6 +975,24 @@
       "writtenOn": "2022-05-12T17:34:16Z",
       "side": 1,
       "message": "Should this still be using tabs?",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6248bb05_99a68b3d",
+        "filename": "internal/core/dep/testdata/structcomprehension.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:31:00Z",
+      "side": 1,
+      "message": "Probably not. But we can fix the formatting after all is checked in. Right now it causes too much mayhem.",
+      "parentUuid": "04ecbc0e_f0c78e8b",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

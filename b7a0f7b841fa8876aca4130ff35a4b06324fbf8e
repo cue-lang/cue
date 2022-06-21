@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4275626f_f7334650",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-21T07:51:21Z",
+      "side": 1,
+      "message": "\u003e Patch Set 2: TryBot-Result-1\n\u003e \n\u003e Build failed for Windows-1.18.x; see https://github.com/cue-lang/cue/actions/runs/2533757921 for more details\n\nThat is https://github.com/golang/go/issues/30789. I\u0027ll work on a fix for go-internal/testscript. In the meantime, it\u0027s safe to ignore this failure - all other test environments passed.",
+      "revId": "b7a0f7b841fa8876aca4130ff35a4b06324fbf8e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

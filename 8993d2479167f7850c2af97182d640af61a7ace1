@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cd2bcfc_1880fc58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:17:48Z",
+      "side": 1,
+      "message": "I\u0027m not a huge fan of the function variable initialized at init time. I used to use exactly that method, in fact, and I ran into some trouble at times.\n\nI think the current solution is obscure enough to discourage people from going that route.\n\nSome of these issues may resolve themselves with restructuring anyway.",
+      "revId": "8993d2479167f7850c2af97182d640af61a7ace1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

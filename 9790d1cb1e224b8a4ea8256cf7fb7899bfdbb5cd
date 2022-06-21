@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "113ee86a_8746c8b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T12:54:08Z",
+      "side": 1,
+      "message": "LGTM with a couple of trivial thoughts, thanks!",
+      "revId": "9790d1cb1e224b8a4ea8256cf7fb7899bfdbb5cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da5f1478_fe2243b8",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2021,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T12:54:08Z",
+      "side": 1,
+      "message": "Maybe add a doc comment. How is this different from injectDynamicFields ?",
+      "revId": "9790d1cb1e224b8a4ea8256cf7fb7899bfdbb5cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "277367eb_f6a0ba1f",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2041,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T12:54:08Z",
+      "side": 1,
+      "message": "Taking the address of a field is pretty standard without the additional parens:\n\n\u003e progress \u003d progress || n.injectComprehensions(\u0026n.comprehensions)",
+      "revId": "9790d1cb1e224b8a4ea8256cf7fb7899bfdbb5cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

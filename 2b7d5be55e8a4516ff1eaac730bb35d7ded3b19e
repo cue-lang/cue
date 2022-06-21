@@ -89,6 +89,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f93ef85e_ad5b7c8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:24:00Z",
+      "side": 1,
+      "message": "Tests are typically put in the directory that implements this functionality. So in this case `cue/format`.\n\nThese tests should at least be there. But I think it is then not necessary, or even undesirable, to have the tests here. The cue/cmd tests are typically reserved for tests related to the command line specifically.\n\nThe only \"generic\" test suite we have is `cue/testdata`. (This testdata directory should probably move to the top level directory of the repo.)\nBasically, several components in `internal/core` build their tests on that. But in each case the respective test is run in the relevant directory.\n",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8e0a52c5_8077b30f",
         "filename": "cue/format/node.go",
         "patchSetId": 1

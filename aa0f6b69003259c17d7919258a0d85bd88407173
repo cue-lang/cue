@@ -261,6 +261,24 @@
       "parentUuid": "7afd71f3_2c2e5621",
       "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1aeaef3e_09f14209",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 26
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T09:48:50Z",
+      "side": 1,
+      "message": "Ha, bitten by gofmt\u0027s matched indentation for condition and body again! (I didn\u0027t notice that the condition ran to multiple lines).\n\nYou could do this:\n\n```\nfunc (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {\n\tif src \u003d\u003d nil ||\n\t\tb.Code !\u003d CycleError ||\n\t\tlen(errors.Positions(b.Err)) \u003e 0 {\n\t\treturn b\n\t}\n\tbb :\u003d *b\n\tbb.Err \u003d errors.Wrapf(b.Err, src.Pos(), \"\")\n\treturn \u0026bb\n}\n```\n\nbut agreed, not much of an improvement if any.",
+      "parentUuid": "0676ed4c_3a0f4476",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

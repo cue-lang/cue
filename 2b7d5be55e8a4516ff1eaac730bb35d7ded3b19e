@@ -153,6 +153,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2ebfd3c6_0d545676",
+        "filename": "cue/format/node.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 705,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:28:18Z",
+      "side": 1,
+      "message": "At the semantic level they are different, which is probably why.",
+      "parentUuid": "21b8dbf3_9403384b",
+      "range": {
+        "startLine": 705,
+        "startChar": 0,
+        "endLine": 705,
+        "endChar": 1
+      },
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5e8fe369_f46b1a01",
         "filename": "cue/format/printer.go",
         "patchSetId": 1
@@ -164,6 +188,24 @@
       "writtenOn": "2022-05-24T15:28:51Z",
       "side": 1,
       "message": "I was confused by the name \"mayCombine\", as the return booleans are true if the combining requires blank spaces. I would have guessed the opposite given the name.",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26ae7f56_5efeb440",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 406,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:28:18Z",
+      "side": 1,
+      "message": "It\u0027s a legacy artifact of the original name of the function: https://github.com/golang/go/blob/5fcd1badf724db853784243b29711df209976873/src/cmd/compile/internal/syntax/printer.go#L236",
+      "parentUuid": "5e8fe369_f46b1a01",
       "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

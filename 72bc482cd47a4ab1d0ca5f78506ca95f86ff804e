@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4410de46_76985c37",
+        "filename": "cmd/cue/cmd/testdata/script/vet_embed.txt",
+        "patchSetId": 17
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:29:50Z",
+      "side": 1,
+      "message": "This is fixed in a later CL. Essentially, this repetition will naturally disappear from a change in control flow due to the new comprehension algorithm.",
+      "parentUuid": "d20562ec_1bd3aebf",
+      "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1036c75b_9ca7e191",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-05-11T16:06:16Z",
       "side": 1,
       "message": "Out of interest, is this the only test result that\u0027s actually changed as a result of the code changing (other than the noise from the message getting a path prefix) ?",
+      "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "60c443d9_23676223",
+        "filename": "cue/testdata/fulleval/035_optionals_with_label_filters.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:29:50Z",
+      "side": 1,
+      "message": "There are various other places. Note that the error remains the same. It was just that before these fields with errors were sometimes dropped.",
+      "parentUuid": "1036c75b_9ca7e191",
       "revId": "72bc482cd47a4ab1d0ca5f78506ca95f86ff804e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

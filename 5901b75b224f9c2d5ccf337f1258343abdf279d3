@@ -995,6 +995,24 @@
       "parentUuid": "04ecbc0e_f0c78e8b",
       "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "096d98ea_341a705b",
+        "filename": "internal/core/dep/testdata/structcomprehension.txtar",
+        "patchSetId": 36
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T12:43:00Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "6248bb05_99a68b3d",
+      "revId": "5901b75b224f9c2d5ccf337f1258343abdf279d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "063327d7_e46da64e",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 632,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T12:45:51Z",
+      "side": 1,
+      "message": "This line looks redundant to me.",
+      "revId": "af4bba6e10650d832097c987101918d5cccb932f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

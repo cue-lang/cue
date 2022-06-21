@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6e4997a_d188e697",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T08:22:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ccd50e4b_081fe937",
+      "range": {
+        "startLine": 7,
+        "startChar": 0,
+        "endLine": 7,
+        "endChar": 51
+      },
+      "revId": "434db9c630bb35952ce6f6161c2913b6f3c24bdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c21bdad_93c855de",
@@ -37,6 +61,24 @@
       "writtenOn": "2022-06-21T07:21:31Z",
       "side": 1,
       "message": "It seems that this CL makes both changes and moves code around. This makes it very hard to see what changes are really made.\n\nI would first have a CL that hoists/rearranges code, and then the CL with the actual changes.",
+      "revId": "434db9c630bb35952ce6f6161c2913b6f3c24bdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c72c9fb_0aed433e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T08:22:04Z",
+      "side": 1,
+      "message": "Is it the type definition of the generator type you\u0027re referring to here? (I don\u0027t see any other code movement per se). I started to try to do this, but I\u0027m not sure it\u0027s possible - much of the code has been factored out of main and so there\u0027s not really a corresponding place to put it before those changes have been made.\n\nI\u0027ve moved the type definition before the `generate` function, which seems to help the diff algorithm a bit. Maybe the time for the code move is after this CL, not before.",
+      "parentUuid": "8c21bdad_93c855de",
       "revId": "434db9c630bb35952ce6f6161c2913b6f3c24bdd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0d039f6_1cdf6555",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T08:22:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2f4baad1_687356f3",
+      "range": {
+        "startLine": 20,
+        "startChar": 8,
+        "endLine": 20,
+        "endChar": 14
+      },
+      "revId": "434db9c630bb35952ce6f6161c2913b6f3c24bdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c189be53_c1cf074f",
@@ -77,6 +143,30 @@
       "writtenOn": "2022-06-21T07:21:31Z",
       "side": 1,
       "message": "Put literal string on new line. We generally aim to keep lines under 80 chars, when sensible.",
+      "range": {
+        "startLine": 65,
+        "startChar": 52,
+        "endLine": 65,
+        "endChar": 53
+      },
+      "revId": "434db9c630bb35952ce6f6161c2913b6f3c24bdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3abd4357_cb8aaa8e",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T08:22:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c189be53_c1cf074f",
       "range": {
         "startLine": 65,
         "startChar": 52,

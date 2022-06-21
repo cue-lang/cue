@@ -34,6 +34,24 @@
       "parentUuid": "76571836_6b69977e",
       "revId": "3e2052a8d4ba3553b666b1c7e21d8c18e7a9e81e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfece3a7_68a1fc4d",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T12:36:54Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "dcea2f41_d8ae6524",
+      "revId": "3e2052a8d4ba3553b666b1c7e21d8c18e7a9e81e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": []

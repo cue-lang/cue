@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85710196_42097a44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T13:02:51Z",
+      "side": 1,
+      "message": "LGTM with a few trivial comment suggestions, thanks!",
+      "revId": "aa213d52b33fd40d9a57ae00154837e7b2903cc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "094024ad_7992df54",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2031,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T13:02:51Z",
+      "side": 1,
+      "message": "\"Do\" is a tad ambiguous. Maybe \"Inject expressions\" ? Or \"Process expressions\" ?",
+      "revId": "aa213d52b33fd40d9a57ae00154837e7b2903cc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91d6cfea_25f62acf",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2041,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T13:02:51Z",
+      "side": 1,
+      "message": "n.injectComprehensions(\u0026n.comprehensions)",
+      "revId": "aa213d52b33fd40d9a57ae00154837e7b2903cc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "587864ff_442bf4d3",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 2045,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-21T13:02:51Z",
+      "side": 1,
+      "message": "This return is redundant. Also, I don\u0027t understand how we know there\u0027s no progress at this point, as this statement is reached any time the initial `if` condition (line 2025) isn\u0027t true - maybe the comment would be better moved up there (just after the `if`) if that\u0027s where we know there\u0027s no progress?",
+      "revId": "aa213d52b33fd40d9a57ae00154837e7b2903cc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

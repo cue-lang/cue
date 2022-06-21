@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76571836_6b69977e",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-21T12:30:03Z",
+      "side": 1,
+      "message": "should \"inst\" be called \"val\" or \"value\" now?",
+      "revId": "3e2052a8d4ba3553b666b1c7e21d8c18e7a9e81e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

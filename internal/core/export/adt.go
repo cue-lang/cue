@@ -79,43 +79,7 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 
 		return s
 
-	case *adt.FieldReference:
-		f := e.frame(x.UpCount)
-		entry := f.fields[x.Label]
-
-		name := x.Label.IdentString(e.ctx)
-		switch {
-		case entry.alias != "":
-			name = entry.alias
-
-		case !ast.IsValidIdent(name):
-			name = "X"
-			if x.Src != nil {
-				name = x.Src.Name
-			}
-			name = e.uniqueAlias(name)
-			entry.alias = name
-		}
-
-		ident := ast.NewIdent(name)
-		entry.references = append(entry.references, ident)
-
-		if f.fields != nil {
-			f.fields[x.Label] = entry
-		}
-
-		return ident
-
-	case *adt.ValueReference:
-		name := x.Label.IdentString(e.ctx)
-		if a, ok := x.Src.Node.(*ast.Alias); ok { // Should always pass
-			if b, ok := e.valueAlias[a]; ok {
-				name = b.Ident.Name
-			}
-		}
-		ident := ast.NewIdent(name)
-		return ident
-
+		// TODO: why is this not a resolver?
 	case *adt.LabelReference:
 		// get potential label from Source. Otherwise use X.
 		f := e.frame(x.UpCount)
@@ -147,51 +111,8 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 		ident.Node = f.labelExpr
 		return ident
 
-	case *adt.DynamicReference:
-		// get potential label from Source. Otherwise use X.
-		name := "X"
-		f := e.frame(x.UpCount)
-		if d := f.field; d != nil {
-			if x.Src != nil {
-				name = x.Src.Name
-			}
-			name = e.getFieldAlias(d, name)
-		}
-		ident := ast.NewIdent(name)
-		ident.Scope = f.field
-		ident.Node = f.field
-		return ident
-
-	case *adt.ImportReference:
-		importPath := x.ImportPath.StringValue(e.index)
-		spec := ast.NewImport(nil, importPath)
-
-		info, _ := astutil.ParseImportSpec(spec)
-		name := info.PkgName
-		if x.Label != 0 {
-			name = x.Label.StringValue(e.index)
-			if name != info.PkgName {
-				spec.Name = ast.NewIdent(name)
-			}
-		}
-		ident := ast.NewIdent(name)
-		ident.Node = spec
-		return ident
-
-	case *adt.LetReference:
-		return e.resolveLet(x)
-
-	case *adt.SelectorExpr:
-		return &ast.SelectorExpr{
-			X:   e.expr(x.X),
-			Sel: e.stringLabel(x.Sel),
-		}
-
-	case *adt.IndexExpr:
-		return &ast.IndexExpr{
-			X:     e.expr(x.X),
-			Index: e.expr(x.Index),
-		}
+	case adt.Resolver:
+		return e.resolver(x)
 
 	case *adt.SliceExpr:
 		var lo, hi ast.Expr
@@ -329,6 +250,94 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 }
 
 var dummyTop = &ast.Ident{Name: "_"}
+
+func (e *exporter) resolver(r adt.Resolver) ast.Expr {
+	switch x := r.(type) {
+	case *adt.FieldReference:
+		f := e.frame(x.UpCount)
+		entry := f.fields[x.Label]
+
+		name := x.Label.IdentString(e.ctx)
+		switch {
+		case entry.alias != "":
+			name = entry.alias
+
+		case !ast.IsValidIdent(name):
+			name = "X"
+			if x.Src != nil {
+				name = x.Src.Name
+			}
+			name = e.uniqueAlias(name)
+			entry.alias = name
+		}
+
+		ident := ast.NewIdent(name)
+		entry.references = append(entry.references, ident)
+
+		if f.fields != nil {
+			f.fields[x.Label] = entry
+		}
+
+		return ident
+
+	case *adt.ValueReference:
+		name := x.Label.IdentString(e.ctx)
+		if a, ok := x.Src.Node.(*ast.Alias); ok { // Should always pass
+			if b, ok := e.valueAlias[a]; ok {
+				name = b.Ident.Name
+			}
+		}
+		ident := ast.NewIdent(name)
+		return ident
+
+	case *adt.DynamicReference:
+		// get potential label from Source. Otherwise use X.
+		name := "X"
+		f := e.frame(x.UpCount)
+		if d := f.field; d != nil {
+			if x.Src != nil {
+				name = x.Src.Name
+			}
+			name = e.getFieldAlias(d, name)
+		}
+		ident := ast.NewIdent(name)
+		ident.Scope = f.field
+		ident.Node = f.field
+		return ident
+
+	case *adt.ImportReference:
+		importPath := x.ImportPath.StringValue(e.index)
+		spec := ast.NewImport(nil, importPath)
+
+		info, _ := astutil.ParseImportSpec(spec)
+		name := info.PkgName
+		if x.Label != 0 {
+			name = x.Label.StringValue(e.index)
+			if name != info.PkgName {
+				spec.Name = ast.NewIdent(name)
+			}
+		}
+		ident := ast.NewIdent(name)
+		ident.Node = spec
+		return ident
+
+	case *adt.LetReference:
+		return e.resolveLet(x)
+
+	case *adt.SelectorExpr:
+		return &ast.SelectorExpr{
+			X:   e.expr(x.X),
+			Sel: e.stringLabel(x.Sel),
+		}
+
+	case *adt.IndexExpr:
+		return &ast.IndexExpr{
+			X:     e.expr(x.X),
+			Index: e.expr(x.Index),
+		}
+	}
+	panic("unreachable")
+}
 
 func (e *exporter) decl(d adt.Decl) ast.Decl {
 	switch x := d.(type) {

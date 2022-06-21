@@ -16,6 +16,24 @@
       "message": "should \"inst\" be called \"val\" or \"value\" now?",
       "revId": "3e2052a8d4ba3553b666b1c7e21d8c18e7a9e81e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcea2f41_d8ae6524",
+        "filename": "cmd/cue/cmd/orphans.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 196,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T12:31:42Z",
+      "side": 1,
+      "message": "It could. But it is a value representing an instance. So the name is still valid I guess. An instance is now just a special case of a value that does not have its own Go type.",
+      "parentUuid": "76571836_6b69977e",
+      "revId": "3e2052a8d4ba3553b666b1c7e21d8c18e7a9e81e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

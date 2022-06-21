@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "df6e9cf3_1939af80",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T08:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cc55d7bd_fad42337",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "189a10bb_97c4c146",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-05-11T15:46:42Z",
       "side": 1,
       "message": "I wonder if it would be worth adding a few words of commentary on each of these cases explaining what is supposed to be happening. For example, I\u0027d naively think that this would be an error because #C1.p is never present and #C1 is closed, but it\u0027s not easy to know if that\u0027s intended behaviour or not.\n\nParticularly with the fact that the output is automatically generated, it\u0027s not easy to tell what\u0027s working as intended and what\u0027s not.\n\nParticularly with cases that currently yield errors but should not, it would be nice to say which cases don\u0027t work but shouldn\u0027t, or vice versa (it\u0027s quite laborious cross-checking this file against out/eval to see)",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8099417_7b0c210d",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T08:25:19Z",
+      "side": 1,
+      "message": "I have changed many of the field names to reflect whether success, and error (fail) or an incomplete error is expected.",
+      "parentUuid": "189a10bb_97c4c146",
       "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a780ef9e_2c3d385e",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T08:25:19Z",
+      "side": 1,
+      "message": "I generally find the two-arg version clearer, which helps avoid confusion in test.",
+      "parentUuid": "aa4b39f7_6df5b6d9",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bded6d30_6c961f07",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-05-11T15:46:42Z",
       "side": 1,
       "message": "What does this mean?",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff751787_93f9df3c",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T08:25:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bded6d30_6c961f07",
       "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5af470f3_4b161421",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 136,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T08:25:19Z",
+      "side": 1,
+      "message": "It is a copy/variant of a test in structural.txtar. Changed.",
+      "parentUuid": "e5f71cd4_235951df",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fec5e658_ce305335",
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd6c20fc_d09e570a",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 26
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T08:25:19Z",
+      "side": 1,
+      "message": "Added comment.",
+      "parentUuid": "fec5e658_ce305335",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7afd71f3_2c2e5621",
@@ -133,6 +241,24 @@
       "writtenOn": "2022-05-11T15:46:42Z",
       "side": 1,
       "message": "return early when src\u003d\u003dnil ?",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0676ed4c_3a0f4476",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 26
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T08:25:19Z",
+      "side": 1,
+      "message": "We could, but it doesn\u0027t really reduce the indentation, if that is what you hoped to achieve.",
+      "parentUuid": "7afd71f3_2c2e5621",
       "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -279,6 +279,24 @@
       "parentUuid": "0676ed4c_3a0f4476",
       "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1758e09e_a60e31f0",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 26
+      },
+      "lineNbr": 670,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-21T10:03:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1aeaef3e_09f14209",
+      "revId": "aa0f6b69003259c17d7919258a0d85bd88407173",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

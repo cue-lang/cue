@@ -69,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1decc489_fc576b54",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 40
+      },
+      "lineNbr": 855,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-22T09:46:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41ab1456_2acc0011",
+      "revId": "951fe370c1e626d9cf8cfd92cb522156788a842d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5f740c9_e4c867bc",
@@ -82,6 +100,24 @@
       "writtenOn": "2022-06-21T12:43:00Z",
       "side": 1,
       "message": "This still isn\u0027t valid CUE currently, I\u0027m fairly sure. Does that matter?",
+      "revId": "951fe370c1e626d9cf8cfd92cb522156788a842d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5b62ba3_fdde5ee8",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 40
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-06-22T09:46:36Z",
+      "side": 1,
+      "message": "Hmmm, that line slipped in inadvertently, I think. It is a rewirte, which is included below.",
+      "parentUuid": "b5f740c9_e4c867bc",
       "revId": "951fe370c1e626d9cf8cfd92cb522156788a842d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

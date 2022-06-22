@@ -16,6 +16,24 @@
       "message": "Adding Marcel for review. Apologies for the delay in getting around to this",
       "revId": "89439e5b2994896963a82c8b337e48253a69c19a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3195cb2_07901443",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019759
+      },
+      "writtenOn": "2022-06-22T14:13:48Z",
+      "side": 1,
+      "message": "Thanks.\ntweaked a typo in commit message.\n`a existing` -\u003e `an existing`",
+      "parentUuid": "4962e80a_28e0ecd4",
+      "revId": "89439e5b2994896963a82c8b337e48253a69c19a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

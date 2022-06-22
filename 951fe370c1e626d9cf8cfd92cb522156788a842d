@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "028aff38_26f361c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 40
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-22T05:01:02Z",
+      "side": 1,
+      "message": "I should have be clearer in my previous comment: the vector diff is clearly fine so unity is all good. Once this change is merged we can \"rebase\" unity.",
+      "revId": "951fe370c1e626d9cf8cfd92cb522156788a842d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "41ab1456_2acc0011",

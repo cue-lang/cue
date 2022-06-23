@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fd617d4_47d3a733",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-23T15:34:17Z",
+      "side": 1,
+      "message": "LGTM but one thing I\u0027ll mention since we\u0027re looking at lots of diff places: conventions differ as to whethe \"+\" means old or new in the diff output, so it would be nice to make that explicit. One way of doing that might be to factor out some kind of testing helper package which defines a function that provides that information on failure. Or just use quicktest I guess 😊",
+      "revId": "1f6073f0bdc0921f1b65404c9a630fb97fff3382",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

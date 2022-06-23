@@ -24,7 +24,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kr/pretty"
+	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -67,8 +67,8 @@ func TestExtractDefinitions(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if desc := pretty.Diff(out.String(), string(b)); len(desc) > 0 {
-				t.Errorf("files differ:\n%v", desc)
+			if diff := cmp.Diff(out.String(), string(b)); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

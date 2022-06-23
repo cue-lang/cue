@@ -238,8 +238,8 @@ func TestDecode(t *testing.T) {
 			checkFatal(t, err, tc.err, "init")
 
 			got := reflect.ValueOf(tc.dst).Elem().Interface()
-			if !cmp.Equal(got, tc.want) {
-				t.Error(cmp.Diff(got, tc.want))
+			if diff := cmp.Diff(got, tc.want); diff != "" {
+				t.Error(diff)
 				t.Errorf("\n%#v\n%#v", got, tc.want)
 			}
 		})

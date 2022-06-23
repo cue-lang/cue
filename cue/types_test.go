@@ -978,8 +978,8 @@ func TestFill(t *testing.T) {
 
 		w := compileT(t, r, tc.out).Value()
 
-		if !cmp.Equal(goValue(v), goValue(w)) {
-			t.Error(cmp.Diff(goValue(v), goValue(w)))
+		if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
+			t.Error(diff)
 			t.Errorf("\ngot:  %s\nwant: %s", v, w)
 		}
 	}
@@ -1239,7 +1239,8 @@ func TestFillPath(t *testing.T) {
 
 			w := compileT(t, r, tc.out).Value()
 
-			if !cmp.Equal(goValue(v), goValue(w)) {
+			if diff := cmp.Diff(goValue(v), goValue(w)); diff != "" {
+				t.Error(diff)
 				t.Error(cmp.Diff(goValue(v), goValue(w)))
 				t.Errorf("\ngot:  %s\nwant: %s", v, w)
 			}

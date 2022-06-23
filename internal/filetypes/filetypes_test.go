@@ -29,8 +29,8 @@ func check(t *testing.T, want, x interface{}, err error) {
 	if err != nil {
 		x = errors.String(err.(errors.Error))
 	}
-	if !cmp.Equal(x, want, cmpopts.EquateEmpty()) {
-		t.Error(cmp.Diff(want, x))
+	if diff := cmp.Diff(x, want, cmpopts.EquateEmpty()); diff != "" {
+		t.Error(diff)
 	}
 }
 

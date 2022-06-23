@@ -506,8 +506,8 @@ func TestRelative(t *testing.T) {
 		got = append(got, fmt.Sprintf("%-7s %-8s %s", pos.RelPos(), tok, lit))
 		pos, tok, lit = S.Scan()
 	}
-	if !cmp.Equal(got, want) {
-		t.Error(cmp.Diff(got, want))
+	if diff := cmp.Diff(got, want); diff != "" {
+		t.Error(diff)
 	}
 }
 

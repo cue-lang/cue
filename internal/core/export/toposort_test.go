@@ -80,7 +80,7 @@ func TestSortArcs(t *testing.T) {
 
 			want := parseFeatures(r, tc.out)[0]
 
-			if !cmp.Equal(keys, want) {
+			if diff := cmp.Diff(keys, want); diff != "" {
 				got := ""
 				for _, f := range keys {
 					got += " " + f.SelectorString(r)

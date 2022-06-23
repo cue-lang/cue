@@ -194,8 +194,8 @@ func TestMarshalMultiPackage(t *testing.T) {
 			}
 			got := strValue(insts)
 
-			if !cmp.Equal(got, want) {
-				t.Error(cmp.Diff(got, want))
+			if diff := cmp.Diff(got, want); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

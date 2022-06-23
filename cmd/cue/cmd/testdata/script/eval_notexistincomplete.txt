@@ -1,12 +1,12 @@
 #Issue: 1509
 
 # export
-! exec cue export
+! cue export
 cmp stderr expect-stderr1
 cmp stdout expect-stdout1
 
 # eval
-exec cue eval
+cue eval
 cmp stderr expect-stderr2
 cmp stdout expect-stdout2
 

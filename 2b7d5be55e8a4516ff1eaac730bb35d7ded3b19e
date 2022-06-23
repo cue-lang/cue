@@ -106,6 +106,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1f953553_50771e74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-23T14:35:43Z",
+      "side": 1,
+      "message": "The reason I used cmd/cue/cmd is that I wanted a testscript txtar file; note how I want to have three CUE files, because each one of these edge cases needs the clause to be at the start of the file to reproduce the bug.\n\ncue/format does have tests, and I initially looked there, but it does not use testscript or txtar files at all just yet. It uses a testdata input+golden file structure, so it would mean six added files - not great. So I thought that piggybacking off of an existing place that already uses testscript would be easier.\n\nI\u0027m happy to move this test to cue/format if you think that\u0027s best, though the diff will certainly be larger as I\u0027ll have to teach it about txtar.",
+      "parentUuid": "f93ef85e_ad5b7c8e",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8e0a52c5_8077b30f",
         "filename": "cue/format/node.go",
         "patchSetId": 1

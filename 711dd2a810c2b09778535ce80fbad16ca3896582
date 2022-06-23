@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9910bda6_f18d49e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-23T15:28:42Z",
+      "side": 1,
+      "message": "LGTM but it seems like it might be nice to have a smoke test for that logic. Totally understand if that\u0027s not really feasible though.",
+      "revId": "711dd2a810c2b09778535ce80fbad16ca3896582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1fa5f7d3_dbd63aec",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-23T15:28:42Z",
+      "side": 1,
+      "message": "can be set",
+      "revId": "711dd2a810c2b09778535ce80fbad16ca3896582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fef4fd6d_2be3e99d",
+        "filename": "cmd/cue/cmd/version_1.18.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-23T15:28:42Z",
+      "side": 1,
+      "message": "maybe add a comment saying why we\u0027re truncating to 12 bytes here?",
+      "revId": "711dd2a810c2b09778535ce80fbad16ca3896582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

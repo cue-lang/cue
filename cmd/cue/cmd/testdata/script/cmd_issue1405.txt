@@ -1,4 +1,4 @@
-exec cue cmd alias ./alias_tool.cue
+cue cmd alias ./alias_tool.cue
 cmp stdout stdout-golden
 
 -- alias_tool.cue --

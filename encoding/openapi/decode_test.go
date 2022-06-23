@@ -87,8 +87,8 @@ func TestDecode(t *testing.T) {
 			if err != nil {
 				got = []byte(err.Error())
 			}
-			if !cmp.Equal(errout, got) {
-				t.Error(cmp.Diff(string(got), string(errout)))
+			if diff := cmp.Diff(errout, got); diff != "" {
+				t.Error(diff)
 			}
 
 			if expr != nil {
@@ -105,7 +105,8 @@ func TestDecode(t *testing.T) {
 				b = bytes.TrimSpace(b)
 				out = bytes.TrimSpace(out)
 
-				if !cmp.Equal(b, out) {
+				if diff := cmp.Diff(b, out); diff != "" {
+					t.Error(diff)
 					if cuetest.UpdateGoldenFiles {
 						a.Files[outIndex].Data = b
 						b = txtar.Format(a)

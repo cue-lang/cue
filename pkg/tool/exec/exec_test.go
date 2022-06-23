@@ -63,8 +63,8 @@ func TestEnv(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if !cmp.Equal(cmd.Env, tc.env) {
-				t.Error(cmp.Diff(cmd.Env, tc.env))
+			if diff := cmp.Diff(cmd.Env, tc.env); diff != "" {
+				t.Error(diff)
 			}
 		})
 	}

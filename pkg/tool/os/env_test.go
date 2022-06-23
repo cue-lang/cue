@@ -102,8 +102,8 @@ func TestGetenv(t *testing.T) {
 			}),
 		}
 
-		if !cmp.Equal(got, want, opts...) {
-			t.Error(cmp.Diff(got, want, opts...))
+		if diff := cmp.Diff(got, want, opts...); diff != "" {
+			t.Error(diff)
 		}
 
 		// Errors:

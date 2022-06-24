@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5cc8982_88fc2193",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-24T13:15:37Z",
+      "side": 1,
+      "message": "Errr... There was a test, but I think I deleted that part of the diff when I proposed an alternative implementation 😄 That\u0027s the whole reason why CUE_VERSION_TEST_CFG exists in version_1.18.go exists.\n\nAdded again. Please review.",
+      "parentUuid": "9910bda6_f18d49e5",
+      "revId": "711dd2a810c2b09778535ce80fbad16ca3896582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1fa5f7d3_dbd63aec",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30d2cf43_ef75a3d8",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-24T13:15:37Z",
+      "side": 1,
+      "message": "We\u0027ll get rid of the support for setting the version via ldflags once this is merged, as with Marcel and Paul we already agreed that it\u0027s no longer used, so this will be deleted in a very short amount of time. I\u0027m not modifying it here, so I\u0027ll choose to avoid churn if that\u0027s okay.",
+      "parentUuid": "1fa5f7d3_dbd63aec",
+      "revId": "711dd2a810c2b09778535ce80fbad16ca3896582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fef4fd6d_2be3e99d",
@@ -48,6 +84,24 @@
       "writtenOn": "2022-06-23T15:28:42Z",
       "side": 1,
       "message": "maybe add a comment saying why we\u0027re truncating to 12 bytes here?",
+      "revId": "711dd2a810c2b09778535ce80fbad16ca3896582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79bd469b_229f1ca2",
+        "filename": "cmd/cue/cmd/version_1.18.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-24T13:15:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fef4fd6d_2be3e99d",
       "revId": "711dd2a810c2b09778535ce80fbad16ca3896582",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

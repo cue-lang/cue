@@ -29,7 +29,7 @@
 //     }
 //
 //     func main() {
-//         fmt.Println(cuego.Validate(&Sum{A: 1, B: 5, C: 7}))
+//         fmt.Println(cuego.Validate(&Sum{A: 1, B: 5, C: 6}))
 //     }
 //
 // AddConstraints allows annotating Go types with any CUE constraints.

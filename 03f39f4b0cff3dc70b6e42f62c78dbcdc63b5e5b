@@ -1,0 +1,265 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eea2ba99_d46ef13e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "I like all the deleted code, but I can\u0027t say I understand that much of what\u0027s going on here! Some work on the already very useful comment explaining the algorithm might help with that. Basically this review is just a bunch of grammar nits :)",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25461400_1cc0c24b",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "\"can be detected\" would read better (or omit the first \"Then\" and leave this one).",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7d6263d_02379d12",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "References are accumulated as follows.\n\n?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f338780f_14b2dc52",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "It would be nice to have consistent indentation here.",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 0
+      },
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b731230_b3abe75f",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "Resolver instance ? Resolver value ? (just to make it clear that we\u0027re talking about the Resolver interface here)",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "924ab478_2744e9ca",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "are not aggregated",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "687b19f1_f3e0297e",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "what does \"ancestor\" mean in this case? Is it the same as \"parent\" in the sense of the JSON hierarchy, or is it more about the reference-traversal hierarchy?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb77cb59_7b97a7f8",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "I\u0027m struggling to understand this. It seems to be saying that if there\u0027s one conjunct for a field that isn\u0027t cyclic, the field doesn\u0027t have a structural cycle. That seems odd to me, but I must be missing something.",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae041e5a_e78afea5",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "It looks like this should be referred to above, but I can\u0027t seem to find the reference.",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "559b9bbf_d551dce7",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "that it is... ?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0df1ea59_bde96242",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "where ... ?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "935f2218_3a1fcdb2",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "The below is a bit hard to interpret, and could perhaps use some work?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf77a37e_0867980a",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "doc comment?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb3d79fa_0564c857",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "Could we say what the other parameters are too, please? (I presume that `x` is a reference made within conjunct `v` which is held inside vertex `arc`, but it would be nice to be explicit about that). It would be nice to explain what it returns too.",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "636cae56_1e105a0d",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-06-27T16:35:57Z",
+      "side": 1,
+      "message": "been found.",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

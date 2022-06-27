@@ -261,7 +261,6 @@ func (g *generator) toValue(x ast.Expr) constant.Value {
 	default:
 		panic(fmt.Errorf("%s: unsupported expression type %T: %#v", g.cuePkgPath, x, x))
 	}
-	return constant.MakeUnknown()
 }
 
 func (g *generator) genFunc(x *ast.FuncDecl) {

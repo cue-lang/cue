@@ -1,0 +1,6 @@
+Code-Review+2: Daniel Martí <mvdan@mvdan.cc>
+Submitted-by: Paul Jolly <paul@myitcv.io>
+Submitted-at: Tue, 28 Jun 2022 12:47:12 +0000
+Reviewed-on: https://review.gerrithub.io/c/cue-lang/cue/+/540582
+Project: cue-lang/cue
+Branch: refs/heads/meta/config

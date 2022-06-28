@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "00c5b0fb_347189f1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-28T10:07:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8be246b0_8a93bf24",
+      "revId": "ba38f86352ad7e70a62aff6da700a53f6c0c384b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0a2d6dce_a679514a",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2022-06-28T09:57:48Z",
       "side": 1,
       "message": "I think the commit message should also mention the switch from Code-Review-2 to Hold+1.",
+      "revId": "ba38f86352ad7e70a62aff6da700a53f6c0c384b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "900eef56_26f95962",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-28T10:07:15Z",
+      "side": 1,
+      "message": "Agree.",
+      "parentUuid": "0a2d6dce_a679514a",
       "revId": "ba38f86352ad7e70a62aff6da700a53f6c0c384b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4626ebb_9caaeaa0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-28T12:41:50Z",
+      "side": 1,
+      "message": "Re-added Daniel\u0027s +2",
+      "revId": "b8830671ae7b7b7140d3f8162eef6012843eaa54",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

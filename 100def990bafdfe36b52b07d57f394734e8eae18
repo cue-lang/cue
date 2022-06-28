@@ -18,6 +18,41 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dc48ccc_4d8fc71d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-28T15:32:35Z",
+      "side": 1,
+      "message": "It correctly highlight ebnf, but knows nothing about grammar (which is not actually a thing, so we could drop this info string TBH)",
+      "parentUuid": "bc705322_6e045fb7",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "116e9bc5_828d5403",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-28T15:32:35Z",
+      "side": 1,
+      "message": "Marking as a hold to ensure we get a review from @mpvl",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1758e844_630845b2",
@@ -31,6 +66,24 @@
       "writtenOn": "2022-06-28T11:18:57Z",
       "side": 1,
       "message": "is there a reason we want foo_bar for some EBNF names but FooBar for others?",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ec2d916_7152cb2d",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-28T15:32:35Z",
+      "side": 1,
+      "message": "This is actually a convention according to https://pkg.go.dev/golang.org/x/exp/ebnf:\n\n\"Production names starting with an uppercase Unicode letter denote non-terminal productions (i.e., productions which allow white-space and comments between tokens); all other production names denote lexical productions.\"\n\nWill need @mpvl to opine here on the fact there is a big of \"upper-casing\" going on in order to accommodate this rule.",
+      "parentUuid": "1758e844_630845b2",
       "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "for context: https://github.com/cue-lang/cue/issues/772\n\nI guess fine to remove at this point given that it is still unused, and probably confusing to the reader.",
       "revId": "2f05fc92404e0c47dd62c8f769c8881f87ae9bec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04b22c0f_6d4a2ada",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 1912,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-06-28T15:32:35Z",
+      "side": 0,
+      "message": "Yes we definitely need @mpvl to opine here.",
+      "parentUuid": "6fe1470b_62e61c3a",
+      "revId": "2f05fc92404e0c47dd62c8f769c8881f87ae9bec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

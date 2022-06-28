@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc705322_6e045fb7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-28T11:18:57Z",
+      "side": 1,
+      "message": "does github\u0027s syntax highlighting recognize either of the triple-backtick syntax names?",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1758e844_630845b2",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-28T11:18:57Z",
+      "side": 1,
+      "message": "is there a reason we want foo_bar for some EBNF names but FooBar for others?",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

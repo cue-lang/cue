@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fe1470b_62e61c3a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 1912,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-28T11:18:57Z",
+      "side": 0,
+      "message": "for context: https://github.com/cue-lang/cue/issues/772\n\nI guess fine to remove at this point given that it is still unused, and probably confusing to the reader.",
+      "revId": "2f05fc92404e0c47dd62c8f769c8881f87ae9bec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

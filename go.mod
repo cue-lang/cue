@@ -5,7 +5,7 @@ go 1.17
 require (
 	github.com/cockroachdb/apd/v2 v2.0.1
 	github.com/emicklei/proto v1.10.0
-	github.com/google/go-cmp v0.5.7
+	github.com/google/go-cmp v0.5.8
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.2.0
 	github.com/kr/pretty v0.1.0
@@ -16,6 +16,8 @@ require (
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.2.2
+	github.com/yuin/goldmark v1.4.12
+	golang.org/x/exp v0.0.0-20220613132600-b0d781184e0d
 	golang.org/x/net v0.0.0-20220425223048-2871e0cb64e4
 	golang.org/x/text v0.3.7
 	golang.org/x/tools v0.1.10

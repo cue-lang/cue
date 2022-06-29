@@ -38,6 +38,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
       - name: Re-test cuelang.org
-        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
+        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cue/dispatches'
       - name: Trigger unity build
-        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Check against CUE ${GITHUB_REF##refs/tags/}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'
+        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Check against CUE ${GITHUB_REF##refs/tags/}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-lang/cue/dispatches'

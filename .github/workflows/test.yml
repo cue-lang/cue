@@ -69,7 +69,7 @@ jobs:
       - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}
         name: Test with -race
         run: go test -race ./...
-      - name: Check that git is clean post generate and tests
+      - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
       - if: ${{ github.ref == 'refs/heads/master' }}
         name: Pull this commit through the proxy on master
@@ -79,12 +79,12 @@ jobs:
           go mod init mod.com
           GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
   delete_build_branch:
-    runs-on: ubuntu-20.04
-    if: ${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}
     needs: test
+    runs-on: ubuntu-20.04
     defaults:
       run:
         shell: bash
+    if: ${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}
     steps:
       - run: |-
           mkdir tmpgit

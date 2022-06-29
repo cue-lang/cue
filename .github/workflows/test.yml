@@ -16,21 +16,11 @@ jobs:
         shell: bash
     steps:
       - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
-        name: Write netrc file for cueckoo Gerrithub
-        run: |-
-          cat <<EOD > ~/.netrc
-          machine review.gerrithub.io
-          login cueckoo
-          password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
-          EOD
-          chmod 600 ~/.netrc
-      - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
         name: Update Gerrit CL message with starting message
-        run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
+        run: 'curl -f -s -u ''cueckoo:${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}'' --basic -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   test:
     needs: start
     strategy:
-      fail-fast: false
       matrix:
         go-version:
           - 1.17.x
@@ -39,19 +29,8 @@ jobs:
           - ubuntu-20.04
           - macos-11
           - windows-2022
-    runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
+      fail-fast: false
     steps:
-      - name: Write netrc file for cueckoo Gerrithub
-        run: |-
-          cat <<EOD > ~/.netrc
-          machine review.gerrithub.io
-          login cueckoo
-          password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
-          EOD
-          chmod 600 ~/.netrc
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -107,7 +86,11 @@ jobs:
           GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
       - if: ${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}
         name: Post any failures for this matrix entry
-        run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"TryBot-Result\":-1}}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
+        run: 'curl -f -s -u ''cueckoo:${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}'' --basic -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"TryBot-Result\":-1}}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
+    runs-on: ${{ matrix.os }}
+    defaults:
+      run:
+        shell: bash
   mark_ci_success:
     runs-on: ubuntu-20.04
     if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
@@ -116,16 +99,8 @@ jobs:
       run:
         shell: bash
     steps:
-      - name: Write netrc file for cueckoo Gerrithub
-        run: |-
-          cat <<EOD > ~/.netrc
-          machine review.gerrithub.io
-          login cueckoo
-          password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
-          EOD
-          chmod 600 ~/.netrc
       - name: Update Gerrit CL message with success message
-        run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"TryBot-Result\":1}}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
+        run: 'curl -f -s -u ''cueckoo:${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}'' --basic -H "Content-Type: application/json" --request POST --data "{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"TryBot-Result\":1}}" https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   delete_build_branch:
     runs-on: ubuntu-20.04
     if: ${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}

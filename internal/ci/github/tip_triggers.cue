@@ -14,24 +14,23 @@
 
 package github
 
-import (
-	encjson "encoding/json"
-	"strconv"
-)
-
-tip_triggers: _#bashWorkflow & {
+// The tip_triggers workflow. This fires for each new commit that hits the
+// default branch.
+tip_triggers: _base.#bashWorkflow & {
 
 	name: "Triggers on push to tip"
-	on: push: branches: [_#masterBranch]
+	on: push: branches: [_#defaultBranch]
 	jobs: push: {
 		"runs-on": _#linuxMachine
 		steps: [
 			{
 				name: "Rebuild tip.cuelang.org"
-				run:  "\(_#curl) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
+				run:  "\(_base.#curl) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
 			},
-			{
-				_#arg: {
+			_base.#repositoryDispatch & {
+				name:           "Trigger unity build"
+				#repositoryURL: "https://github.com/cue-unity/unity"
+				#arg: {
 					event_type: "Check against ${GITHUB_SHA}"
 					client_payload: {
 						type: "unity"
@@ -42,10 +41,6 @@ tip_triggers: _#bashWorkflow & {
 						}
 					}
 				}
-				name: "Trigger unity build"
-				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-unity/unity/dispatches
-					"""#
 			},
 		]
 	}

@@ -15,32 +15,37 @@
 package github
 
 import (
-	encjson "encoding/json"
-	"strconv"
+	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-release: _#bashWorkflow & {
+// _#cueVersionRef is a workflow job-runtime expression that evaluates to the
+// git tag (version) that is being released. Defining as a "constant" here for
+// re-use below
+_#cueVersionRef: "${GITHUB_REF##refs/tags/}"
+
+// The release workflow
+release: _core.#bashWorkflow & {
 
 	name: "Release"
 	on: push: tags: [_#releaseTagPattern]
 	jobs: goreleaser: {
 		"runs-on": _#linuxMachine
 		steps: [
-			_#checkoutCode & {
+			_core.#checkoutCode & {
 				with: "fetch-depth": 0
 			},
-			_#installGo & {
+			_core.#installGo & {
 				with: "go-version": _#pinnedReleaseGo
 			},
-			_#step & {
+			json.#step & {
 				name: "Setup qemu"
 				uses: "docker/setup-qemu-action@v1"
 			},
-			_#step & {
+			json.#step & {
 				name: "Set up Docker Buildx"
 				uses: "docker/setup-buildx-action@v1"
 			},
-			_#step & {
+			json.#step & {
 				name: "Docker Login"
 				uses: "docker/login-action@v1"
 				with: {
@@ -49,40 +54,36 @@ release: _#bashWorkflow & {
 					password: "${{ secrets.CUECKOO_DOCKER_PAT }}"
 				}
 			},
-			_#step & {
+			json.#step & {
 				name: "Run GoReleaser"
 				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
 				uses: "goreleaser/goreleaser-action@v2"
 				with: {
 					args:    "release --rm-dist"
-					version: "v1.8.2"
+					version: _#goreleaserVersion
 				}
 			},
-			_#step & {
-				_#arg: {
-					event_type: "Re-test post release of ${GITHUB_REF##refs/tags/}"
+			_core.#repositoryDispatch & {
+				name:           "Re-test cuelang.org"
+				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
+				#arg: {
+					event_type: "Re-test post release of \(_#cueVersionRef)"
 				}
-				name: "Re-test cuelang.org"
-				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/cuelang.org/dispatches
-					"""#
 			},
-			_#step & {
-				_#arg: {
-					event_type: "Check against CUE ${GITHUB_REF##refs/tags/}"
+			_core.#repositoryDispatch & {
+				name:           "Trigger unity build"
+				#repositoryURL: _#unityURL
+				#arg: {
+					event_type: "Check against CUE \(_#cueVersionRef)"
 					client_payload: {
 						type: "unity"
 						payload: {
 							versions: """
-							"${GITHUB_REF##refs/tags/}"
+							"\(_#cueVersionRef)"
 							"""
 						}
 					}
 				}
-				name: "Trigger unity build"
-				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-unity/unity/dispatches
-					"""#
 			},
 		]
 	}

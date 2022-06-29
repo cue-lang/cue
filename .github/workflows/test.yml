@@ -9,6 +9,22 @@ name: Test
       - v*
   pull_request: {}
 jobs:
+  delete_build_branch:
+    runs-on: ubuntu-20.04
+    if: ${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}
+    needs: test
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: |-
+          mkdir tmpgit
+          cd tmpgit
+          git init
+          git config user.name cueckoo
+          git config user.email cueckoo@gmail.com
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
+          git push https://github.com/cue-lang/cue-trybot :${GITHUB_REF#refs/heads/}
   test:
     strategy:
       fail-fast: false
@@ -69,7 +85,7 @@ jobs:
       - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}
         name: Test with -race
         run: go test -race ./...
-      - name: Check that git is clean post generate and tests
+      - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
       - if: ${{ github.ref == 'refs/heads/master' }}
         name: Pull this commit through the proxy on master
@@ -78,19 +94,3 @@ jobs:
           cd $(mktemp -d)
           go mod init mod.com
           GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
-  delete_build_branch:
-    runs-on: ubuntu-20.04
-    if: ${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}
-    needs: test
-    defaults:
-      run:
-        shell: bash
-    steps:
-      - run: |-
-          mkdir tmpgit
-          cd tmpgit
-          git init
-          git config user.name cueckoo
-          git config user.email cueckoo@gmail.com
-          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
-          git push https://github.com/cue-lang/cue-trybot :${GITHUB_REF#refs/heads/}

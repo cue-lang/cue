@@ -14,17 +14,22 @@
 
 package github
 
-trybot: _#bashWorkflow & {
+import (
+	"github.com/SchemaStore/schemastore/src/schemas/json"
+)
 
+// The trybot workflow.
+trybot: _core.#bashWorkflow & {
 	// Note: the name of this workflow is used by gerritstatusupdater as an
 	// identifier in the status updates that are posted as reviews for this
 	// workflows, but also as the result label key, e.g. "TryBot-Result" would
 	// be the result label key for the "TryBot" workflow. Note the result label
 	// key is therefore tied to the configuration of this repository.
 	name: "TryBot"
+
 	on: {
 		push: {
-			branches: ["**"] // any branch (including '/' namespaced branches)
+			branches: ["trybot/*/*", _#defaultBranch] // do not run PR branches
 			"tags-ignore": [_#releaseTagPattern]
 		}
 		pull_request: {}
@@ -35,18 +40,22 @@ trybot: _#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
-				_#installGo,
-				_#checkoutCode & {
+				_core.#installGo,
+				_core.#checkoutCode & {
 					// "pull_request" builds will by default use a merge commit,
 					// testing the PR's HEAD merged on top of the master branch.
 					// For consistency with Gerrit, avoid that merge commit entirely.
 					// This doesn't affect "push" builds, which never used merge commits.
 					with: ref: "${{ github.event.pull_request.head.sha }}"
 				},
-				_#earlyChecks,
-				_#cacheGoModules,
-				_#step & {
-					if:  "${{ \(_#isMaster) }}"
+				_core.#earlyChecks & {
+					// These checks don't vary based on the Go version or OS,
+					// so we only need to run them on one of the matrix jobs.
+					if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+				},
+				_core.#cacheGoModules,
+				json.#step & {
+					if:  "${{ \(_core.#isDefaultBranch) }}"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,
@@ -55,28 +64,50 @@ trybot: _#bashWorkflow & {
 				_#goTestRace & {
 					if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
 				},
-				_#checkGitClean,
+				_core.#checkGitClean,
 				_#pullThroughProxy,
 			]
 		}
 	}
 
-	// _#isCLCITestBranch is an expression that evaluates to true
-	// if the job is running as a result of a CL triggered CI build
-	_#isCLCITestBranch: "startsWith(github.ref, '\(_#branchRefPrefix)ci/')"
-
-	// _#isMaster is an expression that evaluates to true if the
-	// job is running as a result of a master commit push
-	_#isMaster: "github.ref == '\(_#branchRefPrefix+_#masterBranch)'"
-
-	_#pullThroughProxy: _#step & {
-		name: "Pull this commit through the proxy on \(_#masterBranch)"
+	_#pullThroughProxy: json.#step & {
+		name: "Pull this commit through the proxy on \(_#defaultBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
 			go mod init mod.com
 			GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
 			"""
-		if: "${{ \(_#isMaster) }}"
+		if: "${{ \(_core.#isDefaultBranch) }}"
+	}
+
+	_#goGenerate: json.#step & {
+		name: "Generate"
+		run:  "go generate ./..."
+		// The Go version corresponds to the precise version specified in
+		// the matrix. Skip windows for now until we work out why re-gen is flaky
+		if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+	}
+
+	_#goTest: json.#step & {
+		name: "Test"
+		run:  "go test ./..."
+	}
+
+	_#goCheck: json.#step & {
+		// These checks can vary between platforms, as different code can be built
+		// based on GOOS and GOARCH build tags.
+		// However, CUE does not have any such build tags yet, and we don't use
+		// dependencies that vary wildly between platforms.
+		// For now, to save CI resources, just run the checks on one matrix job.
+		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
+		if:   "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+		name: "Check"
+		run:  "go vet ./..."
+	}
+
+	_#goTestRace: json.#step & {
+		name: "Test with -race"
+		run:  "go test -race ./..."
 	}
 }

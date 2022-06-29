@@ -16,3 +16,5 @@ jobs:
         run: curl -f -s -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}
       - name: Trigger unity build
         run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Check against ${GITHUB_SHA}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'
+      - name: Trigger unity build
+        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Check against ${GITHUB_SHA}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'

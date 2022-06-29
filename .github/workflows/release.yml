@@ -31,7 +31,7 @@ jobs:
           username: cueckoo
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
       - name: Run GoReleaser
-        run: go run github.com/goreleaser/goreleaser@v1.8.2 release
+        uses: goreleaser/goreleaser-action@v2
         with:
           args: release --rm-dist
           version: v1.8.2

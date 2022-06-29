@@ -4,7 +4,8 @@ name: TryBot
 "on":
   push:
     branches:
-      - '**'
+      - trybot/*/*
+      - master
     tags-ignore:
       - v*
   pull_request: {}
@@ -69,7 +70,7 @@ jobs:
       - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}
         name: Test with -race
         run: go test -race ./...
-      - name: Check that git is clean post generate and tests
+      - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
       - if: ${{ github.ref == 'refs/heads/master' }}
         name: Pull this commit through the proxy on master

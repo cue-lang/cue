@@ -12,16 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// package github declares the workflows for this project.
 package github
 
 import (
+	"cuelang.org/go/internal/ci/base"
+	"cuelang.org/go/internal/ci/gerrithub"
+
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
-
-workflowsDir: *"./" | string @tag(workflowsDir)
-
-_#masterBranch:      "master"
-_#releaseTagPattern: "v*"
 
 workflows: [...{file: string, schema: (json.#Workflow & {})}]
 workflows: [
@@ -47,14 +46,12 @@ workflows: [
 	},
 ]
 
-_#bashWorkflow: json.#Workflow & {
-	jobs: [string]: defaults: run: shell: "bash"
-}
+// TODO: _#repositoryURL and _#unityURL should be extracted from codereview.cfg
+_#repositoryURL: "https://github.com/cue-lang/cue"
+_#unityURL:      "https://github.com/cue-unity/unity"
 
-// TODO: drop when cuelang.org/issue/390 is fixed.
-// Declare definitions for sub-schemas
-_#job:  ((json.#Workflow & {}).jobs & {x: _}).x
-_#step: ((_#job & {steps:                 _}).steps & [_])[0]
+_#defaultBranch:     "master"
+_#releaseTagPattern: "v*"
 
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
@@ -69,6 +66,8 @@ _#linuxMachine:   "ubuntu-20.04"
 _#macosMachine:   "macos-11"
 _#windowsMachine: "windows-2022"
 
+_#goreleaserVersion: "v1.8.2"
+
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
@@ -77,96 +76,27 @@ _#testStrategy: {
 	}
 }
 
-_#installGo: _#step & {
-	name: "Install Go"
-	uses: "actions/setup-go@v3"
-	with: {
-		"go-version": *"${{ matrix.go-version }}" | string
-	}
+// _gerrithub is an instance of ./gerrithub, parameterised by the properties of
+// this project
+_gerrithub: gerrithub & {
+	#repositoryURL:                      _#repositoryURL
+	#botGitHubUser:                      "cueckoo"
+	#botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
+	#botGitHubUserEmail:                 "cueckoo@gmail.com"
+	#botGerritHubUser:                   #botGitHubUser
+	#botGerritHubUserPasswordSecretsKey: "CUECKOO_GERRITHUB_PASSWORD"
+	#botGerritHubUserEmail:              #botGitHubUserEmail
 }
 
-_#checkoutCode: _#step & {
-	name: "Checkout code"
-	uses: "actions/checkout@v3"
+// _base is an instance of ./base, parameterised by the properties of this
+// project
+//
+// TODO: revisit the naming strategy here. _base and base are very similar.
+// Perhaps rename the import to something more obviously not intended to be
+// used, and then rename the field base?
+_base: base & {
+	#repositoryURL:                "https://github.com/cue-lang/cue"
+	#defaultBranch:                _#defaultBranch
+	#botGitHubUser:                "cueckoo"
+	#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
 }
-
-_#earlyChecks: _#step & {
-	name: "Early git and code sanity checks"
-	run: """
-		# Ensure the recent commit messages have Signed-off-by headers.
-		# TODO: Remove once this is enforced for admins too;
-		# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229
-		# TODO: Our --max-count here is just 1, because we've made mistakes very
-		# recently. Increase it to 5 or 10 soon, to also cover CL chains.
-		for commit in $(git rev-list --max-count=1 HEAD); do
-			if ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then
-				echo -e "\nRecent commit is lacking Signed-off-by:\n"
-				git show --quiet $commit
-				exit 1
-			fi
-		done
-		"""
-	// These checks don't vary based on the Go version or OS,
-	// so we only need to run them on one of the matrix jobs.
-	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
-}
-
-_#cacheGoModules: _#step & {
-	name: "Cache Go modules"
-	uses: "actions/cache@v3"
-	with: {
-		path: "~/go/pkg/mod"
-		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"
-		"restore-keys": """
-			${{ runner.os }}-${{ matrix.go-version }}-go-
-			"""
-	}
-}
-
-_#goGenerate: _#step & {
-	name: "Generate"
-	run:  "go generate ./..."
-	// The Go version corresponds to the precise version specified in
-	// the matrix. Skip windows for now until we work out why re-gen is flaky
-	if: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
-}
-
-_#goTest: _#step & {
-	name: "Test"
-	run:  "go test ./..."
-}
-
-_#goCheck: _#step & {
-	// These checks can vary between platforms, as different code can be built
-	// based on GOOS and GOARCH build tags.
-	// However, CUE does not have any such build tags yet, and we don't use
-	// dependencies that vary wildly between platforms.
-	// For now, to save CI resources, just run the checks on one matrix job.
-	// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-	if:   "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
-	name: "Check"
-	run:  "go vet ./..."
-}
-
-_#goTestRace: _#step & {
-	name: "Test with -race"
-	run:  "go test -race ./..."
-}
-
-_#checkGitClean: _#step & {
-	name: "Check that git is clean post generate and tests"
-	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
-}
-
-_#branchRefPrefix: "refs/heads/"
-
-_#tempCueckooGitDir: """
-	mkdir tmpgit
-	cd tmpgit
-	git init
-	git config user.name cueckoo
-	git config user.email cueckoo@gmail.com
-	git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
-	"""
-
-_#curl: "curl -f -s"

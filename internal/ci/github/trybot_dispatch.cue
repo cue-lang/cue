@@ -14,46 +14,7 @@
 
 package github
 
-trybot_dispatch: _#bashWorkflow & {
-	// These constants are defined by github.com/cue-sh/tools/cmd/cueckoo
-	_#runtrybot: "runtrybot"
-	_#unity:     "unity"
-
-	_#dispatchJob: _#job & {
-		_#type:    string
-		"runs-on": _#linuxMachine
-		if:        "${{ github.event.client_payload.type == '\(_#type)' }}"
-	}
-
-	name: "TryBot Dispatch"
-	on: ["repository_dispatch"]
-	jobs: {
-		"\(_#runtrybot)": _#dispatchJob & {
-			_#type: _#runtrybot
-			steps: [
-				_#writeNetrcFile,
-				_#step & {
-					name: "Trigger trybot"
-					run:  """
-						\(_#tempCueckooGitDir)
-						git fetch https://review.gerrithub.io/a/cue-lang/cue ${{ github.event.client_payload.payload.ref }}
-						git checkout -b trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
-						git push https://github.com/cue-lang/cue-trybot trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
-						"""
-				},
-			]
-		}
-	}
-
-	_#writeNetrcFile: _#step & {
-		name: "Write netrc file for cueckoo Gerrithub"
-		run: """
-			cat <<EOD > ~/.netrc
-			machine review.gerrithub.io
-			login cueckoo
-			password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
-			EOD
-			chmod 600 ~/.netrc
-			"""
-	}
+// The trybot_dispatch workflow.
+trybot_dispatch: _base.#bashWorkflow & _gerrithub.#dispatchWorkflow & {
+	#type: _gerrithub.#dispatchTrybot
 }

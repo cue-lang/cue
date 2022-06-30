@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f2add36_1661f154",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-30T14:43:49Z",
+      "side": 1,
+      "message": "Only now getting back to this - we went over these changes with Marcel and Roger on two calls, and Paul gave his +2, so I\u0027ll submit before the CL goes stale and gains merge conflicts :) \n\nThere are two unresolved comments about TODOs that Roger said he might look into - I\u0027m leaving those unsolved and up to him.",
+      "revId": "cb825db91c22242cd90097764186a7da3eea9494",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ef37bc5_01756e0e",
@@ -31,6 +48,24 @@
       "writtenOn": "2022-05-04T16:16:28Z",
       "side": 1,
       "message": "Drive-by (not necessary for this round per se): aren\u0027t they typically referred to as \"back ticks\"?",
+      "revId": "cb825db91c22242cd90097764186a7da3eea9494",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8a65d7d_6ff39ed4",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 5
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-30T14:43:49Z",
+      "side": 1,
+      "message": "Wikipedia et al do indeed call it backtick, but the Go spec calls it backquote as well, so I\u0027ll defer to you or Marcel as to whether we want to deviate.",
+      "parentUuid": "7ef37bc5_01756e0e",
       "revId": "cb825db91c22242cd90097764186a7da3eea9494",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -110,6 +110,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e30e5b51_5576232a",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-06-30T14:48:57Z",
+      "side": 1,
+      "message": "I\u0027d like to land this before months go by due to nit picks :) Do either of you have any last suggestion or strong feelings about this?\n\nIf not, I might adopt Roger\u0027s suggestion but replacing the Go term \"relative import paths\" for CUE\u0027s \"rooted import paths\":\n\n\u003e Dir is used as the base directory for rooted import paths (paths starting with \"./\").",
+      "parentUuid": "7cf57654_204342f4",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30b97fca_bc3af1e3",
         "filename": "cue/load/config.go",
         "patchSetId": 2

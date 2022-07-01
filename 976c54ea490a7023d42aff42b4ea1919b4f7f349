@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9584f993_00662633",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-01T05:00:54Z",
+      "side": 1,
+      "message": "Thanks - Marcel returning from travelling next week so he will get round to this.",
+      "revId": "976c54ea490a7023d42aff42b4ea1919b4f7f349",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

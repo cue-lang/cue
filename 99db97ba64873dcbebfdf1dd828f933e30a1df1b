@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59f24bfb_8a1f025e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-01T12:01:46Z",
+      "side": 1,
+      "message": "Apologies - my +2 was misleading before, I was attempting to +2 your suggestion 😊",
+      "revId": "99db97ba64873dcbebfdf1dd828f933e30a1df1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ab636db_60506adc",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "nit: call it repositoryURL to clarify the format, otherwise I would have assumed this would be `foo/bar` rather than `https://github.com/foo/bar`.",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c9ac7b6_d0239a8d",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "I\u0027m surprised that this is a non-concrete input - when would this ever be anything other than `refs/heads/`?",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49a4a130_5fc073fd",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "out of curiosity: does this string need quoting?",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "250bc1b5_45e5275e",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "nit: this \"core\" step is generic so you don\u0027t know whether `go generate` or `go test` ran at all. How about:\n\n\u003e Check that git is clean at the end of the job",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dba406eb_3515bdc7",
+        "filename": "internal/ci/workflows/gerrithub/gerrithub.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "same comments as before for these two",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb31dd4b_2bf2ca1f",
+        "filename": "internal/ci/workflows/gerrithub/gerrithub.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "what is the purpose of the empty strategy? it\u0027s not obvious to me at least - perhaps add a comment?",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dee99202_aeec9632",
+        "filename": "internal/ci/workflows/release.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "might as well make this a variable, like the ubuntu version in the gerrithub file?",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80498dbb_4153ebdc",
+        "filename": "internal/ci/workflows/release.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-01T11:49:45Z",
+      "side": 1,
+      "message": "this is duplicated in at least three places that I can see - put it in a definition?\n\nI guess you must use bash\u0027s `${x##y}` because `$GITHUB_REF` is only defined at run-time, would be nicer to do this transformation in CUE.",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

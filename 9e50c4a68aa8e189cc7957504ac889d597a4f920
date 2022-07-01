@@ -182,6 +182,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d5508772_06199929",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-01T11:43:05Z",
+      "side": 1,
+      "message": "\u003e New suggestion based on yours and picking up bits from my previous longer suggestion:\n\nTotally forgot to reply to this. I\u0027m +2 on this suggestion!",
+      "parentUuid": "c2d93edf_10d302fe",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30b97fca_bc3af1e3",
         "filename": "cue/load/config.go",
         "patchSetId": 2

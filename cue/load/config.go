@@ -150,8 +150,10 @@ type Config struct {
 	//         in the _ package.
 	Package string
 
-	// Dir is the directory from which to load packages.
-	// If Dir is empty, the tool is run in the current directory.
+	// Dir is the base directory for import path resolution.
+	// For example, it is used to determine the main module,
+	// and rooted import paths starting with "./" are relative to it.
+	// If Dir is empty, the current directory is used.
 	Dir string
 
 	// Tags defines boolean tags or key-value pairs to select files to build

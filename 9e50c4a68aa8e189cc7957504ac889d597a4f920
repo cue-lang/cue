@@ -128,6 +128,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "99c36985_02c119d1",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-01T04:59:55Z",
+      "side": 1,
+      "message": "\u003e I\u0027d like to land this before months go by due to nit picks\n\nUnderstood 😊 Another approach might have been to discuss/agree this in an issue first?\n\nRegarding the suggestion:\n\n| Dir is used as the base directory for rooted import paths (paths starting with \"./\").\n\nThis isn\u0027t quite right either to my mind, because it seems to suggest that the directory is only used for resolution of rooted imported paths. But the directory is also used for determining the main module, and hence the ability to resolve any dependencies outside of the main module. So how about something more simple:\n\n| Dir is the base directory for import path resolution. \n\nThere could then be some text that follows that explains the different types of resolutions that occur that depend on this directory. \n\nSide note not for this CL: but I\u0027m not particularly comfortable with the term \"import path\" also capturing the concept of a \"relative import path\" and patterns. \"Import path\" suggests to me the thing we are referring to is something I can use in an import declaration. However, I can use neither:\n\n    import \"./my/pkg\"\n    \n(because relative imports are not supported in module mode) nor:\n \n    import \"example.com/my/...\"\n    \nas import declarations. However, both \"./my/pkg\" and \"example.com/my/...\" are, according to my understanding of the Go docs, considered \"import paths\".\n\nSome clarity in the Go and CUE docs would be helpful to my mind, but as you say, mvdan, that\u0027s beyond the scope of this CL. But useful context in establishing what to write right here and now.",
+      "parentUuid": "e30e5b51_5576232a",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30b97fca_bc3af1e3",
         "filename": "cue/load/config.go",
         "patchSetId": 2

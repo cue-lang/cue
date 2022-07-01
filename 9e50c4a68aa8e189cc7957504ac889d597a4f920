@@ -164,6 +164,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c2d93edf_10d302fe",
+        "filename": "cue/load/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-01T11:39:42Z",
+      "side": 1,
+      "message": "\u003e It\u0027s a three-line doc change where the old docs were clearly wrong, so I didn\u0027t feel like an issue was needed :) Even in hindsight, I still wouldn\u0027t have over-engineered for the discussion of so little text\n\nApologies, my suggestion was poorly worded. What I meant to say was, when we realised this was a bigger issue we could have abandoned this CL in favour of more holistically working out what the right language should be and discussing in an issue. Not saying that\u0027s the right approach, just an alternative.",
+      "parentUuid": "147b111f_cb0962b2",
+      "revId": "9e50c4a68aa8e189cc7957504ac889d597a4f920",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "30b97fca_bc3af1e3",
         "filename": "cue/load/config.go",
         "patchSetId": 2

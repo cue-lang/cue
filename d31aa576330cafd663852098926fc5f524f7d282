@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7f3d9bc_6e93362f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-06T09:44:08Z",
+      "side": 1,
+      "message": "Hey Paul, as discussed. Maybe we can test this together between the two of us after merging, like we did with your changes - happy to do that today or tomorrow.",
+      "revId": "d31aa576330cafd663852098926fc5f524f7d282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

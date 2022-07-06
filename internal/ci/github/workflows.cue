@@ -57,20 +57,10 @@ test: _#bashWorkflow & {
 	}
 
 	jobs: {
-		start: {
-			"runs-on": _#linuxMachine
-			steps: [...(_ & {if: "${{ \(_#isCLCITestBranch) }}"})]
-			steps: [
-				_#writeNetrcFile,
-				_#startCLBuild,
-			]
-		}
 		test: {
-			needs:     "start"
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
-				_#writeNetrcFile,
 				_#installGo,
 				_#checkoutCode & {
 					// "pull_request" builds will by default use a merge commit,
@@ -93,16 +83,6 @@ test: _#bashWorkflow & {
 				},
 				_#checkGitClean,
 				_#pullThroughProxy,
-				_#failCLBuild,
-			]
-		}
-		mark_ci_success: {
-			"runs-on": _#linuxMachine
-			if:        "${{ \(_#isCLCITestBranch) }}"
-			needs:     "test"
-			steps: [
-				_#writeNetrcFile,
-				_#passCLBuild,
 			]
 		}
 		delete_build_branch: {
@@ -113,7 +93,7 @@ test: _#bashWorkflow & {
 				_#step & {
 					run: """
 						\(_#tempCueckooGitDir)
-						git push https://github.com/cue-lang/cue :${GITHUB_REF#\(_#branchRefPrefix)}
+						git push https://github.com/cue-lang/cue-trybot :${GITHUB_REF#\(_#branchRefPrefix)}
 						"""
 				},
 			]
@@ -138,57 +118,6 @@ test: _#bashWorkflow & {
 			"""
 		if: "${{ \(_#isMaster) }}"
 	}
-
-	_#startCLBuild: _#step & {
-		name: "Update Gerrit CL message with starting message"
-		run:  (_#gerrit._#setCodeReview & {
-			#args: {
-				message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-			}
-		}).res
-	}
-
-	_#failCLBuild: _#step & {
-		if:   "${{ \(_#isCLCITestBranch) && failure() }}"
-		name: "Post any failures for this matrix entry"
-		run:  (_#gerrit._#setCodeReview & {
-			#args: {
-				message: "Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details"
-				labels: {
-					"TryBot-Result": -1
-				}
-			}
-		}).res
-	}
-
-	_#passCLBuild: _#step & {
-		name: "Update Gerrit CL message with success message"
-		run:  (_#gerrit._#setCodeReview & {
-			#args: {
-				message: "Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-				labels: {
-					"TryBot-Result": 1
-				}
-			}
-		}).res
-	}
-
-	_#gerrit: {
-		// _#setCodeReview assumes that it is invoked from a job where
-		// _#isCLCITestBranch is true
-		_#setCodeReview: {
-			#args: {
-				tag:     "trybot"
-				message: string
-				labels?: {
-					"TryBot-Result": int
-				}
-			}
-			res: #"""
-			\#(_#curl) -n -H "Content-Type: application/json" --request POST --data \#(strconv.Quote(encjson.Marshal(#args))) https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review
-			"""#
-		}
-	}
 }
 
 repository_dispatch: _#bashWorkflow & {
@@ -208,14 +137,13 @@ repository_dispatch: _#bashWorkflow & {
 		"\(_#runtrybot)": _#dispatchJob & {
 			_#type: _#runtrybot
 			steps: [
-				_#writeNetrcFile,
 				_#step & {
 					name: "Trigger trybot"
 					run:  """
 						\(_#tempCueckooGitDir)
 						git fetch https://review.gerrithub.io/a/cue-lang/cue ${{ github.event.client_payload.payload.ref }}
 						git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
-						git push https://github.com/cue-lang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
+						git push https://github.com/cue-lang/cue-trybot ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
 						"""
 				},
 			]
@@ -433,18 +361,6 @@ _#goTestRace: _#step & {
 _#checkGitClean: _#step & {
 	name: "Check that git is clean post generate and tests"
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
-}
-
-_#writeNetrcFile: _#step & {
-	name: "Write netrc file for cueckoo Gerrithub"
-	run: """
-		cat <<EOD > ~/.netrc
-		machine review.gerrithub.io
-		login cueckoo
-		password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
-		EOD
-		chmod 600 ~/.netrc
-		"""
 }
 
 _#branchRefPrefix: "refs/heads/"

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "763e9e7f_b4aea18b",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "3ab636db_60506adc",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c9ac7b6_d0239a8d",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-07-01T11:49:45Z",
       "side": 1,
       "message": "I\u0027m surprised that this is a non-concrete input - when would this ever be anything other than `refs/heads/`?",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af63a2c1_2d8e8c2f",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "Good point. Hard-coding.",
+      "parentUuid": "4c9ac7b6_d0239a8d",
       "revId": "8f6592f24e7b5a28706141c374d258692440c728",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f220851d_37168397",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "The RHS value always needs to be quoted. Unless I misunderstood the question?",
+      "parentUuid": "49a4a130_5fc073fd",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "250bc1b5_45e5275e",
         "filename": "internal/ci/workflows/core/core.cue",
         "patchSetId": 18
@@ -82,6 +136,24 @@
       "writtenOn": "2022-07-01T11:49:45Z",
       "side": 1,
       "message": "nit: this \"core\" step is generic so you don\u0027t know whether `go generate` or `go test` ran at all. How about:\n\n\u003e Check that git is clean at the end of the job",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84271340_706c185d",
+        "filename": "internal/ci/workflows/core/core.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "250bc1b5_45e5275e",
       "revId": "8f6592f24e7b5a28706141c374d258692440c728",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "943e87e9_ee587a80",
+        "filename": "internal/ci/workflows/gerrithub/gerrithub.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dba406eb_3515bdc7",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eb31dd4b_2bf2ca1f",
@@ -116,6 +206,24 @@
       "writtenOn": "2022-07-01T11:49:45Z",
       "side": 1,
       "message": "what is the purpose of the empty strategy? it\u0027s not obvious to me at least - perhaps add a comment?",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3da42d85_a2d53dae",
+        "filename": "internal/ci/workflows/gerrithub/gerrithub.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "This change has been superseded. Resolving.",
+      "parentUuid": "eb31dd4b_2bf2ca1f",
       "revId": "8f6592f24e7b5a28706141c374d258692440c728",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7767db86_a65ccbca",
+        "filename": "internal/ci/workflows/release.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "dee99202_aeec9632",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "80498dbb_4153ebdc",
@@ -150,6 +276,24 @@
       "writtenOn": "2022-07-01T11:49:45Z",
       "side": 1,
       "message": "this is duplicated in at least three places that I can see - put it in a definition?\n\nI guess you must use bash\u0027s `${x##y}` because `$GITHUB_REF` is only defined at run-time, would be nicer to do this transformation in CUE.",
+      "revId": "8f6592f24e7b5a28706141c374d258692440c728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f53b389_dcc8d6a4",
+        "filename": "internal/ci/workflows/release.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-07T15:24:05Z",
+      "side": 1,
+      "message": "\u003e put it in a definition?\n\nDone.\n\n\u003e I guess you must use bash\u0027s  ${x##y}  because  $GITHUB_REF  is only defined at run-time\n\nCorrect.\n\n\u003e would be nicer to do this transformation in CUE.\n\nThat would require shelling out to CUE. Not impossible... but more heavyweight than this simple alternative.",
+      "parentUuid": "80498dbb_4153ebdc",
       "revId": "8f6592f24e7b5a28706141c374d258692440c728",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

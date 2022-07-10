@@ -25,6 +25,7 @@ jobs:
       run:
         shell: bash
     steps:
+      - run: "false"
       - name: Install Go
         uses: actions/setup-go@v3
         with:

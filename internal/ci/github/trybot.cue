@@ -29,7 +29,7 @@ trybot: _core.#bashWorkflow & {
 
 	on: {
 		push: {
-			branches: ["**"] // any branch (including '/' namespaced branches)
+			branches: ["ci/*/*", _#defaultBranch] // any branch (including '/' namespaced branches)
 			"tags-ignore": [_#releaseTagPattern]
 		}
 		pull_request: {}
@@ -40,6 +40,9 @@ trybot: _core.#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
+				json.#step & {
+					run: "false"
+				},
 				_core.#installGo,
 				_core.#checkoutCode & {
 					// "pull_request" builds will by default use a merge commit,

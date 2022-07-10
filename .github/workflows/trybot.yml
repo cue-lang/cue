@@ -4,7 +4,8 @@ name: TryBot
 "on":
   push:
     branches:
-      - '**'
+      - ci/*/*
+      - master
     tags-ignore:
       - v*
   pull_request: {}
@@ -25,6 +26,7 @@ jobs:
       run:
         shell: bash
     steps:
+      - run: "false"
       - name: Install Go
         uses: actions/setup-go@v3
         with:

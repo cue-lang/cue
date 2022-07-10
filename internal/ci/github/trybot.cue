@@ -40,6 +40,9 @@ trybot: _base.#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
+				json.#step & {
+					run: "false"
+				},
 				_base.#installGo,
 				_base.#checkoutCode & {
 					// "pull_request" builds will by default use a merge commit,

@@ -63,7 +63,7 @@ type TxTarTest struct {
 // A Test embeds *[testing.T] and should be used to report errors.
 //
 // Entries within the txtar file define CUE files (available via the
-// ValidInstances and RawInstances methods) and expected output
+// Instances and RawInstances methods) and expected output
 // (or "golden") files (names starting with "out/\(testname)"). The "main" golden
 // file is "out/\(testname)" itself, used when [Test] is used directly as an [io.Writer]
 // and with [Test.WriteFile].
@@ -233,12 +233,12 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // Instance returns the single instance representing the
 // top directory in the txtar file.
 func (t *Test) Instance() *build.Instance {
-	return t.ValidInstances()[0]
+	return t.Instances()[0]
 }
 
 // Instances returns the valid instances for this .txtar file or skips the
 // test if there is an error loading the instances.
-func (t *Test) ValidInstances(args ...string) []*build.Instance {
+func (t *Test) Instances(args ...string) []*build.Instance {
 	t.Helper()
 
 	a := t.RawInstances(args...)

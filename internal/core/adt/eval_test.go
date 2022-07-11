@@ -52,9 +52,9 @@ func TestEval(t *testing.T) {
 	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
+		a := t.Instance()
 
-		v, err := r.Build(nil, a[0])
+		v, err := r.Build(nil, a)
 		if err != nil {
 			t.WriteErrors(err)
 			return

@@ -28,12 +28,12 @@ _#releaseTagPattern: "v*"
 workflows: [...{file: string, schema: (json.#Workflow & {})}]
 workflows: [
 	{
-		file:   "test.yml"
-		schema: test
+		file:   "trybot.yml"
+		schema: trybot
 	},
 	{
-		file:   "repository_dispatch.yml"
-		schema: repository_dispatch
+		file:   "trybot_dispatch.yml"
+		schema: trybot_dispatch
 	},
 	{
 		file:   "release.yml"
@@ -45,9 +45,9 @@ workflows: [
 	},
 ]
 
-test: _#bashWorkflow & {
+trybot: _#bashWorkflow & {
 
-	name: "Test"
+	name: "TryBot"
 	on: {
 		push: {
 			branches: ["**"] // any branch (including '/' namespaced branches)
@@ -191,7 +191,7 @@ test: _#bashWorkflow & {
 	}
 }
 
-repository_dispatch: _#bashWorkflow & {
+trybot_dispatch: _#bashWorkflow & {
 	// These constants are defined by github.com/cue-sh/tools/cmd/cueckoo
 	_#runtrybot: "runtrybot"
 	_#unity:     "unity"
@@ -202,7 +202,7 @@ repository_dispatch: _#bashWorkflow & {
 		if:        "${{ github.event.client_payload.type == '\(_#type)' }}"
 	}
 
-	name: "Repository Dispatch"
+	name: "TryBot Dispatch"
 	on: ["repository_dispatch"]
 	jobs: {
 		"\(_#runtrybot)": _#dispatchJob & {

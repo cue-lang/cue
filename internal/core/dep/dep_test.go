@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/dep"
@@ -35,14 +36,12 @@ func TestVisit(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
-
-		inst := cue.Build(a)[0].Value()
-		if inst.Err() != nil {
-			t.Fatal(inst.Err())
+		val := cuecontext.New().BuildInstance(t.Instance())
+		if val.Err() != nil {
+			t.Fatal(val.Err())
 		}
 
-		ctxt := eval.NewContext(value.ToInternal(inst))
+		ctxt := eval.NewContext(value.ToInternal(val))
 
 		testCases := []struct {
 			name string
@@ -63,7 +62,7 @@ func TestVisit(t *testing.T) {
 		}}
 
 		for _, tc := range testCases {
-			v := inst.LookupPath(cue.ParsePath(tc.root))
+			v := val.LookupPath(cue.ParsePath(tc.root))
 
 			_, n := value.ToInternal(v)
 			w := t.Writer(tc.name)

@@ -35,9 +35,9 @@ func Run(name string, t *testing.T) {
 	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
+		a := t.Instance()
 
-		v, errs := r.Build(nil, a[0])
+		v, errs := r.Build(nil, a)
 		if errs != nil {
 			t.Fatal(errs)
 		}

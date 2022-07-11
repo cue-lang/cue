@@ -43,7 +43,7 @@ func TestSelfContained(t *testing.T) {
 	r := cuecontext.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
+		a := t.Instances()
 
 		v := buildFile(t.T, r, a[0])
 

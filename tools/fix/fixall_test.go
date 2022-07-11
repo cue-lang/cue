@@ -31,7 +31,7 @@ func TestInstances(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances("./...")
+		a := t.Instances("./...")
 		err := Instances(a)
 		t.WriteErrors(err)
 		for _, b := range a {

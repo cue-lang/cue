@@ -24,16 +24,14 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/dep"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/value"
 )
 
 func TestVisit(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
-		Name:   "dependencies",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata",
+		Name: "dependencies",
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

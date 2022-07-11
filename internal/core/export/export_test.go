@@ -31,7 +31,6 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/value"
 	"golang.org/x/tools/txtar"
@@ -39,9 +38,8 @@ import (
 
 func TestDefinition(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata/main",
-		Name:   "definition",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata/main",
+		Name: "definition",
 	}
 
 	r := runtime.New()

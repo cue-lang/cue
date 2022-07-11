@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
@@ -35,11 +34,10 @@ var (
 
 func TestCompile(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "../../../cue/testdata/",
-		Name:   "compile",
-		Update: cuetest.UpdateGoldenFiles,
-		Skip:   alwaysSkip,
-		ToDo:   needFix,
+		Root: "../../../cue/testdata/",
+		Name: "compile",
+		Skip: alwaysSkip,
+		ToDo: needFix,
 	}
 
 	if *todo {

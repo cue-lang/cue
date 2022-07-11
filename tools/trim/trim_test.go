@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"github.com/rogpeppe/go-internal/txtar"
 )
@@ -278,9 +277,8 @@ const trace = false
 
 func TestData(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
-		Name:   "trim",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata",
+		Name: "trim",
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

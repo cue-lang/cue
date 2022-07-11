@@ -21,15 +21,13 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/encoding/protobuf/textproto"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
 func TestEncode(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata/encoder",
-		Name:   "encode",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata/encoder",
+		Name: "encode",
 	}
 
 	r := cue.Runtime{}

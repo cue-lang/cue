@@ -23,15 +23,13 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
 func TestEncoder(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata/encoder",
-		Name:   "jsonpb",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata/encoder",
+		Name: "jsonpb",
 	}
 
 	r := cue.Runtime{}

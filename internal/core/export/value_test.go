@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"github.com/rogpeppe/go-internal/txtar"
 )
@@ -36,10 +35,9 @@ var exclude = map[string]string{
 
 func TestValue(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
-		Name:   "value",
-		Update: cuetest.UpdateGoldenFiles,
-		Skip:   exclude,
+		Root: "./testdata",
+		Name: "value",
+		Skip: exclude,
 	}
 
 	r := runtime.New()

@@ -38,7 +38,8 @@ import (
 )
 
 // A TxTarTest represents a test run that process all CUE tests in the txtar
-// format rooted in a given directory.
+// format rooted in a given directory. See the [Test] documentation for
+// more details.
 type TxTarTest struct {
 	// Run TxTarTest on this directory.
 	Root string
@@ -49,12 +50,8 @@ type TxTarTest struct {
 	// TODO: by default derive from the current base directory name.
 	Name string
 
-	// If Update is true, TestTxTar will update the out/Name file if it differs
-	// from the original input. The user must set the output in Gold for this
-	// to be detected.
-	Update bool
-
-	// Skip is a map of tests to skip to their skip message.
+	// Skip is a map of tests to skip; the key is the test name; the value is the
+	// skip message.
 	Skip map[string]string
 
 	// ToDo is a map of tests that should be skipped now, but should be fixed.
@@ -63,12 +60,28 @@ type TxTarTest struct {
 
 // A Test represents a single test based on a .txtar file.
 //
-// A Test embeds *testing.T and should be used to report errors.
+// A Test embeds *[testing.T] and should be used to report errors.
 //
-// A Test also embeds a *bytes.Buffer which is used to report test results,
-// which are compared against the golden file for the test in the TxTar archive.
-// If the test fails and the update flag is set to true, the Archive will be
-// updated and written to disk.
+// Entries within the txtar file define CUE files (available via the
+// ValidInstances and RawInstances methods) and expected output
+// data (names starting with "out/\(testname)").
+//
+// When the test function has returned, output written with [Test.Write], [Test.Writer]
+// and friends is checked against the expected output files.
+//
+// A txtar file can define test-specific tags and values in the comment section.
+// These are available via the [Test.HasTag] and [Test.Value] methods.
+// The #skip tag causes a [Test] to be skipped.
+// The #noformat tag causes the $CUE_FORMAT_TXTAR value
+// to be ignored.
+//
+// If the test fails and $CUE_UPDATE is non-empty, the txtar file will be
+// updated and written to disk with the actual output data replacing the
+// out files.
+//
+// If $CUE_FORMAT_TXTAR is non-empty, any CUE files in the txtar
+// file will be updated to be properly formatted, unless the #noformat
+// tag is present.
 type Test struct {
 	// Allow Test to be used as a T.
 	*testing.T
@@ -85,6 +98,8 @@ type Test struct {
 	hasGold bool
 }
 
+// Write implements [io.Writer] by writing to the output for the test,
+// which will be tested against the main golden file.
 func (t *Test) Write(b []byte) (n int, err error) {
 	if t.buf == nil {
 		t.buf = &bytes.Buffer{}
@@ -98,6 +113,11 @@ type file struct {
 	buf  *bytes.Buffer
 }
 
+// HasTag reports whether the tag with the given key is defined
+// for the current test. A tag x is defined by a line in the comment
+// section of the txtar file like:
+//
+//	#x
 func (t *Test) HasTag(key string) bool {
 	prefix := []byte("#" + key)
 	s := bufio.NewScanner(bytes.NewReader(t.Archive.Comment))
@@ -110,6 +130,15 @@ func (t *Test) HasTag(key string) bool {
 	return false
 }
 
+// Value returns the value for the given key for this test and
+// reports whether it was defined.
+//
+// A value is defined by a line in the comment section of the txtar
+// file like:
+//
+//	#key: value
+//
+// White space is trimmed from the value before returning.
 func (t *Test) Value(key string) (value string, ok bool) {
 	prefix := []byte("#" + key + ":")
 	s := bufio.NewScanner(bytes.NewReader(t.Archive.Comment))
@@ -123,7 +152,7 @@ func (t *Test) Value(key string) (value string, ok bool) {
 }
 
 // Bool searches for a line starting with #key: value in the comment and
-// returns true if the key exists and the value is true.
+// reports whether the key exists and its value is true.
 func (t *Test) Bool(key string) bool {
 	s, ok := t.Value(key)
 	return ok && s == "true"
@@ -139,7 +168,7 @@ func (t *Test) Rel(filename string) string {
 	return filepath.ToSlash(rel)
 }
 
-// WriteErrors writes strings and
+// WriteErrors writes the full list of errors in err to the test output.
 func (t *Test) WriteErrors(err errors.Error) {
 	if err != nil {
 		errors.Print(t, err, &errors.Config{
@@ -149,14 +178,22 @@ func (t *Test) WriteErrors(err errors.Error) {
 	}
 }
 
-// Write file in a directory.
+// WriteFile formats f and writes it to the test output,
+// prefixed by a line of the form:
+//
+//	== name
+//
+// where name is the base name of f.Filename.
 func (t *Test) WriteFile(f *ast.File) {
 	// TODO: use FileWriter instead in separate CL.
 	fmt.Fprintln(t, "==", filepath.Base(f.Filename))
 	_, _ = t.Write(formatNode(t.T, f))
 }
 
-// Writer returns a Writer with the given name.
+// Writer returns a Writer with the given name. Data written will
+// be checked against the file with name "out/\(testName)/\(name)"
+// in the txtar file. If name is empty, data will be written to the test
+// output and checked against "out/\(testName)".
 func (t *Test) Writer(name string) io.Writer {
 	switch name {
 	case "":
@@ -216,7 +253,7 @@ func (t *Test) RawInstances(args ...string) []*build.Instance {
 
 // Load loads the intstances of a txtar file. By default, it only loads
 // files in the root directory. Relative files in the archive are given an
-// absolution location by prefixing it with dir.
+// absolute location by prefixing it with dir.
 func Load(a *txtar.Archive, dir string, args ...string) []*build.Instance {
 	auto := len(args) == 0
 	overlay := map[string]load.Source{}
@@ -235,8 +272,10 @@ func Load(a *txtar.Archive, dir string, args ...string) []*build.Instance {
 	return load.Instances(args, cfg)
 }
 
-// Run runs tests defined in txtar files in root or its subdirectories.
-// Only tests for which an `old/name` test output file exists are run.
+// Run runs tests defined in txtar files in x.Root or its subdirectories.
+//
+// The function f is called for each such txtar file. See the [Test] documentation
+// for more details.
 func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 	t.Helper()
 
@@ -288,8 +327,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 			for i, f := range a.Files {
 
-				// TODO: not entirely correct.
-				if strings.HasPrefix(f.Name, tc.prefix) {
+				if strings.HasPrefix(f.Name, tc.prefix) && (f.Name == tc.prefix || f.Name[len(tc.prefix)] == '/') {
 					tc.hasGold = true
 				}
 
@@ -329,7 +367,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					continue
 				}
 
-				if x.Update || cuetest.UpdateGoldenFiles {
+				if cuetest.UpdateGoldenFiles {
 					update = true
 					gold.Data = result
 					continue

@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
@@ -27,9 +26,8 @@ func TestInstances(t *testing.T) {
 	t.Skip()
 
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
-		Name:   "fixmod",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata",
+		Name: "fixmod",
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

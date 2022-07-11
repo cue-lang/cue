@@ -29,7 +29,6 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/validate"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
@@ -40,11 +39,10 @@ var (
 
 func TestEval(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "../../../cue/testdata",
-		Name:   "eval",
-		Update: cuetest.UpdateGoldenFiles,
-		Skip:   alwaysSkip,
-		ToDo:   needFix,
+		Root: "../../../cue/testdata",
+		Name: "eval",
+		Skip: alwaysSkip,
+		ToDo: needFix,
 	}
 
 	if *todo {

@@ -22,15 +22,13 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/astinternal"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
 func TestResolve(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata/resolve",
-		Name:   "resolve",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata/resolve",
+		Name: "resolve",
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

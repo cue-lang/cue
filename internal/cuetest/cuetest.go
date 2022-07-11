@@ -65,6 +65,7 @@ var UpdateGoldenFiles = os.Getenv(envUpdate) != ""
 
 // FormatTxtar ensures that .cue files in txtar test archives are well
 // formatted, updating the archive as required prior to running a test.
+// It is controlled by setting CUE_FORMAT_TXTAR to a non-empty string like "true".
 var FormatTxtar = os.Getenv(envFormatTxtar) != ""
 
 // Condition adds support for CUE-specific testscript conditions within

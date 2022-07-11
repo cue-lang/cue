@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/tools/flow"
 )
@@ -37,9 +36,8 @@ import (
 // their dependencies.
 func TestFlow(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
-		Name:   "run",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata",
+		Name: "run",
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

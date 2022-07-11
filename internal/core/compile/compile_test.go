@@ -49,9 +49,9 @@ func TestCompile(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		// TODO: use high-level API.
 
-		a := t.ValidInstances()
+		a := t.Instance()
 
-		v, err := compile.Files(nil, r, "", a[0].Files...)
+		v, err := compile.Files(nil, r, "", a.Files...)
 
 		// Write the results.
 		t.WriteErrors(err)
@@ -60,7 +60,7 @@ func TestCompile(t *testing.T) {
 			return
 		}
 
-		for i, f := range a[0].Files {
+		for i, f := range a.Files {
 			if i > 0 {
 				fmt.Fprintln(t)
 			}

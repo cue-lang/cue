@@ -43,11 +43,11 @@ func TestValue(t *testing.T) {
 	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
+		a := t.Instance()
 
-		pkgID := a[0].ID()
+		pkgID := a.ID()
 
-		v, err := r.Build(nil, a[0])
+		v, err := r.Build(nil, a)
 		if err != nil {
 			t.Fatal(err)
 		}

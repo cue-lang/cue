@@ -45,9 +45,9 @@ func TestDefinition(t *testing.T) {
 	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
+		a := t.Instance()
 
-		v, errs := compile.Files(nil, r, "", a[0].Files...)
+		v, errs := compile.Files(nil, r, "", a.Files...)
 		if errs != nil {
 			t.Fatal(errs)
 		}

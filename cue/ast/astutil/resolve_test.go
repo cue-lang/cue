@@ -32,9 +32,9 @@ func TestResolve(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
+		a := t.Instance()
 
-		for _, f := range a[0].Files {
+		for _, f := range a.Files {
 			if filepath.Ext(f.Filename) != ".cue" {
 				continue
 			}

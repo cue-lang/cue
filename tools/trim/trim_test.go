@@ -282,16 +282,15 @@ func TestData(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
 
-		inst := cue.Build(a[:1])[0]
-		if inst.Err != nil {
-			t.Fatal(inst.Err)
-		}
+		a := t.Instance()
+		val := cuecontext.New().BuildInstance(a)
+		// Note: don't check val.Err because there are deliberate
+		// errors in some tests.
 
-		files := a[0].Files
+		files := a.Files
 
-		err := Files(files, inst, &Config{Trace: trace})
+		err := Files(files, val, &Config{Trace: trace})
 		if err != nil {
 			t.WriteErrors(errors.Promote(err, ""))
 		}

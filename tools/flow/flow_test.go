@@ -41,13 +41,10 @@ func TestFlow(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.ValidInstances()
-
-		insts, err := cuecontext.New().BuildInstances(a)
-		if err != nil {
+		v := cuecontext.New().BuildInstance(t.Instance())
+		if err := v.Err(); err != nil {
 			t.Fatal(err)
 		}
-		v := insts[0]
 
 		seqNum = 0
 

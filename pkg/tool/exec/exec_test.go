@@ -36,7 +36,7 @@ func TestEnv(t *testing.T) {
 		env: {
 			WHO:  "World"
 			WHAT: "Hello"
-			WHEN: "Now!"
+			WHEN: *"Now!" | "Never"
 		}
 		`,
 		env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},

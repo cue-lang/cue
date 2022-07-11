@@ -29,7 +29,6 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/export"
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
 	"cuelang.org/go/internal/types"
@@ -38,8 +37,7 @@ import (
 
 func TestSelfContained(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata/selfcontained",
-		Update: cuetest.UpdateGoldenFiles,
+		Root: "./testdata/selfcontained",
 	}
 
 	r := cuecontext.New()

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "477cfcf0_8056799a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:18:32Z",
+      "side": 1,
+      "message": "LGTM with two small suggestions.",
+      "revId": "1f59a6b653e7ef69ac936a96df2b3d8d50fead8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5e310f2_956ff29a",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:18:32Z",
+      "side": 1,
+      "message": "s/top/root/?\n\ns/txtar file/txtar archive/?",
+      "revId": "1f59a6b653e7ef69ac936a96df2b3d8d50fead8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

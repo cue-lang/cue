@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff0aa627_c5e235bd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:17:11Z",
+      "side": 1,
+      "message": "Drive by very-low-priority comment: I wonder too whether we should settle on using the term \"txtar archive\" instead of \"txtar file\". The former is more general. ",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "688532c5_9ad3b115",

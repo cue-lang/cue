@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bfcdf976_eccb4c78",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "internal",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f9228fe_7fe17696",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "Couple of small nits and questions but LGTM.",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "688532c5_9ad3b115",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "Is it worth being more specific here than simply \"if the test fails\". Because it\u0027s specifically in the case the comparison between golden and actual failing that this logic kicks in, any not anything else.",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80a95a4b_05ceb518",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "\"main golden file\" - first such use of this term.",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfce62ab_1a727cec",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "\"test output\" - first use of this term. How does this relate to the `out/X` files?",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0eac168_7bbf8567",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "Ditto re \"test output\"",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f42e6dd_56dd78e1",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "Ah here is the note on \"test output\". Could move something like this comment to the Test type?",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0276b07_33772a1a",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-12T13:11:52Z",
+      "side": 1,
+      "message": "Comment on the logic here to explain?",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

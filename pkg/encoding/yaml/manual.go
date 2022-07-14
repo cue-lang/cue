@@ -35,7 +35,7 @@ func Marshal(v cue.Value) (string, error) {
 		// messages can be passed.
 		return "", internal.ErrIncomplete
 	}
-	n := v.Syntax(cue.Final(), cue.Concrete(true))
+	n := v.Syntax(cue.Final(), cue.Concrete(true), cue.Docs(true))
 	b, err := cueyaml.Encode(n)
 	return string(b), err
 }
@@ -53,7 +53,7 @@ func MarshalStream(v cue.Value) (string, error) {
 			buf.WriteString("---\n")
 		}
 		v := iter.Value()
-		if err := v.Validate(cue.Concrete(true)); err != nil {
+		if err := v.Validate(cue.Concrete(true), cue.Docs(true)); err != nil {
 			if err := v.Validate(); err != nil {
 				return "", err
 			}

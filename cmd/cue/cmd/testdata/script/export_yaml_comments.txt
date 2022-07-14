@@ -1,0 +1,18 @@
+cue export --out yaml ./hello
+cmp stdout expect-stdout
+-- expect-stdout --
+# cloud-config
+foo: bar
+hello:
+  # occupy
+  world: from mars?
+-- hello/hello.cue --
+package hello
+
+//cloud-config
+foo: "bar"
+
+hello: {
+        // occupy
+        world: "from mars?"
+}

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fb6a6d3_cbeec3b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 56
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-14T11:35:30Z",
+      "side": 1,
+      "message": "SGTM - just some minor suggestions. Feel free to leave any of these as TODOs if they make sense but you don\u0027t want to delay merging all this further.",
+      "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09eb1896_c7cca7bc",
+        "filename": "internal/ci/core/core.cue",
+        "patchSetId": 56
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-14T11:35:30Z",
+      "side": 1,
+      "message": "How about `base`, e.g. `base.#earlyChecks`? I think the term \"base\" is slightly more appropriate, as downstreams are meant to build upon these definitions. And `core` strikes me as too generic, like `common` or `util`.\n\nAnother one that might also work nicely is \"standard\", e.g. `standard.#earlyChecks`, though it\u0027s longer.",
+      "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36b84abf_80f22905",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 56
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-14T11:35:30Z",
+      "side": 1,
+      "message": "nit: could the first not be `trybot/**`?\n\nhttps://docs.github.com/en/actions/using-workflows/events-that-trigger-workflows#running-your-workflow-based-on-the-head-or-base-branch-of-a-pull-request shows one such example, so it should work, and it\u0027s a bit more versatile if we ever slightly change the syntax of trybot branch names.",
+      "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e450a6e1_6ac01006",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 56
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-14T11:35:30Z",
+      "side": 1,
+      "message": "I like this as a pattern, though I worry that one might typo this and use `core` rather than `_core`. Is there no way to do something like Go shadowing, so that we replace `core` with a more specific CUE value?",
+      "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

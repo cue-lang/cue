@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e45b43e_b03e2d1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-14T11:07:05Z",
+      "side": 1,
+      "message": "This would have been a lot easier to review if Gerrit supported seeing \"moved lines\" separate from modified lines. Unfortunately it appears they do not support that: https://bugs.chromium.org/p/gerrit/issues/detail?id\u003d6441\n\nCan we add that to our bucket list of requests for the GerritForge folks? :) Certainly a wishlist item though, not a huge priority or blocker.",
+      "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfac5aab_9fb687ca",
+        "filename": "internal/ci/github/tip_triggers.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-14T11:07:05Z",
+      "side": 1,
+      "message": "nit: this sounds like you\u0027re pushing to some \"tip triggers\", whereas I think you want \"push-to-tip triggers\".\n\nHow about \"Triggers on push to tip\"?",
+      "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55a50fa6_2816cec3",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-14T11:07:05Z",
+      "side": 1,
+      "message": "Hmm - I would hope that we would use the \"ID\" of the workflow, i.e. `trybot`, and not the human-friendly name of it, i.e. `TryBot`, to then identify the workflow later.\n\nI say this because the name is what is rendered in the UI for humans. We might later want to make this friendlier or more accurate, e.g. `Run TryBot tests`.",
+      "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

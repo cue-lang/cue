@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38f16062_470f1deb",
+        "filename": "internal/ci/github/tip_triggers.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-15T12:02:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfac5aab_9fb687ca",
+      "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55a50fa6_2816cec3",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-07-14T11:07:05Z",
       "side": 1,
       "message": "Hmm - I would hope that we would use the \"ID\" of the workflow, i.e. `trybot`, and not the human-friendly name of it, i.e. `TryBot`, to then identify the workflow later.\n\nI say this because the name is what is rendered in the UI for humans. We might later want to make this friendlier or more accurate, e.g. `Run TryBot tests`.",
+      "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "186b9f72_aef9e646",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-15T12:02:10Z",
+      "side": 1,
+      "message": "I _think_ I\u0027ve understood your point here. Let me try and explain why I don\u0027t think we have the option. \n\nThe \"ID\" of the workflow as you refer to it from GitHub\u0027s perspective is actually the filepath: .github/workflows/trybot.yml. The name, \"TryBot\", is what you see in the GitHub actions UI (see the LHS of https://github.com/cue-lang/cue/actions). The field name `trybot` exists only in the CUE world; that does not get seen/used by GitHub at all.\n\nHence how I concluded that the best identifier to use here was the human readable name. That would at least allow us to unify things between the GitHub UI, the Gerrit label, and review comments in Gerrit, with that name intentionally corresponding closely to the filename (although that is not enforced per se, the comments around the name of the workflow explain the constraints). \n\nPlease let me know if I\u0027ve misunderstood.",
+      "parentUuid": "55a50fa6_2816cec3",
       "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

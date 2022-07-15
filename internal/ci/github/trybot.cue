@@ -59,11 +59,13 @@ trybot: _base.#bashWorkflow & {
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,
-				_#goTest,
-				_#goCheck,
-				_#goTestRace & {
-					if: "${{ matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+				_#goTest & {
+					if: "${{ \(_base.#isDefaultBranch) || matrix.go-version != '\(_#latestStableGo)' || matrix.os != '\(_#linuxMachine)' }}"
 				},
+				_#goTestRace & {
+					if: "${{ \(_base.#isDefaultBranch) || matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+				},
+				_#goCheck,
 				_base.#checkGitClean,
 				_#pullThroughProxy,
 			]

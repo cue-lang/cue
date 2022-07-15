@@ -104,6 +104,24 @@
       "parentUuid": "186b9f72_aef9e646",
       "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "740ee412_27b36c31",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-15T15:10:14Z",
+      "side": 1,
+      "message": "Sounds fine. I\u0027d still personally choose the filename as the ID, to let the UI name be more human-friendly, but either works for sure.",
+      "parentUuid": "641c564a_b78489d2",
+      "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

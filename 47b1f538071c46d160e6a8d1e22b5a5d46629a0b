@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed94d35e_c0347229",
+        "filename": "internal/ci/core/core.cue",
+        "patchSetId": 56
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-15T14:49:41Z",
+      "side": 1,
+      "message": "I like your suggestion of base.",
+      "parentUuid": "09eb1896_c7cca7bc",
+      "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36b84abf_80f22905",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e087ae9_18064be4",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 56
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-15T14:49:41Z",
+      "side": 1,
+      "message": "I think we should tend towards being precise to the format we actually use. If things change, it\u0027s hard to say at this point the way in which they will change so I\u0027d rather solve for that later on.",
+      "parentUuid": "36b84abf_80f22905",
+      "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e450a6e1_6ac01006",
@@ -65,6 +101,24 @@
       "writtenOn": "2022-07-14T11:35:30Z",
       "side": 1,
       "message": "I like this as a pattern, though I worry that one might typo this and use `core` rather than `_core`. Is there no way to do something like Go shadowing, so that we replace `core` with a more specific CUE value?",
+      "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81045ac8_e88915e8",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 56
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-15T14:49:41Z",
+      "side": 1,
+      "message": "The only risk of using `core` vs `_core` is that you potentially reference an incomplete (i.e. non-concrete) value. This would immediately be caught, because we would not be able to generate Yaml output. As such I\u0027m not too worried about this. \n\nWe could of course rename the import so the package value is name something else more obscure, and then adopt `core` as the local field name. Happy to revisit this in a later CL because it\u0027s not critical.\n\nAdded a TODO.",
+      "parentUuid": "e450a6e1_6ac01006",
       "revId": "47b1f538071c46d160e6a8d1e22b5a5d46629a0b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

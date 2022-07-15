@@ -86,6 +86,24 @@
       "parentUuid": "55a50fa6_2816cec3",
       "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "641c564a_b78489d2",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-15T14:41:12Z",
+      "side": 1,
+      "message": "I\u0027ll mark this as resolved, and in case I have misunderstood, happy to fix up etc in a later CL.",
+      "parentUuid": "186b9f72_aef9e646",
+      "revId": "8aff515dbb35e39ea9144a526fb8969ddc7a9b6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

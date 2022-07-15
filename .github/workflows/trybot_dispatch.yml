@@ -11,6 +11,14 @@ jobs:
         shell: bash
     if: ${{ github.event.client_payload.type == 'runtrybot' }}
     steps:
+      - name: Write netrc file for cueckoo Gerrithub
+        run: |-
+          cat <<EOD > ~/.netrc
+          machine review.gerrithub.io
+          login cueckoo
+          password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+          EOD
+          chmod 600 ~/.netrc
       - name: Trigger trybot
         run: |-
           mkdir tmpgit

@@ -374,7 +374,7 @@ $ cat <<EOF >> kube.cue
 EOF
 
 # add a file with the component label to each directory
-$ ls -d */ | sed 's/.$//' | xargs -I DIR sh -c 'cd DIR; echo "package kube
+$ ls -d */ | sed 's/$.//' | xargs -I DIR sh -c 'cd DIR; echo "package kube
 
 #Component: \"DIR\"
 " > kube.cue; cd ..'

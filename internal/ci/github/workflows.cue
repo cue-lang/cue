@@ -133,6 +133,7 @@ trybot_dispatch: _#bashWorkflow & {
 		"\(_#runtrybot)": _#dispatchJob & {
 			_#type: _#runtrybot
 			steps: [
+				_#writeNetrcFile,
 				_#step & {
 					name: "Trigger trybot"
 					run:  """
@@ -144,6 +145,18 @@ trybot_dispatch: _#bashWorkflow & {
 				},
 			]
 		}
+	}
+
+	_#writeNetrcFile: _#step & {
+		name: "Write netrc file for cueckoo Gerrithub"
+		run: """
+			cat <<EOD > ~/.netrc
+			machine review.gerrithub.io
+			login cueckoo
+			password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+			EOD
+			chmod 600 ~/.netrc
+			"""
 	}
 }
 

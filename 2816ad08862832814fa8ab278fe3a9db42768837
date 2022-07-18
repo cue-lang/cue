@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5cc877c_4c79c7b4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-18T12:58:49Z",
+      "side": 1,
+      "message": "FWIW I think there\u0027s still a small amount of benefit to running both, because if there is a regular test failure, getting it without the data race detector means:\n\n* you\u0027ll get a result faster (as the race detector adds overhead)\n* you\u0027ll know it is most likely not a data race, and probably easy to reproduce\n\nThat said, we want CI to be as fast as possible now that we have the submit checks, and the data race detector is getting much faster in Go 1.19, so I think I overall agree with the change.",
+      "revId": "2816ad08862832814fa8ab278fe3a9db42768837",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

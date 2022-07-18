@@ -34,6 +34,24 @@
       "parentUuid": "f5cc877c_4c79c7b4",
       "revId": "2816ad08862832814fa8ab278fe3a9db42768837",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19fc3f14_a2a3d987",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-18T15:46:29Z",
+      "side": 1,
+      "message": "All great points. I think your concerns are somewhat mitigated by the fact that there are a number of entries in the build matrix where non-race tests would fail fast. These errors are reported back to the GerritCL immediately.\n\nThat said, I think we should only apply the logic I\u0027m suggesting here on CL-based CI checks. On the default branch, we should run everything. I\u0027ll make that change.",
+      "parentUuid": "03c494e3_d155ea25",
+      "revId": "2816ad08862832814fa8ab278fe3a9db42768837",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

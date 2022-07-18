@@ -16,6 +16,24 @@
       "message": "FWIW I think there\u0027s still a small amount of benefit to running both, because if there is a regular test failure, getting it without the data race detector means:\n\n* you\u0027ll get a result faster (as the race detector adds overhead)\n* you\u0027ll know it is most likely not a data race, and probably easy to reproduce\n\nThat said, we want CI to be as fast as possible now that we have the submit checks, and the data race detector is getting much faster in Go 1.19, so I think I overall agree with the change.",
       "revId": "2816ad08862832814fa8ab278fe3a9db42768837",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03c494e3_d155ea25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-18T12:59:54Z",
+      "side": 1,
+      "message": "Another third advantage of keeping them separate is that, if the regular test succeeds and the race test fails, you almost certainly know that the bug is a data race. Versus running with just the data race detector, you have to take an educated guess.\n\nAgain, a very minor benefit, though :)",
+      "parentUuid": "f5cc877c_4c79c7b4",
+      "revId": "2816ad08862832814fa8ab278fe3a9db42768837",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

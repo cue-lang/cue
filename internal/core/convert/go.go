@@ -685,16 +685,21 @@ func goTypeToValueRec(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type)
 				}
 				elem = ast.NewBinExpr(token.AND, elem, v)
 			}
-			// TODO: if an identifier starts with __ (or otherwise is not a
-			// valid CUE name), make it a string and create a map to a new
-			// name for references.
 
-			// The GO JSON decoder always allows a value to be undefined.
-			d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
-			if isOptional(&f) {
-				d.Optional = token.Blank.Pos()
+			if name == "" {
+				obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: elem})
+			} else {
+				// TODO: if an identifier starts with __ (or otherwise is not a
+				// valid CUE name), make it a string and create a map to a new
+				// name for references.
+
+				// The GO JSON decoder always allows a value to be undefined.
+				d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
+				if isOptional(&f) {
+					d.Optional = token.Blank.Pos()
+				}
+				obj.Elts = append(obj.Elts, d)
 			}
-			obj.Elts = append(obj.Elts, d)
 		}
 
 		// TODO: should we validate references here? Can be done using

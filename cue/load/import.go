@@ -93,7 +93,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	}
 
 	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
-		err := errors.Newf(token.NoPos, "module root not defined", p.DisplayPath)
+		err := errors.Newf(token.NoPos, "module root not defined, provided display path: %s", p.DisplayPath)
 		return retErr(err)
 	}
 

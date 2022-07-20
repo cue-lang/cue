@@ -16,6 +16,7 @@
 package task
 
 import (
+	"bufio"
 	"context"
 	"io"
 	"sync"
@@ -29,7 +30,7 @@ import (
 // A Context provides context for running a task.
 type Context struct {
 	Context context.Context
-	Stdin   io.Reader
+	Stdin   *bufio.Reader // buffered, so that prompts can read entire lines easily
 	Stdout  io.Writer
 	Stderr  io.Writer
 	Obj     cue.Value

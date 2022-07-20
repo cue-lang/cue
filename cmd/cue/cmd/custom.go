@@ -17,6 +17,7 @@ package cmd
 // This file contains code or initializing and running custom commands.
 
 import (
+	"bufio"
 	"context"
 	"encoding/json"
 	"io/ioutil"
@@ -184,6 +185,12 @@ var legacyKinds = map[string]string{
 }
 
 func newTaskFunc(cmd *Command) flow.TaskFunc {
+	// stdin, stdout, and stderr are used throughout all tasks.
+	// We especially want to use a single buffered reader for stdin.
+	stdin := bufio.NewReader(cmd.InOrStdin())
+	stdout := cmd.OutOrStdout()
+	stderr := cmd.OutOrStderr()
+
 	return func(v cue.Value) (flow.Runner, error) {
 		if !isTask(v) {
 			return nil, nil
@@ -222,9 +229,9 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		return flow.RunnerFunc(func(t *flow.Task) error {
 			c := &itask.Context{
 				Context: t.Context(),
-				Stdin:   cmd.InOrStdin(),
-				Stdout:  cmd.OutOrStdout(),
-				Stderr:  cmd.OutOrStderr(),
+				Stdin:   stdin,
+				Stdout:  stdout,
+				Stderr:  stderr,
 				Obj:     t.Value(),
 			}
 			value, err := runner.Run(c)

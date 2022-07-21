@@ -16,6 +16,24 @@
       "message": "The unity diff looks benign:\n\nhttps://gist.github.com/myitcv/2cb04a124bd09c7a62f52210f9198cb6\n\nRelated to the shadowing fixes you mentioned earlier perhaps?",
       "revId": "238a746f8897d43462526d518ed9031d6aed1a60",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8eb910d4_88bcd5b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-21T15:05:51Z",
+      "side": 1,
+      "message": "Ah, yes. I know exactly which piece of code that is. It makes the uniquer slightly more conservative and thus reduces the need for an additional number in some cases. That is exactly what you see.",
+      "parentUuid": "8afe81bb_1f584c0d",
+      "revId": "238a746f8897d43462526d518ed9031d6aed1a60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

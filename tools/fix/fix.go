@@ -65,29 +65,6 @@ func File(f *ast.File, o ...Option) *ast.File {
 		return true
 	}, nil).(*ast.File)
 
-	// Rewrite an old-style alias to a let clause.
-	ast.Walk(f, func(n ast.Node) bool {
-		var decls []ast.Decl
-		switch x := n.(type) {
-		case *ast.StructLit:
-			decls = x.Elts
-		case *ast.File:
-			decls = x.Decls
-		}
-		for i, d := range decls {
-			if a, ok := d.(*ast.Alias); ok {
-				x := &ast.LetClause{
-					Ident: a.Ident,
-					Equal: a.Equal,
-					Expr:  a.Expr,
-				}
-				astutil.CopyMeta(x, a)
-				decls[i] = x
-			}
-		}
-		return true
-	}, nil)
-
 	// Rewrite block comments to regular comments.
 	ast.Walk(f, func(n ast.Node) bool {
 		switch x := n.(type) {

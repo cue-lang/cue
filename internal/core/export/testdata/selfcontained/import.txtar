@@ -1,0 +1,50 @@
+-- cue.mod/module.cue --
+module: "example.com/a"
+
+-- in.cue --
+import "example.com/a/pkg"
+
+// Can be inlined.
+v: pkg.v.v
+
+// Do not simplify because of multiple usages of enclosing struct.
+x: pkg.a.b.c
+y: pkg.a.b
+
+// Cannot simplify because of definition.
+z: pkg.#Def.f
+
+-- pkg/pkg.cue --
+package pkg
+
+v: v: { x: 3, y: x }
+
+a: b: c: { d: int }
+
+#Def: f: g: int
+
+-- out/default --
+// Can be inlined.
+v: {
+	x: 3
+	y: x
+}
+
+// Do not simplify because of multiple usages of enclosing struct.
+x: _b.c
+y: _b
+
+// Cannot simplify because of definition.
+z: _#f
+
+//cue:path: "example.com/a/pkg".a.b
+_b: {
+	c: {
+		d: int
+	}
+}
+
+//cue:path: "example.com/a/pkg".#Def.f
+_#f: {
+	g: int
+}

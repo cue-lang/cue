@@ -1,0 +1,49 @@
+#path: a.b
+
+TODO: some alternative behaviors to consider here:
+- inline small values, even in expressions.
+- fail if hoisting results in an impossible expression,
+  such as: `foo[string]` or `{}.foo`.
+- evaluate expressions to completion, if possible.
+
+-- in.cue --
+x: map: {foo: int}
+y: z: map: {bar: int}
+
+incomplete1: string
+incomplete2: string
+completeExist: "foo"
+completeNotExist: "bar"
+
+a: b: {
+	ref1: x.map
+	ref2: x.map.foo
+	ref3: x.map[incomplete1]      // always an error
+	ref4: x.map[completeExist]    // can be simplified
+	ref5: x.map[completeNotExist] // always an error
+
+	ref6: y.z.map[incomplete2] // inline the single-use map.
+}
+-- out/default --
+ref1: _map
+ref2: _map.foo
+ref3: _map[_incomplete1]
+ref4: _map.foo
+ref5: _map["bar"]
+ref6: _map_1[_incomplete2]
+
+//cue:path: x.map
+_map: {
+	foo: int
+}
+
+//cue:path: incomplete1
+_incomplete1: string
+
+//cue:path: y.z.map
+_map_1: {
+	bar: int
+}
+
+//cue:path: incomplete2
+_incomplete2: string

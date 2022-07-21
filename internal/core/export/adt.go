@@ -119,7 +119,12 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 
 	case adt.Resolver:
 		return e.resolve(env, x)
+	}
 
+	e.inExpression++
+	defer func() { e.inExpression-- }()
+
+	switch x := expr.(type) {
 	case *adt.SliceExpr:
 		var lo, hi ast.Expr
 		if x.Lo != nil {
@@ -258,6 +263,15 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 var dummyTop = &ast.Ident{Name: "_"}
 
 func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
+	if c := e.selfContainedCloser; c != nil {
+		if alt := c.refExpr(r); alt != nil {
+			return alt
+		}
+	}
+
+	e.inExpression++
+	defer func() { e.inExpression-- }()
+
 	switch x := r.(type) {
 	case *adt.FieldReference:
 		ident, _ := e.newIdentForField(x.Src, x.Label, x.UpCount)

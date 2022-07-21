@@ -1,0 +1,30 @@
+Import a package at its root and ensure it comes up with a proper identifier.
+
+-- cue.mod/module.cue --
+module: "example.com/a"
+
+-- in.cue --
+import "example.com/a/pkg"
+
+v: pkg
+
+// Force no inline.
+w: pkg.v.a
+
+-- pkg/pkg.cue --
+package pkg
+
+a: 1
+b: a
+
+-- out/default --
+v: _pkg
+
+// Force no inline.
+w: _pkg.v.a
+
+//cue:path: "example.com/a/pkg".
+_pkg: {
+	a: 1
+	b: a
+}

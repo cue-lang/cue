@@ -47,7 +47,18 @@ import (
 // a common root and prefixing that to the reference. This is now possible
 // with the Environment construct and could be done later.
 
-func (e *exporter) expr(v adt.Elem) (result ast.Expr) {
+var empty *adt.Vertex
+
+func init() {
+	// TODO: Consider setting a non-nil BaseValue.
+	empty = &adt.Vertex{}
+	empty.UpdateStatus(adt.Finalized)
+}
+
+// expr converts an ADT expression to an AST expression.
+// The env is used for resolution and does not need to be given if v is known
+// to not contain any references.
+func (e *exporter) expr(env *adt.Environment, v adt.Elem) (result ast.Expr) {
 	switch x := v.(type) {
 	case nil:
 		return nil
@@ -66,14 +77,14 @@ func (e *exporter) expr(v adt.Elem) (result ast.Expr) {
 		return e.mergeValues(adt.InvalidLabel, x, a, x.Conjuncts...)
 
 	case *adt.StructLit:
-		c := adt.MakeRootConjunct(nil, x)
+		c := adt.MakeRootConjunct(env, x)
 		return e.mergeValues(adt.InvalidLabel, nil, []conjunct{{c: c, up: 0}}, c)
 
 	case adt.Value:
 		return e.value(x) // Use conjuncts.
 
 	default:
-		return e.adt(v, nil)
+		return e.adt(env, v)
 	}
 }
 
@@ -91,7 +102,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		attrs:    []*ast.Attribute{},
 	}
 
-	s, saved := e.pushFrame(orig)
+	s, saved := e.pushFrame(src, orig)
 	defer e.popFrame(saved)
 
 	// Handle value aliases and lets
@@ -334,14 +345,16 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 
 		// Only add if it only has no bulk fields or elipsis.
 		if isComplexStruct(x) {
-			_, saved := e.pushFrame(nil)
-			e.embed = append(e.embed, e.adt(x, nil))
+			_, saved := e.pushFrame(src, nil)
+			e.embed = append(e.embed, e.adt(env, x))
 			e.top().upCount-- // not necessary, but for proper form
 			e.popFrame(saved)
 			return
 		}
 		// Used for sorting.
 		e.structs = append(e.structs, &adt.StructInfo{StructLit: x, Env: env})
+
+		env = &adt.Environment{Up: env, Vertex: e.node()}
 
 		for _, d := range x.Decls {
 			var label adt.Feature
@@ -411,9 +424,9 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			e.addValueConjunct(src, env, x)
 		default:
 			if isEmbed {
-				e.embed = append(e.embed, e.expr(x))
+				e.embed = append(e.embed, e.expr(env, x))
 			} else {
-				e.conjuncts = append(e.conjuncts, e.expr(x))
+				e.conjuncts = append(e.conjuncts, e.expr(env, x))
 			}
 		}
 
@@ -422,9 +435,9 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 		case isSelfContained(x):
 			e.addValueConjunct(src, env, x)
 		case isEmbed:
-			e.embed = append(e.embed, e.expr(x))
+			e.embed = append(e.embed, e.expr(env, x))
 		default:
-			e.conjuncts = append(e.conjuncts, e.expr(x))
+			e.conjuncts = append(e.conjuncts, e.expr(env, x))
 		}
 	}
 }

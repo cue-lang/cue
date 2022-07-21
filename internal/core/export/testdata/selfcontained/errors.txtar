@@ -1,0 +1,53 @@
+#path: root
+
+TODO: do not inline errors
+-- in.cue --
+root: {
+	// comprehensions
+	t1: {for p in b let x = c if d {}}
+
+	t2: e
+	t3: f
+
+	// incomplete
+	t4: [1, 2][x]
+	t5: m.foo // TODO: do not inline m
+	t6: {a: 1}[n.foo.bar]
+}
+b: _
+c: _
+d: _
+e: {for p in _ {}}
+f: {if _ {}}
+
+x: int
+y: "b"
+z: string
+m: {}
+n: {foo: {baz: int}}
+-- out/default --
+// comprehensions
+t1: {
+	for p in _ let x = _ if _ {}
+}
+t2: {
+	for p in _ {}
+}
+t3: {
+	if _ {}
+}
+
+// incomplete
+t4: [1, 2][X]
+t5: {}.foo
+t6: {
+	a: 1
+}[FOO.bar]
+
+//cue:path: x
+let X = int
+
+//cue:path: n.foo
+let FOO = {
+	baz: int
+}

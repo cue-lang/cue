@@ -84,7 +84,11 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 	// TODO: why does LabelReference not implement resolve?
 	case *adt.LabelReference:
 		// get potential label from Source. Otherwise use X.
+		v, ok := e.ctx.Evaluate(env, x)
 		f := e.frame(x.UpCount)
+		if ok && (adt.IsConcrete(v) || f.field == nil) {
+			return e.value(v)
+		}
 		if f.field == nil {
 			// This can happen when the LabelReference is evaluated outside of
 			// normal evaluation, that is, if a pattern constraint or
@@ -287,13 +291,16 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		return ident
 
 	case *adt.DynamicReference:
-		// TODO(dynamic): ensure we correctly unshadow newly visible fields.
+		// TODO(unshadow): ensure we correctly unshadow newly visible fields.
 		//   before uncommenting this.
-		//
 		// if v := x.EvaluateLabel(e.ctx, env); v != 0 {
 		// 	str := v.StringValue(e.ctx)
 		// 	if ast.IsValidIdent(str) {
-		// 		return ast.NewIdent(str)
+		// 		label := e.ctx.StringLabel(str)
+		// 		ident, ok := e.newIdentForField(x.Src, label, x.UpCount)
+		// 		if ok {
+		// 			return ident
+		// 		}
 		// 	}
 		// }
 
@@ -451,13 +458,29 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 		f := &ast.Field{}
 
-		key := e.expr(env, srcKey)
-		switch key.(type) {
-		case *ast.Interpolation, *ast.BasicLit:
+		v, _ := e.ctx.Evaluate(env, x.Key)
+
+		switch s, ok := v.(*adt.String); {
+		// TODO(unshadow): allow once unshadowing algorithm is fixed.
+		// case ok && ast.IsValidIdent(s.Str):
+		// 	label := e.ctx.StringLabel(s.Str)
+		// 	f.Label = ast.NewIdent(s.Str)
+		// 	e.setField(label, f)
+
+		case ok:
+			srcKey = s
+
+			fallthrough
+
 		default:
-			key = &ast.ParenExpr{X: key}
+			key := e.expr(env, srcKey)
+			switch key.(type) {
+			case *ast.Interpolation, *ast.BasicLit:
+			default:
+				key = &ast.ParenExpr{X: key}
+			}
+			f.Label = key.(ast.Label)
 		}
-		f.Label = key.(ast.Label)
 
 		alias := aliasFromLabel(x.Src)
 

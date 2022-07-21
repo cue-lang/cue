@@ -106,7 +106,7 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, er
 		e.inDefinition++
 	}
 
-	expr := e.expr(v)
+	expr := e.expr(nil, v)
 
 	if isDef {
 		e.inDefinition--
@@ -128,7 +128,7 @@ func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, error
 	e := newExporter(p, r, pkgID, nil)
 	e.markUsedFeatures(n)
 
-	return e.expr(n), nil
+	return e.expr(nil, n), nil
 }
 
 func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) (*ast.File, errors.Error) {
@@ -373,19 +373,19 @@ func filterUnusedLets(s *ast.StructLit) {
 
 // resolveLet actually parses the let expression.
 // If there was no recorded let expression, it expands the expression in place.
-func (e *exporter) resolveLet(x *adt.LetReference) ast.Expr {
+func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Expr {
 	letClause, _ := x.Src.Node.(*ast.LetClause)
 	let := e.letAlias[letClause]
 
 	switch {
 	case let == nil:
-		return e.expr(x.X)
+		return e.expr(env, x.X)
 
 	case let.Expr == nil:
 		label := e.uniqueLetIdent(x.Label, x.X)
 
 		let.Ident = e.ident(label)
-		let.Expr = e.expr(x.X)
+		let.Expr = e.expr(env, x.X)
 	}
 
 	ident := ast.NewIdent(let.Ident.Name)
@@ -455,6 +455,8 @@ func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
 }
 
 type frame struct {
+	node *adt.Vertex
+
 	scope *ast.StructLit
 
 	docSources []adt.Conjunct
@@ -491,10 +493,11 @@ func (e *exporter) addEmbed(x ast.Expr) {
 	frame.scope.Elts = append(frame.scope.Elts, x)
 }
 
-func (e *exporter) pushFrame(conjuncts []adt.Conjunct) (s *ast.StructLit, saved []frame) {
+func (e *exporter) pushFrame(src *adt.Vertex, conjuncts []adt.Conjunct) (s *ast.StructLit, saved []frame) {
 	saved = e.stack
 	s = &ast.StructLit{}
 	e.stack = append(e.stack, frame{
+		node:       src,
 		scope:      s,
 		mapped:     map[adt.Node]ast.Node{},
 		fields:     map[adt.Feature]entry{},
@@ -522,6 +525,17 @@ func (e *exporter) popFrame(saved []frame) {
 
 func (e *exporter) top() *frame {
 	return &(e.stack[len(e.stack)-1])
+}
+
+func (e *exporter) node() *adt.Vertex {
+	if len(e.stack) == 0 {
+		return empty
+	}
+	n := e.stack[len(e.stack)-1].node
+	if n == nil {
+		return empty
+	}
+	return n
 }
 
 func (e *exporter) frame(upCount int32) *frame {

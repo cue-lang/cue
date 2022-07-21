@@ -39,7 +39,7 @@ import (
 
 func TestDefinition(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
+		Root:   "./testdata/main",
 		Name:   "definition",
 		Update: cuetest.UpdateGoldenFiles,
 	}

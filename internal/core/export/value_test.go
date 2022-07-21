@@ -36,7 +36,7 @@ var exclude = map[string]string{
 
 func TestValue(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
+		Root:   "./testdata/main",
 		Name:   "value",
 		Update: cuetest.UpdateGoldenFiles,
 		Skip:   exclude,

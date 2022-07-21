@@ -68,7 +68,7 @@ fieldAlias: {
 		baz: 3
 		X_2="d-2": {
 			E=[D="cue"]: {
-				C="foo\(baz)": {
+				C="foo3": {
 					name: "xx"
 					foo:  C.name
 					bar:  X_2

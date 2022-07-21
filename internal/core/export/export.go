@@ -57,9 +57,11 @@ type Profile struct {
 	// Use unevaluated conjuncts for these error types
 	// IgnoreRecursive
 
-	// TODO: recurse over entire tree to determine transitive closure
-	// of what needs to be printed.
-	// IncludeDependencies bool
+	// SelfContained exports a schema such that it does not rely on any imports.
+	SelfContained bool
+
+	// InlineImports expands references to non-builtin packages.
+	InlineImports bool
 }
 
 var Simplified = &Profile{
@@ -92,13 +94,16 @@ var All = &Profile{
 // Concrete
 
 // Def exports v as a definition.
+// It resolves references that point outside any of the vertices in v.
 func Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
 	return All.Def(r, pkgID, v)
 }
 
 // Def exports v as a definition.
-func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
+// It resolves references that point outside any of the vertices in v.
+func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, err errors.Error) {
 	e := newExporter(p, r, pkgID, v)
+	e.initPivot(v)
 
 	isDef := v.IsRecursivelyClosed()
 	if isDef {
@@ -116,13 +121,18 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, er
 			)
 		}
 	}
+
 	return e.finalize(v, expr)
 }
 
+// Expr exports the given unevaluated expression (schema mode).
+// It does not resolve references that point outside the given expession.
 func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 	return Simplified.Expr(r, pkgID, n)
 }
 
+// Expr exports the given unevaluated expression (schema mode).
+// It does not resolve references that point outside the given expression.
 func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 	e := newExporter(p, r, pkgID, nil)
 
@@ -170,21 +180,33 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	return f
 }
 
+// Vertex exports evaluated values (data mode).
+// It resolves incomplete references that point outside the current context.
 func Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
 	return Simplified.Vertex(r, pkgID, n)
 }
 
-func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
+// Vertex exports evaluated values (data mode).
+// It resolves incomplete references that point outside the current context.
+func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (f *ast.File, err errors.Error) {
 	e := newExporter(p, r, pkgID, n)
+	e.initPivot(n)
+
 	v := e.value(n, n.Conjuncts...)
 	return e.finalize(n, v)
 }
 
+// Value exports evaluated values (data mode).
+// It does not resolve references that point outside the given Value.
 func Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 	return Simplified.Value(r, pkgID, n)
 }
 
-// Should take context.
+// Value exports evaluated values (data mode).
+//
+// It does not resolve references that point outside the given Value.
+//
+// TODO: Should take context.
 func (p *Profile) Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 	e := newExporter(p, r, pkgID, n)
 	v := e.value(n)
@@ -204,6 +226,7 @@ type exporter struct {
 	stack []frame
 
 	inDefinition int // for close() wrapping.
+	inExpression int // for inlining decisions.
 
 	// hidden label handling
 	pkgID  string
@@ -217,6 +240,8 @@ type exporter struct {
 	letAlias    map[*ast.LetClause]*ast.LetClause
 
 	usedHidden map[string]bool
+
+	pivotter *pivotter
 }
 
 // newExporter creates and initializes an exporter.
@@ -234,10 +259,24 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 	return e
 }
 
+// initPivot initializes the pivotter to allow aligning a configuration around
+// a new root, if needed.
+func (e *exporter) initPivot(n *adt.Vertex) {
+	if !e.cfg.InlineImports &&
+		!e.cfg.SelfContained &&
+		n.Parent == nil {
+		return
+	}
+
+	e.initPivotter(n)
+}
+
 // finalize finalizes the result of an export. It is only needed for use cases
 // that require conversion to a File, Sanitization, and self containment.
 func (e *exporter) finalize(n *adt.Vertex, v ast.Expr) (f *ast.File, err errors.Error) {
 	f = e.toFile(n, v)
+
+	e.completePivot(f)
 
 	if err := astutil.Sanitize(f); err != nil {
 		err := errors.Promote(err, "export")

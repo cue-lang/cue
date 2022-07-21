@@ -1,0 +1,16 @@
+#path: a.b
+-- in.cue --
+#def: {
+	a: 1
+}
+
+a: b: c: #def
+-- out/default --
+c: DEF.#x
+
+//cue:path: #def
+let DEF = {
+	#x: {
+		a: 1
+	}
+}

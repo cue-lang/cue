@@ -727,6 +727,8 @@ func (x *FieldReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 
 // A ValueReference represents a lexical reference to a value.
 //
+// Example: an X referring to
+//
 //    a: X=b
 //
 type ValueReference struct {
@@ -752,7 +754,9 @@ func (x *ValueReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 
 // A LabelReference refers to the string or integer value of a label.
 //
-//    [X=Pattern]: b: X
+// Example: an X referring to
+//
+//    [X=Pattern]: b: a
 //
 type LabelReference struct {
 	Src     *ast.Ident
@@ -783,8 +787,11 @@ func (x *LabelReference) evaluate(ctx *OpContext) Value {
 
 // A DynamicReference is like a LabelReference, but with a computed label.
 //
-//    X=(x): X
-//    X="\(x)": X
+// Example: an X referring to
+//
+//    X=(x): v
+//    X="\(x)": v
+//    X=[string]: v
 //
 type DynamicReference struct {
 	Src     *ast.Ident
@@ -818,6 +825,8 @@ func (x *DynamicReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 
 // An ImportReference refers to an imported package.
 //
+// Example: strings in
+//
 //    import "strings"
 //
 //    strings.ToLower("Upper")
@@ -845,6 +854,8 @@ func (x *ImportReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 }
 
 // A LetReference evaluates a let expression in its original environment.
+//
+// Example: an X referring to
 //
 //   let X = x
 //
@@ -881,7 +892,7 @@ func (x *LetReference) evaluate(c *OpContext) Value {
 
 // A SelectorExpr looks up a fixed field in an expression.
 //
-//     X.Sel
+//     a.sel
 //
 type SelectorExpr struct {
 	Src *ast.SelectorExpr
@@ -916,7 +927,7 @@ func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
 
 // IndexExpr is like a selector, but selects an index.
 //
-//    X[Index]
+//    a[index]
 //
 type IndexExpr struct {
 	Src   *ast.IndexExpr

@@ -292,7 +292,7 @@ func (f Feature) IsRegular() bool {
 func (f Feature) IsString() bool { return f.Typ() == StringLabel }
 
 // IsDef reports whether the label is a definition (an identifier starting with
-// # or #_.
+// # or _#.
 func (f Feature) IsDef() bool {
 	return f.Typ().IsDef()
 }

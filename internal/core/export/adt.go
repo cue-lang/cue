@@ -34,15 +34,16 @@ func (e *exporter) ident(x adt.Feature) *ast.Ident {
 	return ast.NewIdent(s)
 }
 
-func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
+func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 	switch x := expr.(type) {
 	case adt.Value:
-		return e.expr(x)
+		return e.expr(env, x)
 
 	case *adt.ListLit:
+		env := &adt.Environment{Up: env, Vertex: e.node()}
 		a := []ast.Expr{}
 		for _, x := range x.Elems {
-			a = append(a, e.elem(x))
+			a = append(a, e.elem(env, x))
 		}
 		return ast.NewList(a...)
 
@@ -53,6 +54,7 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 		// s := e.frame(0).scope
 
 		s := &ast.StructLit{}
+		env := &adt.Environment{Up: env, Vertex: e.node()}
 
 		for _, d := range x.Decls {
 			var a *ast.Alias
@@ -65,7 +67,7 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 					e.valueAlias[alias] = a
 				}
 			}
-			decl := e.decl(d)
+			decl := e.decl(env, d)
 
 			if a != nil {
 				if f, ok := decl.(*ast.Field); ok {
@@ -79,7 +81,7 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 
 		return s
 
-		// TODO: why is this not a resolver?
+	// TODO: why does LabelReference not implement resolve?
 	case *adt.LabelReference:
 		// get potential label from Source. Otherwise use X.
 		f := e.frame(x.UpCount)
@@ -112,21 +114,21 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 		return ident
 
 	case adt.Resolver:
-		return e.resolver(x)
+		return e.resolve(env, x)
 
 	case *adt.SliceExpr:
 		var lo, hi ast.Expr
 		if x.Lo != nil {
-			lo = e.expr(x.Lo)
+			lo = e.expr(env, x.Lo)
 		}
 		if x.Hi != nil {
-			hi = e.expr(x.Hi)
+			hi = e.expr(env, x.Hi)
 		}
 		// TODO: Stride not yet? implemented.
 		// if x.Stride != nil {
-		// 	stride = e.expr(x.Stride)
+		// 	stride = e.expr(env, x.Stride)
 		// }
-		return &ast.SliceExpr{X: e.expr(x.X), Low: lo, High: hi}
+		return &ast.SliceExpr{X: e.expr(env, x.X), Low: lo, High: hi}
 
 	case *adt.Interpolation:
 		var (
@@ -168,7 +170,7 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 		suffix := `\(`
 		for i, elem := range x.Parts {
 			if i%2 == 1 {
-				t.Elts = append(t.Elts, e.expr(elem))
+				t.Elts = append(t.Elts, e.expr(env, elem))
 			} else {
 				// b := strings.Builder{}
 				buf := []byte(prefix)
@@ -198,39 +200,39 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 	case *adt.BoundExpr:
 		return &ast.UnaryExpr{
 			Op: x.Op.Token(),
-			X:  e.expr(x.Expr),
+			X:  e.expr(env, x.Expr),
 		}
 
 	case *adt.UnaryExpr:
 		return &ast.UnaryExpr{
 			Op: x.Op.Token(),
-			X:  e.expr(x.X),
+			X:  e.expr(env, x.X),
 		}
 
 	case *adt.BinaryExpr:
 		return &ast.BinaryExpr{
 			Op: x.Op.Token(),
-			X:  e.expr(x.X),
-			Y:  e.expr(x.Y),
+			X:  e.expr(env, x.X),
+			Y:  e.expr(env, x.Y),
 		}
 
 	case *adt.CallExpr:
 		a := []ast.Expr{}
 		for _, arg := range x.Args {
-			v := e.expr(arg)
+			v := e.expr(env, arg)
 			if v == nil {
-				e.expr(arg)
+				e.expr(env, arg)
 				panic("")
 			}
 			a = append(a, v)
 		}
-		fun := e.expr(x.Fun)
+		fun := e.expr(env, x.Fun)
 		return &ast.CallExpr{Fun: fun, Args: a}
 
 	case *adt.DisjunctionExpr:
 		a := []ast.Expr{}
 		for _, d := range x.Values {
-			v := e.expr(d.Val)
+			v := e.expr(env, d.Val)
 			if d.Default {
 				v = &ast.UnaryExpr{Op: token.MUL, X: v}
 			}
@@ -242,7 +244,23 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 		if !x.DidResolve() {
 			return dummyTop
 		}
-		return e.adt(adt.ToExpr(x.Value), conjuncts)
+	loop:
+		for c := x.Clauses; ; {
+			switch x := c.(type) {
+			case *adt.ForClause:
+				env = &adt.Environment{Up: env, Vertex: empty}
+				c = x.Dst
+			case *adt.IfClause:
+			case *adt.LetClause:
+				env = &adt.Environment{Up: env, Vertex: empty}
+				c = x.Dst
+			case *adt.ValueClause:
+				break loop
+			default:
+				panic("unreachable")
+			}
+		}
+		return e.adt(env, adt.ToExpr(x.Value))
 
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
@@ -251,7 +269,7 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 
 var dummyTop = &ast.Ident{Name: "_"}
 
-func (e *exporter) resolver(r adt.Resolver) ast.Expr {
+func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 	switch x := r.(type) {
 	case *adt.FieldReference:
 		f := e.frame(x.UpCount)
@@ -322,27 +340,27 @@ func (e *exporter) resolver(r adt.Resolver) ast.Expr {
 		return ident
 
 	case *adt.LetReference:
-		return e.resolveLet(x)
+		return e.resolveLet(env, x)
 
 	case *adt.SelectorExpr:
 		return &ast.SelectorExpr{
-			X:   e.expr(x.X),
+			X:   e.expr(env, x.X),
 			Sel: e.stringLabel(x.Sel),
 		}
 
 	case *adt.IndexExpr:
 		return &ast.IndexExpr{
-			X:     e.expr(x.X),
-			Index: e.expr(x.Index),
+			X:     e.expr(env, x.X),
+			Index: e.expr(env, x.Index),
 		}
 	}
 	panic("unreachable")
 }
 
-func (e *exporter) decl(d adt.Decl) ast.Decl {
+func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 	switch x := d.(type) {
 	case adt.Elem:
-		return e.elem(x)
+		return e.elem(env, x)
 
 	case *adt.Field:
 		e.setDocs(x)
@@ -356,7 +374,7 @@ func (e *exporter) decl(d adt.Decl) ast.Decl {
 		entry.node = f.Value
 		frame.fields[x.Label] = entry
 
-		f.Value = e.expr(x.Value)
+		f.Value = e.expr(env, x.Value)
 
 		// extractDocs(nil)
 		return f
@@ -374,7 +392,7 @@ func (e *exporter) decl(d adt.Decl) ast.Decl {
 		entry.node = f.Value
 		frame.fields[x.Label] = entry
 
-		f.Value = e.expr(x.Value)
+		f.Value = e.expr(env, x.Value)
 
 		// extractDocs(nil)
 		return f
@@ -384,7 +402,7 @@ func (e *exporter) decl(d adt.Decl) ast.Decl {
 		// set bulk in frame.
 		frame := e.frame(0)
 
-		expr := e.expr(x.Filter)
+		expr := e.expr(env, x.Filter)
 		frame.labelExpr = expr // see astutil.Resolve.
 
 		if x.Label != 0 {
@@ -396,13 +414,13 @@ func (e *exporter) decl(d adt.Decl) ast.Decl {
 
 		frame.field = f
 
-		f.Value = e.expr(x.Value)
+		f.Value = e.expr(env, x.Value)
 
 		return f
 
 	case *adt.DynamicField:
 		e.setDocs(x)
-		key := e.expr(x.Key)
+		key := e.expr(env, x.Key)
 		if _, ok := key.(*ast.Interpolation); !ok {
 			key = &ast.ParenExpr{X: key}
 		}
@@ -415,7 +433,7 @@ func (e *exporter) decl(d adt.Decl) ast.Decl {
 		frame.labelExpr = key
 		// extractDocs(nil)
 
-		f.Value = e.expr(x.Value)
+		f.Value = e.expr(env, x.Value)
 
 		return f
 
@@ -424,28 +442,28 @@ func (e *exporter) decl(d adt.Decl) ast.Decl {
 	}
 }
 
-func (e *exporter) elem(d adt.Elem) ast.Expr {
+func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {
 
 	switch x := d.(type) {
 	case adt.Expr:
-		return e.expr(x)
+		return e.expr(env, x)
 
 	case *adt.Ellipsis:
 		t := &ast.Ellipsis{}
 		if x.Value != nil {
-			t.Type = e.expr(x.Value)
+			t.Type = e.expr(env, x.Value)
 		}
 		return t
 
 	case *adt.Comprehension:
-		return e.comprehension(x)
+		return e.comprehension(env, x)
 
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}
 }
 
-func (e *exporter) comprehension(comp *adt.Comprehension) *ast.Comprehension {
+func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) *ast.Comprehension {
 	c := &ast.Comprehension{}
 
 	y := comp.Clauses
@@ -454,14 +472,15 @@ loop:
 	for {
 		switch x := y.(type) {
 		case *adt.ForClause:
+			env := &adt.Environment{Up: env, Vertex: empty}
 			value := e.ident(x.Value)
 			clause := &ast.ForClause{
 				Value:  value,
-				Source: e.expr(x.Src),
+				Source: e.expr(env, x.Src),
 			}
 			c.Clauses = append(c.Clauses, clause)
 
-			_, saved := e.pushFrame(nil)
+			_, saved := e.pushFrame(empty, nil)
 			defer e.popFrame(saved)
 
 			if x.Key != adt.InvalidLabel ||
@@ -475,18 +494,19 @@ loop:
 			y = x.Dst
 
 		case *adt.IfClause:
-			clause := &ast.IfClause{Condition: e.expr(x.Condition)}
+			clause := &ast.IfClause{Condition: e.expr(env, x.Condition)}
 			c.Clauses = append(c.Clauses, clause)
 			y = x.Dst
 
 		case *adt.LetClause:
+			env := &adt.Environment{Up: env, Vertex: empty}
 			clause := &ast.LetClause{
 				Ident: e.ident(x.Label),
-				Expr:  e.expr(x.Expr),
+				Expr:  e.expr(env, x.Expr),
 			}
 			c.Clauses = append(c.Clauses, clause)
 
-			_, saved := e.pushFrame(nil)
+			_, saved := e.pushFrame(empty, nil)
 			defer e.popFrame(saved)
 
 			e.addField(x.Label, nil, clause)
@@ -501,7 +521,7 @@ loop:
 		}
 	}
 
-	v := e.expr(adt.ToExpr(comp.Value))
+	v := e.expr(env, adt.ToExpr(comp.Value))
 	if _, ok := v.(*ast.StructLit); !ok {
 		v = ast.NewStruct(ast.Embed(v))
 	}

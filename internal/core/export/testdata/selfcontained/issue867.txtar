@@ -1,0 +1,9 @@
+#path: output
+-- in.cue --
+t: {name: string}
+output: [...t]
+-- out/default --
+
+[...{
+	name: string
+}]

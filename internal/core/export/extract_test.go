@@ -29,7 +29,7 @@ import (
 
 func TestExtract(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata",
+		Root:   "./testdata/main",
 		Name:   "doc",
 		Update: cuetest.UpdateGoldenFiles,
 	}

@@ -57,9 +57,11 @@ type Profile struct {
 	// Use unevaluated conjuncts for these error types
 	// IgnoreRecursive
 
-	// TODO: recurse over entire tree to determine transitive closure
-	// of what needs to be printed.
-	// IncludeDependencies bool
+	// SelfContained exports a schema such that it does not rely on any imports.
+	SelfContained bool
+
+	// ExpandImports expands non-builtin packages.
+	ExpandImports bool
 }
 
 var Simplified = &Profile{
@@ -101,6 +103,8 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, er
 	e := newExporter(p, r, pkgID, v)
 	e.markUsedFeatures(v)
 
+	e.initSelfContainedCloser(v)
+
 	isDef := v.IsRecursivelyClosed()
 	if isDef {
 		e.inDefinition++
@@ -117,7 +121,15 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, er
 			)
 		}
 	}
-	return e.toFile(v, expr)
+
+	f, err := e.toFile(v, expr)
+	if err != nil {
+		return f, err
+	}
+
+	e.completeSelfContained(f)
+
+	return f, nil
 }
 
 func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
@@ -225,6 +237,7 @@ type exporter struct {
 	stack []frame
 
 	inDefinition int // for close() wrapping.
+	inExpression int // for inlining decisions.
 
 	// hidden label handling
 	pkgID  string
@@ -238,6 +251,8 @@ type exporter struct {
 	letAlias    map[*ast.LetClause]*ast.LetClause
 
 	usedHidden map[string]bool
+
+	selfContainedCloser *selfContainedCloser
 }
 
 func newExporter(p *Profile, r adt.Runtime, pkgID string, v *adt.Vertex) *exporter {
@@ -427,6 +442,12 @@ func (e *exporter) uniqueAlias(name string) string {
 func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
 	if e.rand == nil {
 		e.rand = rand.New(rand.NewSource(808))
+	}
+
+	f = adt.MakeIdentLabel(e.ctx, base, "")
+	if _, ok := e.usedFeature[f]; !ok {
+		e.usedFeature[f] = nil
+		return f, name
 	}
 
 	// Try the first few numbers in sequence.

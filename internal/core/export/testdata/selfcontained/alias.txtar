@@ -1,0 +1,81 @@
+#path: a.b
+
+-- in.cue --
+E=ext: one: 1
+E1=("ext1"): two: 2
+E2=("ext2"): { three: 3, a: int}
+a: B=b: {
+	x: string
+	y: B.x
+	X=(x): 4
+	Y=("y"): 5
+	enclosed: {
+		V=x: string
+		y: B.enclosed.x
+		z: V
+
+		labelX: X
+		labelY: Y
+	}
+	hoisted: {
+		"ext1": E
+		ext2: E
+		ext3: E1
+		ext4: E2
+		ext5: E2.a
+	}
+
+	other: [INNER=string]: name: INNER
+}
+
+[NAME=string]: b: name: NAME
+-- out/default --
+
+{
+	x:     string
+	y:     b.x
+	X=(x): 4
+	Y="y": 5
+	enclosed: {
+		x:      string
+		y:      b.enclosed.x
+		z:      x
+		labelX: X
+		labelY: Y
+	}
+	hoisted: {
+		ext1: _ext
+		ext2: _ext
+		ext3: {
+			two: 2
+			b: {
+				name: "ext1"
+			}
+		}
+		ext4: _ext2
+		ext5: _ext2.a
+	}
+	other: {
+		[INNER=string]: {
+			name: INNER
+		}
+	}
+}
+name: "a"
+
+//cue:path: ext
+_ext: {
+	one: 1
+	b: {
+		name: "ext"
+	}
+}
+
+//cue:path: ext2
+_ext2: {
+	three: 3
+	b: {
+		name: "ext2"
+	}
+	a: int
+}

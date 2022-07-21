@@ -272,30 +272,7 @@ var dummyTop = &ast.Ident{Name: "_"}
 func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 	switch x := r.(type) {
 	case *adt.FieldReference:
-		f := e.frame(x.UpCount)
-		entry := f.fields[x.Label]
-
-		name := x.Label.IdentString(e.ctx)
-		switch {
-		case entry.alias != "":
-			name = entry.alias
-
-		case !ast.IsValidIdent(name):
-			name = "X"
-			if x.Src != nil {
-				name = x.Src.Name
-			}
-			name = e.uniqueAlias(name)
-			entry.alias = name
-		}
-
-		ident := ast.NewIdent(name)
-		entry.references = append(entry.references, ident)
-
-		if f.fields != nil {
-			f.fields[x.Label] = entry
-		}
-
+		ident, _ := e.newIdentForField(x.Src, x.Label, x.UpCount)
 		return ident
 
 	case *adt.ValueReference:
@@ -357,6 +334,38 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 	panic("unreachable")
 }
 
+func (e *exporter) newIdentForField(
+	orig *ast.Ident,
+	label adt.Feature,
+	upCount int32) (ident *ast.Ident, ok bool) {
+	f := e.frame(upCount)
+	entry := f.fields[label]
+
+	name := label.IdentString(e.ctx)
+	switch {
+	case entry.alias != "":
+		name = entry.alias
+
+	case !ast.IsValidIdent(name):
+		name = "X"
+		if orig != nil {
+			name = orig.Name
+		}
+		name = e.uniqueAlias(name)
+		entry.alias = name
+	}
+
+	ident = ast.NewIdent(name)
+	entry.references = append(entry.references, ident)
+
+	if f.fields != nil {
+		f.fields[label] = entry
+		ok = true
+	}
+
+	return ident, ok
+}
+
 func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 	switch x := d.(type) {
 	case adt.Elem:
@@ -368,11 +377,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 			Label: e.stringLabel(x.Label),
 		}
 
-		frame := e.frame(0)
-		entry := frame.fields[x.Label]
-		entry.field = f
-		entry.node = f.Value
-		frame.fields[x.Label] = entry
+		e.setField(x.Label, f)
 
 		f.Value = e.expr(env, x.Value)
 
@@ -386,11 +391,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 			Optional: token.NoSpace.Pos(),
 		}
 
-		frame := e.frame(0)
-		entry := frame.fields[x.Label]
-		entry.field = f
-		entry.node = f.Value
-		frame.fields[x.Label] = entry
+		e.setField(x.Label, f)
 
 		f.Value = e.expr(env, x.Value)
 
@@ -440,6 +441,14 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}
+}
+
+func (e *exporter) setField(label adt.Feature, f *ast.Field) {
+	frame := e.frame(0)
+	entry := frame.fields[label]
+	entry.field = f
+	entry.node = f.Value
+	frame.fields[label] = entry
 }
 
 func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {

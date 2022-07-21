@@ -286,18 +286,36 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 		return ident
 
 	case *adt.DynamicReference:
-		// get potential label from Source. Otherwise use X.
+		// TODO(dynamic): ensure we correctly unshadow newly visible fields.
+		//   before uncommenting this.
+		//
+		// if v := x.EvaluateLabel(e.ctx, env); v != 0 {
+		// 	str := v.StringValue(e.ctx)
+		// 	if ast.IsValidIdent(str) {
+		// 		return ast.NewIdent(str)
+		// 	}
+		// }
+
 		name := "X"
-		f := e.frame(x.UpCount)
-		if d := f.field; d != nil {
-			if x.Src != nil {
-				name = x.Src.Name
-			}
-			name = e.getFieldAlias(d, name)
+		if x.Src != nil {
+			name = x.Src.Name
 		}
+		var f *ast.Field
+		for i := len(e.stack) - 1; i >= 0; i-- {
+			for _, entry := range e.stack[i].dynamicFields {
+				if entry.alias == name {
+					f = entry.field
+				}
+			}
+		}
+
+		if f != nil {
+			name = e.getFieldAlias(f, name)
+		}
+
 		ident := ast.NewIdent(name)
-		ident.Scope = f.field
-		ident.Node = f.field
+		ident.Scope = f
+		ident.Node = f
 		return ident
 
 	case *adt.ImportReference:
@@ -415,23 +433,38 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 		frame.field = f
 
+		if alias := aliasFromLabel(x.Src); alias != "" {
+			frame.dynamicFields = append(frame.dynamicFields, &entry{
+				alias: alias,
+				field: f,
+			})
+		}
+
 		f.Value = e.expr(env, x.Value)
 
 		return f
 
 	case *adt.DynamicField:
 		e.setDocs(x)
-		key := e.expr(env, x.Key)
-		if _, ok := key.(*ast.Interpolation); !ok {
+		srcKey := x.Key
+
+		f := &ast.Field{}
+
+		key := e.expr(env, srcKey)
+		switch key.(type) {
+		case *ast.Interpolation, *ast.BasicLit:
+		default:
 			key = &ast.ParenExpr{X: key}
 		}
-		f := &ast.Field{
-			Label: key.(ast.Label),
-		}
+		f.Label = key.(ast.Label)
+
+		alias := aliasFromLabel(x.Src)
 
 		frame := e.frame(0)
-		frame.field = f
-		frame.labelExpr = key
+		frame.dynamicFields = append(frame.dynamicFields, &entry{
+			alias: alias,
+			field: f,
+		})
 		// extractDocs(nil)
 
 		f.Value = e.expr(env, x.Value)
@@ -449,6 +482,15 @@ func (e *exporter) setField(label adt.Feature, f *ast.Field) {
 	entry.field = f
 	entry.node = f.Value
 	frame.fields[label] = entry
+}
+
+func aliasFromLabel(src *ast.Field) string {
+	if src != nil {
+		if a, ok := src.Label.(*ast.Alias); ok {
+			return a.Ident.Name
+		}
+	}
+	return ""
 }
 
 func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {

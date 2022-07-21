@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b55dd862_caf567b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-21T14:22:36Z",
+      "side": 1,
+      "message": "\u003e Patch Set 1: TryBot-Result-1\n\u003e \n\u003e TryBot run job failed for ubuntu-20.04; see https://github.com/cue-lang/cue-trybot/runs/7451087932?check_suite_focus\u003dtrue for more details\n\nWell, good thing we have the race detector.",
+      "revId": "e67fa45c1704c350bc1240f8fd69cdfca9f68aed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

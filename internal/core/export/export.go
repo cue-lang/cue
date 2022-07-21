@@ -416,6 +416,29 @@ func (e *exporter) uniqueAlias(name string) string {
 	return name
 }
 
+// A featureSet implements a set of Features. It only supports testing
+// whether a given string is available as a Feature.
+type featureSet interface {
+	// intn returns a pseudo-random integer in [0..n).
+	intn(n int) int
+
+	// makeFeature converts s to f if it is available.
+	makeFeature(s string) (f adt.Feature, ok bool)
+}
+
+func (e *exporter) intn(n int) int {
+	return e.rand.Intn(n)
+}
+
+func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
+	f = adt.MakeIdentLabel(e.ctx, s, "")
+	_, exists := e.usedFeature[f]
+	if !exists {
+		e.usedFeature[f] = nil
+	}
+	return f, !exists
+}
+
 // uniqueFeature returns a name for an identifier that uniquely identifies
 // the given expression. If the preferred name is already taken, a new globally
 // unique name of the form base_X ... base_XXXXXXXXXXXXXX is generated.
@@ -428,13 +451,18 @@ func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
 	if e.rand == nil {
 		e.rand = rand.New(rand.NewSource(808))
 	}
+	return findUnique(e, base)
+}
+
+func findUnique(set featureSet, base string) (f adt.Feature, name string) {
+	if f, ok := set.makeFeature(base); ok {
+		return f, base
+	}
 
 	// Try the first few numbers in sequence.
 	for i := 1; i < 5; i++ {
 		name := fmt.Sprintf("%s_%01X", base, i)
-		f := adt.MakeIdentLabel(e.ctx, name, "")
-		if _, ok := e.usedFeature[f]; !ok {
-			e.usedFeature[f] = nil
+		if f, ok := set.makeFeature(name); ok {
 			return f, name
 		}
 	}
@@ -443,11 +471,9 @@ func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
 	const shift = 4                  // rate of growth
 	digits := 1
 	for n := int64(0x10); ; n = int64(mask&((n<<shift)-1)) + 1 {
-		num := e.rand.Intn(int(n)-1) + 1
+		num := set.intn(int(n)-1) + 1
 		name := fmt.Sprintf("%[1]s_%0[2]*[3]X", base, digits, num)
-		f := adt.MakeIdentLabel(e.ctx, name, "")
-		if _, ok := e.usedFeature[f]; !ok {
-			e.usedFeature[f] = nil
+		if f, ok := set.makeFeature(name); ok {
 			return f, name
 		}
 		digits++

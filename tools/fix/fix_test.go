@@ -44,13 +44,6 @@ c: __quo(2, 9)
 d: __rem(1.0, 1.0) // pass on illegal values.
 `,
 	}, {
-		in: `
-		y = foo
-		`,
-		out: `
-let y = foo
-`,
-	}, {
 		simplify: true,
 		in: `
 		x1: 3 & _

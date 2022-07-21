@@ -291,28 +291,18 @@ func spawn(env *Environment, node *Vertex) *Environment {
 }
 
 func (c *OpContext) Env(upCount int32) *Environment {
-	e := c.e
-	for ; upCount > 0; upCount-- {
-		e = e.Up
-	}
-	return e
+	return c.e.up(upCount)
 }
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
-	e := c.e
-	for ; upCount > 0; upCount-- {
-		e = e.Up
-	}
+	e := c.e.up(upCount)
 	c.Unify(e.Vertex, Partial)
 	return e.Vertex
 }
 
 func (c *OpContext) relLabel(upCount int32) Feature {
 	// locate current label.
-	e := c.e
-	for ; upCount > 0; upCount-- {
-		e = e.Up
-	}
+	e := c.e.up(upCount)
 	return e.DynamicLabel
 }
 

@@ -461,10 +461,14 @@ type frame struct {
 
 	docSources []adt.Conjunct
 
-	// For resolving dynamic fields.
+	// For resolving pattern constraints  fields labels
 	field     *ast.Field
 	labelExpr ast.Expr
-	upCount   int32 // for off-by-one handling
+
+	dynamicFields []*entry
+
+	// for off-by-one handling
+	upCount int32
 
 	// labeled fields
 	fields map[adt.Feature]entry

@@ -1,0 +1,24 @@
+#path: a.b
+-- in.cue --
+import "struct"
+
+s: {a: 1, b: 2}
+
+a: b: {
+	// Do not inline `s`, as it makes calls less readable.
+	c: struct.MaxFields(s & d, 3)
+	d: {}
+}
+
+-- out/default --
+import "struct"
+
+// Do not inline `s`, as it makes calls less readable.
+c: struct.MaxFields(S & d, 3)
+d: {}
+
+//cue:path: s
+let S = {
+	a: 1
+	b: 2
+}

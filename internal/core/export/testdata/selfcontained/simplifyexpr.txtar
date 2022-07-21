@@ -1,0 +1,23 @@
+#path: a.b
+-- in.cue --
+import "struct"
+
+s: {a: 1, b: 2}
+
+// TODO: this could be resolved because all inputs are fixed.
+a: b: {
+	c: struct.MaxFields(s, 3)
+	d: {}
+}
+
+-- out/default --
+import "struct"
+
+c: struct.MaxFields(S, 3)
+d: {}
+
+//cue:path: s
+let S = {
+	a: 1
+	b: 2
+}

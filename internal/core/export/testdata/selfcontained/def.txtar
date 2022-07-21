@@ -1,0 +1,14 @@
+#path: a.b
+-- in.cue --
+#def: {
+	a: 1
+}
+
+a: b: c: #def
+-- out/default --
+c: _#def
+
+//cue:path: #def
+_#def: {
+	a: 1
+}

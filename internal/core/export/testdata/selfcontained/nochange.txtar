@@ -1,0 +1,12 @@
+#path: a.b
+-- foo.cue --
+a: b: {
+	c: 1
+	d: 2
+}
+-- out/selfcontained --
+c: 1
+d: 2
+-- out/default --
+c: 1
+d: 2

@@ -1,0 +1,53 @@
+#path: a.b
+
+TODO: alternatives to consider
+- `b.s` rewrites to `s` here. But we could interpret this as
+   a "closed" value and write string instead. So
+
+	s: string
+	t: string
+
+	or
+
+	s: string
+	t: _s
+	_s: string
+
+   Theoretically this seems more appropriate. It just may not be
+   what users expect. Note that `t: s` would still remain `t: s`,
+   as that reference does not refer to a node outside the closed
+   node.
+
+-- in.cue --
+x: "out"
+y: {
+	s: "foo"
+	t: "bar"
+}
+let X = "a: " + x
+
+a: b: {
+	c: x
+	// TODO: should most likely resolve to "out", not c, because b points to
+	// outside the exported value
+	d: b.c
+	e: y
+	f: X
+	g: "a: " + x // TODO: resolve
+
+	s: string
+	t: b.s
+}
+-- out/default --
+c: "out"
+// TODO: should most likely resolve to "out", not c, because b points to
+// outside the exported value
+d: c
+e: {
+	s: "foo"
+	t: "bar"
+}
+f: "a: " + "out"
+g: "a: " + "out"
+s: string
+t: s

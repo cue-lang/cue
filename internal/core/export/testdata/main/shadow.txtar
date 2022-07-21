@@ -1,0 +1,111 @@
+In this file we test cases where a newly created dynamic field
+ends up shadowing an existing field.
+
+-- in.cue --
+y: "outer"
+a: {
+	key: "y"
+	X=(key): "inner"
+
+	refs: {
+		Z="y": 1
+		outer: y
+		mid:   X // TODO(unshadow)
+		inner: Z // TODO(unshadow)
+
+	}
+}
+-- out/definition --
+y: "outer"
+a: {
+	key:     "y"
+	X=(key): "inner"
+	refs: {
+		y:     1
+		outer: y
+		mid:   X
+		inner: y
+	}
+}
+-- out/doc --
+[]
+[y]
+[a]
+[a key]
+[a refs]
+[a refs y]
+[a refs outer]
+[a refs mid]
+[a refs inner]
+[a y]
+-- out/value --
+== Simplified
+{
+	y: "outer"
+	a: {
+		key: "y"
+		y:   "inner"
+		refs: {
+			y:     1
+			outer: "outer"
+			mid:   "inner"
+			inner: 1
+		}
+	}
+}
+== Raw
+{
+	y: "outer"
+	a: {
+		key: "y"
+		y:   "inner"
+		refs: {
+			y:     1
+			outer: "outer"
+			mid:   "inner"
+			inner: 1
+		}
+	}
+}
+== Final
+{
+	y: "outer"
+	a: {
+		key: "y"
+		y:   "inner"
+		refs: {
+			y:     1
+			outer: "outer"
+			mid:   "inner"
+			inner: 1
+		}
+	}
+}
+== All
+{
+	y: "outer"
+	a: {
+		key: "y"
+		y:   "inner"
+		refs: {
+			y:     1
+			outer: "outer"
+			mid:   "inner"
+			inner: 1
+		}
+	}
+}
+== Eval
+{
+	y: "outer"
+	a: {
+		key: "y"
+		y:   "inner"
+		refs: {
+			y:     1
+			outer: "outer"
+			mid:   "inner"
+			inner: 1
+		}
+	}
+}

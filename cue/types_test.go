@@ -1783,7 +1783,7 @@ func TestElem(t *testing.T) {
 		a: foo: b: [Bar=string]: { d: Bar }
 		`,
 		path: []string{"a", "foo", "b", ""},
-		want: "{\n\tc: string + string\n\td: string\n}",
+		want: "{\n\tc: \"foo\" + string\n\td: string\n}",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

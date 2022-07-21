@@ -132,11 +132,11 @@ p1: {
 	}
 }
 d1: {
-	"foo\(bar)": int
+	"foobar": int
 }
 bar: "bar"
 d2: {
-	C="foo\(bar)": {
+	C="foobar": {
 		name: "xx"
 		foo:  C.name
 	}

@@ -1,0 +1,98 @@
+#inlineImports: true
+
+-- cue.mod/module.cue --
+module: "example.com/a"
+
+-- in.cue --
+import "example.com/a/pkg"
+
+// Can be inlined.
+v: pkg.v.v
+
+// Do not simplify because of multiple usages of enclosing struct.
+x: pkg.a.b.c
+y: pkg.a.b
+
+// Cannot simplify because of definition.
+z: pkg.#Def.f
+
+// Two references to package, but since the second is a scalar, it can be
+// hoisted and only one reference remains. So there is still no need for
+// a helper.
+// TODO: fix this to eliminate the helper.
+w: pkg.w
+wa: pkg.w.a
+
+-- pkg/pkg.cue --
+package pkg
+
+v: v: { x: 3, y: x }
+
+a: b: c: { d: int }
+
+#Def: f: g: int
+
+w: {
+	a: 1
+	b: a
+}
+
+-- out/default --
+import "example.com/a/pkg"
+
+// Can be inlined.
+v: pkg.v.v
+
+// Do not simplify because of multiple usages of enclosing struct.
+x: pkg.a.b.c
+y: pkg.a.b
+
+// Cannot simplify because of definition.
+z: pkg.#Def.f
+
+// Two references to package, but since the second is a scalar, it can be
+// hoisted and only one reference remains. So there is still no need for
+// a helper.
+// TODO: fix this to eliminate the helper.
+w:  pkg.w
+wa: pkg.w.a
+-- out/expand_imports --
+// Can be inlined.
+v: {
+	x: 3
+	y: x
+}
+
+// Do not simplify because of multiple usages of enclosing struct.
+x: B.c
+y: B
+
+// Cannot simplify because of definition.
+z: F.#x
+
+// Two references to package, but since the second is a scalar, it can be
+// hoisted and only one reference remains. So there is still no need for
+// a helper.
+// TODO: fix this to eliminate the helper.
+w:  W
+wa: 1
+
+//cue:path: "example.com/a/pkg".a.b
+let B = {
+	c: {
+		d: int
+	}
+}
+
+//cue:path: "example.com/a/pkg".#Def.f
+let F = {
+	#x: {
+		g: int
+	}
+}
+
+//cue:path: "example.com/a/pkg".w
+let W = {
+	a: 1
+	b: a
+}

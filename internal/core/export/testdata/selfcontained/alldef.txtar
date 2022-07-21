@@ -1,0 +1,19 @@
+#path: #a.b
+
+No need to have an indirection to create a reference if the enclosing value
+is already a definition.
+
+-- in.cue --
+#def: {
+	a: 1
+}
+
+#a: b: c: #def
+-- out/default --
+
+_#def
+_#def: {
+	c: {
+		a: 1
+	}
+}

@@ -70,6 +70,24 @@
       "parentUuid": "89561929_ff859f7b",
       "revId": "238a746f8897d43462526d518ed9031d6aed1a60",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e25837ca_6153f5c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-21T16:57:06Z",
+      "side": 1,
+      "message": "Now in different CL: https://review.gerrithub.io/c/cue-lang/cue/+/541492/1\n\nThis CL now also does a related refactoring I meant to do as well.",
+      "parentUuid": "c7126fd4_e40c1979",
+      "revId": "238a746f8897d43462526d518ed9031d6aed1a60",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

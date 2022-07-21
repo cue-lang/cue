@@ -125,6 +125,13 @@ type Environment struct {
 	cache map[Expr]Value
 }
 
+func (e *Environment) up(count int32) *Environment {
+	for ; count > 0; count-- {
+		e = e.Up
+	}
+	return e
+}
+
 type ID int32
 
 // evalCached is used to look up let expressions. Caching let expressions

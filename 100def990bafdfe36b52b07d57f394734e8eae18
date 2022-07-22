@@ -53,6 +53,80 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "948be8be_527536ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-22T23:43:26Z",
+      "side": 1,
+      "message": "This is an incorrect fix. lowercase entries should remain lowercase.",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fa3c84c_41294896",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-22T23:43:26Z",
+      "side": 1,
+      "message": "remove space before \u003d",
+      "range": {
+        "startLine": 291,
+        "startChar": 13,
+        "endLine": 291,
+        "endChar": 14
+      },
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5028d55_237604e4",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 445,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-22T23:43:26Z",
+      "side": 1,
+      "message": "See comments below. This really should be lowercase.\n\nI understand an EBNF wouldn\u0027t support this, as Go doesn\u0027t have such cases. But I see no other way here. I looked at Swift and they do the same: it allows lexical entries to refer to productions.\n\nI think the only practical solution here is to fix the checker.",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8991f8b2_5bfe64e9",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 453,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-22T23:43:26Z",
+      "side": 1,
+      "message": "Hmmm, this is tricky. These really are terminals interspersed with productions. Using uppercase is certainly not correct. But I can see why it doesn\u0027t like the lowercase.\n\nStill, if I had to chose, I would leave this lowercase.\n\nI guess the real problem is Interpolation. That should be lowercase too.",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1758e844_630845b2",

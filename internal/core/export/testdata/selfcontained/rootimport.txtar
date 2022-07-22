@@ -28,13 +28,13 @@ a: pkg
 // Force no inline.
 b: pkg.v.a
 -- out/expand_imports --
-a: _pkg
+a: PKG
 
 // Force no inline.
-b: _pkg.v.a
+b: PKG.v.a
 
-//cue:path: "example.com/a/pkg".
-_pkg: {
+//cue:path: "example.com/a/pkg"
+let PKG = {
 	v: {
 		a: int
 		b: a

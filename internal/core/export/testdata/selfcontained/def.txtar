@@ -6,9 +6,11 @@
 
 a: b: c: #def
 -- out/default --
-c: _#def
+c: DEF.#x
 
 //cue:path: #def
-_#def: {
-	a: 1
+let DEF = {
+	#x: {
+		a: 1
+	}
 }

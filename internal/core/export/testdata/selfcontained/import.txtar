@@ -64,33 +64,35 @@ v: {
 }
 
 // Do not simplify because of multiple usages of enclosing struct.
-x: _b.c
-y: _b
+x: B.c
+y: B
 
 // Cannot simplify because of definition.
-z: _#f
+z: F.#x
 
 // Two references to package, but since the second is a scalar, it can be
 // hoisted and only one reference remains. So there is still no need for
 // a helper.
 // TODO: fix this to eliminate the helper.
-w:  _w
+w:  W
 wa: 1
 
 //cue:path: "example.com/a/pkg".a.b
-_b: {
+let B = {
 	c: {
 		d: int
 	}
 }
 
 //cue:path: "example.com/a/pkg".#Def.f
-_#f: {
-	g: int
+let F = {
+	#x: {
+		g: int
+	}
 }
 
 //cue:path: "example.com/a/pkg".w
-_w: {
+let W = {
 	a: 1
 	b: a
 }

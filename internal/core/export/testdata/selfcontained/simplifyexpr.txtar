@@ -13,11 +13,11 @@ a: b: {
 -- out/default --
 import "struct"
 
-c: struct.MaxFields(_s, 3)
+c: struct.MaxFields(S, 3)
 d: {}
 
 //cue:path: s
-_s: {
+let S = {
 	a: 1
 	b: 2
 }

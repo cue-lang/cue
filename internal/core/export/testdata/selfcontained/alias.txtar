@@ -44,16 +44,16 @@ a: B=b: {
 		labelY: Y
 	}
 	hoisted: {
-		ext1: _ext
-		ext2: _ext
+		ext1: EXT
+		ext2: EXT
 		ext3: {
 			two: 2
 			b: {
 				name: "ext1"
 			}
 		}
-		ext4: _ext2
-		ext5: _ext2.a
+		ext4: EXT2
+		ext5: EXT2.a
 	}
 	other: {
 		[INNER=string]: {
@@ -64,7 +64,7 @@ a: B=b: {
 name: "a"
 
 //cue:path: ext
-_ext: {
+let EXT = {
 	one: 1
 	b: {
 		name: "ext"
@@ -72,7 +72,7 @@ _ext: {
 }
 
 //cue:path: ext2
-_ext2: {
+let EXT2 = {
 	three: 3
 	b: {
 		name: "ext2"

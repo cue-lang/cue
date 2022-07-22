@@ -26,54 +26,15 @@ import (
 )
 
 // This file contains the algorithm to contain a self-contained CUE file.
-//
-// TODO: Edge cases:
-//   In the cases below, the field called `root` is the one that is
-//   hoisted to be made self-contained.
-//
-//   // how to represent this?
-//   // Probably need aliases to embeddings to mark top of file.
-//   x: root: a: b: root | null
-//   // -->
-//   // X=_
-//   // a: b: X | null
-//
-//   x: root: {c: int, a: b: root | null}
-//   // -->
-//   // X=_
-//   // a: b: X | null
-//   // c: int
-//
-//   // Probably need aliases to embeddings to mark top of file.
-//   // Use commensurate strategy above.
-//   x: y: root: a: b: y | null
-//   // -->
-//   // X=_
-//   // a: b: null | {root: X}
-//
-//   // X.y.root
-//   // let X = y: root: a: b: y | null
-//
-//   x: y: c: int
-//   x: y: root: a: b: y | null
-//   // -->
-//   // X=_
-//   // a: b: null | {c: int, root: X}
-//
-//   // #args: y: root: a: b: y | null
-//   // #args.y.root
-//   //
-//   // OR
-//   //
-//   // #args: y: root: a: b: y | null
-//   // a: b: #args.y | null
-//   //
-//   // OR
-//   //
-//   // ROOT=_
-//   // #args: y: root: ROOT
-//   // a: b: #args.y | null
-//
+
+// TODO:
+// - Handle below edge cases where a reference directly references the root
+//   of the exported main tree.
+// - Inline smallish structs that themselves do not have outside
+//   references.
+// - Overall better inlining.
+// - Consider a shorthand for the `let X = { #x: foo }` annotation. Possibly
+//   allow `#{}`, or allow "let definitions", like `let #X = {}`.
 
 // initSelfContainedCloser initializes a selfContainedCloser if either a subtree
 // is exported or imports need to be removed. It will not initialize one if
@@ -101,7 +62,7 @@ func (e *exporter) completeSelfContained(f *ast.File) {
 		return
 	}
 	for _, d := range s.deps {
-		if d.ident == 0 {
+		if !d.isRootArg() {
 			continue
 		}
 		s.addExternal(d)
@@ -132,6 +93,10 @@ type depData struct {
 	useCount     int // Other reference using this vertex
 	included     bool
 	needTopLevel bool
+}
+
+func (d *depData) isRootArg() bool {
+	return d.ident != 0
 }
 
 func (d *depData) usageCount() int {
@@ -254,7 +219,7 @@ func (s *selfContainedCloser) makeParentPath(d *depData) {
 		panic("not a parent")
 	}
 
-	if d.included || d.ident != 0 {
+	if d.included || d.isRootArg() {
 		return
 	}
 
@@ -269,18 +234,17 @@ func (s *selfContainedCloser) makeParentPath(d *depData) {
 	}
 
 	str := f.IdentString(s.x.ctx)
-	// Make it a definition if we need it.
-	if d.dstNode.IsRecursivelyClosed() && !f.IsDef() {
-		str = "#" + str
-	}
-	// Make it hidden if it is not already so.
-	if !strings.HasPrefix(str, "_") {
-		str = "_" + str
-	}
-	f, _ = s.x.uniqueFeature(str)
+	str = strings.TrimLeft(str, "_#")
+	str = strings.ToUpper(str)
+	uf, _ := s.x.uniqueFeature(str)
 
-	d.path = []adt.Feature{f}
-	d.ident = f
+	d.path = []adt.Feature{uf}
+	d.ident = uf
+
+	// Make it a definition if we need it.
+	if d.dstNode.IsRecursivelyClosed() {
+		d.path = append(d.path, adt.MakeIdentLabel(s.x.ctx, "#x", ""))
+	}
 }
 
 // makeAlternativeReference computes the alternative path for the reference.
@@ -317,15 +281,15 @@ func (s *selfContainedCloser) makeAlternativeReference(r *refData) ast.Expr {
 	var x ast.Expr = s.x.ident(path[0])
 
 	for _, f := range path[1:] {
-		if f.IsString() {
-			x = &ast.SelectorExpr{
-				X:   x,
-				Sel: s.x.stringLabel(f),
-			}
-		} else {
+		if f.IsInt() {
 			x = &ast.IndexExpr{
 				X:     x,
 				Index: ast.NewLit(token.INT, strconv.Itoa(f.Index())),
+			}
+		} else {
+			x = &ast.SelectorExpr{
+				X:   x,
+				Sel: s.x.stringLabel(f),
 			}
 		}
 	}
@@ -380,26 +344,19 @@ func (s *selfContainedCloser) addExternal(d *depData) {
 		return
 	}
 
-	// TODO: this should ideally be a let expression to reflect the fact that
-	// the hoisted fields are not arguments. We don't do so, though, as there
-	// is no convenient way to mark a let expression as a definition. Using
-	// hidden fields is the next best thing.
-	//
-	// let := &ast.LetClause{
-	// 	Ident: s.x.ident(d.let),
-	// 	Expr:  s.x.expr(nil, d.node()),
-	// }
 	expr := s.x.expr(nil, d.node())
-	if st, ok := expr.(*ast.StructLit); ok {
-		st.Lbrace = token.Blank.Pos() // Force curly braces.
-		// TODO: this should not be necessary if the printer realizes that
-		// the precense of a doc comment makes the curly braces mandatory.
+
+	if len(d.path) > 1 {
+		expr = ast.NewStruct(&ast.Field{
+			Label: s.x.ident(d.path[1]),
+			Value: expr,
+		})
 	}
-	let := &ast.Field{
-		Label:    s.x.ident(d.ident),
-		TokenPos: token.Blank.Pos(),
-		Value:    expr,
+	let := &ast.LetClause{
+		Ident: s.x.ident(d.path[0]),
+		Expr:  expr,
 	}
+
 	ast.SetRelPos(let, token.NewSection)
 
 	path := s.x.ctx.PathToString(s.x.ctx, d.node().Path())
@@ -408,7 +365,11 @@ func (s *selfContainedCloser) addExternal(d *depData) {
 		msg = fmt.Sprintf("//cue:path: %s", path)
 	} else {
 		pkg := d.dstImport.ImportPath.SelectorString(s.x.ctx)
-		msg = fmt.Sprintf("//cue:path: %s.%s", pkg, path)
+		if path == "" {
+			msg = fmt.Sprintf("//cue:path: %s", pkg)
+		} else {
+			msg = fmt.Sprintf("//cue:path: %s.%s", pkg, path)
+		}
 	}
 	cg := &ast.CommentGroup{
 		Doc:  true,

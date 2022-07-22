@@ -14,11 +14,11 @@ a: b: {
 import "struct"
 
 // Do not inline `s`, as it makes calls less readable.
-c: struct.MaxFields(_s & d, 3)
+c: struct.MaxFields(S & d, 3)
 d: {}
 
 //cue:path: s
-_s: {
+let S = {
 	a: 1
 	b: 2
 }

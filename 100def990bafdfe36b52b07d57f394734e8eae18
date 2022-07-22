@@ -86,6 +86,24 @@
       "parentUuid": "1758e844_630845b2",
       "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2507f3f4_cf607876",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-22T16:19:46Z",
+      "side": 1,
+      "message": "Yes, the distinction between terminals and productions is quite an important one: the interpretation of the grammar is different between them. So the distinction should definitely be kept.",
+      "parentUuid": "8ec2d916_7152cb2d",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

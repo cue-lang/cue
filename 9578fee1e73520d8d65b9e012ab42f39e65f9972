@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25f0afa9_27de27a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-22T15:53:03Z",
+      "side": 1,
+      "message": "The unity failure at patchset 2 is as expected, given the intention of this change.\n\nSo post submitting this change, we will just need to update minimum versions in unity for Cascaad, at which point changes above this will need to be retested. ",
+      "revId": "9578fee1e73520d8d65b9e012ab42f39e65f9972",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -583,13 +583,12 @@ func (c *OpContext) evaluateRec(env *Environment, x Expr, state VertexStatus) Va
 
 	val := c.evalState(x, state)
 	if val == nil {
-		// Be defensive: this never happens, but just in case.
-		Assertf(false, "nil return value: unspecified error")
 		val = &Bottom{
 			Code: IncompleteError,
-			Err:  c.Newf("UNANTICIPATED ERROR"),
+			Err:  c.Newf("evaluated expression has no value"),
 		}
 	}
+
 	_ = c.PopState(s)
 
 	return val

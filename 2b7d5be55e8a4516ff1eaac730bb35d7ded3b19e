@@ -122,6 +122,41 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c76bdb08_41c346db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-22T23:45:06Z",
+      "side": 1,
+      "message": "test should not be done in cmd. See comments.",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14bdb4a1_a88f713c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-22T23:45:06Z",
+      "side": 1,
+      "message": "\u003e So I thought that piggybacking off of an existing place that already uses testscript would be easier.\nI think that causes too much technical debt. The tests should be in the directory where they most apply.\n\nI\u0027m find adding at testdata subdir with txtar files to cue/format as well, though, and either move existing tests over or do it later.",
+      "parentUuid": "1f953553_50771e74",
+      "revId": "2b7d5be55e8a4516ff1eaac730bb35d7ded3b19e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e0a52c5_8077b30f",

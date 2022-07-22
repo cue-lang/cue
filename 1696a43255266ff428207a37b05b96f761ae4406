@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d7e0a01_ace8ccfd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-22T16:16:03Z",
+      "side": 1,
+      "message": "Currently (patchset 6) fails unity in exactly the same way as the commit~2. So fixing unity post submit of that commit, will (all else equal) cause this CL to go green for unity.",
+      "revId": "1696a43255266ff428207a37b05b96f761ae4406",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

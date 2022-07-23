@@ -563,10 +563,10 @@ loop:
 		case *adt.ForClause:
 			env := &adt.Environment{Up: env, Vertex: empty}
 			value := e.ident(x.Value)
-			clause := &ast.ForClause{
-				Value:  value,
-				Source: e.expr(env, x.Src),
-			}
+			e.inExpression++
+			src := e.expr(env, x.Src)
+			e.inExpression--
+			clause := &ast.ForClause{Value: value, Source: src}
 			c.Clauses = append(c.Clauses, clause)
 
 			_, saved := e.pushFrame(empty, nil)
@@ -583,15 +583,21 @@ loop:
 			y = x.Dst
 
 		case *adt.IfClause:
-			clause := &ast.IfClause{Condition: e.expr(env, x.Condition)}
+			e.inExpression++
+			cond := e.expr(env, x.Condition)
+			e.inExpression--
+			clause := &ast.IfClause{Condition: cond}
 			c.Clauses = append(c.Clauses, clause)
 			y = x.Dst
 
 		case *adt.LetClause:
 			env := &adt.Environment{Up: env, Vertex: empty}
+			e.inExpression++
+			expr := e.expr(env, x.Expr)
+			e.inExpression--
 			clause := &ast.LetClause{
 				Ident: e.ident(x.Label),
-				Expr:  e.expr(env, x.Expr),
+				Expr:  expr,
 			}
 			c.Clauses = append(c.Clauses, clause)
 

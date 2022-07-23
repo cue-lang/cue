@@ -156,16 +156,32 @@ func (p *pivotter) markDeps(v *adt.Vertex) {
 		node := d.Node
 
 		switch {
-		case
+		case p.refMap[d.Reference] != nil:
 			// Already done.
-			p.refMap[d.Reference] != nil,
+			return nil
 
+		case d.Import() != nil:
 			// Only record nodes within import if we want to expand imports.
-			!p.x.cfg.InlineImports && d.Import() != nil,
+			if !p.x.cfg.InlineImports {
+				return nil
+			}
 
+			// Never resolve core packages. Reasons:
+			// - most of them are builtins
+			// - they are available anyway
+			// - some of the types have special meaning, which would be lost
+			//   by rewriting to their underlying type.
+			// TODO: support marking non-CUE packages as "special". This could
+			// be done, for instance, by marking them as "core" in the runtime
+			// and using a Runtime method to determine whether something is
+			// a core package, rather than relying on the precense of a dot.
+			path := d.Import().ImportPath.StringValue(p.x.ctx)
+			if !strings.ContainsRune(path, '.') {
+				return nil
+			}
+
+		case node.Status() == adt.Unprocessed:
 			// This may happen for DynamicReferences.
-			node.Status() == adt.Unprocessed:
-
 			return nil
 		}
 
@@ -352,7 +368,7 @@ func (p *pivotter) addExternal(d *depData) {
 
 	if len(d.path) > 1 {
 		expr = ast.NewStruct(&ast.Field{
-			Label: p.x.ident(d.path[1]),
+			Label: p.x.stringLabel(d.path[1]),
 			Value: expr,
 		})
 	}

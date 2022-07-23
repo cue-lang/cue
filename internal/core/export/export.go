@@ -229,8 +229,10 @@ type exporter struct {
 	inExpression int // for inlining decisions.
 
 	// hidden label handling
-	pkgID  string
-	hidden map[string]adt.Feature // adt.InvalidFeatures means more than one.
+	pkgID string
+	// pkgHash is used when mangling hidden identifiers of packages that are
+	// inlined.
+	pkgHash map[string]string
 
 	// If a used feature maps to an expression, it means it is assigned to a
 	// unique let expression.

@@ -403,6 +403,10 @@ func (p *pivotter) refExpr(r adt.Resolver) ast.Expr {
 		// We need to wrap the value in a definition.
 	case dst.usageCount() == 0:
 		// The root value itself.
+	case n.IsErr():
+		// Don't simplify for errors to make the position of the error clearer.
+	case !n.IsConcrete() && p.x.inExpression > 0:
+		// Don't simplify an expression that is known will fail.
 	case dst.usageCount() == 1 && p.x.inExpression == 0:
 		// Used only once.
 		fallthrough

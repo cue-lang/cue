@@ -119,25 +119,20 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 
 	case adt.Resolver:
 		return e.resolve(env, x)
-	}
 
-	e.inExpression++
-	defer func() { e.inExpression-- }()
-
-	switch x := expr.(type) {
 	case *adt.SliceExpr:
 		var lo, hi ast.Expr
 		if x.Lo != nil {
-			lo = e.expr(env, x.Lo)
+			lo = e.innerExpr(env, x.Lo)
 		}
 		if x.Hi != nil {
-			hi = e.expr(env, x.Hi)
+			hi = e.innerExpr(env, x.Hi)
 		}
 		// TODO: Stride not yet? implemented.
 		// if x.Stride != nil {
-		// 	stride = e.expr(env, x.Stride)
+		// 	stride = e.innerExpr(env, x.Stride)
 		// }
-		return &ast.SliceExpr{X: e.expr(env, x.X), Low: lo, High: hi}
+		return &ast.SliceExpr{X: e.innerExpr(env, x.X), Low: lo, High: hi}
 
 	case *adt.Interpolation:
 		var (
@@ -179,7 +174,7 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		suffix := `\(`
 		for i, elem := range x.Parts {
 			if i%2 == 1 {
-				t.Elts = append(t.Elts, e.expr(env, elem))
+				t.Elts = append(t.Elts, e.innerExpr(env, elem))
 			} else {
 				// b := strings.Builder{}
 				buf := []byte(prefix)
@@ -209,33 +204,33 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 	case *adt.BoundExpr:
 		return &ast.UnaryExpr{
 			Op: x.Op.Token(),
-			X:  e.expr(env, x.Expr),
+			X:  e.innerExpr(env, x.Expr),
 		}
 
 	case *adt.UnaryExpr:
 		return &ast.UnaryExpr{
 			Op: x.Op.Token(),
-			X:  e.expr(env, x.X),
+			X:  e.innerExpr(env, x.X),
 		}
 
 	case *adt.BinaryExpr:
 		return &ast.BinaryExpr{
 			Op: x.Op.Token(),
-			X:  e.expr(env, x.X),
-			Y:  e.expr(env, x.Y),
+			X:  e.innerExpr(env, x.X),
+			Y:  e.innerExpr(env, x.Y),
 		}
 
 	case *adt.CallExpr:
 		a := []ast.Expr{}
 		for _, arg := range x.Args {
-			v := e.expr(env, arg)
+			v := e.innerExpr(env, arg)
 			if v == nil {
-				e.expr(env, arg)
+				e.innerExpr(env, arg)
 				panic("")
 			}
 			a = append(a, v)
 		}
-		fun := e.expr(env, x.Fun)
+		fun := e.innerExpr(env, x.Fun)
 		return &ast.CallExpr{Fun: fun, Args: a}
 
 	case *adt.DisjunctionExpr:
@@ -285,9 +280,6 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 			return alt
 		}
 	}
-
-	e.inExpression++
-	defer func() { e.inExpression-- }()
 
 	switch x := r.(type) {
 	case *adt.FieldReference:
@@ -361,14 +353,14 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 
 	case *adt.SelectorExpr:
 		return &ast.SelectorExpr{
-			X:   e.expr(env, x.X),
+			X:   e.innerExpr(env, x.X),
 			Sel: e.stringLabel(x.Sel),
 		}
 
 	case *adt.IndexExpr:
 		return &ast.IndexExpr{
-			X:     e.expr(env, x.X),
-			Index: e.expr(env, x.Index),
+			X:     e.innerExpr(env, x.X),
+			Index: e.innerExpr(env, x.Index),
 		}
 	}
 	panic("unreachable")
@@ -443,7 +435,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		// set bulk in frame.
 		frame := e.frame(0)
 
-		expr := e.expr(env, x.Filter)
+		expr := e.innerExpr(env, x.Filter)
 		frame.labelExpr = expr // see astutil.Resolve.
 
 		if x.Label != 0 {
@@ -487,7 +479,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 			fallthrough
 
 		default:
-			key := e.expr(env, srcKey)
+			key := e.innerExpr(env, srcKey)
 			switch key.(type) {
 			case *ast.Interpolation, *ast.BasicLit:
 			default:
@@ -563,10 +555,8 @@ loop:
 		case *adt.ForClause:
 			env := &adt.Environment{Up: env, Vertex: empty}
 			value := e.ident(x.Value)
-			clause := &ast.ForClause{
-				Value:  value,
-				Source: e.expr(env, x.Src),
-			}
+			src := e.innerExpr(env, x.Src)
+			clause := &ast.ForClause{Value: value, Source: src}
 			c.Clauses = append(c.Clauses, clause)
 
 			_, saved := e.pushFrame(empty, nil)
@@ -583,15 +573,17 @@ loop:
 			y = x.Dst
 
 		case *adt.IfClause:
-			clause := &ast.IfClause{Condition: e.expr(env, x.Condition)}
+			cond := e.innerExpr(env, x.Condition)
+			clause := &ast.IfClause{Condition: cond}
 			c.Clauses = append(c.Clauses, clause)
 			y = x.Dst
 
 		case *adt.LetClause:
 			env := &adt.Environment{Up: env, Vertex: empty}
+			expr := e.innerExpr(env, x.Expr)
 			clause := &ast.LetClause{
 				Ident: e.ident(x.Label),
-				Expr:  e.expr(env, x.Expr),
+				Expr:  expr,
 			}
 			c.Clauses = append(c.Clauses, clause)
 

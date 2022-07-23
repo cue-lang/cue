@@ -1,6 +1,5 @@
 #path: root
 
-TODO: do not inline errors
 -- in.cue --
 root: {
 	// comprehensions
@@ -28,14 +27,10 @@ n: {foo: {baz: int}}
 -- out/default --
 // comprehensions
 t1: {
-	for p in _ let x = _ if _ {}
+	for p in B let x = C if D {}
 }
-t2: {
-	for p in _ {}
-}
-t3: {
-	if _ {}
-}
+t2: E
+t3: F
 
 // incomplete
 t4: [1, 2][X]
@@ -43,6 +38,25 @@ t5: {}.foo
 t6: {
 	a: 1
 }[FOO.bar]
+
+//cue:path: b
+let B = _
+
+//cue:path: c
+let C = _
+
+//cue:path: d
+let D = _
+
+//cue:path: e
+let E = {
+	for p in _ {}
+}
+
+//cue:path: f
+let F = {
+	if _ {}
+}
 
 //cue:path: x
 let X = int

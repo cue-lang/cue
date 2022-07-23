@@ -1,0 +1,38 @@
+#path: a
+-- in.cue --
+a: {
+		t1: {for p in b let x = c if d {}}
+
+		t2: e
+		t3: f
+}
+b: _
+c: _
+d: _
+e: {for p in _ {}}
+f: {if _ {}}
+-- out/default --
+t1: {
+	for p in B let x = C if D {}
+}
+t2: E
+t3: F
+
+//cue:path: b
+let B = _
+
+//cue:path: c
+let C = _
+
+//cue:path: d
+let D = _
+
+//cue:path: e
+let E = {
+	for p in _ {}
+}
+
+//cue:path: f
+let F = {
+	if _ {}
+}

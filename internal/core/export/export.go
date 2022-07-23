@@ -99,7 +99,6 @@ func Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
 // Def exports v as a definition.
 func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
 	e := newExporter(p, r, pkgID, v)
-	e.markUsedFeatures(v)
 
 	isDef := v.IsRecursivelyClosed()
 	if isDef {
@@ -117,7 +116,7 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, er
 			)
 		}
 	}
-	return e.toFile(v, expr)
+	return e.finalize(v, expr)
 }
 
 func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
@@ -126,12 +125,11 @@ func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 
 func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 	e := newExporter(p, r, pkgID, nil)
-	e.markUsedFeatures(n)
 
 	return e.expr(nil, n), nil
 }
 
-func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) (*ast.File, errors.Error) {
+func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	f := &ast.File{}
 
 	pkgName := ""
@@ -168,31 +166,18 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) (*ast.File, errors.Error) {
 	default:
 		f.Decls = append(f.Decls, &ast.EmbedDecl{Expr: x})
 	}
-	if err := astutil.Sanitize(f); err != nil {
-		err := errors.Promote(err, "export")
-		return f, errors.Append(e.errs, err)
-	}
 
-	return f, nil
+	return f
 }
-
-// File
 
 func Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
 	return Simplified.Vertex(r, pkgID, n)
 }
 
 func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
-	e := exporter{
-		ctx:   eval.NewContext(r, nil),
-		cfg:   p,
-		index: r,
-		pkgID: pkgID,
-	}
-	e.markUsedFeatures(n)
+	e := newExporter(p, r, pkgID, n)
 	v := e.value(n, n.Conjuncts...)
-
-	return e.toFile(n, v)
+	return e.finalize(n, v)
 }
 
 func Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
@@ -201,13 +186,7 @@ func Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 
 // Should take context.
 func (p *Profile) Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
-	e := exporter{
-		ctx:   eval.NewContext(r, nil),
-		cfg:   p,
-		index: r,
-		pkgID: pkgID,
-	}
-	e.markUsedFeatures(n)
+	e := newExporter(p, r, pkgID, n)
 	v := e.value(n)
 	return v, e.errs
 }
@@ -240,13 +219,32 @@ type exporter struct {
 	usedHidden map[string]bool
 }
 
-func newExporter(p *Profile, r adt.Runtime, pkgID string, v *adt.Vertex) *exporter {
-	return &exporter{
+// newExporter creates and initializes an exporter.
+func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter {
+	n, _ := v.(*adt.Vertex)
+	e := &exporter{
 		cfg:   p,
-		ctx:   eval.NewContext(r, v),
+		ctx:   eval.NewContext(r, n),
 		index: r,
 		pkgID: pkgID,
 	}
+
+	e.markUsedFeatures(v)
+
+	return e
+}
+
+// finalize finalizes the result of an export. It is only needed for use cases
+// that require conversion to a File, Sanitization, and self containment.
+func (e *exporter) finalize(n *adt.Vertex, v ast.Expr) (f *ast.File, err errors.Error) {
+	f = e.toFile(n, v)
+
+	if err := astutil.Sanitize(f); err != nil {
+		err := errors.Promote(err, "export")
+		return f, errors.Append(e.errs, err)
+	}
+
+	return f, nil
 }
 
 func (e *exporter) markUsedFeatures(x adt.Expr) {

@@ -70,6 +70,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb8abb45_dc6040af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-23T00:01:51Z",
+      "side": 1,
+      "message": "One alternative would be to rewrite the grammar to have separate terminals for start, mid, and end interpolation. The interpolation can then be a production. But I think this probably will end up being quite clunky: you would have to either not match string quote types or have these three variants for each string type, thus blowing up the number of productions.",
+      "revId": "100def990bafdfe36b52b07d57f394734e8eae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fa3c84c_41294896",

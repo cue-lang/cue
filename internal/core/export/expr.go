@@ -55,6 +55,14 @@ func init() {
 	empty.UpdateStatus(adt.Finalized)
 }
 
+// innerExpr is like expr, but prohibits inlining in certain cases.
+func (e *exporter) innerExpr(env *adt.Environment, v adt.Elem) (result ast.Expr) {
+	e.inExpression++
+	r := e.expr(env, v)
+	e.inExpression--
+	return r
+}
+
 // expr converts an ADT expression to an AST expression.
 // The env is used for resolution and does not need to be given if v is known
 // to not contain any references.

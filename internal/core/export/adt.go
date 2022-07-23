@@ -381,7 +381,7 @@ func (e *exporter) newIdentForField(
 	f := e.frame(upCount)
 	entry := f.fields[label]
 
-	name := label.IdentString(e.ctx)
+	name := e.identString(label)
 	switch {
 	case entry.alias != "":
 		name = entry.alias

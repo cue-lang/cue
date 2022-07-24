@@ -26,7 +26,6 @@ import (
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -985,6 +984,7 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		ShowAttributes:  !o.omitAttrs,
 		ShowDocs:        o.docs,
 		ShowErrors:      o.showErrors,
+		InlineImports:   o.inlineImports,
 	}
 
 	pkgID := v.instance().ID()
@@ -1016,20 +1016,12 @@ You could file a bug with the above information at:
 	var err error
 	var f *ast.File
 	if o.concrete || o.final || o.resolveReferences {
-		// inst = v.instance()
-		var expr ast.Expr
-		expr, err = p.Value(v.idx, pkgID, v.v)
+		f, err = p.Vertex(v.idx, pkgID, v.v)
 		if err != nil {
-			return bad(`"cuelang.org/go/internal/core/export".Value`, err)
+			return bad(`"cuelang.org/go/internal/core/export".Vertex`, err)
 		}
-
-		// This introduces gratuitous unshadowing!
-		f, err = astutil.ToFile(expr)
-		if err != nil {
-			return bad(`"cuelang.org/go/ast/astutil".ToFile`, err)
-		}
-		// return expr
 	} else {
+		p.AddPackage = true
 		f, err = p.Def(v.idx, pkgID, v.v)
 		if err != nil {
 			return bad(`"cuelang.org/go/internal/core/export".Def`, err)
@@ -2047,6 +2039,7 @@ type options struct {
 	omitDefinitions   bool
 	omitOptional      bool
 	omitAttrs         bool
+	inlineImports     bool
 	resolveReferences bool
 	showErrors        bool
 	final             bool
@@ -2096,6 +2089,12 @@ func Concrete(concrete bool) Option {
 	}
 }
 
+// InlineImports causes references to values within imported packages to be
+// inlined. References to builtin packages are not inlined.
+func InlineImports(expand bool) Option {
+	return func(p *options) { p.inlineImports = expand }
+}
+
 // DisallowCycles forces validation in the presence of cycles, even if
 // non-concrete values are allowed. This is implied by Concrete(true).
 func DisallowCycles(disallow bool) Option {
@@ -2103,7 +2102,11 @@ func DisallowCycles(disallow bool) Option {
 }
 
 // ResolveReferences forces the evaluation of references when outputting.
-// This implies the input cannot have cycles.
+//
+// Deprecated: Syntax will now always attempt to resolve dangling references and
+// make the output self-contained. When Final or Concrete is used, it will
+// already attempt to resolve all references.
+// See also InlineImports.
 func ResolveReferences(resolve bool) Option {
 	return func(p *options) {
 		p.resolveReferences = resolve

@@ -59,8 +59,24 @@ graph TD
 	env: {}
 	stdout:  "foo"
 	stderr:  null
-	stdin:   (*null | string | bytes) & get.response.body
+	stdin:   (*null | string | bytes) & GET.response.body
 	success: bool
+
+	//cue:path: root.get
+	let GET = {
+		$id:    "tool/http.Do"
+		method: "GET"
+		url:    string
+		request: {
+			body: *bytes | string
+		}
+	} & {
+		request: {
+			body: ""
+		}
+		url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+		stdout: "foo"
+	}
 }
 -- out/run/t3 --
 graph TD

@@ -1,0 +1,49 @@
+cue def
+cmp stdout out-stdout
+
+cue def --inline-imports
+cmp stdout out-stdout-expand
+
+-- cue.mod/module.cue --
+module: "example.com/a"
+
+-- in.cue --
+package a
+
+import "example.com/a/pkg"
+import "list"
+
+v: pkg.v
+
+// Never inline core packages.
+run: list.Comparer
+
+-- pkg/pkg.cue --
+package pkg
+
+v: { x: 3, y: x }
+
+-- out-stdout --
+package a
+
+import (
+	"example.com/a/pkg"
+	"list"
+)
+
+v: pkg.v
+
+// Never inline core packages.
+run: list.Comparer
+-- out-stdout-expand --
+package a
+
+import "list"
+
+v: {
+	x: 3
+	y: x
+}
+
+// Never inline core packages.
+run: list.Comparer

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48b4491b_12a797c4",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-24T09:45:48Z",
+      "side": 1,
+      "message": "personally I\u0027m not a fan of one parameter per line - it\u0027s not like these four lines are all very long :) I think it could easily and comfortably fit in two lines, for instance.\n\nis this a style we\u0027re trying to stick to?",
+      "revId": "97218749ae625b113c60d542e40be42e7568041e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

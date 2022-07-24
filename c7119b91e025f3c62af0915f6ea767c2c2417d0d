@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e601818_34bdb383",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-24T09:19:07Z",
+      "side": 1,
+      "message": "nit: Example",
+      "revId": "c7119b91e025f3c62af0915f6ea767c2c2417d0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2bcf10d_93ad9df3",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-24T09:19:07Z",
+      "side": 1,
+      "message": "I would be consistent in leaving this empty line, as I think godoc will want it for good rendering.",
+      "revId": "c7119b91e025f3c62af0915f6ea767c2c2417d0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

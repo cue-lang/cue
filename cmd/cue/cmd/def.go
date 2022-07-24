@@ -44,6 +44,9 @@ The --expression flag is used to only print parts of a configuration.
 	cmd.Flags().BoolP(string(flagAttributes), "A", false,
 		"display field attributes")
 
+	cmd.Flags().Bool(string(flagInlineImports), false,
+		"expand references to non-core imports")
+
 	// TODO: Option to include comments in output.
 	return cmd
 }

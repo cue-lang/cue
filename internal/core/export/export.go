@@ -60,6 +60,9 @@ type Profile struct {
 	// SelfContained exports a schema such that it does not rely on any imports.
 	SelfContained bool
 
+	// AddPackage causes a package clause to be added.
+	AddPackage bool
+
 	// InlineImports expands references to non-builtin packages.
 	InlineImports bool
 }
@@ -80,6 +83,7 @@ var Raw = &Profile{
 	ShowDefinitions: true,
 	ShowHidden:      true,
 	ShowDocs:        true,
+	AddPackage:      true,
 }
 
 var All = &Profile{
@@ -89,6 +93,7 @@ var All = &Profile{
 	ShowHidden:      true,
 	ShowDocs:        true,
 	ShowAttributes:  true,
+	AddPackage:      true,
 }
 
 // Concrete
@@ -142,28 +147,30 @@ func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, error
 func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	f := &ast.File{}
 
-	pkgName := ""
-	pkg := &ast.Package{}
-	for _, c := range v.Conjuncts {
-		f, _ := c.Source().(*ast.File)
-		if f == nil {
-			continue
-		}
+	if e.cfg.AddPackage {
+		pkgName := ""
+		pkg := &ast.Package{}
+		for _, c := range v.Conjuncts {
+			f, _ := c.Source().(*ast.File)
+			if f == nil {
+				continue
+			}
 
-		if _, name, _ := internal.PackageInfo(f); name != "" {
-			pkgName = name
-		}
+			if _, name, _ := internal.PackageInfo(f); name != "" {
+				pkgName = name
+			}
 
-		if e.cfg.ShowDocs {
-			if doc := internal.FileComment(f); doc != nil {
-				ast.AddComment(pkg, doc)
+			if e.cfg.ShowDocs {
+				if doc := internal.FileComment(f); doc != nil {
+					ast.AddComment(pkg, doc)
+				}
 			}
 		}
-	}
 
-	if pkgName != "" {
-		pkg.Name = ast.NewIdent(pkgName)
-		f.Decls = append(f.Decls, pkg)
+		if pkgName != "" {
+			pkg.Name = ast.NewIdent(pkgName)
+			f.Decls = append(f.Decls, pkg)
+		}
 	}
 
 	switch st := x.(type) {

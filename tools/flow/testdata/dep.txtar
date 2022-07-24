@@ -152,8 +152,11 @@ graph TD
 
 -- out/run/t3/value --
 {
-	x:   [0, 1][concreteValueInGeneratedSubfield.index]
+	x:   [0, 1][INDEX]
 	$id: "valToOut"
+
+	//cue:path: root.concreteValueInGeneratedSubfield.index
+	let INDEX = int
 }
 -- out/run/t4 --
 graph TD
@@ -178,11 +181,14 @@ graph TD
 -- out/run/t4/value --
 {
 	$after: {
-		x:   [0, 1][concreteValueInGeneratedSubfield.index]
+		x:   [0, 1][INDEX]
 		$id: "valToOut"
 	}
 	$id: "valToOut"
 	x:   3
+
+	//cue:path: root.concreteValueInGeneratedSubfield.index
+	let INDEX = int
 }
 -- out/run/t5 --
 graph TD
@@ -261,9 +267,12 @@ graph TD
 -- out/run/t7/value --
 {
 	x: {
-		for x in indirectTaskRootReference.incomplete {}
+		for x in INCOMPLETE {}
 	}
 	$id: "valToOut"
+
+	//cue:path: root.indirectTaskRootReference.incomplete
+	let INCOMPLETE = _
 }
 -- out/run/t8 --
 graph TD
@@ -287,8 +296,16 @@ graph TD
 
 -- out/run/t8/value --
 {
-	x: [incompleteComprehensionSource.x]
+	x: [X]
 	$id: "valToOut"
+
+	//cue:path: root.incompleteComprehensionSource.x
+	let X = {
+		for x in INCOMPLETE {}
+	}
+
+	//cue:path: root.indirectTaskRootReference.incomplete
+	let INCOMPLETE = _
 }
 -- out/run/t9 --
 graph TD
@@ -313,7 +330,15 @@ graph TD
 -- out/run/t9/value --
 {
 	x: {
-		foo: [incompleteComprehensionSource.x]
+		foo: [X_1]
 	}
 	$id: "valToOut"
+
+	//cue:path: root.incompleteComprehensionSource.x
+	let X_1 = {
+		for x in INCOMPLETE {}
+	}
+
+	//cue:path: root.indirectTaskRootReference.incomplete
+	let INCOMPLETE = _
 }

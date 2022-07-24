@@ -25,7 +25,7 @@ tip_triggers: _base.#bashWorkflow & {
 		steps: [
 			{
 				name: "Rebuild tip.cuelang.org"
-				run:  "\(_base.#curl) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
+				run:  "\(_base.#curl) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CUELANGORGTIPREBUILDHOOK }}"
 			},
 			_base.#repositoryDispatch & {
 				name:           "Trigger unity build"

@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "abb8d274_9c4551eb",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 730,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-24T10:52:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "663acd9b_1a96e235",
+      "revId": "c7119b91e025f3c62af0915f6ea767c2c2417d0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2bcf10d_93ad9df3",
@@ -49,6 +67,24 @@
       "writtenOn": "2022-07-24T09:19:07Z",
       "side": 1,
       "message": "I would be consistent in leaving this empty line, as I think godoc will want it for good rendering.",
+      "revId": "c7119b91e025f3c62af0915f6ea767c2c2417d0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6ef4087_31d693f6",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 826,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-24T10:52:58Z",
+      "side": 1,
+      "message": "Added empty line everywhere, just to be sure and to be consistent. My local godoc accepts both though. But maybe other versions don\u0027t.",
+      "parentUuid": "c2bcf10d_93ad9df3",
       "revId": "c7119b91e025f3c62af0915f6ea767c2c2417d0d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -54,14 +54,6 @@ func TestSyntax(t *testing.T) {
 		output: [ ... {t & x.value}]
 		`,
 		options: o(cue.ResolveReferences(true)),
-
-		// TODO: note that this does not resolve t, even though it potentially
-		// could. The current implementation makes this rather hard. As the
-		// output would not be correct anyway, the question is whether this
-		// makes sense.
-		// One way to implement this would be for the evaluator to keep track
-		// of good and bad conjuncts, and then package them nicely in a Vertex
-		// so they remain accessible.
 		out: `
 {
 	x: {}
@@ -71,6 +63,22 @@ func TestSyntax(t *testing.T) {
 	output: [...t & x.value]
 }`,
 	}, {
+		name: "issue867",
+		path: "output",
+		in: `
+	x: {}
+	t: {name: string}
+	output: [ ... {t & x.value}]
+	`,
+		out: `
+{
+	[...T & {}.value]
+
+	//cue:path: t
+	let T = {
+		name: string
+	}
+}`}, {
 		// Structural errors (and worse) are reported as is.
 		name: "structural error",
 		in: `
@@ -88,6 +96,7 @@ func TestSyntax(t *testing.T) {
 }`,
 	}, {
 		name: "resolveReferences",
+		path: "resource",
 		in: `
 		// User 1
 		v1: #Deployment: {
@@ -148,7 +157,6 @@ func TestSyntax(t *testing.T) {
 
 		parameter: replicas: 3
 		`,
-		path:    "resource",
 		options: o(cue.ResolveReferences(true)),
 		out: `
 {
@@ -164,9 +172,9 @@ func TestSyntax(t *testing.T) {
 		}
 	}
 	incomplete: {
-		x: a.x
+		x: {}.x
 		y: 1 | 2
-		z: [1, 2][a.x]
+		z: [1, 2][{}.x]
 	}
 	recursive: {
 		Value: _

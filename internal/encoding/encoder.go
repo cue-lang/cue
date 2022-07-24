@@ -126,6 +126,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 			cue.Definitions(fi.Definitions),
 			cue.ResolveReferences(!fi.References),
 			cue.DisallowCycles(!fi.Cycles),
+			cue.InlineImports(cfg.InlineImports),
 		)
 
 		opts := []format.Option{}

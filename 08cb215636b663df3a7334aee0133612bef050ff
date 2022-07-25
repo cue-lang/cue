@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5867b39d_1ce9cd96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:30:08Z",
+      "side": 1,
+      "message": "LGTM with one nit",
+      "revId": "08cb215636b663df3a7334aee0133612bef050ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7a22647_89bcd799",
+        "filename": "cmd/cue/cmd/def.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:30:08Z",
+      "side": 1,
+      "message": "s/expand/inline/\n\nTo be consistent with the name of the flag itself?",
+      "revId": "08cb215636b663df3a7334aee0133612bef050ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11d0bb1a_869a45a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T04:48:10Z",
+      "side": 1,
+      "message": "nit: unnecessarily",
+      "revId": "3a806f1f0f9070718003446e8ad7180f45cdbfd3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0408c2ff_0e26bd68",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T04:48:10Z",
+      "side": 1,
+      "message": "Unity failures are as expected too. I will \"rebase\" unity after this CL gets submitted.",
+      "revId": "3a806f1f0f9070718003446e8ad7180f45cdbfd3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

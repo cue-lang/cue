@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "96621a16_dc1cb3da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:05:29Z",
+      "side": 1,
+      "message": "One additional comment. We don\u0027t have any tests here (or in another CL) that unifies the self-contained results from two sources/actors. That\u0027s really the core use case of #867, so I wonder whether we should add some tests cases here/another CL in anticipation of that use case? Two sources/actors should be sufficient to cover off the various use cases. ",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "01ecf945_482dcbb6",

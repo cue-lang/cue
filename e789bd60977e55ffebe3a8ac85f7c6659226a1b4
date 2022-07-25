@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56ffe884_3b2f31e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T07:59:29Z",
+      "side": 1,
+      "message": "LGTM with a couple of questions.\n\nNote I can\u0027t say I\u0027ve totally followed all of the code change, but the intent of the change has been very well covered in tests and previous discussions. ",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01ecf945_482dcbb6",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T07:59:29Z",
+      "side": 1,
+      "message": "What is \"the exported context\" a reference to here?\n\nSame for occurrences below.",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a828339_4ac62037",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T07:59:29Z",
+      "side": 1,
+      "message": "Nit: missing \u0027)\u0027",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c83a23f_707d838d",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T07:59:29Z",
+      "side": 1,
+      "message": "Nit: missing \u0027)\u0027",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a25ec08_97042597",
+        "filename": "internal/core/export/testdata/selfcontained/alias.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T07:59:29Z",
+      "side": 1,
+      "message": "nit: the caller might well have expected to see the alias they used to refer to this field as part of this comment? i.e. E1 in this case.",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49fccbc9_c0805707",
+        "filename": "internal/core/export/testdata/selfcontained/errors.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T07:59:29Z",
+      "side": 1,
+      "message": "I\u0027m not clear this is what we need/want. Because some self-contained CUE from another \"actor\" can never make this concrete, correct? Because [1,2][int] \u0026 [1,2][1] is still incomplete AFAICT.",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

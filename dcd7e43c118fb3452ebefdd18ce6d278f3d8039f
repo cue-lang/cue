@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62632c76_55e4f90e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:17:23Z",
+      "side": 1,
+      "message": "LGTM with a couple of nit questions.",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12adab7d_03290499",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:17:23Z",
+      "side": 1,
+      "message": "Does this belong in this change?",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67071b09_eab51de8",
+        "filename": "internal/core/export/label.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:17:23Z",
+      "side": 1,
+      "message": "I struggle to see how this wouldn\u0027t break?",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b1e083b_65eda7a9",
+        "filename": "internal/core/export/label.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:17:23Z",
+      "side": 1,
+      "message": "I\u0027m not sure how this would work when unifying the result with another self-contained value from another actor?",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

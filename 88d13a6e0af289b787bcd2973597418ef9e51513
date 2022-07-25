@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16a63757_00240dfb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:28:48Z",
+      "side": 1,
+      "message": "LGTM with small questions",
+      "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6551d93d_635b8f14",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 987,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:28:48Z",
+      "side": 1,
+      "message": "Just to confirm my understanding: the reason you have named this option InlineImports is because that\u0027s the intent from the perspective of the caller. From the perspective of the exporter however, it\u0027s considered an \"expansion\". Correct?",
+      "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f60ac7c8_6a05d4d7",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:28:48Z",
+      "side": 1,
+      "message": "Why was this inlined? \n\nIs it not a core builtin?",
+      "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

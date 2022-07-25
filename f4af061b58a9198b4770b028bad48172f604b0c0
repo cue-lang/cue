@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c96af32_5133bbfd",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-25T08:19:51Z",
+      "side": 1,
+      "message": "nit: this three-line pattern could be extracted.",
+      "revId": "f4af061b58a9198b4770b028bad48172f604b0c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

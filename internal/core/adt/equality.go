@@ -139,6 +139,11 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 	}
 
 	switch x := v.(type) {
+	case *Bottom:
+		// All errors are logically the same.
+		_, ok := w.(*Bottom)
+		return ok
+
 	case *Num, *String, *Bool, *Bytes, *Null:
 		if b, ok := BinOp(ctx, EqualOp, v, w).(*Bool); ok {
 			return b.B

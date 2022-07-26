@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7cfea172_69e08ae3",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 987,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:52:46Z",
+      "side": 1,
+      "message": "Yes. By hindsight, everything could have been named inline imports. Overall, this seems more intuitive and precise than expand imports or expand packages.\n\nI could still make it consistent everywhere.",
+      "parentUuid": "6551d93d_635b8f14",
+      "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f60ac7c8_6a05d4d7",
         "filename": "tools/flow/testdata/template.txtar",
         "patchSetId": 1
@@ -48,6 +66,24 @@
       "writtenOn": "2022-07-25T08:28:48Z",
       "side": 1,
       "message": "Why was this inlined? \n\nIs it not a core builtin?",
+      "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88e8fd9f_387b56bb",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:52:46Z",
+      "side": 1,
+      "message": "It is not. The path is root.get, which is not the import. In fact, that field does not use an imported value at all, just a value defined within the configuration that looks like it. :)",
+      "parentUuid": "f60ac7c8_6a05d4d7",
       "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

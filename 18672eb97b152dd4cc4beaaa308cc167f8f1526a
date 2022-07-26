@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62af3646_69c5f978",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-26T18:23:04Z",
+      "side": 1,
+      "message": "FYI - this stack of changes needs rebasing on tip. ",
+      "revId": "18672eb97b152dd4cc4beaaa308cc167f8f1526a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

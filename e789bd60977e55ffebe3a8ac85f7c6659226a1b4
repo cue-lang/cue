@@ -69,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98a853b5_c6a68161",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:04:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01ecf945_482dcbb6",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a828339_4ac62037",
@@ -86,6 +104,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "03f9ad5e_a05b8477",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:04:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a828339_4ac62037",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6c83a23f_707d838d",
@@ -99,6 +135,24 @@
       "writtenOn": "2022-07-25T07:59:29Z",
       "side": 1,
       "message": "Nit: missing \u0027)\u0027",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b21ea054_5cfa7125",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:04:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c83a23f_707d838d",
       "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -122,6 +176,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5c8d2b15_38749dd6",
+        "filename": "internal/core/export/testdata/selfcontained/alias.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:04:59Z",
+      "side": 1,
+      "message": "That is not entirely trivial, as the data is gathered at the Vertex level, not the expression level. So one would have to dig into the conjuncts to find the aliases.\n\nNote also that a single node can be associated with many aliases. Would you show them all or pick one? If so, which one?",
+      "parentUuid": "1a25ec08_97042597",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "49fccbc9_c0805707",
         "filename": "internal/core/export/testdata/selfcontained/errors.txtar",
         "patchSetId": 10
@@ -133,6 +205,24 @@
       "writtenOn": "2022-07-25T07:59:29Z",
       "side": 1,
       "message": "I\u0027m not clear this is what we need/want. Because some self-contained CUE from another \"actor\" can never make this concrete, correct? Because [1,2][int] \u0026 [1,2][1] is still incomplete AFAICT.",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d46c571_6895e46a",
+        "filename": "internal/core/export/testdata/selfcontained/errors.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:04:59Z",
+      "side": 1,
+      "message": "Indeed. This is always an error and cannot be fixed. And I believe this is the correct behavior. This is entirely how CUE would behave if it were evaluated within CUE itself.\n\nThere _is_ in fact an inconsistent behavior here where \n```\na: root: { b: a.root.c, c: int }\n```\ngets translated to \n```\nb: c, c: int\n```\nI actually think this should be translated to\n```\nb: int, c: int\n```\nNamely, once you hoist out `root`, the `b` points to the original `c` the value of which won\u0027t be affected by setting the new `c`.\n\nThis is a bit up for debate, but this would be consistent with all the other interpretations. Added a todo for that.",
+      "parentUuid": "49fccbc9_c0805707",
       "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

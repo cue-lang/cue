@@ -35,10 +35,6 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	mod := &bi.Main
-	if mod.Replace != nil {
-		mod = mod.Replace
-	}
 
 	// test-based overrides
 	if v := os.Getenv("CUE_VERSION_TEST_CFG"); v != "" {

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a58f382_b65a5826",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 384,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:18:49Z",
+      "side": 1,
+      "message": "yes, some hidden fields wouldn\u0027t be appropriately renamed if not.",
+      "parentUuid": "12adab7d_03290499",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67071b09_eab51de8",
@@ -54,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0fd7fa76_c8dfee35",
+        "filename": "internal/core/export/label.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:18:49Z",
+      "side": 1,
+      "message": "This might work, as hidden fields are either unused (in which case it won\u0027t matter) or they are used, at which point the unification will commence as usual at the reference points.\n\nBut either way this seems a bit brittle indeed. It _would_ break if people are using API calls to set the hidden fields, for instance.",
+      "parentUuid": "67071b09_eab51de8",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7b1e083b_65eda7a9",
         "filename": "internal/core/export/label.go",
         "patchSetId": 4
@@ -65,6 +101,24 @@
       "writtenOn": "2022-07-25T08:17:23Z",
       "side": 1,
       "message": "I\u0027m not sure how this would work when unifying the result with another self-contained value from another actor?",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a3c67d91_b9b8643d",
+        "filename": "internal/core/export/label.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:18:49Z",
+      "side": 1,
+      "message": "let expressions are scoped locally, so they can never clash, even within the same package.\n\nInlining preserves semantics.\n\nThe only difference is that hidden fields are no longer available through introspecting via the API. But that is fine, IMO, and better than the alternatives.",
+      "parentUuid": "7b1e083b_65eda7a9",
       "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

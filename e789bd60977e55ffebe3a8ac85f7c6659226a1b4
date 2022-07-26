@@ -192,6 +192,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2a10d10_3cf81adf",
+        "filename": "internal/core/export/testdata/selfcontained/alias.txtar",
+        "patchSetId": 10
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-26T08:01:42Z",
+      "side": 1,
+      "message": "\u003e Note also that a single node can be associated with many aliases. Would you show them all or pick one? If so, which one?\n\nOooh good point. That alone makes my question null and void I think. Marking as resolved therefore!",
+      "parentUuid": "5c8d2b15_38749dd6",
+      "revId": "e789bd60977e55ffebe3a8ac85f7c6659226a1b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49fccbc9_c0805707",

@@ -396,6 +396,10 @@ a: x: "hello"
 		x:       `{a: 1, _hidden1: 1, _hidden: 1}`,
 		y:       `{a: 1, _hidden2: 1, _hidden: 2}`,
 		profile: &Profile{SkipHidden: true, Concrete: true},
+	}, {
+		name: "all errors are equal",
+		x:    `1 & 3`,
+		y:    `1 & 4`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

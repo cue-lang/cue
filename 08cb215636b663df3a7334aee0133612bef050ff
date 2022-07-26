@@ -33,6 +33,24 @@
       "message": "s/expand/inline/\n\nTo be consistent with the name of the flag itself?",
       "revId": "08cb215636b663df3a7334aee0133612bef050ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6673b643_7beb6865",
+        "filename": "cmd/cue/cmd/def.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T01:56:33Z",
+      "side": 1,
+      "message": "I figured it is \"expanding references\" and \"inlining imports\". The references themselves are not inlined. A bit semantics, but that was the thinking. \n\nI figured this was more informative than just repeating the flag name, as saying that it expands the references to imports is actually slightly more precise than \"inline non-core imports\", which could also mean it adjusts the import block or something else.\n\nBut open to suggestions.",
+      "parentUuid": "f7a22647_89bcd799",
+      "revId": "08cb215636b663df3a7334aee0133612bef050ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

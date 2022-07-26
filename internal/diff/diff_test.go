@@ -372,7 +372,30 @@ a: x: "hello"
         }
         path: string | *"/"
 	}
-	`,
+`,
+	}, {
+		name: "hidden fields",
+		x:    `{a: 1, _hidden1: 1, _hidden: 1}`,
+		y:    `{a: 1, _hidden2: 1, _hidden: 2}`,
+		diff: `  {
+      a: 1
+-     _hidden1: 1
++     _hidden2: 1
+-     _hidden: 1
++     _hidden: 2
+  }
+`,
+		kind: Modified,
+	}, {
+		name:    "ignore hidden fields in schema",
+		x:       `{a: 1, _hidden1: 1, _hidden: 1}`,
+		y:       `{a: 1, _hidden2: 1, _hidden: 2}`,
+		profile: &Profile{SkipHidden: true},
+	}, {
+		name:    "ignore hidden fields in data",
+		x:       `{a: 1, _hidden1: 1, _hidden: 1}`,
+		y:       `{a: 1, _hidden2: 1, _hidden: 2}`,
+		profile: &Profile{SkipHidden: true, Concrete: true},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1238882_ff5ebd67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-26T15:24:15Z",
+      "side": 1,
+      "message": "Hm, why are the \"starting unity\" comments duplicated?",
+      "revId": "58ca04d8642c84ded983c67f9af42bd30740a8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

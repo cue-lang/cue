@@ -22,6 +22,19 @@ import (
 // Profile configures a diff operation.
 type Profile struct {
 	Concrete bool
+
+	// Hidden fields are only useful to compare when a values are from the same
+	// package.
+	SkipHidden bool
+
+	// TODO: Use this method instead of SkipHidden. To do this, we need to have
+	// access the package associated with a hidden field, which is only
+	// accessible through the Iterator API. And we should probably get rid of
+	// the cue.Struct API.
+	//
+	// HiddenPkg compares hidden fields for the package if this is not the empty
+	// string. Use "_" for the anonymous package.
+	// HiddenPkg string
 }
 
 var (
@@ -195,6 +208,14 @@ func (d *differ) diffValue(x, y cue.Value) (Kind, *EditScript) {
 	return Identity, nil
 }
 
+func (d *differ) field(s *cue.Struct, i int) (_ cue.FieldInfo, ok bool) {
+	f := s.Field(i)
+	if d.cfg.SkipHidden && f.IsHidden {
+		return cue.FieldInfo{}, false
+	}
+	return f, true
+}
+
 func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 	sx, _ := x.Struct()
 	sy, _ := y.Struct()
@@ -208,10 +229,18 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 	xMap := make(map[string]int32, sx.Len())
 	yMap := make(map[string]int32, sy.Len())
 	for i := 0; i < sx.Len(); i++ {
-		xMap[sx.Field(i).Selector] = int32(i + 1)
+		f, ok := d.field(sx, i)
+		if !ok {
+			continue
+		}
+		xMap[f.Selector] = int32(i + 1)
 	}
 	for i := 0; i < sy.Len(); i++ {
-		yMap[sy.Field(i).Selector] = int32(i + 1)
+		f, ok := d.field(sy, i)
+		if !ok {
+			continue
+		}
+		yMap[f.Selector] = int32(i + 1)
 	}
 
 	edits := []Edit{}
@@ -219,10 +248,14 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 
 	var xi, yi int
 	var xf, yf cue.FieldInfo
+	var ok bool
 	for xi < sx.Len() || yi < sy.Len() {
 		// Process zero nodes
 		for ; xi < sx.Len(); xi++ {
-			xf = sx.Field(xi)
+			xf, ok = d.field(sx, xi)
+			if !ok {
+				continue
+			}
 			yp := yMap[xf.Selector]
 			if yp > 0 {
 				break
@@ -231,7 +264,10 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 			differs = true
 		}
 		for ; yi < sy.Len(); yi++ {
-			yf = sy.Field(yi)
+			yf, ok = d.field(sy, yi)
+			if !ok {
+				continue
+			}
 			if yMap[yf.Selector] == 0 {
 				// already done
 				continue
@@ -246,8 +282,12 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 		}
 
 		// Compare nodes
+		var ok bool
 		for ; xi < sx.Len(); xi++ {
-			xf = sx.Field(xi)
+			xf, ok = d.field(sx, xi)
+			if !ok {
+				continue
+			}
 
 			yp := yMap[xf.Selector]
 			if yp == 0 {
@@ -256,7 +296,10 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 			// If yp != xi+1, the topological sort was not possible.
 			yMap[xf.Selector] = 0
 
-			yf := sy.Field(int(yp - 1))
+			yf, ok := d.field(sy, int(yp-1))
+			if !ok {
+				continue
+			}
 
 			kind := Identity
 			var script *EditScript

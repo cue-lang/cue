@@ -51,6 +51,24 @@
       "parentUuid": "f7a22647_89bcd799",
       "revId": "08cb215636b663df3a7334aee0133612bef050ff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "54707512_1cec3c50",
+        "filename": "cmd/cue/cmd/def.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-26T04:40:23Z",
+      "side": 1,
+      "message": "Got it. That makes total sense. So either it could be \"inline non-core imports\" or \"expand references to non-core imports\". I\u0027m happy with how you have it now.",
+      "parentUuid": "6673b643_7beb6865",
+      "revId": "08cb215636b663df3a7334aee0133612bef050ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

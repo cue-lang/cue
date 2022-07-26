@@ -373,6 +373,14 @@ a: x: "hello"
         path: string | *"/"
 	}
 	`,
+	}, {
+		x:       `{a: 1, _hidden1: 1, _hidden: 1}`,
+		y:       `{a: 1, _hidden2: 1, _hidden: 2}`,
+		profile: &Profile{SkipHidden: true},
+	}, {
+		x:       `{a: 1, _hidden1: 1, _hidden: 1}`,
+		y:       `{a: 1, _hidden2: 1, _hidden: 2}`,
+		profile: &Profile{SkipHidden: true, Concrete: true},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

@@ -16,6 +16,24 @@
       "message": "Where are these coming from?",
       "revId": "a532ae48afa6bd86a6e93d26696f2af578f68f7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8f97579_f786e69d",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-26T15:16:33Z",
+      "side": 1,
+      "message": "They are being generated on my mac somehow. Not the exe files of course",
+      "parentUuid": "fb3eee8c_9bc0ffde",
+      "revId": "a532ae48afa6bd86a6e93d26696f2af578f68f7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

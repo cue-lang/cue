@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb3eee8c_9bc0ffde",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-26T15:14:46Z",
+      "side": 1,
+      "message": "Where are these coming from?",
+      "revId": "a532ae48afa6bd86a6e93d26696f2af578f68f7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a5253b3_d40de29b",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 987,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-26T04:42:38Z",
+      "side": 1,
+      "message": "You made it consistent so I\u0027ll mark this resolved :)",
+      "parentUuid": "7cfea172_69e08ae3",
+      "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f60ac7c8_6a05d4d7",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "It is not. The path is root.get, which is not the import. In fact, that field does not use an imported value at all, just a value defined within the configuration that looks like it. :)",
       "parentUuid": "f60ac7c8_6a05d4d7",
+      "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46ce500b_5c63e3b1",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-26T04:42:38Z",
+      "side": 1,
+      "message": "Doh! Thanks. Didn\u0027t look closely enough.",
+      "parentUuid": "88e8fd9f_387b56bb",
       "revId": "88d13a6e0af289b787bcd2973597418ef9e51513",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

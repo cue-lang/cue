@@ -34,6 +34,24 @@
       "parentUuid": "fb3eee8c_9bc0ffde",
       "revId": "a532ae48afa6bd86a6e93d26696f2af578f68f7b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83514bf8_1a831b26",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-26T15:18:45Z",
+      "side": 1,
+      "message": "Ah __debug_bin is delve. That makes a bit more sense.",
+      "parentUuid": "d8f97579_f786e69d",
+      "revId": "a532ae48afa6bd86a6e93d26696f2af578f68f7b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

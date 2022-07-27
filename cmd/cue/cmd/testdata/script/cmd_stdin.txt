@@ -1,14 +1,44 @@
-stdin stdin.txt
+# Executing a program that consumes all of stdin.
+stdin echo-stdin
 cue cmd echo
-cmp stdout expect-stdout
+cmp stdout echo-stdout
 
+# A command with two prompts, where the input is three lines.
+# The first and second line should be the two answers.
+stdin intro-stdin
+cue cmd intro
+cmp stdout intro-stdout
 
--- expect-stdout --
+# Like the previous test case, but with more whitespace in the answers.
+# The response strings should contain the entire lines including the whitespace.
+stdin intro-spaces-stdin
+cue cmd intro
+cmp stdout intro-spaces-stdout
+
+-- echo-stdin --
 Hello World!
--- stdin.txt --
+-- echo-stdout --
 Hello World!
+-- intro-stdin --
+John Doe
+Capital City
+Extra input that shouldn't be used.
+-- intro-stdout --
+What is your name? Where do you live? 
+Your full name is John Doe and you live in Capital City.
+-- intro-spaces-stdin --
+  John  Doe  
+	Capital City
+Extra input that shouldn't be used.
+-- intro-spaces-stdout --
+What is your name? Where do you live? 
+Your full name is   John  Doe   and you live in 	Capital City.
 -- hello_tool.cue --
 package hello
+
+import (
+	"tool/cli"
+)
 
 command: echo: {
     echo: {
@@ -22,5 +52,22 @@ command: echo: {
         cmd:    "cat"
         stdin:  echo.stdout
     }
+}
+
+command: intro: {
+	askName: cli.Ask & {
+		prompt:   "What is your name?"
+		response: string
+	}
+
+	askPlace: cli.Ask & {
+		order:    askName.response
+		prompt:   "Where do you live?"
+		response: string
+	}
+
+	results: cli.Print & {
+		text: "\nYour full name is \(askName.response) and you live in \(askPlace.response)."
+	}
 }
 -- cue.mod --

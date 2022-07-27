@@ -61,7 +61,9 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	if v, ok := stream("stdin"); !ok {
+		ctx.StdinMu.Lock()
 		cmd.Stdin = ctx.Stdin
+		defer ctx.StdinMu.Unlock()
 	} else if cmd.Stdin, err = v.Reader(); err != nil {
 		return nil, errors.Wrapf(err, v.Pos(), "invalid input")
 	}

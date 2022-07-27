@@ -16,6 +16,7 @@
 package task
 
 import (
+	"bufio"
 	"context"
 	"io"
 	"sync"
@@ -29,11 +30,19 @@ import (
 // A Context provides context for running a task.
 type Context struct {
 	Context context.Context
-	Stdin   io.Reader
-	Stdout  io.Writer
-	Stderr  io.Writer
-	Obj     cue.Value
-	Err     errors.Error
+
+	// Stdin is buffered, so that CLI prompts can read entire lines easily.
+	// If a task reads Stdin, like exec.Run or cli.Ask, it must grab StdinMu.
+	// Concurrent readers can otherwise lead to data races or interleaved reads.
+	// There is a logic race in the form of which concurrent task gets the mutex,
+	// but concurrent tasks inherently race each other unless `$after` is used.
+	Stdin   *bufio.Reader
+	StdinMu *sync.Mutex
+
+	Stdout io.Writer
+	Stderr io.Writer
+	Obj    cue.Value
+	Err    errors.Error
 }
 
 func (c *Context) Lookup(field string) cue.Value {

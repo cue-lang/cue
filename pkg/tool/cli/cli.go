@@ -19,6 +19,7 @@ package cli
 
 import (
 	"fmt"
+	"io"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -63,8 +64,16 @@ func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		fmt.Fprint(ctx.Stdout, str+" ")
 	}
 
-	var response string
-	if _, err := fmt.Scan(&response); err != nil {
+	ctx.StdinMu.Lock()
+	response, err := ctx.Stdin.ReadString('\n')
+	ctx.StdinMu.Unlock()
+	switch err {
+	case nil:
+		// Answer with a newline; remove the trailing newline.
+		response = response[:len(response)-1]
+	case io.EOF:
+		// Answer without a newline.
+	default:
 		return nil, err
 	}
 

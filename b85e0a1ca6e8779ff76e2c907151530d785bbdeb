@@ -16,6 +16,24 @@
       "message": "nit: add a test case which actually compares hidden fields, with SkipHidden: false.",
       "revId": "b85e0a1ca6e8779ff76e2c907151530d785bbdeb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "850d954d_4e14f870",
+        "filename": "internal/diff/diff_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-27T07:43:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "589ebd34_6e99be5b",
+      "revId": "b85e0a1ca6e8779ff76e2c907151530d785bbdeb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

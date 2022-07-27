@@ -29,11 +29,21 @@ import (
 // A Context provides context for running a task.
 type Context struct {
 	Context context.Context
-	Stdin   io.Reader
-	Stdout  io.Writer
-	Stderr  io.Writer
-	Obj     cue.Value
-	Err     errors.Error
+
+	Stdin  StdinReader
+	Stdout io.Writer
+	Stderr io.Writer
+	Obj    cue.Value
+	Err    errors.Error
+}
+
+// StdinReader contains the methods needed to use stdin to run tasks.
+// It is a subset of bufio.Reader, as that helps us with tasks like cli.Ask.
+// It is assumed that concurrent method calls are safe.
+type StdinReader interface {
+	io.Reader
+	io.WriterTo                            // for io.Copy
+	ReadString(delim byte) (string, error) // for cli.Ask
 }
 
 func (c *Context) Lookup(field string) cue.Value {

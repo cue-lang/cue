@@ -1,0 +1,31 @@
+cue cmd runtwo
+cmp stdout runtwo-stdout
+
+-- runtwo-stdout --
+foo: wrote foo and found bar
+
+bar: wrote bar and found foo
+
+-- runtwo_tool.cue --
+package hello
+
+import (
+	"tool/cli"
+)
+
+command: runtwo: {
+    foo: {
+        kind:   "exec"
+        cmd:    ["testcmd", "concurrent", "foo", "bar"]
+        stdout: string
+    }
+    bar: {
+        kind:   "exec"
+        cmd:    ["testcmd", "concurrent", "bar", "foo"]
+		stdout: string
+    }
+	results: cli.Print & {
+		text: "foo: \(foo.stdout)\nbar: \(bar.stdout)"
+	}
+}
+-- cue.mod --

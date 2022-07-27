@@ -27,6 +27,7 @@ import (
 	goruntime "runtime"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
@@ -179,6 +180,13 @@ func TestMain(m *testing.M) {
 	// as Windows.
 	os.Exit(testscript.RunMain(m, map[string]func() int{
 		"cue": MainTest,
+		"testcmd": func() int {
+			if err := testCmd(); err != nil {
+				fmt.Fprintln(os.Stderr, err)
+				return 1
+			}
+			return 0
+		},
 	}))
 }
 
@@ -193,5 +201,35 @@ func homeEnvName() string {
 		return "home"
 	default:
 		return "HOME"
+	}
+}
+
+func testCmd() error {
+	cmd := os.Args[1]
+	args := os.Args[2:]
+	switch cmd {
+	case "concurrent":
+		// Used to test that we support running tasks concurrently.
+		// Run like `concurrent foo bar` and `concurrent bar foo`,
+		// each command creates one file and waits for the other to exist.
+		// If the commands are run sequentially, neither will succeed.
+		if len(args) != 2 {
+			return fmt.Errorf("usage: concurrent to_create to_wait\n")
+		}
+		toCreate := args[0]
+		toWait := args[1]
+		if err := os.WriteFile(toCreate, []byte("dummy"), 0o666); err != nil {
+			return err
+		}
+		for i := 0; i < 10; i++ {
+			if _, err := os.Stat(toWait); err == nil {
+				fmt.Printf("wrote %s and found %s\n", toCreate, toWait)
+				return nil
+			}
+			time.Sleep(100 * time.Millisecond)
+		}
+		return fmt.Errorf("timed out waiting for %s to exist", toWait)
+	default:
+		return fmt.Errorf("unknown command: %q\n", cmd)
 	}
 }

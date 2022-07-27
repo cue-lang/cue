@@ -69,6 +69,23 @@
       "message": "Marking HOLD for now so we can again test this post the merge of https://github.com/cue-lang/cuelang.org/pull/262",
       "revId": "58ca04d8642c84ded983c67f9af42bd30740a8dd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ca112cd_73fc78e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-27T14:58:55Z",
+      "side": 1,
+      "message": "Removing hold. This is now good to go!\n\nThanks for letting me test using it.",
+      "revId": "58ca04d8642c84ded983c67f9af42bd30740a8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

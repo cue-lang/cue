@@ -34,6 +34,24 @@
       "parentUuid": "b1238882_ff5ebd67",
       "revId": "58ca04d8642c84ded983c67f9af42bd30740a8dd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f2414ad_542036e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-27T14:14:29Z",
+      "side": 1,
+      "message": "Hopefully addressed in https://github.com/cue-lang/cuelang.org/pull/262",
+      "parentUuid": "56a3012b_a546cbfd",
+      "revId": "58ca04d8642c84ded983c67f9af42bd30740a8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

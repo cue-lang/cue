@@ -67,6 +67,23 @@
       "message": "This is breaking on Windows. Instead of passing \"/tmp/test\", pass t.TempDir().",
       "revId": "59132d25f48d134c7cceb7b646ae5ee0c1fec48e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22cd5f9a_1d8cdb44",
+        "filename": "internal/core/export/self_test.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T16:40:05Z",
+      "side": 1,
+      "message": "Pass t.TempDir() as the second arg.",
+      "revId": "59132d25f48d134c7cceb7b646ae5ee0c1fec48e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

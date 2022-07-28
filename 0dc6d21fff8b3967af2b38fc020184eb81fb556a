@@ -16,6 +16,57 @@
       "message": "PTAL, particularly the new test. I used a generic \"testcmd\" with sub-commands, meaning that we can very easily add more in the future. For example, to replace the non-portable shell.",
       "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfafc125_930a5095",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T15:50:11Z",
+      "side": 1,
+      "message": "Just one last question/thought from my side.",
+      "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efa1eda9_d9d91c73",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T15:50:11Z",
+      "side": 1,
+      "message": "To avoid creating a new *bufio.Reader each time (which as you say runs the risk of bytes getting lost) can\u0027t we create a method on *Command here which ensures we only do so once?",
+      "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab540d25_d7581c8f",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_concurrent.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T15:50:11Z",
+      "side": 1,
+      "message": "nit: formatting",
+      "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

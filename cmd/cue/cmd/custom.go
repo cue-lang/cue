@@ -32,7 +32,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
-	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
 	_ "cuelang.org/go/pkg/tool/exec"
@@ -236,7 +235,7 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		if k, ok := legacyKinds[kind]; ok {
 			kind = k
 		}
-		rf := itask.Lookup(kind)
+		rf := task.Lookup(kind)
 		if rf == nil {
 			return nil, errors.Newf(v.Pos(), "runner of kind %q not found", kind)
 		}
@@ -254,7 +253,7 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		}
 
 		return flow.RunnerFunc(func(t *flow.Task) error {
-			c := &itask.Context{
+			c := &task.Context{
 				Context: t.Context(),
 				Stdin:   stdin,
 				Stdout:  stdout,
@@ -274,12 +273,12 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 }
 
 func init() {
-	itask.Register("cmd/cue/cmd.Test", newTestServerCmd)
+	task.Register("cmd/cue/cmd.Test", newTestServerCmd)
 }
 
 var testOnce sync.Once
 
-func newTestServerCmd(v cue.Value) (itask.Runner, error) {
+func newTestServerCmd(v cue.Value) (task.Runner, error) {
 	server := ""
 	testOnce.Do(func() {
 		s := httptest.NewServer(http.HandlerFunc(
@@ -299,6 +298,6 @@ func newTestServerCmd(v cue.Value) (itask.Runner, error) {
 
 type testServerCmd string
 
-func (s testServerCmd) Run(ctx *itask.Context) (x interface{}, err error) {
+func (s testServerCmd) Run(ctx *task.Context) (x interface{}, err error) {
 	return map[string]interface{}{"url": string(s)}, nil
 }

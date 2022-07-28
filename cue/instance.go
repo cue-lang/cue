@@ -98,7 +98,7 @@ func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *I
 		index:       x,
 	}
 	if p.Err != nil {
-		inst.setListOrError(p.Err)
+		inst.setError(p.Err)
 	}
 
 	x.SetBuildData(p, inst)
@@ -162,7 +162,7 @@ func newInstance(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance
 		inst.PkgName = p.PkgName
 		inst.DisplayName = p.ImportPath
 		if p.Err != nil {
-			inst.setListOrError(p.Err)
+			inst.setError(p.Err)
 		}
 	}
 
@@ -172,20 +172,9 @@ func newInstance(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance
 	return inst
 }
 
-func (inst *Instance) setListOrError(err errors.Error) {
-	inst.Incomplete = true
-	inst.Err = errors.Append(inst.Err, err)
-}
-
 func (inst *Instance) setError(err errors.Error) {
 	inst.Incomplete = true
 	inst.Err = errors.Append(inst.Err, err)
-}
-
-func (inst *Instance) eval(ctx *adt.OpContext) adt.Value {
-	// TODO: remove manifest here?
-	v := manifest(ctx, inst.root)
-	return v
 }
 
 // ID returns the package identifier that uniquely qualifies module and
@@ -267,14 +256,14 @@ func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
 
 	i := newInstance(idx, p, v)
 	if rErr != nil {
-		i.setListOrError(rErr)
+		i.setError(rErr)
 	}
 	if i.Err != nil {
-		i.setListOrError(i.Err)
+		i.setError(i.Err)
 	}
 
 	if err != nil {
-		i.setListOrError(err)
+		i.setError(err)
 	}
 
 	return i

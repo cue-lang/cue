@@ -44,7 +44,6 @@ type buildContext struct {
 	nameFunc      func(inst *cue.Instance, path []string) string
 	descFunc      func(v cue.Value) string
 	fieldFilter   *regexp.Regexp
-	evalDepth     int // detect cycles when resolving references
 
 	schemas *OrderedMap
 

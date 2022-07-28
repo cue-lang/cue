@@ -1371,10 +1371,6 @@ func (v Value) structValData(ctx *adt.OpContext) (structValue, *adt.Bottom) {
 	})
 }
 
-func (v Value) structValFull(ctx *adt.OpContext) (structValue, *adt.Bottom) {
-	return v.structValOpts(ctx, options{allowScalar: true})
-}
-
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err *adt.Bottom) {
 	v, _ = v.Default()

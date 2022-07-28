@@ -61,18 +61,6 @@ const (
 	InterpolationOp Op = adt.InterpolationOp
 )
 
-// isCmp reports whether an op is a comparator.
-func (op op) isCmp() bool {
-	return opEql <= op && op <= opGeq
-}
-
-func (op op) unifyType() (unchecked, ok bool) {
-	if op == opUnifyUnchecked {
-		return true, true
-	}
-	return false, op == opUnify
-}
-
 type op uint16
 
 const (

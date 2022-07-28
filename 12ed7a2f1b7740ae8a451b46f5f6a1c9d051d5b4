@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "589bdf74_f2393121",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T09:21:10Z",
+      "side": 1,
+      "message": "I would include some mention here of the rough plan we discussed for making stdin an optional field in a future change. Perhaps with a link to that issue?",
+      "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "d4ed1a05_fda1a640",
@@ -14,6 +31,40 @@
       "writtenOn": "2022-07-27T19:10:46Z",
       "side": 1,
       "message": "The race is now dealt with.\n\nI ended up using a mutex around each whole task that uses stdin, as opposed to each read operation, as this helps us against interleaved reads, which are still a form of logic race.\n\nNot allowing the running of two concurrent tasks which use stdin is perhaps a bit strict, but it\u0027s a direction we want to head towards anyway, so I hope it\u0027s okay. If you feel like it will slow down too many users, I am happy to bounce ideas, and we should write a test that ensures e.g. two exec.Run tasks can run concurrently in their default state (stdin is used).",
+      "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6fcdce5_15d6b86b",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T09:21:10Z",
+      "side": 1,
+      "message": "See comment in later file, but I\u0027m not clear that this approach works because the reads themselves need to be synchronised.\n\nPerhaps this could be best achieved by defining the InOrStdin() on *Command. That method can then return a value that wraps *bufio.Reader, encapsulating the mutex, providing two methods: Read() (satisfying io.Reader) and ReadString() (direct wrapper to *bufio.Reader.ReadString(), but mutex guarded). \n\nThe InOrStdin() could then also be responsible for only creating a single wrapper, hence we won\u0027t discard bytes.\n\nWould that work?",
+      "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee8e05f3_4faf1253",
+        "filename": "pkg/tool/exec/exec.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T09:21:10Z",
+      "side": 1,
+      "message": "I\u0027m not clear what this is doing. Isn\u0027t it the reads from \"stdin\" that need to be synchronised?",
       "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

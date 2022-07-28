@@ -16,6 +16,24 @@
       "message": "I wonder if the intent was to use a static directory for debugging purposes. But sgtm in any case.",
       "revId": "6006cdf5a1f39fa06f49f00eacffbe3c9483ee50",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b88b53e6_eb24d09c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T20:18:53Z",
+      "side": 1,
+      "message": "There are situations when this is used outside of debugging, so I don\u0027t think so.",
+      "parentUuid": "238a10df_3ab9d585",
+      "revId": "6006cdf5a1f39fa06f49f00eacffbe3c9483ee50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

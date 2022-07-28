@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "023e3776_355b9088",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-28T14:59:52Z",
+      "side": 1,
+      "message": "PTAL, particularly the new test. I used a generic \"testcmd\" with sub-commands, meaning that we can very easily add more in the future. For example, to replace the non-portable shell.",
+      "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

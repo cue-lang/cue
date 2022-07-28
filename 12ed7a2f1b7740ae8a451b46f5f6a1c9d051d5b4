@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1e4f9773_a25db2aa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-28T14:59:52Z",
+      "side": 1,
+      "message": "Given that we don\u0027t change how exec.Run works for commands that don\u0027t read for stdin with the new patchset, I\u0027m inclined to not mix the two issues.\n\nI will still file it now, though :)",
+      "parentUuid": "589bdf74_f2393121",
+      "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "d4ed1a05_fda1a640",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2022-07-28T09:21:10Z",
       "side": 1,
       "message": "See comment in later file, but I\u0027m not clear that this approach works because the reads themselves need to be synchronised.\n\nPerhaps this could be best achieved by defining the InOrStdin() on *Command. That method can then return a value that wraps *bufio.Reader, encapsulating the mutex, providing two methods: Read() (satisfying io.Reader) and ReadString() (direct wrapper to *bufio.Reader.ReadString(), but mutex guarded). \n\nThe InOrStdin() could then also be responsible for only creating a single wrapper, hence we won\u0027t discard bytes.\n\nWould that work?",
+      "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e72a7b63_e469f514",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-28T14:59:52Z",
+      "side": 1,
+      "message": "As discussed separately, we\u0027re now using a slightly tweaked strategy.",
+      "parentUuid": "e6fcdce5_15d6b86b",
       "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -83,6 +119,24 @@
       "side": 1,
       "message": "I totally missed the defer. Ignore me on that point.\n\nBut as discussed, I don\u0027t think we can make exec tasks sequential in this way.",
       "parentUuid": "ee8e05f3_4faf1253",
+      "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea1fd81c_90f4ddc7",
+        "filename": "pkg/tool/exec/exec.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-28T14:59:52Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2b0e7b31_9115e112",
       "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

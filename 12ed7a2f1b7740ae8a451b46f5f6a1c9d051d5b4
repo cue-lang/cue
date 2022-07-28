@@ -67,6 +67,24 @@
       "message": "I\u0027m not clear what this is doing. Isn\u0027t it the reads from \"stdin\" that need to be synchronised?",
       "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b0e7b31_9115e112",
+        "filename": "pkg/tool/exec/exec.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T10:02:13Z",
+      "side": 1,
+      "message": "I totally missed the defer. Ignore me on that point.\n\nBut as discussed, I don\u0027t think we can make exec tasks sequential in this way.",
+      "parentUuid": "ee8e05f3_4faf1253",
+      "revId": "12ed7a2f1b7740ae8a451b46f5f6a1c9d051d5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

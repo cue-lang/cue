@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b9fc0e07_c401a63a",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-28T15:59:14Z",
+      "side": 1,
+      "message": "I\u0027m not sure I follow; this function does not actually set up or run a single task. it returns a _constructor_ closure, meaning that `newTaskFunc` only gets called once, but the returned constructor gets run once per task.\n\nthis is what I was trying to call out with the added comment: \"used throughout all tasks\", meaning that they are created upfront, and reused. is it not clear enough perhaps?",
+      "parentUuid": "efa1eda9_d9d91c73",
+      "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ab540d25_d7581c8f",
         "filename": "cmd/cue/cmd/testdata/script/cmd_concurrent.txt",
         "patchSetId": 3
@@ -65,6 +83,24 @@
       "writtenOn": "2022-07-28T15:50:11Z",
       "side": 1,
       "message": "nit: formatting",
+      "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9165f6bb_633af3ea",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_concurrent.txt",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-28T15:59:14Z",
+      "side": 1,
+      "message": "is there a convention to leave an empty line? or what do you mean?",
+      "parentUuid": "ab540d25_d7581c8f",
       "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

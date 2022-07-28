@@ -32,7 +32,7 @@ import (
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
-	"github.com/rogpeppe/go-internal/txtar"
+	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"

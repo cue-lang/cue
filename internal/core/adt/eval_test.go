@@ -20,7 +20,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rogpeppe/go-internal/txtar"
+	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"

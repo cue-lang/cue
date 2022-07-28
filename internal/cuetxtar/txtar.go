@@ -34,7 +34,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cuetest"
 	"github.com/google/go-cmp/cmp"
-	"github.com/rogpeppe/go-internal/txtar"
+	"golang.org/x/tools/txtar"
 )
 
 // A TxTarTest represents a test run that process all CUE tests in the txtar

@@ -95,7 +95,7 @@ func TestValueX(t *testing.T) {
 	`
 
 	archive := txtar.Parse([]byte(in))
-	a := cuetxtar.Load(archive, "/tmp/test")
+	a := cuetxtar.Load(archive, t.TempDir())
 
 	r := runtime.New()
 	v, errs := compile.Files(nil, r, "", a[0].Files...)

@@ -323,7 +323,7 @@ func TestX(t *testing.T) {
 	t.Skip()
 
 	a := txtar.Parse([]byte(in))
-	instances := cuetxtar.Load(a, "/tmp/test")
+	instances := cuetxtar.Load(a, t.TempDir())
 
 	inst := cue.Build(instances)[0]
 	if inst.Err != nil {

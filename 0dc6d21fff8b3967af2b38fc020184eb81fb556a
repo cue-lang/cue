@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71b24cd2_b685ba3c",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 217,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-07-28T16:10:28Z",
+      "side": 1,
+      "message": "Sorry, you\u0027re not missing anything. I\u0027m clearly having a very slow day :)",
+      "parentUuid": "b9fc0e07_c401a63a",
+      "revId": "0dc6d21fff8b3967af2b38fc020184eb81fb556a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab540d25_d7581c8f",

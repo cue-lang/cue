@@ -112,7 +112,7 @@ module: "example.com"
 	}
 
 	a := txtar.Parse([]byte(in))
-	instance := cuetxtar.Load(a, "/tmp/test")[0]
+	instance := cuetxtar.Load(a, t.TempDir())[0]
 	if instance.Err != nil {
 		t.Fatal(instance.Err)
 	}

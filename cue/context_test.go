@@ -98,8 +98,7 @@ bar: [
 `
 
 	a := txtar.Parse([]byte(in))
-	dir := t.TempDir()
-	instance := cuetxtar.Load(a, dir)[0]
+	instance := cuetxtar.Load(a, t.TempDir())[0]
 	if instance.Err != nil {
 		t.Fatal(instance.Err)
 	}
@@ -124,8 +123,7 @@ bar: [
 `
 
 	a := txtar.Parse([]byte(in))
-	dir := t.TempDir()
-	instance := cuetxtar.Load(a, dir)[0]
+	instance := cuetxtar.Load(a, t.TempDir())[0]
 
 	// Normally, this should be checked, however, this is explicitly
 	// testing the path where this was NOT checked.

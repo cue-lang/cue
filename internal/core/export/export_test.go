@@ -302,7 +302,7 @@ package test
 	`
 
 	archive := txtar.Parse([]byte(in))
-	a := cuetxtar.Load(archive, "/tmp/test")
+	a := cuetxtar.Load(archive, t.TempDir())
 	if err := a[0].Err; err != nil {
 		t.Fatal(err)
 	}

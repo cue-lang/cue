@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdb2d91c_a18244d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-29T15:55:55Z",
+      "side": 1,
+      "message": "FYI Paul, the same that you gave a +2 to, but it also does all other instances: acme.com, example.com, and example.org.\n\nNote that I left https links alone, e.g. in tutorials and docs.",
+      "revId": "f8fa23b46130e90694de55d5a6365b3079574f3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

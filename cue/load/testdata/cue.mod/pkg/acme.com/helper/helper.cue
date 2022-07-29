@@ -1,3 +1,0 @@
-package helper
-
-Gotcha: "gotcha"

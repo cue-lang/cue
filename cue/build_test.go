@@ -67,7 +67,7 @@ func TestBuild(t *testing.T) {
 		`),
 	}
 	pkg2 := &bimport{
-		"example.com/foo/pkg2:pkg",
+		"mod.test/foo/pkg2:pkg",
 		files(`
 		package pkg
 
@@ -75,7 +75,7 @@ func TestBuild(t *testing.T) {
 		`),
 	}
 	pkg3 := &bimport{
-		"example.com/foo/v1:pkg3",
+		"mod.test/foo/v1:pkg3",
 		files(`
 		package pkg3
 
@@ -144,7 +144,7 @@ func TestBuild(t *testing.T) {
 				`package test
 
 				import bar "pkg1"
-				import baz "example.com/foo/pkg2:pkg"
+				import baz "mod.test/foo/pkg2:pkg"
 
 				pkg1: Object: 3
 				"Hello \(pkg1.Object)!"`),
@@ -155,18 +155,18 @@ func TestBuild(t *testing.T) {
 			files(
 				`package test
 
-				import "example.com/foo/pkg2:pkg"
+				import "mod.test/foo/pkg2:pkg"
 
 				"Hello \(pkg2.Number)!"`),
 		}),
-		`imported and not used: "example.com/foo/pkg2:pkg" (and 1 more errors)`,
+		`imported and not used: "mod.test/foo/pkg2:pkg" (and 1 more errors)`,
 		// `file0.cue:5:14: unresolved reference pkg2`,
 	}, {
 		insts(pkg2, &bimport{"",
 			files(
 				`package test
 
-				import "example.com/foo/pkg2:pkg"
+				import "mod.test/foo/pkg2:pkg"
 
 				"Hello \(pkg.Number)!"`),
 		}),
@@ -176,7 +176,7 @@ func TestBuild(t *testing.T) {
 			files(
 				`package test
 
-				import "example.com/foo/v1:pkg3"
+				import "mod.test/foo/v1:pkg3"
 
 				"Hello \(pkg3.List[1])!"`),
 		}),
@@ -186,7 +186,7 @@ func TestBuild(t *testing.T) {
 			files(
 				`package test
 
-				import "example.com/foo/v1:pkg3"
+				import "mod.test/foo/v1:pkg3"
 
 				pkg3: 3
 

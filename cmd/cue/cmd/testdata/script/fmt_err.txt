@@ -6,7 +6,7 @@ cue fmt ./...
 
 cmp x.cue out/x_cue
 -- cue.mod/module.cue --
-module: "example.com/x"
+module: "mod.test/x"
 -- x.cue --
 package x
 

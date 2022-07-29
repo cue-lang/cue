@@ -83,7 +83,7 @@ We initialize a Go module so that later we can resolve the
 `k8s.io/api/apps/v1` Go package dependency:
 
 ```
-$ go mod init example.com
+$ go mod init mod.test
 ```
 
 Let's try to use the `cue import` command to convert the given YAML files

@@ -11,7 +11,7 @@ A: 5
 package b
 
 import (
-	"example.com/blah/a"
+	"mod.test/blah/a"
 )
 
 #Def: {
@@ -21,7 +21,7 @@ import (
 x: #Def
 x: y: a.A
 -- cue.mod/module.cue --
-module: "example.com/blah"
+module: "mod.test/blah"
 -- out/trim --
 == b.cue
 package b

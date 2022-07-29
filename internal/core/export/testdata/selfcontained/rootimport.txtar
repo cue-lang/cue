@@ -2,10 +2,10 @@ Import a package at its root and ensure it comes up with a proper identifier.
 
 #inlineImports: true
 -- cue.mod/module.cue --
-module: "example.com/a"
+module: "mod.test/a"
 
 -- in.cue --
-import "example.com/a/pkg"
+import "mod.test/a/pkg"
 
 a: pkg
 
@@ -21,7 +21,7 @@ v: {
 }
 
 -- out/default --
-import "example.com/a/pkg"
+import "mod.test/a/pkg"
 
 a: pkg
 
@@ -33,7 +33,7 @@ a: PKG
 // Force no inline.
 b: PKG.v.a
 
-//cue:path: "example.com/a/pkg"
+//cue:path: "mod.test/a/pkg"
 let PKG = {
 	v: {
 		a: int

@@ -77,7 +77,7 @@ trybot: _base.#bashWorkflow & {
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
-			go mod init mod.com
+			go mod init mod.test
 			GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
 			"""
 		if: "${{ \(_base.#isDefaultBranch) }}"

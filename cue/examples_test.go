@@ -39,10 +39,10 @@ func load(file string) *cue.Instance {
 func ExampleHid() {
 	const file = `
 -- cue.mod/module.cue --
-module: "acme.com"
+module: "mod.test"
 
 -- main.cue --
-import "acme.com/foo:bar"
+import "mod.test/foo:bar"
 
 bar
 _foo: int // scoped in main (anonymous) package
@@ -57,7 +57,7 @@ bar: _foo
 
 	v := load(file).Value()
 
-	v = v.FillPath(cue.MakePath(cue.Hid("_foo", "acme.com/foo:bar")), 1)
+	v = v.FillPath(cue.MakePath(cue.Hid("_foo", "mod.test/foo:bar")), 1)
 	v = v.FillPath(cue.MakePath(cue.Hid("_foo", "_")), 2)
 	fmt.Println(v.LookupPath(cue.ParsePath("bar")).Int64())
 	fmt.Println(v.LookupPath(cue.ParsePath("baz")).Int64())

@@ -1,7 +1,7 @@
 cue cmd -t greeting=hello prefix
 
 -- cue.mod/module.cue --
-module: "mod.com"
+module: "mod.test"
 -- my.cue --
 package tools
 

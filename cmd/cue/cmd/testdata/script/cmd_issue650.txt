@@ -10,13 +10,13 @@ package blah
 #PodSpec: {
 }
 -- cue.mod/module.cue --
-module: "mod.com"
+module: "mod.test"
 -- x_tool.cue --
 package kube
 
 import (
  "tool/cli"
- "mod.com/blah"
+ "mod.test/blah"
 )
 
 root: blah.#Pod

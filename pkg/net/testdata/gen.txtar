@@ -6,7 +6,7 @@ import "net"
 t1:  net.FQDN & "foo.bar."
 t2:  net.FQDN("foo.bararararararararararararararararararararararararararararararararara")
 t3:  net.SplitHostPort("[::%lo0]:80")
-t4:  net.JoinHostPort("example.com", "80")
+t4:  net.JoinHostPort("mod.test", "80")
 t5:  net.JoinHostPort("2001:db8::1", 80)
 t6:  net.JoinHostPort([192, 30, 4, 2], 80)
 t7:  net.JoinHostPort([192, 30, 4], 80)
@@ -40,7 +40,7 @@ Result:
 t1: "foo.bar."
 t2: false
 t3: ["::%lo0", "80"]
-t4:  "example.com:80"
+t4:  "mod.test:80"
 t5:  "[2001:db8::1]:80"
 t6:  "192.30.4.2:80"
 t7:  _|_ // error in call to net.JoinHostPort: invalid host [192, 30, 4]

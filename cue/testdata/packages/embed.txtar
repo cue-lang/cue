@@ -1,18 +1,18 @@
 cue eval ./pkg:foo
 
 -- cue.mod/module.cue --
-module: "example.com"
+module: "mod.test"
 -- in.cue --
 package foo
 
-import "example.com/pkg:bar"
+import "mod.test/pkg:bar"
 
 bar
 z: 3
 -- pkg/bar.cue --
 package bar
 
-import "example.com/pkg:baz"
+import "mod.test/pkg:baz"
 
 foo: {
 	baz
@@ -36,6 +36,6 @@ x: 1
 -- out/compile --
 --- in.cue
 {
-  〈import;"example.com/pkg:bar"〉
+  〈import;"mod.test/pkg:bar"〉
   z: 3
 }

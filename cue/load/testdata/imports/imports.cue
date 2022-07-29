@@ -1,6 +1,6 @@
 package imports
 
-import "acme.com/catch"
+import "mod.test/catch"
 
 coyoteTry1: catch.Method & "tnt"
 

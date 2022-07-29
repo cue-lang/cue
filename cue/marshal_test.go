@@ -100,7 +100,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 	insts := func(i ...*instanceData) []*instanceData { return i }
 	pkg1 := &instanceData{
 		true,
-		"example.com/foo/pkg1",
+		"mod.test/foo/pkg1",
 		files(`
 		package pkg1
 
@@ -109,7 +109,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 	}
 	pkg2 := &instanceData{
 		true,
-		"example.com/foo/pkg2",
+		"mod.test/foo/pkg2",
 		files(`
 		package pkg
 
@@ -137,7 +137,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 			files(
 				`package test
 
-			import "example.com/foo/pkg1"
+			import "mod.test/foo/pkg1"
 
 			"Hello \(pkg1.Object)!"`),
 		}),
@@ -147,7 +147,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 			files(
 				`package test
 
-		import pkg2 "example.com/foo/pkg1"
+		import pkg2 "mod.test/foo/pkg1"
 		"Hello \(pkg1)!"
 
 		pkg1: pkg2.Object`),
@@ -158,7 +158,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 			files(
 				`package test
 
-		import "example.com/foo/pkg2"
+		import "mod.test/foo/pkg2"
 
 		"Hello \(pkg.Number)!"`),
 		}),

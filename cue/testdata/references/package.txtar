@@ -1,5 +1,5 @@
 -- cue.mod/module.cue --
-module: "example.com"
+module: "mod.test"
 -- in.cue --
 package exitcode
 

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99803d0e_4963d19f",
+        "filename": "internal/core/export/self.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-29T04:38:31Z",
+      "side": 1,
+      "message": "Oops leftover debug comments and code.",
+      "parentUuid": "ba989e87_deee8ed3",
+      "revId": "59132d25f48d134c7cceb7b646ae5ee0c1fec48e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7f3d91fb_01b0e2ef",
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebc8c387_7852353b",
+        "filename": "internal/core/export/self_test.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-29T04:38:31Z",
+      "side": 1,
+      "message": "Thanks for catching that!",
+      "parentUuid": "7f3d91fb_01b0e2ef",
+      "revId": "59132d25f48d134c7cceb7b646ae5ee0c1fec48e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "22cd5f9a_1d8cdb44",
@@ -82,6 +118,24 @@
       "writtenOn": "2022-07-28T16:40:05Z",
       "side": 1,
       "message": "Pass t.TempDir() as the second arg.",
+      "revId": "59132d25f48d134c7cceb7b646ae5ee0c1fec48e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee1323f2_b3c6cc41",
+        "filename": "internal/core/export/self_test.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-29T04:38:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22cd5f9a_1d8cdb44",
       "revId": "59132d25f48d134c7cceb7b646ae5ee0c1fec48e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

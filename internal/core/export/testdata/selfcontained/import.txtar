@@ -1,10 +1,10 @@
 #inlineImports: true
 
 -- cue.mod/module.cue --
-module: "example.com/a"
+module: "mod.test/a"
 
 -- in.cue --
-import "example.com/a/pkg"
+import "mod.test/a/pkg"
 import "tool/exec"
 
 // Can be inlined.
@@ -50,7 +50,7 @@ w: {
 
 -- out/default --
 import (
-	"example.com/a/pkg"
+	"mod.test/a/pkg"
 	"tool/exec"
 )
 
@@ -101,29 +101,29 @@ wa: W.a
 run:     exec.Run
 _hidden: int
 
-//cue:path: "example.com/a/pkg".a.b
+//cue:path: "mod.test/a/pkg".a.b
 let B = {
 	c: {
 		d: int
 	}
 }
 
-//cue:path: "example.com/a/pkg".#Def.f
+//cue:path: "mod.test/a/pkg".#Def.f
 let F = {
 	#x: {
 		g: int
 	}
 }
 
-//cue:path: "example.com/a/pkg".w
+//cue:path: "mod.test/a/pkg".w
 let W = {
-	a: _hidden_6D1DE229
-	_hidden_6D1DE229: {
+	a: _hidden_567475F3
+	_hidden_567475F3: {
 		a: 1
 	}
 	b: 1
 	x: {
-		_hidden2_6D1DE229: _hidden_6D1DE229
-		y:                 _hidden2_6D1DE229
+		_hidden2_567475F3: _hidden_567475F3
+		y:                 _hidden2_567475F3
 	}
 }

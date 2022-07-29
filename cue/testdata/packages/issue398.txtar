@@ -1,16 +1,16 @@
 -- cue.mod/module.cue --
-module: "example.com"
+module: "mod.test"
 -- foo.cue --
 package foo
 
-import "example.com/pkg:bar"
+import "mod.test/pkg:bar"
 
 bar
 zz: 3
 -- pkg/bar.cue --
 package bar
 
-import "example.com/pkg:baz"
+import "mod.test/pkg:baz"
 
 baz
 yy: 2
@@ -27,6 +27,6 @@ xx: 1
 -- out/compile --
 --- foo.cue
 {
-  〈import;"example.com/pkg:bar"〉
+  〈import;"mod.test/pkg:bar"〉
   zz: 3
 }

@@ -9,7 +9,7 @@ cmp stdout expect-stdout-def
 cue vet  . instance.json
 
 -- cue.mod/module.cue --
-module: "example.com/config"
+module: "mod.test/config"
 
 -- components/widget.cue --
 package widget
@@ -23,7 +23,7 @@ package widget
 package config
 
 import (
-	"example.com/config/components:widget"
+	"mod.test/config/components:widget"
 )
 
 w: widget.#Widget
@@ -41,7 +41,7 @@ w: {
     explicit: "literal string"
 }
 -- expect-stdout-def --
-import "example.com/config/components:widget"
+import "mod.test/config/components:widget"
 
 w: widget.#Widget & {
 	model: "retroencabulator"

@@ -110,7 +110,7 @@ const FromArgsUsage = `
    a single instance.
 
    Examples, assume a module name of acme.org/root:
-      example.com/foo   package in cue.mod
+      mod.test/foo   package in cue.mod
       ./foo             package corresponding to foo directory
       .:bar             package in current directory with package name bar
 `

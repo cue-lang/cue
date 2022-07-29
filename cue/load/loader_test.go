@@ -232,8 +232,8 @@ display:./imports
 files:
 	$CWD/testdata/imports/imports.cue
 imports:
-	acme.com/catch: $CWD/testdata/cue.mod/pkg/acme.com/catch/catch.cue
-	acme.com/helper:helper1: $CWD/testdata/cue.mod/pkg/acme.com/helper/helper1.cue`,
+	mod.test/catch: $CWD/testdata/cue.mod/pkg/mod.test/catch/catch.cue
+	mod.test/helper:helper1: $CWD/testdata/cue.mod/pkg/mod.test/helper/helper1.cue`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./toolonly"),
@@ -358,7 +358,7 @@ func TestOverlays(t *testing.T) {
 	c := &Config{
 		Overlay: map[string]Source{
 			// Not necessary, but nice to add.
-			abs("cue.mod"): FromString(`module: "acme.com"`),
+			abs("cue.mod"): FromString(`module: "mod.test"`),
 
 			abs("dir/top.cue"): FromBytes([]byte(`
 			   package top

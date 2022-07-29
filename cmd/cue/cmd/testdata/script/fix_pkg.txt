@@ -8,7 +8,7 @@ cmp cue.mod/pkg/foobar.org/notimported/notimported.cue expect/cue.mod/pkg/foobar
 cmp cue.mod/gen/foobar.org/imported/imported.cue expect/cue.mod/gen/foobar.org/imported/imported.cue
 
 -- cue.mod/module.cue --
-module: "acme.com"
+module: "mod.test"
 -- cue.mod/pkg/foobar.org/notimported/notimported.cue --
 package notimported
 
@@ -26,7 +26,7 @@ Bar :: {
 package bar
 
 import (
-    "acme.com/foo"
+    "mod.test/foo"
     "foobar.org/imported"
 )
 
@@ -58,7 +58,7 @@ c: [Def.b]: int
 package bar
 
 import (
-	"acme.com/foo"
+	"mod.test/foo"
 	"foobar.org/imported"
 )
 

@@ -1,13 +1,13 @@
 -- in.cue --
 package foo
 
-import "acme.com/pkg"
+import "mod.test/pkg"
 
 a: pkg.#A
 a: _val:  3
 a: _#val: 6
 -- cue.mod/module.cue --
-module: "acme.com"
+module: "mod.test"
 -- pkg/pkg.cue --
 package pkg
 
@@ -18,7 +18,7 @@ package pkg
 -- out/definition --
 package foo
 
-import "acme.com/pkg"
+import "mod.test/pkg"
 
 a: pkg.#A & {
 	_val:  3

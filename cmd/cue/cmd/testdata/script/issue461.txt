@@ -1,7 +1,7 @@
 cue cmd writefile
 
 -- cue.mod/module.cue --
-module: "mod.com"
+module: "mod.test"
 -- expect-hello --
 Hello, world!
 -- x_tool.cue --

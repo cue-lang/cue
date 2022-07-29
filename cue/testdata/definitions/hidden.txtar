@@ -1,11 +1,11 @@
 cue eval ./pkg:foo
 
 -- cue.mod/module.cue --
-module: "example.com"
+module: "mod.test"
 -- in.cue --
 package foo
 
-import "example.com/pkg"
+import "mod.test/pkg"
 
 #def: {
 	_name: d: int
@@ -46,7 +46,7 @@ Result:
     }
   }
   d: (#struct){
-    _val(example.com/pkg): (#struct){
+    _val(mod.test/pkg): (#struct){
       f: (int){ 3 }
     }
     _name(:foo): (struct){
@@ -58,7 +58,7 @@ Result:
   }
   e: (_|_){
     // [eval]
-    _val(example.com/pkg): (#struct){
+    _val(mod.test/pkg): (#struct){
       f: (int){ 3 }
     }
     _name(:foo): (_|_){
@@ -76,7 +76,7 @@ Result:
     }
   }
   f: (#struct){
-    _val(example.com/pkg): (#struct){
+    _val(mod.test/pkg): (#struct){
       f: (int){ 3 }
     }
     _val(:foo): (struct){
@@ -95,7 +95,7 @@ Result:
       d: int
     }
   }
-  d: (〈import;"example.com/pkg"〉.#D & {
+  d: (〈import;"mod.test/pkg"〉.#D & {
     _name: {
       d: int
     }
@@ -103,7 +103,7 @@ Result:
       f: 4
     }
   })
-  e: ((〈import;"example.com/pkg"〉.#D & 〈0;#def〉) & {
+  e: ((〈import;"mod.test/pkg"〉.#D & 〈0;#def〉) & {
     _name: {
       c: int
     }
@@ -111,7 +111,7 @@ Result:
       g: int
     }
   })
-  f: (〈import;"example.com/pkg"〉.#D & {
+  f: (〈import;"mod.test/pkg"〉.#D & {
     _val: {
       f: 4
     }

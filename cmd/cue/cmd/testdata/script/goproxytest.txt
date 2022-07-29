@@ -1,12 +1,12 @@
 # Basic test to ensure that the goproxytest instance used by various testscript
 # tests works as expected.
 
-go get example.com/blah
+go get externalmod.test/blah
 go mod tidy
 cmp go.mod go.mod.golden
 
 -- go.mod --
-module rubbish
+module test
 
 go 1.14
 -- main.go --
@@ -15,15 +15,15 @@ package main
 import (
 	"fmt"
 
-	"example.com/blah"
+	"externalmod.test/blah"
 )
 
 func main() {
 	fmt.Println(blah.Orange)
 }
 -- go.mod.golden --
-module rubbish
+module test
 
 go 1.14
 
-require example.com/blah v1.0.0
+require externalmod.test/blah v1.0.0

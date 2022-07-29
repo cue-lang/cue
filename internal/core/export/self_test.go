@@ -33,7 +33,7 @@ import (
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
 	"cuelang.org/go/internal/types"
-	"github.com/rogpeppe/go-internal/txtar"
+	"golang.org/x/tools/txtar"
 )
 
 func TestSelfContained(t *testing.T) {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "797fad3d_80332c29",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-29T14:49:29Z",
+      "side": 1,
+      "message": "Actually, I just noticed there are plenty of instances of example.com and acme.com - will fix those as well.",
+      "revId": "aedb4f4e3b7cfdcbc5df27c23e807be359a51f10",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

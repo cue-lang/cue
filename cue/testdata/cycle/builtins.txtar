@@ -8,7 +8,7 @@ import "regexp"
 // builtin, effectively the entire struct needs to be evaluated and special care
 // should be taking to not evaluate too early.
 builtinCyclePerm0: {
-	X: "example.com"
+	X: "mod.test"
 
 	Y: {
 		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
@@ -26,7 +26,7 @@ builtinCyclePerm1: {
 		host:        #components.host
 	}
 
-	X: "example.com"
+	X: "mod.test"
 }
 
 builtinCyclePerm2: {
@@ -36,7 +36,7 @@ builtinCyclePerm2: {
 	}
 
 	X: Y.host
-	X: "example.com"
+	X: "mod.test"
 }
 
 builtinCyclePerm3: {
@@ -45,12 +45,12 @@ builtinCyclePerm3: {
 		host:        #components.host
 	}
 
-	X: "example.com"
+	X: "mod.test"
 	X: Y.host
 }
 
 builtinCyclePerm4: {
-	X: "example.com"
+	X: "mod.test"
 	X: Y.host
 
 	Y: {
@@ -61,7 +61,7 @@ builtinCyclePerm4: {
 
 builtinCyclePerm5: {
 	X: Y.host
-	X: "example.com"
+	X: "mod.test"
 
 	Y: {
 		#components: regexp.FindNamedSubmatch(#"^(?P<host>[[:alnum:].]+)$"#, X)
@@ -71,57 +71,57 @@ builtinCyclePerm5: {
 -- out/eval --
 (struct){
   builtinCyclePerm0: (struct){
-    X: (string){ "example.com" }
+    X: (string){ "mod.test" }
     Y: (struct){
       #components: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      host: (string){ "example.com" }
+      host: (string){ "mod.test" }
     }
   }
   builtinCyclePerm1: (struct){
-    X: (string){ "example.com" }
+    X: (string){ "mod.test" }
     Y: (struct){
       #components: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      host: (string){ "example.com" }
+      host: (string){ "mod.test" }
     }
   }
   builtinCyclePerm2: (struct){
     Y: (struct){
       #components: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      host: (string){ "example.com" }
+      host: (string){ "mod.test" }
     }
-    X: (string){ "example.com" }
+    X: (string){ "mod.test" }
   }
   builtinCyclePerm3: (struct){
     Y: (struct){
       #components: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      host: (string){ "example.com" }
+      host: (string){ "mod.test" }
     }
-    X: (string){ "example.com" }
+    X: (string){ "mod.test" }
   }
   builtinCyclePerm4: (struct){
-    X: (string){ "example.com" }
+    X: (string){ "mod.test" }
     Y: (struct){
       #components: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      host: (string){ "example.com" }
+      host: (string){ "mod.test" }
     }
   }
   builtinCyclePerm5: (struct){
-    X: (string){ "example.com" }
+    X: (string){ "mod.test" }
     Y: (struct){
       #components: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      host: (string){ "example.com" }
+      host: (string){ "mod.test" }
     }
   }
 }
@@ -129,7 +129,7 @@ builtinCyclePerm5: {
 --- in.cue
 {
   builtinCyclePerm0: {
-    X: "example.com"
+    X: "mod.test"
     Y: {
       #components: 〈import;regexp〉.FindNamedSubmatch("^(?P<host>[[:alnum:].]+)$", 〈1;X〉)
       host: 〈0;#components〉.host
@@ -142,7 +142,7 @@ builtinCyclePerm5: {
       #components: 〈import;regexp〉.FindNamedSubmatch("^(?P<host>[[:alnum:].]+)$", 〈1;X〉)
       host: 〈0;#components〉.host
     }
-    X: "example.com"
+    X: "mod.test"
   }
   builtinCyclePerm2: {
     Y: {
@@ -150,18 +150,18 @@ builtinCyclePerm5: {
       host: 〈0;#components〉.host
     }
     X: 〈0;Y〉.host
-    X: "example.com"
+    X: "mod.test"
   }
   builtinCyclePerm3: {
     Y: {
       #components: 〈import;regexp〉.FindNamedSubmatch("^(?P<host>[[:alnum:].]+)$", 〈1;X〉)
       host: 〈0;#components〉.host
     }
-    X: "example.com"
+    X: "mod.test"
     X: 〈0;Y〉.host
   }
   builtinCyclePerm4: {
-    X: "example.com"
+    X: "mod.test"
     X: 〈0;Y〉.host
     Y: {
       #components: 〈import;regexp〉.FindNamedSubmatch("^(?P<host>[[:alnum:].]+)$", 〈1;X〉)
@@ -170,7 +170,7 @@ builtinCyclePerm5: {
   }
   builtinCyclePerm5: {
     X: 〈0;Y〉.host
-    X: "example.com"
+    X: "mod.test"
     Y: {
       #components: 〈import;regexp〉.FindNamedSubmatch("^(?P<host>[[:alnum:].]+)$", 〈1;X〉)
       host: 〈0;#components〉.host

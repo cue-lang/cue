@@ -1,11 +1,11 @@
 cue eval ./pkg:foo
 
 -- cue.mod/module.cue --
-module: "example.com"
+module: "mod.test"
 -- in.cue --
 package test
 
-import pkg2 "example.com/foo/pkg1"
+import pkg2 "mod.test/foo/pkg1"
 
 #pkg1: pkg2.Object
 
@@ -22,7 +22,7 @@ Object: "World"
 -- out/definition --
 package test
 
-import pkg2 "example.com/foo/pkg1"
+import pkg2 "mod.test/foo/pkg1"
 
 "Hello \(#pkg1)!"
 #pkg1: pkg2.Object

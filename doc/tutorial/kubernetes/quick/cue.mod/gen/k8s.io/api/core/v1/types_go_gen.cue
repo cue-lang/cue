@@ -4897,7 +4897,7 @@ import (
 
 	// loadBalancerClass is the class of the load balancer implementation this Service belongs to.
 	// If specified, the value of this field must be a label-style identifier, with an optional prefix,
-	// e.g. "internal-vip" or "example.com/internal-vip". Unprefixed names are reserved for end-users.
+	// e.g. "internal-vip" or "mod.test/internal-vip". Unprefixed names are reserved for end-users.
 	// This field can only be set when the Service type is 'LoadBalancer'. If not set, the default load
 	// balancer implementation is used, today this is typically done through the cloud provider integration,
 	// but should apply for any default implementation. If set, it is assumed that a load balancer

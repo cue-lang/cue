@@ -42,11 +42,11 @@ configMap: authproxy: {
 
 		## Google Apps Domains to allow authentication for
 		google_apps_domains = [
-		    \"example.com\",
+		    \"mod.test\",
 		]
 
 		email_domains = [
-		    \"example.com\",
+		    \"mod.test\",
 		]
 
 		## The Google OAuth Client ID, Secret

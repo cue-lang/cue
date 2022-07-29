@@ -2,7 +2,7 @@ cue cmd foo
 cmp stdout cue_cmd_foo_both.golden
 
 -- cue.mod/module.cue --
-module: "example.org/test"
+module: "mod.test/test"
 -- sub/sub.cue --
 package sub
 
@@ -13,7 +13,7 @@ package x
 import (
  "tool/cli"
 
- "example.org/test/sub"
+ "mod.test/test/sub"
 )
 
 command: foo: cli.Print & {

@@ -5,12 +5,12 @@ cue def --inline-imports
 cmp stdout out-stdout-expand
 
 -- cue.mod/module.cue --
-module: "example.com/a"
+module: "mod.test/a"
 
 -- in.cue --
 package a
 
-import "example.com/a/pkg"
+import "mod.test/a/pkg"
 import "list"
 
 v: pkg.v
@@ -27,7 +27,7 @@ v: { x: 3, y: x }
 package a
 
 import (
-	"example.com/a/pkg"
+	"mod.test/a/pkg"
 	"list"
 )
 

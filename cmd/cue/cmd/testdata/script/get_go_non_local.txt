@@ -16,14 +16,14 @@ cmp cue.mod/gen/example.com/blah/blah_gen.cue cue.mod/gen/example.com/blah/blah_
 cmp go.mod go.mod.golden
 
 -- cue.mod/module.cue --
-module: "mod.com/blah"
+module: "mod.test/blah"
 
 -- go.mod --
-module mod.com/blah
+module mod.test/blah
 
 go 1.14
 -- go.mod.golden --
-module mod.com/blah
+module mod.test/blah
 
 go 1.14
 

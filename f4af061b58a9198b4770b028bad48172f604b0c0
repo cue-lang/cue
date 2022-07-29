@@ -16,6 +16,24 @@
       "message": "nit: this three-line pattern could be extracted.",
       "revId": "f4af061b58a9198b4770b028bad48172f604b0c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87be4089_59b8019c",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-29T04:22:38Z",
+      "side": 1,
+      "message": "Done, also elsewhere. Using innerExpr gives a bit more fine-grained control. For instance, now it inlining is allowed in disjunctions.",
+      "parentUuid": "1c96af32_5133bbfd",
+      "revId": "f4af061b58a9198b4770b028bad48172f604b0c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

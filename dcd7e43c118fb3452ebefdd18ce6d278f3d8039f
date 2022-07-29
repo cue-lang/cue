@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dc76186_85818ed8",
+        "filename": "internal/core/export/label.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-29T04:49:17Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0fd7fa76_c8dfee35",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b1e083b_65eda7a9",
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "let expressions are scoped locally, so they can never clash, even within the same package.\n\nInlining preserves semantics.\n\nThe only difference is that hidden fields are no longer available through introspecting via the API. But that is fine, IMO, and better than the alternatives.",
       "parentUuid": "7b1e083b_65eda7a9",
+      "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6af81c7a_9ab88b6b",
+        "filename": "internal/core/export/label.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-07-29T04:49:17Z",
+      "side": 1,
+      "message": "The tests now cover this case-ish, by unifying the original (sub) value (which may have different hidden fields), with the value that was the result of the pivotter.",
+      "parentUuid": "a3c67d91_b9b8643d",
       "revId": "dcd7e43c118fb3452ebefdd18ce6d278f3d8039f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

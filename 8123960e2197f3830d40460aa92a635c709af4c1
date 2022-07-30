@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e15d01f_c689e69a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-07-30T21:15:17Z",
+      "side": 1,
+      "message": "FYI Paul, per our chat on Friday. I tested this manually as you can see on the commit message.",
+      "revId": "8123960e2197f3830d40460aa92a635c709af4c1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

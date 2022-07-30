@@ -22,9 +22,6 @@ jobs:
           - macos-11
           - windows-2022
     runs-on: ${{ matrix.os }}
-    defaults:
-      run:
-        shell: bash
     steps:
       - name: Install Go
         uses: actions/setup-go@v3

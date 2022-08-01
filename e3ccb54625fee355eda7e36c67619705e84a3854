@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2135ccba_dfea1116",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-01T09:25:55Z",
+      "side": 1,
+      "message": "FYI Paul, the ci/test push is running at https://github.com/cue-lang/cue/runs/7608259475?check_suite_focus\u003dtrue",
+      "revId": "e3ccb54625fee355eda7e36c67619705e84a3854",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

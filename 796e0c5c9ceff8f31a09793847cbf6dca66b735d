@@ -16,6 +16,23 @@
       "message": "I just realised that a handful of other pkg/... packages have basically the same setup, they just weren\u0027t being noisy because they use `gofmt -s -w .`. These are all almost entirely copy pasted. Any thoughts?",
       "revId": "796e0c5c9ceff8f31a09793847cbf6dca66b735d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80acfdf3_c90c698d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-01T12:03:04Z",
+      "side": 1,
+      "message": "Hm, I could piggyback off of Rog\u0027s pkg/gen program, and place each package godoc in a text file inside each package, like pkgdoc.txt.",
+      "revId": "796e0c5c9ceff8f31a09793847cbf6dca66b735d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

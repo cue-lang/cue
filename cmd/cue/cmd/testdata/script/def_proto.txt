@@ -47,7 +47,7 @@ import "google/protobuf/timestamp.proto";
 
 package acme.api.v1;
 
-option go_package = "acme.com/api/v1";
+option go_package = "mod.test/api/v1";
 
 
 // Attributes defines attributes.

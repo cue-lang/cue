@@ -195,7 +195,7 @@ large: {
 	p1: {
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 
 		X: #X.userinfo + #X.host + #X.port
@@ -238,7 +238,7 @@ large: {
 
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 
 		#X: {
@@ -297,7 +297,7 @@ large: {
 
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 
 		Y: {
@@ -340,7 +340,7 @@ large: {
 
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 
 		Y: {
@@ -493,9 +493,9 @@ large: {
         // [cycle] large.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
         //     ./in.cue:226:7
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       #X: (_|_){
         // [cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
         //     ./in.cue:202:7
@@ -503,19 +503,19 @@ large: {
         //     ./in.cue:205:7
         userinfo: (string){ "user@" }
         port: (string){ "" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         port: (string){ "" }
         userinfo: (string){ "user" }
       }
     }
     p2: (struct){
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         port: (_|_){
           // [cycle] large.p2.Y: undefined field: port:
           //     ./in.cue:267:10
@@ -524,10 +524,10 @@ large: {
       #X: (#struct){
         userinfo: (string){ "user@" }
         port: (string){ "" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (_|_){// (string){ "example.com" }
+        host: (_|_){// (string){ "mod.test" }
         }
         port: (_|_){// (string){ "" }
         }
@@ -536,7 +536,7 @@ large: {
       }
     }
     p3: (struct){
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       #X: (_|_){
         // [cycle] large.p3.Y: undefined field: port:
         //     ./in.cue:308:10
@@ -545,25 +545,25 @@ large: {
           // [cycle] large.p3.Y: undefined field: port:
           //     ./in.cue:308:10
         }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         port: (_|_){
           // [cycle] large.p3.Y: undefined field: port:
           //     ./in.cue:308:10
         }
       }
       #Y: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         port: (_|_){// (string){ "" }
         }
         userinfo: (string){ "user" }
       }
     }
     p4: (struct){
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       #X: (_|_){
         // [cycle] large.p4.Y: undefined field: port:
         //     ./in.cue:351:10
@@ -572,16 +572,16 @@ large: {
           // [cycle] large.p4.Y: undefined field: port:
           //     ./in.cue:351:10
         }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         port: (string){ "" }
         userinfo: (string){ "user" }
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         port: (_|_){
           // [cycle] large.p4.Y: undefined field: port:
           //     ./in.cue:351:10
@@ -734,7 +734,7 @@ large: {
     p1: {
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
       X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
       #X: {
@@ -767,7 +767,7 @@ large: {
       X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
       #X: {
         if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
@@ -814,7 +814,7 @@ large: {
       }
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
       Y: {
         if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
@@ -847,7 +847,7 @@ large: {
       #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
       Y: {
         if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {

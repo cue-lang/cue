@@ -146,10 +146,10 @@ func compileT(t *testing.T, r *cue.Runtime, s string) cue.Value {
 func TestHidden(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
-module: "example.com"
+module: "mod.test"
 
 -- in.cue --
-import "example.com/foo"
+import "mod.test/foo"
 
 a: foo.C
 b: _c
@@ -174,7 +174,7 @@ _d: 3
 		pkg  string
 	}{{
 		path: cue.ParsePath("a"),
-		pkg:  "example.com/foo",
+		pkg:  "mod.test/foo",
 	}, {
 		path: cue.ParsePath("b"),
 		pkg:  "_",

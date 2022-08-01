@@ -102,7 +102,7 @@ var needFix = map[string]string{
 func TestX(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
-module: "example.com"
+module: "mod.test"
 
 -- in.cue --
 	`

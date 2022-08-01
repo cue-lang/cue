@@ -6,6 +6,7 @@ name: TryBot
     branches:
       - trybot/*/*
       - master
+      - ci/test
     tags-ignore:
       - v*
   pull_request: {}
@@ -57,15 +58,15 @@ jobs:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
-      - if: ${{ github.ref == 'refs/heads/master' }}
+      - if: github.ref == 'refs/heads/master' || github.ref == 'refs/heads/ci/test'
         run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'
         name: Generate
         run: go generate ./...
-      - if: ${{ github.ref == 'refs/heads/master' || matrix.go-version != '1.18.x' || matrix.os != 'ubuntu-20.04' }}
+      - if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/ci/test') || !( matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' )
         name: Test
         run: go test ./...
-      - if: ${{ matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04' }}
+      - if: matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'
         name: Test with -race
         run: go test -race ./...
       - if: matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04'
@@ -73,7 +74,7 @@ jobs:
         run: go vet ./...
       - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
-      - if: ${{ github.ref == 'refs/heads/master' }}
+      - if: (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/ci/test') && (matrix.go-version == '1.18.x' && matrix.os == 'ubuntu-20.04')
         name: Pull this commit through the proxy on master
         run: |-
           v=$(git rev-parse HEAD)

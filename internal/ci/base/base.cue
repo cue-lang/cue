@@ -27,12 +27,16 @@ import (
 
 #repositoryURL:                string
 #defaultBranch:                string
+#testDefaultBranch:            "ci/test"
 #botGitHubUser:                string
 #botGitHubUserTokenSecretsKey: string
 
 // #isDefaultBranch is an expression that evaluates to true if the
-// job is running as a result of a master commit push
-#isDefaultBranch: "github.ref == 'refs/heads/\(#defaultBranch)'"
+// job is running as a result of pushing to the default branch, like master.
+// For the sake of testing CI, pushes to #testDefaultBranch branch also match.
+// It would be nice to use the "contains" builtin for simplicity,
+// but array literals are not yet supported in expressions.
+#isDefaultBranch: "github.ref == 'refs/heads/\(#defaultBranch)' || github.ref == 'refs/heads/\(#testDefaultBranch)'"
 
 #bashWorkflow: json.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"

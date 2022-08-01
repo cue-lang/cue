@@ -66,6 +66,11 @@ _#linuxMachine:   "ubuntu-20.04"
 _#macosMachine:   "macos-11"
 _#windowsMachine: "windows-2022"
 
+// #_isLatestLinux evaluates to true if the job is running on Linux with the
+// latest version of Go. This expression is often used to run certain steps
+// just once per CI workflow, to avoid duplicated work.
+#_isLatestLinux: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+
 _#goreleaserVersion: "v1.8.2"
 
 _#testStrategy: {

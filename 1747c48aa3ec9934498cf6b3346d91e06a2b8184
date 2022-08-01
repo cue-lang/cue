@@ -16,6 +16,24 @@
       "message": "This does not appear to significantly conflict with other current chains of CLs so I think we can submit this now without fear of creating work via complex rebases. \n\nI\u0027m assuming we\u0027ll rely on human review to catch future instances of non .test domains sneaking through?",
       "revId": "1747c48aa3ec9934498cf6b3346d91e06a2b8184",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49382cb3_86288a6d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-01T08:48:55Z",
+      "side": 1,
+      "message": "Yeah, I would say so. I was going to test and submit this, and then I realised master is broken :) fixing that first, to be safe.",
+      "parentUuid": "b6f71386_bafd6f86",
+      "revId": "1747c48aa3ec9934498cf6b3346d91e06a2b8184",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

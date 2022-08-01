@@ -23,6 +23,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"go/format"
 	"io/ioutil"
 	"os"
 )
@@ -52,11 +53,11 @@ package tool
 `
 
 func main() {
-	f, _ := os.Create("doc.go")
-	defer f.Close()
 	b, _ := ioutil.ReadFile("tool.cue")
 	i := bytes.Index(b, []byte("package tool"))
 	b = b[i+len("package tool")+1:]
 	b = bytes.ReplaceAll(b, []byte("\n"), []byte("\n//     "))
-	fmt.Fprintf(f, msg, string(b))
+	b = []byte(fmt.Sprintf(msg, b))
+	b, _ = format.Source(b)
+	os.WriteFile("doc.go", b, 0o666)
 }

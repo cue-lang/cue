@@ -13,10 +13,10 @@ cmp root/cue.mod/gen/googleapis.com/acme/test/test_proto_gen.cue expect-test_pro
 Skipping file "cue.mod/gen/googleapis.com/acme/test/test/test_proto_gen.cue": already exists.
 Use -Rf to override.
 -- root/cue.mod/module.cue --
-module: "acme.com/api"
+module: "acme.test/api"
 
 -- root/cue.mod/module.cue --
-module: "acme.com/api"
+module: "acme.test/api"
 
 -- root/cue.mod/gen/googleapis.com/acme/test/test/test_proto_gen.cue --
 package test_test
@@ -33,7 +33,7 @@ import "acme/test/test.proto";
 
 package acme.mixer.v1;
 
-option go_package = "acme.com/api/mixer/v1";
+option go_package = "acme.test/api/mixer/v1";
 
 // Attributes defines attributes.
 message Attributes {
@@ -79,7 +79,7 @@ import "mixer/v1/attributes.proto";
 // Describes the configuration state for the Mixer client library that's built into Envoy.
 package acme.mixer.v1.config.client;
 
-option go_package = "acme.com/api/mixer/v1/config/client";
+option go_package = "acme.test/api/mixer/v1/config/client";
 
 // Defines the per-service client configuration.
 message ServiceConfig {
@@ -230,7 +230,7 @@ import (
 // Describes the configuration state for the Mixer client library that's built into Envoy.
 package client
 
-import "acme.com/api/mixer/v1"
+import "acme.test/api/mixer/v1"
 
 // Defines the per-service client configuration.
 #ServiceConfig: {

@@ -130,7 +130,7 @@ medium: {
 	p1: {
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 
 		// X: "user@example.com"
@@ -138,7 +138,7 @@ medium: {
 
 		#X: {
 			// userinfo: "user@"
-			// host:     "example.com"
+			// host:     "mod.test"
 
 			if Y.userinfo == _|_ {
 				userinfo: ""
@@ -152,7 +152,7 @@ medium: {
 
 		Y: {
 			// userinfo: "user"
-			// host:     "example.com"
+			// host:     "mod.test"
 
 			if #Y.userinfo != _|_ {
 				userinfo: #Y.userinfo
@@ -169,7 +169,7 @@ medium: {
 
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 
 		#X: {
@@ -210,7 +210,7 @@ medium: {
 
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 
 		Y: {
@@ -250,7 +250,7 @@ medium: {
 
 		Y: {
 			userinfo: "user"
-			host:     "example.com"
+			host:     "mod.test"
 		}
 	}
 }
@@ -318,60 +318,60 @@ medium: {
     p1: (struct){
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       #X: (#struct){
         userinfo: (string){ "user@" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         userinfo: (string){ "user" }
       }
     }
     p2: (struct){
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #X: (#struct){
         userinfo: (string){ "user@" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         userinfo: (string){ "user" }
       }
     }
     p3: (struct){
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       #X: (#struct){
         userinfo: (string){ "user@" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         userinfo: (string){ "user" }
       }
     }
     p4: (struct){
-      X: (string){ "user@example.com" }
+      X: (string){ "user@mod.test" }
       #X: (#struct){
         userinfo: (string){ "user@" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (string){ "example.com" }
+        host: (string){ "mod.test" }
         userinfo: (string){ "user" }
       }
     }
@@ -466,7 +466,7 @@ medium: {
     p1: {
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
       X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
       #X: {
@@ -490,7 +490,7 @@ medium: {
       X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
       #X: {
         if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
@@ -522,7 +522,7 @@ medium: {
       }
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
       Y: {
         if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
@@ -552,7 +552,7 @@ medium: {
       #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
       Y: {
         userinfo: "user"
-        host: "example.com"
+        host: "mod.test"
       }
     }
   }

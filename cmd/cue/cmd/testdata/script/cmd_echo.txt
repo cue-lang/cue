@@ -5,7 +5,7 @@ cue cmd echohidden
 stdout 'Hello World!'
 
 -- cue.mod/module.cue --
-module: "example.com/foo"
+module: "mod.test/foo"
 
 -- data.cue --
 package hello

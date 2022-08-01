@@ -1,15 +1,15 @@
 -- cue.mod/module.cue --
-module: "mod.com"
+module: "mod.test"
 -- a.cue --
 package a
 
-import "mod.com/b"
+import "mod.test/b"
 
 theb: b.name
 -- b/b.cue --
 package b
 
-import "mod.com/c"
+import "mod.test/c"
 
 b: c.c & {
 	other: "name"
@@ -21,7 +21,7 @@ package c
 -- out/compile --
 --- a.cue
 {
-  theb: 〈import;"mod.com/b"〉.name
+  theb: 〈import;"mod.test/b"〉.name
 }
 -- out/eval --
 (struct){

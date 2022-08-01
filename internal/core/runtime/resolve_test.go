@@ -24,7 +24,7 @@ import (
 // TestPartiallyResolved tests that the resolve will detect the usage of
 // imports that are referenced by previously resolved nodes.
 func TestPartiallyResolved(t *testing.T) {
-	const importPath = "acme.com/foo"
+	const importPath = "mod.test/foo"
 	spec1 := &ast.ImportSpec{
 		Path: ast.NewString(importPath),
 	}

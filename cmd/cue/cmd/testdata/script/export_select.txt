@@ -1,4 +1,4 @@
-cue export .:foo example.org/bar:baz
+cue export .:foo mod.test/bar:baz
 
 cmp stdout expect-stdout
 -- cue.mod/module.cue --
@@ -20,7 +20,7 @@ b: 1
 {
     "c": 1
 }
--- cue.mod/gen/example.org/bar/bar.cue --
+-- cue.mod/gen/mod.test/bar/bar.cue --
 package baz
 
 c:1

@@ -16,6 +16,24 @@
       "message": "How does this work (or not) with our plan to move away from bash-based workflows?\n\nAlso, should we link to the Go issue that captures a \"better\" fix for this?",
       "revId": "150fd253ea5f5fac431c53011087597aaa13bb93",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b81643c_55444ac2",
+        "filename": ".github/workflows/trybot.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-01T06:47:18Z",
+      "side": 1,
+      "message": "This is all firmly sh/bash, so there\u0027s no intent to have it work on Windows. I think that\u0027s fine because we just need it to run once per push to master, so we just need it to run on ubuntu + Go latest.\n\nThis doesn\u0027t happen right now, but if/when we remove bash as the default shell everywhere, we can adjust this step to only run on that one job.\n\nThe only reasonably portable alternative with logic like this would IMO be to rewrite in Go, but I think that\u0027s unnecessary.",
+      "parentUuid": "07bfd0ea_02653942",
+      "revId": "150fd253ea5f5fac431c53011087597aaa13bb93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

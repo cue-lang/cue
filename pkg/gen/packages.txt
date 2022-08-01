@@ -17,6 +17,7 @@ crypto/sha512
 crypto/md5
 crypto/sha1
 crypto/hmac
+tool
 tool/os
 tool/cli
 tool/exec

@@ -1,11 +1,11 @@
 -- cue.mod/module.cue --
-module: "example.org/test"
+module: "mod.test/test"
 -- sub/sub.cue --
 package sub
 
 User: "sub"
 -- in.cue --
-import "example.org/test/sub"
+import "mod.test/test/sub"
 
 root: {
 	a: {

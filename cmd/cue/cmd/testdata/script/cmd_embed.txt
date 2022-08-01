@@ -35,9 +35,9 @@ stdout 'hello, world'
 }
 -- cue.mod/module.cue --
 module: ""
--- cue.mod/pkg/example.com/hello/cue.mod/module.cue --
-module: "example.com/hello"
--- cue.mod/pkg/example.com/hello/hello.cue --
+-- cue.mod/pkg/mod.test/hello/cue.mod/module.cue --
+module: "mod.test/hello"
+-- cue.mod/pkg/mod.test/hello/hello.cue --
 package hello
 
 import "tool/cli"
@@ -49,7 +49,7 @@ command: hello: task: hello: cli.Print & {
 package x
 import (
 	"tool/cli"
-	"example.com/hello"
+	"mod.test/hello"
 )
 
 hello
@@ -61,7 +61,7 @@ command: hello1: task: hello: cli.Print & {
 package x
 import (
 	"tool/cli"
-	"example.com/hello"
+	"mod.test/hello"
 )
 
 // This should pull in the hello task.

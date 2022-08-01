@@ -149,7 +149,7 @@ func doDiff(t *testing.T, v, w cue.Value) {
 func TestSC(t *testing.T) {
 	in := `
 -- cue.mod/module.cue --
-module: "example.com/a"
+module: "mod.test/a"
 
 -- in.cue --
 	`

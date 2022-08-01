@@ -1,7 +1,7 @@
 cue eval --out json x.cue
 
 -- cue.mod/module.cue --
-module: "mod.com"
+module: "mod.test"
 -- x.cue --
 package x
 

@@ -15,6 +15,13 @@ stdin intro-spaces-stdin
 cue cmd intro
 cmp stdout intro-spaces-stdout
 
+# Run a command with exec.Run which doesn't actually read stdin,
+# but still passes through stdin to os/exec per exec.Run's default.
+# This will hang unless the task's stdin is an os.File,
+# as otherwise io.Copy does not finish; see https://go.dev/issue/7990.
+cue_stdinpipe cmd noreads
+cmp stdout noreads-stdout
+
 -- echo-stdin --
 Hello World!
 -- echo-stdout --
@@ -33,11 +40,14 @@ Extra input that shouldn't be used.
 -- intro-spaces-stdout --
 What is your name? Where do you live? 
 Your full name is   John  Doe   and you live in 	Capital City.
+-- noreads-stdout --
+not reading any stdin
 -- hello_tool.cue --
 package hello
 
 import (
 	"tool/cli"
+	"tool/exec"
 )
 
 command: echo: {
@@ -68,6 +78,12 @@ command: intro: {
 
 	results: cli.Print & {
 		text: "\nYour full name is \(askName.response) and you live in \(askPlace.response)."
+	}
+}
+
+command: noreads: {
+	first: exec.Run & {
+		cmd: ["echo", "not reading any stdin"]
 	}
 }
 -- cue.mod --

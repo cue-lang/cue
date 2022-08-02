@@ -175,11 +175,21 @@ func TestX(t *testing.T) {
 }
 
 func TestMain(m *testing.M) {
-	// Setting inTest causes filenames printed in error messages
-	// to be normalized so the output looks the same on Unix
-	// as Windows.
 	os.Exit(testscript.RunMain(m, map[string]func() int{
 		"cue": MainTest,
+		"cue_stdinpipe": func() int {
+			cwd, _ := os.Getwd()
+			if err := mainTestStdinPipe(); err != nil {
+				if err != ErrPrintedError { // print errors like Main
+					errors.Print(os.Stderr, err, &errors.Config{
+						Cwd:     cwd,
+						ToSlash: inTest,
+					})
+				}
+				return 1
+			}
+			return 0
+		},
 		"testcmd": func() int {
 			if err := testCmd(); err != nil {
 				fmt.Fprintln(os.Stderr, err)
@@ -202,6 +212,23 @@ func homeEnvName() string {
 	default:
 		return "HOME"
 	}
+}
+
+func mainTestStdinPipe() error {
+	// Like MainTest, but sets stdin to a pipe,
+	// to emulate stdin reads like a terminal.
+	inTest = true
+	cmd, err := New(os.Args[1:])
+	if err != nil {
+		return err
+	}
+	pr, pw, err := os.Pipe()
+	if err != nil {
+		return err
+	}
+	cmd.SetInput(pr)
+	_ = pw // we don't write to stdin at all, for now
+	return cmd.Run(context.Background())
 }
 
 func testCmd() error {

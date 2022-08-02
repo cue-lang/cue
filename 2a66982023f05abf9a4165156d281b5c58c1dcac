@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "59fca8c7_9aa998ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:34:12Z",
+      "side": 1,
+      "message": "It\u0027s arguably also a correctness thing (as in, it may result in a different time complexity).",
+      "parentUuid": "ff962bd0_e8f9a4d5",
+      "revId": "2a66982023f05abf9a4165156d281b5c58c1dcac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0ca8d134_00489549",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-06-21T12:57:33Z",
       "side": 1,
       "message": "Is that a TODO? Also, it would be nice to have a description of what we\u0027re doing here.",
+      "revId": "2a66982023f05abf9a4165156d281b5c58c1dcac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae619e3e_fc16a51d",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 214,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:34:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcbfd3bc_6ec6cd18",
       "revId": "2a66982023f05abf9a4165156d281b5c58c1dcac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

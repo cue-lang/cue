@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "135940cc_bd7437e5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T16:00:41Z",
+      "side": 1,
+      "message": "Looks pretty good, thanks! One thing that might be a bug and a suggestion for keeping the prod code a bit slimmer.",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13d55f27_7929258a",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T16:00:41Z",
+      "side": 1,
+      "message": "It seems to me like a bit of a pity to pollute the prod code with such specific test-related code. Another possibility might be to add another, more generic global variable, e.g.\n\n```\n// testCmdInit is used for test-related initialization of the command.\nvar testCmdInit \u003d func(*Command) {}\n```\n\nThen set that inside `MainTest` to use the logic below(in fact, maybe better just to move `MainTest` directly into `script_test.go`).\n\nAnother possibility might be go with the above approach but avoid the env var and just use another named entry point (e.g. `cue_stdinpipe`). Then it would be clearer that this logic is only used by a single test.",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44a31e15_1e20a590",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T16:00:41Z",
+      "side": 1,
+      "message": "What if it returns (1, io.EOF) and the character that\u0027s been read is a delimiter?\n\nI think you probably want to process any character read before looking at err.",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1bd1b6ab_bc025312",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T16:00:41Z",
+      "side": 1,
+      "message": "This makes me a bit wary of having a reader that continually returns (0, nil), but I guess in practice we can be sure that it\u0027s going to be a *os.File which will never do that.",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61e8b123_0354519a",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T16:00:41Z",
+      "side": 1,
+      "message": "I\u0027m slightly surprised that this doesn\u0027t deal with \\r\\n line endings, but given that the old logic used ReadString(\u0027\\n\u0027) I guess it\u0027s OK.",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -55,6 +55,36 @@ func newAskCmd(v cue.Value) (task.Runner, error) {
 	return &askCmd{}, nil
 }
 
+// readLine is akin to bufio.Reader.ReadString('\n'),
+// but it avoids the need for a buffered reader.
+// This is important because we want to use os.Stdin directly for os/exec,
+// as without an os.File it will copy bytes in a goroutine,
+// causing problems like https://go.dev/issue/7990.
+//
+// Since we don't need '\n' to be included in the resulting string,
+// we exclude it directly, unlike bufio.Reader.ReadString.
+// For consistent behavior on Windows, we also skip '\r'.
+func readLine(r io.Reader) (string, error) {
+	var p [1]byte
+	var b strings.Builder
+	for {
+		n, err := r.Read(p[:])
+		if n == 1 {
+			if p[0] == '\n' {
+				s := b.String()
+				if s[len(s)-1] == '\r' {
+					s = s[:len(s)-1] // treat CRLF line endings as if they were LF
+				}
+				return s, err // err might or might not be nil
+			}
+			b.WriteByte(p[0])
+		}
+		if err != nil {
+			return b.String(), err
+		}
+	}
+}
+
 func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	str := ctx.String("prompt")
 	if ctx.Err != nil {
@@ -64,14 +94,8 @@ func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		fmt.Fprint(ctx.Stdout, str+" ")
 	}
 
-	response, err := ctx.Stdin.ReadString('\n')
-	switch err {
-	case nil:
-		// Answer with a newline; remove the trailing newline.
-		response = response[:len(response)-1]
-	case io.EOF:
-		// Answer without a newline.
-	default:
+	response, err := readLine(ctx.Stdin)
+	if err != nil && err != io.EOF { // we are fine with an answer ending with EOF
 		return nil, err
 	}
 

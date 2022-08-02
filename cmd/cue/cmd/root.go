@@ -123,6 +123,9 @@ For more information on writing CUE configuration files see cuelang.org.`,
 
 // MainTest is like Main, runs the cue tool and returns the code for passing to os.Exit.
 func MainTest() int {
+	// Setting inTest causes filenames printed in error messages
+	// to be normalized so the output looks the same on Unix
+	// as Windows.
 	inTest = true
 	return Main()
 }

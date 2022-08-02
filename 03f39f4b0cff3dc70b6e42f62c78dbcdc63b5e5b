@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e65b4da0_0ad0b9c4",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25461400_1cc0c24b",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7d6263d_02379d12",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-06-27T16:35:57Z",
       "side": 1,
       "message": "References are accumulated as follows.\n\n?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "350534fd_56cb6dee",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7d6263d_02379d12",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +111,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "218de2d5_23fd2946",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f338780f_14b2dc52",
+      "range": {
+        "startLine": 105,
+        "startChar": 0,
+        "endLine": 113,
+        "endChar": 0
+      },
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b731230_b3abe75f",
@@ -88,6 +148,24 @@
       "writtenOn": "2022-06-27T16:35:57Z",
       "side": 1,
       "message": "Resolver instance ? Resolver value ? (just to make it clear that we\u0027re talking about the Resolver interface here)",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e214f122_568d7928",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "It is an instance of a Resolver interface.",
+      "parentUuid": "8b731230_b3abe75f",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -128,6 +206,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "690f61f8_5b1f4de7",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "I believe I meant the JSON hierarchy. The traversal hierarchy is already implied by mentioning \"associated references\". Added a note.",
+      "parentUuid": "687b19f1_f3e0297e",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "eb77cb59_7b97a7f8",
         "filename": "internal/core/adt/cycle.go",
         "patchSetId": 4
@@ -139,6 +235,24 @@
       "writtenOn": "2022-06-27T16:35:57Z",
       "side": 1,
       "message": "I\u0027m struggling to understand this. It seems to be saying that if there\u0027s one conjunct for a field that isn\u0027t cyclic, the field doesn\u0027t have a structural cycle. That seems odd to me, but I must be missing something.",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fee7ac3d_e7eb7316",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Yes. As long as there is one conjunct that is not cyclic, evaluation may still terminate. For instance:\n```\n#list: { v: _, next: #list | * null }\n\nlist: #list\nlist: {v: 1, next: {v: 2, next: {v: 3, next: null}}\n```\nHere a cycle will be detected as #list is referencing itself. But the evaluation will still terminate.",
+      "parentUuid": "eb77cb59_7b97a7f8",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -162,6 +276,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cb024c61_425ff6b4",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Just made it a paragraph.",
+      "parentUuid": "ae041e5a_e78afea5",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "559b9bbf_d551dce7",
         "filename": "internal/core/adt/cycle.go",
         "patchSetId": 4
@@ -173,6 +305,24 @@
       "writtenOn": "2022-06-27T16:35:57Z",
       "side": 1,
       "message": "that it is... ?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab195d22_9b6e7464",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "This whole remainder of the section doesn\u0027t make much sense. So I removed most of it.",
+      "parentUuid": "559b9bbf_d551dce7",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -196,6 +346,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9dbdfef3_6ea3e13b",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Ditto",
+      "parentUuid": "0df1ea59_bde96242",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "935f2218_3a1fcdb2",
         "filename": "internal/core/adt/cycle.go",
         "patchSetId": 4
@@ -207,6 +375,24 @@
       "writtenOn": "2022-06-27T16:35:57Z",
       "side": 1,
       "message": "The below is a bit hard to interpret, and could perhaps use some work?",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8393c2fc_afd02e45",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "935f2218_3a1fcdb2",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -228,6 +414,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45fa48ce_2a06a306",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 254,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf77a37e_0867980a",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb3d79fa_0564c857",
@@ -245,6 +449,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95d5ab08_badf469b",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 266,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Done.\n\nUsually arc is a node to which something points.",
+      "parentUuid": "bb3d79fa_0564c857",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "636cae56_1e105a0d",
@@ -258,6 +480,24 @@
       "writtenOn": "2022-06-27T16:35:57Z",
       "side": 1,
       "message": "been found.",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc7705ee_b446e519",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "636cae56_1e105a0d",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

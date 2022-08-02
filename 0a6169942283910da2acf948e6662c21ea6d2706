@@ -16,6 +16,24 @@
       "message": "There\u0027s an extra `-` on the line below. Maybe just put it all one one line? Also, there\u0027s a spurious \"is\".\n\n- note that this also activates the same reference in other (parent) conjuncts\n?",
       "revId": "0a6169942283910da2acf948e6662c21ea6d2706",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f50816d_8a4f67fa",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-02T04:33:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "15d48d48_7d89d08e",
+      "revId": "0a6169942283910da2acf948e6662c21ea6d2706",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

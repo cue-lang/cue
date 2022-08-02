@@ -17,10 +17,8 @@ package cmd
 // This file contains code or initializing and running custom commands.
 
 import (
-	"bufio"
 	"context"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
@@ -31,7 +29,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal/task"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
@@ -186,38 +183,7 @@ var legacyKinds = map[string]string{
 	"testserver": "cmd/cue/cmd.Test",
 }
 
-type sequentialReader struct {
-	mu   sync.Mutex
-	bufr *bufio.Reader
-}
-
-func (r *sequentialReader) Read(p []byte) (int, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.bufr.Read(p)
-}
-
-func (r *sequentialReader) WriteTo(w io.Writer) (int64, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.bufr.WriteTo(w)
-}
-
-func (r *sequentialReader) ReadString(delim byte) (string, error) {
-	r.mu.Lock()
-	defer r.mu.Unlock()
-	return r.bufr.ReadString(delim)
-}
-
-var _ task.StdinReader = (*sequentialReader)(nil)
-
 func newTaskFunc(cmd *Command) flow.TaskFunc {
-	// stdin, stdout, and stderr are used throughout all tasks.
-	// We especially want to use a single buffered reader for stdin.
-	stdin := &sequentialReader{bufr: bufio.NewReader(cmd.InOrStdin())}
-	stdout := cmd.OutOrStdout()
-	stderr := cmd.OutOrStderr()
-
 	return func(v cue.Value) (flow.Runner, error) {
 		if !isTask(v) {
 			return nil, nil
@@ -256,9 +222,9 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		return flow.RunnerFunc(func(t *flow.Task) error {
 			c := &itask.Context{
 				Context: t.Context(),
-				Stdin:   stdin,
-				Stdout:  stdout,
-				Stderr:  stderr,
+				Stdin:   cmd.InOrStdin(),
+				Stdout:  cmd.OutOrStdout(),
+				Stderr:  cmd.OutOrStderr(),
 				Obj:     t.Value(),
 			}
 			value, err := runner.Run(c)

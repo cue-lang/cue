@@ -18,6 +18,7 @@ package cli
 //go:generate gofmt -s -w .
 
 import (
+	"bufio"
 	"fmt"
 	"io"
 	"strings"
@@ -55,6 +56,17 @@ func newAskCmd(v cue.Value) (task.Runner, error) {
 	return &askCmd{}, nil
 }
 
+type oneByteReader struct {
+	r io.Reader
+}
+
+func (r *oneByteReader) Read(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+	return r.r.Read(p[:1])
+}
+
 func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	str := ctx.String("prompt")
 	if ctx.Err != nil {
@@ -64,14 +76,20 @@ func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		fmt.Fprint(ctx.Stdout, str+" ")
 	}
 
-	response, err := ctx.Stdin.ReadString('\n')
-	switch err {
-	case nil:
-		// Answer with a newline; remove the trailing newline.
-		response = response[:len(response)-1]
-	case io.EOF:
-		// Answer without a newline.
-	default:
+	// Roger is convinced that bufio.Scanner will only issue as many reads
+	// as it needs, so that limiting it to one-byte reads should be enough
+	// to not read any bytes after a newline.
+	// This behavior is true today but technically not documented,
+	// so Roger will send a CL to properly document it.
+	//
+	// TODO(mvdan): come back to remove this notice once Roger's CL is
+	// approved, or to rewrite the code if it is rejected.
+	scanner := bufio.NewScanner(&oneByteReader{ctx.Stdin})
+	var response string
+	if scanner.Scan() {
+		response = scanner.Text()
+	}
+	if err := scanner.Err(); err != nil {
 		return nil, err
 	}
 

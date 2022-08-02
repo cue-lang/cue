@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f0052d7_31d585da",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T17:03:10Z",
+      "side": 0,
+      "message": "Thanks for removing this remnant.",
+      "revId": "5a08d2f7a9a7595def05c5486cbb5276e66391cb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

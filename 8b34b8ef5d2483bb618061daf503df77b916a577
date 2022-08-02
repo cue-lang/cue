@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b38d954_246e6143",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T17:03:10Z",
+      "side": 1,
+      "message": "Thanks for doing this. Definitely a good idea. LGTM modulo one suggestion.",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dc30b29_60ad51a0",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T17:03:10Z",
+      "side": 1,
+      "message": "Rather than assuming that the CUE file is named after the package, could we instead do the same thing as processCUE, which already ends up with the string that we\u0027re wanting here? That feels like less of a hack (and then we\u0027re free to spread definitions out over multiple files as we\u0027d expect to be able to do normally).",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b18eb76_cae803bf",
+        "filename": "pkg/tool/pkg.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-02T17:03:10Z",
+      "side": 1,
+      "message": "This wasn\u0027t available for import before AFAICS. Are we sure we want to add it?",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

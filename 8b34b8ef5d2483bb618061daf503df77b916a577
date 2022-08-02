@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ee34f20d_5d755e7d",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-02T21:06:17Z",
+      "side": 1,
+      "message": "I gave this a try, and it sort of works. I had to remove the ToExpr bit, because I don\u0027t want the whole package as a struct literal - I don\u0027t want the {} around all declarations.\n\nThe comments are gone for some reason. I didn\u0027t quickly spot why.\n\nSome of the syntax also ends up slightly different; e.g. `$id: \u003d~#\"\\.\"#` turns into `$id:     \u003d~\"\\\\.\"`. That\u0027s not wrong per se, but also unnecessary churn.\n\nIf you\u0027re convinced this is the right way, I\u0027m happy to push to a branch and you can play with it. But I imagine it\u0027s not worth our time and we should leave it as a TODO for the future. This change isn\u0027t making things any worse, that I can see.",
+      "parentUuid": "9dc30b29_60ad51a0",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1b18eb76_cae803bf",
         "filename": "pkg/tool/pkg.go",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2022-08-02T17:03:10Z",
       "side": 1,
       "message": "This wasn\u0027t available for import before AFAICS. Are we sure we want to add it?",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "efa8a205_5ea92643",
+        "filename": "pkg/tool/pkg.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-02T21:06:17Z",
+      "side": 1,
+      "message": "See the commit message. I\u0027m not 100% sure whether this is a good or bad idea, but beyond what I wrote in the commit, it\u0027s worth noting that we wouldn\u0027t loop over that package otherwise - meaning no generation.\n\nI guess we could add another special case to the generate loop, to not generate the `Register` line for this package, though I think it\u0027s best to avoid special cases if we can.\n\nWe can always leave it to Paul or Marcel if we\u0027re not sure :)",
+      "parentUuid": "1b18eb76_cae803bf",
       "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

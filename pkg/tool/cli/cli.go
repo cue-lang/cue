@@ -55,6 +55,32 @@ func newAskCmd(v cue.Value) (task.Runner, error) {
 	return &askCmd{}, nil
 }
 
+// readDelim is akin to bufio.Reader.ReadString,
+// but it avoids the need for a buffered reader.
+// This is important because we want to use os.Stdin directly for os/exec,
+// as without an os.File it will copy bytes in a goroutine,
+// causing problems like https://go.dev/issue/7990.
+//
+// Since we don't need the delimiter to be included in the resulting string,
+// we exclude it directly, unlike bufio.Reader.ReadString.
+func readDelim(r io.Reader, delim byte) (string, error) {
+	var p [1]byte
+	var b strings.Builder
+	for {
+		n, err := r.Read(p[:])
+		if err != nil {
+			return b.String(), err
+		}
+		if n == 0 {
+			continue // we didn't read anything
+		}
+		if p[0] == delim {
+			return b.String(), nil
+		}
+		b.WriteByte(p[0])
+	}
+}
+
 func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	str := ctx.String("prompt")
 	if ctx.Err != nil {
@@ -64,13 +90,10 @@ func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		fmt.Fprint(ctx.Stdout, str+" ")
 	}
 
-	response, err := ctx.Stdin.ReadString('\n')
+	response, err := readDelim(ctx.Stdin, '\n')
 	switch err {
-	case nil:
-		// Answer with a newline; remove the trailing newline.
-		response = response[:len(response)-1]
-	case io.EOF:
-		// Answer without a newline.
+	case nil: // Answer ends with a newline.
+	case io.EOF: // Answer ends with EOF.
 	default:
 		return nil, err
 	}

@@ -148,6 +148,14 @@ func mainErr(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
+	if inTest && os.Getenv("CUE_TEST_STDIN_PIPE") == "1" {
+		pr, pw, err := os.Pipe()
+		if err != nil {
+			return err
+		}
+		cmd.SetInput(pr)
+		_ = pw // we don't write to stdin at all, for now
+	}
 	return cmd.Run(ctx)
 }
 

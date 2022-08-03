@@ -62,34 +62,67 @@ b.let[]: cyclic references in let clause or alias:
 --- in.cue
 {
   a: {
-    b: 〈0;let X〉
+    let X#1 = 〈0;let Y#2〉
+    let Y#2 = 〈0;c〉
+    b: 〈0;let X#1〉
     c: 5
   }
   b: {
-    b: 〈0;let X〉
+    let X#3 = 〈0;let Y#4〉
+    let Y#4 = 〈0;let X#3〉
+    b: 〈0;let X#3〉
     c: 5
   }
   fieldOffset: {
     a: {
       p1: {
-        x: 〈0;let X〉
+        let X#5 = {
+          value: 〈1;let Y#6〉
+        }
+        let Y#6 = 2
+        x: 〈0;let X#5〉
       }
       p2: {
-        x: 〈0;let X〉
+        x: 〈0;let X#8〉
+        let Y#7 = 2
+        let X#8 = {
+          value: 〈1;let Y#7〉
+        }
       }
     }
     b: {
       p1: {
-        x: 〈0;let X〉
+        let X#9 = {
+          x: {
+            y: 〈2;let Y#A〉
+          }
+        }
+        let Y#A = 2
+        x: 〈0;let X#9〉
       }
       p2: {
-        x: 〈0;let X〉
+        x: 〈0;let X#C〉
+        let Y#B = 2
+        let X#C = {
+          x: {
+            y: 〈2;let Y#B〉
+          }
+        }
       }
     }
   }
   issue767: {
     #Foo: {
-      out: 〈0;let _#volmnts〉
+      let _#bar#D = {
+        value: ""
+      }
+      let _#volmnts#E = {
+        x: 〈1;let _#baz#F〉.value
+      }
+      let _#baz#F = {
+        〈1;let _#bar#D〉
+      }
+      out: 〈0;let _#volmnts#E〉
     }
   }
 }

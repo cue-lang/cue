@@ -67,11 +67,16 @@ b:
 -- out/eval --
 (struct){
   #Foo: (#struct){
+    let X#1 = (_|_){
+      // [incomplete] empty list in call to or:
+      //     ./in.cue:2:10
+    }
     connection: (#struct){
     }
   }
   #A: (#struct){
     foo: (string){ "key" }
+    let X#2 = (string){ "key" }
     a: (#struct){
       foo: (#struct){
       }
@@ -79,6 +84,7 @@ b:
   }
   #B: (#struct){
     foo: (string){ string }
+    let X#3 = (string){ string }
     a: (#struct){
       foo: (#struct){
       }
@@ -86,6 +92,7 @@ b:
   }
   b: (#struct){
     foo: (string){ "key" }
+    let X#3 = (string){ "key" }
     a: (#struct){
       foo: (#struct){
       }
@@ -96,23 +103,30 @@ b:
 --- in.cue
 {
   #Foo: {
+    let X#1 = or([
+      for k, _ in {} {
+        〈1;k〉
+      },
+    ])
     connection: {
-      [〈1;let X〉]: 〈1;let X〉
+      [〈1;let X#1〉]: 〈1;let X#1〉
     }
   }
   #A: {
     foo: "key"
+    let X#2 = 〈0;foo〉
     a: {
       foo: {
-        [〈2;let X〉]: 〈2;let X〉
+        [〈2;let X#2〉]: 〈2;let X#2〉
       }
     }
   }
   #B: {
     foo: string
+    let X#3 = 〈0;foo〉
     a: {
       foo: {
-        [〈2;let X〉]: 〈2;let X〉
+        [〈2;let X#3〉]: 〈2;let X#3〉
       }
     }
   }

@@ -60,6 +60,9 @@ type StringIndexer interface {
 
 	// ToString returns a string s for index such that ToIndex(s) == index.
 	IndexToString(index int64) string
+
+	// NextUniqueID returns a new unique identifier.
+	NextUniqueID() uint64
 }
 
 // SelectorString reports the shortest string representation of f when used as a
@@ -90,7 +93,7 @@ func (f Feature) SelectorString(index StringIndexer) string {
 // is not an identifier label.
 func (f Feature) IdentString(index StringIndexer) string {
 	s := index.IndexToString(f.safeIndex())
-	if f.IsHidden() {
+	if f.IsHidden() || f.IsLet() {
 		if p := strings.IndexByte(s, '\x00'); p >= 0 {
 			s = s[:p]
 		}
@@ -117,6 +120,12 @@ func (f Feature) StringValue(index StringIndexer) string {
 	if !f.IsString() {
 		panic("not a string label")
 	}
+	x := f.safeIndex()
+	return index.IndexToString(x)
+}
+
+// RawString reports the underlying string value of f without interpretation.
+func (f Feature) RawString(index StringIndexer) string {
 	x := f.safeIndex()
 	return index.IndexToString(x)
 }
@@ -185,6 +194,23 @@ func HiddenKey(s, pkgPath string) string {
 func MakeNamedLabel(r StringIndexer, t FeatureType, s string) Feature {
 	i := r.StringToIndex(s)
 	f, err := MakeLabel(nil, i, t)
+	if err != nil {
+		panic("out of free string slots")
+	}
+	return f
+}
+
+// MakeLetLabel creates a label for the given let identifier s.
+//
+// A let declaration is always logically unique within its scope and will never
+// unify with a let field of another struct. This is enforced by ensuring that
+// the let identifier is unique across an entire configuration. This, in turn,
+// is done by adding a unique number to each let identifier.
+func MakeLetLabel(r StringIndexer, s string) Feature {
+	id := r.NextUniqueID()
+	s = fmt.Sprintf("%s\x00%X", s, id)
+	i := r.StringToIndex(s)
+	f, err := MakeLabel(nil, i, LetLabel)
 	if err != nil {
 		panic("out of free string slots")
 	}
@@ -294,6 +320,7 @@ const (
 	DefinitionLabel
 	HiddenLabel
 	HiddenDefinitionLabel
+	LetLabel
 )
 
 const (
@@ -308,6 +335,10 @@ func (f FeatureType) IsDef() bool {
 
 func (f FeatureType) IsHidden() bool {
 	return f == HiddenLabel || f == HiddenDefinitionLabel
+}
+
+func (f FeatureType) IsLet() bool {
+	return f == LetLabel
 }
 
 // IsValid reports whether f is a valid label.
@@ -338,6 +369,11 @@ func (f Feature) IsInt() bool { return f.Typ() == IntLabel }
 // _ or #_).
 func (f Feature) IsHidden() bool {
 	return f.Typ().IsHidden()
+}
+
+// IsLet reports whether this label is a let field (like `let X = value`).
+func (f Feature) IsLet() bool {
+	return f.Typ().IsLet()
 }
 
 // Index reports the abstract index associated with f.

@@ -24,18 +24,104 @@ b: {
 	a: T
 	b: F
 }
+issue1828: {
+	volumes: L3
+
+	let L3 = {
+		for v2 in [ for v1 in L2 {} ] {}
+	}
+
+	let L2 = L1
+	let L1 = []
+}
+ignoreErrorInLet: {
+	let X = 1 & 2
+	disjunction: *X | 3
+}
 -- out/eval --
 (struct){
+  let A#1 = (int){ 9 }
+  let B#2 = (int){ 18 }
+  let C#3 = (int){ 36 }
+  let D#4 = (int){ 72 }
+  let E#5 = (int){ 144 }
+  let F#6 = (int){ 288 }
   b: (struct){
+    let G#7 = (int){ 576 }
+    let H#8 = (int){ 1152 }
+    let I#9 = (int){ 2304 }
+    let J#A = (int){ 4608 }
+    let K#B = (int){ 9216 }
+    let L#C = (int){ 18432 }
+    let M#D = (int){ 36864 }
+    let N#E = (int){ 73728 }
+    let O#F = (int){ 147456 }
+    let P#10 = (int){ 294912 }
+    let Q#11 = (int){ 589824 }
+    let R#12 = (int){ 1179648 }
+    let S#13 = (int){ 2359296 }
+    let T#14 = (int){ 4718592 }
     a: (int){ 4718592 }
     b: (int){ 288 }
+  }
+  issue1828: (struct){
+    volumes: (struct){
+    }
+    let L3#15 = (struct){
+    }
+    let L2#16 = (#list){
+    }
+    let L1#17 = (#list){
+    }
+  }
+  ignoreErrorInLet: (struct){
+    let X#18 = (_|_){
+      // [eval] ignoreErrorInLet.X: conflicting values 2 and 1:
+      //     ./in.cue:37:10
+      //     ./in.cue:37:14
+    }
+    disjunction: (int){ 3 }
   }
 }
 -- out/compile --
 --- in.cue
 {
+  let A#1 = (3 * 3)
+  let B#2 = (〈0;let A#1〉 + 〈0;let A#1〉)
+  let C#3 = (〈0;let B#2〉 + 〈0;let B#2〉)
+  let D#4 = (〈0;let C#3〉 + 〈0;let C#3〉)
+  let E#5 = (〈0;let D#4〉 + 〈0;let D#4〉)
+  let F#6 = (〈0;let E#5〉 + 〈0;let E#5〉)
   b: {
-    a: 〈0;let T〉
-    b: 〈1;let F〉
+    let G#7 = (〈1;let F#6〉 + 〈1;let F#6〉)
+    let H#8 = (〈0;let G#7〉 + 〈0;let G#7〉)
+    let I#9 = (〈0;let H#8〉 + 〈0;let H#8〉)
+    let J#A = (〈0;let I#9〉 + 〈0;let I#9〉)
+    let K#B = (〈0;let J#A〉 + 〈0;let J#A〉)
+    let L#C = (〈0;let K#B〉 + 〈0;let K#B〉)
+    let M#D = (〈0;let L#C〉 + 〈0;let L#C〉)
+    let N#E = (〈0;let M#D〉 + 〈0;let M#D〉)
+    let O#F = (〈0;let N#E〉 + 〈0;let N#E〉)
+    let P#10 = (〈0;let O#F〉 + 〈0;let O#F〉)
+    let Q#11 = (〈0;let P#10〉 + 〈0;let P#10〉)
+    let R#12 = (〈0;let Q#11〉 + 〈0;let Q#11〉)
+    let S#13 = (〈0;let R#12〉 + 〈0;let R#12〉)
+    let T#14 = (〈0;let S#13〉 + 〈0;let S#13〉)
+    a: 〈0;let T#14〉
+    b: 〈1;let F#6〉
+  }
+  issue1828: {
+    volumes: 〈0;let L3#15〉
+    let L3#15 = {
+      for _, v2 in [
+        for _, v1 in 〈2;let L2#16〉 {},
+      ] {}
+    }
+    let L2#16 = 〈0;let L1#17〉
+    let L1#17 = []
+  }
+  ignoreErrorInLet: {
+    let X#18 = (1 & 2)
+    disjunction: (*〈0;let X#18〉|3)
   }
 }

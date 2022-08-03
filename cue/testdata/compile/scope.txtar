@@ -68,10 +68,14 @@ let _schema_1 = schema
       b: 〈1;-〉
     }
   }
-  f: 〈0;let B〉
-  schema: {
-    next: 〈1;let _schema_1〉
+  let B#1 = {
+    open: int
   }
+  f: 〈0;let B#1〉
+  schema: {
+    next: 〈1;let _schema_1#2〉
+  }
+  let _schema_1#2 = 〈0;schema〉
 }
 -- out/eval --
 Errors:
@@ -96,6 +100,9 @@ Result:
   c: (string){ "foo" }
   d: (struct){
   }
+  let B#1 = (struct){
+    open: (int){ int }
+  }
   f: (struct){
     open: (int){ int }
   }
@@ -104,5 +111,9 @@ Result:
     next: (_|_){
       // [structural cycle] schema.next: structural cycle
     }
+  }
+  let _schema_1#2 = (_|_){
+    // [structural cycle] _schema_1: structural cycle:
+    //     ./in.cue:32:8
   }
 }

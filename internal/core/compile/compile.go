@@ -141,7 +141,7 @@ func (c *compiler) path() []string {
 type frame struct {
 	label labeler  // path name leading to this frame.
 	scope ast.Node // *ast.File or *ast.Struct
-	field *ast.Field
+	field ast.Decl
 	// scope   map[ast.Node]bool
 	upCount int32 // 1 for field, 0 for embedding.
 
@@ -250,6 +250,7 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	// Excluded from cross-file resolution are:
 	// - import specs
 	// - aliases
+	// - let declarations
 	// - anything in an anonymous file
 	//
 	for _, f := range a {
@@ -792,12 +793,12 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 	}
 }
 
-func (c *compiler) labeledExpr(f *ast.Field, lab labeler, expr ast.Expr) adt.Expr {
+func (c *compiler) labeledExpr(f ast.Decl, lab labeler, expr ast.Expr) adt.Expr {
 	k := len(c.stack) - 1
 	return c.labeledExprAt(k, f, lab, expr)
 }
 
-func (c *compiler) labeledExprAt(k int, f *ast.Field, lab labeler, expr ast.Expr) adt.Expr {
+func (c *compiler) labeledExprAt(k int, f ast.Decl, lab labeler, expr ast.Expr) adt.Expr {
 	if c.stack[k].field != nil {
 		panic("expected nil field")
 	}

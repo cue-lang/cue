@@ -51,7 +51,10 @@ V: #S & {
         d: int
       }
     }
-    b: 〈0;let B〉
+    let B#4C = {
+      open: int
+    }
+    b: 〈0;let B#4C〉
   }
   V: (〈0;#S〉 & {
     c: {
@@ -85,6 +88,9 @@ Result:
     a: (#struct){
       c: (int){ int }
     }
+    let B#1 = (#struct){
+      open: (int){ int }
+    }
     b: (#struct){
       open: (int){ int }
     }
@@ -104,6 +110,9 @@ Result:
     }
     a: (#struct){
       c: (int){ int }
+    }
+    let B#1 = (#struct){
+      open: (int){ int }
     }
     b: (_|_){
       // [eval]

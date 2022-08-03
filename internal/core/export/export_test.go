@@ -269,34 +269,6 @@ func TestX(t *testing.T) {
 
 	in := `
 -- in.cue --
-package test
-
-// // Foo
-// a: [X=string]: [Y=string]: {
-// 	name: X+Y
-// }
-
-// [Y=string]: [X=string]: name: {Y+X}
-// {
-// 	name:  X.other + Y
-// 	other: string
-// }
-
-// c: [X=string]: X
-
-// #pkg1: Object
-
-// "Hello \(#pkg1)!"
-
-
-// Object: "World"
-
-// // A Foo fooses stuff.
-// foos are instances of Foo.
-// foos: [string]: {}
-
-// // // My first little foo.
-// foos: MyFoo: {}
 	`
 
 	archive := txtar.Parse([]byte(in))
@@ -308,7 +280,8 @@ package test
 	// x := a[0].Files[0]
 	// astutil.Sanitize(x)
 
-	r := runtime.New()
+	ctx := cuecontext.New()
+	r := (*runtime.Runtime)(ctx)
 	v, errs := compile.Files(nil, r, "", a[0].Files...)
 	if errs != nil {
 		t.Fatal(errs)

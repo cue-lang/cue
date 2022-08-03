@@ -218,20 +218,20 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 
 // markResolve resolves dependencies.
 func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
-	switch x := r.(type) {
-	case nil:
-	case *adt.LetReference:
-		saved := c.ctxt.PushState(env, nil)
-		env := c.ctxt.Env(x.UpCount)
-		c.markExpr(env, x.X)
-		c.ctxt.PopState(saved)
-		return
-	}
-
-	// Note: it is okay to pass an empty CloseInfo{} here as we assume that
-	// all nodes are finalized already and we need neither closedness nor cycle
-	// checks.
 	if ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r); ref != nil {
+		if ref.Label.IsLet() {
+			x := r.(*adt.LetReference)
+			saved := c.ctxt.PushState(env, nil)
+			env := c.ctxt.Env(x.UpCount)
+			c.markExpr(env, ref.Conjuncts[0].Expr())
+			c.ctxt.PopState(saved)
+			return
+		}
+
+		// Note: it is okay to pass an empty CloseInfo{} here as we assume that
+		// all nodes are finalized already and we need neither closedness nor cycle
+		// checks.
+
 		if ref != c.node && ref != empty {
 			d := Dependency{
 				Node:      ref,

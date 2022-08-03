@@ -153,6 +153,7 @@ type aliasEntry struct {
 	srcExpr ast.Expr
 	expr    adt.Expr
 	source  ast.Node
+	feature adt.Feature // For let declarations
 	used    bool
 }
 
@@ -202,6 +203,8 @@ func (c *compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 
 	switch {
 	case entry.label != nil:
+		// TODO: allow cyclic references in let expressions once these can be
+		// encoded as a ValueReference.
 		if entry.srcExpr == nil {
 			entry.expr = c.errf(id, "cyclic references in let clause or alias")
 			break
@@ -344,7 +347,10 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		upCount += c.upCountOffset
 		for p := c.Scope; p != nil; p = p.Parent() {
 			for _, a := range p.Vertex().Arcs {
-				if a.Label == label {
+				switch {
+				case a.Label.IsLet() && a.Label.IdentString(c.index) == n.Name:
+					label = a.Label
+				case a.Label == label:
 					return &adt.FieldReference{
 						Src:     n,
 						UpCount: upCount,
@@ -442,13 +448,14 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		if entry.expr == nil {
 			panic("unreachable")
 		}
+		label = entry.feature
 
 		// let x = y
 		return &adt.LetReference{
 			Src:     n,
 			UpCount: upCount,
 			Label:   label,
-			X:       entry.expr,
+			X:       entry.expr, // TODO: remove usage
 		}
 
 	// TODO: handle new-style aliases
@@ -525,10 +532,12 @@ func (c *compiler) markAlias(d ast.Decl) {
 		}
 
 	case *ast.LetClause:
+		f := adt.MakeLetLabel(c.index, x.Ident.Name)
 		a := aliasEntry{
 			label:   (*letScope)(x),
 			srcExpr: x.Expr,
 			source:  x,
+			feature: f,
 		}
 		c.insertAlias(x.Ident, a)
 
@@ -634,8 +643,28 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			}
 		}
 
-	// Handled in addLetDecl.
 	case *ast.LetClause:
+		m := c.stack[len(c.stack)-1].aliases
+		entry := m[x.Ident.Name]
+
+		v := x.Expr
+		var value adt.Expr
+
+		// A reference to the let should, in principle, be interpreted as a
+		// value reference, not field reference:
+		// - this is syntactically consistent for the use of =
+		// - this is semantically the only valid interpretation
+		// In practice this amounts to the same thing, as let expressions cannot
+		// be addressed from outside their scope. But it will matter once
+		// expressions may refer to a let from within the let.
+		value = c.labeledExpr(x, (*letScope)(x), v)
+
+		return &adt.LetField{
+			Src:   x,
+			Label: entry.feature,
+			Value: value,
+		}
+
 	// case: *ast.Alias: // TODO(value alias)
 
 	case *ast.CommentGroup:
@@ -664,16 +693,6 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 
 func (c *compiler) addLetDecl(d ast.Decl) {
 	switch x := d.(type) {
-	// An alias reference will have an expression that is looked up in the
-	// environment cash.
-	case *ast.LetClause:
-		// Cache the parsed expression. Creating a unique expression for each
-		// reference allows the computation to be shared given that we don't
-		// have fields for expressions. This, in turn, prevents exponential
-		// blowup in x2: x1+x1, x3: x2+x2,  ... patterns.
-		expr := c.labeledExpr(nil, (*letScope)(x), x.Expr)
-		c.updateAlias(x.Ident, expr)
-
 	case *ast.Field:
 		lab := x.Label
 		if a, ok := lab.(*ast.Alias); ok {
@@ -799,9 +818,6 @@ func (c *compiler) labeledExpr(f ast.Decl, lab labeler, expr ast.Expr) adt.Expr 
 }
 
 func (c *compiler) labeledExprAt(k int, f ast.Decl, lab labeler, expr ast.Expr) adt.Expr {
-	if c.stack[k].field != nil {
-		panic("expected nil field")
-	}
 	saved := c.stack[k]
 
 	c.stack[k].label = lab

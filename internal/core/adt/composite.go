@@ -91,6 +91,8 @@ type Environment struct {
 	// TODO(perf): make the following public fields a shareable struct as it
 	// mostly is going to be the same for child nodes.
 
+	// TODO: This can probably move into the nodeContext, making it a map from
+	// conjunct to Value.
 	cache map[Expr]Value
 }
 
@@ -103,8 +105,7 @@ func (e *Environment) up(count int32) *Environment {
 
 type ID int32
 
-// evalCached is used to look up let expressions. Caching let expressions
-// prevents a possible combinatorial explosion.
+// evalCached is used to look up dynamic field pattern constraint expressions.
 func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 	if v, ok := x.(Value); ok {
 		return v
@@ -162,6 +163,11 @@ type Vertex struct {
 	// case, for instance, if it is a node in a definition or if one of the
 	// conjuncts, or ancestor conjuncts, is a definition.
 	Closed bool
+
+	// MultiLet indicates whether multiple let fields were added from
+	// different sources. If true, a LetReference must be resolved using
+	// the per-Environment value cache.
+	MultiLet bool
 
 	// arcType indicates the level of optionality of this arc.
 	arcType arcType

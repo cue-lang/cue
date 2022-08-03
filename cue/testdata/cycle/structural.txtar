@@ -1293,6 +1293,10 @@ Result:
         // [structural cycle] withLetFail.schema.next: structural cycle
       }
     }
+    let _schema_1#1 = (_|_){
+      // [structural cycle] withLetFail._schema_1: structural cycle:
+      //     ./in.cue:355:17
+    }
   }
   listOptOK: (struct){
     list: (struct){
@@ -2227,8 +2231,9 @@ Result:
   }
   withLetFail: {
     schema: {
-      next: 〈1;let _schema_1〉
+      next: 〈1;let _schema_1#1〉
     }
+    let _schema_1#1 = 〈0;schema〉
   }
   listOptOK: {
     list: {

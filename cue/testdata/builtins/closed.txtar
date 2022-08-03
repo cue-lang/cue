@@ -81,6 +81,9 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
+            let X#1 = (#struct){
+              b: (bool){ true }
+            }
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -88,6 +91,9 @@ Result:
             }
           }, (#struct){
             a: (#struct){
+              b: (bool){ true }
+            }
+            let X#1 = (#struct){
               b: (bool){ true }
             }
             string: (#struct){
@@ -102,6 +108,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
+            let X#1 = 〈0;a〉 // multi
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -111,6 +118,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
+            let X#1 = 〈0;a〉 // multi
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -121,6 +129,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
+            let X#1 = 〈0;a〉 // multi
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -130,6 +139,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
+            let X#1 = 〈0;a〉 // multi
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -191,10 +201,11 @@ Result:
         a: {
           b: true
         }
+        let X#1 = 〈0;a〉
         (close({
           uint: {
             a: {
-              b: 〈3;let X〉.b
+              b: 〈3;let X#1〉.b
             }
           }
         })|close({

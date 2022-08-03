@@ -49,10 +49,9 @@ func TestEval(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	r := runtime.New()
-
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.Instance()
+		r := runtime.New()
 
 		v, err := r.Build(nil, a)
 		if err != nil {

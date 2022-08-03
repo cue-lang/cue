@@ -44,9 +44,8 @@ func TestCompile(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	r := runtime.New()
-
 	test.Run(t, func(t *cuetxtar.Test) {
+		r := runtime.New()
 		// TODO: use high-level API.
 
 		a := t.Instance()

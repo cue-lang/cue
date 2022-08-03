@@ -106,7 +106,10 @@ out: #sub & {#p: _test.s1}
       [string]: _
     }
     for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "complex") {
-      for sn, sd in 〈0;let subs〉.dict {
+      let subs#1 = (〈3;#sub〉 & {
+        #p: 〈2;rd〉.a
+      })
+      for sn, sd in 〈0;let subs#1〉.dict {
         dict: {
           "\(〈4;rn〉)_\(〈2;sn〉)": 〈2;sd〉
         }
@@ -401,6 +404,88 @@ out: #sub & {#p: _test.s1}
                         }
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    let subs#1 = (#struct){
+      dict: (#struct){
+        r1: (#struct){
+          a: (#struct){
+            k: (string){ "simple" }
+            d: (#struct){
+              n: (string){ "c1" }
+            }
+          }
+        }
+        r2_r1: (#struct){
+          a: (#struct){
+            k: (string){ "simple" }
+            d: (#struct){
+              n: (string){ "c1" }
+            }
+          }
+        }
+      }
+      #p: (#struct){
+        k: (string){ "complex" }
+        d: (#struct){
+          n: (string){ "s2" }
+          r: (#struct){
+            r1: (#struct){
+              a: (#struct){
+                k: (string){ "simple" }
+                d: (#struct){
+                  n: (string){ "c1" }
+                }
+              }
+            }
+            r2: (#struct){
+              a: (#struct){
+                k: (string){ "complex" }
+                d: (#struct){
+                  n: (string){ "s3" }
+                  r: (#struct){
+                    r1: (#struct){
+                      a: (#struct){
+                        k: (string){ "simple" }
+                        d: (#struct){
+                          n: (string){ "c1" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      let subs#1 = (#struct){
+        dict: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              k: (string){ "simple" }
+              d: (#struct){
+                n: (string){ "c1" }
+              }
+            }
+          }
+        }
+        #p: (#struct){
+          k: (string){ "complex" }
+          d: (#struct){
+            n: (string){ "s3" }
+            r: (#struct){
+              r1: (#struct){
+                a: (#struct){
+                  k: (string){ "simple" }
+                  d: (#struct){
+                    n: (string){ "c1" }
                   }
                 }
               }

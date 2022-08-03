@@ -48,6 +48,7 @@ func TestNilSource(t *testing.T) {
 		&Interpolation{},
 		&LabelReference{},
 		&LetClause{},
+		&LetField{},
 		&LetReference{},
 		&ListLit{},
 		&ListMarker{},

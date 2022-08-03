@@ -474,6 +474,21 @@ func (c *OpContext) Resolve(x Conjunct, r Resolver) (*Vertex, *Bottom) {
 	return arc, err
 }
 
+// Lookup looks up r in env without further resolving the value.
+func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
+	s := c.PushState(env, r.Source())
+
+	arc := r.resolve(c, Partial)
+
+	err := c.PopState(s)
+
+	if arc != nil {
+		arc = arc.Indirect()
+	}
+
+	return arc, err
+}
+
 // Validate calls validates value for the given validator.
 //
 // TODO(errors): return boolean instead: only the caller has enough information

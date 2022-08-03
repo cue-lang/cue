@@ -83,23 +83,26 @@ issue1116: {
       1
     },
   ]
-  a1: ((100 * 〈0;let A1〉[0]) + 〈0;let A1〉[0])
+  let A1#1 = 〈0;a1list〉
+  a1: ((100 * 〈0;let A1#1〉[0]) + 〈0;let A1#1〉[0])
   a2list: [
     {
       2
     },
   ]
+  let A2#2 = 〈0;a2list〉
   a2: {
-    b: ((100 * 〈1;let A2〉[0]) + 〈1;let A2〉[0])
+    b: ((100 * 〈1;let A2#2〉[0]) + 〈1;let A2#2〉[0])
   }
   a3list: [
     {
       3
     },
   ]
+  let A3#3 = 〈0;a3list〉
   a3: {
     b: {
-      c: ((100 * 〈2;let A3〉[0]) + 〈2;let A3〉[0])
+      c: ((100 * 〈2;let A3#3〉[0]) + 〈2;let A3#3〉[0])
     }
   }
   a4list: [
@@ -107,8 +110,9 @@ issue1116: {
       4
     },
   ]
+  let A4#4 = 〈0;a4list〉
   a4: [
-    for _, x in 〈1;let A4〉 {
+    for _, x in 〈1;let A4#4〉 {
       v: 404
     },
   ]
@@ -117,9 +121,10 @@ issue1116: {
       5
     },
   ]
+  let A5#5 = 〈0;a5list〉
   a5: {
     b: [
-      for _, x in 〈2;let A5〉 {
+      for _, x in 〈2;let A5#5〉 {
         v: 505
       },
     ]
@@ -129,10 +134,11 @@ issue1116: {
       6
     },
   ]
+  let A6#6 = 〈0;a6list〉
   a6: {
     b: {
       c: [
-        for _, x in 〈3;let A6〉 {
+        for _, x in 〈3;let A6#6〉 {
           v: 606
         },
       ]
@@ -143,8 +149,9 @@ issue1116: {
       7
     },
   ]
+  let A7#7 = 〈0;a7list〉
   a7: {
-    for _, x in 〈1;let A7〉 {
+    for _, x in 〈1;let A7#7〉 {
       v: 707
     }
   }
@@ -153,9 +160,10 @@ issue1116: {
       8
     },
   ]
+  let A8#8 = 〈0;a8list〉
   a8: {
     b: {
-      for _, x in 〈2;let A8〉 {
+      for _, x in 〈2;let A8#8〉 {
         v: 808
       }
     }
@@ -165,10 +173,11 @@ issue1116: {
       9
     },
   ]
+  let A9#9 = 〈0;a9list〉
   a9: {
     b: {
       c: {
-        for _, x in 〈3;let A9〉 {
+        for _, x in 〈3;let A9#9〉 {
           v: 909
         }
       }
@@ -187,8 +196,10 @@ issue1116: {
       max: 〈import;list〉.Max(〈1;input〉)
     }
     bar: {
-      min: 〈0;let mn〉
-      max: 〈0;let mx〉
+      let mn#A = 〈1;last〉.min
+      let mx#B = 〈import;list〉.max
+      min: 〈0;let mn#A〉
+      max: 〈0;let mx#B〉
     }
     x: {
       if (〈import;list〉.max < 0) {}
@@ -200,10 +211,12 @@ issue1116: {
         "a",
         "b",
       ]
-      〈0;let List〉[(len(〈0;let List〉) - 1)]
+      let List#C = 〈0;#a〉
+      〈0;let List#C〉[(len(〈0;let List#C〉) - 1)]
     }
     b: {
-      〈0;let List〉[(len(〈0;let List〉) - 1)]
+      let List#D = 〈0;#a〉
+      〈0;let List#D〉[(len(〈0;let List#D〉) - 1)]
       #a: [
         "a",
         "b",
@@ -216,14 +229,23 @@ issue1116: {
   a1list: (#list){
     0: (int){ 1 }
   }
+  let A1#1 = (#list){
+    0: (int){ 1 }
+  }
   a1: (int){ 101 }
   a2list: (#list){
+    0: (int){ 2 }
+  }
+  let A2#2 = (#list){
     0: (int){ 2 }
   }
   a2: (struct){
     b: (int){ 202 }
   }
   a3list: (#list){
+    0: (int){ 3 }
+  }
+  let A3#3 = (#list){
     0: (int){ 3 }
   }
   a3: (struct){
@@ -234,12 +256,18 @@ issue1116: {
   a4list: (#list){
     0: (int){ 4 }
   }
+  let A4#4 = (#list){
+    0: (int){ 4 }
+  }
   a4: (#list){
     0: (struct){
       v: (int){ 404 }
     }
   }
   a5list: (#list){
+    0: (int){ 5 }
+  }
+  let A5#5 = (#list){
     0: (int){ 5 }
   }
   a5: (struct){
@@ -250,6 +278,9 @@ issue1116: {
     }
   }
   a6list: (#list){
+    0: (int){ 6 }
+  }
+  let A6#6 = (#list){
     0: (int){ 6 }
   }
   a6: (struct){
@@ -264,10 +295,16 @@ issue1116: {
   a7list: (#list){
     0: (int){ 7 }
   }
+  let A7#7 = (#list){
+    0: (int){ 7 }
+  }
   a7: (struct){
     v: (int){ 707 }
   }
   a8list: (#list){
+    0: (int){ 8 }
+  }
+  let A8#8 = (#list){
     0: (int){ 8 }
   }
   a8: (struct){
@@ -276,6 +313,9 @@ issue1116: {
     }
   }
   a9list: (#list){
+    0: (int){ 9 }
+  }
+  let A9#9 = (#list){
     0: (int){ 9 }
   }
   a9: (struct){
@@ -298,6 +338,11 @@ issue1116: {
       max: (int){ 5 }
     }
     bar: (struct){
+      let mn#A = (int){ 1 }
+      let mx#B = (_|_){
+        // [incomplete] incompleteLet.bar.mx: undefined field: max:
+        //     ./in.cue:54:17
+      }
       min: (int){ 1 }
       max: (_|_){
         // [incomplete] incompleteLet.bar.max: undefined field: max:
@@ -316,9 +361,17 @@ issue1116: {
         0: (string){ "a" }
         1: (string){ "b" }
       }
+      let List#C = (#list){
+        0: (string){ "a" }
+        1: (string){ "b" }
+      }
     }
     b: (string){
       "b"
+      let List#D = (#list){
+        0: (string){ "a" }
+        1: (string){ "b" }
+      }
       #a: (#list){
         0: (string){ "a" }
         1: (string){ "b" }

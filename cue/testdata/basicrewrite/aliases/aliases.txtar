@@ -14,10 +14,12 @@ t1: {
 {
   t0: {
     _a: _
-    _out: 〈0;let _b〉
+    let _b#1 = 〈0;_a〉
+    _out: 〈0;let _b#1〉
   }
   t1: {
-    _a: 〈0;let b〉
+    _a: 〈0;let b#2〉
+    let b#2 = 〈0;d〉
     d: 3
   }
 }
@@ -25,10 +27,12 @@ t1: {
 (struct){
   t0: (struct){
     _a: (_){ _ }
+    let _b#1 = (_){ _ }
     _out: (_){ _ }
   }
   t1: (struct){
     _a: (int){ 3 }
+    let b#2 = (int){ 3 }
     d: (int){ 3 }
   }
 }

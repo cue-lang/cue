@@ -49,22 +49,38 @@ t2: {
     x: (struct){
       a: (int){ int }
       y: (struct){
+        let X#1 = (struct){
+          b: (int){ int }
+          c: (int){ 1 }
+        }
         v: (int){ 1 }
       }
     }
     x1: (struct){
       a: (int){ 1 }
       y: (struct){
+        let X#1 = (struct){
+          b: (int){ 1 }
+          c: (int){ 1 }
+        }
         v: (int){ 1 }
       }
     }
     x2: (struct){
       a: (int){ 2 }
       y: (struct){
+        let X#1 = (struct){
+          b: (int){ 2 }
+          c: (int){ 1 }
+        }
         v: (int){ 1 }
       }
     }
     xy: (struct){
+      let X#1 = {
+        b: 〈2;a〉
+        c: 1
+      } // multi
       v: (int){ 1 }
     }
   }
@@ -73,6 +89,11 @@ t2: {
       a: (struct){
       }
       y: (struct){
+        let X#2 = (struct){
+          b: (struct){
+          }
+          c: (int){ 1 }
+        }
         v: (int){ 1 }
       }
     }
@@ -81,6 +102,12 @@ t2: {
         q: (int){ 1 }
       }
       y: (struct){
+        let X#2 = (struct){
+          b: (struct){
+            q: (int){ 1 }
+          }
+          c: (int){ 1 }
+        }
         v: (int){ 1 }
       }
     }
@@ -89,6 +116,12 @@ t2: {
         r: (int){ 2 }
       }
       y: (struct){
+        let X#2 = (struct){
+          b: (struct){
+            r: (int){ 2 }
+          }
+          c: (int){ 1 }
+        }
         v: (int){ 1 }
       }
     }
@@ -98,6 +131,10 @@ t2: {
         r: (int){ 2 }
       }
       y: (struct){
+        let X#2 = {
+          b: 〈2;a〉
+          c: 1
+        } // multi
         v: (int){ 1 }
       }
     }
@@ -110,7 +147,11 @@ t2: {
     x: {
       a: int
       y: {
-        v: 〈0;let X〉.c
+        let X#1 = {
+          b: 〈2;a〉
+          c: 1
+        }
+        v: 〈0;let X#1〉.c
       }
     }
     x1: 〈0;x〉
@@ -127,7 +168,11 @@ t2: {
     x: {
       a: {}
       y: {
-        v: 〈0;let X〉.c
+        let X#2 = {
+          b: 〈2;a〉
+          c: 1
+        }
+        v: 〈0;let X#2〉.c
       }
     }
     x1: 〈0;x〉

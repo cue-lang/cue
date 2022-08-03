@@ -708,7 +708,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 				continue
 			}
 
-			if err, _ := a.BaseValue.(*Bottom); err != nil {
+			if err, _ := a.BaseValue.(*Bottom); err != nil && !a.Label.IsLet() {
 				n.node.AddChildError(err)
 			}
 
@@ -1808,7 +1808,7 @@ func (n *nodeContext) addStruct(
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
-		case *Field:
+		case *Field, *LetField:
 			// handle in next iteration.
 
 		case *DynamicField:
@@ -1854,6 +1854,9 @@ func (n *nodeContext) addStruct(
 				n.aStructID = closeInfo
 			}
 			n.insertField(x.Label, MakeConjunct(childEnv, x, closeInfo))
+
+		case *LetField:
+			n.insertField(x.Label, MakeConjunct(childEnv, x, closeInfo))
 		}
 	}
 }
@@ -1871,7 +1874,11 @@ func (n *nodeContext) addStruct(
 // disjunctions.
 func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	ctx := n.ctx
-	arc, _ := n.node.GetArc(ctx, f, arcMember)
+	arc, isNew := n.node.GetArc(ctx, f, arcMember)
+	if f.IsLet() && !isNew {
+		arc.MultiLet = true
+		return arc
+	}
 	arc.addConjunct(x)
 
 	switch {

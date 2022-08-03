@@ -1,0 +1,147 @@
+-- in.cue --
+// Test that an error in a let that is merged with itself from two different
+// origins does not result in an error as long as the error is not referenced
+// outside the let.
+t1: {
+	x: {
+		a: int
+		y: {
+			let X = {
+				b: a
+				c: 1
+			}
+			v: X.c
+		}
+	}
+
+	x1: x
+	x1: a: 1
+	
+	x2: x
+	x2: a: 2
+
+	xy: x1.y & x2.y
+}
+
+t2: {
+	x: {
+		a: {}
+		y: {
+			let X = {
+				b: a
+				c: 1
+			}
+			v: X.c
+		}
+	}
+
+	x1: x
+	x1: a: q: 1
+
+	x2: x
+	x2: a: r: 2
+
+	xy: x1 & x2
+}
+-- out/eval --
+(struct){
+  t1: (struct){
+    x: (struct){
+      a: (int){ int }
+      y: (struct){
+        v: (int){ 1 }
+      }
+    }
+    x1: (struct){
+      a: (int){ 1 }
+      y: (struct){
+        v: (int){ 1 }
+      }
+    }
+    x2: (struct){
+      a: (int){ 2 }
+      y: (struct){
+        v: (int){ 1 }
+      }
+    }
+    xy: (struct){
+      v: (int){ 1 }
+    }
+  }
+  t2: (struct){
+    x: (struct){
+      a: (struct){
+      }
+      y: (struct){
+        v: (int){ 1 }
+      }
+    }
+    x1: (struct){
+      a: (struct){
+        q: (int){ 1 }
+      }
+      y: (struct){
+        v: (int){ 1 }
+      }
+    }
+    x2: (struct){
+      a: (struct){
+        r: (int){ 2 }
+      }
+      y: (struct){
+        v: (int){ 1 }
+      }
+    }
+    xy: (struct){
+      a: (struct){
+        q: (int){ 1 }
+        r: (int){ 2 }
+      }
+      y: (struct){
+        v: (int){ 1 }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    x: {
+      a: int
+      y: {
+        v: 〈0;let X〉.c
+      }
+    }
+    x1: 〈0;x〉
+    x1: {
+      a: 1
+    }
+    x2: 〈0;x〉
+    x2: {
+      a: 2
+    }
+    xy: (〈0;x1〉.y & 〈0;x2〉.y)
+  }
+  t2: {
+    x: {
+      a: {}
+      y: {
+        v: 〈0;let X〉.c
+      }
+    }
+    x1: 〈0;x〉
+    x1: {
+      a: {
+        q: 1
+      }
+    }
+    x2: 〈0;x〉
+    x2: {
+      a: {
+        r: 2
+      }
+    }
+    xy: (〈0;x1〉 & 〈0;x2〉)
+  }
+}

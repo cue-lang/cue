@@ -1,4 +1,6 @@
 -- in.cue --
+import "list"
+
 cycles: {
 	a: {
 		let A = {c: B}
@@ -45,21 +47,11 @@ cycles: {
 }
 -- out/compile --
 cycles.a.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:3:15
+    ./in.cue:5:15
 cycles.b.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:9:15
-cycles.issue1042.#Add16.let[]: reference "list" not found:
-    ./in.cue:31:14
-cycles.issue1042.#Add16.let[].for[].c.for[]: reference "list" not found:
-    ./in.cue:31:14
+    ./in.cue:11:15
 cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
-    ./in.cue:32:45
-cycles.issue1042.#Add16.let[]: reference "list" not found:
-    ./in.cue:37:14
-cycles.issue1042.#Add16.let[].for[].c: reference "list" not found:
-    ./in.cue:37:14
-cycles.issue1042.#Add16.out: reference "list" not found:
-    ./in.cue:40:14
+    ./in.cue:34:45
 --- in.cue
 {
   cycles: {
@@ -88,7 +80,7 @@ cycles.issue1042.#Add16.out: reference "list" not found:
           bool,
         ] * 16)
         out: [
-          for _, i in _|_(reference "list" not found).Range(0, 4, 1) {
+          for _, i in 〈import;list〉.Range(0, 4, 1) {
             〈3;let fulladders〉[〈1;i〉].sum
           },
         ]
@@ -98,18 +90,8 @@ cycles.issue1042.#Add16.out: reference "list" not found:
 }
 -- out/eval --
 cycles.a.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:3:15
+    ./in.cue:5:15
 cycles.b.let[].c.c: cyclic references in let clause or alias:
-    ./in.cue:9:15
-cycles.issue1042.#Add16.let[]: reference "list" not found:
-    ./in.cue:31:14
-cycles.issue1042.#Add16.let[].for[].c.for[]: reference "list" not found:
-    ./in.cue:31:14
+    ./in.cue:11:15
 cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
-    ./in.cue:32:45
-cycles.issue1042.#Add16.let[]: reference "list" not found:
-    ./in.cue:37:14
-cycles.issue1042.#Add16.let[].for[].c: reference "list" not found:
-    ./in.cue:37:14
-cycles.issue1042.#Add16.out: reference "list" not found:
-    ./in.cue:40:14
+    ./in.cue:34:45

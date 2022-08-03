@@ -94,14 +94,22 @@ func (w *printer) ident(f adt.Feature) {
 
 // TODO: fold into label once :: is no longer supported.
 func (w *printer) labelString(f adt.Feature) string {
-	if f.IsHidden() {
+	switch {
+	case f.IsHidden():
 		ident := f.IdentString(w.index)
 		if pkgName := f.PkgID(w.index); pkgName != "_" {
 			ident = fmt.Sprintf("%s(%s)", ident, pkgName)
 		}
 		return ident
+
+	case f.IsLet():
+		ident := f.RawString(w.index)
+		ident = strings.Replace(ident, "\x00", "#", 1)
+		return ident
+
+	default:
+		return f.SelectorString(w.index)
 	}
-	return f.SelectorString(w.index)
 }
 
 func (w *printer) shortError(errs errors.Error) {
@@ -214,9 +222,21 @@ func (w *printer) node(n adt.Node) {
 
 		for _, a := range x.Arcs {
 			w.string("\n")
-			w.label(a.Label)
-			w.string(": ")
-			w.node(a)
+			if a.Label.IsLet() {
+				w.string("let ")
+				w.label(a.Label)
+				w.string(" = ")
+				if c := a.Conjuncts[0]; a.MultiLet {
+					w.node(c.Expr())
+					w.string(" // multi")
+					continue
+				}
+				w.node(a)
+			} else {
+				w.label(a.Label)
+				w.string(": ")
+				w.node(a)
+			}
 		}
 
 		if x.BaseValue == nil {
@@ -287,6 +307,13 @@ func (w *printer) node(n adt.Node) {
 			w.string(":")
 		}
 		w.string(" ")
+		w.node(x.Value)
+
+	case *adt.LetField:
+		w.string("let ")
+		s := w.labelString(x.Label)
+		w.string(s)
+		w.string(" = ")
 		w.node(x.Value)
 
 	case *adt.BulkOptionalField:
@@ -391,7 +418,7 @@ func (w *printer) node(n adt.Node) {
 		w.string(openTuple)
 		w.string(strconv.Itoa(int(x.UpCount)))
 		w.string(";let ")
-		w.ident(x.Label)
+		w.label(x.Label)
 		w.string(closeTuple)
 
 	case *adt.SelectorExpr:

@@ -50,9 +50,21 @@ func (w *compactPrinter) node(n adt.Node) {
 				if i > 0 {
 					w.string(",")
 				}
-				w.label(a.Label)
-				w.string(":")
-				w.node(a)
+				if a.Label.IsLet() {
+					w.string("let ")
+					w.label(a.Label)
+					w.string("=")
+					if c := a.Conjuncts[0]; a.MultiLet {
+						w.node(c.Expr())
+						w.string(" // multi")
+						continue
+					}
+					w.node(a)
+				} else {
+					w.label(a.Label)
+					w.string(":")
+					w.node(a)
+				}
 			}
 			w.string("}")
 
@@ -106,6 +118,13 @@ func (w *compactPrinter) node(n adt.Node) {
 		s := w.labelString(x.Label)
 		w.string(s)
 		w.string("?:")
+		w.node(x.Value)
+
+	case *adt.LetField:
+		w.string("let ")
+		s := w.labelString(x.Label)
+		w.string(s)
+		w.string("=")
 		w.node(x.Value)
 
 	case *adt.BulkOptionalField:

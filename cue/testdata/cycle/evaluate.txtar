@@ -115,6 +115,10 @@ Result:
       // [structural cycle] letCycle.0: structural cycle:
       //     ./in.cue:34:9
     }
+    let X#1 = (_|_){
+      // [structural cycle] letCycle.0: structural cycle:
+      //     ./in.cue:34:9
+    }
     c: (_|_){
       // [structural cycle] letCycle.0: structural cycle:
       //     ./in.cue:34:9
@@ -273,7 +277,8 @@ Result:
 {
   letCycle: {
     b: 〈0;c〉
-    c: 〈0;let X〉
+    let X#1A = 〈0;b〉
+    c: 〈0;let X#1A〉
   }
   listCycle: {
     a: 〈0;b〉

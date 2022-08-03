@@ -425,7 +425,19 @@ func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Exp
 
 	switch {
 	case let == nil:
-		return e.expr(env, x.X)
+		ref, _ := e.ctx.Lookup(env, x)
+		if ref == nil {
+			// This can happen if x.X does not resolve to a valid value. At this
+			// point we will not get a valid configuration.
+
+			// TODO: get rid of the use of x.X.
+			// str := x.Label.IdentString(e.ctx)
+			// ident := ast.NewIdent(str)
+			// return ident
+
+			return e.expr(env, x.X)
+		}
+		return e.expr(env, ref.Conjuncts[0].Expr())
 
 	case let.Expr == nil:
 		label := e.uniqueLetIdent(x.Label, x.X)

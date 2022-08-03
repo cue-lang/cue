@@ -236,6 +236,8 @@ func (*Field) declNode()                {}
 func (x *Field) expr() Expr             { return x.Value }
 func (*OptionalField) declNode()        {}
 func (x *OptionalField) expr() Expr     { return x.Value }
+func (*LetField) declNode()             {}
+func (x *LetField) expr() Expr          { return x.Value }
 func (*BulkOptionalField) declNode()    {}
 func (x *BulkOptionalField) expr() Expr { return x.Value }
 func (*DynamicField) declNode()         {}
@@ -370,6 +372,7 @@ func (*CallExpr) node()          {}
 func (*DisjunctionExpr) node()   {}
 func (*Field) node()             {}
 func (*OptionalField) node()     {}
+func (*LetField) node()          {}
 func (*BulkOptionalField) node() {}
 func (*DynamicField) node()      {}
 func (*Ellipsis) node()          {}

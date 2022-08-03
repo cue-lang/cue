@@ -620,6 +620,8 @@ d1.r: structural cycle:
     ./in.cue:299:26
 d3.config.0: structural cycle:
     ./in.cue:315:13
+withLetFail._schema_1: structural cycle:
+    ./in.cue:355:17
 
 Result:
 (_|_){
@@ -1292,6 +1294,10 @@ Result:
       next: (_|_){
         // [structural cycle] withLetFail.schema.next: structural cycle
       }
+    }
+    let _schema_1#1 = (_|_){
+      // [structural cycle] withLetFail._schema_1: structural cycle:
+      //     ./in.cue:355:17
     }
   }
   listOptOK: (struct){
@@ -2227,8 +2233,9 @@ Result:
   }
   withLetFail: {
     schema: {
-      next: 〈1;let _schema_1〉
+      next: 〈1;let _schema_1#1C〉
     }
+    let _schema_1#1C = 〈0;schema〉
   }
   listOptOK: {
     list: {

@@ -229,6 +229,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	}
 
 	for _, f := range fields {
+		if f.IsLet() {
+			continue
+		}
 		field := e.fields[f]
 		c := field.conjuncts
 
@@ -375,6 +378,8 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			case *adt.OptionalField:
 				// TODO: mark optional here.
 				label = f.Label
+			case *adt.LetField:
+				continue
 			case *adt.Ellipsis:
 				e.hasEllipsis = true
 				continue
@@ -506,6 +511,8 @@ func isComplexStruct(s *adt.StructLit) bool {
 					return ok
 				}
 			}
+
+		case *adt.LetField:
 
 		case adt.Expr:
 

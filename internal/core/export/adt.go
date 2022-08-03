@@ -68,6 +68,11 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 				}
 			}
 			decl := e.decl(env, d)
+			// decl may be nil if it represents a let. Lets are added later, and
+			// only when they are still used.
+			if decl == nil {
+				continue
+			}
 
 			if a != nil {
 				if f, ok := decl.(*ast.Field); ok {
@@ -429,6 +434,10 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 		// extractDocs(nil)
 		return f
+
+	case *adt.LetField:
+		// Handled elsewhere
+		return nil
 
 	case *adt.BulkOptionalField:
 		e.setDocs(x)

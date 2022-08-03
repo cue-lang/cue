@@ -170,6 +170,7 @@ is no need to rename the variable here as the expression
 was known to compile and is known to be correct.
 
 [issue1308]
+[issue1308 _xA]
 [issue1308 sub]
 [issue1308 sub 0]
 [issue1308 sub 0 _A]

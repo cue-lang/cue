@@ -112,6 +112,12 @@ func (o *StructLit) Init() {
 			o.Fields[p].Optional = append(o.Fields[p].Optional, x)
 			o.types |= HasField
 
+		case *LetField:
+			if o.fieldIndex(x.Label) >= 0 {
+				panic("duplicate let identifier")
+			}
+			o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
+
 		case *DynamicField:
 			o.Dynamic = append(o.Dynamic, x)
 			o.types |= HasDynamic
@@ -213,6 +219,23 @@ type OptionalField struct {
 }
 
 func (x *OptionalField) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+
+// A LetField represents a field that is only visible in the local scope.
+//
+//   let X = expr
+//
+type LetField struct {
+	Src   *ast.LetClause
+	Label Feature
+	Value Expr
+}
+
+func (x *LetField) Source() ast.Node {
 	if x.Src == nil {
 		return nil
 	}
@@ -866,25 +889,43 @@ func (x *LetReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LetReference) resolve(c *OpContext, state VertexStatus) *Vertex {
-	e := c.Env(x.UpCount)
-	label := e.Vertex.Label
-	if x.X == nil {
-		panic("nil expression")
-	}
-	// Anonymous arc.
-	return &Vertex{
-		Parent:    e.Vertex,
-		Label:     label,
-		Conjuncts: []Conjunct{{e, x.X, c.ci}},
-	}
-}
+func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
+	e := ctx.Env(x.UpCount)
+	n := e.Vertex
 
-func (x *LetReference) evaluate(c *OpContext) Value {
-	e := c.Env(x.UpCount)
+	// No need to Unify n, as Let references can only result from evaluating
+	// an experssion within n, in which case evaluation must already have
+	// started.
+	if n.status < Evaluating {
+		panic("unexpected node state < Evaluating")
+	}
+
+	arc := ctx.lookup(n, pos(x), x.Label, state)
+	if arc == nil {
+		return nil
+	}
+
+	if !arc.MultiLet {
+		return arc
+	}
 
 	// Not caching let expressions may lead to exponential behavior.
-	return e.evalCached(c, x.X)
+	// The expr uses the expression of a Let field, which can never be used in
+	// any other context.
+	expr := arc.Conjuncts[0].Expr()
+	v, ok := e.cache[expr]
+	if !ok {
+		if e.cache == nil {
+			e.cache = map[Expr]Value{}
+		}
+		v = &Vertex{
+			Parent:    n,
+			Label:     x.Label,
+			Conjuncts: []Conjunct{{e, expr, ctx.ci}},
+		}
+		e.cache[expr] = v
+	}
+	return v.(*Vertex)
 }
 
 // A SelectorExpr looks up a fixed field in an expression.
@@ -1755,7 +1796,7 @@ func (x *IfClause) yield(ctx *OpContext, f YieldFunc) {
 	}
 }
 
-// An LetClause represents a let clause in a comprehension.
+// A LetClause represents a let clause in a comprehension.
 //
 //	let x = y
 type LetClause struct {

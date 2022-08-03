@@ -155,6 +155,19 @@ Result:
       // [eval]
       description: (_|_){
         // [eval]
+        let dep#1 = (#struct){
+          service: (#struct){
+            ref: (#struct){
+              kind: (string){ "service" }
+            }
+            description: (_|_){
+              // [incomplete] #DoDeploy.deployment.description.dep.service.description: undefined field: service:
+              //     ./in.cue:5:28
+            }
+          }
+          hsize: (#struct){
+          }
+        }
         service: (_|_){
           // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
           //     ./in.cue:29:20
@@ -182,6 +195,20 @@ Result:
       // [eval]
       description: (_|_){
         // [eval]
+        let configed#2 = (_|_){
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          //     ./in.cue:29:20
+          //     ./in.cue:35:13
+          //     ./in.cue:55:12
+          //     ./in.cue:56:22
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          //     ./in.cue:29:20
+          //     ./in.cue:35:13
+          //     ./in.cue:55:12
+          //     ./in.cue:56:15
+          // _params.hsize.$_instances: 2 errors in empty disjunction::
+          //     ./in.cue:33:20
+        }
         role: (_|_){
           // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
           //     ./in.cue:29:20
@@ -270,9 +297,10 @@ Result:
     }
     deployment: {
       description: {
+        let dep#17 = 〈2;_params〉.manifest.description
         service: (〈3;#Configure〉 & {
           _params: {
-            hsize: 〈2;let dep〉.hsize
+            hsize: 〈2;let dep#17〉.hsize
           }
         }).service
       }
@@ -286,7 +314,13 @@ Result:
     }
     service: {
       description: {
-        role: 〈0;let configed〉.role
+        let configed#18 = (〈3;#RelabelService〉 & {
+          _params: {
+            hsize: 〈4;_params〉.hsize
+          }
+          role: "admin"
+        }).out
+        role: 〈0;let configed#18〉.role
       }
     }
   }

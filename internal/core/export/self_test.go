@@ -83,6 +83,7 @@ func TestSelfContained(t *testing.T) {
 }
 
 func buildFile(t *testing.T, r *cue.Context, b *build.Instance) cue.Value {
+	t.Helper()
 	v := r.BuildInstance(b)
 	if err := v.Err(); err != nil {
 		t.Fatal(errors.Details(err, nil))

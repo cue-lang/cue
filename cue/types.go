@@ -1402,6 +1402,9 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 
 	k := 0
 	for _, f := range features {
+		if f.IsLet() {
+			continue
+		}
 		if f.IsDef() && (o.omitDefinitions || o.concrete) {
 			continue
 		}

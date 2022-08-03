@@ -51,6 +51,7 @@ disallowTopAsLabel: cannot use _ as label:
   dis1: ("dev"|"prd")
   dis2: (*"dev"|"prd")
   con1: string
+  let con2#5 = string
   ok0: {
     [string]: string
   }
@@ -61,7 +62,7 @@ disallowTopAsLabel: cannot use _ as label:
     [〈1;con1〉]: string
   }
   ok3: {
-    [〈1;let con2〉]: string
+    [〈1;let con2#5〉]: string
   }
   ok4: {
     ["foo"]: string

@@ -139,6 +139,24 @@
       "parentUuid": "efa8a205_5ea92643",
       "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da4c9b7a_c1333128",
+        "filename": "pkg/tool/pkg.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-03T09:41:52Z",
+      "side": 1,
+      "message": "Ack. Any thoughts on how to deal with package tool, then? Leave the old generator in place, with a TODO?",
+      "parentUuid": "8bedd225_0aed2a27",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

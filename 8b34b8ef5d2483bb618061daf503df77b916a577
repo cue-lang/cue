@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38006420_2eb22327",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-03T09:34:05Z",
+      "side": 1,
+      "message": "LGTM but I think we should avoid exporting the new API without explicit signoff.",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9dc30b29_60ad51a0",
@@ -55,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3e11ca57_ff813b73",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-03T09:34:05Z",
+      "side": 1,
+      "message": "Yeah, fair enough. I don\u0027t care about the syntax churn too much, but missing the comments is a problem. It definitely is a more \"right\" way, but I\u0027m happy to leave it as is for now.",
+      "parentUuid": "ee34f20d_5d755e7d",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1b18eb76_cae803bf",
         "filename": "pkg/tool/pkg.go",
         "patchSetId": 2
@@ -84,6 +119,24 @@
       "side": 1,
       "message": "See the commit message. I\u0027m not 100% sure whether this is a good or bad idea, but beyond what I wrote in the commit, it\u0027s worth noting that we wouldn\u0027t loop over that package otherwise - meaning no generation.\n\nI guess we could add another special case to the generate loop, to not generate the `Register` line for this package, though I think it\u0027s best to avoid special cases if we can.\n\nWe can always leave it to Paul or Marcel if we\u0027re not sure :)",
       "parentUuid": "1b18eb76_cae803bf",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8bedd225_0aed2a27",
+        "filename": "pkg/tool/pkg.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-03T09:34:05Z",
+      "side": 1,
+      "message": "Lacking input from Marcel, I think we should probably be conservative for now and avoid adding to the API. I mean, it\u0027s probably fine, but I\u0027m wary of adding more fuel for Hyrum.",
+      "parentUuid": "efa8a205_5ea92643",
       "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

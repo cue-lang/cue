@@ -157,6 +157,24 @@
       "parentUuid": "8bedd225_0aed2a27",
       "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86a3e0ac_452b996d",
+        "filename": "pkg/tool/pkg.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-04T14:51:45Z",
+      "side": 1,
+      "message": "Maybe special-case to avoid generating/registering the package?",
+      "parentUuid": "da4c9b7a_c1333128",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

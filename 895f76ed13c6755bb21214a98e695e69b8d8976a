@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf40a8b8_1b03adcc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-04T12:11:39Z",
+      "side": 1,
+      "message": "PTAL",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13d55f27_7929258a",
@@ -31,6 +48,24 @@
       "writtenOn": "2022-08-02T16:00:41Z",
       "side": 1,
       "message": "It seems to me like a bit of a pity to pollute the prod code with such specific test-related code. Another possibility might be to add another, more generic global variable, e.g.\n\n```\n// testCmdInit is used for test-related initialization of the command.\nvar testCmdInit \u003d func(*Command) {}\n```\n\nThen set that inside `MainTest` to use the logic below(in fact, maybe better just to move `MainTest` directly into `script_test.go`).\n\nAnother possibility might be go with the above approach but avoid the env var and just use another named entry point (e.g. `cue_stdinpipe`). Then it would be clearer that this logic is only used by a single test.",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "254afab7_ad9126a7",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 151,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-04T12:11:39Z",
+      "side": 1,
+      "message": "I had indeed thought about this for a bit, and didn\u0027t like the global variable way any more than the env var way to be honest - both fiddled with the main binary\u0027s behavior. I ended up with cue_stdinpipe, I like that :)",
+      "parentUuid": "13d55f27_7929258a",
       "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "278ee658_dcef3c82",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-04T12:11:39Z",
+      "side": 1,
+      "message": "Drat, I always get something slightly wrong with reading. Done.",
+      "parentUuid": "44a31e15_1e20a590",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1bd1b6ab_bc025312",
@@ -69,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4242e92e_67733374",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-04T12:11:39Z",
+      "side": 1,
+      "message": "the io.Reader docs especially call out that read callers should handle this, even when readers should never return it. I think continuing to read is the only reasonable approach - if a reader is malicious, it could also just block us forever.",
+      "parentUuid": "1bd1b6ab_bc025312",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "61e8b123_0354519a",
@@ -82,6 +153,24 @@
       "writtenOn": "2022-08-02T16:00:41Z",
       "side": 1,
       "message": "I\u0027m slightly surprised that this doesn\u0027t deal with \\r\\n line endings, but given that the old logic used ReadString(\u0027\\n\u0027) I guess it\u0027s OK.",
+      "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a366abcd_90885314",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-04T12:11:39Z",
+      "side": 1,
+      "message": "The old fmt.Scan logic only read the first word/field, up to the first whitespace, so the old code wasn\u0027t affected by CRLF vs LF.\n\nStill, you\u0027re right that we should have cli.Ask consistently read a line and exclude the line ending, be it LF or CRLF. Fixed, PTAL.",
+      "parentUuid": "61e8b123_0354519a",
       "revId": "895f76ed13c6755bb21214a98e695e69b8d8976a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

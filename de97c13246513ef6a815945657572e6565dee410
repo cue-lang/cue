@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f27bc69e_2f6ed0d0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-04T16:01:51Z",
+      "side": 1,
+      "message": "Thanks for making those changes. I like using the variant command name. One issue still remaining though.",
+      "revId": "de97c13246513ef6a815945657572e6565dee410",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8a49fc9_a0f65e15",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-04T16:01:51Z",
+      "side": 1,
+      "message": "ISTM that this will crash when the line is empty.\nHow about:\n\n    s :\u003d strings.TrimSuffix(b.String(), \"\\r\")\n    \ninstead? It should have a test case too.",
+      "revId": "de97c13246513ef6a815945657572e6565dee410",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0526d1d9_8ab55cdf",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-04T16:01:51Z",
+      "side": 1,
+      "message": "Maybe better to do this here, so the contract of readLine is clear (non-nil error means error):\n\n    if err \u003d\u003d io.EOF {\n        err \u003d nil\n    }\n\nthen you can avoid the extra case for the caller.\n\nMaybe the whole thing could be something like:\n\n    eol :\u003d false\n    n, err :\u003d r.Read(p[:])\n    if n \u003e 0 {\n       b.Write(p[:n])\n       eol \u003d p[0] \u003d\u003d \u0027\\n\u0027\n    }\n    if eol || err \u003d\u003d io.EOF {\n        s :\u003d b.String()\n        s \u003d strings.TrimSuffix(s, \"\\r\\n\")\n        s \u003d strings.TrimSuffix(s, \"\\n\")\n        return s, nil\n    }\n    if err !\u003d nil {\n        return \"\", err\n    }\n\n\nBTW, an easier way to do this whole thing would be:\n\n\tfunc readLine(r io.Reader) (string, error) {\n\t\tscan :\u003d bufio.NewScanner(iotest.OneByteReader(r))\n\t\tif !scan.Scan() {\n\t\t\treturn \"\", scan.Err()\n\t\t}\n\t\treturn scan.Text(), nil\n\t}\n\n(apart from the fact that it\u0027s a bit less efficient and it maybe seems a bit weird to use iotest in production code).",
+      "revId": "de97c13246513ef6a815945657572e6565dee410",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

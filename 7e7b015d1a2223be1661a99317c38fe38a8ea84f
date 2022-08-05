@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e416301e_22312214",
+        "filename": "pkg/tool/cli/cli.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-05T17:15:04Z",
+      "side": 1,
+      "message": "FWIW I\u0027d argue that this comment isn\u0027t necessary and the existing docs are sufficient to support this behaviour. Specifically the following clause in the `bufio.ScanFunc` documentation implies that where there\u0027s a complete token (i.e. a line) available, the Scanner won\u0027t issue another Read on the underlying Reader:\n\n\u003e If the data does not yet hold a complete token, for instance if it has no newline while scanning lines, a SplitFunc can return (0, nil, nil) to signal the Scanner to read more data into the slice and try again with a longer slice starting at the same point in the input.\n\nhttps://pkg.go.dev/bufio#SplitFunc\n\nFor bufio.Reader, the situation is so clear, but we\u0027re not using that here.",
+      "revId": "7e7b015d1a2223be1661a99317c38fe38a8ea84f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

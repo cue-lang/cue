@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/source"
 )
 
 var errExclude = errors.New("file rejected")
@@ -44,9 +45,9 @@ func (e excludeError) Is(err error) bool { return err == errExclude }
 func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, err errors.Error) {
 	if fi := cfg.fileSystem.getOverlay(file.Filename); fi != nil {
 		if fi.file != nil {
-			file.Source = fi.file
+			file.AST = fi.file
 		} else {
-			file.Source = fi.contents
+			file.Source = source.NewBytesSource(fi.contents)
 		}
 	}
 
@@ -60,8 +61,12 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 			err = errors.Newf(token.NoPos, "read stdin: %v", err)
 			return
 		}
-		file.Source = b
+		file.Source = source.NewBytesSource(b)
 		return true, b, nil // don't check shouldBuild for stdin
+	}
+
+	if file.AST != nil && file.Source == nil {
+		file.Source = source.NewFileSource(file.Filename)
 	}
 
 	name := filepath.Base(file.Filename)

@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/source"
 )
 
 func TestParse(t *testing.T) {
@@ -661,7 +662,7 @@ bar: 2
 			if strings.Contains(tc.desc, "comments") {
 				mode = append(mode, ParseComments)
 			}
-			f, err := ParseFile("input", tc.in, mode...)
+			f, err := ParseFile("input", source.NewStringSource(tc.in), mode...)
 			got := debugStr(f)
 			if err != nil {
 				got += "\n" + err.Error()
@@ -695,7 +696,7 @@ func TestStrict(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			mode := []Option{AllErrors, ParseComments, FromVersion(Latest)}
-			_, err := ParseFile("input", tc.in, mode...)
+			_, err := ParseFile("input", source.NewStringSource(tc.in), mode...)
 			if err == nil {
 				t.Errorf("unexpected success: %v", tc.in)
 			}
@@ -799,7 +800,7 @@ func TestImports(t *testing.T) {
 	for path, isValid := range imports {
 		t.Run(path, func(t *testing.T) {
 			src := fmt.Sprintf("package p, import %s", path)
-			_, err := ParseFile("", src)
+			_, err := ParseFile("", source.NewStringSource(src))
 			switch {
 			case err != nil && isValid:
 				t.Errorf("ParseFile(%s): got %v; expected no error", src, err)
@@ -819,7 +820,7 @@ func TestIncompleteSelection(t *testing.T) {
 		"{ a: fmt.\n0.0: x }", // not at end of struct
 	} {
 		t.Run("", func(t *testing.T) {
-			f, err := ParseFile("", src)
+			f, err := ParseFile("", source.NewStringSource(src))
 			if err == nil {
 				t.Fatalf("ParseFile(%s) succeeded unexpectedly", src)
 			}
@@ -851,8 +852,9 @@ func TestIncompleteSelection(t *testing.T) {
 func TestX(t *testing.T) {
 	t.Skip()
 
-	f, err := ParseFile("input", `
-	`, ParseComments)
+	s := `
+	`
+	f, err := ParseFile("input", source.NewStringSource(s), ParseComments)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

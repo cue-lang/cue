@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/source"
 	"golang.org/x/tools/txtar"
 )
 
@@ -252,7 +253,7 @@ foo: entry: {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := parser.ParseFile("test", tc.in)
+			f, err := parser.ParseFile("test", source.NewStringSource(tc.in))
 			if err != nil {
 				t.Fatal(err)
 			}

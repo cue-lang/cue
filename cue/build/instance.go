@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/source"
 )
 
 // An Instance describes the collection of files, and its imports, necessary
@@ -184,7 +185,7 @@ func (inst *Instance) Context() *Context {
 	return inst.ctxt
 }
 
-func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
+func (inst *Instance) parse(name string, src source.Source) (*ast.File, error) {
 	if inst.ctxt != nil && inst.ctxt.parseFunc != nil {
 		return inst.ctxt.parseFunc(name, src)
 	}
@@ -221,7 +222,7 @@ func (inst *Instance) addImport(imp *Instance) {
 //
 // Deprecated: use AddSyntax or wait for this to be renamed using a new
 // signature.
-func (inst *Instance) AddFile(filename string, src interface{}) error {
+func (inst *Instance) AddFile(filename string, src source.Source) error {
 	file, err := inst.parse(filename, src)
 	if err != nil {
 		// should always be an errors.List, but just in case.

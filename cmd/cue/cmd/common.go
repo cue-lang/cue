@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/value"
 )
 
@@ -50,7 +51,7 @@ var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
 
 var defaultConfig = config{
 	loadCfg: &load.Config{
-		ParseFile: func(name string, src interface{}) (*ast.File, error) {
+		ParseFile: func(name string, src source.Source) (*ast.File, error) {
 			version := syntaxVersion
 			if requestedVersion != "" {
 				switch {
@@ -695,14 +696,14 @@ func (b *buildPlan) parseFlags() (err error) {
 	}
 
 	for _, e := range flagExpression.StringArray(b.cmd) {
-		expr, err := parser.ParseExpr("--expression", e)
+		expr, err := parser.ParseExpr("--expression", source.NewStringSource(e))
 		if err != nil {
 			return err
 		}
 		b.expressions = append(b.expressions, expr)
 	}
 	if s := flagSchema.String(b.cmd); s != "" {
-		b.schema, err = parser.ParseExpr("--schema", s)
+		b.schema, err = parser.ParseExpr("--schema", source.NewStringSource(s))
 		if err != nil {
 			return err
 		}

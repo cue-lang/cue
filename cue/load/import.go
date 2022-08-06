@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/source"
 )
 
 // An importMode controls the behavior of the Import method.
@@ -384,7 +385,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return false
 	}
 
-	pf, perr := parser.ParseFile(fullPath, data, parser.ImportsOnly, parser.ParseComments)
+	pf, perr := parser.ParseFile(fullPath, source.NewBytesSource(data), parser.ImportsOnly, parser.ParseComments)
 	if perr != nil {
 		badFile(errors.Promote(perr, "add failed"))
 		return true

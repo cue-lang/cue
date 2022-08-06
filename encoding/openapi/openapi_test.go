@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/source"
 )
 
 func TestParseDefinitions(t *testing.T) {
@@ -220,10 +221,11 @@ func walk(om *openapi.OrderedMap) {
 // TODO: move OpenAPI testing to txtar and allow errors.
 func TestIssue1234(t *testing.T) {
 	var r cue.Runtime
-	inst, err := r.Compile("test", `
+	s := `
 #Test: or([])
 
-	`)
+	`
+	inst, err := r.Compile("test", source.NewStringSource(s))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -239,8 +241,8 @@ func TestX(t *testing.T) {
 	t.Skip()
 
 	var r cue.Runtime
-	inst, err := r.Compile("test", `
-	`)
+	inst, err := r.Compile("test", source.NewStringSource(`
+	`))
 	if err != nil {
 		t.Fatal(err)
 	}

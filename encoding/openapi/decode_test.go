@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/source"
 )
 
 // TestDecode reads the testdata/*.txtar files, converts the contained
@@ -98,7 +99,7 @@ func TestDecode(t *testing.T) {
 				}
 
 				// verify the generated CUE.
-				if _, err = r.Compile(fullpath, b); err != nil {
+				if _, err = r.Compile(fullpath, source.NewBytesSource(b)); err != nil {
 					t.Fatal(errors.Details(err, nil))
 				}
 

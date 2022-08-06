@@ -38,6 +38,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/source"
 )
 
 const (
@@ -71,7 +72,7 @@ func TestLatest(t *testing.T) {
 					return
 				}
 				v := parser.FromVersion(parser.Latest)
-				_, err := parser.ParseFile(f.Name, f.Data, v)
+				_, err := parser.ParseFile(f.Name, source.NewBytesSource(f.Data), v)
 				if err != nil {
 					w := &bytes.Buffer{}
 					fmt.Fprintf(w, "\n%s:\n", fullpath)

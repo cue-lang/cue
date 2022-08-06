@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/source"
 )
 
 func TestParse(t *testing.T) {
@@ -48,7 +49,7 @@ func TestParse(t *testing.T) {
 		for _, f := range t.Archive.Files {
 			switch {
 			case strings.HasSuffix(f.Name, ".cue"):
-				inst, err := r.Compile(f.Name, f.Data)
+				inst, err := r.Compile(f.Name, source.NewBytesSource(f.Data))
 				if err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return

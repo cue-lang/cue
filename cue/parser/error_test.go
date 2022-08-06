@@ -139,15 +139,16 @@ func compareErrors(t *testing.T, file *token.File, expected map[token.Pos]string
 	}
 }
 
-func checkErrors(t *testing.T, filename string, input interface{}) {
+func checkErrors(t *testing.T, filename string, input source.Source) {
 	t.Helper()
-	src, err := source.Read(filename, input)
+	// src, err := source.Read(filename, input)
+	src, err := input.Read()
 	if err != nil {
 		t.Error(err)
 		return
 	}
 
-	f, err := ParseFile(filename, src, DeclarationErrors, AllErrors)
+	f, err := ParseFile(filename, source.NewBytesSource(src), DeclarationErrors, AllErrors)
 	file := f.Pos().File()
 	found := errors.Errors(err)
 
@@ -171,7 +172,7 @@ func TestFuzz(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			_, _ = ParseFile("go-fuzz", []byte(tc))
+			_, _ = ParseFile("go-fuzz", source.NewStringSource(tc))
 		})
 	}
 }

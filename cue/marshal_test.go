@@ -19,6 +19,7 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/internal/source"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -59,7 +60,7 @@ func TestMarshalling(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.filename, func(t *testing.T) {
 			r := &Runtime{}
-			inst, err := r.Compile(tc.filename, tc.input)
+			inst, err := r.Compile(tc.filename, source.NewStringSource(tc.input))
 			if err != nil {
 				t.Fatal(err)
 			}

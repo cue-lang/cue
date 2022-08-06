@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/source"
 )
 
 func TestExtractDefinitions(t *testing.T) {
@@ -49,7 +50,7 @@ func TestExtractDefinitions(t *testing.T) {
 
 			out := &bytes.Buffer{}
 
-			if f, err := Extract(filename, nil, c); err != nil {
+			if f, err := Extract(filename, source.NewFileSource(filename), c); err != nil {
 				fmt.Fprintln(out, err)
 			} else {
 				b, _ := format.Node(f, format.Simplify())
@@ -87,10 +88,16 @@ func TestBuild(t *testing.T) {
 	}
 
 	b := NewExtractor(c)
-	_ = b.AddFile("networking/v1alpha3/gateway.proto", nil)
-	_ = b.AddFile("mixer/v1/attributes.proto", nil)
-	_ = b.AddFile("mixer/v1/mixer.proto", nil)
-	_ = b.AddFile("mixer/v1/config/client/client_config.proto", nil)
+	add := func(filename string) {
+		e := b.AddFile(filename)
+		if e != nil {
+			t.Fatal(e)
+		}
+	}
+	add("networking/v1alpha3/gateway.proto")
+	add("mixer/v1/attributes.proto")
+	add("mixer/v1/mixer.proto")
+	add("mixer/v1/config/client/client_config.proto")
 
 	files, err := b.Files()
 	if err != nil {

@@ -17,11 +17,13 @@ package cue
 import (
 	"fmt"
 	"testing"
+
+	"cuelang.org/go/internal/source"
 )
 
 func TestPaths(t *testing.T) {
 	var r Runtime
-	inst, _ := r.Compile("", `
+	s := `
 		#Foo:   a: b: 1
 		"#Foo": c: d: 2
 		_foo: b: 5
@@ -30,7 +32,8 @@ func TestPaths(t *testing.T) {
 		c: "#Foo": 7
 		map: [string]: int
 		list: [...int]
-	`)
+	`
+	inst, _ := r.Compile("", source.NewStringSource(s))
 	testCases := []struct {
 		path Path
 		out  string

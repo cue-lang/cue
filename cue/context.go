@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/source"
 )
 
 // A Context is used for creating CUE Values.
@@ -219,7 +220,7 @@ const anonymousPkg = "_"
 // error occurred.
 func (c *Context) CompileString(src string, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.runtime().Compile(&cfg, src))
+	return c.compile(c.runtime().Compile(&cfg, source.NewStringSource(src)))
 }
 
 // CompileBytes parses and build a Value from the given source bytes.
@@ -228,7 +229,7 @@ func (c *Context) CompileString(src string, options ...BuildOption) Value {
 // error occurred.
 func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.runtime().Compile(&cfg, b))
+	return c.compile(c.runtime().Compile(&cfg, source.NewBytesSource(b)))
 }
 
 // TODO: fs.FS or custom wrapper?

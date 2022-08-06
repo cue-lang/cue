@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/source"
 )
 
 func TestDiff(t *testing.T) {
@@ -404,11 +405,11 @@ a: x: "hello"
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var r cue.Runtime
-			x, err := r.Compile("x", tc.x)
+			x, err := r.Compile("x", source.NewStringSource(tc.x))
 			if err != nil {
 				t.Fatal(err)
 			}
-			y, err := r.Compile("y", tc.y)
+			y, err := r.Compile("y", source.NewStringSource(tc.y))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -453,11 +454,11 @@ func TestX(t *testing.T) {
 		diff: ``,
 	}
 	var r cue.Runtime
-	x, err := r.Compile("x", tc.x)
+	x, err := r.Compile("x", source.NewStringSource(tc.x))
 	if err != nil {
 		t.Fatal(err)
 	}
-	y, err := r.Compile("y", tc.y)
+	y, err := r.Compile("y", source.NewStringSource(tc.y))
 	if err != nil {
 		t.Fatal(err)
 	}

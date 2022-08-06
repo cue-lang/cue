@@ -99,6 +99,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/source"
 
 	// Generated protobuf CUE may use builtins. Ensure that these can always be
 	// found, even if the user does not use cue/load or another package that
@@ -217,7 +218,7 @@ func (b *Extractor) addErr(err error) {
 // AddFile assumes that the proto file compiles with protoc and may not report
 // an error if it does not. Imports are resolved using the paths defined in
 // Config.
-func (b *Extractor) AddFile(filename string, src interface{}) error {
+func (b *Extractor) AddFile(filename string) error {
 	if b.done {
 		err := errors.Newf(token.NoPos,
 			"protobuf: cannot call AddFile: Instances was already called")
@@ -227,7 +228,7 @@ func (b *Extractor) AddFile(filename string, src interface{}) error {
 	if b.root != b.cwd && !filepath.IsAbs(filename) {
 		filename = filepath.Join(b.root, filename)
 	}
-	_, err := b.parse(filename, src)
+	_, err := b.parse(filename, source.NewFileSource(filename))
 	return err
 }
 
@@ -285,7 +286,7 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 			// return nil, err
 			continue
 		}
-		f, err = parser.ParseFile(f.Filename, buf, parser.ParseComments)
+		f, err = parser.ParseFile(f.Filename, source.NewBytesSource(buf), parser.ParseComments)
 		if err != nil {
 			b.addErr(err)
 			continue
@@ -392,7 +393,7 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 //
 // Extract assumes the proto file compiles with protoc and may not report an error
 // if it does not. Imports are resolved using the paths defined in Config.
-func Extract(filename string, src interface{}, c *Config) (f *ast.File, err error) {
+func Extract(filename string, src source.Source, c *Config) (f *ast.File, err error) {
 	if c == nil {
 		c = &Config{}
 	}

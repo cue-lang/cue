@@ -22,6 +22,7 @@ import (
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/encoding/protobuf"
+	"cuelang.org/go/internal/source"
 )
 
 func ExampleExtract() {
@@ -30,7 +31,8 @@ func ExampleExtract() {
 	paths = append(paths, cwd)
 	paths = append(paths, filepath.Join(cwd, "testdata"))
 
-	f, err := protobuf.Extract("examples/basic/basic.proto", nil, &protobuf.Config{
+	fname := "examples/basic/basic.proto"
+	f, err := protobuf.Extract(fname, source.NewFileSource(fname), &protobuf.Config{
 		Paths: paths,
 	})
 

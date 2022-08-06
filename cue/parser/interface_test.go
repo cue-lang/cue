@@ -25,7 +25,7 @@ import (
 func Test_readSource(t *testing.T) {
 	type args struct {
 		filename string
-		src      interface{}
+		src      source.Source
 	}
 	tests := []struct {
 		name    string
@@ -36,7 +36,7 @@ func Test_readSource(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		got, err := source.Read(tt.args.filename, tt.args.src)
+		got, err := tt.args.src.Read()
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. readSource() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
@@ -50,7 +50,7 @@ func Test_readSource(t *testing.T) {
 func TestParseFile(t *testing.T) {
 	type args struct {
 		filename string
-		src      interface{}
+		src      source.Source
 		options  []Option
 	}
 	tests := []struct {
@@ -76,7 +76,7 @@ func TestParseFile(t *testing.T) {
 func TestParseExprFrom(t *testing.T) {
 	type args struct {
 		filename string
-		src      interface{}
+		src      source.Source
 		mode     Option
 	}
 	tests := []struct {

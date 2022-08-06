@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/source"
 )
 
 type Sum struct {
@@ -89,7 +90,7 @@ func TestValidate(t *testing.T) {
 			}
 
 			if tc.constraints != "" {
-				inst, err := r.Compile(tc.name, tc.constraints)
+				inst, err := r.Compile(tc.name, source.NewStringSource(tc.constraints))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -209,7 +210,7 @@ func TestComplete(t *testing.T) {
 			}
 
 			if tc.constraints != "" {
-				inst, err := r.Compile(tc.name, tc.constraints)
+				inst, err := r.Compile(tc.name, source.NewStringSource(tc.constraints))
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -240,7 +241,7 @@ func TestEncode(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			inst, err := r.Compile("test", tc.in)
+			inst, err := r.Compile("test", source.NewStringSource(tc.in))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -337,7 +338,7 @@ func TestX(t *testing.T) {
 	}
 
 	if constraints != "" {
-		inst, err := r.Compile(name, constraints)
+		inst, err := r.Compile(name, source.NewStringSource(constraints))
 		if err != nil {
 			t.Fatal(err)
 		}

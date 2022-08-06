@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/source"
 )
 
 func TestStructural(t *testing.T) {
@@ -460,7 +461,7 @@ func TestStructural(t *testing.T) {
 
 		t.Run(strconv.Itoa(i)+"/"+key, func(t *testing.T) {
 
-			file, err := parser.ParseFile("subsume", tc.in)
+			file, err := parser.ParseFile("subsume", source.NewStringSource(tc.in))
 			if err != nil {
 				t.Fatal(err)
 			}

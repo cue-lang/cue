@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/source"
 )
 
 var (
@@ -69,7 +70,7 @@ func format(src []byte, mode checkMode) ([]byte, error) {
 	}
 
 	// make sure formatted output is syntactically correct
-	if _, err := parser.ParseFile("", res, parser.AllErrors); err != nil {
+	if _, err := parser.ParseFile("", source.NewBytesSource(res), parser.AllErrors); err != nil {
 		return nil, errors.Append(err.(errors.Error),
 			errors.Newf(token.NoPos, "re-parse failed: %s", res))
 	}
@@ -285,7 +286,7 @@ func TestNodes(t *testing.T) {
 func TestBadNodes(t *testing.T) {
 	const src = "package p\n("
 	const res = "package p\n\n(_|_)\n"
-	f, err := parser.ParseFile("", src, parser.ParseComments)
+	f, err := parser.ParseFile("", source.NewStringSource(src), parser.ParseComments)
 	if err == nil {
 		t.Error("expected illegal program") // error in test
 	}
@@ -370,7 +371,7 @@ e2: c*t.z
 `
 
 	// parse original
-	f1, err := parser.ParseFile("src", src, parser.ParseComments)
+	f1, err := parser.ParseFile("src", source.NewStringSource(src), parser.ParseComments)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -383,7 +384,7 @@ e2: c*t.z
 
 	// parse pretty printed original
 	// (//line comments must be interpreted even w/o syntax.ParseComments set)
-	f2, err := parser.ParseFile("", b, parser.AllErrors, parser.ParseComments)
+	f2, err := parser.ParseFile("", source.NewBytesSource(b), parser.AllErrors, parser.ParseComments)
 	if err != nil {
 		t.Fatalf("%s\n%s", err, b)
 	}
@@ -432,7 +433,7 @@ var decls = []string{
 
 func TestDeclLists(t *testing.T) {
 	for _, src := range decls {
-		file, err := parser.ParseFile("", src, parser.ParseComments)
+		file, err := parser.ParseFile("", source.NewStringSource(src), parser.ParseComments)
 		if err != nil {
 			panic(err) // error in test
 		}

@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/value"
 )
 
@@ -95,7 +96,7 @@ func TestX(t *testing.T) {
 	}
 
 	rt := cue.Runtime{}
-	inst, err := rt.Compile("", in)
+	inst, err := rt.Compile("", source.NewStringSource(in))
 	if err != nil {
 		t.Fatal(err)
 	}

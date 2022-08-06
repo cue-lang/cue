@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/source"
 )
 
 func getInstance(t *testing.T, body string) *Instance {
@@ -38,7 +39,7 @@ func getInstance(t *testing.T, body string) *Instance {
 
 	var r Runtime // TODO: use Context and return Value
 
-	inst, err := r.Compile("foo", body)
+	inst, err := r.Compile("foo", source.NewStringSource(body))
 	if err != nil {
 		t.Fatalf("unexpected parse error: %v", err)
 	}
@@ -100,7 +101,7 @@ func TestAPI(t *testing.T) {
 		}
 		t.Run("", func(t *testing.T) {
 			var r Runtime
-			inst, err := r.Compile("in", tc.input)
+			inst, err := r.Compile("in", source.NewStringSource(tc.input))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -842,7 +843,7 @@ func TestAllFields(t *testing.T) {
 
 func TestLookup(t *testing.T) {
 	var runtime = new(Runtime)
-	inst, err := runtime.Compile("x.cue", `
+	s := `
 #V: {
 	x: int
 }
@@ -850,7 +851,8 @@ func TestLookup(t *testing.T) {
 	[string]: int64
 } & #V
 v: #X
-`)
+`
+	inst, err := runtime.Compile("x.cue", source.NewStringSource(s))
 	if err != nil {
 		t.Fatalf("compile: %v", err)
 	}
@@ -906,7 +908,7 @@ v: #X
 
 func compileT(t *testing.T, r *Runtime, s string) *Instance {
 	t.Helper()
-	inst, err := r.Compile("", s)
+	inst, err := r.Compile("", source.NewStringSource(s))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -988,14 +990,15 @@ func TestFill(t *testing.T) {
 func TestFill2(t *testing.T) {
 	r := &Runtime{}
 
-	root, err := r.Compile("test", `
+	s := `
 	#Provider: {
 		ID: string
 		notConcrete: bool
 		a: int
 		b: int
 	}
-	`)
+	`
+	root, err := r.Compile("test", source.NewStringSource(s))
 
 	if err != nil {
 		t.Fatal(err)
@@ -1530,9 +1533,10 @@ func TestFillFloat(t *testing.T) {
 
 	filltest := func(x interface{}) {
 		r := &Runtime{}
-		i, err := r.Compile("test", `
+		s := `
 	x: number
-	`)
+	`
+		i, err := r.Compile("test", source.NewStringSource(s))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -2097,11 +2101,11 @@ func TestEquals(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			var r Runtime
-			a, err := r.Compile("a", tc.a)
+			a, err := r.Compile("a", source.NewStringSource(tc.a))
 			if err != nil {
 				t.Fatal(err)
 			}
-			b, err := r.Compile("b", tc.b)
+			b, err := r.Compile("b", source.NewStringSource(tc.b))
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -2246,7 +2250,7 @@ func TestValidate(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			r := Runtime{}
-			inst, err := r.Parse("validate", tc.in)
+			inst, err := r.Parse("validate", source.NewStringSource(tc.in))
 			if err == nil {
 				err = inst.Value().Validate(tc.opts...)
 			}
@@ -2280,7 +2284,7 @@ func TestPath(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		r := Runtime{}
-		inst, err := r.Parse("config", config)
+		inst, err := r.Parse("config", source.NewStringSource(config))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -2451,7 +2455,7 @@ func TestValueDoc(t *testing.T) {
 	`
 	var r Runtime
 	getInst := func(name, body string) *Instance {
-		inst, err := r.Compile("dir/file1.cue", body)
+		inst, err := r.Compile("dir/file1.cue", source.NewStringSource(body))
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -2932,7 +2936,7 @@ func TestReferencePath(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			var r Runtime
-			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)
+			inst, _ := r.Compile("in", source.NewStringSource(tc.input)) // getInstance(t, tc.input)
 			v := inst.Lookup("v", "w", "x")
 
 			root, path := v.ReferencePath()
@@ -3229,7 +3233,7 @@ func TestPathCorrection(t *testing.T) {
 		}
 		t.Run("", func(t *testing.T) {
 			var r Runtime
-			inst, err := r.Compile("in", tc.input)
+			inst, err := r.Compile("in", source.NewStringSource(tc.input))
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/source"
 )
 
 // A Runtime is used for creating CUE Values.
@@ -58,7 +59,7 @@ func (r *Runtime) complete(p *build.Instance, v *adt.Vertex) (*Instance, error) 
 // Build to allow importing non-builtin packages.
 //
 // Deprecated: use Parse or ParseBytes. The use of Instance is being phased out.
-func (r *hiddenRuntime) Compile(filename string, source interface{}) (*Instance, error) {
+func (r *hiddenRuntime) Compile(filename string, source source.Source) (*Instance, error) {
 	cfg := &runtime.Config{Filename: filename}
 	v, p := r.runtime().Compile(cfg, source)
 	return r.complete(p, v)
@@ -103,7 +104,7 @@ func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
 //
 // Deprecated: use CompileString or CompileBytes.  The use of Instance is being
 // phased out.
-func (r *hiddenRuntime) Parse(name string, source interface{}) (*Instance, error) {
+func (r *hiddenRuntime) Parse(name string, source source.Source) (*Instance, error) {
 	return r.Compile(name, source)
 }
 

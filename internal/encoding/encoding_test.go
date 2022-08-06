@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/source"
 )
 
 func TestValidate(t *testing.T) {
@@ -65,7 +66,7 @@ func TestValidate(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(path.Join(string(tc.form), tc.in), func(t *testing.T) {
-			f, err := parser.ParseFile("", tc.in, parser.ParseComments)
+			f, err := parser.ParseFile("", source.NewStringSource(tc.in), parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
 			}

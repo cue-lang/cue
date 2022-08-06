@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
@@ -374,7 +375,7 @@ func protoMode(b *buildPlan) error {
 	}
 	p := protobuf.NewExtractor(c)
 	for _, f := range protoFiles {
-		_ = p.AddFile(f.Filename, f.Source)
+		_ = p.AddFile(f.Filename)
 	}
 
 	files, err := p.Files()
@@ -571,7 +572,7 @@ func (h *hoister) hoist(f *ast.File) {
 func tryParse(str string) (s ast.Expr, pkg string) {
 	b := []byte(str)
 	if json.Valid(b) {
-		expr, err := parser.ParseExpr("", b)
+		expr, err := parser.ParseExpr("", source.NewBytesSource(b))
 		if err != nil {
 			// TODO: report error
 			return nil, ""

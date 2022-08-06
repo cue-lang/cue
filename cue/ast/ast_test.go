@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/source"
 )
 
 func TestCommentText(t *testing.T) {
@@ -88,7 +89,7 @@ func TestPackageName(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			f, err := parser.ParseFile("test", tc.input)
+			f, err := parser.ParseFile("test", source.NewStringSource(tc.input))
 			if err != nil {
 				t.Fatal(err)
 			}

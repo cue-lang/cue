@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8620a45e_3bc4739f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019759
+      },
+      "writtenOn": "2022-08-06T10:40:59Z",
+      "side": 1,
+      "message": "I have found https://github.com/cue-lang/cue/issues/1731 .\nIt might be better to create a new flag such as `-l` for printing.\nIf so, I will change.",
+      "revId": "4ccc1c5017163509b8bb3eeb0f2e730bffd5c0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

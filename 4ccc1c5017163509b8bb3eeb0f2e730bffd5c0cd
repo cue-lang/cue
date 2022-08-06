@@ -16,6 +16,24 @@
       "message": "I have found https://github.com/cue-lang/cue/issues/1731 .\nIt might be better to create a new flag such as `-l` for printing.\nIf so, I will change.",
       "revId": "4ccc1c5017163509b8bb3eeb0f2e730bffd5c0cd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe3fb797_95e43915",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019759
+      },
+      "writtenOn": "2022-08-06T20:21:02Z",
+      "side": 1,
+      "message": "Tried to implement `-l` and `-d` option.\nSize might be large because concrete `Source` types are introduced.",
+      "parentUuid": "8620a45e_3bc4739f",
+      "revId": "4ccc1c5017163509b8bb3eeb0f2e730bffd5c0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 )
@@ -31,7 +32,7 @@ import (
 func parse(t *testing.T, kind, expr string) cue.Value {
 	t.Helper()
 
-	x, err := parser.ParseExpr("test", expr)
+	x, err := parser.ParseExpr("test", source.NewStringSource(expr))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -14,7 +14,11 @@
 
 package build
 
-import "cuelang.org/go/cue/errors"
+import (
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal/source"
+)
 
 // A File represents a file that is part of the build process.
 type File struct {
@@ -25,8 +29,11 @@ type File struct {
 	Form           Form              `json:"form,omitempty"`
 	Tags           map[string]string `json:"tags,omitempty"` // code=go
 
-	ExcludeReason errors.Error `json:"-"`
-	Source        interface{}  `json:"-"` // TODO: swap out with concrete type.
+	ExcludeReason errors.Error  `json:"-"`
+	Source        source.Source `json:"-"`
+	Modified      bool          `json:"-"`
+	AST           *ast.File     `json:"-"`
+	Diff          string        `json:"-"`
 }
 
 // A Encoding indicates a file format for representing a program.

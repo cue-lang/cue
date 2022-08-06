@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/source"
 )
 
 type Config struct {
@@ -89,7 +90,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 
 func dummyLoad(token.Pos, string) *build.Instance { return nil }
 
-func (r *Runtime) Compile(cfg *Config, source interface{}) (*adt.Vertex, *build.Instance) {
+func (r *Runtime) Compile(cfg *Config, source source.Source) (*adt.Vertex, *build.Instance) {
 	ctx := build.NewContext()
 	var filename string
 	if cfg != nil && cfg.Filename != "" {

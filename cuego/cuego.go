@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/value"
 )
 
@@ -135,7 +136,7 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	expr, err := parser.ParseExpr(fmt.Sprintf("<%T>", x), constraints)
+	expr, err := parser.ParseExpr(fmt.Sprintf("<%T>", x), source.NewStringSource(constraints))
 	if err != nil {
 		return err
 	}
@@ -165,7 +166,7 @@ var (
 
 func init() {
 	var err error
-	instance, err = value.ConvertToRuntime(runtime).Compile("<cuego>", "{}")
+	instance, err = value.ConvertToRuntime(runtime).Compile("<cuego>", source.NewStringSource("{}"))
 	if err != nil {
 		panic(err)
 	}

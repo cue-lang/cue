@@ -16,7 +16,11 @@
 
 package parser
 
-import "testing"
+import (
+	"testing"
+
+	"cuelang.org/go/internal/source"
+)
 
 var valids = []string{
 	"\n",
@@ -28,7 +32,7 @@ var valids = []string{
 func TestValid(t *testing.T) {
 	for _, src := range valids {
 		t.Run(src, func(t *testing.T) {
-			checkErrors(t, src, src)
+			checkErrors(t, src, source.NewStringSource(src))
 		})
 	}
 }

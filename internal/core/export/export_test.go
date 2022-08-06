@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/value"
 	"golang.org/x/tools/txtar"
 )
@@ -113,10 +114,11 @@ func TestGenerated(t *testing.T) {
 		out: `*null|[...*null|{Name: string, Description: string}]`,
 	}, {
 		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			expr, err := parser.ParseExpr("test", `{
+			s := `{
 				x: Guide.#Terminal
 				Guide: {}
-			}`)
+			}`
+			expr, err := parser.ParseExpr("test", source.NewStringSource(s))
 			if err != nil {
 				return nil, err
 			}

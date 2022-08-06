@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/source"
 )
 
 func TestOptionalTypes(t *testing.T) {
@@ -55,7 +56,7 @@ func TestOptionalTypes(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			ctx := eval.NewContext(runtime.New(), nil)
-			f, err := parser.ParseFile("opt", tc.in)
+			f, err := parser.ParseFile("opt", source.NewStringSource(tc.in))
 			if err != nil {
 				t.Fatal(err)
 			}

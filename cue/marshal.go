@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/source"
 )
 
 // root.
@@ -62,7 +63,7 @@ func (b *unmarshaller) build(bi *instanceData) *build.Instance {
 	p := b.ctxt.NewInstance(bi.Path, b.load)
 	p.ImportPath = bi.Path
 	for _, f := range bi.Files {
-		_ = p.AddFile(f.Name, f.Data)
+		_ = p.AddFile(f.Name, source.NewBytesSource(f.Data))
 	}
 	p.Complete()
 	return p

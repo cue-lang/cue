@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/source"
 )
 
 func TestYAML(t *testing.T) {
@@ -128,7 +129,7 @@ null
 				yamlOut = tc.yamlOut
 			}
 
-			inst, _ = r.Compile(tc.name, tc.want)
+			inst, _ = r.Compile(tc.name, source.NewStringSource(tc.want))
 			if !tc.isStream {
 				b, err = Encode(inst.Value())
 				if err != nil {

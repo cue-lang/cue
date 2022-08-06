@@ -18,12 +18,10 @@
 package encoding
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"net/url"
-	"os"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -42,6 +40,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/third_party/yaml"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -151,10 +150,12 @@ type Config struct {
 
 	PkgName string // package name for files to generate
 
-	Force     bool // overwrite existing files
-	Strict    bool
-	Stream    bool // potentially write more than one document per file
-	AllErrors bool
+	Force              bool // overwrite existing files
+	StaleIfNotModified bool // do not overwrite if result is same as source
+	DiffViewEnabled    bool
+	Strict             bool
+	Stream             bool // potentially write more than one document per file
+	AllErrors          bool
 
 	Schema cue.Value // used for schema-based decoding
 
@@ -162,7 +163,7 @@ type Config struct {
 	InlineImports bool // expand references to non-core imports
 	ProtoPath     []string
 	Format        []format.Option
-	ParseFile     func(name string, src interface{}) (*ast.File, error)
+	ParseFile     func(name string, src source.Source) (*ast.File, error)
 }
 
 // NewDecoder returns a stream of non-rooted data expressions. The encoding
@@ -180,14 +181,25 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		return nil, io.EOF
 	}
 
-	if file, ok := f.Source.(*ast.File); ok {
-		i.file = file
+	if f.AST != nil {
+		i.file = f.AST
 		i.closer = ioutil.NopCloser(strings.NewReader(""))
-		i.validate(file, f)
+		i.validate(f.AST, f)
 		return i
 	}
 
-	rc, err := reader(f, cfg.Stdin)
+	// TODO: should we allow this?
+	if f.Filename == "-" && f.Source == nil {
+		f.Source = source.NewReaderSource(cfg.Stdin)
+		// return ioutil.NopCloser(stdin), nil
+	}
+
+	if f.Source == nil {
+		f.Source = source.NewFileSource(f.Filename)
+	}
+
+	rc, err := f.Source.Reader()
+	// rc, err := reader(f, cfg.Stdin)
 	i.closer = rc
 	i.err = err
 	if err != nil {
@@ -233,9 +245,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	switch f.Encoding {
 	case build.CUE:
 		if cfg.ParseFile == nil {
-			i.file, i.err = parser.ParseFile(path, r, parser.ParseComments)
+			i.file, i.err = parser.ParseFile(path, source.NewReaderSource(r), parser.ParseComments)
 		} else {
-			i.file, i.err = cfg.ParseFile(path, r)
+			i.file, i.err = cfg.ParseFile(path, source.NewReaderSource(r))
 		}
 		i.validate(i.file, f)
 		if i.err == nil {
@@ -263,7 +275,7 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 			Paths:   cfg.ProtoPath,
 			PkgName: cfg.PkgName,
 		}
-		i.file, i.err = protobuf.Extract(path, r, paths)
+		i.file, i.err = protobuf.Extract(path, source.NewReaderSource(r), paths)
 	case build.TextProto:
 		b, err := ioutil.ReadAll(r)
 		i.err = err
@@ -323,29 +335,6 @@ func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
 		}
 		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
 	}
-}
-
-func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {
-	switch s := f.Source.(type) {
-	case nil:
-		// Use the file name.
-	case string:
-		return ioutil.NopCloser(strings.NewReader(s)), nil
-	case []byte:
-		return ioutil.NopCloser(bytes.NewReader(s)), nil
-	case *bytes.Buffer:
-		// is io.Reader, but it needs to be readable repeatedly
-		if s != nil {
-			return ioutil.NopCloser(bytes.NewReader(s.Bytes())), nil
-		}
-	default:
-		return nil, fmt.Errorf("invalid source type %T", f.Source)
-	}
-	// TODO: should we allow this?
-	if f.Filename == "-" {
-		return ioutil.NopCloser(stdin), nil
-	}
-	return os.Open(f.Filename)
 }
 
 func shouldValidate(i *filetypes.FileInfo) bool {
@@ -481,5 +470,5 @@ func simplify(f *ast.File, err error) (*ast.File, error) {
 	if err != nil {
 		return nil, err
 	}
-	return parser.ParseFile(f.Filename, b, parser.ParseComments)
+	return parser.ParseFile(f.Filename, source.NewBytesSource(b), parser.ParseComments)
 }

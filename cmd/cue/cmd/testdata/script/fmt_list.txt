@@ -1,0 +1,38 @@
+cue fmt . -l -d  # not modified
+stdout 'x.cue'
+stdout 'y.cue'
+stdout 'z.cue'
+
+cue fmt . -l  # modified
+stdout 'x.cue'
+stdout 'y.cue'
+stdout 'z.cue'
+
+cue fmt . -l
+stdout ''
+-- x.cue --
+// header
+
+package x
+
+// file comment
+
+a:    1
+bb:  2
+
+-- y.cue --
+package y
+
+// a comment
+a:    1
+bb:  2 @test(foo)
+
+-- z.cue --
+// only for prod
+@if(prod)
+
+package y
+
+a:    1 @test(foo)
+bb:  2
+

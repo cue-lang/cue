@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/internal/source"
 )
 
 func TestDetect(t *testing.T) {
@@ -88,7 +89,7 @@ func TestDetect(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			var r cue.Runtime
-			inst, err := r.Compile(tc.name, tc.in)
+			inst, err := r.Compile(tc.name, source.NewStringSource(tc.in))
 			if err != nil {
 				t.Fatal(err)
 			}

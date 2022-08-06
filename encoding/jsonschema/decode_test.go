@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/source"
 	_ "cuelang.org/go/pkg"
 )
 
@@ -120,7 +121,7 @@ func TestDecode(t *testing.T) {
 
 				// verify the generated CUE.
 				if !bytes.Contains(a.Comment, []byte("#noverify")) {
-					if _, err = r.Compile(fullpath, b); err != nil {
+					if _, err = r.Compile(fullpath, source.NewBytesSource(b)); err != nil {
 						t.Fatal(errors.Details(err, nil))
 					}
 				}

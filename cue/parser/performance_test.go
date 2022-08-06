@@ -17,6 +17,8 @@ package parser
 import (
 	"io/ioutil"
 	"testing"
+
+	"cuelang.org/go/internal/source"
 )
 
 var src = readFile("testdata/commas.src")
@@ -32,7 +34,7 @@ func readFile(filename string) []byte {
 func BenchmarkParse(b *testing.B) {
 	b.SetBytes(int64(len(src)))
 	for i := 0; i < b.N; i++ {
-		if _, err := ParseFile("", src, ParseComments); err != nil {
+		if _, err := ParseFile("", source.NewBytesSource(src), ParseComments); err != nil {
 			b.Fatalf("benchmark failed due to parse error: %s", err)
 		}
 	}

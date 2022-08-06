@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"github.com/spf13/cobra"
+	"golang.org/x/text/message"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -27,9 +28,14 @@ import (
 	"cuelang.org/go/tools/fix"
 )
 
+const (
+	flagFmtList flagName = "list"
+	flagFmtDiff flagName = "diff"
+)
+
 func newFmtCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "fmt [-s] [inputs]",
+		Use:   "fmt [-s] [-l] [-d] [inputs]",
 		Short: "formats CUE configuration files",
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
@@ -52,9 +58,15 @@ func newFmtCmd(c *Command) *cobra.Command {
 				opts = append(opts, format.Simplify())
 			}
 
+			listFileNamesEnabled := flagFmtList.Bool(cmd)
+
 			cfg := *plan.encConfig
 			cfg.Format = opts
 			cfg.Force = true
+			cfg.StaleIfNotModified = true
+			cfg.DiffViewEnabled = flagFmtDiff.Bool(cmd)
+
+			p := message.NewPrinter(getLang())
 
 			for _, inst := range builds {
 				if inst.Err != nil {
@@ -88,10 +100,21 @@ func newFmtCmd(c *Command) *cobra.Command {
 						exitOnErr(cmd, err, false)
 					}
 					e.Close()
+
+					if file.Modified && listFileNamesEnabled {
+						_, _ = p.Println(inst.RelPath(file))
+					}
+					if file.Modified && cfg.DiffViewEnabled && !listFileNamesEnabled {
+						_, _ = p.Printf("> %s\n", inst.RelPath(file))
+						_, _ = p.Print(file.Diff)
+					}
 				}
 			}
 			return nil
 		}),
 	}
+
+	cmd.Flags().BoolP(string(flagFmtList), "l", false, "list file names which would be/were formatted")
+	cmd.Flags().BoolP(string(flagFmtDiff), "d", false, "show diffs which `fmt` would make without writing files")
 	return cmd
 }

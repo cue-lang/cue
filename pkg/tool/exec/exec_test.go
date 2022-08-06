@@ -21,6 +21,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/task"
 )
 
@@ -50,7 +51,7 @@ func TestEnv(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			var r cue.Runtime
-			inst, err := r.Compile(tc.desc, tc.val)
+			inst, err := r.Compile(tc.desc, source.NewStringSource(tc.val))
 			if err != nil {
 				t.Fatal(err)
 			}

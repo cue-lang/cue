@@ -141,10 +141,10 @@ const (
 // errors were found, the result is a partial AST (with Bad* nodes
 // representing the fragments of erroneous source code). Multiple errors
 // are returned via a ErrorList which is sorted by file position.
-func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
+func ParseFile(filename string, src source.Source, mode ...Option) (f *ast.File, err error) {
 
 	// get source
-	text, err := source.Read(filename, src)
+	text, err := src.Read()
 	if err != nil {
 		return nil, err
 	}
@@ -184,9 +184,9 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 // The arguments have the same meaning as for Parse, but the source must
 // be a valid CUE (type or value) expression. Specifically, fset must not
 // be nil.
-func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, error) {
+func ParseExpr(filename string, src source.Source, mode ...Option) (ast.Expr, error) {
 	// get source
-	text, err := source.Read(filename, src)
+	text, err := src.Read()
 	if err != nil {
 		return nil, err
 	}
@@ -228,5 +228,5 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 // expression x. The position information recorded in the AST is undefined. The
 // filename used in error messages is the empty string.
 func parseExprString(x string) (ast.Expr, error) {
-	return ParseExpr("", []byte(x))
+	return ParseExpr("", source.NewStringSource(x))
 }

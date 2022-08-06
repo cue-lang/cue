@@ -1,0 +1,9 @@
+mkdir orig
+cp x.cue orig/x.cue
+cue fmt . -d
+stdout '> x.cue'
+stdout '\-\[  \]'
+stdout '\+\[\]'
+cmp x.cue orig/x.cue
+-- x.cue --
+[  ]

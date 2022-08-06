@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
+	"cuelang.org/go/internal/source"
 	"golang.org/x/tools/txtar"
 )
 
@@ -136,7 +137,7 @@ func TestLookupPath(t *testing.T) {
 
 func compileT(t *testing.T, r *cue.Runtime, s string) cue.Value {
 	t.Helper()
-	inst, err := r.Compile("", s)
+	inst, err := r.Compile("", source.NewStringSource(s))
 	if err != nil {
 		t.Fatal(err)
 	}

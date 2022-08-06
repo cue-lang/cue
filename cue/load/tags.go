@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cli"
+	"cuelang.org/go/internal/source"
 )
 
 // A TagVar represents an injection variable.
@@ -318,7 +319,7 @@ func shouldBuildFile(f *ast.File, fp *fileProcessor) errors.Error {
 
 	_, body := a.Split()
 
-	expr, err := parser.ParseExpr("", body)
+	expr, err := parser.ParseExpr("", source.NewStringSource(body))
 	if err != nil {
 		return errors.Promote(err, "")
 	}

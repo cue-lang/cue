@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/source"
 )
 
 // For debugging purposes, do not remove.
@@ -45,7 +46,7 @@ func TestX(t *testing.T) {
 func parse(t *testing.T, ctx *adt.OpContext, str string) *adt.Vertex {
 	t.Helper()
 
-	file, err := parser.ParseFile("subsume", str)
+	file, err := parser.ParseFile("subsume", source.NewStringSource(str))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/value"
 )
 
@@ -43,7 +44,7 @@ func Validate(b []byte, v cue.Value) error {
 		return fmt.Errorf("json: invalid JSON")
 	}
 	r := value.ConvertToRuntime(v.Context())
-	inst, err := r.Compile("json.Validate", b)
+	inst, err := r.Compile("json.Validate", source.NewBytesSource(b))
 	if err != nil {
 		return err
 	}
@@ -79,7 +80,7 @@ func Decode(r *cue.Runtime, path string, data []byte) (*cue.Instance, error) {
 }
 
 func extract(path string, b []byte) (ast.Expr, error) {
-	expr, err := parser.ParseExpr(path, b)
+	expr, err := parser.ParseExpr(path, source.NewBytesSource(b))
 	if err != nil || !json.Valid(b) {
 		p := token.NoPos
 		if pos := errors.Positions(err); len(pos) > 0 {
@@ -137,7 +138,8 @@ func (d *Decoder) extract() (ast.Expr, error) {
 		pos := token.NewFile(d.path, offset, len(raw)).Pos(0, 0)
 		return nil, errors.Wrapf(err, pos, "invalid JSON for file %q", d.path)
 	}
-	expr, err := parser.ParseExpr(d.path, []byte(raw), parser.FileOffset(offset))
+	s := source.NewBytesSource([]byte(raw))
+	expr, err := parser.ParseExpr(d.path, s, parser.FileOffset(offset))
 	if err != nil {
 		return nil, err
 	}

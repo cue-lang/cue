@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/source"
 	"github.com/cockroachdb/apd/v2"
 )
 
@@ -121,7 +122,7 @@ func ParsePath(s string) Path {
 	if s == "" {
 		return Path{}
 	}
-	expr, err := parser.ParseExpr("", s)
+	expr, err := parser.ParseExpr("", source.NewStringSource(s))
 	if err != nil {
 		return MakePath(Selector{pathError{errors.Promote(err, "invalid path")}})
 	}

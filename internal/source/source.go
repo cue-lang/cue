@@ -18,36 +18,116 @@ package source
 
 import (
 	"bytes"
-	"fmt"
+	"errors"
 	"io"
 	"io/ioutil"
+	"os"
+	"strings"
 )
 
-// Read loads the source bytes for the given arguments. If src != nil,
-// Read converts src to a []byte if possible; otherwise it returns an
-// error. If src == nil, readSource returns the result of reading the file
-// specified by filename.
-//
-func Read(filename string, src interface{}) ([]byte, error) {
-	if src != nil {
-		switch s := src.(type) {
-		case string:
-			return []byte(s), nil
-		case []byte:
-			return s, nil
-		case *bytes.Buffer:
-			// is io.Reader, but src is already available in []byte form
-			if s != nil {
-				return s.Bytes(), nil
-			}
-		case io.Reader:
-			var buf bytes.Buffer
-			if _, err := io.Copy(&buf, s); err != nil {
-				return nil, err
-			}
-			return buf.Bytes(), nil
-		}
-		return nil, fmt.Errorf("invalid source type %T", src)
+type Source interface {
+	// Read loads the source bytes for the given arguments.
+	// Read converts src to a []byte if possible; otherwise it returns an
+	// error.
+	Read() ([]byte, error)
+
+	Reader() (io.ReadCloser, error)
+}
+
+type StringSource struct {
+	src string
+}
+
+func NewStringSource(src string) *StringSource {
+	return &StringSource{
+		src: src,
 	}
-	return ioutil.ReadFile(filename)
+}
+
+func (ss *StringSource) Read() ([]byte, error) {
+	return []byte(ss.src), nil
+}
+
+func (ss *StringSource) Reader() (io.ReadCloser, error) {
+	return ioutil.NopCloser(strings.NewReader(ss.src)), nil
+}
+
+type BytesSource struct {
+	src []byte
+}
+
+func NewBytesSource(src []byte) *BytesSource {
+	return &BytesSource{
+		src: src,
+	}
+}
+
+func (bs *BytesSource) Read() ([]byte, error) {
+	return bs.src, nil
+}
+
+func (bs *BytesSource) Reader() (io.ReadCloser, error) {
+	return ioutil.NopCloser(bytes.NewReader(bs.src)), nil
+}
+
+type BytesBufferSource struct {
+	src *bytes.Buffer
+}
+
+func NewBytesBufferSource(src *bytes.Buffer) *BytesBufferSource {
+	return &BytesBufferSource{
+		src: src,
+	}
+}
+func (bbs *BytesBufferSource) Read() ([]byte, error) {
+	if bbs.src == nil {
+		return nil, errors.New("BytesBufferSource is nil")
+	}
+	return bbs.src.Bytes(), nil
+}
+
+func (bbs *BytesBufferSource) Reader() (io.ReadCloser, error) {
+	if bbs.src == nil {
+		return nil, errors.New("BytesBufferSource is nil")
+	}
+	return ioutil.NopCloser(bytes.NewReader(bbs.src.Bytes())), nil
+}
+
+type ReaderSource struct {
+	src io.Reader
+}
+
+func NewReaderSource(src io.Reader) *ReaderSource {
+	return &ReaderSource{
+		src: src,
+	}
+}
+
+func (rs *ReaderSource) Read() ([]byte, error) {
+	var buf bytes.Buffer
+	if _, err := io.Copy(&buf, rs.src); err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func (rs *ReaderSource) Reader() (io.ReadCloser, error) {
+	return ioutil.NopCloser(rs.src), nil
+}
+
+type FileSource struct {
+	src string // filename
+}
+
+func NewFileSource(src string) *FileSource {
+	return &FileSource{
+		src: src,
+	}
+}
+func (fs *FileSource) Read() ([]byte, error) {
+	return ioutil.ReadFile(fs.src)
+}
+
+func (fs *FileSource) Reader() (io.ReadCloser, error) {
+	return os.Open(fs.src)
 }

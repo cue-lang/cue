@@ -43,6 +43,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/source"
 )
 
 // TODO:
@@ -573,7 +574,7 @@ func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error 
 			if filepath.Ext(path) != ".cue" {
 				return nil
 			}
-			f, err := parser.ParseFile(path, nil)
+			f, err := parser.ParseFile(path, source.NewFileSource(path))
 			if err != nil {
 				return err
 			}
@@ -777,7 +778,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 
 				c := e.pkg.TypesInfo.Defs[v.Names[i]].(*types.Const)
 				sv := c.Val().ExactString()
-				cv, err := parser.ParseExpr("", sv)
+				cv, err := parser.ParseExpr("", source.NewStringSource(sv))
 				if err != nil {
 					panic(fmt.Errorf("failed to parse %v: %v", sv, err))
 				}
@@ -1213,7 +1214,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		add(field)
 
 		if s := reflect.StructTag(tag).Get("cue"); s != "" {
-			expr, err := parser.ParseExpr("get go", s)
+			expr, err := parser.ParseExpr("get go", source.NewStringSource(s))
 			if err != nil {
 				e.logf("error parsing struct tag %q:", s, err)
 			}

@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/source"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -188,7 +189,7 @@ y: conflicting values 4 and 2:
 
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			f, err := parser.ParseFile("test", tc.in)
+			f, err := parser.ParseFile("test", source.NewStringSource(tc.in))
 			if err != nil {
 				t.Fatal(err)
 			}

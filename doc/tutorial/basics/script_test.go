@@ -14,6 +14,7 @@ import (
 	"cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/source"
 )
 
 // TestLatest checks that the examples match the latest language standard,
@@ -38,7 +39,7 @@ func TestLatest(t *testing.T) {
 					return
 				}
 				v := parser.FromVersion(parser.Latest)
-				_, err := parser.ParseFile(f.Name, f.Data, v)
+				_, err := parser.ParseFile(f.Name, source.NewBytesSource(f.Data), v)
 				if err != nil {
 					t.Errorf("%v: %v", fullpath, err)
 				}

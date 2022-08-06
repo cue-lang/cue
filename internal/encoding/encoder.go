@@ -35,6 +35,8 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/pkg/encoding/yaml"
+
+	"github.com/kylelemons/godebug/diff"
 )
 
 // An Encoder converts CUE to various file formats, including CUE itself.
@@ -310,8 +312,33 @@ func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err er
 	// Delay opening the file until we can write it to completion. This will
 	// prevent clobbering the file in case of a crash.
 	b := &bytes.Buffer{}
-	fn := func() error {
+
+	close = func() error {
 		return ioutil.WriteFile(path, b.Bytes(), 0644)
 	}
-	return b, fn, nil
+
+	staleClose := func() error {
+		res := b.Bytes()
+		source, err := f.Source.Read()
+		if err != nil {
+			return err
+		}
+
+		if bytes.Equal(source, res) {
+			f.Modified = false
+			return nil
+		}
+		f.Modified = true
+		if cfg.DiffViewEnabled {
+			f.Diff = diff.Diff(string(source), string(res))
+			return nil
+		}
+		return ioutil.WriteFile(path, res, 0644)
+	}
+
+	if cfg.StaleIfNotModified {
+		close = staleClose
+	}
+
+	return b, close, nil
 }

@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/source"
 )
 
 var (
@@ -92,7 +93,7 @@ func TestX(t *testing.T) {
 		t.Skip()
 	}
 
-	file, err := parser.ParseFile("TestX", in)
+	file, err := parser.ParseFile("TestX", source.NewStringSource(in))
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -36,7 +36,7 @@ import (
 	"cuelang.org/go/internal/source"
 )
 
-func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, err error) {
+func (s *Extractor) parse(filename string, src source.Source) (p *protoConverter, err error) {
 	if filename == "" {
 		return nil, errors.Newf(token.NoPos, "empty filename")
 	}
@@ -47,7 +47,7 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		s.fileCache[filename] = result{p, err}
 	}()
 
-	b, err := source.Read(filename, src)
+	b, err := src.Read()
 	if err != nil {
 		return nil, err
 	}
@@ -322,7 +322,7 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 		return nil
 	}
 
-	imp, err := p.state.parse(filename, nil)
+	imp, err := p.state.parse(filename, source.NewFileSource(filename))
 	if err != nil {
 		fail(v.Position, err)
 	}
@@ -785,7 +785,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 
 		case "(cue.val)":
 			// TODO: set filename and base offset.
-			expr, err := parser.ParseExpr("", o.Constant.Source)
+			expr, err := parser.ParseExpr("", source.NewStringSource(o.Constant.Source))
 			if err != nil {
 				failf(o.Position, "invalid cue.val value: %v", err)
 			}

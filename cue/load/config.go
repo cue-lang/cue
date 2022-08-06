@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/source"
 )
 
 const (
@@ -266,7 +267,7 @@ type Config struct {
 	// An application may supply a custom implementation of ParseFile to change
 	// the effective file contents or the behavior of the parser, or to modify
 	// the syntax tree.
-	ParseFile func(name string, src interface{}) (*ast.File, error)
+	ParseFile func(name string, src source.Source) (*ast.File, error)
 
 	// Overlay provides a mapping of absolute file paths to file contents.  If
 	// the file with the given path already exists, the parser will use the
@@ -541,7 +542,7 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 
 		// TODO: move to full build again
-		file, err := parser.ParseFile("load", f)
+		file, err := parser.ParseFile("load", source.NewReaderSource(f))
 		if err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 		}

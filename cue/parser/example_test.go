@@ -18,12 +18,14 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/source"
 )
 
 func ExampleParseFile() {
 	// Parse the file containing this very example
 	// but stop after processing the imports.
-	f, err := parser.ParseFile("testdata/test.cue", nil)
+	name := "testdata/test.cue"
+	f, err := parser.ParseFile(name, source.NewFileSource(name))
 	if err != nil {
 		fmt.Println(err)
 		return

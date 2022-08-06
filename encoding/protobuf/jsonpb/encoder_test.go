@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/source"
 )
 
 func TestEncoder(t *testing.T) {
@@ -45,7 +46,7 @@ func TestEncoder(t *testing.T) {
 		for _, f := range t.Archive.Files {
 			switch {
 			case f.Name == "schema.cue":
-				inst, err := r.Compile(f.Name, f.Data)
+				inst, err := r.Compile(f.Name, source.NewBytesSource(f.Data))
 				if err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return
@@ -53,7 +54,7 @@ func TestEncoder(t *testing.T) {
 				schema = inst.Value()
 
 			case f.Name == "value.cue":
-				f, err := parser.ParseFile(f.Name, f.Data, parser.ParseComments)
+				f, err := parser.ParseFile(f.Name, source.NewBytesSource(f.Data), parser.ParseComments)
 				if err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return

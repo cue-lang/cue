@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/value"
 )
 
@@ -256,7 +257,7 @@ func (b *builder) build(bi *bimport) *build.Instance {
 	}
 	p := b.ctxt.NewInstance(path, b.load)
 	for i, f := range bi.files {
-		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), f)
+		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), source.NewStringSource(f))
 	}
 	_ = p.Complete()
 	return p

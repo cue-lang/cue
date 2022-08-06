@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
+	"cuelang.org/go/internal/source"
 )
 
 // A Builtin is a Builtin function or constant.
@@ -89,7 +90,7 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 
 	// Parse builtin CUE
 	if p.CUE != "" {
-		expr, err := parser.ParseExpr(importPath, p.CUE)
+		expr, err := parser.ParseExpr(importPath, source.NewStringSource(p.CUE))
 		if err != nil {
 			panic(fmt.Errorf("could not parse %v: %v", p.CUE, err))
 		}
@@ -169,7 +170,7 @@ func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 // newConstBuiltin parses and creates any CUE expression that does not have
 // fields.
 func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
-	expr, err := parser.ParseExpr("<builtin:"+name+">", val)
+	expr, err := parser.ParseExpr("<builtin:"+name+">", source.NewStringSource(val))
 	if err != nil {
 		panic(err)
 	}

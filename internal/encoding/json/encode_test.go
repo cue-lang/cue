@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/source"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -228,7 +229,7 @@ f4: {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := parser.ParseFile(tc.name, tc.in, parser.ParseComments)
+			f, err := parser.ParseFile(tc.name, source.NewStringSource(tc.in), parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
 			}

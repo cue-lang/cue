@@ -27,6 +27,7 @@ type File struct {
 
 	ExcludeReason errors.Error `json:"-"`
 	Source        interface{}  `json:"-"` // TODO: swap out with concrete type.
+	Modified      bool         `json:"-"`
 }
 
 // A Encoding indicates a file format for representing a program.

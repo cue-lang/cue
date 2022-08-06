@@ -310,8 +310,41 @@ func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err er
 	// Delay opening the file until we can write it to completion. This will
 	// prevent clobbering the file in case of a crash.
 	b := &bytes.Buffer{}
-	fn := func() error {
+
+	close = func() error {
 		return ioutil.WriteFile(path, b.Bytes(), 0644)
 	}
-	return b, fn, nil
+
+	staleClose := func() error {
+		res := b.Bytes()
+		var source []byte
+		switch s := f.Source.(type) {
+		case nil:
+			source, err = ioutil.ReadFile(f.Filename)
+			if err != nil {
+				return err
+			}
+		case []byte:
+			source = s
+		case string:
+			source = []byte(s)
+		case *bytes.Buffer:
+			source = s.Bytes()
+		default:
+			return fmt.Errorf("invalid source type %T", f.Source)
+		}
+
+		if bytes.Equal(source, res) {
+			f.Modified = false
+			return nil
+		}
+		f.Modified = true
+		return ioutil.WriteFile(path, res, 0644)
+	}
+
+	if cfg.StaleIfNotModified {
+		close = staleClose
+	}
+
+	return b, close, nil
 }

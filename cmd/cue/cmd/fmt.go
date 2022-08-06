@@ -15,7 +15,10 @@
 package cmd
 
 import (
+	"io/ioutil"
+
 	"github.com/spf13/cobra"
+	"golang.org/x/text/message"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -55,6 +58,9 @@ func newFmtCmd(c *Command) *cobra.Command {
 			cfg := *plan.encConfig
 			cfg.Format = opts
 			cfg.Force = true
+			cfg.StaleIfNotModified = true
+
+			p := message.NewPrinter(getLang())
 
 			for _, inst := range builds {
 				if inst.Err != nil {
@@ -67,6 +73,11 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 				}
 				for _, file := range inst.BuildFiles {
+					if file.Source == nil {
+						// prevent re-reading file
+						file.Source, err = ioutil.ReadFile(file.Filename)
+						exitOnErr(cmd, err, true)
+					}
 					files := []*ast.File{}
 					d := encoding.NewDecoder(file, &cfg)
 					defer d.Close()
@@ -88,6 +99,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 						exitOnErr(cmd, err, false)
 					}
 					e.Close()
+
+					if file.Modified {
+						_, _ = p.Println(inst.RelPath(file))
+					}
 				}
 			}
 			return nil

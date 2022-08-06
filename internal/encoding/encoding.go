@@ -151,10 +151,11 @@ type Config struct {
 
 	PkgName string // package name for files to generate
 
-	Force     bool // overwrite existing files
-	Strict    bool
-	Stream    bool // potentially write more than one document per file
-	AllErrors bool
+	Force              bool // overwrite existing files
+	StaleIfNotModified bool // do not overwrite if result is same as source
+	Strict             bool
+	Stream             bool // potentially write more than one document per file
+	AllErrors          bool
 
 	Schema cue.Value // used for schema-based decoding
 

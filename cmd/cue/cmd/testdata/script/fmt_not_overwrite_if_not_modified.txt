@@ -1,0 +1,21 @@
+go run mtime.go
+cp stderr mtime_before
+
+cue fmt not_modified.cue
+stdout ''
+
+go run mtime.go
+cp stderr mtime_after
+
+cmp mtime_before mtime_after
+-- not_modified.cue --
+[]
+-- mtime.go --
+package main
+
+import "os"
+
+func main () {
+	s, _ := os.Stat("not_modified.cue")
+	print(s.ModTime().UnixNano())
+}

@@ -15,6 +15,7 @@
 package openapi
 
 import (
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -24,7 +25,7 @@ var _ errors.Error = &openapiError{}
 // implements cue/Error
 type openapiError struct {
 	errors.Message
-	path []string
+	path cue.Path
 	pos  token.Pos
 }
 
@@ -37,5 +38,13 @@ func (e *openapiError) InputPositions() []token.Pos {
 }
 
 func (e *openapiError) Path() []string {
-	return e.path
+	return pathToStrings(e.path)
+}
+
+// pathToString is a utility function for creating debugging info.
+func pathToStrings(p cue.Path) (a []string) {
+	for _, sel := range p.Selectors() {
+		a = append(a, sel.String())
+	}
+	return a
 }

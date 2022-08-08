@@ -117,7 +117,7 @@ func TestParseDefinitions(t *testing.T) {
 		out: "oneof-funcs.json",
 		config: &openapi.Config{
 			Info: info,
-			ReferenceFunc: func(inst *cue.Instance, path []string) string {
+			ReferenceFunc: func(v cue.Value, path []string) string {
 				return strings.ToUpper(strings.Join(path, "_"))
 			},
 			DescriptionFunc: func(v cue.Value) string {
@@ -129,7 +129,7 @@ func TestParseDefinitions(t *testing.T) {
 		out: "refs.json",
 		config: &openapi.Config{
 			Info: info,
-			ReferenceFunc: func(inst *cue.Instance, path []string) string {
+			ReferenceFunc: func(v cue.Value, path []string) string {
 				switch {
 				case strings.HasPrefix(path[0], "Excluded"):
 					return ""

@@ -459,7 +459,6 @@ Errors:
 a1.f.0: structural cycle
 a3.f.g: structural cycle
 b13.root.a.0.0: structural cycle
-b14.root.b.1.0: structural cycle
 b14.root.b.1.1: structural cycle
 b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
     ./in.cue:53:5
@@ -758,12 +757,48 @@ Result:
     x: (#struct){ |((#struct){
         c: (#list){
           0: ((string|struct)){ |((string){ string }, (#struct){
+              c: (#list){
+                0: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+                1: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+                2: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+              }
+            }, (#struct){
               ref: (string){ string }
             }) }
           1: ((string|struct)){ |((string){ string }, (#struct){
+              c: (#list){
+                0: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+                1: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+                2: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+              }
+            }, (#struct){
               ref: (string){ string }
             }) }
           2: ((string|struct)){ |((string){ string }, (#struct){
+              c: (#list){
+                0: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+                1: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+                2: ((string|struct)){ |((string){ string }, (#struct){
+                    ref: (string){ string }
+                  }) }
+              }
+            }, (#struct){
               ref: (string){ string }
             }) }
         }
@@ -788,9 +823,7 @@ Result:
   b11: (struct){
     #list: (#struct){
       tail: ((null|struct)){ |(*(null){ null }, (#struct){
-          tail: ((null|struct)){ |(*(null){ null }, (#struct){
-              tail: (null){ null }
-            }) }
+          tail: (null){ null }
         }) }
     }
   }
@@ -864,8 +897,7 @@ Result:
         }
         1: (_|_){
           // [structural cycle]
-          0: (_|_){
-            // [structural cycle] b14.root.b.1.0: structural cycle
+          0: (list){
           }
           1: (_|_){
             // [structural cycle] b14.root.b.1.1: structural cycle
@@ -1178,9 +1210,7 @@ Result:
     // [structural cycle]
     doubleRef: (struct){
       a: (#struct){
-        Next: ((null|struct)){ |(*(null){ null }, (#struct){
-            Next: (null){ null }
-          }) }
+        Next: (null){ null }
       }
       #List: (#struct){
         Next: (null){ null }
@@ -1211,9 +1241,7 @@ Result:
     comprehension: (struct){
       #list: (#struct){
         tail: ((null|struct)){ |(*(null){ null }, (#struct){
-            tail: ((null|struct)){ |(*(null){ null }, (#struct){
-                tail: (null){ null }
-              }) }
+            tail: (null){ null }
           }) }
       }
     }

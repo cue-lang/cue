@@ -83,8 +83,6 @@ fib12: 144
 Errors:
 structural cycle:
     ./in.cue:3:25
-structural cycle:
-    ./in.cue:8:9
 
 Result:
 (_|_){
@@ -119,17 +117,16 @@ Result:
     }
     n: (int){ int }
   }
-  fib2: (int){ 1 }
+  fib2: (_|_){
+    // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+  }
   fib7: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
-    // structural cycle:
-    //     ./in.cue:8:9
   }
   fib12: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
-    // structural cycle:
-    //     ./in.cue:8:9
   }
 }

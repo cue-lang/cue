@@ -205,20 +205,27 @@ package adt
 //     Cambridge University Press, ISBN:0-521-41932-8
 
 type CycleInfo struct {
+	// IsCyclic indicates whether this conjunct, or any of its ancestors,
+	// had a violating cycle.
 	IsCyclic bool
 
 	// Inline is used to detect expressions referencing themselves, for instance:
 	//     {x: out, out: x}.out
 	Inline bool
 
+	// IsPattern indicates whether this conjunct was inserted by a pattern.
+	IsPattern bool
+
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
-	Refs *RefNode
+	Refs   *RefNode
+	Exempt *RefNode // First RefNode that should not count as a cycle next.
 }
 
 // A RefNode is a linked list of associated references.
 type RefNode struct {
 	Ref  Resolver
+	Node *Vertex
 	Next *RefNode
 }
 
@@ -249,8 +256,12 @@ type cyclicConjunct struct {
 // be fully cyclic so far.
 func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, delay bool) {
 	found := false
+	exempt := false
 	for r := v.CloseInfo.Refs; r != nil; r = r.Next {
-		if r.Ref == x {
+		if arc.status != EvaluatingArcs && v.CloseInfo.Exempt == r {
+			exempt = true
+		}
+		if r.Ref == x || r.Node == arc {
 			if v.CloseInfo.Inline {
 				n.reportCycleError()
 				return v, true
@@ -259,24 +270,38 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		}
 	}
 
-	if !found {
+	if !found && (!exempt || arc.status != Finalized) {
 		// Adding this in case there is a cycle is unnecessary, but gives
 		// somewhat better error messages.
-		v.CloseInfo.Refs = &RefNode{Ref: x, Next: v.CloseInfo.Refs}
+		ref := &RefNode{
+			Ref:  x,
+			Next: v.CloseInfo.Refs,
+		}
+
+		ref.Node = arc
+		v.CloseInfo.Refs = ref
 
 		if arc.status != EvaluatingArcs {
+			// Count first-time reference as cycle breaker and exempt all
+			// previous reference from producing a cycle next time around.
+			// TODO: find tighter rule, like only activating this when
+			// crossing a pattern constraint (x: [string]: b: x). See circularIf in errors.txtar.
+			v.CloseInfo.Exempt = v.CloseInfo.Refs
 			return v, false
 		}
 	}
 
-	// Found duplicate reference or direct detection through arc status.
+	v.CloseInfo.Exempt = nil
 
-	n.hasCycle = true
-	v.CloseInfo.IsCyclic = true
+	if !exempt {
+		v.CloseInfo.IsCyclic = true // !exempt
+		// Found duplicate reference or direct detection through arc status.
+		n.hasCycle = true
 
-	if !n.hasNonCycle {
-		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
-		return v, true
+		if !n.hasNonCycle {
+			n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
+			return v, true
+		}
 	}
 
 	return v, false
@@ -295,10 +320,22 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 }
 
 func assertStructuralCycle(n *nodeContext) bool {
-	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
-		n.reportCycleError()
-		return true
+	if n.hasCycle {
+		if !n.hasNonCycle {
+			n.reportCycleError()
+			return true
+		}
 	}
+
+	if n.hasNonCycle {
+		for _, arc := range n.node.Arcs {
+			for _, c := range arc.Conjuncts {
+				info := &c.CloseInfo.CycleInfo
+				info.Exempt = info.Refs
+			}
+		}
+	}
+
 	return false
 }
 

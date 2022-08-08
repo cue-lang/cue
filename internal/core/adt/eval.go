@@ -199,6 +199,11 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 	n := v.getNodeContext(c, 1)
 	defer v.freeNode(n)
 
+	// TODO(cycle): verify this happens in all cases when we need it.
+	if n != nil && v.Parent != nil && v.Parent.state != nil {
+		n.depth = v.Parent.state.depth + 1
+	}
+
 	if state <= v.Status() &&
 		state == Partial &&
 		v.isDefined() &&
@@ -926,6 +931,7 @@ type nodeContext struct {
 	hasTop      bool
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
+	depth       int32
 
 	// Disjunction handling
 	disjunctions []envDisjunct
@@ -989,6 +995,7 @@ func (n *nodeContext) clone() *nodeContext {
 	d.hasTop = n.hasTop
 	d.hasCycle = n.hasCycle
 	d.hasNonCycle = n.hasNonCycle
+	d.depth = n.depth
 
 	// d.arcMap = append(d.arcMap, n.arcMap...) // XXX add?
 	d.cyclicConjuncts = append(d.cyclicConjuncts, n.cyclicConjuncts...)
@@ -1534,6 +1541,11 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		// TODO(cycles): this can probably most easily be fixed with a
 		// having a more recursive implementation.
 		n.ctx.Unify(arc, Partial)
+	}
+
+	// Don't add conjuncts if a node is referring to itself.
+	if n.node == arc {
+		return
 	}
 
 	for _, c := range arc.Conjuncts {

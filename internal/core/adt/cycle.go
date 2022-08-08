@@ -205,11 +205,16 @@ package adt
 //     Cambridge University Press, ISBN:0-521-41932-8
 
 type CycleInfo struct {
+	// IsCyclic indicates whether this conjunct, or any of its ancestors,
+	// had a violating cycle.
 	IsCyclic bool
 
 	// Inline is used to detect expressions referencing themselves, for instance:
 	//     {x: out, out: x}.out
 	Inline bool
+
+	// IsPattern indicates whether this conjunct was inserted by a pattern.
+	IsPattern bool
 
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
@@ -218,8 +223,10 @@ type CycleInfo struct {
 
 // A RefNode is a linked list of associated references.
 type RefNode struct {
-	Ref  Resolver
-	Next *RefNode
+	Ref   Resolver
+	Arc   *Vertex
+	Next  *RefNode
+	Depth int32
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -248,35 +255,84 @@ type cyclicConjunct struct {
 // its processing should be delayed, which is the case if the conjunct seems to
 // be fully cyclic so far.
 func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, delay bool) {
+	// Check whether the reference already occurred in the list, signaling
+	// a potential cycle.
 	found := false
+	depth := int32(0)
 	for r := v.CloseInfo.Refs; r != nil; r = r.Next {
-		if r.Ref == x {
+		if r.Ref == x || r.Arc == arc {
 			if v.CloseInfo.Inline {
 				n.reportCycleError()
 				return v, true
 			}
+			depth = r.Depth
 			found = true
+			break
 		}
 	}
 
-	if !found {
-		// Adding this in case there is a cycle is unnecessary, but gives
-		// somewhat better error messages.
-		v.CloseInfo.Refs = &RefNode{Ref: x, Next: v.CloseInfo.Refs}
-
-		if arc.status != EvaluatingArcs {
-			return v, false
+	if !found || depth != n.depth {
+		// Adding this in case there is a definite cycle is unnecessary, but
+		// gives somewhat better error messages.
+		// We also need to add the reference again if the depth differs, as
+		// the depth is used for tracking "new structure".
+		v.CloseInfo.Refs = &RefNode{
+			Arc:   arc,
+			Ref:   x,
+			Next:  v.CloseInfo.Refs,
+			Depth: n.depth,
 		}
 	}
 
-	// Found duplicate reference or direct detection through arc status.
+	if !found && arc.status != EvaluatingArcs {
+		// No cycle.
+		return v, false
+	}
 
-	n.hasCycle = true
+	alreadyCycle := v.CloseInfo.IsCyclic
 	v.CloseInfo.IsCyclic = true
 
-	if !n.hasNonCycle {
-		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
-		return v, true
+	// TODO: depth might legitimately be 0 if it is a root vertex.
+	// In the worst case, this may lead to a spurious cycle.
+	// Fix this by ensuring the root vertex starts with a depth of 1, for
+	// instance.
+	foundCycle := n.node.Parent == nil || depth == 0
+
+	foundNonCycle := false
+	if !foundCycle {
+		// Look for evidence of "new structure" to invalidate the cycle.
+		// This is done by checking for non-cyclic conjuncts between the
+		// current vertex up to the ancestor to which the reference points.
+		// Note that the cyclic conjunct may not be marked as such, so we
+		// look for at least one other non-cyclic conjunct if this is the case.
+		upCount := n.depth - depth
+		for p := n.node.Parent; p != nil; p = p.Parent {
+			if upCount--; upCount == 0 {
+				break
+			}
+			a := p.Conjuncts
+			count := 0
+			for _, c := range a {
+				if !c.CloseInfo.IsCyclic {
+					count++
+				}
+			}
+			if !alreadyCycle {
+				count--
+			}
+			if count > 0 {
+				foundNonCycle = true
+				break
+			}
+		}
+	}
+
+	if foundCycle || !foundNonCycle {
+		n.hasCycle = true
+		if !n.hasNonCycle {
+			n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
+			return v, true
+		}
 	}
 
 	return v, false
@@ -295,7 +351,7 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 }
 
 func assertStructuralCycle(n *nodeContext) bool {
-	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
+	if n.hasCycle && !n.hasNonCycle {
 		n.reportCycleError()
 		return true
 	}

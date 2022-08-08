@@ -26,7 +26,9 @@ func (o *StructInfo) MatchAndInsert(c *OpContext, arc *Vertex) {
 		// TODO: This is not entirely correct. It could be that a pattern is
 		// "feeding" new conjuncts without it being a cycle just yet.
 		// Perhaps we allow a reference to be discarded only once.
-		if !v.CloseInfo.IsCyclic {
+		// Needed for Issue #990.
+		// TODO: eliminate the need for IsPattern.
+		if !v.CloseInfo.IsCyclic && !v.CloseInfo.IsPattern {
 			closeInfo.CycleInfo.Refs = nil
 			break
 		}
@@ -69,6 +71,7 @@ outer:
 			if matchBulk(c, env, b, f, label) {
 				matched = true
 				info := closeInfo.SpawnSpan(b.Value, ConstraintSpan)
+				info.IsPattern = true
 				arc.AddConjunct(MakeConjunct(&bulkEnv, b, info))
 			}
 		}

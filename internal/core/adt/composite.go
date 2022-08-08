@@ -709,7 +709,6 @@ func (v *Vertex) addConjunct(c Conjunct) {
 	for _, x := range v.Conjuncts {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
 		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo && x.x == c.x {
-			// if x == c {
 			return
 		}
 	}
@@ -727,7 +726,7 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		CloseInfo: ci,
 	}
 	for _, t := range v.Structs {
-		if *t == info { // check for different identity.
+		if *t == info { // TODO: check for different identity.
 			return t
 		}
 	}

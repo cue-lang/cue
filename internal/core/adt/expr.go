@@ -888,7 +888,11 @@ func (x *LetReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 		panic("nil expression")
 	}
 	// Anonymous arc.
-	return &Vertex{Parent: nil, Label: label, Conjuncts: []Conjunct{{e, x.X, CloseInfo{}}}}
+	return &Vertex{
+		Parent:    e.Vertex,
+		Label:     label,
+		Conjuncts: []Conjunct{{e, x.X, CloseInfo{}}},
+	}
 }
 
 func (x *LetReference) evaluate(c *OpContext) Value {

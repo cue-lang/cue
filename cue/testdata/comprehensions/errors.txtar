@@ -42,7 +42,9 @@ Result:
   circularIf: (struct){
     #list: (#struct){
       tail: ((null|struct)){ |(*(null){ null }, (#struct){
-          tail: (null){ null }
+          tail: ((null|struct)){ |(*(null){ null }, (#struct){
+              tail: (null){ null }
+            }) }
         }) }
     }
   }

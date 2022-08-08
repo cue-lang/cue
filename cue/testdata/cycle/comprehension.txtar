@@ -47,6 +47,25 @@ Issue486: {
 		]
 	}
 }
+
+// Issue #1666
+issue1666: {
+	#E: {
+		f1: [string]: #E | [...#E]
+		f2: [string]: t: #E
+	}
+	
+	_e: #E
+	_e: f2: a: _
+	
+	e: _e & {
+		f1: {
+			for fk, s in _e.f2 {
+				(fk): s.t
+			}
+		}
+	}
+}
 -- out/eval --
 (struct){
   A: (struct){
@@ -87,6 +106,48 @@ Issue486: {
       c: (struct){
         parent: (string){ "b" }
         children: (#list){
+        }
+      }
+    }
+  }
+  issue1666: (struct){
+    #E: (#struct){
+      f1: (#struct){
+      }
+      f2: (#struct){
+      }
+    }
+    _e: (#struct){
+      f1: (#struct){
+      }
+      f2: (#struct){
+        a: (#struct){
+          t: (#struct){
+            f1: (#struct){
+            }
+            f2: (#struct){
+            }
+          }
+        }
+      }
+    }
+    e: (#struct){
+      f1: (#struct){
+        a: (#struct){
+          f1: (#struct){
+          }
+          f2: (#struct){
+          }
+        }
+      }
+      f2: (#struct){
+        a: (#struct){
+          t: (#struct){
+            f1: (#struct){
+            }
+            f2: (#struct){
+            }
+          }
         }
       }
     }
@@ -153,5 +214,32 @@ Issue486: {
         ]
       }
     }
+  }
+  issue1666: {
+    #E: {
+      f1: {
+        [string]: (〈2;#E〉|[
+          ...〈3;#E〉,
+        ])
+      }
+      f2: {
+        [string]: {
+          t: 〈3;#E〉
+        }
+      }
+    }
+    _e: 〈0;#E〉
+    _e: {
+      f2: {
+        a: _
+      }
+    }
+    e: (〈0;_e〉 & {
+      f1: {
+        for fk, s in 〈2;_e〉.f2 {
+          〈1;fk〉: 〈1;s〉.t
+        }
+      }
+    })
   }
 }

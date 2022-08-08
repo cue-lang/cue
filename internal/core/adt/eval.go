@@ -1536,6 +1536,11 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		n.ctx.Unify(arc, Partial)
 	}
 
+	// Don't add conjuncts if a node is referring to itself.
+	if n.node == arc {
+		return
+	}
+
 	for _, c := range arc.Conjuncts {
 		// Note that we are resetting the tree here. We hereby assume that
 		// closedness conflicts resulting from unifying the referenced arc were

@@ -105,6 +105,141 @@ func TestX(t *testing.T) {
 module: "mod.test"
 
 -- in.cue --
+circularIf: {
+	#list: {
+		tail: #list | *null
+		if tail != null {
+		}
+	}
+}
+
+// Issue #754
+Template: {
+	from: _
+
+	task: from
+}
+
+C: Template & {
+	from: Template & {
+		// from: Template & {}
+	}
+}
+
+// simple2: {
+// 	y: [string]: b: c: y
+// 	x: y
+// 	x: c: y
+// }
+
+// x: y
+// y: [y & {}| bool]
+
+// z: {
+// 	a: #A
+// 	b: #A
+// }
+// #A: string | [#A]
+
+// p5: {
+// 	#T: {
+// 		a: [...{link: #T}]
+// 		a: [{}]
+// 	}
+
+// 	a: #T & {
+// 		a: [{link: a: [{}]}]
+// 	}
+// }
+
+
+// d1: {
+// 	a: b: c: d: {h: int, t: r}
+// 	r: a.b
+
+// }
+
+
+// b11: {
+// 	#list: {
+// 		tail: #list | *null
+// 		if tail != null {
+// 		}
+// 	}
+// }
+
+// b8: {
+// 	x: a
+// 	a: f: b
+// 	b: a | string
+// }
+
+// b10: {
+// 	a: close({
+// 		b: string | a | c
+// 	})
+// 	c: close({
+// 		d: string | a
+// 	})
+// }
+
+
+
+
+// shortPathFail: comprehension: {
+// 	#list: {
+//         tail: #list | *null
+//         if tail != null {
+//         }
+//     }
+// }
+
+// withLet: {
+// 	schema: next:  _schema_1
+// 	let _schema_1 = schema
+// }
+
+// Template: {
+// 	from: _
+// 	task: from
+// }
+
+// C: Template & {
+// 	from: Template
+// }
+
+
+// a: ["3"] + b
+// b: a
+// a: ["1", "2"]
+
+// a: ["3"] + b
+// b: a
+// b: ["1", "2"]
+
+// b: a
+// a: ["1", "2"]
+// a: ["3"] + b
+
+
+
+// Secret: $secret: id: string
+// #secrets: Secret | {[string]: #secrets}
+// #secrets: Secret | {[string]: #secrets}
+// out: #secrets & {
+// 	FOO: $secret: id: "100"
+// 	ONE: TWO: THREE: $secret: id: "123"
+// }
+
+
+//   #S: a: a: a: #S
+//   a: a: a: #S
+//   a: a: #S
+//   a: a: a: a: a: a: _
+//   // Should be:
+//   a: a: a: a: a: a: a: a: a: _
+
+
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {

@@ -1,0 +1,145 @@
+-- in.cue --
+expr: error1: {
+	a: 3
+	a: a + 1
+}
+expr: error2: {
+	a: a + 1
+	a: 3
+}
+list: error1: {
+	a: ["1", "2"]
+	a: a + ["3"]
+}
+
+list: error2: {
+	a: ["3"] + a
+	a: ["1", "2"]
+}
+
+-- out/eval --
+Errors:
+expr.error1.a: conflicting values 4 and 3:
+    ./in.cue:2:5
+    ./in.cue:3:5
+expr.error2.a: conflicting values 4 and 3:
+    ./in.cue:6:5
+    ./in.cue:7:5
+list.error1.a: incompatible list lengths (2 and 2)
+list.error2.a: conflicting values "1" and "2":
+    ./in.cue:16:6
+    ./in.cue:16:11
+list.error2.a: conflicting values "3" and "1":
+    ./in.cue:15:6
+    ./in.cue:16:6
+list.error2.a: conflicting values "3" and "2":
+    ./in.cue:15:6
+    ./in.cue:16:11
+list.error2.a: incompatible list lengths (2 and 2)
+list.error2.a.2: conflicting values "1" and "2":
+    ./in.cue:16:6
+    ./in.cue:16:11
+list.error2.a.2: conflicting values "3" and "2":
+    ./in.cue:15:6
+    ./in.cue:16:11
+
+Result:
+(_|_){
+  // [eval]
+  expr: (_|_){
+    // [eval]
+    error1: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] expr.error1.a: conflicting values 4 and 3:
+        //     ./in.cue:2:5
+        //     ./in.cue:3:5
+      }
+    }
+    error2: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] expr.error2.a: conflicting values 4 and 3:
+        //     ./in.cue:6:5
+        //     ./in.cue:7:5
+      }
+    }
+  }
+  list: (_|_){
+    // [eval]
+    error1: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] list.error1.a: incompatible list lengths (2 and 2)
+        0: (string){ "1" }
+        1: (string){ "2" }
+        2: (string){ "3" }
+      }
+    }
+    error2: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] list.error2.a: incompatible list lengths (2 and 2)
+        0: (_|_){
+          // [eval] list.error2.a: conflicting values "3" and "1":
+          //     ./in.cue:15:6
+          //     ./in.cue:16:6
+        }
+        1: (_|_){
+          // [eval] list.error2.a: conflicting values "1" and "2":
+          //     ./in.cue:16:6
+          //     ./in.cue:16:11
+          // list.error2.a: conflicting values "3" and "2":
+          //     ./in.cue:15:6
+          //     ./in.cue:16:11
+        }
+        2: (_|_){
+          // [eval] list.error2.a.2: conflicting values "1" and "2":
+          //     ./in.cue:16:6
+          //     ./in.cue:16:11
+          // list.error2.a.2: conflicting values "3" and "2":
+          //     ./in.cue:15:6
+          //     ./in.cue:16:11
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  expr: {
+    error1: {
+      a: 3
+      a: (〈0;a〉 + 1)
+    }
+  }
+  expr: {
+    error2: {
+      a: (〈0;a〉 + 1)
+      a: 3
+    }
+  }
+  list: {
+    error1: {
+      a: [
+        "1",
+        "2",
+      ]
+      a: (〈0;a〉 + [
+        "3",
+      ])
+    }
+  }
+  list: {
+    error2: {
+      a: ([
+        "3",
+      ] + 〈0;a〉)
+      a: [
+        "1",
+        "2",
+      ]
+    }
+  }
+}

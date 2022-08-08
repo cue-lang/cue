@@ -218,15 +218,24 @@ type CycleInfo struct {
 
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
-	Refs   *RefNode
-	Exempt *RefNode // First RefNode that should not count as a cycle next.
+	Refs *RefNode
+
+	// Values is used to track newly introduced conjuncts, which may override
+	// cycles.
+	Values *ValueNode
 }
 
 // A RefNode is a linked list of associated references.
 type RefNode struct {
 	Ref  Resolver
-	Node *Vertex
+	Arc  *Vertex
 	Next *RefNode
+}
+
+// A ValueNode is a linked list of used values within a conjunct.
+type ValueNode struct {
+	Expr Expr
+	Next *ValueNode
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -255,13 +264,34 @@ type cyclicConjunct struct {
 // its processing should be delayed, which is the case if the conjunct seems to
 // be fully cyclic so far.
 func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, delay bool) {
-	found := false
+
+	// Check whether we have new conjuncts. If we do, it may postpone triggering
+	// a detected cycle. If we are doing inline processing, or if we the
+	// referenced arc is already on a cyclic path (EvaluatingArcs), we can skip
+	// this step as it is always a cycle.
 	exempt := false
-	for r := v.CloseInfo.Refs; r != nil; r = r.Next {
-		if arc.status != EvaluatingArcs && v.CloseInfo.Exempt == r {
+	if !v.CloseInfo.Inline && arc.status != EvaluatingArcs {
+	outer:
+		for _, c := range arc.Conjuncts {
+			x := c.Expr()
+			for v := v.CloseInfo.Values; v != nil; v = v.Next {
+				if v.Expr == x {
+					continue outer
+				}
+			}
+			v.CloseInfo.Values = &ValueNode{
+				Next: v.CloseInfo.Values,
+				Expr: x,
+			}
 			exempt = true
 		}
-		if r.Ref == x || r.Node == arc {
+	}
+
+	// Check whether the reference already occurred in the list, signaling
+	// a potential cycle.
+	found := false
+	for r := v.CloseInfo.Refs; r != nil; r = r.Next {
+		if r.Ref == x || r.Arc == arc {
 			if v.CloseInfo.Inline {
 				n.reportCycleError()
 				return v, true
@@ -273,29 +303,19 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 	if !found && (!exempt || arc.status != Finalized) {
 		// Adding this in case there is a cycle is unnecessary, but gives
 		// somewhat better error messages.
-		ref := &RefNode{
+		v.CloseInfo.Refs = &RefNode{
+			Arc:  arc,
 			Ref:  x,
 			Next: v.CloseInfo.Refs,
 		}
 
-		ref.Node = arc
-		v.CloseInfo.Refs = ref
-
 		if arc.status != EvaluatingArcs {
-			// Count first-time reference as cycle breaker and exempt all
-			// previous reference from producing a cycle next time around.
-			// TODO: find tighter rule, like only activating this when
-			// crossing a pattern constraint (x: [string]: b: x). See circularIf in errors.txtar.
-			v.CloseInfo.Exempt = v.CloseInfo.Refs
 			return v, false
 		}
 	}
 
-	v.CloseInfo.Exempt = nil
-
 	if !exempt {
-		v.CloseInfo.IsCyclic = true // !exempt
-		// Found duplicate reference or direct detection through arc status.
+		v.CloseInfo.IsCyclic = true
 		n.hasCycle = true
 
 		if !n.hasNonCycle {
@@ -320,20 +340,9 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 }
 
 func assertStructuralCycle(n *nodeContext) bool {
-	if n.hasCycle {
-		if !n.hasNonCycle {
-			n.reportCycleError()
-			return true
-		}
-	}
-
-	if n.hasNonCycle {
-		for _, arc := range n.node.Arcs {
-			for _, c := range arc.Conjuncts {
-				info := &c.CloseInfo.CycleInfo
-				info.Exempt = info.Refs
-			}
-		}
+	if n.hasCycle && !n.hasNonCycle {
+		n.reportCycleError()
+		return true
 	}
 
 	return false

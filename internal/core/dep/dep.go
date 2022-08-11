@@ -209,7 +209,7 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 		}
 
 	case *adt.Comprehension:
-		for i := x.Nest; i > 0; i-- {
+		for i := x.Nest(); i > 0; i-- {
 			env = &adt.Environment{Up: env, Vertex: empty}
 		}
 		c.markComprehension(env, x)

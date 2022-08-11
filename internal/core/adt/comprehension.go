@@ -93,14 +93,14 @@ type envComprehension struct {
 // value. Multiple envYields can be associated with a single envComprehension.
 // An envComprehension only needs to be evaluated once for multiple envYields.
 type envYield struct {
-	*envComprehension // The original comprehension.
+	*envComprehension                // The original comprehension.
+	leaf              *Comprehension // The leaf Comprehension
 
 	// Values specific to the field corresponsing to this envYield
 
 	env  *Environment // The adjusted Environment.
 	id   CloseInfo    // CloseInfo for the field.
 	expr Node         // The adjusted expression.
-	nest int          // How many scopes is this nested below the original?
 }
 
 // insertComprehension registers a comprehension with a node, possibly pushing
@@ -147,8 +147,9 @@ func (n *nodeContext) insertComprehension(
 					Clauses: c.Clauses,
 					Value:   f,
 
-					comp: ec,
-					Nest: c.Nest + 1,
+					comp:   ec,
+					parent: c,
+					arc:    n.node,
 				}
 
 				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
@@ -205,10 +206,10 @@ func (n *nodeContext) insertComprehension(
 
 	n.comprehensions = append(n.comprehensions, envYield{
 		envComprehension: ec,
+		leaf:             c,
 		env:              env,
 		id:               ci,
 		expr:             x,
-		nest:             c.Nest,
 	})
 }
 
@@ -271,17 +272,15 @@ func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
 		}
 
 		v := n.node
-		for i := 0; i < d.nest; i++ {
+		for c := d.leaf; c.parent != nil; c = c.parent {
 			v.arcType = arcMember
-			v = v.Parent
+			v = c.arc
 		}
 
 		id := d.id
 
 		for _, env := range d.envs {
-			if d.nest > 0 {
-				env = linkChildren(env, n.node.Parent, d.nest-1)
-			}
+			env = linkChildren(env, d.leaf)
 			n.addExprConjunct(Conjunct{env, d.expr, id})
 		}
 	}
@@ -293,12 +292,12 @@ func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
 	return progress
 }
 
-// linkChildren adjusts the given Environment to the given nesting count so that
-// up counts in references point to the correct Vertex.
-func linkChildren(env *Environment, v *Vertex, nest int) *Environment {
-	if nest > 0 {
-		env = linkChildren(env, v.Parent, nest-1)
+// linkChildren adds environments for the chain of vertices to a result
+// environment.
+func linkChildren(env *Environment, c *Comprehension) *Environment {
+	if c.parent != nil {
+		env = linkChildren(env, c.parent)
+		env = spawn(env, c.arc)
 	}
-	env = spawn(env, v)
 	return env
 }

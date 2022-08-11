@@ -1661,8 +1661,18 @@ type Comprehension struct {
 	Value Node
 
 	// Only used for partial comprehensions.
-	comp *envComprehension
-	Nest int
+	comp   *envComprehension
+	parent *Comprehension // comprehension from which this one was derived, if any
+	arc    *Vertex        // arc to which this comprehension was added.
+}
+
+// Nest returns the nesting level of void arcs of this comprehension.
+func (c *Comprehension) Nest() int {
+	count := 0
+	for ; c.parent != nil; c = c.parent {
+		count++
+	}
+	return count
 }
 
 // DidResolve reports whether a comprehension was processed and resulted in at

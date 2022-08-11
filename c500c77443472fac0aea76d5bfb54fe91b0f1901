@@ -16,6 +16,74 @@
       "message": "I\u0027ll take a look at what is happening in unity world.",
       "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6eb422f1_afee855c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-11T15:54:40Z",
+      "side": 1,
+      "message": "LGTM with one doc nit and a couple of other questions to satisfy my curiosity. The test case looks good, so I guess the answers don\u0027t matter too much - I hope I\u0027ll understand more of this code in due course!",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23d226f9_ad2d49d9",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-11T15:54:40Z",
+      "side": 1,
+      "message": "Out of interest, what\u0027s the difference between the \"leaf\" comprehension and the \"original\" comprehension here? Which tree hierarchy are we talking about?",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56f9635d_5a5e84de",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-11T15:54:40Z",
+      "side": 1,
+      "message": "There\u0027s no \"nesting count\" argument any more.",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b73e4088_7dd488b2",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1669,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-11T15:54:40Z",
+      "side": 1,
+      "message": "Why of _void_ arcs and not all arcs?\nHow is it different from the nesting level of the arcs of this comprehension?",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

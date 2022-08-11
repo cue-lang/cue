@@ -595,6 +595,16 @@ unity: success1: {
 	}
 }
 
+issue1759: {
+	_ports_map: {}
+	if len(_ports_map) > 0 {
+		port: _ports_map.a.port
+	}
+	if true {
+		_ports_map: a: {port: "80"}
+	}
+}
+
 -- reflect.cue --
 import "encoding/json"
 
@@ -1212,6 +1222,14 @@ Result:
             }
           }
         }
+      }
+    }
+  }
+  issue1759: (struct){
+    port: (string){ "80" }
+    _ports_map: (struct){
+      a: (struct){
+        port: (string){ "80" }
       }
     }
   }
@@ -1945,6 +1963,19 @@ Result:
               }
             }
           }
+        }
+      }
+    }
+  }
+  issue1759: {
+    _ports_map: {}
+    if (len(〈0;_ports_map〉) > 0) {
+      port: 〈1;_ports_map〉.a.port
+    }
+    if true {
+      _ports_map: {
+        a: {
+          port: "80"
         }
       }
     }

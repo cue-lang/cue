@@ -219,6 +219,8 @@ type CycleInfo struct {
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
 	Refs *RefNode
+
+	Values *ValueNode
 }
 
 // A RefNode is a linked list of associated references.
@@ -227,6 +229,11 @@ type RefNode struct {
 	Arc   *Vertex
 	Next  *RefNode
 	Depth int32
+}
+
+type ValueNode struct {
+	Expr Expr
+	Next *ValueNode
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -257,6 +264,8 @@ type cyclicConjunct struct {
 func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, delay bool) {
 	// Check whether the reference already occurred in the list, signaling
 	// a potential cycle.
+	n.Logf("RESOLVE  %v", x)
+
 	found := false
 	depth := int32(0)
 	for r := v.CloseInfo.Refs; r != nil; r = r.Next {
@@ -267,6 +276,29 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 			}
 			depth = r.Depth
 			found = true
+
+			// We do not exclude references pointing to the same nodes as these
+			// are always cycles, and because excluding them would degrade
+			// performance too much.
+			if r.Arc == arc {
+				break
+			}
+
+		outer:
+			for _, c := range arc.Conjuncts {
+				x := c.Expr()
+				for v := v.CloseInfo.Values; v != nil; v = v.Next {
+					if v.Expr == x {
+						continue outer
+					}
+				}
+				v.CloseInfo.Values = &ValueNode{
+					Next: v.CloseInfo.Values,
+					Expr: x,
+				}
+				found = false
+			}
+
 			break
 		}
 	}
@@ -297,8 +329,8 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 	// Fix this by ensuring the root vertex starts with a depth of 1, for
 	// instance.
 	foundCycle := n.node.Parent == nil || depth == 0
-
 	foundNonCycle := false
+
 	if !foundCycle {
 		// Look for evidence of "new structure" to invalidate the cycle.
 		// This is done by checking for non-cyclic conjuncts between the
@@ -322,6 +354,7 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 			}
 			if count > 0 {
 				foundNonCycle = true
+				v.CloseInfo.Values = nil
 				break
 			}
 		}

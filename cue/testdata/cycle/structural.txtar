@@ -449,6 +449,45 @@ z1: {
 	z: x & y
 }
 
+// Cross references. Here there is no cycle, but the repeated instantiations
+// of T will cause, in turn, cause repeated resolution of `x`. The algorithm
+// should not identify these as cyclic references. Instead, it should be
+// noted that the reference is each time referring to new content.
+// Issue #754
+crossRefNoCycle: t1: {
+	T: {
+		x: _
+		y: x
+	}
+	C: { x: T } & T
+}
+
+crossRefNoCycle: t2: {
+	T: {
+		x: _
+		y: x
+	}
+	C: T & { x: T }
+}
+
+crossRefNoCycle: t3: {
+	T: {
+		x: _
+		y: x
+		z: y
+	}
+	C: T & { x: T }
+}
+
+crossRefNoCycle: t4: {
+	T: {
+		x: _
+		y: x
+		z: y
+	}
+	C: T & { x: T & { x: T } }
+}
+
 // Ensure these are NOT treated as structural errors.
 
 n1: a: b: int
@@ -460,7 +499,6 @@ Errors:
 a1.f.0: structural cycle
 a3.f.g: structural cycle
 b13.root.a.0.0: structural cycle
-b14.root.b.1.0: structural cycle
 b14.root.b.1.1: structural cycle
 b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
     ./in.cue:53:5
@@ -484,6 +522,9 @@ b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
     ./in.cue:69:6
 b7.b.0.0.0: structural cycle
 c1.a.c.c: structural cycle
+crossRefNoCycle.t4.C.y.x: structural cycle
+crossRefNoCycle.t4.C.y.y: structural cycle
+crossRefNoCycle.t4.C.y.z: structural cycle
 d1.a.b.c.d.t: structural cycle
 d2.r.c.d.t: structural cycle
 d2.x.d.t.c.d.t: structural cycle
@@ -861,8 +902,7 @@ Result:
         }
         1: (_|_){
           // [structural cycle]
-          0: (_|_){
-            // [structural cycle] b14.root.b.1.0: structural cycle
+          0: (list){
           }
           1: (_|_){
             // [structural cycle] b14.root.b.1.1: structural cycle
@@ -1497,6 +1537,110 @@ Result:
         // [structural cycle]
         h: (_|_){
           // [structural cycle] z1.z.g.h: structural cycle
+        }
+      }
+    }
+  }
+  crossRefNoCycle: (_|_){
+    // [structural cycle]
+    t1: (struct){
+      T: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+      C: (struct){
+        x: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+        y: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+      }
+    }
+    t2: (struct){
+      T: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+      C: (struct){
+        x: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+        y: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+      }
+    }
+    t3: (struct){
+      T: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+        z: (_){ _ }
+      }
+      C: (struct){
+        x: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+          z: (_){ _ }
+        }
+        y: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+          z: (_){ _ }
+        }
+        z: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+          z: (_){ _ }
+        }
+      }
+    }
+    t4: (_|_){
+      // [structural cycle]
+      T: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+        z: (_){ _ }
+      }
+      C: (_|_){
+        // [structural cycle]
+        x: (struct){
+          x: (struct){
+            x: (_){ _ }
+            y: (_){ _ }
+            z: (_){ _ }
+          }
+          y: (struct){
+            x: (_){ _ }
+            y: (_){ _ }
+            z: (_){ _ }
+          }
+          z: (struct){
+            x: (_){ _ }
+            y: (_){ _ }
+            z: (_){ _ }
+          }
+        }
+        y: (_|_){
+          // [structural cycle]
+          x: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.y.x: structural cycle
+          }
+          y: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.y.y: structural cycle
+          }
+          z: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.y.z: structural cycle
+          }
+        }
+        z: (_|_){
+          // [structural cycle] crossRefNoCycle.t4.C.y.x: structural cycle
+          // crossRefNoCycle.t4.C.y.y: structural cycle
+          // crossRefNoCycle.t4.C.y.z: structural cycle
         }
       }
     }
@@ -2196,6 +2340,54 @@ Result:
       g: 〈0;f〉
     }
     z: (〈0;x〉 & 〈0;y〉)
+  }
+  crossRefNoCycle: {
+    t1: {
+      T: {
+        x: _
+        y: 〈0;x〉
+      }
+      C: ({
+        x: 〈1;T〉
+      } & 〈0;T〉)
+    }
+  }
+  crossRefNoCycle: {
+    t2: {
+      T: {
+        x: _
+        y: 〈0;x〉
+      }
+      C: (〈0;T〉 & {
+        x: 〈1;T〉
+      })
+    }
+  }
+  crossRefNoCycle: {
+    t3: {
+      T: {
+        x: _
+        y: 〈0;x〉
+        z: 〈0;y〉
+      }
+      C: (〈0;T〉 & {
+        x: 〈1;T〉
+      })
+    }
+  }
+  crossRefNoCycle: {
+    t4: {
+      T: {
+        x: _
+        y: 〈0;x〉
+        z: 〈0;y〉
+      }
+      C: (〈0;T〉 & {
+        x: (〈1;T〉 & {
+          x: 〈2;T〉
+        })
+      })
+    }
   }
   n1: {
     a: {

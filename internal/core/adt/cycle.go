@@ -219,6 +219,21 @@ type CycleInfo struct {
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
 	Refs *RefNode
+
+	// Values is used to track the introduction of new values to invalidate
+	// potential cycles in case repeated uses of a reference are triggered
+	// by something that is not a cycle. For instance, consider
+	//
+	// 	T: {
+	//		x: _
+	//		y: x
+	//	}
+	//	C: { x: T } & T
+	//
+	// Here the repeated mixing in of T causes reference x to be repeatedly
+	// added to the same conjunct. However, as it keeps refering to fresh
+	// content, it is not a cycle.
+	Values *ValueNode
 }
 
 // A RefNode is a linked list of associated references.
@@ -227,6 +242,13 @@ type RefNode struct {
 	Arc   *Vertex
 	Next  *RefNode
 	Depth int32
+}
+
+// ValueNode is a node of a linked list of expressions. See the Values field
+// in CycleInfo for more info.
+type ValueNode struct {
+	Expr Expr
+	Next *ValueNode
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -267,6 +289,31 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 			}
 			depth = r.Depth
 			found = true
+
+			// We do not exclude references pointing to the same nodes as these
+			// are always cycles, and because excluding them would degrade
+			// performance too much.
+			if r.Arc == arc {
+				break
+			}
+
+			// This loop checks that the detected cycle is not postponed or
+			// invalidated by new values. See the comment in CloseInfo.Values.
+		outer:
+			for _, c := range arc.Conjuncts {
+				x := c.Expr()
+				for v := v.CloseInfo.Values; v != nil; v = v.Next {
+					if v.Expr == x {
+						continue outer
+					}
+				}
+				v.CloseInfo.Values = &ValueNode{
+					Next: v.CloseInfo.Values,
+					Expr: x,
+				}
+				found = false
+			}
+
 			break
 		}
 	}
@@ -297,8 +344,8 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 	// Fix this by ensuring the root vertex starts with a depth of 1, for
 	// instance.
 	foundCycle := n.node.Parent == nil || depth == 0
-
 	foundNonCycle := false
+
 	if !foundCycle {
 		// Look for evidence of "new structure" to invalidate the cycle.
 		// This is done by checking for non-cyclic conjuncts between the

@@ -71,6 +71,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0d979c90_b2c057e8",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-12T11:22:25Z",
+      "side": 1,
+      "message": "The leaf is the Comprehension struct that is created as it is pushed down into the void arc. The original represents the shared structure for collecting the results that are shared with all pushed down locations (there can be more than one).",
+      "parentUuid": "23d226f9_ad2d49d9",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "56f9635d_5a5e84de",
         "filename": "internal/core/adt/comprehension.go",
         "patchSetId": 1
@@ -99,6 +117,24 @@
       "writtenOn": "2022-08-11T15:54:40Z",
       "side": 1,
       "message": "Why of _void_ arcs and not all arcs?\nHow is it different from the nesting level of the arcs of this comprehension?",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3199c2cb_040db7b3",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1669,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-12T11:22:25Z",
+      "side": 1,
+      "message": "The void arcs are all the arcs below the environments for, for instance, the let and for clauses. So this is exactly the number of arcs that offset the up counts within references if they are pointing outside of the comprehension value. Package dep, and later also others, use this to create dummy environments to account for such offsets.",
+      "parentUuid": "b73e4088_7dd488b2",
       "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

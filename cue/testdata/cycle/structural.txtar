@@ -449,6 +449,33 @@ z1: {
 	z: x & y
 }
 
+// Cross references
+// Issue #754
+crossRefNoCycle: t1: {
+	T: {
+		x: _
+		y: x
+	}
+	C: { x: T } & T
+}
+
+crossRefNoCycle: t2: {
+	T: {
+		x: _
+		y: x
+	}
+	C: T & { x: T }
+}
+
+crossRefNoCycle: t3: {
+	T: {
+		x: _
+		y: x
+		z: y
+	}
+	C: T & { x: T }
+}
+
 // Ensure these are NOT treated as structural errors.
 
 n1: a: b: int
@@ -460,7 +487,6 @@ Errors:
 a1.f.0: structural cycle
 a3.f.g: structural cycle
 b13.root.a.0.0: structural cycle
-b14.root.b.1.0: structural cycle
 b14.root.b.1.1: structural cycle
 b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
     ./in.cue:53:5
@@ -861,8 +887,7 @@ Result:
         }
         1: (_|_){
           // [structural cycle]
-          0: (_|_){
-            // [structural cycle] b14.root.b.1.0: structural cycle
+          0: (list){
           }
           1: (_|_){
             // [structural cycle] b14.root.b.1.1: structural cycle
@@ -1497,6 +1522,64 @@ Result:
         // [structural cycle]
         h: (_|_){
           // [structural cycle] z1.z.g.h: structural cycle
+        }
+      }
+    }
+  }
+  crossRefNoCycle: (struct){
+    t1: (struct){
+      T: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+      C: (struct){
+        x: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+        y: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+      }
+    }
+    t2: (struct){
+      T: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+      C: (struct){
+        x: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+        y: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+        }
+      }
+    }
+    t3: (struct){
+      T: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+        z: (_){ _ }
+      }
+      C: (struct){
+        x: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+          z: (_){ _ }
+        }
+        y: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+          z: (_){ _ }
+        }
+        z: (struct){
+          x: (_){ _ }
+          y: (_){ _ }
+          z: (_){ _ }
         }
       }
     }
@@ -2196,6 +2279,40 @@ Result:
       g: 〈0;f〉
     }
     z: (〈0;x〉 & 〈0;y〉)
+  }
+  crossRefNoCycle: {
+    t1: {
+      T: {
+        x: _
+        y: 〈0;x〉
+      }
+      C: ({
+        x: 〈1;T〉
+      } & 〈0;T〉)
+    }
+  }
+  crossRefNoCycle: {
+    t2: {
+      T: {
+        x: _
+        y: 〈0;x〉
+      }
+      C: (〈0;T〉 & {
+        x: 〈1;T〉
+      })
+    }
+  }
+  crossRefNoCycle: {
+    t3: {
+      T: {
+        x: _
+        y: 〈0;x〉
+        z: 〈0;y〉
+      }
+      C: (〈0;T〉 & {
+        x: 〈1;T〉
+      })
+    }
   }
   n1: {
     a: {

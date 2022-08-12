@@ -87,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23c16e10_292921e6",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-12T16:03:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0d979c90_b2c057e8",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "56f9635d_5a5e84de",
@@ -100,6 +118,24 @@
       "writtenOn": "2022-08-11T15:54:40Z",
       "side": 1,
       "message": "There\u0027s no \"nesting count\" argument any more.",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a53ecc18_de53a0b4",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-12T16:03:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "56f9635d_5a5e84de",
       "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -135,6 +171,24 @@
       "side": 1,
       "message": "The void arcs are all the arcs below the environments for, for instance, the let and for clauses. So this is exactly the number of arcs that offset the up counts within references if they are pointing outside of the comprehension value. Package dep, and later also others, use this to create dummy environments to account for such offsets.",
       "parentUuid": "b73e4088_7dd488b2",
+      "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ae1d970_702a1d05",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1669,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-12T16:03:28Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "3199c2cb_040db7b3",
       "revId": "c500c77443472fac0aea76d5bfb54fe91b0f1901",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

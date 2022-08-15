@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "787a52ea_8171d7a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:07:35Z",
+      "side": 1,
+      "message": "LGTM with a bunch of RFCs, thanks :)",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfd9c74f_6acb11ff",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:07:35Z",
+      "side": 1,
+      "message": "again, it would be great to have comments on these to say what the expected behaviour is and ideally why.",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a30b602_0ca1edab",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:07:35Z",
+      "side": 1,
+      "message": "doc comment please!",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c928aa9_f788d791",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:07:35Z",
+      "side": 1,
+      "message": "doc comment please",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f23b3bc_b7d73f1c",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:07:35Z",
+      "side": 1,
+      "message": "maybe a comment explaining what this somewhat intricate loop is doing might be useful here?",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2abba4a_026dafef",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:07:35Z",
+      "side": 1,
+      "message": "a comment here would be nice too. why is it appropriate to nil out Values at this point?",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

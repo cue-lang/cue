@@ -86,6 +86,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "890276d6_72c77af7",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6c1cd050_77614a4d",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f393bc9e_2f035ee6",
@@ -99,6 +117,24 @@
       "writtenOn": "2022-08-15T15:15:14Z",
       "side": 1,
       "message": "Looks like we\u0027re missing an indentation level here.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aba15d9a_0e7f25bc",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f393bc9e_2f035ee6",
       "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +156,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "017c90b0_df14f7a3",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8781b57c_c60cfb86",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "430cbbbd_734cf7d8",
@@ -133,6 +187,24 @@
       "writtenOn": "2022-08-15T15:15:14Z",
       "side": 1,
       "message": "a bunch of indentation wrong in _test too.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "187d6812_b25b0120",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "430cbbbd_734cf7d8",
       "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +226,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb59e6ab_fd42aad6",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0530bb4f_ee99d14d",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a273f357_97053c97",
@@ -167,6 +257,24 @@
       "writtenOn": "2022-08-15T15:15:14Z",
       "side": 1,
       "message": "ditto",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa43e1bf_202f5d7b",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a273f357_97053c97",
       "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +296,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d85c7bb_a32bf76b",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "91dff09c_151e3d7d",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "49a4bda4_259a9b0f",
@@ -205,6 +331,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "492e7e51_aac4ee84",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49a4bda4_259a9b0f",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a6f1943_882889b1",
@@ -218,6 +362,24 @@
       "writtenOn": "2022-08-15T15:15:14Z",
       "side": 1,
       "message": "withLetFail ?",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5188987_f39e7b5a",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:44:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a6f1943_882889b1",
       "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

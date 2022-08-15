@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a29a6b6d_b45f021e",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 454,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-15T17:18:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfd9c74f_6acb11ff",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a30b602_0ca1edab",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-08-15T17:07:35Z",
       "side": 1,
       "message": "doc comment please!",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc06bebf_879a897e",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-15T17:18:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a30b602_0ca1edab",
       "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c8b2343_a43f2841",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 234,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-15T17:18:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c928aa9_f788d791",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f23b3bc_b7d73f1c",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "982f2c70_543fff6e",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-15T17:18:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f23b3bc_b7d73f1c",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2abba4a_026dafef",
@@ -99,6 +171,24 @@
       "writtenOn": "2022-08-15T17:07:35Z",
       "side": 1,
       "message": "a comment here would be nice too. why is it appropriate to nil out Values at this point?",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "86c9206b_0bcbd29f",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-15T17:18:38Z",
+      "side": 1,
+      "message": "It should be okay, but it is not tested and it is always a bit dodgy to do so. So I removed it.",
+      "parentUuid": "e2abba4a_026dafef",
       "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

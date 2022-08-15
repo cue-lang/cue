@@ -68,6 +68,24 @@
       "message": "This doesn\u0027t seem related to the rest of the CL.",
       "revId": "d58cd1382e3500a021ce082f87988ecc6ee039f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0025cc9_d9186aa9",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1173,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-15T09:38:48Z",
+      "side": 1,
+      "message": "It is, tho.",
+      "parentUuid": "81af2c3c_ef332a5b",
+      "revId": "d58cd1382e3500a021ce082f87988ecc6ee039f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

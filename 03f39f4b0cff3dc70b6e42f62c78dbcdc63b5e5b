@@ -187,6 +187,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3cf8f76_ff2359eb",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "924ab478_2744e9ca",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "687b19f1_f3e0297e",
@@ -218,6 +236,24 @@
       "side": 1,
       "message": "I believe I meant the JSON hierarchy. The traversal hierarchy is already implied by mentioning \"associated references\". Added a note.",
       "parentUuid": "687b19f1_f3e0297e",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce3e418b_6a14f899",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 153,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "690f61f8_5b1f4de7",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -363,6 +399,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "43d7f195_15e7f039",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab195d22_9b6e7464",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0df1ea59_bde96242",
@@ -398,6 +452,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38401c9e_c1189f16",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dbdfef3_6ea3e13b",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "935f2218_3a1fcdb2",
@@ -429,6 +501,24 @@
       "side": 1,
       "message": "ditto",
       "parentUuid": "935f2218_3a1fcdb2",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b82afc3d_40fdee3a",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8393c2fc_afd02e45",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

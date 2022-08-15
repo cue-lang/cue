@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e15c1bdc_bce793e9",
+        "filename": "cue/testdata/cycle/023_reentrance.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0bbb1e2e_e2d15c41",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2c26a2d_2ab4967e",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "59de5c3b_1948149f",
+        "filename": "cue/testdata/cycle/constraints.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2c26a2d_2ab4967e",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d224da2_41241a1d",
@@ -65,6 +101,24 @@
       "writtenOn": "2022-08-15T15:15:14Z",
       "side": 1,
       "message": "\"fib\" is a bit misleading - nothing fibonacci-like going on here.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bce8bb5a_cb0d0c5a",
+        "filename": "cue/testdata/cycle/inline.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:46:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d224da2_41241a1d",
       "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

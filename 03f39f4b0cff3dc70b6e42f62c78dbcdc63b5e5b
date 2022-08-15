@@ -257,6 +257,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8962a69_b9315132",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "fee7ac3d_e7eb7316",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae041e5a_e78afea5",
@@ -288,6 +306,24 @@
       "side": 1,
       "message": "Just made it a paragraph.",
       "parentUuid": "ae041e5a_e78afea5",
+      "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc7f688c_e7035443",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "cb024c61_425ff6b4",
       "revId": "03f39f4b0cff3dc70b6e42f62c78dbcdc63b5e5b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

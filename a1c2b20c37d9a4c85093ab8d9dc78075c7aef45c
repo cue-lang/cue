@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "189a7202_7c9acdbc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "LGTM modulo a bunch of trivia, thanks!",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0bbb1e2e_e2d15c41",
+        "filename": "cue/testdata/cycle/023_reentrance.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "The behaviour has changed here. Would fib1 be an error too or not? Presumably not, but maybe good to include a test case just to make sure.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2c26a2d_2ab4967e",
+        "filename": "cue/testdata/cycle/constraints.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "Some commentary on all these cases would be very helpful, please, both for this review and for future generations to come. :)",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d224da2_41241a1d",
+        "filename": "cue/testdata/cycle/inline.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "\"fib\" is a bit misleading - nothing fibonacci-like going on here.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c1cd050_77614a4d",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "Is this still problematic? Looks like not, given the lack of apparent errors in the result.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f393bc9e_2f035ee6",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "Looks like we\u0027re missing an indentation level here.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8781b57c_c60cfb86",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "and here",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "430cbbbd_734cf7d8",
+        "filename": "cue/testdata/cycle/issue990.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "a bunch of indentation wrong in _test too.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0530bb4f_ee99d14d",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "This error message seems spurious.",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a273f357_97053c97",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91dff09c_151e3d7d",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "occurrence",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49a4bda4_259a9b0f",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "indentation",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a6f1943_882889b1",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T15:15:14Z",
+      "side": 1,
+      "message": "withLetFail ?",
+      "revId": "a1c2b20c37d9a4c85093ab8d9dc78075c7aef45c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

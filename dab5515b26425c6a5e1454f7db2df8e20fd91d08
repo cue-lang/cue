@@ -191,6 +191,24 @@
       "parentUuid": "e2abba4a_026dafef",
       "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79ca8996_8897fc7b",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-15T17:49:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "86c9206b_0bcbd29f",
+      "revId": "dab5515b26425c6a5e1454f7db2df8e20fd91d08",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

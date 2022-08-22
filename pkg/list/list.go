@@ -27,12 +27,11 @@ import (
 //
 // For instance:
 //
-//    Drop([1, 2, 3, 4], 2)
+//	Drop([1, 2, 3, 4], 2)
 //
 // results in
 //
-//    [3, 4]
-//
+//	[3, 4]
 func Drop(x []cue.Value, n int) ([]cue.Value, error) {
 	if n < 0 {
 		return nil, fmt.Errorf("negative index")
@@ -91,12 +90,11 @@ func Drop(x []cue.Value, n int) ([]cue.Value, error) {
 //
 // For instance:
 //
-//    FlattenN([1, [[2, 3], []], [4]], 1)
+//	FlattenN([1, [[2, 3], []], [4]], 1)
 //
 // results in
 //
-//    [1, [2, 3], [], 4]
-//
+//	[1, [2, 3], [], 4]
 func FlattenN(xs cue.Value, depth int) ([]cue.Value, error) {
 	var flattenN func(cue.Value, int) ([]cue.Value, error)
 	flattenN = func(xs cue.Value, depth int) ([]cue.Value, error) {
@@ -127,12 +125,11 @@ func FlattenN(xs cue.Value, depth int) ([]cue.Value, error) {
 //
 // For instance:
 //
-//    Repeat([1, 2], 2)
+//	Repeat([1, 2], 2)
 //
 // results in
 //
-//    [1, 2, 1, 2]
-//
+//	[1, 2, 1, 2]
 func Repeat(x []cue.Value, count int) ([]cue.Value, error) {
 	if count < 0 {
 		return nil, fmt.Errorf("negative count")
@@ -148,8 +145,7 @@ func Repeat(x []cue.Value, count int) ([]cue.Value, error) {
 //
 // Concat([a, b, c]) is equivalent to
 //
-//     [ for x in a {x}, for x in b {x}, for x in c {x} ]
-//
+//	[ for x in a {x}, for x in b {x}, for x in c {x} ]
 func Concat(a []cue.Value) ([]cue.Value, error) {
 	var res []cue.Value
 	for _, e := range a {
@@ -168,12 +164,11 @@ func Concat(a []cue.Value) ([]cue.Value, error) {
 //
 // For instance:
 //
-//    Take([1, 2, 3, 4], 2)
+//	Take([1, 2, 3, 4], 2)
 //
 // results in
 //
-//    [1, 2]
-//
+//	[1, 2]
 func Take(x []cue.Value, n int) ([]cue.Value, error) {
 	if n < 0 {
 		return nil, fmt.Errorf("negative index")
@@ -191,12 +186,11 @@ func Take(x []cue.Value, n int) ([]cue.Value, error) {
 //
 // For instance:
 //
-//    Slice([1, 2, 3, 4], 1, 3)
+//	Slice([1, 2, 3, 4], 1, 3)
 //
 // results in
 //
-//    [2, 3]
-//
+//	[2, 3]
 func Slice(x []cue.Value, i, j int) ([]cue.Value, error) {
 	if i < 0 {
 		return nil, fmt.Errorf("negative index")

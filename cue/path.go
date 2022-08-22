@@ -78,7 +78,8 @@ var (
 )
 
 // Optional converts sel into an optional equivalent.
-//     foo -> foo?
+//
+//	foo -> foo?
 func (sel Selector) Optional() Selector {
 	return wrapOptional(sel)
 }
@@ -168,8 +169,8 @@ func (p Path) String() string {
 }
 
 // Optional returns the optional form of a Path. For instance,
-//    foo.bar  --> foo?.bar?
 //
+//	foo.bar  --> foo?.bar?
 func (p Path) Optional() Path {
 	q := make([]Selector, 0, len(p.path))
 	for _, s := range p.path {
@@ -435,9 +436,10 @@ func (s anySelector) feature(r adt.Runtime) adt.Feature {
 //
 // // ImportPath defines a lookup at the root of an instance. It must be the first
 // // element of a Path.
-// func ImportPath(s string) Selector {
-// 	return importSelector(s)
-// }
+//
+//	func ImportPath(s string) Selector {
+//		return importSelector(s)
+//	}
 type optionalSelector struct {
 	selector
 }

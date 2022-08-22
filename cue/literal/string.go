@@ -287,14 +287,14 @@ const (
 // unquoteChar decodes the first character or byte in the escaped string.
 // It returns four values:
 //
-//	1) value, the decoded Unicode code point or byte value if non-negative, or
-//	one of the following special values:
-//		- terminatedByQuote indicates terminated by quotes
-//		- terminatedByExpr means terminated by \(
-//		- escapedNewline means that the line-termination character was quoted and should be omitted
-//	2) multibyte, a boolean indicating whether the decoded character requires a multibyte UTF-8 representation;
-//	3) tail, the remainder of the string after the character; and
-//	4) an error that will be nil if the character is syntactically valid.
+//  1. value, the decoded Unicode code point or byte value if non-negative, or
+//     one of the following special values:
+//     - terminatedByQuote indicates terminated by quotes
+//     - terminatedByExpr means terminated by \(
+//     - escapedNewline means that the line-termination character was quoted and should be omitted
+//  2. multibyte, a boolean indicating whether the decoded character requires a multibyte UTF-8 representation;
+//  3. tail, the remainder of the string after the character; and
+//  4. an error that will be nil if the character is syntactically valid.
 //
 // The second argument, kind, specifies the type of literal being parsed
 // and therefore which kind of escape sequences are permitted.

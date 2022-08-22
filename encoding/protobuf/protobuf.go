@@ -19,8 +19,7 @@
 // discussed in https://developers.google.com/protocol-buffers/docs/proto3, and
 // carries some of the mapping further when possible with CUE.
 //
-//
-// Package Paths
+// # Package Paths
 //
 // If a .proto file contains a go_package directive, it will be used as the
 // destination package fo the generated .cue files. A common use case is to
@@ -33,48 +32,48 @@
 // It is safe to mix package with and without a go_package within the same
 // project.
 //
-// Type Mappings
+// # Type Mappings
 //
 // The following type mappings of definitions apply:
 //
-//   Proto type     CUE type/def     Comments
-//   message        struct           Message fields become CUE fields, whereby
-//                                   names are mapped to lowerCamelCase.
-//   enum           e1 | e2 | ...    Where ex are strings. A separate mapping is
-//                                   generated to obtain the numeric values.
-//   map<K, V>      { <>: V }        All keys are converted to strings.
-//   repeated V     [...V]           null is accepted as the empty list [].
-//   bool           bool
-//   string         string
-//   bytes          bytes            A base64-encoded string when converted to JSON.
-//   int32, fixed32 int32            An integer with bounds as defined by int32.
-//   uint32         uint32           An integer with bounds as defined by uint32.
-//   int64, fixed64 int64            An integer with bounds as defined by int64.
-//   uint64         uint64           An integer with bounds as defined by uint64.
-//   float          float32          A number with bounds as defined by float32.
-//   double         float64          A number with bounds as defined by float64.
-//   Struct         struct           See struct.proto.
-//   Value          _                See struct.proto.
-//   ListValue      [...]            See struct.proto.
-//   NullValue      null             See struct.proto.
-//   BoolValue      bool             See struct.proto.
-//   StringValue    string           See struct.proto.
-//   NumberValue    number           See struct.proto.
-//   StringValue    string           See struct.proto.
-//   Empty          close({})
-//   Timestamp      time.Time        See struct.proto.
-//   Duration       time.Duration    See struct.proto.
+//	Proto type     CUE type/def     Comments
+//	message        struct           Message fields become CUE fields, whereby
+//	                                names are mapped to lowerCamelCase.
+//	enum           e1 | e2 | ...    Where ex are strings. A separate mapping is
+//	                                generated to obtain the numeric values.
+//	map<K, V>      { <>: V }        All keys are converted to strings.
+//	repeated V     [...V]           null is accepted as the empty list [].
+//	bool           bool
+//	string         string
+//	bytes          bytes            A base64-encoded string when converted to JSON.
+//	int32, fixed32 int32            An integer with bounds as defined by int32.
+//	uint32         uint32           An integer with bounds as defined by uint32.
+//	int64, fixed64 int64            An integer with bounds as defined by int64.
+//	uint64         uint64           An integer with bounds as defined by uint64.
+//	float          float32          A number with bounds as defined by float32.
+//	double         float64          A number with bounds as defined by float64.
+//	Struct         struct           See struct.proto.
+//	Value          _                See struct.proto.
+//	ListValue      [...]            See struct.proto.
+//	NullValue      null             See struct.proto.
+//	BoolValue      bool             See struct.proto.
+//	StringValue    string           See struct.proto.
+//	NumberValue    number           See struct.proto.
+//	StringValue    string           See struct.proto.
+//	Empty          close({})
+//	Timestamp      time.Time        See struct.proto.
+//	Duration       time.Duration    See struct.proto.
 //
 // Protobuf definitions can be annotated with CUE constraints that are included
 // in the generated CUE:
-//    (cue.val)     string        CUE expression defining a constraint for this
-//                                field. The string may refer to other fields
-//                                in a message definition using their JSON name.
 //
-//    (cue.opt)     FieldOptions
-//       required   bool          Defines the field is required. Use with
-//                                caution.
+//	(cue.val)     string        CUE expression defining a constraint for this
+//	                            field. The string may refer to other fields
+//	                            in a message definition using their JSON name.
 //
+//	(cue.opt)     FieldOptions
+//	   required   bool          Defines the field is required. Use with
+//	                            caution.
 package protobuf
 
 // TODO mappings:
@@ -158,7 +157,6 @@ type Config struct {
 // specified Root (or current working directory if none is specified).
 // All other imported files are assigned to the CUE pkg dir ($Root/pkg)
 // according to their Go package import path.
-//
 type Extractor struct {
 	root     string
 	cwd      string
@@ -219,7 +217,6 @@ func (b *Extractor) addErr(err error) {
 // AddFile assumes that the proto file compiles with protoc and may not report
 // an error if it does not. Imports are resolved using the paths defined in
 // Config.
-//
 func (b *Extractor) AddFile(filename string, src interface{}) error {
 	if b.done {
 		err := errors.Newf(token.NoPos,
@@ -395,7 +392,6 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 //
 // Extract assumes the proto file compiles with protoc and may not report an error
 // if it does not. Imports are resolved using the paths defined in Config.
-//
 func Extract(filename string, src interface{}, c *Config) (f *ast.File, err error) {
 	if c == nil {
 		c = &Config{}

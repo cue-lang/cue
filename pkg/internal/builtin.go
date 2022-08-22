@@ -30,20 +30,19 @@ import (
 //
 // A function may return and a constant may be any of the following types:
 //
-//   error (translates to bottom)
-//   nil   (translates to null)
-//   bool
-//   int*
-//   uint*
-//   float64
-//   string
-//   *big.Float
-//   *big.Int
+//	error (translates to bottom)
+//	nil   (translates to null)
+//	bool
+//	int*
+//	uint*
+//	float64
+//	string
+//	*big.Float
+//	*big.Int
 //
-//   For any of the above, including interface{} and these types recursively:
-//   []T
-//   map[string]T
-//
+//	For any of the above, including interface{} and these types recursively:
+//	[]T
+//	map[string]T
 type Builtin struct {
 	Name   string
 	Pkg    adt.Feature

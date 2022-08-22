@@ -101,10 +101,10 @@ loop1:
 
 // equalClosed tests if x and y have the same set of close information.
 // TODO: the following refinements are possible:
-// - unify optional fields and equate the optional fields
-// - do the same for pattern constraints, where the pattern constraints
-//   are collated by pattern equality.
-// - a further refinement would collate patterns by ranges.
+//   - unify optional fields and equate the optional fields
+//   - do the same for pattern constraints, where the pattern constraints
+//     are collated by pattern equality.
+//   - a further refinement would collate patterns by ranges.
 //
 // For all these refinements it would be necessary to have well-working
 // structure sharing so as to not repeatedly recompute optional arcs.

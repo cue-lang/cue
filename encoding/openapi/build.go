@@ -691,18 +691,18 @@ func (b *builder) dispatch(f typeFunc, v cue.Value) {
 }
 
 // object supports the following
-// - maxProperties: maximum allowed fields in this struct.
-// - minProperties: minimum required fields in this struct.
-// - patternProperties: [regexp]: schema
-//   TODO: we can support this once .kv(key, value) allow
-//      foo [=~"pattern"]: type
-//      An instance field must match all schemas for which a regexp matches.
-//   Even though it is not supported in OpenAPI, we should still accept it
-//   when receiving from OpenAPI. We could possibly use disjunctions to encode
-//   this.
-// - dependencies: what?
-// - propertyNames: schema
-//   every property name in the enclosed schema matches that of
+//   - maxProperties: maximum allowed fields in this struct.
+//   - minProperties: minimum required fields in this struct.
+//   - patternProperties: [regexp]: schema
+//     TODO: we can support this once .kv(key, value) allow
+//     foo [=~"pattern"]: type
+//     An instance field must match all schemas for which a regexp matches.
+//     Even though it is not supported in OpenAPI, we should still accept it
+//     when receiving from OpenAPI. We could possibly use disjunctions to encode
+//     this.
+//   - dependencies: what?
+//   - propertyNames: schema
+//     every property name in the enclosed schema matches that of
 func (b *builder) object(v cue.Value) {
 	// TODO: discriminator objects: we could theoretically derive discriminator
 	// objects automatically: for every object in a oneOf/allOf/anyOf, or any
@@ -797,25 +797,25 @@ func (b *builder) object(v cue.Value) {
 // List constraints:
 //
 // Max and min items.
-// - maxItems: int (inclusive)
-// - minItems: int (inclusive)
-// - items (item type)
-//   schema: applies to all items
-//   array of schemas:
-//       schema at pos must match if both value and items are defined.
-// - additional items:
-//   schema: where items must be an array of schemas, intstance elements
-//   succeed for if they match this value for any value at a position
-//   greater than that covered by items.
-// - uniqueItems: bool
-//   TODO: support with list.Unique() unique() or comprehensions.
-//   For the latter, we need equality for all values, which is doable,
-//   but not done yet.
+//   - maxItems: int (inclusive)
+//   - minItems: int (inclusive)
+//   - items (item type)
+//     schema: applies to all items
+//     array of schemas:
+//     schema at pos must match if both value and items are defined.
+//   - additional items:
+//     schema: where items must be an array of schemas, intstance elements
+//     succeed for if they match this value for any value at a position
+//     greater than that covered by items.
+//   - uniqueItems: bool
+//     TODO: support with list.Unique() unique() or comprehensions.
+//     For the latter, we need equality for all values, which is doable,
+//     but not done yet.
 //
 // NOT SUPPORTED IN OpenAPI:
-// - contains:
-//   schema: an array instance is valid if at least one element matches
-//   this schema.
+//   - contains:
+//     schema: an array instance is valid if at least one element matches
+//     this schema.
 func (b *builder) array(v cue.Value) {
 
 	switch op, a := v.Expr(); op {
@@ -1003,6 +1003,7 @@ func (b *builder) number(v cue.Value) {
 //   - begin and end anchors: ^ and $
 //   - simple grouping: (...)
 //   - alteration: |
+//
 // This is a subset of RE2 used by CUE.
 //
 // Most notably absent:
@@ -1018,7 +1019,6 @@ func (b *builder) number(v cue.Value) {
 // flag setting will be tricky. Unicode character classes,
 // boundaries, etc can be compiled into simple character classes,
 // although the resulting regexp will look cumbersome.
-//
 func (b *builder) string(v cue.Value) {
 	switch op, a := v.Expr(); op {
 

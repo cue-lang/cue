@@ -62,11 +62,11 @@ type decoder struct {
 // Parse parses the given textproto bytes and converts them to a CUE expression,
 // using schema as the guideline for conversion using the following rules:
 //
-//    - the @protobuf attribute is optional, but is necessary for:
-//        - interpreting protobuf maps
-//        - using a name different from the CUE name
-//    - fields in the textproto that have no corresponding field in
-//      schema are ignored
+//   - the @protobuf attribute is optional, but is necessary for:
+//   - interpreting protobuf maps
+//   - using a name different from the CUE name
+//   - fields in the textproto that have no corresponding field in
+//     schema are ignored
 //
 // NOTE: the filename is used for associating position information. However,
 // currently no position information is associated with the text proto because
@@ -129,7 +129,6 @@ func (d *decoder) protoPos(p pbast.Position) token.Pos {
 
 // parseSchema walks over a CUE "type", converts it to an internal data
 // structure that is used for parsing text proto, and writes it to
-//
 func (d *decoder) parseSchema(schema cue.Value) *mapping {
 	_, v := value.ToInternal(schema)
 	if v == nil {

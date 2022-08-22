@@ -91,7 +91,6 @@ func (es *EditScript) Len() int {
 }
 
 // Label returns a string representation of the label.
-//
 func (es *EditScript) LabelX(i int) string {
 	e := es.edits[i]
 	p := e.XPos()

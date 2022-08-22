@@ -58,12 +58,11 @@ func New(r *cue.Runtime, c *Config) *Codec {
 // field tag. The value of the tag is a CUE expression, which may contain
 // references to the JSON name of other fields in a struct.
 //
-//     type Sum struct {
-//         A int `cue:"c-b" json:"a,omitempty"`
-//         B int `cue:"c-a" json:"b,omitempty"`
-//         C int `cue:"a+b" json:"c,omitempty"`
-//     }
-//
+//	type Sum struct {
+//	    A int `cue:"c-b" json:"a,omitempty"`
+//	    B int `cue:"c-a" json:"b,omitempty"`
+//	    C int `cue:"a+b" json:"c,omitempty"`
+//	}
 func (c *Codec) ExtractType(x interface{}) (cue.Value, error) {
 	// ExtractType cannot introduce new fields on repeated calls. We could
 	// consider optimizing the lock usage based on this property.

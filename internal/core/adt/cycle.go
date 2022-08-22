@@ -259,12 +259,13 @@ type cyclicConjunct struct {
 }
 
 // markCycle checks whether the reference x is cyclic. There are two cases:
-//   1) it was previously used in this conjunct, and
-//   2) it directly references a parent node.
+//  1. it was previously used in this conjunct, and
+//  2. it directly references a parent node.
 //
 // Other inputs:
-//   arc  the reference to which x points
-//   v    the Conjunct from which x originates
+//
+//	arc  the reference to which x points
+//	v    the Conjunct from which x originates
 //
 // A cyclic node is added to a queue for later processing if no evidence of
 // a non-cyclic node has so far been found. updateCyclicStatus processes
@@ -421,8 +422,7 @@ func (n *nodeContext) reportCycleError() {
 // evaluating an expression.
 //
 // Example:
-//    TODO:
-//
+// TODO:
 func makeAnonymousConjunct(env *Environment, x Expr, refs *RefNode) Conjunct {
 	return Conjunct{
 		env, x, CloseInfo{CycleInfo: CycleInfo{

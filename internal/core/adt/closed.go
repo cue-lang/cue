@@ -174,8 +174,7 @@ func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
 // SpawnGroup is used for structs that contain embeddings that may end up
 // closing the struct. This is to force that `b` is not allowed in
 //
-//      a: {#foo} & {b: int}
-//
+//	a: {#foo} & {b: int}
 func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
 	var span SpanType
 	if c.closeInfo != nil {

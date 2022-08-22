@@ -140,7 +140,6 @@ func isIncomplete(v *Vertex) bool {
 //
 // If x is not already an error, the value is recorded in the error for
 // reference.
-//
 func (v *Vertex) AddChildError(recursive *Bottom) {
 	v.ChildErrors = CombineErrors(nil, v.ChildErrors, recursive)
 	if recursive.IsIncomplete() {

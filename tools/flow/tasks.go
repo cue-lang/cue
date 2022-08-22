@@ -217,15 +217,14 @@ func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
 //
 // This terminates because:
 //
-//  - traversing all nodes of all tasks is guaranteed finite (CUE does not
-//    evaluate to infinite structure).
+//   - traversing all nodes of all tasks is guaranteed finite (CUE does not
+//     evaluate to infinite structure).
 //
-//  - traversing conjuncts of all nodes is finite, as the input syntax is
-//    inherently finite.
+//   - traversing conjuncts of all nodes is finite, as the input syntax is
+//     inherently finite.
 //
-//  - as regular nodes are traversed recursively they are marked with a cycle
-//    marker to detect cycles, ensuring a finite traversal as well.
-//
+//   - as regular nodes are traversed recursively they are marked with a cycle
+//     marker to detect cycles, ensuring a finite traversal as well.
 func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 	dep.VisitFields(c.opCtx, n, func(d dep.Dependency) error {
 		depTask := c.findImpliedTask(d)

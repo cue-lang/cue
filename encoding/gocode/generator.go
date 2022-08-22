@@ -65,17 +65,16 @@ const defaultPrefix = "cuegen"
 //
 // The following options are supported:
 //
-//     type=<gotype>    The Go type as which this value should be interpreted.
-//                      This defaults to the type with the (possibly overridden)
-//                      name of the field.
-//     validate=<name>  Alternative name for the validation function or method
-//                      Setting this to the empty string disables generation.
-//     complete=<name>  Alternative name for the validation function or method.
-//                      Setting this to the empty string disables generation.
-//     func             Generate as a function instead of a method.
+//	type=<gotype>    The Go type as which this value should be interpreted.
+//	                 This defaults to the type with the (possibly overridden)
+//	                 name of the field.
+//	validate=<name>  Alternative name for the validation function or method
+//	                 Setting this to the empty string disables generation.
+//	complete=<name>  Alternative name for the validation function or method.
+//	                 Setting this to the empty string disables generation.
+//	func             Generate as a function instead of a method.
 //
-//
-// Selection and Naming
+// # Selection and Naming
 //
 // Generate will not generate any code for fields that have no go attribute
 // and that are not exported or for which there is no namesake Go type.
@@ -90,12 +89,10 @@ const defaultPrefix = "cuegen"
 // methods by default. If not, it will be generated as a function. The default
 // function name is the default operation name with the Go name as a suffix.
 //
-//
 // Caveats
 // Currently not supported:
 //   - option to generate Go structs (or automatically generate if undefined)
 //   - for type option to refer to types outside the package.
-//
 func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err error) {
 	// TODO: if inst is nil, the instance is loaded from CUE files in the same
 	// package directory with the same package name.

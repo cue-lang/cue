@@ -102,7 +102,8 @@ func varToString(s string, err error) (ast.Expr, error) {
 // A tag binds an identifier to a field to allow passing command-line values.
 //
 // A tag is of the form
-//     @tag(<name>,[type=(string|int|number|bool)][,short=<shorthand>+])
+//
+//	@tag(<name>,[type=(string|int|number|bool)][,short=<shorthand>+])
 //
 // The name is mandatory and type defaults to string. Tags are set using the -t
 // option on the command line. -t name=value will parse value for the type

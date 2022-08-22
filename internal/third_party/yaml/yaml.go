@@ -2,8 +2,7 @@
 //
 // Source code and other details for the project are available at GitHub:
 //
-//   https://github.com/go-yaml/yaml
-//
+//	https://github.com/go-yaml/yaml
 package yaml // import "cuelang.org/go/internal/third_party/yaml"
 
 import (
@@ -70,16 +69,15 @@ type Marshaler interface {
 //
 // For example:
 //
-//     type T struct {
-//         F int `yaml:"a,omitempty"`
-//         B int
-//     }
-//     var t T
-//     yaml.Unmarshal([]byte("a: 1\nb: 2"), &t)
+//	type T struct {
+//	    F int `yaml:"a,omitempty"`
+//	    B int
+//	}
+//	var t T
+//	yaml.Unmarshal([]byte("a: 1\nb: 2"), &t)
 //
 // See the documentation of Marshal for the format of tags and a list of
 // supported tag options.
-//
 func Unmarshal(filename string, in []byte) (expr ast.Expr, err error) {
 	return unmarshal(filename, in)
 }

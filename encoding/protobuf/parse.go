@@ -561,17 +561,17 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 //
 // An enum will generate two top-level definitions:
 //
-//    Enum:
-//      "Value1" |
-//      "Value2" |
-//      "Value3"
+//	Enum:
+//	  "Value1" |
+//	  "Value2" |
+//	  "Value3"
 //
 // and
 //
-//    Enum_value: {
-//        "Value1": 0
-//        "Value2": 1
-//    }
+//	Enum_value: {
+//	    "Value1": 0
+//	    "Value2": 1
+//	}
 //
 // Enums are always defined at the top level. The name of a nested enum
 // will be prefixed with the name of its parent and an underscore.

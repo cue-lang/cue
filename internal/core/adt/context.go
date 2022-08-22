@@ -37,15 +37,17 @@ import (
 var Debug bool = os.Getenv("CUE_DEBUG") != "0"
 
 // Verbosity sets the log level. There are currently only two levels:
-//   0: no logging
-//   1: logging
+//
+//	0: no logging
+//	1: logging
 var Verbosity int
 
 // DebugSort specifies that arcs be sorted consistently between implementations.
-// 0: default
-// 1: sort by Feature: this should be consistent between implementations where
-//    there is no change in the compiler and indexing code.
-// 2: alphabetical
+//
+//	0: default
+//	1: sort by Feature: this should be consistent between implementations where
+//		   there is no change in the compiler and indexing code.
+//	2: alphabetical
 var DebugSort int
 
 func DebugSortArcs(c *OpContext, n *Vertex) {
@@ -705,7 +707,6 @@ func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
 // unifyNode returns a possibly partially evaluated node value.
 //
 // TODO: maybe return *Vertex, *Bottom
-//
 func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 	savedSrc := c.src
 	c.src = v.Source()

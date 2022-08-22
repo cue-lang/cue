@@ -88,7 +88,6 @@ func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 // A Scope maintains the set of named language entities declared
 // in the scope and a link to the immediately surrounding (outer)
 // scope.
-//
 type scope struct {
 	file    *ast.File
 	outer   *scope

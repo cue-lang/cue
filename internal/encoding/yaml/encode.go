@@ -35,15 +35,16 @@ import (
 //
 // The given file must only contain values that can be directly supported by
 // YAML:
-//    Type          Restrictions
-//    BasicLit
-//    File          no imports, aliases, or definitions
-//    StructLit     no embeddings, aliases, or definitions
-//    List
-//    Field         must be regular; label must be a BasicLit or Ident
-//    CommentGroup
 //
-//    TODO: support anchors through Ident.
+//	Type          Restrictions
+//	BasicLit
+//	File          no imports, aliases, or definitions
+//	StructLit     no embeddings, aliases, or definitions
+//	List
+//	Field         must be regular; label must be a BasicLit or Ident
+//	CommentGroup
+//
+// TODO: support anchors through Ident.
 func Encode(n ast.Node) (b []byte, err error) {
 	y, err := encode(n)
 	if err != nil {

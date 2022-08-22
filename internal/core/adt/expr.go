@@ -182,14 +182,13 @@ func (o *StructLit) IsOptionalField(label Feature) bool {
 // Field represents a field with a fixed label. It can be a regular field,
 // definition or hidden field.
 //
-//   foo: bar
-//   #foo: bar
-//   _foo: bar
+//	foo: bar
+//	#foo: bar
+//	_foo: bar
 //
 // Legacy:
 //
-//   Foo :: bar
-//
+//	Foo :: bar
 type Field struct {
 	Src *ast.Field
 
@@ -206,8 +205,7 @@ func (x *Field) Source() ast.Node {
 
 // An OptionalField represents an optional regular field.
 //
-//   foo?: expr
-//
+//	foo?: expr
 type OptionalField struct {
 	Src   *ast.Field
 	Label Feature
@@ -223,8 +221,7 @@ func (x *OptionalField) Source() ast.Node {
 
 // A BulkOptionalField represents a set of optional field.
 //
-//   [expr]: expr
-//
+//	[expr]: expr
 type BulkOptionalField struct {
 	Src    *ast.Field // Elipsis or Field
 	Filter Expr
@@ -241,8 +238,7 @@ func (x *BulkOptionalField) Source() ast.Node {
 
 // A Ellipsis represents a set of optional fields of a given type.
 //
-//   ...T
-//
+//	...T
 type Ellipsis struct {
 	Src   *ast.Ellipsis
 	Value Expr
@@ -257,9 +253,8 @@ func (x *Ellipsis) Source() ast.Node {
 
 // A DynamicField represents a regular field for which the key is computed.
 //
-//    "\(expr)": expr
-//    (expr): expr
-//
+//	"\(expr)": expr
+//	(expr): expr
 type DynamicField struct {
 	Src   *ast.Field
 	Key   Expr
@@ -279,8 +274,7 @@ func (x *DynamicField) Source() ast.Node {
 
 // A ListLit represents an unevaluated list literal.
 //
-//    [a, for x in src { ... }, b, ...T]
-//
+//	[a, for x in src { ... }, b, ...T]
 type ListLit struct {
 	Src *ast.ListLit
 
@@ -419,11 +413,10 @@ func (x *Top) Kind() Kind { return TopKind }
 // BasicType represents all values of a certain Kind. It can be used as a Value
 // and Expr.
 //
-//   string
-//   int
-//   num
-//   bool
-//
+//	string
+//	int
+//	num
+//	bool
 type BasicType struct {
 	Src ast.Node
 	K   Kind
@@ -452,9 +445,8 @@ func (x *BasicType) Kind() Kind { return x.K }
 
 // BoundExpr represents an unresolved unary comparator.
 //
-//    <a
-//    =~MyPattern
-//
+//	<a
+//	=~MyPattern
 type BoundExpr struct {
 	Src  *ast.UnaryExpr
 	Op   Op
@@ -585,9 +577,8 @@ func (x *BoundExpr) evaluate(ctx *OpContext) Value {
 // A BoundValue is a fully evaluated unary comparator that can be used to
 // validate other values.
 //
-//    <5
-//    =~"Name$"
-//
+//	<5
+//	=~"Name$"
 type BoundValue struct {
 	Src   ast.Expr
 	Op    Op
@@ -704,8 +695,7 @@ func (x *NodeLink) resolve(c *OpContext, state VertexStatus) *Vertex {
 
 // A FieldReference represents a lexical reference to a field.
 //
-//    a
-//
+//	a
 type FieldReference struct {
 	Src     *ast.Ident
 	UpCount int32
@@ -729,8 +719,7 @@ func (x *FieldReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 //
 // Example: an X referring to
 //
-//    a: X=b
-//
+//	a: X=b
 type ValueReference struct {
 	Src     *ast.Ident
 	UpCount int32
@@ -756,8 +745,7 @@ func (x *ValueReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 //
 // Example: an X referring to
 //
-//    [X=Pattern]: b: a
-//
+//	[X=Pattern]: b: a
 type LabelReference struct {
 	Src     *ast.Ident
 	UpCount int32
@@ -789,10 +777,9 @@ func (x *LabelReference) evaluate(ctx *OpContext) Value {
 //
 // Example: an X referring to
 //
-//    X=(x): v
-//    X="\(x)": v
-//    X=[string]: v
-//
+//	X=(x): v
+//	X="\(x)": v
+//	X=[string]: v
 type DynamicReference struct {
 	Src     *ast.Ident
 	UpCount int32
@@ -835,10 +822,9 @@ func (x *DynamicReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 //
 // Example: strings in
 //
-//    import "strings"
+//	import "strings"
 //
-//    strings.ToLower("Upper")
-//
+//	strings.ToLower("Upper")
 type ImportReference struct {
 	Src        *ast.Ident
 	ImportPath Feature
@@ -865,8 +851,7 @@ func (x *ImportReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 //
 // Example: an X referring to
 //
-//   let X = x
-//
+//	let X = x
 type LetReference struct {
 	Src     *ast.Ident
 	UpCount int32
@@ -904,8 +889,7 @@ func (x *LetReference) evaluate(c *OpContext) Value {
 
 // A SelectorExpr looks up a fixed field in an expression.
 //
-//     a.sel
-//
+//	a.sel
 type SelectorExpr struct {
 	Src *ast.SelectorExpr
 	X   Expr
@@ -939,8 +923,7 @@ func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
 
 // IndexExpr is like a selector, but selects an index.
 //
-//    a[index]
-//
+//	a[index]
 type IndexExpr struct {
 	Src   *ast.IndexExpr
 	X     Expr
@@ -977,8 +960,7 @@ func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 
 // A SliceExpr represents a slice operation. (Not currently in spec.)
 //
-//    X[Lo:Hi:Stride]
-//
+//	X[Lo:Hi:Stride]
 type SliceExpr struct {
 	Src    *ast.SliceExpr
 	X      Expr
@@ -1069,8 +1051,7 @@ func (x *SliceExpr) evaluate(c *OpContext) Value {
 
 // An Interpolation is a string interpolation.
 //
-//    "a \(b) c"
-//
+//	"a \(b) c"
 type Interpolation struct {
 	Src   *ast.Interpolation
 	K     Kind   // string or bytes
@@ -1111,9 +1092,8 @@ func (x *Interpolation) evaluate(c *OpContext) Value {
 
 // UnaryExpr is a unary expression.
 //
-//    Op X
-//    -X !X +X
-//
+//	Op X
+//	-X !X +X
 type UnaryExpr struct {
 	Src *ast.UnaryExpr
 	Op  Op
@@ -1172,9 +1152,8 @@ func (x *UnaryExpr) evaluate(c *OpContext) Value {
 
 // BinaryExpr is a binary expression.
 //
-//    X + Y
-//    X & Y
-//
+//	X + Y
+//	X & Y
 type BinaryExpr struct {
 	Src *ast.BinaryExpr
 	Op  Op
@@ -1304,9 +1283,8 @@ func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectErr
 
 // A CallExpr represents a call to a builtin.
 //
-//    len(x)
-//    strings.ToLower(x)
-//
+//	len(x)
+//	strings.ToLower(x)
 type CallExpr struct {
 	Src  *ast.CallExpr
 	Fun  Expr
@@ -1502,8 +1480,7 @@ func (x *Builtin) Source() ast.Node { return nil }
 // A BuiltinValidator is a Value that results from evaluation a partial call
 // to a builtin (using CallExpr).
 //
-//    strings.MinRunes(4)
-//
+//	strings.MinRunes(4)
 type BuiltinValidator struct {
 	Src     *CallExpr
 	Builtin *Builtin
@@ -1696,8 +1673,7 @@ func (x *Comprehension) Source() ast.Node {
 // A ForClause represents a for clause of a comprehension. It can be used
 // as a struct or list element.
 //
-//    for k, v in src {}
-//
+//	for k, v in src {}
 type ForClause struct {
 	Syntax *ast.ForClause
 	Key    Feature
@@ -1759,8 +1735,7 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 // An IfClause represents an if clause of a comprehension. It can be used
 // as a struct or list element.
 //
-//    if cond {}
-//
+//	if cond {}
 type IfClause struct {
 	Src       *ast.IfClause
 	Condition Expr
@@ -1782,8 +1757,7 @@ func (x *IfClause) yield(ctx *OpContext, f YieldFunc) {
 
 // An LetClause represents a let clause in a comprehension.
 //
-//    let x = y
-//
+//	let x = y
 type LetClause struct {
 	Src   *ast.LetClause
 	Label Feature

@@ -37,14 +37,14 @@ import (
 // attributes.
 //
 // Mappings per CUE type:
-//  for any CUE type:
-//  int:       if the expression value is an integer and the schema value is
-//             an int64, it is converted to a string.
-//  {}:        JSON objects representing any values will be left as is.
-//             If the CUE type corresponding to the URL can be determined within
-//             the module context it will be unified.
-//  _:         Adds a `@type` URL (TODO).
 //
+//	for any CUE type:
+//	int:       if the expression value is an integer and the schema value is
+//	           an int64, it is converted to a string.
+//	{}:        JSON objects representing any values will be left as is.
+//	           If the CUE type corresponding to the URL can be determined within
+//	           the module context it will be unified.
+//	_:         Adds a `@type` URL (TODO).
 type Encoder struct {
 	schema cue.Value
 }

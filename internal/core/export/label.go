@@ -61,14 +61,14 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 // still match across inlining and unifications.
 //
 // TODO: Alternatives approaches to consider:
-// 1. Rewrite to unique hidden field names. This means, though, that hidden
-//    fields may not match across unifications. That may be okay.
-// 2. Force inline hidden fields from such packages, or translate them to let
-//    expressions when necessary. This should generally preserve semantics
-//    quite well.
-// 3. Allow addressing hidden fields across packages, for instance by allowing
-//    `_(hiddenField, pkg: "import/path")`. This kind of defeats the purpose
-//    of hidden fields, though.
+//  1. Rewrite to unique hidden field names. This means, though, that hidden
+//     fields may not match across unifications. That may be okay.
+//  2. Force inline hidden fields from such packages, or translate them to let
+//     expressions when necessary. This should generally preserve semantics
+//     quite well.
+//  3. Allow addressing hidden fields across packages, for instance by allowing
+//     `_(hiddenField, pkg: "import/path")`. This kind of defeats the purpose
+//     of hidden fields, though.
 //
 // Option 2 seems the best long-term solution. It should be possible to
 // piggyback on the self containment algorithm for this: basically, whenever

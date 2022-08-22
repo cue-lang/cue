@@ -23,11 +23,11 @@
 //
 // To clarify between these cases, we adopt the following naming convention:
 //
-//    Name        Direction   Level    Example
-//    Decode      x -> CUE    Value    Convert an incoming proto message to CUE
-//    Encode      CUE -> x    Value    Convert CUE to JSON
-//    Extract     x -> CUE    Type     Extract CUE definition from .proto file
-//    Generate    CUE -> x    Type     Generate OpenAPI definition from CUE
+//	Name        Direction   Level    Example
+//	Decode      x -> CUE    Value    Convert an incoming proto message to CUE
+//	Encode      CUE -> x    Value    Convert CUE to JSON
+//	Extract     x -> CUE    Type     Extract CUE definition from .proto file
+//	Generate    CUE -> x    Type     Generate OpenAPI definition from CUE
 //
 // To be more precise, Decoders and Encoders deal with concrete values only.
 //

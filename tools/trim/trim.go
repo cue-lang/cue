@@ -24,29 +24,27 @@
 // be removed because a definition field dominates a regular field and because
 // the latter subsumes the default value of the former.
 //
-//
 // Examples:
 //
-// 	light: [string]: {
-// 		room:          string
-// 		brightnessOff: *0.0 | >=0 & <=100.0
-// 		brightnessOn:  *100.0 | >=0 & <=100.0
-// 	}
+//	light: [string]: {
+//		room:          string
+//		brightnessOff: *0.0 | >=0 & <=100.0
+//		brightnessOn:  *100.0 | >=0 & <=100.0
+//	}
 //
-// 	light: ceiling50: {
-// 		room:          "MasterBedroom"
-// 		brightnessOff: 0.0    // this line
-// 		brightnessOn:  100.0  // and this line will be removed
-// 	}
+//	light: ceiling50: {
+//		room:          "MasterBedroom"
+//		brightnessOff: 0.0    // this line
+//		brightnessOn:  100.0  // and this line will be removed
+//	}
 //
 // Results in:
 //
-// 	// Unmodified: light: [string]: { ... }
+//	// Unmodified: light: [string]: { ... }
 //
-// 	light: ceiling50: {
-// 		room: "MasterBedroom"
-// 	}
-//
+//	light: ceiling50: {
+//		room: "MasterBedroom"
+//	}
 package trim
 
 import (

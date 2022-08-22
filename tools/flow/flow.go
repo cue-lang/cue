@@ -263,11 +263,11 @@ func (c *Controller) Value() cue.Value {
 //
 // The following state diagram indicates the possible state transitions:
 //
-//          Ready
-//       ↗︎        ↘︎
-//   Waiting  ←  Running
-//       ↘︎        ↙︎
-//       Terminated
+//	       Ready
+//	    ↗︎        ↘︎
+//	Waiting  ←  Running
+//	    ↘︎        ↙︎
+//	    Terminated
 //
 // A Task may move from Waiting to Terminating if one of
 // the tasks on which it depends fails.
@@ -275,7 +275,6 @@ func (c *Controller) Value() cue.Value {
 // NOTE: transitions from Running to Waiting are currently not supported. In
 // the future this may be possible if a task depends on continuously running
 // tasks that send updates.
-//
 type State int
 
 const (

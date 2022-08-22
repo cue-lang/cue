@@ -60,19 +60,19 @@ const (
 // In the directory and ancestor directories up to including one with a
 // cue.mod file, all .cue files are considered part of the package except for:
 //
-//	- files starting with _ or . (likely editor temporary files)
-//	- files with build constraints not satisfied by the context
+//   - files starting with _ or . (likely editor temporary files)
+//   - files with build constraints not satisfied by the context
 //
 // If an error occurs, importPkg sets the error in the returned instance,
 // which then may contain partial information.
 //
 // pkgName indicates which packages to load. It supports the following
 // values:
-//     ""      the default package for the directory, if only one
-//             is present.
-//     _       anonymous files (which may be marked with _)
-//     *       all packages
 //
+//	""      the default package for the directory, if only one
+//	        is present.
+//	_       anonymous files (which may be marked with _)
+//	*       all packages
 func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	l.stk.Push(p.ImportPath)
 	defer l.stk.Pop()

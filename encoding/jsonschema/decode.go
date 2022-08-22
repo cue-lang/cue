@@ -643,17 +643,16 @@ func (s *state) listItems(name string, n cue.Value, allowEmpty bool) (a []cue.Va
 // excludeFields returns a CUE expression that can be used to exclude the
 // fields of the given declaration in a label expression. For instance, for
 //
-//    { foo: 1, bar: int }
+//	{ foo: 1, bar: int }
 //
 // it creates
 //
-//    "^(foo|bar)$"
+//	"^(foo|bar)$"
 //
 // which can be used in a label expression to define types for all fields but
 // those existing:
 //
-//   [!~"^(foo|bar)$"]: string
-//
+//	[!~"^(foo|bar)$"]: string
 func excludeFields(decls []ast.Decl) ast.Expr {
 	var a []string
 	for _, d := range decls {

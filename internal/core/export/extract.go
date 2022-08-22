@@ -26,9 +26,8 @@ import (
 // Comments are attached to a field with a field shorthand belong to the
 // child node. So in the following the comment is attached to field bar.
 //
-//     // comment
-//     foo: bar: 2
-//
+//	// comment
+//	foo: bar: 2
 func ExtractDoc(v *adt.Vertex) (docs []*ast.CommentGroup) {
 	return extractDocs(v, v.Conjuncts)
 }
@@ -98,8 +97,7 @@ func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 // hasShorthandValue reports whether this field has a struct value that will
 // be rendered as a shorthand, for instance:
 //
-//     f: g: 2
-//
+//	f: g: 2
 func hasShorthandValue(f *ast.Field) bool {
 	if f = nestedField(f); f == nil {
 		return false

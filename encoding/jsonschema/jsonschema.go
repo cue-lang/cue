@@ -14,17 +14,18 @@
 
 // Package jsonschema implements the JSON schema standard.
 //
-// Mapping and Linking
+// # Mapping and Linking
 //
 // JSON Schema are often defined in a single file. CUE, on the other hand
 // idiomatically defines schema as a definition.
 //
 // CUE:
-//    $schema: which schema is used for validation.
-//    $id: which validation does this schema provide.
 //
-//    Foo: _ @jsonschema(sc)
-//    @source(https://...) // What schema is used to validate.
+//	$schema: which schema is used for validation.
+//	$id: which validation does this schema provide.
+//
+//	Foo: _ @jsonschema(sc)
+//	@source(https://...) // What schema is used to validate.
 //
 // NOTE: JSON Schema is a draft standard and may undergo backwards incompatible
 // changes.

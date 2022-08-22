@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1e8d4de_835d9164",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-22T20:57:13Z",
+      "side": 1,
+      "message": "FYI all. I did not re-run go generate with 1.19, because internal/filetypes has a tiny resulting change that I don\u0027t fully understand yet.",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

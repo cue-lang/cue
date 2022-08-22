@@ -22,39 +22,36 @@
 // CUE code with a Go type. The field tags method follows the usual
 // Go pattern:
 //
-//     type Sum struct {
-//         A int `cue:"C-B" json:",omitempty"`
-//         B int `cue:"C-A" json:",omitempty"`
-//         C int `cue:"A+B" json:",omitempty"`
-//     }
+//	type Sum struct {
+//	    A int `cue:"C-B" json:",omitempty"`
+//	    B int `cue:"C-A" json:",omitempty"`
+//	    C int `cue:"A+B" json:",omitempty"`
+//	}
 //
-//     func main() {
-//         fmt.Println(cuego.Validate(&Sum{A: 1, B: 5, C: 6}))
-//     }
+//	func main() {
+//	    fmt.Println(cuego.Validate(&Sum{A: 1, B: 5, C: 6}))
+//	}
 //
 // AddConstraints allows annotating Go types with any CUE constraints.
 //
-//
-// Validating Go Values
+// # Validating Go Values
 //
 // To check whether a struct's values satisfy its constraints, call Validate:
 //
-//   if err := cuego.Validate(p); err != nil {
-//      return err
-//   }
+//	if err := cuego.Validate(p); err != nil {
+//	   return err
+//	}
 //
 // Validation assumes that all values are filled in correctly and will not
 // infer values. To automatically infer values, use Complete.
 //
-//
-// Completing Go Values
+// # Completing Go Values
 //
 // Package cuego can also be used to infer undefined values from a set of
 // CUE constraints, for instance to fill out fields in a struct. A value
 // is considered undefined if it is a nil pointer type or if it is a zero
 // value and there is a JSON field tag with the omitempty flag.
 // A Complete will implicitly validate a struct.
-//
 package cuego // import "cuelang.org/go/cuego"
 
 // The first goal of this packages is to get the semantics right. After that,

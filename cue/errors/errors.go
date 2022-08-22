@@ -433,7 +433,6 @@ func Sanitize(err Error) Error {
 // Sort sorts an List. *posError entries are sorted by position,
 // other errors are sorted by error message, and before any *posError
 // entry.
-//
 func (p list) Sort() {
 	sort.Sort(p)
 }
@@ -531,7 +530,6 @@ type Config struct {
 // Print is a utility function that prints a list of errors to w,
 // one error per line, if the err parameter is an List. Otherwise
 // it prints the err string.
-//
 func Print(w io.Writer, err error, cfg *Config) {
 	if cfg == nil {
 		cfg = &Config{}

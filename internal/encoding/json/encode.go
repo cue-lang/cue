@@ -31,12 +31,13 @@ import (
 //
 // The given file must only contain values that can be directly supported by
 // JSON:
-//    Type          Restrictions
-//    BasicLit
-//    File          no imports, aliases, or definitions
-//    StructLit     no embeddings, aliases, or definitions
-//    List
-//    Field         must be regular; label must be a BasicLit or Ident
+//
+//	Type          Restrictions
+//	BasicLit
+//	File          no imports, aliases, or definitions
+//	StructLit     no embeddings, aliases, or definitions
+//	List
+//	Field         must be regular; label must be a BasicLit or Ident
 //
 // Comments and attributes are ignored.
 func Encode(n ast.Node) (b []byte, err error) {

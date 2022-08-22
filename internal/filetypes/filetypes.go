@@ -145,18 +145,18 @@ func update(errs errors.Error, v, i cue.Value, field, value string) (cue.Value, 
 //
 // The arguments are of the form
 //
-//     file* (spec: file+)*
+//	file* (spec: file+)*
 //
 // where file is a filename and spec is itself of the form
 //
-//     tag[=value]('+'tag[=value])*
+//	tag[=value]('+'tag[=value])*
 //
 // A file type spec applies to all its following files and until a next spec
 // is found.
 //
 // Examples:
-//     json: foo.data bar.data json+schema: bar.schema
 //
+//	json: foo.data bar.data json+schema: bar.schema
 func ParseArgs(args []string) (files []*build.File, err error) {
 	var inst, v cue.Value
 
@@ -221,8 +221,8 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 // passed to a command line argument.
 //
 // Example:
-//   cue eval -o yaml:foo.data
 //
+//	cue eval -o yaml:foo.data
 func ParseFile(s string, mode Mode) (*build.File, error) {
 	scope := ""
 	file := s

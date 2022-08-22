@@ -480,11 +480,11 @@ func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 
 // Complete updates the configuration information. After calling complete,
 // the following invariants hold:
-//  - c.ModuleRoot != ""
-//  - c.Module is set to the module import prefix if there is a cue.mod file
-//    with the module property.
-//  - c.loader != nil
-//  - c.cache != ""
+//   - c.ModuleRoot != ""
+//   - c.Module is set to the module import prefix if there is a cue.mod file
+//     with the module property.
+//   - c.loader != nil
+//   - c.cache != ""
 func (c Config) complete() (cfg *Config, err error) {
 	// Each major CUE release should add a tag here.
 	// Old tags should not be removed. That is, the cue1.x tag is present

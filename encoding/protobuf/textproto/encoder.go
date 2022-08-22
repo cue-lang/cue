@@ -27,7 +27,6 @@ import (
 )
 
 // Encoder marshals CUE into text proto.
-//
 type Encoder struct {
 	// Schema
 }
@@ -46,7 +45,6 @@ func NewEncoder(options ...Option) *Encoder {
 //   - it is explicitly required that only fields with an attribute are exported
 //   - a struct represents a Protobuf map
 //   - custom naming
-//
 func (e *Encoder) Encode(v cue.Value, options ...Option) ([]byte, error) {
 	n := &pbast.Node{}
 	enc := &encoder{}

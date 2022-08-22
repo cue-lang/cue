@@ -492,7 +492,6 @@ func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
 // It prefers short extensions over large ones, while ensuring the likelihood of
 // fast termination is high. There are at least two digits to make it visually
 // clearer this concerns a generated number.
-//
 func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
 	if e.rand == nil {
 		e.rand = rand.New(rand.NewSource(808))

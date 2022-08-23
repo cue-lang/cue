@@ -16,6 +16,23 @@
       "message": "which issue does this relate to?",
       "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "342d9405_5f59ef25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-23T07:41:21Z",
+      "side": 1,
+      "message": "Also, please confirm this keeps working with the cue-gen istio tool.",
+      "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

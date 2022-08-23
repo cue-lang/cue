@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8ea39a8_c3ee1f03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T10:02:44Z",
+      "side": 1,
+      "message": "LGTM with a few minor suggestions that could easily be done in another CL (or not at all), thanks!",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "101f182c_e44be702",
+        "filename": "encoding/protobuf/jsonpb/decoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T10:02:44Z",
+      "side": 1,
+      "message": "Should this be formatted as code?",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd6b2c1b_08bb3423",
+        "filename": "encoding/protobuf/jsonpb/encoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T10:02:44Z",
+      "side": 1,
+      "message": "should this be formatted as code?",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25e88fd1_a84571ac",
+        "filename": "internal/third_party/yaml/apic.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T10:02:44Z",
+      "side": 1,
+      "message": "remove the extra // ?",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -171,6 +171,8 @@ func MakeIdentLabel(r StringIndexer, s, pkgpath string) Feature {
 const msgGround = "invalid non-ground value %s (must be concrete %s)"
 
 func labelFromValue(c *OpContext, src Expr, v Value) Feature {
+	v, _ = c.getDefault(v)
+
 	var i int64
 	var t FeatureType
 	if isError(v) {

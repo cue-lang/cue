@@ -3,11 +3,46 @@
 	a:      "foo"
 	"\(a)": 3
 }
+#B: a: b: {
+	c: string
+	d: 2
+}
+#C: a: b: {
+	c: *"d" | string
+	(c): 2
+}
+
+x: #B & #C
+
 -- out/eval --
 (struct){
   #A: (#struct){
     a: (string){ "foo" }
     foo: (int){ 3 }
+  }
+  #B: (#struct){
+    a: (#struct){
+      b: (#struct){
+        c: (string){ string }
+        d: (int){ 2 }
+      }
+    }
+  }
+  #C: (#struct){
+    a: (#struct){
+      b: (#struct){
+        c: (string){ |(*(string){ "d" }, (string){ string }) }
+        d: (int){ 2 }
+      }
+    }
+  }
+  x: (#struct){
+    a: (#struct){
+      b: (#struct){
+        c: (string){ |(*(string){ "d" }, (string){ string }) }
+        d: (int){ 2 }
+      }
+    }
   }
 }
 -- out/compile --
@@ -17,4 +52,21 @@
     a: "foo"
     "\(〈0;a〉)": 3
   }
+  #B: {
+    a: {
+      b: {
+        c: string
+        d: 2
+      }
+    }
+  }
+  #C: {
+    a: {
+      b: {
+        c: (*"d"|string)
+        〈0;c〉: 2
+      }
+    }
+  }
+  x: (〈0;#B〉 & 〈0;#C〉)
 }

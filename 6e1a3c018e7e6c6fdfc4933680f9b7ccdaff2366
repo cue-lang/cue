@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "eee6f414_1278cdbd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-23T14:50:17Z",
+      "side": 1,
+      "message": "Yep, Updates #1795. Or I usually write \n```\nIssue #1795\n```",
+      "parentUuid": "63498666_6c330bd8",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "c061e802_63155d88",

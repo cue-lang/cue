@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b3520c7f_e24bb8f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T13:57:26Z",
+      "side": 1,
+      "message": "I never know whether to go with markdown (don\u0027t wanna wrap because the renderer will choose where to wrap) or not. Let me know for sure and I\u0027ll change it.",
+      "parentUuid": "f2736d1a_20f21a3c",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "40537bdb_5acc382e",
         "filename": "/COMMIT_MSG",
         "patchSetId": 4

@@ -38,6 +38,41 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "91bbe72c_27530f0d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T14:33:35Z",
+      "side": 1,
+      "message": "I think it\u0027s just a general git thing to try to keep to 72 characters. Why 72? Because many tools like `git log` or emails or other plaintext renderings will indent the message with one tab (8 columns), so that helps the whole thing stay within 80.\n\nYou can also say \"this is not the 1980s, long lines are fine\", but I do find that sticking to 72 (or 80) as a limit helps consistency and readability in plaintext.",
+      "parentUuid": "b3520c7f_e24bb8f7",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "035fe3ca_1d93072d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T14:33:35Z",
+      "side": 1,
+      "message": "nit: tab indent rather than using triple backquotes. It renders the same in markdown, and it\u0027s nicer and shorter in plaintext. Go does it that way too, in general.",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "40537bdb_5acc382e",
         "filename": "/COMMIT_MSG",
         "patchSetId": 4
@@ -49,6 +84,41 @@
       "writtenOn": "2022-08-23T13:44:22Z",
       "side": 1,
       "message": "I think the standard used in the Go project is \"For #X\" but @mvdan might be able to confirm?",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63498666_6c330bd8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T14:33:35Z",
+      "side": 1,
+      "message": "Yeah, the three formats I use in decreasing order of frequency are:\n\nFixes #N.\nUpdates #N. (partial fix)\nFor #N. (necessary step to unblock a fix)\n\nSo in this case I guess \"Updates\", since it helps a bit, but we\u0027re still quite slow?",
+      "parentUuid": "40537bdb_5acc382e",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c061e802_63155d88",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T14:33:35Z",
+      "side": 1,
+      "message": "Do allocations change with the optimization? We should probably use ReportAllocs on the benchmark in any case.",
       "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

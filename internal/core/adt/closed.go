@@ -507,6 +507,7 @@ func verifyArc(ctx *OpContext, s *StructInfo, f Feature, label Value) bool {
 	if len(o.Dynamic) > 0 && f.IsString() && label != nil {
 		for _, b := range o.Dynamic {
 			v := env.evalCached(ctx, b.Key)
+			v, _ = ctx.getDefault(v)
 			s, ok := Unwrap(v).(*String)
 			if !ok {
 				continue

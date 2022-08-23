@@ -10,9 +10,9 @@
 env GOPROXY=https://proxy.golang.org
 
 # Sanity check pre install
-! exists $WORK/gopath/bin/git-codereview
+! exists $GOPATH/bin/git-codereview
 
 # Install
 go install golang.org/x/review/git-codereview@latest
-exec $WORK/gopath/bin/git-codereview help
+exec $GOPATH/bin/git-codereview help
 stdout 'Git-codereview is a git helper'

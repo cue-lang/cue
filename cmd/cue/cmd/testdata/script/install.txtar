@@ -10,9 +10,9 @@
 env GOPROXY=https://proxy.golang.org
 
 # Sanity check pre install
-! exists $WORK/gopath/bin/cue
+! exists $GOPATH/bin/cue
 
 # Install
 go install cuelang.org/go/cmd/cue@latest
-exec $WORK/gopath/bin/cue help
+exec $GOPATH/bin/cue help
 stdout 'cue evaluates CUE files'

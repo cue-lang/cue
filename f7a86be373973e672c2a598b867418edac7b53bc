@@ -16,6 +16,24 @@
       "message": "Issue #1795",
       "revId": "f7a86be373973e672c2a598b867418edac7b53bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c9339fa_db0bf94d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-23T15:13:58Z",
+      "side": 1,
+      "message": "The hash is needed to update Github.",
+      "parentUuid": "9503dc31_ae433c3b",
+      "revId": "f7a86be373973e672c2a598b867418edac7b53bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

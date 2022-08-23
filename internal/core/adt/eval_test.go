@@ -22,7 +22,6 @@ import (
 
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -152,5 +151,23 @@ func BenchmarkUnifyAPI(b *testing.B) {
 			}
 			v = v.FillPath(cue.ParsePath(fmt.Sprintf("i_%d", i)), i)
 		}
+	}
+}
+
+func BenchmarkChainedRef(b *testing.B) {
+	var buf strings.Builder
+	fmt.Fprintf(&buf, "f0: string\n")
+	for i := 1; i < 1000; i++ {
+		fmt.Fprintf(&buf, "f%d: f%d\n", i, i-1)
+	}
+	code := buf.String()
+	ctx := cuecontext.New()
+	v := ctx.CompileString(code)
+	if err := v.Err(); err != nil {
+		b.Fatal(err)
+	}
+	b.ResetTimer()
+	for i := 0; i < b.N; i++ {
+		ctx.CompileString(code)
 	}
 }

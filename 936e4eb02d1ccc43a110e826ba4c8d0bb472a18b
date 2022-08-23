@@ -33,6 +33,42 @@
       "message": "Also, please confirm this keeps working with the cue-gen istio tool.",
       "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "720830bf_f654b888",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T17:36:41Z",
+      "side": 1,
+      "message": "Could you provide a few more details so that I can know where this is and how to run it, please?",
+      "parentUuid": "342d9405_5f59ef25",
+      "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "806bc410_8ae3487e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T17:36:41Z",
+      "side": 1,
+      "message": "There doesn\u0027t appear to be a related open issue. Shall I make one?",
+      "parentUuid": "c54ea922_a8e9ac3f",
+      "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

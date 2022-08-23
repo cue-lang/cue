@@ -52,6 +52,24 @@
       "parentUuid": "9c9339fa_db0bf94d",
       "revId": "f7a86be373973e672c2a598b867418edac7b53bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b3f0538_7bcce817",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-23T18:45:40Z",
+      "side": 1,
+      "message": "I think I do typically without, but shouldn\u0027t matter for the result.",
+      "parentUuid": "bdce5185_ac1d3120",
+      "revId": "f7a86be373973e672c2a598b867418edac7b53bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

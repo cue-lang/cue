@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c46adeeb_0dd780d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T10:52:46Z",
+      "side": 1,
+      "message": "Thanks for the reviews! Will be submitting now.",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "101f182c_e44be702",
@@ -31,6 +48,24 @@
       "writtenOn": "2022-08-23T10:02:44Z",
       "side": 1,
       "message": "Should this be formatted as code?",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b41e836f_aaf6ccdd",
+        "filename": "encoding/protobuf/jsonpb/decoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T10:52:46Z",
+      "side": 1,
+      "message": "Paul and I looked at these briefly - the previous code was also considered a blockquote, so it\u0027s up to Marcel whether or not that was intentional. I think it\u0027s best to be conservative and leave it to be formatted just like it was, and he or we can change it later if we prefer some other form.",
+      "parentUuid": "101f182c_e44be702",
       "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90eef110_b53a69ac",
+        "filename": "encoding/protobuf/jsonpb/encoder.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T10:52:46Z",
+      "side": 1,
+      "message": "ditto, same as above.",
+      "parentUuid": "fd6b2c1b_08bb3423",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25e88fd1_a84571ac",
@@ -65,6 +118,24 @@
       "writtenOn": "2022-08-23T10:02:44Z",
       "side": 1,
       "message": "remove the extra // ?",
+      "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c17188b_97657ac5",
+        "filename": "internal/third_party/yaml/apic.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T10:52:46Z",
+      "side": 1,
+      "message": "This is third party code, so with Paul we agreed to not try to fix up its godocs for two reasons:\n\n1) the godocs are (generally) not rendered - we only care about our own go docs\n\n2) the code is copied from upstream, so we can\u0027t \"fix\" upstream this way\n\nApplying gofmt is still useful for the sake of making `gofmt -l .` happy, even if the end result is slightly wonky. Hopefully if/when we update to a newer yaml version, they will have fixed up their godocs.",
+      "parentUuid": "25e88fd1_a84571ac",
       "revId": "868c9337f7199baba186d610aacb2e548a1f5bf1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

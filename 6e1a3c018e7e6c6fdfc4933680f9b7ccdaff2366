@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2736d1a_20f21a3c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-23T13:44:22Z",
+      "side": 1,
+      "message": "Small nit: I think the standard for Gerrit/Go is to wrap these lines at 80 chars? @mvdan?",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40537bdb_5acc382e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-23T13:44:22Z",
+      "side": 1,
+      "message": "I think the standard used in the Go project is \"For #X\" but @mvdan might be able to confirm?",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

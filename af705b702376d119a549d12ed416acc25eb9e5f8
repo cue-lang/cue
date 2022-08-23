@@ -16,6 +16,91 @@
       "message": "FYI all. I did not re-run go generate with 1.19, because internal/filetypes has a tiny resulting change that I don\u0027t fully understand yet.",
       "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee6eee88_f4fb6ca4",
+        "filename": "cue/format.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T08:52:42Z",
+      "side": 1,
+      "message": "Marcel: Paul suggests that we might not have intended this as a block quote. If that sounds good, I will revert this to being a regular paragraph following the warning.",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acc7b0bb_6c59daa5",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T08:52:42Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c78e7f88_612ef28f",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T08:52:42Z",
+      "side": 1,
+      "message": "bug: this was not being rendered as a list",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14103278_65ec3c60",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T08:52:42Z",
+      "side": 1,
+      "message": "this one might have been a bug too, it\u0027s just a TODO example.",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7f65301_1e82b9bd",
+        "filename": "internal/third_party/yaml/parserc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T08:52:42Z",
+      "side": 1,
+      "message": "this is broken but it\u0027s third party, so it\u0027s fine.",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -34,6 +34,24 @@
       "parentUuid": "9503dc31_ae433c3b",
       "revId": "f7a86be373973e672c2a598b867418edac7b53bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdce5185_ac1d3120",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T15:56:51Z",
+      "side": 1,
+      "message": "With or without the period? I\u0027ll go for with for now, but let me know if that\u0027s wrong.",
+      "parentUuid": "9c9339fa_db0bf94d",
+      "revId": "f7a86be373973e672c2a598b867418edac7b53bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -69,6 +69,42 @@
       "parentUuid": "c54ea922_a8e9ac3f",
       "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a1aa98c_2f7d1d95",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-23T17:46:16Z",
+      "side": 1,
+      "message": "I think we\u0027re doing this work under https://github.com/cue-lang/cue/issues/1806",
+      "parentUuid": "806bc410_8ae3487e",
+      "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6af960c_0a2aab44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-23T17:46:16Z",
+      "side": 1,
+      "message": "I can help on this front. Probably worth jumping on a quick call because I will need to refresh on a couple of details.",
+      "parentUuid": "720830bf_f654b888",
+      "revId": "936e4eb02d1ccc43a110e826ba4c8d0bb472a18b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -12,7 +12,7 @@ require (
 	github.com/kylelemons/godebug v1.1.0
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20220428173112-74888fd59c2b
-	github.com/rogpeppe/go-internal v1.8.1
+	github.com/rogpeppe/go-internal v1.9.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.2.2
@@ -34,5 +34,5 @@ require (
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
-	gopkg.in/errgo.v2 v2.1.0 // indirect
+	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

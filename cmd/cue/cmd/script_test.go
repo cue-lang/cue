@@ -52,7 +52,7 @@ func TestLatest(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if !strings.HasSuffix(fullpath, ".txt") ||
+		if !strings.HasSuffix(fullpath, ".txtar") ||
 			strings.HasPrefix(filepath.Base(fullpath), "fix") {
 			return nil
 		}
@@ -124,7 +124,7 @@ func TestScript(t *testing.T) {
 // Usage Comment out t.Skip() and set file to test.
 func TestX(t *testing.T) {
 	t.Skip()
-	const path = "./testdata/script/eval_e.txt"
+	const path = "./testdata/script/eval_e.txtar"
 
 	check := func(err error) {
 		t.Helper()

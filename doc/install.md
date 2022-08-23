@@ -10,7 +10,7 @@ Go 1.17 or higher (see below)
 
 ### Installing CUE
 
-<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txt -->
+<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txtar -->
 
 To download and install the `cue` command line tool run
 

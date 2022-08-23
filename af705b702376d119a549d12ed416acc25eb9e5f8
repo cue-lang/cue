@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "253d7902_4338f066",
+        "filename": "cue/format.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af35db95_56ed849e",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee6eee88_f4fb6ca4",
@@ -65,6 +83,24 @@
       "writtenOn": "2022-08-23T08:52:42Z",
       "side": 1,
       "message": "Marcel: Paul suggests that we might not have intended this as a block quote. If that sounds good, I will revert this to being a regular paragraph following the warning.",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c654856_f243da70",
+        "filename": "cue/format.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee6eee88_f4fb6ca4",
       "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +139,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a32d43ab_e3e52581",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da1e1caa_fe486bcd",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c78e7f88_612ef28f",
@@ -116,6 +170,24 @@
       "writtenOn": "2022-08-23T08:52:42Z",
       "side": 1,
       "message": "bug: this was not being rendered as a list",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccdd01ef_00c66bf7",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c78e7f88_612ef28f",
       "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +226,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7def9d25_63747b15",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14103278_65ec3c60",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f6f8e4a_12163c05",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "375c81ad_a9689577",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "653c807e_921b6be6",
@@ -171,6 +279,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb11d981_9e4a7407",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "653c807e_921b6be6",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7f65301_1e82b9bd",
@@ -184,6 +310,24 @@
       "writtenOn": "2022-08-23T08:52:42Z",
       "side": 1,
       "message": "this is broken but it\u0027s third party, so it\u0027s fine.",
+      "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4df4fdd_581f1d25",
+        "filename": "internal/third_party/yaml/parserc.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 316,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-23T09:49:17Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f7f65301_1e82b9bd",
       "revId": "af705b702376d119a549d12ed416acc25eb9e5f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

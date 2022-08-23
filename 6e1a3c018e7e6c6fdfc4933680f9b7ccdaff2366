@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5625c4cb_c67fcbf2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T15:02:34Z",
+      "side": 1,
+      "message": "I struggle to care tbh, but done anyway 😊",
+      "parentUuid": "91bbe72c_27530f0d",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "035fe3ca_1d93072d",
@@ -67,6 +85,24 @@
       "writtenOn": "2022-08-23T14:33:35Z",
       "side": 1,
       "message": "nit: tab indent rather than using triple backquotes. It renders the same in markdown, and it\u0027s nicer and shorter in plaintext. Go does it that way too, in general.",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2231fd4b_91c6a0a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T15:02:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "035fe3ca_1d93072d",
       "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -126,6 +162,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3f0e1536_f4c44b3e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T15:02:34Z",
+      "side": 1,
+      "message": "In general I prefer to use the full URL because the repo might eventually be moved away from github, but that could be argued the other way, so I\u0027ll go with convention.",
+      "parentUuid": "eee6f414_1278cdbd",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "c061e802_63155d88",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -137,6 +191,24 @@
       "writtenOn": "2022-08-23T14:33:35Z",
       "side": 1,
       "message": "Do allocations change with the optimization? We should probably use ReportAllocs on the benchmark in any case.",
+      "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b64f7e6c_d5037872",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-23T15:02:34Z",
+      "side": 1,
+      "message": "We should, but I\u0027m pretty sure that no I2I conversion will allocate, particularly if used only for equality. Let\u0027s leave that for another PR.",
+      "parentUuid": "c061e802_63155d88",
       "revId": "6e1a3c018e7e6c6fdfc4933680f9b7ccdaff2366",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

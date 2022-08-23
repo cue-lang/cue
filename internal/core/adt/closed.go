@@ -212,10 +212,12 @@ func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 	}
 	found := false
 	if !isDef {
+		xnode := Node(x) // Optimization so we're comparing identical interface types.
 		// TODO: make this work for non-definitions too.
 		for p := c.closeInfo; p != nil; p = p.parent {
-			if p.location == x && p.span == span {
+			if p.span == span && p.location == xnode {
 				found = true
+				break
 			}
 		}
 	}

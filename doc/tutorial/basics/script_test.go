@@ -23,7 +23,7 @@ func TestLatest(t *testing.T) {
 		if err != nil {
 			return err
 		}
-		if !strings.HasSuffix(fullpath, ".txt") {
+		if !strings.HasSuffix(fullpath, ".txtar") {
 			return nil
 		}
 

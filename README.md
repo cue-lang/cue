@@ -106,7 +106,7 @@ brew install cue-lang/tap/cue
 
 #### Install from Source
 
-<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txt -->
+<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txtar -->
 
 If you already have Go 1.16 or later installed, the short version is:
 

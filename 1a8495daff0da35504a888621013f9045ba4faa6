@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf5e80c6_e716fe67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-24T15:37:42Z",
+      "side": 1,
+      "message": "Hi satotake! Thanks for raising this CL. It looks like a big change. Please can I suggest we first reach agreement on changes in one of the issues you have linked?\n\nThanks",
+      "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
-exec cue eval -i regexp.cue
-cmp stdout expect-stdout-cue
+! exec cue eval regexp.cue
+cmp stderr expect-stderr
 
 -- frontmatter.toml --
 title = "Regular expressions"
@@ -26,9 +26,8 @@ d: "foo"
 e: c
 e: "foo bar"
 
--- expect-stdout-cue --
-a: true
-b: true
-c: =~"^[a-z]{3}$"
-d: "foo"
-e: _|_ // invalid value "foo bar" (does not match =~"^[a-z]{3}$")
+-- expect-stderr --
+e: invalid value "foo bar" (out of bound =~"^[a-z]{3}$"):
+    ./regexp.cue:4:4
+    ./regexp.cue:9:4
+    ./regexp.cue:10:4

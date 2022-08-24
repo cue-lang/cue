@@ -20,8 +20,8 @@ selectors: {name: "bar"}
 
 -- expect-stdout-cue --
 labels: {
-    name: "bar"
     app:  "foo"
+    name: "bar"
 }
 selectors: {
     name: "bar"

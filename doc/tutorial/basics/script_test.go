@@ -5,6 +5,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -51,18 +52,25 @@ func TestLatest(t *testing.T) {
 }
 
 func TestScript(t *testing.T) {
-	if err := filepath.WalkDir(".", func(path string, entry fs.DirEntry, err error) error {
-		if entry.IsDir() {
-			return filepath.SkipDir
+	tourDir := regexp.MustCompile(`^\d+_.+`)
+	entries, err := os.ReadDir(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	didWork := false
+	for _, entry := range entries {
+		if !entry.IsDir() || !tourDir.MatchString(entry.Name()) {
+			continue
 		}
+		didWork = true
 		testscript.Run(t, testscript.Params{
-			Dir:                 path,
+			Dir:                 entry.Name(),
 			UpdateScripts:       cuetest.UpdateGoldenFiles,
 			RequireExplicitExec: true,
 		})
-		return nil
-	}); err != nil {
-		t.Fatal(err)
+	}
+	if !didWork {
+		t.Fatal("failed to find any steps in the tour")
 	}
 }
 

@@ -1,4 +1,5 @@
-exec cue eval -i order.cue
+# TODO: revert to cue eval -i post fix for #1786
+exec cue eval order.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

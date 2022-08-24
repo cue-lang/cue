@@ -1,5 +1,6 @@
-exec cue eval -ic bound.cue
-cmp stdout expect-stdout-cue
+# TODO: revert to cue eval -i post fix for #1786
+! exec cue eval -c bound.cue
+cmp stderr expect-stderr
 
 -- frontmatter.toml --
 title = "Predefined Bounds"
@@ -37,7 +38,6 @@ a: #positive & -1
 b: #byte & 128
 c: #word & 2_000_000_000
 
--- expect-stdout-cue --
-a: _|_ // invalid value -1 (out of bound int & >=0)
-b: 128
-c: 2000000000
+-- expect-stderr --
+a: invalid value -1 (out of bound >=0):
+    ./bound.cue:5:16

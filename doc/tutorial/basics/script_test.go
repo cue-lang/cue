@@ -51,18 +51,19 @@ func TestLatest(t *testing.T) {
 }
 
 func TestScript(t *testing.T) {
-	if err := filepath.WalkDir(".", func(path string, entry fs.DirEntry, err error) error {
-		if entry.IsDir() {
-			return filepath.SkipDir
+	des, err := os.ReadDir(".")
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, de := range des {
+		if !de.IsDir() || strings.Index(de.Name(), "_") == -1 {
+			continue
 		}
 		testscript.Run(t, testscript.Params{
-			Dir:                 path,
+			Dir:                 de.Name(),
 			UpdateScripts:       cuetest.UpdateGoldenFiles,
 			RequireExplicitExec: true,
 		})
-		return nil
-	}); err != nil {
-		t.Fatal(err)
 	}
 }
 

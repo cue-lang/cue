@@ -157,6 +157,10 @@ type Vertex struct {
 	// and additional constraints, as well as optional fields, should be
 	// ignored.
 	isData bool
+
+	// Closed indicates whether this Vertex is recursively closed. This is the
+	// case, for instance, if it is a node in a definition or if one of the
+	// conjuncts, or ancestor conjuncts, is a definition.
 	Closed bool
 
 	// arcType indicates the level of optionality of this arc.
@@ -567,7 +571,7 @@ func (v *Vertex) IsClosedStruct() bool {
 
 	case *Disjunction:
 	}
-	return v.Closed || isClosed(v)
+	return isClosed(v)
 }
 
 func (v *Vertex) IsClosedList() bool {

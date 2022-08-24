@@ -139,9 +139,6 @@ type Vertex struct {
 	// tree.
 	Parent *Vertex
 
-	// Label is the feature leading to this vertex.
-	Label Feature
-
 	// State:
 	//   eval: nil, BaseValue: nil -- unevaluated
 	//   eval: *,   BaseValue: nil -- evaluating
@@ -149,6 +146,9 @@ type Vertex struct {
 	//
 	state *nodeContext
 	// TODO: move the following status fields to nodeContext.
+
+	// Label is the feature leading to this vertex.
+	Label Feature
 
 	// status indicates the evaluation progress of this vertex.
 	status VertexStatus

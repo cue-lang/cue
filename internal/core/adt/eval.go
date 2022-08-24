@@ -1424,6 +1424,13 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			return
 		}
 
+		// If an arc is not a cycle, we complete the evaluation. Some
+		// optimizations will only work when an arc is already finalized. So
+		// this ensures that such optimizations get triggered more often.
+		if arc.status == AllArcs {
+			arc.Finalize(ctx)
+		}
+
 		n.addVertexConjuncts(v, arc, false)
 
 	case Evaluator:

@@ -1,4 +1,4 @@
-cue export json.cue
+exec cue export json.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
@@ -42,12 +42,12 @@ list: [
 
 -- expect-stdout-cue --
 {
+    "one": 1,
+    "two": 2,
+    "two-and-a-half": 2.5,
     "list": [
         1,
         2,
         3
-    ],
-    "one": 1,
-    "two": 2,
-    "two-and-a-half": 2.5
+    ]
 }

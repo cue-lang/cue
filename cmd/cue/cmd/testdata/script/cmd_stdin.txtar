@@ -1,25 +1,25 @@
 # Executing a program that consumes all of stdin.
 stdin echo-stdin
-cue cmd echo
+exec cue cmd echo
 cmp stdout echo-stdout
 
 # A command with two prompts, where the input is three lines.
 # The first and second line should be the two answers.
 stdin intro-stdin
-cue cmd intro
+exec cue cmd intro
 cmp stdout intro-stdout
 
 # Like the previous test case, but with more whitespace in the answers.
 # The response strings should contain the entire lines including the whitespace.
 stdin intro-spaces-stdin
-cue cmd intro
+exec cue cmd intro
 cmp stdout intro-spaces-stdout
 
 # Run a command with exec.Run which doesn't actually read stdin,
 # but still passes through stdin to os/exec per exec.Run's default.
 # This will hang unless the task's stdin is an os.File,
 # as otherwise io.Copy does not finish; see https://go.dev/issue/7990.
-cue_stdinpipe cmd noreads
+exec cue_stdinpipe cmd noreads
 cmp stdout noreads-stdout
 
 -- echo-stdin --

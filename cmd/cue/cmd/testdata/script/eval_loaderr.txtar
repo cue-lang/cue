@@ -1,4 +1,4 @@
-! cue eval non-existing .
+! exec cue eval non-existing .
 ! stdout .
 cmp stderr expect-stderr
 

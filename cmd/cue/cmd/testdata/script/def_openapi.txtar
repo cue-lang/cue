@@ -1,30 +1,30 @@
-cue def foo.cue -o openapi+cue:out.cue
+exec cue def foo.cue -o openapi+cue:out.cue
 cmp out.cue expect-out.cue
 
-cue def openapi+cue: expect-cue-out -o -
+exec cue def openapi+cue: expect-cue-out -o -
 
-cue def foo.cue -o openapi:-
+exec cue def foo.cue -o openapi:-
 cmp stdout expect-json-out
 
-cue def foo.cue -o openapi+cue:-
+exec cue def foo.cue -o openapi+cue:-
 cmp stdout expect-cue-out
 
-cue def foo.cue -o openapi+yaml:-
+exec cue def foo.cue -o openapi+yaml:-
 cmp stdout expect-yaml-out
 
-cue def -p foo openapi: openapi.json
+exec cue def -p foo openapi: openapi.json
 cmp stdout expect-cue
 
 # auto mode
-cue def -p foo openapi.json
+exec cue def -p foo openapi.json
 cmp stdout expect-cue
 
 # cue to openapi
-cue def openapi+cue: expect-cue-out -o -
+exec cue def openapi+cue: expect-cue-out -o -
 cmp stdout expect-cue2
 
 # combine
-cue def -p foo openapi.json openapi2.json
+exec cue def -p foo openapi.json openapi2.json
 cmp stdout expect-cue3
 
 -- foo.cue --

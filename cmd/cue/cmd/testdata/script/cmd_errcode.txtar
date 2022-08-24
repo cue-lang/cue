@@ -1,4 +1,4 @@
-! cue cmd errcode
+! exec cue cmd errcode
 ! stdout .
 stderr '^task failed: command "ls --badflags" failed: exit status [12]$'
 

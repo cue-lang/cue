@@ -1,20 +1,20 @@
-! cue eval ./exporterr --out json
+! exec cue eval ./exporterr --out json
 cmp stdout expect-stdout
 cmp stderr expect-stderr
 
-! cue eval ./exporterr -c
+! exec cue eval ./exporterr -c
 cmp stdout expect-stdout
 cmp stderr expect-stderr
 
-! cue export ./exporterr
+! exec cue export ./exporterr
 cmp stdout expect-stdout
 cmp stderr expect-stderr
 
-! cue export repeated.cue -o openapi:export.json
+! exec cue export repeated.cue -o openapi:export.json
 ! stdout .
 cmp stderr expect-stderr-openapi
 
-! cue eval repeated.cue --out openapi
+! exec cue eval repeated.cue --out openapi
 ! stdout .
 cmp stderr expect-stderr-openapi
 

@@ -1,10 +1,10 @@
-! cue export x.cue -out cue
+! exec cue export x.cue -out cue
 cmp stderr expect-stderr
 
-! cue export -out cue
+! exec cue export -out cue
 cmp stderr expect-stderr
 
-! cue export -out x.cue
+! exec cue export -out x.cue
 cmp stderr expect-stderr
 
 -- expect-stderr --

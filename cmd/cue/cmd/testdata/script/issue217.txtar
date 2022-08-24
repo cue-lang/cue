@@ -1,7 +1,7 @@
-cue eval
+exec cue eval
 cmp stdout eval-stdout
 
-cue def
+exec cue def
 cmp stdout def-stdout
 
 -- schema.cue --

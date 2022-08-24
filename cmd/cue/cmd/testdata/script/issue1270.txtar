@@ -1,4 +1,4 @@
-cue def test.cue test.json -o openapi:- -e '{#Output: #Test}'
+exec cue def test.cue test.json -o openapi:- -e '{#Output: #Test}'
 
 cmp stdout stdout.golden
 

@@ -1,6 +1,6 @@
 env TESTNUM=10
 env MYTEXT=World
-cue cmd env
+exec cue cmd env
 cmp stdout cmd_env.out
 -- cmd_env.out --
 Hello World!

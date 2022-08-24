@@ -1,7 +1,7 @@
-cue def
+exec cue def
 cmp stdout out-stdout
 
-cue def --inline-imports
+exec cue def --inline-imports
 cmp stdout out-stdout-expand
 
 -- cue.mod/module.cue --

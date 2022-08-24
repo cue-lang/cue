@@ -1,14 +1,14 @@
 # Issue #904
-cue eval -e _a
+exec cue eval -e _a
 stdout '34'
 
-cue eval -e _a dep.cue
+exec cue eval -e _a dep.cue
 stdout '34'
 
-cue eval -e _a tst.cue
+exec cue eval -e _a tst.cue
 stdout '34'
 
-cue eval -H
+exec cue eval -H
 stdout '_a: 34'
 
 -- dep.cue --

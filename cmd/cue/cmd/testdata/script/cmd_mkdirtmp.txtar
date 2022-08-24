@@ -1,4 +1,4 @@
-cue cmd mkdirtmp
+exec cue cmd mkdirtmp
 
 -- mkdir_tool.cue --
 package mkdirtmp

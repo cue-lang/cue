@@ -1,8 +1,8 @@
-! cue cmd cycle
+! exec cue cmd cycle
 cmp stderr expect-stderr1
-! cue cmd aftercycle
+! exec cue cmd aftercycle
 cmp stderr expect-stderr2
-cue cmd interlockedTasks
+exec cue cmd interlockedTasks
 cmp stdout interlocked-stdout
 cmp stderr expect-stderr3
 

@@ -56,8 +56,9 @@ func TestScript(t *testing.T) {
 			return filepath.SkipDir
 		}
 		testscript.Run(t, testscript.Params{
-			Dir:           path,
-			UpdateScripts: cuetest.UpdateGoldenFiles,
+			Dir:                 path,
+			UpdateScripts:       cuetest.UpdateGoldenFiles,
+			RequireExplicitExec: true,
 		})
 		return nil
 	}); err != nil {

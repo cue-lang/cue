@@ -1,5 +1,5 @@
-cue export -o bools.yaml bools.cue
-cue import -o bools2.cue bools.yaml
+exec cue export -o bools.yaml bools.cue
+exec cue import -o bools2.cue bools.yaml
 cmp bools.cue bools2.cue
 
 -- bools.cue --

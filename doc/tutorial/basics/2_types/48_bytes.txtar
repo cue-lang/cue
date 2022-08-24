@@ -1,4 +1,4 @@
-cue export bytes.cue
+exec cue export bytes.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

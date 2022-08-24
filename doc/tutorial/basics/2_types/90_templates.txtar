@@ -1,4 +1,4 @@
-cue eval templates.cue
+exec cue eval templates.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

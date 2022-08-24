@@ -1,4 +1,4 @@
-cue fmt .
+exec cue fmt .
 cmp x.cue out/x.cue
 cmp x.cue out/star-cue
 cmp y.cue out/y-cue

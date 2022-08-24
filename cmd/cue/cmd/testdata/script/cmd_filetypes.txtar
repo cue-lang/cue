@@ -1,4 +1,4 @@
-! cue eval cue+date: x.cue
+! exec cue eval cue+date: x.cue
 stderr 'unknown filetype date'
 -- x.cue --
 a: 5

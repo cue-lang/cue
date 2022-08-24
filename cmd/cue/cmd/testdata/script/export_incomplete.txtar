@@ -2,27 +2,27 @@
 #Issue 1152
 
 # Default export mode
-! cue export x.cue
+! exec cue export x.cue
 stderr 'incomplete'
 
 # JSON
-! cue export --out json x.cue
+! exec cue export --out json x.cue
 stderr 'incomplete'
 
 # Yaml
-! cue export --out yaml x.cue
+! exec cue export --out yaml x.cue
 stderr 'incomplete'
 
 # CUE data
-! cue export --out cue x.cue
+! exec cue export --out cue x.cue
 stderr 'incomplete'
 
 # Concrete
-! cue eval -c x.cue
+! exec cue eval -c x.cue
 stderr 'incomplete'
 
 # CUE
-cue eval --out cue x.cue
+exec cue eval --out cue x.cue
 cmp stdout expect-cue
 
 -- x.cue --

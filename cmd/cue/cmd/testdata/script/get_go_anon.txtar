@@ -1,7 +1,7 @@
 # Issue #1183
 
 # Run get go
-cue get go --local .
+exec cue get go --local .
 cmp a_go_gen.cue a_go_gen.cue.golden
 
 -- a.go --

@@ -1,4 +1,4 @@
-! cue cmd print
+! exec cue cmd print
 
 cmp stderr expect-stderr
 

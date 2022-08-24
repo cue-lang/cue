@@ -1,6 +1,6 @@
-cue import -o - -f --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)": "\(data["@name"])":' ./import
+exec cue import -o - -f --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)": "\(data["@name"])":' ./import
 cmp stdout expect-stdout
-cue import -o - -f --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)"' -l 'data["@name"]' ./import
+exec cue import -o - -f --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)"' -l 'data["@name"]' ./import
 cmp stdout expect-stdout
 -- expect-stdout --
 ".jsonl:1/3": elem1: {

@@ -1,4 +1,4 @@
-! cue vet foo.cue
+! exec cue vet foo.cue
 
 cmp stderr expect-stderr
 

@@ -1,4 +1,4 @@
-cue cmd foo
+exec cue cmd foo
 cmp stdout cue_cmd_foo_both.golden
 
 -- cue.mod/module.cue --

@@ -1,7 +1,7 @@
-cue eval -c -a
+exec cue eval -c -a
 cmp stdout eval_conc.cue
 
-cue eval --out yaml
+exec cue eval --out yaml
 cmp stdout eval_conc.yaml
 
 -- eval_conc.cue --

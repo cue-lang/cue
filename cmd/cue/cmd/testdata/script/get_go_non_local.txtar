@@ -8,7 +8,7 @@ go get externalmod.test/blah@v1.0.0
 go mod tidy
 
 # cue get go
-cue get go externalmod.test/blah
+exec cue get go externalmod.test/blah
 cmp cue.mod/gen/externalmod.test/blah/blah_go_gen.cue cue.mod/gen/externalmod.test/blah/blah_go_gen.cue.golden
 cmp cue.mod/gen/externalmod.test/blah/blah_gen.cue cue.mod/gen/externalmod.test/blah/blah_gen.cue.golden
 

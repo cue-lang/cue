@@ -3,7 +3,7 @@
 # debugging, but not when the final result needs to be compiled again to be
 # converted to another format.
 
-cue eval in.cue --out yaml
+exec cue eval in.cue --out yaml
 cmp stdout expect-stdout
 
 -- in.cue --

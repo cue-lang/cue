@@ -1,17 +1,17 @@
 stdin in
-cue import yaml: -
+exec cue import yaml: -
 cmp stdout stdout-cue1
 
 stdin in
-cue export yaml: -
+exec cue export yaml: -
 cmp stdout stdout-json
 
 stdin in
-cue eval yaml: -
+exec cue eval yaml: -
 cmp stdout stdout-cue2
 
 stdin in
-cue def yaml: -
+exec cue def yaml: -
 cmp stdout stdout-cue3
 
 -- in --

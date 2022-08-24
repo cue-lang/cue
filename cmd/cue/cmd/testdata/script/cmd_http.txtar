@@ -1,4 +1,4 @@
-cue cmd http
+exec cue cmd http
 cmp stdout cmd_http.out
 -- cmd_http.out --
 {"data":"I'll be back!","when":"now"}

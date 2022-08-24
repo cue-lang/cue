@@ -4,10 +4,10 @@
 
 # Issue #743
 
-! cue vet schema.cue foo.yaml
+! exec cue vet schema.cue foo.yaml
 cmp stderr expect-foo
 
-! cue vet schema.cue stream.yaml
+! exec cue vet schema.cue stream.yaml
 cmp stderr expect-stream
 
 -- schema.cue --

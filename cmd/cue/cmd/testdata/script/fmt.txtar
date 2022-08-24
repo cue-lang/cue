@@ -1,4 +1,4 @@
-! cue fmt ./fmt
+! exec cue fmt ./fmt
 cmp stderr expect-stderr
 -- expect-stderr --
 expected 'STRING', found '.':

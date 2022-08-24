@@ -1,4 +1,4 @@
-cue cmd ls
+exec cue cmd ls
 cmp stdout expect-stdout
 
 -- expect-stdout --

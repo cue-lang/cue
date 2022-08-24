@@ -1,7 +1,7 @@
-! cue vet schema.cue data.yaml
+! exec cue vet schema.cue data.yaml
 cmp stderr vet-stderr
 
-! cue export schema.cue data.yaml
+! exec cue export schema.cue data.yaml
 cmp stderr export-stderr
 
 -- schema.cue --

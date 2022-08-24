@@ -1,12 +1,12 @@
-cue import -o - -f -l "\(strings.ToLower(kind))" --list ./import1
+exec cue import -o - -f -l "\(strings.ToLower(kind))" --list ./import1
 cmp stdout expect-stdout1
 
 # Issue #368
-cue import -o - -f --list ./import2
+exec cue import -o - -f --list ./import2
 cmp stdout expect-stdout2
 
 # Issue #369
-cue import --with-context -l '"\(path.Ext(filename))": data' ./import3/data.json
+exec cue import --with-context -l '"\(path.Ext(filename))": data' ./import3/data.json
 cmpenv import3/data.cue expect3
 -- expect-stdout1 --
 service: [{

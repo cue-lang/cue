@@ -1,8 +1,8 @@
 # ignore certain errors for cue fmt
-cue fmt x.cue
+exec cue fmt x.cue
 
 # Issue #644
-cue fmt ./...
+exec cue fmt ./...
 
 cmp x.cue out/x_cue
 -- cue.mod/module.cue --

@@ -1,7 +1,7 @@
-cue vet schema.cue json: foo.data
+exec cue vet schema.cue json: foo.data
 ! stderr .
 
-cue export schema.cue json: foo.data
+exec cue export schema.cue json: foo.data
 cmp stdout export-stdout
 
 -- schema.cue --

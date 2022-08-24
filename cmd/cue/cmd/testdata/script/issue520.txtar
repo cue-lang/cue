@@ -1,4 +1,4 @@
-cue cmd -t greeting=hello prefix
+exec cue cmd -t greeting=hello prefix
 
 -- cue.mod/module.cue --
 module: "mod.test"

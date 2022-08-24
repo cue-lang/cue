@@ -1,4 +1,4 @@
-cue cmd ref
+exec cue cmd ref
 cmp stdout expect-stdout
 
 -- expect-stdout --

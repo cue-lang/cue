@@ -1,4 +1,4 @@
-cue eval selectors.cue
+exec cue eval selectors.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

@@ -1,7 +1,7 @@
-cue def
+exec cue def
 cmp stdout expect-stdout1
 
-cue def data.cue
+exec cue def data.cue
 cmp stdout expect-stdout2
 
 -- schema.cue --

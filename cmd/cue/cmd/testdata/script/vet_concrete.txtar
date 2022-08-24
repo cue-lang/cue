@@ -1,4 +1,4 @@
-! cue vet -c
+! exec cue vet -c
 cmp stderr expect-stderr
 -- expect-stderr --
 b.str: incomplete value string:

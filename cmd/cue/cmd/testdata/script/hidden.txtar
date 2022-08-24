@@ -1,10 +1,10 @@
-cue eval pkg.cue -H
+exec cue eval pkg.cue -H
 cmp stdout expect-stdout
 
-cue eval -H
+exec cue eval -H
 cmp stdout expect-stdout
 
-cue eval file.cue -H
+exec cue eval file.cue -H
 cmp stdout expect-stdout
 
 -- pkg.cue --

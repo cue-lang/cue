@@ -1,7 +1,7 @@
-cue cmd echo
+exec cue cmd echo
 stdout 'Hello World!'
 
-cue cmd echohidden
+exec cue cmd echohidden
 stdout 'Hello World!'
 
 -- cue.mod/module.cue --

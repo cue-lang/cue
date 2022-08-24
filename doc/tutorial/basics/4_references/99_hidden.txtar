@@ -1,4 +1,4 @@
-cue export hidden.cue
+exec cue export hidden.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

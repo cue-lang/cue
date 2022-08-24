@@ -1,4 +1,4 @@
-! cue eval errs.cue
+! exec cue eval errs.cue
 cmp stderr expect-stderr
 cmp stdout expect-stdout
 

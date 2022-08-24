@@ -1,12 +1,12 @@
 # Verify that the various forms of requesting help work
 
-cue help
+exec cue help
 cmp stdout stdout.golden
 
-cue --help
+exec cue --help
 cmp stdout stdout.golden
 
-cue -h
+exec cue -h
 cmp stdout stdout.golden
 
 -- stdout.golden --

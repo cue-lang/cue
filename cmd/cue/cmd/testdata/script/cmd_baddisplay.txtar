@@ -1,4 +1,4 @@
-! cue cmd baddisplay
+! exec cue cmd baddisplay
 ! stdout .
 cmp stderr cmd_baddisplay.out
 

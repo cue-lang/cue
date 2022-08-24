@@ -1,4 +1,4 @@
-! cue eval genfield.cue
+! exec cue eval genfield.cue
 cmp stderr expect-stderr
 
 -- frontmatter.toml --

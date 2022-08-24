@@ -1,4 +1,4 @@
-cue cmd run_list
+exec cue cmd run_list
 stdout 'Hello world!'
 
 -- task.cue --

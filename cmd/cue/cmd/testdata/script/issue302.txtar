@@ -1,4 +1,4 @@
-cue trim foo.cue
+exec cue trim foo.cue
 cmp foo.cue rewritten
 
 -- foo.cue --

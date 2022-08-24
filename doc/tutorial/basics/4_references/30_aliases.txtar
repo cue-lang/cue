@@ -1,4 +1,4 @@
-cue eval alias.cue
+exec cue eval alias.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

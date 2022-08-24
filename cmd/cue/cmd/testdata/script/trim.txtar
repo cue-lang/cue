@@ -1,4 +1,4 @@
-cue trim -o - ./trim
+exec cue trim -o - ./trim
 cmp stdout expect-stdout
 -- expect-stdout --
 package trim

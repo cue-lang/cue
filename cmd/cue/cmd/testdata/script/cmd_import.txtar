@@ -1,4 +1,4 @@
-! cue cmd pkg
+! exec cue cmd pkg
 cmp stderr expect-stderr
 
 -- expect-stderr --

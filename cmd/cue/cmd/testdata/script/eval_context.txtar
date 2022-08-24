@@ -1,4 +1,4 @@
-cue eval --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)"' -l 'data["@name"]' -s services.jsonl
+exec cue eval --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)"' -l 'data["@name"]' -s services.jsonl
 cmp stdout expect-stdout
 -- expect-stdout --
 ".jsonl:1/3": elem1: {

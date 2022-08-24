@@ -1,4 +1,4 @@
-cue eval -ic bounds.cue
+exec cue eval -ic bounds.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

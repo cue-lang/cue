@@ -1,4 +1,4 @@
-cue import -o - --recursive ./import/data.json
+exec cue import -o - --recursive ./import/data.json
 cmp stdout expect-stdout
 -- expect-stdout --
 import (

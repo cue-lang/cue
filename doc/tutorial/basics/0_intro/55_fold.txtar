@@ -1,4 +1,4 @@
-cue export fold.cue
+exec cue export fold.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

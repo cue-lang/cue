@@ -1,4 +1,4 @@
-cue cmd dostuffloop
+exec cue cmd dostuffloop
 cmp stdout expect-stdout
 
 -- x_tool.cue --

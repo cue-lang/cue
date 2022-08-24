@@ -1,6 +1,6 @@
 # TODO: error message could be improved.
 
-! cue import test.yaml -p kube -l 'strings.ToCamel(kind)' -l metadata.name -f
+! exec cue import test.yaml -p kube -l 'strings.ToCamel(kind)' -l metadata.name -f
 cmp stderr expect-stderr
 
 -- test.yaml --

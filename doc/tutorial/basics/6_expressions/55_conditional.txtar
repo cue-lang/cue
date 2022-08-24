@@ -23,5 +23,5 @@ if price > 100 {
 price: 200
 
 -- expect-stdout-cue --
-price:         200
 justification: string
+price:         200

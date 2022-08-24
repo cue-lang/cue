@@ -1,4 +1,4 @@
-cue eval emit.cue
+cue export emit.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

@@ -26,4 +26,4 @@ protocol: *"udp" | "tcp"
 
 -- expect-stdout-cue --
 replicas: 1
-protocol: "tcp" | "udp" | *_|_
+protocol: "tcp" | "udp"

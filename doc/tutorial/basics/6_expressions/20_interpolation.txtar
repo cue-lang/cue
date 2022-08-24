@@ -1,4 +1,4 @@
-cue eval interpolation.cue
+cue export interpolation.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

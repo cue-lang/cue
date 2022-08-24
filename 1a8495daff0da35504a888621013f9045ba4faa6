@@ -16,6 +16,24 @@
       "message": "Hi satotake! Thanks for raising this CL. It looks like a big change. Please can I suggest we first reach agreement on changes in one of the issues you have linked?\n\nThanks",
       "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49479b46_ee03cf1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019759
+      },
+      "writtenOn": "2022-08-24T16:12:36Z",
+      "side": 1,
+      "message": "of course, it is fine :)",
+      "parentUuid": "bf5e80c6_e716fe67",
+      "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,4 +1,4 @@
-exec cue eval -i order.cue
+exec cue eval order.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

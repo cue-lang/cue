@@ -1,5 +1,5 @@
-exec cue eval -i -c cycle.cue
-cmp stdout expect-stdout-cue
+! exec cue eval -c cycle.cue
+cmp stderr expect-stderr
 
 -- frontmatter.toml --
 title = "Reference Cycles"
@@ -26,8 +26,6 @@ y: x - 100
 a: b + 100
 b: a - 100
 
--- expect-stdout-cue --
-x: 200
-y: 100
-a: _|_ // cycle detected
-b: _|_ // cycle detected
+-- expect-stderr --
+cycle error:
+    ./cycle.cue:7:4

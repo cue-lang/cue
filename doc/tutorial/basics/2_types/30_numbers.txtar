@@ -1,5 +1,5 @@
-exec cue eval -i numbers.cue
-cmp stdout expect-stdout-cue
+! exec cue eval numbers.cue
+cmp stderr expect-stderr
 
 -- frontmatter.toml --
 title = "Numbers"
@@ -37,9 +37,7 @@ e: [
     0x1000_0000, // 268_435_456
 ]
 
--- expect-stdout-cue --
-a: 4
-b: 4.0
-c: _|_ // conflicting values int and 4.0 (mismatched types int and float)
-d: 4
-e: [1234, 5000000, 1610612736, 268435456]
+-- expect-stderr --
+c: conflicting values int and 4.0 (mismatched types int and float):
+    ./numbers.cue:7:4
+    ./numbers.cue:8:4

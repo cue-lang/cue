@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f00697f8_688970c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-24T16:48:37Z",
+      "side": 1,
+      "message": "Noting here that I found another issue along the way that fails with current tip, that is _not_ fixed by this CL: https://github.com/cue-lang/cue/issues/1881",
+      "revId": "547c4390430c9ab4274a8f5aa3548dacfc1f4981",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

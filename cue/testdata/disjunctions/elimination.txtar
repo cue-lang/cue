@@ -180,6 +180,37 @@ preserveClosedness: medium: p3: {
 		*{} | {c: int} | {d: string}
 	}
 }
+
+// If an error occurred in the last disjunction, it may sometimes be propagated
+// to parent nodes. This, in turn, could lead to references to such field
+// to fail with that error.
+noChildError: _
+noChildError: issue1608: {
+	myValue: #type & {fieldName: "some string"}
+	#type: fieldName: #subtype
+
+	#subtype: string | {foo: string} | {bar: #subtype}
+}
+
+noChildError: t1: {
+	#D: {b: string} | {c: #D }
+	o: #D & {b: "test"}
+}
+
+noChildError: t2: {
+	o: #D & {b: "test"}
+	#D: {b: string} | {c: #D }
+}
+
+noChildError: t3: {
+	#D: {a: null} | {b: string} | {c: #D }
+	o: #D & {b: "test"}
+}
+
+noChildError: t4: {
+	o: #D & {b: "test"}
+	#D: {a: null} | {b: string} | {c: #D }
+}
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){
@@ -514,6 +545,57 @@ preserveClosedness: medium: p3: {
             d: (string){ string }
           }) }
       }
+    }
+  }
+  noChildError: (struct){
+    issue1608: (struct){
+      myValue: (#struct){
+        fieldName: (string){ "some string" }
+      }
+      #type: (#struct){
+        fieldName: ((string|struct)){ |((string){ string }, (#struct){
+            foo: (string){ string }
+          }) }
+      }
+      #subtype: ((string|struct)){ |((string){ string }, (#struct){
+          foo: (string){ string }
+        }) }
+    }
+    t1: (struct){
+      #D: (#struct){
+        b: (string){ string }
+      }
+      o: (#struct){
+        b: (string){ "test" }
+      }
+    }
+    t2: (struct){
+      o: (#struct){
+        b: (string){ "test" }
+      }
+      #D: (#struct){
+        b: (string){ string }
+      }
+    }
+    t3: (struct){
+      #D: (#struct){ |((#struct){
+          a: (null){ null }
+        }, (#struct){
+          b: (string){ string }
+        }) }
+      o: (#struct){
+        b: (string){ "test" }
+      }
+    }
+    t4: (struct){
+      o: (#struct){
+        b: (string){ "test" }
+      }
+      #D: (#struct){ |((#struct){
+          a: (null){ null }
+        }, (#struct){
+          b: (string){ string }
+        }) }
     }
   }
 }
@@ -1075,6 +1157,74 @@ preserveClosedness: medium: p3: {
           })
         }
       }
+    }
+  }
+  noChildError: _
+  noChildError: {
+    issue1608: {
+      myValue: (〈0;#type〉 & {
+        fieldName: "some string"
+      })
+      #type: {
+        fieldName: 〈1;#subtype〉
+      }
+      #subtype: (string|{
+        foo: string
+      }|{
+        bar: 〈1;#subtype〉
+      })
+    }
+  }
+  noChildError: {
+    t1: {
+      #D: ({
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+    }
+  }
+  noChildError: {
+    t2: {
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+      #D: ({
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
+    }
+  }
+  noChildError: {
+    t3: {
+      #D: ({
+        a: null
+      }|{
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+    }
+  }
+  noChildError: {
+    t4: {
+      o: (〈0;#D〉 & {
+        b: "test"
+      })
+      #D: ({
+        a: null
+      }|{
+        b: string
+      }|{
+        c: 〈1;#D〉
+      })
     }
   }
 }

@@ -108,8 +108,12 @@ const (
 type CloseInfo struct {
 	*closeInfo
 
-	IsClosed   bool
-	IsOptional bool
+	// IsClosed is true if this conjunct represents a single level of closing
+	// as indicated by the closed builtin.
+	IsClosed bool
+
+	// FieldTypes indicates which kinds of fields (optional, dynamic, patterns,
+	// etc.) are contained in this conjunct.
 	FieldTypes OptionalType
 
 	CycleInfo
@@ -321,15 +325,17 @@ func (c *closeInfo) isClosed() bool {
 	return c.mode == closeDef
 }
 
+// isClosed reports whether v is closed at this level (so not recursively).
 func isClosed(v *Vertex) bool {
+	// We could have used IsRecursivelyClosed here, but (effectively)
+	// implementing it again here allows us to only have to interate over
+	// Structs once.
+	if v.Closed {
+		return true
+	}
 	for _, s := range v.Structs {
-		if s.IsClosed {
+		if s.IsClosed || s.IsInOneOf(DefinitionSpan) {
 			return true
-		}
-		for c := s.closeInfo; c != nil; c = c.parent {
-			if c.isClosed() {
-				return true
-			}
 		}
 	}
 	return false

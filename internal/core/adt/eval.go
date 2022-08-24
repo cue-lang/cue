@@ -360,6 +360,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 				}
 			}
 			v.Arcs = nil
+			v.ChildErrors = nil
 			// v.Structs = nil // TODO: should we keep or discard the Structs?
 			// TODO: how to represent closedness information? Do we need it?
 		}

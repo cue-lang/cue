@@ -126,11 +126,11 @@ func (c CloseInfo) Location() Node {
 	return c.closeInfo.location
 }
 
-func (c CloseInfo) SpanMask() SpanType {
+func (c CloseInfo) span() SpanType {
 	if c.closeInfo == nil {
 		return 0
 	}
-	return c.span
+	return c.closeInfo.span
 }
 
 func (c CloseInfo) RootSpanType() SpanType {
@@ -141,10 +141,7 @@ func (c CloseInfo) RootSpanType() SpanType {
 }
 
 func (c CloseInfo) IsInOneOf(t SpanType) bool {
-	if c.closeInfo == nil {
-		return false
-	}
-	return c.span&t != 0
+	return c.span()&t != 0
 }
 
 // TODO(perf): remove: error positions should always be computed on demand
@@ -160,17 +157,12 @@ func (c *CloseInfo) AddPositions(ctx *OpContext) {
 // TODO(perf): use on StructInfo. Then if parent and expression are the same
 // it is possible to use cached value.
 func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
-	var span SpanType
-	if c.closeInfo != nil {
-		span = c.span
-	}
-
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
 		mode:     closeEmbed,
 		root:     EmbeddingSpan,
-		span:     span | EmbeddingSpan,
+		span:     c.span() | EmbeddingSpan,
 	}
 	return c
 }
@@ -180,14 +172,10 @@ func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
 //
 //	a: {#foo} & {b: int}
 func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
-	var span SpanType
-	if c.closeInfo != nil {
-		span = c.span
-	}
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
-		span:     span,
+		span:     c.span(),
 	}
 	return c
 }
@@ -196,24 +184,17 @@ func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
 // or constraint. Definition and embedding spans are introduced with SpawnRef
 // and SpawnEmbed, respectively.
 func (c CloseInfo) SpawnSpan(x Node, t SpanType) CloseInfo {
-	var span SpanType
-	if c.closeInfo != nil {
-		span = c.span
-	}
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
 		root:     t,
-		span:     span | t,
+		span:     c.span() | t,
 	}
 	return c
 }
 
 func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
-	var span SpanType
-	if c.closeInfo != nil {
-		span = c.span
-	}
+	span := c.span()
 	found := false
 	if !isDef {
 		xnode := Node(x) // Optimization so we're comparing identical interface types.

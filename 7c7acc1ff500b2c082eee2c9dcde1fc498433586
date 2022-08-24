@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9105f8f1_0e076754",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-24T12:03:34Z",
+      "side": 1,
+      "message": "One thing we should also do as part of reviewing this CL, is look at whether the change to `cue-gen` \"makes sense\".",
+      "revId": "7c7acc1ff500b2c082eee2c9dcde1fc498433586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

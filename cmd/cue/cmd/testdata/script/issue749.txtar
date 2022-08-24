@@ -1,4 +1,4 @@
-cue eval ./float.cue
+exec cue eval ./float.cue
 cmp stderr expect-stderr
 cmp stdout expect-stdout
 -- float.cue --

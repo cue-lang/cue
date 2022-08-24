@@ -1,5 +1,5 @@
 cd root
-cue import proto -I ../include ./... --proto_enum=json
+exec cue import proto -I ../include ./... --proto_enum=json
 cd ..
 
 cmp stderr expect-stderr

@@ -1,7 +1,7 @@
-! cue vet ./vet.cue ./data.yaml
+! exec cue vet ./vet.cue ./data.yaml
 cmp stderr expect-stderr
 
-! cue vet . ./data.yaml
+! exec cue vet . ./data.yaml
 cmp stderr expect-stderr2
 
 -- expect-stderr --

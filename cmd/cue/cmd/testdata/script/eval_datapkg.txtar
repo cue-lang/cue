@@ -1,12 +1,12 @@
 #Issue: 1596
 
-cue eval . instance.json
+exec cue eval . instance.json
 cmp stdout expect-stdout-eval
 
-cue def  . instance.json
+exec cue def  . instance.json
 cmp stdout expect-stdout-def
 
-cue vet  . instance.json
+exec cue vet  . instance.json
 
 -- cue.mod/module.cue --
 module: "mod.test/config"

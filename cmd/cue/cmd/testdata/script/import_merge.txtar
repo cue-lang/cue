@@ -1,4 +1,4 @@
-cue import -o - x.yaml -l objects: -l metadata.name
+exec cue import -o - x.yaml -l objects: -l metadata.name
 cmp stdout expect-stdout
 
 -- x.yaml --

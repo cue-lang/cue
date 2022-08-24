@@ -1,14 +1,14 @@
 #Issue 1304
 
-! cue export --out json x.cue
+! exec cue export --out json x.cue
 cmp stdout expect_stdout_json
 cmp stderr expect_stderr_json
 
-! cue export --out cue x.cue
+! exec cue export --out cue x.cue
 cmp stdout expect_stdout_cue
 cmp stderr expect_stderr_cue
 
-! cue export --out yaml x.cue
+! exec cue export --out yaml x.cue
 cmp stdout expect_stdout_yaml
 cmp stderr expect_stderr_yaml
 

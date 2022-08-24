@@ -1,17 +1,17 @@
 # Print the data for the current package a yaml.
-cue export --out=yaml
+exec cue export --out=yaml
 cmp stdout stdout-export
 
 # Print the string value of the name field as a string.
-cue export -e name --out=text
+exec cue export -e name --out=text
 cmp stdout expect-stdout
 
 # Write the string value of the name field to a txt file.
-cue export -e name -o=foo.txt
+exec cue export -e name -o=foo.txt
 cmp stdout-foo foo.txt
 
 # Write the string value of the name field to a file foo.
-cue export -e name -o=text:foo
+exec cue export -e name -o=text:foo
 cmp stdout-foo foo
 
 # Interpret bar.cue and foo.yaml as OpenAPI data.

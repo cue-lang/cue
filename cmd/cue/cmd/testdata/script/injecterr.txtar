@@ -1,4 +1,4 @@
-! cue eval test.cue -t env=prod
+! exec cue eval test.cue -t env=prod
 
 cmp stderr expect-stderr
 

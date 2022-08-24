@@ -1,4 +1,4 @@
-cue eval ./pkg:foo
+exec cue eval ./pkg:foo
 cmp stdout expect-stdout
 -- cue.mod/module.cue --
 module: "mod.test"

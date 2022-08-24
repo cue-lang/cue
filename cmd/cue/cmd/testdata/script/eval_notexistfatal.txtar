@@ -3,12 +3,12 @@
 # TODO: recognize when an unresolved value
 
 # export
-! cue export
+! exec cue export
 cmp stderr expect-stderr1
 cmp stdout expect-stdout1
 
 # eval
-cue eval
+exec cue eval
 cmp stderr expect-stderr2
 cmp stdout expect-stdout2
 

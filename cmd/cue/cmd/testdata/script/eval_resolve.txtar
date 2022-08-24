@@ -3,18 +3,18 @@
 # references should never resolve to files of an
 # anonymous package (no package or package _).
 
-! cue eval data.yaml check.cue
+! exec cue eval data.yaml check.cue
 cmp stderr out-stderr
 
-! cue eval none.cue check.cue
+! exec cue eval none.cue check.cue
 cmp stderr out-stderr
 
-! cue eval anon.cue check.cue
+! exec cue eval anon.cue check.cue
 cmp stderr out-stderr
 
 # TODO: allow this for now. Files without a package clause should not resolve
 # across other files.
-cue eval package.cue check.cue
+exec cue eval package.cue check.cue
 
 -- data.yaml --
 nodes:

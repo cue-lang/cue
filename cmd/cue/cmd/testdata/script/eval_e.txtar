@@ -1,18 +1,18 @@
-! cue eval -e nonExist
+! exec cue eval -e nonExist
 cmp stderr expect/nonExist/stderr
 cmp stdout expect/nonExist/stdout
 
 # Issue #550: ignore incomplete error in different package
-cue eval -e incomplete
+exec cue eval -e incomplete
 cmp stderr expect/incomplete/stderr
 cmp stdout expect/incomplete/stdout
 
 # Issue #384
-! cue eval foo.bar
+! exec cue eval foo.bar
 cmp stderr expect/foobar/stderr
 
 # Issue #999
-cue export --out text -e 'yaml.MarshalStream(X)' issue999/x.cue
+exec cue export --out text -e 'yaml.MarshalStream(X)' issue999/x.cue
 cmp stdout expect/issue999/stdout
 
 -- expect/nonExist/stdout --

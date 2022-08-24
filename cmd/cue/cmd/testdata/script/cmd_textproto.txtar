@@ -1,10 +1,10 @@
-cue eval topschema.cue foo.textproto
+exec cue eval topschema.cue foo.textproto
 cmp stdout out/topfoo.textproto
 
-cue eval -d '#X' schema.cue foo.textproto
+exec cue eval -d '#X' schema.cue foo.textproto
 cmp stdout out/foo.textproto
 
-! cue eval -d '#X' schema.cue foo.textproto -l c
+! exec cue eval -d '#X' schema.cue foo.textproto -l c
 cmp stderr out/stderr3
 
 -- topschema.cue --

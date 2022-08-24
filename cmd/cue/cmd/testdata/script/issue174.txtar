@@ -1,4 +1,4 @@
-! cue export ./issue174
+! exec cue export ./issue174
 cmp stderr expect-stderr
 -- expect-stderr --
 build constraints exclude all CUE files in ./issue174:

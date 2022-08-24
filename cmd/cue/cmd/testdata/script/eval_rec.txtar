@@ -1,4 +1,4 @@
-cue eval ./rec.cue -O
+exec cue eval ./rec.cue -O
 cmp stdout expect-stdout
 -- rec.cue --
 Foo: {

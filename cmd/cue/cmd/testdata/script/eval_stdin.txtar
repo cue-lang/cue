@@ -1,5 +1,5 @@
 stdin stdin.cue
-cue eval t.cue -
+exec cue eval t.cue -
 cmp stdout expect-stdout
 
 -- stdin.cue --

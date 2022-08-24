@@ -1,5 +1,5 @@
 # Issue #578
-cue dump ./...
+exec cue dump ./...
 cmp stdout stdout-expect
 -- k1.cue --
 package kube

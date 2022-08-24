@@ -1,4 +1,4 @@
-cue import -o - ./openapi.yaml
+exec cue import -o - ./openapi.yaml
 cmp stdout expect-openapi
 
 -- expect-openapi --

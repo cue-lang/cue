@@ -1,4 +1,4 @@
-cue eval scopes.cue
+exec cue eval scopes.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

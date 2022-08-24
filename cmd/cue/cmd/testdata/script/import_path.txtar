@@ -1,7 +1,7 @@
-cue import -o - -f -l '"\(strings.ToLower(kind))": "\(name)":' ./import
+exec cue import -o - -f -l '"\(strings.ToLower(kind))": "\(name)":' ./import
 cmp stdout expect-stdout
 
-cue import -o - -f -l 'strings.ToLower(kind)' -l name ./import
+exec cue import -o - -f -l 'strings.ToLower(kind)' -l name ./import
 cmp stdout expect-stdout
 -- expect-stdout --
 service: booster: {

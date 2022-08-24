@@ -7,7 +7,7 @@
 # on the various rules of get go.
 
 # cue get go
-cue get go --local ./...
+exec cue get go --local ./...
 cmp ./pkg3/pkg3_go_gen.cue ./pkg3/pkg3_go_gen.cue.golden
 cmp ./pkg1/file1_go_gen.cue ./pkg1/file1_go_gen.cue.golden
 cmp ./pkg1/alias_go_gen.cue ./pkg1/alias_go_gen.cue.golden

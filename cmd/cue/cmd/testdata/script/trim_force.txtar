@@ -1,15 +1,15 @@
 # Verify that trim with --force works
 
 # First time should simply succeed
-cue trim -o test.cue file.cue
+exec cue trim -o test.cue file.cue
 cmp test.cue file.cue
 
 # Second time will fail without --force
-! cue trim -o test.cue file.cue
+! exec cue trim -o test.cue file.cue
 stderr 'error writing "test.cue": file already exists'
 
 # Second time with --force should succeed
-cue trim --force -o test.cue file.cue
+exec cue trim --force -o test.cue file.cue
 cmp test.cue file.cue
 
 -- file.cue --

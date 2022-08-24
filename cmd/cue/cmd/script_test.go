@@ -92,8 +92,9 @@ func TestScript(t *testing.T) {
 		t.Fatalf("cannot start proxy: %v", err)
 	}
 	p := testscript.Params{
-		Dir:           filepath.Join("testdata", "script"),
-		UpdateScripts: cuetest.UpdateGoldenFiles,
+		Dir:                 filepath.Join("testdata", "script"),
+		UpdateScripts:       cuetest.UpdateGoldenFiles,
+		RequireExplicitExec: true,
 		Setup: func(e *testscript.Env) error {
 			// Set up a home dir within work dir with a . prefix so that the
 			// Go/CUE pattern ./... does not descend into it.

@@ -1,4 +1,4 @@
-cue eval -c structs.cue
+exec cue eval -c structs.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

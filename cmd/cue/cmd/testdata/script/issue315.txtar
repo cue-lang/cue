@@ -1,4 +1,4 @@
-! cue vet -c file.cue
+! exec cue vet -c file.cue
 
 cmp stderr expect-stderr
 

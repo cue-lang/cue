@@ -1,4 +1,4 @@
-cue eval -t env=staging -t name=bar
+exec cue eval -t env=staging -t name=bar
 cmp stdout expect-stdout
 
 -- expect-stdout --

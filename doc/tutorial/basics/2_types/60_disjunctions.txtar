@@ -1,4 +1,4 @@
-cue eval disjunctions.cue
+exec cue eval disjunctions.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

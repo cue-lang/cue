@@ -1,15 +1,15 @@
 # Verify that eval with --force works
 
 # First time should simply succeed
-cue eval -o eval.cue file.cue
+exec cue eval -o eval.cue file.cue
 cmp eval.cue eval.golden
 
 # Second time will fail without --force
-! cue eval -o eval.cue file.cue
+! exec cue eval -o eval.cue file.cue
 stderr 'error writing "eval.cue": file already exists'
 
 # Second time with --force should succeed
-cue eval --force -o eval.cue file.cue
+exec cue eval --force -o eval.cue file.cue
 cmp eval.cue eval.golden
 
 -- file.cue --

@@ -1,4 +1,4 @@
-cue help cmd hello
+exec cue help cmd hello
 cmp stdout expect-stdout
 
 -- cue.mod --

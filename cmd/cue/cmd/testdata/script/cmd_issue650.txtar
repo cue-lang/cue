@@ -1,4 +1,4 @@
-cue cmd test
+exec cue cmd test
 
 -- blah/blah.cue --
 package blah

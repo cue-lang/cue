@@ -1,4 +1,4 @@
-cue eval ./pkg:foo
+exec cue eval ./pkg:foo
 
 -- cue.mod/module.cue --
 module: "mod.test"

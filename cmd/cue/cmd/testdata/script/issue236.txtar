@@ -1,4 +1,4 @@
-cue trim
+exec cue trim
 
 -- in.cue --
 package x

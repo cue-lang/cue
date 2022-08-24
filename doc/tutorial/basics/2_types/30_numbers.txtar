@@ -1,4 +1,4 @@
-cue eval -i numbers.cue
+exec cue eval -i numbers.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

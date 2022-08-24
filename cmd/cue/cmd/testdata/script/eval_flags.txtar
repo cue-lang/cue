@@ -1,18 +1,18 @@
 # Issue #969
 
-! cue eval test.json -n ".+\.cue"
+! exec cue eval test.json -n ".+\.cue"
 cmp stderr expect-stderr1
 
-! cue eval test.json -d '#D2'
+! exec cue eval test.json -d '#D2'
 cmp stderr expect-stderr2
 
-! cue eval test.json -n ".+\.cue" -d '#D2'
+! exec cue eval test.json -n ".+\.cue" -d '#D2'
 cmp stderr expect-stderr3
 
-! cue eval test.json vector.cue -d '#D1'
+! exec cue eval test.json vector.cue -d '#D1'
 cmp stderr expect-stderr4
 
-! cue eval test.json vector.cue -d '#D2'
+! exec cue eval test.json vector.cue -d '#D2'
 cmp stderr expect-stderr5
 
 -- test.json --

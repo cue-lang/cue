@@ -1,7 +1,7 @@
 # Test that we get expected error when we ask cue get go to get
 # a Go package that cannot be resolved.
 
-! cue get go k8s.io/api/apps/v1
+! exec cue get go k8s.io/api/apps/v1
 stderr '\Qno required module provides package k8s.io/api/apps/v1'
 
 -- go.mod --

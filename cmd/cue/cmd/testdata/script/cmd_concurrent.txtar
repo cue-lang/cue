@@ -1,4 +1,4 @@
-cue cmd runtwo
+exec cue cmd runtwo
 cmp stdout runtwo-stdout
 
 -- runtwo-stdout --

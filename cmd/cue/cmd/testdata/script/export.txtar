@@ -1,4 +1,4 @@
-cue export ./hello
+exec cue export ./hello
 cmp stdout expect-stdout
 -- expect-stdout --
 {

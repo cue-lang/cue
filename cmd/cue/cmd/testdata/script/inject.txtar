@@ -1,19 +1,19 @@
-cue eval test.cue -t env=prod
+exec cue eval test.cue -t env=prod
 cmp stdout expect-stdout
 
-cue eval vars.cue -T
+exec cue eval vars.cue -T
 cmp stdout expect-stdout-vars
 
-cue eval vars.cue -T -t dir=xxx
+exec cue eval vars.cue -T -t dir=xxx
 cmp stdout expect-stdout-override
 
-cue eval vars.cue
+exec cue eval vars.cue
 cmp stdout expect-stdout-novars
 
-! cue eval -T err.cue
+! exec cue eval -T err.cue
 cmp stderr expect-stderr-err
 
-cue cmd user vars.cue vars_tool.cue
+exec cue cmd user vars.cue vars_tool.cue
 cmp stdout expect-stdout-tool
 
 # TODO: report errors for invalid tags?

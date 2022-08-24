@@ -1,4 +1,4 @@
-cue eval ./struct.cue
+exec cue eval ./struct.cue
 cmp stderr expect-stderr
 cmp stdout expect-stdout
 -- struct.cue --

@@ -2,7 +2,7 @@
 # check errors. In this mode, cue get go proceeds on a best-efforts
 # basis.
 
-cue get go --local
+exec cue get go --local
 cmp blah_go_gen.cue blah.cue.golden
 
 -- go.mod --

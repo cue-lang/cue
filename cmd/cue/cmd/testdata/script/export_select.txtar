@@ -1,4 +1,4 @@
-cue export .:foo mod.test/bar:baz
+exec cue export .:foo mod.test/bar:baz
 
 cmp stdout expect-stdout
 -- cue.mod/module.cue --

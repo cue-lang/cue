@@ -1,4 +1,4 @@
-! cue eval
+! exec cue eval
 cmp stderr expect-stderr
 
 -- expect-stderr --

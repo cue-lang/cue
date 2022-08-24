@@ -1,4 +1,4 @@
-cue cmd gengithub
+exec cue cmd gengithub
 
 -- x.cue --
 package x

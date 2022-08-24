@@ -1,7 +1,7 @@
 # try to trick cue reading from a perpetually open stdin by placing a file
 # named '-' in the current directory.
 
-! cue eval
+! exec cue eval
 stdin -
 cmp stderr expect-stderr
 -- - --

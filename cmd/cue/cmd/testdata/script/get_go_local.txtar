@@ -1,14 +1,14 @@
 # Test that a basic get go works using --local
 
 # All the things
-cue get go --local
+exec cue get go --local
 cmp blah_go_gen.cue all.cue.golden
 
 # Verify dependencies did not change
 cmp go.mod go.mod.golden
 
 # Use an alternative package name
-cue get go --local -p other
+exec cue get go --local -p other
 cmp blah_go_gen.cue other.cue.golden
 
 # Verify dependencies did not change

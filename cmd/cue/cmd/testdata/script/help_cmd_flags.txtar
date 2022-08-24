@@ -1,7 +1,7 @@
-cue cmd -h
+exec cue cmd -h
 cmp stdout expect-stdout
 
-cue cmd --help
+exec cue cmd --help
 cmp stdout expect-stdout
 
 -- cue.mod --

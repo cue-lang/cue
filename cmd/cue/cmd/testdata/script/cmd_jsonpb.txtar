@@ -1,13 +1,13 @@
-cue eval schema.cue json+pb: data.json
+exec cue eval schema.cue json+pb: data.json
 cmp stdout out/data1
 
-cue eval schemaflag.cue -d '#X' json+pb: data.json
+exec cue eval schemaflag.cue -d '#X' json+pb: data.json
 cmp stdout out/data1
 
-! cue eval schema.cue json+pb: data-err.json
+! exec cue eval schema.cue json+pb: data-err.json
 cmp stderr out/data-err
 
-cue eval .:nested yaml+pb: stream.yaml -l kind
+exec cue eval .:nested yaml+pb: stream.yaml -l kind
 cmp stdout out/stream
 
 -- schema.cue --

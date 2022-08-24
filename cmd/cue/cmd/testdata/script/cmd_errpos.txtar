@@ -1,4 +1,4 @@
-! cue cmd prompter
+! exec cue cmd prompter
 cmp stderr expect-stderr
 
 # Issue #479

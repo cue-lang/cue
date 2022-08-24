@@ -1,4 +1,4 @@
-cue vet list.cue list.json
+exec cue vet list.cue list.json
 
 cmp stdout expect-stdout
 

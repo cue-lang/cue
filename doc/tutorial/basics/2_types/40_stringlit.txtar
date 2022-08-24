@@ -1,4 +1,4 @@
-cue export stringlit.cue
+exec cue export stringlit.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

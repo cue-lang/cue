@@ -1,4 +1,4 @@
-cue eval -i -c cycle.cue
+exec cue eval -i -c cycle.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

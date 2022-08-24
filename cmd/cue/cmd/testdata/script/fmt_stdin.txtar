@@ -1,5 +1,5 @@
 stdin feed
-cue fmt -
+exec cue fmt -
 cmp stdout expect-stdout
 
 -- feed --

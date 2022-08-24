@@ -2,12 +2,12 @@
 #
 # TODO: this test may fail if someone runs the tests via GOPROXY,
 # as then the module version won't be "devel".
-cue version
+exec cue version
 stdout -count=1 'cue version \(devel\)'
 
 # Version output with VCS information.
 env CUE_VERSION_TEST_CFG='[{"Key":"vcs","Value":"git"},{"Key":"vcs.revision","Value":"47b7032385cb490fab7d47b89fca36835cf13d39"},{"Key":"vcs.time","Value":"2022-05-10T04:58:46Z"},{"Key":"vcs.modified","Value":"true"}]'
-cue version
+exec cue version
 [!go1.18] stdout -count=1 'cue version \(devel\) [a-z]+/[a-z]+'
 [go1.18] stdout -count=1 'cue version v0.0.0-20220510045846-47b7032385cb$'
 [go1.18] stdout -count=1 'vcs git'

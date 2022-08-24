@@ -1,7 +1,7 @@
-cue eval ./data.cue
+exec cue eval ./data.cue
 cmp stdout expect-stdout
 
-cue eval ./data.cue -o out.cue
+exec cue eval ./data.cue -o out.cue
 cmp out.cue expect-out.cue
 
 -- data.cue --

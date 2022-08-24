@@ -1,4 +1,4 @@
-cue import -o - -f --files ./import
+exec cue import -o - -f --files ./import
 cmp stdout expect-stdout
 -- expect-stdout --
 kind: "Service"

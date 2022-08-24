@@ -1,4 +1,4 @@
-cue cmd -t prod -t name=bar tag tags.cue tags_tool.cue
+exec cue cmd -t prod -t name=bar tag tags.cue tags_tool.cue
 cmp stdout expect-stdout
 
 -- expect-stdout --

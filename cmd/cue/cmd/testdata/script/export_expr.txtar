@@ -1,4 +1,4 @@
-cue export data.cue -e a+c -e d.e.f --out yaml
+exec cue export data.cue -e a+c -e d.e.f --out yaml
 cmp stdout expect-stdout
 -- expect-stdout --
 4

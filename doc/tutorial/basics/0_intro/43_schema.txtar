@@ -1,4 +1,4 @@
-cue export schema.cue
+exec cue export schema.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --

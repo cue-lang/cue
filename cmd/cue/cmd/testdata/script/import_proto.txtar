@@ -1,5 +1,5 @@
 cd root
-cue import proto -I ../include ./...
+exec cue import proto -I ../include ./...
 cd ..
 
 cmp stderr expect-stderr

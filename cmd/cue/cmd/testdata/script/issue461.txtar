@@ -1,4 +1,4 @@
-cue cmd writefile
+exec cue cmd writefile
 
 -- cue.mod/module.cue --
 module: "mod.test"

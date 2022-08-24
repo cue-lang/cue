@@ -1,4 +1,4 @@
-cue cmd run
+exec cue cmd run
 
 -- task.cue --
 package ci

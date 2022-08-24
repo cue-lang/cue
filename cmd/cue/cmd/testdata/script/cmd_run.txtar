@@ -1,4 +1,4 @@
-cue cmd run
+exec cue cmd run
 stdout 'Hello world!'
 
 -- task.cue --

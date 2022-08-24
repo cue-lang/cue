@@ -1,4 +1,4 @@
-cue export --out yaml ./hello
+exec cue export --out yaml ./hello
 cmp stdout expect-stdout
 -- expect-stdout --
 message: Hello World!

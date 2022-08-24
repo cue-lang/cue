@@ -1,4 +1,4 @@
-! cue cmd notool
+! exec cue cmd notool
 ! stdout .
 cmp stderr cmd_baddisplay.out
 

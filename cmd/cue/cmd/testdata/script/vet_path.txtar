@@ -1,4 +1,4 @@
-! cue vet -l 'strings.ToLower(kind)' -l name services.jsonl services.cue
+! exec cue vet -l 'strings.ToLower(kind)' -l name services.jsonl services.cue
 cmp stderr expect-stderr
 -- expect-stderr --
 deployment.Booster.name: invalid value "Booster" (out of bound !~"^[A-Z]"):

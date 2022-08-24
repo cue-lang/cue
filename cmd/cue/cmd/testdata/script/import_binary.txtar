@@ -1,11 +1,11 @@
-cue import binary --ext crt .
+exec cue import binary --ext crt .
 cmp x.cue out/expect.cue
 
-cue export bin.cue --out binary
+exec cue export bin.cue --out binary
 cmp stdout out/bin
 
 # TODO: txtarscript should distinguish final newline
-cue export str.cue --out binary
+exec cue export str.cue --out binary
 cmp stdout out/str
 
 -- x.crt --

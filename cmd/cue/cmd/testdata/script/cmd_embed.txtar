@@ -1,14 +1,14 @@
 # Issue #281
 # Verify that we get the expected exported output.
-cue export
+exec cue export
 cmp stdout expect/concrete.json
 
 # Using the explicitly written command works OK.
-cue hello1
+exec cue hello1
 stdout 'hello, world'
 
 # Using the command that's defined externally fails.
-cue hello
+exec cue hello
 stdout 'hello, world'
 
 

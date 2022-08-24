@@ -1,4 +1,4 @@
-! cue vet schema.cue data.yaml
+! exec cue vet schema.cue data.yaml
 cmp stderr expect-stderr
 
 -- frontmatter.toml --

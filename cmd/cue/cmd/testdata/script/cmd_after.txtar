@@ -1,4 +1,4 @@
-cue cmd after
+exec cue cmd after
 cmp stdout expect-stdout
 
 -- expect-stdout --

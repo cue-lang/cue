@@ -3,7 +3,7 @@
 
 [golang.org/issue/44287] skip
 
-cue get go --local
+exec cue get go --local
 exec ls
 cmp cue.mod/gen/mod.test/blah/blah_go_gen.cue blah.cue.golden
 

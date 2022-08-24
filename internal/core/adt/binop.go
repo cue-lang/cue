@@ -182,6 +182,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 			x := MakeIdentLabel(c, "x", "")
 
+			// for x in expr { x }
 			forClause := func(src Expr) *Comprehension {
 				s := &StructLit{Decls: []Decl{
 					&FieldReference{UpCount: 1, Label: x},

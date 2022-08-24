@@ -118,7 +118,7 @@ outer:
 		if (flags&IgnoreOptional != 0) && !s.StructLit.HasOptional() {
 			continue
 		}
-		if s.closeInfo == nil || s.closeInfo.span&DefinitionSpan == 0 {
+		if s.span()&DefinitionSpan == 0 {
 			if !s.StructLit.HasOptional() {
 				continue
 			}

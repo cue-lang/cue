@@ -16,6 +16,23 @@
       "message": "Note that we cannot use GOBIN as testscript does not set the env var, nor does Go even give us the default via `go env GOBIN` unless it\u0027s set explicitly.\n\nThis does assume that GOPATH only has one element in the directory list, but honestly, that\u0027s an OK assumption to make in 2022 with Go modules :) No sane person would use a multi-directory GOPATH, and even less so in testscript.",
       "revId": "da23b0a8bbf80140a280614b17dfeb8ffd9d1f5d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41855d7d_1b4fbcc2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-24T04:26:36Z",
+      "side": 1,
+      "message": "I raised https://github.com/cue-lang/cue/issues/1876 as a low priority follow-up.",
+      "revId": "da23b0a8bbf80140a280614b17dfeb8ffd9d1f5d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -500,12 +500,6 @@ a1.f.0: structural cycle
 a3.f.g: structural cycle
 b13.root.a.0.0: structural cycle
 b14.root.b.1.1: structural cycle
-b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
-    ./in.cue:53:5
-    ./in.cue:53:12
-    ./in.cue:54:8
-    ./in.cue:54:9
-b4.b.0.0: structural cycle
 b4.x.y.0: structural cycle
 b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
     ./in.cue:63:5
@@ -515,19 +509,12 @@ b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
 b6.b.a.0.0: structural cycle
 b6.x.a.0: structural cycle
 b7.a.0: structural cycle
-b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
-    ./in.cue:68:5
-    ./in.cue:68:11
-    ./in.cue:69:5
-    ./in.cue:69:6
-b7.b.0.0.0: structural cycle
 c1.a.c.c: structural cycle
 crossRefNoCycle.t4.C.y.x: structural cycle
 crossRefNoCycle.t4.C.y.y: structural cycle
 crossRefNoCycle.t4.C.y.z: structural cycle
 d1.a.b.c.d.t: structural cycle
 d2.r.c.d.t: structural cycle
-d2.x.d.t.c.d.t: structural cycle
 e1.a.c: structural cycle
 e1.b.c: structural cycle
 e2.a.c: structural cycle
@@ -588,7 +575,6 @@ p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
 shortPathFail.elipsis.t2.Foo.ref.ref: structural cycle
 withLetFail.schema.next: structural cycle
-z1.z.f.h.h: structural cycle
 z1.z.g.h: structural cycle
 b12b.#list.tail: structural cycle:
     ./in.cue:141:6
@@ -677,18 +663,11 @@ Result:
     }
   }
   b4: (_|_){
-    // [eval]
+    // [structural cycle]
     b: (_|_){
-      // [eval]
+      // [structural cycle]
       0: (_|_){
-        // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
-        //     ./in.cue:53:5
-        //     ./in.cue:53:12
-        //     ./in.cue:54:8
-        //     ./in.cue:54:9
-        0: (_|_){
-          // [structural cycle] b4.b.0.0: structural cycle
-        }
+        // [structural cycle] b4.x.y.0: structural cycle
       }
     }
     x: (_|_){
@@ -744,21 +723,12 @@ Result:
     }
   }
   b7: (_|_){
-    // [eval]
+    // [structural cycle]
     b: (_|_){
-      // [eval]
+      // [structural cycle]
       0: (_|_){
-        // [eval]
-        0: (_|_){
-          // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
-          //     ./in.cue:68:5
-          //     ./in.cue:68:11
-          //     ./in.cue:69:5
-          //     ./in.cue:69:6
-          0: (_|_){
-            // [structural cycle] b7.b.0.0.0: structural cycle
-          }
-        }
+        // [structural cycle] b7.a.0: structural cycle
+        0: (int){ 1 }
       }
     }
     a: (_|_){
@@ -820,9 +790,7 @@ Result:
         }) }
     }
     c: (#struct){
-      d: ((string|struct)){ |((string){ string }, (#struct){
-          b: (string){ string }
-        }) }
+      d: (string){ string }
     }
   }
   b11: (struct){
@@ -1142,16 +1110,6 @@ Result:
         h: (int){ int }
         t: (_|_){
           // [structural cycle]
-          c: (_|_){
-            // [structural cycle]
-            d: (_|_){
-              // [structural cycle]
-              h: (int){ int }
-              t: (_|_){
-                // [structural cycle] d2.x.d.t.c.d.t: structural cycle
-              }
-            }
-          }
         }
       }
     }
@@ -1168,10 +1126,8 @@ Result:
         }
       }
     }
-    a: (_|_){
-      // [structural cycle]
-      b: (_|_){
-        // [structural cycle]
+    a: (struct){
+      b: (struct){
         c: (_|_){
           // [structural cycle]
           d: (_|_){
@@ -1179,6 +1135,16 @@ Result:
             h: (int){ int }
             t: (_|_){
               // [structural cycle]
+              c: (_|_){
+                // [structural cycle]
+                d: (_|_){
+                  // [structural cycle]
+                  h: (int){ int }
+                  t: (_|_){
+                    // [structural cycle]
+                  }
+                }
+              }
             }
           }
         }
@@ -1529,7 +1495,7 @@ Result:
         h: (_|_){
           // [structural cycle]
           h: (_|_){
-            // [structural cycle] z1.z.f.h.h: structural cycle
+            // [structural cycle] z1.z.g.h: structural cycle
           }
         }
       }

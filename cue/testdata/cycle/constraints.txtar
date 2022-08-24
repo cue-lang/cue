@@ -435,12 +435,8 @@ mutuallyTriggeringCycle.t1.x.c.b.b.b.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.c: structural cycle
 selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
-selfTriggerCycle.issue1503.a.a.b.link.a.b.link.a.b.link: structural cycle
-selfTriggerCycle.issue1503.a.a.one.link.a.b.link.a.b.link: structural cycle
-selfTriggerCycle.issue1503.a.a.one.link.a.two.link.a.b.link.a.b.link: structural cycle
 selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
 selfTriggerCycle.t1.#T.b.b: structural cycle
-selfTriggerCycle.t1.a.b.b.b: structural cycle
 selfTriggerCycle.t2.b.c.a: structural cycle
 
 Result:
@@ -658,12 +654,6 @@ Result:
         // [structural cycle]
         b: (_|_){
           // [structural cycle]
-          b: (_|_){
-            // [structural cycle]
-            b: (_|_){
-              // [structural cycle] selfTriggerCycle.t1.a.b.b.b: structural cycle
-            }
-          }
         }
       }
       #T: (_|_){
@@ -724,70 +714,14 @@ Result:
             // [structural cycle]
             link: (_|_){
               // [structural cycle]
-              a: (_|_){
-                // [structural cycle]
-                b: (_|_){
-                  // [structural cycle]
-                  link: (_|_){
-                    // [structural cycle]
-                    a: (_|_){
-                      // [structural cycle]
-                      b: (_|_){
-                        // [structural cycle]
-                        link: (_|_){
-                          // [structural cycle] selfTriggerCycle.issue1503.a.a.b.link.a.b.link.a.b.link: structural cycle
-                        }
-                      }
-                    }
-                  }
-                }
-              }
             }
           }
           one: (_|_){
             // [structural cycle]
             link: (_|_){
               // [structural cycle]
-              a: (_|_){
-                // [structural cycle]
-                two: (_|_){
-                  // [structural cycle]
-                  link: (_|_){
-                    // [structural cycle]
-                    a: (_|_){
-                      // [structural cycle]
-                      b: (_|_){
-                        // [structural cycle]
-                        link: (_|_){
-                          // [structural cycle]
-                          a: (_|_){
-                            // [structural cycle]
-                            b: (_|_){
-                              // [structural cycle]
-                              link: (_|_){
-                                // [structural cycle] selfTriggerCycle.issue1503.a.a.one.link.a.two.link.a.b.link.a.b.link: structural cycle
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-                b: (_|_){
-                  // [structural cycle]
-                  link: (_|_){
-                    // [structural cycle]
-                    a: (_|_){
-                      // [structural cycle]
-                      b: (_|_){
-                        // [structural cycle]
-                        link: (_|_){
-                          // [structural cycle] selfTriggerCycle.issue1503.a.a.one.link.a.b.link.a.b.link: structural cycle
-                        }
-                      }
-                    }
-                  }
+              a: (struct){
+                two: (struct){
                 }
               }
             }

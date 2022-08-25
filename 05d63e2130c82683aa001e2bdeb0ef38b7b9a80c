@@ -51,6 +51,24 @@
       "parentUuid": "a1943fb5_70c9a901",
       "revId": "05d63e2130c82683aa001e2bdeb0ef38b7b9a80c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16f4a4c5_eb6d22af",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T10:56:04Z",
+      "side": 1,
+      "message": "Maybe add a comment here as well as in Vertex.IsInOneOf ?",
+      "parentUuid": "8aa046b2_8244c8a0",
+      "revId": "05d63e2130c82683aa001e2bdeb0ef38b7b9a80c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

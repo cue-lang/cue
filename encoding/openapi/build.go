@@ -20,7 +20,6 @@ import (
 	"path"
 	"regexp"
 	"sort"
-	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -29,19 +28,20 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	internalvalue "cuelang.org/go/internal/value"
 )
 
 type buildContext struct {
-	inst      *cue.Instance
-	instExt   *cue.Instance
+	inst      cue.Value
+	instExt   cue.Value
 	refPrefix string
-	path      []string
+	path      []cue.Selector
 	errs      errors.Error
 
 	expandRefs    bool
 	structural    bool
 	exclusiveBool bool
-	nameFunc      func(inst *cue.Instance, path []string) string
+	nameFunc      func(inst cue.Value, path cue.Path) string
 	descFunc      func(v cue.Value) string
 	fieldFilter   *regexp.Regexp
 	evalDepth     int // detect cycles when resolving references
@@ -58,12 +58,17 @@ type buildContext struct {
 	// TODO: consider an option in the CUE API where optional fields are
 	// recursively evaluated.
 	cycleNodes []*adt.Vertex
+
+	// imports caches values as returned by cue.Value.ReferencePath
+	// for use by ReferenceFunc. It's only initialised when ReferenceFunc
+	// is non-nil.
+	imports map[cue.Value]*cue.Instance
 }
 
 type externalType struct {
 	ref   string
-	inst  *cue.Instance
-	path  []string
+	inst  cue.Value
+	path  cue.Path
 	value cue.Value
 }
 
@@ -71,7 +76,9 @@ type oaSchema = OrderedMap
 
 type typeFunc func(b *builder, a cue.Value)
 
-func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err error) {
+func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, err error) {
+	val := inst.Value()
+	_, isInstance := inst.(*cue.Instance)
 	var fieldFilter *regexp.Regexp
 	if g.FieldFilter != "" {
 		fieldFilter, err = regexp.Compile(g.FieldFilter)
@@ -93,17 +100,48 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		g.Version = "3.0.0"
 	}
 
-	c := buildContext{
-		inst:         inst,
-		instExt:      inst,
+	c := &buildContext{
+		inst:         val,
+		instExt:      val,
 		refPrefix:    "components/schemas",
 		expandRefs:   g.ExpandReferences,
 		structural:   g.ExpandReferences,
-		nameFunc:     g.ReferenceFunc,
+		nameFunc:     g.NameFunc,
 		descFunc:     g.DescriptionFunc,
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 		fieldFilter:  fieldFilter,
+	}
+	if g.ReferenceFunc != nil {
+		if !isInstance {
+			panic("cannot use ReferenceFunc along with cue.Value")
+		}
+		if g.NameFunc != nil {
+			panic("cannot specify both ReferenceFunc and NameFunc")
+		}
+
+		c.nameFunc = func(val cue.Value, path cue.Path) string {
+			sels := path.Selectors()
+			labels := make([]string, len(sels))
+			for i, sel := range sels {
+				labels[i] = selectorLabel(sel) // TODO this is arguably incorrect.
+			}
+			inst, ok := c.imports[val]
+			if !ok {
+				r, n := internalvalue.ToInternal(val)
+				buildInst := r.GetInstanceFromNode(n)
+				var err error
+				inst, err = (*cue.Runtime)(r).Build(buildInst)
+				if err != nil {
+					panic("cannot build instance from value")
+				}
+				if c.imports == nil {
+					c.imports = make(map[cue.Value]*cue.Instance)
+				}
+				c.imports[val] = inst
+			}
+			return g.ReferenceFunc(inst, labels)
+		}
 	}
 
 	switch g.Version {
@@ -131,22 +169,19 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		return nil, err
 	}
 	for i.Next() {
-		if !i.IsDefinition() {
+		sel := i.Selector()
+		if !sel.IsDefinition() {
 			continue
 		}
 		// message, enum, or constant.
-		label := i.Label()
-		if c.isInternal(label) {
+		if c.isInternal(sel) {
 			continue
 		}
-		if i.IsDefinition() && strings.HasPrefix(label, "#") {
-			label = label[1:]
-		}
-		ref := c.makeRef(inst, []string{label})
+		ref := c.makeRef(val, cue.MakePath(sel))
 		if ref == "" {
 			continue
 		}
-		c.schemas.Set(ref, c.build(label, i.Value()))
+		c.schemas.Set(ref, c.build(sel, i.Value()))
 	}
 
 	// keep looping until a fixed point is reached.
@@ -163,9 +198,10 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		for _, k := range external {
 			ext := c.externalRefs[k]
 			c.instExt = ext.inst
-			last := len(ext.path) - 1
-			c.path = ext.path[:last]
-			name := ext.path[last]
+			sels := ext.path.Selectors()
+			last := len(sels) - 1
+			c.path = sels[:last]
+			name := sels[last]
 			c.schemas.Set(ext.ref, c.build(name, cue.Dereference(ext.value)))
 		}
 	}
@@ -180,21 +216,21 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 	return (*ast.StructLit)(c.schemas), c.errs
 }
 
-func (c *buildContext) build(name string, v cue.Value) *ast.StructLit {
+func (c *buildContext) build(name cue.Selector, v cue.Value) *ast.StructLit {
 	return newCoreBuilder(c).schema(nil, name, v)
 }
 
 // isInternal reports whether or not to include this type.
-func (c *buildContext) isInternal(name string) bool {
+func (c *buildContext) isInternal(sel cue.Selector) bool {
 	// TODO: allow a regexp filter in Config. If we have closed structs and
 	// definitions, this will likely be unnecessary.
-	return strings.HasSuffix(name, "_value")
+	return strings.HasSuffix(sel.String(), "_value")
 }
 
 func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
 	panic(&openapiError{
 		errors.NewMessage(format, args),
-		b.ctx.path,
+		cue.MakePath(b.ctx.path...),
 		v.Pos(),
 	})
 }
@@ -212,7 +248,7 @@ func (b *builder) checkArgs(a []cue.Value, n int) {
 	}
 }
 
-func (b *builder) schema(core *builder, name string, v cue.Value) *ast.StructLit {
+func (b *builder) schema(core *builder, name cue.Selector, v cue.Value) *ast.StructLit {
 	oldPath := b.ctx.path
 	b.ctx.path = append(b.ctx.path, name)
 	defer func() { b.ctx.path = oldPath }()
@@ -340,9 +376,10 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 		for _, v := range conjuncts {
 			// This may be a reference to an enum. So we need to check references before
 			// dissecting them.
-			switch p, r := v.Reference(); {
-			case len(r) > 0:
-				ref := b.ctx.makeRef(p, r)
+
+			switch v1, path := v.ReferencePath(); {
+			case len(path.Selectors()) > 0:
+				ref := b.ctx.makeRef(v1, path)
 				if ref == "" {
 					v = cue.Dereference(v)
 					break
@@ -352,7 +389,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 				}
 				dedup[ref] = true
 
-				b.addRef(v, p, r)
+				b.addRef(v, v1, path)
 				disallowDefault = true
 				continue
 			}
@@ -754,21 +791,22 @@ func (b *builder) object(v cue.Value) {
 	}
 
 	for i, _ := v.Fields(cue.Optional(true), cue.Definitions(true)); i.Next(); {
-		label := i.Label()
-		if b.ctx.isInternal(label) {
+		sel := i.Selector()
+		if b.ctx.isInternal(sel) {
 			continue
 		}
-		if i.IsDefinition() && strings.HasPrefix(label, "#") {
+		label := sel.String()
+		if sel.IsDefinition() {
 			label = label[1:]
 		}
 		var core *builder
 		if b.core != nil {
 			core = b.core.properties[label]
 		}
-		schema := b.schema(core, label, i.Value())
+		schema := b.schema(core, sel, i.Value())
 		switch {
-		case i.IsDefinition():
-			ref := b.ctx.makeRef(b.ctx.instExt, append(b.ctx.path, label))
+		case sel.IsDefinition():
+			ref := b.ctx.makeRef(b.ctx.instExt, cue.MakePath(append(b.ctx.path, sel)...))
 			if ref == "" {
 				continue
 			}
@@ -784,7 +822,7 @@ func (b *builder) object(v cue.Value) {
 
 	if t, ok := v.Elem(); ok &&
 		(b.core == nil || b.core.items == nil) && b.checkCycle(t) {
-		schema := b.schema(nil, "*", t)
+		schema := b.schema(nil, cue.AnyString, t)
 		if len(schema.Elts) > 0 {
 			b.setSingle("additionalProperties", schema, true) // Not allowed in structural.
 		}
@@ -859,7 +897,7 @@ func (b *builder) array(v cue.Value) {
 	items := []ast.Expr{}
 	count := 0
 	for i, _ := v.List(); i.Next(); count++ {
-		items = append(items, b.schema(nil, strconv.Itoa(count), i.Value()))
+		items = append(items, b.schema(nil, cue.Index(count), i.Value()))
 	}
 	if len(items) > 0 {
 		// TODO: per-item schema are not allowed in OpenAPI, only in JSON Schema.
@@ -889,7 +927,7 @@ func (b *builder) array(v cue.Value) {
 			if b.core != nil {
 				core = b.core.items
 			}
-			t := b.schema(core, "*", typ)
+			t := b.schema(core, cue.AnyString, typ)
 			if len(items) > 0 {
 				b.setFilter("Schema", "additionalItems", t) // Not allowed in structural.
 			} else if !b.isNonCore() || len(t.Elts) > 0 {
@@ -1255,11 +1293,13 @@ func (b *builder) addConjunct(f func(*builder)) {
 	b.add((*ast.StructLit)(c.finish()))
 }
 
-func (b *builder) addRef(v cue.Value, inst *cue.Instance, ref []string) {
+func (b *builder) addRef(v cue.Value, inst cue.Value, ref cue.Path) {
 	name := b.ctx.makeRef(inst, ref)
 	b.addConjunct(func(b *builder) {
 		b.allOf = append(b.allOf, ast.NewStruct(
-			"$ref", ast.NewString(path.Join("#", b.ctx.refPrefix, name))))
+			"$ref",
+			ast.NewString(path.Join("#", b.ctx.refPrefix, name)),
+		))
 	})
 
 	if b.ctx.inst != inst {
@@ -1272,20 +1312,19 @@ func (b *builder) addRef(v cue.Value, inst *cue.Instance, ref []string) {
 	}
 }
 
-func (b *buildContext) makeRef(inst *cue.Instance, ref []string) string {
-	ref = append([]string{}, ref...)
-	for i, s := range ref {
-		if strings.HasPrefix(s, "#") {
-			ref[i] = s[1:]
-		}
-	}
-	a := make([]string, 0, len(ref)+3)
+func (b *buildContext) makeRef(inst cue.Value, ref cue.Path) string {
 	if b.nameFunc != nil {
-		a = append(a, b.nameFunc(inst, ref))
-	} else {
-		a = append(a, ref...)
+		return b.nameFunc(inst, ref)
 	}
-	return strings.Join(a, ".")
+	var buf strings.Builder
+	for i, sel := range ref.Selectors() {
+		if i > 0 {
+			buf.WriteByte('.')
+		}
+		// TODO what should this do when it's not a valid identifier?
+		buf.WriteString(selectorLabel(sel))
+	}
+	return buf.String()
 }
 
 func (b *builder) int64(v cue.Value) int64 {
@@ -1320,4 +1359,12 @@ func (b *builder) decode(v cue.Value) ast.Expr {
 func (b *builder) big(v cue.Value) ast.Expr {
 	v, _ = v.Default()
 	return v.Syntax(cue.Final()).(ast.Expr)
+}
+
+func selectorLabel(sel cue.Selector) string {
+	label := sel.String()
+	if sel.IsDefinition() {
+		return label[1:]
+	}
+	return label
 }

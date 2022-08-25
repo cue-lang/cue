@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b7c7b68_587cca9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T08:51:08Z",
+      "side": 1,
+      "message": "LGTM with one minor thought, thanks.",
+      "revId": "05d63e2130c82683aa001e2bdeb0ef38b7b9a80c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1943fb5_70c9a901",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T08:51:08Z",
+      "side": 1,
+      "message": "It would be nice to have doc comments on these exported methods, even if technically it is all internal. For example, it wasn\u0027t immediately clear to me what \"OneOf\" signifies here - it sounded initially like a protobuf oneof but I suspect it probably means \"is in one of the types in the SpanType mask\". If the latter is the case, wouldn\u0027t \"IsOneOf\" be a better name?",
+      "revId": "05d63e2130c82683aa001e2bdeb0ef38b7b9a80c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

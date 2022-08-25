@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b0bb922_87f461d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-25T11:36:31Z",
+      "side": 1,
+      "message": "LGTM - but I don\u0027t think we want/need to update the k8s tutorial files so they can be kept as-is. \n\nWill leave to Marcel to +2.",
+      "revId": "5ad1ae6f1450d716b7ec124d354739b745b6712c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

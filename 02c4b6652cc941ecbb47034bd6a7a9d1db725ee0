@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ceb4474_e080a40d",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-25T18:09:28Z",
+      "side": 1,
+      "message": "I would call it SelHidden. We call it like this everywhere else and to me String is very different from Hidden / Definition (only String is output in export).",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "213606da_c2a45f5a",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-25T18:09:28Z",
+      "side": 1,
+      "message": "A hidden field is not a regular field. If anything, regular is String + Index.",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a988d8fa_95dad9c5",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-25T18:09:28Z",
+      "side": 1,
+      "message": "This is wrong. IsString signifies a string \"data\" label, which SelHiddenString is not.",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cdb3c06_83c14cf1",
+        "filename": "cue/path_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-25T18:09:28Z",
+      "side": 1,
+      "message": "should be false",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

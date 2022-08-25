@@ -78,9 +78,7 @@ func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
 
 // parseTag parses a CUE expression from a cue tag.
 func parseTag(ctx *adt.OpContext, obj *ast.StructLit, field, tag string) ast.Expr {
-	if p := strings.Index(tag, ","); p >= 0 {
-		tag = tag[:p]
-	}
+	tag, _ = splitTag(tag)
 	if tag == "" {
 		return topSentinel
 	}
@@ -94,6 +92,15 @@ func parseTag(ctx *adt.OpContext, obj *ast.StructLit, field, tag string) ast.Exp
 	return expr
 }
 
+// splitTag splits a cue tag into cue and options.
+func splitTag(tag string) (cue string, options string) {
+	q := strings.LastIndexByte(tag, '"')
+	if c := strings.IndexByte(tag[q+1:], ','); c >= 0 {
+		return tag[:q+1+c], tag[q+1+c+1:]
+	}
+	return tag, ""
+}
+
 // TODO: should we allow mapping names in cue tags? This only seems like a good
 // idea if we ever want to allow mapping CUE to a different name than JSON.
 var tagsWithNames = []string{"json", "yaml", "protobuf"}
@@ -105,7 +112,7 @@ func getName(f *reflect.StructField) string {
 	}
 	for _, s := range tagsWithNames {
 		if tag, ok := f.Tag.Lookup(s); ok {
-			if p := strings.Index(tag, ","); p >= 0 {
+			if p := strings.IndexByte(tag, ','); p >= 0 {
 				tag = tag[:p]
 			}
 			if tag != "" {
@@ -129,8 +136,9 @@ func isOptional(f *reflect.StructField) bool {
 	}
 	if tag, ok := f.Tag.Lookup("cue"); ok {
 		// TODO: only if first field is not empty.
+		_, opt := splitTag(tag)
 		isOptional = false
-		for _, f := range strings.Split(tag, ",")[1:] {
+		for _, f := range strings.Split(opt, ",") {
 			switch f {
 			case "opt":
 				isOptional = true

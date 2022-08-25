@@ -369,6 +369,20 @@ func TestConvertType(t *testing.T) {
 	}, {
 		time.Now, // a function
 		"_|_(unsupported Go type (func() time.Time))",
+	}, {
+		struct {
+			Foobar string `cue:"\"foo,bar\",opt"`
+		}{},
+		`{
+  Foobar?: (string & "foo,bar")
+}`,
+	}, {
+		struct {
+			Foobar string `cue:"\"foo,opt,bar\""`
+		}{},
+		`{
+  Foobar: (string & "foo,opt,bar")
+}`,
 	}}
 
 	r := runtime.New()

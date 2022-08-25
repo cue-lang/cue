@@ -52,6 +52,24 @@
       "parentUuid": "9b045382_60966614",
       "revId": "59a66b65439c193a223852505a29a5e2f7e0c4d8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6918126e_b0d77d4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-25T17:01:12Z",
+      "side": 1,
+      "message": "Sorry, my question was poorly worded. \n\nUnity is currently breaking on vector.dev for this CL which is semi to be expected. However to be sure this CL is not having any semantic impact, we should check to confirm there is no diff between CUE_DEBUG_SORT_ARCS\u003d2 with tip and this CL for vector. Is that diff zero? If so, we are good.\n\nOnce this CL is submitted, as you say, we then run unity with --update flag (but not CUE_DEBUG_SORT_ARCS\u003d2) to baseline the new \"golden\".",
+      "parentUuid": "228ad342_7330075d",
+      "revId": "59a66b65439c193a223852505a29a5e2f7e0c4d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

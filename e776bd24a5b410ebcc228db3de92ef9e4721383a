@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e5a9929b_864433ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T08:45:46Z",
+      "side": 1,
+      "message": "LGTM module one typo and one minor question, thanks!",
+      "revId": "e776bd24a5b410ebcc228db3de92ef9e4721383a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94d484f9_42d546ac",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T08:45:46Z",
+      "side": 1,
+      "message": "iterate",
+      "revId": "e776bd24a5b410ebcc228db3de92ef9e4721383a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65a215bd_77cb4f2a",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T08:45:46Z",
+      "side": 1,
+      "message": "You say \"for instance\", but is there actually any other circumstance in which a Vertex is recursively closed?",
+      "revId": "e776bd24a5b410ebcc228db3de92ef9e4721383a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

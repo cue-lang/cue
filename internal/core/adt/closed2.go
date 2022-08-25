@@ -36,6 +36,7 @@ func verifyArc2(ctx *OpContext, f Feature, v *Vertex, isClosed bool) (found bool
 	if v.Label == InvalidLabel {
 		return true, nil
 	}
+	ctx.Logf(v, "   FEAT %v", f)
 
 	// TODO(perf): collect positions in error.
 	defer ctx.ReleasePositions(ctx.MarkPositions())

@@ -55,12 +55,7 @@ er3.min: conflicting values 1 and 5:
     ./in.cue:28:8
     ./in.cue:43:6
     ./in.cue:44:7
-es3.max: 3 errors in empty disjunction:
-es3.max: conflicting values 1 and 5:
-    ./in.cue:4:16
-    ./in.cue:5:15
-    ./in.cue:20:6
-    ./in.cue:22:7
+es3.max: 2 errors in empty disjunction:
 es3.max: conflicting values 10 and 5:
     ./in.cue:5:15
     ./in.cue:20:6
@@ -106,12 +101,7 @@ Result:
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
     min: (int){ 10 }
     max: (_|_){
-      // [eval] es3.max: 3 errors in empty disjunction:
-      // es3.max: conflicting values 1 and 5:
-      //     ./in.cue:4:16
-      //     ./in.cue:5:15
-      //     ./in.cue:20:6
-      //     ./in.cue:22:7
+      // [eval] es3.max: 2 errors in empty disjunction:
       // es3.max: conflicting values 10 and 5:
       //     ./in.cue:5:15
       //     ./in.cue:20:6

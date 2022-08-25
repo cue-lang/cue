@@ -49,6 +49,7 @@ type StructLit struct {
 	HasEmbed    bool
 	IsOpen      bool // has a ...
 	initialized bool
+	HasRef      bool
 
 	types OptionalType
 
@@ -75,6 +76,7 @@ func (x *StructLit) Source() ast.Node { return x.Src }
 func (x *StructLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{
+		// referencedByChilled: true,
 		Parent:    e.Vertex,
 		Conjuncts: []Conjunct{{e, x, CloseInfo{}}},
 	}
@@ -282,6 +284,8 @@ type ListLit struct {
 	Elems []Elem
 
 	info *StructLit // Shared closedness info.
+
+	HasRef bool
 }
 
 func (x *ListLit) Source() ast.Node {
@@ -294,8 +298,9 @@ func (x *ListLit) Source() ast.Node {
 func (x *ListLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{
-		Parent:    e.Vertex,
-		Conjuncts: []Conjunct{{e, x, CloseInfo{}}},
+		referencedByChild: true,
+		Parent:            e.Vertex,
+		Conjuncts:         []Conjunct{{e, x, CloseInfo{}}},
 	}
 	// TODO: should be AllArcs and then use Finalize for builtins?
 	c.Unify(v, Finalized) // TODO: also partial okay?
@@ -711,6 +716,7 @@ func (x *FieldReference) Source() ast.Node {
 
 func (x *FieldReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 	n := c.relNode(x.UpCount)
+	n.referencedByChild = true
 	pos := pos(x)
 	return c.lookup(n, pos, x.Label, state)
 }
@@ -738,6 +744,7 @@ func (x *ValueReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 		return c.vertex
 	}
 	n := c.relNode(x.UpCount - 1)
+	n.referencedByChild = true
 	return n
 }
 
@@ -815,7 +822,9 @@ func (x *DynamicReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	v := ctx.value(x.Label)
 	ctx.PopState(frame)
 	f := ctx.Label(x.Label, v)
-	return ctx.lookup(e.Vertex, pos(x), f, state)
+	n := ctx.lookup(e.Vertex, pos(x), f, state)
+	n.referencedByChild = true
+	return n
 }
 
 // An ImportReference refers to an imported package.
@@ -874,9 +883,10 @@ func (x *LetReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 	}
 	// Anonymous arc.
 	return &Vertex{
-		Parent:    e.Vertex,
-		Label:     label,
-		Conjuncts: []Conjunct{{e, x.X, CloseInfo{}}},
+		Parent:            e.Vertex,
+		Label:             label,
+		referencedByChild: true,
+		Conjuncts:         []Conjunct{{e, x.X, CloseInfo{}}},
 	}
 }
 
@@ -1699,20 +1709,25 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 		c.Unify(a, Partial)
 
 		n := &Vertex{
-			Parent: c.Env(0).Vertex,
-			status: Finalized,
+			referencedByChild: true,
+			Parent:            c.Env(0).Vertex,
+			status:            Finalized,
 		}
 
 		if x.Value != InvalidLabel {
 			b := &Vertex{
-				Label:     x.Value,
-				BaseValue: a,
+				referencedByChild: true,
+				Label:             x.Value,
+				BaseValue:         a,
 			}
 			n.Arcs = append(n.Arcs, b)
 		}
 
 		if x.Key != InvalidLabel {
-			v := &Vertex{Label: x.Key}
+			v := &Vertex{
+				referencedByChild: true,
+				Label:             x.Key,
+			}
 			key := a.Label.ToValue(c)
 			v.AddConjunct(MakeRootConjunct(c.Env(0), key))
 			v.SetValue(c, Finalized, key)
@@ -1774,7 +1789,10 @@ func (x *LetClause) Source() ast.Node {
 
 func (x *LetClause) yield(c *OpContext, f YieldFunc) {
 	n := &Vertex{Arcs: []*Vertex{
-		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, CloseInfo{}}}},
+		{
+			referencedByChild: true,
+
+			Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, CloseInfo{}}}},
 	}}
 
 	sub := c.spawn(n)

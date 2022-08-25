@@ -83,12 +83,10 @@ o3: o1 & {
 Errors:
 o3.a: 2 errors in empty disjunction:
 o3.a: conflicting values "bar" and "foo":
-    ./in.cue:15:12
     ./in.cue:17:5
     ./in.cue:20:5
     ./in.cue:20:14
 o3.a: conflicting values "baz" and "foo":
-    ./in.cue:15:9
     ./in.cue:20:5
     ./in.cue:20:14
     ./in.cue:20:24
@@ -152,12 +150,10 @@ Result:
     a: (_|_){
       // [eval] o3.a: 2 errors in empty disjunction:
       // o3.a: conflicting values "bar" and "foo":
-      //     ./in.cue:15:12
       //     ./in.cue:17:5
       //     ./in.cue:20:5
       //     ./in.cue:20:14
       // o3.a: conflicting values "baz" and "foo":
-      //     ./in.cue:15:9
       //     ./in.cue:20:5
       //     ./in.cue:20:14
       //     ./in.cue:20:24

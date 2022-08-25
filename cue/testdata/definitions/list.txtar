@@ -11,7 +11,7 @@ c: #R & {
     w: (#list){
       0: (#struct){
       }
-      1: (struct){
+      1: (#struct){
         b: (int){ int }
       }
     }

@@ -163,6 +163,8 @@ type Vertex struct {
 	// conjuncts, or ancestor conjuncts, is a definition.
 	Closed bool
 
+	referencedByChild bool
+
 	// arcType indicates the level of optionality of this arc.
 	arcType arcType
 
@@ -468,6 +470,8 @@ func ToVertex(v Value) *Vertex {
 		return x
 	default:
 		n := &Vertex{
+			// referencedByChilled: true,
+
 			status:    Finalized,
 			BaseValue: x,
 		}
@@ -733,6 +737,9 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 		if *t == info { // TODO: check for different identity.
 			return t
 		}
+	}
+	if s.HasRef {
+		v.referencedByChild = true
 	}
 	t := &info
 	v.Structs = append(v.Structs, t)

@@ -86,6 +86,9 @@ var needFix = map[string]string{
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
 	in := `
+	a: {
+		b: X={ c: X }
+	}
 	`
 
 	if strings.TrimSpace(in) == "" {

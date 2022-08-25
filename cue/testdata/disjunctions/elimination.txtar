@@ -192,6 +192,12 @@ noChildError: issue1608: {
 	#subtype: string | {foo: string} | {bar: #subtype}
 }
 
+noChildError: issue1882: v1: {
+	#Output: output?: #Output
+	#Output: #Output
+	o: #Output
+}
+
 noChildError: t1: {
 	#D: {b: string} | {c: #D }
 	o: #D & {b: "test"}
@@ -560,6 +566,14 @@ noChildError: t4: {
       #subtype: ((string|struct)){ |((string){ string }, (#struct){
           foo: (string){ string }
         }) }
+    }
+    issue1882: (struct){
+      v1: (struct){
+        #Output: (#struct){
+        }
+        o: (#struct){
+        }
+      }
     }
     t1: (struct){
       #D: (#struct){
@@ -1173,6 +1187,17 @@ noChildError: t4: {
       }|{
         bar: 〈1;#subtype〉
       })
+    }
+  }
+  noChildError: {
+    issue1882: {
+      v1: {
+        #Output: {
+          output?: 〈1;#Output〉
+        }
+        #Output: 〈0;#Output〉
+        o: 〈0;#Output〉
+      }
     }
   }
   noChildError: {

@@ -144,6 +144,7 @@ type frame struct {
 	field *ast.Field
 	// scope   map[ast.Node]bool
 	upCount int32 // 1 for field, 0 for embedding.
+	hasRef  bool
 
 	aliases map[string]aliasEntry
 }
@@ -192,6 +193,7 @@ func (c *compiler) updateAlias(id *ast.Ident, expr adt.Expr) {
 // lookupAlias looks up an alias with the given name at the k'th stack position.
 func (c *compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 	m := c.stack[k].aliases
+	c.stack[k].hasRef = true
 	name := id.Name
 	entry, ok := m[name]
 
@@ -229,7 +231,7 @@ func (c *compiler) pushScope(n labeler, upCount int32, id ast.Node) *frame {
 	return &c.stack[len(c.stack)-1]
 }
 
-func (c *compiler) popScope() {
+func (c *compiler) popScope() frame {
 	k := len(c.stack) - 1
 	f := c.stack[k]
 	for k, v := range f.aliases {
@@ -238,6 +240,7 @@ func (c *compiler) popScope() {
 		}
 	}
 	c.stack = c.stack[:k]
+	return f
 }
 
 func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
@@ -329,6 +332,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 	// Unresolved field.
 	if n.Node == nil {
+		// TODO: mark top structlit as "dirty"
 		upCount := int32(0)
 		for _, c := range c.stack {
 			upCount += c.upCount
@@ -385,6 +389,8 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			upCount += c.stack[k].upCount
 		}
 
+		c.stack[k].hasRef = true
+
 		label := &adt.LabelReference{
 			Src:     n,
 			UpCount: upCount,
@@ -433,6 +439,8 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		// Should have been handled above.
 		return c.errf(n, "unresolved identifier %v", n.Name)
 	}
+
+	c.stack[k].hasRef = true
 
 	switch f := n.Node.(type) {
 	// Local expressions
@@ -796,6 +804,8 @@ func (c *compiler) labeledExprAt(k int, f *ast.Field, lab labeler, expr ast.Expr
 
 	value := c.expr(expr)
 
+	saved.hasRef = saved.hasRef || c.stack[k].hasRef
+
 	c.stack[k] = saved
 	return value
 }
@@ -811,7 +821,8 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		c.pushScope(nil, 1, n)
 		v := &adt.StructLit{Src: n}
 		c.addDecls(v, n.Elts)
-		c.popScope()
+		f := c.popScope()
+		v.HasRef = f.hasRef
 		return v
 
 	case *ast.ListLit:
@@ -836,7 +847,8 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			}
 			v.Elems = append(v.Elems, d)
 		}
-		c.popScope()
+		f := c.popScope()
+		v.HasRef = f.hasRef
 		return v
 
 	case *ast.SelectorExpr:

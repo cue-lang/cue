@@ -639,9 +639,7 @@ Errors:
 embed.fail1.p: field not allowed:
     ./in.cue:37:9
     ./in.cue:38:7
-    ./in.cue:45:3
     ./in.cue:45:12
-    ./in.cue:46:4
     ./in.cue:49:9
 embed.fail4.p: field not allowed:
     ./in.cue:69:9
@@ -718,9 +716,7 @@ Result:
         // [eval] embed.fail1.p: field not allowed:
         //     ./in.cue:37:9
         //     ./in.cue:38:7
-        //     ./in.cue:45:3
         //     ./in.cue:45:12
-        //     ./in.cue:46:4
         //     ./in.cue:49:9
       }
     }

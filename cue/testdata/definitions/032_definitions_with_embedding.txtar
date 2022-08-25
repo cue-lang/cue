@@ -83,7 +83,6 @@
 Errors:
 #e1.a.d: field not allowed:
     ./in.cue:2:5
-    ./in.cue:6:2
     ./in.cue:7:5
     ./in.cue:12:6
     ./in.cue:12:15
@@ -112,7 +111,6 @@ Result:
       d: (_|_){
         // [eval] #e1.a.d: field not allowed:
         //     ./in.cue:2:5
-        //     ./in.cue:6:2
         //     ./in.cue:7:5
         //     ./in.cue:12:6
         //     ./in.cue:12:15

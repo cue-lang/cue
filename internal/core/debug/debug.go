@@ -245,6 +245,9 @@ func (w *printer) node(n adt.Node) {
 			w.string("{}")
 			break
 		}
+		// if x.HasRef {
+		// 	w.string("%")
+		// }
 		w.string("{")
 		w.indent += "  "
 		for _, d := range x.Decls {

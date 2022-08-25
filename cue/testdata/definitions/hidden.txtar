@@ -49,10 +49,10 @@ Result:
     _val(mod.test/pkg): (#struct){
       f: (int){ 3 }
     }
-    _name(:foo): (struct){
+    _name(:foo): (#struct){
       d: (int){ int }
     }
-    _val(:foo): (struct){
+    _val(:foo): (#struct){
       f: (int){ 4 }
     }
   }
@@ -71,7 +71,7 @@ Result:
         //     ./in.cue:16:9
       }
     }
-    _val(:foo): (struct){
+    _val(:foo): (#struct){
       g: (int){ int }
     }
   }
@@ -79,11 +79,11 @@ Result:
     _val(mod.test/pkg): (#struct){
       f: (int){ 3 }
     }
-    _val(:foo): (struct){
+    _val(:foo): (#struct){
       f: (int){ 4 }
     }
   }
-  g: (struct){
+  g: (#struct){
     f: (int){ 4 }
   }
 }

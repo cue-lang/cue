@@ -1496,6 +1496,8 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	// this is probably the best way to guarantee that conjunctions are
 	// linear in this case.
 
+	n.Logf("  XXXXX %v %v", c.Expr(), arc.Parent == n.node)
+
 	ckey := closeInfo
 	ckey.Refs = nil
 	ckey.Inline = false
@@ -1540,7 +1542,6 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		n.ctx.Unify(arc, Partial)
 	}
 
-	// Don't add conjuncts if a node is referring to itself.
 	if n.node == arc {
 		return
 	}
@@ -1554,6 +1555,101 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	x := c.Expr()
 	if !inline || arc.IsClosedStruct() || arc.IsClosedList() {
 		closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
+	}
+
+	switch {
+	// Don't add conjuncts if a node is referring to itself.
+	case !closeInfo.IsClosed && arc.status == Finalized && !arc.referencedByChild && !arc.IsList() &&
+		true:
+		// break
+		// !IsDef(x):
+		// for _, s := range arc.Structs {
+		// 	if s.IsClosed {
+		// 		break outer
+		// 	}
+		// }
+
+		// break
+
+		// n.node.Structs = append(n.node.Structs, arc.Structs...)
+		switch v := arc.BaseValue.(type) {
+		case *Disjunction:
+		case *Bottom:
+		case Value:
+			n.addValueConjunct(c.Env, v, closeInfo)
+
+			for _, a := range arc.Arcs {
+				arc, _ := n.node.GetArc(n.ctx, a.Label, a.arcType)
+				for _, c := range a.Conjuncts {
+					ci := closeInfo
+					// if !IsDef(x) {
+					ci = ci.SpawnSpan(x, c.CloseInfo.span())
+					// }
+					// ci.IsClosed = c.CloseInfo.IsClosed
+					c.CloseInfo = ci
+					arc.addConjunct(c)
+				}
+			}
+			if arc.IsRecursivelyClosed() {
+				n.node.Closed = true
+			}
+			return
+
+		case *StructMarker:
+			n.updateCyclicStatus(closeInfo)
+			if arc.IsRecursivelyClosed() {
+				n.node.Closed = true
+			}
+
+			for _, s := range arc.Structs {
+				ci := closeInfo
+				// if !IsDef(x) {
+				ci = ci.SpawnSpan(x, s.CloseInfo.span())
+				// }
+				// if s.CloseInfo.closeInfo != nil && s.CloseInfo.mode == closeDef {
+				// 	// ci.closeInfo.mode = closeDef
+				// 	// n.node.Closed = true
+				// }
+				// ci := s.CloseInfo
+				if s.HasEmbed && !s.IsFile() {
+					ci = ci.SpawnGroup(nil)
+				}
+				// ci.CycleInfo = closeInfo.CycleInfo
+				ci.IsClosed = ci.IsClosed || s.IsClosed
+				n.node.AddStruct(s.StructLit, s.Env, ci)
+			}
+
+			for _, a := range arc.Arcs {
+				arc, _ := n.node.GetArc(n.ctx, a.Label, a.arcType)
+				for _, c := range a.Conjuncts {
+					ci := closeInfo
+					// if c.CloseInfo.closeInfo != nil && c.CloseInfo.mode == closeDef && c.span {
+					// 	ci.closeInfo.mode = closeDef
+					// 	// n.node.Closed = true
+					// }
+					// ci.IsClosed = c.CloseInfo.IsClosed
+					// ci.IsClosed = ci.IsClosed || v.NeedClose
+
+					c.CloseInfo = ci
+					arc.addConjunct(c)
+					if a.IsRecursivelyClosed() {
+						arc.Closed = true
+					}
+				}
+			}
+			n.aStruct = arc
+			n.aStructID = closeInfo
+			// if arc.Closed {
+			// 	n.node.Closed = true
+			// }
+			return
+
+		default:
+		}
+		fallthrough
+
+	default:
+
 	}
 
 	for _, c := range arc.Conjuncts {
@@ -2068,6 +2164,10 @@ outer:
 		l := n.lists[i]
 
 		n.updateCyclicStatus(l.id)
+
+		if l.list.HasRef {
+			n.node.referencedByChild = true
+		}
 
 		index := int64(0)
 		hasComprehension := false

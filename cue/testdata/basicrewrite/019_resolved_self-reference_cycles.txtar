@@ -95,14 +95,14 @@ s3:
     1: (int){ 100 }
   }
   s1: (struct){
-    c: (int){ 3 }
     b: (int){ 2 }
     a: (int){ 1 }
+    c: (int){ 3 }
   }
   s2: (struct){
+    b: (int){ 2 }
     a: (int){ 1 }
     c: (int){ 3 }
-    b: (int){ 2 }
   }
   s3: (struct){
     b: (int){ 2 }

@@ -64,12 +64,12 @@
 #ServiceManifest: #Manifest & {ref: kind: "service"}
 -- out/eval --
 Errors:
-_params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+_params.hsize.$_instances: conflicting values 1 and {$_instances:*1 | >=0} (mismatched types int and struct):
     ./in.cue:29:20
     ./in.cue:35:13
     ./in.cue:54:12
     ./in.cue:55:22
-_params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+_params.hsize.$_instances: conflicting values >=0 and {$_instances:*1 | >=0} (mismatched types number and struct):
     ./in.cue:29:20
     ./in.cue:35:13
     ./in.cue:54:12
@@ -155,12 +155,12 @@ Result:
       description: (_|_){
         // [eval]
         service: (_|_){
-          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:*1 | >=0} (mismatched types int and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
           //     ./in.cue:54:12
           //     ./in.cue:55:22
-          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:*1 | >=0} (mismatched types number and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
           //     ./in.cue:54:12
@@ -182,12 +182,12 @@ Result:
       description: (_|_){
         // [eval]
         role: (_|_){
-          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:*1 | >=0} (mismatched types int and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
           //     ./in.cue:54:12
           //     ./in.cue:55:22
-          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:*1 | >=0} (mismatched types number and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
           //     ./in.cue:54:12

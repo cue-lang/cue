@@ -1694,26 +1694,23 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 		expr = convert.GoValueToValue(ctx, x, true)
 	}
 	for i := len(p.path) - 1; i >= 0; i-- {
-		switch sel := p.path[i].sel; {
-		case sel == AnyString.sel:
-			expr = &adt.StructLit{Decls: []adt.Decl{
-				&adt.BulkOptionalField{
-					Filter: &adt.BasicType{K: adt.StringKind},
-					Value:  expr,
-				},
-			}}
+		switch sel := p.path[i]; sel.Type() {
+		case SelPattern:
+			if sel.sel == AnyString.sel {
+				expr = &adt.StructLit{Decls: []adt.Decl{
+					&adt.BulkOptionalField{
+						Filter: &adt.BasicType{K: adt.StringKind},
+						Value:  expr,
+					},
+				}}
+			} else {
+				expr = &adt.ListLit{Elems: []adt.Elem{
+					&adt.Ellipsis{Value: expr},
+				}}
+			}
 
-		case sel == anyIndex.sel:
-			expr = &adt.ListLit{Elems: []adt.Elem{
-				&adt.Ellipsis{Value: expr},
-			}}
-
-		case sel == anyDefinition.sel:
-			expr = &adt.Bottom{Err: errors.Newf(token.NoPos,
-				"AnyDefinition not supported")}
-
-		case sel.kind() == adt.IntLabel:
-			i := sel.feature(ctx.Runtime).Index()
+		case SelIndex:
+			i := sel.Index()
 			list := &adt.ListLit{}
 			any := &adt.Top{}
 			// TODO(perf): make this a constant thing. This will be possible with the query extension.
@@ -1725,14 +1722,14 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 
 		default:
 			var d adt.Decl
-			if sel.optional() {
+			if sel.IsOptional() {
 				d = &adt.OptionalField{
-					Label: sel.feature(v.idx),
+					Label: sel.sel.feature(v.idx),
 					Value: expr,
 				}
 			} else {
 				d = &adt.Field{
-					Label: sel.feature(v.idx),
+					Label: sel.sel.feature(v.idx),
 					Value: expr,
 				}
 			}

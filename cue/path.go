@@ -29,6 +29,59 @@ import (
 	"github.com/cockroachdb/apd/v2"
 )
 
+// SelectorType represents the kind of a selector.
+type SelectorType byte
+
+const (
+	SelInvalid SelectorType = iota
+	// SelString represents a regular (non definition) field.
+	SelString
+	// SelHiddenString represents a hidden regular field.
+	SelHiddenString
+	// SelDefinition represents a definition.
+	SelDefinition
+	// SelHiddenDefinition represents a hidden definition.
+	SelHiddenDefinition
+	// SelIndex represents a numeric index into an array.
+	SelIndex
+	// SelPattern represents a selector of fields in a struct
+	// or array that match a constraint.
+	SelPattern
+)
+
+var selectorTypeStrings = [...]string{
+	SelInvalid:          "SelInvalid",
+	SelString:           "SelString",
+	SelHiddenString:     "SelHiddenString",
+	SelDefinition:       "SelDefinition",
+	SelHiddenDefinition: "SelHiddenDefinition",
+	SelIndex:            "SelIndex",
+	SelPattern:          "SelPattern",
+}
+
+func (t SelectorType) String() string {
+	if int(t) >= len(selectorTypeStrings) {
+		return fmt.Sprintf("SelInvalid%d", t)
+	}
+	return selectorTypeStrings[t]
+}
+
+// IsHidden reports whether t describes a hidden field.
+func (t SelectorType) IsHidden() bool {
+	return t == SelHiddenString || t == SelHiddenDefinition
+}
+
+// IsString reports whether t describes a regular field, hidden
+// or not.
+func (t SelectorType) IsString() bool {
+	return t == SelString || t == SelHiddenString
+}
+
+// IsDefinition reports whether t describes a definition.
+func (t SelectorType) IsDefinition() bool {
+	return t == SelHiddenDefinition || t == SelDefinition
+}
+
 // A Selector is a component of a path.
 type Selector struct {
 	sel selector
@@ -39,21 +92,57 @@ func (sel Selector) String() string {
 	return sel.sel.String()
 }
 
-// IsString reports whether sel is a regular label type.
-func (sel Selector) IsString() bool {
-	return sel.sel.kind() == adt.StringLabel
+// Unquoted returns the unquoted value of a regular string label.
+// It panics unless sel.Type is SelString.
+func (sel Selector) Unquoted() string {
+	if sel.Type() != SelString {
+		panic("Selector.Unquoted invoked on non-string label")
+	}
+	switch s := sel.sel.(type) {
+	case stringSelector:
+		return string(s)
+	case optionalSelector:
+		return string(s.selector.(stringSelector))
+	}
+	panic("unreachable")
+}
+
+// IsOptional reports whether s is an optional field or definition.
+func (sel Selector) IsOptional() bool {
+	_, ok := sel.sel.(optionalSelector)
+	return ok
 }
 
 // IsDefinition reports whether sel is a non-hidden definition label type.
 func (sel Selector) IsDefinition() bool {
-	return sel.sel.kind() == adt.DefinitionLabel
+	return sel.Type().IsDefinition()
+}
+
+// IsString reports whether sel is a regular label type.
+func (sel Selector) IsString() bool {
+	return sel.Type().IsString()
+}
+
+// Type returns the type of the selector.
+func (sel Selector) Type() SelectorType {
+	return sel.sel.kind()
 }
 
 // PkgPath reports the package path associated with a hidden label or "" if
 // this is not a hidden label.
 func (sel Selector) PkgPath() string {
-	h, _ := sel.sel.(scopedSelector)
-	return h.pkg
+	s, _ := sel.sel.(scopedSelector)
+	return s.pkg
+}
+
+// Index returns the index of the selector. It panics
+// unless sel.Type is SelIndex.
+func (sel Selector) Index() int {
+	s, ok := sel.sel.(indexSelector)
+	if !ok {
+		panic("Index called on non-index selector")
+	}
+	return adt.Feature(s).Index()
 }
 
 var (
@@ -63,7 +152,6 @@ var (
 	// In paths it is used to select constraints that apply to all elements.
 	// AnyDefinition = anyDefinition
 	anyDefinition = Selector{sel: anySelector(adt.AnyDefinition)}
-
 	// AnyIndex can be used to ask for any index.
 	//
 	// In paths it is used to select constraints that apply to all elements.
@@ -78,6 +166,7 @@ var (
 )
 
 // Optional converts sel into an optional equivalent.
+// It's a no-op if the selector is already optional.
 //
 //	foo -> foo?
 func (sel Selector) Optional() Selector {
@@ -88,7 +177,7 @@ type selector interface {
 	String() string
 
 	feature(ctx adt.Runtime) adt.Feature
-	kind() adt.FeatureType
+	kind() SelectorType
 	optional() bool
 }
 
@@ -129,7 +218,7 @@ func ParsePath(s string) Path {
 
 	p := Path{path: toSelectors(expr)}
 	for _, sel := range p.path {
-		if sel.sel.kind().IsHidden() {
+		if sel.Type().IsHidden() {
 			return MakePath(Selector{pathError{errors.Newf(token.NoPos,
 				"invalid path: hidden fields not allowed in path %s", s)}})
 		}
@@ -151,10 +240,9 @@ func (p Path) String() string {
 	b := &strings.Builder{}
 	for i, sel := range p.path {
 		x := sel.sel
-		// TODO: use '.' in all cases, once supported.
-		_, isAny := x.(anySelector)
 		switch {
-		case x.kind() == adt.IntLabel && !isAny:
+		case x.kind() == SelIndex:
+			// TODO: use '.' in all cases, once supported.
 			b.WriteByte('[')
 			b.WriteString(x.String())
 			b.WriteByte(']')
@@ -330,17 +418,11 @@ func (s scopedSelector) String() string {
 }
 func (scopedSelector) optional() bool { return false }
 
-func (s scopedSelector) kind() adt.FeatureType {
-	switch {
-	case strings.HasPrefix(s.name, "#"):
-		return adt.DefinitionLabel
-	case strings.HasPrefix(s.name, "_#"):
-		return adt.HiddenDefinitionLabel
-	case strings.HasPrefix(s.name, "_"):
-		return adt.HiddenLabel
-	default:
-		return adt.StringLabel
+func (s scopedSelector) kind() SelectorType {
+	if strings.HasPrefix(s.name, "_#") {
+		return SelHiddenDefinition
 	}
+	return SelHiddenString
 }
 
 func (s scopedSelector) feature(r adt.Runtime) adt.Feature {
@@ -369,8 +451,8 @@ func (d definitionSelector) String() string {
 
 func (d definitionSelector) optional() bool { return false }
 
-func (d definitionSelector) kind() adt.FeatureType {
-	return adt.DefinitionLabel
+func (d definitionSelector) kind() SelectorType {
+	return SelDefinition
 }
 
 func (d definitionSelector) feature(r adt.Runtime) adt.Feature {
@@ -392,8 +474,8 @@ func (s stringSelector) String() string {
 	return str
 }
 
-func (s stringSelector) optional() bool        { return false }
-func (s stringSelector) kind() adt.FeatureType { return adt.StringLabel }
+func (s stringSelector) optional() bool     { return false }
+func (s stringSelector) kind() SelectorType { return SelString }
 
 func (s stringSelector) feature(r adt.Runtime) adt.Feature {
 	return adt.MakeStringLabel(r, string(s))
@@ -414,8 +496,8 @@ func (s indexSelector) String() string {
 	return strconv.Itoa(adt.Feature(s).Index())
 }
 
-func (s indexSelector) kind() adt.FeatureType { return adt.IntLabel }
-func (s indexSelector) optional() bool        { return false }
+func (s indexSelector) kind() SelectorType { return SelIndex }
+func (s indexSelector) optional() bool     { return false }
 
 func (s indexSelector) feature(r adt.Runtime) adt.Feature {
 	return adt.Feature(s)
@@ -424,9 +506,9 @@ func (s indexSelector) feature(r adt.Runtime) adt.Feature {
 // an anySelector represents a wildcard option of a particular type.
 type anySelector adt.Feature
 
-func (s anySelector) String() string        { return "[_]" }
-func (s anySelector) optional() bool        { return true }
-func (s anySelector) kind() adt.FeatureType { return adt.Feature(s).Typ() }
+func (s anySelector) String() string     { return "[_]" }
+func (s anySelector) optional() bool     { return true }
+func (s anySelector) kind() SelectorType { return SelPattern }
 
 func (s anySelector) feature(r adt.Runtime) adt.Feature {
 	return adt.Feature(s)
@@ -481,9 +563,9 @@ type pathError struct {
 	errors.Error
 }
 
-func (p pathError) String() string        { return "" }
-func (p pathError) optional() bool        { return false }
-func (p pathError) kind() adt.FeatureType { return 0 }
+func (p pathError) String() string     { return "" }
+func (p pathError) optional() bool     { return false }
+func (p pathError) kind() SelectorType { return SelInvalid }
 func (p pathError) feature(r adt.Runtime) adt.Feature {
 	return adt.InvalidLabel
 }

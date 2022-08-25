@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f201a9ad_8096dd0f",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-25T10:35:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "94d484f9_42d546ac",
+      "revId": "e776bd24a5b410ebcc228db3de92ef9e4721383a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "65a215bd_77cb4f2a",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-08-25T08:45:46Z",
       "side": 1,
       "message": "You say \"for instance\", but is there actually any other circumstance in which a Vertex is recursively closed?",
+      "revId": "e776bd24a5b410ebcc228db3de92ef9e4721383a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d1e54dc_a134337d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-25T10:35:53Z",
+      "side": 1,
+      "message": "I guess if a definition is embedded, if it is the result of a function that returns a recursively closed vertex. There are probably a few other cases.",
+      "parentUuid": "65a215bd_77cb4f2a",
       "revId": "e776bd24a5b410ebcc228db3de92ef9e4721383a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

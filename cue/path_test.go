@@ -153,3 +153,155 @@ func TestPaths(t *testing.T) {
 		})
 	}
 }
+
+var selectorTests = []struct {
+	sel          Selector
+	stype        SelectorType
+	string       string
+	unquoted     string
+	index        int
+	isHidden     bool
+	isOptional   bool
+	isDefinition bool
+	isString     bool
+	pkgPath      string
+}{{
+	sel:      Str("foo"),
+	stype:    SelString,
+	string:   "foo",
+	unquoted: "foo",
+	isString: true,
+}, {
+	sel:      Str("_foo"),
+	stype:    SelString,
+	string:   `"_foo"`,
+	unquoted: "_foo",
+	isString: true,
+}, {
+	sel:      Str(`a "b`),
+	stype:    SelString,
+	string:   `"a \"b"`,
+	unquoted: `a "b`,
+	isString: true,
+}, {
+	sel:    Index(5),
+	stype:  SelIndex,
+	string: "5",
+	index:  5,
+}, {
+	sel:          Def("foo"),
+	stype:        SelDefinition,
+	string:       "#foo",
+	isDefinition: true,
+}, {
+	sel:        Str("foo").Optional(),
+	stype:      SelString,
+	string:     "foo?",
+	unquoted:   "foo",
+	isString:   true,
+	isOptional: true,
+}, {
+	sel:          Def("foo").Optional(),
+	stype:        SelDefinition,
+	string:       "#foo?",
+	isDefinition: true,
+	isOptional:   true,
+}, {
+	sel:    AnyString,
+	stype:  SelPattern,
+	string: "[_]",
+}, {
+	sel:    AnyIndex,
+	stype:  SelPattern,
+	string: "[_]",
+}, {
+	sel:      Hid("_foo", "example.com"),
+	stype:    SelHidden,
+	string:   "_foo",
+	isHidden: true,
+	pkgPath:  "example.com",
+}, {
+	sel:          Hid("_#foo", "example.com"),
+	stype:        SelHiddenDefinition,
+	string:       "_#foo",
+	isHidden:     true,
+	isDefinition: true,
+	pkgPath:      "example.com",
+}}
+
+func TestSelector(t *testing.T) {
+	for _, tc := range selectorTests {
+		t.Run(tc.sel.String(), func(t *testing.T) {
+			sel := tc.sel
+			if got, want := sel.Type(), tc.stype; got != want {
+				t.Errorf("unexpected type; got %v want %v", got, want)
+			}
+			if got, want := sel.String(), tc.string; got != want {
+				t.Errorf("unexpected sel.String result; got %q want %q", got, want)
+			}
+			if sel.Type() != SelString {
+				checkPanic(t, "Selector.Unquoted invoked on non-string label", func() {
+					sel.Unquoted()
+				})
+			} else {
+				if got, want := sel.Unquoted(), tc.unquoted; got != want {
+					t.Errorf("unexpected sel.Unquoted result; got %q want %q", got, want)
+				}
+			}
+			if sel.Type() != SelIndex {
+				checkPanic(t, "Index called on non-index selector", func() {
+					sel.Index()
+				})
+			} else {
+				if got, want := sel.Index(), tc.index; got != want {
+					t.Errorf("unexpected sel.Index result; got %v want %v", got, want)
+				}
+			}
+			if got, want := sel.Type().IsHidden(), tc.isHidden; got != want {
+				t.Errorf("unexpected sel.IsHidden result; got %v want %v", got, want)
+			}
+			if got, want := sel.IsOptional(), tc.isOptional; got != want {
+				t.Errorf("unexpected sel.IsOptional result; got %v want %v", got, want)
+			}
+			if got, want := sel.IsString(), tc.isString; got != want {
+				t.Errorf("unexpected sel.IsString result; got %v want %v", got, want)
+			}
+			if got, want := sel.IsDefinition(), tc.isDefinition; got != want {
+				t.Errorf("unexpected sel.IsDefinition result; got %v want %v", got, want)
+			}
+			if got, want := sel.PkgPath(), tc.pkgPath; got != want {
+				t.Errorf("unexpected sel.PkgPath result; got %v want %v", got, want)
+			}
+		})
+	}
+}
+
+func TestSelectorTypeString(t *testing.T) {
+	if got, want := SelInvalid.String(), "SelInvalid"; got != want {
+		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
+	}
+	if got, want := SelPattern.String(), "SelPattern"; got != want {
+		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
+	}
+	if got, want := SelectorType(255).String(), "SelInvalid255"; got != want {
+		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
+	}
+}
+
+func checkPanic(t *testing.T, wantPanicStr string, f func()) {
+	gotPanicStr := ""
+	func() {
+		defer func() {
+			e := recover()
+			if e == nil {
+				t.Errorf("function did not panic")
+				return
+			}
+			gotPanicStr = fmt.Sprint(e)
+		}()
+		f()
+	}()
+	if got, want := gotPanicStr, wantPanicStr; got != want {
+		t.Errorf("unexpected panic message; got %q want %q", got, want)
+	}
+}

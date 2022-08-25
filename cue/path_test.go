@@ -277,6 +277,18 @@ func TestSelector(t *testing.T) {
 	}
 }
 
+func TestSelectorTypeString(t *testing.T) {
+	if got, want := SelInvalid.String(), "SelInvalid"; got != want {
+		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
+	}
+	if got, want := SelPattern.String(), "SelPattern"; got != want {
+		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
+	}
+	if got, want := SelectorType(255).String(), "SelInvalid255"; got != want {
+		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
+	}
+}
+
 func checkPanic(t *testing.T, wantPanicStr string, f func()) {
 	gotPanicStr := ""
 	func() {

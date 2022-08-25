@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05d05dd6_aed58bc7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T17:13:10Z",
+      "side": 1,
+      "message": "I\u0027ve just verified that the latest version works OK with the istio protobuf-\u003eCUE-\u003eopenAPI conversion by running this set of commands:\n\n\tcd $PATH_TO_ISTIO_TOOLS/cmd\n\tgo install ./cue-gen\n\tcd $PATH_TO_ISTIO_API\n\tcue-gen -paths\u003dcommon-protos -f\u003d./cue.yaml\n\tcue-gen -paths\u003dcommon-protos -f\u003d./cue.yaml --crd\u003dtrue -snake\u003djwksUri,apiKeys,apiSpecs,includedPaths,jwtHeaders,triggerRules,excludedPaths,mirrorPercent;git status\n\tgit status\n\nThe git status at the end was clean.\n",
+      "revId": "befa53925cd1181e5212ccbfb848c702ccae1fdf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

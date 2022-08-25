@@ -55,7 +55,7 @@ func newCoreBuilder(c *buildContext) *builder {
 	return b
 }
 
-func (b *builder) coreSchemaWithName(name string) *ast.StructLit {
+func (b *builder) coreSchemaWithName(name cue.Selector) *ast.StructLit {
 	oldPath := b.ctx.path
 	b.ctx.path = append(b.ctx.path, name)
 	s := b.coreSchema()
@@ -69,7 +69,7 @@ func (b *builder) coreSchema() *ast.StructLit {
 	case cue.ListKind:
 		if b.items != nil {
 			b.setType("array", "")
-			schema := b.items.coreSchemaWithName("*")
+			schema := b.items.coreSchemaWithName(cue.AnyString)
 			b.setSingle("items", schema, false)
 		}
 
@@ -77,7 +77,7 @@ func (b *builder) coreSchema() *ast.StructLit {
 		p := &OrderedMap{}
 		for _, k := range b.keys {
 			sub := b.properties[k]
-			p.Set(k, sub.coreSchemaWithName(k))
+			p.Set(k, sub.coreSchemaWithName(cue.Str(k)))
 		}
 		if p.len() > 0 || b.items != nil {
 			b.setType("object", "")
@@ -87,7 +87,7 @@ func (b *builder) coreSchema() *ast.StructLit {
 		}
 		// TODO: in Structural schema only one of these is allowed.
 		if b.items != nil {
-			schema := b.items.coreSchemaWithName("*")
+			schema := b.items.coreSchemaWithName(cue.AnyString)
 			b.setSingle("additionalProperties", schema, false)
 		}
 	}

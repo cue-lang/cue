@@ -34,6 +34,24 @@
       "parentUuid": "89dec68b_6a21a94c",
       "revId": "59a66b65439c193a223852505a29a5e2f7e0c4d8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "228ad342_7330075d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-25T14:59:29Z",
+      "side": 1,
+      "message": "It is resolved by re-running unity with this fix and the --update flag. CUE_DEBUG_SORT_ARCS\u003d2 results in the same changes - it only helped work around this particular bug before this fix. We need to make a change to Unity because right now it relies on an arbitrary sort.",
+      "parentUuid": "9b045382_60966614",
+      "revId": "59a66b65439c193a223852505a29a5e2f7e0c4d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

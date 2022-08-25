@@ -16,6 +16,24 @@
       "message": "All your comments addressed, Paul. We should get this in and then fix up Unity.",
       "revId": "59a66b65439c193a223852505a29a5e2f7e0c4d8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b045382_60966614",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-25T14:53:29Z",
+      "side": 1,
+      "message": "Just to confirm, the unity failure is \"resolved\" by using CUE_DEBUG_SORT_ARCS\u003d2?",
+      "parentUuid": "89dec68b_6a21a94c",
+      "revId": "59a66b65439c193a223852505a29a5e2f7e0c4d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

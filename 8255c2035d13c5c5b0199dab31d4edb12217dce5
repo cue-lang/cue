@@ -16,6 +16,23 @@
       "message": "LGTM assuming long tests also pass",
       "revId": "8255c2035d13c5c5b0199dab31d4edb12217dce5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00507b35_61791268",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-25T07:10:36Z",
+      "side": 1,
+      "message": "Yup, just verified that the long tests pass.",
+      "revId": "8255c2035d13c5c5b0199dab31d4edb12217dce5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

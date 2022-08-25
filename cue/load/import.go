@@ -274,9 +274,19 @@ func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 	normalizeFiles(p.UnknownFiles)
 }
 
+// normalizeFiles sorts the files so that files contained by a parent directory
+// always come before files contained in sub-directories, and that filenames in
+// the same directory are sorted lexically byte-wise, like Go's `<` operator.
 func normalizeFiles(a []*build.File) {
 	sort.Slice(a, func(i, j int) bool {
-		return len(filepath.Dir(a[i].Filename)) < len(filepath.Dir(a[j].Filename))
+		fi := a[i].Filename
+		fj := a[j].Filename
+		ci := strings.Count(fi, string(filepath.Separator))
+		cj := strings.Count(fj, string(filepath.Separator))
+		if ci != cj {
+			return ci < cj
+		}
+		return fi < fj
 	})
 }
 

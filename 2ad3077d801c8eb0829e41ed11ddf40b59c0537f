@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d88a92c3_b71f03ee",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-25T13:30:29Z",
+      "side": 1,
+      "message": "Note that a scope selector is always hidden (and that\u0027s guarded by the constructor) so the cases this previously handled aren\u0027t all necessary.",
+      "revId": "2ad3077d801c8eb0829e41ed11ddf40b59c0537f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

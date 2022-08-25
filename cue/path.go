@@ -49,6 +49,23 @@ const (
 	SelPattern
 )
 
+var selectorTypeStrings = [...]string{
+	SelInvalid:          "SelInvalid",
+	SelString:           "SelString",
+	SelHiddenString:     "SelHiddenString",
+	SelDefinition:       "SelDefinition",
+	SelHiddenDefinition: "SelHiddenDefinition",
+	SelIndex:            "SelIndex",
+	SelPattern:          "SelPattern",
+}
+
+func (t SelectorType) String() string {
+	if int(t) >= len(selectorTypeStrings) {
+		return fmt.Sprintf("SelInvalid%d", t)
+	}
+	return selectorTypeStrings[t]
+}
+
 // IsHidden reports whether t describes a hidden field.
 func (t SelectorType) IsHidden() bool {
 	return t == SelHiddenString || t == SelHiddenDefinition

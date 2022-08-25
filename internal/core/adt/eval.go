@@ -44,8 +44,9 @@ import (
 //
 
 type Stats struct {
-	DisjunctCount int
 	UnifyCount    int
+	ConjunctCount int
+	DisjunctCount int
 
 	Freed    int
 	Retained int
@@ -71,6 +72,7 @@ Allocs: {{.Allocs}}
 Retain: {{.Retained}}
 
 Unifications: {{.UnifyCount}}
+Conjuncts:    {{.ConjunctCount}}
 Disjuncts:    {{.DisjunctCount}}`))
 
 func (s *Stats) String() string {
@@ -1372,6 +1374,7 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 		if x.Op == AndOp {
 			n.addExprConjunct(MakeConjunct(env, x.X, id))
 			n.addExprConjunct(MakeConjunct(env, x.Y, id))
+			return
 		} else {
 			n.evalExpr(v)
 		}
@@ -1398,6 +1401,7 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 		// Must be Resolver or Evaluator.
 		n.evalExpr(v)
 	}
+	n.ctx.stats.ConjunctCount++
 }
 
 // evalExpr is only called by addExprConjunct. If an error occurs, it records

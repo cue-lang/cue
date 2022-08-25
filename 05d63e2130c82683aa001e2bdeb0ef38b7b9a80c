@@ -33,6 +33,24 @@
       "message": "It would be nice to have doc comments on these exported methods, even if technically it is all internal. For example, it wasn\u0027t immediately clear to me what \"OneOf\" signifies here - it sounded initially like a protobuf oneof but I suspect it probably means \"is in one of the types in the SpanType mask\". If the latter is the case, wouldn\u0027t \"IsOneOf\" be a better name?",
       "revId": "05d63e2130c82683aa001e2bdeb0ef38b7b9a80c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aa046b2_8244c8a0",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-25T10:40:53Z",
+      "side": 1,
+      "message": "I guess it is \"IsWithinOneOf\". The \"In\" here is referring to the span.\n\nAdded comment. Keeping name for now to avoid conflicts as there are quite a few change outstanding in the files where this is used.",
+      "parentUuid": "a1943fb5_70c9a901",
+      "revId": "05d63e2130c82683aa001e2bdeb0ef38b7b9a80c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

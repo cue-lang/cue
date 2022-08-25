@@ -37,7 +37,7 @@ const (
 	InvalidLabel Feature = 0
 
 	// MaxIndex indicates the maximum number of unique strings that are used for
-	// labeles within this CUE implementation.
+	// labels within this CUE implementation.
 	MaxIndex = 1<<(32-indexShift) - 1
 )
 

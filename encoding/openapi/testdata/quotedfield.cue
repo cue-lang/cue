@@ -1,0 +1,3 @@
+#Def: {
+    "@type": string
+}

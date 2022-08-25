@@ -143,57 +143,25 @@ let Y_1 = x
 		}
 	}]
 	for cfg in cfgs {
-		let filepath = "kind-\(cfg.name)"
+		let filepath_1 = "kind-\(cfg.name)"
 		files: {
-			"\(filepath)": {
+			"\(filepath_1)": {
 				patches: cfg
 			}
 		}
 	}
 }
-#Foo: X
-x:    "foo"
 comprehension: {
 	for cfg in [{
 		a: "one"
 	}] {
-		let filepath_1 = "kind-\(cfg.name)"
-		"\(filepath_1)": {
+		let filepath = "kind-\(cfg.name)"
+		"\(filepath)": {
 			patches: cfg
 		}
 	}
 }
-scoped: {
-	_args: {
-		required: 1
-	}
-	direct: {
-		let Args = _args
-		a: Args.required
-	}
-	embed1: {
-		let Args_1 = _args
-		a: Args_1.required
-	}
-	embed2: {
-		let Args_2 = _args
-		a: Args_2.required
-	}
-	list: {
-		let Args_3 = _args
-		a: [Args_3.required]
-	}
-	listStruct: {
-		let Args_4 = _args
-		a: [{
-			a: Args_4.required
-		}]
-	}
-	listEmbed: {
-		let Args_8 = _args
-		a: [Args_8.required]
-	}
-}
+#Foo: X
 complete: {
 	let A = run.a
 	x: "a \(A) z"
@@ -201,7 +169,38 @@ complete: {
 		a: "foo"
 	}
 }
-y: Y & Y_1
+scoped: {
+	_args: {
+		required: 1
+	}
+	direct: {
+		let Args_1 = _args
+		a: Args_1.required
+	}
+	embed1: {
+		let Args_2 = _args
+		a: Args_2.required
+	}
+	embed2: {
+		let Args_3 = _args
+		a: Args_3.required
+	}
+	list: {
+		let Args_4 = _args
+		a: [Args_4.required]
+	}
+	listStruct: {
+		let Args_8 = _args
+		a: [{
+			a: Args_8.required
+		}]
+	}
+	listEmbed: {
+		let Args_32 = _args
+		a: [Args_32.required]
+	}
+}
+x: "foo"
 incomplete: {
 	a: {
 		x: "a \(run.a) z"
@@ -230,9 +229,9 @@ incomplete: {
 	}
 	d: {
 		let A_4 = run.a
-		let A_32 = run2.a
+		let A_9 = run2.a
 		x:  "a \(A_4) z"
-		x2: "a \(A_32) z"
+		x2: "a \(A_9) z"
 		run: {
 			a: string
 		}
@@ -243,13 +242,13 @@ incomplete: {
 }
 unresolvedDisjunction: {
 	#TypePrimitive: {
-		let Args_9 = _args
+		let Args = _args
 		{
 			"*": {}
 		} | {
 			bool: #TypeBool & {
 				_args: {
-					required: Args_9.required
+					required: Args.required
 				}
 			}
 		}
@@ -268,39 +267,11 @@ unresolvedDisjunction: {
 		}
 	}
 }
+y: Y & Y_1
 -- out/doc --
 []
-[#Foo]
-[x]
-[y]
-[files]
-[cfgs]
-[cfgs 0]
-[cfgs 0 metadata]
-[cfgs 0 metadata name]
-[cfgs 1]
-[cfgs 1 metadata]
-[cfgs 1 metadata name]
 [comprehension]
-[scoped]
-[scoped _args]
-[scoped _args required]
-[scoped direct]
-[scoped direct a]
-[scoped embed1]
-[scoped embed1 a]
-[scoped embed2]
-[scoped embed2 a]
-[scoped list]
-[scoped list a]
-[scoped list a 0]
-[scoped listStruct]
-[scoped listStruct a]
-[scoped listStruct a 0]
-[scoped listStruct a 0 a]
-[scoped listEmbed]
-[scoped listEmbed a]
-[scoped listEmbed a 0]
+[#Foo]
 [complete]
 [complete x]
 [complete run]
@@ -334,10 +305,54 @@ unresolvedDisjunction: {
 [unresolvedDisjunction #TypeBool default]
 [unresolvedDisjunction #TypeBool _args]
 [unresolvedDisjunction #TypeBool _args required]
+[files]
+[cfgs]
+[cfgs 0]
+[cfgs 0 metadata]
+[cfgs 0 metadata name]
+[cfgs 1]
+[cfgs 1 metadata]
+[cfgs 1 metadata name]
+[scoped]
+[scoped _args]
+[scoped _args required]
+[scoped direct]
+[scoped direct a]
+[scoped embed1]
+[scoped embed1 a]
+[scoped embed2]
+[scoped embed2 a]
+[scoped list]
+[scoped list a]
+[scoped list a 0]
+[scoped listStruct]
+[scoped listStruct a]
+[scoped listStruct a 0]
+[scoped listStruct a 0 a]
+[scoped listEmbed]
+[scoped listEmbed a]
+[scoped listEmbed a 0]
+[x]
+[y]
 -- out/value --
 == Simplified
 {
-	x: "foo"
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	cfgs: [{
 		metadata: {
 			name: "one"
@@ -350,16 +365,6 @@ unresolvedDisjunction: {
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
-		}
-	}
-	comprehension: {
-		for cfg in [{
-			a: "one"
-		}] {
-			let filepath_1 = "kind-\(cfg.name)"
-			"\(filepath_1)": {
-				patches: cfg
-			}
 		}
 	}
 	scoped: {
@@ -384,13 +389,7 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	y: "foo"
+	x: "foo"
 	incomplete: {
 		a: {
 			x: "a \(run.a) z"
@@ -431,11 +430,27 @@ unresolvedDisjunction: {
 		}
 	}
 	unresolvedDisjunction: {}
+	y: "foo"
 }
 == Raw
 {
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
 	#Foo: 2
-	x:    "foo"
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	cfgs: [{
 		metadata: {
 			name: "one"
@@ -448,16 +463,6 @@ unresolvedDisjunction: {
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
-		}
-	}
-	comprehension: {
-		for cfg in [{
-			a: "one"
-		}] {
-			let filepath_1 = "kind-\(cfg.name)"
-			"\(filepath_1)": {
-				patches: cfg
-			}
 		}
 	}
 	scoped: {
@@ -485,13 +490,7 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	y: "foo"
+	x: "foo"
 	incomplete: {
 		a: {
 			x: "a \(run.a) z"
@@ -533,13 +532,13 @@ unresolvedDisjunction: {
 	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
-			let Args_2 = _args
+			let Args = _args
 			{
 				"*": {}
 			} | {
 				bool: #TypeBool & {
 					_args: {
-						required: Args_2.required
+						required: Args.required
 					}
 				}
 			}
@@ -548,20 +547,27 @@ unresolvedDisjunction: {
 			}
 		}
 		#TypeBool: {
-			let Args_3 = _args
+			let Args_1 = _args
 			_args: {
 				required: bool
 			}
-			if !Args_3.required {
+			if !Args_1.required {
 				// `default` sets the default value.
 				default: bool | null
 			}
 		}
 	}
+	y: "foo"
 }
 == Final
 {
-	x: "foo"
+	comprehension: _|_ // invalid interpolation: invalid interpolation: comprehension: undefined field: name
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	cfgs: [{
 		metadata: {
 			name: "one"
@@ -571,8 +577,7 @@ unresolvedDisjunction: {
 			name: "two"
 		}
 	}]
-	files:         _|_ // invalid interpolation: invalid interpolation: files: undefined field: name (and 3 more errors)
-	comprehension: _|_ // invalid interpolation: invalid interpolation: comprehension: undefined field: name
+	files: _|_ // invalid interpolation: invalid interpolation: files: undefined field: name (and 3 more errors)
 	scoped: {
 		direct: {
 			a: 1
@@ -595,13 +600,7 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	y: "foo"
+	x: "foo"
 	incomplete: {
 		a: {
 			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
@@ -637,11 +636,27 @@ unresolvedDisjunction: {
 		}
 	}
 	unresolvedDisjunction: {}
+	y: "foo"
 }
 == All
 {
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
 	#Foo: 2
-	x:    "foo"
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	cfgs: [{
 		metadata: {
 			name: "one"
@@ -654,16 +669,6 @@ unresolvedDisjunction: {
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
-		}
-	}
-	comprehension: {
-		for cfg in [{
-			a: "one"
-		}] {
-			let filepath_1 = "kind-\(cfg.name)"
-			"\(filepath_1)": {
-				patches: cfg
-			}
 		}
 	}
 	scoped: {
@@ -691,13 +696,7 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	y: "foo"
+	x: "foo"
 	incomplete: {
 		a: {
 			x: "a \(run.a) z"
@@ -739,13 +738,13 @@ unresolvedDisjunction: {
 	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
-			let Args_2 = _args
+			let Args = _args
 			{
 				"*": {}
 			} | {
 				bool: #TypeBool & {
 					_args: {
-						required: Args_2.required
+						required: Args.required
 					}
 				}
 			}
@@ -754,21 +753,37 @@ unresolvedDisjunction: {
 			}
 		}
 		#TypeBool: {
-			let Args_3 = _args
+			let Args_1 = _args
 			_args: {
 				required: bool
 			}
-			if !Args_3.required {
+			if !Args_1.required {
 				// `default` sets the default value.
 				default: bool | null
 			}
 		}
 	}
+	y: "foo"
 }
 == Eval
 {
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath = "kind-\(cfg.name)"
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
 	#Foo: 2
-	x:    "foo"
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	cfgs: [{
 		metadata: {
 			name: "one"
@@ -781,16 +796,6 @@ unresolvedDisjunction: {
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
-		}
-	}
-	comprehension: {
-		for cfg in [{
-			a: "one"
-		}] {
-			let filepath_1 = "kind-\(cfg.name)"
-			"\(filepath_1)": {
-				patches: cfg
-			}
 		}
 	}
 	scoped: {
@@ -815,13 +820,7 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
-	complete: {
-		x: "a foo z"
-		run: {
-			a: "foo"
-		}
-	}
-	y: "foo"
+	x: "foo"
 	incomplete: {
 		a: {
 			x: "a \(run.a) z"
@@ -863,13 +862,13 @@ unresolvedDisjunction: {
 	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
-			let Args_2 = _args
+			let Args = _args
 			{
 				"*": {}
 			} | {
 				bool: #TypeBool & {
 					_args: {
-						required: Args_2.required
+						required: Args.required
 					}
 				}
 			}
@@ -878,13 +877,14 @@ unresolvedDisjunction: {
 			}
 		}
 		#TypeBool: {
-			let Args_3 = _args
+			let Args_1 = _args
 			_args: {
 				required: bool
 			}
-			if !Args_3.required {
+			if !Args_1.required {
 				default: bool | null
 			}
 		}
 	}
+	y: "foo"
 }

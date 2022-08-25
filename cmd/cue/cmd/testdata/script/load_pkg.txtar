@@ -17,6 +17,22 @@ cmp stdout stdout-pkg
 # don't allow mixing two differently named packages
 ! exec cue eval kube.cue foo/kube2.cue
 
+# When passing multiple CUE files in different directories,
+# cue/load will sort the filenames so that children come later.
+# Due to a bug, we had an unstable sort that changed between Go 1.18 and 1.19.
+# Ensure that our sorting is deterministic with 8 scattered files.
+cd sort
+
+# First, test with the same input order that "find" would use: lexically sorted.
+exec cue eval print.cue root_1.cue root_2/child_1.cue root_2/child_2.cue root_2/child_3.cue root_2/child_4/grandchild_1.cue root_2/child_4/grandchild_2.cue root_2/child_5.cue root_2/child_6.cue root_2/child_7.cue root_3.cue
+cmp stdout stdout-sort
+
+# Second, test with the opposite order of what we want.
+exec cue eval print.cue root_2/child_4/grandchild_2.cue root_2/child_4/grandchild_1.cue root_2/child_7.cue root_2/child_6.cue root_2/child_5.cue root_2/child_3.cue root_2/child_2.cue root_2/child_1.cue root_3.cue root_1.cue
+cmp stdout stdout-sort
+
+cd ..
+
 -- data.cue --
 foo:3
 -- t.cue --
@@ -43,3 +59,40 @@ bar: 3
 -- stdout-pkg --
 foo: int
 bar: 3
+-- sort/print.cue --
+files: {}
+flat: [ for k, _ in files {k} ]
+-- sort/root_1.cue --
+files: root_1: 0
+-- sort/root_2/child_1.cue --
+files: child_1: 0
+-- sort/root_2/child_2.cue --
+files: child_2: 0
+-- sort/root_2/child_3.cue --
+files: child_3: 0
+-- sort/root_2/child_4/grandchild_1.cue --
+files: grandchild_1: 0
+-- sort/root_2/child_4/grandchild_2.cue --
+files: grandchild_2: 0
+-- sort/root_2/child_5.cue --
+files: child_5: 0
+-- sort/root_2/child_6.cue --
+files: child_6: 0
+-- sort/root_2/child_7.cue --
+files: child_7: 0
+-- sort/root_3.cue --
+files: root_3: 0
+-- sort/stdout-sort --
+files: {
+    root_1:       0
+    root_3:       0
+    child_1:      0
+    child_2:      0
+    child_3:      0
+    child_5:      0
+    child_6:      0
+    child_7:      0
+    grandchild_1: 0
+    grandchild_2: 0
+}
+flat: ["root_1", "root_3", "child_1", "child_2", "child_3", "child_5", "child_6", "child_7", "grandchild_1", "grandchild_2"]

@@ -55,6 +55,12 @@ package foo
   }
 }
 -- out/compile --
+--- box.cue
+{
+  (〈0;#Config〉 & {
+    console: 〈1;dark〉
+  })
+}
 --- in.cue
 {
   #theme: {
@@ -72,10 +78,4 @@ package foo
   #Config: {
     console: (〈1;dark〉|*〈1;light〉)
   }
-}
---- box.cue
-{
-  (〈0;#Config〉 & {
-    console: 〈1;dark〉
-  })
 }

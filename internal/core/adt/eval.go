@@ -1530,17 +1530,6 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		// if there is a non-cyclic conjunct. See cycle.go.
 	}
 
-	// Performance: the following if check filters cases that are not strictly
-	// necessary for correct functioning. Not updating the closeInfo may cause
-	// some position information to be lost for top-level positions of merges
-	// resulting form APIs. These tend to be fairly uninteresting.
-	// At the same time, this optimization may prevent considerable slowdown
-	// in case an API does many calls to Unify.
-	x := c.Expr()
-	if !inline || arc.IsClosedStruct() || arc.IsClosedList() {
-		closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
-	}
-
 	if arc.status == 0 && !inline {
 		// This is a rare condition, but can happen in certain
 		// evaluation orders. Unfortunately, adding this breaks
@@ -1554,6 +1543,17 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	// Don't add conjuncts if a node is referring to itself.
 	if n.node == arc {
 		return
+	}
+
+	// Performance: the following if check filters cases that are not strictly
+	// necessary for correct functioning. Not updating the closeInfo may cause
+	// some position information to be lost for top-level positions of merges
+	// resulting form APIs. These tend to be fairly uninteresting.
+	// At the same time, this optimization may prevent considerable slowdown
+	// in case an API does many calls to Unify.
+	x := c.Expr()
+	if !inline || arc.IsClosedStruct() || arc.IsClosedList() {
+		closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
 	}
 
 	for _, c := range arc.Conjuncts {

@@ -34,6 +34,24 @@
       "parentUuid": "9105f8f1_0e076754",
       "revId": "7c7acc1ff500b2c082eee2c9dcde1fc498433586",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12786ca7_8015ec0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-26T06:59:43Z",
+      "side": 1,
+      "message": "Also, just for clarity of process: if a change in client code is necessary we would first make sure the client code works with the new and old version of the code, then switch over to a newer implementation, and then potentially clean up the client code.",
+      "parentUuid": "b5ceb350_9b2427e2",
+      "revId": "7c7acc1ff500b2c082eee2c9dcde1fc498433586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

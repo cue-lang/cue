@@ -1934,11 +1934,11 @@ func (v Value) instance() *Instance {
 // Deprecated: use ReferencePath
 func (v hiddenValue) Reference() (inst *Instance, path []string) {
 	root, p := v.ReferencePath()
-	if !root.Exists() {
-		return nil, nil
-	}
 
 	inst = getImportFromNode(v.idx, root.v)
+	if inst == nil {
+		return nil, nil
+	}
 	for _, sel := range p.Selectors() {
 		switch x := sel.sel.(type) {
 		case stringSelector:
@@ -1952,19 +1952,19 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 }
 
 // ReferencePath returns the value and path referred to by this value such that
-// value.LookupPath(path) resolves to the same value, or no path if this value
-// is not a reference.
+// value.LookupPath(path) resolves to the same value, or the original
+// value and an empty path if this value is not a reference.
 func (v Value) ReferencePath() (root Value, p Path) {
 	// TODO: don't include references to hidden fields.
 	if v.v == nil || len(v.v.Conjuncts) != 1 {
-		return Value{}, Path{}
+		return v, Path{}
 	}
 	ctx := v.ctx()
 	c := v.v.Conjuncts[0]
 
 	x, path := reference(v.idx, ctx, c.Env, c.Expr())
 	if x == nil {
-		return Value{}, Path{}
+		return v, Path{}
 	}
 	// NOTE: due to structure sharing, the path of the referred node may end
 	// up different from the one explicitly pointed to. The value will be the

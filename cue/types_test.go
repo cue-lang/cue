@@ -2864,10 +2864,10 @@ func TestReferencePath(t *testing.T) {
 		alt            string
 	}{{
 		input: "v: w: x: _|_",
-		want:  "",
+		alt:   "_|_ // explicit error (_|_ literal) in source",
 	}, {
 		input: "v: w: x: 2",
-		want:  "",
+		alt:   "2",
 	}, {
 		input: "v: w: x: a, a: 1",
 		want:  "a",
@@ -2941,15 +2941,16 @@ func TestReferencePath(t *testing.T) {
 			if got := path.String(); got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}
+
+			want := "1"
+			if tc.alt != "" {
+				want = tc.alt
+			}
+			got := fmt.Sprint(root.LookupPath(path))
+			if got != want {
+				t.Errorf("path resolved to %s; want %s", got, want)
+			}
 			if tc.want != "" {
-				want := "1"
-				if tc.alt != "" {
-					want = tc.alt
-				}
-				v := fmt.Sprint(root.LookupPath(path))
-				if v != want {
-					t.Errorf("path resolved to %s; want %s", v, want)
-				}
 				buildInst := root.BuildInstance()
 				if buildInst == nil {
 					t.Fatalf("no build instance found for reference path root")
@@ -2965,6 +2966,9 @@ func TestReferencePath(t *testing.T) {
 			}
 
 			if tc.want != "" {
+				if inst == nil {
+					t.Fatal("got unexpected nil *Instance from Value.Reference")
+				}
 				want := "1"
 				if tc.alt != "" {
 					want = tc.alt

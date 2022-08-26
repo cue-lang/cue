@@ -53,6 +53,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c7c7495_a286248e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-26T08:17:29Z",
+      "side": 1,
+      "message": "Hi satotake - thanks for following up in the issue. Let\u0027s agree a plan there first, at which point we can return to creating any necessary CLs.",
+      "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ed56c96c_1bc7f2d3",

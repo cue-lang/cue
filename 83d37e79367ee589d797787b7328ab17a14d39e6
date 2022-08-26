@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d1105a1_23757176",
+        "filename": "cue/build.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-26T07:07:00Z",
+      "side": 0,
+      "message": "This is a backwards-incompatible change. It is also a deprecated API, so not really worth changing.",
+      "revId": "83d37e79367ee589d797787b7328ab17a14d39e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

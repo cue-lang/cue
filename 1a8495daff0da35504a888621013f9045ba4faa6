@@ -34,6 +34,40 @@
       "parentUuid": "bf5e80c6_e716fe67",
       "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb16982c_97d6472f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-26T07:07:00Z",
+      "side": 1,
+      "message": "In general, this change has a lot of backwards-incompatible changes. Even though the API is not officially stable yet, we tend to shy aways from breaking changes in favor of a deprecation process.\n\nAlso, judging from the linked issues, this CL seems to address multiple issues that could be separated into separate CLs.",
+      "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed56c96c_1bc7f2d3",
+        "filename": "cue/build.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-26T07:07:00Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

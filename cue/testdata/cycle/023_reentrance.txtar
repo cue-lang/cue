@@ -16,8 +16,9 @@ fib: {
 		out: n
 	}
 }
-fib1:  (fib & {n: 1}).out  // Not an error.
-fib2:  (fib & {n: 2}).out  // Error
+fib1:  (fib & {n: 1}).out  // MAY NOT be an error
+fib2:  (fib & {n: 2}).out  // MAY be an error
+fib3:  (fib & {n: 3}).out  // SHOULD be an error
 fib7:  (fib & {n: 7}).out  // Error
 fib12: (fib & {n: 12}).out // Error
 
@@ -51,6 +52,9 @@ fib12: (fib & {n: 12}).out // Error
   fib2: (〈0;fib〉 & {
     n: 2
   }).out
+  fib3: (〈0;fib〉 & {
+    n: 3
+  }).out
   fib7: (〈0;fib〉 & {
     n: 7
   }).out
@@ -62,6 +66,8 @@ fib12: (fib & {n: 12}).out // Error
 Errors:
 structural cycle:
     ./in.cue:3:25
+structural cycle:
+    ./in.cue:8:9
 
 Result:
 (_|_){
@@ -97,16 +103,23 @@ Result:
     n: (int){ int }
   }
   fib1: (int){ 1 }
-  fib2: (_|_){
+  fib2: (int){ 1 }
+  fib3: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
+    // structural cycle:
+    //     ./in.cue:8:38
   }
   fib7: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
+    // structural cycle:
+    //     ./in.cue:8:9
   }
   fib12: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
+    // structural cycle:
+    //     ./in.cue:8:9
   }
 }

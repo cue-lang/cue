@@ -166,6 +166,10 @@ type Vertex struct {
 	// arcType indicates the level of optionality of this arc.
 	arcType arcType
 
+	// cyclicReferences is a linked list of internal references pointing to this
+	// Vertex. This is used to shorten the path of some structural cycles.
+	cyclicReferences *RefNode
+
 	// BaseValue is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
 	BaseValue BaseValue

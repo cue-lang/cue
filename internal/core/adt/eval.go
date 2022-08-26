@@ -1419,16 +1419,17 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			n.exprs = append(n.exprs, envExpr{v, err})
 			break
 		}
-		v, delay := n.markCycle(arc, v, x)
-		if delay {
-			return
-		}
 
 		// If an arc is not a cycle, we complete the evaluation. Some
 		// optimizations will only work when an arc is already finalized. So
 		// this ensures that such optimizations get triggered more often.
 		if arc.status == AllArcs {
 			arc.Finalize(ctx)
+		}
+
+		v, delay := n.markCycle(arc, v, x)
+		if delay {
+			return
 		}
 
 		n.addVertexConjuncts(v, arc, false)

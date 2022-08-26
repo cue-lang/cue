@@ -2858,9 +2858,10 @@ func TestTrimZeros(t *testing.T) {
 
 func TestReferencePath(t *testing.T) {
 	testCases := []struct {
-		input string
-		want  string
-		alt   string
+		input          string
+		want           string
+		wantImportPath string
+		alt            string
 	}{{
 		input: "v: w: x: _|_",
 		want:  "",
@@ -2926,8 +2927,9 @@ func TestReferencePath(t *testing.T) {
 
 		v: w: x: math.Pi
 		`,
-		want: "Pi",
-		alt:  "3.14159265358979323846264338327950288419716939937510582097494459",
+		want:           "Pi",
+		wantImportPath: "math",
+		alt:            "3.14159265358979323846264338327950288419716939937510582097494459",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -2939,7 +2941,6 @@ func TestReferencePath(t *testing.T) {
 			if got := path.String(); got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}
-
 			if tc.want != "" {
 				want := "1"
 				if tc.alt != "" {
@@ -2948,6 +2949,13 @@ func TestReferencePath(t *testing.T) {
 				v := fmt.Sprint(root.LookupPath(path))
 				if v != want {
 					t.Errorf("path resolved to %s; want %s", v, want)
+				}
+				buildInst := root.BuildInstance()
+				if buildInst == nil {
+					t.Fatalf("no build instance found for reference path root")
+				}
+				if got, want := buildInst.ImportPath, tc.wantImportPath; got != want {
+					t.Errorf("unexpected import path; got %q want %q", got, want)
 				}
 			}
 

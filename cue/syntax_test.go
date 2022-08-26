@@ -178,7 +178,10 @@ func TestSyntax(t *testing.T) {
 	}
 	recursive: {
 		Value: _
-		Next:  null
+		Next:  *null | {
+			Value: _
+			Next:  null
+		}
 	}
 }
 		`,

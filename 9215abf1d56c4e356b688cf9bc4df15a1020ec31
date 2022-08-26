@@ -16,6 +16,24 @@
       "message": "I found that last sentence a bit hard to parse. Perhaps something like \"...the result of reading the file specified by filename...\".\n\nAlso I think src needs a mention in the first sentence of the overall comment.",
       "revId": "9215abf1d56c4e356b688cf9bc4df15a1020ec31",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "593d86e9_519fed7b",
+        "filename": "encoding/yaml/yaml.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-26T14:38:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fb270db_8291c07c",
+      "revId": "9215abf1d56c4e356b688cf9bc4df15a1020ec31",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -29,6 +29,8 @@ import (
 
 // Extract parses the YAML to a CUE expression. Streams are returned as a list
 // of the streamed values.
+// The src argument may be a nil, string, []byte, or io.Reader.
+// If it's nil, the YAML will be read from the file path filename.
 func Extract(filename string, src interface{}) (*ast.File, error) {
 	a := []ast.Expr{}
 	d, err := yaml.NewDecoder(filename, src)

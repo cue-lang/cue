@@ -54,10 +54,10 @@ issue1666: {
 		f1: [string]: #E | [...#E]
 		f2: [string]: t: #E
 	}
-	
+
 	_e: #E
 	_e: f2: a: _
-	
+
 	e: _e & {
 		f1: {
 			for fk, s in _e.f2 {

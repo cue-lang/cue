@@ -219,36 +219,14 @@ type CycleInfo struct {
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
 	Refs *RefNode
-
-	// Values is used to track the introduction of new values to invalidate
-	// potential cycles in case repeated uses of a reference are triggered
-	// by something that is not a cycle. For instance, consider
-	//
-	// 	T: {
-	//		x: _
-	//		y: x
-	//	}
-	//	C: { x: T } & T
-	//
-	// Here the repeated mixing in of T causes reference x to be repeatedly
-	// added to the same conjunct. However, as it keeps refering to fresh
-	// content, it is not a cycle.
-	Values *ValueNode
 }
 
 // A RefNode is a linked list of associated references.
 type RefNode struct {
 	Ref   Resolver
-	Arc   *Vertex
+	Arc   *Vertex // Ref points to this Vertex
 	Next  *RefNode
 	Depth int32
-}
-
-// ValueNode is a node of a linked list of expressions. See the Values field
-// in CycleInfo for more info.
-type ValueNode struct {
-	Expr Expr
-	Next *ValueNode
 }
 
 // cyclicConjunct is used in nodeContext to postpone the computation of
@@ -278,47 +256,63 @@ type cyclicConjunct struct {
 // its processing should be delayed, which is the case if the conjunct seems to
 // be fully cyclic so far.
 func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, delay bool) {
+	// TODO(perf): this optimization can work if we also check for any
+	// references pointing to arc within arc. This can be done with compiler
+	// support. With this optimization, almost all references could avoid cycle
+	// checking altogether!
+	// if arc.status == Finalized && arc.cyclicReferences == nil {
+	//  return v, false
+	// }
+
 	// Check whether the reference already occurred in the list, signaling
 	// a potential cycle.
 	found := false
 	depth := int32(0)
 	for r := v.CloseInfo.Refs; r != nil; r = r.Next {
-		if r.Ref == x || r.Arc == arc {
-			if v.CloseInfo.Inline {
-				n.reportCycleError()
-				return v, true
-			}
-			depth = r.Depth
-			found = true
-
-			// We do not exclude references pointing to the same nodes as these
-			// are always cycles, and because excluding them would degrade
-			// performance too much.
-			if r.Arc == arc {
-				break
-			}
-
-			// This loop checks that the detected cycle is not postponed or
-			// invalidated by new values. See the comment in CloseInfo.Values.
-		outer:
-			for _, c := range arc.Conjuncts {
-				x := c.Expr()
-				for v := v.CloseInfo.Values; v != nil; v = v.Next {
-					if v.Expr == x {
-						continue outer
-					}
-				}
-				v.CloseInfo.Values = &ValueNode{
-					Next: v.CloseInfo.Values,
-					Expr: x,
-				}
-				found = false
-			}
-
-			break
+		if r.Ref != x {
+			continue
 		}
+		if v.CloseInfo.Inline {
+			n.reportCycleError()
+			return v, true
+		}
+
+		// A reference that is within a graph that is being evaluated
+		// may repeat with a different arc and will point to a
+		// non-finalized arc. A repeating reference that points outside the
+		// graph will always be the same address. Hence, if this is a
+		// finalized arc with a different address, it resembles a reference that
+		// is included through a different path and is not a cycle.
+		if r.Arc != arc && arc.status == Finalized {
+			continue
+		}
+
+		depth = r.Depth
+		found = true
+
+		break
 	}
 
+	// NOTE: we need to add a tracked reference even if arc is not cyclic: it
+	// may still cause a cycle that does not refer to a parent node. For
+	// instance:
+	//
+	//      y: [string]: b: y
+	//      x: y
+	//      x: c: x
+	// ->
+	//      x: [string]: b: y
+	//      x: c: b: y
+	//      x: c: [string]: b: y
+	//      x: c: b: b: y
+	//      x: c: b: [string]: b: y
+	//      x: c: b: b: b: y
+	//      ....       // structural cycle 1
+	//      x: c: c: x // structural cycle 2
+	//
+	// Note that in this example there is a structural cycle at x.c.c, but we
+	// would need go guarantee that cycle is detected before the algorithm
+	// descends into x.c.b.
 	if !found || depth != n.depth {
 		// Adding this in case there is a definite cycle is unnecessary, but
 		// gives somewhat better error messages.
@@ -344,10 +338,7 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 	// In the worst case, this may lead to a spurious cycle.
 	// Fix this by ensuring the root vertex starts with a depth of 1, for
 	// instance.
-	foundCycle := n.node.Parent == nil || depth == 0
-	foundNonCycle := false
-
-	if !foundCycle {
+	if depth > 0 {
 		// Look for evidence of "new structure" to invalidate the cycle.
 		// This is done by checking for non-cyclic conjuncts between the
 		// current vertex up to the ancestor to which the reference points.
@@ -355,7 +346,7 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		// look for at least one other non-cyclic conjunct if this is the case.
 		upCount := n.depth - depth
 		for p := n.node.Parent; p != nil; p = p.Parent {
-			if upCount--; upCount == 0 {
+			if upCount--; upCount <= 0 {
 				break
 			}
 			a := p.Conjuncts
@@ -369,18 +360,15 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 				count--
 			}
 			if count > 0 {
-				foundNonCycle = true
-				break
+				return v, false
 			}
 		}
 	}
 
-	if foundCycle || !foundNonCycle {
-		n.hasCycle = true
-		if !n.hasNonCycle {
-			n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
-			return v, true
-		}
+	n.hasCycle = true
+	if !n.hasNonCycle {
+		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
+		return v, true
 	}
 
 	return v, false

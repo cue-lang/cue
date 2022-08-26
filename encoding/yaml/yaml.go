@@ -27,8 +27,11 @@ import (
 	pkgyaml "cuelang.org/go/pkg/encoding/yaml"
 )
 
-// Extract parses the YAML to a CUE expression. Streams are returned as a list
-// of the streamed values.
+// Extract parses the YAML specified by src to a CUE expression. If
+// there's more than one document, the documents will be returned as a
+// list. The src argument may be a nil, string, []byte, or io.Reader. If
+// src is nil, the result of reading the file specified by filename will
+// be used.
 func Extract(filename string, src interface{}) (*ast.File, error) {
 	a := []ast.Expr{}
 	d, err := yaml.NewDecoder(filename, src)

@@ -26,6 +26,7 @@ import (
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -1086,6 +1087,18 @@ func (v Value) Source() ast.Node {
 		return v.v.Conjuncts[0].Source()
 	}
 	return v.v.Value().Source()
+}
+
+// If v exactly represents a package, BuildInstance returns
+// the build instance corresponding to the value; otherwise it returns nil.
+//
+// The value returned by Value.ReferencePath will commonly represent
+// a package.
+func (v Value) BuildInstance() *build.Instance {
+	if v.idx == nil {
+		return nil
+	}
+	return v.idx.GetInstanceFromNode(v.v)
 }
 
 // Err returns the error represented by v or nil v is not an error.

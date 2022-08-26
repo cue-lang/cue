@@ -72,6 +72,42 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4a0ab98a_0d2e7c92",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019759
+      },
+      "writtenOn": "2022-08-26T12:01:04Z",
+      "side": 1,
+      "message": "\u003e Also, judging from the linked issues, this CL seems to address multiple issues that could be separated into separate CLs.\n\nYes,I am regretting the size of this patch.\nI should have considered it.\nAnyway, let’s wait for reaching the conclusion at the issue page, as Paul said.\nWhen I recreate patches after that, I will reflect what you commented here.\nThank you for your time.",
+      "parentUuid": "eb16982c_97d6472f",
+      "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe8728af_82f5da26",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019759
+      },
+      "writtenOn": "2022-08-26T12:01:04Z",
+      "side": 1,
+      "message": "Sure!",
+      "parentUuid": "1c7c7495_a286248e",
+      "revId": "1a8495daff0da35504a888621013f9045ba4faa6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "ed56c96c_1bc7f2d3",
         "filename": "cue/build.go",
         "patchSetId": 3

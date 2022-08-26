@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "597b1981_9e15e868",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-26T11:39:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ceb4474_e080a40d",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "213606da_c2a45f5a",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-08-25T18:09:28Z",
       "side": 1,
       "message": "A hidden field is not a regular field. If anything, regular is String + Index.",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0479c27e_9e1a5de4",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-26T11:39:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "213606da_c2a45f5a",
       "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89ef64e9_3d9c1356",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-26T11:39:21Z",
+      "side": 1,
+      "message": "Is there any term that covers both `foo` and `_foo` ? I guess not. I guess I\u0027ll just remove this method.\n\nUpdate: Ha, can\u0027t remove this method of course, because it was already there. Fixed.",
+      "parentUuid": "a988d8fa_95dad9c5",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3cdb3c06_83c14cf1",
@@ -65,6 +119,24 @@
       "writtenOn": "2022-08-25T18:09:28Z",
       "side": 1,
       "message": "should be false",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99e9e901_75c33403",
+        "filename": "cue/path_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-26T11:39:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cdb3c06_83c14cf1",
       "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

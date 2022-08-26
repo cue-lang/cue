@@ -16,7 +16,6 @@ list: error2: {
 	a: ["3"] + a
 	a: ["1", "2"]
 }
-
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

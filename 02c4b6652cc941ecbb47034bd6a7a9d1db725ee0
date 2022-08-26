@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "44f9011c_3c5fe989",
+        "filename": "cue/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-26T15:35:17Z",
+      "side": 1,
+      "message": "There is no concept that includes both `foo` and `_foo`. Maybe \"non-definition\". But that is rather artificial.",
+      "parentUuid": "89ef64e9_3d9c1356",
+      "revId": "02c4b6652cc941ecbb47034bd6a7a9d1db725ee0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3cdb3c06_83c14cf1",

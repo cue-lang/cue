@@ -228,8 +228,29 @@ type CycleInfo struct {
 
 // A RefNode is a linked list of associated references.
 type RefNode struct {
-	Ref   Resolver
-	Arc   *Vertex // Ref points to this Vertex
+	Ref Resolver
+	Arc *Vertex // Ref points to this Vertex
+
+	// Node is the Vertex of which Ref is evaluated as a conjunct.
+	// If there is a cyclic reference (not structural cycle), then
+	// the reference will have the same node. This allows detecting reference
+	// cycles for nodes referring to nodes with an evaluation cycle
+	// (mode tracked to Evaluating status). Examples:
+	//
+	//      a: x
+	//      Y: x
+	//      x: {Y}
+	//
+	// and
+	//
+	//      Y: x.b
+	//      a: x
+	//      x: b: {Y} | null
+	//
+	// In both cases there are not structural cycles and thus need to be
+	// distinguised from regular structural cycles.
+	Node *Vertex
+
 	Next  *RefNode
 	Depth int32
 }
@@ -292,6 +313,13 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 			continue
 		}
 
+		// We have a reference cycle, as distinguished from a structural
+		// cycle. Reference cycles represent equality, and thus are equal
+		// to top. We can stop processing here.
+		if r.Node == n.node {
+			return v, true
+		}
+
 		depth = r.Depth
 		found = true
 
@@ -326,6 +354,7 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		v.CloseInfo.Refs = &RefNode{
 			Arc:   arc,
 			Ref:   x,
+			Node:  n.node,
 			Next:  v.CloseInfo.Refs,
 			Depth: n.depth,
 		}

@@ -349,6 +349,45 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		break
 	}
 
+	// The code in this switch statement registers caught through EvaluatingArcs
+	// to the root of the cycle. This way, any node referencing this value can
+	// track these nodes early. This is mostly an optimization to shorten the
+	// path for which structural cycles are detected, which may be critical for
+	// performance.
+outer:
+	switch arc.status {
+	case EvaluatingArcs: // also  Evaluating?
+		// The reference may already be there if we had no-cyclic structure
+		// invalidating the cycle.
+		for r := arc.cyclicReferences; r != nil; r = r.Next {
+			if r.Ref == x {
+				break outer
+			}
+		}
+
+		arc.cyclicReferences = &RefNode{
+			Arc:  arc,
+			Ref:  x,
+			Next: arc.cyclicReferences,
+		}
+
+	case Finalized:
+		// Insert cyclic references from found arc, if any.
+		for r := arc.cyclicReferences; r != nil; r = r.Next {
+			if r.Ref == x {
+				found = true
+			}
+			v.CloseInfo.Refs = &RefNode{
+				Arc:  r.Arc,
+				Node: n.node,
+
+				Ref:   x,
+				Next:  v.CloseInfo.Refs,
+				Depth: n.depth,
+			}
+		}
+	}
+
 	// NOTE: we need to add a tracked reference even if arc is not cyclic: it
 	// may still cause a cycle that does not refer to a parent node. For
 	// instance:

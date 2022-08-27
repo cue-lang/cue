@@ -324,6 +324,30 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		depth = r.Depth
 		found = true
 
+		// Mark all conjuncts of this Vertex that refer to the same node as
+		// cyclic. This is an extra safety measure to ensure that two conjuncts
+		// cannot work in tandom to circumvent a cycle. It also tightens
+		// structural cycle detection in some cases. Late detection of cycles
+		// can result in a lot of redundant work.
+		//
+		// TODO: this loop is not on a critical path, but it may be evaluated
+		// if it is worthy keeping at some point.
+		for i, c := range n.node.Conjuncts {
+			if c.CloseInfo.IsCyclic {
+				continue
+			}
+			for rr := c.CloseInfo.Refs; rr != nil; rr = rr.Next {
+				// TODO: Is it necessary to find another way to find
+				// "parent" conjuncts? This mechanism seems not entirely
+				// accurate. Maybe a pointer up to find the root and then
+				// "spread" downwards?
+				if r.Ref == x && r.Arc == rr.Arc {
+					n.node.Conjuncts[i].CloseInfo.IsCyclic = true
+					break
+				}
+			}
+		}
+
 		break
 	}
 

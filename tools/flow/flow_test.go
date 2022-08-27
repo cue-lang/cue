@@ -65,6 +65,9 @@ func TestFlow(t *testing.T) {
 					t.Fatal(err)
 				}
 				fmt.Fprintln(t.Writer(path.Join(step, "value")), string(b))
+
+				stats := task.Stats()
+				fmt.Fprintln(t.Writer(path.Join(step, "stats")), &stats)
 			}
 
 			incSeqNum()
@@ -91,6 +94,8 @@ func TestFlow(t *testing.T) {
 				ToSlash: true,
 			})
 		}
+
+		fmt.Fprintln(t.Writer("stats/totals"), c.Stats())
 	})
 }
 
@@ -263,4 +268,6 @@ func TestX(t *testing.T) {
 	if err := c.Run(context.Background()); err != nil {
 		t.Fatal(errors.Details(err, nil))
 	}
+
+	t.Error(c.Stats())
 }

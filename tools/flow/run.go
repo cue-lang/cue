@@ -94,6 +94,12 @@ func (c *Controller) runLoop() {
 		case t := <-c.taskCh:
 			t.state = Terminated
 
+			taskStats := *t.ctxt.Stats()
+			t.stats.Add(taskStats)
+			c.taskStats.Add(taskStats)
+
+			start := *t.ctxt.Stats()
+
 			switch t.err {
 			case nil:
 				c.updateTaskResults(t)
@@ -115,6 +121,8 @@ func (c *Controller) runLoop() {
 			}
 
 			c.updateTaskValue(t)
+
+			t.stats.Add(c.opCtx.Stats().Since(start))
 
 			c.markReady(t)
 		}

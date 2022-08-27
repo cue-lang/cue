@@ -19,6 +19,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
@@ -105,6 +106,13 @@ func InferBuiltins(elide bool) BuildOption {
 	}
 }
 
+// AccrueCounts accumulates counts for various operations.
+//
+// This is an experimental option.
+func AccrueCounts(counters *stats.Counts) BuildOption {
+	return func(o *runtime.Config) { o.Counts = counters }
+}
+
 func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
 	cfg.Runtime = (*runtime.Runtime)(c)
 	for _, f := range options {
@@ -123,7 +131,7 @@ func (c *Context) BuildInstance(i *build.Instance, options ...BuildOption) Value
 	if err != nil {
 		return c.makeError(err)
 	}
-	return c.make(v)
+	return c.make(v, cfg.Counts)
 }
 
 func (c *Context) makeError(err errors.Error) Value {
@@ -131,21 +139,22 @@ func (c *Context) makeError(err errors.Error) Value {
 	node := &adt.Vertex{BaseValue: b}
 	node.UpdateStatus(adt.Finalized)
 	node.AddConjunct(adt.MakeRootConjunct(nil, b))
-	return c.make(node)
+	return c.make(node, nil)
 }
 
 // BuildInstances creates a Value for each of the given instances and reports
 // the combined errors or nil if there were no errors.
-func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
+func (c *Context) BuildInstances(instances []*build.Instance, options ...BuildOption) ([]Value, error) {
+	cfg := c.parseOptions(options)
 	var errs errors.Error
 	var a []Value
 	for _, b := range instances {
-		v, err := c.runtime().Build(nil, b)
+		v, err := c.runtime().Build(&cfg, b)
 		if err != nil {
 			errs = errors.Append(errs, err)
 			a = append(a, c.makeError(err))
 		} else {
-			a = append(a, c.make(v))
+			a = append(a, c.make(v, cfg.Counts))
 		}
 	}
 	return a, errs
@@ -157,14 +166,15 @@ func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
 // error occurred.
 func (c *Context) BuildFile(f *ast.File, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.runtime().CompileFile(&cfg, f))
+	v, p := c.runtime().CompileFile(&cfg, f)
+	return c.compile(v, p, &cfg)
 }
 
-func (c *Context) compile(v *adt.Vertex, p *build.Instance) Value {
+func (c *Context) compile(v *adt.Vertex, p *build.Instance, cfg *runtime.Config) Value {
 	if p.Err != nil {
 		return c.makeError(p.Err)
 	}
-	return c.make(v)
+	return c.make(v, cfg.Counts)
 }
 
 // BuildExpr creates a Value from x.
@@ -190,9 +200,13 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	if err != nil {
 		return c.makeError(err)
 	}
-	v := adt.Resolve(ctx, conjunct)
+	n := adt.Resolve(ctx, conjunct)
 
-	return c.make(v)
+	v := newValueRoot(r, ctx, n)
+	if cfg.Counts != nil {
+		cfg.Counts.Add(*ctx.Stats())
+	}
+	return v
 }
 
 func errFn(pos token.Pos, msg string, args ...interface{}) {}
@@ -219,7 +233,8 @@ const anonymousPkg = "_"
 // error occurred.
 func (c *Context) CompileString(src string, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.runtime().Compile(&cfg, src))
+	p, v := c.runtime().Compile(&cfg, src)
+	return c.compile(p, v, &cfg)
 }
 
 // CompileBytes parses and build a Value from the given source bytes.
@@ -228,7 +243,8 @@ func (c *Context) CompileString(src string, options ...BuildOption) Value {
 // error occurred.
 func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.runtime().Compile(&cfg, b))
+	p, v := c.runtime().Compile(&cfg, b)
+	return c.compile(p, v, &cfg)
 }
 
 // TODO: fs.FS or custom wrapper?
@@ -244,8 +260,14 @@ func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 // 	return c.compile(c.runtime().Compile("", b))
 // }
 
-func (c *Context) make(v *adt.Vertex) Value {
-	return newValueRoot(c.runtime(), newContext(c.runtime()), v)
+func (c *Context) make(v *adt.Vertex, counts *stats.Counts) Value {
+	r := c.runtime()
+	ctx := newContext(c.runtime())
+	x := newValueRoot(r, ctx, v)
+	if counts != nil {
+		counts.Add(*ctx.Stats())
+	}
+	return x
 }
 
 // An EncodeOption defines options for the various encoding-related methods of
@@ -366,7 +388,7 @@ func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 	n := &adt.Vertex{}
 	n.AddConjunct(adt.MakeRootConjunct(nil, expr))
 	n.Finalize(ctx)
-	return c.make(n)
+	return c.make(n, nil)
 }
 
 // Encode converts a Go type to a CUE value.
@@ -376,7 +398,7 @@ func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 func (c *Context) EncodeType(x interface{}, option ...EncodeOption) Value {
 	switch v := x.(type) {
 	case *adt.Vertex:
-		return c.make(v)
+		return c.make(v, nil)
 	}
 
 	ctx := c.ctx()
@@ -387,7 +409,7 @@ func (c *Context) EncodeType(x interface{}, option ...EncodeOption) Value {
 	n := &adt.Vertex{}
 	n.AddConjunct(adt.MakeRootConjunct(nil, expr))
 	n.Finalize(ctx)
-	return c.make(n)
+	return c.make(n, nil)
 }
 
 // NewList creates a Value that is a list of the given values.
@@ -401,7 +423,7 @@ func (c *Context) NewList(v ...Value) Value {
 		}
 		a[i] = x.v
 	}
-	return c.make(c.ctx().NewList(a...))
+	return c.make(c.ctx().NewList(a...), nil)
 }
 
 // TODO:

@@ -342,3 +342,103 @@ graph TD
 	//cue:path: root.indirectTaskRootReference.incomplete
 	let INCOMPLETE = _
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t3/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t4/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t5/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t6/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t7/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t8/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/t9/stats --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  3
+Reused: 1
+Allocs: 2
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3

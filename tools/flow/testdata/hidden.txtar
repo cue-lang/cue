@@ -85,3 +85,43 @@ graph TD
 	$id: "valToOut"
 	out: "foobar"
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  23
+Reused: 18
+Allocs: 5
+Retain: 0
+
+Unifications: 23
+Conjuncts:    39
+Disjuncts:    23
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  46
+Reused: 41
+Allocs: 5
+Retain: 0
+
+Unifications: 46
+Conjuncts:    73
+Disjuncts:    46
+-- out/run/t3/stats --
+Leaks:  0
+Freed:  46
+Reused: 41
+Allocs: 5
+Retain: 0
+
+Unifications: 46
+Conjuncts:    73
+Disjuncts:    46
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  46
+Reused: 41
+Allocs: 5
+Retain: 0
+
+Unifications: 46
+Conjuncts:    73
+Disjuncts:    46

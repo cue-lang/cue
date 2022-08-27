@@ -100,3 +100,53 @@ graph TD
 	$id: "valToOut"
 	out: "foobarbaz"
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  20
+Reused: 16
+Allocs: 4
+Retain: 0
+
+Unifications: 20
+Conjuncts:    27
+Disjuncts:    20
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  40
+Reused: 36
+Allocs: 4
+Retain: 0
+
+Unifications: 40
+Conjuncts:    58
+Disjuncts:    40
+-- out/run/t3/stats --
+Leaks:  0
+Freed:  60
+Reused: 56
+Allocs: 4
+Retain: 0
+
+Unifications: 60
+Conjuncts:    90
+Disjuncts:    60
+-- out/run/t4/stats --
+Leaks:  0
+Freed:  60
+Reused: 56
+Allocs: 4
+Retain: 0
+
+Unifications: 60
+Conjuncts:    90
+Disjuncts:    60
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  60
+Reused: 56
+Allocs: 4
+Retain: 0
+
+Unifications: 60
+Conjuncts:    90
+Disjuncts:    60

@@ -104,3 +104,53 @@ graph TD
 	out: "foo2"
 	val: "foo2"
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  21
+Reused: 15
+Allocs: 6
+Retain: 0
+
+Unifications: 21
+Conjuncts:    35
+Disjuncts:    21
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  44
+Reused: 38
+Allocs: 6
+Retain: 0
+
+Unifications: 44
+Conjuncts:    77
+Disjuncts:    44
+-- out/run/t3/stats --
+Leaks:  0
+Freed:  72
+Reused: 66
+Allocs: 6
+Retain: 0
+
+Unifications: 72
+Conjuncts:    132
+Disjuncts:    72
+-- out/run/t4/stats --
+Leaks:  0
+Freed:  101
+Reused: 95
+Allocs: 6
+Retain: 0
+
+Unifications: 101
+Conjuncts:    192
+Disjuncts:    101
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  107
+Reused: 97
+Allocs: 10
+Retain: 0
+
+Unifications: 107
+Conjuncts:    198
+Disjuncts:    107

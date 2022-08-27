@@ -16,6 +16,252 @@ list: error2: {
 	a: ["3"] + a
 	a: ["1", "2"]
 }
+
+selfEmbed: ok1: {
+	a: x
+	Y: x
+	x: {Y}
+}
+
+selfEmbed: ok2: {
+	Y: x.b
+	a: x
+	x: b: {Y}
+}
+
+selfEmbed: ok3: {
+	Y: x
+	a: x
+	x: {Y}
+}
+
+selfEmbed: ok4: {
+	a: x
+	x: {Y}
+	Y: x
+}
+
+selfEmbed: ok5: {
+	x: {Y}
+	a: x
+	Y: x
+}
+
+selfEmbed: ok6: {
+	x: b: {Y}
+	Y: x.b
+	a: x
+}
+
+
+disjSelf: ok1: {
+	#A: string | #A
+	x: #A
+}
+
+disjSelf: ok2: {
+	x: #A
+	#A: string | #A
+}
+
+disjSelf: ok3: {
+	#A: #A | string
+	x: #A
+}
+
+disjSelf: ok4: {
+	x: #A
+	#A: #A | string
+}
+
+disjEmbed: ok1: {
+	#A: string | {#A}
+	x: #A
+}
+
+disjEmbed: ok2: {
+	x: #A
+	#A: string | {#A}
+}
+
+disjEmbed: ok3: {
+	#A: {#A} | string
+	x: #A
+}
+
+disjEmbed: ok4: {
+	x: #A
+	#A: {#A} | string
+}
+
+// TODO: x and #A should yield the same result.
+disjList: _
+disjList: ok1: {
+	#A: string | [#A]
+	x: #A
+
+	y: x
+	y: [[[[string]]]]
+}
+
+disjList: ok2: {
+	x: #A
+	#A: string | [#A]
+}
+
+disjList: ok3: {
+	#A: [#A] | string
+	x: #A
+}
+
+disjList: ok4: {
+	x: #A
+	#A: [#A] | string
+}
+
+name: "foo"
+dynamicSelf: ok1: {
+	X=(name): string | X
+	x: X
+}
+
+dynamicSelf: ok2: {
+	x: X
+	X=(name): string | X
+}
+
+dynamicSelf: ok3: {
+	X=(name): X | string
+	x: X
+}
+
+dynamicSelf: ok4: {
+	x: X
+	X=(name): X | string
+}
+
+dynamicEmbed: ok1: {
+	X=(name): string | {X}
+	x: X
+}
+
+dynamicEmbed: ok2: {
+	x: X
+	X=(name): string | {X}
+}
+
+dynamicEmbed: ok3: {
+	X=(name): {X} | string
+	x: X
+}
+
+dynamicEmbed: ok4: {
+	x: X
+	X=(name): {X} | string
+}
+
+dynamicList: _
+dynamicList: ok1: {
+	X=(name): string | [X]
+	x: X
+
+	y: x
+	y: [[[[string]]]]
+}
+
+dynamicList: ok2: {
+	x: X
+	X=(name): string | [X]
+}
+
+dynamicList: ok3: {
+	X=(name): [X] | string
+	x: X
+}
+
+dynamicList: ok4: {
+	x: X
+	X=(name): [X] | string
+}
+
+dynamicPatternSelf: ok1: { X=[string]: string | X }
+dynamicPatternSelf: ok2: { X=[string]: X | string }
+dynamicPatternEmbed: ok1: { X=[string]: string | {X} }
+dynamicPatternEmbed: ok2: { X=[string]: {X} | string }
+dynamicPatternList: ok1: { X=[string]: string | [X] }
+dynamicPatternList: ok2: { X=[string]: [X] | string }
+
+valueSelf: ok1: {
+	y: X={string | X}
+	x: y
+}
+
+valueSelf: ok2: {
+	x: y
+	y: X={string | X}
+}
+
+valueSelf: ok3: {
+	y: X={X | string}
+	x: y
+}
+
+valueSelf: ok4: {
+	x: y
+	y: X={X | string}
+}
+
+valueEmbed: ok1: {
+	y: X={string | {X}}
+	x: y
+}
+
+valueEmbed: ok2: {
+	x: y
+	y: X={string | {X}}
+}
+
+valueEmbed: ok3: {
+	y: X={{X} | string}
+	x: y
+}
+
+valueEmbed: ok4: {
+	x: y
+	y: X={{X} | string}
+}
+
+valueList: ok1: {
+	y: X={string | [X]}
+	x: y
+}
+
+valueList: ok2: {
+	x: y
+	y: X={string | [X]}
+}
+
+valueList: ok3: {
+	y: X={[X] | string}
+	x: y
+}
+
+valueList: ok4: {
+	x: y
+	y: X={[X] | string}
+}
+
+// Issue #1729
+issue1729: t1: {
+	#x: { #x | {} }
+	x: #x & {}
+}
+
+issue1729: t2: {
+	x: #x & {}
+	#x: { #x | {} }
+}
+
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:
@@ -103,6 +349,325 @@ Result:
       }
     }
   }
+  selfEmbed: (struct){
+    ok1: (struct){
+      a: (struct){
+      }
+      Y: (struct){
+      }
+      x: (struct){
+      }
+    }
+    ok2: (struct){
+      Y: (struct){
+      }
+      a: (struct){
+        b: (struct){
+        }
+      }
+      x: (struct){
+        b: (struct){
+        }
+      }
+    }
+    ok3: (struct){
+      Y: (struct){
+      }
+      a: (struct){
+      }
+      x: (struct){
+      }
+    }
+    ok4: (struct){
+      a: (struct){
+      }
+      x: (struct){
+      }
+      Y: (struct){
+      }
+    }
+    ok5: (struct){
+      x: (struct){
+      }
+      a: (struct){
+      }
+      Y: (struct){
+      }
+    }
+    ok6: (struct){
+      x: (struct){
+        b: (struct){
+        }
+      }
+      Y: (struct){
+      }
+      a: (struct){
+        b: (struct){
+        }
+      }
+    }
+  }
+  disjSelf: (struct){
+    ok1: (struct){
+      #A: (_){ |((string){ string }, (_){ _ }) }
+      x: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (_){ _ }) }
+      #A: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok3: (struct){
+      #A: (_){ |((_){ _ }, (string){ string }) }
+      x: (_){ |((_){ _ }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((_){ _ }, (string){ string }) }
+      #A: (_){ |((_){ _ }, (string){ string }) }
+    }
+  }
+  disjEmbed: (struct){
+    ok1: (struct){
+      #A: ((string|struct)){ |((string){ string }, (#struct){
+        }) }
+      x: ((string|struct)){ |((string){ string }, (#struct){
+        }) }
+    }
+    ok2: (struct){
+      x: ((string|struct)){ |((string){ string }, (#struct){
+        }) }
+      #A: ((string|struct)){ |((string){ string }, (#struct){
+        }) }
+    }
+    ok3: (struct){
+      #A: ((string|struct)){ |((#struct){
+        }, (string){ string }) }
+      x: ((string|struct)){ |((#struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: ((string|struct)){ |((#struct){
+        }, (string){ string }) }
+      #A: ((string|struct)){ |((#struct){
+        }, (string){ string }) }
+    }
+  }
+  disjList: (struct){
+    ok1: (struct){
+      #A: (string){ string }
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      y: (#list){
+        0: (#list){
+          0: (#list){
+            0: (#list){
+              0: (string){ string }
+            }
+          }
+        }
+      }
+    }
+    ok2: (struct){
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      #A: (string){ string }
+    }
+    ok3: (struct){
+      #A: (string){ string }
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      #A: (string){ string }
+    }
+  }
+  name: (string){ "foo" }
+  dynamicSelf: (struct){
+    ok1: (struct){
+      x: (_){ |((string){ string }, (_){ _ }) }
+      foo: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (_){ _ }) }
+      foo: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok3: (struct){
+      x: (_){ |((_){ _ }, (string){ string }) }
+      foo: (_){ |((_){ _ }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((_){ _ }, (string){ string }) }
+      foo: (_){ |((_){ _ }, (string){ string }) }
+    }
+  }
+  dynamicEmbed: (struct){
+    ok1: (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+      foo: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+    }
+    ok2: (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+      foo: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+    }
+    ok3: (struct){
+      x: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+      foo: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+      foo: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+    }
+  }
+  dynamicList: (struct){
+    ok1: (struct){
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      y: (#list){
+        0: (#list){
+          0: (#list){
+            0: (#list){
+              0: (string){ string }
+            }
+          }
+        }
+      }
+      foo: (string){ string }
+    }
+    ok2: (struct){
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      foo: (string){ string }
+    }
+    ok3: (struct){
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      foo: (string){ string }
+    }
+    ok4: (struct){
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      foo: (string){ string }
+    }
+  }
+  dynamicPatternSelf: (struct){
+    ok1: (struct){
+    }
+    ok2: (struct){
+    }
+  }
+  dynamicPatternEmbed: (struct){
+    ok1: (struct){
+    }
+    ok2: (struct){
+    }
+  }
+  dynamicPatternList: (struct){
+    ok1: (struct){
+    }
+    ok2: (struct){
+    }
+  }
+  valueSelf: (struct){
+    ok1: (struct){
+      y: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+      x: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+    }
+    ok2: (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+      y: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+    }
+    ok3: (struct){
+      y: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+      x: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+      y: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+    }
+  }
+  valueEmbed: (struct){
+    ok1: (struct){
+      y: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+      x: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+    }
+    ok2: (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+      y: ((string|struct)){ |((string){ string }, (struct){
+        }) }
+    }
+    ok3: (struct){
+      y: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+      x: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+      y: ((string|struct)){ |((struct){
+        }, (string){ string }) }
+    }
+  }
+  valueList: (struct){
+    ok1: (struct){
+      y: (string){ string }
+      x: (string){ string }
+    }
+    ok2: (struct){
+      x: (string){ string }
+      y: (string){ string }
+    }
+    ok3: (struct){
+      y: (string){ string }
+      x: (string){ string }
+    }
+    ok4: (struct){
+      x: (string){ string }
+      y: (string){ string }
+    }
+  }
+  issue1729: (struct){
+    t1: (struct){
+      #x: (#struct){
+      }
+      x: (#struct){
+      }
+    }
+    t2: (struct){
+      x: (#struct){
+      }
+      #x: (#struct){
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -139,6 +704,429 @@ Result:
         "1",
         "2",
       ]
+    }
+  }
+  selfEmbed: {
+    ok1: {
+      a: 〈0;x〉
+      Y: 〈0;x〉
+      x: {
+        〈1;Y〉
+      }
+    }
+  }
+  selfEmbed: {
+    ok2: {
+      Y: 〈0;x〉.b
+      a: 〈0;x〉
+      x: {
+        b: {
+          〈2;Y〉
+        }
+      }
+    }
+  }
+  selfEmbed: {
+    ok3: {
+      Y: 〈0;x〉
+      a: 〈0;x〉
+      x: {
+        〈1;Y〉
+      }
+    }
+  }
+  selfEmbed: {
+    ok4: {
+      a: 〈0;x〉
+      x: {
+        〈1;Y〉
+      }
+      Y: 〈0;x〉
+    }
+  }
+  selfEmbed: {
+    ok5: {
+      x: {
+        〈1;Y〉
+      }
+      a: 〈0;x〉
+      Y: 〈0;x〉
+    }
+  }
+  selfEmbed: {
+    ok6: {
+      x: {
+        b: {
+          〈2;Y〉
+        }
+      }
+      Y: 〈0;x〉.b
+      a: 〈0;x〉
+    }
+  }
+  disjSelf: {
+    ok1: {
+      #A: (string|〈0;#A〉)
+      x: 〈0;#A〉
+    }
+  }
+  disjSelf: {
+    ok2: {
+      x: 〈0;#A〉
+      #A: (string|〈0;#A〉)
+    }
+  }
+  disjSelf: {
+    ok3: {
+      #A: (〈0;#A〉|string)
+      x: 〈0;#A〉
+    }
+  }
+  disjSelf: {
+    ok4: {
+      x: 〈0;#A〉
+      #A: (〈0;#A〉|string)
+    }
+  }
+  disjEmbed: {
+    ok1: {
+      #A: (string|{
+        〈1;#A〉
+      })
+      x: 〈0;#A〉
+    }
+  }
+  disjEmbed: {
+    ok2: {
+      x: 〈0;#A〉
+      #A: (string|{
+        〈1;#A〉
+      })
+    }
+  }
+  disjEmbed: {
+    ok3: {
+      #A: ({
+        〈1;#A〉
+      }|string)
+      x: 〈0;#A〉
+    }
+  }
+  disjEmbed: {
+    ok4: {
+      x: 〈0;#A〉
+      #A: ({
+        〈1;#A〉
+      }|string)
+    }
+  }
+  disjList: _
+  disjList: {
+    ok1: {
+      #A: (string|[
+        〈1;#A〉,
+      ])
+      x: 〈0;#A〉
+      y: 〈0;x〉
+      y: [
+        [
+          [
+            [
+              string,
+            ],
+          ],
+        ],
+      ]
+    }
+  }
+  disjList: {
+    ok2: {
+      x: 〈0;#A〉
+      #A: (string|[
+        〈1;#A〉,
+      ])
+    }
+  }
+  disjList: {
+    ok3: {
+      #A: ([
+        〈1;#A〉,
+      ]|string)
+      x: 〈0;#A〉
+    }
+  }
+  disjList: {
+    ok4: {
+      x: 〈0;#A〉
+      #A: ([
+        〈1;#A〉,
+      ]|string)
+    }
+  }
+  name: "foo"
+  dynamicSelf: {
+    ok1: {
+      〈2;name〉: (string|〈0;(〈2;name〉)〉)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicSelf: {
+    ok2: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (string|〈0;(〈2;name〉)〉)
+    }
+  }
+  dynamicSelf: {
+    ok3: {
+      〈2;name〉: (〈0;(〈2;name〉)〉|string)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicSelf: {
+    ok4: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (〈0;(〈2;name〉)〉|string)
+    }
+  }
+  dynamicEmbed: {
+    ok1: {
+      〈2;name〉: (string|{
+        〈1;(〈2;name〉)〉
+      })
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicEmbed: {
+    ok2: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (string|{
+        〈1;(〈2;name〉)〉
+      })
+    }
+  }
+  dynamicEmbed: {
+    ok3: {
+      〈2;name〉: ({
+        〈1;(〈2;name〉)〉
+      }|string)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicEmbed: {
+    ok4: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: ({
+        〈1;(〈2;name〉)〉
+      }|string)
+    }
+  }
+  dynamicList: _
+  dynamicList: {
+    ok1: {
+      〈2;name〉: (string|[
+        〈1;(〈2;name〉)〉,
+      ])
+      x: 〈0;(〈2;name〉)〉
+      y: 〈0;x〉
+      y: [
+        [
+          [
+            [
+              string,
+            ],
+          ],
+        ],
+      ]
+    }
+  }
+  dynamicList: {
+    ok2: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: (string|[
+        〈1;(〈2;name〉)〉,
+      ])
+    }
+  }
+  dynamicList: {
+    ok3: {
+      〈2;name〉: ([
+        〈1;(〈2;name〉)〉,
+      ]|string)
+      x: 〈0;(〈2;name〉)〉
+    }
+  }
+  dynamicList: {
+    ok4: {
+      x: 〈0;(〈2;name〉)〉
+      〈2;name〉: ([
+        〈1;(〈2;name〉)〉,
+      ]|string)
+    }
+  }
+  dynamicPatternSelf: {
+    ok1: {
+      [string]: (string|〈0;(〈0;-〉)〉)
+    }
+  }
+  dynamicPatternSelf: {
+    ok2: {
+      [string]: (〈0;(〈0;-〉)〉|string)
+    }
+  }
+  dynamicPatternEmbed: {
+    ok1: {
+      [string]: (string|{
+        〈1;(〈1;-〉)〉
+      })
+    }
+  }
+  dynamicPatternEmbed: {
+    ok2: {
+      [string]: ({
+        〈1;(〈1;-〉)〉
+      }|string)
+    }
+  }
+  dynamicPatternList: {
+    ok1: {
+      [string]: (string|[
+        〈1;(〈1;-〉)〉,
+      ])
+    }
+  }
+  dynamicPatternList: {
+    ok2: {
+      [string]: ([
+        〈1;(〈1;-〉)〉,
+      ]|string)
+    }
+  }
+  valueSelf: {
+    ok1: {
+      y: {
+        (string|〈1〉)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueSelf: {
+    ok2: {
+      x: 〈0;y〉
+      y: {
+        (string|〈1〉)
+      }
+    }
+  }
+  valueSelf: {
+    ok3: {
+      y: {
+        (〈1〉|string)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueSelf: {
+    ok4: {
+      x: 〈0;y〉
+      y: {
+        (〈1〉|string)
+      }
+    }
+  }
+  valueEmbed: {
+    ok1: {
+      y: {
+        (string|{
+          〈2〉
+        })
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueEmbed: {
+    ok2: {
+      x: 〈0;y〉
+      y: {
+        (string|{
+          〈2〉
+        })
+      }
+    }
+  }
+  valueEmbed: {
+    ok3: {
+      y: {
+        ({
+          〈2〉
+        }|string)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueEmbed: {
+    ok4: {
+      x: 〈0;y〉
+      y: {
+        ({
+          〈2〉
+        }|string)
+      }
+    }
+  }
+  valueList: {
+    ok1: {
+      y: {
+        (string|[
+          〈2〉,
+        ])
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueList: {
+    ok2: {
+      x: 〈0;y〉
+      y: {
+        (string|[
+          〈2〉,
+        ])
+      }
+    }
+  }
+  valueList: {
+    ok3: {
+      y: {
+        ([
+          〈2〉,
+        ]|string)
+      }
+      x: 〈0;y〉
+    }
+  }
+  valueList: {
+    ok4: {
+      x: 〈0;y〉
+      y: {
+        ([
+          〈2〉,
+        ]|string)
+      }
+    }
+  }
+  issue1729: {
+    t1: {
+      #x: {
+        (〈1;#x〉|{})
+      }
+      x: (〈0;#x〉 & {})
+    }
+  }
+  issue1729: {
+    t2: {
+      x: (〈0;#x〉 & {})
+      #x: {
+        (〈1;#x〉|{})
+      }
     }
   }
 }

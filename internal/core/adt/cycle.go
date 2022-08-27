@@ -293,10 +293,6 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		if r.Ref != x {
 			continue
 		}
-		if v.CloseInfo.Inline {
-			n.reportCycleError()
-			return v, true
-		}
 
 		// A reference that is within a graph that is being evaluated
 		// may repeat with a different arc and will point to a
@@ -306,6 +302,11 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		// is included through a different path and is not a cycle.
 		if r.Arc != arc && arc.status == Finalized {
 			continue
+		}
+
+		if v.CloseInfo.Inline {
+			n.reportCycleError()
+			return v, true
 		}
 
 		// We have a reference cycle, as distinguished from a structural

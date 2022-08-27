@@ -52,11 +52,7 @@ sameValues: CmustBeA: {
       }
       C: (struct){
         x: (#list){
-          0: ((string|struct)){ |((string){ string }, (struct){
-              x: (#list){
-                0: (string){ string }
-              }
-            }) }
+          0: (string){ string }
         }
       }
     }

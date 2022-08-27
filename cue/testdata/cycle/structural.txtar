@@ -550,6 +550,7 @@ b6.x.a.0: structural cycle
 b7.a.0: structural cycle
 c1.a.c.c: structural cycle
 d1.a.b.c.d.t: structural cycle
+d2.a.b.c.d.t: structural cycle
 d2.r.c.d.t: structural cycle
 e1.a.c: structural cycle
 e1.b.c: structural cycle
@@ -611,6 +612,7 @@ p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
 shortPathFail.elipsis.t2.Foo.ref.ref: structural cycle
 withLetFail.schema.next: structural cycle
+z1.z.f.h: structural cycle
 z1.z.g.h: structural cycle
 b12b.#list.tail: structural cycle:
     ./in.cue:176:6
@@ -1210,17 +1212,7 @@ Result:
             // [structural cycle]
             h: (int){ int }
             t: (_|_){
-              // [structural cycle]
-              c: (_|_){
-                // [structural cycle]
-                d: (_|_){
-                  // [structural cycle]
-                  h: (int){ int }
-                  t: (_|_){
-                    // [structural cycle]
-                  }
-                }
-              }
+              // [structural cycle] d2.a.b.c.d.t: structural cycle
             }
           }
         }
@@ -1257,9 +1249,7 @@ Result:
     // [structural cycle]
     doubleRef: (struct){
       a: (#struct){
-        Next: ((null|struct)){ |(*(null){ null }, (#struct){
-            Next: (null){ null }
-          }) }
+        Next: (null){ null }
       }
       #List: (#struct){
         Next: (null){ null }
@@ -1571,10 +1561,7 @@ Result:
       f: (_|_){
         // [structural cycle]
         h: (_|_){
-          // [structural cycle]
-          h: (_|_){
-            // [structural cycle] z1.z.g.h: structural cycle
-          }
+          // [structural cycle] z1.z.f.h: structural cycle
         }
       }
       g: (_|_){

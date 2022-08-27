@@ -263,20 +263,20 @@ type cyclicConjunct struct {
 //
 // Other inputs:
 //
-//	arc  the reference to which x points
-//	v    the Conjunct from which x originates
+//  arc  the reference to which x points
+//  v    the Conjunct from which x originates
 //
-// A cyclic node is added to a queue for later processing if no evidence of
-// a non-cyclic node has so far been found. updateCyclicStatus processes
-// delayed nodes down the line once such evidence is found.
+// A cyclic node is added to a queue for later processing if no evidence of a
+// non-cyclic node has so far been found. updateCyclicStatus processes delayed
+// nodes down the line once such evidence is found.
 //
 // If a cycle is the result of "inline" processing (an expression referencing
 // itself), an error is reported immediately.
 //
 // It returns the updated Conjunct (marked with cyclic info) and whether or not
-// its processing should be delayed, which is the case if the conjunct seems to
-// be fully cyclic so far.
-func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, delay bool) {
+// its processing should be skipped, which is the case either if the conjunct
+// seems to be fully cyclic so far or if there is a valid reference cycle.
+func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, skip bool) {
 	// TODO(perf): this optimization can work if we also check for any
 	// references pointing to arc within arc. This can be done with compiler
 	// support. With this optimization, almost all references could avoid cycle
@@ -293,10 +293,6 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		if r.Ref != x {
 			continue
 		}
-		if v.CloseInfo.Inline {
-			n.reportCycleError()
-			return v, true
-		}
 
 		// A reference that is within a graph that is being evaluated
 		// may repeat with a different arc and will point to a
@@ -306,6 +302,11 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 		// is included through a different path and is not a cycle.
 		if r.Arc != arc && arc.status == Finalized {
 			continue
+		}
+
+		if v.CloseInfo.Inline {
+			n.reportCycleError()
+			return v, true
 		}
 
 		// We have a reference cycle, as distinguished from a structural

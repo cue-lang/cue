@@ -1431,8 +1431,8 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			arc.Finalize(ctx)
 		}
 
-		v, delay := n.markCycle(arc, v, x)
-		if delay {
+		v, skip := n.markCycle(arc, v, x)
+		if skip {
 			return
 		}
 

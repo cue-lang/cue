@@ -1,4 +1,6 @@
 -- x.cue --
+// variants of fib
+
 inline: small: {
 	f: {
 		n: int
@@ -21,6 +23,20 @@ inline: patterns: {
 	[string]: {n: {}}
 	f: [string]: {}
 	f: {}
+}
+
+inline: acrossFields: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: (f & {in: k00}).out
+	k20: (f & {in: k10}).out
+	k30: (f & {in: k20}).out
+
+	// invalid recursion is here.
+	k10: (f & {in: k30}).out
 }
 -- out/compile --
 --- x.cue
@@ -73,15 +89,42 @@ inline: patterns: {
       f: {}
     }
   }
+  inline: {
+    acrossFields: {
+      f: {
+        in: number
+        out: 〈0;in〉
+      }
+      k00: 0
+      k10: (〈0;f〉 & {
+        in: 〈1;k00〉
+      }).out
+      k20: (〈0;f〉 & {
+        in: 〈1;k10〉
+      }).out
+      k30: (〈0;f〉 & {
+        in: 〈1;k20〉
+      }).out
+      k10: (〈0;f〉 & {
+        in: 〈1;k30〉
+      }).out
+    }
+  }
 }
 -- out/eval --
 Errors:
 structural cycle:
-    ./x.cue:4:9
+    ./x.cue:6:9
 structural cycle:
-    ./x.cue:10:24
+    ./x.cue:12:24
 structural cycle:
-    ./x.cue:18:9
+    ./x.cue:20:9
+in: structural cycle:
+    ./x.cue:34:8
+in: structural cycle:
+    ./x.cue:35:8
+in: structural cycle:
+    ./x.cue:38:8
 
 Result:
 (_|_){
@@ -95,7 +138,7 @@ Result:
         n: (int){ int }
         out: (_|_){
           // [structural cycle] structural cycle:
-          //     ./x.cue:4:9
+          //     ./x.cue:6:9
         }
       }
     }
@@ -103,14 +146,14 @@ Result:
       // [structural cycle]
       f2: (_|_){
         // [structural cycle] structural cycle:
-        //     ./x.cue:10:24
+        //     ./x.cue:12:24
       }
       fRec: (_|_){
         // [structural cycle]
         nn: (int){ int }
         out: (_|_){
           // [structural cycle] structural cycle:
-          //     ./x.cue:10:24
+          //     ./x.cue:12:24
         }
       }
       f: (_|_){
@@ -118,7 +161,7 @@ Result:
         n: (int){ int }
         out: (_|_){
           // [structural cycle] structural cycle:
-          //     ./x.cue:10:24
+          //     ./x.cue:12:24
         }
       }
     }
@@ -128,8 +171,28 @@ Result:
         // [structural cycle]
         n: (_|_){
           // [structural cycle] structural cycle:
-          //     ./x.cue:18:9
+          //     ./x.cue:20:9
         }
+      }
+    }
+    acrossFields: (_|_){
+      // [structural cycle]
+      f: (struct){
+        in: (number){ number }
+        out: (number){ number }
+      }
+      k00: (int){ 0 }
+      k10: (_|_){
+        // [structural cycle] in: structural cycle:
+        //     ./x.cue:38:8
+      }
+      k20: (_|_){
+        // [structural cycle] in: structural cycle:
+        //     ./x.cue:34:8
+      }
+      k30: (_|_){
+        // [structural cycle] in: structural cycle:
+        //     ./x.cue:35:8
       }
     }
   }

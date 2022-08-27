@@ -21,6 +21,8 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/cuetxtar"
 	"golang.org/x/tools/txtar"
 )
@@ -134,5 +136,94 @@ bar: [
 	vs, err := cuecontext.New().BuildInstances([]*build.Instance{instance})
 	if err == nil {
 		t.Fatalf("BuildInstances() = %#v, wanted error", vs)
+	}
+}
+
+func TestAddCounts(t *testing.T) {
+	config := `{
+	a: 1
+	b: 1 & a
+	c: 3 | 4
+}`
+
+	archive := txtar.Parse([]byte("-- foo.cue --\n" + config))
+
+	want := stats.Counts{
+		Unifications: 4,
+		Disjuncts:    6,
+		Conjuncts:    9,
+	}
+
+	counts := &stats.Counts{}
+	accrueOpt := cue.AccrueCounts(counts)
+
+	c := cuecontext.New()
+
+	testCases := []struct {
+		name string
+		f    func(t *testing.T)
+
+		// Some operations may have a slight deviating count.
+		adjust stats.Counts
+	}{{
+		name: "BuildExpr",
+		f: func(t *testing.T) {
+			x, err := parser.ParseExpr("", config)
+			if err != nil {
+				t.Fatal(err)
+			}
+			c.BuildExpr(x, accrueOpt)
+		},
+		adjust: stats.Counts{
+			Conjuncts: 1, // BuildExpr uses one less conjunct.
+		},
+	}, {
+		name: "BuildFile",
+		f: func(t *testing.T) {
+			x, _ := parser.ParseFile("", config)
+			c.BuildFile(x, accrueOpt)
+		},
+	}, {
+		name: "BuildInstance",
+		f: func(t *testing.T) {
+			// Don't reuse load as the result of computing the package may be
+			// cached.
+			instance := cuetxtar.Load(archive, t.TempDir())[0]
+			if instance.Err != nil {
+				t.Fatal(instance.Err)
+			}
+			c.BuildInstance(instance, accrueOpt)
+		},
+	}, {
+		name: "BuildInstances",
+		f: func(t *testing.T) {
+			instance := cuetxtar.Load(archive, t.TempDir())[0]
+			if instance.Err != nil {
+				t.Fatal(instance.Err)
+			}
+			c.BuildInstances([]*build.Instance{instance}, accrueOpt)
+		},
+	}, {
+		name: "CompileBytes",
+		f:    func(t *testing.T) { c.CompileBytes([]byte(config), accrueOpt) },
+	}, {
+		name: "CompileString",
+		f:    func(t *testing.T) { c.CompileString(config, accrueOpt) },
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			*counts = stats.Counts{}
+			tc.f(t)
+			got := stats.Counts{
+				Unifications: counts.Unifications,
+				Disjuncts:    counts.Disjuncts,
+				Conjuncts:    counts.Conjuncts,
+			}
+			got.Add(tc.adjust)
+
+			if got != want {
+				t.Errorf("\ngot:\n%v;\n\nwant:\n%v", got, want)
+			}
+		})
 	}
 }

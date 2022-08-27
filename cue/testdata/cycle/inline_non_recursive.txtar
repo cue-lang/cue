@@ -1,0 +1,240 @@
+-- in.cue --
+// All these should pass. These look like recursive inlined calls, but they are
+// not.
+
+ok1: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: (f & {in: k00}).out
+	k20: (f & {in: k10}).out
+	k30: (f & {in: k20}).out
+}
+
+ok2: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: {(f & {in: k00}).out}
+	k20: {(f & {in: k10}).out}
+	k30: {(f & {in: k20}).out}
+}
+
+ok3: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: {close((f & {in: k00})).out}
+	k20: {close((f & {in: k10})).out}
+	k30: {close((f & {in: k20})).out}
+}
+
+ok4: {
+	f: {
+		in:  number
+		out: in
+	}
+	k00: 0
+	k10: {out: {(f & {in: k00}).out}}.out
+	k20: {out: {(f & {in: k10}).out}}.out
+	k30: {out: {(f & {in: k20}).out}}.out
+}
+
+// Issue #1708
+issue1708: {
+	#add10: {
+		in: number
+		a10: { i: in, o: i + 10 }
+		out: a10.o
+	}
+	k00: 0
+	k10: (#add10 & {in: k00}).out
+	k20: (#add10 & {in: k10}).out
+	k30: (#add10 & {in: k20}).out
+}
+
+-- out/eval --
+(struct){
+  ok1: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  ok2: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  ok3: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  ok4: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  issue1708: (struct){
+    #add10: (#struct){
+      in: (number){ number }
+      a10: (#struct){
+        i: (number){ number }
+        o: (_|_){
+          // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
+          //     ./in.cue:52:20
+          //     ./in.cue:51:7
+          //     ./in.cue:52:13
+        }
+      }
+      out: (_|_){
+        // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
+        //     ./in.cue:52:20
+        //     ./in.cue:51:7
+        //     ./in.cue:52:13
+      }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 10 }
+    k20: (int){ 20 }
+    k30: (int){ 30 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  ok1: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: (〈0;f〉 & {
+      in: 〈1;k00〉
+    }).out
+    k20: (〈0;f〉 & {
+      in: 〈1;k10〉
+    }).out
+    k30: (〈0;f〉 & {
+      in: 〈1;k20〉
+    }).out
+  }
+  ok2: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: {
+      (〈1;f〉 & {
+        in: 〈2;k00〉
+      }).out
+    }
+    k20: {
+      (〈1;f〉 & {
+        in: 〈2;k10〉
+      }).out
+    }
+    k30: {
+      (〈1;f〉 & {
+        in: 〈2;k20〉
+      }).out
+    }
+  }
+  ok3: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: {
+      close((〈1;f〉 & {
+        in: 〈2;k00〉
+      })).out
+    }
+    k20: {
+      close((〈1;f〉 & {
+        in: 〈2;k10〉
+      })).out
+    }
+    k30: {
+      close((〈1;f〉 & {
+        in: 〈2;k20〉
+      })).out
+    }
+  }
+  ok4: {
+    f: {
+      in: number
+      out: 〈0;in〉
+    }
+    k00: 0
+    k10: {
+      out: {
+        (〈2;f〉 & {
+          in: 〈3;k00〉
+        }).out
+      }
+    }.out
+    k20: {
+      out: {
+        (〈2;f〉 & {
+          in: 〈3;k10〉
+        }).out
+      }
+    }.out
+    k30: {
+      out: {
+        (〈2;f〉 & {
+          in: 〈3;k20〉
+        }).out
+      }
+    }.out
+  }
+  issue1708: {
+    #add10: {
+      in: number
+      a10: {
+        i: 〈1;in〉
+        o: (〈0;i〉 + 10)
+      }
+      out: 〈0;a10〉.o
+    }
+    k00: 0
+    k10: (〈0;#add10〉 & {
+      in: 〈1;k00〉
+    }).out
+    k20: (〈0;#add10〉 & {
+      in: 〈1;k10〉
+    }).out
+    k30: (〈0;#add10〉 & {
+      in: 〈1;k20〉
+    }).out
+  }
+}

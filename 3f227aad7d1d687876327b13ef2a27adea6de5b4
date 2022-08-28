@@ -50,6 +50,23 @@
       "message": "LGTM with nits on the commit message.",
       "revId": "3f227aad7d1d687876327b13ef2a27adea6de5b4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcb14267_aaf7c582",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:58:30Z",
+      "side": 1,
+      "message": "Noting per our msg exchange that Unity failing here is fine because it passes in CL 542791, where timings actually appear to be faster than baseline versions.",
+      "revId": "3f227aad7d1d687876327b13ef2a27adea6de5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,23 @@
       "message": "Noting per our msg exchange that Unity failing here is fine because it passes in CL 542791, where timings actually appear to be faster than baseline versions.",
       "revId": "d05dd1c1404a0886cb134f0752e3cea623004428",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a0b6259_24a44e03",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:58:10Z",
+      "side": 1,
+      "message": "LGTM pending previous comments in patchset 4",
+      "revId": "d05dd1c1404a0886cb134f0752e3cea623004428",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

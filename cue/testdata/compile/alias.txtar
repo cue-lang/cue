@@ -1,0 +1,45 @@
+-- in.cue --
+dynamic: t1: {
+	X=(a): 1
+	x: X
+	a: "name"
+}
+
+dynamic: t2: {
+	x: X
+	X=(a): 1
+	a: "name"
+}
+-- out/compile --
+--- in.cue
+{
+  dynamic: {
+    t1: {
+      〈0;a〉: 1
+      x: 〈0;(〈0;a〉)〉
+      a: "name"
+    }
+  }
+  dynamic: {
+    t2: {
+      x: 〈0;(〈0;a〉)〉
+      〈0;a〉: 1
+      a: "name"
+    }
+  }
+}
+-- out/eval --
+(struct){
+  dynamic: (struct){
+    t1: (struct){
+      x: (int){ 1 }
+      a: (string){ "name" }
+      name: (int){ 1 }
+    }
+    t2: (struct){
+      x: (int){ 1 }
+      a: (string){ "name" }
+      name: (int){ 1 }
+    }
+  }
+}

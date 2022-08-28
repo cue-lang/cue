@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5c62742_2931b20e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:18:03Z",
+      "side": 1,
+      "message": "\"distinction _between_ references\"",
+      "revId": "b78a3373b5d6f0bbd20e7e370c8b8770a7d17ddf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a60033c_c67941ce",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:18:03Z",
+      "side": 1,
+      "message": "\"tightening\"",
+      "revId": "b78a3373b5d6f0bbd20e7e370c8b8770a7d17ddf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09a87267_4dc0ca46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:18:03Z",
+      "side": 1,
+      "message": "LGTM. I don\u0027t follow all the algorithm changes, but the test diffs look sensible.",
+      "revId": "b78a3373b5d6f0bbd20e7e370c8b8770a7d17ddf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

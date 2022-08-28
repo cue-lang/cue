@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80f8a0e2_5661b882",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "LGTM with some questions on what appear to be lots of duplicate cases?\n\nI follow the general gist of the change, as we discussed. ",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30d503ee_38059479",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to disjList.ok1, but for the missing y field.",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb8e5f50_20c7a1c4",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to dynamicList.ok1, but for the missing y field.",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "643d07ce_e8adc138",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to valueSelf.ok1?",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bad9165_1f922239",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to valueSelf.ok3?",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db2fb682_b90ed884",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to valueEmbed.ok1?",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ed0edff_26cae4f8",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 229,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to valueEmbed.ok3?",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18efee9e_5bf6a716",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 239,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to valueList.ok1?",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9727ae9e_48d3ac27",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 249,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to valueList.ok3?",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96bda9ba_e616dd7a",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "\"nodes referring to nodes\"?",
+      "revId": "f80ffeddcd6a03a09216eb90c5182a6312debb29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

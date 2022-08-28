@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce74538b_e925055c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "\"references\"",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed8a796b_1ae6fa20",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "This appears to be the same as selfEmbed.ok1? An intentional addition with permutation of ordering for this selfEmbed.okN?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a8cb121_ca50b22d",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to disjSelf.ok1?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2298d7f8_0957f27e",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to disjSelf.ok3?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f70f45b7_7e460bb4",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Repeated declaration of disjEmbed.ok1?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d9a4ced_169603fc",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Repeated declaration of disjEmbed.ok2, which is identical to disjEmbed.ok1?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56e26ef6_38c5e1b9",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Repeated declaration of disjEmbed.ok3?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62a38d48_17b99c2d",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Repeated declaration of disjEmbed.ok4, whic is identical to disjEmbed.ok3?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1dcdf34_8c8c0856",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to disjList.ok3?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "563ad518_3e8736c4",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to dynamicSelf.ok1?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a402f09a_624fcd9e",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to dynamicSelf.ok3?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6c97748_6d67c202",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to dynamicEmbed.ok1?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "955876a8_739884ed",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to dynamicEmbed.ok3?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b5f40a1_b3792dac",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:46:42Z",
+      "side": 1,
+      "message": "Identical to dynamicList.ok3?",
+      "revId": "bea2fda6c297b2a02e59de3e31cba56a0d33dbcb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

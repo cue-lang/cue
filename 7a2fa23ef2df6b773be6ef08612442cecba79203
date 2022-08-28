@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6e987c9_9caa1bd8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:57:42Z",
+      "side": 1,
+      "message": "LGTM pending previous comments in patchset 3\n\nNoting per our msg exchange that Unity failing here is fine because it passes in CL 542791, where timings actually appear to be faster than baseline versions.",
+      "revId": "7a2fa23ef2df6b773be6ef08612442cecba79203",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

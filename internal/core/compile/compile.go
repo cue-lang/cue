@@ -438,6 +438,9 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 	// Local expressions
 	case *ast.LetClause:
 		entry := c.lookupAlias(k, n)
+		if entry.expr == nil {
+			panic("unreachable")
+		}
 
 		// let x = y
 		return &adt.LetReference{
@@ -543,14 +546,6 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		if a, ok := lab.(*ast.Alias); ok {
 			if lab, ok = a.Expr.(ast.Label); !ok {
 				return c.errf(a, "alias expression is not a valid label")
-			}
-
-			switch lab.(type) {
-			case *ast.Ident, *ast.BasicLit, *ast.ListLit:
-				// Even though we won't need the alias, we still register it
-				// for duplicate and failed reference detection.
-			default:
-				c.updateAlias(a.Ident, c.expr(a.Expr))
 			}
 		}
 
@@ -677,6 +672,23 @@ func (c *compiler) addLetDecl(d ast.Decl) {
 		// blowup in x2: x1+x1, x3: x2+x2,  ... patterns.
 		expr := c.labeledExpr(nil, (*letScope)(x), x.Expr)
 		c.updateAlias(x.Ident, expr)
+
+	case *ast.Field:
+		lab := x.Label
+		if a, ok := lab.(*ast.Alias); ok {
+			if lab, ok = a.Expr.(ast.Label); !ok {
+				// error reported elsewhere
+				return
+			}
+
+			switch lab.(type) {
+			case *ast.Ident, *ast.BasicLit, *ast.ListLit:
+				// Even though we won't need the alias, we still register it
+				// for duplicate and failed reference detection.
+			default:
+				c.updateAlias(a.Ident, c.expr(a.Expr))
+			}
+		}
 
 	case *ast.Alias:
 		c.errf(x, "old-style alias no longer supported: use let clause; use cue fix to update.")

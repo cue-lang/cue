@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c211a7b4_996d9f55",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:53:41Z",
+      "side": 1,
+      "message": "This looks like a draft sentence?",
+      "revId": "3f227aad7d1d687876327b13ef2a27adea6de5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19390d8c_126a6be3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:53:41Z",
+      "side": 1,
+      "message": "I don\u0027t think you mean this issue.",
+      "revId": "3f227aad7d1d687876327b13ef2a27adea6de5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75245af5_dee448ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-28T16:53:41Z",
+      "side": 1,
+      "message": "LGTM with nits on the commit message.",
+      "revId": "3f227aad7d1d687876327b13ef2a27adea6de5b4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

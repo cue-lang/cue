@@ -1,0 +1,305 @@
+-- in.cue --
+// All these cases whose name end with cycle should fail with a structural
+// error. These are all uncommon code paths, triggered when container types
+// are evalated within a nested expression such as as an argument to a
+// function call.
+//
+// The builtins are typically used to trigger the uncommon path. The choice of
+// builtin is irrelevant, as long as they don't finalize args before processing.
+
+letCycle: {
+	b: c
+	let X = b
+	c: X
+}
+
+listCycle: {
+	a: b
+	b: and([c])
+	c: a
+}
+
+disjunctionCycle: {
+	a: b
+	b: and(1 | c)
+	c: a
+}
+
+forCycle: {
+	#A: a: #B
+	#B: or([ for x in #A { b: x } ])
+}
+
+letCycle: {
+	a: d: b
+	b: and([for x in a let y = x { y }])
+	c: a
+}
+
+closeCycle: {
+	a: b
+	b: close({d: c})
+	c: a
+}
+
+structCycle: {
+	a: b
+	b: and([{d: c}])
+	c: a
+}
+
+embedCycle: {
+	a: b
+	b: close({c})
+	c: a
+}
+
+// consult the correct closeness info in the face of it being passed down
+// from parent.
+closeFail: {
+	#T: [_]: _
+	#T: close({"a": string})
+	x:  #T
+	x: b: "foo"
+}
+-- out/eval --
+Errors:
+closeCycle.a: structural cycle
+closeCycle.b.d: structural cycle
+closeFail.x.b: field not allowed:
+    ./in.cue:59:6
+    ./in.cue:60:12
+    ./in.cue:61:6
+    ./in.cue:62:5
+listCycle.0: structural cycle:
+    ./in.cue:17:9
+disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
+    ./in.cue:23:9
+disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
+    ./in.cue:23:9
+disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
+    ./in.cue:23:9
+forCycle.0.b: structural cycle:
+    ./in.cue:29:9
+letCycle.0: structural cycle:
+    ./in.cue:34:9
+letCycle.a.d.d: structural cycle:
+    ./in.cue:34:19
+closeCycle.c: structural cycle:
+    ./in.cue:40:15
+structCycle.0.d: structural cycle:
+    ./in.cue:46:9
+embedCycle: structural cycle:
+    ./in.cue:52:11
+
+Result:
+(_|_){
+  // [eval]
+  letCycle: (_|_){
+    // [structural cycle]
+    b: (_|_){
+      // [structural cycle] letCycle.0: structural cycle:
+      //     ./in.cue:34:9
+    }
+    c: (_|_){
+      // [structural cycle] letCycle.0: structural cycle:
+      //     ./in.cue:34:9
+      d: (_|_){// 〈1;b〉
+      }
+    }
+    a: (_|_){
+      // [structural cycle]
+      d: (_|_){
+        // [structural cycle] letCycle.0: structural cycle:
+        //     ./in.cue:34:9
+        d: (_|_){
+          // [structural cycle] letCycle.a.d.d: structural cycle:
+          //     ./in.cue:34:19
+        }
+      }
+    }
+  }
+  listCycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle] listCycle.0: structural cycle:
+      //     ./in.cue:17:9
+    }
+    b: (_|_){
+      // [structural cycle] listCycle.0: structural cycle:
+      //     ./in.cue:17:9
+    }
+    c: (_|_){
+      // [structural cycle] listCycle.0: structural cycle:
+      //     ./in.cue:17:9
+    }
+  }
+  disjunctionCycle: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
+      //     ./in.cue:23:9
+    }
+    b: (_|_){
+      // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
+      //     ./in.cue:23:9
+    }
+    c: (_|_){
+      // [eval] disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
+      //     ./in.cue:23:9
+    }
+  }
+  forCycle: (_|_){
+    // [structural cycle]
+    #A: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle] forCycle.0.b: structural cycle:
+        //     ./in.cue:29:9
+      }
+    }
+    #B: (_|_){
+      // [structural cycle] forCycle.0.b: structural cycle:
+      //     ./in.cue:29:9
+    }
+  }
+  closeCycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle] closeCycle.a: structural cycle
+    }
+    b: (_|_){
+      // [structural cycle]
+      d: (_|_){
+        // [structural cycle] closeCycle.b.d: structural cycle
+      }
+    }
+    c: (_|_){
+      // [structural cycle] closeCycle.c: structural cycle:
+      //     ./in.cue:40:15
+    }
+  }
+  structCycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle] structCycle.0.d: structural cycle:
+      //     ./in.cue:46:9
+    }
+    b: (_|_){
+      // [structural cycle] structCycle.0.d: structural cycle:
+      //     ./in.cue:46:9
+    }
+    c: (_|_){
+      // [structural cycle] structCycle.0.d: structural cycle:
+      //     ./in.cue:46:9
+    }
+  }
+  embedCycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle] embedCycle: structural cycle:
+      //     ./in.cue:52:11
+    }
+    b: (_|_){
+      // [structural cycle] embedCycle: structural cycle:
+      //     ./in.cue:52:11
+    }
+    c: (_|_){
+      // [structural cycle] embedCycle: structural cycle:
+      //     ./in.cue:52:11
+    }
+  }
+  closeFail: (_|_){
+    // [eval]
+    #T: (#struct){
+      a: (string){ string }
+    }
+    x: (_|_){
+      // [eval]
+      a: (string){ string }
+      b: (_|_){
+        // [eval] closeFail.x.b: field not allowed:
+        //     ./in.cue:59:6
+        //     ./in.cue:60:12
+        //     ./in.cue:61:6
+        //     ./in.cue:62:5
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  letCycle: {
+    b: 〈0;c〉
+    c: 〈0;let X〉
+  }
+  listCycle: {
+    a: 〈0;b〉
+    b: and([
+      〈1;c〉,
+    ])
+    c: 〈0;a〉
+  }
+  disjunctionCycle: {
+    a: 〈0;b〉
+    b: and((1|〈0;c〉))
+    c: 〈0;a〉
+  }
+  forCycle: {
+    #A: {
+      a: 〈1;#B〉
+    }
+    #B: or([
+      for _, x in 〈1;#A〉 {
+        b: 〈1;x〉
+      },
+    ])
+  }
+  letCycle: {
+    a: {
+      d: 〈1;b〉
+    }
+    b: and([
+      for _, x in 〈1;a〉 let y = 〈0;x〉 {
+        〈1;y〉
+      },
+    ])
+    c: 〈0;a〉
+  }
+  closeCycle: {
+    a: 〈0;b〉
+    b: close({
+      d: 〈1;c〉
+    })
+    c: 〈0;a〉
+  }
+  structCycle: {
+    a: 〈0;b〉
+    b: and([
+      {
+        d: 〈2;c〉
+      },
+    ])
+    c: 〈0;a〉
+  }
+  embedCycle: {
+    a: 〈0;b〉
+    b: close({
+      〈1;c〉
+    })
+    c: 〈0;a〉
+  }
+  closeFail: {
+    #T: {
+      [_]: _
+    }
+    #T: close({
+      a: string
+    })
+    x: 〈0;#T〉
+    x: {
+      b: "foo"
+    }
+  }
+}

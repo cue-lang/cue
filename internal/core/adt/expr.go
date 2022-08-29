@@ -76,7 +76,7 @@ func (x *StructLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
-		Conjuncts: []Conjunct{{e, x, CloseInfo{}}},
+		Conjuncts: []Conjunct{{e, x, c.ci}},
 	}
 	// evaluate may not finalize a field, as the resulting value may be
 	// used in a context where more conjuncts are added. It may also lead
@@ -295,7 +295,7 @@ func (x *ListLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
-		Conjuncts: []Conjunct{{e, x, CloseInfo{}}},
+		Conjuncts: []Conjunct{{e, x, c.ci}},
 	}
 	// TODO: should be AllArcs and then use Finalize for builtins?
 	c.Unify(v, Finalized) // TODO: also partial okay?
@@ -876,7 +876,7 @@ func (x *LetReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 	return &Vertex{
 		Parent:    e.Vertex,
 		Label:     label,
-		Conjuncts: []Conjunct{{e, x.X, CloseInfo{}}},
+		Conjuncts: []Conjunct{{e, x.X, c.ci}},
 	}
 }
 
@@ -1461,7 +1461,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
 		if _, ok := v.(*BasicType); !ok {
 			env := c.Env(0)
 			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
-			n := &Vertex{Conjuncts: []Conjunct{{env, x, CloseInfo{}}}}
+			n := &Vertex{Conjuncts: []Conjunct{{env, x, c.ci}}}
 			c.Unify(n, Finalized)
 			if _, ok := n.BaseValue.(*Bottom); ok {
 				c.addErrf(0, pos(a),
@@ -1585,7 +1585,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 
 func (x *DisjunctionExpr) evaluate(c *OpContext) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
+	v := &Vertex{Conjuncts: []Conjunct{{e, x, c.ci}}}
 	c.Unify(v, Finalized) // TODO: also partial okay?
 	// TODO: if the disjunction result originated from a literal value, we may
 	// consider the result closed to create more permanent errors.
@@ -1774,7 +1774,7 @@ func (x *LetClause) Source() ast.Node {
 
 func (x *LetClause) yield(c *OpContext, f YieldFunc) {
 	n := &Vertex{Arcs: []*Vertex{
-		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, CloseInfo{}}}},
+		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}}},
 	}}
 
 	sub := c.spawn(n)

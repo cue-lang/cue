@@ -228,6 +228,9 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 		return
 	}
 
+	// Note: it is okay to pass an empty CloseInfo{} here as we assume that
+	// all nodes are finalized already and we need neither closedness nor cycle
+	// checks.
 	if ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r); ref != nil {
 		if ref != c.node && ref != empty {
 			d := Dependency{

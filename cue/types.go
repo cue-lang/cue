@@ -1695,21 +1695,20 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	}
 	for i := len(p.path) - 1; i >= 0; i-- {
 		switch sel := p.path[i]; sel.Type() {
-		case SelPattern:
-			if sel.sel == AnyString.sel {
-				expr = &adt.StructLit{Decls: []adt.Decl{
-					&adt.BulkOptionalField{
-						Filter: &adt.BasicType{K: adt.StringKind},
-						Value:  expr,
-					},
-				}}
-			} else {
-				expr = &adt.ListLit{Elems: []adt.Elem{
-					&adt.Ellipsis{Value: expr},
-				}}
-			}
+		case StringLabel | PatternConstraint:
+			expr = &adt.StructLit{Decls: []adt.Decl{
+				&adt.BulkOptionalField{
+					Filter: &adt.BasicType{K: adt.StringKind},
+					Value:  expr,
+				},
+			}}
 
-		case SelIndex:
+		case IndexLabel | PatternConstraint:
+			expr = &adt.ListLit{Elems: []adt.Elem{
+				&adt.Ellipsis{Value: expr},
+			}}
+
+		case IndexLabel:
 			i := sel.Index()
 			list := &adt.ListLit{}
 			any := &adt.Top{}
@@ -1722,7 +1721,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 
 		default:
 			var d adt.Decl
-			if sel.IsOptional() {
+			if sel.ConstraintType() == OptionalConstraint {
 				d = &adt.OptionalField{
 					Label: sel.sel.feature(v.idx),
 					Value: expr,

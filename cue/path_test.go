@@ -161,68 +161,70 @@ var selectorTests = []struct {
 	unquoted     string
 	index        int
 	isHidden     bool
-	isOptional   bool
+	isConstraint bool
 	isDefinition bool
 	isString     bool
 	pkgPath      string
 }{{
 	sel:      Str("foo"),
-	stype:    SelString,
+	stype:    StringLabel,
 	string:   "foo",
 	unquoted: "foo",
 	isString: true,
 }, {
 	sel:      Str("_foo"),
-	stype:    SelString,
+	stype:    StringLabel,
 	string:   `"_foo"`,
 	unquoted: "_foo",
 	isString: true,
 }, {
 	sel:      Str(`a "b`),
-	stype:    SelString,
+	stype:    StringLabel,
 	string:   `"a \"b"`,
 	unquoted: `a "b`,
 	isString: true,
 }, {
 	sel:    Index(5),
-	stype:  SelIndex,
+	stype:  IndexLabel,
 	string: "5",
 	index:  5,
 }, {
 	sel:          Def("foo"),
-	stype:        SelDefinition,
+	stype:        DefinitionLabel,
 	string:       "#foo",
 	isDefinition: true,
 }, {
-	sel:        Str("foo").Optional(),
-	stype:      SelString,
-	string:     "foo?",
-	unquoted:   "foo",
-	isString:   true,
-	isOptional: true,
+	sel:          Str("foo").Optional(),
+	stype:        StringLabel | OptionalConstraint,
+	string:       "foo?",
+	unquoted:     "foo",
+	isString:     true,
+	isConstraint: true,
 }, {
 	sel:          Def("foo").Optional(),
-	stype:        SelDefinition,
+	stype:        DefinitionLabel | OptionalConstraint,
 	string:       "#foo?",
 	isDefinition: true,
-	isOptional:   true,
+	isConstraint: true,
 }, {
-	sel:    AnyString,
-	stype:  SelPattern,
-	string: "[_]",
+	sel:          AnyString,
+	stype:        StringLabel | PatternConstraint,
+	string:       "[_]",
+	isConstraint: true,
 }, {
-	sel:    AnyIndex,
-	stype:  SelPattern,
-	string: "[_]",
+	sel:          AnyIndex,
+	stype:        IndexLabel | PatternConstraint,
+	string:       "[_]",
+	isConstraint: true,
 }, {
 	sel:      Hid("_foo", "example.com"),
-	stype:    SelHidden,
+	stype:    HiddenLabel,
 	string:   "_foo",
 	isHidden: true,
 	pkgPath:  "example.com",
 }, {
 	sel:          Hid("_#foo", "example.com"),
-	stype:        SelHiddenDefinition,
+	stype:        HiddenDefinitionLabel,
 	string:       "_#foo",
 	isHidden:     true,
 	isDefinition: true,
@@ -239,7 +241,7 @@ func TestSelector(t *testing.T) {
 			if got, want := sel.String(), tc.string; got != want {
 				t.Errorf("unexpected sel.String result; got %q want %q", got, want)
 			}
-			if sel.Type() != SelString {
+			if sel.Type() != StringLabel {
 				checkPanic(t, "Selector.Unquoted invoked on non-string label", func() {
 					sel.Unquoted()
 				})
@@ -248,7 +250,7 @@ func TestSelector(t *testing.T) {
 					t.Errorf("unexpected sel.Unquoted result; got %q want %q", got, want)
 				}
 			}
-			if sel.Type() != SelIndex {
+			if sel.Type() != IndexLabel {
 				checkPanic(t, "Index called on non-index selector", func() {
 					sel.Index()
 				})
@@ -260,7 +262,7 @@ func TestSelector(t *testing.T) {
 			if got, want := sel.Type().IsHidden(), tc.isHidden; got != want {
 				t.Errorf("unexpected sel.IsHidden result; got %v want %v", got, want)
 			}
-			if got, want := sel.IsOptional(), tc.isOptional; got != want {
+			if got, want := sel.IsConstraint(), tc.isConstraint; got != want {
 				t.Errorf("unexpected sel.IsOptional result; got %v want %v", got, want)
 			}
 			if got, want := sel.IsString(), tc.isString; got != want {
@@ -277,13 +279,16 @@ func TestSelector(t *testing.T) {
 }
 
 func TestSelectorTypeString(t *testing.T) {
-	if got, want := SelInvalid.String(), "SelInvalid"; got != want {
+	if got, want := InvalidSelectorType.String(), "InvalidSelectorType"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
-	if got, want := SelPattern.String(), "SelPattern"; got != want {
+	if got, want := PatternConstraint.String(), "PatternConstraint"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
-	if got, want := SelectorType(255).String(), "SelInvalid255"; got != want {
+	if got, want := (StringLabel | OptionalConstraint).String(), "StringLabel|OptionalConstraint"; got != want {
+		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
+	}
+	if got, want := SelectorType(255).String(), "InvalidSelectorType(0xff)"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
 }

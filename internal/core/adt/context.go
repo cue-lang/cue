@@ -254,6 +254,8 @@ type OpContext struct {
 	inConstraint int
 }
 
+func (c *OpContext) CloseInfo() CloseInfo { return c.ci }
+
 func (n *nodeContext) skipNonMonotonicChecks() bool {
 	if n.ctx.inConstraint > 0 {
 		return false

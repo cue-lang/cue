@@ -2057,8 +2057,7 @@ func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 
 		for _, a := range elems {
 			if a.Conjuncts == nil {
-				x := a.BaseValue.(Value)
-				n.insertField(a.Label, MakeRootConjunct(nil, x))
+				n.insertField(a.Label, MakeRootConjunct(nil, a))
 				continue
 			}
 			for _, c := range a.Conjuncts {

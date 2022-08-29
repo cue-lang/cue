@@ -205,7 +205,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			}
 
 			n := &Vertex{}
-			n.AddConjunct(MakeRootConjunct(c.Env(0), list))
+			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
 			n.Finalize(c)
 
 			return n
@@ -266,7 +266,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			}
 
 			n := &Vertex{}
-			n.AddConjunct(MakeRootConjunct(c.Env(0), list))
+			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
 			n.Finalize(c)
 
 			return n

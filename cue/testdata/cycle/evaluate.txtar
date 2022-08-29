@@ -54,6 +54,18 @@ embedCycle: {
 	c: a
 }
 
+listAddCycle: {
+	a: b
+	b: [c] + [c]
+	c: a
+}
+
+listMulCycle: {
+	a: b
+	b: 3 + [{a: b: c}]
+	c: a
+}
+
 // consult the correct closeness info in the face of it being passed down
 // from parent.
 closeFail: {
@@ -67,10 +79,10 @@ Errors:
 closeCycle.a: structural cycle
 closeCycle.b.d: structural cycle
 closeFail.x.b: field not allowed:
-    ./in.cue:59:6
-    ./in.cue:60:12
-    ./in.cue:61:6
-    ./in.cue:62:5
+    ./in.cue:71:6
+    ./in.cue:72:12
+    ./in.cue:73:6
+    ./in.cue:74:5
 listCycle.0: structural cycle:
     ./in.cue:17:9
 disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
@@ -91,6 +103,8 @@ structCycle.0.d: structural cycle:
     ./in.cue:46:9
 embedCycle: structural cycle:
     ./in.cue:52:11
+listAddCycle.0: structural cycle:
+    ./in.cue:58:5
 
 Result:
 (_|_){
@@ -209,6 +223,33 @@ Result:
       //     ./in.cue:52:11
     }
   }
+  listAddCycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle] listAddCycle.0: structural cycle:
+      //     ./in.cue:58:5
+    }
+    b: (_|_){
+      // [structural cycle] listAddCycle.0: structural cycle:
+      //     ./in.cue:58:5
+    }
+    c: (_|_){
+      // [structural cycle] listAddCycle.0: structural cycle:
+      //     ./in.cue:58:5
+    }
+  }
+  listMulCycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+    }
+    b: (_|_){
+      // [structural cycle]
+    }
+    c: (_|_){
+      // [structural cycle]
+    }
+  }
   closeFail: (_|_){
     // [eval]
     #T: (#struct){
@@ -219,10 +260,10 @@ Result:
       a: (string){ string }
       b: (_|_){
         // [eval] closeFail.x.b: field not allowed:
-        //     ./in.cue:59:6
-        //     ./in.cue:60:12
-        //     ./in.cue:61:6
-        //     ./in.cue:62:5
+        //     ./in.cue:71:6
+        //     ./in.cue:72:12
+        //     ./in.cue:73:6
+        //     ./in.cue:74:5
       }
     }
   }
@@ -288,6 +329,26 @@ Result:
     b: close({
       〈1;c〉
     })
+    c: 〈0;a〉
+  }
+  listAddCycle: {
+    a: 〈0;b〉
+    b: ([
+      〈1;c〉,
+    ] + [
+      〈1;c〉,
+    ])
+    c: 〈0;a〉
+  }
+  listMulCycle: {
+    a: 〈0;b〉
+    b: (3 + [
+      {
+        a: {
+          b: 〈3;c〉
+        }
+      },
+    ])
     c: 〈0;a〉
   }
   closeFail: {

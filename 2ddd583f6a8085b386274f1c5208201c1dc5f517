@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f1d68d80_e1ff76d6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-30T16:44:03Z",
+      "side": 1,
+      "message": "Looks fine to me, thanks, modulo a few considerations that you might well want to ignore 😊",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63f1cdaf_5d0a6072",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-30T16:44:03Z",
+      "side": 1,
+      "message": "Now that it\u0027s a bit mask, there\u0027s much less space for future expansion. I might consider using `int` or `uint16` or something instead, and leaving some bit space in between label types and constraints, \"just in case\".",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7b57b6c_660b52b2",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-30T16:44:03Z",
+      "side": 1,
+      "message": "Given that the bitmask can be legitimately used to select multiple types (as you\u0027re suggesting for Value.Field), I\u0027m not entirely sure that this should be represented as InvalidSelectorType.\n\nI think this more naive approach might work out better (either that or have a separate type to represent the more general bitmask when that\u0027s allowed).\n\n\tfunc (t SelectorType) String() string {\n\t\tif t.LabelType() \u003d\u003d 0 {\n\t\t\treturn \"NoLabels\"\n\t\t}\n\t\tvar buf strings.Builder\n\t\tfor i :\u003d 0; i \u003c 8; i++ {\n\t\t\tif t \u0026 (byte(1) \u003c\u003c i) !\u003d 0 {\n\t\t\t\tif buf.Len() \u003e 0 {\n\t\t\t\t\tbuf.WriteByte(\u0027|\u0027)\n\t\t\t\t}\n\t\t\t\tbuf.WriteString(selectorTypeStrings[i])\n\t\t\t}\n\t\t}\n\t\treturn buf.String()\n\t}",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c61f9dd_e29693a8",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-30T16:44:03Z",
+      "side": 1,
+      "message": "constraint part",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2454a3d8_301b358d",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-30T16:44:03Z",
+      "side": 1,
+      "message": "It would be nice if the string representation could reflect the selector type, but I\u0027m not sure that\u0027s possible for half of the possibilities below. Is it actually possible for those cases to happen?",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ca8a5be_bf7b4689",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-30T16:44:03Z",
+      "side": 1,
+      "message": "I wonder if we should do about the funkiness that is possible here by doing (for example) `cue.AnyString.Optional()`, which is perfectly possible but won\u0027t result in a selector that behaves like one might expect AFAICS.",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

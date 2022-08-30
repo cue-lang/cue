@@ -44,7 +44,7 @@ Run: {
 	// If it is of typ bytes or string, that input will be used instead.
 	stdin: *null | string | bytes
 
-	// success is set to true when the process terminates with with a zero exit
+	// success is set to true when the process terminates with a zero exit
 	// code or false otherwise. The user can explicitly specify the value
 	// force a fatal error if the desired success code is not reached.
 	success: bool

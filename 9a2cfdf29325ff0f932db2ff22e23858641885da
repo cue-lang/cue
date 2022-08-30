@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4509f35_5e8968ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-30T10:01:37Z",
+      "side": 1,
+      "message": "I\u0027ve just verified that the istio cue-gen tool can be updated to use the API and works, although it does also need the `Value.BuildInstance` method so that it can determine the origin of the definitions that it\u0027s processing.",
+      "revId": "9a2cfdf29325ff0f932db2ff22e23858641885da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

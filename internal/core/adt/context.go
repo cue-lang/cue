@@ -85,7 +85,7 @@ func DebugSortFields(c *OpContext, a []Feature) {
 // Assert panics if the condition is false. Assert can be used to check for
 // conditions that are considers to break an internal variant or unexpected
 // condition, but that nonetheless probably will be handled correctly down the
-// line. For instance, a faulty condition could lead to to error being caught
+// line. For instance, a faulty condition could lead to error being caught
 // down the road, but resulting in an inaccurate error message. In production
 // code it is better to deal with the bad error message than to panic.
 //

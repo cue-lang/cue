@@ -469,7 +469,7 @@ var constraints = []*constraint{
 			state.doc(f)
 			f.Optional = token.Blank.Pos()
 			if len(obj.Elts) > 0 && len(f.Comments()) > 0 {
-				// TODO: change formatter such that either a a NewSection on the
+				// TODO: change formatter such that either a NewSection on the
 				// field or doc comment will cause a new section.
 				ast.SetRelPos(f.Comments()[0], token.NewSection)
 			}
@@ -573,7 +573,7 @@ var constraints = []*constraint{
 	p2("patternProperties", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
 		if n.Kind() != cue.StructKind {
-			s.errf(n, `value of "patternProperties" must be an an object, found %v`, n.Kind())
+			s.errf(n, `value of "patternProperties" must be an object, found %v`, n.Kind())
 		}
 		obj := s.object(n)
 		existing := excludeFields(s.obj.Elts)

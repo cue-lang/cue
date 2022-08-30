@@ -373,7 +373,7 @@ func (n *nodeContext) expandDisjuncts(
 		// the value was scalar before, we drop this information when there is
 		// only one disjunct, while not discarding hard defaults. TODO: a more
 		// principled approach would be to recognize that there is only one
-		// default at a point where this does not break commutativity. if
+		// default at a point where this does not break commutativity.
 		// if len(n.disjuncts) == 1 && n.disjuncts[0].defaultMode != isDefault {
 		// 	n.disjuncts[0].defaultMode = maybeDefault
 		// }

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6770092_f87b6fff",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-30T18:43:14Z",
+      "side": 1,
+      "message": "Yeah, I can think of one more, but uint16 is good.",
+      "parentUuid": "63f1cdaf_5d0a6072",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7b57b6c_660b52b2",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-08-30T16:44:03Z",
       "side": 1,
       "message": "Given that the bitmask can be legitimately used to select multiple types (as you\u0027re suggesting for Value.Field), I\u0027m not entirely sure that this should be represented as InvalidSelectorType.\n\nI think this more naive approach might work out better (either that or have a separate type to represent the more general bitmask when that\u0027s allowed).\n\n\tfunc (t SelectorType) String() string {\n\t\tif t.LabelType() \u003d\u003d 0 {\n\t\t\treturn \"NoLabels\"\n\t\t}\n\t\tvar buf strings.Builder\n\t\tfor i :\u003d 0; i \u003c 8; i++ {\n\t\t\tif t \u0026 (byte(1) \u003c\u003c i) !\u003d 0 {\n\t\t\t\tif buf.Len() \u003e 0 {\n\t\t\t\t\tbuf.WriteByte(\u0027|\u0027)\n\t\t\t\t}\n\t\t\t\tbuf.WriteString(selectorTypeStrings[i])\n\t\t\t}\n\t\t}\n\t\treturn buf.String()\n\t}",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "37cbbdcb_308f6cd8",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-30T18:43:14Z",
+      "side": 1,
+      "message": "I had that initially, but I think just do SelectorType(n) is sufficient. What I like about the current approach is that the common case of having just one bit is fast.",
+      "parentUuid": "a7b57b6c_660b52b2",
       "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1008e7ce_c3963baa",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-30T18:43:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c61f9dd_e29693a8",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2454a3d8_301b358d",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "212f6da2_58a04ba7",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 558,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-30T18:43:14Z",
+      "side": 1,
+      "message": "Not yet, only once that part of the query proposal is implemented.",
+      "parentUuid": "2454a3d8_301b358d",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ca8a5be_bf7b4689",
@@ -99,6 +171,24 @@
       "writtenOn": "2022-08-30T16:44:03Z",
       "side": 1,
       "message": "I wonder if we should do about the funkiness that is possible here by doing (for example) `cue.AnyString.Optional()`, which is perfectly possible but won\u0027t result in a selector that behaves like one might expect AFAICS.",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2573afb_dfd5db79",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-30T18:43:14Z",
+      "side": 1,
+      "message": "That should not add Optional: a pattern is itself optional, so the optional type will not be wrapped in that case.",
+      "parentUuid": "8ca8a5be_bf7b4689",
       "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

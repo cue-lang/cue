@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f41f69e_dbd513dc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-30T18:43:14Z",
+      "side": 1,
+      "message": "Two unresolved questions that could be addressed in subsequent CLs.",
+      "revId": "7cbe737db11df35124a77dece92067653a5c2d56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

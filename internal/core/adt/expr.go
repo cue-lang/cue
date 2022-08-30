@@ -1245,7 +1245,7 @@ func (x *BinaryExpr) evaluate(c *OpContext, state vertexStatus) Value {
 		}
 
 		// Do not fully evaluate the Vertex: if it is embedded within a
-		// a struct with arcs that are referenced from within this expression,
+		// struct with arcs that are referenced from within this expression,
 		// it will end up adding "locked" fields, resulting in an error.
 		// It will be the responsibility of the "caller" to get the result
 		// to the required state. If the struct is already dynamic, we will

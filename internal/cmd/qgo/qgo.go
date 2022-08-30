@@ -41,7 +41,7 @@ Commands:
 extract		Extract one-line signature of exported types of
 			the given package.
 
-			Functions that have have more than one return
+			Functions that have more than one return
 			argument or unknown types are skipped.
 `
 

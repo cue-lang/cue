@@ -476,7 +476,7 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 		//		// AllConjunctsDone before evaluating b._env, it is still okay
 		//		// to add arcs to b after this evaluation: only the set of arcs
 		//		// in b._env needs to be frozen after that.
-		//		for for k2, v2 in b._env {
+		//		for k2, v2 in b._env {
 		//			("b"): env: (k2): v2
 		//		}
 		//	}
@@ -2076,7 +2076,7 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 	for _, x := range exprs {
 		n.addExprConjunct(x.c, state)
 
-		// collect and and or
+		// collect and or
 	}
 	if len(n.exprs) < len(exprs) {
 		return true

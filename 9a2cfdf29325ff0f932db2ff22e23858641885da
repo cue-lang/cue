@@ -16,6 +16,23 @@
       "message": "I\u0027ve just verified that the istio cue-gen tool can be updated to use the API and works, although it does also need the `Value.BuildInstance` method so that it can determine the origin of the definitions that it\u0027s processing.",
       "revId": "9a2cfdf29325ff0f932db2ff22e23858641885da",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96b2d705_b75ee70b",
+        "filename": "encoding/openapi/build.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-31T08:19:55Z",
+      "side": 1,
+      "message": "Should this not be Unquoted? Not sure, just checking.",
+      "revId": "9a2cfdf29325ff0f932db2ff22e23858641885da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

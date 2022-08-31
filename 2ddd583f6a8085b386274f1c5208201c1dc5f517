@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ceec851_b064002a",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-31T10:24:30Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "667a9ced_80fb4172",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c61f9dd_e29693a8",

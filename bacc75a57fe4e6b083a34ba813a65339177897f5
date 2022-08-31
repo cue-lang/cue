@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5cff8ae_451b57a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T10:26:28Z",
+      "side": 1,
+      "message": "LGTM with two more trivial suggestions.",
+      "revId": "bacc75a57fe4e6b083a34ba813a65339177897f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c5d6543_574bc37b",
+        "filename": "cue/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T10:26:28Z",
+      "side": 1,
+      "message": "I don\u0027t think this entry is used any more. Leaving it out simplifies the code in SelectorType.String a bit.",
+      "revId": "bacc75a57fe4e6b083a34ba813a65339177897f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9b821da_80a67fb4",
+        "filename": "cue/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T10:26:28Z",
+      "side": 1,
+      "message": "!\u003d 0 (to mirror the logic in `Selector.IsConstraint`) ?\nMaybe consider adding `SelectorType.IsConstraint` and using it from both places.",
+      "revId": "bacc75a57fe4e6b083a34ba813a65339177897f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

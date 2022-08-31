@@ -26,11 +26,10 @@ package adt
 
 import (
 	"fmt"
-	"html/template"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 )
 
@@ -43,45 +42,7 @@ import (
 // - Test closedness far more thoroughly.
 //
 
-type Stats struct {
-	UnifyCount    int
-	ConjunctCount int
-	DisjunctCount int
-
-	Freed    int
-	Retained int
-	Reused   int
-	Allocs   int
-}
-
-// Leaks reports the number of nodeContext structs leaked. These are typically
-// benign, as they will just be garbage collected, as long as the pointer from
-// the original nodes has been eliminated or the original nodes are also not
-// referred to. But Leaks may have notable impact on performance, and thus
-// should be avoided.
-func (s *Stats) Leaks() int {
-	return s.Allocs + s.Reused - s.Freed
-}
-
-var stats = template.Must(template.New("stats").Parse(`{{"" -}}
-
-Leaks:  {{.Leaks}}
-Freed:  {{.Freed}}
-Reused: {{.Reused}}
-Allocs: {{.Allocs}}
-Retain: {{.Retained}}
-
-Unifications: {{.UnifyCount}}
-Conjuncts:    {{.ConjunctCount}}
-Disjuncts:    {{.DisjunctCount}}`))
-
-func (s *Stats) String() string {
-	buf := &strings.Builder{}
-	_ = stats.Execute(buf, s)
-	return buf.String()
-}
-
-func (c *OpContext) Stats() *Stats {
+func (c *OpContext) Stats() *stats.Counts {
 	return &c.stats
 }
 
@@ -244,7 +205,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		defer c.PopArc(c.PushArc(v))
 
-		c.stats.UnifyCount++
+		c.stats.Unifications++
 
 		// Set the cache to a cycle error to ensure a cyclic reference will result
 		// in an error if applicable. A cyclic error may be ignored for
@@ -1401,7 +1362,7 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 		// Must be Resolver or Evaluator.
 		n.evalExpr(v)
 	}
-	n.ctx.stats.ConjunctCount++
+	n.ctx.stats.Conjuncts++
 }
 
 // evalExpr is only called by addExprConjunct. If an error occurs, it records

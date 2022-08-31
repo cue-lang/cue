@@ -28,6 +28,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 )
 
@@ -214,7 +215,7 @@ type OpContext struct {
 
 	nest int
 
-	stats        Stats
+	stats        stats.Counts
 	freeListNode *nodeContext
 
 	e         *Environment

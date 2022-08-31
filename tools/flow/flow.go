@@ -72,6 +72,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
@@ -164,6 +165,11 @@ type Controller struct {
 	context    context.Context
 	cancelFunc context.CancelFunc
 
+	// taskStats tracks counters for auxiliary operations done by tasks. It does
+	// not include the CUE operations done by the Controller on behalf of tasks,
+	// which is likely going to tbe the bulk of the operations.
+	taskStats stats.Counts
+
 	mut  *sync.Mutex
 	done bool
 
@@ -179,6 +185,19 @@ type Controller struct {
 	nodes map[*adt.Vertex]*Task
 
 	errs errors.Error
+}
+
+// Stats reports statistics on the total number of CUE operations used.
+//
+// This is an experimental method and the API is likely to change. The
+// Counts.String method will likely stay and is the safest way to use this API.
+//
+// This currently should only be called after completion or within a call to
+// UpdateFunc.
+func (c *Controller) Stats() (counts stats.Counts) {
+	counts = *c.opCtx.Stats()
+	counts.Add(c.taskStats)
+	return counts
 }
 
 // Tasks reports the tasks that are currently registered with the controller.
@@ -333,6 +352,19 @@ type Task struct {
 	err         errors.Error
 	state       State
 	depTasks    []*Task
+
+	stats stats.Counts
+}
+
+// Stats reports statistics on the number of CUE operations used to complete
+// this task.
+//
+// This is an experimental method and the API is likely to change. The
+// Counts.String method will likely stay and is the safest way to use this API.
+//
+// It only shows numbers upon completion. This may change in the future.
+func (t *Task) Stats() stats.Counts {
+	return t.stats
 }
 
 // Context reports the Controller's Context.

@@ -33,6 +33,24 @@
       "message": "s/top/root/?\n\ns/txtar file/txtar archive/?",
       "revId": "1f59a6b653e7ef69ac936a96df2b3d8d50fead8b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fac474c1_3e128e0c",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 232,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:03:08Z",
+      "side": 1,
+      "message": "done \"root\", but kept \"txtar file\" as mentioned elsewhere.",
+      "parentUuid": "f5e310f2_956ff29a",
+      "revId": "1f59a6b653e7ef69ac936a96df2b3d8d50fead8b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,6 +33,24 @@
       "message": "FYI, all failures appear to be of the form:\n\n            - \t\"error in call to regexp.Find: no match:\",\n            + \t\"error in call to regexp.Find: : no match:\",\n              \t\"    ./in.cue:4:5\",\n\nNote the additional position (great) and the additional `:` (not great).",
       "revId": "854d69695c6dee43a7fba1a7565c28afc06fbbc3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71a89cda_8eb9b6bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T13:01:11Z",
+      "side": 1,
+      "message": "The underlying reason was the fix to `Promote` to make it correctly use `%s` instead of passing the error string directly as the format argument to `Wrapf`.\n\nThat change meant that the logic inside `writeErr` to detect whether an error message was empty no longer worked, because it only looked at `msg`, not at the end result of the sprintf.\n\nI\u0027ve fixed it to do the sprintf first before checking for empty. That\u0027s more correct, although marginally slower.",
+      "parentUuid": "51f9f70e_64cda93e",
+      "revId": "854d69695c6dee43a7fba1a7565c28afc06fbbc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

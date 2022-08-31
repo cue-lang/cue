@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d729570f_e75c47b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-31T14:24:29Z",
+      "side": 1,
+      "message": "LGTM with a couple of small nits.",
+      "revId": "f89bb5ff39b6f335f474b3e40082a07cec16ac50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7bb60ffe_d959d779",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-31T14:24:29Z",
+      "side": 1,
+      "message": "Does this comment about Counts.String method belong here?",
+      "revId": "f89bb5ff39b6f335f474b3e40082a07cec16ac50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a928df81_f936fa9d",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-08-31T14:24:29Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "f89bb5ff39b6f335f474b3e40082a07cec16ac50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

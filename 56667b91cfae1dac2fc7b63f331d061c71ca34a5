@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "df187ced_c15e0abd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfcdf976_eccb4c78",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "3f9228fe_7fe17696",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "68851636_a7c0a906",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "I\u0027m not sure. \"txtar archive\" seems redundant to me as the \"ar\" already implies \"archive\". For example, I\u0027d usually say a \"tar file\" rather than a \"tar archive\".\n:shrug:",
+      "parentUuid": "ff0aa627_c5e235bd",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "688532c5_9ad3b115",
@@ -65,6 +101,24 @@
       "writtenOn": "2022-07-12T13:11:52Z",
       "side": 1,
       "message": "Is it worth being more specific here than simply \"if the test fails\". Because it\u0027s specifically in the case the comparison between golden and actual failing that this logic kicks in, any not anything else.",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b468bbb6_2d7a61bc",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "688532c5_9ad3b115",
       "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5f035738_18854d99",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "80a95a4b_05ceb518",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dfce62ab_1a727cec",
@@ -99,6 +171,24 @@
       "writtenOn": "2022-07-12T13:11:52Z",
       "side": 1,
       "message": "\"test output\" - first use of this term. How does this relate to the `out/X` files?",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c39e899_60980477",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfce62ab_1a727cec",
       "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3002eecc_8bed29fe",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 181,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0eac168_7bbf8567",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f42e6dd_56dd78e1",
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7200d0b5_f654662e",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5f42e6dd_56dd78e1",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d0276b07_33772a1a",
@@ -150,6 +276,24 @@
       "writtenOn": "2022-07-12T13:11:52Z",
       "side": 1,
       "message": "Comment on the logic here to explain?",
+      "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9819ae25_5c44aea6",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T15:01:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0276b07_33772a1a",
       "revId": "56667b91cfae1dac2fc7b63f331d061c71ca34a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

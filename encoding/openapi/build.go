@@ -46,6 +46,8 @@ type buildContext struct {
 	fieldFilter   *regexp.Regexp
 	evalDepth     int // detect cycles when resolving references
 
+	paths *OrderedMap
+
 	schemas *OrderedMap
 
 	// Track external schemas.
@@ -70,6 +72,85 @@ type externalType struct {
 type oaSchema = OrderedMap
 
 type typeFunc func(b *builder, a cue.Value)
+
+func paths(g *Generator, inst *cue.Instance) (paths *ast.StructLit, err error) {
+	var fieldFilter *regexp.Regexp
+	if g.FieldFilter != "" {
+		fieldFilter, err = regexp.Compile(g.FieldFilter)
+		if err != nil {
+			return nil, errors.Newf(token.NoPos, "invalid field filter: %v", err)
+		}
+
+		// verify that certain elements are still passed.
+		for _, f := range strings.Split(
+			"version,title,allOf,anyOf,not,enum,Schema/properties,Schema/items"+
+				"nullable,type", ",") {
+			if fieldFilter.MatchString(f) {
+				return nil, errors.Newf(token.NoPos, "field filter may not exclude %q", f)
+			}
+		}
+	}
+
+	c := buildContext{
+		inst:         inst,
+		instExt:      inst,
+		refPrefix:    "components/schemas",
+		expandRefs:   g.ExpandReferences,
+		structural:   g.ExpandReferences,
+		nameFunc:     g.ReferenceFunc,
+		descFunc:     g.DescriptionFunc,
+		paths:        &OrderedMap{},
+		schemas:      &OrderedMap{},
+		externalRefs: map[string]*externalType{},
+		fieldFilter:  fieldFilter,
+	}
+
+	switch g.Version {
+	case "3.0.0":
+		c.exclusiveBool = true
+	case "3.1.0":
+	default:
+		return nil, errors.Newf(token.NoPos, "unsupported version %s", g.Version)
+	}
+
+	defer func() {
+		switch x := recover().(type) {
+		case nil:
+		case *openapiError:
+			err = x
+		default:
+			panic(x)
+		}
+	}()
+
+	i, err := inst.Value().Fields(cue.Definitions(true))
+	if err != nil {
+		return nil, err
+	}
+	for i.Next() {
+		label := i.Label()
+
+		if i.IsDefinition() || !strings.HasPrefix(label, "$/") || c.isInternal(label) {
+			continue
+		}
+
+		label = label[1:]
+		ref := c.makeRef(inst, []string{label})
+		if ref == "" {
+			continue
+		}
+		c.paths.Set(ref, c.buildPath(i.Value()))
+	}
+
+	a := c.paths.Elts
+	sort.Slice(a, func(i, j int) bool {
+		x, _, _ := ast.LabelName(a[i].(*ast.Field).Label)
+		y, _, _ := ast.LabelName(a[j].(*ast.Field).Label)
+		return x < y
+	})
+
+	return (*ast.StructLit)(c.paths), c.errs
+}
 
 func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err error) {
 	var fieldFilter *regexp.Regexp
@@ -180,6 +261,10 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 	return (*ast.StructLit)(c.schemas), c.errs
 }
 
+func (c *buildContext) buildPath(v cue.Value) *ast.StructLit {
+	return newRootPathBuilder(c).buildPath(v)
+}
+
 func (c *buildContext) build(name string, v cue.Value) *ast.StructLit {
 	return newCoreBuilder(c).schema(nil, name, v)
 }
@@ -210,6 +295,94 @@ func (b *builder) checkArgs(a []cue.Value, n int) {
 	if len(a)-1 != n {
 		b.failf(a[0], "%v must be used with %d arguments", a[0], len(a)-1)
 	}
+}
+
+func (pb *PathBuilder) pathDescription(v cue.Value) {
+	description, err := v.String()
+	if err != nil {
+		description = ""
+	}
+	pb.path.Set("description", ast.NewString(description))
+}
+
+func (pb *PathBuilder) responses(v cue.Value) *ast.StructLit {
+	responses := &OrderedMap{}
+	for i, _ := v.Value().Fields(cue.Definitions(false)); i.Next(); {
+		// searching http status
+		label, err := strconv.Atoi(i.Label())
+		if err != nil {
+			pb.failf(v, "%v is no HTTP Status code", label)
+		}
+
+		if label > 599 || label < 100 {
+			pb.failf(v, "wrong HTTP Status code %v", label)
+		}
+
+		responseStruct := Response(i.Value(), pb.ctx)
+		responses.Set(strconv.Itoa(label), responseStruct)
+
+	}
+
+	return (*ast.StructLit)(responses)
+}
+
+func (pb *PathBuilder) operation(v cue.Value) {
+	operation := &OrderedMap{}
+	var security *ast.ListLit
+
+	if v.Lookup("description").Exists() {
+		description, err := v.Lookup("description").String()
+		if err != nil {
+			description = ""
+		}
+		operation.Set("description", description)
+	}
+
+	if v.Lookup("security").Exists() {
+		security = pb.securityList(v.Lookup("security"))
+	} else if pb.security != nil {
+		security = pb.security
+	}
+	if security != nil {
+		operation.Set("security", security)
+
+	}
+
+	responses := pb.responses(v.Lookup("responses"))
+
+	operation.Set("responses", responses)
+
+	label, _ := v.Label()
+	pb.path.Set(label, operation)
+}
+
+func (pb *PathBuilder) failf(v cue.Value, format string, args ...interface{}) {
+	panic(&openapiError{
+		errors.NewMessage(format, args),
+		pb.ctx.path,
+		v.Pos(),
+	})
+}
+
+func (pb *PathBuilder) buildPath(v cue.Value) *ast.StructLit {
+
+	for i, _ := v.Value().Fields(cue.Definitions(true)); i.Next(); {
+		label := i.Label()
+
+		switch label {
+		case "description":
+			pb.pathDescription(v.Lookup("description"))
+		case "security":
+			pb.security = pb.securityList(v.Lookup("security"))
+		case "get", "put", "post", "delete", "options", "head", "patch", "trace":
+			pb.operation(v.Lookup(label))
+		default:
+			pb.failf(i.Value(), "unsupported field \"%v\" for path struct", label)
+		}
+
+	}
+
+	return (*ast.StructLit)(pb.path)
 }
 
 func (b *builder) schema(core *builder, name string, v cue.Value) *ast.StructLit {
@@ -899,6 +1072,16 @@ func (b *builder) array(v cue.Value) {
 	}
 }
 
+func (pb *PathBuilder) securityList(v cue.Value) *ast.ListLit {
+	items := []ast.Expr{}
+
+	for i, _ := v.List(); i.Next(); {
+		items = append(items, pb.decode(i.Value()))
+	}
+
+	return ast.NewList(items...)
+}
+
 func (b *builder) listCap(v cue.Value) {
 	switch op, a := v.Expr(); op {
 	case cue.LessThanOp:
@@ -1093,6 +1276,13 @@ func (b *builder) bytes(v cue.Value) {
 	}
 }
 
+type PathBuilder struct {
+	ctx  *buildContext
+	path *OrderedMap
+
+	security *ast.ListLit
+}
+
 type builder struct {
 	ctx          *buildContext
 	typ          string
@@ -1110,6 +1300,11 @@ type builder struct {
 	keys       []string
 	properties map[string]*builder
 	items      *builder
+}
+
+func newRootPathBuilder(c *buildContext) *PathBuilder {
+	return &PathBuilder{ctx: c,
+		path: &OrderedMap{}}
 }
 
 func newRootBuilder(c *buildContext) *builder {
@@ -1313,6 +1508,11 @@ func (b *builder) inta(v cue.Value, offset int64) ast.Expr {
 }
 
 func (b *builder) decode(v cue.Value) ast.Expr {
+	v, _ = v.Default()
+	return v.Syntax(cue.Final()).(ast.Expr)
+}
+
+func (pb *PathBuilder) decode(v cue.Value) ast.Expr {
 	v, _ = v.Default()
 	return v.Syntax(cue.Final()).(ast.Expr)
 }

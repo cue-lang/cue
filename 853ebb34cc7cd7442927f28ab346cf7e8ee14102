@@ -1,6 +1,46 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "46d8a4a6_4ed1d62a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-31T11:10:22Z",
+      "side": 1,
+      "message": "nit: you replaced the globbing, presumably to be stricter about matching only N_ prefixes, so you should update this paragraph",
+      "range": {
+        "startLine": 35,
+        "startChar": 38,
+        "endLine": 35,
+        "endChar": 46
+      },
+      "revId": "853ebb34cc7cd7442927f28ab346cf7e8ee14102",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1996a9a1_b0410b10",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-31T11:10:22Z",
+      "side": 1,
+      "message": "oops, my bad presumably.",
+      "revId": "853ebb34cc7cd7442927f28ab346cf7e8ee14102",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "08554c20_58c08f83",
@@ -14,6 +54,40 @@
       "writtenOn": "2022-08-31T08:44:05Z",
       "side": 1,
       "message": "PTAL",
+      "revId": "853ebb34cc7cd7442927f28ab346cf7e8ee14102",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaf10877_450a8c3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-31T11:10:22Z",
+      "side": 1,
+      "message": "Meaning the +2 for your most recent changes, not mine, of course.",
+      "revId": "853ebb34cc7cd7442927f28ab346cf7e8ee14102",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4638d1c_22cf30ea",
+        "filename": "doc/tutorial/basics/script_test.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-08-31T11:10:22Z",
+      "side": 1,
+      "message": "nit: name these variables \"entry\" and \"entries\" to clarify what they are. \"dir\" tells me it\u0027s a directory (presumably a path string), and not its contents.",
       "revId": "853ebb34cc7cd7442927f28ab346cf7e8ee14102",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

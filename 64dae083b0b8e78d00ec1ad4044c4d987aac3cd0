@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13b9d5c9_56055318",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T11:42:32Z",
+      "side": 1,
+      "message": "LGTM, thanks, modulo some nits that you might consider worth addressing.",
+      "revId": "64dae083b0b8e78d00ec1ad4044c4d987aac3cd0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

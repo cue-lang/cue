@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57e0f37d_3b0bf891",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 565,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T11:42:32Z",
+      "side": 1,
+      "message": "I like the more efficient implementation, but I think a comment would be good (internal only) on SelectorType saying that the constants mirror those of adt.Feature.",
+      "revId": "db7e2895f719a4c774859ebd56770002d2079add",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7fa8f2c_efbd9528",
+        "filename": "internal/core/adt/feature.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T11:42:32Z",
+      "side": 1,
+      "message": "ISTM that this is equivalent to `\"%s\\u0000%s\"` and therefore a valid regular JSON string label. Is that ambiguity ever an issue?\n\nAlso, I suspect that `s + \"\\x00\" + pkgPath` will be a bit faster here.\n\nIf we\u0027re guaranteed that `s` is a label that doesn\u0027t need quoting (and I suspect that it is) then just a space would be sufficient, I think.",
+      "revId": "db7e2895f719a4c774859ebd56770002d2079add",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95c8e86d_0aa13842",
+        "filename": "internal/core/path/selector.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T11:42:32Z",
+      "side": 1,
+      "message": "It also assumes that `t.ConstraintType()` is zero, right? I think it would be nice to check that the invariants are true and panic otherwise (it\u0027s pretty cheap to do that, I think), otherwise we could end up with hard-to-diagnose bugs later.",
+      "revId": "db7e2895f719a4c774859ebd56770002d2079add",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b131420e_21e5d081",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T09:52:57Z",
+      "side": 1,
+      "message": "LGTM modulo one more suggestion about `SelectorType.String` which I think is probably worth doing, but YMMV.",
+      "revId": "938555f0ee78b744e439e5e1544a826d7d44f899",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

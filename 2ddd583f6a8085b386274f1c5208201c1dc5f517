@@ -227,6 +227,24 @@
       "parentUuid": "a2573afb_dfd5db79",
       "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3863c6de_fa187915",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T09:52:57Z",
+      "side": 1,
+      "message": "That seems nicer, thanks.",
+      "parentUuid": "9a069c44_4c1ea00e",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

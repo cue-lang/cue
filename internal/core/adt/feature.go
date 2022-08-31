@@ -68,11 +68,17 @@ func (f Feature) SelectorString(index StringIndexer) string {
 	x := f.safeIndex()
 	switch f.Typ() {
 	case IntLabel:
+		if f == AnyIndex {
+			return "_"
+		}
 		return strconv.Itoa(int(x))
 	case StringLabel:
 		s := index.IndexToString(x)
 		if ast.IsValidIdent(s) && !internal.IsDefOrHidden(s) {
 			return s
+		}
+		if f == AnyString {
+			return "_"
 		}
 		return literal.String.Quote(s)
 	default:
@@ -153,17 +159,42 @@ func MakeIdentLabel(r StringIndexer, s, pkgpath string) Feature {
 	switch {
 	case strings.HasPrefix(s, "_#"):
 		t = HiddenDefinitionLabel
-		s = fmt.Sprintf("%s\x00%s", s, pkgpath)
+		s = HiddenKey(s, pkgpath)
 	case strings.HasPrefix(s, "#"):
 		t = DefinitionLabel
 	case strings.HasPrefix(s, "_"):
-		s = fmt.Sprintf("%s\x00%s", s, pkgpath)
+		s = HiddenKey(s, pkgpath)
 		t = HiddenLabel
 	}
 	i := r.StringToIndex(s)
 	f, err := MakeLabel(nil, i, t)
 	if err != nil {
 		panic("out of free string slots")
+	}
+	return f
+}
+
+// HiddenKey constructs the uniquely identifying string for a hidden fields and
+// its package.
+func HiddenKey(s, pkgPath string) string {
+	return fmt.Sprintf("%s\x00%s", s, pkgPath)
+}
+
+// MakeNamedLabel creates a feature for the given name and feature type.
+func MakeNamedLabel(r StringIndexer, t FeatureType, s string) Feature {
+	i := r.StringToIndex(s)
+	f, err := MakeLabel(nil, i, t)
+	if err != nil {
+		panic("out of free string slots")
+	}
+	return f
+}
+
+// MakeIntLabel creates an integer label.
+func MakeIntLabel(t FeatureType, i int64) Feature {
+	f, err := MakeLabel(nil, i, t)
+	if err != nil {
+		panic("index out of range")
 	}
 	return f
 }

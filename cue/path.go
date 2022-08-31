@@ -37,18 +37,17 @@ type SelectorType uint16
 const (
 	// StringLabel represents a regular non-definition field.
 	StringLabel SelectorType = 1 << iota
-	// HiddenLabel represents a hidden non-definition field.
-	HiddenLabel
-	// DefinitionLabel represents a definition.
-	DefinitionLabel
-	// HiddenDefinitionLabel represents a hidden definition.
-	HiddenDefinitionLabel
 	// IndexLabel represents a numeric index into an array.
 	IndexLabel
+	// DefinitionLabel represents a definition.
+	DefinitionLabel
+	// HiddenLabel represents a hidden non-definition field.
+	HiddenLabel
+	// HiddenDefinitionLabel represents a hidden definition.
+	HiddenDefinitionLabel
 
 	// OptionalConstraint represents an optional constraint (?).
 	OptionalConstraint
-
 	// PatternConstraint represents a selector of fields in a struct
 	// or array that match a constraint.
 	PatternConstraint
@@ -69,10 +68,10 @@ func (t SelectorType) ConstraintType() SelectorType {
 var selectorTypeStrings = [...]string{
 	"InvalidSelectorType",
 	"StringLabel",
-	"HiddenLabel",
-	"DefinitionLabel",
-	"HiddenDefinitionLabel",
 	"IndexLabel",
+	"DefinitionLabel",
+	"HiddenLabel",
+	"HiddenDefinitionLabel",
 	"OptionalConstraint",
 	"PatternConstraint",
 }
@@ -560,18 +559,7 @@ type anySelector adt.Feature
 func (s anySelector) String() string { return "[_]" }
 func (s anySelector) optional() bool { return true }
 func (s anySelector) labelType() SelectorType {
-	var l SelectorType
-	switch adt.Feature(s) {
-	case adt.AnyString:
-		l = StringLabel
-	case adt.AnyIndex:
-		l = IndexLabel
-	case adt.AnyDefinition:
-		l = DefinitionLabel
-	case adt.AnyHidden:
-		l = HiddenLabel
-	}
-	return l
+	return SelectorType((1 << adt.Feature(s).Typ()) >> 1)
 }
 func (s anySelector) constraintType() SelectorType { return PatternConstraint }
 

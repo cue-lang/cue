@@ -191,6 +191,24 @@
       "parentUuid": "8ca8a5be_bf7b4689",
       "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a069c44_4c1ea00e",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-08-31T09:42:50Z",
+      "side": 1,
+      "message": "split kind() now into labelType and constraintType",
+      "parentUuid": "a2573afb_dfd5db79",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/tools/flow"
@@ -53,6 +54,8 @@ func TestFlow(t *testing.T) {
 
 		seqNum = 0
 
+		var tasksTotal stats.Counts
+
 		updateFunc := func(c *flow.Controller, task *flow.Task) error {
 			str := mermaidGraph(c)
 			step := fmt.Sprintf("t%d", seqNum)
@@ -65,6 +68,10 @@ func TestFlow(t *testing.T) {
 					t.Fatal(err)
 				}
 				fmt.Fprintln(t.Writer(path.Join(step, "value")), string(b))
+
+				stats := task.Stats()
+				tasksTotal.Add(stats)
+				fmt.Fprintln(t.Writer(path.Join(step, "stats")), &stats)
 			}
 
 			incSeqNum()
@@ -91,8 +98,27 @@ func TestFlow(t *testing.T) {
 				ToSlash: true,
 			})
 		}
+
+		totals := c.Stats()
+		if tasksTotal != zeroStats && totals != tasksTotal {
+			t.Errorf(diffMsg, tasksTotal, totals, tasksTotal.Since(totals))
+		}
+		fmt.Fprintln(t.Writer("stats/totals"), totals)
 	})
 }
+
+var zeroStats stats.Counts
+
+const diffMsg = `
+stats: task totals differens from controller:
+task totals:
+%v
+
+controller totals:
+%v
+
+task totals - controller totals:
+%v`
 
 func TestFlowValuePanic(t *testing.T) {
 	f := `
@@ -256,6 +282,12 @@ func TestX(t *testing.T) {
 
 	c := flow.New(&flow.Config{
 		Root: cue.ParsePath("root"),
+		UpdateFunc: func(c *flow.Controller, ft *flow.Task) error {
+			if ft != nil {
+				t.Errorf("\nTASK:\n%s", ft.Stats())
+			}
+			return nil
+		},
 	}, v, taskFunc)
 
 	t.Error(mermaidGraph(c))
@@ -263,4 +295,6 @@ func TestX(t *testing.T) {
 	if err := c.Run(context.Background()); err != nil {
 		t.Fatal(errors.Details(err, nil))
 	}
+
+	t.Errorf("\nCONTROLLER:\n%s", c.Stats())
 }

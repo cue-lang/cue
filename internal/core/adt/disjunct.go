@@ -124,7 +124,7 @@ func (n *nodeContext) expandDisjuncts(
 	parentMode defaultMode, // default mode of this disjunct
 	recursive, last bool) {
 
-	n.ctx.stats.DisjunctCount++
+	n.ctx.stats.Disjuncts++
 
 	node := n.node
 	defer func() {

@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "667a9ced_80fb4172",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-08-31T09:44:52Z",
+      "side": 1,
+      "message": "My reservation is that `t :\u003d cue.StringLabel | cue.DefinitionLabel; t.String()` will result in `SelectorType(0x5)` which really isn\u0027t great.\n\nWith respect to speed, is this ever actually likely to be in a critical path? If so, we could easily optimise later by using `OnesCount` and using the fast path when it only returns one.\n\nIn fact, that\u0027s pretty straightforward. This code seems simpler and it\u0027s faster in all cases I measured, FWIW:\n\n\tfunc (t SelectorType) String() string {\n\t\tif t.LabelType() \u003d\u003d 0 {\n\t\t\treturn \"NoLabels\"\n\t\t}\n\t\tsingle :\u003d bits.OnesCount16(uint16(t)) \u003d\u003d 1\n\t\tvar buf strings.Builder\n\t\tfor i :\u003d range selectorTypeStrings[:len(selectorTypeStrings)-1] {\n\t\t\tif t\u0026(SelectorType(1)\u003c\u003ci) \u003d\u003d 0 {\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tif single {\n\t\t\t\treturn selectorTypeStrings[i+1]\n\t\t\t}\n\t\t\tif buf.Len() \u003e 0 {\n\t\t\t\tbuf.WriteByte(\u0027|\u0027)\n\t\t\t}\n\t\t\tbuf.WriteString(selectorTypeStrings[i+1])\n\t\t}\n\t\treturn buf.String()\n\t}",
+      "parentUuid": "37cbbdcb_308f6cd8",
+      "revId": "2ddd583f6a8085b386274f1c5208201c1dc5f517",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0c61f9dd_e29693a8",
         "filename": "cue/path.go",
         "patchSetId": 1

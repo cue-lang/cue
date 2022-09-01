@@ -74,12 +74,21 @@ func TestGenerate(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			want, b = normalize(want), normalize(b)
 
 			if d := diff.Diff(string(want), string(b)); d != "" {
-				t.Errorf("files differ:\n%v", d)
+				t.Errorf("files differ (-want +got):\n%v", d)
 			}
 		})
 	}
+}
+
+// normalize copes with differences between the Go string literal conventions
+// between go1.18 and go1.19. The byte 0x7f changed from \u007f to \x7f.
+// By normalizing here, we make the comparison independent of the Go version
+// that's used to run the tests.
+func normalize(gen []byte) []byte {
+	return bytes.ReplaceAll(gen, []byte(`\u007f`), []byte(`\x7f`))
 }
 
 func errStr(err error) string {

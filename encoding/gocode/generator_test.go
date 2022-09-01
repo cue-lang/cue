@@ -74,12 +74,22 @@ func TestGenerate(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
+			want, b = normalize(want), normalize(b)
 
 			if d := diff.Diff(string(want), string(b)); d != "" {
 				t.Errorf("files differ:\n%v", d)
 			}
 		})
 	}
+}
+
+var instanceDataPat = regexp.MustCompile(`var cuegenInstanceData = \[\]byte\(".*"\)`)
+
+func normalize(gen []byte) []byte {
+	if !instanceDataPat.Match(gen) {
+		panic("no match for cuegenInstanceData pattern")
+	}
+	return instanceDataPat.ReplaceAll(gen, nil)
 }
 
 func errStr(err error) string {

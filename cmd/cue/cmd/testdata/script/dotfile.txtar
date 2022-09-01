@@ -1,0 +1,12 @@
+exec cue export ./.foo
+cmp stdout stdout.golden
+
+-- .foo/x.cue --
+package foo
+
+x: 1
+
+-- stdout.golden --
+{
+    "x": 1
+}

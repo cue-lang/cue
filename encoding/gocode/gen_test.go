@@ -25,68 +25,86 @@ import (
 	"cuelang.org/go/encoding/gocode/testdata/pkg2"
 )
 
+type validator interface {
+	Validate() error
+}
+
 func TestPackages(t *testing.T) {
-	t.Skip("fix error messages") // TODO(errors)
 
 	testCases := []struct {
-		name string
-		got  error
-		want string
+		name  string
+		value validator
+		want  string
 	}{{
-		name: "failing int",
-		got: func() error {
-			v := pkg2.PickMe(4)
-			return v.Validate()
-		}(),
-		want: "invalid value 4 (out of bound >5):\n    pkg2/instance.cue:x:x",
+		name:  "failing int",
+		value: pkg2.PickMe(4),
+		want:  "invalid value 4 (out of bound >5):\n    pkg2/instance.cue:x:x",
 	}, {
-		name: "failing field with validator",
-		got: func() error {
-			v := &pkg1.OtherStruct{A: "car"}
-			return v.Validate()
-		}(),
-		want: "A: invalid value \"car\" (does not satisfy strings.ContainsAny(\"X\")):\n    pkg1/instance.cue:x:x\nP: invalid value 0 (out of bound >5):\n    pkg2/instance.cue:x:x",
+		name:  "failing field with validator",
+		value: &pkg1.OtherStruct{A: "car"},
+		want: `
+2 errors in empty disjunction:
+conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
+    pkg1/instance.cue:x:x
+A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
+    pkg1/instance.cue:x:x
+    pkg1/instance.cue:x:x
+`,
 	}, {
-		name: "failing field of type int",
-		got: func() error {
-			v := &pkg1.MyStruct{A: 11, B: "dog"}
-			return v.Validate()
-		}(),
-		want: "A: invalid value 11 (out of bound <=10):\n    pkg1/instance.cue:x:x",
+		name:  "failing field of type int",
+		value: &pkg1.MyStruct{A: 11, B: "dog"},
+		want: `
+2 errors in empty disjunction:
+conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang.org/go/encoding/gocode/testdata/pkg2".ImportMe} (mismatched types null and struct):
+    pkg1/instance.cue:x:x
+A: invalid value 11 (out of bound <=10):
+    pkg1/instance.cue:x:x
+`,
 	}, {
-		name: "failing nested struct ",
-		got: func() error {
-			v := &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "car", P: 6}}
-			return v.Validate()
-		}(),
-		want: "O.A: invalid value \"car\" (does not satisfy strings.ContainsAny(\"X\")):\n    pkg1/instance.cue:x:x",
+		name:  "failing nested struct ",
+		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "car", P: 6}},
+		want: `
+4 errors in empty disjunction:
+conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang.org/go/encoding/gocode/testdata/pkg2".ImportMe} (mismatched types null and struct):
+    pkg1/instance.cue:x:x
+O: 2 errors in empty disjunction:
+O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
+    pkg1/instance.cue:x:x
+    pkg1/instance.cue:x:x
+O.A: invalid value "car" (does not satisfy strings.ContainsAny("X")):
+    pkg1/instance.cue:x:x
+    pkg1/instance.cue:x:x
+`,
 	}, {
-		name: "fail nested struct of different package",
-		got: func() error {
-			v := &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "X", P: 4}}
-			return v.Validate()
-		}(),
-		want: "O.P: invalid value 4 (out of bound >5):\n    pkg2/instance.cue:x:x",
+		name:  "fail nested struct of different package",
+		value: &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "X", P: 4}},
+		want: `
+4 errors in empty disjunction:
+conflicting values null and {A:<=10,B:(=~"cat"|*"dog"),O?:OtherStruct,I:"cuelang.org/go/encoding/gocode/testdata/pkg2".ImportMe} (mismatched types null and struct):
+    pkg1/instance.cue:x:x
+O: 2 errors in empty disjunction:
+O: conflicting values null and {A:strings.ContainsAny("X"),P:"cuelang.org/go/encoding/gocode/testdata/pkg2".PickMe} (mismatched types null and struct):
+    pkg1/instance.cue:x:x
+    pkg1/instance.cue:x:x
+O.P: invalid value 4 (out of bound >5):
+    pkg2/instance.cue:x:x
+`,
 	}, {
 		name: "all good",
-		got: func() error {
-			v := &pkg1.MyStruct{
-				A: 5,
-				B: "dog",
-				I: &pkg2.ImportMe{A: 1000, B: "a"},
-			}
-			return v.Validate()
-		}(),
+		value: &pkg1.MyStruct{
+			A: 5,
+			B: "dog",
+			I: &pkg2.ImportMe{A: 1000, B: "a"},
+		},
 		want: "nil",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			got := strings.TrimSpace(errStr(tc.got))
-			want := tc.want
+			got := strings.TrimSpace(errStr(tc.value.Validate()))
+			want := strings.TrimSpace(tc.want)
 			if got != want {
 				t.Errorf("got:\n%q\nwant:\n%q", got, want)
 			}
-
 		})
 	}
 }

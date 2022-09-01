@@ -29,8 +29,8 @@ func check(t *testing.T, want, x interface{}, err error) {
 	if err != nil {
 		x = errors.String(err.(errors.Error))
 	}
-	if diff := cmp.Diff(x, want, cmpopts.EquateEmpty()); diff != "" {
-		t.Error(diff)
+	if diff := cmp.Diff(want, x, cmpopts.EquateEmpty()); diff != "" {
+		t.Errorf("unexpected result; -want +got\n%s", diff)
 	}
 }
 
@@ -252,9 +252,6 @@ func TestFromFile(t *testing.T) {
 }
 
 func TestParseFile(t *testing.T) {
-	t.Skip("fix error messages")
-	// TODO(errors): wrong path?
-
 	testCases := []struct {
 		in   string
 		mode Mode
@@ -311,10 +308,10 @@ func TestParseFile(t *testing.T) {
 		},
 	}, {
 		in:  "foo:file.bar",
-		out: `cue: marshal error: tags: value "foo" not found`,
+		out: `unknown filetype foo`,
 	}, {
 		in:  "file.bar",
-		out: `cue: marshal error: extensions: value ".bar" not found`,
+		out: `unknown file extension .bar`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.in, func(t *testing.T) {

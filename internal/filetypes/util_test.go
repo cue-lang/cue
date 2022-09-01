@@ -27,6 +27,8 @@ func TestIsPackage(t *testing.T) {
 		{".../foo", true},
 		{"./:foo", true},
 		{"foo.bar/foo", true},
+		{"./.foo", true},
+		{"./.foo.json", false},
 
 		// Not supported yet, but could be and isn't anything else valid.
 		{":foo", true},

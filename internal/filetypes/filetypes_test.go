@@ -71,6 +71,14 @@ func TestFromFile(t *testing.T) {
 			Attributes:   true,
 		},
 	}, {
+		// Filename starting with a . but no other extension.
+		name: "filename-with-dot",
+		in: build.File{
+			Filename: ".json",
+		},
+		mode: Def,
+		out:  "#FileInfo.encoding: non-concrete value string",
+	}, {
 		name: "yaml",
 		mode: Def,
 		in: build.File{
@@ -263,6 +271,18 @@ func TestParseFile(t *testing.T) {
 		out: &build.File{
 			Filename:       "file.json",
 			Encoding:       "json",
+			Interpretation: "auto",
+		},
+	}, {
+		in:   ".json",
+		mode: Input,
+		out:  `no encoding specified for file ".json"`,
+	}, {
+		in:   ".json.yaml",
+		mode: Input,
+		out: &build.File{
+			Filename:       ".json.yaml",
+			Encoding:       "yaml",
 			Interpretation: "auto",
 		},
 	}, {

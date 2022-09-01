@@ -102,7 +102,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	v = v.Fill(b)
 
 	if b.Encoding == "" {
-		ext := i.Lookup("extensions", filepath.Ext(b.Filename))
+		ext := i.Lookup("extensions", fileExt(b.Filename))
 		if ext.Exists() {
 			v = v.Unify(ext)
 		}
@@ -260,7 +260,7 @@ func toFile(i, v cue.Value, filename string) (*build.File, error) {
 			if !hasDefault {
 				v = v.Unify(i.LookupDef("Default"))
 			}
-		} else if ext := filepath.Ext(filename); ext != "" {
+		} else if ext := fileExt(filename); ext != "" {
 			if x := i.Lookup("extensions", ext); x.Exists() || !hasDefault {
 				v = v.Unify(x)
 				if err := v.Err(); err != nil {
@@ -303,4 +303,14 @@ func parseType(s string, mode Mode) (inst, val cue.Value, err error) {
 	}
 
 	return i, v, nil
+}
+
+// fileExt is like filepath.Ext except we don't treat file names starting with "." as having an extension
+// unless there's also another . in the name.
+func fileExt(f string) string {
+	e := filepath.Ext(f)
+	if e == "" || e == filepath.Base(f) {
+		return ""
+	}
+	return e
 }

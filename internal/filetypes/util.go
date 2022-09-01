@@ -15,7 +15,6 @@
 package filetypes
 
 import (
-	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -48,8 +47,8 @@ func IsPackage(s string) bool {
 	// Assuming we terminate search for packages once a scoped qualifier is
 	// found, we know that any file without an extension (except maybe '-')
 	// is invalid. We can therefore assume it is a package.
-	// The section may still contain a dot, for instance ./foo/. or ./foo/...
-	return strings.TrimLeft(filepath.Ext(s), ".") == ""
+	// The section may still contain a dot, for instance ./foo/., ./.foo/, or ./foo/...
+	return strings.TrimLeft(fileExt(s), ".") == ""
 
 	// NOTE/TODO: we have not needed to check whether it is an absolute package
 	// or whether the package starts with a dot. Potentially we could thus relax

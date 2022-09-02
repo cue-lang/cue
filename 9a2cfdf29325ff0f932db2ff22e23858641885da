@@ -33,6 +33,24 @@
       "message": "Should this not be Unquoted? Not sure, just checking.",
       "revId": "9a2cfdf29325ff0f932db2ff22e23858641885da",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1de82985_829f7b60",
+        "filename": "encoding/openapi/build.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-02T13:54:56Z",
+      "side": 1,
+      "message": "As discussed online, it seems like it should only really apply to definitions here, so changed to exclude non-definitions.",
+      "parentUuid": "96b2d705_b75ee70b",
+      "revId": "9a2cfdf29325ff0f932db2ff22e23858641885da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

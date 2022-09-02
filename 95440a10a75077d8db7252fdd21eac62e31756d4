@@ -16,6 +16,24 @@
       "message": "Feels like it would be worth having a test that exercises this via cmd/cue and one for cue/load too given that\u0027s ultimately what we want here?",
       "revId": "95440a10a75077d8db7252fdd21eac62e31756d4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "852c361a_87ad785e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-02T12:13:05Z",
+      "side": 1,
+      "message": "Good call! I added one for cmd/cue (which actually found an issue) but not one for cue/load, as there didn\u0027t seem a good place for doing it (there don\u0027t seem to be any similar tests in cue/load), and cmd/cue is a fairly thin layer over cue/load, so I think the cmd/cue test should give us sufficient confidence here.",
+      "parentUuid": "c249998b_f5a13494",
+      "revId": "95440a10a75077d8db7252fdd21eac62e31756d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

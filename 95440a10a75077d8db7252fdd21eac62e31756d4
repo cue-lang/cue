@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c249998b_f5a13494",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-02T05:56:38Z",
+      "side": 1,
+      "message": "Feels like it would be worth having a test that exercises this via cmd/cue and one for cue/load too given that\u0027s ultimately what we want here?",
+      "revId": "95440a10a75077d8db7252fdd21eac62e31756d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

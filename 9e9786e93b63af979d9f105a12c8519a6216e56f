@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "014b1787_3fd6a55f",
+        "filename": "README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-05T12:55:52Z",
+      "side": 0,
+      "message": "this is me with a draft review on PS2.",
+      "revId": "9e9786e93b63af979d9f105a12c8519a6216e56f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

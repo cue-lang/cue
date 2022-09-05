@@ -35,6 +35,7 @@
 				_params: {
 					hsize: $p.hsize
 				}
+				role: "admin"
 			}).out
 
 			role: configed.role
@@ -67,17 +68,17 @@ Errors:
 _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
     ./in.cue:29:20
     ./in.cue:35:13
-    ./in.cue:54:12
-    ./in.cue:55:22
+    ./in.cue:55:12
+    ./in.cue:56:22
 _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
     ./in.cue:29:20
     ./in.cue:35:13
-    ./in.cue:54:12
-    ./in.cue:55:15
+    ./in.cue:55:12
+    ./in.cue:56:15
 _params.hsize.$_instances: 2 errors in empty disjunction::
     ./in.cue:33:20
 #RelabelService.out.labstr: undefined field: label:
-    ./in.cue:50:14
+    ./in.cue:51:14
 
 Result:
 (_|_){
@@ -158,13 +159,13 @@ Result:
           // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
-          //     ./in.cue:54:12
-          //     ./in.cue:55:22
+          //     ./in.cue:55:12
+          //     ./in.cue:56:22
           // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
-          //     ./in.cue:54:12
-          //     ./in.cue:55:15
+          //     ./in.cue:55:12
+          //     ./in.cue:56:15
           // _params.hsize.$_instances: 2 errors in empty disjunction::
           //     ./in.cue:33:20
         }
@@ -185,13 +186,13 @@ Result:
           // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
-          //     ./in.cue:54:12
-          //     ./in.cue:55:22
+          //     ./in.cue:55:12
+          //     ./in.cue:56:22
           // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
           //     ./in.cue:29:20
           //     ./in.cue:35:13
-          //     ./in.cue:54:12
-          //     ./in.cue:55:15
+          //     ./in.cue:55:12
+          //     ./in.cue:56:15
           // _params.hsize.$_instances: 2 errors in empty disjunction::
           //     ./in.cue:33:20
         }
@@ -209,7 +210,7 @@ Result:
       // [eval]
       labstr: (_|_){
         // [eval] #RelabelService.out.labstr: undefined field: label:
-        //     ./in.cue:50:14
+        //     ./in.cue:51:14
       }
     }
   }

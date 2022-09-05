@@ -16,6 +16,24 @@
       "message": "personally I\u0027m not a fan of one parameter per line - it\u0027s not like these four lines are all very long :) I think it could easily and comfortably fit in two lines, for instance.\n\nis this a style we\u0027re trying to stick to?",
       "revId": "97218749ae625b113c60d542e40be42e7568041e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb20bf0e_1dc912ef",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 341,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-05T10:03:55Z",
+      "side": 1,
+      "message": "Breaking after `newIdentForField(` doesn\u0027t make it, and neither does breaking the return signature work. Looking through the code the consistent way to deal with this is either to run a little bit over or like this.\n\nSo I\u0027ll leave it like this.\n\nAlso, the +2 seems to disappear again on new commits...",
+      "parentUuid": "48b4491b_12a797c4",
+      "revId": "97218749ae625b113c60d542e40be42e7568041e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

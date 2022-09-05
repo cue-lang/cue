@@ -29,7 +29,6 @@ to simplify tasks involving defining and using data.
 It is a superset of JSON,
 allowing users familiar with JSON to get started quickly.
 
-
 ### What is it for?
 
 You can use CUE to
@@ -157,7 +156,6 @@ Changes can be contributed using Gerrit or Github pull requests.
 Guidelines for participating in CUE community spaces and a reporting process for
 handling issues can be found in the [Code of
 Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
-
 
 ## Contact
 

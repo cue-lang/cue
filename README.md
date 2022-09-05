@@ -29,7 +29,6 @@ to simplify tasks involving defining and using data.
 It is a superset of JSON,
 allowing users familiar with JSON to get started quickly.
 
-
 ### What is it for?
 
 You can use CUE to

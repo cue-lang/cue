@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac208cd5_9fcb8fbb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-05T07:51:34Z",
+      "side": 1,
+      "message": "Seems like it could work. The only problem is that there are currently two ways to check whether the result is a reference: `root.Exists()` and `len(p.Selectors()) \u003e 0`.\n\nIt will be hard to know what external users are doing, and I\u0027m afraid that such subtle difference can lead to nasty bugs. As you say, there was at least one point in our own code where the first check was used.\n\nWhat I would propose is mark this in the code as a TODO and change the behavior when we move to a v1 API where `Reference` has been removed and then can implement the current `ReferencePath` signature with the new semantics.",
+      "revId": "750b00d29d30b9d9853a6144c9d9f233ad22f0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "177fdac6_e2fce178",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1947,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-05T07:51:34Z",
+      "side": 1,
+      "message": "I would prefer not to increase the reliance on getImportFromNode.\n\nAlso, I\u0027m not certain one can always guarantee these tests are the same.\n\nBut it seems to me that one could instead test the length of the returned path.",
+      "revId": "750b00d29d30b9d9853a6144c9d9f233ad22f0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1174c850_5bcc1dd7",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1965,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-05T07:51:34Z",
+      "side": 1,
+      "message": "To make clear the invariant `root.LookupPath(path) \u003d\u003d v` holds, I would write\n\n// ReferencePath returns a value and path such that\n// root.LookupPath(p) resolves to v. It returns the original\n// value and an empty path if v is not a reference.",
+      "revId": "750b00d29d30b9d9853a6144c9d9f233ad22f0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

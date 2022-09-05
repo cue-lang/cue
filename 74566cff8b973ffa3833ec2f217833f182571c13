@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29812981_6169e41e",
+        "filename": "encoding/openapi/openapi.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-05T07:35:12Z",
+      "side": 1,
+      "message": "May be the Monday morning, but I\u0027m not sure what this means.",
+      "revId": "74566cff8b973ffa3833ec2f217833f182571c13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

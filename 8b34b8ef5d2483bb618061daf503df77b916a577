@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc0eb8a5_37333a2d",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-12T12:55:24Z",
+      "side": 1,
+      "message": "I\u0027m going to leave it as a future improvement :) I\u0027m pretty happy with the diffstat and cleanup in this CL as is.",
+      "parentUuid": "3e11ca57_ff813b73",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1b18eb76_cae803bf",
@@ -173,6 +191,24 @@
       "side": 1,
       "message": "Maybe special-case to avoid generating/registering the package?",
       "parentUuid": "da4c9b7a_c1333128",
+      "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38f56e87_d7b70b2b",
+        "filename": "pkg/tool/pkg.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-12T12:55:24Z",
+      "side": 1,
+      "message": "Done; I added the special case to pkg/gen, just like you did for the `path` package.\n\nWe can always change this detail in the future if we want.",
+      "parentUuid": "86a3e0ac_452b996d",
       "revId": "8b34b8ef5d2483bb618061daf503df77b916a577",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

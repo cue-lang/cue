@@ -23,7 +23,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -345,7 +345,7 @@ func (v Value) MantExp(mant *big.Int) (exp int, err error) {
 		return 0, ErrInfinite
 	}
 	if mant != nil {
-		mant.Set(&n.X.Coeff)
+		mant.Set(n.X.Coeff.MathBigInt())
 		if n.X.Negative {
 			mant.Neg(mant)
 		}
@@ -425,7 +425,7 @@ func (v Value) Int(z *big.Int) (*big.Int, error) {
 	if n.X.Exponent != 0 {
 		panic("cue: exponent should always be nil for integer types")
 	}
-	z.Set(&n.X.Coeff)
+	z.Set(n.X.Coeff.MathBigInt())
 	if n.X.Negative {
 		z.Neg(z)
 	}

@@ -17,7 +17,7 @@ package literal
 import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 )
 
 var baseContext apd.Context

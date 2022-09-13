@@ -15,9 +15,7 @@
 package adt
 
 import (
-	"math/big"
-
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 )
 
 var apdCtx apd.Context
@@ -86,22 +84,22 @@ func numOp(c *OpContext, fn numFunc, x, y *Num) Value {
 }
 
 func (c *OpContext) IntDiv(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Div, a, b)
+	return intDivOp(c, (*apd.BigInt).Div, a, b)
 }
 
 func (c *OpContext) IntMod(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Mod, a, b)
+	return intDivOp(c, (*apd.BigInt).Mod, a, b)
 }
 
 func (c *OpContext) IntQuo(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Quo, a, b)
+	return intDivOp(c, (*apd.BigInt).Quo, a, b)
 }
 
 func (c *OpContext) IntRem(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Rem, a, b)
+	return intDivOp(c, (*apd.BigInt).Rem, a, b)
 }
 
-type intFunc func(z, x, y *big.Int) *big.Int
+type intFunc func(z, x, y *apd.BigInt) *apd.BigInt
 
 func intDivOp(c *OpContext, fn intFunc, a, b *Num) Value {
 	if b.X.IsZero() {

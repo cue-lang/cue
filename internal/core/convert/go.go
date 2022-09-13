@@ -25,7 +25,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 	"golang.org/x/text/encoding/unicode"
 
 	"cuelang.org/go/cue/ast"
@@ -251,12 +251,16 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		return compileExpr(ctx, v)
 
 	case *big.Int:
-		return &adt.Num{Src: src, K: adt.IntKind, X: *apd.NewWithBigInt(v, 0)}
+		v2 := new(apd.BigInt).SetMathBigInt(v)
+		return &adt.Num{Src: src, K: adt.IntKind, X: *apd.NewWithBigInt(v2, 0)}
 
 	case *big.Rat:
 		// should we represent this as a binary operation?
 		n := &adt.Num{Src: src, K: adt.IntKind}
-		_, err := apd.BaseContext.Quo(&n.X, apd.NewWithBigInt(v.Num(), 0), apd.NewWithBigInt(v.Denom(), 0))
+		_, err := apd.BaseContext.Quo(&n.X,
+			apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(v.Num()), 0),
+			apd.NewWithBigInt(new(apd.BigInt).SetMathBigInt(v.Denom()), 0),
+		)
 		if err != nil {
 			return ctx.AddErrf("could not convert *big.Rat: %v", err)
 		}

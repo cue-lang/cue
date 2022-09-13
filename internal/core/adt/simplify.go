@@ -15,7 +15,7 @@
 package adt
 
 import (
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 )
 
 // SimplifyBounds collapses bounds if possible. The bound values must be

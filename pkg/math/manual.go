@@ -17,12 +17,12 @@ package math
 import (
 	"math/big"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/internal"
 )
 
-func roundContext(rounder string) *apd.Context {
+func roundContext(rounder apd.Rounder) *apd.Context {
 	c := *apdContext
 	c.Rounding = rounder
 	return &c
@@ -37,7 +37,7 @@ func toInt(d *internal.Decimal) *big.Int {
 	if d.Negative {
 		i.Neg(i)
 	}
-	return i
+	return i.MathBigInt()
 }
 
 // Floor returns the greatest integer value less than or equal to x.

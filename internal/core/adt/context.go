@@ -23,7 +23,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 	"golang.org/x/text/encoding/unicode"
 
 	"cuelang.org/go/cue/ast"

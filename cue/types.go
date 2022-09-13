@@ -1431,8 +1431,9 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 
 // Struct returns the underlying struct of a value or an error if the value
 // is not a struct.
+//
+// Deprecated: use Fields.
 func (v hiddenValue) Struct() (*Struct, error) {
-	// TODO: deprecate
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, options{})
 	if err != nil {

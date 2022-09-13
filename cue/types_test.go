@@ -93,6 +93,39 @@ func TestAPI(t *testing.T) {
 			return res
 		},
 		want: "_|_ // w.ction: field not allowed",
+	}, {
+		// Issue #1879
+		input: `
+		#Steps: {
+			...
+		}
+
+		test: #Steps & {
+			if true {
+				test1: "test1"
+			}
+			if false {
+				test2: "test2"
+			}
+		}
+		`,
+
+		fun: func(i *Instance) (val Value) {
+			v := i.Value()
+
+			sub := v.LookupPath(ParsePath("test"))
+			st, err := sub.Struct()
+			if err != nil {
+				panic(err)
+			}
+
+			for i := 0; i < st.Len(); i++ {
+				val = st.Field(i).Value
+			}
+
+			return val
+		},
+		want: `"test1"`,
 	}}
 	for _, tc := range testCases {
 		if tc.skip {
@@ -811,6 +844,10 @@ func TestAllFields(t *testing.T) {
 	}, {
 		value: `{_a:"a", b?: "b", #c: 3}`,
 		res:   `{_a:"a",b?:"b",#c:3,}`,
+	}, {
+		// Issue #1879
+		value: `{a: 1, if false { b: 2 }}`,
+		res:   `{a:1,}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

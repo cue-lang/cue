@@ -412,6 +412,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		e.setField(x.Label, f)
 
 		f.Value = e.expr(env, x.Value)
+		f.Attrs = extractFieldAttrs(nil, x)
 
 		// extractDocs(nil)
 		return f
@@ -426,6 +427,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		e.setField(x.Label, f)
 
 		f.Value = e.expr(env, x.Value)
+		f.Attrs = extractFieldAttrs(nil, x)
 
 		// extractDocs(nil)
 		return f
@@ -455,6 +457,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		}
 
 		f.Value = e.expr(env, x.Value)
+		f.Attrs = extractFieldAttrs(nil, x)
 
 		return f
 
@@ -498,6 +501,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		// extractDocs(nil)
 
 		f.Value = e.expr(env, x.Value)
+		f.Attrs = extractFieldAttrs(nil, x)
 
 		return f
 

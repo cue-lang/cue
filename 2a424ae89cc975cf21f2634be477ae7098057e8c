@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3043e7a_2ce5e9b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T09:41:43Z",
+      "side": 1,
+      "message": "s/Let\u0027s/Lets/",
+      "revId": "2a424ae89cc975cf21f2634be477ae7098057e8c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5229edae_2f3a6be7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T09:41:43Z",
+      "side": 1,
+      "message": "LGTM thanks!",
+      "revId": "2a424ae89cc975cf21f2634be477ae7098057e8c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42da63ef_1f705010",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:05:53Z",
+      "side": 1,
+      "message": "LGTM modulo a few trivial suggestions, thanks!",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59f22a66_bba3c7db",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:05:53Z",
+      "side": 1,
+      "message": "no it doesn\u0027t 😊",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e6bd846_50cfa3ba",
+        "filename": "internal/core/adt/feature.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:05:53Z",
+      "side": 1,
+      "message": "It\u0027s not entirely clear what signifies \"the given let\". Do you mean \"the let with identifier s\", perhaps?",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ecacbbf_753b2ba8",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:05:53Z",
+      "side": 1,
+      "message": "or just inline?",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f6d53a0_751e150b",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:05:53Z",
+      "side": 1,
+      "message": "i\u0027m not sure how much putting the above on three separate lines helps.\nSeems like just putting it inline might be fine (with the comment on the field).\n\nValue: c.labeledExpr(x, (*letScope)(x), x.Expr)\n\nOr at any rate losing the first two of the three lines.",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "335de845_0dc51a69",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:05:53Z",
+      "side": 1,
+      "message": "this comment doesn\u0027t seem to make sense any more.",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f8d65a2_f6c314a3",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:05:53Z",
+      "side": 1,
+      "message": "maybe comment that this happens for let fields ?",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

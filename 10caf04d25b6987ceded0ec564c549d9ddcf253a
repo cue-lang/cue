@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "115dd95b_1c92ba35",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-13T09:37:08Z",
+      "side": 1,
+      "message": "Perhaps explain why the reordering happens (I could not see why, given the diff in eval.go), and why the reordering is a safe change to make.",
+      "revId": "10caf04d25b6987ceded0ec564c549d9ddcf253a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43b1ba9e_c0dd8184",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1437,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-13T09:37:08Z",
+      "side": 1,
+      "message": "delete this now?",
+      "revId": "10caf04d25b6987ceded0ec564c549d9ddcf253a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd8195a4_7cb6a6a4",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-13T09:37:08Z",
+      "side": 1,
+      "message": "nit: remove tabs",
+      "revId": "10caf04d25b6987ceded0ec564c549d9ddcf253a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

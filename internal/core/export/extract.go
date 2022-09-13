@@ -144,13 +144,18 @@ func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {
 
 func ExtractFieldAttrs(v *adt.Vertex) (attrs []*ast.Attribute) {
 	for _, x := range v.Conjuncts {
-		attrs = extractFieldAttrs(attrs, x)
+		attrs = extractFieldAttrs(attrs, x.Field())
 	}
 	return attrs
 }
 
-func extractFieldAttrs(attrs []*ast.Attribute, c adt.Conjunct) []*ast.Attribute {
-	if f, ok := c.Source().(*ast.Field); ok {
+// extractFieldAttrs extracts the fields from n and appends unique entries to
+// attrs.
+//
+// The value of n should be obtained from the Conjunct.Field method if the
+// source for n is a Conjunct so that Comprehensions are properly unwrapped.
+func extractFieldAttrs(attrs []*ast.Attribute, n adt.Node) []*ast.Attribute {
+	if f, ok := n.Source().(*ast.Field); ok {
 		for _, a := range f.Attrs {
 			if !containsAttr(attrs, a) {
 				attrs = append(attrs, a)

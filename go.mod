@@ -3,6 +3,7 @@ module cuelang.org/go
 go 1.17
 
 require (
+	github.com/bmatcuk/doublestar/v4 v4.2.0
 	github.com/cockroachdb/apd/v2 v2.0.2
 	github.com/emicklei/proto v1.10.0
 	github.com/google/go-cmp v0.5.8

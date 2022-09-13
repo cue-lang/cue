@@ -167,9 +167,6 @@ func (n *nodeContext) expandDisjuncts(
 				// Perhaps introduce an Err() method.
 				err = x.ChildErrors
 			}
-			if err.IsIncomplete() {
-				break
-			}
 			if err != nil {
 				parent.disjunctErrs = append(parent.disjunctErrs, err)
 			}

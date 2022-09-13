@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cab47dc1_dc922bc1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:15:54Z",
+      "side": 1,
+      "message": "LGTM, thanks!",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cc0680a_833a6ec4",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:15:54Z",
+      "side": 1,
+      "message": "I\u0027m not sure that the blank line here helps much.",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8de62cb_9efc7706",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:15:54Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd28d532_c30a006a",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:15:54Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d27dda3_6fd4849e",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:15:54Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

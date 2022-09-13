@@ -267,7 +267,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		}
 		if x.cfg.ShowAttributes {
 			for _, c := range a {
-				d.Attrs = extractFieldAttrs(d.Attrs, c)
+				d.Attrs = extractFieldAttrs(d.Attrs, c.Field())
 			}
 		}
 		s.Elts = append(s.Elts, d)

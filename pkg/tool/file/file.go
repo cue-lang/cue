@@ -25,6 +25,8 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
+
+	"github.com/bmatcuk/doublestar/v4"
 )
 
 func init() {
@@ -114,7 +116,8 @@ func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
 	if ctx.Err != nil {
 		return nil, ctx.Err
 	}
-	m, err := filepath.Glob(glob)
+
+	m, err := doublestar.FilepathGlob(glob)
 	for i, s := range m {
 		m[i] = filepath.ToSlash(s)
 	}

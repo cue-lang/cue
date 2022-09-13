@@ -778,6 +778,17 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 		n.checkClosed(state)
 	}
 
+	// Strip struct literals that were not initialized and are not part
+	// of the output.
+	k := 0
+	for _, s := range n.node.Structs {
+		if s.initialized {
+			n.node.Structs[k] = s
+			k++
+		}
+	}
+	n.node.Structs = n.node.Structs[:k]
+
 	n.node.UpdateStatus(Finalized)
 }
 

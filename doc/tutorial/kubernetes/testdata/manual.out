@@ -1267,11 +1267,11 @@ kubernetes: {
                                 name:  "ETCD_AUTO_COMPACTION_RETENTION"
                                 value: "4"
                             }]
+                            command: ["/usr/local/bin/etcd"]
                             volumeMounts: [{
                                 name:      "etcd3"
                                 mountPath: "/data"
                             }]
-                            command: ["/usr/local/bin/etcd"]
                             ports: [{
                                 name:          "client"
                                 containerPort: 2379

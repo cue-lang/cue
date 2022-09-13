@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75d35e8e_c8040565",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:12:40Z",
+      "side": 1,
+      "message": "LGTM with one minor thought.",
+      "revId": "10caf04d25b6987ceded0ec564c549d9ddcf253a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43b1ba9e_c0dd8184",
@@ -48,6 +65,23 @@
       "writtenOn": "2022-09-13T09:37:08Z",
       "side": 1,
       "message": "nit: remove tabs",
+      "revId": "10caf04d25b6987ceded0ec564c549d9ddcf253a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9acca18_21be5da0",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 784,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-13T12:12:40Z",
+      "side": 1,
+      "message": "When all members are initialized (something that I suspect is the most common case), this does a no-op assignment to all members, which might be a performance hit. Maybe worth adding a TODO? Or maybe not :) :shrug:",
       "revId": "10caf04d25b6987ceded0ec564c549d9ddcf253a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

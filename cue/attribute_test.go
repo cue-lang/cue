@@ -32,6 +32,16 @@ func TestAttributes(t *testing.T) {
 		3
 	} @field(foo)
 
+	c1: {} @step(1)
+	if true {
+		c2: { @step(2a) } @step(2b)
+		@step(2c)
+	}
+	c3: {} @step(3)
+	if false {
+		c4: { @step(4a) } @step(4b)
+		@step(4c)
+	}
 	`
 
 	testCases := []struct {
@@ -58,9 +68,33 @@ func TestAttributes(t *testing.T) {
 		flags: ValueAttr,
 		path:  "b",
 		out:   "[@field(foo) @embed(foo)]",
+	}, {
+		flags: ValueAttr,
+		path:  "c1",
+		out:   "[@step(1)]",
+	}, {
+		flags: DeclAttr,
+		path:  "c2",
+		out:   "[@step(2a)]",
+	}, {
+		flags: FieldAttr,
+		path:  "c2",
+		out:   "[@step(2b)]",
+	}, {
+		flags: DeclAttr,
+		path:  "",
+		out:   "[@step(2c)]",
+	}, {
+		flags: ValueAttr | FieldAttr,
+		path:  "c3",
+		out:   "[@step(3)]",
+	}, {
+		flags: ValueAttr | FieldAttr,
+		path:  "c4",
+		out:   "[]",
 	}}
 	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
+		t.Run(tc.path, func(t *testing.T) {
 			v := getInstance(t, config).Value().LookupPath(ParsePath(tc.path))
 			a := v.Attributes(tc.flags)
 			got := fmt.Sprint(a)

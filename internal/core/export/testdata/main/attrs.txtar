@@ -43,6 +43,42 @@ dontMergeForDef: {
 	c: a & {@decl2()}
 	d: {a, @decl2()}
 }
+
+comprehensions: {
+	@step(0)
+	c1: {} @step(1)
+	if true {
+		c2: { @step(2a) } @step(2b)
+		@step(2c)
+	}
+	c3: {} @step(3)
+	if false {
+		c4: { @step(4a) } @step(4b)
+		@step(4c)
+	}
+}
+
+dynamicComplex: {
+	a: "foo"
+
+	(a): "foo" @step(1)
+
+	[string]: "foo" @step(2)
+
+	a?: "foo" @step(3)
+
+	b?: "foo" @step(4)
+
+	if true {} // trigger isComplex
+}
+
+dynamicSimple: {
+	a: "foo"
+
+	a?: "foo" @step(3)
+
+	b?: "foo" @step(4)
+}
 -- b.cue --
 @package("b")
 
@@ -104,6 +140,35 @@ dontMergeForDef: {
 		a
 	}
 }
+comprehensions: {
+	@step(0)
+	c1: {} @step(1)
+	if true {
+		@step(2c)
+		c2: {
+			@step(2a)
+		} @step(2b)
+	}
+	c3: {} @step(3)
+	if false {
+		@step(4c)
+		c4: {
+			@step(4a)
+		} @step(4b)
+	}
+}
+dynamicComplex: {
+	a:        "foo"
+	(a):      "foo" @step(1)
+	[string]: "foo" @step(2)
+	a?:       "foo" @step(3)
+	b?:       "foo" @step(4)
+	if true {}
+}
+dynamicSimple: {
+	a:  "foo" @step(3)
+	b?: "foo" @step(4)
+}
 -- out/doc --
 []
 [a]
@@ -126,6 +191,15 @@ dontMergeForDef: {
 [dontMergeForDef b x]
 [dontMergeForDef c]
 [dontMergeForDef d]
+[comprehensions]
+[comprehensions c2]
+[comprehensions c1]
+[comprehensions c3]
+[dynamicComplex]
+[dynamicComplex a]
+[dynamicComplex foo]
+[dynamicSimple]
+[dynamicSimple a]
 -- out/value --
 == Simplified
 {
@@ -149,6 +223,18 @@ dontMergeForDef: {
 		}
 		c: {}
 		d: {}
+	}
+	comprehensions: {
+		c1: {}
+		c2: {}
+		c3: {}
+	}
+	dynamicComplex: {
+		foo: "foo"
+		a:   "foo"
+	}
+	dynamicSimple: {
+		a: "foo"
 	}
 }
 == Raw
@@ -178,6 +264,20 @@ dontMergeForDef: {
 		c: {}
 		d: {}
 	}
+	comprehensions: {
+		c1: {}
+		c2: {}
+		c3: {}
+	}
+	dynamicComplex: {
+		foo: "foo"
+		a:   "foo"
+		b?:  "foo"
+	}
+	dynamicSimple: {
+		a:  "foo"
+		b?: "foo"
+	}
 }
 == Final
 {
@@ -201,6 +301,18 @@ dontMergeForDef: {
 		}
 		c: {}
 		d: {}
+	}
+	comprehensions: {
+		c1: {}
+		c2: {}
+		c3: {}
+	}
+	dynamicComplex: {
+		foo: "foo"
+		a:   "foo"
+	}
+	dynamicSimple: {
+		a: "foo"
 	}
 }
 == All
@@ -251,6 +363,24 @@ dontMergeForDef: {
 			@decl2(), @decl1()
 		}
 	}
+	comprehensions: {
+		@step(0)
+		@step(2c)
+		c1: {} @step(1)
+		c2: {
+			@step(2a)
+		} @step(2b)
+		c3: {} @step(3)
+	}
+	dynamicComplex: {
+		foo: "foo" @step(1) @step(2)
+		a:   "foo" @step(3) @step(2)
+		b?:  "foo" @step(4) @step(2)
+	}
+	dynamicSimple: {
+		a:  "foo" @step(3)
+		b?: "foo" @step(4)
+	}
 }
 == Eval
 {
@@ -297,5 +427,23 @@ dontMergeForDef: {
 		d: {
 			@decl2(), @decl1()
 		}
+	}
+	comprehensions: {
+		@step(0)
+		@step(2c)
+		c1: {} @step(1)
+		c2: {
+			@step(2a)
+		} @step(2b)
+		c3: {} @step(3)
+	}
+	dynamicComplex: {
+		foo: "foo" @step(1) @step(2)
+		a:   "foo" @step(3) @step(2)
+		b?:  "foo" @step(4) @step(2)
+	}
+	dynamicSimple: {
+		a:  "foo" @step(3)
+		b?: "foo" @step(4)
 	}
 }

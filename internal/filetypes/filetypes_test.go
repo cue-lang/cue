@@ -250,6 +250,33 @@ func TestFromFile(t *testing.T) {
 			Docs:         true,
 			Attributes:   true,
 		},
+	}, {
+		name: "cuedata",
+		in: build.File{
+			Filename:       "",
+			Encoding:       build.CUE,
+			Interpretation: build.CUEdata,
+		},
+		mode: Def,
+		out: &FileInfo{
+			File: &build.File{
+				Filename:       "",
+				Encoding:       "cue",
+				Interpretation: "cuedata",
+				Form:           "schema",
+			},
+			Definitions:  true,
+			Data:         true,
+			Optional:     true,
+			Constraints:  true,
+			References:   true,
+			Cycles:       true,
+			KeepDefaults: true,
+			Incomplete:   true,
+			Imports:      true,
+			Docs:         true,
+			Attributes:   true,
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

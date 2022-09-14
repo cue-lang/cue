@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/cuedata"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
@@ -88,6 +89,11 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 				i = internal.MakeInstance(v).(*cue.Instance)
 			}
 			return openapi.Generate(i, cfg)
+		}
+	case build.CUEdata:
+		e.interpret = func(v cue.Value) (*ast.File, error) {
+			f := valueToFile(v)
+			return f, cuedata.NewEncoder().RewriteFile(f)
 		}
 	case build.ProtobufJSON:
 		e.interpret = func(v cue.Value) (*ast.File, error) {

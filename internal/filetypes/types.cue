@@ -228,6 +228,10 @@ tags: {
 		interpretation: "openapi"
 		encoding:       *"json" | _
 	}
+	cuedata: {
+		interpretation: "cuedata"
+		encoding:       *"json" | _
+	}
 }
 
 // forms defines schema for all forms. It does not include the form ID.
@@ -372,4 +376,9 @@ interpretations: openapi: {
 interpretations: pb: {
 	forms.data
 	stream: true
+}
+
+interpretations: cuedata: {
+	forms.schema
+	encoding: *"json" | _
 }

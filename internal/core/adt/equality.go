@@ -191,6 +191,14 @@ func equalTerminal(ctx *OpContext, v, w Value, flags Flag) bool {
 		return true
 
 	case *BuiltinValidator:
+		// Incomplete: compare func name and arg values
+		y, ok := w.(*BuiltinValidator)
+		if !ok || len(x.Args) != len(y.Args) {
+			return false
+		}
+		return true
+	case *Bottom:
+		return true
 	}
 
 	return false

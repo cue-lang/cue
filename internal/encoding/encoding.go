@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/cuedata"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/openapi"
@@ -225,6 +226,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	case build.ProtobufJSON:
 		i.interpretation = build.ProtobufJSON
 		i.rewriteFunc = protobufJSONFunc(cfg, f)
+	case build.CUEdata:
+		i.interpretation = build.CUEdata
+		i.rewriteFunc = CUEDataFunc(cfg, f)
 	default:
 		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}
@@ -322,6 +326,25 @@ func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
 				"no schema specified for protobuf interpretation.")
 		}
 		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
+	}
+}
+
+func CUEDataFunc(c *Config, file *build.File) rewriteFunc {
+	return func(f *ast.File) (*ast.File, error) {
+		err := cuedata.NewDecoder().RewriteFile(f)
+		if err != nil {
+			return f, err
+		}
+		// reformat by compile and get file from value
+		var r cue.Runtime
+		inst, err := r.CompileFile(f)
+		if err != nil {
+			return f, err
+		}
+		v := inst.Value()
+		n := v.Syntax(cue.All())
+		file := internal.ToFile(n)
+		return file, err
 	}
 }
 

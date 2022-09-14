@@ -60,6 +60,7 @@ the following modes:
               and interpret them as binary.
    jsonschema Interpret JSON, YAML or CUE files as JSON Schema.
    openapi    Interpret JSON, YAML or CUE files as OpenAPI.
+   cuedata    Interpret JSON, YAML or CUE files as CUE literal data format.
    auto       Look for JSON or YAML files and interpret them as
               data, JSON Schema, or OpenAPI, depending on
               existing fields.
@@ -298,7 +299,7 @@ func runImport(cmd *Command, args []string) (err error) {
 				return errors.Newf(token.NoPos,
 					"use of --ext flag required in binary mode")
 			}
-		case "auto", "openapi", "jsonschema":
+		case "auto", "openapi", "jsonschema", "cuedata":
 			c.interpretation = build.Interpretation(mode)
 			c.encoding = "yaml"
 		case "data":

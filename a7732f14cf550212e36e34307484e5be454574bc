@@ -16,6 +16,24 @@
       "message": "Investigating the unity failure here. ",
       "revId": "a7732f14cf550212e36e34307484e5be454574bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84d9fbe4_b2b2e890",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-14T15:30:16Z",
+      "side": 1,
+      "message": "Should have left that comment as \"unresolved\" while I work on this.",
+      "parentUuid": "3cbdf8fa_b89ac3f6",
+      "revId": "a7732f14cf550212e36e34307484e5be454574bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

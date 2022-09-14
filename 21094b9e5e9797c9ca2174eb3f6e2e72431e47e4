@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2e4a45c_3f4b8a1c",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 415,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-14T12:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1cc0680a_833a6ec4",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8de62cb_9efc7706",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-09-13T12:15:54Z",
       "side": 1,
       "message": "ditto",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7bf21d9_7936ea46",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-14T12:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8de62cb_9efc7706",
       "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb9db311_0d969b69",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-14T12:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd28d532_c30a006a",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d27dda3_6fd4849e",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-09-13T12:15:54Z",
       "side": 1,
       "message": "ditto",
+      "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cba21dc9_607274ab",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-14T12:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d27dda3_6fd4849e",
       "revId": "21094b9e5e9797c9ca2174eb3f6e2e72431e47e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

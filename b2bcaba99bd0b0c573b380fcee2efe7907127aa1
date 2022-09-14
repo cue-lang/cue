@@ -34,6 +34,24 @@
       "parentUuid": "b556b701_5e205daa",
       "revId": "b2bcaba99bd0b0c573b380fcee2efe7907127aa1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f7466d8_5cba98c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-14T16:25:06Z",
+      "side": 1,
+      "message": "Parking this investigation until we land https://review.gerrithub.io/c/cue-lang/cue/+/543427.",
+      "parentUuid": "4c377dda_bd67f33a",
+      "revId": "b2bcaba99bd0b0c573b380fcee2efe7907127aa1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

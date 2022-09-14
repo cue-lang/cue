@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a62042cb_fee24648",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020013
+      },
+      "writtenOn": "2022-09-14T08:22:35Z",
+      "side": 1,
+      "message": "This is also submitted as a PR https://github.com/cue-lang/cue/pull/1920 and fixes https://github.com/cue-lang/cue/issues/1919",
+      "revId": "1741b746933a7dc82f70963f51994d8931477133",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

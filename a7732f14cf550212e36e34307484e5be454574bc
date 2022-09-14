@@ -34,6 +34,23 @@
       "parentUuid": "3cbdf8fa_b89ac3f6",
       "revId": "a7732f14cf550212e36e34307484e5be454574bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5dac4cb_268ff541",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-14T16:24:03Z",
+      "side": 1,
+      "message": "Here is a short repro that summarises the non-trivial diffs in this unity failure:\n\n    exec cue eval x.cue\n    cmp stdout stdout.golden\n\n    -- x.cue --\n    #TypePrimitive: {\n            _args: {\n                    required: bool\n            }\n            let Args \u003d _args\n\n            f1: \"x\" | {\"bool\": #TypeBool \u0026 {_args: required: Args.required}}\n\n            f2: \"x\" | #TypeBool \u0026 {_args: required: Args.required}\n    }\n\n    #TypeBool: {\n            _args: required: bool\n            if !_args.required {\n                    default: bool | null\n            }\n    }\n    -- stdout.golden --\n    #TypePrimitive: {\n        let Args \u003d _args\n        f1: \"x\" | {\n            bool: #TypeBool \u0026 {\n                _args: {\n                    required: Args.required\n                }\n            }\n        }\n        f2: \"x\" | _|_ // #TypePrimitive.f2: operand _args.required of \u0027!\u0027 not concrete (was bool)\n    }\n    #TypeBool: {\n        _args: {\n            required: bool\n        }\n        if !_args.required {\n            default: bool | null\n        }\n    }\n\nUsing tip, this test passes. i.e. the expectation in stdout.golden is defined in terms of tip.\n\nWhen run against this CL, the test fails with the following:\n\n    \u003e cmp stdout stdout.golden\n    --- stdout\n    +++ stdout.golden\n    @@ -1,6 +1,13 @@\n     #TypePrimitive: {\n    -    f1: \"x\"\n    -    f2: \"x\"\n    +    let Args \u003d _args\n    +    f1: \"x\" | {\n    +        bool: #TypeBool \u0026 {\n    +            _args: {\n    +                required: Args.required\n    +            }\n    +        }\n    +    }\n    +    f2: \"x\" | _|_ // #TypePrimitive.f2: operand _args.required of \u0027!\u0027 not concrete (was bool)\n     }\n     #TypeBool: {\n         _args: {\n\n    FAIL: /tmp/testscript859055973/repro.txtar/script.txtar:2: stdout and stdout.golden differ\n\nHowever, in the context of this CL, that failure looks correct. i.e. the output under this CL is valid, so we should accept similar diffs in unity.\n\nThe one thing the expectation in stdout.golden shows with respect to tip is that eval is not surfacing an error for f1, whereas it does for f2. The embedding is perhaps related?\n\nmpvl to comment on the above.",
+      "revId": "a7732f14cf550212e36e34307484e5be454574bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1072,19 +1072,19 @@ Result:
           }
         }
       }
-      E: (struct){ |((struct){
-          e: (bool){ bool }
-          f: (_|_){
-            // [incomplete] voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-            //     ./in.cue:404:7
-          }
-        }, (struct){
-          g: (bool){ bool }
-          h: (_|_){
-            // [incomplete] voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-            //     ./in.cue:407:7
-          }
-        }) }
+      E: (_|_){
+        // [incomplete] voidEliminationSuccess.derefDisj1.E: 2 errors in empty disjunction::
+        //     ./in.cue:394:28
+        // voidEliminationSuccess.derefDisj1.E.f: operand e of '!' not concrete (was bool):
+        //     ./in.cue:404:7
+        // voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
+        //     ./in.cue:407:7
+        g: (bool){ bool }
+        h: (_|_){
+          // [incomplete] voidEliminationSuccess.derefDisj1.E.h: operand g of '!' not concrete (was bool):
+          //     ./in.cue:407:7
+        }
+      }
     }
     derefDisj2: (struct){
       a: (struct){
@@ -1093,19 +1093,19 @@ Result:
           }
         }
       }
-      E: (struct){ |((struct){
-          e: (bool){ bool }
-          f: (_|_){
-            // [incomplete] voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-            //     ./in.cue:422:7
-          }
-        }, (struct){
-          g: (bool){ bool }
-          h: (_|_){
-            // [incomplete] voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-            //     ./in.cue:425:7
-          }
-        }) }
+      E: (_|_){
+        // [incomplete] voidEliminationSuccess.derefDisj2.E: 2 errors in empty disjunction::
+        //     ./in.cue:412:28
+        // voidEliminationSuccess.derefDisj2.E.f: operand e of '!' not concrete (was bool):
+        //     ./in.cue:422:7
+        // voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
+        //     ./in.cue:425:7
+        g: (bool){ bool }
+        h: (_|_){
+          // [incomplete] voidEliminationSuccess.derefDisj2.E.h: operand g of '!' not concrete (was bool):
+          //     ./in.cue:425:7
+        }
+      }
     }
     bulk1: (struct){
       a: (struct){

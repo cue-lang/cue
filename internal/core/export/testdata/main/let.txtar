@@ -301,6 +301,9 @@ y: Y & Y_1
 [incomplete d run2 a]
 [unresolvedDisjunction]
 [unresolvedDisjunction #TypePrimitive]
+[unresolvedDisjunction #TypePrimitive _args]
+[unresolvedDisjunction #TypePrimitive _args required]
+[unresolvedDisjunction #TypePrimitive "*"]
 [unresolvedDisjunction #TypeBool]
 [unresolvedDisjunction #TypeBool default]
 [unresolvedDisjunction #TypeBool _args]
@@ -532,19 +535,10 @@ y: Y & Y_1
 	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
-			let Args = _args
-			{
-				"*": {}
-			} | {
-				bool: #TypeBool & {
-					_args: {
-						required: Args.required
-					}
-				}
-			}
 			_args: {
 				required: bool
 			}
+			"*": {}
 		}
 		#TypeBool: {
 			let Args_1 = _args
@@ -738,19 +732,10 @@ y: Y & Y_1
 	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
-			let Args = _args
-			{
-				"*": {}
-			} | {
-				bool: #TypeBool & {
-					_args: {
-						required: Args.required
-					}
-				}
-			}
 			_args: {
 				required: bool
 			}
+			"*": {}
 		}
 		#TypeBool: {
 			let Args_1 = _args
@@ -862,19 +847,7 @@ y: Y & Y_1
 	}
 	unresolvedDisjunction: {
 		#TypePrimitive: {
-			let Args = _args
-			{
-				"*": {}
-			} | {
-				bool: #TypeBool & {
-					_args: {
-						required: Args.required
-					}
-				}
-			}
-			_args: {
-				required: bool
-			}
+			"*": {}
 		}
 		#TypeBool: {
 			let Args_1 = _args

@@ -43,8 +43,8 @@ var (
 )
 
 func TestTutorial(t *testing.T) {
-	if testing.Short() {
-		t.Skip()
+	if !cuetest.Long {
+		t.Skipf("the kubernetes tutorial can easily take half a minute")
 	}
 
 	cwd, err := os.Getwd()

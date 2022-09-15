@@ -68,6 +68,24 @@
       "message": "Marking with a hold.",
       "revId": "a7732f14cf550212e36e34307484e5be454574bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55e1ff2b_8a940482",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T11:59:41Z",
+      "side": 1,
+      "message": "This seems right to me. In both cases, the second disjunct is recursively incomplete and thus ends up being eliminated.\n\nSo this is a correct fix in behavior.",
+      "parentUuid": "d5dac4cb_268ff541",
+      "revId": "a7732f14cf550212e36e34307484e5be454574bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

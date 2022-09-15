@@ -33,6 +33,24 @@
       "message": "or just:\n{{if .CUEPKg -}}",
       "revId": "7760fc926a0636128833df07bc989d36cfee15f4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "246ec75a_5eba82b6",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-15T12:52:59Z",
+      "side": 1,
+      "message": "good catch, thanks! done",
+      "parentUuid": "24b31821_67bcd5d2",
+      "revId": "7760fc926a0636128833df07bc989d36cfee15f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

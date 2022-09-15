@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7d70aed_e6d3f018",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T13:44:43Z",
+      "side": 1,
+      "message": "Even the article was wrong. 😊",
+      "parentUuid": "59f22a66_bba3c7db",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e6bd846_50cfa3ba",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-09-13T12:05:53Z",
       "side": 1,
       "message": "It\u0027s not entirely clear what signifies \"the given let\". Do you mean \"the let with identifier s\", perhaps?",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41c20384_abbd3f4f",
+        "filename": "internal/core/adt/feature.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T13:44:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8e6bd846_50cfa3ba",
       "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8333681_90b969b3",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 535,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T13:44:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3ecacbbf_753b2ba8",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f6d53a0_751e150b",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-09-13T12:05:53Z",
       "side": 1,
       "message": "i\u0027m not sure how much putting the above on three separate lines helps.\nSeems like just putting it inline might be fine (with the comment on the field).\n\nValue: c.labeledExpr(x, (*letScope)(x), x.Expr)\n\nOr at any rate losing the first two of the three lines.",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a5e18ac_d3480f96",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 665,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T13:44:43Z",
+      "side": 1,
+      "message": "removed the first two.",
+      "parentUuid": "2f6d53a0_751e150b",
       "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1118a525_aa7df9e4",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T13:44:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "335de845_0dc51a69",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "52488e6d_9fcbbede",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T13:44:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "335de845_0dc51a69",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1f8d65a2_f6c314a3",
@@ -116,6 +224,24 @@
       "writtenOn": "2022-09-13T12:05:53Z",
       "side": 1,
       "message": "maybe comment that this happens for let fields ?",
+      "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "524e41b2_becf13fd",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-15T13:44:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f8d65a2_f6c314a3",
       "revId": "8e7346e5cd5c09d8601979192d59eea39cfb4830",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

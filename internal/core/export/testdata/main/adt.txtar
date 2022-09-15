@@ -13,6 +13,16 @@ d2: C="foo\(bar)": {
 	foo:  C.name
 }
 
+// Issue #1910
+a: _
+comp: {
+	for k, v in [0]
+	let w = v {
+		"\(a)": w
+		"\(bar)": w
+	}
+}
+
 bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
 
 c1: mystrings.Contains("aa", "a")
@@ -141,6 +151,13 @@ d2: {
 		foo:  C.name
 	}
 }
+a: _
+comp: {
+	for k, v in [0] let w = v {
+		"\(a)": w
+		"bar":  w
+	}
+}
 bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
 c1:    mystrings.Contains("aa", "a")
 s1:    """
@@ -230,6 +247,11 @@ errorListDef: {
 [d2 foobar]
 [d2 foobar name]
 [d2 foobar foo]
+[a]
+- Issue #1910
+
+[comp]
+[comp bar]
 [bytes]
 [c1]
 [s1]
@@ -310,6 +332,15 @@ _|_ // e3: index out of range [2] with length 2
 		foobar: {
 			name: "xx"
 			foo:  "xx"
+		}
+	}
+
+	// Issue #1910
+	a: _
+	comp: {
+		for k, v in [0] let w = v {
+			"\(a)": w
+			"bar":  w
 		}
 	}
 	bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'

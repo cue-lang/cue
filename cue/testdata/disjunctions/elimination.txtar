@@ -211,6 +211,20 @@ noChildError: t4: {
 	o: #D & {b: "test"}
 	#D: {a: null} | {b: string} | {c: #D }
 }
+
+
+issue1924: t1: {
+	m: a: 2
+	x: *[m.b] | 2
+}
+issue1924: t2: {
+	m: a: 2
+	x: *{v: m.b} | 3
+}
+issue1924: t3: {
+	m: a: 2
+	x: *m.b | 1
+}
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){
@@ -289,26 +303,10 @@ noChildError: t4: {
       a: (struct){
         n1: (struct){
           p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (_|_){
-                  // [incomplete] nestedNonMonotonic.incomplete.a.n1.p1.x.a: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                  //     ./in.cue:84:12
-                  //     ./in.cue:84:29
-                  //     ./in.cue:85:9
-                  c: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
           p2: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (_|_){
-                  // [incomplete] nestedNonMonotonic.incomplete.a.n1.p2.x.a: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
-                  //     ./in.cue:90:12
-                  //     ./in.cue:89:9
-                  //     ./in.cue:90:29
-                  c: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
         }
         n2: (struct){
@@ -343,43 +341,13 @@ noChildError: t4: {
       b: (struct){
         n1: (struct){
           p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (_|_){
-                  // [incomplete] nestedNonMonotonic.incomplete.b.n1.p1.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-                  //     ./in.cue:104:12
-                  //     ./in.cue:104:29
-                  //     ./in.cue:105:9
-                  //     ./in.cue:106:9
-                  c: (int){ 1 }
-                  d: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
           p2: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (_|_){
-                  // [incomplete] nestedNonMonotonic.incomplete.b.n1.p2.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-                  //     ./in.cue:111:12
-                  //     ./in.cue:110:9
-                  //     ./in.cue:111:29
-                  //     ./in.cue:112:9
-                  c: (int){ 1 }
-                  d: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
           p3: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (_|_){
-                  // [incomplete] nestedNonMonotonic.incomplete.b.n1.p3.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
-                  //     ./in.cue:118:12
-                  //     ./in.cue:116:9
-                  //     ./in.cue:117:9
-                  //     ./in.cue:118:29
-                  c: (int){ 1 }
-                  d: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
         }
         n2: (struct){
@@ -596,6 +564,26 @@ noChildError: t4: {
         }, (#struct){
           b: (string){ string }
         }) }
+    }
+  }
+  issue1924: (struct){
+    t1: (struct){
+      m: (struct){
+        a: (int){ 2 }
+      }
+      x: (int){ 2 }
+    }
+    t2: (struct){
+      m: (struct){
+        a: (int){ 2 }
+      }
+      x: (int){ 3 }
+    }
+    t3: (struct){
+      m: (struct){
+        a: (int){ 2 }
+      }
+      x: (int){ 1 }
     }
   }
 }
@@ -1225,6 +1213,34 @@ noChildError: t4: {
       }|{
         c: 〈1;#D〉
       })
+    }
+  }
+  issue1924: {
+    t1: {
+      m: {
+        a: 2
+      }
+      x: (*[
+        〈1;m〉.b,
+      ]|2)
+    }
+  }
+  issue1924: {
+    t2: {
+      m: {
+        a: 2
+      }
+      x: (*{
+        v: 〈1;m〉.b
+      }|3)
+    }
+  }
+  issue1924: {
+    t3: {
+      m: {
+        a: 2
+      }
+      x: (*〈0;m〉.b|1)
     }
   }
 }

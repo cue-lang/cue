@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67205cb9_312c17f3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-15T12:46:06Z",
+      "side": 1,
+      "message": "LGTM with one trivial thought, thanks!",
+      "revId": "7760fc926a0636128833df07bc989d36cfee15f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24b31821_67bcd5d2",
+        "filename": "pkg/gen/gen.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-15T12:46:06Z",
+      "side": 1,
+      "message": "or just:\n{{if .CUEPKg -}}",
+      "revId": "7760fc926a0636128833df07bc989d36cfee15f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -54,6 +54,9 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		// s := e.frame(0).scope
 
 		s := &ast.StructLit{}
+		// TODO: ensure e.node() is set in more cases. Right now it is not
+		// always set in mergeValues, even in cases where it could be. Better
+		// to be conservative for now, though.
 		env := &adt.Environment{Up: env, Vertex: e.node()}
 
 		for _, d := range x.Decls {
@@ -557,7 +560,7 @@ loop:
 	for {
 		switch x := y.(type) {
 		case *adt.ForClause:
-			env := &adt.Environment{Up: env, Vertex: empty}
+			env = &adt.Environment{Up: env, Vertex: empty}
 			value := e.ident(x.Value)
 			src := e.innerExpr(env, x.Src)
 			clause := &ast.ForClause{Value: value, Source: src}
@@ -583,7 +586,7 @@ loop:
 			y = x.Dst
 
 		case *adt.LetClause:
-			env := &adt.Environment{Up: env, Vertex: empty}
+			env = &adt.Environment{Up: env, Vertex: empty}
 			expr := e.innerExpr(env, x.Expr)
 			clause := &ast.LetClause{
 				Ident: e.ident(x.Label),
@@ -604,6 +607,12 @@ loop:
 		default:
 			panic(fmt.Sprintf("unknown field %T", x))
 		}
+	}
+
+	// If this is an "unwrapped" comprehension, we need to also
+	// account for the curly braces of the original comprehension.
+	if comp.Nest() > 0 {
+		env = &adt.Environment{Up: env, Vertex: empty}
 	}
 
 	v := e.expr(env, adt.ToExpr(comp.Value))

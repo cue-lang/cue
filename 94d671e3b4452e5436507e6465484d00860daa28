@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "415331da_0fc1a4f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-15T14:47:59Z",
+      "side": 1,
+      "message": "The latest unity \"break\" is entirely accounted for by differences in auto-named lets. Hence, we can accept this diff. Removing the hold.",
+      "revId": "94d671e3b4452e5436507e6465484d00860daa28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

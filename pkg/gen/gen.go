@@ -146,7 +146,8 @@ func generate(cuePkgPath string) error {
 		}
 		i := bytes.Index(defs, []byte("package "+pkg.Name))
 		defs = defs[i+len("package "+pkg.Name)+1:]
-		defs = bytes.ReplaceAll(defs, []byte("\n"), []byte("\n//     "))
+		defs = bytes.TrimRight(defs, "\n")
+		defs = bytes.ReplaceAll(defs, []byte("\n"), []byte("\n//\t"))
 		params.PackageDoc = string(doc)
 		params.PackageDefs = string(defs)
 	}

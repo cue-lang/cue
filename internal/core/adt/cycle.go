@@ -268,8 +268,8 @@ type cyclicConjunct struct {
 //
 // Other inputs:
 //
-//  arc  the reference to which x points
-//  v    the Conjunct from which x originates
+//	arc  the reference to which x points
+//	v    the Conjunct from which x originates
 //
 // A cyclic node is added to a queue for later processing if no evidence of a
 // non-cyclic node has so far been found. updateCyclicStatus processes delayed

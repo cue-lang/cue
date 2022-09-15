@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df3c60fc_54041139",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-15T13:51:05Z",
+      "side": 1,
+      "message": "Here is a repro of the unity failure:\n\nhttps://gist.github.com/myitcv/4ea7358d6a2ce8c99e5101fc55f5bc63\n\nExpectation is that this should pass. Or at least the cue eval should not fail.\n\nWhat I see instead is:\n\n    \u003e exec cue eval x.cue\n    [stderr]\n    envs.\"ocb-vfziogrqdglgqivh\".configurations.tshzetpznsktkvxv.tfvars.Permissions.0: invalid interpolation: undefined field: domain:\n        ./x.cue:86:108\n        ./x.cue:86:150\n    [exit status 1]\n    FAIL: /tmp/testscript1637812971/repro.txtar/script.txtar:1: unexpected command failure\n",
+      "revId": "103b6045bcec0237a3c2d94511b57c33a4a8ec26",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

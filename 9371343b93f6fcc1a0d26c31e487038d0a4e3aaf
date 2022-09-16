@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cd689bb_91e92156",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-16T06:43:42Z",
+      "side": 1,
+      "message": "A slight conflict of interest to +2 this, but otherwise ok. :)",
+      "revId": "9371343b93f6fcc1a0d26c31e487038d0a4e3aaf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

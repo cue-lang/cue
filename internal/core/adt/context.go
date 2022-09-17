@@ -890,17 +890,23 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 
 		// TODO(errors): add path reference and make message
 		//       "undefined field %s in %s"
+		var err *ValueError
 		if l.IsInt() {
-			c.addErrf(code, pos, "index out of range [%d] with length %d",
+			err = c.NewPosf(pos, "index out of range [%d] with length %d",
 				l.Index(), len(x.Elems()))
 		} else {
 			if code != 0 && x.IsOptional(l) {
-				c.addErrf(code, pos,
+				err = c.NewPosf(pos,
 					"cannot reference optional field: %s", label)
 			} else {
-				c.addErrf(code, pos, "undefined field: %s", label)
+				err = c.NewPosf(pos, "undefined field: %s", label)
 			}
 		}
+		c.AddBottom(&Bottom{
+			Code:      code,
+			Permanent: x.status >= AllArcs,
+			Err:       err,
+		})
 	}
 	return a
 }

@@ -1390,7 +1390,7 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 	switch x := v.Expr().(type) {
 	case Resolver:
 		arc, err := ctx.Resolve(v, x)
-		if err != nil && !err.IsIncomplete() {
+		if err != nil && (!err.IsIncomplete() || err.Permanent) {
 			n.addBottom(err)
 			break
 		}

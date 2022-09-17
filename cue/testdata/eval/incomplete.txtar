@@ -17,6 +17,32 @@ E: {
 
 a:    int
 okay: (>10 & <a) + 3
+
+issue1837: {
+	// x is properly recognized as erroneous and the "message" field is added
+	// with the value "a", instead of as a cycle error.
+	p1: {
+		context: {}
+		x: context.b // incomplete error
+		if x == _|_ {
+			message: "a"
+		}
+	}
+	p2: {
+		if x == _|_ {
+			message: "a"
+		}
+		x: context.b // incomplete error
+		context: {}
+	}
+	p3: {
+		if x == _|_ {
+			message: "a"
+		}
+		context: {}
+		x: context.b // incomplete error
+	}
+}
 -- out/eval --
 (struct){
   s: (string){ string }
@@ -58,6 +84,35 @@ okay: (>10 & <a) + 3
     //     ./in.cue:18:7
     //     ./in.cue:18:8
   }
+  issue1837: (struct){
+    p1: (struct){
+      message: (string){ "a" }
+      context: (struct){
+      }
+      x: (_|_){
+        // [incomplete] issue1837.p1.x: undefined field: b:
+        //     ./in.cue:25:14
+      }
+    }
+    p2: (struct){
+      message: (string){ "a" }
+      x: (_|_){
+        // [incomplete] issue1837.p2.x: undefined field: b:
+        //     ./in.cue:34:14
+      }
+      context: (struct){
+      }
+    }
+    p3: (struct){
+      message: (string){ "a" }
+      context: (struct){
+      }
+      x: (_|_){
+        // [incomplete] issue1837.p3.x: undefined field: b:
+        //     ./in.cue:42:14
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -76,4 +131,27 @@ okay: (>10 & <a) + 3
   }
   a: int
   okay: ((>10 & <〈0;a〉) + 3)
+  issue1837: {
+    p1: {
+      context: {}
+      x: 〈0;context〉.b
+      if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
+        message: "a"
+      }
+    }
+    p2: {
+      if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
+        message: "a"
+      }
+      x: 〈0;context〉.b
+      context: {}
+    }
+    p3: {
+      if (〈0;x〉 == _|_(explicit error (_|_ literal) in source)) {
+        message: "a"
+      }
+      context: {}
+      x: 〈0;context〉.b
+    }
+  }
 }

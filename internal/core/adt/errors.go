@@ -40,7 +40,7 @@ import (
 
 // ErrorCode indicates the type of error. The type of error may influence
 // control flow. No other aspects of an error may influence control flow.
-type ErrorCode int
+type ErrorCode int8
 
 const (
 	// An EvalError is a fatal evaluation error.

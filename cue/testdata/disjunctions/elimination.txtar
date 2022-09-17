@@ -225,6 +225,17 @@ issue1924: t3: {
 	m: a: 2
 	x: *m.b | 1
 }
+
+// should eliminate erroneous comprehension and pass
+issue1838: t1: {
+	p?: []
+	a: [for k in p {k}] | null
+}
+issue1838: t2: {
+	p?: []
+	a: null | [for k in p {k}] 
+}
+
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){
@@ -584,6 +595,14 @@ issue1924: t3: {
         a: (int){ 2 }
       }
       x: (int){ 1 }
+    }
+  }
+  issue1838: (struct){
+    t1: (struct){
+      a: (null){ null }
+    }
+    t2: (struct){
+      a: (null){ null }
     }
   }
 }
@@ -1241,6 +1260,26 @@ issue1924: t3: {
         a: 2
       }
       x: (*〈0;m〉.b|1)
+    }
+  }
+  issue1838: {
+    t1: {
+      p?: []
+      a: ([
+        for _, k in 〈1;p〉 {
+          〈1;k〉
+        },
+      ]|null)
+    }
+  }
+  issue1838: {
+    t2: {
+      p?: []
+      a: (null|[
+        for _, k in 〈1;p〉 {
+          〈1;k〉
+        },
+      ])
     }
   }
 }

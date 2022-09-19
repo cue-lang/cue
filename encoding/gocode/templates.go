@@ -14,7 +14,10 @@
 
 package gocode
 
-import "text/template"
+import (
+	"strings"
+	"text/template"
+)
 
 // Inputs:
 // .pkgName  the Go package name
@@ -32,6 +35,14 @@ import (
 )
 
 `))
+
+// normalizeHex copes with differences between the Go string literal conventions
+// between go1.18 and go1.19. The byte 0x7f changed from \u007f to \x7f.
+// By normalizing here, we make the code generation independent of the Go
+// version that's used.
+func normalizeHex(s string) string {
+	return strings.ReplaceAll(s, `\u007f`, `\x7f`)
+}
 
 // Inputs:
 // .prefix 	  prefix to all generated variable names
@@ -64,7 +75,9 @@ func {{if .func}}{{.complete}}{{.cueName}}{{$sig}}
 // .prefix 	  prefix to all generated variable names
 // .runtime   the variable name of a user-supplied runtime, if any
 // .data      bytes obtained from Instance.MarshalBinary
-var loadCode = template.Must(template.New("load").Parse(`
+var loadCode = template.Must(template.New("load").Funcs(template.FuncMap{
+	"normalizeHex": normalizeHex,
+}).Parse(`
 var {{.prefix}}Codec, {{.prefix}}Instance = func() (*gocodec.Codec, *cue.Instance) {
 	var r *cue.Runtime
 	r = {{if .runtime}}{{.runtime}}{{else}}&cue.Runtime{}{{end}}
@@ -97,5 +110,5 @@ func {{.prefix}}Make(name string, x interface{}) cue.Value {
 }
 
 // Data size: {{len .data}} bytes.
-var {{.prefix}}InstanceData = []byte({{printf "%+q" .data}})
+var {{.prefix}}InstanceData = []byte({{printf "%+q" .data | normalizeHex }})
 `))

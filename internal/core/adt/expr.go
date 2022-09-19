@@ -1279,7 +1279,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 
 	default:
 		v, ok := b.(*Vertex)
-		isVoid := ok && !v.isDefined()
+		isVoid := ok && !v.IsDefined(c)
 		c.verifyNonMonotonicResult(env, x, isVoid)
 
 		// TODO(cycle): if EqualOp:
@@ -1742,7 +1742,7 @@ func (x *ForClause) Source() ast.Node {
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 	n := c.node(x, x.Src, true, Finalized)
 	for _, a := range n.Arcs {
-		if !a.Label.IsRegular() {
+		if !a.Label.IsRegular() || !a.IsDefined(c) {
 			continue
 		}
 

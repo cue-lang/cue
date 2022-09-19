@@ -560,7 +560,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		switch {
 		case v.Kind() == ListKind:
 			for _, a := range n.node.Arcs {
-				if a.Label.Typ() == StringLabel {
+				if a.Label.Typ() == StringLabel && a.IsDefined(ctx) {
 					n.addErr(ctx.Newf("list may not have regular fields"))
 					// TODO(errors): add positions for list and arc definitions.
 
@@ -1623,6 +1623,9 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 		n.node.Structs = append(n.node.Structs, x.Structs...)
 
 		for _, a := range x.Arcs {
+			if !a.IsDefined(ctx) {
+				continue
+			}
 			// TODO(errors): report error when this is a regular field.
 			c := MakeConjunct(nil, a, id)
 			n.insertField(a.Label, c)

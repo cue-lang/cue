@@ -237,7 +237,7 @@ func Merge(inst ...*Instance) *Instance {
 
 	for _, i := range inst {
 		w := i.Value()
-		v.AddConjunct(adt.MakeRootConjunct(nil, w.v.ToDataAll()))
+		v.AddConjunct(adt.MakeRootConjunct(nil, w.v.ToDataAll(ctx)))
 	}
 	v.Finalize(ctx)
 

@@ -1740,7 +1740,15 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
+	// TODO: should be AllArcs
 	n := c.node(x, x.Src, true, Finalized)
+	if n.status == Evaluating {
+		c.AddBottom(&Bottom{
+			Code:  CycleError,
+			Value: n,
+		})
+		return
+	}
 	for _, a := range n.Arcs {
 		if !a.Label.IsRegular() || !a.IsDefined(c) {
 			continue

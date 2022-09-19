@@ -56,6 +56,9 @@ func writeDocs(t *cuetxtar.Test, r adt.Runtime, v *adt.Vertex, path []string) {
 	}
 
 	for _, a := range v.Arcs {
+		// if !a.IsDefined() {
+		// 	continue
+		// }
 		writeDocs(t, r, a, append(path, a.Label.SelectorString(r)))
 	}
 }

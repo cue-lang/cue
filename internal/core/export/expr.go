@@ -154,6 +154,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 	if src != nil {
 		for _, a := range src.Arcs {
+			// if !a.IsDefined() {
+			// 	continue
+			// }
 			if x, ok := e.fields[a.Label]; ok {
 				x.arc = a
 				e.fields[a.Label] = x
@@ -425,6 +428,10 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 
 				for _, a := range v.Arcs {
 					a.Finalize(e.ctx) // TODO: should we do this?
+
+					if !a.IsDefined(e.ctx) {
+						continue
+					}
 
 					e.addConjunct(a.Label, env, a)
 				}

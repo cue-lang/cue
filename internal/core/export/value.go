@@ -370,6 +370,9 @@ func (e exporter) showArcs(v *adt.Vertex) bool {
 		return false
 	}
 	for _, a := range v.Arcs {
+		// if !a.IsDefined() {
+		// 	continue
+		// }
 		switch {
 		case a.Label.IsDef() && p.ShowDefinitions:
 			return true

@@ -656,6 +656,10 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		c.errs = CombineErrors(c.src, c.errs, err)
 
 		if v, ok := result.(*Vertex); ok {
+			// // TODO: is this check necessary?
+			// if !v.isDefined() {
+			// 	c.Unify(v, Partial)
+			// }
 			if b, _ := v.BaseValue.(*Bottom); b != nil {
 				switch b.Code {
 				case IncompleteError:

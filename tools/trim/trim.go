@@ -290,6 +290,9 @@ func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (re
 	if len(v.Arcs) > 0 {
 		var match int
 		for _, a := range v.Arcs {
+			// if !a.IsDefined() {
+			// 	continue
+			// }
 			d := doms.Lookup(a.Label)
 			match |= t.findSubordinates(d, a, pickedDefault)
 		}

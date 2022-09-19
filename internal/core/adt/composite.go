@@ -205,6 +205,14 @@ func (v *Vertex) isDefined() bool {
 	return v.arcType == arcMember
 }
 
+func (v *Vertex) IsDefined(c *OpContext) bool {
+	if v.isDefined() {
+		return true
+	}
+	c.Unify(v, Finalized)
+	return v.isDefined()
+}
+
 type arcType uint8
 
 const (
@@ -374,6 +382,10 @@ func (v *Vertex) ToDataSingle() *Vertex {
 func (v *Vertex) ToDataAll() *Vertex {
 	arcs := make([]*Vertex, 0, len(v.Arcs))
 	for _, a := range v.Arcs {
+		// TODO: can this happen?
+		// if !a.isDefined() {
+		// 	continue
+		// }
 		if a.Label.IsRegular() {
 			arcs = append(arcs, a.ToDataAll())
 		}

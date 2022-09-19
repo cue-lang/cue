@@ -34,6 +34,9 @@ func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	// dynamically created.
 	var a []adt.Feature
 	for _, arc := range v.Arcs {
+		// if !arc.IsDefined() {
+		// 	continue
+		// }
 		if _, ok := m[arc.Label]; !ok {
 			a = append(a, arc.Label)
 		}

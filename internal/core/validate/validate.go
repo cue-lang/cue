@@ -101,6 +101,9 @@ func (v *validator) validate(x *adt.Vertex) {
 		if a.Label.IsLet() {
 			continue
 		}
+		// if !a.IsDefined() {
+		// 	continue
+		// }
 		if !v.AllErrors && v.err != nil {
 			break
 		}

@@ -221,6 +221,9 @@ func (w *printer) node(n adt.Node) {
 		}
 
 		for _, a := range x.Arcs {
+			// if !a.IsDefined() {
+			// 	continue
+			// }
 			w.string("\n")
 			if a.Label.IsLet() {
 				w.string("let ")

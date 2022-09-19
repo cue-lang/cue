@@ -68,7 +68,13 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 
 loop1:
 	for _, a := range x.Arcs {
+		if !a.IsDefined(ctx) {
+			continue
+		}
 		for _, b := range y.Arcs {
+			if !b.IsDefined(ctx) {
+				continue
+			}
 			if a.Label == b.Label {
 				if !Equal(ctx, a, b, flags) {
 					return false

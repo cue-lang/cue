@@ -48,7 +48,7 @@ var lenBuiltin = &adt.Builtin{
 				n := 0
 				v, _ := v.(*adt.Vertex)
 				for _, a := range v.Arcs {
-					if a.Label.IsRegular() {
+					if a.Label.IsRegular() && a.IsDefined(c) {
 						n++
 					}
 				}

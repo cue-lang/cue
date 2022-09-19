@@ -45,6 +45,9 @@ func dynamic(c *adt.OpContext, n *adt.Vertex, f VisitFunc, m marked, top bool) {
 	}
 
 	for _, a := range n.Arcs {
+		if !a.IsDefined(c) {
+			continue
+		}
 		dynamic(c, a, f, m, false)
 	}
 }

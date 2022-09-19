@@ -200,9 +200,22 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
-// isDefined indicates whether this arc is a non-optional field.
+// isDefined indicates whether this arc is a "value" field, and not a constraint
+// or void arc.
 func (v *Vertex) isDefined() bool {
 	return v.arcType == arcMember
+}
+
+// IsDefined indicates whether this arc is defined meaning it is not a
+// required or optional constraint and not a "void" arc.
+// It will evaluate the arc, and thus evaluate any comprehension, to make this
+// determination.
+func (v *Vertex) IsDefined(c *OpContext) bool {
+	if v.isDefined() {
+		return true
+	}
+	c.Unify(v, Finalized)
+	return v.isDefined()
 }
 
 type arcType uint8
@@ -371,18 +384,21 @@ func (v *Vertex) ToDataSingle() *Vertex {
 
 // ToDataAll returns a new v where v and all its descendents contain only
 // the regular fields.
-func (v *Vertex) ToDataAll() *Vertex {
+func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	arcs := make([]*Vertex, 0, len(v.Arcs))
 	for _, a := range v.Arcs {
+		if !a.IsDefined(ctx) {
+			continue
+		}
 		if a.Label.IsRegular() {
-			arcs = append(arcs, a.ToDataAll())
+			arcs = append(arcs, a.ToDataAll(ctx))
 		}
 	}
 	w := *v
 	w.state = nil
 	w.status = Finalized
 
-	w.BaseValue = toDataAll(w.BaseValue)
+	w.BaseValue = toDataAll(ctx, w.BaseValue)
 	w.Arcs = arcs
 	w.isData = true
 	w.Conjuncts = make([]Conjunct, len(v.Conjuncts))
@@ -394,19 +410,19 @@ func (v *Vertex) ToDataAll() *Vertex {
 	copy(w.Conjuncts, v.Conjuncts)
 	for i, c := range w.Conjuncts {
 		if v, _ := c.x.(Value); v != nil {
-			w.Conjuncts[i].x = toDataAll(v).(Value)
+			w.Conjuncts[i].x = toDataAll(ctx, v).(Value)
 		}
 	}
 	return &w
 }
 
-func toDataAll(v BaseValue) BaseValue {
+func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 	switch x := v.(type) {
 	default:
 		return x
 
 	case *Vertex:
-		return x.ToDataAll()
+		return x.ToDataAll(ctx)
 
 	// The following cases are always erroneous, but we handle them anyway
 	// to avoid issues with the closedness algorithm down the line.
@@ -414,7 +430,7 @@ func toDataAll(v BaseValue) BaseValue {
 		d := *x
 		d.Values = make([]*Vertex, len(x.Values))
 		for i, v := range x.Values {
-			d.Values[i] = v.ToDataAll()
+			d.Values[i] = v.ToDataAll(ctx)
 		}
 		return &d
 
@@ -423,7 +439,7 @@ func toDataAll(v BaseValue) BaseValue {
 		c.Values = make([]Value, len(x.Values))
 		for i, v := range x.Values {
 			// This case is okay because the source is of type Value.
-			c.Values[i] = toDataAll(v).(Value)
+			c.Values[i] = toDataAll(ctx, v).(Value)
 		}
 		return &c
 	}

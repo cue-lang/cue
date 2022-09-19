@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a7051e3_ca53a9ae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-09-19T10:06:32Z",
+      "side": 1,
+      "message": "Perhaps s/it/evaluation? or unification.",
+      "range": {
+        "startLine": 9,
+        "startChar": 30,
+        "endLine": 9,
+        "endChar": 32
+      },
+      "revId": "9dd8639eb5df3e90e9cb673b9a90a1d9319d304a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15cced9c_8977001e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-09-19T10:06:32Z",
+      "side": 1,
+      "message": "typo, s/evaluatin/evaluation/",
+      "range": {
+        "startLine": 11,
+        "startChar": 8,
+        "endLine": 11,
+        "endChar": 17
+      },
+      "revId": "9dd8639eb5df3e90e9cb673b9a90a1d9319d304a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b026305_fee098a1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-09-19T10:06:32Z",
+      "side": 1,
+      "message": "I don\u0027t yet have a deep-enough understanding of the core algorithm,\nbut from my limited understanding this change seems correct.\n\nIs this also related in some way to #1911?\n",
+      "revId": "9dd8639eb5df3e90e9cb673b9a90a1d9319d304a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

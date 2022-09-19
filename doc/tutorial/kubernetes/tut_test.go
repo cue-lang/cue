@@ -272,6 +272,10 @@ func isCUE(filename string) bool {
 }
 
 func TestEval(t *testing.T) {
+	if !cuetest.Long {
+		t.Skipf("the kubernetes tutorial can easily take half a minute")
+	}
+
 	for _, dir := range []string{"quick", "manual"} {
 		t.Run(dir, func(t *testing.T) {
 			buf := &bytes.Buffer{}

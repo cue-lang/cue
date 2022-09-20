@@ -297,6 +297,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		case 1:
 			x := n.disjuncts[0].result
 			x.state = nil
+			x.cyclicReferences = n.node.cyclicReferences
 			*v = x
 
 		default:
@@ -2039,7 +2040,7 @@ func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 
 		for _, a := range elems {
 			if a.Conjuncts == nil {
-				n.insertField(a.Label, MakeRootConjunct(nil, a))
+				n.insertField(a.Label, MakeConjunct(nil, a, n.ctx.ci))
 				continue
 			}
 			for _, c := range a.Conjuncts {

@@ -126,6 +126,8 @@ func (n *nodeContext) expandDisjuncts(
 
 	n.ctx.stats.Disjuncts++
 
+	var refNode *RefNode
+
 	node := n.node
 	defer func() {
 		n.node = node
@@ -227,6 +229,12 @@ func (n *nodeContext) expandDisjuncts(
 						newMode := mode(d.hasDefaults, v.Default)
 
 						cn.expandDisjuncts(state, n, newMode, true, last)
+
+						for r := n.node.cyclicReferences; r != nil; r = r.Next {
+							s := *r
+							s.Next = refNode
+							refNode = &s
+						}
 					}
 
 				case d.value != nil:
@@ -240,6 +248,12 @@ func (n *nodeContext) expandDisjuncts(
 						newMode := mode(d.hasDefaults, i < d.value.NumDefaults)
 
 						cn.expandDisjuncts(state, n, newMode, true, last)
+
+						// for r := n.node.cyclicReferences; r != nil; r = r.Next {
+						// 	s := *r
+						// 	s.Next = parent.node.cyclicReferences
+						// 	parent.node.cyclicReferences = &s
+						// }
 					}
 				}
 			}
@@ -389,6 +403,13 @@ func (n *nodeContext) expandDisjuncts(
 		}
 
 		n.disjuncts = n.disjuncts[:0]
+	}
+
+	for r := refNode; r != nil; {
+		next := r.Next
+		r.Next = parent.node.cyclicReferences
+		parent.node.cyclicReferences = r
+		r = next
 	}
 }
 

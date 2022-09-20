@@ -1,0 +1,66 @@
+#Issue: 1940
+
+-- in.cue --
+#T:
+	["a", #T] |
+	["b", #T] |
+	["c", #T] |
+	["d", ...#T]
+
+x: #T
+y: #T
+z: #T
+v: #T
+
+#X: x
+#X: y
+#X: z
+#X: v
+#X: #T
+-- out/compile --
+--- in.cue
+{
+  #T: ([
+    "a",
+    〈1;#T〉,
+  ]|[
+    "b",
+    〈1;#T〉,
+  ]|[
+    "c",
+    〈1;#T〉,
+  ]|[
+    "d",
+    ...〈1;#T〉,
+  ])
+  x: 〈0;#T〉
+  y: 〈0;#T〉
+  z: 〈0;#T〉
+  v: 〈0;#T〉
+  #X: 〈0;x〉
+  #X: 〈0;y〉
+  #X: 〈0;z〉
+  #X: 〈0;v〉
+  #X: 〈0;#T〉
+}
+-- out/eval --
+(struct){
+  #T: (list){
+    0: (string){ "d" }
+  }
+  x: (list){
+    0: (string){ "d" }
+  }
+  y: (list){
+    0: (string){ "d" }
+  }
+  z: (list){
+    0: (string){ "d" }
+  }
+  v: (list){
+    0: (string){ "d" }
+  }
+  #X: (list){
+    0: (string){ "d" }
+  }
+}

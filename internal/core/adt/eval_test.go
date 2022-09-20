@@ -123,7 +123,7 @@ module: "mod.test"
 
 	// t.Error(debug.NodeString(r, v, nil))
 	// eval.Debug = true
-	adt.Verbosity = 1
+	// adt.Verbosity = 1
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)

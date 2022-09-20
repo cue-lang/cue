@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "903fa512_909251a9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-20T16:12:19Z",
+      "side": 1,
+      "message": "LGTM modulo some suggestions for comments, thanks!",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5c5ddce_b1cfc37b",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-20T16:12:19Z",
+      "side": 1,
+      "message": "comment?",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "864da7c5_8391d09e",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-20T16:12:19Z",
+      "side": 1,
+      "message": "It would be good to explain what this is doing.",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1270a8a5_2ca72f87",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-20T16:12:19Z",
+      "side": 1,
+      "message": "Why leave this commented out?",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0873722_422554e1",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-20T16:12:19Z",
+      "side": 1,
+      "message": "It would be good to have a comment saying what this loop is doing.",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "904dd151_9b355057",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-20T16:12:19Z",
+      "side": 1,
+      "message": "Did you really mean to leave this commented out?",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

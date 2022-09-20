@@ -22,17 +22,6 @@ func (o *StructInfo) MatchAndInsert(c *OpContext, arc *Vertex) {
 
 	closeInfo := o.CloseInfo
 	closeInfo.IsClosed = false
-	for _, v := range arc.Conjuncts {
-		// TODO: This is not entirely correct. It could be that a pattern is
-		// "feeding" new conjuncts without it being a cycle just yet.
-		// Perhaps we allow a reference to be discarded only once.
-		// Needed for Issue #990.
-		// TODO: eliminate the need for IsPattern.
-		if !v.CloseInfo.IsCyclic && !v.CloseInfo.IsPattern {
-			closeInfo.CycleInfo.Refs = nil
-			break
-		}
-	}
 
 	// Match normal fields
 	matched := false
@@ -71,7 +60,6 @@ outer:
 			if matchBulk(c, env, b, f, label) {
 				matched = true
 				info := closeInfo.SpawnSpan(b.Value, ConstraintSpan)
-				info.IsPattern = true
 				arc.AddConjunct(MakeConjunct(&bulkEnv, b, info))
 			}
 		}
@@ -130,9 +118,9 @@ func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, 
 	}
 
 	n := Vertex{}
-	m := MakeRootConjunct(env, v)
+	m := MakeConjunct(env, v, c.ci)
 	n.AddConjunct(m)
-	n.AddConjunct(MakeRootConjunct(m.Env, label))
+	n.AddConjunct(MakeConjunct(m.Env, label, c.ci))
 
 	c.inConstraint++
 	n.Finalize(c)

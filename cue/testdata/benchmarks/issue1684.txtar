@@ -1,0 +1,120 @@
+#Issue: 1684
+
+// TODO: significantly reduce the number of counts in this evaluation.
+-- stats.txt --
+Leaks:  0
+Freed:  384153
+Reused: 384113
+Allocs: 40
+Retain: 0
+
+Unifications: 285437
+Conjuncts:    1347594
+Disjuncts:    384153
+
+-- in.cue --
+#Secret: {
+	$secret: id: string
+}
+#secrets: #Secret | {[string]: #secrets}
+
+out: #secrets & {
+	FOO: $secret: id: "100"
+	ONE: TWO: THREE: $secret: id: "123"
+}
+
+#Secret: {
+	$secret: _id: string
+}
+#secrets: #Secret | {[string]: #secrets}
+
+out: #secrets & {
+	FOO: $secret: _id: "100"
+	ONE: TWO: THREE: $secret: _id: "123"
+}
+-- out/eval --
+(struct){
+  #Secret: (#struct){
+    $secret: (#struct){
+      id: (string){ string }
+      _id: (string){ string }
+    }
+  }
+  #secrets: (#struct){ |((#struct){
+      $secret: (#struct){
+        id: (string){ string }
+        _id: (string){ string }
+      }
+    }, (#struct){
+    }) }
+  out: (#struct){
+    FOO: (#struct){
+      $secret: (#struct){
+        id: (string){ "100" }
+        _id: (string){ "100" }
+      }
+    }
+    ONE: (#struct){
+      TWO: (#struct){
+        THREE: (#struct){
+          $secret: (#struct){
+            id: (string){ "123" }
+            _id: (string){ "123" }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Secret: {
+    $secret: {
+      id: string
+    }
+  }
+  #secrets: (〈0;#Secret〉|{
+    [string]: 〈1;#secrets〉
+  })
+  out: (〈0;#secrets〉 & {
+    FOO: {
+      $secret: {
+        id: "100"
+      }
+    }
+    ONE: {
+      TWO: {
+        THREE: {
+          $secret: {
+            id: "123"
+          }
+        }
+      }
+    }
+  })
+  #Secret: {
+    $secret: {
+      _id: string
+    }
+  }
+  #secrets: (〈0;#Secret〉|{
+    [string]: 〈1;#secrets〉
+  })
+  out: (〈0;#secrets〉 & {
+    FOO: {
+      $secret: {
+        _id: "100"
+      }
+    }
+    ONE: {
+      TWO: {
+        THREE: {
+          $secret: {
+            _id: "123"
+          }
+        }
+      }
+    }
+  })
+}

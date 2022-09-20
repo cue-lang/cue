@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13553971_fd9dd145",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-09-20T08:50:24Z",
+      "side": 1,
+      "message": "I think making programs implicitly-dependent on their environment is a Very Bad Idea, but we already have the feature, and we already export `os`, so adding this seems consistent.\n",
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14101c16_bed22c28",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-09-20T08:50:24Z",
+      "side": 1,
+      "message": "Why have a possibly-obsolete list here, when we can just link to Go\u0027s list? Same for os. The wording makes this list sound canonical and complete, but it\u0027s really not.",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

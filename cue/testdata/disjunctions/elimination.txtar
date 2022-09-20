@@ -246,6 +246,18 @@ noHang: {
 	#X: #T
 }
 
+issue1940: {
+	#T: ["a", #T] | ["b", #T] | ["c", #T] | ["d", [...#T]]
+
+	#A: type: #T
+
+	#B: [string]: #A
+
+	#C: #B & {
+		x: #A
+	}
+}
+
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){
@@ -619,22 +631,37 @@ noHang: {
     #T: (list){
       0: (string){ "d" }
     }
-    x: (#list){ |((#list){
-        0: (string){ "a" }
-        1: (list){
-          0: (string){ "d" }
-        }
-      }, (list){
+    x: (list){
+      0: (string){ "d" }
+    }
+    #X: (list){
+      0: (string){ "d" }
+    }
+  }
+  issue1940: (struct){
+    #T: (#list){
+      0: (string){ "d" }
+      1: (list){
+      }
+    }
+    #A: (#struct){
+      type: (#list){
         0: (string){ "d" }
-      }) }
-    #X: (#list){ |((#list){
-        0: (string){ "a" }
         1: (list){
-          0: (string){ "d" }
         }
-      }, (list){
-        0: (string){ "d" }
-      }) }
+      }
+    }
+    #B: (#struct){
+    }
+    #C: (#struct){
+      x: (#struct){
+        type: (#list){
+          0: (string){ "d" }
+          1: (list){
+          }
+        }
+      }
+    }
   }
 }
 -- out/compile --
@@ -1324,5 +1351,31 @@ noHang: {
     x: 〈0;#T〉
     #X: 〈0;x〉
     #X: 〈0;#T〉
+  }
+  issue1940: {
+    #T: ([
+      "a",
+      〈1;#T〉,
+    ]|[
+      "b",
+      〈1;#T〉,
+    ]|[
+      "c",
+      〈1;#T〉,
+    ]|[
+      "d",
+      [
+        ...〈2;#T〉,
+      ],
+    ])
+    #A: {
+      type: 〈1;#T〉
+    }
+    #B: {
+      [string]: 〈1;#A〉
+    }
+    #C: (〈0;#B〉 & {
+      x: 〈1;#A〉
+    })
   }
 }

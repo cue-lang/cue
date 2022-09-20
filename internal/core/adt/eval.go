@@ -297,6 +297,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		case 1:
 			x := n.disjuncts[0].result
 			x.state = nil
+			x.cyclicReferences = n.node.cyclicReferences
 			*v = x
 
 		default:

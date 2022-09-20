@@ -439,7 +439,7 @@ mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.b.b.b: structural cycle
 noCancelSelfInvoke.t1.x.c.c: structural cycle
 selfTriggerCycle.issue1503.#T.a.b.link: structural cycle
-selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
 selfTriggerCycle.t1.#T.b.b: structural cycle
 selfTriggerCycle.t2.b.c.a: structural cycle
 
@@ -699,7 +699,13 @@ Result:
                 c: (_|_){
                   // [structural cycle]
                   b: (_|_){
-                    // [structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b: structural cycle
+                    // [structural cycle]
+                    c: (_|_){
+                      // [structural cycle]
+                      b: (_|_){
+                        // [structural cycle] selfTriggerCycle.long1.a.c.b.c.b.c.b.c.b: structural cycle
+                      }
+                    }
                   }
                 }
               }

@@ -218,9 +218,6 @@ type CycleInfo struct {
 	//     {x: out, out: x}.out
 	Inline bool
 
-	// IsPattern indicates whether this conjunct was inserted by a pattern.
-	IsPattern bool
-
 	// TODO(perf): pack this in with CloseInfo. Make an uint32 pointing into
 	// a buffer maintained in OpContext, using a mark-release mechanism.
 	Refs *RefNode

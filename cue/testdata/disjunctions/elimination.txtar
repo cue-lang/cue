@@ -233,7 +233,17 @@ issue1838: t1: {
 }
 issue1838: t2: {
 	p?: []
-	a: null | [for k in p {k}] 
+	a: null | [for k in p {k}]
+}
+
+noHang: {
+	// This should terminate.
+	#T: ["a", #T] | ["d", ...#T]
+
+	x: #T
+
+	#X: x
+	#X: #T
 }
 
 -- out/eval --
@@ -604,6 +614,27 @@ issue1838: t2: {
     t2: (struct){
       a: (null){ null }
     }
+  }
+  noHang: (struct){
+    #T: (list){
+      0: (string){ "d" }
+    }
+    x: (#list){ |((#list){
+        0: (string){ "a" }
+        1: (list){
+          0: (string){ "d" }
+        }
+      }, (list){
+        0: (string){ "d" }
+      }) }
+    #X: (#list){ |((#list){
+        0: (string){ "a" }
+        1: (list){
+          0: (string){ "d" }
+        }
+      }, (list){
+        0: (string){ "d" }
+      }) }
   }
 }
 -- out/compile --
@@ -1281,5 +1312,17 @@ issue1838: t2: {
         },
       ])
     }
+  }
+  noHang: {
+    #T: ([
+      "a",
+      〈1;#T〉,
+    ]|[
+      "d",
+      ...〈1;#T〉,
+    ])
+    x: 〈0;#T〉
+    #X: 〈0;x〉
+    #X: 〈0;#T〉
   }
 }

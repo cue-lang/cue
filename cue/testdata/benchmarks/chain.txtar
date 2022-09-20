@@ -1,3 +1,15 @@
+// TODO(perf): reduce number of Conjunctions
+-- stats.txt --
+Leaks:  0
+Freed:  1001
+Reused: 999
+Allocs: 2
+Retain: 0
+
+Unifications: 1001
+Conjuncts:    500501
+Disjuncts:    1001
+
 -- in.cue --
 f1: string
 f2: f1

@@ -1,3 +1,14 @@
+-- stats.txt --
+Leaks:  0
+Freed:  25
+Reused: 15
+Allocs: 10
+Retain: 1
+
+Unifications: 15
+Conjuncts:    30
+Disjuncts:    25
+
 -- in.cue --
 sameValues: SmustBeF: {
 	T: string | F

@@ -9,6 +9,17 @@
 // disjunct.
 //
 // Issue #651
+-- stats.txt --
+Leaks:  0
+Freed:  163
+Reused: 157
+Allocs: 6
+Retain: 0
+
+Unifications: 99
+Conjuncts:    290
+Disjuncts:    163
+
 -- in.cue --
 list: [
 	0, 1, 2, 3, 4, 5, 6, 7, 8,

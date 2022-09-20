@@ -1,3 +1,14 @@
+-- stats.txt --
+Leaks:  0
+Freed:  11
+Reused: 6
+Allocs: 5
+Retain: 0
+
+Unifications: 7
+Conjuncts:    29
+Disjuncts:    11
+
 -- in.cue --
 package bench1
 

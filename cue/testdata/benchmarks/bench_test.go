@@ -20,6 +20,9 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"golang.org/x/tools/txtar"
 )
@@ -41,9 +44,42 @@ func Benchmark(b *testing.B) {
 			b.Fatal(err)
 		}
 
-		inst := cue.Build(cuetxtar.Load(a, b.TempDir()))[0]
+		inst := cuetxtar.Load(a, b.TempDir())[0]
 		if inst.Err != nil {
 			b.Fatal(inst.Err)
+		}
+
+		r := runtime.New()
+
+		v, err := r.Build(nil, inst)
+		if err != nil {
+			b.Fatal(err)
+		}
+		e := eval.New(r)
+		ctx := e.NewContext(v)
+		v.Finalize(ctx)
+
+		if cuetest.UpdateGoldenFiles {
+			const statsFile = "stats.txt"
+			var stats txtar.File
+			var statsPos int
+			for i, f := range a.Files {
+				if f.Name == statsFile {
+					stats = f
+					statsPos = i
+					break
+				}
+			}
+			if stats.Name == "" {
+				// At stats.txt as the first file.
+				a.Files = append([]txtar.File{{
+					Name: statsFile,
+				}}, a.Files...)
+			}
+
+			a.Files[statsPos].Data = []byte(ctx.Stats().String() + "\n\n")
+
+			ioutil.WriteFile(name, txtar.Format(a), fi.Mode())
 		}
 
 		b.Run(name, func(b *testing.B) {

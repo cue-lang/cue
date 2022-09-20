@@ -1,5 +1,15 @@
 // Triggering recomputation of disjunctions on each branch results
 // in exponential run time. Ensure this does not happen.
+-- stats.txt --
+Leaks:  0
+Freed:  82
+Reused: 74
+Allocs: 8
+Retain: 0
+
+Unifications: 4
+Conjuncts:    143
+Disjuncts:    82
 
 -- in.cue --
 x: a0: {}

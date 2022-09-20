@@ -126,6 +126,13 @@ func (n *nodeContext) expandDisjuncts(
 
 	n.ctx.stats.Disjuncts++
 
+	// refNode is used to collect cyclicReferences for all disjuncts to be
+	// passed up to the parent node. Note that because the node in the parent
+	// context is overwritten in the course of expanding disjunction to retain
+	// pointer identity, it is not possible to simply record the refNodes in the
+	// parent directly.
+	var refNode *RefNode
+
 	node := n.node
 	defer func() {
 		n.node = node
@@ -227,6 +234,17 @@ func (n *nodeContext) expandDisjuncts(
 						newMode := mode(d.hasDefaults, v.Default)
 
 						cn.expandDisjuncts(state, n, newMode, true, last)
+
+						// Record the cyclicReferences of the conjunct in the
+						// parent list.
+						// TODO: avoid the copy. It should be okay to "steal"
+						// this list and avoid the copy. But this change is best
+						// done in a separate CL.
+						for r := n.node.cyclicReferences; r != nil; r = r.Next {
+							s := *r
+							s.Next = refNode
+							refNode = &s
+						}
 					}
 
 				case d.value != nil:
@@ -240,6 +258,13 @@ func (n *nodeContext) expandDisjuncts(
 						newMode := mode(d.hasDefaults, i < d.value.NumDefaults)
 
 						cn.expandDisjuncts(state, n, newMode, true, last)
+
+						// See comment above.
+						for r := n.node.cyclicReferences; r != nil; r = r.Next {
+							s := *r
+							s.Next = refNode
+							refNode = &s
+						}
 					}
 				}
 			}
@@ -389,6 +414,14 @@ func (n *nodeContext) expandDisjuncts(
 		}
 
 		n.disjuncts = n.disjuncts[:0]
+	}
+
+	// Record the refNodes in the parent.
+	for r := refNode; r != nil; {
+		next := r.Next
+		r.Next = parent.node.cyclicReferences
+		parent.node.cyclicReferences = r
+		r = next
 	}
 }
 

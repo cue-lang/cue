@@ -1,0 +1,8 @@
+Code-Review+2: Aram Hăvărneanu <aram@mgk.ro>
+Unity-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+TryBot-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+Submitted-by: Daniel Martí <mvdan@mvdan.cc>
+Submitted-at: Tue, 20 Sep 2022 08:57:15 +0000
+Reviewed-on: https://review.gerrithub.io/c/cue-lang/cue/+/543617
+Project: cue-lang/cue
+Branch: refs/heads/master

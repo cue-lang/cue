@@ -281,6 +281,15 @@ list.error2.a: conflicting values "3" and "2":
     ./in.cue:15:6
     ./in.cue:16:11
 list.error2.a: incompatible list lengths (2 and 2)
+list.error2.a.0: conflicting values "3" and "1":
+    ./in.cue:15:6
+    ./in.cue:16:6
+list.error2.a.1: conflicting values "1" and "2":
+    ./in.cue:16:6
+    ./in.cue:16:11
+list.error2.a.1: conflicting values "3" and "2":
+    ./in.cue:15:6
+    ./in.cue:16:11
 list.error2.a.2: conflicting values "1" and "2":
     ./in.cue:16:6
     ./in.cue:16:11
@@ -329,12 +338,21 @@ Result:
           // [eval] list.error2.a: conflicting values "3" and "1":
           //     ./in.cue:15:6
           //     ./in.cue:16:6
+          // list.error2.a.0: conflicting values "3" and "1":
+          //     ./in.cue:15:6
+          //     ./in.cue:16:6
         }
         1: (_|_){
           // [eval] list.error2.a: conflicting values "1" and "2":
           //     ./in.cue:16:6
           //     ./in.cue:16:11
           // list.error2.a: conflicting values "3" and "2":
+          //     ./in.cue:15:6
+          //     ./in.cue:16:11
+          // list.error2.a.1: conflicting values "1" and "2":
+          //     ./in.cue:16:6
+          //     ./in.cue:16:11
+          // list.error2.a.1: conflicting values "3" and "2":
           //     ./in.cue:15:6
           //     ./in.cue:16:11
         }

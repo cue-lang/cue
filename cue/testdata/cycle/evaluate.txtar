@@ -7,7 +7,8 @@
 // The builtins are typically used to trigger the uncommon path. The choice of
 // builtin is irrelevant, as long as they don't finalize args before processing.
 
-letCycle: {
+// This is a resolvable cycle, were b is equated to c.
+letCycleOK: {
 	b: c
 	let X = b
 	c: X
@@ -30,7 +31,7 @@ forCycle: {
 	#B: or([ for x in #A { b: x } ])
 }
 
-letCycle: {
+letCycleWithAnd: {
 	a: d: b
 	b: and([for x in a let y = x { y }])
 	c: a
@@ -79,92 +80,67 @@ Errors:
 closeCycle.a: structural cycle
 closeCycle.b.d: structural cycle
 closeFail.x.b: field not allowed:
-    ./in.cue:71:6
-    ./in.cue:72:12
-    ./in.cue:73:6
-    ./in.cue:74:5
+    ./in.cue:72:6
+    ./in.cue:73:12
+    ./in.cue:74:6
+    ./in.cue:75:5
 listCycle.0: structural cycle:
-    ./in.cue:17:9
+    ./in.cue:18:9
 disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
-    ./in.cue:23:9
+    ./in.cue:24:9
 disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
-    ./in.cue:23:9
+    ./in.cue:24:9
 disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
-    ./in.cue:23:9
+    ./in.cue:24:9
 forCycle.0.b: structural cycle:
-    ./in.cue:29:9
-letCycle.0: structural cycle:
-    ./in.cue:34:9
-letCycle.a.d.d: structural cycle:
-    ./in.cue:34:19
+    ./in.cue:30:9
+letCycleWithAnd.0: structural cycle:
+    ./in.cue:35:9
 closeCycle.c: structural cycle:
-    ./in.cue:40:15
+    ./in.cue:41:15
 structCycle.0.d: structural cycle:
-    ./in.cue:46:9
+    ./in.cue:47:9
 embedCycle: structural cycle:
-    ./in.cue:52:11
+    ./in.cue:53:11
 listAddCycle.0: structural cycle:
-    ./in.cue:58:5
+    ./in.cue:59:5
 
 Result:
 (_|_){
   // [eval]
-  letCycle: (_|_){
-    // [structural cycle]
-    b: (_|_){
-      // [structural cycle] letCycle.0: structural cycle:
-      //     ./in.cue:34:9
-    }
-    let X#1 = (_|_){
-      // [structural cycle] letCycle.0: structural cycle:
-      //     ./in.cue:34:9
-    }
-    c: (_|_){
-      // [structural cycle] letCycle.0: structural cycle:
-      //     ./in.cue:34:9
-      d: (_|_){// 〈1;b〉
-      }
-    }
-    a: (_|_){
-      // [structural cycle]
-      d: (_|_){
-        // [structural cycle] letCycle.0: structural cycle:
-        //     ./in.cue:34:9
-        d: (_|_){
-          // [structural cycle] letCycle.a.d.d: structural cycle:
-          //     ./in.cue:34:19
-        }
-      }
-    }
+  letCycleOK: (struct){
+    b: (_){ _ }
+    let X#1 = (_){ _ }
+    c: (_){ _ }
   }
   listCycle: (_|_){
     // [structural cycle]
     a: (_|_){
       // [structural cycle] listCycle.0: structural cycle:
-      //     ./in.cue:17:9
+      //     ./in.cue:18:9
     }
     b: (_|_){
       // [structural cycle] listCycle.0: structural cycle:
-      //     ./in.cue:17:9
+      //     ./in.cue:18:9
     }
     c: (_|_){
       // [structural cycle] listCycle.0: structural cycle:
-      //     ./in.cue:17:9
+      //     ./in.cue:18:9
     }
   }
   disjunctionCycle: (_|_){
     // [eval]
     a: (_|_){
       // [eval] disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
-      //     ./in.cue:23:9
+      //     ./in.cue:24:9
     }
     b: (_|_){
       // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
-      //     ./in.cue:23:9
+      //     ./in.cue:24:9
     }
     c: (_|_){
       // [eval] disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
-      //     ./in.cue:23:9
+      //     ./in.cue:24:9
     }
   }
   forCycle: (_|_){
@@ -173,12 +149,30 @@ Result:
       // [structural cycle]
       a: (_|_){
         // [structural cycle] forCycle.0.b: structural cycle:
-        //     ./in.cue:29:9
+        //     ./in.cue:30:9
       }
     }
     #B: (_|_){
       // [structural cycle] forCycle.0.b: structural cycle:
-      //     ./in.cue:29:9
+      //     ./in.cue:30:9
+    }
+  }
+  letCycleWithAnd: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      d: (_|_){
+        // [structural cycle] letCycleWithAnd.0: structural cycle:
+        //     ./in.cue:35:9
+      }
+    }
+    b: (_|_){
+      // [structural cycle] letCycleWithAnd.0: structural cycle:
+      //     ./in.cue:35:9
+    }
+    c: (_|_){
+      // [structural cycle] letCycleWithAnd.0: structural cycle:
+      //     ./in.cue:35:9
     }
   }
   closeCycle: (_|_){
@@ -194,52 +188,52 @@ Result:
     }
     c: (_|_){
       // [structural cycle] closeCycle.c: structural cycle:
-      //     ./in.cue:40:15
+      //     ./in.cue:41:15
     }
   }
   structCycle: (_|_){
     // [structural cycle]
     a: (_|_){
       // [structural cycle] structCycle.0.d: structural cycle:
-      //     ./in.cue:46:9
+      //     ./in.cue:47:9
     }
     b: (_|_){
       // [structural cycle] structCycle.0.d: structural cycle:
-      //     ./in.cue:46:9
+      //     ./in.cue:47:9
     }
     c: (_|_){
       // [structural cycle] structCycle.0.d: structural cycle:
-      //     ./in.cue:46:9
+      //     ./in.cue:47:9
     }
   }
   embedCycle: (_|_){
     // [structural cycle]
     a: (_|_){
       // [structural cycle] embedCycle: structural cycle:
-      //     ./in.cue:52:11
+      //     ./in.cue:53:11
     }
     b: (_|_){
       // [structural cycle] embedCycle: structural cycle:
-      //     ./in.cue:52:11
+      //     ./in.cue:53:11
     }
     c: (_|_){
       // [structural cycle] embedCycle: structural cycle:
-      //     ./in.cue:52:11
+      //     ./in.cue:53:11
     }
   }
   listAddCycle: (_|_){
     // [structural cycle]
     a: (_|_){
       // [structural cycle] listAddCycle.0: structural cycle:
-      //     ./in.cue:58:5
+      //     ./in.cue:59:5
     }
     b: (_|_){
       // [structural cycle] listAddCycle.0: structural cycle:
-      //     ./in.cue:58:5
+      //     ./in.cue:59:5
     }
     c: (_|_){
       // [structural cycle] listAddCycle.0: structural cycle:
-      //     ./in.cue:58:5
+      //     ./in.cue:59:5
     }
   }
   listMulCycle: (_|_){
@@ -264,10 +258,10 @@ Result:
       a: (string){ string }
       b: (_|_){
         // [eval] closeFail.x.b: field not allowed:
-        //     ./in.cue:71:6
-        //     ./in.cue:72:12
-        //     ./in.cue:73:6
-        //     ./in.cue:74:5
+        //     ./in.cue:72:6
+        //     ./in.cue:73:12
+        //     ./in.cue:74:6
+        //     ./in.cue:75:5
       }
     }
   }
@@ -275,7 +269,7 @@ Result:
 -- out/compile --
 --- in.cue
 {
-  letCycle: {
+  letCycleOK: {
     b: 〈0;c〉
     let X#1 = 〈0;b〉
     c: 〈0;let X#1〉
@@ -302,7 +296,7 @@ Result:
       },
     ])
   }
-  letCycle: {
+  letCycleWithAnd: {
     a: {
       d: 〈1;b〉
     }

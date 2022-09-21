@@ -374,7 +374,12 @@ outer:
 		// Insert cyclic references from found arc, if any.
 		for r := arc.cyclicReferences; r != nil; r = r.Next {
 			if r.Ref == x {
-				found = true
+				// We have detected a cycle, with the only exception if arc is
+				// a disjunction, as evaluation always stops at unresolved
+				// disjunctions.
+				if _, ok := arc.BaseValue.(*Disjunction); !ok {
+					found = true
+				}
 			}
 			v.CloseInfo.Refs = &RefNode{
 				Arc:  r.Arc,

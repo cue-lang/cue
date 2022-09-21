@@ -14,7 +14,7 @@ letCycleOK: {
 	c: X
 }
 
-listCycle: {
+listCycleOK: {
 	a: b
 	b: and([c])
 	c: a
@@ -27,7 +27,7 @@ disjunctionCycle: {
 }
 
 forCycle: {
-	#A: a: #B
+	#A: a: #B // TODO(errors): Correct error position.
 	#B: or([ for x in #A { b: x } ])
 }
 
@@ -84,26 +84,33 @@ closeFail.x.b: field not allowed:
     ./in.cue:73:12
     ./in.cue:74:6
     ./in.cue:75:5
-listCycle.0: structural cycle:
-    ./in.cue:18:9
+structCycle.a: structural cycle
+structCycle.b.d: structural cycle
 disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:24:9
 disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:24:9
 disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:24:9
-forCycle.0.b: structural cycle:
-    ./in.cue:30:9
-letCycleWithAnd.0: structural cycle:
-    ./in.cue:35:9
+1 errors in empty disjunction::
+    ./in.cue:30:6
+b: structural cycle:
+    ./in.cue:30:6
 closeCycle.c: structural cycle:
     ./in.cue:41:15
-structCycle.0.d: structural cycle:
-    ./in.cue:47:9
+structCycle.c: structural cycle:
+    ./in.cue:47:14
 embedCycle: structural cycle:
     ./in.cue:53:11
-listAddCycle.0: structural cycle:
-    ./in.cue:59:5
+listMulCycle.a: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
+    ./in.cue:65:5
+    ./in.cue:65:9
+listMulCycle.b: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
+    ./in.cue:65:5
+    ./in.cue:65:9
+listMulCycle.c: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
+    ./in.cue:65:5
+    ./in.cue:65:9
 
 Result:
 (_|_){
@@ -113,20 +120,10 @@ Result:
     let X#1 = (_){ _ }
     c: (_){ _ }
   }
-  listCycle: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle] listCycle.0: structural cycle:
-      //     ./in.cue:18:9
-    }
-    b: (_|_){
-      // [structural cycle] listCycle.0: structural cycle:
-      //     ./in.cue:18:9
-    }
-    c: (_|_){
-      // [structural cycle] listCycle.0: structural cycle:
-      //     ./in.cue:18:9
-    }
+  listCycleOK: (struct){
+    a: (_){ _ }
+    b: (_){ _ }
+    c: (_){ _ }
   }
   disjunctionCycle: (_|_){
     // [eval]
@@ -148,31 +145,29 @@ Result:
     #A: (_|_){
       // [structural cycle]
       a: (_|_){
-        // [structural cycle] forCycle.0.b: structural cycle:
-        //     ./in.cue:30:9
+        // [structural cycle] 1 errors in empty disjunction::
+        //     ./in.cue:30:6
+        // b: structural cycle:
+        //     ./in.cue:30:6
       }
     }
     #B: (_|_){
-      // [structural cycle] forCycle.0.b: structural cycle:
-      //     ./in.cue:30:9
+      // [structural cycle] 1 errors in empty disjunction::
+      //     ./in.cue:30:6
+      // b: structural cycle:
+      //     ./in.cue:30:6
     }
   }
-  letCycleWithAnd: (_|_){
-    // [structural cycle]
-    a: (_|_){
-      // [structural cycle]
-      d: (_|_){
-        // [structural cycle] letCycleWithAnd.0: structural cycle:
-        //     ./in.cue:35:9
+  letCycleWithAnd: (struct){
+    a: (struct){
+      d: (struct){
       }
     }
-    b: (_|_){
-      // [structural cycle] letCycleWithAnd.0: structural cycle:
-      //     ./in.cue:35:9
+    b: (struct){
     }
-    c: (_|_){
-      // [structural cycle] letCycleWithAnd.0: structural cycle:
-      //     ./in.cue:35:9
+    c: (struct){
+      d: (struct){
+      }
     }
   }
   closeCycle: (_|_){
@@ -194,16 +189,17 @@ Result:
   structCycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] structCycle.0.d: structural cycle:
-      //     ./in.cue:47:9
+      // [structural cycle] structCycle.a: structural cycle
     }
     b: (_|_){
-      // [structural cycle] structCycle.0.d: structural cycle:
-      //     ./in.cue:47:9
+      // [structural cycle]
+      d: (_|_){
+        // [structural cycle] structCycle.b.d: structural cycle
+      }
     }
     c: (_|_){
-      // [structural cycle] structCycle.0.d: structural cycle:
-      //     ./in.cue:47:9
+      // [structural cycle] structCycle.c: structural cycle:
+      //     ./in.cue:47:14
     }
   }
   embedCycle: (_|_){
@@ -224,28 +220,31 @@ Result:
   listAddCycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] listAddCycle.0: structural cycle:
-      //     ./in.cue:59:5
+      // [structural cycle]
     }
     b: (_|_){
-      // [structural cycle] listAddCycle.0: structural cycle:
-      //     ./in.cue:59:5
+      // [structural cycle]
     }
     c: (_|_){
-      // [structural cycle] listAddCycle.0: structural cycle:
-      //     ./in.cue:59:5
+      // [structural cycle]
     }
   }
   listMulCycle: (_|_){
-    // [structural cycle]
+    // [eval]
     a: (_|_){
-      // [structural cycle]
+      // [eval] listMulCycle.a: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
+      //     ./in.cue:65:5
+      //     ./in.cue:65:9
     }
     b: (_|_){
-      // [structural cycle]
+      // [eval] listMulCycle.b: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
+      //     ./in.cue:65:5
+      //     ./in.cue:65:9
     }
     c: (_|_){
-      // [structural cycle]
+      // [eval] listMulCycle.c: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
+      //     ./in.cue:65:5
+      //     ./in.cue:65:9
     }
   }
   closeFail: (_|_){
@@ -274,7 +273,7 @@ Result:
     let X#1 = 〈0;b〉
     c: 〈0;let X#1〉
   }
-  listCycle: {
+  listCycleOK: {
     a: 〈0;b〉
     b: and([
       〈1;c〉,

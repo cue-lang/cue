@@ -270,7 +270,7 @@ expr.error1.a: conflicting values 4 and 3:
 expr.error2.a: conflicting values 4 and 3:
     ./in.cue:6:5
     ./in.cue:7:5
-list.error1.a: incompatible list lengths (2 and 2)
+list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
 list.error2.a: conflicting values "1" and "2":
     ./in.cue:16:6
     ./in.cue:16:11
@@ -280,7 +280,7 @@ list.error2.a: conflicting values "3" and "1":
 list.error2.a: conflicting values "3" and "2":
     ./in.cue:15:6
     ./in.cue:16:11
-list.error2.a: incompatible list lengths (2 and 2)
+list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
 list.error2.a.0: conflicting values "3" and "1":
     ./in.cue:15:6
     ./in.cue:16:6
@@ -324,7 +324,7 @@ Result:
     error1: (_|_){
       // [eval]
       a: (_|_){
-        // [eval] list.error1.a: incompatible list lengths (2 and 2)
+        // [eval] list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
         0: (string){ "1" }
         1: (string){ "2" }
         2: (string){ "3" }
@@ -333,7 +333,7 @@ Result:
     error2: (_|_){
       // [eval]
       a: (_|_){
-        // [eval] list.error2.a: incompatible list lengths (2 and 2)
+        // [eval] list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
         0: (_|_){
           // [eval] list.error2.a: conflicting values "3" and "1":
           //     ./in.cue:15:6

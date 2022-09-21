@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f742b0cb_10939ffb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-21T09:13:55Z",
+      "side": 1,
+      "message": "The injection variables are precisely about the environment :) You\u0027re right that in general they shouldn\u0027t be used, but in some cases they can be useful. They are a side effect that is deliberately kept at a distance.",
+      "parentUuid": "13553971_fd9dd145",
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14101c16_bed22c28",
@@ -31,6 +49,30 @@
       "writtenOn": "2022-09-20T08:50:24Z",
       "side": 1,
       "message": "Why have a possibly-obsolete list here, when we can just link to Go\u0027s list? Same for os. The wording makes this list sound canonical and complete, but it\u0027s really not.",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89536b9a_2327b847",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-21T09:13:55Z",
+      "side": 1,
+      "message": "You\u0027re right that this list may become obsolete over time; I\u0027m just following the example of `os` here.\n\nI guess we could link to https://go.dev/doc/install/source#environment, or point the user at `go tool dist list`. I think I prefer the former, as Go may not be installed.",
+      "parentUuid": "14101c16_bed22c28",
       "range": {
         "startLine": 354,
         "startChar": 0,

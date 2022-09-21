@@ -21,7 +21,7 @@ Errors:
 fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
     ./in.cue:2:9
     ./in.cue:2:17
-fatalChild.0.a: undefined field: c:
+fatalChild.x.a: undefined field: c:
     ./in.cue:8:17
 
 Result:
@@ -40,8 +40,11 @@ Result:
     #b: (#struct){
     }
     x: (_|_){
-      // [eval] fatalChild.0.a: undefined field: c:
-      //     ./in.cue:8:17
+      // [eval]
+      a: (_|_){
+        // [eval] fatalChild.x.a: undefined field: c:
+        //     ./in.cue:8:17
+      }
     }
   }
   okIncompleteChild: (struct){

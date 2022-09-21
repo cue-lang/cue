@@ -739,17 +739,8 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 		c.errs = CombineErrors(c.src, c.errs, err)
 
 		if v, ok := result.(*Vertex); ok {
-			if b, _ := v.BaseValue.(*Bottom); b != nil {
-				switch b.Code {
-				case IncompleteError:
-				case CycleError:
-					if state == Partial {
-						break
-					}
-					fallthrough
-				default:
-					result = b
-				}
+			if b, _ := v.BaseValue.(*Bottom); b != nil && !b.IsIncomplete() {
+				result = b
 			}
 		}
 
@@ -1034,8 +1025,15 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state VertexStatus) *Ve
 	return node
 }
 
-// Elems returns the elements of a list.
+// Elems returns the evaluated elements of a list.
 func (c *OpContext) Elems(v Value) []*Vertex {
+	list := c.list(v)
+	list.Finalize(c)
+	return list.Elems()
+}
+
+// RawElems returns the elements of the list without evaluating them.
+func (c *OpContext) RawElems(v Value) []*Vertex {
 	list := c.list(v)
 	return list.Elems()
 }

@@ -738,11 +738,14 @@ func (v *Vertex) addConjunct(c Conjunct) {
 			return
 		}
 	}
-	v.Conjuncts = append(v.Conjuncts, c)
+	v.addConjunctUnchecked(c)
 }
 
 func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
+	if n := v.state; n != nil {
+		n.conjuncts = append(n.conjuncts, c)
+	}
 }
 
 func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *StructInfo {

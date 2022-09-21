@@ -51,7 +51,6 @@ a.q.e: field not allowed:
     ./in.cue:11:4
     ./in.cue:15:3
 issue852.a.Foo: field not allowed:
-    ./in.cue:30:14
     ./in.cue:22:6
     ./in.cue:26:5
     ./in.cue:28:5
@@ -87,18 +86,16 @@ Result:
     }
   }
   issue852: (_|_){
-    // [eval] issue852.a.Foo: field not allowed:
-    //     ./in.cue:30:14
-    //     ./in.cue:22:6
-    //     ./in.cue:26:5
-    //     ./in.cue:28:5
+    // [eval]
+    b: (struct){
+      Foo: (string){ "foo" }
+    }
     #A: (#struct){
     }
     a: (_|_){
       // [eval]
       Foo: (_|_){
         // [eval] issue852.a.Foo: field not allowed:
-        //     ./in.cue:30:14
         //     ./in.cue:22:6
         //     ./in.cue:26:5
         //     ./in.cue:28:5

@@ -468,6 +468,38 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		n.updateNodeType(StructKind, n.aStruct, n.aStructID)
 	}
 
+	if len(n.selfComprehensions) > 0 {
+		// Up to here all comprehensions with sources other than this node will
+		// have had a chance to run. We can now run self-referencing
+		// comprehensions with the restriction that they cannot add new arcs.
+		//
+		// Note: we should only set this in case of self-referential
+		// comprehensions. A comprehension in a parent node may still add
+		// arcs to this node, even if it has reached AllConjunctsDone status,
+		// as long as any evaluation did not rely on its specific set of arcs.
+		// Example:
+		//
+		//	a: {
+		//		b: _env: c: 1
+		//
+		//		// Using dynamic field ("b") prevents the evaluation of the
+		//		// comprehension to be pushed down to env: and instead evaluates
+		//		// it before b is completed. Even though b needs to reach state
+		//		// AllConjunctsDone before evaluating b._env, it is still okay
+		//		// to add arcs to b after this evaluation: only the set of arcs
+		//		// in b._env needs to be frozen after that.
+		//		for for k2, v2 in b._env {
+		//			("b"): env: (k2): v2
+		//		}
+		//	}
+		n.node.LockArcs = true
+
+		n.injectComprehensions(&(n.selfComprehensions), false)
+	}
+
+	for n.expandOne() {
+	}
+
 	switch err := n.getErr(); {
 	case err != nil:
 		n.node.BaseValue = err
@@ -601,6 +633,43 @@ func (n *nodeContext) incompleteErrors() *Bottom {
 		// 	continue
 		// }
 		err = CombineErrors(nil, err, c.err)
+		n.node.arcType = arcMember
+
+		// TODO: use this code once possible.
+		//
+		// Add comprehension to ensure incomplete error is inserted. This
+		// ensures that the error is reported in the Vertex where the
+		// comprehension was defined, and not just in the node below. This, in
+		// turn, is necessary to support certain logic, like export, that
+		// expects to be able to detect an "incomplete" error at the first level
+		// where it is necessary.
+		// if c.node.status != Finalized {
+		// 	n := c.node.getNodeContext(n.ctx)
+		// 	n.comprehensions = append(n.comprehensions, c)
+		// } else {
+		// 	n.node.AddErr(n.ctx, err)
+		// }
+		// n := d.node.getNodeContext(ctx)
+		// n.addBottom(err)
+		if c.node != nil && c.node.status != Finalized {
+			n := c.node.getNodeContext(n.ctx, 0)
+			n.addBottom(err)
+			c.node = nil
+		}
+	}
+	for _, c := range n.selfComprehensions {
+		if c.err == nil {
+			continue
+		}
+		// TODO: Current flow doesn't handle adding errors to parents well.
+		//       Fix this, though, as this is a more appropriate location to
+		//       report the error.
+		// if c.node != nil {
+		// 	c.node.AddErr(n.ctx, c.err)
+		// 	continue
+		// }
+		err = CombineErrors(nil, err, c.err)
+		// n.node.arcType &^= arcVoid
 		n.node.arcType = arcMember
 
 		// TODO: use this code once possible.
@@ -899,10 +968,11 @@ type nodeContext struct {
 	notify []*Vertex
 
 	// Struct information
-	dynamicFields  []envDynamic
-	comprehensions []envYield
-	aStruct        Expr
-	aStructID      CloseInfo
+	dynamicFields      []envDynamic
+	comprehensions     []envYield
+	selfComprehensions []envYield // comprehensions iterating over own struct.
+	aStruct            Expr
+	aStructID          CloseInfo
 
 	// Expression conjuncts
 	lists  []envList
@@ -985,6 +1055,7 @@ func (n *nodeContext) clone() *nodeContext {
 	d.postChecks = append(d.postChecks, n.postChecks...)
 	d.dynamicFields = append(d.dynamicFields, n.dynamicFields...)
 	d.comprehensions = append(d.comprehensions, n.comprehensions...)
+	d.selfComprehensions = append(d.selfComprehensions, n.selfComprehensions...)
 	d.lists = append(d.lists, n.lists...)
 	d.vLists = append(d.vLists, n.vLists...)
 	d.exprs = append(d.exprs, n.exprs...)
@@ -1001,24 +1072,25 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		c.freeListNode = n.nextFree
 
 		*n = nodeContext{
-			ctx:             c,
-			node:            node,
-			kind:            TopKind,
-			arcMap:          n.arcMap[:0],
-			cyclicConjuncts: n.cyclicConjuncts[:0],
-			notify:          n.notify[:0],
-			checks:          n.checks[:0],
-			postChecks:      n.postChecks[:0],
-			dynamicFields:   n.dynamicFields[:0],
-			comprehensions:  n.comprehensions[:0],
-			lists:           n.lists[:0],
-			vLists:          n.vLists[:0],
-			exprs:           n.exprs[:0],
-			disjunctions:    n.disjunctions[:0],
-			usedDefault:     n.usedDefault[:0],
-			disjunctErrs:    n.disjunctErrs[:0],
-			disjuncts:       n.disjuncts[:0],
-			buffer:          n.buffer[:0],
+			ctx:                c,
+			node:               node,
+			kind:               TopKind,
+			arcMap:             n.arcMap[:0],
+			cyclicConjuncts:    n.cyclicConjuncts[:0],
+			notify:             n.notify[:0],
+			checks:             n.checks[:0],
+			postChecks:         n.postChecks[:0],
+			dynamicFields:      n.dynamicFields[:0],
+			comprehensions:     n.comprehensions[:0],
+			selfComprehensions: n.selfComprehensions[:0],
+			lists:              n.lists[:0],
+			vLists:             n.vLists[:0],
+			exprs:              n.exprs[:0],
+			disjunctions:       n.disjunctions[:0],
+			usedDefault:        n.usedDefault[:0],
+			disjunctErrs:       n.disjunctErrs[:0],
+			disjuncts:          n.disjuncts[:0],
+			buffer:             n.buffer[:0],
 		}
 
 		return n
@@ -1201,7 +1273,9 @@ func (n *nodeContext) finalDone() bool {
 			return false
 		}
 	}
-	return len(n.dynamicFields) == 0 && len(n.comprehensions) == 0
+	return len(n.dynamicFields) == 0 &&
+		len(n.comprehensions) == 0 &&
+		len(n.selfComprehensions) == 0
 }
 
 // hasErr is used to determine if an evaluation path, for instance a single
@@ -1309,6 +1383,9 @@ type envList struct {
 	n       int64 // recorded length after evaluator
 	elipsis *Ellipsis
 	id      CloseInfo
+	ignore  bool // has a self-referencing comprehension and is postponed
+	self    bool // was added as a postponed self-referencing comprehension
+	index   int
 }
 
 type envCheck struct {
@@ -1928,7 +2005,7 @@ func (n *nodeContext) expandOne() (done bool) {
 		return true
 	}
 
-	if progress = n.injectComprehensions(&(n.comprehensions)); progress {
+	if progress = n.injectComprehensions(&(n.comprehensions), true); progress {
 		return true
 	}
 
@@ -2061,6 +2138,10 @@ outer:
 
 		n.updateCyclicStatus(l.id)
 
+		if l.self {
+			n.node.LockArcs = true
+		}
+
 		index := int64(0)
 		hasComprehension := false
 		for j, elem := range l.list.Elems {
@@ -2075,7 +2156,13 @@ outer:
 				})
 				hasComprehension = true
 				if err != nil {
-					n.addBottom(err)
+					if err.ForCycle && !l.self {
+						n.lists[i].ignore = true
+						l.self = true
+						n.lists = append(n.lists, l)
+					} else {
+						n.addBottom(err)
+					}
 					continue outer
 				}
 
@@ -2139,7 +2226,7 @@ outer:
 	}
 
 	for _, l := range n.lists {
-		if l.elipsis == nil {
+		if l.elipsis == nil || l.ignore {
 			continue
 		}
 
@@ -2159,7 +2246,7 @@ outer:
 	sources := []ast.Expr{}
 	// Add conjuncts for additional items.
 	for _, l := range n.lists {
-		if l.elipsis == nil {
+		if l.elipsis == nil || l.ignore {
 			continue
 		}
 		if src, _ := l.elipsis.Source().(ast.Expr); src != nil {

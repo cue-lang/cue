@@ -300,7 +300,7 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // injectComprehension evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
+func (n *nodeContext) injectComprehensions(all *[]envYield, allowCycle bool) (progress bool) {
 	ctx := n.ctx
 
 	k := 0
@@ -315,6 +315,11 @@ func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
 
 			if err := ctx.yield(d.node, d.env, d.comp, f); err != nil {
 				if err.IsIncomplete() {
+					// TODO:  Detect that the nodes are actually equal
+					if allowCycle && err.ForCycle && err.Value == n.node {
+						n.selfComprehensions = append(n.selfComprehensions, d)
+						continue
+					}
 					d.err = err
 					(*all)[k] = d
 					k++

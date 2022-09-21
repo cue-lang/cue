@@ -169,6 +169,11 @@ type Vertex struct {
 	// the per-Environment value cache.
 	MultiLet bool
 
+	// After this is set, no more arcs may be added during evaluation. This is
+	// set, for instance, after a Vertex is used as a source for comprehensions,
+	// or any other operation that relies on the set of arcs being constant.
+	LockArcs bool
+
 	// arcType indicates the level of optionality of this arc.
 	arcType arcType
 
@@ -697,6 +702,16 @@ func (v *Vertex) Elems() []*Vertex {
 func (v *Vertex) GetArc(c *OpContext, f Feature, t arcType) (arc *Vertex, isNew bool) {
 	arc = v.Lookup(f)
 	if arc == nil {
+		if v.LockArcs {
+			// TODO(errors): add positions.
+			if f.IsInt() {
+				c.addErrf(EvalError, token.NoPos,
+					"element at index %s not allowed by earlier comprehension or reference cycle", f)
+			} else {
+				c.addErrf(EvalError, token.NoPos,
+					"field %s not allowed by earlier comprehension or reference cycle", f)
+			}
+		}
 		arc = &Vertex{Parent: v, Label: f, arcType: t}
 		v.Arcs = append(v.Arcs, arc)
 		isNew = true

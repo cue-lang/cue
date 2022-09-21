@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "793fb412_a48ef603",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-21T06:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5c5ddce_b1cfc37b",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "864da7c5_8391d09e",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-09-20T16:12:19Z",
       "side": 1,
       "message": "It would be good to explain what this is doing.",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90437020_cae2060b",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-21T06:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "864da7c5_8391d09e",
       "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca1acb6f_71a2166a",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-21T06:56:55Z",
+      "side": 1,
+      "message": "oops",
+      "parentUuid": "1270a8a5_2ca72f87",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0873722_422554e1",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-09-20T16:12:19Z",
       "side": 1,
       "message": "It would be good to have a comment saying what this loop is doing.",
+      "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10399715_60ee7372",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-21T06:56:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f0873722_422554e1",
       "revId": "2ebdd10ca50551d50f3eb975c0e2b4a18d78522d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

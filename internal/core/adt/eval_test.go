@@ -97,12 +97,15 @@ var needFix = map[string]string{
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
+	verbosity := 0
+	verbosity = 1 // uncomment to turn logging off.
+
 	in := `
 -- cue.mod/module.cue --
 module: "mod.test"
 
 -- in.cue --
-`
+	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
 		t.Skip()
@@ -123,7 +126,7 @@ module: "mod.test"
 
 	// t.Error(debug.NodeString(r, v, nil))
 	// eval.Debug = true
-	adt.Verbosity = 1
+	adt.Verbosity = verbosity
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)

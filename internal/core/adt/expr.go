@@ -319,8 +319,7 @@ func (x *ListLit) evaluate(c *OpContext) Value {
 		Parent:    e.Vertex,
 		Conjuncts: []Conjunct{{e, x, c.ci}},
 	}
-	// TODO: should be AllConjunctsDone and then use Finalize for builtins?
-	c.Unify(v, Finalized) // TODO: also partial okay?
+	c.Unify(v, Conjuncts)
 	return v
 }
 
@@ -1740,24 +1739,33 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
-	// TODO: should be AllConjunctsDone
-	n := c.node(x, x.Src, true, Finalized)
-	if n.status == Evaluating {
+	n := c.node(x, x.Src, true, Conjuncts)
+	if n.status == Evaluating && !n.LockArcs {
 		c.AddBottom(&Bottom{
-			Code:  CycleError,
-			Value: n,
+			Code:     CycleError,
+			ForCycle: true,
+			Value:    n,
+			Err:      errors.Newf(pos(x.Src), "comprehension source references itself"),
 		})
 		return
 	}
+	n.LockArcs = true
 	for _, a := range n.Arcs {
 		if !a.Label.IsRegular() || !a.IsDefined(c) {
 			continue
 		}
 
 		c.Unify(a, Partial)
+		if a.arcType == arcVoid {
+			continue
+		}
 
 		n := &Vertex{
 			Parent: c.Env(0).Vertex,
+
+			// Using Finalized here ensures that no nodeContext is allocated,
+			// preventing a leak, as this "helper" struct bypasses normal
+			// processing, eluding the deallocation step.
 			status: Finalized,
 		}
 

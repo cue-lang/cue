@@ -556,6 +556,10 @@ issue1940: {
       #type: (#struct){
         fieldName: ((string|struct)){ |((string){ string }, (#struct){
             foo: (string){ string }
+          }, (#struct){
+            bar: ((string|struct)){ |((string){ string }, (#struct){
+                foo: (string){ string }
+              }) }
           }) }
       }
       #subtype: ((string|struct)){ |((string){ string }, (#struct){

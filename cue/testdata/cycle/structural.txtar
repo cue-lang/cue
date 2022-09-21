@@ -552,6 +552,7 @@ c1.a.c.c: structural cycle
 d1.a.b.c.d.t: structural cycle
 d2.a.b.c.d.t: structural cycle
 d2.r.c.d.t: structural cycle
+d3.x.a.b.c: structural cycle
 e1.a.c: structural cycle
 e1.b.c: structural cycle
 e2.a.c: structural cycle
@@ -618,8 +619,8 @@ b12b.#list.tail: structural cycle:
     ./in.cue:176:6
 d1.r: structural cycle:
     ./in.cue:299:26
-d3.config.0: structural cycle:
-    ./in.cue:315:13
+d3.x.indirect: structural cycle:
+    ./in.cue:314:12
 
 Result:
 (_|_){
@@ -1221,27 +1222,30 @@ Result:
   }
   d3: (_|_){
     // [structural cycle]
-    config: (_|_){
+    config: (struct){
+      a: (struct){
+        b: (struct){
+          c: (null){ null }
+        }
+      }
+      indirect: (null){ null }
+      i: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    x: (_|_){
       // [structural cycle]
       a: (_|_){
         // [structural cycle]
         b: (_|_){
           // [structural cycle]
           c: (_|_){
-            // [structural cycle] d3.config.0: structural cycle:
-            //     ./in.cue:315:13
+            // [structural cycle] d3.x.a.b.c: structural cycle
           }
         }
       }
       indirect: (_|_){
-        // [structural cycle] d3.config.0: structural cycle:
-        //     ./in.cue:315:13
+        // [structural cycle] d3.x.indirect: structural cycle:
+        //     ./in.cue:314:12
       }
-      i: (int){ |(*(int){ 1 }, (int){ int }) }
-    }
-    x: (_|_){
-      // [structural cycle] d3.config.0: structural cycle:
-      //     ./in.cue:315:13
       i: (int){ 0 }
     }
   }

@@ -97,6 +97,7 @@ type Bottom struct {
 	HasRecursive bool
 	ChildError   bool // Err is the error of the child
 	NotExists    bool // This error originated from a failed lookup.
+	ForCycle     bool // this is a for cycle
 	// Value holds the computed value so far in case
 	Value Value
 }

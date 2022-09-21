@@ -108,7 +108,7 @@ Allocs: 4
 Retain: 0
 
 Unifications: 20
-Conjuncts:    27
+Conjuncts:    28
 Disjuncts:    20
 -- out/run/t2/stats --
 Leaks:  0
@@ -118,7 +118,7 @@ Allocs: 0
 Retain: 0
 
 Unifications: 20
-Conjuncts:    31
+Conjuncts:    32
 Disjuncts:    20
 -- out/run/t3/stats --
 Leaks:  0
@@ -148,5 +148,5 @@ Allocs: 4
 Retain: 0
 
 Unifications: 60
-Conjuncts:    90
+Conjuncts:    92
 Disjuncts:    60

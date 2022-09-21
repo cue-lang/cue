@@ -66,8 +66,242 @@ issue1666: {
 		}
 	}
 }
+
+// Issue #779: bidirectional projection
+// Should be allowed as long as the set of fields is not modified as a result
+// of a comprehension.
+issue779: {
+	X: Y.message
+	STATE: {
+		for k, v in Y {
+			if k != "message" {
+				"\(k)": v
+			}
+		}
+	}
+	Y: STATE & { message: X }
+	X: "test"
+	STATE: { code: 101 }
+}
+
+// Comprehension ends up inserting in the same arcs over which it
+// is iterating. This is fine as long as the set is not altered.
+// Issue #1934
+selfReferential: T1: {
+	S: d: "bar"
+
+	T: e: S: a: "foo"
+
+	for s, v in S for t, _ in T {
+		T: (t): S: (s): v
+	}
+}
+
+// selfReferential comprehenion for list.
+// Issue #1934
+selfReferential: list: {
+	panels: [
+		for i, _ in panels {
+			id: i
+		}
+	]
+	panels: [{}, {}, {}]
+}
+
+selfReferential: insertionError: {
+	A: {
+		foo: 1
+		for x in A {
+			// May not insert foo3. Use dynamic references to force the
+			// comprehension to be evaluated in the struct in which it is
+			// defined.
+			("foo3"): 1
+		}
+	}
+}
+
+// A comprehension should not recursively evaluated arcs, so that a
+// structural cycle can be avoided when unnecessary.
+selfReferential: acrossOr: t1: p1: {
+	o: #Output & { retry: reject: "ok" }
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: #Output
+	}
+
+	#Output: or([ for name, config in #AllOutputs {
+		(name): config
+	}])
+}
+
+selfReferential: acrossOr: t1: p2: {
+	#Output: or([ for name, config in #AllOutputs {
+		(name): config
+	}])
+
+	o: #Output & { retry: reject: "ok" }
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: #Output
+	}
+}
+
+selfReferential: acrossOr: t1: p3: {
+	#Output: or([ for name, config in #AllOutputs {
+		(name): config
+	}])
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: #Output
+	}
+
+	o: #Output & { retry: reject: "ok" }
+}
+
+selfReferential: acrossOr: t2: p1: {
+	d: or([ for x, y in #A { y } ])
+	o: d & { b: 2 }
+	#A: {
+		d1: int
+		d2: string
+		d3: b: d
+	}
+}
+
+selfReferential: acrossOr: t2: p2: {
+	o: d & { b: 2 }
+	d: or([ for x, y in #A { y } ])
+	#A: {
+		d1: int
+		d2: string
+		d3: b: d
+	}
+}
+
+selfReferential: acrossOr: t2: p3: {
+	o: d & { b: 2 }
+	#A: {
+		d1: int
+		d2: string
+		d3: b: d
+	}
+	d: or([ for x, y in #A { y } ])
+}
+
+issue1881: p1: {
+	o: #Output & { retry: output: reject: "ok" }
+
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: output: #Output
+	}
+
+	#Output: or([ for name, config in #AllOutputs {
+		(name): config
+	}])
+}
+
+issue1881: p2: {
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: output: #Output
+	}
+	
+	o: #Output & { retry: output: reject: "ok" }
+
+	#Output: or([ for name, config in #AllOutputs {
+		(name): config
+	}])
+}
+
+issue1881: p3: {
+	#AllOutputs: {
+		reject:   string
+		resource: string
+		retry: output: #Output
+	}
+
+	#Output: or([ for name, config in #AllOutputs {
+		(name): config
+	}])
+
+	o: #Output & { retry: output: reject: "ok" }
+}
+
+siblingInsertion: t1: p1: {
+	D: "logging": _
+	deployment: _
+
+	for k, v in deployment
+	for k1, v2 in v.env2 {
+		deployment: (k): env: (k1): v2
+	}
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+}
+
+siblingInsertion: t1: p2: {
+	D: "logging": _
+	deployment: _
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+
+	for k, v in deployment
+	for k1, v2 in v.env2 {
+		deployment: (k): env: (k1): v2
+	}
+}
+
+// TODO: fix nested comprehension bug.
+siblingInsertion: t2: p1: {
+	D: "logging": _
+	deployment: _
+
+	for k, v in deployment {
+		for k1, v2 in v.env2 {
+			deployment: (k): env: (k1): v2
+		}
+	}
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+}
+
+siblingInsertion: t2: p2: {
+	D: "logging": _
+	deployment: _
+
+	for k, v in deployment {
+		for k1, v2 in v.env2 {
+			deployment: (k): env: (k1): v2
+		}
+	}
+
+	for id, v in D {
+		deployment: (id): env2: ENV: "True"
+	}
+}
+
 -- out/eval --
-(struct){
+Errors:
+selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
+
+Result:
+(_|_){
+  // [eval]
   A: (struct){
     a: (struct){
       parent: (string){ "" }
@@ -83,9 +317,7 @@ issue1666: {
   B: (struct){
     a: (struct){
       parent: (string){ "" }
-      children: (_|_){
-        // [cycle] cycle error:
-        //     ./in.cue:19:41
+      children: (#list){
       }
     }
   }
@@ -148,6 +380,298 @@ issue1666: {
             f2: (#struct){
             }
           }
+        }
+      }
+    }
+  }
+  issue779: (struct){
+    X: (string){ "test" }
+    STATE: (struct){
+      code: (int){ 101 }
+    }
+    Y: (struct){
+      code: (int){ 101 }
+      message: (string){ "test" }
+    }
+  }
+  selfReferential: (_|_){
+    // [eval]
+    T1: (struct){
+      T: (struct){
+        e: (struct){
+          S: (struct){
+            a: (string){ "foo" }
+            d: (string){ "bar" }
+          }
+        }
+      }
+      S: (struct){
+        d: (string){ "bar" }
+      }
+    }
+    list: (struct){
+      panels: (#list){
+        0: (struct){
+          id: (int){ 0 }
+        }
+        1: (struct){
+          id: (int){ 1 }
+        }
+        2: (struct){
+          id: (int){ 2 }
+        }
+      }
+    }
+    insertionError: (_|_){
+      // [eval]
+      A: (_|_){
+        // [eval] selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
+        foo: (int){ 1 }
+        foo3: (int){ 1 }
+      }
+    }
+    acrossOr: (struct){
+      t1: (struct){
+        p1: (struct){
+          o: (#struct){
+            retry: (#struct){
+              reject: (string){ "ok" }
+            }
+          }
+          #AllOutputs: (#struct){
+            reject: (string){ string }
+            resource: (string){ string }
+            retry: (#struct){ |((#struct){
+                reject: (string){ string }
+              }, (#struct){
+                resource: (string){ string }
+              }) }
+          }
+          #Output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+        }
+        p2: (struct){
+          #Output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+          o: (#struct){
+            retry: (#struct){
+              reject: (string){ "ok" }
+            }
+          }
+          #AllOutputs: (#struct){
+            reject: (string){ string }
+            resource: (string){ string }
+            retry: (#struct){ |((#struct){
+                reject: (string){ string }
+              }, (#struct){
+                resource: (string){ string }
+              }) }
+          }
+        }
+        p3: (struct){
+          #Output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+          #AllOutputs: (#struct){
+            reject: (string){ string }
+            resource: (string){ string }
+            retry: (#struct){ |((#struct){
+                reject: (string){ string }
+              }, (#struct){
+                resource: (string){ string }
+              }) }
+          }
+          o: (#struct){
+            retry: (#struct){
+              reject: (string){ "ok" }
+            }
+          }
+        }
+      }
+      t2: (struct){
+        p1: (struct){
+          d: ((int|string)){ |((int){ int }, (string){ string }) }
+          o: (struct){
+            b: (int){ 2 }
+          }
+          #A: (#struct){
+            d1: (int){ int }
+            d2: (string){ string }
+            d3: (#struct){
+              b: ((int|string)){ |((int){ int }, (string){ string }) }
+            }
+          }
+        }
+        p2: (struct){
+          o: (struct){
+            b: (int){ 2 }
+          }
+          d: ((int|string)){ |((int){ int }, (string){ string }) }
+          #A: (#struct){
+            d1: (int){ int }
+            d2: (string){ string }
+            d3: (#struct){
+              b: ((int|string)){ |((int){ int }, (string){ string }) }
+            }
+          }
+        }
+        p3: (struct){
+          o: (struct){
+            b: (int){ 2 }
+          }
+          #A: (#struct){
+            d1: (int){ int }
+            d2: (string){ string }
+            d3: (#struct){
+              b: ((int|string)){ |((int){ int }, (string){ string }) }
+            }
+          }
+          d: ((int|string)){ |((int){ int }, (string){ string }) }
+        }
+      }
+    }
+  }
+  issue1881: (struct){
+    p1: (struct){
+      o: (#struct){
+        retry: (#struct){
+          output: (#struct){
+            reject: (string){ "ok" }
+          }
+        }
+      }
+      #AllOutputs: (#struct){
+        reject: (string){ string }
+        resource: (string){ string }
+        retry: (#struct){
+          output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+        }
+      }
+      #Output: (#struct){ |((#struct){
+          reject: (string){ string }
+        }, (#struct){
+          resource: (string){ string }
+        }) }
+    }
+    p2: (struct){
+      #AllOutputs: (#struct){
+        reject: (string){ string }
+        resource: (string){ string }
+        retry: (#struct){
+          output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+        }
+      }
+      o: (#struct){
+        retry: (#struct){
+          output: (#struct){
+            reject: (string){ "ok" }
+          }
+        }
+      }
+      #Output: (#struct){ |((#struct){
+          reject: (string){ string }
+        }, (#struct){
+          resource: (string){ string }
+        }) }
+    }
+    p3: (struct){
+      #AllOutputs: (#struct){
+        reject: (string){ string }
+        resource: (string){ string }
+        retry: (#struct){
+          output: (#struct){ |((#struct){
+              reject: (string){ string }
+            }, (#struct){
+              resource: (string){ string }
+            }) }
+        }
+      }
+      #Output: (#struct){ |((#struct){
+          reject: (string){ string }
+        }, (#struct){
+          resource: (string){ string }
+        }) }
+      o: (#struct){
+        retry: (#struct){
+          output: (#struct){
+            reject: (string){ "ok" }
+          }
+        }
+      }
+    }
+  }
+  siblingInsertion: (struct){
+    t1: (struct){
+      p1: (struct){
+        deployment: (struct){
+          logging: (struct){
+            env2: (struct){
+              ENV: (string){ "True" }
+            }
+            env: (struct){
+              ENV: (string){ "True" }
+            }
+          }
+        }
+        D: (struct){
+          logging: (_){ _ }
+        }
+      }
+      p2: (struct){
+        deployment: (struct){
+          logging: (struct){
+            env2: (struct){
+              ENV: (string){ "True" }
+            }
+            env: (struct){
+              ENV: (string){ "True" }
+            }
+          }
+        }
+        D: (struct){
+          logging: (_){ _ }
+        }
+      }
+    }
+    t2: (struct){
+      p1: (struct){
+        deployment: (struct){
+          logging: (struct){
+            env2: (struct){
+              ENV: (string){ "True" }
+            }
+          }
+        }
+        D: (struct){
+          logging: (_){ _ }
+        }
+      }
+      p2: (struct){
+        deployment: (struct){
+          logging: (struct){
+            env2: (struct){
+              ENV: (string){ "True" }
+            }
+          }
+        }
+        D: (struct){
+          logging: (_){ _ }
         }
       }
     }
@@ -241,5 +765,392 @@ issue1666: {
         }
       }
     })
+  }
+  issue779: {
+    X: 〈0;Y〉.message
+    STATE: {
+      for k, v in 〈1;Y〉 {
+        if (〈1;k〉 != "message") {
+          "\(〈2;k〉)": 〈2;v〉
+        }
+      }
+    }
+    Y: (〈0;STATE〉 & {
+      message: 〈1;X〉
+    })
+    X: "test"
+    STATE: {
+      code: 101
+    }
+  }
+  selfReferential: {
+    T1: {
+      S: {
+        d: "bar"
+      }
+      T: {
+        e: {
+          S: {
+            a: "foo"
+          }
+        }
+      }
+      for s, v in 〈0;S〉 for t, _ in 〈1;T〉 {
+        T: {
+          〈2;t〉: {
+            S: {
+              〈5;s〉: 〈5;v〉
+            }
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    list: {
+      panels: [
+        for i, _ in 〈1;panels〉 {
+          id: 〈1;i〉
+        },
+      ]
+      panels: [
+        {},
+        {},
+        {},
+      ]
+    }
+  }
+  selfReferential: {
+    insertionError: {
+      A: {
+        foo: 1
+        for _, x in 〈1;A〉 {
+          "foo3": 1
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t1: {
+        p1: {
+          o: (〈0;#Output〉 & {
+            retry: {
+              reject: "ok"
+            }
+          })
+          #AllOutputs: {
+            reject: string
+            resource: string
+            retry: 〈1;#Output〉
+          }
+          #Output: or([
+            for name, config in 〈1;#AllOutputs〉 {
+              〈1;name〉: 〈1;config〉
+            },
+          ])
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t1: {
+        p2: {
+          #Output: or([
+            for name, config in 〈1;#AllOutputs〉 {
+              〈1;name〉: 〈1;config〉
+            },
+          ])
+          o: (〈0;#Output〉 & {
+            retry: {
+              reject: "ok"
+            }
+          })
+          #AllOutputs: {
+            reject: string
+            resource: string
+            retry: 〈1;#Output〉
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t1: {
+        p3: {
+          #Output: or([
+            for name, config in 〈1;#AllOutputs〉 {
+              〈1;name〉: 〈1;config〉
+            },
+          ])
+          #AllOutputs: {
+            reject: string
+            resource: string
+            retry: 〈1;#Output〉
+          }
+          o: (〈0;#Output〉 & {
+            retry: {
+              reject: "ok"
+            }
+          })
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t2: {
+        p1: {
+          d: or([
+            for x, y in 〈1;#A〉 {
+              〈1;y〉
+            },
+          ])
+          o: (〈0;d〉 & {
+            b: 2
+          })
+          #A: {
+            d1: int
+            d2: string
+            d3: {
+              b: 〈2;d〉
+            }
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t2: {
+        p2: {
+          o: (〈0;d〉 & {
+            b: 2
+          })
+          d: or([
+            for x, y in 〈1;#A〉 {
+              〈1;y〉
+            },
+          ])
+          #A: {
+            d1: int
+            d2: string
+            d3: {
+              b: 〈2;d〉
+            }
+          }
+        }
+      }
+    }
+  }
+  selfReferential: {
+    acrossOr: {
+      t2: {
+        p3: {
+          o: (〈0;d〉 & {
+            b: 2
+          })
+          #A: {
+            d1: int
+            d2: string
+            d3: {
+              b: 〈2;d〉
+            }
+          }
+          d: or([
+            for x, y in 〈1;#A〉 {
+              〈1;y〉
+            },
+          ])
+        }
+      }
+    }
+  }
+  issue1881: {
+    p1: {
+      o: (〈0;#Output〉 & {
+        retry: {
+          output: {
+            reject: "ok"
+          }
+        }
+      })
+      #AllOutputs: {
+        reject: string
+        resource: string
+        retry: {
+          output: 〈2;#Output〉
+        }
+      }
+      #Output: or([
+        for name, config in 〈1;#AllOutputs〉 {
+          〈1;name〉: 〈1;config〉
+        },
+      ])
+    }
+  }
+  issue1881: {
+    p2: {
+      #AllOutputs: {
+        reject: string
+        resource: string
+        retry: {
+          output: 〈2;#Output〉
+        }
+      }
+      o: (〈0;#Output〉 & {
+        retry: {
+          output: {
+            reject: "ok"
+          }
+        }
+      })
+      #Output: or([
+        for name, config in 〈1;#AllOutputs〉 {
+          〈1;name〉: 〈1;config〉
+        },
+      ])
+    }
+  }
+  issue1881: {
+    p3: {
+      #AllOutputs: {
+        reject: string
+        resource: string
+        retry: {
+          output: 〈2;#Output〉
+        }
+      }
+      #Output: or([
+        for name, config in 〈1;#AllOutputs〉 {
+          〈1;name〉: 〈1;config〉
+        },
+      ])
+      o: (〈0;#Output〉 & {
+        retry: {
+          output: {
+            reject: "ok"
+          }
+        }
+      })
+    }
+  }
+  siblingInsertion: {
+    t1: {
+      p1: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for k, v in 〈0;deployment〉 for k1, v2 in 〈0;v〉.env2 {
+          deployment: {
+            〈3;k〉: {
+              env: {
+                〈4;k1〉: 〈4;v2〉
+              }
+            }
+          }
+        }
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  siblingInsertion: {
+    t1: {
+      p2: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+        for k, v in 〈0;deployment〉 for k1, v2 in 〈0;v〉.env2 {
+          deployment: {
+            〈3;k〉: {
+              env: {
+                〈4;k1〉: 〈4;v2〉
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  siblingInsertion: {
+    t2: {
+      p1: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for k, v in 〈0;deployment〉 {
+          for k1, v2 in 〈1;v〉.env2 {
+            deployment: {
+              〈4;k〉: {
+                env: {
+                  〈4;k1〉: 〈4;v2〉
+                }
+              }
+            }
+          }
+        }
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  siblingInsertion: {
+    t2: {
+      p2: {
+        D: {
+          logging: _
+        }
+        deployment: _
+        for k, v in 〈0;deployment〉 {
+          for k1, v2 in 〈1;v〉.env2 {
+            deployment: {
+              〈4;k〉: {
+                env: {
+                  〈4;k1〉: 〈4;v2〉
+                }
+              }
+            }
+          }
+        }
+        for id, v in 〈0;D〉 {
+          deployment: {
+            〈2;id〉: {
+              env2: {
+                ENV: "True"
+              }
+            }
+          }
+        }
+      }
+    }
   }
 }

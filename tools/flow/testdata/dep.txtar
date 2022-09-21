@@ -26,6 +26,9 @@ root: {
 	}
 
 	indexReference: {
+		// This inline struct currently causes a memory leak. This is fine
+		// for now.
+		// TODO(leak): fix this.
 		x: [0, 1][concreteValueInGeneratedSubfield.index]
 	}
 
@@ -433,12 +436,12 @@ Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
 -- out/run/stats/totals --
-Leaks:  0
-Freed:  3
-Reused: 1
-Allocs: 2
-Retain: 0
+Leaks:  1
+Freed:  0
+Reused: 0
+Allocs: 1
+Retain: 1
 
-Unifications: 3
-Conjuncts:    3
-Disjuncts:    3
+Unifications: 1
+Conjuncts:    1
+Disjuncts:    1

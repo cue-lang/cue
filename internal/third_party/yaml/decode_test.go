@@ -674,13 +674,30 @@ a:
 		`ñoño: "very yes 🟔"`,
 	},
 
-	// YAML Float regex shouldn't match this
+	// This *is* in fact a float number, per the spec. #171 was a mistake.
 	{
 		"a: 123456e1\n",
-		`a: "123456e1"`,
+		`a: 123456e1`,
 	}, {
 		"a: 123456E1\n",
-		`a: "123456E1"`,
+		`a: 123456e1`,
+	},
+	// Other float formats:
+	{
+		"x: .1",
+		"x: 0.1",
+	},
+	{
+		"x: .1e-3",
+		"x: 0.1e-3",
+	},
+	{
+		"x: 1.2E4",
+		"x: 1.2e4",
+	},
+	{
+		"x: 1.2E+4",
+		"x: 1.2e+4",
 	},
 	// yaml-test-suite 3GZX: Spec Example 7.1. Alias Nodes
 	{

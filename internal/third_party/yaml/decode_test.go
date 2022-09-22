@@ -425,8 +425,8 @@ Null: 1
 
 	// Non-specific tag (Issue #75)
 	{
-		"v: ! test",
-		// TODO: map[string]interface{}{"v": "test"},
+		`v: ! test`,
+		// TODO this should work and produce a string.
 		"",
 	},
 
@@ -739,7 +739,7 @@ func TestUnmarshal(t *testing.T) {
 				t.Fatal("expected error to be nil")
 			}
 			if got := cueStr(expr); got != item.want {
-				t.Errorf("\n got: %v;\nwant: %v", got, item.want)
+				t.Errorf("\n got:\n%v\nwant:\n%v", got, item.want)
 			}
 		})
 	}

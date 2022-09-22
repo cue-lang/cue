@@ -425,9 +425,9 @@ Null: 1
 
 	// Non-specific tag (Issue #75)
 	{
-		"v: ! test",
-		// TODO: map[string]interface{}{"v": "test"},
-		"",
+		`v: ! test`,
+		// TODO this should work and produce a string.
+		"v: _|_ // line 1: cannot unmarshal ! `test`",
 	},
 
 	// Anchors and aliases.
@@ -682,6 +682,11 @@ a:
 		"a: 123456E1\n",
 		`a: "123456E1"`,
 	},
+	// Unknown tag
+	{
+		"x: !!unknown foo",
+		"x: _|_ // line 1: cannot unmarshal !!unknown `foo`",
+	},
 	// yaml-test-suite 3GZX: Spec Example 7.1. Alias Nodes
 	{
 		"First occurrence: &anchor Foo\nSecond occurrence: *anchor\nOverride anchor: &anchor Bar\nReuse anchor: *anchor\n",
@@ -739,7 +744,7 @@ func TestUnmarshal(t *testing.T) {
 				t.Fatal("expected error to be nil")
 			}
 			if got := cueStr(expr); got != item.want {
-				t.Errorf("\n got: %v;\nwant: %v", got, item.want)
+				t.Errorf("\n got:\n%v\nwant:\n%v", got, item.want)
 			}
 		})
 	}

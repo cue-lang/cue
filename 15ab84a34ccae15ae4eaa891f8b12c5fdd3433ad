@@ -16,6 +16,23 @@
       "message": "SGTM, agreed with Roger that this is more understandable with comments.",
       "revId": "15ab84a34ccae15ae4eaa891f8b12c5fdd3433ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee1fae57_06a37f26",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-23T14:19:50Z",
+      "side": 1,
+      "message": "LGTM modulo one final nit, thanks!",
+      "revId": "15ab84a34ccae15ae4eaa891f8b12c5fdd3433ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

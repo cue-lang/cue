@@ -16,6 +16,24 @@
       "message": "This seems to remove some comment and position information from the error.",
       "revId": "00b8845b01d8891daa3787a2c1603333249bb48c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6df4f6c6_45df89e0",
+        "filename": "internal/third_party/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-09-23T21:45:09Z",
+      "side": 1,
+      "message": "That might appear to be the case (and indeed I also thought so initially) but in fact all this info is discarded because it\u0027s only in the AST node, but calling terror results in all AST info being discarded. At first I made a change to return both the AST node and the error from Unmarshal, but then thought better of it and just decided to keep the existing contract and simplify the code. The error is still identical to what it was - there should be no externally visible change here.",
+      "parentUuid": "18dcaf4b_fd01890f",
+      "revId": "00b8845b01d8891daa3787a2c1603333249bb48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

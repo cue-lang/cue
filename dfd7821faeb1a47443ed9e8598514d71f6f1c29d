@@ -52,6 +52,24 @@
       "parentUuid": "25014c80_87445e44",
       "revId": "dfd7821faeb1a47443ed9e8598514d71f6f1c29d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1de9ea07_29ce003e",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-09-23T14:24:09Z",
+      "side": 1,
+      "message": "Please see Patchset 6.",
+      "parentUuid": "6f7ad32f_3339db57",
+      "revId": "dfd7821faeb1a47443ed9e8598514d71f6f1c29d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

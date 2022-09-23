@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18dcaf4b_fd01890f",
+        "filename": "internal/third_party/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-23T14:00:05Z",
+      "side": 1,
+      "message": "This seems to remove some comment and position information from the error.",
+      "revId": "00b8845b01d8891daa3787a2c1603333249bb48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ca5abee_62a36710",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-23T14:00:18Z",
+      "side": 1,
+      "message": "SGTM, agreed with Roger that this is more understandable with comments.",
+      "revId": "15ab84a34ccae15ae4eaa891f8b12c5fdd3433ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

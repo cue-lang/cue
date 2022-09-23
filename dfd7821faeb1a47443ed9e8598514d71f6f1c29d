@@ -16,6 +16,24 @@
       "message": "The \"because\" and \"so\" don\u0027t agree. Perhaps drop the word \"so\" here.",
       "revId": "dfd7821faeb1a47443ed9e8598514d71f6f1c29d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25014c80_87445e44",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-23T09:28:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87416c13_6b10d2de",
+      "revId": "dfd7821faeb1a47443ed9e8598514d71f6f1c29d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

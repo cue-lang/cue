@@ -16,6 +16,24 @@
       "message": "I\u0027m assuming the long test is still run as part of our CI.",
       "revId": "6551ea5dd7890757afdbf6823443357bc96f4e5f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f200cc6a_db4c7b8e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-25T05:25:56Z",
+      "side": 1,
+      "message": "Yes - the long tests run on master:\n\nhttps://github.com/cue-lang/cue/blob/830b138ebfb6b81ecc5ec2bbcc14adaf7665d756/internal/ci/github/trybot.cue#L59\n\nSo not as part of each CL, but after the submit.",
+      "parentUuid": "57e87de9_d79e593a",
+      "revId": "6551ea5dd7890757afdbf6823443357bc96f4e5f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

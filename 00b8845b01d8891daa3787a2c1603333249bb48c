@@ -34,6 +34,24 @@
       "parentUuid": "18dcaf4b_fd01890f",
       "revId": "00b8845b01d8891daa3787a2c1603333249bb48c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6e0e4fb_20ba4179",
+        "filename": "internal/third_party/yaml/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-09-26T14:08:33Z",
+      "side": 1,
+      "message": "Not sure I follow. The AST has position and comment information attached to it.\n\nIs there any reason for this change at all?",
+      "parentUuid": "6df4f6c6_45df89e0",
+      "revId": "00b8845b01d8891daa3787a2c1603333249bb48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

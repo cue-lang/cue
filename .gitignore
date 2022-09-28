@@ -4,6 +4,7 @@ cmd/cue/cue
 /dist
 /.unity-bin
 **/__debug_bin
+**/.DS_Store
 **/*.exe
 
 # We use test module paths like mod.test or externalmod.test.

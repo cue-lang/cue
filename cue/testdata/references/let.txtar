@@ -63,6 +63,30 @@ incompleteLet: {
 		}
 	}
 }
+
+// Let references should also work inside embedded scalars.
+// Issue #1955
+scalarReference: {
+	inScalar: p0: {
+		5
+		let x = 6
+		#b: x
+	}
+	inScalar: p1: {
+		#b: x
+		let x = 6
+		5
+	}
+	inList: p0: {
+		let x = { a: 1 }
+		[ x ]
+	}
+	inList: p1: {
+		[ x ]
+		let x = { a: 1 }
+	}
+}
+
 issue1116: {
 	a: {
 		#a: ["a", "b"]
@@ -205,18 +229,54 @@ issue1116: {
       if (〈import;list〉.max < 0) {}
     }
   }
+  scalarReference: {
+    inScalar: {
+      p0: {
+        5
+        let x#C = 6
+        #b: 〈0;let x#C〉
+      }
+    }
+    inScalar: {
+      p1: {
+        #b: 〈0;let x#D〉
+        let x#D = 6
+        5
+      }
+    }
+    inList: {
+      p0: {
+        let x#E = {
+          a: 1
+        }
+        [
+          〈1;let x#E〉,
+        ]
+      }
+    }
+    inList: {
+      p1: {
+        [
+          〈1;let x#F〉,
+        ]
+        let x#F = {
+          a: 1
+        }
+      }
+    }
+  }
   issue1116: {
     a: {
       #a: [
         "a",
         "b",
       ]
-      let List#C = 〈0;#a〉
-      〈0;let List#C〉[(len(〈0;let List#C〉) - 1)]
+      let List#10 = 〈0;#a〉
+      〈0;let List#10〉[(len(〈0;let List#10〉) - 1)]
     }
     b: {
-      let List#D = 〈0;#a〉
-      〈0;let List#D〉[(len(〈0;let List#D〉) - 1)]
+      let List#11 = 〈0;#a〉
+      〈0;let List#11〉[(len(〈0;let List#11〉) - 1)]
       #a: [
         "a",
         "b",
@@ -354,6 +414,38 @@ issue1116: {
       //     ./in.cue:61:11
     }
   }
+  scalarReference: (struct){
+    inScalar: (struct){
+      p0: (int){
+        5
+        let x#C = (int){ 6 }
+        #b: (int){ 6 }
+      }
+      p1: (int){
+        5
+        #b: (int){ 6 }
+        let x#D = (int){ 6 }
+      }
+    }
+    inList: (struct){
+      p0: (#list){
+        let x#E = (struct){
+          a: (int){ 1 }
+        }
+        0: (struct){
+          a: (int){ 1 }
+        }
+      }
+      p1: (#list){
+        let x#F = (struct){
+          a: (int){ 1 }
+        }
+        0: (struct){
+          a: (int){ 1 }
+        }
+      }
+    }
+  }
   issue1116: (struct){
     a: (string){
       "b"
@@ -361,14 +453,14 @@ issue1116: {
         0: (string){ "a" }
         1: (string){ "b" }
       }
-      let List#C = (#list){
+      let List#10 = (#list){
         0: (string){ "a" }
         1: (string){ "b" }
       }
     }
     b: (string){
       "b"
-      let List#D = (#list){
+      let List#11 = (#list){
         0: (string){ "a" }
         1: (string){ "b" }
       }

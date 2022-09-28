@@ -835,7 +835,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 				return nil
 			}
 
-		case l.IsDef(), l.IsHidden():
+		case l.IsDef(), l.IsHidden(), l.IsLet():
 
 		default:
 			c.addErrf(0, pos, "invalid list index %s (type string)", l)
@@ -855,7 +855,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 			// 	"cannot look up %s in incomplete type %s (type %s)",
 			// 	l, x.Source(), kind)
 			// return nil
-		} else if !l.IsDef() && !l.IsHidden() {
+		} else if !l.IsDef() && !l.IsHidden() && !l.IsLet() {
 			c.addErrf(0, pos,
 				"invalid selector %s for value of type %s", l, kind)
 			return nil

@@ -1697,6 +1697,16 @@ func (c *Comprehension) Nest() int {
 	return count
 }
 
+// Envs returns all Environments yielded from an evaluated comprehension.
+// Together with the Comprehension value, each Environment represents a
+// result value of the comprehension.
+func (c *Comprehension) Envs() []*Environment {
+	if c.comp == nil {
+		return nil
+	}
+	return c.comp.envs
+}
+
 // DidResolve reports whether a comprehension was processed and resulted in at
 // least one yielded value.
 func (x *Comprehension) DidResolve() bool {

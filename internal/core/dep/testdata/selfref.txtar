@@ -27,3 +27,4 @@ value
 a.command.alias.val
 a.#base
 a.#combined
+a.instance.enabled

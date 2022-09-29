@@ -1,0 +1,36 @@
+Test comprehensions that are defined above the reference root.
+
+Because the references are not at addressable locations, the printed
+references are bogus. However, this simply tests they are found, reported,
+and do not cause a crash.
+-- in.cue --
+for key, value in { test: 1 } {
+	("a"): b: k1: key
+	("a"): b: v1: value
+	a: b: k2: key
+	a: b: v2: value
+}
+a: {
+	for key, value in { test: 1 } {
+		("b"): k3: key
+		("b"): v3: value
+		b: k4: key
+		b: v4: value
+	}
+	b: {}
+}
+-- out/dependencies/field --
+-- out/dependencies/all --
+key
+test
+key
+test
+-- out/dependencies/dynamic --
+key
+test
+key
+a.test
+key
+test
+key
+a.test

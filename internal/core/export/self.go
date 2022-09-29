@@ -251,7 +251,9 @@ func (p *pivotter) makeParentPath(d *depData) {
 	} else if imp := d.dstImport; imp != nil {
 		f = imp.Label
 	} else {
-		panic("unexpected zero path length")
+		// This may legitimately happen for internal vertices, such as
+		// comprehension scopes.
+		return
 	}
 
 	str := f.IdentString(p.x.ctx)

@@ -209,9 +209,6 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 		}
 
 	case *adt.Comprehension:
-		for i := x.Nest(); i > 0; i-- {
-			env = &adt.Environment{Up: env, Vertex: empty}
-		}
 		c.markComprehension(env, x)
 	}
 }
@@ -311,6 +308,27 @@ func (c *visitor) markDecl(env *adt.Environment, d adt.Decl) {
 
 func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) {
 	env = c.markYielder(env, y.Clauses)
+
+	// Use "live" environments if we have them. This is important if
+	// dependencies are computed on a partially evaluated value where a pushed
+	// down comprehension is defined outside the root of the dependency
+	// analysis. For instance, when analyzing dependencies at path a.b in:
+	//
+	//  a: {
+	//      for value in { test: 1 } {
+	//          b: bar: value
+	//      }
+	//  }
+	//
+	if envs := y.Envs(); len(envs) > 0 {
+		// We use the Environment to get access to the parent chain. It
+		// suffices to take any Environment (in this case the first), as all
+		// will have the same parent chain.
+		env = envs[0]
+	}
+	for i := y.Nest(); i > 0; i-- {
+		env = &adt.Environment{Up: env, Vertex: empty}
+	}
 	c.markExpr(env, adt.ToExpr(y.Value))
 }
 

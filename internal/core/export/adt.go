@@ -527,7 +527,10 @@ func (e *exporter) setField(label adt.Feature, f *ast.Field) {
 	entry := frame.fields[label]
 	entry.field = f
 	entry.node = f.Value
-	frame.fields[label] = entry
+	// This can happen when evaluation is "pivoted".
+	if frame.fields != nil {
+		frame.fields[label] = entry
+	}
 }
 
 func aliasFromLabel(src *ast.Field) string {

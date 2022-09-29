@@ -1697,6 +1697,13 @@ func (c *Comprehension) Nest() int {
 	return count
 }
 
+func (c *Comprehension) Envs() []*Environment {
+	if c.comp == nil {
+		return nil
+	}
+	return c.comp.envs
+}
+
 // DidResolve reports whether a comprehension was processed and resulted in at
 // least one yielded value.
 func (x *Comprehension) DidResolve() bool {

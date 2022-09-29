@@ -1,0 +1,95 @@
+#path: a.item
+
+-- in.cue --
+import "encoding/yaml"
+
+a: {
+	for key, value in { test: _ } {
+		("item"): foo: key
+	}
+	item: {}
+}
+
+encode: yaml.Marshal(a.item)
+
+-- out/definition --
+import "encoding/yaml"
+
+a: {
+	for key, value in {
+		test: _
+	} {
+		"item": {
+			foo: key
+		}
+	}
+	item: {}
+}
+encode: yaml.Marshal(a.item)
+-- out/doc --
+[]
+[a]
+[a item]
+[a item foo]
+[encode]
+-- out/value --
+== Simplified
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encode: """
+		foo: test
+
+		"""
+}
+== Raw
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encode: """
+		foo: test
+
+		"""
+}
+== Final
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encode: """
+		foo: test
+
+		"""
+}
+== All
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encode: """
+		foo: test
+
+		"""
+}
+== Eval
+{
+	a: {
+		item: {
+			foo: "test"
+		}
+	}
+	encode: """
+		foo: test
+
+		"""
+}

@@ -16,6 +16,24 @@
       "message": "This could exist in global .gitignore... but also works here :)",
       "revId": "bade483dcf73d9798cf59dbafba62c2255a95986",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "999d030a_23e08453",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-30T10:10:49Z",
+      "side": 1,
+      "message": "yeah I\u0027m with Paul :) I don\u0027t object on the basis that many people will contribute to this repo and this might save us having to explain this over and over again, but we also shouldn\u0027t litter all of our gitignore files with OS-specific shenanigans.",
+      "parentUuid": "99db7d5f_5d1af4c6",
+      "revId": "bade483dcf73d9798cf59dbafba62c2255a95986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

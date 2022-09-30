@@ -32,6 +32,64 @@ disallowed: {
 
 	vErr: #D & {d: 5}
 }
+
+// Interpret comprehensions as embeddings.
+// Issue #1956
+comprehensionIsEmbed: {
+	#A: size: int | *1
+	#B: {
+		kind: string
+
+		// Should be identical to just #A. That is, #A is treated as open.
+		if true {
+			#A
+		}
+	}
+	x: #B & {
+		kind: "A"
+	}
+}
+
+// This comprehension is inside a definition and should still disallow b.
+noEraseDefinition: {
+	#Foo: [if true {a: int}]
+	a: { #Foo & [{ b: 2 }] } // Error
+}
+
+issue1956: {
+	#Details: {
+		size: int | *1
+	}
+	
+	#Thing: {
+		kind: "KindA" | "KindB"
+		if kind == "KindA" {
+			#Details
+		}
+	}
+	
+	x: #Thing & {
+		kind: "KindA"
+	}
+}
+
+// This triggers adding the same "closedInfo" twice, potentially causing
+// a cyclic linked list in the todo list.
+dedupTodo: {
+	#sub: {
+		c: _
+		if c.n == "c" {
+			X: test: c
+		}
+	}
+
+	out: #sub // needs to be definition
+	out: {
+		c: n: "c" // Cannot use & to combine these two.
+		c: n: string
+	}
+}
+
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:
@@ -41,6 +99,10 @@ disallowed.vErr.d: field not allowed:
     ./in.cue:28:4
     ./in.cue:32:8
     ./in.cue:32:14
+noEraseDefinition.a.0.b: field not allowed:
+    ./in.cue:54:17
+    ./in.cue:55:7
+    ./in.cue:55:17
 
 Result:
 (_|_){
@@ -82,6 +144,71 @@ Result:
         //     ./in.cue:28:4
         //     ./in.cue:32:8
         //     ./in.cue:32:14
+      }
+    }
+  }
+  comprehensionIsEmbed: (struct){
+    #A: (#struct){
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    #B: (#struct){
+      kind: (string){ string }
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    x: (#struct){
+      kind: (string){ "A" }
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+  }
+  noEraseDefinition: (_|_){
+    // [eval]
+    #Foo: (#list){
+      0: (#struct){
+        a: (int){ int }
+      }
+    }
+    a: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval]
+        a: (int){ int }
+        b: (_|_){
+          // [eval] noEraseDefinition.a.0.b: field not allowed:
+          //     ./in.cue:54:17
+          //     ./in.cue:55:7
+          //     ./in.cue:55:17
+        }
+      }
+    }
+  }
+  issue1956: (struct){
+    #Details: (#struct){
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    #Thing: (_|_){
+      // [incomplete] issue1956.#Thing: unresolved disjunction "KindA" | "KindB" (type string):
+      //     ./in.cue:65:6
+      kind: (string){ |((string){ "KindA" }, (string){ "KindB" }) }
+    }
+    x: (#struct){
+      kind: (string){ "KindA" }
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+  }
+  dedupTodo: (struct){
+    #sub: (_|_){
+      // [incomplete] dedupTodo.#sub: c.n undefined as c is incomplete (type _):
+      //     ./in.cue:80:6
+      c: (_){ _ }
+    }
+    out: (#struct){
+      X: (#struct){
+        test: (#struct){
+          n: (string){ "c" }
+        }
+      }
+      c: (struct){
+        n: (string){ "c" }
       }
     }
   }
@@ -129,5 +256,66 @@ Result:
     vErr: (〈0;#D〉 & {
       d: 5
     })
+  }
+  comprehensionIsEmbed: {
+    #A: {
+      size: (int|*1)
+    }
+    #B: {
+      kind: string
+      if true {
+        〈2;#A〉
+      }
+    }
+    x: (〈0;#B〉 & {
+      kind: "A"
+    })
+  }
+  noEraseDefinition: {
+    #Foo: [
+      if true {
+        a: int
+      },
+    ]
+    a: {
+      (〈1;#Foo〉 & [
+        {
+          b: 2
+        },
+      ])
+    }
+  }
+  issue1956: {
+    #Details: {
+      size: (int|*1)
+    }
+    #Thing: {
+      kind: ("KindA"|"KindB")
+      if (〈0;kind〉 == "KindA") {
+        〈2;#Details〉
+      }
+    }
+    x: (〈0;#Thing〉 & {
+      kind: "KindA"
+    })
+  }
+  dedupTodo: {
+    #sub: {
+      c: _
+      if (〈0;c〉.n == "c") {
+        X: {
+          test: 〈2;c〉
+        }
+      }
+    }
+    out: 〈0;#sub〉
+    out: {
+      c: {
+        n: "c"
+      }
+      c: {
+        n: string
+      }
+    }
   }
 }

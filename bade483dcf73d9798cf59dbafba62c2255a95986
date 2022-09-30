@@ -34,6 +34,24 @@
       "parentUuid": "99db7d5f_5d1af4c6",
       "revId": "bade483dcf73d9798cf59dbafba62c2255a95986",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2931bee7_5835f626",
+        "filename": ".gitignore",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-30T10:32:40Z",
+      "side": 1,
+      "message": "There is precedent here:\n\nhttps://github.com/golang/go/blob/d7dbe0111ef2a6de80a20fef188db61d8fab5c96/.gitignore#L1",
+      "parentUuid": "999d030a_23e08453",
+      "revId": "bade483dcf73d9798cf59dbafba62c2255a95986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

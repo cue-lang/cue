@@ -129,7 +129,8 @@ func (n *nodeContext) insertComprehension(
 
 	x := c.Value
 
-	ci = ci.SpawnSpan(c, ComprehensionSpan)
+	ci = ci.SpawnEmbed(c)
+	ci.closeInfo.span |= ComprehensionSpan
 
 	switch v := ToExpr(x).(type) {
 	case *StructLit:

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b1c04f6_b20f3b14",
+        "filename": "cue/testdata/comprehensions/closed.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-30T10:21:33Z",
+      "side": 1,
+      "message": "This seems redundant given the commented example for comprehensionIsEmbed above?\n\nIf not, this could do with a comment explaining what it\u0027s testing that is different.",
+      "revId": "25bca8ba17d8f997c03366a7ee7eefc690a57ae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4caf816_09099707",
+        "filename": "cue/testdata/comprehensions/closed.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-09-30T10:21:33Z",
+      "side": 1,
+      "message": "Why not?",
+      "revId": "25bca8ba17d8f997c03366a7ee7eefc690a57ae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -81,6 +81,30 @@
       },
       "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abfff42c_73d01a90",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-09-30T22:15:30Z",
+      "side": 1,
+      "message": "Rog or Paul, do either of you have thoughts here? For example, we could go with\n\n   arch       GOARCH as described in https://go.dev/doc/install/source#environment\n\nand similar for \"os\".",
+      "parentUuid": "89536b9a_2327b847",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

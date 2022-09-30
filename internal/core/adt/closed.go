@@ -160,7 +160,7 @@ func (c *CloseInfo) AddPositions(ctx *OpContext) {
 
 // TODO(perf): use on StructInfo. Then if parent and expression are the same
 // it is possible to use cached value.
-func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
+func (c CloseInfo) SpawnEmbed(x Node) CloseInfo {
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
@@ -303,7 +303,9 @@ type closeStats struct {
 	accepted bool
 
 	required bool
-	next     *closeStats
+
+	inTodoList bool // true if added to todo list.
+	next       *closeStats
 }
 
 func (c *closeInfo) isClosed() bool {
@@ -404,9 +406,10 @@ func markRequired(ctx *OpContext, info *closeInfo) {
 			return
 		}
 
-		if s.span&EmbeddingSpan == 0 {
+		if s.span&EmbeddingSpan == 0 && !x.inTodoList {
 			x.next = ctx.todo
 			ctx.todo = x
+			x.inTodoList = true
 		}
 
 		x.required = true

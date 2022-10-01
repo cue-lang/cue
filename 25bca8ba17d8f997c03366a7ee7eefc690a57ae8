@@ -33,6 +33,24 @@
       "message": "Why not?",
       "revId": "25bca8ba17d8f997c03366a7ee7eefc690a57ae8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "deb995c8_fc8ae8fc",
+        "filename": "cue/testdata/comprehensions/closed.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-10-01T18:07:28Z",
+      "side": 1,
+      "message": "Just that the error isn\u0027t triggered if \u0026 is used.",
+      "parentUuid": "b4caf816_09099707",
+      "revId": "25bca8ba17d8f997c03366a7ee7eefc690a57ae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

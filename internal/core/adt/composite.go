@@ -281,9 +281,9 @@ const (
 	// nodeContext to allow reusing the computations done so far.
 	Partial
 
-	// AllArcs is request only. It must be past Partial, but
-	// before recursively resolving arcs.
-	AllArcs
+	// AllConjunctsDone is the state reached when all conjuncts have been
+	// evaluated, but without recursively processing arcs.
+	AllConjunctsDone
 
 	// EvaluatingArcs indicates that the arcs of the Vertex are currently being
 	// evaluated. If this is encountered it indicates a structural cycle.
@@ -303,7 +303,7 @@ func (s VertexStatus) String() string {
 		return "evaluating"
 	case Partial:
 		return "partial"
-	case AllArcs:
+	case AllConjunctsDone:
 		return "allarcs"
 	case EvaluatingArcs:
 		return "evaluatingArcs"

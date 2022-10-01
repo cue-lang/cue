@@ -82,7 +82,7 @@ func (x *StructLit) evaluate(c *OpContext) Value {
 	// used in a context where more conjuncts are added. It may also lead
 	// to disjuncts being in a partially expanded state, leading to
 	// misaligned nodeContexts.
-	c.Unify(v, AllArcs)
+	c.Unify(v, AllConjunctsDone)
 	return v
 }
 
@@ -319,7 +319,7 @@ func (x *ListLit) evaluate(c *OpContext) Value {
 		Parent:    e.Vertex,
 		Conjuncts: []Conjunct{{e, x, c.ci}},
 	}
-	// TODO: should be AllArcs and then use Finalize for builtins?
+	// TODO: should be AllConjunctsDone and then use Finalize for builtins?
 	c.Unify(v, Finalized) // TODO: also partial okay?
 	return v
 }
@@ -944,8 +944,8 @@ func (x *SelectorExpr) Source() ast.Node {
 }
 
 func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
-	// TODO: the node should really be evaluated as AllArcs, but the order
-	// of evaluation is slightly off, causing too much to be evaluated.
+	// TODO: the node should really be evaluated as AllConjunctsDone, but the
+	// order of evaluation is slightly off, causing too much to be evaluated.
 	// This may especially result in incorrect results when using embedded
 	// scalars.
 	n := c.node(x, x.X, x.Sel.IsRegular(), Partial)
@@ -979,8 +979,8 @@ func (x *IndexExpr) Source() ast.Node {
 
 func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	// TODO: support byte index.
-	// TODO: the node should really be evaluated as AllArcs, but the order
-	// of evaluation is slightly off, causing too much to be evaluated.
+	// TODO: the node should really be evaluated as AllConjunctsDone, but the
+	// order of evaluation is slightly off, causing too much to be evaluated.
 	// This may especially result in incorrect results when using embedded
 	// scalars.
 	n := ctx.node(x, x.X, true, Partial)
@@ -1737,7 +1737,7 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
-	// TODO: should be AllArcs
+	// TODO: should be AllConjunctsDone
 	n := c.node(x, x.Src, true, Finalized)
 	if n.status == Evaluating {
 		c.AddBottom(&Bottom{

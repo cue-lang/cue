@@ -789,12 +789,12 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 		}
 
 		if v.isUndefined() || state > v.status {
-			// Keep a minimum state of AllArcs.
-			// TODO: AllArcs may still not be achieved if a node is currently
-			// evaluating.
+			// Keep a minimum state of AllConjunctsDone.
+			// TODO: AllConjunctsDone may still not be achieved if a node is
+			// currently evaluating.
 			state := state
-			if state < AllArcs {
-				state = AllArcs
+			if state < AllConjunctsDone {
+				state = AllConjunctsDone
 			}
 			// Use node itself to allow for cycle detection.
 			c.Unify(v, state)
@@ -908,7 +908,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 		}
 		c.AddBottom(&Bottom{
 			Code:      code,
-			Permanent: x.status >= AllArcs,
+			Permanent: x.status >= AllConjunctsDone,
 			Err:       err,
 		})
 	}

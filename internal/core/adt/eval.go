@@ -256,11 +256,11 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 				}
 				return
 
-			case state < AllArcs:
+			case state < Conjuncts:
 				n.node.UpdateStatus(Partial)
 				return
 
-			case state == AllArcs:
+			case state == Conjuncts:
 				if err := n.incompleteErrors(); err != nil && err.Code < CycleError {
 					n.node.AddErr(c, err)
 				} else {
@@ -359,7 +359,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		// Free memory here?
 		v.UpdateStatus(Finalized)
 
-	case AllArcs:
+	case Conjuncts:
 		if n.hasErr() || !n.checkClosed(state) {
 			break
 		}
@@ -680,8 +680,8 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	// all arcs to be sure we get the correct result.
 	// For other cases we terminate early as this results in considerably
 	// better error messages.
-	if state <= AllArcs && n.node.arcType != arcVoid {
-		n.node.UpdateStatus(AllArcs)
+	if state <= Conjuncts && n.node.arcType != arcVoid {
+		n.node.UpdateStatus(Conjuncts)
 		return
 	}
 
@@ -702,7 +702,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 			ctx.Unify(a, state)
 			// Don't set the state to Finalized if the child arcs are not done.
 			if state == Finalized && a.status < Finalized {
-				state = AllArcs
+				state = Conjuncts
 			}
 
 			if !a.isDefined() {
@@ -1403,7 +1403,7 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 		// We complete the evaluation. Some optimizations will only work when an
 		// arc is already finalized. So this ensures that such optimizations get
 		// triggered more often.
-		if arc.status == AllArcs {
+		if arc.status == Conjuncts {
 			arc.Finalize(ctx)
 		}
 

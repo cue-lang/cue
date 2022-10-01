@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "69014df9_2109d904",
+        "filename": "cue/testdata/comprehensions/closed.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-10-01T18:17:27Z",
+      "side": 1,
+      "message": "The test above was a simplified version of the issue. I usually include the actual issue as well, named after the issue, to ensure that the original issue remains fixed as well, in case the reduction misses something.",
+      "parentUuid": "6b1c04f6_b20f3b14",
+      "revId": "25bca8ba17d8f997c03366a7ee7eefc690a57ae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b4caf816_09099707",
         "filename": "cue/testdata/comprehensions/closed.txtar",
         "patchSetId": 1

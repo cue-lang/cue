@@ -133,19 +133,5 @@ func (m marked) markExpr(x adt.Expr) {
 }
 
 func (m marked) markComprehension(y *adt.Comprehension) {
-	m.markYielder(y.Clauses)
 	m.markExpr(adt.ToExpr(y.Value))
-}
-
-func (m marked) markYielder(y adt.Yielder) {
-	switch x := y.(type) {
-	case *adt.ForClause:
-		m.markYielder(x.Dst)
-
-	case *adt.IfClause:
-		m.markYielder(x.Dst)
-
-	case *adt.LetClause:
-		m.markYielder(x.Dst)
-	}
 }

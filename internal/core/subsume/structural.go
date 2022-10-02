@@ -270,12 +270,10 @@ func (c *collatedDecls) collate(env *adt.Environment, s *adt.StructLit) {
 			c.additional = append(c.additional, x)
 
 		case *adt.Comprehension:
-			c.yielders = append(c.yielders, x.Clauses)
+			c.yielders = append(c.yielders, x.Clauses...)
 
 		case *adt.LetClause:
 			c.yielders = append(c.yielders, x)
-
-		case *adt.ValueClause:
 		}
 	}
 }

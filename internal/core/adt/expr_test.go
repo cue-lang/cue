@@ -63,7 +63,6 @@ func TestNilSource(t *testing.T) {
 		&StructMarker{},
 		&Top{},
 		&UnaryExpr{},
-		&ValueClause{},
 		&Vertex{},
 	}
 	for _, x := range testCases {

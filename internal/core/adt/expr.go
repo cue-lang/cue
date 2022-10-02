@@ -1673,7 +1673,7 @@ func (x *Disjunction) Kind() Kind {
 }
 
 type Comprehension struct {
-	Clauses Yielder
+	Clauses []Yielder
 
 	// Value can be either a StructLit if this is a compiled expression or
 	// a Field if this is a computed Comprehension. Value holds a Field,
@@ -1713,7 +1713,7 @@ func (x *Comprehension) Source() ast.Node {
 	if x.Clauses == nil {
 		return nil
 	}
-	return x.Clauses.Source()
+	return x.Clauses[0].Source()
 }
 
 // A ForClause represents a for clause of a comprehension. It can be used
@@ -1725,7 +1725,6 @@ type ForClause struct {
 	Key    Feature
 	Value  Feature
 	Src    Expr
-	Dst    Yielder
 }
 
 func (x *ForClause) Source() ast.Node {
@@ -1735,7 +1734,8 @@ func (x *ForClause) Source() ast.Node {
 	return x.Syntax
 }
 
-func (x *ForClause) yield(c *OpContext, f YieldFunc) {
+func (x *ForClause) yield(s *compState) {
+	c := s.ctx
 	n := c.node(x, x.Src, true, AllConjunctsDone)
 	if n.status == Evaluating && !n.LockArcs {
 		c.AddBottom(&Bottom{
@@ -1785,13 +1785,7 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 		}
 
 		sub := c.spawn(n)
-		saved := c.PushState(sub, x.Dst.Source())
-		x.Dst.yield(c, f)
-		if b := c.PopState(saved); b != nil {
-			c.AddBottom(b)
-			break
-		}
-		if c.HasErr() {
+		if !s.yield(sub) {
 			break
 		}
 	}
@@ -1804,7 +1798,6 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 type IfClause struct {
 	Src       *ast.IfClause
 	Condition Expr
-	Dst       Yielder
 }
 
 func (x *IfClause) Source() ast.Node {
@@ -1814,9 +1807,10 @@ func (x *IfClause) Source() ast.Node {
 	return x.Src
 }
 
-func (x *IfClause) yield(ctx *OpContext, f YieldFunc) {
+func (x *IfClause) yield(s *compState) {
+	ctx := s.ctx
 	if ctx.BoolValue(ctx.value(x.Condition)) {
-		x.Dst.yield(ctx, f)
+		s.yield(ctx.e)
 	}
 }
 
@@ -1827,7 +1821,6 @@ type LetClause struct {
 	Src   *ast.LetClause
 	Label Feature
 	Expr  Expr
-	Dst   Yielder
 }
 
 func (x *LetClause) Source() ast.Node {
@@ -1837,34 +1830,11 @@ func (x *LetClause) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LetClause) yield(c *OpContext, f YieldFunc) {
+func (x *LetClause) yield(s *compState) {
+	c := s.ctx
 	n := &Vertex{Arcs: []*Vertex{
 		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}}},
 	}}
 
-	sub := c.spawn(n)
-	saved := c.PushState(sub, x.Dst.Source())
-	x.Dst.yield(c, f)
-	if b := c.PopState(saved); b != nil {
-		c.AddBottom(b)
-	}
-}
-
-// A ValueClause represents the value part of a comprehension.
-type ValueClause struct {
-	*StructLit
-}
-
-func (x *ValueClause) Source() ast.Node {
-	if x.StructLit == nil {
-		return nil
-	}
-	if x.Src == nil {
-		return nil
-	}
-	return x.Src
-}
-
-func (x *ValueClause) yield(op *OpContext, f YieldFunc) {
-	f(op.Env(0))
+	s.yield(c.spawn(n))
 }

@@ -103,6 +103,17 @@ type envYield struct {
 	expr Node         // The adjusted expression.
 }
 
+// valueClause inserts a wrapper Environment in a chained clause
+// list ot account for the dropped Value.
+type valueClause struct {
+	Node
+	arc *Vertex
+}
+
+func (v *valueClause) yield(s *compState) {
+	s.yield(s.ctx.spawn(v.arc))
+}
+
 // insertComprehension registers a comprehension with a node, possibly pushing
 // down its evaluation to the node's children. It will only evaluate one level
 // of fields at a time.
@@ -155,12 +166,27 @@ func (n *nodeContext) insertComprehension(
 
 				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
 				fields = append(fields, f)
-				// TODO: adjust ci to embed?
+			// TODO: adjust ci to embed?
 
-				// TODO: this also needs to be done for optional fields.
+			// TODO: this also needs to be done for optional fields.
 
-				// case *Comprehension:
-				// TODO: expand nested comprehensions.
+			case *Comprehension:
+				// Proactively expand nested comprehensions to give maximal
+				// information in subfields about which conjuncts are available.
+				numFixed++
+				clauses := append(c.Clauses, &valueClause{
+					Node: c.Value,
+					arc:  n.node,
+				})
+				clauses = append(clauses, f.Clauses...)
+				c := &Comprehension{
+					Clauses: clauses,
+					Value:   f.Value,
+
+					parent: c.parent,
+					arc:    n.node,
+				}
+				n.insertComprehension(env, c, ci)
 			}
 		}
 

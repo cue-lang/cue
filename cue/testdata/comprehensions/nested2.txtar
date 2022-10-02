@@ -48,8 +48,8 @@ foo: {
     }
   }
   foo: (struct){
-    a: (int){ 10 }
     b: (int){ 20 }
+    a: (int){ 10 }
   }
 }
 -- out/compile --

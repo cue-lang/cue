@@ -188,10 +188,11 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 					&FieldReference{UpCount: 1, Label: x},
 				}}
 				return &Comprehension{
-					Clauses: &ForClause{
-						Value: x,
-						Src:   src,
-						Dst:   &ValueClause{s},
+					Clauses: []Yielder{
+						&ForClause{
+							Value: x,
+							Src:   src,
+						},
 					},
 					Value: s,
 				}
@@ -252,10 +253,11 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 				}}
 				list.Elems = append(list.Elems,
 					&Comprehension{
-						Clauses: &ForClause{
-							Value: x,
-							Src:   right,
-							Dst:   &ValueClause{st},
+						Clauses: []Yielder{
+							&ForClause{
+								Value: x,
+								Src:   right,
+							},
 						},
 						Value: st,
 					},

@@ -307,7 +307,7 @@ func (c *visitor) markDecl(env *adt.Environment, d adt.Decl) {
 }
 
 func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) {
-	env = c.markYielder(env, y.Clauses)
+	env = c.markClauses(env, y.Clauses)
 
 	// Use "live" environments if we have them. This is important if
 	// dependencies are computed on a partially evaluated value where a pushed
@@ -332,24 +332,23 @@ func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) 
 	c.markExpr(env, adt.ToExpr(y.Value))
 }
 
-func (c *visitor) markYielder(env *adt.Environment, y adt.Yielder) *adt.Environment {
-	switch x := y.(type) {
-	case *adt.ForClause:
-		c.markExpr(env, x.Src)
-		env = &adt.Environment{Up: env, Vertex: empty}
-		env = c.markYielder(env, x.Dst)
-		// In dynamic mode, iterate over all actual value and
-		// evaluate.
+func (c *visitor) markClauses(env *adt.Environment, a []adt.Yielder) *adt.Environment {
+	for _, y := range a {
+		switch x := y.(type) {
+		case *adt.ForClause:
+			c.markExpr(env, x.Src)
+			env = &adt.Environment{Up: env, Vertex: empty}
+			// In dynamic mode, iterate over all actual value and
+			// evaluate.
 
-	case *adt.LetClause:
-		c.markExpr(env, x.Expr)
-		env = &adt.Environment{Up: env, Vertex: empty}
-		env = c.markYielder(env, x.Dst)
+		case *adt.LetClause:
+			c.markExpr(env, x.Expr)
+			env = &adt.Environment{Up: env, Vertex: empty}
 
-	case *adt.IfClause:
-		c.markExpr(env, x.Condition)
-		// In dynamic mode, only continue if condition is true.
-		env = c.markYielder(env, x.Dst)
+		case *adt.IfClause:
+			c.markExpr(env, x.Condition)
+			// In dynamic mode, only continue if condition is true.
+		}
 	}
 	return env
 }

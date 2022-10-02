@@ -320,7 +320,9 @@ func (w *compactPrinter) node(n adt.Node) {
 		}
 
 	case *adt.Comprehension:
-		w.node(x.Clauses)
+		for _, c := range x.Clauses {
+			w.node(c)
+		}
 		w.node(adt.ToExpr(x.Value))
 
 	case *adt.ForClause:
@@ -331,13 +333,11 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string(" in ")
 		w.node(x.Src)
 		w.string(" ")
-		w.node(x.Dst)
 
 	case *adt.IfClause:
 		w.string("if ")
 		w.node(x.Condition)
 		w.string(" ")
-		w.node(x.Dst)
 
 	case *adt.LetClause:
 		w.string("let ")
@@ -345,9 +345,6 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string(" = ")
 		w.node(x.Expr)
 		w.string(" ")
-		w.node(x.Dst)
-
-	case *adt.ValueClause:
 
 	default:
 		panic(fmt.Sprintf("unknown type %T", x))

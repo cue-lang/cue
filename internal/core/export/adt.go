@@ -256,19 +256,13 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		if !x.DidResolve() {
 			return dummyTop
 		}
-	loop:
-		for c := x.Clauses; ; {
-			switch x := c.(type) {
+		for _, c := range x.Clauses {
+			switch c.(type) {
 			case *adt.ForClause:
 				env = &adt.Environment{Up: env, Vertex: empty}
-				c = x.Dst
 			case *adt.IfClause:
-				c = x.Dst
 			case *adt.LetClause:
 				env = &adt.Environment{Up: env, Vertex: empty}
-				c = x.Dst
-			case *adt.ValueClause:
-				break loop
 			default:
 				panic("unreachable")
 			}
@@ -566,10 +560,7 @@ func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {
 func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) *ast.Comprehension {
 	c := &ast.Comprehension{}
 
-	y := comp.Clauses
-
-loop:
-	for {
+	for _, y := range comp.Clauses {
 		switch x := y.(type) {
 		case *adt.ForClause:
 			env = &adt.Environment{Up: env, Vertex: empty}
@@ -589,13 +580,10 @@ loop:
 			}
 			e.addField(x.Value, nil, clause)
 
-			y = x.Dst
-
 		case *adt.IfClause:
 			cond := e.innerExpr(env, x.Condition)
 			clause := &ast.IfClause{Condition: cond}
 			c.Clauses = append(c.Clauses, clause)
-			y = x.Dst
 
 		case *adt.LetClause:
 			env = &adt.Environment{Up: env, Vertex: empty}
@@ -610,11 +598,6 @@ loop:
 			defer e.popFrame(saved)
 
 			e.addField(x.Label, nil, clause)
-
-			y = x.Dst
-
-		case *adt.ValueClause:
-			break loop
 
 		default:
 			panic(fmt.Sprintf("unknown field %T", x))

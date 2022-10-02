@@ -729,9 +729,7 @@ func (c *compiler) elem(n ast.Expr) adt.Elem {
 }
 
 func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
-	var cur adt.Yielder
-	var first adt.Yielder
-	var prev, next *adt.Yielder
+	var a []adt.Yielder
 	for _, v := range x.Clauses {
 		switch x := v.(type) {
 		case *ast.ForClause:
@@ -745,18 +743,16 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 				Value:  c.label(x.Value),
 				Src:    c.expr(x.Source),
 			}
-			cur = y
 			c.pushScope((*forScope)(x), 1, v)
 			defer c.popScope()
-			next = &y.Dst
+			a = append(a, y)
 
 		case *ast.IfClause:
 			y := &adt.IfClause{
 				Src:       x,
 				Condition: c.expr(x.Condition),
 			}
-			cur = y
-			next = &y.Dst
+			a = append(a, y)
 
 		case *ast.LetClause:
 			y := &adt.LetClause{
@@ -764,22 +760,15 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 				Label: c.label(x.Ident),
 				Expr:  c.expr(x.Expr),
 			}
-			cur = y
 			c.pushScope((*letScope)(x), 1, v)
 			defer c.popScope()
-			next = &y.Dst
+			a = append(a, y)
 		}
 
-		if prev != nil {
-			*prev = cur
-		} else {
-			first = cur
-			if _, ok := cur.(*adt.LetClause); ok {
-				return c.errf(x,
-					"first comprehension clause must be 'if' or 'for'")
-			}
+		if _, ok := a[0].(*adt.LetClause); ok {
+			return c.errf(x,
+				"first comprehension clause must be 'if' or 'for'")
 		}
-		prev = next
 	}
 
 	// TODO: make x.Value an *ast.StructLit and this is redundant.
@@ -796,14 +785,12 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 		return y
 	}
 
-	if prev != nil {
-		*prev = &adt.ValueClause{StructLit: st}
-	} else {
+	if len(a) == 0 {
 		return c.errf(x, "comprehension value without clauses")
 	}
 
 	return &adt.Comprehension{
-		Clauses: first,
+		Clauses: a,
 		Value:   st,
 	}
 }

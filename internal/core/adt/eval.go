@@ -360,6 +360,8 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		v.UpdateStatus(Finalized)
 
 	case AllConjunctsDone:
+		// TODO: merge the state with Partial, and move to a "bit-based"
+		// state model.
 		if n.hasErr() || !n.checkClosed(state) {
 			break
 		}

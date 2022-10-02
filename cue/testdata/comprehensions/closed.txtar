@@ -85,7 +85,7 @@ dedupTodo: {
 
 	out: #sub // needs to be definition
 	out: {
-		c: n: "c" // Do not combine with &, as the original issue relies on this. 
+		c: n: "c" // Do not combine with &, as the original issue relies on this.
 		c: n: string
 	}
 }

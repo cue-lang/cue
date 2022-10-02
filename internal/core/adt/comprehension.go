@@ -158,6 +158,9 @@ func (n *nodeContext) insertComprehension(
 				// TODO: adjust ci to embed?
 
 				// TODO: this also needs to be done for optional fields.
+
+				// case *Comprehension:
+				// TODO: expand nested comprehensions.
 			}
 		}
 
@@ -212,6 +215,60 @@ func (n *nodeContext) insertComprehension(
 		id:               ci,
 		expr:             x,
 	})
+}
+
+type compState struct {
+	ctx  *OpContext
+	comp *Comprehension
+	i    int
+	f    YieldFunc
+}
+
+// yield evaluates a Comprehension within the given Environment and and calls
+// f for each result.
+func (c *OpContext) yield(
+	node *Vertex, // errors are associated with this node
+	env *Environment, // env for field for which this yield is called
+	comp *Comprehension,
+	f YieldFunc, // called for every result
+) *Bottom {
+	s := &compState{
+		ctx:  c,
+		comp: comp,
+		f:    f,
+	}
+	y := comp.Clauses[0]
+
+	saved := c.PushState(env, y.Source())
+	if node != nil {
+		defer c.PopArc(c.PushArc(node))
+	}
+
+	s.i++
+	y.yield(s)
+	s.i--
+
+	return c.PopState(saved)
+}
+
+func (s *compState) yield(env *Environment) (ok bool) {
+	c := s.ctx
+	if s.i >= len(s.comp.Clauses) {
+		s.f(env)
+		return true
+	}
+	dst := s.comp.Clauses[s.i]
+	saved := c.PushState(env, dst.Source())
+
+	s.i++
+	dst.yield(s)
+	s.i--
+
+	if b := c.PopState(saved); b != nil {
+		c.AddBottom(b)
+		return false
+	}
+	return !c.HasErr()
 }
 
 // injectComprehension evaluates and inserts embeddings. It first evaluates all

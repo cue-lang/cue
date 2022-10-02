@@ -505,26 +505,6 @@ func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 	return err
 }
 
-// yield evaluates a Comprehension within the given Environment and and calls
-// f for each result.
-func (c *OpContext) yield(
-	node *Vertex, // errors are associated with this node
-	env *Environment, // env for field for which this yield is called
-	comp *Comprehension,
-	f YieldFunc, // called for every result
-) *Bottom {
-	y := comp.Clauses
-
-	s := c.PushState(env, y.Source())
-	if node != nil {
-		defer c.PopArc(c.PushArc(node))
-	}
-
-	y.yield(c, f)
-
-	return c.PopState(s)
-}
-
 // Concrete returns the concrete value of x after evaluating it.
 // msg is used to mention the context in which an error occurred, if any.
 func (c *OpContext) Concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {

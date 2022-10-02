@@ -22,6 +22,64 @@ foo: {
 		}
 	}
 }
+
+indirectlyNested: {
+	a: true // must be declared outside of the nested comprehensions for test.
+	if true {
+		b: {
+			if a {
+				a
+			}
+		}
+	}
+}
+
+directlyNestedEmpty: {
+	a: true
+	if true {
+		if a {
+		}
+	}
+}
+
+directlyDoublyNestedEmpty: {
+	a: true 
+	if true {
+		if a {
+		}
+	}
+}
+
+indirectlyDoublyNestedEmpty: {
+	a: true
+	b: {
+		if true {
+			if a {
+				if a {
+					a
+				}
+			}
+			if a {
+				a
+			}
+		}
+	}
+}
+
+indirectlyDoublyNested: {
+	a: true
+	if true {
+		if a {
+			if a {
+				b: 1
+			}
+		}
+		if a {
+			c: 1
+		}
+	}
+}
+
 -- out/eval --
 (struct){
   given: (struct){
@@ -48,8 +106,27 @@ foo: {
     }
   }
   foo: (struct){
-    a: (int){ 10 }
     b: (int){ 20 }
+    a: (int){ 10 }
+  }
+  indirectlyNested: (struct){
+    b: (bool){ true }
+    a: (bool){ true }
+  }
+  directlyNestedEmpty: (struct){
+    a: (bool){ true }
+  }
+  directlyDoublyNestedEmpty: (struct){
+    a: (bool){ true }
+  }
+  indirectlyDoublyNestedEmpty: (struct){
+    a: (bool){ true }
+    b: (bool){ true }
+  }
+  indirectlyDoublyNested: (struct){
+    b: (int){ 1 }
+    c: (int){ 1 }
+    a: (bool){ true }
   }
 }
 -- out/compile --
@@ -86,6 +163,56 @@ foo: {
     if (〈0;a〉 < 20) {
       if (〈1;a〉 < 50) {
         b: 20
+      }
+    }
+  }
+  indirectlyNested: {
+    a: true
+    if true {
+      b: {
+        if 〈2;a〉 {
+          〈3;a〉
+        }
+      }
+    }
+  }
+  directlyNestedEmpty: {
+    a: true
+    if true {
+      if 〈1;a〉 {}
+    }
+  }
+  directlyDoublyNestedEmpty: {
+    a: true
+    if true {
+      if 〈1;a〉 {}
+    }
+  }
+  indirectlyDoublyNestedEmpty: {
+    a: true
+    b: {
+      if true {
+        if 〈2;a〉 {
+          if 〈3;a〉 {
+            〈4;a〉
+          }
+        }
+        if 〈2;a〉 {
+          〈3;a〉
+        }
+      }
+    }
+  }
+  indirectlyDoublyNested: {
+    a: true
+    if true {
+      if 〈1;a〉 {
+        if 〈2;a〉 {
+          b: 1
+        }
+      }
+      if 〈1;a〉 {
+        c: 1
       }
     }
   }

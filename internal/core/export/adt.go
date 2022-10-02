@@ -263,6 +263,9 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 			case *adt.IfClause:
 			case *adt.LetClause:
 				env = &adt.Environment{Up: env, Vertex: empty}
+			case *adt.ValueClause:
+				// Can occur in nested comprehenions.
+				env = &adt.Environment{Up: env, Vertex: empty}
 			default:
 				panic("unreachable")
 			}
@@ -598,6 +601,10 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			defer e.popFrame(saved)
 
 			e.addField(x.Label, nil, clause)
+
+		case *adt.ValueClause:
+			// Can occur in nested comprehenions.
+			env = &adt.Environment{Up: env, Vertex: empty}
 
 		default:
 			panic(fmt.Sprintf("unknown field %T", x))

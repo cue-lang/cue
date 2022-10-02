@@ -335,7 +335,7 @@ out: #sub & {#p: _test.s1}
   }
   out: (#struct){
     dict: (#struct){
-      r1: (#struct){
+      r2_r2_r1: (#struct){
         a: (#struct){
           k: (string){ "simple" }
           d: (#struct){
@@ -351,7 +351,7 @@ out: #sub & {#p: _test.s1}
           }
         }
       }
-      r2_r2_r1: (#struct){
+      r1: (#struct){
         a: (#struct){
           k: (string){ "simple" }
           d: (#struct){
@@ -414,7 +414,7 @@ out: #sub & {#p: _test.s1}
     }
     let subs#1 = (#struct){
       dict: (#struct){
-        r1: (#struct){
+        r2_r1: (#struct){
           a: (#struct){
             k: (string){ "simple" }
             d: (#struct){
@@ -422,7 +422,7 @@ out: #sub & {#p: _test.s1}
             }
           }
         }
-        r2_r1: (#struct){
+        r1: (#struct){
           a: (#struct){
             k: (string){ "simple" }
             d: (#struct){

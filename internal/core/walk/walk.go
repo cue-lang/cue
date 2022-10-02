@@ -169,6 +169,8 @@ func (w *Visitor) node(n adt.Node) {
 		w.feature(x.Label, x)
 		w.node(x.Expr)
 
+	case *adt.ValueClause:
+
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}

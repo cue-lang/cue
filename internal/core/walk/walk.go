@@ -153,24 +153,21 @@ func (w *Visitor) node(n adt.Node) {
 	// Yielders
 
 	case *adt.Comprehension:
-		w.node(x.Clauses)
+		for _, c := range x.Clauses {
+			w.node(c)
+		}
 		w.node(adt.ToExpr(x.Value))
 
 	case *adt.ForClause:
 		w.feature(x.Key, x)
 		w.feature(x.Value, x)
-		w.node(x.Dst)
 
 	case *adt.IfClause:
 		w.node(x.Condition)
-		w.node(x.Dst)
 
 	case *adt.LetClause:
 		w.feature(x.Label, x)
 		w.node(x.Expr)
-		w.node(x.Dst)
-
-	case *adt.ValueClause:
 
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))

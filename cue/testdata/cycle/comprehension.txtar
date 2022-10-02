@@ -264,7 +264,6 @@ siblingInsertion: t1: p2: {
 	}
 }
 
-// TODO: fix nested comprehension bug.
 siblingInsertion: t2: p1: {
 	D: "logging": _
 	deployment: _
@@ -656,6 +655,9 @@ Result:
             env2: (struct){
               ENV: (string){ "True" }
             }
+            env: (struct){
+              ENV: (string){ "True" }
+            }
           }
         }
         D: (struct){
@@ -666,6 +668,9 @@ Result:
         deployment: (struct){
           logging: (struct){
             env2: (struct){
+              ENV: (string){ "True" }
+            }
+            env: (struct){
               ENV: (string){ "True" }
             }
           }

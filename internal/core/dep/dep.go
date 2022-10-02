@@ -344,6 +344,9 @@ func (c *visitor) markClauses(env *adt.Environment, a []adt.Yielder) *adt.Enviro
 		case *adt.IfClause:
 			c.markExpr(env, x.Condition)
 			// In dynamic mode, only continue if condition is true.
+
+		case *adt.ValueClause:
+			env = &adt.Environment{Up: env, Vertex: empty}
 		}
 	}
 	return env

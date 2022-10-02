@@ -669,7 +669,6 @@ Result:
     w: (int){ 1 }
     v: (struct){
       y: (int){ 1 }
-      x: (int){ 1 }
       z: (int){ 1 }
       rw: (int){ 1 }
       rx: (int){ 1 }
@@ -698,6 +697,7 @@ Result:
           nz: (int){ 1 }
         }
       }
+      x: (int){ 1 }
     }
   }
   fail: (struct){

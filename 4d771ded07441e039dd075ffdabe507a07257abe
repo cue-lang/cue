@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58ce1cd3_2895415b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-10-03T18:41:35Z",
+      "side": 1,
+      "message": "Somewhere in this stack, we are allocating a lot more memory. I have a private offline CUE configuration that hits an OOM on a 45GB machine, where with v0.4.3 is used ~8GB.\n\nMarking as Hold for now.",
+      "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

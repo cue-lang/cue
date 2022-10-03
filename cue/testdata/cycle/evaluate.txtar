@@ -7,11 +7,31 @@
 // The builtins are typically used to trigger the uncommon path. The choice of
 // builtin is irrelevant, as long as they don't finalize args before processing.
 
-// This is a resolvable cycle, were b is equated to c.
-letCycleOK: {
+// This is a resolvable reference cycle, were b is equated to c.
+letCycleOK: t1: {
 	b: c
 	let X = b
 	c: X
+}
+
+// The let has structural cycle, but it is only used in a way that the
+// structural cycle is avoided.
+letCycleOK: t2: {
+	a: {
+		b: 1
+		let X = a
+		c: X.b
+	}
+}
+
+// Ensure that the cycle exemption algorithm does not bypass actual structural
+// cycles.
+letCycleFail: t1: {
+	a: {
+		b: 1
+		let X = a
+		c: X
+	}
 }
 
 listCycleOK: {
@@ -75,50 +95,79 @@ closeFail: {
 	x:  #T
 	x: b: "foo"
 }
+
 -- out/eval --
 Errors:
 closeCycle.a: structural cycle
 closeCycle.b.d: structural cycle
 closeFail.x.b: field not allowed:
-    ./in.cue:72:6
-    ./in.cue:73:12
-    ./in.cue:74:6
-    ./in.cue:75:5
+    ./in.cue:92:6
+    ./in.cue:93:12
+    ./in.cue:94:6
+    ./in.cue:95:5
+letCycleFail.t1.a.c: structural cycle
 structCycle.a: structural cycle
 structCycle.b.d: structural cycle
 disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
-    ./in.cue:24:9
+    ./in.cue:44:9
 disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
-    ./in.cue:24:9
+    ./in.cue:44:9
 disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
-    ./in.cue:24:9
+    ./in.cue:44:9
 1 errors in empty disjunction::
-    ./in.cue:30:6
+    ./in.cue:50:6
 b: structural cycle:
-    ./in.cue:30:6
+    ./in.cue:50:6
 closeCycle.c: structural cycle:
-    ./in.cue:41:15
+    ./in.cue:61:15
 structCycle.c: structural cycle:
-    ./in.cue:47:14
+    ./in.cue:67:14
 embedCycle: structural cycle:
-    ./in.cue:53:11
+    ./in.cue:73:11
 listMulCycle.a: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
-    ./in.cue:65:5
-    ./in.cue:65:9
+    ./in.cue:85:5
+    ./in.cue:85:9
 listMulCycle.b: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
-    ./in.cue:65:5
-    ./in.cue:65:9
+    ./in.cue:85:5
+    ./in.cue:85:9
 listMulCycle.c: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
-    ./in.cue:65:5
-    ./in.cue:65:9
+    ./in.cue:85:5
+    ./in.cue:85:9
 
 Result:
 (_|_){
   // [eval]
   letCycleOK: (struct){
-    b: (_){ _ }
-    let X#1 = (_){ _ }
-    c: (_){ _ }
+    t1: (struct){
+      b: (_){ _ }
+      let X#1 = (_){ _ }
+      c: (_){ _ }
+    }
+    t2: (struct){
+      a: (struct){
+        b: (int){ 1 }
+        let X#2 = (_|_){
+          // [structural cycle] letCycleOK.t2.a.X: structural cycle
+        }
+        c: (int){ 1 }
+      }
+    }
+  }
+  letCycleFail: (_|_){
+    // [structural cycle]
+    t1: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        b: (int){ 1 }
+        let X#3 = (_|_){
+          // [structural cycle] letCycleFail.t1.a.X: structural cycle
+        }
+        c: (_|_){
+          // [structural cycle] letCycleFail.t1.a.c: structural cycle
+        }
+      }
+    }
   }
   listCycleOK: (struct){
     a: (_){ _ }
@@ -129,15 +178,15 @@ Result:
     // [eval]
     a: (_|_){
       // [eval] disjunctionCycle.a: cannot use 1 (type int) as list in argument 1 to and:
-      //     ./in.cue:24:9
+      //     ./in.cue:44:9
     }
     b: (_|_){
       // [eval] disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
-      //     ./in.cue:24:9
+      //     ./in.cue:44:9
     }
     c: (_|_){
       // [eval] disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
-      //     ./in.cue:24:9
+      //     ./in.cue:44:9
     }
   }
   forCycle: (_|_){
@@ -146,16 +195,16 @@ Result:
       // [structural cycle]
       a: (_|_){
         // [structural cycle] 1 errors in empty disjunction::
-        //     ./in.cue:30:6
+        //     ./in.cue:50:6
         // b: structural cycle:
-        //     ./in.cue:30:6
+        //     ./in.cue:50:6
       }
     }
     #B: (_|_){
       // [structural cycle] 1 errors in empty disjunction::
-      //     ./in.cue:30:6
+      //     ./in.cue:50:6
       // b: structural cycle:
-      //     ./in.cue:30:6
+      //     ./in.cue:50:6
     }
   }
   letCycleWithAnd: (struct){
@@ -183,7 +232,7 @@ Result:
     }
     c: (_|_){
       // [structural cycle] closeCycle.c: structural cycle:
-      //     ./in.cue:41:15
+      //     ./in.cue:61:15
     }
   }
   structCycle: (_|_){
@@ -199,22 +248,22 @@ Result:
     }
     c: (_|_){
       // [structural cycle] structCycle.c: structural cycle:
-      //     ./in.cue:47:14
+      //     ./in.cue:67:14
     }
   }
   embedCycle: (_|_){
     // [structural cycle]
     a: (_|_){
       // [structural cycle] embedCycle: structural cycle:
-      //     ./in.cue:53:11
+      //     ./in.cue:73:11
     }
     b: (_|_){
       // [structural cycle] embedCycle: structural cycle:
-      //     ./in.cue:53:11
+      //     ./in.cue:73:11
     }
     c: (_|_){
       // [structural cycle] embedCycle: structural cycle:
-      //     ./in.cue:53:11
+      //     ./in.cue:73:11
     }
   }
   listAddCycle: (_|_){
@@ -233,18 +282,18 @@ Result:
     // [eval]
     a: (_|_){
       // [eval] listMulCycle.a: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
-      //     ./in.cue:65:5
-      //     ./in.cue:65:9
+      //     ./in.cue:85:5
+      //     ./in.cue:85:9
     }
     b: (_|_){
       // [eval] listMulCycle.b: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
-      //     ./in.cue:65:5
-      //     ./in.cue:65:9
+      //     ./in.cue:85:5
+      //     ./in.cue:85:9
     }
     c: (_|_){
       // [eval] listMulCycle.c: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
-      //     ./in.cue:65:5
-      //     ./in.cue:65:9
+      //     ./in.cue:85:5
+      //     ./in.cue:85:9
     }
   }
   closeFail: (_|_){
@@ -257,10 +306,10 @@ Result:
       a: (string){ string }
       b: (_|_){
         // [eval] closeFail.x.b: field not allowed:
-        //     ./in.cue:72:6
-        //     ./in.cue:73:12
-        //     ./in.cue:74:6
-        //     ./in.cue:75:5
+        //     ./in.cue:92:6
+        //     ./in.cue:93:12
+        //     ./in.cue:94:6
+        //     ./in.cue:95:5
       }
     }
   }
@@ -269,9 +318,29 @@ Result:
 --- in.cue
 {
   letCycleOK: {
-    b: 〈0;c〉
-    let X#1 = 〈0;b〉
-    c: 〈0;let X#1〉
+    t1: {
+      b: 〈0;c〉
+      let X#1 = 〈0;b〉
+      c: 〈0;let X#1〉
+    }
+  }
+  letCycleOK: {
+    t2: {
+      a: {
+        b: 1
+        let X#2 = 〈1;a〉
+        c: 〈0;let X#2〉.b
+      }
+    }
+  }
+  letCycleFail: {
+    t1: {
+      a: {
+        b: 1
+        let X#3 = 〈1;a〉
+        c: 〈0;let X#3〉
+      }
+    }
   }
   listCycleOK: {
     a: 〈0;b〉

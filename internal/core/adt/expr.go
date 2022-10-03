@@ -903,7 +903,23 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 		return nil
 	}
 
-	if !arc.MultiLet {
+	// Using a let arc directly saves an allocation, but should not be done
+	// in the following circumstances:
+	// 1) multiple Environments to be resolved for a single let
+	// 2) in case of error: some errors, like structural cycles, may only
+	//    occur when an arc is resolved directly, but not when used in an
+	//    expression. Consider, for instance:
+	//
+	//        a: {
+	//            b: 1
+	//            let X = a  // structural cycle
+	//            c: X.b     // not a structural cycle
+	//        }
+	//
+	//     In other words, a Vertex is not necessarily erroneous when a let
+	//     field contained in that Vertex is erroneous.
+	ctx.Unify(arc, Finalized)
+	if _, ok := arc.BaseValue.(*Bottom); !arc.MultiLet && !ok {
 		return arc
 	}
 
@@ -916,12 +932,15 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 		if e.cache == nil {
 			e.cache = map[Expr]Value{}
 		}
-		v = &Vertex{
+		n := &Vertex{
 			Parent:    n,
 			Label:     x.Label,
 			Conjuncts: []Conjunct{{e, expr, ctx.ci}},
 		}
-		e.cache[expr] = v
+		v = n
+		e.cache[expr] = n
+		nc := n.getNodeContext(ctx, 0)
+		nc.hasNonCycle = true // Allow a first cycle to be skipped.
 	}
 	return v.(*Vertex)
 }

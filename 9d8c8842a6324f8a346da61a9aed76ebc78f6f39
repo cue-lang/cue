@@ -16,6 +16,23 @@
       "message": "PS 3 unity break is simply an ordering diff. Confirmed by running with CUE_DEBUG_SORT_ARCS\u003d2.",
       "revId": "9d8c8842a6324f8a346da61a9aed76ebc78f6f39",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "94c29f0b_7d3f2246",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-10-03T16:31:33Z",
+      "side": 1,
+      "message": "Somewhere in this stack, we are allocating a lot more memory. I have a private offline CUE configuration that hits an OOM on a 45GB machine, where with v0.4.3 is used ~8GB.\n\nMarking as Hold for now.",
+      "revId": "9d8c8842a6324f8a346da61a9aed76ebc78f6f39",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

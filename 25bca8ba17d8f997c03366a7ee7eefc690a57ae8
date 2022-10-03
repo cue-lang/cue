@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fa55c92b_385ea6f7",
+        "filename": "cue/testdata/comprehensions/closed.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-10-03T12:25:06Z",
+      "side": 1,
+      "message": "I tend to go with \"reduced\" reproducers from the original report if I\u0027m fairly sure that there\u0027s nothing else at play, but if the original example is slightly complex and we think it may give more coverage, I don\u0027t see a harm in keeping the original one. So what Marcel says SGTM",
+      "parentUuid": "69014df9_2109d904",
+      "revId": "25bca8ba17d8f997c03366a7ee7eefc690a57ae8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b4caf816_09099707",
         "filename": "cue/testdata/comprehensions/closed.txtar",
         "patchSetId": 1

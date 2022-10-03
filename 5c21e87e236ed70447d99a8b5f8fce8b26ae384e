@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25db39e8_26bece50",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1700,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-10-03T12:20:38Z",
+      "side": 1,
+      "message": "nit: document?",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a461c7f9_0f8d28e0",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-10-03T12:20:38Z",
+      "side": 1,
+      "message": "typo",
+      "range": {
+        "startLine": 313,
+        "startChar": 61,
+        "endLine": 313,
+        "endChar": 72
+      },
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12d14176_52529757",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-10-03T12:20:38Z",
+      "side": 1,
+      "message": "I\u0027m struggling to parse these four lines of CUE: you have three opening curly braces, but only two closing curly braces. isn\u0027t there a syntax error here?",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90c233f1_ae532aab",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-10-03T12:20:38Z",
+      "side": 1,
+      "message": "is there a particular reason why we only care about the first env? perhaps this could be clarified with a better method name than Envs, like PrimaryEnv or something like that. If not, perhaps a very short comment.",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af914174_fc4e7f3b",
+        "filename": "internal/core/export/testdata/main/issue1849.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-10-03T12:20:38Z",
+      "side": 1,
+      "message": "this seems slightly different from the original repro at https://github.com/cue-lang/cue/issues/1849 - is that on purpose?",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

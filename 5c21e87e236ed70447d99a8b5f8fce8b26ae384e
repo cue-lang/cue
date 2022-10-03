@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "41ee1f36_6938f94f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-03T15:29:49Z",
+      "side": 1,
+      "message": "LGTM with one minor thought in addition to Daniel\u0027s. Thanks!",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25db39e8_26bece50",
@@ -71,6 +88,23 @@
       "writtenOn": "2022-10-03T12:20:38Z",
       "side": 1,
       "message": "is there a particular reason why we only care about the first env? perhaps this could be clarified with a better method name than Envs, like PrimaryEnv or something like that. If not, perhaps a very short comment.",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3049b5f4_3ad5e708",
+        "filename": "internal/core/dep/testdata/topcomprehension.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-03T15:29:49Z",
+      "side": 1,
+      "message": "A minor concern with these tests: I guess it\u0027s conceivable that the initial evaluation phase, as a legitimate optimization (AFICS), starts turning `(\"a\"): _` into `\"a\": _`.\nThen this test wouldn\u0027t be testing the same thing as currently.\n\nMight it be more resistant to this kind of future change if this held some other expression rather than `(\"a\")` e.g. `(label)` where `label` is defined elsewhere as `let label \u003d \"a\"` or something?",
       "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edc4e573_7bea3034",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:53:13Z",
+      "side": 1,
+      "message": "s/conjuncs/conjuncts/",
+      "revId": "ce598c1b8c37a164ea3688a0ca1a724a242bfb84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eac5bca9_91258a28",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:53:13Z",
+      "side": 1,
+      "message": "Some spurious errors are added that are corrected in a later commit.\n?",
+      "revId": "ce598c1b8c37a164ea3688a0ca1a724a242bfb84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

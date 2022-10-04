@@ -1,0 +1,242 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d14187a0_04b073ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "LGTM with a bunch of minor suggestions, thanks.",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6ab5eae_bee49f16",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "Doc comment please. (also, ISTM that maybe the comment on `Vertex.isDefined` might be a bit out of date, as let fields are also \"non-optional\", and required fields will also be non-optional, but I presume wouldn\u0027t return true from `IsDefined`).",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eba0c1ae_e5bcb385",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "lose the TODO ?",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c2c949e_16a412af",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "lose this?",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d4996c3_7eca5d17",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "add TODOs or lose the commented out code?",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "257ce7df_839cdbfb",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "Is there a reason not to use `a.IsDefined` here?",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5312d0e_baab508b",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a836a270_ef27b362",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d7d0ee8_199eb684",
+        "filename": "internal/core/export/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ac91a9f_9d7d222a",
+        "filename": "internal/core/export/extract_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "381e3579_2300f734",
+        "filename": "internal/core/export/toposort.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e5c38dc_9dbcdd05",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c694a6e_d8ddbed4",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b76299ff_3463b0cd",
+        "filename": "tools/trim/trim.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-04T13:47:57Z",
+      "side": 1,
+      "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

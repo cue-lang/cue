@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f9ec130_36d54da0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "LGTM with a few minor suggestions, thanks!",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68c66257_66af2544",
+        "filename": "cue/testdata/cycle/comprehension.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "This doesn\u0027t point to any source locations. Is that something that can be done, or is it too hard?\nFor example, it would be great if it could point to the comprehension(s) in question.",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0200f6b6_2e239c56",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "if arc !\u003d nil {\n        return arc, false\n    }\n?",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "834b13b1_6715ca53",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "This might justify a comment.",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dc3d6bc_a9cbb9b8",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 2158,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "Perhaps a comment explaining what we\u0027re doing here?",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "206de64c_a2b3c07f",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "testing remnant, I believe.",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce9d6d85_7422acdd",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1745,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "s/referencing/references/\n?",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e93f9998_26990786",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1757,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T15:40:02Z",
+      "side": 1,
+      "message": "This `if` is redundant. Did you mean something else?",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c058fe7_8ddf3ea0",
+        "filename": "internal/core/adt/binop.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T16:26:06Z",
+      "side": 1,
+      "message": "nit: I\u0027d tend to match the indentation by putting each } on its own line. Like it is on line 196.",
+      "revId": "6c424d1de7fa3a926fd26a3ab3852a67c39876c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f51d323_3f676c25",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1695,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T16:26:06Z",
+      "side": 1,
+      "message": "It would be nice to comment this, and maybe explain what\u0027s special about the first element (given that a bunch of code unconditionally uses `Clauses[0]`)",
+      "revId": "6c424d1de7fa3a926fd26a3ab3852a67c39876c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

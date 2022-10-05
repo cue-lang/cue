@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "68d3b45a_5e24c14a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T17:03:55Z",
+      "side": 1,
+      "message": "s/reduce/reduces/",
+      "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "58ce1cd3_2895415b",
@@ -14,6 +31,40 @@
       "writtenOn": "2022-10-03T18:41:35Z",
       "side": 1,
       "message": "Somewhere in this stack, we are allocating a lot more memory. I have a private offline CUE configuration that hits an OOM on a 45GB machine, where with v0.4.3 is used ~8GB.\n\nMarking as Hold for now.",
+      "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3d0b13c_44f4b57b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T17:03:55Z",
+      "side": 1,
+      "message": "LGTM modulo Paul\u0027s concerns and a couple of minor nits. Thanks!",
+      "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7893dd73_ade24d22",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-10-05T17:03:55Z",
+      "side": 1,
+      "message": "s/inserts/represents/\n?\n\nIt\u0027s not clear that a struct can \"do\" something active like inserting.",
       "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

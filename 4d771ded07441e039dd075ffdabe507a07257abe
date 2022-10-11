@@ -52,6 +52,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84d203c8_3e8fa8d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-10-11T05:24:27Z",
+      "side": 1,
+      "message": "Per discussion with Marcel, happy for this to be submitted and for us to fix up the performance/memory issue in a separate CL.\n\nThe performance/memory issue investigation is captured in https://github.com/cue-lang/cue/issues/1969",
+      "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7893dd73_ade24d22",

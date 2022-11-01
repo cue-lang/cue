@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34cd2638_cc7a2f16",
+        "filename": "cue/testdata/cycle/comprehension.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T14:43:13Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "63c4595e_2624a6ac",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0200f6b6_2e239c56",

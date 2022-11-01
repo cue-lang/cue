@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b27caa95_900d92e1",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1700,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:37:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25db39e8_26bece50",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a461c7f9_0f8d28e0",
@@ -48,6 +66,30 @@
       "writtenOn": "2022-10-03T12:20:38Z",
       "side": 1,
       "message": "typo",
+      "range": {
+        "startLine": 313,
+        "startChar": 61,
+        "endLine": 313,
+        "endChar": 72
+      },
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6056e009_067c6dca",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:37:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a461c7f9_0f8d28e0",
       "range": {
         "startLine": 313,
         "startChar": 61,
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "804b5b10_2b83fa0e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:37:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "12d14176_52529757",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "90c233f1_ae532aab",
@@ -88,6 +148,24 @@
       "writtenOn": "2022-10-03T12:20:38Z",
       "side": 1,
       "message": "is there a particular reason why we only care about the first env? perhaps this could be clarified with a better method name than Envs, like PrimaryEnv or something like that. If not, perhaps a very short comment.",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56931daf_b6bf5a9d",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:37:31Z",
+      "side": 1,
+      "message": "Added this comment:\n\n\t\t// We use the Environment to get access to the parent chain. It\n\t\t// suffices to take any Environment (in this case the first), as all\n\t\t// will have the same parent chain.",
+      "parentUuid": "90c233f1_ae532aab",
       "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -109,6 +187,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4bbb3f8_ee86972b",
+        "filename": "internal/core/dep/testdata/topcomprehension.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:37:31Z",
+      "side": 1,
+      "message": "I think it is good to be aware of the impact if we made such changes.\nRight now I have taken the stance that behavior should be explainable in the most simple of terms. So that means that the rules hold regardless of optimizations.\n\nWhether that is the right thing to do or not remains open. But I kinda prefer tests breaking in these cases to be reminded of this and to consider whether we should adjust the spec accordingly, for instance.",
+      "parentUuid": "3049b5f4_3ad5e708",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af914174_fc4e7f3b",
@@ -122,6 +218,24 @@
       "writtenOn": "2022-10-03T12:20:38Z",
       "side": 1,
       "message": "this seems slightly different from the original repro at https://github.com/cue-lang/cue/issues/1849 - is that on purpose?",
+      "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38bd8f98_bc995f89",
+        "filename": "internal/core/export/testdata/main/issue1849.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:37:31Z",
+      "side": 1,
+      "message": "This was a slightly simpler variant that exposed the same problem. But good point. Added both.",
+      "parentUuid": "af914174_fc4e7f3b",
       "revId": "5c21e87e236ed70447d99a8b5f8fce8b26ae384e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

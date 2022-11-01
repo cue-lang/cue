@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "354bdf4f_14c84b91",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6ab5eae_bee49f16",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "eba0c1ae_e5bcb385",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-10-04T13:47:57Z",
       "side": 1,
       "message": "lose the TODO ?",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abedc0a0_6816c819",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 385,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Changed the code to use IsDefined. I\u0027m not sure whether it could be applicable now, but it definitely will be once we implement the required field proposal and fix the disjunction bugs.",
+      "parentUuid": "eba0c1ae_e5bcb385",
       "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8a7f031_8b1ffb73",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 659,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c2c949e_16a412af",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d4996c3_7eca5d17",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-10-04T13:47:57Z",
       "side": 1,
       "message": "add TODOs or lose the commented out code?",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7a4ef7e_ff996eb3",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Uncommented to be sure. We are currently relying on fields being evaluated, but not sure if that is always the case.",
+      "parentUuid": "1d4996c3_7eca5d17",
       "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0714596_20da7c38",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 563,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Good catch. I think it should use it. \n\nThe other uses of isDefined seem appropriate.",
+      "parentUuid": "257ce7df_839cdbfb",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c5312d0e_baab508b",
@@ -116,6 +206,24 @@
       "writtenOn": "2022-10-04T13:47:57Z",
       "side": 1,
       "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aac7c049_fde4c77c",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5312d0e_baab508b",
       "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1880e6cc_b9691836",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a836a270_ef27b362",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7d7d0ee8_199eb684",
@@ -150,6 +276,24 @@
       "writtenOn": "2022-10-04T13:47:57Z",
       "side": 1,
       "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11ab5434_34fd68bd",
+        "filename": "internal/core/export/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 157,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Removed. It should be evaluated, but in case it is not, the bug will be easy to spot and fix.",
+      "parentUuid": "7d7d0ee8_199eb684",
       "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "66cc4b59_5a2e2ee3",
+        "filename": "internal/core/export/extract_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4ac91a9f_9d7d222a",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "381e3579_2300f734",
@@ -184,6 +346,24 @@
       "writtenOn": "2022-10-04T13:47:57Z",
       "side": 1,
       "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07f75985_3a8c2732",
+        "filename": "internal/core/export/toposort.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Ditto.",
+      "parentUuid": "381e3579_2300f734",
       "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -205,6 +385,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f4c3d36_939c1fd2",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Ditto.",
+      "parentUuid": "5e5c38dc_9dbcdd05",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c694a6e_d8ddbed4",
@@ -222,6 +420,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8ff6255_f87598c2",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "The API already requires that values are evaluated, so safe to remove.",
+      "parentUuid": "7c694a6e_d8ddbed4",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b76299ff_3463b0cd",
@@ -235,6 +451,24 @@
       "writtenOn": "2022-10-04T13:47:57Z",
       "side": 1,
       "message": "either TODO or remove",
+      "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49fbedc1_76ae8a3e",
+        "filename": "tools/trim/trim.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 293,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T12:32:07Z",
+      "side": 1,
+      "message": "Trim values are evaluated (through cue API), so should be safe to remove.",
+      "parentUuid": "b76299ff_3463b0cd",
       "revId": "4be753e545b2d64cbb9f9b71631e080b0de979fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

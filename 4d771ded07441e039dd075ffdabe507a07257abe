@@ -84,6 +84,24 @@
       "message": "s/inserts/represents/\n?\n\nIt\u0027s not clear that a struct can \"do\" something active like inserting.",
       "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c29edc90_082f093f",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:21:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7893dd73_ade24d22",
+      "revId": "4d771ded07441e039dd075ffdabe507a07257abe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

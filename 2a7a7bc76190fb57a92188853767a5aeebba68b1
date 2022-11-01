@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "63c4595e_2624a6ac",
+        "filename": "cue/testdata/cycle/comprehension.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:09:56Z",
+      "side": 1,
+      "message": "There is a TODO for this. It is currently quite hard to get to this position information.",
+      "parentUuid": "68c66257_66af2544",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0200f6b6_2e239c56",
         "filename": "internal/core/adt/composite.go",
         "patchSetId": 3
@@ -48,6 +66,24 @@
       "writtenOn": "2022-10-05T15:40:02Z",
       "side": 1,
       "message": "if arc !\u003d nil {\n        return arc, false\n    }\n?",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9074dbcd_eb70edc2",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 704,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:09:56Z",
+      "side": 1,
+      "message": "Yep, much nicer.",
+      "parentUuid": "0200f6b6_2e239c56",
       "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcb1d822_dd968648",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:09:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "834b13b1_6715ca53",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0dc3d6bc_a9cbb9b8",
@@ -82,6 +136,24 @@
       "writtenOn": "2022-10-05T15:40:02Z",
       "side": 1,
       "message": "Perhaps a comment explaining what we\u0027re doing here?",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcd96514_4a7925e1",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 2158,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:09:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0dc3d6bc_a9cbb9b8",
       "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f32978e1_112877c0",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:09:56Z",
+      "side": 1,
+      "message": "Actually, this is done to make it faster to turn logging on or off. If the test below is large, it avoids having to scroll past the end of the test to do so. This is relevant as in VSCode it is easy to run a test at the top of the test. So the editor will typically be opened here, and not below the test.\n\nSplitting setting the verbosity in two lines makes it easier to disable too, as uncommenting a line is faster than changing the value.\n\nReduced the diffs a bit, though.",
+      "parentUuid": "206de64c_a2b3c07f",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce9d6d85_7422acdd",
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01a6598d_ce1d5762",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1745,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:09:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce9d6d85_7422acdd",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e93f9998_26990786",
@@ -133,6 +241,24 @@
       "writtenOn": "2022-10-05T15:40:02Z",
       "side": 1,
       "message": "This `if` is redundant. Did you mean something else?",
+      "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25076f68_25df7fb5",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1757,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T13:09:56Z",
+      "side": 1,
+      "message": "Probably a remnant of a simplification. Removed.",
+      "parentUuid": "e93f9998_26990786",
       "revId": "2a7a7bc76190fb57a92188853767a5aeebba68b1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

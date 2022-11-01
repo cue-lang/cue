@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e515762_c4c48759",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-11-01T13:31:31Z",
+      "side": 1,
+      "message": "LGTM modulo one tiny nit, thanks.",
+      "revId": "db7090e27eb57630b2abf8f5c57018b1ff61c87e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8883e40_b6e7e4d9",
+        "filename": "internal/core/export/toposort.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-11-01T13:31:31Z",
+      "side": 1,
+      "message": "_are_ properly",
+      "revId": "db7090e27eb57630b2abf8f5c57018b1ff61c87e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

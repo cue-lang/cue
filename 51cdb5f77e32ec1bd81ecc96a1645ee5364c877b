@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fce319cf_668b2b33",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:40:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78cb6d1e_a751ca7d",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 15
+      },
+      "revId": "51cdb5f77e32ec1bd81ecc96a1645ee5364c877b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1aa3ba3a_a28f1b3c",
@@ -37,6 +61,24 @@
       "writtenOn": "2022-10-03T12:25:06Z",
       "side": 1,
       "message": "nit: trailing whitespace :)",
+      "revId": "51cdb5f77e32ec1bd81ecc96a1645ee5364c877b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47f6af53_c3509649",
+        "filename": "cue/testdata/comprehensions/closed.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-01T11:40:41Z",
+      "side": 1,
+      "message": "Thanks. This is good to call out on, as trailing whitespace can be quite a nuisance when automatic formatting causes bogus diffs down the line.",
+      "parentUuid": "1aa3ba3a_a28f1b3c",
       "revId": "51cdb5f77e32ec1bd81ecc96a1645ee5364c877b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

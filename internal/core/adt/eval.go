@@ -525,8 +525,6 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		// }
 
 		// We are no longer evaluating.
-		// n.node.UpdateStatus(Partial)
-		n.node.UpdateStatus(Evaluating)
 
 		// Either set to Conjunction or error.
 		// TODO: verify and simplify the below code to determine whether

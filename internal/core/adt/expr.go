@@ -1610,6 +1610,12 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 		buf.WriteString(")")
 	}
 
+	// If the validator returns an error and we already had an error, just
+	// return the original error.
+	if b, ok := Unwrap(args[0]).(*Bottom); ok {
+		return b
+	}
+
 	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", args[0], buf.String())
 
 	for _, v := range args {

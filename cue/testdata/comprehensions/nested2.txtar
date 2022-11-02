@@ -80,6 +80,21 @@ indirectlyDoublyNested: {
 	}
 }
 
+// This case used to trigger an over-aggressive deduplication.
+issue1974: {
+	X: {
+		foo: {
+			bar: ""
+			baz: ""
+		}
+	}
+	out: {
+		for k, v in X for vk, vv in v {
+			"\(k)": "\(vk)": vv
+		}
+	}
+}
+
 -- out/eval --
 (struct){
   given: (struct){
@@ -127,6 +142,20 @@ indirectlyDoublyNested: {
     b: (int){ 1 }
     c: (int){ 1 }
     a: (bool){ true }
+  }
+  issue1974: (struct){
+    X: (struct){
+      foo: (struct){
+        bar: (string){ "" }
+        baz: (string){ "" }
+      }
+    }
+    out: (struct){
+      foo: (struct){
+        bar: (string){ "" }
+        baz: (string){ "" }
+      }
+    }
   }
 }
 -- out/compile --
@@ -213,6 +242,21 @@ indirectlyDoublyNested: {
       }
       if 〈1;a〉 {
         c: 1
+      }
+    }
+  }
+  issue1974: {
+    X: {
+      foo: {
+        bar: ""
+        baz: ""
+      }
+    }
+    out: {
+      for k, v in 〈1;X〉 for vk, vv in 〈0;v〉 {
+        "\(〈2;k〉)": {
+          "\(〈2;vk〉)": 〈2;vv〉
+        }
       }
     }
   }

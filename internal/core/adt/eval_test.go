@@ -106,6 +106,45 @@ func TestX(t *testing.T) {
 module: "mod.test"
 
 -- in.cue --
+import "list"
+
+#Depth: {
+	#maxiter: 4
+
+	for k, v in list.Range(0, #maxiter, 1) {
+		#funcs: "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+	}
+
+	// Alternative comprehension that exposes cycle directly.
+	// #funcs:{
+	// 	for k, v in list.Range(0, #maxiter, 1) {
+	// 		 "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+	// 	}}
+
+	#funcs: "\(#maxiter)": null
+
+	#funcs["0"]
+}
+
+#DepthF: {
+	#next: _
+	#func: {
+		#in:    _
+		#basic: string | null
+		out: {
+			if (#in & #basic) != _|_ {1}
+			if (#in & #basic) == _|_ {
+				list.Max([ for k, v in #in {(#next & {#in: v}).out}]) + 1
+			}
+		}
+	}
+}
+
+tree: "bar"
+
+d: #Depth & {#in: tree}
+
+
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {

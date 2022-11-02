@@ -98,6 +98,12 @@ type envYield struct {
 
 	// Values specific to the field corresponsing to this envYield
 
+	// This envYield was added to selfComprehensions
+	self bool
+	// This envYield was successfully executed and the resulting conjuncts were
+	// added.
+	inserted bool
+
 	env  *Environment // The adjusted Environment.
 	id   CloseInfo    // CloseInfo for the field.
 	expr Node         // The adjusted expression.
@@ -316,17 +322,26 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // injectComprehension evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectComprehensions(all *[]envYield, allowCycle bool) (progress bool) {
+func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool) (progress bool) {
 	ctx := n.ctx
 
-	k := 0
-	for i := 0; i < len(*all); i++ {
-		d := (*all)[i]
+	all := *allP
+	workRemaining := false
+
+	// We use variables, instead of range, as the list may grow dynamically.
+	for i := 0; i < len(*allP); i++ {
+		all = *allP // update list as long as it is non-empty.
+		d := all[i]
+
+		if d.self && allowCycle {
+			continue
+		}
 
 		// Compute environments, if needed.
 		if !d.done {
+			var envs []*Environment
 			f := func(env *Environment) {
-				d.envs = append(d.envs, env)
+				envs = append(envs, env)
 			}
 
 			if err := ctx.yield(d.node, d.env, d.comp, f); err != nil {
@@ -334,11 +349,12 @@ func (n *nodeContext) injectComprehensions(all *[]envYield, allowCycle bool) (pr
 					// TODO:  Detect that the nodes are actually equal
 					if allowCycle && err.ForCycle && err.Value == n.node {
 						n.selfComprehensions = append(n.selfComprehensions, d)
+						progress = true
+						all[i].self = true
 						continue
 					}
 					d.err = err
-					(*all)[k] = d
-					k++
+					workRemaining = true
 
 					// TODO: add this when it can be done without breaking other
 					// things.
@@ -352,10 +368,12 @@ func (n *nodeContext) injectComprehensions(all *[]envYield, allowCycle bool) (pr
 					// // is necessary.
 					// n := d.node.getNodeContext(ctx)
 					// n.addBottom(err)
+
 				} else {
 					// continue to collect other errors.
 					d.node.state.addBottom(err)
 					d.done = true
+					progress = true
 				}
 				if d.node != nil {
 					ctx.PopArc(d.node)
@@ -363,14 +381,25 @@ func (n *nodeContext) injectComprehensions(all *[]envYield, allowCycle bool) (pr
 				continue
 			}
 
-			if len(d.envs) > 0 {
-				for _, s := range d.structs {
-					s.Init()
+			if !d.done {
+				d.envs = envs
+
+				if len(d.envs) > 0 {
+					for _, s := range d.structs {
+						s.Init()
+					}
 				}
+				d.structs = nil
+				d.done = true
 			}
-			d.structs = nil
-			d.done = true
 		}
+
+		if all[i].inserted {
+			continue
+		}
+		all[i].inserted = true
+
+		progress = true
 
 		if len(d.envs) == 0 {
 			continue
@@ -390,10 +419,9 @@ func (n *nodeContext) injectComprehensions(all *[]envYield, allowCycle bool) (pr
 		}
 	}
 
-	progress = k < len(*all)
-
-	*all = (*all)[:k]
-
+	if !workRemaining {
+		*allP = all[:0]
+	}
 	return progress
 }
 

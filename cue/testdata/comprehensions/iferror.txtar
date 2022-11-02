@@ -49,6 +49,25 @@ useDefault: {
 		]
 	}
 }
+
+issue1972: {
+	err1: {
+		#patchs: []
+		#patchs
+	
+		#someCondition: _
+		if #someCondition {
+		}
+	}
+	err1: {
+		someCondition: _
+		patchs: [...{}]
+		patchs
+		if someCondition {
+			patchs: _
+		}
+	}
+}
 -- out/compile --
 --- in.cue
 {
@@ -108,15 +127,38 @@ useDefault: {
       ]
     }
   }
+  issue1972: {
+    err1: {
+      #patchs: []
+      〈0;#patchs〉
+      #someCondition: _
+      if 〈0;#someCondition〉 {}
+    }
+    err1: {
+      someCondition: _
+      patchs: [
+        ...{},
+      ]
+      〈0;patchs〉
+      if 〈0;someCondition〉 {
+        patchs: _
+      }
+    }
+  }
 }
 -- out/eval --
 Errors:
+issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+    ./in.cue:54:12
+    ./in.cue:61:8
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
     ./in.cue:1:8
 wrongType: cannot use int (type int) as type bool:
     ./in.cue:10:2
     ./in.cue:1:14
+issue1972.err1: invalid list index someCondition (type string):
+    ./in.cue:65:6
 
 Result:
 (_|_){
@@ -168,6 +210,22 @@ Result:
           b: (string){ |(*(string){ "bar" }, (string){ string }) }
         }
       }
+    }
+  }
+  issue1972: (_|_){
+    // [eval]
+    err1: (_|_){
+      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+      //     ./in.cue:54:12
+      //     ./in.cue:61:8
+      // issue1972.err1: invalid list index someCondition (type string):
+      //     ./in.cue:65:6
+      patchs: (list){
+      }
+      someCondition: (_){ _ }
+      #patchs: (#list){
+      }
+      #someCondition: (_){ _ }
     }
   }
 }

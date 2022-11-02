@@ -1,0 +1,711 @@
+-- in.cue --
+import "list"
+
+// The following just chains existing fields and should NOT trigger cycle
+// detection.
+
+
+chain: t1: {
+	#maxiter: 2
+
+	// Trigger lookup of a.x0 before the "regular" evaluation of a.
+	x: a.x0
+
+	a: {
+		for k, _ in [0, 1] {
+			"x\(k)": (#DepthF & {#in: a["x\(k+1)"]}).#out
+		}
+	}
+
+	a: x2: null
+
+
+	#DepthF: {
+		#in: _
+		#out: {}
+	}
+}
+
+chain: t2: p1: {
+	X: 1
+
+	// Reference X through x.x0 before X is inserted.
+	for v in [0, X] + [] {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+}
+
+chain: t2: p2: {
+	// Reference X through x.x0 before X is inserted.
+	for v in [0, X] + [] {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+
+	X: 1
+}
+
+chain: t3: p1: {
+	X: 1
+
+	for v in list.Range(0, X, 1) {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+}
+
+chain: t3: p1: {
+	for v in list.Range(0, X, 1) {
+		x: "x\(v)": {}
+	}
+
+	x: _
+
+	x.x0
+
+	X: 1
+}
+
+-- issue2052.cue --
+import "list"
+
+issue2052: t1: {
+	#Depth: {
+		#maxiter: 4
+
+		for k, v in list.Range(0, #maxiter, 1) {
+			#funcs: "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+		}
+
+		#funcs: "\(#maxiter)": null
+
+		#funcs["0"]
+	}
+
+	#DepthF: {
+		#next: _
+		#func: {
+			#in:    _
+			#basic: string | null
+			out: {
+				if (#in & #basic) != _|_ {1}
+				if (#in & #basic) == _|_ {
+					list.Max([ for k, v in #in {(#next & {#in: v}).out}]) + 1
+				}
+			}
+		}
+	}
+
+	tree: "bar"
+
+	d: #Depth & {#in: tree}
+
+}
+
+issue2052: t2: {
+	#Depth: {
+		#maxiter: 4
+
+		for k, v in list.Range(0, #maxiter, 1) {
+			#funcs: "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+		}
+
+		#funcs:{
+			for k, v in list.Range(0, #maxiter, 1) {
+				 "\(k)": (#DepthF & {#next: #funcs["\(k+1)"]}).#func
+			}
+		}
+
+		#funcs: "\(#maxiter)": null
+
+		#funcs["0"]
+	}
+
+	#DepthF: {
+		#next: _
+		#func: {
+			#in:    _
+			#basic: string | null
+			out: {
+				if (#in & #basic) != _|_ {1}
+				if (#in & #basic) == _|_ {
+					list.Max([ for k, v in #in {(#next & {#in: v}).out}]) + 1
+				}
+			}
+		}
+	}
+
+	tree: "bar"
+
+	d: #Depth & {#in: tree}
+}
+
+issue2052: full: {
+	#RecurseN: {
+		// this is the bound on our recursion
+		#maxiter: uint | *4
+
+		// This is the function list element
+		// we generate this to simulate recursion
+		#funcFactory: {
+			#next: _
+			#func: _
+		}
+
+		// this is our "recursion unrolling"
+		for k, v in list.Range(0, #maxiter, 1) {
+			// this is where we build up our indexed functions and the references between them
+			#funcs: "\(k)": (#funcFactory & {#next: #funcs["\(k+1)"]}).#func
+		}
+
+		// our final value needs to be null
+		#funcs: "\(#maxiter)": null
+
+		// we embed the head of the list so that the values
+		// we write this into can be used like other CUE "functions"
+		#funcs["0"]
+	}
+
+	#DepthF: {
+		#next: _
+		#func: {
+			#in:    _
+			#basic: int | number | string | bytes | null
+			out: {
+				// if we have a basic type, we are at a leaf, depth is 1
+				if (#in & #basic) != _|_ {1}
+
+				// if we are not a basic type, then we are 1 + the max of children
+				if (#in & #basic) == _|_ {
+					// this is our "recursion" for each child
+					let depths = [ for k, v in #in {(#next & {#in: v}).out}]
+					list.Max(depths) + 1
+				}
+			}
+		}
+	}
+
+	#Depth: #RecurseN & {#maxiter: 11, #funcFactory: #DepthF}
+
+	tree: {
+		a: {
+			foo: "bar"
+			a: b: c: "d"
+		}
+		cow: "moo"
+	}
+
+	d: #Depth & {#in: tree}
+}
+-- out/eval/stats --
+Leaks:  12
+Freed:  192
+Reused: 179
+Allocs: 25
+Retain: 28
+
+Unifications: 141
+Conjuncts:    364
+Disjuncts:    188
+-- out/eval --
+Errors:
+#in: structural cycle:
+    ./in.cue:15:14
+
+Result:
+(_|_){
+  // [structural cycle]
+  chain: (_|_){
+    // [structural cycle]
+    t1: (_|_){
+      // [structural cycle]
+      #maxiter: (int){ 2 }
+      x: (_|_){
+        // [structural cycle] #in: structural cycle:
+        //     ./in.cue:15:14
+      }
+      a: (_|_){
+        // [structural cycle]
+        x2: (null){ null }
+        x0: (_|_){
+          // [structural cycle] #in: structural cycle:
+          //     ./in.cue:15:14
+        }
+        x1: (#struct){
+        }
+      }
+      #DepthF: (#struct){
+        #in: (_){ _ }
+        #out: (#struct){
+        }
+      }
+    }
+    t2: (struct){
+      p1: (_|_){
+        // [incomplete] 1: invalid interpolation: undefined field: X:
+        //     ./in.cue:33:6
+        //     ./in.cue:32:15
+        // chain.t2.p1: cannot add field x: was already used:
+        //     ./in.cue:36:2
+        x: (_|_){
+          // [incomplete] 1: invalid interpolation: undefined field: X:
+          //     ./in.cue:33:6
+          //     ./in.cue:32:15
+          x0: (_|_){// {}
+          }
+        }
+        X: (int){ 1 }
+      }
+      p2: (_|_){
+        // [incomplete] 1: invalid interpolation: undefined field: X:
+        //     ./in.cue:44:6
+        //     ./in.cue:43:15
+        // chain.t2.p2: cannot add field x: was already used:
+        //     ./in.cue:47:2
+        x: (_|_){
+          // [incomplete] 1: invalid interpolation: undefined field: X:
+          //     ./in.cue:44:6
+          //     ./in.cue:43:15
+          x0: (_|_){// {}
+          }
+        }
+        X: (int){ 1 }
+      }
+    }
+    t3: (struct){
+      p1: (_|_){
+        // [incomplete] chain.t3.p1: undefined field: X:
+        //     ./in.cue:57:25
+        // chain.t3.p1: cannot add field x: was already used:
+        //     ./in.cue:61:2
+        // chain.t3.p1: undefined field: X:
+        //     ./in.cue:67:25
+        // chain.t3.p1: cannot add field x: was already used:
+        //     ./in.cue:71:2
+        x: (_|_){
+          // [incomplete] chain.t3.p1: undefined field: X:
+          //     ./in.cue:57:25
+          // chain.t3.p1: undefined field: X:
+          //     ./in.cue:67:25
+        }
+        X: (int){ 1 }
+      }
+    }
+  }
+  issue2052: (struct){
+    t1: (struct){
+      #Depth: (_|_){
+        // [incomplete] issue2052.t1.#Depth: undefined field: #maxiter:
+        //     ./issue2052.cue:7:29
+        // issue2052.t1.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:11:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t1.#Depth: undefined field: #maxiter:
+          //     ./issue2052.cue:7:29
+        }
+        #maxiter: (int){ 4 }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      tree: (string){ "bar" }
+      d: (_|_){
+        // [incomplete] issue2052.t1.d: undefined field: #maxiter:
+        //     ./issue2052.cue:7:29
+        // issue2052.t1.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:11:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t1.d: undefined field: #maxiter:
+          //     ./issue2052.cue:7:29
+        }
+        #maxiter: (int){ 4 }
+        #in: (string){ "bar" }
+      }
+    }
+    t2: (struct){
+      #Depth: (_|_){
+        // [incomplete] issue2052.t2.#Depth: undefined field: #maxiter:
+        //     ./issue2052.cue:40:29
+        // issue2052.t2.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:44:3
+        // issue2052.t2.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:50:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t2.#Depth: undefined field: #maxiter:
+          //     ./issue2052.cue:40:29
+        }
+        #maxiter: (int){ 4 }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      tree: (string){ "bar" }
+      d: (_|_){
+        // [incomplete] issue2052.t2.d: undefined field: #maxiter:
+        //     ./issue2052.cue:40:29
+        // issue2052.t2.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:44:3
+        // issue2052.t2.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:50:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t2.d: undefined field: #maxiter:
+          //     ./issue2052.cue:40:29
+        }
+        #maxiter: (int){ 4 }
+        #in: (string){ "bar" }
+      }
+    }
+    full: (struct){
+      #RecurseN: (_|_){
+        // [incomplete] issue2052.full.#RecurseN: undefined field: #maxiter:
+        //     ./issue2052.cue:87:29
+        // issue2052.full.#RecurseN: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:93:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.full.#RecurseN: undefined field: #maxiter:
+          //     ./issue2052.cue:87:29
+        }
+        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (_){ _ }
+        }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      #Depth: (_|_){
+        // [incomplete] issue2052.full.#Depth: undefined field: #maxiter:
+        //     ./issue2052.cue:87:29
+        // issue2052.full.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:93:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.full.#Depth: undefined field: #maxiter:
+          //     ./issue2052.cue:87:29
+        }
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+      }
+      tree: (struct){
+        a: (struct){
+          foo: (string){ "bar" }
+          a: (struct){
+            b: (struct){
+              c: (string){ "d" }
+            }
+          }
+        }
+        cow: (string){ "moo" }
+      }
+      d: (_|_){
+        // [incomplete] issue2052.full.d: undefined field: #maxiter:
+        //     ./issue2052.cue:87:29
+        // issue2052.full.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:93:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.full.d: undefined field: #maxiter:
+          //     ./issue2052.cue:87:29
+        }
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+        #in: (#struct){
+          a: (#struct){
+            foo: (string){ "bar" }
+            a: (#struct){
+              b: (#struct){
+                c: (string){ "d" }
+              }
+            }
+          }
+          cow: (string){ "moo" }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  chain: {
+    t1: {
+      #maxiter: 2
+      x: 〈0;a〉.x0
+      a: {
+        for k, _ in [
+          0,
+          1,
+        ] {
+          "x\(〈1;k〉)": (〈3;#DepthF〉 & {
+            #in: 〈4;a〉["x\((〈2;k〉 + 1))"]
+          }).#out
+        }
+      }
+      a: {
+        x2: null
+      }
+      #DepthF: {
+        #in: _
+        #out: {}
+      }
+    }
+  }
+  chain: {
+    t2: {
+      p1: {
+        X: 1
+        for _, v in ([
+          0,
+          〈1;X〉,
+        ] + []) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+      }
+    }
+  }
+  chain: {
+    t2: {
+      p2: {
+        for _, v in ([
+          0,
+          〈1;X〉,
+        ] + []) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+        X: 1
+      }
+    }
+  }
+  chain: {
+    t3: {
+      p1: {
+        X: 1
+        for _, v in 〈import;list〉.Range(0, 〈0;X〉, 1) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+      }
+    }
+  }
+  chain: {
+    t3: {
+      p1: {
+        for _, v in 〈import;list〉.Range(0, 〈0;X〉, 1) {
+          x: {
+            "x\(〈2;v〉)": {}
+          }
+        }
+        x: _
+        〈0;x〉.x0
+        X: 1
+      }
+    }
+  }
+}
+--- issue2052.cue
+{
+  issue2052: {
+    t1: {
+      #Depth: {
+        #maxiter: 4
+        for k, v in 〈import;list〉.Range(0, 〈0;#maxiter〉, 1) {
+          #funcs: {
+            "\(〈2;k〉)": (〈4;#DepthF〉 & {
+              #next: 〈2;#funcs〉["\((〈3;k〉 + 1))"]
+            }).#func
+          }
+        }
+        #funcs: {
+          "\(〈1;#maxiter〉)": null
+        }
+        〈0;#funcs〉["0"]
+      }
+      #DepthF: {
+        #next: _
+        #func: {
+          #in: _
+          #basic: (string|null)
+          out: {
+            if ((〈1;#in〉 & 〈1;#basic〉) != _|_(explicit error (_|_ literal) in source)) {
+              1
+            }
+            if ((〈1;#in〉 & 〈1;#basic〉) == _|_(explicit error (_|_ literal) in source)) {
+              (〈import;list〉.Max([
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]) + 1)
+            }
+          }
+        }
+      }
+      tree: "bar"
+      d: (〈0;#Depth〉 & {
+        #in: 〈1;tree〉
+      })
+    }
+  }
+  issue2052: {
+    t2: {
+      #Depth: {
+        #maxiter: 4
+        for k, v in 〈import;list〉.Range(0, 〈0;#maxiter〉, 1) {
+          #funcs: {
+            "\(〈2;k〉)": (〈4;#DepthF〉 & {
+              #next: 〈2;#funcs〉["\((〈3;k〉 + 1))"]
+            }).#func
+          }
+        }
+        #funcs: {
+          for k, v in 〈import;list〉.Range(0, 〈1;#maxiter〉, 1) {
+            "\(〈1;k〉)": (〈4;#DepthF〉 & {
+              #next: 〈4;#funcs〉["\((〈2;k〉 + 1))"]
+            }).#func
+          }
+        }
+        #funcs: {
+          "\(〈1;#maxiter〉)": null
+        }
+        〈0;#funcs〉["0"]
+      }
+      #DepthF: {
+        #next: _
+        #func: {
+          #in: _
+          #basic: (string|null)
+          out: {
+            if ((〈1;#in〉 & 〈1;#basic〉) != _|_(explicit error (_|_ literal) in source)) {
+              1
+            }
+            if ((〈1;#in〉 & 〈1;#basic〉) == _|_(explicit error (_|_ literal) in source)) {
+              (〈import;list〉.Max([
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]) + 1)
+            }
+          }
+        }
+      }
+      tree: "bar"
+      d: (〈0;#Depth〉 & {
+        #in: 〈1;tree〉
+      })
+    }
+  }
+  issue2052: {
+    full: {
+      #RecurseN: {
+        #maxiter: (&(int, >=0)|*4)
+        #funcFactory: {
+          #next: _
+          #func: _
+        }
+        for k, v in 〈import;list〉.Range(0, 〈0;#maxiter〉, 1) {
+          #funcs: {
+            "\(〈2;k〉)": (〈3;#funcFactory〉 & {
+              #next: 〈2;#funcs〉["\((〈3;k〉 + 1))"]
+            }).#func
+          }
+        }
+        #funcs: {
+          "\(〈1;#maxiter〉)": null
+        }
+        〈0;#funcs〉["0"]
+      }
+      #DepthF: {
+        #next: _
+        #func: {
+          #in: _
+          #basic: (int|number|string|bytes|null)
+          out: {
+            if ((〈1;#in〉 & 〈1;#basic〉) != _|_(explicit error (_|_ literal) in source)) {
+              1
+            }
+            if ((〈1;#in〉 & 〈1;#basic〉) == _|_(explicit error (_|_ literal) in source)) {
+              let depths#1 = [
+                for k, v in 〈3;#in〉 {
+                  (〈6;#next〉 & {
+                    #in: 〈2;v〉
+                  }).out
+                },
+              ]
+              (〈import;list〉.Max(〈0;let depths#1〉) + 1)
+            }
+          }
+        }
+      }
+      #Depth: (〈0;#RecurseN〉 & {
+        #maxiter: 11
+        #funcFactory: 〈1;#DepthF〉
+      })
+      tree: {
+        a: {
+          foo: "bar"
+          a: {
+            b: {
+              c: "d"
+            }
+          }
+        }
+        cow: "moo"
+      }
+      d: (〈0;#Depth〉 & {
+        #in: 〈1;tree〉
+      })
+    }
+  }
+}

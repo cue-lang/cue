@@ -80,16 +80,31 @@ indirectlyDoublyNested: {
 	}
 }
 
+// This case used to trigger an over-aggressive deduplication.
+issue1974: {
+	X: {
+		foo: {
+			bar: ""
+			baz: ""
+		}
+	}
+	out: {
+		for k, v in X for vk, vv in v {
+			"\(k)": "\(vk)": vv
+		}
+	}
+}
+
 -- out/eval/stats --
 Leaks:  0
-Freed:  34
-Reused: 30
-Allocs: 4
+Freed:  43
+Reused: 38
+Allocs: 5
 Retain: 5
 
-Unifications: 34
-Conjuncts:    55
-Disjuncts:    34
+Unifications: 43
+Conjuncts:    69
+Disjuncts:    43
 -- out/eval --
 (struct){
   given: (struct){
@@ -137,6 +152,20 @@ Disjuncts:    34
     b: (int){ 1 }
     c: (int){ 1 }
     a: (bool){ true }
+  }
+  issue1974: (struct){
+    X: (struct){
+      foo: (struct){
+        bar: (string){ "" }
+        baz: (string){ "" }
+      }
+    }
+    out: (struct){
+      foo: (struct){
+        bar: (string){ "" }
+        baz: (string){ "" }
+      }
+    }
   }
 }
 -- out/compile --
@@ -223,6 +252,21 @@ Disjuncts:    34
       }
       if 〈1;a〉 {
         c: 1
+      }
+    }
+  }
+  issue1974: {
+    X: {
+      foo: {
+        bar: ""
+        baz: ""
+      }
+    }
+    out: {
+      for k, v in 〈1;X〉 for vk, vv in 〈0;v〉 {
+        "\(〈2;k〉)": {
+          "\(〈2;vk〉)": 〈2;vv〉
+        }
       }
     }
   }

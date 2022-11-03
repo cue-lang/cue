@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f144432_8561d1b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-03T07:47:30Z",
+      "side": 1,
+      "message": "Maybe abandon this change? I keep revisiting it. I don\u0027t think we should do this until the Go team adopts their UI/UX, which will probably not happen, as it seems.",
+      "revId": "67c4b1df46b3fe3c97cfe3cd615b5c0855433979",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

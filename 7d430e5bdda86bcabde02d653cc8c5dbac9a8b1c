@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec071ed8_7acfbfe4",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 527,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-11-03T09:08:45Z",
+      "side": 1,
+      "message": "Remove this comment?",
+      "revId": "7d430e5bdda86bcabde02d653cc8c5dbac9a8b1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

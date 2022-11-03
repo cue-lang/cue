@@ -20,7 +20,7 @@ import (
 	"io"
 	"regexp"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"

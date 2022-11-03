@@ -3,7 +3,7 @@ module cuelang.org/go
 go 1.19
 
 require (
-	github.com/cockroachdb/apd/v2 v2.0.2
+	github.com/cockroachdb/apd/v3 v3.2.0
 	github.com/emicklei/proto v1.10.0
 	github.com/go-quicktest/qt v1.100.0
 	github.com/google/go-cmp v0.5.9
@@ -27,9 +27,7 @@ require (
 require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
-	github.com/lib/pq v1.0.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/pkg/errors v0.8.1 // indirect
 	golang.org/x/sys v0.6.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

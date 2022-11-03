@@ -15,7 +15,7 @@
 package compile
 
 import (
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 	"golang.org/x/text/unicode/norm"
 
 	"cuelang.org/go/cue/ast"

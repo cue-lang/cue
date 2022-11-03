@@ -131,7 +131,7 @@ Result:
   sum: (int){ 1 }
   div1: (float){ 4.00000000000000000000000 }
   div2: (float){ 4.00000000000000000000000 }
-  div3: (float){ 1 }
+  div3: (float){ 1.0 }
   divZero: (_|_){
     // [eval] divZero: failed arithmetic: division by zero:
     //     ./in.cue:8:10
@@ -158,7 +158,7 @@ Result:
     // [eval] irem00: division by zero:
     //     ./in.cue:16:9
   }
-  v1: (float){ 5.0000000000E+11 }
+  v1: (float){ 5.0E+11 }
   v2: (bool){ true }
   v3: (float){ 0.666666666666666666666667 }
   v5: (int){ 0 }

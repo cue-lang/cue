@@ -21,19 +21,17 @@ package math
 import (
 	"math"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/internal"
 )
-
-var apdContext = apd.BaseContext.WithPrecision(24)
 
 // Abs returns the absolute value of x.
 //
 // Special case: Abs(±Inf) = +Inf
 func Abs(x *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Abs(&d, x)
+	_, err := internal.BaseContext.Abs(&d, x)
 	return &d, err
 }
 
@@ -137,7 +135,7 @@ func Atanh(x float64) float64 {
 //	Cbrt(NaN) = NaN
 func Cbrt(x *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Cbrt(&d, x)
+	_, err := internal.BaseContext.Cbrt(&d, x)
 	return &d, err
 }
 
@@ -178,7 +176,7 @@ var zero = apd.New(0, 0)
 //	Dim(x, NaN) = Dim(NaN, x) = NaN
 func Dim(x, y *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Sub(&d, x, y)
+	_, err := internal.BaseContext.Sub(&d, x, y)
 	if err != nil {
 		return nil, err
 	}
@@ -245,7 +243,7 @@ func Erfcinv(x float64) float64 {
 // Very small values underflow to 1.
 func Exp(x *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Exp(&d, x)
+	_, err := internal.BaseContext.Exp(&d, x)
 	return &d, err
 }
 
@@ -256,7 +254,7 @@ var two = apd.New(2, 0)
 // Special cases are the same as Exp.
 func Exp2(x *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Pow(&d, two, x)
+	_, err := internal.BaseContext.Pow(&d, two, x)
 	return &d, err
 }
 
@@ -391,7 +389,7 @@ func Ldexp(frac float64, exp int) float64 {
 //	Log(NaN) = NaN
 func Log(x *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Ln(&d, x)
+	_, err := internal.BaseContext.Ln(&d, x)
 	return &d, err
 }
 
@@ -399,7 +397,7 @@ func Log(x *internal.Decimal) (*internal.Decimal, error) {
 // The special cases are the same as for Log.
 func Log10(x *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Log10(&d, x)
+	_, err := internal.BaseContext.Log10(&d, x)
 	return &d, err
 }
 
@@ -407,12 +405,12 @@ func Log10(x *internal.Decimal) (*internal.Decimal, error) {
 // The special cases are the same as for Log.
 func Log2(x *internal.Decimal) (*internal.Decimal, error) {
 	var d, ln2 internal.Decimal
-	_, _ = apdContext.Ln(&ln2, two)
-	_, err := apdContext.Ln(&d, x)
+	_, _ = internal.BaseContext.Ln(&ln2, two)
+	_, err := internal.BaseContext.Ln(&d, x)
 	if err != nil {
 		return &d, err
 	}
-	_, err = apdContext.Quo(&d, &d, &ln2)
+	_, err = internal.BaseContext.Quo(&d, &d, &ln2)
 	return &d, err
 }
 
@@ -493,7 +491,7 @@ func Mod(x, y float64) float64 {
 //	Pow(x, y) = NaN for finite x < 0 and finite non-integer y
 func Pow(x, y *internal.Decimal) (*internal.Decimal, error) {
 	var d internal.Decimal
-	_, err := apdContext.Pow(&d, x, y)
+	_, err := internal.BaseContext.Pow(&d, x, y)
 	return &d, err
 }
 

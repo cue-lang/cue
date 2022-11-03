@@ -15,17 +15,9 @@
 package adt
 
 import (
-	"math/big"
-
-	"github.com/cockroachdb/apd/v2"
+	"cuelang.org/go/internal"
+	"github.com/cockroachdb/apd/v3"
 )
-
-var apdCtx apd.Context
-
-func init() {
-	apdCtx = apd.BaseContext
-	apdCtx.Precision = 24
-}
 
 func (n *Num) Impl() *apd.Decimal {
 	return &n.X
@@ -40,19 +32,19 @@ func (a *Num) Cmp(b *Num) int {
 }
 
 func (c *OpContext) Add(a, b *Num) Value {
-	return numOp(c, apdCtx.Add, a, b)
+	return numOp(c, internal.BaseContext.Add, a, b)
 }
 
 func (c *OpContext) Sub(a, b *Num) Value {
-	return numOp(c, apdCtx.Sub, a, b)
+	return numOp(c, internal.BaseContext.Sub, a, b)
 }
 
 func (c *OpContext) Mul(a, b *Num) Value {
-	return numOp(c, apdCtx.Mul, a, b)
+	return numOp(c, internal.BaseContext.Mul, a, b)
 }
 
 func (c *OpContext) Quo(a, b *Num) Value {
-	v := numOp(c, apdCtx.Quo, a, b)
+	v := numOp(c, internal.BaseContext.Quo, a, b)
 	if n, ok := v.(*Num); ok {
 		n.K = FloatKind
 	}
@@ -60,7 +52,7 @@ func (c *OpContext) Quo(a, b *Num) Value {
 }
 
 func (c *OpContext) Pow(a, b *Num) Value {
-	return numOp(c, apdCtx.Pow, a, b)
+	return numOp(c, internal.BaseContext.Pow, a, b)
 }
 
 type numFunc func(z, x, y *apd.Decimal) (apd.Condition, error)
@@ -86,22 +78,22 @@ func numOp(c *OpContext, fn numFunc, x, y *Num) Value {
 }
 
 func (c *OpContext) IntDiv(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Div, a, b)
+	return intDivOp(c, (*apd.BigInt).Div, a, b)
 }
 
 func (c *OpContext) IntMod(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Mod, a, b)
+	return intDivOp(c, (*apd.BigInt).Mod, a, b)
 }
 
 func (c *OpContext) IntQuo(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Quo, a, b)
+	return intDivOp(c, (*apd.BigInt).Quo, a, b)
 }
 
 func (c *OpContext) IntRem(a, b *Num) Value {
-	return intDivOp(c, (*big.Int).Rem, a, b)
+	return intDivOp(c, (*apd.BigInt).Rem, a, b)
 }
 
-type intFunc func(z, x, y *big.Int) *big.Int
+type intFunc func(z, x, y *apd.BigInt) *apd.BigInt
 
 func intDivOp(c *OpContext, fn intFunc, a, b *Num) Value {
 	if b.X.IsZero() {
@@ -109,11 +101,11 @@ func intDivOp(c *OpContext, fn intFunc, a, b *Num) Value {
 	}
 
 	var x, y apd.Decimal
-	_, _ = apdCtx.RoundToIntegralValue(&x, &a.X)
+	_, _ = internal.BaseContext.RoundToIntegralValue(&x, &a.X)
 	if x.Negative {
 		x.Coeff.Neg(&x.Coeff)
 	}
-	_, _ = apdCtx.RoundToIntegralValue(&y, &b.X)
+	_, _ = internal.BaseContext.RoundToIntegralValue(&y, &b.X)
 	if y.Negative {
 		y.Coeff.Neg(&y.Coeff)
 	}

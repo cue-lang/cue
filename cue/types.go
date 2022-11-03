@@ -23,7 +23,7 @@ import (
 	"math/big"
 	"strings"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -345,7 +345,7 @@ func (v Value) MantExp(mant *big.Int) (exp int, err error) {
 		return 0, ErrInfinite
 	}
 	if mant != nil {
-		mant.Set(&n.X.Coeff)
+		mant.Set(n.X.Coeff.MathBigInt())
 		if n.X.Negative {
 			mant.Neg(mant)
 		}
@@ -381,7 +381,7 @@ func (v Value) AppendFloat(buf []byte, fmt byte, prec int) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	ctx := apd.BaseContext
+	ctx := internal.BaseContext
 	nd := int(apd.NumDigits(&n.X.Coeff)) + int(n.X.Exponent)
 	if n.X.Form == apd.Infinite {
 		if n.X.Negative {
@@ -390,9 +390,9 @@ func (v Value) AppendFloat(buf []byte, fmt byte, prec int) ([]byte, error) {
 		return append(buf, string('∞')...), nil
 	}
 	if fmt == 'f' && nd > 0 {
-		ctx.Precision = uint32(nd + prec)
+		ctx = ctx.WithPrecision(uint32(nd + prec))
 	} else {
-		ctx.Precision = uint32(prec)
+		ctx = ctx.WithPrecision(uint32(prec))
 	}
 	var d apd.Decimal
 	ctx.Round(&d, &n.X)
@@ -425,7 +425,7 @@ func (v Value) Int(z *big.Int) (*big.Int, error) {
 	if n.X.Exponent != 0 {
 		panic("cue: exponent should always be nil for integer types")
 	}
-	z.Set(&n.X.Coeff)
+	z.Set(n.X.Coeff.MathBigInt())
 	if n.X.Negative {
 		z.Neg(z)
 	}
@@ -504,8 +504,7 @@ func init() {
 		// math.MaxFloat64: 2**1023 * (2**53 - 1) / 2**52
 		max = "1.797693134862315708145274237317043567981e+308"
 	)
-	ctx := apd.BaseContext
-	ctx.Precision = 40
+	ctx := internal.BaseContext.WithPrecision(40)
 
 	var err error
 	smallestPosFloat64, _, err = ctx.NewFromString(smallest)

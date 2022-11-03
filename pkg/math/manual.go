@@ -17,15 +17,15 @@ package math
 import (
 	"math/big"
 
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 
 	"cuelang.org/go/internal"
 )
 
-func roundContext(rounder string) *apd.Context {
-	c := *apdContext
+func roundContext(rounder apd.Rounder) internal.Context {
+	c := internal.BaseContext
 	c.Rounding = rounder
-	return &c
+	return c
 }
 
 // TODO: for now we convert Decimals to int. This allows the desired type to be
@@ -37,7 +37,7 @@ func toInt(d *internal.Decimal) *big.Int {
 	if d.Negative {
 		i.Neg(i)
 	}
-	return i
+	return i.MathBigInt()
 }
 
 // Floor returns the greatest integer value less than or equal to x.
@@ -49,8 +49,8 @@ func toInt(d *internal.Decimal) *big.Int {
 //	Floor(NaN) = NaN
 func Floor(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
-	_, err := apdContext.Floor(&d, x)
-	_, _ = apdContext.Quantize(&d, &d, 0)
+	_, err := internal.BaseContext.Floor(&d, x)
+	_, _ = internal.BaseContext.Quantize(&d, &d, 0)
 	return toInt(&d), err
 }
 
@@ -63,8 +63,8 @@ func Floor(x *internal.Decimal) (*big.Int, error) {
 //	Ceil(NaN) = NaN
 func Ceil(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
-	_, err := apdContext.Ceil(&d, x)
-	_, _ = apdContext.Quantize(&d, &d, 0)
+	_, err := internal.BaseContext.Ceil(&d, x)
+	_, _ = internal.BaseContext.Quantize(&d, &d, 0)
 	return toInt(&d), err
 }
 
@@ -113,7 +113,7 @@ func RoundToEven(x *internal.Decimal) (*big.Int, error) {
 	return toInt(&d), err
 }
 
-var mulContext = apd.BaseContext.WithPrecision(1)
+var mulContext = internal.BaseContext.WithPrecision(1)
 
 // MultipleOf reports whether x is a multiple of y.
 func MultipleOf(x, y *internal.Decimal) (bool, error) {

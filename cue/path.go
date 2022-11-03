@@ -27,7 +27,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
 )
 
 // SelectorType represents the kind of a selector. It indicates both the label

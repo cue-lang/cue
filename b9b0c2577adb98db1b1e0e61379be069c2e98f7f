@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52bf41c4_ba9373ab",
+        "filename": "cue/testdata/comprehensions/iferror.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2022-11-03T09:09:41Z",
+      "side": 1,
+      "message": "extra space.",
+      "revId": "b9b0c2577adb98db1b1e0e61379be069c2e98f7f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

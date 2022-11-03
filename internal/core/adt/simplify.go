@@ -15,7 +15,9 @@
 package adt
 
 import (
-	"github.com/cockroachdb/apd/v2"
+	"github.com/cockroachdb/apd/v3"
+
+	"cuelang.org/go/internal"
 )
 
 // SimplifyBounds collapses bounds if possible. The bound values must be
@@ -82,21 +84,21 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 			// Readjust bounds for integers.
 			if x.Op == GreaterEqualOp {
 				// >=3.4  ==>  >=4
-				_, _ = apdCtx.Ceil(&lo, &a.X)
+				_, _ = internal.BaseContext.Ceil(&lo, &a.X)
 			} else {
 				// >3.4  ==>  >3
-				_, _ = apdCtx.Floor(&lo, &a.X)
+				_, _ = internal.BaseContext.Floor(&lo, &a.X)
 			}
 			if y.Op == LessEqualOp {
 				// <=2.3  ==>  <= 2
-				_, _ = apdCtx.Floor(&hi, &b.X)
+				_, _ = internal.BaseContext.Floor(&hi, &b.X)
 			} else {
 				// <2.3   ==>  < 3
-				_, _ = apdCtx.Ceil(&hi, &b.X)
+				_, _ = internal.BaseContext.Ceil(&hi, &b.X)
 			}
 		}
 
-		cond, err := apd.BaseContext.Sub(&d, &hi, &lo)
+		cond, err := internal.BaseContext.Sub(&d, &hi, &lo)
 		if cond.Inexact() || err != nil {
 			break
 		}
@@ -140,7 +142,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 
 		case diff == 2:
 			if k&FloatKind == 0 && x.Op == GreaterThanOp && y.Op == LessThanOp {
-				_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &lo)
+				_, _ = internal.BaseContext.Add(&d, d.SetInt64(1), &lo)
 				return ctx.newNum(&d, k&NumKind, x, y)
 
 			}

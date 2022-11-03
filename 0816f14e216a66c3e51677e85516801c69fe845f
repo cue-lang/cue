@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b0f5e430_5741ceeb",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-03T16:17:22Z",
+      "side": 1,
+      "message": "note to self: allocate this big int globally once",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

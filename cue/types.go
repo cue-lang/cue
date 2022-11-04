@@ -1076,9 +1076,9 @@ func (v hiddenValue) Split() []Value {
 }
 
 // Source returns the original node for this value. The return value may not
-// be a syntax.Expr. For instance, a struct kind may be represented by a
+// be an [ast.Expr]. For instance, a struct kind may be represented by a
 // struct literal, a field comprehension, or a file. It returns nil for
-// computed nodes. Use Split to get all source values that apply to a field.
+// computed nodes. Use [Value.Expr] to get all source values that apply to a field.
 func (v Value) Source() ast.Node {
 	if v.v == nil {
 		return nil

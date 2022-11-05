@@ -2152,7 +2152,7 @@ func All() Option {
 
 // Docs indicates whether docs should be included.
 func Docs(include bool) Option {
-	return func(p *options) { p.docs = true }
+	return func(p *options) { p.docs = include }
 }
 
 // Definitions indicates whether definitions should be included.

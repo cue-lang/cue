@@ -3,6 +3,108 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8f2a5ba7_8a729c06",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "Since we are getting close now, I would move internal.Context as suggested. Could be a followup CL.\n\nThis allows us to move more easily to a precision of 34 digits, commensurate to the decimal128 standard.",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f69815c9_1e47bb5a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "Just to confirm, 2.00 * 3 would result in 6.00? \n\nThere may be tests for this, but would be good to verify.",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0484f71e_890bd5dc",
+        "filename": "cue/literal/num.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "One FYI, since we are on this. Georges from Bentos has asked if we could increase the number of decimal digits to 34, commensurate to the up and coming decimal128 standard.\n\nNot particularly urgent, but something to keep in mind.",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc594f91_64efe1f1",
+        "filename": "cue/literal/num.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "Not sure if I see the cycle. But why not move the main shared context here? Or in another package like internal/decimal?",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abb96023_18d54b79",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "Maybe use SetMathBigInt instead? I can imagine that may avoid an allocation.",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcca9b7f_f804746d",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b0f5e430_5741ceeb",
         "filename": "internal/internal.go",
         "patchSetId": 2
@@ -14,6 +116,41 @@
       "writtenOn": "2022-11-03T16:17:22Z",
       "side": 1,
       "message": "note to self: allocate this big int globally once",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85ffae99_ebf93f66",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "Maybe add a TODO?",
+      "parentUuid": "b0f5e430_5741ceeb",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d257969f_06c6ddad",
+        "filename": "pkg/math/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T10:28:11Z",
+      "side": 1,
+      "message": "I wonder if this is actually a bug (also in the old code)?\n\nTo be sure, i would just use d.MathBigInt()?",
       "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

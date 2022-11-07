@@ -105,6 +105,30 @@
       },
       "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8767280_bc3a8f7b",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-07T14:52:19Z",
+      "side": 1,
+      "message": "Personally I\u0027m not keen on referencing the Go docs directly for various reason. For one, the set may actually not be the same as Go\u0027s. Other systems are not tested. We officially only support Windows, Linux, and Mac.\n\nSame might be true for arch.\n\nBut in general, it is not a great user experience to have to link through to other pages for something simple like this.\n\nIf we are worried about getting out of sync, a simple test that checks if new entries are added to goarch.go, etc. would do, I reckon.",
+      "parentUuid": "abfff42c_73d01a90",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

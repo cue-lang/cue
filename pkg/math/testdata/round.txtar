@@ -33,7 +33,7 @@ trunc0: math.Trunc(2.5)
 trunc1: math.Trunc(-2.9)
 -- out/math --
 Errors:
-error in call to math.MultipleOf: division by zero:
+mul2: error in call to math.MultipleOf: division by zero:
     ./in.cue:6:7
 floorE1: too many arguments in call to math.Floor (have 2, want 1):
     ./in.cue:17:10
@@ -44,7 +44,7 @@ Result:
 mul0: true
 mul1: false
 // TODO(errors): ensure path is included for the following error.
-mul2:    _|_ // error in call to math.MultipleOf: division by zero
+mul2:    _|_ // mul2: error in call to math.MultipleOf: division by zero
 mul3:    false
 mul4:    true
 mul5:    true

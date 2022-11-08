@@ -293,7 +293,7 @@ Result:
         y: (string){ string }
       }
       out: (_|_){
-        // [incomplete] error in call to text/template.Execute: cannot convert non-concrete value string:
+        // [incomplete] multipleErrors.#T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
         //     ./in.cue:98:8
         //     ./in.cue:95:4
       }

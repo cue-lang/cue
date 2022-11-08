@@ -9,12 +9,12 @@ t2: ed25519.Valid(hex.Decode("00000000000000000000000000000000000000000000000000
 t3: ed25519.Valid(hex.Decode(""), hex.Decode("77726f6e67206b65792073697a65"), hex.Decode("34b7fe250b3ddfb1ba7e56aca7e869a59c5208315f705323c4b3abf915c2a8c07537417bd988b0144929f52b1d00eb768741e7e139dca10412ae1997b6644c09"))
 -- out/ed25519 --
 Errors:
-error in call to crypto/ed25519.Valid: ed25519: publicKey must be 32 bytes:
+t3: error in call to crypto/ed25519.Valid: ed25519: publicKey must be 32 bytes:
     ./in.cue:8:5
 
 Result:
 t0: true
 t1: false
 t2: false
-t3: _|_ // error in call to crypto/ed25519.Valid: ed25519: publicKey must be 32 bytes
+t3: _|_ // t3: error in call to crypto/ed25519.Valid: ed25519: publicKey must be 32 bytes
 

@@ -48,7 +48,7 @@ Disjuncts:    19
     #User: (#struct){
       tags_str: (string){ string }
       tags_map: (_|_){
-        // [incomplete] error in call to strings.Split: non-concrete value string:
+        // [incomplete] issue560.#User.tags_map: error in call to strings.Split: non-concrete value string:
         //     ./in.cue:14:16
         //     ./in.cue:12:13
         "{a}": (string){ string }

@@ -1,0 +1,149 @@
+exec cue cmd tangle_sublime
+cmp stdout stdout1.golden
+
+exec cue cmd ts
+cmp stdout stdout2.golden
+
+-- tangle_sublime_tool.cue --
+package tangle_sublime
+
+import (
+	"encoding/yaml"
+	"tool/cli"
+)
+
+command: tangle_sublime: {
+	debugSourceFile: cli.Print & {text: yaml.Marshal(buildSource)}
+}
+
+v: w: 0
+
+let X = {c: d: v}
+
+a: b: X.c
+
+command: ts: cli.Print & {text: "foo", x: a}
+
+-- other.cue --
+package tangle_sublime
+
+import (
+	"strings"
+	"list"
+
+)
+
+keyzen: KeyZen: {
+	Commands: {
+		CommandNames: ["CursorMoveToLineForward"]
+		CommandDetailsMap: {
+			CursorMoveToLineForward: {
+				Human:       "Cursor Down"
+				Category:    "Cursor"
+				Subcategory: ""
+			}
+		}
+	}
+	Editors: {
+		SublimeText: {
+			EditorCommandNameMap: {
+				CursorMoveToLineForward: {
+					command: "move"
+					// delete this line to remove panic
+					argsText: "test"
+				}
+			}
+		}
+	}
+	Strokes: {
+		ZenStrokes1: {
+			Name: "ZenStrokes1"
+			StrokeCmdDefsMap: {
+				CursorMoveToLineForward: [["Down"], ["Hyper+K"]]
+			}
+			StrokesMap: {
+				CursorMoveToLineForward: [{
+					Bindings: {
+						Linux: {
+							Down: 10
+						}
+					}
+					DefText: "Down"
+				}]
+			}
+		}
+	}
+
+}
+
+args: {
+	editorName:   "SublimeText"
+	strokesName:  "ZenStrokes1"
+	platformName: "Linux"
+	fileName:     "_" + strings.ToLower(editorName) + "_strokes.json5"
+}
+
+cmdNames:      keyzen.KeyZen.Commands.CommandNames
+editorCmds:    keyzen.KeyZen.Editors["\(args.editorName)"].EditorCommandNameMap
+strokeCmdsMap: keyzen.KeyZen.Strokes["\(args.strokesName)"].StrokesMap
+
+buildSource: {
+	EditorName:   args.editorName
+	StrokesName:  args.strokesName
+	PlatformName: args.platformName
+
+	CommandBindingsCount: len(CommandBindings)
+
+	CommandBindings: [
+		for cmdIdx, cmdName in cmdNames
+		if keyzen.KeyZen.Strokes[StrokesName].StrokesMap[cmdName] != _|_ &&
+			editorCmds[cmdName] != _|_ {
+			let cmdDetails = keyzen.KeyZen.Commands.CommandDetailsMap[cmdName]
+			let strokeDefs = keyzen.KeyZen.Strokes[StrokesName].StrokesMap[cmdName]
+			let editorCmd = editorCmds[cmdName]
+
+			let editorCmdText = editorCmd.argsText
+			let editorCmdTextCommand = "\"command\": \"" + editorCmd.command + "\""
+
+			CmdName:      cmdName
+			CmdHumanName: cmdDetails["Human"]
+
+			EditorCmdText: string
+			if editorCmdText == _|_ {EditorCmdText: editorCmdTextCommand}
+			if editorCmdText != _|_ {EditorCmdText: editorCmdTextCommand + ", \"args\": " + editorCmd.argsText}
+
+			BindingsCount: len(Bindings)
+			if BindingsCount == 0 {{BindingsMax: 0}}
+			if BindingsCount > 0 {{BindingsMax: BindingsCount - 1}}
+			Bindings: [
+				for _, strokeDef in strokeDefs {
+					let bindingMap = strokeDef.Bindings["\(PlatformName)"]
+					let bindingIds = [ for k, v in bindingMap {name: k, idx: v}]
+					let bindingIdsSorted = list.Sort(bindingIds, {x: {}, y: {}, less: x.idx < y.idx})
+					let bindingKeys = [ for _, kv in bindingIdsSorted {kv.name}]
+					let bindingText = strings.Join(bindingKeys, "+")
+					"DefText":  "\(strokeDef.DefText)"
+					"BindText": bindingText
+				},
+			]
+		},
+	]
+}
+
+-- stdout1.golden --
+EditorName: SublimeText
+StrokesName: ZenStrokes1
+PlatformName: Linux
+CommandBindingsCount: 1
+CommandBindings:
+  - CmdName: CursorMoveToLineForward
+    CmdHumanName: Cursor Down
+    EditorCmdText: '"command": "move", "args": test'
+    BindingsCount: 1
+    BindingsMax: 0
+    Bindings:
+      - DefText: Down
+        BindText: Down
+
+-- stdout2.golden --
+foo

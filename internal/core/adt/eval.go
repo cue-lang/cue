@@ -769,17 +769,22 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 			wasVoid := !a.isDefined()
 
 			ctx.Unify(a, state)
-			// Don't set the state to Finalized if the child arcs are not done.
-			if state == Finalized && a.status < Finalized {
-				state = Conjuncts
-			}
 
 			if !a.isDefined() {
 				continue
 			}
 
-			if err, _ := a.BaseValue.(*Bottom); err != nil && !a.Label.IsLet() {
-				n.node.AddChildError(err)
+			// Errors are allowed in let fields. Handle errors and failure to
+			// complete accordingly.
+			if !a.Label.IsLet() {
+				// Don't set the state to Finalized if the child arcs are not done.
+				if state == Finalized && a.status < Finalized {
+					state = Conjuncts
+				}
+
+				if err, _ := a.BaseValue.(*Bottom); err != nil {
+					n.node.AddChildError(err)
+				}
 			}
 
 			n.node.Arcs[k] = a

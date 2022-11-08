@@ -79,6 +79,16 @@ raw: true
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  15
+Reused: 11
+Allocs: 4
+Retain: 0
+
+Unifications: 15
+Conjuncts:    26
+Disjuncts:    15
 -- out/eval --
 (struct){
   #emb: (#struct){

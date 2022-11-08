@@ -124,6 +124,16 @@ z3:  8
   z3: (〈0;z1〉 - 3)
   z3: 8
 }
+-- out/eval/stats --
+Leaks:  6
+Freed:  38
+Reused: 34
+Allocs: 10
+Retain: 28
+
+Unifications: 27
+Conjuncts:    93
+Disjuncts:    44
 -- out/eval --
 Errors:
 xe1: 2 errors in empty disjunction:

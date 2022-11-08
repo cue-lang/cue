@@ -100,6 +100,16 @@ jobs3: _|_ // field "fooTest1" not allowed in closed struct
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  19
+Reused: 15
+Allocs: 4
+Retain: 0
+
+Unifications: 19
+Conjuncts:    45
+Disjuncts:    19
 -- out/eval --
 Errors:
 jobs1.foo1: field not allowed:

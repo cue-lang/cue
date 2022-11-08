@@ -95,6 +95,16 @@ t2: d: {
 t2total: {
 	for _, v in t2 {v}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  58
+Reused: 49
+Allocs: 9
+Retain: 41
+
+Unifications: 58
+Conjuncts:    424
+Disjuncts:    58
 -- out/eval --
 (struct){
   t1: (struct){

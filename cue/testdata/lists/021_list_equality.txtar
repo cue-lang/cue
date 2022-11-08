@@ -482,6 +482,16 @@ fne11: false
     ...,
   ])
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  234
+Reused: 229
+Allocs: 5
+Retain: 96
+
+Unifications: 234
+Conjuncts:    234
+Disjuncts:    234
 -- out/eval --
 (struct){
   eq0: (bool){ true }

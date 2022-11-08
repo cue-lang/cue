@@ -26,6 +26,16 @@ a: {
     x: "hey"
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  4
+Reused: 0
+Allocs: 4
+Retain: 1
+
+Unifications: 4
+Conjuncts:    6
+Disjuncts:    4
 -- out/eval --
 Errors:
 a.x: conflicting values "hey!?" and "hey":

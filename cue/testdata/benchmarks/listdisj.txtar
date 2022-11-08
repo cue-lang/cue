@@ -54,6 +54,16 @@ v: #T
   #X: 〈0;v〉
   #X: 〈0;#T〉
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  447
+Reused: 439
+Allocs: 8
+Retain: 0
+
+Unifications: 287
+Conjuncts:    894
+Disjuncts:    447
 -- out/eval --
 (struct){
   #T: (list){

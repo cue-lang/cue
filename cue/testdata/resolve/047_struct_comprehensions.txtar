@@ -77,6 +77,16 @@ reg: 4
     "\(〈1;k〉)": 〈1;v〉
   }
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  11
+Reused: 5
+Allocs: 8
+Retain: 2
+
+Unifications: 9
+Conjuncts:    18
+Disjuncts:    12
 -- out/eval --
 (struct){
   obj: (struct){

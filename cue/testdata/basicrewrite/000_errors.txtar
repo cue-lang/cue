@@ -29,6 +29,16 @@ e: true
   f: (({} & false) == _|_(explicit error (_|_ literal) in source))
   g: (_|_(explicit error (_|_ literal) in source) != ({} & false))
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 7
+Allocs: 3
+Retain: 0
+
+Unifications: 10
+Conjuncts:    14
+Disjuncts:    10
 -- out/eval --
 Errors:
 explicit error (_|_ literal) in source:

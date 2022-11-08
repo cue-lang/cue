@@ -32,6 +32,16 @@ out: #secrets & {
 	FOO: $secret: _id: "100"
 	ONE: TWO: THREE: $secret: _id: "123"
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  995025
+Reused: 994976
+Allocs: 49
+Retain: 0
+
+Unifications: 740771
+Conjuncts:    3143640
+Disjuncts:    995025
 -- out/eval --
 (struct){
   #Secret: (#struct){

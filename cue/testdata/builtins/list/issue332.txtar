@@ -12,6 +12,16 @@ import "list"
 r: #foo & {
 	#x: "hello"
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  25
+Reused: 19
+Allocs: 6
+Retain: 0
+
+Unifications: 25
+Conjuncts:    65
+Disjuncts:    25
 -- out/eval --
 (struct){
   #d: (#struct){

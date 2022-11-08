@@ -28,6 +28,16 @@ issue560: {
 		tags_str: "b {c}"
 	}
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  18
+Reused: 12
+Allocs: 8
+Retain: 2
+
+Unifications: 20
+Conjuncts:    25
+Disjuncts:    19
 -- out/eval --
 (struct){
   dynamic: (struct){

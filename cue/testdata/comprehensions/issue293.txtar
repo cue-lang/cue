@@ -24,6 +24,16 @@ t: #C
 	}
 }
 t: p: "foo"
+-- out/eval/stats --
+Leaks:  2
+Freed:  12
+Reused: 8
+Allocs: 6
+Retain: 3
+
+Unifications: 14
+Conjuncts:    25
+Disjuncts:    14
 -- out/eval --
 Errors:
 z.x.f2: field not allowed:

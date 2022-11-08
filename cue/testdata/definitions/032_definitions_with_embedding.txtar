@@ -79,6 +79,16 @@
     }
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  20
+Reused: 16
+Allocs: 4
+Retain: 0
+
+Unifications: 20
+Conjuncts:    36
+Disjuncts:    20
 -- out/eval --
 Errors:
 #e1.a.d: field not allowed:

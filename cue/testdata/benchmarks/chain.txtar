@@ -2015,6 +2015,16 @@ f1000: f999
   f999: 〈0;f998〉
   f1000: 〈0;f999〉
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  1001
+Reused: 999
+Allocs: 2
+Retain: 0
+
+Unifications: 1001
+Conjuncts:    500501
+Disjuncts:    1001
 -- out/eval --
 (struct){
   f1: (string){ string }

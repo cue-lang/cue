@@ -13,6 +13,16 @@ b: #A & {
 	c: 3
 	d: 4
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  32
+Reused: 26
+Allocs: 6
+Retain: 0
+
+Unifications: 20
+Conjuncts:    46
+Disjuncts:    32
 -- out/eval --
 Errors:
 b: 2 errors in empty disjunction:

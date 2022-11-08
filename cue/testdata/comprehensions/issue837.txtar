@@ -63,6 +63,16 @@
 }
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
+-- out/eval/stats --
+Leaks:  2
+Freed:  162
+Reused: 145
+Allocs: 19
+Retain: 11
+
+Unifications: 114
+Conjuncts:    291
+Disjuncts:    164
 -- out/eval --
 Errors:
 _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):

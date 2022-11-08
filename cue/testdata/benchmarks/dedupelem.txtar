@@ -24,6 +24,16 @@ foo: [{type: "string"}] & [...#Value]
 foo: [{type: "string"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
+-- out/eval/stats --
+Leaks:  0
+Freed:  16
+Reused: 10
+Allocs: 6
+Retain: 0
+
+Unifications: 10
+Conjuncts:    94
+Disjuncts:    16
 -- out/eval --
 Errors:
 foo.0: 2 errors in empty disjunction:

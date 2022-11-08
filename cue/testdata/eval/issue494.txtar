@@ -14,6 +14,16 @@ c: ben: [{}]
 #d: ben: [{}]
 
 d: #d
+-- out/eval/stats --
+Leaks:  0
+Freed:  26
+Reused: 21
+Allocs: 5
+Retain: 0
+
+Unifications: 26
+Conjuncts:    56
+Disjuncts:    26
 -- out/eval --
 (struct){
   _Q: (#list){

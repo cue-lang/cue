@@ -18,6 +18,16 @@ x2: _#x & {
 	Name: "hello"
 	Age:  50
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 8
+Allocs: 3
+Retain: 0
+
+Unifications: 11
+Conjuncts:    17
+Disjuncts:    11
 -- out/eval --
 Errors:
 x1.Age: field not allowed:

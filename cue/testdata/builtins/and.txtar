@@ -3,6 +3,16 @@ merge: and([1, 1])
 
 // ensure definitions along embedded scalars are preserved.
 embed: and([{2, #x: 1}, {2, #x: 2}])
+-- out/eval/stats --
+Leaks:  2
+Freed:  4
+Reused: 1
+Allocs: 5
+Retain: 2
+
+Unifications: 6
+Conjuncts:    13
+Disjuncts:    6
 -- out/eval --
 Errors:
 embed.#x: conflicting values 2 and 1:

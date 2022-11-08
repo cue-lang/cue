@@ -117,6 +117,16 @@ mixedRec: {
     Mixed: string
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  28
+Reused: 24
+Allocs: 4
+Retain: 0
+
+Unifications: 28
+Conjuncts:    43
+Disjuncts:    28
 -- out/eval --
 Errors:
 foo.feild: field not allowed:

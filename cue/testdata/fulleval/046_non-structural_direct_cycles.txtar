@@ -26,6 +26,16 @@ c2: _|_ // conflicting values {bar: 1} and 1 (mismatched types struct and int)
     bar: 1
   } & 〈0;c2〉.bar)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 3
+Allocs: 4
+Retain: 2
+
+Unifications: 7
+Conjuncts:    11
+Disjuncts:    7
 -- out/eval --
 Errors:
 c2: conflicting values 1 and {bar:1} (mismatched types int and struct):

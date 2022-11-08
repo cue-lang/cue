@@ -96,6 +96,16 @@ closeFail: {
 	x: b: "foo"
 }
 
+-- out/eval/stats --
+Leaks:  122
+Freed:  131
+Reused: 127
+Allocs: 126
+Retain: 268
+
+Unifications: 242
+Conjuncts:    503
+Disjuncts:    252
 -- out/eval --
 Errors:
 closeCycle.a: structural cycle

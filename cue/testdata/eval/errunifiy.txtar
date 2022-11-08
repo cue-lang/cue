@@ -6,6 +6,16 @@ a: "t"
 
 b: _|_
 b: "t"
+-- out/eval/stats --
+Leaks:  5
+Freed:  3
+Reused: 1
+Allocs: 7
+Retain: 5
+
+Unifications: 8
+Conjuncts:    14
+Disjuncts:    8
 -- out/eval --
 Errors:
 explicit error (_|_ literal) in source:

@@ -60,6 +60,16 @@ nested: {
 	a: 1 | 2 | *(
 		(3 | 4 | *( 5 | 6 | *7)) & ( 3 | 4 | ( *7 | 8 )))
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  416
+Reused: 381
+Allocs: 37
+Retain: 2
+
+Unifications: 258
+Conjuncts:    483
+Disjuncts:    417
 -- out/eval --
 (struct){
   default: (struct){

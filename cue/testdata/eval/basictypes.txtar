@@ -10,6 +10,16 @@ scalar: {
 	c: {{{number}}}
 	d: number
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 6
+Allocs: 3
+Retain: 0
+
+Unifications: 9
+Conjuncts:    14
+Disjuncts:    9
 -- out/eval --
 (struct){
   top: (struct){

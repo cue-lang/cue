@@ -17,6 +17,16 @@ New_infra: {
 		}
 	}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  18
+Reused: 14
+Allocs: 4
+Retain: 0
+
+Unifications: 18
+Conjuncts:    22
+Disjuncts:    18
 -- out/eval --
 (struct){
   DeleteThis: (#list){

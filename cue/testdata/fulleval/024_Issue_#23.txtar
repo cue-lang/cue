@@ -26,6 +26,16 @@ y: _|_ // ; empty disjunction: conflicting values 2 and 3
     a: 3
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 6
+Allocs: 5
+Retain: 0
+
+Unifications: 7
+Conjuncts:    15
+Disjuncts:    11
 -- out/eval --
 Errors:
 y: 2 errors in empty disjunction:

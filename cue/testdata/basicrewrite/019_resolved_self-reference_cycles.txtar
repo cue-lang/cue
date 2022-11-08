@@ -86,6 +86,16 @@ s3:
     c: 3
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  18
+Reused: 13
+Allocs: 5
+Retain: 4
+
+Unifications: 18
+Conjuncts:    37
+Disjuncts:    18
 -- out/eval --
 (struct){
   a: (int){ 100 }

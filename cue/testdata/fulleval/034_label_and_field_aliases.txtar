@@ -59,6 +59,16 @@ str: 5
   "\(〈0;a〉)": 5
   c: 〈0;("\(〈0;a〉)")〉
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  8
+Reused: 4
+Allocs: 4
+Retain: 3
+
+Unifications: 8
+Conjuncts:    12
+Disjuncts:    8
 -- out/eval --
 (struct){
   p: (struct){

@@ -191,6 +191,16 @@ m4: |2
   \(4)
   "
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 7
+Allocs: 2
+Retain: 0
+
+Unifications: 9
+Conjuncts:    9
+Disjuncts:    9
 -- out/eval --
 (struct){
   a1: (string){ "before\n4\nafter" }

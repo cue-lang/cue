@@ -65,6 +65,16 @@ V: #S & {
     }
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 17
+Allocs: 4
+Retain: 0
+
+Unifications: 21
+Conjuncts:    29
+Disjuncts:    21
 -- out/eval --
 Errors:
 V.b.extra: field not allowed:

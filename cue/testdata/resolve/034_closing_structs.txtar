@@ -51,6 +51,16 @@ ctcp: ct & cp
 ctct: ct & ct
 -- out/legacy-debug --
 <0>{op: <1>{x: int}, ot: <2>{x: int, ...}, cp: <3>C{x: int}, ct: <4>{x: int, ...}, opot: <5>{x: int, ...}, otop: <6>{x: int, ...}, opcp: <7>C{x: int}, cpop: <8>C{x: int}, opct: <9>{x: int, ...}, ctop: <10>{x: int, ...}, otcp: <11>C{x: int}, cpot: <12>C{x: int}, otct: <13>{x: int, ...}, ctot: <14>{x: int, ...}, cpct: <15>C{x: int}, ctcp: <16>C{x: int}, ctct: <17>{x: int, ...}}
+-- out/eval/stats --
+Leaks:  15
+Freed:  35
+Reused: 32
+Allocs: 18
+Retain: 15
+
+Unifications: 50
+Conjuncts:    115
+Disjuncts:    50
 -- out/eval --
 (struct){
   op: (struct){

@@ -62,6 +62,16 @@ simplifyExpr: {
 	e1: <(=~"foo")
 	e2: >(null)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  53
+Reused: 50
+Allocs: 3
+Retain: 1
+
+Unifications: 53
+Conjuncts:    90
+Disjuncts:    53
 -- out/eval --
 Errors:
 simplifyExpr.e2: cannot use null for bound >:

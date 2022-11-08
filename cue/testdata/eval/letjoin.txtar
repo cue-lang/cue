@@ -43,6 +43,16 @@ t2: {
 
 	xy: x1 & x2
 }
+-- out/eval/stats --
+Leaks:  8
+Freed:  65
+Reused: 60
+Allocs: 13
+Retain: 8
+
+Unifications: 73
+Conjuncts:    123
+Disjuncts:    69
 -- out/eval --
 (struct){
   t1: (struct){

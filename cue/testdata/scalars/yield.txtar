@@ -20,6 +20,16 @@ ifScalarNested: {
 	if _#cond {{{5}}}
 
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 4
+Allocs: 3
+Retain: 3
+
+Unifications: 7
+Conjuncts:    16
+Disjuncts:    7
 -- out/eval --
 Errors:
 ifScalarConflict: conflicting values "soo" and 5 (mismatched types string and int):

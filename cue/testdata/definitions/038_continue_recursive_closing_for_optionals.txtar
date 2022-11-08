@@ -36,6 +36,16 @@ a: #S & {
     }
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  6
+Reused: 2
+Allocs: 4
+Retain: 0
+
+Unifications: 6
+Conjuncts:    9
+Disjuncts:    6
 -- out/eval --
 Errors:
 a.v.b: field not allowed:

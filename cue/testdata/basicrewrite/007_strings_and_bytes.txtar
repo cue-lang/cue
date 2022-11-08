@@ -39,6 +39,16 @@ e1: _|_ // invalid operation 'b' + "c" (mismatched types bytes and string)
   e0: ("a" + '')
   e1: ('b' + "c")
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 7
+Allocs: 2
+Retain: 0
+
+Unifications: 9
+Conjuncts:    9
+Disjuncts:    9
 -- out/eval --
 Errors:
 e0: invalid operands "a" and '' to '+' (type string and bytes):

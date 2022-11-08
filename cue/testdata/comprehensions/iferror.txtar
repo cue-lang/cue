@@ -146,6 +146,16 @@ issue1972: {
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  43
+Reused: 35
+Allocs: 8
+Retain: 9
+
+Unifications: 33
+Conjuncts:    68
+Disjuncts:    43
 -- out/eval --
 Errors:
 issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):

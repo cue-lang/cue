@@ -32,6 +32,16 @@ C: #steps: #Script & {mount: [B]}
 }
 
 #ref: {a: 1} | {b: 2}
+-- out/eval/stats --
+Leaks:  0
+Freed:  24096
+Reused: 24051
+Allocs: 45
+Retain: 1
+
+Unifications: 18724
+Conjuncts:    100730
+Disjuncts:    24096
 -- out/eval --
 (struct){
   A: (#struct){ |((#struct){

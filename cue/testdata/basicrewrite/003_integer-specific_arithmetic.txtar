@@ -85,6 +85,16 @@ me2: _|_ // invalid operation 2 mod 1.0 (mismatched types int and float)
   me1: (2.0 mod 1)
   me2: (2 mod 1.0)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  25
+Reused: 23
+Allocs: 2
+Retain: 0
+
+Unifications: 25
+Conjuncts:    25
+Disjuncts:    25
 -- out/eval --
 Errors:
 qe1: invalid operands 2.0 and 1 to 'quo' (type float and int):

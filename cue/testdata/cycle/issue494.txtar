@@ -23,6 +23,16 @@ f: ben: [{}]
 
 g: [rn=string]: _Q[0:len(a[rn])]
 g: ben: [{}, {}]
+-- out/eval/stats --
+Leaks:  0
+Freed:  43
+Reused: 38
+Allocs: 5
+Retain: 0
+
+Unifications: 43
+Conjuncts:    83
+Disjuncts:    43
 -- out/eval --
 Errors:
 f.ben: incompatible list lengths (1 and 2)

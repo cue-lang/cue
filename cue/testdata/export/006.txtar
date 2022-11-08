@@ -25,6 +25,16 @@ e: a.t[2:3]
     e: 〈0;a〉.t[2:3]
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  8
+Reused: 5
+Allocs: 3
+Retain: 0
+
+Unifications: 8
+Conjuncts:    14
+Disjuncts:    8
 -- out/eval --
 (struct){
   a: (struct){

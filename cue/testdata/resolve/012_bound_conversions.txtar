@@ -46,6 +46,16 @@ c4: _|_ // conflicting values 1.2 and ((>=1 & <2) & int) (mismatched types float
   c3: (1.2 & (>=1 & <2))
   c4: (1.2 & ((>=1 & <2) & int))
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  12
+Reused: 10
+Allocs: 2
+Retain: 0
+
+Unifications: 12
+Conjuncts:    35
+Disjuncts:    12
 -- out/eval --
 Errors:
 c4: conflicting values 1.2 and int (mismatched types float and int):

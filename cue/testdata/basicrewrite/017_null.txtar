@@ -35,6 +35,16 @@ call: _|_ // cannot call non-function null (type null)
   ne1: ("s" != null)
   call: null()
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  8
+Reused: 6
+Allocs: 2
+Retain: 0
+
+Unifications: 8
+Conjuncts:    9
+Disjuncts:    8
 -- out/eval --
 Errors:
 call: cannot call non-function null (type null):

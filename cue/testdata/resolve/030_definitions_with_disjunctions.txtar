@@ -59,6 +59,16 @@ baz: #Foo & {
     b: 2
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  33
+Reused: 28
+Allocs: 5
+Retain: 0
+
+Unifications: 25
+Conjuncts:    45
+Disjuncts:    33
 -- out/eval --
 Errors:
 bar: 1 errors in empty disjunction:

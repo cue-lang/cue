@@ -36,6 +36,16 @@ err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
   seq: (("a" + "b") == "ab")
   err: (2 == "s")
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 7
+Allocs: 2
+Retain: 0
+
+Unifications: 9
+Conjuncts:    10
+Disjuncts:    9
 -- out/eval --
 Errors:
 err: invalid operands 2 and "s" to '==' (type int and string):

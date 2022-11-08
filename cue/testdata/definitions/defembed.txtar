@@ -6,6 +6,16 @@ a: {
 a: c: 1
 
 #A: b: 1
+-- out/eval/stats --
+Leaks:  0
+Freed:  6
+Reused: 2
+Allocs: 4
+Retain: 1
+
+Unifications: 6
+Conjuncts:    9
+Disjuncts:    6
 -- out/eval --
 Errors:
 a.c: field not allowed:

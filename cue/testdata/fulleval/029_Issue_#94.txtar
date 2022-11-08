@@ -83,6 +83,16 @@ index: {
     _hidden: 〈1;foo〉["_hidden"]
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 18
+Allocs: 3
+Retain: 0
+
+Unifications: 21
+Conjuncts:    31
+Disjuncts:    21
 -- out/eval --
 (struct){
   foo: (struct){

@@ -19,6 +19,16 @@ c2: #C2 & {
 	c1
 	age: 5
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 8
+Allocs: 3
+Retain: 0
+
+Unifications: 11
+Conjuncts:    27
+Disjuncts:    11
 -- out/eval --
 (struct){
   #C1: (#struct){

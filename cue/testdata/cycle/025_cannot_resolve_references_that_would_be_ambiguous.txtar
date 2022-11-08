@@ -53,6 +53,16 @@ c2: (*{
     b: 2
   }) & 〈0;c1〉)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  48
+Reused: 39
+Allocs: 9
+Retain: 4
+
+Unifications: 24
+Conjuncts:    71
+Disjuncts:    46
 -- out/eval --
 (struct){
   a1: (_|_){

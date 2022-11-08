@@ -262,6 +262,16 @@ issue1729: t2: {
 	#x: { #x | {} }
 }
 
+-- out/eval/stats --
+Leaks:  12
+Freed:  422
+Reused: 413
+Allocs: 21
+Retain: 31
+
+Unifications: 242
+Conjuncts:    718
+Disjuncts:    432
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

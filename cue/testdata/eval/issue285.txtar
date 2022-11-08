@@ -9,6 +9,16 @@
 }
 
 val: #Mid & {} & {myoutput: {content: "foo"}} // Should work.
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 6
+Allocs: 4
+Retain: 0
+
+Unifications: 10
+Conjuncts:    23
+Disjuncts:    10
 -- out/eval --
 (struct){
   #TopLevel: (#struct){

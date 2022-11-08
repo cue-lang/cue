@@ -165,6 +165,16 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
   e8: (>11 & <=11)
   e9: (>"a" & <1)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  50
+Reused: 47
+Allocs: 3
+Retain: 0
+
+Unifications: 50
+Conjuncts:    126
+Disjuncts:    50
 -- out/eval --
 Errors:
 e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):

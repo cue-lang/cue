@@ -10,6 +10,16 @@ valueCycle: b: X=3 + X
 
 // Issue #1003
 listValueAlias: X = [1, 2, X[0]]
+-- out/eval/stats --
+Leaks:  0
+Freed:  13
+Reused: 9
+Allocs: 4
+Retain: 0
+
+Unifications: 13
+Conjuncts:    20
+Disjuncts:    13
 -- out/eval --
 (struct){
   structShorthand: (struct){

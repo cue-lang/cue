@@ -28,6 +28,16 @@ raw: true
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  1
+Reused: 0
+Allocs: 1
+Retain: 0
+
+Unifications: 1
+Conjuncts:    2
+Disjuncts:    1
 -- out/eval --
 (struct){
 }

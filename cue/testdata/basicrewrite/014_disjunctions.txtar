@@ -79,6 +79,16 @@ i1: "c"
     2,
   ][3]|"c")
 }
+-- out/eval/stats --
+Leaks:  1
+Freed:  134
+Reused: 126
+Allocs: 9
+Retain: 1
+
+Unifications: 18
+Conjuncts:    150
+Disjuncts:    135
 -- out/eval --
 (struct){
   o1: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }

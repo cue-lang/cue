@@ -35,6 +35,16 @@ t2: {
 	e: time.Time()
 	f: d & e & d & e
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  121
+Reused: 107
+Allocs: 14
+Retain: 0
+
+Unifications: 65
+Conjuncts:    205
+Disjuncts:    121
 -- out/eval --
 (struct){
   t1: (struct){

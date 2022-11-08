@@ -64,6 +64,16 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
   e2: ("foo" !~ true)
   e3: (!="a" & <5)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  16
+Reused: 14
+Allocs: 2
+Retain: 0
+
+Unifications: 16
+Conjuncts:    25
+Disjuncts:    16
 -- out/eval --
 Errors:
 e3: conflicting values !="a" and <5 (mismatched types string and number):

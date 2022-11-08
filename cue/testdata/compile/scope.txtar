@@ -77,6 +77,16 @@ let _schema_1 = schema
   }
   let _schema_1#2 = 〈0;schema〉
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  50
+Reused: 47
+Allocs: 5
+Retain: 7
+
+Unifications: 52
+Conjuncts:    107
+Disjuncts:    52
 -- out/eval --
 Errors:
 schema.next: structural cycle

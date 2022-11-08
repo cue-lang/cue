@@ -18,6 +18,16 @@ yy: 2
 package baz
 
 xx: 1
+-- out/eval/stats --
+Leaks:  1
+Freed:  6
+Reused: 3
+Allocs: 4
+Retain: 2
+
+Unifications: 7
+Conjuncts:    13
+Disjuncts:    7
 -- out/eval --
 (struct){
   xx: (int){ 1 }

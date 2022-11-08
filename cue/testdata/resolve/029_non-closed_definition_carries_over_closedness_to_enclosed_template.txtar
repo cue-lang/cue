@@ -102,6 +102,16 @@ c: #R & {
     ]
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  23
+Reused: 18
+Allocs: 5
+Retain: 0
+
+Unifications: 21
+Conjuncts:    34
+Disjuncts:    23
 -- out/eval --
 Errors:
 a.v.b: field not allowed:

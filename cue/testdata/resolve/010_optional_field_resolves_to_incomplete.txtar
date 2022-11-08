@@ -25,6 +25,16 @@ r: {
     c: 〈1;r〉["a"]
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  4
+Reused: 1
+Allocs: 3
+Retain: 0
+
+Unifications: 4
+Conjuncts:    4
+Disjuncts:    4
 -- out/eval --
 (struct){
   r: (struct){

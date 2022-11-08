@@ -12,6 +12,16 @@ a: {
     b: 〈0;foo〉
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  3
+Reused: 0
+Allocs: 3
+Retain: 0
+
+Unifications: 3
+Conjuncts:    3
+Disjuncts:    3
 -- out/eval --
 (struct){
   a: (struct){

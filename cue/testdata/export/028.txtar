@@ -38,6 +38,16 @@ a: []
     ]
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  8
+Reused: 1
+Allocs: 7
+Retain: 0
+
+Unifications: 6
+Conjuncts:    9
+Disjuncts:    8
 -- out/eval --
 (struct){
   #FindInMap: (#struct){

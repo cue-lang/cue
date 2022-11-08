@@ -80,6 +80,16 @@ indirectlyDoublyNested: {
 	}
 }
 
+-- out/eval/stats --
+Leaks:  0
+Freed:  34
+Reused: 30
+Allocs: 4
+Retain: 5
+
+Unifications: 34
+Conjuncts:    55
+Disjuncts:    34
 -- out/eval --
 (struct){
   given: (struct){

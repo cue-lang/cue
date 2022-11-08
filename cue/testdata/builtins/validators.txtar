@@ -100,6 +100,16 @@ validatorAsFunction: {
 	b: a("3")
 	c: json.Valid("3")
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  40
+Reused: 36
+Allocs: 4
+Retain: 0
+
+Unifications: 40
+Conjuncts:    68
+Disjuncts:    40
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:

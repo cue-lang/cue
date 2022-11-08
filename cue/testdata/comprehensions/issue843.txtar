@@ -40,6 +40,16 @@ package main
 	do:   "f2"
 	from: #c1
 }
+-- out/eval/stats --
+Leaks:  6
+Freed:  67
+Reused: 52
+Allocs: 21
+Retain: 13
+
+Unifications: 57
+Conjuncts:    143
+Disjuncts:    70
 -- out/eval --
 (struct){
   #d1: (#struct){

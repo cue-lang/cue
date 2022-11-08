@@ -13,6 +13,16 @@ a: _|_ // conflicting values "a" and 1 (mismatched types string and int)
 {
   a: ("a" & 1)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  2
+Reused: 0
+Allocs: 2
+Retain: 0
+
+Unifications: 2
+Conjuncts:    3
+Disjuncts:    2
 -- out/eval --
 Errors:
 a: conflicting values "a" and 1 (mismatched types string and int):

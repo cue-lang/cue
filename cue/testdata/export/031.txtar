@@ -24,6 +24,16 @@ B: A & ([10] | [192])
     ]))
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  8
+Reused: 3
+Allocs: 5
+Retain: 0
+
+Unifications: 6
+Conjuncts:    13
+Disjuncts:    8
 -- out/eval --
 (struct){
   A: (#list){

@@ -73,6 +73,16 @@ e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
     a: 3
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  15
+Reused: 12
+Allocs: 3
+Retain: 0
+
+Unifications: 15
+Conjuncts:    32
+Disjuncts:    15
 -- out/eval --
 Errors:
 e: conflicting values 1 and {a:3} (mismatched types int and struct):

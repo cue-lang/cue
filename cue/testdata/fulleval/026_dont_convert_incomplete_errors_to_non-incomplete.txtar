@@ -44,6 +44,16 @@ s2:  strings.ContainsAny("dd")
 s3:  strings.ContainsAny(str, "dd")
 -- out/legacy-debug --
 <0>{n1: <1>{min: <<2>.max, max: ><2>.min}, n2: -<3>.num, num: <4, n3: +<3>.num, n4: (<3>.num + <3>.num), n5: (<3>.num - <3>.num), n6: (<3>.num * <3>.num), n7: (<3>.num / <3>.num), b1: !<3>.is, is: bool, s1: ""+<3>.str+"", str: string, s2: strings.ContainsAny ("dd"), s3: <4>.ContainsAny (<3>.str,"dd")}
+-- out/eval/stats --
+Leaks:  0
+Freed:  17
+Reused: 12
+Allocs: 5
+Retain: 9
+
+Unifications: 17
+Conjuncts:    67
+Disjuncts:    17
 -- out/eval --
 (struct){
   n1: (struct){

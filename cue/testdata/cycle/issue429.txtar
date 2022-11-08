@@ -48,6 +48,16 @@ er3: #nonEmptyRange & {
 	min: 5
 	max: 5
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  96
+Reused: 89
+Allocs: 7
+Retain: 7
+
+Unifications: 40
+Conjuncts:    149
+Disjuncts:    95
 -- out/eval --
 Errors:
 er3.min: 2 errors in empty disjunction:

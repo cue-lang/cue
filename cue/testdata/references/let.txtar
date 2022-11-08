@@ -284,6 +284,16 @@ issue1116: {
     }
   }
 }
+-- out/eval/stats --
+Leaks:  1
+Freed:  114
+Reused: 108
+Allocs: 7
+Retain: 6
+
+Unifications: 115
+Conjuncts:    164
+Disjuncts:    115
 -- out/eval --
 (struct){
   a1list: (#list){

@@ -32,6 +32,16 @@ l2: ["c", "d"]
     "d",
   ])
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  18
+Reused: 13
+Allocs: 5
+Retain: 0
+
+Unifications: 14
+Conjuncts:    24
+Disjuncts:    18
 -- out/eval --
 (struct){
   l: (list){ |((#list){

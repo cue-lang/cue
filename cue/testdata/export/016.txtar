@@ -51,6 +51,16 @@ fi:   int & float64
     fi: (&(>=-1.797693134862315708145274237317043567981E+308, <=1.797693134862315708145274237317043567981E+308) & int)
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  14
+Reused: 12
+Allocs: 2
+Retain: 0
+
+Unifications: 14
+Conjuncts:    24
+Disjuncts:    14
 -- out/eval --
 (struct){
   u16: (int){ &(>=0, <=65535, int) }

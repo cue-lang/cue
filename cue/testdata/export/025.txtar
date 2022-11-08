@@ -40,6 +40,16 @@ c: *1 | 2
     c: (*1|2)
   }
 }
+-- out/eval/stats --
+Leaks:  5
+Freed:  6
+Reused: 2
+Allocs: 9
+Retain: 6
+
+Unifications: 9
+Conjuncts:    16
+Disjuncts:    11
 -- out/eval --
 (struct){
   b: (_|_){

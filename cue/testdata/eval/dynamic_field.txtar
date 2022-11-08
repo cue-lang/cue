@@ -21,6 +21,16 @@ parenExprRefEqual: {
 	(x): {}
 	x: "foo"
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  24
+Reused: 19
+Allocs: 5
+Retain: 5
+
+Unifications: 24
+Conjuncts:    29
+Disjuncts:    24
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:

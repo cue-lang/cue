@@ -356,6 +356,16 @@ large: {
 		}
 	}
 }
+-- out/eval/stats --
+Leaks:  16
+Freed:  95
+Reused: 84
+Allocs: 27
+Retain: 115
+
+Unifications: 111
+Conjuncts:    182
+Disjuncts:    101
 -- out/eval --
 (struct){
   minimal: (struct){

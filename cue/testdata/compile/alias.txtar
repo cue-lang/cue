@@ -28,6 +28,16 @@ dynamic: t2: {
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 4
+Allocs: 6
+Retain: 4
+
+Unifications: 10
+Conjuncts:    13
+Disjuncts:    10
 -- out/eval --
 (struct){
   dynamic: (struct){

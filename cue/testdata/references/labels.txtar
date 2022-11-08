@@ -82,6 +82,16 @@ underscore: e: {
 //  }
 // }
 // c2: c1 & { x: _ }
+-- out/eval/stats --
+Leaks:  0
+Freed:  46
+Reused: 41
+Allocs: 5
+Retain: 3
+
+Unifications: 46
+Conjuncts:    87
+Disjuncts:    46
 -- out/eval --
 (struct){
   a: (struct){

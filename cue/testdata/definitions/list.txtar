@@ -5,6 +5,16 @@ c: #R & {
 #R: {
 	w: [{}, ...]
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 4
+Allocs: 5
+Retain: 1
+
+Unifications: 9
+Conjuncts:    14
+Disjuncts:    9
 -- out/eval --
 (struct){
   c: (#struct){

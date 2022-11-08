@@ -29,6 +29,16 @@ c: c
   b: (〈0;a〉.x|"b")
   c: (〈0;a〉["x"]|"c")
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  8
+Reused: 5
+Allocs: 3
+Retain: 0
+
+Unifications: 4
+Conjuncts:    8
+Disjuncts:    8
 -- out/eval --
 (struct){
   a: (null){ null }

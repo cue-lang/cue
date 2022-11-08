@@ -37,6 +37,16 @@ m:  _|_ // invalid operation -false (- bool)
   p: +true
   m: -false
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 8
+Allocs: 2
+Retain: 0
+
+Unifications: 10
+Conjuncts:    14
+Disjuncts:    10
 -- out/eval --
 Errors:
 b: invalid operand int ('!' requires concrete value):

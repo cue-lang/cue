@@ -65,6 +65,16 @@ foo:
     op: "pull"
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  27
+Reused: 21
+Allocs: 6
+Retain: 0
+
+Unifications: 15
+Conjuncts:    35
+Disjuncts:    27
 -- out/eval --
 (struct){
   #Task: (#struct){ |((#struct){

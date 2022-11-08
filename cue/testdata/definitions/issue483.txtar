@@ -9,6 +9,16 @@ instance: #Type & {
 	alpha?: bravo?: charlie?: bool
 }
 #Root: {...}
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 5
+Allocs: 6
+Retain: 3
+
+Unifications: 11
+Conjuncts:    31
+Disjuncts:    11
 -- out/eval --
 (struct){
   out: (#struct){

@@ -20,6 +20,16 @@ for x in [1] *close({}) | {
 {}
 -- out/legacy-debug --
 <0>{ <1>for _, x in [1] yield <2>{}, (*close (<3>{}) | <4>{[]: <5>(_: string)->null, })}
+-- out/eval/stats --
+Leaks:  3
+Freed:  3
+Reused: 0
+Allocs: 6
+Retain: 3
+
+Unifications: 4
+Conjuncts:    8
+Disjuncts:    5
 -- out/eval --
 (struct){ |(*(#struct){
   }, (struct){

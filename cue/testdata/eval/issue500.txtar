@@ -19,6 +19,16 @@ h: strings.Join(3*["a"], "")
 
 i: 3 * ["b"]
 j: strings.Join(i, "")
+-- out/eval/stats --
+Leaks:  14
+Freed:  41
+Reused: 37
+Allocs: 18
+Retain: 23
+
+Unifications: 55
+Conjuncts:    81
+Disjuncts:    49
 -- out/eval --
 (struct){
   a: (string){ "est" }

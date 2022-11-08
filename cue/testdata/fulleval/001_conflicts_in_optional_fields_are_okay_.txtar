@@ -34,6 +34,16 @@ c: d & {
     b?: 4
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 6
+Allocs: 5
+Retain: 0
+
+Unifications: 7
+Conjuncts:    13
+Disjuncts:    11
 -- out/eval --
 (struct){
   d: (struct){ |((struct){

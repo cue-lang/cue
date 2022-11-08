@@ -46,6 +46,16 @@ a:
     foo: {}
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  4
+Reused: 0
+Allocs: 4
+Retain: 0
+
+Unifications: 4
+Conjuncts:    9
+Disjuncts:    4
 -- out/eval --
 (struct){
   a: (struct){

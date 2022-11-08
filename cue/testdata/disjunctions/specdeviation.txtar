@@ -61,6 +61,16 @@ issue763a: {
 	h: baa: _
 	h: boo: _
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  171
+Reused: 158
+Allocs: 13
+Retain: 2
+
+Unifications: 28
+Conjuncts:    218
+Disjuncts:    171
 -- out/eval --
 (struct){
   Q: (int){ |(*(int){ 1 }, (int){ int }) }

@@ -55,6 +55,16 @@ c:
     aaa: 3
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  6
+Reused: 3
+Allocs: 3
+Retain: 0
+
+Unifications: 6
+Conjuncts:    17
+Disjuncts:    6
 -- out/eval --
 (struct){
   A: (struct){

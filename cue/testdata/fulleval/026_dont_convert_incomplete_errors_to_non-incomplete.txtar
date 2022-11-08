@@ -103,7 +103,7 @@ Disjuncts:    17
   }
   s2: (string){ strings.ContainsAny("dd") }
   s3: (_|_){
-    // [incomplete] error in call to strings.ContainsAny: non-concrete value string:
+    // [incomplete] s3: error in call to strings.ContainsAny: non-concrete value string:
     //     ./in.cue:15:5
     //     ./in.cue:17:6
   }

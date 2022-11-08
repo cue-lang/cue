@@ -20,20 +20,15 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/internal"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/third_party/yaml"
+	"cuelang.org/go/pkg/internal"
 )
 
 // Marshal returns the YAML encoding of v.
 func Marshal(v cue.Value) (string, error) {
 	if err := v.Validate(cue.Concrete(true)); err != nil {
-		if err := v.Validate(); err != nil {
-			return "", err
-		}
-		// TODO: allow adt.Bottom to implement errors.Error so that code and
-		// messages can be passed.
-		return "", internal.ErrIncomplete
+		return "", err
 	}
 	n := v.Syntax(cue.Final(), cue.Concrete(true))
 	b, err := cueyaml.Encode(n)
@@ -54,12 +49,7 @@ func MarshalStream(v cue.Value) (string, error) {
 		}
 		v := iter.Value()
 		if err := v.Validate(cue.Concrete(true)); err != nil {
-			if err := v.Validate(); err != nil {
-				return "", err
-			}
-			// TODO: allow adt.Bottom to implement errors.Error so that code and
-			// messages can be passed.
-			return "", internal.ErrIncomplete
+			return "", err
 		}
 		n := v.Syntax(cue.Final(), cue.Concrete(true))
 		b, err := cueyaml.Encode(n)
@@ -134,6 +124,10 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 			return false, err
 		}
 		if err := x.Validate(cue.Concrete(true)); err != nil {
+			// Strip error codes: incomplete errors are terminal in this case.
+			if b, ok := err.(internal.Bottomer); ok {
+				err = b.Bottom().Err
+			}
 			return false, err
 		}
 

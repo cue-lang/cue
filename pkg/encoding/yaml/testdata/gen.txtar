@@ -29,23 +29,23 @@ unmarshalStream: {
 }
 -- out/yaml --
 Errors:
-a: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
+t1: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
     ./in.cue:3:5
     ./in.cue:3:49
     yaml.Validate:3:5
-b: error in call to encoding/yaml.Validate: incomplete value int:
+t3: error in call to encoding/yaml.Validate: incomplete value int:
     ./in.cue:5:5
     ./in.cue:5:56
-a: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3):
+t4: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3):
     ./in.cue:6:5
     ./in.cue:6:49
     yaml.ValidatePartial:3:5
 
 Result:
-t1: _|_ // error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3)
+t1: _|_ // t1: error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3)
 t2: true
-t3: _|_ // error in call to encoding/yaml.Validate: b: incomplete value int
-t4: _|_ // error in call to encoding/yaml.ValidatePartial: a: invalid value 4 (out of bound <3)
+t3: _|_ // t3: error in call to encoding/yaml.Validate: b: incomplete value int
+t4: _|_ // t4: error in call to encoding/yaml.ValidatePartial: a: invalid value 4 (out of bound <3)
 t5: true
 t6: true
 t7: """

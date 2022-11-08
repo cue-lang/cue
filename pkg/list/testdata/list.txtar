@@ -43,9 +43,9 @@ unique: {
 }
 -- out/list --
 Errors:
-error in call to list.Repeat: negative count:
+repeat.t8.v: error in call to list.Repeat: negative count:
     ./in.cue:4:30
-error in call to list.Concat: cannot use value 1 (type int) as list:
+concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list:
     ./in.cue:19:22
     ./in.cue:31:10
 concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
@@ -91,7 +91,7 @@ repeat: {
 	t8: {
 		x: [1]
 		n: -1
-		v: _|_ // error in call to list.Repeat: negative count
+		v: _|_ // repeat.t8.v: error in call to list.Repeat: negative count
 	}
 }
 concat: {
@@ -125,7 +125,7 @@ concat: {
 	}
 	t8: {
 		x: [1, [2]]
-		v: _|_ // error in call to list.Concat: cannot use value 1 (type int) as list
+		v: _|_ // concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list
 	}
 }
 unique: {

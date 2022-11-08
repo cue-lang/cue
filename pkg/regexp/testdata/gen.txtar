@@ -28,23 +28,23 @@ Errors:
 t13: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`:
     ./in.cue:15:6
     ./in.cue:15:21
-error in call to regexp.Find: no match:
+t2: error in call to regexp.Find: no match:
     ./in.cue:4:6
-error in call to regexp.FindAll: no match:
+t4: error in call to regexp.FindAll: no match:
     ./in.cue:6:6
-error in call to regexp.FindAllSubmatch: no match:
+t7: error in call to regexp.FindAllSubmatch: no match:
     ./in.cue:9:6
-error in call to regexp.FindAllNamedSubmatch: no match:
+t11: error in call to regexp.FindAllNamedSubmatch: no match:
     ./in.cue:13:6
 
 Result:
 t1: "foo"
-t2: _|_ // error in call to regexp.Find: no match
+t2: _|_ // t2: error in call to regexp.Find: no match
 t3: ["foo", "flo"]
-t4: _|_ // error in call to regexp.FindAll: no match
+t4: _|_ // t4: error in call to regexp.FindAll: no match
 t5: ["flo", "l", "o"]
 t6: [["flo", "l", "o"], ["foo", "o", "o"], ["fro", "r", "o"]]
-t7: _|_ // error in call to regexp.FindAllSubmatch: no match
+t7: _|_ // t7: error in call to regexp.FindAllSubmatch: no match
 t8: {
 	A: "l"
 	B: "o"
@@ -62,9 +62,9 @@ t9: [{
 t10: [{
 	A: ""
 }]
-t11: _|_ // error in call to regexp.FindAllNamedSubmatch: no match
+t11: _|_ // t11: error in call to regexp.FindAllNamedSubmatch: no match
 t12: "valid"
-t13: _|_ // t13: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`
+t13: _|_ // t13: invalid value "invalid)" (does not satisfy regexp.Valid): t13: error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`
 
 // The following two calls should be identical
 t14: "a-l-o-at a-o-o-t -r-o-m"

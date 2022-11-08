@@ -38,16 +38,43 @@ ignoreErrorInLet: {
 	let X = 1 & 2
 	disjunction: *X | 3
 }
--- out/eval/stats --
-Leaks:  3
-Freed:  34
-Reused: 30
-Allocs: 7
-Retain: 6
+-- issue2063.cue --
+import (
+	"encoding/yaml"
+	"strings"
+)
 
-Unifications: 35
-Conjuncts:    45
-Disjuncts:    37
+// Issue #2063
+keepDescending: t1: {
+	ec: {}
+	bs: {
+		let m = ec.b
+		if m == _|_ { }
+		x: y: ""
+	}
+}
+
+keepDescending: t2: {
+	x: yaml.Marshal(bs)
+
+	ec: {}
+	bs: {
+		let m = ec.b
+		if m.b == _|_ { }
+		X: Y: strings.Join([], "")
+	}
+}
+
+-- out/eval/stats --
+Leaks:  7
+Freed:  47
+Reused: 38
+Allocs: 16
+Retain: 23
+
+Unifications: 52
+Conjuncts:    66
+Disjuncts:    54
 -- out/eval --
 (struct){
   let A#1 = (int){ 9 }
@@ -92,6 +119,35 @@ Disjuncts:    37
     }
     disjunction: (int){ 3 }
   }
+  keepDescending: (struct){
+    t1: (struct){
+      ec: (struct){
+      }
+      bs: (struct){
+        let m#19 = (_|_){
+          // [incomplete] keepDescending.t1.bs.m: undefined field: b:
+          //     ./issue2063.cue:10:14
+        }
+        x: (struct){
+          y: (string){ "" }
+        }
+      }
+    }
+    t2: (struct){
+      x: (string){ "X:\n  \"Y\": \"\"\n" }
+      ec: (struct){
+      }
+      bs: (struct){
+        let m#1A = (_|_){
+          // [incomplete] keepDescending.t2.bs.m: undefined field: b:
+          //     ./issue2063.cue:21:14
+        }
+        X: (struct){
+          Y: (string){ "" }
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -133,5 +189,33 @@ Disjuncts:    37
   ignoreErrorInLet: {
     let X#18 = (1 & 2)
     disjunction: (*〈0;let X#18〉|3)
+  }
+}
+--- issue2063.cue
+{
+  keepDescending: {
+    t1: {
+      ec: {}
+      bs: {
+        let m#19 = 〈1;ec〉.b
+        if (〈0;let m#19〉 == _|_(explicit error (_|_ literal) in source)) {}
+        x: {
+          y: ""
+        }
+      }
+    }
+  }
+  keepDescending: {
+    t2: {
+      x: 〈import;"encoding/yaml"〉.Marshal(〈0;bs〉)
+      ec: {}
+      bs: {
+        let m#1A = 〈1;ec〉.b
+        if (〈0;let m#1A〉.b == _|_(explicit error (_|_ literal) in source)) {}
+        X: {
+          Y: 〈import;strings〉.Join([], "")
+        }
+      }
+    }
   }
 }

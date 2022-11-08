@@ -7,6 +7,16 @@ A: close({
 B: A & {
 	c: 3
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  8
+Reused: 5
+Allocs: 5
+Retain: 2
+
+Unifications: 10
+Conjuncts:    14
+Disjuncts:    10
 -- out/eval --
 Errors:
 B.c: field not allowed:

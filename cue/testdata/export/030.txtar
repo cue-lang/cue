@@ -53,6 +53,16 @@ eval: true
     #Bar: string
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  82
+Reused: 70
+Allocs: 12
+Retain: 1
+
+Unifications: 28
+Conjuncts:    165
+Disjuncts:    82
 -- out/eval --
 (struct){
   #Foo: (#struct){

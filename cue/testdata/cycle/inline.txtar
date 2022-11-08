@@ -111,6 +111,16 @@ inline: acrossFields: {
     }
   }
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  221
+Reused: 205
+Allocs: 18
+Retain: 38
+
+Unifications: 223
+Conjuncts:    699
+Disjuncts:    223
 -- out/eval --
 Errors:
 structural cycle:

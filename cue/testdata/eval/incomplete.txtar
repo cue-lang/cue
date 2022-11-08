@@ -43,6 +43,16 @@ issue1837: {
 		x: context.b // incomplete error
 	}
 }
+-- out/eval/stats --
+Leaks:  4
+Freed:  28
+Reused: 23
+Allocs: 9
+Retain: 44
+
+Unifications: 32
+Conjuncts:    101
+Disjuncts:    32
 -- out/eval --
 (struct){
   s: (string){ string }

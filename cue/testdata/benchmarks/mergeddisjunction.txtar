@@ -40,6 +40,16 @@ b: {
 		"\(x.text)": {text: x.text}
 	}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  163
+Reused: 157
+Allocs: 6
+Retain: 0
+
+Unifications: 99
+Conjuncts:    290
+Disjuncts:    163
 -- out/eval --
 (struct){
   list: (#list){

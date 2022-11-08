@@ -50,6 +50,16 @@
     Size: 1
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 5
+Allocs: 5
+Retain: 0
+
+Unifications: 8
+Conjuncts:    15
+Disjuncts:    10
 -- out/eval --
 (struct){
   #def: (#struct){ |((#struct){

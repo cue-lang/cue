@@ -27,6 +27,16 @@ t2: {
 	b: #a & {x: 4}
 	c: #a & {z: 4}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  51
+Reused: 44
+Allocs: 7
+Retain: 0
+
+Unifications: 39
+Conjuncts:    68
+Disjuncts:    51
 -- out/eval --
 Errors:
 t1.c.z: field not allowed:

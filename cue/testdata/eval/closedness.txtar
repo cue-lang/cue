@@ -42,6 +42,16 @@ dynamic: {
 	}
 	d: #D & {foo: 3}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  27
+Reused: 21
+Allocs: 6
+Retain: 5
+
+Unifications: 27
+Conjuncts:    42
+Disjuncts:    27
 -- out/eval --
 Errors:
 a.q.e: field not allowed:

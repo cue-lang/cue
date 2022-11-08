@@ -25,6 +25,16 @@ intField: {
     2: string
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 2
+Allocs: 5
+Retain: 0
+
+Unifications: 7
+Conjuncts:    9
+Disjuncts:    7
 -- out/eval --
 Errors:
 bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):

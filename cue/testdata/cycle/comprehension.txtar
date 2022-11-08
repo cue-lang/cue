@@ -294,6 +294,16 @@ siblingInsertion: t2: p2: {
 	}
 }
 
+-- out/eval/stats --
+Leaks:  48
+Freed:  1265
+Reused: 1253
+Allocs: 60
+Retain: 119
+
+Unifications: 825
+Conjuncts:    2505
+Disjuncts:    1313
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle

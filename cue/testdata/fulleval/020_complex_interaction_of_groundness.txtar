@@ -59,6 +59,16 @@ a: {
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 3
+Allocs: 7
+Retain: 3
+
+Unifications: 10
+Conjuncts:    33
+Disjuncts:    10
 -- out/eval --
 (struct){
   res: (#list){

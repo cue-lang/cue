@@ -29,6 +29,16 @@
 }
 
 a: #a & {config: a: 34}
+-- out/eval/stats --
+Leaks:  0
+Freed:  93
+Reused: 83
+Allocs: 10
+Retain: 0
+
+Unifications: 93
+Conjuncts:    264
+Disjuncts:    93
 -- out/eval --
 (struct){
   #T: (#struct){

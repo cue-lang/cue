@@ -258,6 +258,16 @@ issue1940: {
 	}
 }
 
+-- out/eval/stats --
+Leaks:  0
+Freed:  1014
+Reused: 995
+Allocs: 19
+Retain: 1
+
+Unifications: 647
+Conjuncts:    1520
+Disjuncts:    1014
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){

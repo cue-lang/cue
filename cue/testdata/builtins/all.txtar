@@ -16,6 +16,16 @@ okIncompleteChild: {
 	b: {}
 	x: and([{a: b.c}, {b: 1}])
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  12
+Reused: 8
+Allocs: 6
+Retain: 2
+
+Unifications: 14
+Conjuncts:    17
+Disjuncts:    14
 -- out/eval --
 Errors:
 fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):

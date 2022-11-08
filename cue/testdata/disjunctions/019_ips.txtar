@@ -54,6 +54,16 @@ MyIP: [10, 10, 10, 10]
     10,
   ])
 }
+-- out/eval/stats --
+Leaks:  1
+Freed:  60
+Reused: 54
+Allocs: 7
+Retain: 5
+
+Unifications: 52
+Conjuncts:    123
+Disjuncts:    61
 -- out/eval --
 (struct){
   IP: (#list){

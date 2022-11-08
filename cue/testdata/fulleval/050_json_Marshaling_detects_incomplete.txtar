@@ -22,6 +22,16 @@ foo: {
 b: json.Marshal(foo)
 -- out/legacy-debug --
 <0>{a: <1>.Marshal (<2>{a: string}), foo: <3>{a: 3, b: <4>.foo.c}, b: <1>.Marshal (<4>.foo)}
+-- out/eval/stats --
+Leaks:  0
+Freed:  16
+Reused: 12
+Allocs: 4
+Retain: 5
+
+Unifications: 16
+Conjuncts:    24
+Disjuncts:    16
 -- out/eval --
 (struct){
   a: (_|_){

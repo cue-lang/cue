@@ -21,6 +21,16 @@ c: float
   b: (*1|*int)
   c: (*1.0|*float)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 6
+Allocs: 4
+Retain: 0
+
+Unifications: 4
+Conjuncts:    10
+Disjuncts:    10
 -- out/eval --
 (struct){
   a: (string){ string }

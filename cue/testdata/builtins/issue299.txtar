@@ -4,6 +4,16 @@ import "list"
 x: list.UniqueItems
 x: [string, ...string]
 x: ["x", "x"]
+-- out/eval/stats --
+Leaks:  0
+Freed:  2
+Reused: 0
+Allocs: 2
+Retain: 0
+
+Unifications: 2
+Conjuncts:    5
+Disjuncts:    2
 -- out/eval --
 Errors:
 x: invalid value ["x","x"] (does not satisfy list.UniqueItems):

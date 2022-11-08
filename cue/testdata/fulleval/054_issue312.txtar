@@ -30,6 +30,16 @@ a: 2
     〈2;y〉
   }
 }
+-- out/eval/stats --
+Leaks:  2
+Freed:  8
+Reused: 3
+Allocs: 7
+Retain: 2
+
+Unifications: 6
+Conjuncts:    12
+Disjuncts:    9
 -- out/eval --
 (struct){
   y: ((int|struct)){ |(*(int){ 1 }, (struct){

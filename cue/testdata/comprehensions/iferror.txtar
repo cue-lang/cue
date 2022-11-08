@@ -109,6 +109,16 @@ useDefault: {
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  37
+Reused: 29
+Allocs: 8
+Retain: 5
+
+Unifications: 27
+Conjuncts:    55
+Disjuncts:    37
 -- out/eval --
 Errors:
 wrongConcreteType: cannot use 2 (type int) as type bool:

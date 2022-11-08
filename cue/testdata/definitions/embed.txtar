@@ -73,6 +73,16 @@ reclose3: {
 		Something: 4
 	}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  63
+Reused: 56
+Allocs: 7
+Retain: 6
+
+Unifications: 59
+Conjuncts:    124
+Disjuncts:    63
 -- out/eval --
 Errors:
 reclose1.z.d: field not allowed:

@@ -29,6 +29,16 @@ intField: {
 		}
 	}
 }
+-- out/eval/stats --
+Leaks:  3
+Freed:  24
+Reused: 20
+Allocs: 7
+Retain: 3
+
+Unifications: 17
+Conjuncts:    29
+Disjuncts:    25
 -- out/eval --
 Errors:
 circularFor.#list: invalid operand tail != null (found bool, want list or struct):

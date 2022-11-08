@@ -8,6 +8,16 @@
 }
 
 l: #N
+-- out/eval/stats --
+Leaks:  0
+Freed:  8
+Reused: 4
+Allocs: 4
+Retain: 0
+
+Unifications: 8
+Conjuncts:    13
+Disjuncts:    8
 -- out/eval --
 (struct){
   #A: (_){ _ }

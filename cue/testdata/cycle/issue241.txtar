@@ -23,6 +23,16 @@ cell: b: _
 
 a: cell.a
 b: cell.b
+-- out/eval/stats --
+Leaks:  0
+Freed:  35
+Reused: 29
+Allocs: 6
+Retain: 4
+
+Unifications: 11
+Conjuncts:    69
+Disjuncts:    33
 -- out/eval --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }

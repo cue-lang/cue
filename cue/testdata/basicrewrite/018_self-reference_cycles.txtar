@@ -23,6 +23,16 @@ c: [c[1], c[0]]
     〈1;c〉[0],
   ]
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  6
+Reused: 2
+Allocs: 4
+Retain: 7
+
+Unifications: 6
+Conjuncts:    22
+Disjuncts:    6
 -- out/eval --
 (struct){
   a: (_|_){

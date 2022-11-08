@@ -12,6 +12,16 @@ rg: range2 & {
 	//   min: 1
 	max: 8
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  16
+Reused: 11
+Allocs: 5
+Retain: 0
+
+Unifications: 10
+Conjuncts:    22
+Disjuncts:    16
 -- out/eval --
 (struct){
   range1: (struct){

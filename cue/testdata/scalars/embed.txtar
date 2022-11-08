@@ -99,6 +99,16 @@ hidden: {
 		[_foo]
 	}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  83
+Reused: 77
+Allocs: 6
+Retain: 12
+
+Unifications: 79
+Conjuncts:    156
+Disjuncts:    83
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):

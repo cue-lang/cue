@@ -27,6 +27,16 @@ e1: _|_ // invalid value 100000 (out of bound int & <=32767)
   e1: &(int, >=-32768, <=32767)
   e1: 100000
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  4
+Reused: 2
+Allocs: 2
+Retain: 0
+
+Unifications: 4
+Conjuncts:    7
+Disjuncts:    4
 -- out/eval --
 Errors:
 e1: invalid value 100000 (out of bound <=32767):

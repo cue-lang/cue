@@ -72,6 +72,16 @@ issue783: {
 	check2a: test1 & #Def2
 	check2b: test2 & #Def2
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  52
+Reused: 46
+Allocs: 6
+Retain: 0
+
+Unifications: 46
+Conjuncts:    105
+Disjuncts:    52
 -- out/eval --
 (struct){
   elipsis: (struct){

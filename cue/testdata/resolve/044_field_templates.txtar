@@ -129,6 +129,16 @@ c:
     bar: _
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 15
+Allocs: 6
+Retain: 0
+
+Unifications: 17
+Conjuncts:    33
+Disjuncts:    21
 -- out/eval --
 (struct){
   a: (struct){

@@ -433,6 +433,16 @@ mutuallyTriggeringCycle: t1: {
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  143
+Reused: 130
+Allocs: 13
+Retain: 4
+
+Unifications: 143
+Conjuncts:    321
+Disjuncts:    143
 -- out/eval --
 Errors:
 mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle

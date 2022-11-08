@@ -23,6 +23,16 @@ foo
 package baz
 
 x: 1
+-- out/eval/stats --
+Leaks:  1
+Freed:  12
+Reused: 8
+Allocs: 5
+Retain: 4
+
+Unifications: 13
+Conjuncts:    29
+Disjuncts:    13
 -- out/eval --
 (struct){
   foo: (struct){

@@ -99,6 +99,16 @@ multipleErrors: {
 		out: template.Execute("{{.x}} {{.y}}", params)
 	}
 }
+-- out/eval/stats --
+Leaks:  10
+Freed:  119
+Reused: 114
+Allocs: 15
+Retain: 32
+
+Unifications: 109
+Conjuncts:    265
+Disjuncts:    129
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:

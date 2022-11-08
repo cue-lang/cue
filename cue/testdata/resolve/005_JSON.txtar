@@ -44,6 +44,16 @@ c: 2
   }
   c: 〈0;o〉["a\nb"]
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  6
+Reused: 3
+Allocs: 3
+Retain: 0
+
+Unifications: 6
+Conjuncts:    8
+Disjuncts:    6
 -- out/eval --
 (struct){
   a: (int){ 3 }

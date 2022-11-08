@@ -102,6 +102,16 @@ a: _|_ // field "f3" not allowed in closed struct
     }
   })
 }
+-- out/eval/stats --
+Leaks:  5
+Freed:  23
+Reused: 19
+Allocs: 9
+Retain: 11
+
+Unifications: 28
+Conjuncts:    43
+Disjuncts:    28
 -- out/eval --
 Errors:
 #E.f3: field not allowed:

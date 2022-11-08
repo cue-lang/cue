@@ -68,6 +68,16 @@ B:
   }
   B: (〈0;test〉.A & {})
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  10
+Reused: 6
+Allocs: 4
+Retain: 0
+
+Unifications: 10
+Conjuncts:    15
+Disjuncts:    10
 -- out/eval --
 (struct){
   test: (struct){

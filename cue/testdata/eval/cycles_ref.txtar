@@ -7,6 +7,16 @@ c: d & {b: 2}
 d: e
 e: {a: 1}
 e: c
+-- out/eval/stats --
+Leaks:  0
+Freed:  12
+Reused: 7
+Allocs: 5
+Retain: 3
+
+Unifications: 12
+Conjuncts:    25
+Disjuncts:    12
 -- out/eval --
 (struct){
   a: (int){ 200 }

@@ -83,6 +83,16 @@ job:
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  14
+Reused: 8
+Allocs: 6
+Retain: 0
+
+Unifications: 10
+Conjuncts:    22
+Disjuncts:    14
 -- out/eval --
 (struct){
   job: (struct){

@@ -31,6 +31,16 @@ explicitDefaultError: {
 	if a != "" {
 	}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  39
+Reused: 31
+Allocs: 8
+Retain: 0
+
+Unifications: 27
+Conjuncts:    55
+Disjuncts:    39
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:

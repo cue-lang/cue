@@ -35,6 +35,16 @@ s4b: x: {} | s4b
 
 s5a: x: s5a | []
 s5b: x: [] | s5b
+-- out/eval/stats --
+Leaks:  0
+Freed:  73
+Reused: 68
+Allocs: 5
+Retain: 0
+
+Unifications: 33
+Conjuncts:    73
+Disjuncts:    73
 -- out/eval --
 Errors:
 cycle.a: structural cycle

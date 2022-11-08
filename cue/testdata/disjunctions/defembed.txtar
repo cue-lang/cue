@@ -27,6 +27,16 @@ y4: x & {
 // of `b`, so it should be resolved to {a: 1}.
 b: (*"a" | "b") | "c"
 {a: b} | {b: int}
+-- out/eval/stats --
+Leaks:  0
+Freed:  306
+Reused: 296
+Allocs: 10
+Retain: 0
+
+Unifications: 52
+Conjuncts:    373
+Disjuncts:    306
 -- out/eval --
 (struct){
   x: (struct){

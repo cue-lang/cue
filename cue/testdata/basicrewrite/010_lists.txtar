@@ -74,6 +74,16 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
     ...(>=4 & <=5),
   ])
 }
+-- out/eval/stats --
+Leaks:  4
+Freed:  23
+Reused: 20
+Allocs: 7
+Retain: 4
+
+Unifications: 27
+Conjuncts:    46
+Disjuncts:    26
 -- out/eval --
 Errors:
 e: conflicting values 4 and [] (mismatched types int and list):

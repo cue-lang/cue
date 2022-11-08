@@ -55,6 +55,16 @@ fn1:
     ]
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 5
+Allocs: 4
+Retain: 0
+
+Unifications: 9
+Conjuncts:    17
+Disjuncts:    9
 -- out/eval --
 (struct){
   fn: (struct){

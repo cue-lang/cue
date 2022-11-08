@@ -64,7 +64,8 @@ func TestEval(t *testing.T) {
 		v.Finalize(ctx)
 
 		stats := ctx.Stats()
-		t.Log(stats)
+		w := t.Writer("stats")
+		fmt.Fprintln(w, stats)
 		// if n := stats.Leaks(); n > 0 {
 		// 	t.Skipf("%d leaks reported", n)
 		// }

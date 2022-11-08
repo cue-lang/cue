@@ -50,6 +50,16 @@ d: _|_ // field "aaa" not allowed in closed struct
     aaa: 3
   })
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  9
+Reused: 6
+Allocs: 3
+Retain: 0
+
+Unifications: 9
+Conjuncts:    29
+Disjuncts:    9
 -- out/eval --
 Errors:
 c.aaa: field not allowed:

@@ -132,6 +132,16 @@ n5: 2.5
   n4: ((>=0.0 & <=0.1) & 0.09999)
   n5: ((>=1 & <=5) & 2.5)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  36
+Reused: 34
+Allocs: 2
+Retain: 0
+
+Unifications: 36
+Conjuncts:    120
+Disjuncts:    36
 -- out/eval --
 Errors:
 b14: incompatible bounds >=6 and <=5:

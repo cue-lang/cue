@@ -116,6 +116,16 @@ d1: #D1 & {
     a: int
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  29
+Reused: 24
+Allocs: 5
+Retain: 1
+
+Unifications: 29
+Conjuncts:    41
+Disjuncts:    29
 -- out/eval --
 Errors:
 #D4.env.b: field not allowed:

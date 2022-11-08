@@ -80,6 +80,16 @@ e:
     }
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  11
+Reused: 7
+Allocs: 4
+Retain: 1
+
+Unifications: 11
+Conjuncts:    14
+Disjuncts:    11
 -- out/eval --
 (struct){
   a: (int){ 2 }

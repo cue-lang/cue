@@ -58,6 +58,16 @@ b1: {
     c: string
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  21
+Reused: 14
+Allocs: 7
+Retain: 10
+
+Unifications: 21
+Conjuncts:    44
+Disjuncts:    21
 -- out/eval --
 (struct){
   l: (#list){

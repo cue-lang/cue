@@ -14,6 +14,16 @@ b: _|_ // cannot slice a (type string)
     b: 〈0;a〉[2:3]
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 1
+Allocs: 6
+Retain: 0
+
+Unifications: 3
+Conjuncts:    12
+Disjuncts:    7
 -- out/eval --
 (struct){
   a: ((int|string)){ |(*(string){ "foo" }, *(string){ "bar" }, *(string){ string }, (int){ int }) }

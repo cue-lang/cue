@@ -358,23 +358,38 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 			f(tc)
 
-			for _, sub := range tc.outFiles {
-				var gold *txtar.File
-				for i, f := range a.Files {
-					if f.Name == sub.name {
-						gold = &a.Files[i]
-					}
-				}
+			index := make(map[string]int, len(a.Files))
+			for i, f := range a.Files {
+				index[f.Name] = i
+			}
 
+			// Insert results of this test at first location of any existing
+			// test or at end of list otherwise.
+			k := len(a.Files)
+			for _, sub := range tc.outFiles {
+				if i, ok := index[sub.name]; ok {
+					k = i
+					break
+				}
+			}
+
+			files := []txtar.File{}
+			files = append(files, a.Files[:k]...)
+
+			for _, sub := range tc.outFiles {
 				result := sub.buf.Bytes()
 
-				switch {
-				case gold == nil:
-					a.Files = append(a.Files, txtar.File{Name: sub.name})
-					gold = &a.Files[len(a.Files)-1]
+				files = append(files, txtar.File{Name: sub.name})
+				gold := &files[len(files)-1]
 
-				case bytes.Equal(gold.Data, result):
-					continue
+				if i, ok := index[sub.name]; ok {
+					gold.Data = a.Files[i].Data
+					delete(index, sub.name)
+
+					// Handle exceptional comparers, like stats.
+					if bytes.Equal(gold.Data, result) {
+						continue
+					}
 				}
 
 				if cuetest.UpdateGoldenFiles {
@@ -387,6 +402,15 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					sub.name,
 					cmp.Diff(string(gold.Data), string(result)))
 			}
+
+			// Add remaining unrelated files, ignoring files that were already
+			// added.
+			for _, f := range a.Files[k:] {
+				if _, ok := index[f.Name]; ok {
+					files = append(files, f)
+				}
+			}
+			a.Files = files
 
 			if update {
 				err = ioutil.WriteFile(fullpath, txtar.Format(a), 0644)

@@ -49,6 +49,16 @@ z3: 8
   z3: (〈0;z1〉 - 3)
   z3: 8
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  6
+Reused: 2
+Allocs: 4
+Retain: 3
+
+Unifications: 6
+Conjuncts:    8
+Disjuncts:    6
 -- out/eval --
 (struct){
   x: (int){ 200 }

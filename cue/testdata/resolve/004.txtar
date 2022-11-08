@@ -38,6 +38,16 @@ b:
   }
   b: _
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  5
+Reused: 2
+Allocs: 3
+Retain: 0
+
+Unifications: 5
+Conjuncts:    11
+Disjuncts:    5
 -- out/eval --
 (struct){
   a: (struct){

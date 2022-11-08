@@ -22,6 +22,16 @@ foo: 3
     foo: 3
   }
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  2
+Reused: 0
+Allocs: 2
+Retain: 0
+
+Unifications: 2
+Conjuncts:    4
+Disjuncts:    2
 -- out/eval --
 (struct){
   foo: (int){ 3 }

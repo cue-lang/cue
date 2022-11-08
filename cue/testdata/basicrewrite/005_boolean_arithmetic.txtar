@@ -28,6 +28,16 @@ f: _|_ // conflicting values true and false
   e: (true & true)
   f: (true & false)
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  7
+Reused: 5
+Allocs: 2
+Retain: 0
+
+Unifications: 7
+Conjuncts:    9
+Disjuncts:    7
 -- out/eval --
 Errors:
 f: conflicting values false and true:

@@ -121,6 +121,16 @@ foo: {
 		}
 	}
 }
+-- out/eval/stats --
+Leaks:  4
+Freed:  118
+Reused: 105
+Allocs: 17
+Retain: 10
+
+Unifications: 112
+Conjuncts:    248
+Disjuncts:    120
 -- out/eval --
 (struct){
   networkingv1: (struct){

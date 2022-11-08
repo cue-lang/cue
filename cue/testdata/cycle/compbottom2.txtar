@@ -203,6 +203,16 @@ nestedChain: {
 		#E: x: true
 	}
 }
+-- out/eval/stats --
+Leaks:  3
+Freed:  118
+Reused: 111
+Allocs: 10
+Retain: 27
+
+Unifications: 121
+Conjuncts:    130
+Disjuncts:    121
 -- out/eval --
 (struct){
   self: (struct){

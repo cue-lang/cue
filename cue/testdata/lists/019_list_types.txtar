@@ -116,6 +116,16 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
     ...float,
   ]
 }
+-- out/eval/stats --
+Leaks:  7
+Freed:  50
+Reused: 45
+Allocs: 12
+Retain: 24
+
+Unifications: 57
+Conjuncts:    123
+Disjuncts:    56
 -- out/eval --
 Errors:
 e0: incompatible list lengths (1 and 2)

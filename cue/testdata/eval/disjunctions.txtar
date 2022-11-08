@@ -132,6 +132,16 @@ issue641: {
 		}
 	}
 }
+-- out/eval/stats --
+Leaks:  0
+Freed:  304
+Reused: 292
+Allocs: 12
+Retain: 0
+
+Unifications: 147
+Conjuncts:    564
+Disjuncts:    304
 -- out/eval --
 Errors:
 f: 2 errors in empty disjunction:

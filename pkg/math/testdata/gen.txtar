@@ -27,7 +27,7 @@ t33: math.Dim(5, 7.2)
 Errors:
 t3: cannot call non-function math.Pi (type float):
     ./in.cue:5:6
-error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000:
+t6: error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000:
     ./in.cue:6:6
 t8: cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up:
     ./in.cue:8:6
@@ -37,7 +37,7 @@ Result:
 t1:  3.14159265358979323846264338327950288419716939937510582097494459
 t2:  3
 t3:  _|_ // t3: cannot call non-function math.Pi (type float)
-t6:  _|_ // error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000
+t6:  _|_ // t6: error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000
 t7:  1
 t8:  _|_ // t8: cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up
 t16: 4096

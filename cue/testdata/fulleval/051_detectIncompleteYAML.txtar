@@ -91,8 +91,9 @@ Disjuncts:    17
         //     ./in.cue:11:11
       }
       foobar: (_|_){
-        // [incomplete] #Spec.data.foobar: incomplete value:
+        // [incomplete] #Spec.data.foobar: error in call to encoding/yaml.Marshal: incomplete value string:
         //     ./in.cue:12:11
+        //     ./in.cue:6:21
       }
     }
   }

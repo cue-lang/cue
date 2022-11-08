@@ -2214,7 +2214,7 @@ func (v Value) Validate(opts ...Option) error {
 
 	b := validate.Validate(v.ctx(), v.v, cfg)
 	if b != nil {
-		return b.Err
+		return v.toErr(b)
 	}
 	return nil
 }

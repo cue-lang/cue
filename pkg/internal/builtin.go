@@ -150,7 +150,7 @@ func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 			return nil
 		case adt.Value:
 			return v
-		case bottomer:
+		case Bottomer:
 			// deal with API limitation: catch nil interface issue.
 			if b := v.Bottom(); b != nil {
 				return b
@@ -200,12 +200,12 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	case *callError:
 		ret = err.b
 	case *json.MarshalerError:
-		if err, ok := err.Err.(bottomer); ok {
+		if err, ok := err.Err.(Bottomer); ok {
 			if b := err.Bottom(); b != nil {
 				ret = b
 			}
 		}
-	case bottomer:
+	case Bottomer:
 		ret = wrapCallErr(call, err.Bottom())
 
 	case errors.Error:

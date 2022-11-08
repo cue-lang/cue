@@ -30,6 +30,10 @@ func TestPaths(t *testing.T) {
 		c: "#Foo": 7
 		map: [string]: int
 		list: [...int]
+
+		// Issue 2060
+		let X = {a: b: 0}
+		x: y: X.a
 	`)
 	testCases := []struct {
 		path Path
@@ -124,6 +128,14 @@ func TestPaths(t *testing.T) {
 		path: MakePath(Str("list"), AnyIndex),
 		out:  "int",
 		str:  "list.[_]",
+	}, {
+		path: ParsePath("x.y"),
+		out:  "{\n\tb: 0\n}",
+		str:  "x.y",
+	}, {
+		path: ParsePath("x.y.b"),
+		out:  "0",
+		str:  "x.y.b",
 	}}
 
 	v := inst.Value()

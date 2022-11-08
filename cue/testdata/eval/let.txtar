@@ -38,16 +38,25 @@ ignoreErrorInLet: {
 	let X = 1 & 2
 	disjunction: *X | 3
 }
+// Issue #2063
+keepDescending: {
+	ec: {}
+	bs: {
+		let m = ec.b
+		if m == _|_ { }
+		x: y: ""
+	}
+}
 -- out/eval/stats --
-Leaks:  3
-Freed:  34
-Reused: 30
-Allocs: 7
-Retain: 6
+Leaks:  5
+Freed:  39
+Reused: 34
+Allocs: 10
+Retain: 14
 
-Unifications: 35
-Conjuncts:    45
-Disjuncts:    37
+Unifications: 42
+Conjuncts:    53
+Disjuncts:    44
 -- out/eval --
 (struct){
   let A#1 = (int){ 9 }
@@ -92,6 +101,19 @@ Disjuncts:    37
     }
     disjunction: (int){ 3 }
   }
+  keepDescending: (struct){
+    ec: (struct){
+    }
+    bs: (struct){
+      let m#19 = (_|_){
+        // [incomplete] keepDescending.bs.m: undefined field: b:
+        //     ./in.cue:44:14
+      }
+      x: (struct){
+        y: (string){ "" }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -133,5 +155,15 @@ Disjuncts:    37
   ignoreErrorInLet: {
     let X#18 = (1 & 2)
     disjunction: (*〈0;let X#18〉|3)
+  }
+  keepDescending: {
+    ec: {}
+    bs: {
+      let m#19 = 〈1;ec〉.b
+      if (〈0;let m#19〉 == _|_(explicit error (_|_ literal) in source)) {}
+      x: {
+        y: ""
+      }
+    }
   }
 }

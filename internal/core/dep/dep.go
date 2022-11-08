@@ -219,12 +219,16 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	// all nodes are finalized already and we need neither closedness nor cycle
 	// checks.
 	if ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r); ref != nil {
-		if ref.Label.IsLet() {
-			x := r.(*adt.LetReference)
-			saved := c.ctxt.PushState(env, nil)
-			env := c.ctxt.Env(x.UpCount)
-			c.markExpr(env, ref.Conjuncts[0].Expr())
-			c.ctxt.PopState(saved)
+		// If ref is within a let, we only care about dependencies referred to
+		// by internal expressions. The let expression itself is not considered
+		// a dependency and is considered part of the referring expression.
+		if hasLetParent(ref) {
+			// It is okay to use the Environment recorded in the arc, as
+			// lets that may vary per Environment already have a separate arc
+			// associated with them (see Vertex.MultiLet).
+			for _, x := range ref.Conjuncts {
+				c.markExpr(x.Env, x.Expr())
+			}
 			return
 		}
 
@@ -260,6 +264,17 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	case *adt.SelectorExpr:
 		c.markExpr(env, x.X)
 	}
+}
+
+// TODO(perf): make this available as a property of vertices to avoid doing
+// these dynamic lookups.
+func hasLetParent(v *adt.Vertex) bool {
+	for ; v != nil; v = v.Parent {
+		if v.Label.IsLet() {
+			return true
+		}
+	}
+	return false
 }
 
 func (c *visitor) markSubExpr(env *adt.Environment, x adt.Expr) {

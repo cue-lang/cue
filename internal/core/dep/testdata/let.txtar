@@ -1,0 +1,11 @@
+// Issue #2060
+-- in.cue --
+v: w: 0
+
+let X = {c: d: v}
+
+a: b: X.c
+-- out/dependencies/field --
+-- out/dependencies/all --
+v
+-- out/dependencies/dynamic --

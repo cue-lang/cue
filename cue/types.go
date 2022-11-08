@@ -1580,7 +1580,7 @@ func appendPath(a []Selector, v Value) []Selector {
 	}
 
 	var sel selector
-	switch f.Typ() {
+	switch t := f.Typ(); t {
 	case adt.IntLabel:
 		sel = indexSelector(f)
 	case adt.DefinitionLabel:
@@ -1594,6 +1594,9 @@ func appendPath(a []Selector, v Value) []Selector {
 
 	case adt.StringLabel:
 		sel = stringSelector(f.StringValue(v.idx))
+
+	default:
+		panic(fmt.Sprintf("unsupported label type %v", t))
 	}
 	return append(a, Selector{sel})
 }

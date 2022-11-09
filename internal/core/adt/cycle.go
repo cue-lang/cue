@@ -265,8 +265,8 @@ type cyclicConjunct struct {
 //
 // Other inputs:
 //
-//	arc  the reference to which x points
-//	v    the Conjunct from which x originates
+//	arc      the reference to which x points
+//	env, ci  the components of the Conjunct from which x originates
 //
 // A cyclic node is added to a queue for later processing if no evidence of a
 // non-cyclic node has so far been found. updateCyclicStatus processes delayed
@@ -275,10 +275,11 @@ type cyclicConjunct struct {
 // If a cycle is the result of "inline" processing (an expression referencing
 // itself), an error is reported immediately.
 //
-// It returns the updated Conjunct (marked with cyclic info) and whether or not
-// its processing should be skipped, which is the case either if the conjunct
-// seems to be fully cyclic so far or if there is a valid reference cycle.
-func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct, skip bool) {
+// It returns the CloseInfo with tracked cyclic conjuncts updated, and
+// whether or not its processing should be skipped, which is the case either if
+// the conjunct seems to be fully cyclic so far or if there is a valid reference
+// cycle.
+func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (_ CloseInfo, skip bool) {
 	// TODO(perf): this optimization can work if we also check for any
 	// references pointing to arc within arc. This can be done with compiler
 	// support. With this optimization, almost all references could avoid cycle
@@ -291,7 +292,7 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 	// a potential cycle.
 	found := false
 	depth := int32(0)
-	for r := v.CloseInfo.Refs; r != nil; r = r.Next {
+	for r := ci.Refs; r != nil; r = r.Next {
 		if r.Ref != x {
 			continue
 		}
@@ -306,16 +307,16 @@ func (n *nodeContext) markCycle(arc *Vertex, v Conjunct, x Resolver) (_ Conjunct
 			continue
 		}
 
-		if v.CloseInfo.Inline {
+		if ci.Inline {
 			n.reportCycleError()
-			return v, true
+			return ci, true
 		}
 
 		// We have a reference cycle, as distinguished from a structural
 		// cycle. Reference cycles represent equality, and thus are equal
 		// to top. We can stop processing here.
 		if r.Node == n.node {
-			return v, true
+			return ci, true
 		}
 
 		depth = r.Depth
@@ -381,12 +382,12 @@ outer:
 					found = true
 				}
 			}
-			v.CloseInfo.Refs = &RefNode{
+			ci.Refs = &RefNode{
 				Arc:  r.Arc,
 				Node: n.node,
 
 				Ref:   x,
-				Next:  v.CloseInfo.Refs,
+				Next:  ci.Refs,
 				Depth: n.depth,
 			}
 		}
@@ -417,22 +418,22 @@ outer:
 		// gives somewhat better error messages.
 		// We also need to add the reference again if the depth differs, as
 		// the depth is used for tracking "new structure".
-		v.CloseInfo.Refs = &RefNode{
+		ci.Refs = &RefNode{
 			Arc:   arc,
 			Ref:   x,
 			Node:  n.node,
-			Next:  v.CloseInfo.Refs,
+			Next:  ci.Refs,
 			Depth: n.depth,
 		}
 	}
 
 	if !found && arc.status != EvaluatingArcs {
 		// No cycle.
-		return v, false
+		return ci, false
 	}
 
-	alreadyCycle := v.CloseInfo.IsCyclic
-	v.CloseInfo.IsCyclic = true
+	alreadyCycle := ci.IsCyclic
+	ci.IsCyclic = true
 
 	// TODO: depth might legitimately be 0 if it is a root vertex.
 	// In the worst case, this may lead to a spurious cycle.
@@ -460,18 +461,19 @@ outer:
 				count--
 			}
 			if count > 0 {
-				return v, false
+				return ci, false
 			}
 		}
 	}
 
 	n.hasCycle = true
-	if !n.hasNonCycle {
+	if !n.hasNonCycle && env != nil {
+		v := Conjunct{env, x, ci}
 		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
-		return v, true
+		return ci, true
 	}
 
-	return v, false
+	return ci, false
 }
 
 // updateCyclicStatus looks for proof of non-cyclic conjuncts to override

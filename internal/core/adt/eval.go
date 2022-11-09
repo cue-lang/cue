@@ -1489,10 +1489,11 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			arc.Finalize(ctx)
 		}
 
-		v, skip := n.markCycle(arc, v, x)
+		ci, skip := n.markCycle(arc, v.Env, x, v.CloseInfo)
 		if skip {
 			return
 		}
+		v.CloseInfo = ci
 
 		n.addVertexConjuncts(v, arc, false)
 

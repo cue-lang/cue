@@ -679,8 +679,13 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		if arc == nil {
 			return nil
 		}
-
+		saved := c.ci
+		if n := arc.state; n != nil {
+			c.ci, _ = n.markCycle(arc, nil, x, c.ci)
+		}
+		c.ci.Inline = true
 		v := c.evaluate(arc, x, state)
+		c.ci = saved
 		return v
 
 	default:

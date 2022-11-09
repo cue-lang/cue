@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "185dfeef_f4201864",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-09T18:06:56Z",
+      "side": 1,
+      "message": "LGTM with a couple of minor suggestions, thanks!",
+      "revId": "3cbd18558261c4e128868e34c4bf46a1579c342c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b917bd7_d716ad08",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-09T18:06:56Z",
+      "side": 1,
+      "message": "or just `files :\u003d a.Files[:k:k]` ?",
+      "revId": "3cbd18558261c4e128868e34c4bf46a1579c342c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b888b4e_06027d18",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-09T18:06:56Z",
+      "side": 1,
+      "message": "I don\u0027t understand this comment. How is stats an \"exceptional comparer\" and how does this comparison help with that? Maybe a comment or two on the surrounding code could help?",
+      "revId": "3cbd18558261c4e128868e34c4bf46a1579c342c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

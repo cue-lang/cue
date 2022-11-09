@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2f9d6767_77ae6124",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-09T13:12:32Z",
+      "side": 1,
+      "message": "I\u0027m not sure it is strictly an improvement, as the remaining precision doesn\u0027t reflect the expected precision. CUE allows writing `1.` for exactly that reason. But I agree that is a bit odd.",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8f2a5ba7_8a729c06",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2

@@ -16,7 +16,7 @@
 [![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
 [![Github](https://github.com/cue-lang/cue/workflows/Test/badge.svg)](https://github.com/cue-lang/cue/actions)
 [![GolangCI](https://golangci.com/badges/github.com/cue-lang/cue.svg)](https://golangci.com/r/github.com/cue-lang/cue)
-[![Go 1.17+](https://img.shields.io/badge/go-1.17-9cf.svg)](https://golang.org/dl/)
+[![Go 1.18+](https://img.shields.io/badge/go-1.18-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 
 # The CUE Data Constraint Language
@@ -108,15 +108,13 @@ brew install cue-lang/tap/cue
 
 <!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txtar -->
 
-If you already have Go 1.16 or later installed, the short version is:
+To install the `cue` command line tool, run:
 
 ```
 go install cuelang.org/go/cmd/cue@latest
 ```
 
-This will install the `cue` command line tool.
-
-For more details see [Installing CUE](./doc/install.md).
+For more details, see [Installing CUE](./doc/install.md).
 
 
 ### Learning CUE

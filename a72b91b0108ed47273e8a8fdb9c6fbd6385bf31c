@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "79280e83_d0d15723",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-09T17:30:00Z",
+      "side": 1,
+      "message": "LGTM with one trivial thought, thanks!",
+      "revId": "a72b91b0108ed47273e8a8fdb9c6fbd6385bf31c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09f06b30_571fb2ce",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1599,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-09T17:30:00Z",
+      "side": 1,
+      "message": "Not %v ? Wouldn\u0027t a nicely formatted panic message be better? Well, tbh, I just realised that FeatureType doesn\u0027t implement String, so it makes no difference currently, but it would if we did :) :shrug:",
+      "revId": "a72b91b0108ed47273e8a8fdb9c6fbd6385bf31c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

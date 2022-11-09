@@ -108,15 +108,13 @@ brew install cue-lang/tap/cue
 
 <!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txtar -->
 
-If you already have Go 1.16 or later installed, the short version is:
+To install the `cue` command line tool, run:
 
 ```
 go install cuelang.org/go/cmd/cue@latest
 ```
 
-This will install the `cue` command line tool.
-
-For more details see [Installing CUE](./doc/install.md).
+For more details, see [Installing CUE](./doc/install.md).
 
 
 ### Learning CUE

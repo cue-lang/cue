@@ -60,7 +60,7 @@ _#latestStableGo: "1.19.x"
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-_#pinnedReleaseGo: "1.19.1"
+_#pinnedReleaseGo: "1.19.3"
 
 _#linuxMachine:   "ubuntu-20.04"
 _#macosMachine:   "macos-11"
@@ -76,7 +76,7 @@ _#goreleaserVersion: "v1.8.2"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": ["1.17.x", "1.18.x", _#latestStableGo]
+		"go-version": ["1.18.x", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }

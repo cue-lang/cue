@@ -6,23 +6,19 @@ Currently CUE can only be installed from source.
 
 ### Prerequisites
 
-Go 1.17 or higher (see below)
+Go 1.18 or higher (see below)
 
 ### Installing CUE
 
 <!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txtar -->
 
-To download and install the `cue` command line tool run
+To download and install the `cue` command line tool, run:
 
 ```
 go install cuelang.org/go/cmd/cue@latest
 ```
 
-If the command fails, make sure your version of Go is 1.17 or later.
-
-And make sure the install directory is in your path.
-
-To also download the API and documentation, run
+To also download the API and documentation, run:
 
 ```
 go get cuelang.org/go/cue@latest

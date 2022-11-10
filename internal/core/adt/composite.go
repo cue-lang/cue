@@ -507,8 +507,8 @@ func ToVertex(v Value) *Vertex {
 	}
 }
 
-// Unwrap returns the possibly non-concrete scalar value of v or nil if v is
-// a list, struct or of undefined type.
+// Unwrap returns the possibly non-concrete scalar value of v, v itself for
+// lists and structs, or nil if v is an undefined type.
 func Unwrap(v Value) Value {
 	x, ok := v.(*Vertex)
 	if !ok {

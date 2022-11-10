@@ -107,15 +107,15 @@ closeFail: {
 }
 
 -- out/eval/stats --
-Leaks:  126
-Freed:  138
-Reused: 134
-Allocs: 130
-Retain: 278
+Leaks:  125
+Freed:  141
+Reused: 137
+Allocs: 129
+Retain: 276
 
-Unifications: 252
-Conjuncts:    517
-Disjuncts:    262
+Unifications: 254
+Conjuncts:    521
+Disjuncts:    264
 -- out/eval --
 Errors:
 closeCycle.a: structural cycle

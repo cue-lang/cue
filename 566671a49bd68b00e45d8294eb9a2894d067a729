@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80619a6f_f07c9eb6",
+        "filename": "cue/testdata/eval/let.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-10T11:52:46Z",
+      "side": 1,
+      "message": "This test case doesn\u0027t fail on tip for me, so arguably a slightly better test case would be desirable.",
+      "revId": "566671a49bd68b00e45d8294eb9a2894d067a729",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

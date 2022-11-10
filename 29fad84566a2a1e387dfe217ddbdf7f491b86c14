@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8f3b4d3_d990e516",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-10T11:52:46Z",
+      "side": 1,
+      "message": "LGTM, with one minor thought.",
+      "revId": "29fad84566a2a1e387dfe217ddbdf7f491b86c14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

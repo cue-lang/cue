@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "987cac32_66b76579",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-10T16:51:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7e1ffd48_ddfee9a2",
+      "revId": "f3aa2a45645c8d828b7a87da0ed662613961d235",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "126d08d2_7eea8246",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-11-10T16:16:13Z",
       "side": 1,
       "message": "The extra \"updated\" seems redundant here.\n\n// It returns the CloseInfo with tracked cyclic conjuncts updated, and\n\n?",
+      "revId": "f3aa2a45645c8d828b7a87da0ed662613961d235",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d912fc6a_47230e8a",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-10T16:51:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "126d08d2_7eea8246",
       "revId": "f3aa2a45645c8d828b7a87da0ed662613961d235",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

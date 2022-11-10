@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27f7bfd9_e3af8236",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-10T16:55:49Z",
+      "side": 1,
+      "message": "So the good news is that this fixes two things related to #1969:\n\n1) the OOM error with the large config behind the reduced config that forms the basis of the test case for #1969.\n2) the actual error in the reduced repro in #1969. i.e. with this CL, that reduced repro passes like v0.4.3\n\nThe bad news: even though the large config behind #1969 no longer OOMs, I haven\u0027t actually managed to run cue eval to completion yet. I left it running for ~15 mins, it was steady at 21G of memory, but it still appeared to be \"going strong\". \n\nContrast that same configuration with v0.4.3, where it completes in ~30 seconds. \n\nMy suggestion however is that all else being well we submit this CL. It strictly improves things with respect to that config at least. We could then create an alpha.2 release and get some exposure on that.",
+      "revId": "c6e5eb29482a2b4a0f1d2c8212de3dfe8afcbbee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

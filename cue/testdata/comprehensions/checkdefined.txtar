@@ -1,0 +1,121 @@
+
+Issue #1969
+
+-- in.cue --
+import "list"
+
+// All tests here should pass.
+
+x: close({field: {}})
+
+ok0: {
+	if x.undefined == _|_ {a: 1}
+}
+
+ok1: {
+	if x.undefined != _|_ {a: 1}
+}
+
+ok2: {
+	if ({} & {s: [ for y in x.undefined {}]}) != _|_ {a: 1}
+}
+
+ok3: {
+	if ({s: [ for y in x.undefined {}]}) != _|_ {a: 1}
+}
+
+issue1969: ok1: {
+	let X = x.undefined
+	let Y = {} & {s: [ for y in list.Range(0, X, 1) {}]}
+
+	if Y != _|_ {Y}
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  21
+Reused: 16
+Allocs: 8
+Retain: 9
+
+Unifications: 24
+Conjuncts:    25
+Disjuncts:    24
+-- out/eval --
+(struct){
+  x: (#struct){
+    field: (struct){
+    }
+  }
+  ok0: (struct){
+    a: (int){ 1 }
+  }
+  ok1: (struct){
+  }
+  ok2: (struct){
+  }
+  ok3: (struct){
+  }
+  issue1969: (struct){
+    ok1: (struct){
+      let X#1 = (_|_){
+        // [eval] issue1969.ok1.X: undefined field: undefined:
+        //     ./in.cue:24:12
+      }
+      let Y#2 = (_|_){
+        // [eval]
+        s: (_|_){
+          // [eval] issue1969.ok1.X: undefined field: undefined:
+          //     ./in.cue:24:12
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  x: close({
+    field: {}
+  })
+  ok0: {
+    if (〈1;x〉.undefined == _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  ok1: {
+    if (〈1;x〉.undefined != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  ok2: {
+    if (({} & {
+      s: [
+        for _, y in 〈3;x〉.undefined {},
+      ]
+    }) != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  ok3: {
+    if ({
+      s: [
+        for _, y in 〈3;x〉.undefined {},
+      ]
+    } != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  issue1969: {
+    ok1: {
+      let X#1 = 〈2;x〉.undefined
+      let Y#2 = ({} & {
+        s: [
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+        ]
+      })
+      if (〈0;let Y#2〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#2〉
+      }
+    }
+  }
+}

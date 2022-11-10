@@ -1274,7 +1274,16 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 	// NOTE: using Unwrap is maybe note entirely accurate, as it may discard
 	// a future error. However, if it does so, the error will at least be
 	// reported elsewhere.
-	switch b := c.value(x).(type) {
+	v := c.value(x)
+
+	if n, ok := v.(*Vertex); ok && n.Kind().IsAnyOf(StructKind|ListKind) {
+		// Need to recursively check for errors, so we need to evaluate the
+		// Vertex in case it hadn't been evaluated yet.
+		c.Unify(n, Finalized)
+		v = Unwrap(v)
+	}
+
+	switch b := v.(type) {
 	case nil:
 	case *Bottom:
 		switch b.Code {

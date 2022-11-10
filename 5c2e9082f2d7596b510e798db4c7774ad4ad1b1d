@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d66e1cfb_031891d3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-10T12:08:45Z",
+      "side": 1,
+      "message": "references ?\nthe reference was ?",
+      "revId": "5c2e9082f2d7596b510e798db4c7774ad4ad1b1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b7e12bec_983bf7c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-10T12:08:45Z",
+      "side": 1,
+      "message": "Looks good, thanks, but the commentary could use some updating.",
+      "revId": "5c2e9082f2d7596b510e798db4c7774ad4ad1b1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6eaefb24_2f42fe69",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 682,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-10T12:08:45Z",
+      "side": 1,
+      "message": "I suspect a comment on this subtlety wouldn\u0027t go amiss.",
+      "revId": "5c2e9082f2d7596b510e798db4c7774ad4ad1b1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f4e4d98_e0222d9d",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-10T12:08:45Z",
+      "side": 1,
+      "message": "This is now out of date.",
+      "revId": "5c2e9082f2d7596b510e798db4c7774ad4ad1b1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af09a4bf_8a38a84f",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-10T12:08:45Z",
+      "side": 1,
+      "message": "This is also inaccurate now.",
+      "revId": "5c2e9082f2d7596b510e798db4c7774ad4ad1b1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

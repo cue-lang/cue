@@ -16,6 +16,24 @@
       "message": "I wonder if it would be more robust to use `errors.As` instead of testing the top level in the error chain directly. That way it it\u0027s OK for errors to be annotated if desired.",
       "revId": "e5808ae551d68419442d7d12fecf327014ef8487",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17fe31f2_243422c4",
+        "filename": "pkg/encoding/yaml/manual.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-10T11:14:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e003c0e3_5291dc41",
+      "revId": "e5808ae551d68419442d7d12fecf327014ef8487",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

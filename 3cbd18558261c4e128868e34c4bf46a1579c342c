@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fe15720_7ffe0513",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-10T09:58:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b917bd7_d716ad08",
+      "revId": "3cbd18558261c4e128868e34c4bf46a1579c342c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b888b4e_06027d18",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-11-09T18:06:56Z",
       "side": 1,
       "message": "I don\u0027t understand this comment. How is stats an \"exceptional comparer\" and how does this comparison help with that? Maybe a comment or two on the surrounding code could help?",
+      "revId": "3cbd18558261c4e128868e34c4bf46a1579c342c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55179429_92221273",
+        "filename": "internal/cuetxtar/txtar.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 389,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-10T09:58:41Z",
+      "side": 1,
+      "message": "Ah, this was meant to be a TODO. I will remove it.",
+      "parentUuid": "2b888b4e_06027d18",
       "revId": "3cbd18558261c4e128868e34c4bf46a1579c342c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

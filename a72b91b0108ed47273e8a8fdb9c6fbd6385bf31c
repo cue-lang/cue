@@ -33,6 +33,24 @@
       "message": "Not %v ? Wouldn\u0027t a nicely formatted panic message be better? Well, tbh, I just realised that FeatureType doesn\u0027t implement String, so it makes no difference currently, but it would if we did :) :shrug:",
       "revId": "a72b91b0108ed47273e8a8fdb9c6fbd6385bf31c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cefd7825_2fabe7d8",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1599,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-10T09:52:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09f06b30_571fb2ce",
+      "revId": "a72b91b0108ed47273e8a8fdb9c6fbd6385bf31c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

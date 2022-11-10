@@ -1,0 +1,205 @@
+
+Issue #1969
+
+-- in.cue --
+import "list"
+
+// All tests here should pass and the result of the okcN tests should be
+// identical to those of the okoN tests.
+
+xc: close({field: {}})
+xo: field: {}
+
+okc0: { if xc.undefined == _|_ {a: 1} }
+oko0: { if xo.undefined == _|_ {a: 1} }
+
+okc1: { if xc.undefined != _|_ {a: 1} }
+oko1: { if xo.undefined != _|_ {a: 1} }
+
+okc2: {
+	if ({} & {s: [ for y in xc.undefined {}]}) != _|_ {a: 1}
+}
+
+oko2: {
+	if ({} & {s: [ for y in xo.undefined {}]}) != _|_ {a: 1}
+}
+
+okc3: {
+	if ({s: [ for y in xc.undefined {}]}) != _|_ {a: 1}
+}
+
+oko3: {
+	if ({s: [ for y in xo.undefined {}]}) != _|_ {a: 1}
+}
+
+issue1969: okc: {
+	let X = xc.undefined
+	let Y = {} & {s: [ for y in list.Range(0, X, 1) {}]}
+
+	if Y != _|_ {Y}
+}
+
+issue1969: oko: {
+	let X = xo.undefined
+	let Y = {} & {s: [ for y in list.Range(0, X, 1) {}]}
+
+	if Y != _|_ {Y}
+}
+-- out/eval/stats --
+Leaks:  5
+Freed:  38
+Reused: 33
+Allocs: 10
+Retain: 15
+
+Unifications: 43
+Conjuncts:    44
+Disjuncts:    43
+-- out/eval --
+(struct){
+  xc: (#struct){
+    field: (struct){
+    }
+  }
+  xo: (struct){
+    field: (struct){
+    }
+  }
+  okc0: (struct){
+    a: (int){ 1 }
+  }
+  oko0: (struct){
+    a: (int){ 1 }
+  }
+  okc1: (struct){
+  }
+  oko1: (struct){
+  }
+  okc2: (struct){
+  }
+  oko2: (struct){
+  }
+  okc3: (struct){
+  }
+  oko3: (struct){
+  }
+  issue1969: (struct){
+    okc: (struct){
+      let X#1 = (_|_){
+        // [eval] issue1969.okc.X: undefined field: undefined:
+        //     ./in.cue:32:13
+      }
+      let Y#2 = (_|_){
+        // [eval]
+        s: (_|_){
+          // [eval] issue1969.okc.X: undefined field: undefined:
+          //     ./in.cue:32:13
+        }
+      }
+    }
+    oko: (struct){
+      let X#3 = (_|_){
+        // [incomplete] issue1969.oko.X: undefined field: undefined:
+        //     ./in.cue:39:13
+      }
+      let Y#4 = (struct){
+        s: (_|_){
+          // [incomplete] issue1969.oko.X: undefined field: undefined:
+          //     ./in.cue:39:13
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  xc: close({
+    field: {}
+  })
+  xo: {
+    field: {}
+  }
+  okc0: {
+    if (〈1;xc〉.undefined == _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko0: {
+    if (〈1;xo〉.undefined == _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  okc1: {
+    if (〈1;xc〉.undefined != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko1: {
+    if (〈1;xo〉.undefined != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  okc2: {
+    if (({} & {
+      s: [
+        for _, y in 〈3;xc〉.undefined {},
+      ]
+    }) != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko2: {
+    if (({} & {
+      s: [
+        for _, y in 〈3;xo〉.undefined {},
+      ]
+    }) != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  okc3: {
+    if ({
+      s: [
+        for _, y in 〈3;xc〉.undefined {},
+      ]
+    } != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  oko3: {
+    if ({
+      s: [
+        for _, y in 〈3;xo〉.undefined {},
+      ]
+    } != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
+    }
+  }
+  issue1969: {
+    okc: {
+      let X#1 = 〈2;xc〉.undefined
+      let Y#2 = ({} & {
+        s: [
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#1〉, 1) {},
+        ]
+      })
+      if (〈0;let Y#2〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#2〉
+      }
+    }
+  }
+  issue1969: {
+    oko: {
+      let X#3 = 〈2;xo〉.undefined
+      let Y#4 = ({} & {
+        s: [
+          for _, y in 〈import;list〉.Range(0, 〈2;let X#3〉, 1) {},
+        ]
+      })
+      if (〈0;let Y#4〉 != _|_(explicit error (_|_ literal) in source)) {
+        〈1;let Y#4〉
+      }
+    }
+  }
+}

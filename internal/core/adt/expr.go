@@ -1270,11 +1270,11 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r Value) {
 	s := c.PushState(env, src)
 
-	var match bool
-	// NOTE: using Unwrap is maybe note entirely accurate, as it may discard
-	// a future error. However, if it does so, the error will at least be
-	// reported elsewhere.
-	switch b := c.value(x).(type) {
+	match := op != EqualOp // non-error case
+
+	v := c.value(x)
+
+	switch b := v.(type) {
 	case nil:
 	case *Bottom:
 		switch b.Code {
@@ -1295,11 +1295,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 
 		match = op == EqualOp
 
-	default:
-		v, ok := b.(*Vertex)
-		isVoid := ok && !v.IsDefined(c)
-		c.verifyNonMonotonicResult(env, x, isVoid)
-
+	case *Vertex:
 		// TODO(cycle): if EqualOp:
 		// - ensure to pass special status to if clause or keep a track of "hot"
 		//   paths.
@@ -1307,21 +1303,55 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 		// - walk over all fields and verify that fields are not contradicting
 		//   previously marked fields.
 		//
-		switch {
-		case b.Concreteness() > Concrete, isVoid:
+		c.Unify(b, Finalized)
+
+		switch isVoid := !b.IsDefined(c); {
+		case isVoid:
+			c.verifyNonMonotonicResult(env, x, true)
+
 			// TODO: mimic comparison to bottom semantics. If it is a valid
 			// value, check for concreteness that this level only. This
 			// should ultimately be replaced with an exists and valid
 			// builtin.
 			match = op == EqualOp
-		default:
-			match = op != EqualOp
+
+		case anyError(b):
+			// Need to recursively check for errors, so we need to evaluate the
+			// Vertex in case it hadn't been evaluated yet.
+			match = op == EqualOp
 		}
+
+	default:
+		c.verifyNonMonotonicResult(env, x, false)
+
+		if b.Concreteness() > Concrete {
+			// TODO: mimic comparison to bottom semantics. If it is a valid
+			// value, check for concreteness that this level only. This
+			// should ultimately be replaced with an exists and valid
+			// builtin.
+			match = op == EqualOp
+		}
+
 		c.evalState(x, Partial)
 	}
 
 	c.PopState(s)
 	return &Bool{src, match}
+}
+
+// TODO(perf): keep track of the presence of recursive errors so that we can
+// avoid traversing the arcs here.
+func anyError(n *Vertex) bool {
+	n = n.Indirect()
+	if _, ok := Unwrap(n).(*Bottom); ok {
+		return true
+	}
+	for _, arc := range n.Arcs {
+		if anyError(arc) {
+			return true
+		}
+	}
+	return false
 }
 
 // verifyNonMonotonicResult re-evaluates the given expression at a later point

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87b1b288_c91fdc97",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-11T11:57:29Z",
+      "side": 1,
+      "message": "LGTM with one final nit, thanks!",
+      "revId": "8640319ad909c5fbb59758cc8386edcbfe28aa6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b5226ac_b9d64900",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-11T11:57:29Z",
+      "side": 1,
+      "message": "This still doesn\u0027t document what happens when v doesn\u0027t represent a scalar value.",
+      "revId": "8640319ad909c5fbb59758cc8386edcbfe28aa6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

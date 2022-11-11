@@ -23,6 +23,12 @@ type Config struct {
 	// Concrete, if true, requires that all values be concrete.
 	Concrete bool
 
+	// Incomplete, if true, causes incomplete errors that are not in definitions
+	// to be reported. This is implied by Concrete.
+	Incomplete bool
+
+	// Incomplete, if true, causes also incomplete errors to be reported.
+
 	// DisallowCycles indicates that there may not be cycles.
 	DisallowCycles bool
 
@@ -54,6 +60,10 @@ func (v *validator) checkConcrete() bool {
 	return v.Concrete && v.inDefinition == 0
 }
 
+func (v *validator) checkIncomplete() bool {
+	return (v.Concrete || v.Incomplete) && v.inDefinition == 0
+}
+
 func (v *validator) add(b *adt.Bottom) {
 	if !v.AllErrors {
 		v.err = adt.CombineErrors(nil, v.err, b)
@@ -70,12 +80,12 @@ func (v *validator) validate(x *adt.Vertex) {
 	if b, _ := x.BaseValue.(*adt.Bottom); b != nil {
 		switch b.Code {
 		case adt.CycleError:
-			if v.checkConcrete() || v.DisallowCycles {
+			if v.checkIncomplete() || v.DisallowCycles {
 				v.add(b)
 			}
 
 		case adt.IncompleteError:
-			if v.checkConcrete() {
+			if v.checkIncomplete() {
 				v.add(b)
 			}
 

@@ -95,6 +95,14 @@ y: conflicting values 4 and 2:
     test:3:10`,
 	}, {
 		desc: "incomplete",
+		cfg:  &Config{Incomplete: true},
+		in: `
+		y: 2 + x
+		x: string
+		`,
+		out: "incomplete\ny: non-concrete value string in operand to +:\n    test:2:6\n    test:3:6",
+	}, {
+		desc: "concrete implies incomplete",
 		cfg:  &Config{Concrete: true},
 		in: `
 		y: 2 + x
@@ -138,6 +146,14 @@ y: conflicting values 4 and 2:
 		x: y - 1
 		`,
 	}, {
+		desc: "treat cycles as incomplete when not disallowing",
+		cfg:  &Config{Incomplete: true},
+		in: `
+			y: x + 1
+			x: y - 1
+			`,
+		out: "cycle\ncycle error:\n    test:2:7",
+	}, {
 		// Note: this is already handled by evaluation, as terminal errors
 		// are percolated up.
 		desc: "catch most serious error",
@@ -155,7 +171,7 @@ y: conflicting values 4 and 2:
 		`,
 	}, {
 		desc: "allow non-concrete in definitions in concrete mode",
-		cfg:  &Config{Concrete: true},
+		cfg:  &Config{Incomplete: true},
 		in: `
 		x: 2
 		#d: {

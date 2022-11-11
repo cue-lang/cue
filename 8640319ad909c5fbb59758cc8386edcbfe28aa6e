@@ -33,6 +33,24 @@
       "message": "This still doesn\u0027t document what happens when v doesn\u0027t represent a scalar value.",
       "revId": "8640319ad909c5fbb59758cc8386edcbfe28aa6e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad9b4737_a6df8137",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 511,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-11T15:57:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b5226ac_b9d64900",
+      "revId": "8640319ad909c5fbb59758cc8386edcbfe28aa6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

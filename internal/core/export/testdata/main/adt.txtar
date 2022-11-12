@@ -53,7 +53,7 @@ l6:   [1, #foo] & {
 n1:  1.0
 n10: 10
 
-// Ignored comment.
+// Not ignored comment.
 
 // t is true
 t: true
@@ -151,6 +151,8 @@ d2: {
 		foo:  C.name
 	}
 }
+
+// Issue #1910
 a: _
 comp: {
 	for k, v in [0] let w = v {
@@ -180,7 +182,13 @@ l6:   [1, #foo] & {
 }
 n1:  1.0
 n10: 10
-t:   true
+
+// Not ignored comment.
+
+// t is true
+t: true
+
+// Dangling comment.
 e1:  <n1
 e2:  >n1 & <n10
 e3:  l4[2]

@@ -39,12 +39,28 @@ func TestSyntax(t *testing.T) {
 		in: `
 		// Aloha
 		hello: "world"
+		// Aloha2
+		if true {
+			// Aloha3
+			if true {
+				// Aloha4
+				hello2: "world"
+			}
+		}
 		`,
 		options: o(cue.Docs(true)),
 		out: `
 {
 	// Aloha
 	hello: "world"
+	// Aloha2
+	if true {
+		// Aloha3
+		if true {
+			// Aloha4
+			hello2: "world"
+		}
+	}
 }`,
 	}, {
 		name: "partially resolvable",

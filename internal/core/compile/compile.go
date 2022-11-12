@@ -730,6 +730,7 @@ func (c *compiler) elem(n ast.Expr) adt.Elem {
 
 func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 	var a []adt.Yielder
+	comments := x.Comments()
 	for _, v := range x.Clauses {
 		switch x := v.(type) {
 		case *ast.ForClause:
@@ -737,6 +738,7 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 			if x.Key != nil {
 				key = c.label(x.Key)
 			}
+			x.SetComments(comments)
 			y := &adt.ForClause{
 				Syntax: x,
 				Key:    key,
@@ -748,6 +750,7 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 			a = append(a, y)
 
 		case *ast.IfClause:
+			x.SetComments(comments)
 			y := &adt.IfClause{
 				Src:       x,
 				Condition: c.expr(x.Condition),
@@ -755,6 +758,7 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 			a = append(a, y)
 
 		case *ast.LetClause:
+			x.SetComments(comments)
 			y := &adt.LetClause{
 				Src:   x,
 				Label: c.label(x.Ident),

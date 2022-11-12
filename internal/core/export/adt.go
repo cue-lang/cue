@@ -418,8 +418,8 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 		f.Value = e.expr(env, x.Value)
 		f.Attrs = extractFieldAttrs(nil, x)
+		f.SetComments(x.Src.Comments())
 
-		// extractDocs(nil)
 		return f
 
 	case *adt.OptionalField:
@@ -433,8 +433,8 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 		f.Value = e.expr(env, x.Value)
 		f.Attrs = extractFieldAttrs(nil, x)
+		f.SetComments(x.Src.Comments())
 
-		// extractDocs(nil)
 		return f
 
 	case *adt.LetField:
@@ -507,10 +507,10 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 			alias: alias,
 			field: f,
 		})
-		// extractDocs(nil)
 
 		f.Value = e.expr(env, x.Value)
 		f.Attrs = extractFieldAttrs(nil, x)
+		f.SetComments(x.Src.Comments())
 
 		return f
 
@@ -570,6 +570,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			value := e.ident(x.Value)
 			src := e.innerExpr(env, x.Src)
 			clause := &ast.ForClause{Value: value, Source: src}
+			clause.SetComments(ast.Comments(x.Src.Source()))
 			c.Clauses = append(c.Clauses, clause)
 
 			_, saved := e.pushFrame(empty, nil)
@@ -586,6 +587,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 		case *adt.IfClause:
 			cond := e.innerExpr(env, x.Condition)
 			clause := &ast.IfClause{Condition: cond}
+			clause.SetComments(x.Src.Comments())
 			c.Clauses = append(c.Clauses, clause)
 
 		case *adt.LetClause:
@@ -595,6 +597,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 				Ident: e.ident(x.Label),
 				Expr:  expr,
 			}
+			clause.SetComments(x.Src.Comments())
 			c.Clauses = append(c.Clauses, clause)
 
 			_, saved := e.pushFrame(empty, nil)

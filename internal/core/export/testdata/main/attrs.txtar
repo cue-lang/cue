@@ -163,7 +163,8 @@ dynamicComplex: {
 	[string]: "foo" @step(2)
 	a?:       "foo" @step(3)
 	b?:       "foo" @step(4)
-	if true {}
+	if true // trigger isComplex
+	{}
 }
 dynamicSimple: {
 	a:  "foo" @step(3)

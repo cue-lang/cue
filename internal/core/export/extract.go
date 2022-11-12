@@ -37,12 +37,16 @@ func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 
 	// Collect docs directly related to this Vertex.
 	for _, x := range a {
-		if v, ok := x.Elem().(*adt.Vertex); ok {
-			docs = append(docs, extractDocs(v, v.Conjuncts)...)
+		source := x.Source()
+		switch elem := x.Elem().(type) {
+		case *adt.Vertex:
+			docs = append(docs, extractDocs(elem, elem.Conjuncts)...)
 			continue
+		case *adt.Comprehension:
+			source = elem.Value.Source()
 		}
 
-		switch f := x.Source().(type) {
+		switch f := source.(type) {
 		case *ast.Field:
 			if hasShorthandValue(f) {
 				continue

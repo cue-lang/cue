@@ -43,10 +43,18 @@ baz: bar & {
 	field1: int
 	field2: int
 }
+
+if true {
+	// comment inside of if comprehension
+	field1: int
+}
 -- out.txt --
 -- out/doc --
 []
 - foobar defines at least foo.
+
+[field1]
+- comment inside of if comprehension
 
 [Foo]
 - A Foo fooses stuff.
@@ -107,9 +115,11 @@ Foo: {
 
 // foos are instances of Foo.
 foos: {
-	{
-		[string]: Foo
-	}
+	[string]: Foo
+}
+
+// My first little foo.
+foos: {
 	MyFoo: {
 		// local field comment.
 		field1: 0
@@ -132,6 +142,10 @@ baz: bar & {
 	field1: int
 	field2: int
 }
+if true {
+	// comment inside of if comprehension
+	field1: int
+}
 -- out/value --
 == Simplified
 {
@@ -144,6 +158,8 @@ baz: bar & {
 		// duplicate field comment
 		dup3: int
 	}
+	// comment inside of if comprehension
+	field1: int
 
 	// foos are instances of Foo.
 	foos: {
@@ -187,6 +203,8 @@ baz: bar & {
 		// duplicate field comment
 		dup3: int
 	}
+	// comment inside of if comprehension
+	field1: int
 
 	// foos are instances of Foo.
 	foos: {
@@ -226,6 +244,7 @@ baz: bar & {
 		field2: int
 		dup3:   int
 	}
+	field1: int
 	foos: {
 		MyFoo: {
 			field1: 0
@@ -253,6 +272,8 @@ baz: bar & {
 		// duplicate field comment
 		dup3: int
 	}
+	// comment inside of if comprehension
+	field1: int
 
 	// foos are instances of Foo.
 	foos: {
@@ -292,6 +313,7 @@ baz: bar & {
 		field2: int
 		dup3:   int
 	}
+	field1: int
 	foos: {
 		MyFoo: {
 			field1: 0

@@ -173,6 +173,7 @@ func (n *nodeContext) insertComprehension(
 
 				// Create partial comprehension
 				c := &Comprehension{
+					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
 
@@ -196,6 +197,7 @@ func (n *nodeContext) insertComprehension(
 
 				// Create partial comprehension
 				c := &Comprehension{
+					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
 

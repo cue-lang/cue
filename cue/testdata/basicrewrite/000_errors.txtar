@@ -44,6 +44,8 @@ Errors:
 explicit error (_|_ literal) in source:
     ./in.cue:1:4
 explicit error (_|_ literal) in source:
+    ./in.cue:1:10
+explicit error (_|_ literal) in source:
     ./in.cue:2:11
 
 Result:
@@ -52,6 +54,8 @@ Result:
   a: (_|_){
     // [user] explicit error (_|_ literal) in source:
     //     ./in.cue:1:4
+    // explicit error (_|_ literal) in source:
+    //     ./in.cue:1:10
   }
   b: (_|_){
     // [user] explicit error (_|_ literal) in source:

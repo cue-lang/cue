@@ -694,8 +694,8 @@ func TestStdErrorHander(t *testing.T) {
 	}
 
 	n = len(errors.Errors(errors.Sanitize(list)))
-	if n != 4 {
-		t.Errorf("found %d one-per-line errors, expected 4", n)
+	if n != 8 {
+		t.Errorf("found %d one-per-line errors, expected 8", n)
 		errors.Print(os.Stderr, list, nil)
 	}
 }

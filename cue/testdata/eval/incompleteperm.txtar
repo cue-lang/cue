@@ -22,10 +22,16 @@ issue405: >=100 <= 200
 -- out/eval --
 permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
     ./in.cue:3:5
+permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+    ./in.cue:3:20
 permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
     ./in.cue:8:6
+permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:8:18
 permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
     ./in.cue:12:6
+permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:12:18
 issue680: invalid operand >10 ('*' requires concrete value):
     ./in.cue:15:12
 issue405: invalid operand >=100 ('<=' requires concrete value):
@@ -33,10 +39,16 @@ issue405: invalid operand >=100 ('<=' requires concrete value):
 -- out/compile --
 permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
     ./in.cue:3:5
+permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+    ./in.cue:3:20
 permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
     ./in.cue:8:6
+permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:8:18
 permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
     ./in.cue:12:6
+permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:12:18
 issue680: invalid operand >10 ('*' requires concrete value):
     ./in.cue:15:12
 issue405: invalid operand >=100 ('<=' requires concrete value):

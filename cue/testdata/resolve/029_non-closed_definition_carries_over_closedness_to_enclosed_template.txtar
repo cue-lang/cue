@@ -118,7 +118,6 @@ a.v.b: field not allowed:
     ./in.cue:2:12
     ./in.cue:4:4
     ./in.cue:5:6
-b.w: 1 errors in empty disjunction:
 b.w.c: field not allowed:
     ./in.cue:8:12
     ./in.cue:10:4
@@ -152,8 +151,7 @@ Result:
   b: (_|_){
     // [eval]
     w: (_|_){
-      // [eval] b.w: 1 errors in empty disjunction:
-      // b.w.c: field not allowed:
+      // [eval] b.w.c: field not allowed:
       //     ./in.cue:8:12
       //     ./in.cue:10:4
       //     ./in.cue:11:6

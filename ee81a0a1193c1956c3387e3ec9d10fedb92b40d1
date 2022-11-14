@@ -16,6 +16,23 @@
       "message": "FYI unity timings don\u0027t show any \"significant\" (in a loose sense) difference in timings vs the previous commit in this stack.\n\nJust in the process of seeing how it influences the large private config in which we are chasing down another bug. Will revert back with those timings once that completes (previously it took ~37 mins).",
       "revId": "ee81a0a1193c1956c3387e3ec9d10fedb92b40d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a12920f0_af31b229",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-14T12:48:33Z",
+      "side": 1,
+      "message": "The slow private configuration (with an error) actually runs faster with this CL. Takes ~30 mins. So no \"blocker\" from that perspective. I\u0027m reducing the error separately, but that should not block this CL.",
+      "revId": "ee81a0a1193c1956c3387e3ec9d10fedb92b40d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

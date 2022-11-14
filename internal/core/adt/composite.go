@@ -174,6 +174,11 @@ type Vertex struct {
 	// or any other operation that relies on the set of arcs being constant.
 	LockArcs bool
 
+	// IsDynamic signifies whether this struct is computed as part of an
+	// expression and not part of the static evaluation tree.
+	// Used for cycle detection.
+	IsDynamic bool
+
 	// arcType indicates the level of optionality of this arc.
 	arcType arcType
 

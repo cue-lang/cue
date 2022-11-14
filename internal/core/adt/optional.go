@@ -117,7 +117,9 @@ func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, 
 		return false
 	}
 
-	n := Vertex{}
+	n := Vertex{
+		IsDynamic: true,
+	}
 	m := MakeConjunct(env, v, c.ci)
 	n.AddConjunct(m)
 	n.AddConjunct(MakeConjunct(m.Env, label, c.ci))

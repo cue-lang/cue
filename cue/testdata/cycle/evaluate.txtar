@@ -134,8 +134,6 @@ disjunctionCycle.b: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:54:9
 disjunctionCycle.c: cannot use 1 (type int) as list in argument 1 to and:
     ./in.cue:54:9
-1 errors in empty disjunction::
-    ./in.cue:60:6
 b: structural cycle:
     ./in.cue:60:6
 closeCycle.c: structural cycle:
@@ -230,16 +228,12 @@ Result:
     #A: (_|_){
       // [structural cycle]
       a: (_|_){
-        // [structural cycle] 1 errors in empty disjunction::
-        //     ./in.cue:60:6
-        // b: structural cycle:
+        // [structural cycle] b: structural cycle:
         //     ./in.cue:60:6
       }
     }
     #B: (_|_){
-      // [structural cycle] 1 errors in empty disjunction::
-      //     ./in.cue:60:6
-      // b: structural cycle:
+      // [structural cycle] b: structural cycle:
       //     ./in.cue:60:6
     }
   }

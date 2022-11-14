@@ -71,7 +71,6 @@ Conjuncts:    45
 Disjuncts:    33
 -- out/eval --
 Errors:
-bar: 1 errors in empty disjunction:
 bar.c: field not allowed:
     ./in.cue:1:7
     ./in.cue:4:2
@@ -93,8 +92,7 @@ Result:
     a: (int){ 1 }
   }
   bar: (_|_){
-    // [eval] bar: 1 errors in empty disjunction:
-    // bar.c: field not allowed:
+    // [eval] bar.c: field not allowed:
     //     ./in.cue:1:7
     //     ./in.cue:4:2
     //     ./in.cue:11:6

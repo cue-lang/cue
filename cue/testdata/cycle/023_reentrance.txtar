@@ -78,6 +78,8 @@ structural cycle:
     ./in.cue:3:25
 structural cycle:
     ./in.cue:8:9
+structural cycle:
+    ./in.cue:8:38
 
 Result:
 (_|_){
@@ -125,11 +127,15 @@ Result:
     //     ./in.cue:3:25
     // structural cycle:
     //     ./in.cue:8:9
+    // structural cycle:
+    //     ./in.cue:8:38
   }
   fib12: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
     // structural cycle:
     //     ./in.cue:8:9
+    // structural cycle:
+    //     ./in.cue:8:38
   }
 }

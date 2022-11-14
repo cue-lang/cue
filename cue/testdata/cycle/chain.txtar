@@ -208,38 +208,25 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/eval/stats --
-Leaks:  12
-Freed:  192
-Reused: 179
-Allocs: 25
-Retain: 28
+Leaks:  11
+Freed:  193
+Reused: 180
+Allocs: 24
+Retain: 26
 
 Unifications: 141
-Conjuncts:    364
+Conjuncts:    370
 Disjuncts:    188
 -- out/eval --
-Errors:
-#in: structural cycle:
-    ./in.cue:15:14
-
-Result:
-(_|_){
-  // [structural cycle]
-  chain: (_|_){
-    // [structural cycle]
-    t1: (_|_){
-      // [structural cycle]
+(struct){
+  chain: (struct){
+    t1: (struct){
       #maxiter: (int){ 2 }
-      x: (_|_){
-        // [structural cycle] #in: structural cycle:
-        //     ./in.cue:15:14
+      x: (#struct){
       }
-      a: (_|_){
-        // [structural cycle]
+      a: (struct){
         x2: (null){ null }
-        x0: (_|_){
-          // [structural cycle] #in: structural cycle:
-          //     ./in.cue:15:14
+        x0: (#struct){
         }
         x1: (#struct){
         }

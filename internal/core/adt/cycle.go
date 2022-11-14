@@ -307,7 +307,9 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 			continue
 		}
 
-		if ci.Inline {
+		// For dynamically created structs we mark this as an error. Otherwise
+		// there is only an error if we have visited the arc before.
+		if ci.Inline && (arc.IsDynamic || r.Arc == arc) {
 			n.reportCycleError()
 			return ci, true
 		}

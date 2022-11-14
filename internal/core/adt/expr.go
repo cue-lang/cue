@@ -76,6 +76,7 @@ func (x *StructLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
+		IsDynamic: true,
 		Conjuncts: []Conjunct{{e, x, c.ci}},
 	}
 	// evaluate may not finalize a field, as the resulting value may be
@@ -317,6 +318,7 @@ func (x *ListLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
+		IsDynamic: true,
 		Conjuncts: []Conjunct{{e, x, c.ci}},
 	}
 	c.Unify(v, Conjuncts)
@@ -919,7 +921,8 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	//     In other words, a Vertex is not necessarily erroneous when a let
 	//     field contained in that Vertex is erroneous.
 	ctx.Unify(arc, Finalized)
-	if _, ok := arc.BaseValue.(*Bottom); !arc.MultiLet && !ok {
+	b, ok := arc.BaseValue.(*Bottom)
+	if !arc.MultiLet && !ok {
 		return arc
 	}
 
@@ -935,6 +938,7 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 		n := &Vertex{
 			Parent:    n,
 			Label:     x.Label,
+			IsDynamic: b != nil && b.Code == StructuralCycleError,
 			Conjuncts: []Conjunct{{e, expr, ctx.ci}},
 		}
 		v = n
@@ -1229,9 +1233,12 @@ func (x *BinaryExpr) Source() ast.Node {
 func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
-		v := &Vertex{Conjuncts: []Conjunct{
-			makeAnonymousConjunct(env, x, c.ci.Refs),
-		}}
+		v := &Vertex{
+			IsDynamic: true,
+			Conjuncts: []Conjunct{
+				makeAnonymousConjunct(env, x, c.ci.Refs),
+			},
+		}
 		c.Unify(v, Finalized)
 		return v
 	}
@@ -1425,16 +1432,15 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 				c.Assertf(pos(x.Fun), c.HasErr(),
 					"argument %d to function %s is incomplete", i, x.Fun)
 			}
-			c.errs = CombineErrors(a.Source(), saved, c.errs)
 
 		case *Bottom:
 			// TODO(errors): consider adding an argument index for this errors.
-			c.errs = CombineErrors(a.Source(), saved, v)
+			c.errs = CombineErrors(a.Source(), c.errs, v)
 
 		default:
 			args = append(args, expr)
-			c.errs = saved
 		}
+		c.errs = CombineErrors(a.Source(), saved, c.errs)
 	}
 	if c.HasErr() {
 		return nil
@@ -1552,7 +1558,10 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 		if _, ok := v.(*BasicType); !ok {
 			env := c.Env(0)
 			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
-			n := &Vertex{Conjuncts: []Conjunct{{env, x, c.ci}}}
+			n := &Vertex{
+				IsDynamic: true,
+				Conjuncts: []Conjunct{{env, x, c.ci}},
+			}
 			c.Unify(n, Finalized)
 			if _, ok := n.BaseValue.(*Bottom); ok {
 				c.addErrf(0, pos(a),
@@ -1831,13 +1840,15 @@ func (x *ForClause) yield(s *compState) {
 			// Using Finalized here ensures that no nodeContext is allocated,
 			// preventing a leak, as this "helper" struct bypasses normal
 			// processing, eluding the deallocation step.
-			status: Finalized,
+			status:    Finalized,
+			IsDynamic: true,
 		}
 
 		if x.Value != InvalidLabel {
 			b := &Vertex{
 				Label:     x.Value,
 				BaseValue: a,
+				IsDynamic: true,
 			}
 			n.Arcs = append(n.Arcs, b)
 		}
@@ -1899,7 +1910,11 @@ func (x *LetClause) Source() ast.Node {
 func (x *LetClause) yield(s *compState) {
 	c := s.ctx
 	n := &Vertex{Arcs: []*Vertex{
-		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}}},
+		{
+			Label:     x.Label,
+			IsDynamic: true,
+			Conjuncts: []Conjunct{{c.Env(0), x.Expr, c.ci}},
+		},
 	}}
 
 	s.yield(c.spawn(n))

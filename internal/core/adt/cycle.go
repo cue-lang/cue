@@ -307,7 +307,8 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 			continue
 		}
 
-		if ci.Inline {
+		// For dynamically created structs we immediately
+		if ci.Inline && (arc.IsInline || r.Arc == arc) {
 			n.reportCycleError()
 			return ci, true
 		}

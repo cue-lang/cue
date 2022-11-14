@@ -1501,7 +1501,8 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 		// Interpolation, UnaryExpr, BinaryExpr, CallExpr
 		// Could be unify?
 		val := ctx.evaluateRec(v, Partial)
-		if b, ok := val.(*Bottom); ok && b.IsIncomplete() {
+		if b, ok := val.(*Bottom); ok &&
+			b.IsIncomplete() {
 			n.exprs = append(n.exprs, envExpr{v, b})
 			break
 		}
@@ -2041,8 +2042,13 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 	a := n.dynamicFields
 	for _, d := range n.dynamicFields {
 		var f Feature
-		v, complete := ctx.Evaluate(d.env, d.field.Key)
-		if !complete {
+		x := d.field.Key
+		// Push state to capture and remove errors.
+		s := ctx.PushState(d.env, x.Source())
+		v := ctx.evalState(x, Finalized)
+		b := ctx.PopState(s)
+
+		if b != nil && b.IsIncomplete() {
 			d.err, _ = v.(*Bottom)
 			a[k] = d
 			k++

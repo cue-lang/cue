@@ -294,16 +294,25 @@ siblingInsertion: t2: p2: {
 	}
 }
 
+// Issue #1407
+// Ensure there is a useful error message.
+selfReferential: fail: {
+	a: {}
+	b: a.x != ""
+	if b {
+	}
+}
+
 -- out/eval/stats --
 Leaks:  48
-Freed:  1265
-Reused: 1253
+Freed:  1268
+Reused: 1256
 Allocs: 60
-Retain: 119
+Retain: 125
 
-Unifications: 825
-Conjuncts:    2505
-Disjuncts:    1313
+Unifications: 828
+Conjuncts:    2518
+Disjuncts:    1316
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
@@ -545,6 +554,15 @@ Result:
           }
           d: ((int|string)){ |((int){ int }, (string){ string }) }
         }
+      }
+    }
+    fail: (_|_){
+      // [cycle] cycle error
+      a: (struct){
+      }
+      b: (_|_){
+        // [incomplete] selfReferential.fail.b: undefined field: x:
+        //     ./in.cue:300:7
       }
     }
   }
@@ -1166,6 +1184,13 @@ Result:
           }
         }
       }
+    }
+  }
+  selfReferential: {
+    fail: {
+      a: {}
+      b: (〈0;a〉.x != "")
+      if 〈0;b〉 {}
     }
   }
 }

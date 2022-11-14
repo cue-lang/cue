@@ -21,16 +21,58 @@ parenExprRefEqual: {
 	(x): {}
 	x: "foo"
 }
+chainedResolution: {
+	p1: {
+		(p1.baz): "bar"
+		(p1.foo): "baz"
+		baz: "foo"
+	}
+	p2: {
+		(p2.baz): "bar"
+		baz: "foo"
+		(p2.foo): "baz"
+	}
+	p3: {
+		baz: "foo"
+		(p3.baz): "bar"
+		(p3.foo): "baz"
+	}
+	p4: {
+		(p4.foo): "baz"
+		(p4.baz): "bar"
+		baz: "foo"
+	}
+	p5: {
+		(p5.foo): "baz"
+		baz: "foo"
+		(p5.baz): "bar"
+	}
+	p6: {
+		baz: "foo"
+		(p6.foo): "baz"
+		(p6.baz): "bar"
+	}
+}
+
+// Issue #1407
+noCycleError: {
+	foo: [_]: {
+		#ID: "\(string)"
+	}
+	foo: bar: entries: (foo.baz.#ID): true
+	foo: baz: {}
+}
+
 -- out/eval/stats --
 Leaks:  0
-Freed:  24
-Reused: 19
-Allocs: 5
-Retain: 5
+Freed:  56
+Reused: 49
+Allocs: 7
+Retain: 4
 
-Unifications: 24
-Conjuncts:    29
-Disjuncts:    24
+Unifications: 56
+Conjuncts:    73
+Disjuncts:    56
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:
@@ -67,6 +109,61 @@ Result:
   parenExprRefEqual: (struct){
     x: (string){ "foo" }
     foo: (struct){
+    }
+  }
+  chainedResolution: (struct){
+    p1: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p2: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p3: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p4: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p5: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p6: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+  }
+  noCycleError: (struct){
+    foo: (struct){
+      bar: (struct){
+        entries: (_|_){
+          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+          //     ./in.cue:59:8
+          //     ./in.cue:59:11
+        }
+        #ID: (_|_){
+          // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
+          //     ./in.cue:59:8
+          //     ./in.cue:59:11
+        }
+      }
+      baz: (struct){
+        #ID: (_|_){
+          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+          //     ./in.cue:59:8
+          //     ./in.cue:59:11
+        }
+      }
     }
   }
   foo: (struct){
@@ -113,5 +210,54 @@ Result:
   parenExprRefEqual: {
     〈0;x〉: {}
     x: "foo"
+  }
+  chainedResolution: {
+    p1: {
+      〈1;p1〉.baz: "bar"
+      〈1;p1〉.foo: "baz"
+      baz: "foo"
+    }
+    p2: {
+      〈1;p2〉.baz: "bar"
+      baz: "foo"
+      〈1;p2〉.foo: "baz"
+    }
+    p3: {
+      baz: "foo"
+      〈1;p3〉.baz: "bar"
+      〈1;p3〉.foo: "baz"
+    }
+    p4: {
+      〈1;p4〉.foo: "baz"
+      〈1;p4〉.baz: "bar"
+      baz: "foo"
+    }
+    p5: {
+      〈1;p5〉.foo: "baz"
+      baz: "foo"
+      〈1;p5〉.baz: "bar"
+    }
+    p6: {
+      baz: "foo"
+      〈1;p6〉.foo: "baz"
+      〈1;p6〉.baz: "bar"
+    }
+  }
+  noCycleError: {
+    foo: {
+      [_]: {
+        #ID: "\(string)"
+      }
+    }
+    foo: {
+      bar: {
+        entries: {
+          〈3;foo〉.baz.#ID: true
+        }
+      }
+    }
+    foo: {
+      baz: {}
+    }
   }
 }

@@ -29,15 +29,15 @@ issue560: {
 	}
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  18
-Reused: 12
-Allocs: 8
+Leaks:  1
+Freed:  19
+Reused: 13
+Allocs: 7
 Retain: 2
 
 Unifications: 20
-Conjuncts:    25
-Disjuncts:    19
+Conjuncts:    26
+Disjuncts:    20
 -- out/eval --
 (struct){
   dynamic: (struct){

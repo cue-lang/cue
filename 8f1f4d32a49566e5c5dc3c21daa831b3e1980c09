@@ -129,6 +129,30 @@
       },
       "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd1abc22_781887b5",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-14T13:05:35Z",
+      "side": 1,
+      "message": "Personally I don\u0027t like linking to Go docs too much either, because CUE need not be Go-specific, and it\u0027s a bit messy to follow a link from the command line. However, we do currently just return GOOS/GOARCH, so I\u0027m fine with it given it reflects reality.\n\nRegarding the test - what do you mean by goarch.go?\n\nI imagine what you mean is a test that calls `go tool dist list`, assuming that it\u0027s the same version that we release with, and checks that our help text is up to date. Our help text isn\u0027t structured nor generated, though, so that could be a bit hacky.\n\nFor what it\u0027s worth, the compromise that I reached with Aram in Newcastle is to list the few values which are most often used, then link to upstream for the full list. For example:\n\n```\narch   architecture identifier of the current system.\n       valid values include: 386 amd64 arm arm64 wasm\n       for a full list, see: https://go.dev/doc/install/source#environment\n```",
+      "parentUuid": "c8767280_bc3a8f7b",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

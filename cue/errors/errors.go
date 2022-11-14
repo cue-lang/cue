@@ -427,7 +427,11 @@ func Sanitize(err Error) Error {
 		return nil
 	}
 	if l, ok := err.(list); ok {
-		return l.sanitize()
+		a := l.sanitize()
+		if len(a) == 1 {
+			return a[0]
+		}
+		return a
 	}
 	return err
 }
@@ -473,6 +477,7 @@ func approximateEqual(a, b Error) bool {
 	}
 	return aPos.Filename() == bPos.Filename() &&
 		aPos.Line() == bPos.Line() &&
+		aPos.Column() == bPos.Column() &&
 		equalPath(a.Path(), b.Path())
 }
 

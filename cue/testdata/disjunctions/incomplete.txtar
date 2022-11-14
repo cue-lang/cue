@@ -92,22 +92,28 @@ Disjuncts:    70
       name: (string){ "Hello" }
     }
     allFail1: (_|_){
-      // [incomplete] lookup.allFail1: 1 errors in empty disjunction:
+      // [incomplete] lookup.allFail1: 2 errors in empty disjunction:
       // lookup.allFail1: undefined field: a:
       //     ./in.cue:20:14
+      // lookup.allFail1: undefined field: b:
+      //     ./in.cue:20:20
     }
     allFail2: (_|_){
-      // [incomplete] lookup.allFail2: 1 errors in empty disjunction:
+      // [incomplete] lookup.allFail2: 2 errors in empty disjunction:
       // lookup.allFail2: undefined field: a:
       //     ./in.cue:21:14
+      // lookup.allFail2: undefined field: b:
+      //     ./in.cue:21:20
     }
   }
   func: (struct){
     s: (string){ string }
     ok1: (_|_){
-      // [incomplete] func.ok1: 1 errors in empty disjunction:
+      // [incomplete] func.ok1: 2 errors in empty disjunction:
       // func.ok1: non-concrete argument 0:
       //     ./in.cue:26:7
+      // func.ok1: non-concrete argument 0:
+      //     ./in.cue:26:31
     }
   }
   issue782: (struct){

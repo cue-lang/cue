@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae1305d0_809a26fd",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1505,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-15T13:33:40Z",
+      "side": 1,
+      "message": "remove this debugging remnant?",
+      "revId": "af42136b33babb392e56fdbd92544ff1307b861f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b684658_32878a1a",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2047,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-15T13:33:40Z",
+      "side": 1,
+      "message": "Maybe a comment to say why we\u0027re doing things this way?",
+      "revId": "af42136b33babb392e56fdbd92544ff1307b861f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

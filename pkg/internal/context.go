@@ -218,6 +218,14 @@ func (c *CallCtxt) List(i int) (a []cue.Value) {
 	return a
 }
 
+func (c *CallCtxt) CueList(i int) List {
+	v := c.getList(i)
+	if v == nil {
+		return List{}
+	}
+	return List{c.ctx, v, v.BaseValue.(*adt.ListMarker)}
+}
+
 func (c *CallCtxt) Iter(i int) (a cue.Iterator) {
 	arg := c.args[i]
 	x := value.Make(c.ctx, arg)

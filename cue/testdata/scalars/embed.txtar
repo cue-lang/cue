@@ -100,15 +100,15 @@ hidden: {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  83
-Reused: 77
-Allocs: 6
-Retain: 12
+Leaks:  1
+Freed:  78
+Reused: 72
+Allocs: 7
+Retain: 13
 
-Unifications: 79
-Conjuncts:    156
-Disjuncts:    83
+Unifications: 75
+Conjuncts:    144
+Disjuncts:    79
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):

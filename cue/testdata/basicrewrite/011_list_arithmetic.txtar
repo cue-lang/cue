@@ -46,15 +46,15 @@ e: _|_ // negative number -1 multiplies list
   e: (〈0;list〉 * -1)
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  54
-Reused: 50
-Allocs: 4
-Retain: 0
+Leaks:  7
+Freed:  31
+Reused: 28
+Allocs: 10
+Retain: 7
 
-Unifications: 54
-Conjuncts:    125
-Disjuncts:    54
+Unifications: 38
+Conjuncts:    77
+Disjuncts:    38
 -- out/eval --
 Errors:
 e: cannot convert negative number to uint64:

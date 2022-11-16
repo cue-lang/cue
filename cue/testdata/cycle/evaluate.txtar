@@ -107,15 +107,15 @@ closeFail: {
 }
 
 -- out/eval/stats --
-Leaks:  125
-Freed:  141
-Reused: 137
-Allocs: 129
-Retain: 276
+Leaks:  67
+Freed:  94
+Reused: 90
+Allocs: 71
+Retain: 127
 
-Unifications: 254
-Conjuncts:    521
-Disjuncts:    264
+Unifications: 149
+Conjuncts:    291
+Disjuncts:    159
 -- out/eval --
 Errors:
 closeCycle.a: structural cycle
@@ -144,6 +144,10 @@ structCycle.c: structural cycle:
     ./in.cue:77:14
 embedCycle: structural cycle:
     ./in.cue:83:11
+listAddCycle.c.0.0: structural cycle:
+    ./in.cue:89:5
+listAddCycle.c.0.1: structural cycle:
+    ./in.cue:89:5
 listMulCycle.a: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
     ./in.cue:95:5
     ./in.cue:95:9
@@ -306,12 +310,42 @@ Result:
     // [structural cycle]
     a: (_|_){
       // [structural cycle]
+      0: (_|_){
+        // [structural cycle] listAddCycle.c.0.0: structural cycle:
+        //     ./in.cue:89:5
+      }
+      1: (_|_){
+        // [structural cycle] listAddCycle.c.0.0: structural cycle:
+        //     ./in.cue:89:5
+      }
     }
     b: (_|_){
       // [structural cycle]
+      0: (_|_){
+        // [structural cycle] listAddCycle.c.0.0: structural cycle:
+        //     ./in.cue:89:5
+      }
+      1: (_|_){
+        // [structural cycle] listAddCycle.c.0.0: structural cycle:
+        //     ./in.cue:89:5
+      }
     }
     c: (_|_){
       // [structural cycle]
+      0: (_|_){
+        // [structural cycle]
+        0: (_|_){
+          // [structural cycle] listAddCycle.c.0.0: structural cycle:
+          //     ./in.cue:89:5
+        }
+        1: (_|_){
+          // [structural cycle] listAddCycle.c.0.1: structural cycle:
+          //     ./in.cue:89:5
+        }
+      }
+      1: (_|_){
+        // [structural cycle]
+      }
     }
   }
   listMulCycle: (_|_){

@@ -1413,22 +1413,28 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 	}
 	args := []Value{}
 	for i, a := range x.Args {
+		saved := c.errs
+		c.errs = nil
 		expr := c.value(a)
+
 		switch v := expr.(type) {
 		case nil:
-			// There SHOULD be an error in the context. If not, we generate
-			// one.
-			c.Assertf(pos(x.Fun), c.HasErr(),
-				"argument %d to function %s is incomplete", i, x.Fun)
+			if c.errs == nil {
+				// There SHOULD be an error in the context. If not, we generate
+				// one.
+				c.Assertf(pos(x.Fun), c.HasErr(),
+					"argument %d to function %s is incomplete", i, x.Fun)
+				continue
+			}
+			c.errs = CombineErrors(a.Source(), saved, c.errs)
 
 		case *Bottom:
 			// TODO(errors): consider adding an argument index for this errors.
-			// On the other hand, this error is really not related to the
-			// argument itself, so maybe it is good as it is.
-			c.AddBottom(v)
+			c.errs = CombineErrors(a.Source(), saved, v)
 
 		default:
 			args = append(args, expr)
+			c.errs = saved
 		}
 	}
 	if c.HasErr() {

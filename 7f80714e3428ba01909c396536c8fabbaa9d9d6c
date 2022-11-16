@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5d3c36e_f38e35bb",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1422,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-16T18:21:48Z",
+      "side": 1,
+      "message": "AFAICS this condition always evaluates to true, because you\u0027ve just set `c.errs \u003d nil` above. What are you actually trying to do here?",
+      "revId": "7f80714e3428ba01909c396536c8fabbaa9d9d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

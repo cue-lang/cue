@@ -30,6 +30,17 @@ func (l *List) IsOpen() bool {
 	return l.L.IsOpen
 }
 
+// Struct represents a CUE struct, which can be open or closed.
+type Struct struct {
+	R adt.Runtime
+	V *adt.Vertex
+}
+
+// IsOpen reports whether a list is open ended.
+func (l *Struct) IsOpen() bool {
+	return !l.V.IsClosedStruct()
+}
+
 // A ValidationError indicates an error that is only valid if a builtin is used
 // as a validator.
 type ValidationError struct {

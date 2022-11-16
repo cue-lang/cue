@@ -16,10 +16,10 @@
 package structs
 
 import (
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/pkg/internal"
 )
 
 // MinFields validates the minimum number of fields that are part of a struct.
@@ -27,19 +27,25 @@ import (
 //
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
-func MinFields(object *cue.Struct, n int) *adt.Bottom {
-	iter := object.Fields(cue.Hidden(false), cue.Optional(false))
+func MinFields(object internal.Struct, n int) (bool, error) {
 	count := 0
-	for iter.Next() {
-		count++
-	}
-	if count < n {
-		return &adt.Bottom{
-			Code: adt.IncompleteError, // could still be resolved
-			Err:  errors.Newf(token.NoPos, "len(fields) < MinFields(%[2]d) (%[1]d < %[2]d)", count, n),
+	for _, a := range object.V.Arcs {
+		if a.Label.IsString() {
+			count++
 		}
 	}
-	return nil
+	code := adt.EvalError
+	ot := object.V.OptionalTypes()
+	if (ot&^(adt.HasField|adt.HasDynamic) != 0) || object.IsOpen() {
+		code = adt.IncompleteError
+	}
+	if count < n {
+		return false, internal.ValidationError{B: &adt.Bottom{
+			Code: code,
+			Err:  errors.Newf(token.NoPos, "len(fields) < MinFields(%[2]d) (%[1]d < %[2]d)", count, n),
+		}}
+	}
+	return true, nil
 }
 
 // MaxFields validates the maximum number of fields that are part of a struct.
@@ -47,12 +53,19 @@ func MinFields(object *cue.Struct, n int) *adt.Bottom {
 //
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
-func MaxFields(object *cue.Struct, n int) (bool, error) {
-	iter := object.Fields(cue.Hidden(false), cue.Optional(false))
+func MaxFields(object internal.Struct, n int) (bool, error) {
 	count := 0
-	for iter.Next() {
-		count++
+	for _, a := range object.V.Arcs {
+		if a.Label.IsString() {
+			count++
+		}
 	}
-	// permanent error is okay here.
-	return count <= n, nil
+	if count > n {
+		return false, internal.ValidationError{B: &adt.Bottom{
+			Code: adt.EvalError,
+			Err:  errors.Newf(token.NoPos, "len(fields) > MaxFields(%[2]d) (%[1]d > %[2]d)", count, n),
+		}}
+	}
+
+	return true, nil
 }

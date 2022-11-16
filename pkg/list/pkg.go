@@ -98,7 +98,7 @@ var pkg = &internal.Package{
 			{Kind: adt.ListKind},
 			{Kind: adt.IntKind},
 		},
-		Result: adt.BottomKind,
+		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			list, n := c.CueList(0), c.Int(1)
 			if c.Do() {

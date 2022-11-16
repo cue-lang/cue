@@ -771,14 +771,6 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 		}
 
 		if v.isUndefined() || state > v.status {
-			// Keep a minimum state of AllConjunctsDone.
-			// TODO: AllConjunctsDone may still not be achieved if a node is
-			// currently evaluating.
-			state := state
-			if state < Conjuncts {
-				state = Conjuncts
-			}
-			// Use node itself to allow for cycle detection.
 			c.Unify(v, state)
 		}
 

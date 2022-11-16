@@ -696,3 +696,233 @@ Disjuncts:    188
     }
   }
 }
+-- out/eval/stats --
+Leaks:  17
+Freed:  191
+Reused: 178
+Allocs: 30
+Retain: 50
+
+Unifications: 145
+Conjuncts:    380
+Disjuncts:    194
+-- out/eval --
+(struct){
+  chain: (struct){
+    t1: (struct){
+      #maxiter: (int){ 2 }
+      x: (#struct){
+      }
+      a: (struct){
+        x2: (null){ null }
+        x0: (#struct){
+        }
+        x1: (#struct){
+        }
+      }
+      #DepthF: (#struct){
+        #in: (_){ _ }
+        #out: (#struct){
+        }
+      }
+    }
+    t2: (struct){
+      p1: (struct){
+        x: (struct){
+          x0: (struct){
+          }
+          x1: (struct){
+          }
+        }
+        X: (int){ 1 }
+      }
+      p2: (struct){
+        x: (struct){
+          x0: (struct){
+          }
+          x1: (struct){
+          }
+        }
+        X: (int){ 1 }
+      }
+    }
+    t3: (struct){
+      p1: (_|_){
+        // [incomplete] chain.t3.p1: undefined field: X:
+        //     ./in.cue:57:25
+        // chain.t3.p1: cannot add field x: was already used:
+        //     ./in.cue:61:2
+        // chain.t3.p1: undefined field: X:
+        //     ./in.cue:67:25
+        // chain.t3.p1: cannot add field x: was already used:
+        //     ./in.cue:71:2
+        x: (_|_){
+          // [incomplete] chain.t3.p1: undefined field: X:
+          //     ./in.cue:57:25
+          // chain.t3.p1: undefined field: X:
+          //     ./in.cue:67:25
+        }
+        X: (int){ 1 }
+      }
+    }
+  }
+  issue2052: (struct){
+    t1: (struct){
+      #Depth: (_|_){
+        // [incomplete] issue2052.t1.#Depth: undefined field: #maxiter:
+        //     ./issue2052.cue:7:29
+        // issue2052.t1.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:11:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t1.#Depth: undefined field: #maxiter:
+          //     ./issue2052.cue:7:29
+        }
+        #maxiter: (int){ 4 }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      tree: (string){ "bar" }
+      d: (_|_){
+        // [incomplete] issue2052.t1.d: undefined field: #maxiter:
+        //     ./issue2052.cue:7:29
+        // issue2052.t1.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:11:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t1.d: undefined field: #maxiter:
+          //     ./issue2052.cue:7:29
+        }
+        #maxiter: (int){ 4 }
+        #in: (string){ "bar" }
+      }
+    }
+    t2: (struct){
+      #Depth: (_|_){
+        // [incomplete] issue2052.t2.#Depth: undefined field: #maxiter:
+        //     ./issue2052.cue:40:29
+        // issue2052.t2.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:44:3
+        // issue2052.t2.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:50:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t2.#Depth: undefined field: #maxiter:
+          //     ./issue2052.cue:40:29
+        }
+        #maxiter: (int){ 4 }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      tree: (string){ "bar" }
+      d: (_|_){
+        // [incomplete] issue2052.t2.d: undefined field: #maxiter:
+        //     ./issue2052.cue:40:29
+        // issue2052.t2.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:44:3
+        // issue2052.t2.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:50:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.t2.d: undefined field: #maxiter:
+          //     ./issue2052.cue:40:29
+        }
+        #maxiter: (int){ 4 }
+        #in: (string){ "bar" }
+      }
+    }
+    full: (struct){
+      #RecurseN: (_|_){
+        // [incomplete] issue2052.full.#RecurseN: undefined field: #maxiter:
+        //     ./issue2052.cue:87:29
+        // issue2052.full.#RecurseN: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:93:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.full.#RecurseN: undefined field: #maxiter:
+          //     ./issue2052.cue:87:29
+        }
+        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (_){ _ }
+        }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      #Depth: (_|_){
+        // [incomplete] issue2052.full.#Depth: undefined field: #maxiter:
+        //     ./issue2052.cue:87:29
+        // issue2052.full.#Depth: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:93:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.full.#Depth: undefined field: #maxiter:
+          //     ./issue2052.cue:87:29
+        }
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+      }
+      tree: (struct){
+        a: (struct){
+          foo: (string){ "bar" }
+          a: (struct){
+            b: (struct){
+              c: (string){ "d" }
+            }
+          }
+        }
+        cow: (string){ "moo" }
+      }
+      d: (_|_){
+        // [incomplete] issue2052.full.d: undefined field: #maxiter:
+        //     ./issue2052.cue:87:29
+        // issue2052.full.d: cannot add field #funcs: was already used:
+        //     ./issue2052.cue:93:3
+        #funcs: (_|_){
+          // [incomplete] issue2052.full.d: undefined field: #maxiter:
+          //     ./issue2052.cue:87:29
+        }
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+        #in: (#struct){
+          a: (#struct){
+            foo: (string){ "bar" }
+            a: (#struct){
+              b: (#struct){
+                c: (string){ "d" }
+              }
+            }
+          }
+          cow: (string){ "moo" }
+        }
+      }
+    }
+  }
+}

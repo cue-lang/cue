@@ -261,7 +261,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 				return
 
 			case state == Conjuncts:
-				if err := n.incompleteErrors(); err != nil && err.Code < CycleError {
+				if err := n.incompleteErrors(true); err != nil && err.Code < CycleError {
 					n.node.AddErr(c, err)
 				} else {
 					n.node.UpdateStatus(Partial)
@@ -337,7 +337,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		// We don't do this in postDisjuncts, as it should only be done after
 		// completing all disjunctions.
 		if !n.done() {
-			if err := n.incompleteErrors(); err != nil {
+			if err := n.incompleteErrors(true); err != nil {
 				b, _ := n.node.BaseValue.(*Bottom)
 				if b != err {
 					err = CombineErrors(n.ctx.src, b, err)
@@ -419,7 +419,7 @@ func (n *nodeContext) finalizeDisjuncts() {
 			a[k], a[i] = d, a[k]
 			k++
 		default:
-			if err := d.incompleteErrors(); err != nil {
+			if err := d.incompleteErrors(true); err != nil {
 				n.disjunctErrs = append(n.disjunctErrs, err)
 			}
 		}
@@ -508,7 +508,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 	default:
 		if isCyclePlaceholder(n.node.BaseValue) {
 			if !n.done() {
-				n.node.BaseValue = n.incompleteErrors()
+				n.node.BaseValue = n.incompleteErrors(true)
 			} else {
 				n.node.BaseValue = nil
 			}
@@ -613,7 +613,9 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 	n.completeArcs(state)
 }
 
-func (n *nodeContext) incompleteErrors() *Bottom {
+// incompleteErrors reports all errors from uncompleted conjuncts.
+// If final is true, errors are permanent and reported to parents.
+func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 	// collect incomplete errors.
 	var err *Bottom // n.incomplete
 	for _, d := range n.dynamicFields {
@@ -649,7 +651,7 @@ func (n *nodeContext) incompleteErrors() *Bottom {
 		// }
 		// n := d.node.getNodeContext(ctx)
 		// n.addBottom(err)
-		if c.node != nil && c.node.status != Finalized {
+		if final && c.node != nil && c.node.status != Finalized {
 			n := c.node.getNodeContext(n.ctx, 0)
 			n.addBottom(err)
 			c.node = nil

@@ -44,15 +44,15 @@ f: [1, 2, ...]
   }
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  20
-Reused: 15
+Leaks:  2
+Freed:  14
+Reused: 10
 Allocs: 6
-Retain: 6
+Retain: 12
 
-Unifications: 21
-Conjuncts:    52
-Disjuncts:    21
+Unifications: 16
+Conjuncts:    37
+Disjuncts:    16
 -- out/eval --
 (struct){
   a: (#list){

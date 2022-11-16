@@ -208,15 +208,15 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/eval/stats --
-Leaks:  11
-Freed:  193
-Reused: 180
-Allocs: 24
-Retain: 26
+Leaks:  17
+Freed:  191
+Reused: 178
+Allocs: 30
+Retain: 50
 
-Unifications: 141
-Conjuncts:    370
-Disjuncts:    188
+Unifications: 145
+Conjuncts:    380
+Disjuncts:    194
 -- out/eval --
 (struct){
   chain: (struct){
@@ -238,32 +238,20 @@ Disjuncts:    188
       }
     }
     t2: (struct){
-      p1: (_|_){
-        // [incomplete] 1: invalid interpolation: undefined field: X:
-        //     ./in.cue:33:6
-        //     ./in.cue:32:15
-        // chain.t2.p1: cannot add field x: was already used:
-        //     ./in.cue:36:2
-        x: (_|_){
-          // [incomplete] 1: invalid interpolation: undefined field: X:
-          //     ./in.cue:33:6
-          //     ./in.cue:32:15
-          x0: (_|_){// {}
+      p1: (struct){
+        x: (struct){
+          x0: (struct){
+          }
+          x1: (struct){
           }
         }
         X: (int){ 1 }
       }
-      p2: (_|_){
-        // [incomplete] 1: invalid interpolation: undefined field: X:
-        //     ./in.cue:44:6
-        //     ./in.cue:43:15
-        // chain.t2.p2: cannot add field x: was already used:
-        //     ./in.cue:47:2
-        x: (_|_){
-          // [incomplete] 1: invalid interpolation: undefined field: X:
-          //     ./in.cue:44:6
-          //     ./in.cue:43:15
-          x0: (_|_){// {}
+      p2: (struct){
+        x: (struct){
+          x0: (struct){
+          }
+          x1: (struct){
           }
         }
         X: (int){ 1 }

@@ -20,6 +20,10 @@ import (
 	"sort"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/pkg/internal"
 )
 
 // Drop reports the suffix of list x after the first n elements,
@@ -212,8 +216,19 @@ func Slice(x []cue.Value, i, j int) ([]cue.Value, error) {
 }
 
 // MinItems reports whether a has at least n items.
-func MinItems(a []cue.Value, n int) bool {
-	return len(a) >= n
+func MinItems(list internal.List, n int) (bool, error) {
+	count := len(list.V.Elems())
+	if count >= n {
+		return true, nil
+	}
+	code := adt.EvalError
+	if list.IsOpen() {
+		code = adt.IncompleteError
+	}
+	return false, internal.ValidationError{B: &adt.Bottom{
+		Code: code,
+		Err:  errors.Newf(token.NoPos, "len(list) < MinItems(%[2]d) (%[1]d < %[2]d)", count, n),
+	}}
 }
 
 // MaxItems reports whether a has at most n items.

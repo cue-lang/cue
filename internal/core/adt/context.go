@@ -253,6 +253,10 @@ type OpContext struct {
 	// inConstaint overrides inDisjunct as field matching should always be
 	// enabled.
 	inConstraint int
+
+	// The current call is a validator.
+	// TODO: strictly separate validators and functions.
+	IsValidator bool
 }
 
 func (c *OpContext) CloseInfo() CloseInfo { return c.ci }

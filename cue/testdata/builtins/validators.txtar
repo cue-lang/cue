@@ -102,14 +102,14 @@ validatorAsFunction: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  40
-Reused: 36
-Allocs: 4
+Freed:  44
+Reused: 39
+Allocs: 5
 Retain: 0
 
-Unifications: 40
-Conjuncts:    68
-Disjuncts:    40
+Unifications: 44
+Conjuncts:    75
+Disjuncts:    44
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:

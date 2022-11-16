@@ -1,0 +1,20 @@
+exec cue eval -i in.cue
+cmp stdout expect/stdout
+
+# Issue #1981
+# Issue #1786
+-- in.cue --
+a: 4
+a: 5
+
+l: [ 1, 2 ]
+l: [ 1, 3 ]
+
+list: [0, 1, 2]
+val: list[3]
+
+-- expect/stdout --
+a: _|_ // a: conflicting values 5 and 4
+l: [1, _|_]
+list: [0, 1, 2]
+val: _|_ // val: index out of range [3] with length 3

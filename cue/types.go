@@ -2137,6 +2137,12 @@ func ResolveReferences(resolve bool) Option {
 	}
 }
 
+// ShowErrors shows errors where they occur, instead moving fatal errors to the
+// top.
+func ShowErrors(show bool) Option {
+	return func(p *options) { p.showErrors = show }
+}
+
 // Raw tells Syntax to generate the value as is without any simplifications.
 func Raw() Option {
 	return func(p *options) { p.raw = true }

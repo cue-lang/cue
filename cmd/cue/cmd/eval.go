@@ -93,6 +93,7 @@ func runEval(cmd *Command, args []string) error {
 		cue.Definitions(true),
 		cue.Attributes(flagAttributes.Bool(cmd)),
 		cue.Optional(flagAll.Bool(cmd) || flagOptional.Bool(cmd)),
+		cue.ShowErrors(flagIgnore.Bool(cmd)),
 	}
 
 	// Keep for legacy reasons. Note that `cue eval` is to be deprecated by
@@ -143,18 +144,21 @@ func runEval(cmd *Command, args []string) error {
 			b, _ := format.Node(b.expressions[i%len(b.expressions)])
 			id = string(b)
 		}
-		if err := v.Err(); err != nil {
-			errHeader()
-			return v.Validate(syn...)
-		}
 
-		// TODO(#553): this can be removed once v.Syntax() below retains line
-		// information.
-		if (e.IsConcrete() || flagConcrete.Bool(cmd)) && !flagIgnore.Bool(cmd) {
-			if err := v.Validate(cue.Concrete(true)); err != nil {
+		if !flagIgnore.Bool(cmd) {
+			if err := v.Err(); err != nil {
 				errHeader()
-				exitOnErr(cmd, err, false)
-				continue
+				return v.Validate(syn...)
+			}
+
+			// TODO(#553): this can be removed once v.Syntax() below retains line
+			// information.
+			if e.IsConcrete() || flagConcrete.Bool(cmd) {
+				if err := v.Validate(cue.Concrete(true)); err != nil {
+					errHeader()
+					exitOnErr(cmd, err, false)
+					continue
+				}
 			}
 		}
 

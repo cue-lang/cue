@@ -384,10 +384,10 @@ func (g *generator) goKind(expr ast.Expr) string {
 		return "decimal"
 	case "internal.List":
 		return "cueList"
+	case "internal.Struct":
+		return "struct"
 	case "[]*internal.Decimal":
 		return "decimalList"
-	case "cue.Struct":
-		return "struct"
 	case "cue.Value":
 		return "value"
 	case "cue.List":

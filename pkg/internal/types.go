@@ -35,6 +35,40 @@ func (l *List) IsOpen() bool {
 	return l.isOpen
 }
 
+// Struct represents a CUE struct, which can be open or closed.
+type Struct struct {
+	runtime adt.Runtime
+	node    *adt.Vertex
+}
+
+// Arcs returns all arcs of s.
+func (s *Struct) Arcs() []*adt.Vertex {
+	return s.node.Arcs
+}
+
+// Len reports the number of regular string fields of s.
+func (s *Struct) Len() int {
+	count := 0
+	for _, a := range s.Arcs() {
+		if a.Label.IsString() {
+			count++
+		}
+	}
+	return count
+}
+
+// IsOpen reports whether s allows more fields than are currently defined.
+func (s *Struct) IsOpen() bool {
+	if !s.node.IsClosedStruct() {
+		return true
+	}
+	ot := s.node.OptionalTypes()
+	if ot&^(adt.HasField|adt.HasDynamic) != 0 {
+		return true
+	}
+	return false
+}
+
 // A ValidationError indicates an error that is only valid if a builtin is used
 // as a validator.
 type ValidationError struct {

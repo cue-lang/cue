@@ -58,14 +58,28 @@ func (c *CallCtxt) Value(i int) cue.Value {
 	return v
 }
 
-func (c *CallCtxt) Struct(i int) *cue.Struct {
-	v := value.Make(c.ctx, c.args[i])
-	s, err := v.Struct()
-	if err != nil {
-		c.invalidArgType(c.args[i], i, "struct", err)
-		return nil
+func (c *CallCtxt) Struct(i int) Struct {
+	x := c.args[i]
+	switch v, ok := x.(*adt.Vertex); {
+	case ok && !v.IsList():
+		c.ctx.Unify(v, adt.Conjuncts)
+		return Struct{c.ctx, v}
+
+	case v != nil:
+		x = v.Value()
 	}
-	return s
+	if x.Kind()&adt.StructKind == 0 {
+		var err error
+		if b, ok := x.(*adt.Bottom); ok {
+			err = &callError{b}
+		}
+		c.invalidArgType(c.args[i], i, "struct", err)
+	} else {
+		err := c.ctx.NewErrf("non-concrete struct for argument %d", i)
+		err.Code = adt.IncompleteError
+		c.Err = &callError{err}
+	}
+	return Struct{}
 }
 
 func (c *CallCtxt) Int(i int) int     { return int(c.intValue(i, 64, "int64")) }

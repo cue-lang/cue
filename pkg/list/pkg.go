@@ -113,9 +113,9 @@ var pkg = &internal.Package{
 		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
-			a, n := c.List(0), c.Int(1)
+			list, n := c.CueList(0), c.Int(1)
 			if c.Do() {
-				c.Ret = MaxItems(a, n)
+				c.Ret, c.Err = MaxItems(list, n)
 			}
 		},
 	}, {

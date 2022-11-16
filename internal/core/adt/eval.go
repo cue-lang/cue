@@ -751,7 +751,11 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	// all arcs to be sure we get the correct result.
 	// For other cases we terminate early as this results in considerably
 	// better error messages.
-	if state <= Conjuncts && n.node.arcType != arcVoid {
+	if state <= Conjuncts &&
+		// Is allowed to go one step back. See Vertex.UpdateStatus.
+		n.node.status <= state+1 &&
+		n.node.arcType != arcVoid {
+
 		n.node.UpdateStatus(Conjuncts)
 		return
 	}

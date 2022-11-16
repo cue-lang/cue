@@ -1,7 +1,8 @@
 -- in.cue --
 import (
-	"struct"
 	"encoding/json"
+	"list"
+	"struct"
 )
 
 // non-monotonic builtins must fail with an "incomplete" error if there
@@ -100,20 +101,37 @@ validatorAsFunction: {
 	b: a("3")
 	c: json.Valid("3")
 }
+
+issue2098: ok1: {
+	_a: [1, ...]
+	_a: list.MinItems(1)
+	_a[0]
+}
+
+issue2098: fail1: {
+	_a: [...]
+	_a: list.MinItems(1)
+	_a[0]
+}
+
 -- out/eval/stats --
 Leaks:  0
-Freed:  40
-Reused: 36
+Freed:  45
+Reused: 41
 Allocs: 4
 Retain: 0
 
-Unifications: 40
-Conjuncts:    68
-Disjuncts:    40
+Unifications: 45
+Conjuncts:    81
+Disjuncts:    47
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:
-    ./in.cue:93:5
+    ./in.cue:94:5
+issue2098.fail1._a: invalid value [] (does not satisfy list.MinItems(1)):
+    ./in.cue:112:6
+    ./in.cue:111:6
+    ./in.cue:112:20
 
 Result:
 (_|_){
@@ -132,9 +150,9 @@ Result:
     MyType: (struct){
       kv: (_|_){
         // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+        //     ./in.cue:22:7
         //     ./in.cue:21:7
-        //     ./in.cue:20:7
-        //     ./in.cue:21:24
+        //     ./in.cue:22:24
       }
     }
     foo: (struct){
@@ -156,9 +174,9 @@ Result:
     #MyType: (#struct){
       kv: (_|_){
         // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+        //     ./in.cue:49:7
         //     ./in.cue:48:7
-        //     ./in.cue:47:7
-        //     ./in.cue:48:24
+        //     ./in.cue:49:24
       }
     }
     foo: (#struct){
@@ -189,13 +207,34 @@ Result:
     b: ((string|bytes)){ "encoding/json".Valid() }
     e: (_|_){
       // [eval] callOfCallToValidator.e: cannot call previously called validator b:
-      //     ./in.cue:93:5
+      //     ./in.cue:94:5
     }
   }
   validatorAsFunction: (struct){
     a: ((string|bytes)){ "encoding/json".Valid() }
     b: (bool){ true }
     c: (bool){ true }
+  }
+  issue2098: (_|_){
+    // [eval]
+    ok1: (int){
+      1
+      _a: (list){
+        0: (int){ 1 }
+      }
+    }
+    fail1: (_|_){
+      // [eval] issue2098.fail1._a: invalid value [] (does not satisfy list.MinItems(1)):
+      //     ./in.cue:112:6
+      //     ./in.cue:111:6
+      //     ./in.cue:112:20
+      _a: (_|_){
+        // [eval] issue2098.fail1._a: invalid value [] (does not satisfy list.MinItems(1)):
+        //     ./in.cue:112:6
+        //     ./in.cue:111:6
+        //     ./in.cue:112:20
+      }
+    }
   }
 }
 -- out/compile --
@@ -283,5 +322,24 @@ Result:
     a: 〈import;"encoding/json"〉.Valid
     b: 〈0;a〉("3")
     c: 〈import;"encoding/json"〉.Valid("3")
+  }
+  issue2098: {
+    ok1: {
+      _a: [
+        1,
+        ...,
+      ]
+      _a: 〈import;list〉.MinItems(1)
+      〈0;_a〉[0]
+    }
+  }
+  issue2098: {
+    fail1: {
+      _a: [
+        ...,
+      ]
+      _a: 〈import;list〉.MinItems(1)
+      〈0;_a〉[0]
+    }
   }
 }

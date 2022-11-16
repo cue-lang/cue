@@ -975,8 +975,8 @@ func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
 		return n
 	}
 	if n.status == Partial {
-		if b := n.state.incompleteErrors(); b != nil && b.Code < CycleError {
-			n.BaseValue = b
+		if b := n.state.incompleteErrors(false); b != nil && b.Code < CycleError {
+			c.AddBottom(b)
 			return n
 		}
 	}
@@ -1011,8 +1011,8 @@ func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 		return n
 	}
 	if n.status == Partial {
-		if b := n.state.incompleteErrors(); b != nil && b.Code < CycleError {
-			n.BaseValue = b
+		if b := n.state.incompleteErrors(false); b != nil && b.Code < CycleError {
+			ctx.AddBottom(b)
 			return n
 		}
 	}
@@ -1821,6 +1821,9 @@ func (x *ForClause) yield(s *compState) {
 			Value:    n,
 			Err:      errors.Newf(pos(x.Src), "comprehension source references itself"),
 		})
+		return
+	}
+	if c.HasErr() {
 		return
 	}
 	n.LockArcs = true

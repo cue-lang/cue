@@ -41,15 +41,15 @@ package main
 	from: #c1
 }
 -- out/eval/stats --
-Leaks:  6
-Freed:  67
-Reused: 52
-Allocs: 21
-Retain: 13
+Leaks:  9
+Freed:  55
+Reused: 41
+Allocs: 23
+Retain: 16
 
-Unifications: 57
-Conjuncts:    143
-Disjuncts:    70
+Unifications: 52
+Conjuncts:    120
+Disjuncts:    61
 -- out/eval --
 (struct){
   #d1: (#struct){

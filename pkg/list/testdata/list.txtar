@@ -41,6 +41,15 @@ unique: {
 		_testmylst: list.UniqueItems & [ for x in mylst {x.foo}]
 	}
 }
+// Issue #2099
+minItems: {
+	[string]: list.MinItems(1)
+	incomplete1: [...]
+	fail1: []
+	ok1: [0, ...]
+	ok2: [0]
+}
+
 -- out/list --
 Errors:
 repeat.t8.v: error in call to list.Repeat: negative count:
@@ -50,8 +59,14 @@ concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list
     ./in.cue:31:10
 concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
     ./in.cue:30:9
+minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
+    ./in.cue:45:12
+    ./in.cue:45:26
+    ./in.cue:47:9
 
 Result:
+import "list"
+
 repeat: {
 	t1: {
 		x: []
@@ -136,5 +151,12 @@ unique: {
 			foo: "baz"
 		}]
 	}
+}
+// Issue #2099
+minItems: {
+	incomplete1: [...] & list.MinItems(1)
+	fail1:       _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1) (and 1 more errors)
+	ok1: [0, ...]
+	ok2: [0]
 }
 

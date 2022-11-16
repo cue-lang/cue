@@ -1442,7 +1442,7 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 	if b.IsValidator(len(args)) {
 		return &BuiltinValidator{x, b, args}
 	}
-	result := b.call(c, pos(x), args)
+	result := b.call(c, pos(x), false, args)
 	if result == nil {
 		return nil
 	}
@@ -1512,7 +1512,7 @@ func bottom(v Value) *Bottom {
 	return b
 }
 
-func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
+func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) Expr {
 	fun := x // right now always x.
 	if len(args) > len(x.Params) {
 		c.addErrf(0, p,
@@ -1563,7 +1563,12 @@ func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
 			args[i] = n
 		}
 	}
-	return x.Func(c, args)
+	saved := c.IsValidator
+	c.IsValidator = validate
+	ret := x.Func(c, args)
+	c.IsValidator = saved
+
+	return ret
 }
 
 func (x *Builtin) Source() ast.Node { return nil }
@@ -1608,7 +1613,7 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 	var severeness ErrorCode
 	var err errors.Error
 
-	res := b.call(c, src, args)
+	res := b.call(c, src, true, args)
 	switch v := res.(type) {
 	case nil:
 		return nil

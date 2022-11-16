@@ -225,15 +225,23 @@ func MinItems(list internal.List, n int) (bool, error) {
 	if list.IsOpen() {
 		code = adt.IncompleteError
 	}
-	return false, internal.ValidationError{&adt.Bottom{
+	return false, internal.ValidationError{B: &adt.Bottom{
 		Code: code,
 		Err:  errors.Newf(token.NoPos, "len(list) < MinItems(%[2]d) (%[1]d < %[2]d)", count, n),
 	}}
 }
 
 // MaxItems reports whether a has at most n items.
-func MaxItems(a []cue.Value, n int) bool {
-	return len(a) <= n
+func MaxItems(list internal.List, n int) (bool, error) {
+	count := len(list.V.Elems())
+	if count > n {
+		return false, internal.ValidationError{B: &adt.Bottom{
+			Code: adt.EvalError,
+			Err:  errors.Newf(token.NoPos, "len(list) > MaxItems(%[2]d) (%[1]d > %[2]d)", count, n),
+		}}
+	}
+
+	return true, nil
 }
 
 // UniqueItems reports whether all elements in the list are unique.

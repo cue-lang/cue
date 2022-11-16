@@ -116,14 +116,14 @@ issue2098: incomplete1: {
 
 -- out/eval/stats --
 Leaks:  0
-Freed:  46
-Reused: 41
+Freed:  50
+Reused: 45
 Allocs: 5
 Retain: 0
 
-Unifications: 46
-Conjuncts:    85
-Disjuncts:    48
+Unifications: 50
+Conjuncts:    92
+Disjuncts:    52
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:

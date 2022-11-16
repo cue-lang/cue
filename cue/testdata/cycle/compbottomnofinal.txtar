@@ -361,11 +361,11 @@ Leaks:  16
 Freed:  95
 Reused: 84
 Allocs: 27
-Retain: 115
+Retain: 129
 
 Unifications: 111
-Conjuncts:    182
-Disjuncts:    101
+Conjuncts:    194
+Disjuncts:    103
 -- out/eval --
 (struct){
   minimal: (struct){
@@ -465,8 +465,8 @@ Disjuncts:    101
         }
       }
       #Y: (_|_){
-        // [incomplete] medium.p4.#Y: undefined field: port:
-        //     ./in.cue:142:47
+        // [cycle] medium.p4.#X: cycle with field Y.port:
+        //     ./in.cue:134:7
       }
     }
     p5: (struct){

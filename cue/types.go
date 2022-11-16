@@ -2137,6 +2137,14 @@ func ResolveReferences(resolve bool) Option {
 	}
 }
 
+// ErrorsAsValues treats errors as a regular value, including them at the
+// location in the tree where they occur, instead of interpreting them as a
+// configuration-wide failure that is returned instead of root value.
+// Used by Syntax.
+func ErrorsAsValues(show bool) Option {
+	return func(p *options) { p.showErrors = show }
+}
+
 // Raw tells Syntax to generate the value as is without any simplifications.
 func Raw() Option {
 	return func(p *options) { p.raw = true }

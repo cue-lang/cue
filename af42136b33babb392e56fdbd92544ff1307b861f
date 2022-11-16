@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af8f2b27_f1737c28",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1505,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-16T12:30:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae1305d0_809a26fd",
+      "revId": "af42136b33babb392e56fdbd92544ff1307b861f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b684658_32878a1a",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-11-15T13:33:40Z",
       "side": 1,
       "message": "Maybe a comment to say why we\u0027re doing things this way?",
+      "revId": "af42136b33babb392e56fdbd92544ff1307b861f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ddb36ad_6a8fd249",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2047,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-16T12:30:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b684658_32878a1a",
       "revId": "af42136b33babb392e56fdbd92544ff1307b861f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

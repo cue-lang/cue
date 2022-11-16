@@ -117,8 +117,12 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 		}
 		env, src := c.e, c.src
 		c.e, c.src = e, x.Source()
+		// Save and restore errors to ensure that only relevant errors are
+		// associated with the cash.
+		err := c.errs
 		v = c.evalState(x, Partial) // TODO: should this be Finalized?
 		c.e, c.src = env, src
+		c.errs = err
 		if b, ok := v.(*Bottom); !ok || !b.IsIncomplete() {
 			e.cache[x] = v
 		}

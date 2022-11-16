@@ -325,15 +325,15 @@ s35: [1, 2, 1, 2]
   ])
 }
 -- out/eval/stats --
-Leaks:  156
-Freed:  265
-Reused: 261
-Allocs: 160
-Retain: 258
+Leaks:  198
+Freed:  133
+Reused: 130
+Allocs: 201
+Retain: 300
 
-Unifications: 421
-Conjuncts:    745
-Disjuncts:    343
+Unifications: 331
+Conjuncts:    475
+Disjuncts:    253
 -- out/eval --
 (struct){
   l0: (#list){

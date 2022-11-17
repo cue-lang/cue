@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8798f7a7_b38cd2ac",
+        "filename": "cue/testdata/cycle/chain.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T09:08:00Z",
+      "side": 1,
+      "message": "should NOT trigger a cycle detection error.\n\n?",
+      "revId": "08d0bd2d82469f1aa6ec61d2bd87cd69fcfe79da",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

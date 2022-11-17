@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8520886d_6815a16a",
+        "filename": "cmd/cue/cmd/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T12:32:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "380460fb_18e6a83f",
+      "revId": "2e6c8a4264eec24eee5900ffddd90f45019a11d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af3464dc_226880b4",
@@ -73,6 +91,30 @@
       "side": 1,
       "message": "Completely reworded as per name change.",
       "parentUuid": "af3464dc_226880b4",
+      "range": {
+        "startLine": 2140,
+        "startChar": 45,
+        "endLine": 2140,
+        "endChar": 52
+      },
+      "revId": "2e6c8a4264eec24eee5900ffddd90f45019a11d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "915ffc14_f117dbd8",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2140,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T12:32:50Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "0d1e22b5_080cc301",
       "range": {
         "startLine": 2140,
         "startChar": 45,

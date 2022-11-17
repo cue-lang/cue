@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eef362f7_787f24e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T09:02:44Z",
+      "side": 1,
+      "message": "Also note that CI is red.",
+      "revId": "b8aad3028f7718fce8c5fcb33700c7938bc7ccb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "837e62bf_42a46606",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T09:02:44Z",
+      "side": 1,
+      "message": "perhaps briefly describe why being a validator matters - I can see why in the context of this CL, but it will be trickier to guess it later when reading the code.",
+      "revId": "b8aad3028f7718fce8c5fcb33700c7938bc7ccb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ad4f890_af74d556",
+        "filename": "pkg/internal/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T09:02:44Z",
+      "side": 1,
+      "message": "nit: list",
+      "range": {
+        "startLine": 21,
+        "startChar": 25,
+        "endLine": 21,
+        "endChar": 30
+      },
+      "revId": "b8aad3028f7718fce8c5fcb33700c7938bc7ccb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f804450_70df0ed9",
+        "filename": "pkg/internal/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T09:02:44Z",
+      "side": 1,
+      "message": "are we consistently using single-letter fields like this? my instinct is that we should avoid single letters for exported fields, because it\u0027s almost never obvious what they refer to.",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 18
+      },
+      "revId": "b8aad3028f7718fce8c5fcb33700c7938bc7ccb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

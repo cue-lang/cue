@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4fba38e_8522957c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T09:25:28Z",
+      "side": 1,
+      "message": "_an_ expression\n\nAlso, I\u0027m struggling to understand how this description corresponds to what\u0027s happening in the CL itself, which seems concerned with inline expressions, not what kind of field is being accessed. Maybe this description could explain how those two things are linked?",
+      "revId": "a8a906caa33de79a214847895fe311165e3883a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec4c7b4a_e84d8cf7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T09:25:28Z",
+      "side": 1,
+      "message": "LGTM in general modulo a few nits which you can freely ignore for the most part. Thanks!",
+      "revId": "a8a906caa33de79a214847895fe311165e3883a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8473f71_bb4bb156",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 177,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T09:25:28Z",
+      "side": 1,
+      "message": "I misread this at first as being about when IsInline is calculated, not what it meant... My fault, but maybe:\n\n// IsInline signifies whether this struct is computed as part of an expression ... etc.\n\nmight be clearer.\n\nFWIW after thinking about the meaning for a little bit, I\u0027m not entirely convinced that \"IsInline\" is a great choice of word, as in a sense, these expressions are _not_ inline; that is, they\u0027re not represented as part of a line of source code but calculated on the fly. That said, I haven\u0027t thought of a great alternative: IsResult? IsSynthesized? IsAllocated? IsSource (with the other sense) ?",
+      "revId": "a8a906caa33de79a214847895fe311165e3883a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "540cef26_cda2cb95",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 310,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T09:25:28Z",
+      "side": 1,
+      "message": "we immediately... ?",
+      "revId": "a8a906caa33de79a214847895fe311165e3883a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

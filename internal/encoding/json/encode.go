@@ -231,8 +231,8 @@ func (e *encoder) encodeDecls(decls []ast.Decl, endPos token.Pos) error {
 			continue
 
 		case *ast.Field:
-			if internal.IsDefinition(x.Label) {
-				return errors.Newf(x.TokenPos, "json: definition not allowed")
+			if !internal.IsRegularField(x) {
+				return errors.Newf(x.TokenPos, "json: definition or hidden field not allowed")
 			}
 			if x.Optional != token.NoPos {
 				return errors.Newf(x.Optional, "json: optional fields not allowed")

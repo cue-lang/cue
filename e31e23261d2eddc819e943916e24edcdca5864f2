@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5038c3a6_a053ff50",
+        "filename": "cue/testdata/disjunctions/elimination.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-17T11:08:56Z",
+      "side": 1,
+      "message": "Yes, I started doing that, actually, here and there.\n\nI agree that is helpful.",
+      "parentUuid": "13006a44_671c1799",
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0ceae521_857cfac2",
         "filename": "pkg/internal/types.go",
         "patchSetId": 3
@@ -31,6 +49,30 @@
       "writtenOn": "2022-11-17T10:24:14Z",
       "side": 1,
       "message": "I\u0027d do the same about the single-letter fields that we did in the previous CL :)",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 1
+      },
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8aed9328_7c48b736",
+        "filename": "pkg/internal/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-17T11:08:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ceae521_857cfac2",
       "range": {
         "startLine": 39,
         "startChar": 0,
@@ -54,6 +96,24 @@
       "writtenOn": "2022-11-17T10:24:14Z",
       "side": 1,
       "message": "I\u0027m observing that the boolean return value is always equivalent to `err !\u003d nil`. is there a good reason to separate the return parameters?",
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "848ed535_2f15bc00",
+        "filename": "pkg/struct/struct.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-17T11:08:56Z",
+      "side": 1,
+      "message": "There are two ways in which builtins can be interpreted: normal and as a validator. The ValidationError is ignored if the call was not flagged as being a validator.",
+      "parentUuid": "fca284d6_3ac53881",
       "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

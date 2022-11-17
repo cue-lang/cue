@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0233e87f_77e6b630",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T09:18:52Z",
+      "side": 1,
+      "message": "Found another 1.17 in the contributing doc as well.",
+      "revId": "13185bd9b55e760fbd499e5a3111b83dc3389ca6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

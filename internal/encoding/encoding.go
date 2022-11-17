@@ -422,8 +422,7 @@ func (v *validator) validate(n ast.Node) bool {
 		check(n, i.Imports, "imports", true)
 
 	case *ast.Field:
-		check(n, i.Definitions, "definitions",
-			x.Token == token.ISA || internal.IsDefinition(x.Label))
+		check(n, i.Definitions, "definitions", internal.IsDefinition(x.Label))
 		check(n, i.Data, "regular fields", internal.IsRegularField(x))
 		check(n, constraints, "optional fields", x.Optional != token.NoPos)
 

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "615450ab_a8894e54",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T10:16:43Z",
+      "side": 1,
+      "message": "LGTM with one small suggestion, thanks.",
+      "revId": "0cfbcbbbacadd21c8162977d7f43b43d5f3452f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e84dab51_29399e70",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T10:16:43Z",
+      "side": 1,
+      "message": "comment saying why we want to ignore the errors from `evalState` ?",
+      "revId": "0cfbcbbbacadd21c8162977d7f43b43d5f3452f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

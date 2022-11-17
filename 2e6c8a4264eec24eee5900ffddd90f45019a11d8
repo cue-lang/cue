@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aea45983_37a79525",
+        "filename": "cmd/cue/cmd/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T10:28:31Z",
+      "side": 1,
+      "message": "I\u0027d briefly document this - the code on its own feels backwards. When ignore is true, we show errors? :)",
+      "revId": "2e6c8a4264eec24eee5900ffddd90f45019a11d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af3464dc_226880b4",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2140,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T10:28:31Z",
+      "side": 1,
+      "message": "did you mean \"instead of\"? if not, then I don\u0027t understand what the doc is trying to say.",
+      "range": {
+        "startLine": 2140,
+        "startChar": 45,
+        "endLine": 2140,
+        "endChar": 52
+      },
+      "revId": "2e6c8a4264eec24eee5900ffddd90f45019a11d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1de2fcba_150a041a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-17T10:18:11Z",
+      "side": 1,
+      "message": "The result in more errors because rules for \"deduplication\" are now more strict (or relaxed, however you want to see it), meaning that errors that were previously removed now no longer are. Sometimes this results in kind of useless errors, but it helps prevent losing potentially useful errors.",
+      "parentUuid": "dd6e163a_f639841e",
+      "revId": "cc3f13f275307c317dc4f2cc48c6a92181f006fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ffe674b1_a19c14d0",
         "filename": "internal/core/adt/disjunct.go",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2022-11-17T08:55:48Z",
       "side": 1,
       "message": "seeing error lists made me remember that upstream just accepted a proposal for them. filed https://github.com/cue-lang/cue/issues/2106 as a reminder.",
+      "revId": "cc3f13f275307c317dc4f2cc48c6a92181f006fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f16efdf_561796f6",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-17T10:18:11Z",
+      "side": 1,
+      "message": "Ah. Didn\u0027t see that yet. The proposal seems very close to how errors work in CUE, modulo naming.",
+      "parentUuid": "ffe674b1_a19c14d0",
       "revId": "cc3f13f275307c317dc4f2cc48c6a92181f006fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

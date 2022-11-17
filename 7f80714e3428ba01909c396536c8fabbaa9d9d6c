@@ -52,6 +52,24 @@
       "parentUuid": "59c1ff3e_a8385b89",
       "revId": "7f80714e3428ba01909c396536c8fabbaa9d9d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdcfb03e_04893ed2",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1422,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-17T09:11:55Z",
+      "side": 1,
+      "message": "Fixed to now also restore saved.",
+      "parentUuid": "63a38921_c6263db2",
+      "revId": "7f80714e3428ba01909c396536c8fabbaa9d9d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

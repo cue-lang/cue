@@ -36,11 +36,11 @@ func TestInvalidAST(t *testing.T) {
 	}{{
 		desc: "label sequence for definition",
 		node: &ast.Field{Label: ident("foo"), Value: ast.NewStruct(
-			ident("bar"), token.ISA, &ast.StructLit{},
+			ident("#bar"), token.COLON, &ast.StructLit{},
 		)},
 		// Force a new struct.
 		out: `foo: {
-	bar :: {}
+	#bar: {}
 }`,
 	}, {
 		desc: "label with invalid identifier",

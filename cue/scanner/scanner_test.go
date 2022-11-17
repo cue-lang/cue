@@ -184,7 +184,6 @@ var testTokens = [...]elt{
 	{token.RBRACK, "]", operator},
 	{token.RBRACE, "}", operator},
 	{token.COLON, ":", operator},
-	{token.ISA, "::", operator},
 
 	// Keywords
 	{token.TRUE, "true", keyword},

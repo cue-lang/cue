@@ -595,15 +595,6 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				return c.errf(x, "cannot use _ as label")
 			}
 
-			// TODO(legacy): remove: old-school definitions
-			if x.Token == token.ISA && !label.IsDef() {
-				name, isIdent, err := ast.LabelName(lab)
-				if err == nil && isIdent {
-					idx := c.index.StringToIndex(name)
-					label, _ = adt.MakeLabel(x, idx, adt.DefinitionLabel)
-				}
-			}
-
 			if x.Optional == token.NoPos {
 				return &adt.Field{
 					Src:   x,
@@ -640,9 +631,6 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			}
 
 		case *ast.ParenExpr:
-			if x.Token == token.ISA {
-				c.errf(x, "definitions not supported for dynamic fields")
-			}
 			return &adt.DynamicField{
 				Src:   x,
 				Key:   c.expr(l),
@@ -650,9 +638,6 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			}
 
 		case *ast.Interpolation:
-			if x.Token == token.ISA {
-				c.errf(x, "definitions not supported for interpolations")
-			}
 			return &adt.DynamicField{
 				Src:   x,
 				Key:   c.expr(l),

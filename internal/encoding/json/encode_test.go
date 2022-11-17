@@ -167,7 +167,7 @@ f4: {
 	}, {
 		name: "disallowDefinitions",
 		in:   `#a: 2 `,
-		out:  "json: definition not allowed",
+		out:  "json: definition or hidden field not allowed",
 	}, {
 		name: "disallowOptionals",
 		in:   `a?: 2`,

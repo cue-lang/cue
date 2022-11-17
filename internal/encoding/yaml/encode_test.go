@@ -183,7 +183,7 @@ f4: {} # line 4
 	}, {
 		name: "disallowDefinitions",
 		in:   `#a: 2 `,
-		out:  "yaml: definition not allowed",
+		out:  "yaml: definition or hidden fields not allowed",
 	}, {
 		name: "disallowOptionals",
 		in:   `a?: 2`,

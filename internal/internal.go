@@ -329,9 +329,6 @@ func IsDefinition(label ast.Label) bool {
 }
 
 func IsRegularField(f *ast.Field) bool {
-	if f.Token == token.ISA {
-		return false
-	}
 	var ident *ast.Ident
 	switch x := f.Label.(type) {
 	case *ast.Alias:

@@ -34,7 +34,7 @@ a:
 
 (x): "foo"
 
-a: {
+#a: {
     [string]: _
     foo: 2
 }

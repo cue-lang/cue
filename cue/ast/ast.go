@@ -317,7 +317,7 @@ type Field struct {
 
 	// No TokenPos: Value must be an StructLit with one field.
 	TokenPos token.Pos
-	Token    token.Token // ':' or '::', ILLEGAL implies ':'
+	Token    token.Token // Deprecated
 
 	Value Expr // the value associated with this field.
 
@@ -540,8 +540,6 @@ func NewStruct(fields ...interface{}) *StructLit {
 				break inner
 			case token.Token:
 				switch x {
-				case token.ISA:
-					tok = x
 				case token.OPTION:
 					optional = token.Blank.Pos()
 				case token.COLON, token.ILLEGAL:

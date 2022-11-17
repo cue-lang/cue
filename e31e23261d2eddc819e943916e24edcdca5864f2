@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c3287b8_1e41aa1c",
+        "filename": "cue/testdata/disjunctions/elimination.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T11:09:39Z",
+      "side": 1,
+      "message": "great then :)",
+      "parentUuid": "5038c3a6_a053ff50",
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0ceae521_857cfac2",
@@ -114,6 +132,24 @@
       "side": 1,
       "message": "There are two ways in which builtins can be interpreted: normal and as a validator. The ValidationError is ignored if the call was not flagged as being a validator.",
       "parentUuid": "fca284d6_3ac53881",
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cf3638b_704e4007",
+        "filename": "pkg/struct/struct.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T11:09:39Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "848ed535_2f15bc00",
       "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

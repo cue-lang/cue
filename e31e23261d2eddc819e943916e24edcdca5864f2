@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13006a44_671c1799",
+        "filename": "cue/testdata/disjunctions/elimination.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 365,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T10:24:14Z",
+      "side": 1,
+      "message": "thinking aloud: would be nice if adding one comment, or editing one test case, didn\u0027t shift positions for all other test cases further below.\n\nperhaps we could standardize using one CUE file in the txtar per bug/issue/reproducer, with the idea that shorter files would mean less positions shifting around.",
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ceae521_857cfac2",
+        "filename": "pkg/internal/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T10:24:14Z",
+      "side": 1,
+      "message": "I\u0027d do the same about the single-letter fields that we did in the previous CL :)",
+      "range": {
+        "startLine": 39,
+        "startChar": 0,
+        "endLine": 42,
+        "endChar": 1
+      },
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fca284d6_3ac53881",
+        "filename": "pkg/struct/struct.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T10:24:14Z",
+      "side": 1,
+      "message": "I\u0027m observing that the boolean return value is always equivalent to `err !\u003d nil`. is there a good reason to separate the return parameters?",
+      "revId": "e31e23261d2eddc819e943916e24edcdca5864f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

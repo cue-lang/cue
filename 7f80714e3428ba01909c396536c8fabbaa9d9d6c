@@ -34,6 +34,24 @@
       "parentUuid": "e5d3c36e_f38e35bb",
       "revId": "7f80714e3428ba01909c396536c8fabbaa9d9d6c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63a38921_c6263db2",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1422,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-17T09:05:09Z",
+      "side": 1,
+      "message": "Discarding the previous (saved) errors in this looks a bit dubious to me, but now that I understand that `Assertf` is designed to panic by default, it seems OK.",
+      "parentUuid": "59c1ff3e_a8385b89",
+      "revId": "7f80714e3428ba01909c396536c8fabbaa9d9d6c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

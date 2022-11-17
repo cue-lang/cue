@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2eca099e_42ca8053",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T09:57:35Z",
+      "side": 1,
+      "message": "I\u0027m not a big fan of relying on CL/commit context, because even when that\u0027s available, its usefulness degrades with time. Trying to get context from a patch that was merged a year ago is more difficult because a lot of the changed code has since changed significantly as well.",
+      "parentUuid": "aadac77b_5438d8e8",
+      "revId": "b8aad3028f7718fce8c5fcb33700c7938bc7ccb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2ad4f890_af74d556",
@@ -155,6 +173,30 @@
       "side": 1,
       "message": "I have be using this quite a bit, but happy to use different names.\nChanged it to using accessor methods, partly because I couldn\u0027t come up with a convenient name for ListMarker. :) Also, that is really an implementation detail, so IsOpen is nicer.",
       "parentUuid": "7f804450_70df0ed9",
+      "range": {
+        "startLine": 22,
+        "startChar": 0,
+        "endLine": 25,
+        "endChar": 18
+      },
+      "revId": "b8aad3028f7718fce8c5fcb33700c7938bc7ccb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40377e76_3d199854",
+        "filename": "pkg/internal/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-17T09:57:35Z",
+      "side": 1,
+      "message": "sounds good! this looks better.",
+      "parentUuid": "ad703ed7_d1da59eb",
       "range": {
         "startLine": 22,
         "startChar": 0,

@@ -1279,7 +1279,20 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 
 	match := op != EqualOp // non-error case
 
-	switch v := c.value(x).(type) {
+	// Like value(), but retain the original, unwrapped result.
+	v := c.evalState(x, Partial)
+	u, _ := c.getDefault(v)
+	u = Unwrap(u)
+
+	// If our final (unwrapped) value is potentially a recursive structure, we
+	// still need to recursively check for errors. We do so by treating it
+	// as the original value, which if it is a Vertex will be evaluated
+	// recursively below.
+	if u != nil && u.Kind().IsAnyOf(StructKind|ListKind) {
+		u = v
+	}
+
+	switch v := u.(type) {
 	case nil:
 	case *Bottom:
 		switch v.Code {
@@ -1310,8 +1323,21 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 		//
 		c.Unify(v, Finalized)
 
-		switch isVoid := !v.IsDefined(c); {
-		case isVoid:
+		if v.status == EvaluatingArcs {
+			// We have a cycle, which may be an error. Cycle errors may occur
+			// in chains that are themselves not a cycle. It suffices to check
+			// for non-monotonic results at the end for this particular path.
+			// TODO(perf): finding the right path through such comprehensions
+			// may be expensive. Finding a path in a directed graph is O(n),
+			// though, so we should ensure that the implementation conforms to
+			// this.
+			c.verifyNonMonotonicResult(env, x, true)
+			match = op == EqualOp
+			break
+		}
+
+		switch {
+		case !v.IsDefined(c):
 			c.verifyNonMonotonicResult(env, x, true) // TODO: remove?
 
 			// TODO: mimic comparison to bottom semantics. If it is a valid

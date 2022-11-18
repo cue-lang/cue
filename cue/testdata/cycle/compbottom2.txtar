@@ -150,7 +150,7 @@ sameStruct: {
 	// the structs mutually depend on each other.
 	// TODO: consider allowing a specific postCheck for determining if an arc
 	// is erroneous.
-	cycleFail: t2: p1: { // TODO(broken)
+	cycleFail: t2: p1: {
 		raises: {}
 		if raises == _|_ {
 			ret: a: 1
@@ -165,8 +165,7 @@ sameStruct: {
 	// fields that are added are different for the two cases. This is fine as
 	// long as the parent fails, as that error is ultimately what represents
 	// the value as a whole.
-	// TODO(broken)
-	cycleFail: t2: p2: { // TODO(broken)
+	cycleFail: t2: p2: {
 		ret: {}
 		if ret != _|_ {
 			raises: a: 1
@@ -180,7 +179,7 @@ sameStruct: {
 	// This test should fail similarly to the above tests. The fields ret and
 	// raises are not concrete, but may still become a struct and thus need
 	// to be recursively checked.
-	cycleFail: t3: p1: { // TODO(broken)
+	cycleFail: t3: p1: { 
 		raises: _
 		if raises == _|_ {
 			ret: a: 1
@@ -191,7 +190,7 @@ sameStruct: {
 		}
 	}
 
-	cycleFail: t3: p2: { // TODO(broken)
+	cycleFail: t3: p2: {
 		ret: _
 		if ret != _|_ {
 			raises: a: 1
@@ -440,13 +439,17 @@ Disjuncts:    144
         }
       }
       t2: (struct){
-        p1: (struct){
+        p1: (_|_){
+          // [cycle] sameStruct.cycleFail.t2.p1: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:58:6
           ret: (struct){
           }
           raises: (struct){
           }
         }
-        p2: (struct){
+        p2: (_|_){
+          // [cycle] sameStruct.cycleFail.t2.p2: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:73:6
           raises: (struct){
             a: (int){ 1 }
           }
@@ -456,17 +459,21 @@ Disjuncts:    144
         }
       }
       t3: (struct){
-        p1: (struct){
+        p1: (_|_){
+          // [cycle] sameStruct.cycleFail.t3.p1: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:87:6
           ret: (_){ _ }
-          raises: (struct){
-            a: (int){ 1 }
-          }
+          raises: (_){ _ }
         }
-        p2: (struct){
+        p2: (_|_){
+          // [cycle] sameStruct.cycleFail.t3.p2: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:98:6
           raises: (struct){
             a: (int){ 1 }
           }
-          ret: (_){ _ }
+          ret: (struct){
+            a: (int){ 1 }
+          }
         }
       }
     }

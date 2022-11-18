@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
@@ -135,7 +136,15 @@ module: "mod.test"
 	adt.Verbosity = 0
 
 	// b := validate.Validate(ctx, v, &validate.Config{Concrete: true})
-	// t.Log(errors.Details(b.Err, nil))
+	// if b != nil {
+	// 	t.Log(errors.Details(b.Err, nil))
+	// }
+
+	if b := validate.Validate(ctx, v, &validate.Config{
+		AllErrors: true,
+	}); b != nil {
+		t.Log(errors.Details(b.Err, nil))
+	}
 
 	t.Error(debug.NodeString(r, v, nil))
 

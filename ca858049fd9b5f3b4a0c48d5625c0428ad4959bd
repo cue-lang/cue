@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b8458db_38619dbc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-18T09:20:50Z",
+      "side": 1,
+      "message": "Out of curiosity, how do we know whether our config requires any changes? e.g. if upstream deprecated any fields, or made any breaking changes to the config, or anything like that. I didn\u0027t spot anything obvious in the changelog.\n\nI realise that the project is a v1, but surely they\u0027re evolving the config over time.",
+      "revId": "ca858049fd9b5f3b4a0c48d5625c0428ad4959bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

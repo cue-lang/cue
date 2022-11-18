@@ -16,6 +16,24 @@
       "message": "Out of curiosity, how do we know whether our config requires any changes? e.g. if upstream deprecated any fields, or made any breaking changes to the config, or anything like that. I didn\u0027t spot anything obvious in the changelog.\n\nI realise that the project is a v1, but surely they\u0027re evolving the config over time.",
       "revId": "ca858049fd9b5f3b4a0c48d5625c0428ad4959bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd3c172f_1df410da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-18T09:37:59Z",
+      "side": 1,
+      "message": "I\u0027m not totally clear. Hence why I raised the linked issue (see commit message) about a better mode for testing goreleaser.",
+      "parentUuid": "3b8458db_38619dbc",
+      "revId": "ca858049fd9b5f3b4a0c48d5625c0428ad4959bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -27,16 +27,51 @@ t2: {
 	b: #a & {x: 4}
 	c: #a & {z: 4}
 }
+
+-- issue2109.cue --
+// Detect cycle
+patternCycle: issue2109: p1: {
+	countries: ["US", "GB", "AU"]
+	FlagsURLs: {[or(countries)]: string}
+	FlagsURLs
+}
+patternCycle: issue2109: p2: {
+	FlagsURLs: {[or(countries)]: string}
+	FlagsURLs
+	countries: ["US", "GB", "AU"]
+}
+patternCycle: issue2109: p3: {
+	FlagsURLs
+	FlagsURLs: {[or(countries)]: string}
+	countries: ["US", "GB", "AU"]
+}
+
+patternCycle: t1: p1: {
+	countries: "US" | "GB" | "AU"
+	FlagsURLs: {[countries]: string}
+	FlagsURLs
+}
+patternCycle: t1: p2: {
+	FlagsURLs
+	countries: "US" | "GB" | "AU"
+	FlagsURLs: {[countries]: string}
+}
+patternCycle: t1: p3: {
+	FlagsURLs
+	FlagsURLs: {[countries]: string}
+	countries: "US" | "GB" | "AU"
+}
+
 -- out/eval/stats --
 Leaks:  0
-Freed:  51
-Reused: 44
+Freed:  90
+Reused: 83
 Allocs: 7
-Retain: 0
+Retain: 6
 
-Unifications: 39
-Conjuncts:    68
-Disjuncts:    51
+Unifications: 69
+Conjuncts:    135
+Disjuncts:    90
 -- out/eval --
 Errors:
 t1.c.z: field not allowed:
@@ -47,6 +82,24 @@ t2.c.z: field not allowed:
     ./in.cue:23:6
     ./in.cue:27:5
     ./in.cue:27:11
+patternCycle.issue2109.p1.countries: cyclic pattern constraint:
+    ./issue2109.cue:4:15
+    ./issue2109.cue:3:13
+patternCycle.issue2109.p2.countries: cyclic pattern constraint:
+    ./issue2109.cue:8:15
+    ./issue2109.cue:10:13
+patternCycle.issue2109.p3.countries: cyclic pattern constraint:
+    ./issue2109.cue:14:15
+    ./issue2109.cue:15:13
+patternCycle.t1.p1.countries: cyclic pattern constraint:
+    ./issue2109.cue:20:15
+    ./issue2109.cue:19:13
+patternCycle.t1.p2.countries: cyclic pattern constraint:
+    ./issue2109.cue:26:15
+    ./issue2109.cue:25:13
+patternCycle.t1.p3.countries: cyclic pattern constraint:
+    ./issue2109.cue:30:15
+    ./issue2109.cue:31:13
 
 Result:
 (_|_){
@@ -104,6 +157,84 @@ Result:
       }
     }
   }
+  patternCycle: (_|_){
+    // [eval]
+    issue2109: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval]
+        countries: (_|_){
+          // [eval] patternCycle.issue2109.p1.countries: cyclic pattern constraint:
+          //     ./issue2109.cue:4:15
+          //     ./issue2109.cue:3:13
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
+        }
+        FlagsURLs: (struct){
+        }
+      }
+      p2: (_|_){
+        // [eval]
+        FlagsURLs: (struct){
+        }
+        countries: (_|_){
+          // [eval] patternCycle.issue2109.p2.countries: cyclic pattern constraint:
+          //     ./issue2109.cue:8:15
+          //     ./issue2109.cue:10:13
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
+        }
+      }
+      p3: (_|_){
+        // [eval]
+        FlagsURLs: (struct){
+        }
+        countries: (_|_){
+          // [eval] patternCycle.issue2109.p3.countries: cyclic pattern constraint:
+          //     ./issue2109.cue:14:15
+          //     ./issue2109.cue:15:13
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
+        }
+      }
+    }
+    t1: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval]
+        countries: (_|_){
+          // [eval] patternCycle.t1.p1.countries: cyclic pattern constraint:
+          //     ./issue2109.cue:20:15
+          //     ./issue2109.cue:19:13
+        }
+        FlagsURLs: (struct){
+        }
+      }
+      p2: (_|_){
+        // [eval]
+        countries: (_|_){
+          // [eval] patternCycle.t1.p2.countries: cyclic pattern constraint:
+          //     ./issue2109.cue:26:15
+          //     ./issue2109.cue:25:13
+        }
+        FlagsURLs: (struct){
+        }
+      }
+      p3: (_|_){
+        // [eval]
+        FlagsURLs: (struct){
+        }
+        countries: (_|_){
+          // [eval] patternCycle.t1.p3.countries: cyclic pattern constraint:
+          //     ./issue2109.cue:30:15
+          //     ./issue2109.cue:31:13
+        }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -143,5 +274,86 @@ Result:
     c: (〈0;#a〉 & {
       z: 4
     })
+  }
+}
+--- issue2109.cue
+{
+  patternCycle: {
+    issue2109: {
+      p1: {
+        countries: [
+          "US",
+          "GB",
+          "AU",
+        ]
+        FlagsURLs: {
+          [or(〈1;countries〉)]: string
+        }
+        〈0;FlagsURLs〉
+      }
+    }
+  }
+  patternCycle: {
+    issue2109: {
+      p2: {
+        FlagsURLs: {
+          [or(〈1;countries〉)]: string
+        }
+        〈0;FlagsURLs〉
+        countries: [
+          "US",
+          "GB",
+          "AU",
+        ]
+      }
+    }
+  }
+  patternCycle: {
+    issue2109: {
+      p3: {
+        〈0;FlagsURLs〉
+        FlagsURLs: {
+          [or(〈1;countries〉)]: string
+        }
+        countries: [
+          "US",
+          "GB",
+          "AU",
+        ]
+      }
+    }
+  }
+  patternCycle: {
+    t1: {
+      p1: {
+        countries: ("US"|"GB"|"AU")
+        FlagsURLs: {
+          [〈1;countries〉]: string
+        }
+        〈0;FlagsURLs〉
+      }
+    }
+  }
+  patternCycle: {
+    t1: {
+      p2: {
+        〈0;FlagsURLs〉
+        countries: ("US"|"GB"|"AU")
+        FlagsURLs: {
+          [〈1;countries〉]: string
+        }
+      }
+    }
+  }
+  patternCycle: {
+    t1: {
+      p3: {
+        〈0;FlagsURLs〉
+        FlagsURLs: {
+          [〈1;countries〉]: string
+        }
+        countries: ("US"|"GB"|"AU")
+      }
+    }
   }
 }

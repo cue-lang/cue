@@ -194,6 +194,10 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 			}
 		}
 
+		defer c.PopArc(c.PushArc(v))
+
+		v.UpdateStatus(Evaluating)
+
 		if p := v.Parent; p != nil && p.state != nil && v.Label.IsString() {
 			for _, s := range p.state.node.Structs {
 				if s.Disable {
@@ -202,8 +206,6 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 				s.MatchAndInsert(n.ctx, v)
 			}
 		}
-
-		defer c.PopArc(c.PushArc(v))
 
 		c.stats.Unifications++
 
@@ -217,7 +219,9 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		// special cycle handling unnecessary.
 		v.BaseValue = cycle
 
-		v.UpdateStatus(Evaluating)
+		if c.HasErr() {
+			n.addBottom(c.errs)
+		}
 
 		n.conjuncts = v.Conjuncts
 		if n.insertConjuncts(state) {

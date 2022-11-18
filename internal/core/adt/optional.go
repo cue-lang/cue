@@ -57,7 +57,18 @@ outer:
 			// if matched && f.additional {
 			// 	continue
 			// }
-			if matchBulk(c, env, b, f, label) {
+
+			// Mark the current arc as cyclic while evaluating pattern
+			// expressions, but not while adding conjuncts.
+			// TODO: make MatchAndInsert return a list of conjuncts instead?
+			// TODO: it could be that we can set the cycle before calling
+			// MatchAndInsert after the renewed implementation of disjunctions.
+			saved := arc.BaseValue
+			arc.BaseValue = cycle
+			match := matchBulk(c, env, b, f, label)
+			arc.BaseValue = saved
+
+			if match {
 				matched = true
 				info := closeInfo.SpawnSpan(b.Value, ConstraintSpan)
 				arc.AddConjunct(MakeConjunct(&bulkEnv, b, info))
@@ -82,13 +93,22 @@ outer:
 
 // matchBulk reports whether feature f matches the filter of x. It evaluation of
 // the filter is erroneous, it returns false and the error will  be set in c.
-func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, label Value) bool {
-	v := env.evalCached(c, x.Filter)
+func matchBulk(c *OpContext, env *Environment, p *BulkOptionalField, f Feature, label Value) bool {
+	v := env.evalCached(c, p.Filter)
 	v = Unwrap(v)
 
 	// Fast-track certain cases.
 	switch x := v.(type) {
 	case *Bottom:
+		if x == cycle {
+			err := c.NewPosf(pos(p.Filter), "cyclic pattern constraint")
+			for _, c := range c.vertex.Conjuncts {
+				err.AddPosition(c.Elem())
+			}
+			c.AddBottom(&Bottom{
+				Err: err,
+			})
+		}
 		if c.errs == nil {
 			c.AddBottom(x)
 		}

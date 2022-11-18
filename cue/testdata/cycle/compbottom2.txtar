@@ -122,8 +122,7 @@ sameStruct: {
 		ret?: {}
 	}
 
-
-	cycleFail: a: {
+	cycleFail: t1: p1: {
 		raises?: {}
 		if raises == _|_ {
 			ret: a: 1
@@ -134,12 +133,70 @@ sameStruct: {
 		}
 	}
 
-	cycleFail: b: {
+	cycleFail: t1: p2: {
 		ret?: {}
 		if ret != _|_ {
 			raises: a: 1
 		}
 		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+	}
+
+	// This test should fail with a cycle error. Even though raises and ret are
+	// both known to be defined, comparison against bottom requires that the
+	// structs be recursively checked for errors. We disallow that here, because
+	// the structs mutually depend on each other.
+	// TODO: consider allowing a specific postCheck for determining if an arc
+	// is erroneous.
+	cycleFail: t2: p1: { // TODO(broken)
+		raises: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+	}
+
+	// Same as above test, but different order. It may be that the specific
+	// fields that are added are different for the two cases. This is fine as
+	// long as the parent fails, as that error is ultimately what represents
+	// the value as a whole.
+	// TODO(broken)
+	cycleFail: t2: p2: { // TODO(broken)
+		ret: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+		raises: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+	}
+
+	// This test should fail similarly to the above tests. The fields ret and
+	// raises are not concrete, but may still become a struct and thus need
+	// to be recursively checked.
+	cycleFail: t3: p1: { // TODO(broken)
+		raises: _
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret: _
+		if ret != _|_ {
+			raises: a: 1
+		}
+	}
+
+	cycleFail: t3: p2: { // TODO(broken)
+		ret: _
+		if ret != _|_ {
+			raises: a: 1
+		}
+		raises: _
 		if raises == _|_ {
 			ret: a: 1
 		}
@@ -208,14 +265,14 @@ nestedChain: {
 }
 -- out/eval/stats --
 Leaks:  3
-Freed:  118
-Reused: 111
-Allocs: 10
-Retain: 27
+Freed:  141
+Reused: 132
+Allocs: 12
+Retain: 31
 
-Unifications: 121
-Conjuncts:    133
-Disjuncts:    121
+Unifications: 144
+Conjuncts:    160
+Disjuncts:    144
 -- out/eval --
 (struct){
   self: (struct){
@@ -363,21 +420,55 @@ Disjuncts:    121
       }
     }
     cycleFail: (struct){
-      a: (_|_){
-        // [cycle] sameStruct.cycleFail.a: circular dependency in evaluation of conditionals: ret changed after evaluation:
-        //     ./mutualsamestruct.cue:31:6
-        ret: (struct){
-          a: (int){ 1 }
+      t1: (struct){
+        p1: (_|_){
+          // [cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:30:6
+          ret: (struct){
+            a: (int){ 1 }
+          }
+        }
+        p2: (_|_){
+          // [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:41:6
+          raises: (struct){
+            a: (int){ 1 }
+          }
+          ret: (struct){
+            a: (int){ 1 }
+          }
         }
       }
-      b: (_|_){
-        // [cycle] sameStruct.cycleFail.b: circular dependency in evaluation of conditionals: raises changed after evaluation:
-        //     ./mutualsamestruct.cue:42:6
-        raises: (struct){
-          a: (int){ 1 }
+      t2: (struct){
+        p1: (struct){
+          ret: (struct){
+          }
+          raises: (struct){
+          }
         }
-        ret: (struct){
-          a: (int){ 1 }
+        p2: (struct){
+          raises: (struct){
+            a: (int){ 1 }
+          }
+          ret: (struct){
+            a: (int){ 1 }
+          }
+        }
+      }
+      t3: (struct){
+        p1: (struct){
+          ret: (struct){
+            a: (int){ 1 }
+          }
+          raises: (struct){
+            a: (int){ 1 }
+          }
+        }
+        p2: (struct){
+          raises: (_){ _ }
+          ret: (struct){
+            a: (int){ 1 }
+          }
         }
       }
     }
@@ -667,33 +758,109 @@ Disjuncts:    121
       }
     }
     cycleFail: {
-      a: {
-        raises?: {}
-        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
-          ret: {
-            a: 1
+      t1: {
+        p1: {
+          raises?: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
           }
-        }
-        ret?: {}
-        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
-          raises: {
-            a: 1
+          ret?: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
           }
         }
       }
     }
     cycleFail: {
-      b: {
-        ret?: {}
-        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
-          raises: {
-            a: 1
+      t1: {
+        p2: {
+          ret?: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+          raises?: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
           }
         }
-        raises?: {}
-        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
-          ret: {
-            a: 1
+      }
+    }
+    cycleFail: {
+      t2: {
+        p1: {
+          raises: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+          ret: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t2: {
+        p2: {
+          ret: {}
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+          raises: {}
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t3: {
+        p1: {
+          raises: _
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
+          }
+          ret: _
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+        }
+      }
+    }
+    cycleFail: {
+      t3: {
+        p2: {
+          ret: _
+          if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+            raises: {
+              a: 1
+            }
+          }
+          raises: _
+          if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+            ret: {
+              a: 1
+            }
           }
         }
       }

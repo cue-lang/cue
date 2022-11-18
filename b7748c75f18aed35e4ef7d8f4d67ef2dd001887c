@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82ad859f_85ca7fe8",
+        "filename": "internal/core/adt/eval_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-18T21:10:29Z",
+      "side": 1,
+      "message": "Ah yes. Some are supposed to be there, where I uncomment it if needed, but the rest it.",
+      "parentUuid": "517b9e6c_20dbaef4",
+      "revId": "b7748c75f18aed35e4ef7d8f4d67ef2dd001887c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95bc14f8_71b384a2",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-11-18T18:49:45Z",
       "side": 1,
       "message": "s/Cycles errors/Cycle errors/ ?",
+      "revId": "b7748c75f18aed35e4ef7d8f4d67ef2dd001887c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cca91f41_6d2a1eff",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1327,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-18T21:10:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95bc14f8_71b384a2",
       "revId": "b7748c75f18aed35e4ef7d8f4d67ef2dd001887c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

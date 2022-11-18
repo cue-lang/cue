@@ -31,10 +31,10 @@ jobs:
           username: cueckoo
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
       - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v2
+        uses: goreleaser/goreleaser-action@v3
         with:
           args: release --rm-dist
-          version: v1.8.2
+          version: v1.12.3
         env:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
       - name: Re-test cuelang.org

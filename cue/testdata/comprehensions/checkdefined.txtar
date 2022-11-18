@@ -45,16 +45,30 @@ issue1969: oko: {
 
 	if Y != _|_ {Y}
 }
+-- incomplete.cue --
+// Comparing to string is not an error. But for legacy reasons we want to still
+// support this. We intend to have more clean and precise behavior with the
+// builtins isdefined, isvalid, and isconcrete.
+checkIncomplete: t1: {
+	f: [string]: {
+		if a != _|_ {
+			b: "d\(a)"
+		}
+		a: string
+	}
+	f: blah: {}
+}
+
 -- out/eval/stats --
 Leaks:  5
-Freed:  38
-Reused: 33
-Allocs: 10
-Retain: 15
+Freed:  44
+Reused: 37
+Allocs: 12
+Retain: 16
 
-Unifications: 43
-Conjuncts:    44
-Disjuncts:    43
+Unifications: 49
+Conjuncts:    52
+Disjuncts:    49
 -- out/eval --
 (struct){
   xc: (#struct){
@@ -106,6 +120,15 @@ Disjuncts:    43
         s: (_|_){
           // [incomplete] issue1969.oko.X: undefined field: undefined:
           //     ./in.cue:39:13
+        }
+      }
+    }
+  }
+  checkIncomplete: (struct){
+    t1: (struct){
+      f: (struct){
+        blah: (struct){
+          a: (string){ string }
         }
       }
     }
@@ -199,6 +222,24 @@ Disjuncts:    43
       })
       if (〈0;let Y#4〉 != _|_(explicit error (_|_ literal) in source)) {
         〈1;let Y#4〉
+      }
+    }
+  }
+}
+--- incomplete.cue
+{
+  checkIncomplete: {
+    t1: {
+      f: {
+        [string]: {
+          if (〈0;a〉 != _|_(explicit error (_|_ literal) in source)) {
+            b: "d\(〈1;a〉)"
+          }
+          a: string
+        }
+      }
+      f: {
+        blah: {}
       }
     }
   }

@@ -57,7 +57,7 @@ release: _base.#bashWorkflow & {
 			json.#step & {
 				name: "Run GoReleaser"
 				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
-				uses: "goreleaser/goreleaser-action@v2"
+				uses: "goreleaser/goreleaser-action@v3"
 				with: {
 					args:    "release --rm-dist"
 					version: _#goreleaserVersion

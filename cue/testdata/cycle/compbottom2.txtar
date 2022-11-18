@@ -271,7 +271,7 @@ Allocs: 12
 Retain: 31
 
 Unifications: 144
-Conjuncts:    160
+Conjuncts:    159
 Disjuncts:    144
 -- out/eval --
 (struct){
@@ -457,18 +457,16 @@ Disjuncts:    144
       }
       t3: (struct){
         p1: (struct){
-          ret: (struct){
-            a: (int){ 1 }
-          }
+          ret: (_){ _ }
           raises: (struct){
             a: (int){ 1 }
           }
         }
         p2: (struct){
-          raises: (_){ _ }
-          ret: (struct){
+          raises: (struct){
             a: (int){ 1 }
           }
+          ret: (_){ _ }
         }
       }
     }

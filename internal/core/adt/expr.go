@@ -1329,14 +1329,6 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 	default:
 		c.verifyNonMonotonicResult(env, x, false)
 
-		if v.Concreteness() > Concrete {
-			// TODO: mimic comparison to bottom semantics. If it is a valid
-			// value, check for concreteness that this level only. This
-			// should ultimately be replaced with an exists and valid
-			// builtin.
-			match = op == EqualOp
-		}
-
 		c.evalState(x, Partial)
 	}
 

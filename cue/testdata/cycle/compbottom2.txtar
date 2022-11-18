@@ -37,6 +37,7 @@ self: {
 	}
 }
 
+-- mutual.cue --
 mutual: {
 	noConflicts: {
 		a: {if b.foo == _|_ {new: ""}}
@@ -97,6 +98,7 @@ mutual: {
 	}
 }
 
+-- mutualsamestruct.cue --
 sameStruct: {
 	chainSuccess: a: {
 		raises?: {}
@@ -160,6 +162,7 @@ sameStruct: {
 	}
 }
 
+-- nestedchain.cue --
 // Issue
 nestedChain: {
 	cycleFail: {
@@ -211,7 +214,7 @@ Allocs: 10
 Retain: 27
 
 Unifications: 121
-Conjuncts:    130
+Conjuncts:    133
 Disjuncts:    121
 -- out/eval --
 (struct){
@@ -255,13 +258,13 @@ Disjuncts:    121
     mutualCycleFail: (struct){
       b: (_|_){
         // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
-        //     ./in.cue:47:10
+        //     ./mutual.cue:9:10
         foo: (string){ "" }
       }
       a: (struct){
         bar: (_|_){
           // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
-          //     ./in.cue:47:10
+          //     ./mutual.cue:9:10
         }
       }
     }
@@ -362,14 +365,14 @@ Disjuncts:    121
     cycleFail: (struct){
       a: (_|_){
         // [cycle] sameStruct.cycleFail.a: circular dependency in evaluation of conditionals: ret changed after evaluation:
-        //     ./in.cue:129:6
+        //     ./mutualsamestruct.cue:31:6
         ret: (struct){
           a: (int){ 1 }
         }
       }
       b: (_|_){
         // [cycle] sameStruct.cycleFail.b: circular dependency in evaluation of conditionals: raises changed after evaluation:
-        //     ./in.cue:140:6
+        //     ./mutualsamestruct.cue:42:6
         raises: (struct){
           a: (int){ 1 }
         }
@@ -389,13 +392,13 @@ Disjuncts:    121
   nestedChain: (struct){
     cycleFail: (_|_){
       // [cycle] nestedChain.cycleFail: cycle with field #E.y:
-      //     ./in.cue:168:6
+      //     ./nestedchain.cue:7:6
       #E: (_|_){
         // [cycle] nestedChain.cycleFail: cycle with field #E.y:
-        //     ./in.cue:168:6
+        //     ./nestedchain.cue:7:6
         x: (_|_){
           // [cycle] nestedChain.cycleFail: cycle with field #E.y:
-          //     ./in.cue:168:6
+          //     ./nestedchain.cue:7:6
         }
       }
     }
@@ -407,14 +410,14 @@ Disjuncts:    121
     }
     doubleAddfail: (_|_){
       // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
-      //     ./in.cue:189:6
+      //     ./nestedchain.cue:28:6
       #E: (_|_){
         // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
-        //     ./in.cue:189:6
+        //     ./nestedchain.cue:28:6
         y: (bool){ true }
         x: (_|_){
           // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
-          //     ./in.cue:189:6
+          //     ./nestedchain.cue:28:6
         }
       }
     }
@@ -455,6 +458,9 @@ Disjuncts:    121
       }
     }
   }
+}
+--- mutual.cue
+{
   mutual: {
     noConflicts: {
       a: {
@@ -624,6 +630,9 @@ Disjuncts:    121
       }
     }
   }
+}
+--- mutualsamestruct.cue
+{
   sameStruct: {
     chainSuccess: {
       a: {
@@ -703,6 +712,9 @@ Disjuncts:    121
       })
     }
   }
+}
+--- nestedchain.cue
+{
   nestedChain: {
     cycleFail: {
       if (〈0;#E〉.x != _|_(explicit error (_|_ literal) in source)) {

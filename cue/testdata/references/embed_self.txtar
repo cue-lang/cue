@@ -12,7 +12,7 @@ Retain: 1
 
 Unifications: 2
 Conjuncts:    5
-Disjuncts:    2
+Disjuncts:    3
 -- out/eval --
 (struct){
   Foo: (struct){

@@ -19,7 +19,7 @@ Retain: 1
 
 Unifications: 7
 Conjuncts:    14
-Disjuncts:    7
+Disjuncts:    8
 -- out/eval --
 Errors:
 foo.y: field not allowed:

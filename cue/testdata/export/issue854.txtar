@@ -32,7 +32,7 @@ Retain: 7
 
 Unifications: 6
 Conjuncts:    8
-Disjuncts:    6
+Disjuncts:    8
 -- out/eval --
 (struct){
   theb: (_|_){

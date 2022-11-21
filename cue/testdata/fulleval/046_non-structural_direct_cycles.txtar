@@ -35,7 +35,7 @@ Retain: 2
 
 Unifications: 7
 Conjuncts:    11
-Disjuncts:    7
+Disjuncts:    8
 -- out/eval --
 Errors:
 c2: conflicting values 1 and {bar:1} (mismatched types int and struct):

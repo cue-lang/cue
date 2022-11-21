@@ -77,7 +77,7 @@ Retain: 26
 
 Unifications: 37
 Conjuncts:    61
-Disjuncts:    37
+Disjuncts:    57
 -- out/eval --
 (struct){
   builtinCyclePerm0: (struct){

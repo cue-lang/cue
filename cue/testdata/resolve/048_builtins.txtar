@@ -88,7 +88,7 @@ Retain: 18
 
 Unifications: 55
 Conjuncts:    129
-Disjuncts:    67
+Disjuncts:    75
 -- out/eval --
 Errors:
 o3.a: 2 errors in empty disjunction:

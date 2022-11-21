@@ -269,7 +269,7 @@ Retain: 1
 
 Unifications: 683
 Conjuncts:    1572
-Disjuncts:    1050
+Disjuncts:    1051
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){

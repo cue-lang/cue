@@ -442,7 +442,7 @@ Retain: 4
 
 Unifications: 143
 Conjuncts:    321
-Disjuncts:    143
+Disjuncts:    147
 -- out/eval --
 Errors:
 mutuallyTriggeringCycle.t1.x.c.b.b.b.b: structural cycle

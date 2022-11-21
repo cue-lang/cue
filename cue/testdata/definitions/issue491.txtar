@@ -43,7 +43,7 @@ Retain: 1
 
 Unifications: 29
 Conjuncts:    71
-Disjuncts:    45
+Disjuncts:    46
 -- out/eval --
 (struct){
   #Prestep: (#struct){

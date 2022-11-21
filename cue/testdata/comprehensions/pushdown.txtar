@@ -667,7 +667,6 @@ errorPropagation: { // TODO(broken)
 }
 
 -- issue2131.cue --
-// TODO(broken)
 import "path"
 
 issue2131: tests: {
@@ -704,14 +703,14 @@ unifyDynamicReflectSuccess: {
 
 -- out/eval/stats --
 Leaks:  16
-Freed:  384
-Reused: 377
+Freed:  387
+Reused: 380
 Allocs: 23
 Retain: 69
 
-Unifications: 386
-Conjuncts:    622
-Disjuncts:    393
+Unifications: 389
+Conjuncts:    649
+Disjuncts:    432
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:
@@ -1364,12 +1363,15 @@ Result:
       windows: (struct){
         eg1: (struct){
           in: (string){ "c:\\" }
+          out: (string){ "test" }
         }
         eg2: (struct){
           in: (string){ "c:\\test" }
+          out: (string){ "test" }
         }
         eg3: (struct){
           in: (string){ "c:\\test\\" }
+          out: (string){ "test" }
         }
       }
     }

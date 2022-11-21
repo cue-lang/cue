@@ -72,7 +72,7 @@ Retain: 4
 
 Unifications: 56
 Conjuncts:    73
-Disjuncts:    56
+Disjuncts:    58
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:

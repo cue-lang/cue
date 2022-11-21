@@ -111,7 +111,7 @@ Retain: 11
 
 Unifications: 28
 Conjuncts:    43
-Disjuncts:    28
+Disjuncts:    34
 -- out/eval --
 Errors:
 #E.f3: field not allowed:

@@ -39,7 +39,7 @@ Retain: 2
 
 Unifications: 30
 Conjuncts:    40
-Disjuncts:    30
+Disjuncts:    31
 -- out/eval --
 Errors:
 e._name.c: field not allowed:

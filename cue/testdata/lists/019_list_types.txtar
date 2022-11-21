@@ -125,7 +125,7 @@ Retain: 34
 
 Unifications: 41
 Conjuncts:    75
-Disjuncts:    40
+Disjuncts:    63
 -- out/eval --
 Errors:
 e0: incompatible list lengths (1 and 2)

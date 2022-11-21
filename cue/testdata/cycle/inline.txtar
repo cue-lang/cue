@@ -120,7 +120,7 @@ Retain: 38
 
 Unifications: 223
 Conjuncts:    699
-Disjuncts:    223
+Disjuncts:    225
 -- out/eval --
 Errors:
 structural cycle:

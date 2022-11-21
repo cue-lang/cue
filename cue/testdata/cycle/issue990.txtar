@@ -174,14 +174,14 @@ out: #sub & {#p: _test.s1}
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  2158
-Reused: 2131
+Freed:  2160
+Reused: 2133
 Allocs: 27
-Retain: 16
+Retain: 14
 
-Unifications: 1738
-Conjuncts:    8278
-Disjuncts:    2158
+Unifications: 1740
+Conjuncts:    8276
+Disjuncts:    2160
 -- out/eval --
 (struct){
   #AC: (#struct){
@@ -344,6 +344,88 @@ Disjuncts:    2158
     }
   }
   out: (#struct){
+    let subs#1 = (#struct){
+      let subs#1 = (#struct){
+        dict: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              k: (string){ "simple" }
+              d: (#struct){
+                n: (string){ "c1" }
+              }
+            }
+          }
+        }
+        #p: (#struct){
+          k: (string){ "complex" }
+          d: (#struct){
+            n: (string){ "s3" }
+            r: (#struct){
+              r1: (#struct){
+                a: (#struct){
+                  k: (string){ "simple" }
+                  d: (#struct){
+                    n: (string){ "c1" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      dict: (#struct){
+        r2_r1: (#struct){
+          a: (#struct){
+            k: (string){ "simple" }
+            d: (#struct){
+              n: (string){ "c1" }
+            }
+          }
+        }
+        r1: (#struct){
+          a: (#struct){
+            k: (string){ "simple" }
+            d: (#struct){
+              n: (string){ "c1" }
+            }
+          }
+        }
+      }
+      #p: (#struct){
+        k: (string){ "complex" }
+        d: (#struct){
+          n: (string){ "s2" }
+          r: (#struct){
+            r1: (#struct){
+              a: (#struct){
+                k: (string){ "simple" }
+                d: (#struct){
+                  n: (string){ "c1" }
+                }
+              }
+            }
+            r2: (#struct){
+              a: (#struct){
+                k: (string){ "complex" }
+                d: (#struct){
+                  n: (string){ "s3" }
+                  r: (#struct){
+                    r1: (#struct){
+                      a: (#struct){
+                        k: (string){ "simple" }
+                        d: (#struct){
+                          n: (string){ "c1" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
     dict: (#struct){
       r2_r2_r1: (#struct){
         a: (#struct){
@@ -414,88 +496,6 @@ Disjuncts:    2158
                         }
                       }
                     }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    let subs#1 = (#struct){
-      dict: (#struct){
-        r2_r1: (#struct){
-          a: (#struct){
-            k: (string){ "simple" }
-            d: (#struct){
-              n: (string){ "c1" }
-            }
-          }
-        }
-        r1: (#struct){
-          a: (#struct){
-            k: (string){ "simple" }
-            d: (#struct){
-              n: (string){ "c1" }
-            }
-          }
-        }
-      }
-      #p: (#struct){
-        k: (string){ "complex" }
-        d: (#struct){
-          n: (string){ "s2" }
-          r: (#struct){
-            r1: (#struct){
-              a: (#struct){
-                k: (string){ "simple" }
-                d: (#struct){
-                  n: (string){ "c1" }
-                }
-              }
-            }
-            r2: (#struct){
-              a: (#struct){
-                k: (string){ "complex" }
-                d: (#struct){
-                  n: (string){ "s3" }
-                  r: (#struct){
-                    r1: (#struct){
-                      a: (#struct){
-                        k: (string){ "simple" }
-                        d: (#struct){
-                          n: (string){ "c1" }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      let subs#1 = (#struct){
-        dict: (#struct){
-          r1: (#struct){
-            a: (#struct){
-              k: (string){ "simple" }
-              d: (#struct){
-                n: (string){ "c1" }
-              }
-            }
-          }
-        }
-        #p: (#struct){
-          k: (string){ "complex" }
-          d: (#struct){
-            n: (string){ "s3" }
-            r: (#struct){
-              r1: (#struct){
-                a: (#struct){
-                  k: (string){ "simple" }
-                  d: (#struct){
-                    n: (string){ "c1" }
                   }
                 }
               }

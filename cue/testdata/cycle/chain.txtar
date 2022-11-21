@@ -209,14 +209,14 @@ issue2052: full: {
 }
 -- out/eval/stats --
 Leaks:  17
-Freed:  38762
-Reused: 38715
+Freed:  39364
+Reused: 39317
 Allocs: 64
 Retain: 143
 
-Unifications: 11516
-Conjuncts:    67565
-Disjuncts:    38773
+Unifications: 12118
+Conjuncts:    67550
+Disjuncts:    39375
 -- out/eval --
 (struct){
   chain: (struct){

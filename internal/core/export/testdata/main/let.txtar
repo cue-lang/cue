@@ -320,6 +320,7 @@ y: Y & Y_1
 [unresolvedDisjunction #TypeBool _args required]
 [unresolvedDisjunction #TypeBool Args]
 [unresolvedDisjunction #TypeBool Args required]
+[filepath]
 [files]
 [cfgs]
 [cfgs 0]
@@ -363,7 +364,6 @@ y: Y & Y_1
 [Y]
 [y]
 [Y]
-[filepath]
 -- out/value --
 == Simplified
 {

@@ -74,7 +74,7 @@ Retain: 23
 
 Unifications: 52
 Conjuncts:    66
-Disjuncts:    54
+Disjuncts:    60
 -- out/eval --
 (struct){
   let A#1 = (int){ 9 }

@@ -179,7 +179,7 @@ Retain: 37
 
 Unifications: 31
 Conjuncts:    149
-Disjuncts:    49
+Disjuncts:    59
 -- out/eval --
 Errors:
 xe1: 2 errors in empty disjunction:

@@ -86,7 +86,7 @@ Retain: 7
 
 Unifications: 52
 Conjuncts:    107
-Disjuncts:    52
+Disjuncts:    55
 -- out/eval --
 Errors:
 schema.next: structural cycle

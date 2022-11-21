@@ -271,7 +271,7 @@ Retain: 33
 
 Unifications: 236
 Conjuncts:    700
-Disjuncts:    426
+Disjuncts:    435
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

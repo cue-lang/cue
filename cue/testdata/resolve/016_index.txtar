@@ -100,7 +100,7 @@ Retain: 12
 
 Unifications: 34
 Conjuncts:    44
-Disjuncts:    40
+Disjuncts:    42
 -- out/eval --
 Errors:
 c: invalid list index "3" (type string):

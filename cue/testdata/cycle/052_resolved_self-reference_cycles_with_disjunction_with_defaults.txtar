@@ -133,7 +133,7 @@ Retain: 28
 
 Unifications: 27
 Conjuncts:    93
-Disjuncts:    44
+Disjuncts:    54
 -- out/eval --
 Errors:
 xe1: 2 errors in empty disjunction:

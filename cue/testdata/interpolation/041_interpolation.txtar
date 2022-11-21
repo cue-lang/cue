@@ -40,7 +40,7 @@ Retain: 3
 
 Unifications: 9
 Conjuncts:    17
-Disjuncts:    9
+Disjuncts:    10
 -- out/eval --
 Errors:
 e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):

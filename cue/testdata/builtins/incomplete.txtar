@@ -108,7 +108,7 @@ Retain: 32
 
 Unifications: 109
 Conjuncts:    265
-Disjuncts:    129
+Disjuncts:    147
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:

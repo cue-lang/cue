@@ -63,7 +63,7 @@ Retain: 10
 
 Unifications: 48
 Conjuncts:    111
-Disjuncts:    57
+Disjuncts:    65
 -- out/eval --
 (struct){
   IP: (#list){

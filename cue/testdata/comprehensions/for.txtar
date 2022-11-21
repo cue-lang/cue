@@ -21,7 +21,7 @@ Retain: 9
 
 Unifications: 20
 Conjuncts:    20
-Disjuncts:    18
+Disjuncts:    21
 -- out/eval --
 Errors:
 k: invalid operand e (found int, want list or struct):

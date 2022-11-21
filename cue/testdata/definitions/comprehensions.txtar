@@ -18,7 +18,7 @@ Retain: 2
 
 Unifications: 6
 Conjuncts:    6
-Disjuncts:    6
+Disjuncts:    8
 -- out/eval --
 Errors:
 issue595.files: undefined field: nam:

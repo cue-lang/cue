@@ -15,7 +15,7 @@ Retain: 1
 
 Unifications: 6
 Conjuncts:    9
-Disjuncts:    6
+Disjuncts:    7
 -- out/eval --
 Errors:
 a.c: field not allowed:

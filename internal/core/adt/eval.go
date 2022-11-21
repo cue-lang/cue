@@ -232,7 +232,14 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		fallthrough
 
-	case Partial:
+	case Partial, Conjuncts:
+		// No need to do further processing when we have errors and all values
+		// have been considered.
+		// TODO: is checkClosed really still necessary here?
+		if v.status == Conjuncts && (n.hasErr() || !n.checkClosed(state)) {
+			break
+		}
+
 		defer c.PopArc(c.PushArc(v))
 
 		n.insertConjuncts(state)
@@ -272,18 +279,6 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 				}
 				return
 			}
-		}
-
-		if s := v.Status(); state <= s {
-			// We have found a partial result. There may still be errors
-			// down the line which may result from further evaluating this
-			// field, but that will be caught when evaluating this field
-			// for real.
-
-			// This also covers the case where a recursive evaluation triggered
-			// this field to become finalized in the mean time. In that case
-			// we can avoid running another expandDisjuncts.
-			return
 		}
 
 		// Disjunctions should always be finalized. If there are nested
@@ -362,16 +357,6 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		// Free memory here?
 		v.UpdateStatus(Finalized)
-
-	case Conjuncts:
-		// TODO: merge the state with Partial, and move to a "bit-based"
-		// state model.
-		if n.hasErr() || !n.checkClosed(state) {
-			break
-		}
-		defer c.PopArc(c.PushArc(v))
-
-		n.completeArcs(state)
 
 	case Finalized:
 	}

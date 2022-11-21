@@ -69,7 +69,7 @@ Retain: 4
 
 Unifications: 11
 Conjuncts:    24
-Disjuncts:    15
+Disjuncts:    18
 -- out/eval --
 Errors:
 listOfCloseds.0.b: field not allowed:

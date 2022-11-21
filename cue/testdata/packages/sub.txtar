@@ -23,7 +23,7 @@ Retain: 3
 
 Unifications: 4
 Conjuncts:    6
-Disjuncts:    3
+Disjuncts:    4
 -- out/eval --
 (string){
   "Hello World!"

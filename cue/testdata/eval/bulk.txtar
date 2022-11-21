@@ -78,7 +78,7 @@ Retain: 6
 
 Unifications: 69
 Conjuncts:    135
-Disjuncts:    90
+Disjuncts:    96
 -- out/eval --
 Errors:
 t1.c.z: field not allowed:

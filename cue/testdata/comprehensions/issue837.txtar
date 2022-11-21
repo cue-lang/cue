@@ -72,7 +72,7 @@ Retain: 11
 
 Unifications: 114
 Conjuncts:    291
-Disjuncts:    164
+Disjuncts:    173
 -- out/eval --
 Errors:
 _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):

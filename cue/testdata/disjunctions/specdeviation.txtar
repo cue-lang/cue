@@ -70,7 +70,7 @@ Retain: 2
 
 Unifications: 28
 Conjuncts:    218
-Disjuncts:    171
+Disjuncts:    172
 -- out/eval --
 (struct){
   Q: (int){ |(*(int){ 1 }, (int){ int }) }

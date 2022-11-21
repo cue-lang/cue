@@ -99,7 +99,7 @@ Retain: 6
 
 Unifications: 58
 Conjuncts:    104
-Disjuncts:    71
+Disjuncts:    73
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:

@@ -629,6 +629,59 @@ letPushdown: {
 	}
 }
 
+-- issue2113.cue --
+// Ensure that an enclosing Value clause of a nested comprehension is evaluated
+// before the nested comprehension itself is evaluated.
+nestedWithEmbeddingOK: { // TODO(broken)
+	c: [1]
+	a: {
+		for k, v in c {
+			{x: 1}
+			if a.x != _|_ {
+			}
+		}
+	}
+}
+
+nestedWithDynamicFieldOK: { // TODO(broken)
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			if x != _|_ {
+			}
+			x="\(k)": 1
+		}
+	}
+}
+
+// Errors in nested comprehensions should also be reported.
+errorPropagation: { // TODO(broken)
+	deployment: _
+	for k, v in deployment {
+		for k1, v2 in v.env2 { // Report this error.
+			deployment: (k): x1: 1
+		}
+	}
+	for id in ["elem"] { deployment: (id): x2: 2 }
+}
+
+-- issue2131.cue --
+// TODO(broken)
+import "path"
+
+issue2131: tests: {
+	windows: {
+		eg1: in: #"c:\"#
+		eg2: in: #"c:\test"#
+		eg3: in: #"c:\test\"#
+	}
+
+	for os, examples in tests for k, v in examples {
+		(os): (k): out: "test"
+	}
+}
+
 -- reflect.cue --
 import "encoding/json"
 
@@ -650,15 +703,15 @@ unifyDynamicReflectSuccess: {
 }
 
 -- out/eval/stats --
-Leaks:  15
-Freed:  360
-Reused: 352
+Leaks:  16
+Freed:  384
+Reused: 377
 Allocs: 23
-Retain: 62
+Retain: 69
 
-Unifications: 361
-Conjuncts:    585
-Disjuncts:    368
+Unifications: 386
+Conjuncts:    622
+Disjuncts:    393
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:
@@ -1277,6 +1330,48 @@ Result:
     }
     a: (struct){
       let x#1 = (int){ 1 }
+    }
+  }
+  nestedWithEmbeddingOK: (struct){
+    c: (#list){
+      0: (int){ 1 }
+    }
+    a: (_|_){
+      // [cycle] nestedWithEmbeddingOK.a: circular dependency in evaluation of conditionals: a.x changed after evaluation:
+      //     ./issue2113.cue:8:7
+      x: (int){ 1 }
+    }
+  }
+  nestedWithDynamicFieldOK: (struct){
+    _c: (struct){
+      y: (int){ 1 }
+    }
+    a: (_|_){
+      // [cycle] nestedWithDynamicFieldOK.a: circular dependency in evaluation of conditionals: "\(〈1;k〉)" changed after evaluation:
+      //     ./issue2113.cue:19:7
+      y: (int){ 1 }
+    }
+  }
+  errorPropagation: (struct){
+    deployment: (struct){
+      elem: (struct){
+        x2: (int){ 2 }
+      }
+    }
+  }
+  issue2131: (struct){
+    tests: (struct){
+      windows: (struct){
+        eg1: (struct){
+          in: (string){ "c:\\" }
+        }
+        eg2: (struct){
+          in: (string){ "c:\\test" }
+        }
+        eg3: (struct){
+          in: (string){ "c:\\test\\" }
+        }
+      }
     }
   }
   unifyDynamicReflectSuccess: (struct){
@@ -2050,6 +2145,79 @@ Result:
       for k, v in 〈1;_c〉 {
         let x#1 = 〈1;v〉
         if (〈0;let x#1〉 != _|_(explicit error (_|_ literal) in source)) {}
+      }
+    }
+  }
+}
+--- issue2113.cue
+{
+  nestedWithEmbeddingOK: {
+    c: [
+      1,
+    ]
+    a: {
+      for k, v in 〈1;c〉 {
+        {
+          x: 1
+        }
+        if (〈3;a〉.x != _|_(explicit error (_|_ literal) in source)) {}
+      }
+    }
+  }
+  nestedWithDynamicFieldOK: {
+    _c: {
+      y: 1
+    }
+    a: {
+      for k, v in 〈1;_c〉 {
+        if (〈0;("\(〈1;k〉)")〉 != _|_(explicit error (_|_ literal) in source)) {}
+        "\(〈1;k〉)": 1
+      }
+    }
+  }
+  errorPropagation: {
+    deployment: _
+    for k, v in 〈0;deployment〉 {
+      for k1, v2 in 〈1;v〉.env2 {
+        deployment: {
+          〈4;k〉: {
+            x1: 1
+          }
+        }
+      }
+    }
+    for _, id in [
+      "elem",
+    ] {
+      deployment: {
+        〈2;id〉: {
+          x2: 2
+        }
+      }
+    }
+  }
+}
+--- issue2131.cue
+{
+  issue2131: {
+    tests: {
+      windows: {
+        eg1: {
+          in: "c:\\"
+        }
+        eg2: {
+          in: "c:\\test"
+        }
+        eg3: {
+          in: "c:\\test\\"
+        }
+      }
+      for os, examples in 〈1;tests〉 for k, v in 〈0;examples〉 {
+        〈2;os〉: {
+          〈2;k〉: {
+            out: "test"
+          }
+        }
       }
     }
   }

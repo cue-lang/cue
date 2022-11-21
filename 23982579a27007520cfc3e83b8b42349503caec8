@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b354a93_fc1e4ec1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-21T12:29:37Z",
+      "side": 1,
+      "message": "As I mentioned on Discord, it\u0027s not obvious to me why the reported CUE is cyclic. Perhaps spell it out in the commit message for clarity? Another place where you could explain it is in the regression test, I think either would be fine.",
+      "revId": "23982579a27007520cfc3e83b8b42349503caec8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f473f6e_7174dc96",
+        "filename": "internal/core/adt/optional.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-21T12:29:37Z",
+      "side": 1,
+      "message": "nit: no harm in this statement being all in a single line, I think",
+      "revId": "23982579a27007520cfc3e83b8b42349503caec8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

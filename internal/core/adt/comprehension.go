@@ -176,9 +176,27 @@ func (n *nodeContext) insertComprehension(
 
 				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
 				fields = append(fields, f)
-			// TODO: adjust ci to embed?
+				// TODO: adjust ci to embed?
 
-			// TODO: this also needs to be done for optional fields.
+				// TODO: this also needs to be done for optional fields.
+
+			case *LetField:
+				numFixed++
+
+				arc, _ := n.node.GetArc(n.ctx, f.Label, arcVoid)
+
+				// Create partial comprehension
+				c := &Comprehension{
+					Clauses: c.Clauses,
+					Value:   f,
+
+					comp:   ec,
+					parent: c,
+					arc:    n.node,
+				}
+
+				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
+				fields = append(fields, f)
 
 			case *Comprehension:
 				if _, ok := c.Value.(*StructLit); !ok {

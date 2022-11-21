@@ -564,6 +564,7 @@ allArcsSuccess: p2: {
 	}
 }
 
+-- issue1759.cue --
 // Tests derived from Unity.
 unity: success1: {
 	#Config: {
@@ -614,6 +615,20 @@ arcAlignment: t1: {
 	}
 }
 
+-- issue2111.cue --
+// All arc types, not just regular fields, should be pushed down.
+letPushdown: {
+	_c: y: 1
+
+	a: {
+		for k, v in _c {
+			let x = v
+			if x != _|_ {
+			}
+		}
+	}
+}
+
 -- reflect.cue --
 import "encoding/json"
 
@@ -636,14 +651,14 @@ unifyDynamicReflectSuccess: {
 
 -- out/eval/stats --
 Leaks:  15
-Freed:  355
-Reused: 347
+Freed:  360
+Reused: 352
 Allocs: 23
-Retain: 61
+Retain: 62
 
-Unifications: 356
-Conjuncts:    576
-Disjuncts:    363
+Unifications: 361
+Conjuncts:    585
+Disjuncts:    368
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:
@@ -1254,6 +1269,14 @@ Result:
   }
   arcAlignment: (struct){
     t1: (struct){
+    }
+  }
+  letPushdown: (struct){
+    _c: (struct){
+      y: (int){ 1 }
+    }
+    a: (struct){
+      let x#1 = (int){ 1 }
     }
   }
   unifyDynamicReflectSuccess: (struct){
@@ -1951,6 +1974,9 @@ Result:
       }
     }
   }
+}
+--- issue1759.cue
+{
   unity: {
     success1: {
       #Config: {
@@ -2010,6 +2036,20 @@ Result:
       }
       if false {
         c: _
+      }
+    }
+  }
+}
+--- issue2111.cue
+{
+  letPushdown: {
+    _c: {
+      y: 1
+    }
+    a: {
+      for k, v in 〈1;_c〉 {
+        let x#1 = 〈1;v〉
+        if (〈0;let x#1〉 != _|_(explicit error (_|_ literal) in source)) {}
       }
     }
   }

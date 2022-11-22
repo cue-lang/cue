@@ -9,7 +9,7 @@ assignees: ''
 
 <!--
 Please answer these questions before submitting your issue. Thanks!
-For questions please use one of our forums: https://cuelang.slack.com/
+To ask questions, see https://github.com/cue-lang/cue#contact.
 -->
 
 ### What version of CUE are you using (`cue version`)?
@@ -18,10 +18,6 @@ For questions please use one of our forums: https://cuelang.slack.com/
 $ cue version
 
 </pre>
-
-<!--
-If you built from source, specify what git tag or commit was used.
--->
 
 ### Does this issue reproduce with the latest release?
 

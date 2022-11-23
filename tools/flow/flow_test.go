@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package flow_test
+package flow
 
 import (
 	"context"
@@ -30,7 +30,6 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/cuetxtar"
-	"cuelang.org/go/tools/flow"
 )
 
 // TestTasks tests the logic that determines which nodes are tasks and what are
@@ -51,7 +50,7 @@ func TestFlow(t *testing.T) {
 
 		var tasksTotal stats.Counts
 
-		updateFunc := func(c *flow.Controller, task *flow.Task) error {
+		updateFunc := func(c *Controller, task *Task) error {
 			str := mermaidGraph(c)
 			step := fmt.Sprintf("t%d", seqNum)
 			fmt.Fprintln(t.Writer(step), str)
@@ -74,7 +73,7 @@ func TestFlow(t *testing.T) {
 			return nil
 		}
 
-		cfg := &flow.Config{
+		cfg := &Config{
 			Root:            cue.ParsePath("root"),
 			InferTasks:      t.Bool("InferTasks"),
 			IgnoreConcrete:  t.Bool("IgnoreConcrete"),
@@ -82,7 +81,7 @@ func TestFlow(t *testing.T) {
 			UpdateFunc:      updateFunc,
 		}
 
-		c := flow.New(cfg, v, taskFunc)
+		c := New(cfg, v, taskFunc)
 
 		w := t.Writer("errors")
 		if err := c.Run(context.Background()); err != nil {
@@ -134,15 +133,15 @@ func TestFlowValuePanic(t *testing.T) {
 
 	ch := make(chan bool, 1)
 
-	cfg := &flow.Config{
+	cfg := &Config{
 		Root: cue.ParsePath("root"),
-		UpdateFunc: func(c *flow.Controller, t *flow.Task) error {
+		UpdateFunc: func(c *Controller, t *Task) error {
 			ch <- true
 			return nil
 		},
 	}
 
-	c := flow.New(cfg, v, taskFunc)
+	c := New(cfg, v, taskFunc)
 
 	defer func() { recover() }()
 
@@ -157,11 +156,11 @@ func TestFlowValuePanic(t *testing.T) {
 	t.Errorf("Value() did not panic")
 }
 
-func taskFunc(v cue.Value) (flow.Runner, error) {
+func taskFunc(v cue.Value) (Runner, error) {
 	switch name, err := v.Lookup("$id").String(); name {
 	default:
 		if err == nil {
-			return flow.RunnerFunc(func(t *flow.Task) error {
+			return RunnerFunc(func(t *Task) error {
 				t.Fill(map[string]string{"stdout": "foo"})
 				return nil
 			}), nil
@@ -171,7 +170,7 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 		}
 
 	case "valToOut":
-		return flow.RunnerFunc(func(t *flow.Task) error {
+		return RunnerFunc(func(t *Task) error {
 			if str, err := t.Value().Lookup("val").String(); err == nil {
 				t.Fill(map[string]string{"out": str})
 			}
@@ -179,23 +178,23 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 		}), nil
 
 	case "failure":
-		return flow.RunnerFunc(func(t *flow.Task) error {
+		return RunnerFunc(func(t *Task) error {
 			return errors.New("failure")
 		}), nil
 
 	case "abort":
-		return flow.RunnerFunc(func(t *flow.Task) error {
-			return flow.ErrAbort
+		return RunnerFunc(func(t *Task) error {
+			return ErrAbort
 		}), nil
 
 	case "list":
-		return flow.RunnerFunc(func(t *flow.Task) error {
+		return RunnerFunc(func(t *Task) error {
 			t.Fill(map[string][]int{"out": {1, 2}})
 			return nil
 		}), nil
 
 	case "slow":
-		return flow.RunnerFunc(func(t *flow.Task) error {
+		return RunnerFunc(func(t *Task) error {
 			time.Sleep(10 * time.Millisecond)
 			t.Fill(map[string]string{"out": "finished"})
 			return nil
@@ -204,7 +203,7 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 	case "sequenced":
 		// This task is used to serialize different runners in case
 		// non-deterministic scheduling is possible.
-		return flow.RunnerFunc(func(t *flow.Task) error {
+		return RunnerFunc(func(t *Task) error {
 			seq, err := t.Value().Lookup("seq").Int64()
 			if err != nil {
 				return err
@@ -248,7 +247,7 @@ func waitSeqNum(seq int64) {
 // mermaidGraph generates a mermaid graph of the current state. This can be
 // pasted into https://mermaid-js.github.io/mermaid-live-editor/ for
 // visualization.
-func mermaidGraph(c *flow.Controller) string {
+func mermaidGraph(c *Controller) string {
 	w := &strings.Builder{}
 	fmt.Fprintln(w, "graph TD")
 	for i, t := range c.Tasks() {
@@ -275,9 +274,9 @@ func TestX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	c := flow.New(&flow.Config{
+	c := New(&Config{
 		Root: cue.ParsePath("root"),
-		UpdateFunc: func(c *flow.Controller, ft *flow.Task) error {
+		UpdateFunc: func(c *Controller, ft *Task) error {
 			if ft != nil {
 				t.Errorf("\nTASK:\n%s", ft.Stats())
 			}

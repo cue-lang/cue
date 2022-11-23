@@ -68,6 +68,9 @@ package flow
 
 import (
 	"context"
+	"fmt"
+	"os"
+	"strings"
 	"sync"
 
 	"cuelang.org/go/cue"
@@ -86,6 +89,8 @@ var (
 
 	// TODO: ErrUpdate: update and run a dependency, but don't complete a
 	// dependency as more results may come. This is useful in server mode.
+
+	debug = os.Getenv("CUE_DEBUG_TOOLS_FLOW") != ""
 )
 
 // A TaskFunc creates a Runner for v if v defines a task or reports nil
@@ -276,6 +281,28 @@ func (c *Controller) Value() cue.Value {
 		panic("can't retrieve value before flow has terminated")
 	}
 	return c.inst
+}
+
+// mermaidGraph generates a mermaid graph of the current state. This can be
+// pasted into https://mermaid-js.github.io/mermaid-live-editor/ for
+// visualization.
+func mermaidGraph(c *Controller) string {
+	w := &strings.Builder{}
+	fmt.Fprintln(w, "graph TD;")
+	for i, t := range c.Tasks() {
+		// We need to escape quotes in the path, per
+		// https://mermaid-js.github.io/mermaid/#/flowchart?id=entity-codes-to-escape-characters
+		// This also requires that we escape the quoting
+		// character #.
+		path := t.Path().String()
+		path = strings.ReplaceAll(path, "#", "#35;")
+		path = strings.ReplaceAll(path, "\"", "#quot;")
+		fmt.Fprintf(w, "  t%d[\"%s [%s]\"]\n", i, path, t.State())
+		for _, t := range t.Dependencies() {
+			fmt.Fprintf(w, "  t%d-->t%d\n", i, t.Index())
+		}
+	}
+	return w.String()
 }
 
 // A State indicates the state of a Task.

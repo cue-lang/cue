@@ -51,7 +51,7 @@ func TestFlow(t *testing.T) {
 		var tasksTotal stats.Counts
 
 		updateFunc := func(c *Controller, task *Task) error {
-			str := mermaidGraph(c)
+			str := c.mermaidGraph()
 			step := fmt.Sprintf("t%d", seqNum)
 			fmt.Fprintln(t.Writer(step), str)
 
@@ -244,21 +244,6 @@ func waitSeqNum(seq int64) {
 	seqCond.L.Unlock()
 }
 
-// mermaidGraph generates a mermaid graph of the current state. This can be
-// pasted into https://mermaid-js.github.io/mermaid-live-editor/ for
-// visualization.
-func mermaidGraph(c *Controller) string {
-	w := &strings.Builder{}
-	fmt.Fprintln(w, "graph TD")
-	for i, t := range c.Tasks() {
-		fmt.Fprintf(w, "  t%d(\"%s [%s]\")\n", i, t.Path(), t.State())
-		for _, t := range t.Dependencies() {
-			fmt.Fprintf(w, "  t%d-->t%d\n", i, t.Index())
-		}
-	}
-	return w.String()
-}
-
 // DO NOT REMOVE: for testing purposes.
 func TestX(t *testing.T) {
 	in := `
@@ -284,7 +269,7 @@ func TestX(t *testing.T) {
 		},
 	}, v, taskFunc)
 
-	t.Error(mermaidGraph(c))
+	t.Error(c.mermaidGraph())
 
 	if err := c.Run(context.Background()); err != nil {
 		t.Fatal(errors.Details(err, nil))

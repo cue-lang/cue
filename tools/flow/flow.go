@@ -68,6 +68,8 @@ package flow
 
 import (
 	"context"
+	"fmt"
+	"strings"
 	"sync"
 
 	"cuelang.org/go/cue"
@@ -490,4 +492,19 @@ func (t *Task) Err() error {
 // Task completed, or from within a call to UpdateFunc.
 func (t *Task) State() State {
 	return t.state
+}
+
+// mermaidGraph generates a mermaid graph of the current state. This can be
+// pasted into https://mermaid-js.github.io/mermaid-live-editor/ for
+// visualization.
+func (c *Controller) mermaidGraph() string {
+	w := &strings.Builder{}
+	fmt.Fprintln(w, "graph TD")
+	for i, t := range c.Tasks() {
+		fmt.Fprintf(w, "  t%d(\"%s [%s]\")\n", i, t.Path(), t.State())
+		for _, t := range t.Dependencies() {
+			fmt.Fprintf(w, "  t%d-->t%d\n", i, t.Index())
+		}
+	}
+	return w.String()
 }

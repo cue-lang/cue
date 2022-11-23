@@ -26,6 +26,9 @@ package flow
 // future tasks may be long running, as discussed above.
 
 import (
+	"fmt"
+	"os"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
@@ -134,6 +137,13 @@ func (c *Controller) markReady(t *Task) {
 		if x.state == Waiting && x.isReady() {
 			x.state = Ready
 		}
+	}
+
+	if debug {
+		fmt.Fprintln(os.Stderr, "tools/flow task dependency graph:")
+		fmt.Fprintln(os.Stderr, "```mermaid")
+		fmt.Fprint(os.Stderr, mermaidGraph(c))
+		fmt.Fprintln(os.Stderr, "```")
 	}
 
 	if c.cfg.UpdateFunc != nil {

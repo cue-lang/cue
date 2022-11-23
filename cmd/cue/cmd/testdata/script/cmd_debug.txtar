@@ -1,0 +1,44 @@
+env CUE_DEBUG_TOOLS_FLOW=1
+
+exec cue cmd bar
+cmp stderr stderr.golden
+
+-- x_tool.cue --
+package x
+
+import (
+	"tool/cli"
+)
+
+command: bar: {
+	a: cli.Print & {
+		text: "a"
+	}
+	"\"b#": cli.Print & {
+		text:   "b"
+		$after: a
+	}
+
+}
+-- stderr.golden --
+tools/flow task dependency graph:
+```mermaid
+graph TD
+  t0("command.bar.a [Ready]")
+  t1("command.bar.#quot;\#quot;b#35;#quot; [Waiting]")
+  t1-->t0
+```
+tools/flow task dependency graph:
+```mermaid
+graph TD
+  t0("command.bar.a [Terminated]")
+  t1("command.bar.#quot;\#quot;b#35;#quot; [Ready]")
+  t1-->t0
+```
+tools/flow task dependency graph:
+```mermaid
+graph TD
+  t0("command.bar.a [Terminated]")
+  t1("command.bar.#quot;\#quot;b#35;#quot; [Terminated]")
+  t1-->t0
+```

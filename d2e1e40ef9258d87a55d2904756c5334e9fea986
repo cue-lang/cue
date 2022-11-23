@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58b6243f_c38aca90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-23T13:30:17Z",
+      "side": 1,
+      "message": "\u003e And I wouldn\u0027t mind seeing a test for the mermaid output.\n\nThere are already some tests in tools/flow/testdata that capture the output format, but I\u0027ve added one for cue/cmd to ensure the environment variable setting works. So that also gives some more visible coverage of the format.",
+      "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "50077dee_01cbe285",
@@ -52,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c628186_7e1ef785",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-23T13:30:17Z",
+      "side": 1,
+      "message": "TIL strings.NewReplacer - thanks.",
+      "parentUuid": "50077dee_01cbe285",
+      "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "29a3a91c_0c866e99",
@@ -65,6 +100,24 @@
       "writtenOn": "2022-11-23T13:15:11Z",
       "side": 1,
       "message": "or maybe:\n\n\t```mermaid\n\t$graph\n\t```\n\n?\nso that the format is obvious and it\u0027s trivially pastable into a markdown doc?",
+      "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6afc55c_9f6bd8b0",
+        "filename": "tools/flow/run.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-23T13:30:17Z",
+      "side": 1,
+      "message": "Excellent idea.",
+      "parentUuid": "29a3a91c_0c866e99",
       "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

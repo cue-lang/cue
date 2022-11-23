@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "776ddf06_b76ba264",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-23T12:08:35Z",
+      "side": 1,
+      "message": "LGTM modulo a couple of thoughts. It\u0027s probably worth addressing the quoting issue because it\u0027s going to be the first thing anyone who uses it is likely to complain about...",
+      "revId": "37ef52fb0b25c9292e28b684d44441c0ad4144fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

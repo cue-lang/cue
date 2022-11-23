@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "424c8dc9_ebcbbaa3",
+        "filename": "tools/flow/flow_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 255,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-23T12:08:35Z",
+      "side": 0,
+      "message": "I know it\u0027s awkward, but we should probably escape dubious characters inside the title according to this (poorly specified) doc: https://mermaid-js.github.io/mermaid/#/flowchart?id\u003dentity-codes-to-escape-characters\n\nOtherwise we\u0027ll be producing invalid diagrams whenever the path contains anything that can\u0027t be represented as normal CUE identifiers.\n\nAlso, I wonder if we should have some kind of identifying text at the start of the graph (eg. `tools/flow task dependency graph:` or something?)",
+      "revId": "32bfffd0aa538d63757efeef393bc37a06c8c9a4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

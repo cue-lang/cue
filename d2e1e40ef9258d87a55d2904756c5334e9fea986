@@ -16,6 +16,57 @@
       "message": "I also fixed up the way in which a mermaid graph is rendered. The output wasn\u0027t actually valid according to the online playground (at least). Now it is.",
       "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "436516fa_16b0d073",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-23T13:15:11Z",
+      "side": 1,
+      "message": "LGTM with two final thoughts, thanks!\nAnd I wouldn\u0027t mind seeing a test for the mermaid output.",
+      "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50077dee_01cbe285",
+        "filename": "tools/flow/flow.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-23T13:15:11Z",
+      "side": 1,
+      "message": "or maybe:\n\n```\nvar mermaidQuote \u003d strings.NewReplacer(\"#\", \"#35;\", `\"`, \"#quot;\")\n```\n\nand\n```\npath :\u003d mermaidQuote.Replace(t.Path().String)\n```\n?",
+      "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "29a3a91c_0c866e99",
+        "filename": "tools/flow/run.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-23T13:15:11Z",
+      "side": 1,
+      "message": "or maybe:\n\n\t```mermaid\n\t$graph\n\t```\n\n?\nso that the format is obvious and it\u0027s trivially pastable into a markdown doc?",
+      "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

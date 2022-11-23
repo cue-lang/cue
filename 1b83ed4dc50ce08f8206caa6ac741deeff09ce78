@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d82a7337_1c49efc8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-23T17:44:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f83e2a64_3c5de9cb",
+      "revId": "1b83ed4dc50ce08f8206caa6ac741deeff09ce78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0e435a5d_c6f96362",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af43e74a_b3dd4c2e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-23T17:44:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0e435a5d_c6f96362",
+      "range": {
+        "startLine": 9,
+        "startChar": 31,
+        "endLine": 9,
+        "endChar": 44
+      },
+      "revId": "1b83ed4dc50ce08f8206caa6ac741deeff09ce78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "325c2dfd_c1607a05",
@@ -54,6 +96,24 @@
       "writtenOn": "2022-11-21T12:39:08Z",
       "side": 1,
       "message": "it seems like this case body is exactly the same as the one for Field. should we add a TODO about deduplicating the two cases somehow, or will the two bits of code gain differences in the future?\n\nalso, should the two TODOs be copied as well?",
+      "revId": "1b83ed4dc50ce08f8206caa6ac741deeff09ce78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee495f63_d9aaaf22",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-23T17:44:32Z",
+      "side": 1,
+      "message": "Added a TODO. I\u0027m not sure how they would be merged: I could imagine we only have one Field type left.\n\nThe two pre-existing TODOs are actually exclusive to the Field case. I think we should probably merge the OptionalField and Field types.",
+      "parentUuid": "325c2dfd_c1607a05",
       "revId": "1b83ed4dc50ce08f8206caa6ac741deeff09ce78",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

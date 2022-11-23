@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f3fc47_7ed2ed52",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-23T16:57:55Z",
+      "side": 1,
+      "message": "added to test",
+      "parentUuid": "8b354a93_fc1e4ec1",
+      "revId": "23982579a27007520cfc3e83b8b42349503caec8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f473f6e_7174dc96",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-11-21T12:29:37Z",
       "side": 1,
       "message": "nit: no harm in this statement being all in a single line, I think",
+      "revId": "23982579a27007520cfc3e83b8b42349503caec8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40cb41fc_a083e559",
+        "filename": "internal/core/adt/optional.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-23T16:57:55Z",
+      "side": 1,
+      "message": "I started doing it this way if I expect more fields will be added later so that diffs will be minimized. It happened too often that I had to unroll such a case, resulting in ugly diffs.",
+      "parentUuid": "8f473f6e_7174dc96",
       "revId": "23982579a27007520cfc3e83b8b42349503caec8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

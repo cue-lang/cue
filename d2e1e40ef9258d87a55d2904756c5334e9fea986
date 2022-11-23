@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5147a0f5_7bdf3b79",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-23T12:58:28Z",
+      "side": 1,
+      "message": "I also fixed up the way in which a mermaid graph is rendered. The output wasn\u0027t actually valid according to the online playground (at least). Now it is.",
+      "revId": "d2e1e40ef9258d87a55d2904756c5334e9fea986",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

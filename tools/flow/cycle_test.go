@@ -20,6 +20,9 @@ import (
 	"testing"
 )
 
+// MermaidGraph exports mermaidGraph for external tests
+var MermaidGraph = mermaidGraph
+
 func TestIsCyclic(t *testing.T) {
 	testCases := []struct {
 		// semi-colon-separated list of nodes with comma-separated list

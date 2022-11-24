@@ -1315,11 +1315,17 @@ Result:
   listOptOK: (struct){
     list: (struct){
       head: (int){ int }
+      tail?: (_|_){
+        // [structural cycle] listOptOK.list.tail: structural cycle
+      }
     }
     a: (struct){
       head: (int){ 3 }
       tail: (struct){
         head: (int){ 2 }
+        tail?: (_|_){
+          // [structural cycle] listOptOK.a.tail.tail: structural cycle
+        }
       }
     }
   }

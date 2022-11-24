@@ -489,14 +489,14 @@ issue2263: full: {
 
 -- out/eval/stats --
 Leaks:  4
-Freed:  2151
-Reused: 2135
+Freed:  2339
+Reused: 2323
 Allocs: 20
 Retain: 119
 
-Unifications: 1196
-Conjuncts:    3205
-Disjuncts:    2270
+Unifications: 1260
+Conjuncts:    3417
+Disjuncts:    2458
 -- out/eval --
 Errors:
 issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:

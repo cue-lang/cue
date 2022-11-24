@@ -152,14 +152,14 @@ selfRefInEmbed: t1: {
 
 -- out/eval/stats --
 Leaks:  11
-Freed:  120
-Reused: 113
+Freed:  121
+Reused: 114
 Allocs: 18
-Retain: 69
+Retain: 70
 
-Unifications: 127
-Conjuncts:    313
-Disjuncts:    175
+Unifications: 128
+Conjuncts:    314
+Disjuncts:    177
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):

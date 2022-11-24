@@ -196,8 +196,8 @@ type Vertex struct {
 	// Used for cycle detection.
 	IsDynamic bool
 
-	// arcType indicates the level of optionality of this arc.
-	arcType arcType
+	// ArcType indicates the level of optionality of this arc.
+	ArcType ArcType
 
 	// cyclicReferences is a linked list of internal references pointing to this
 	// Vertex. This is used to shorten the path of some structural cycles.
@@ -230,7 +230,7 @@ type Vertex struct {
 // isDefined indicates whether this arc is a "value" field, and not a constraint
 // or void arc.
 func (v *Vertex) isDefined() bool {
-	return v.arcType == arcMember
+	return v.ArcType == ArcMember
 }
 
 // IsDefined indicates whether this arc is defined meaning it is not a
@@ -245,22 +245,22 @@ func (v *Vertex) IsDefined(c *OpContext) bool {
 	return v.isDefined()
 }
 
-type arcType uint8
+type ArcType uint8
 
 const (
-	// arcMember means that this arc is a normal non-optional field
+	// ArcMember means that this arc is a normal non-optional field
 	// (including regular, hidden, and definition fields).
-	arcMember arcType = iota
+	ArcMember ArcType = iota
 
 	// TODO: define a type for optional arcs. This will be needed for pulling
 	// in optional fields into the Vertex, which, in turn, is needed for
 	// structure sharing, among other things.
 	// We could also define types for required fields and potentially lets.
 
-	// arcVoid means that an arc does not exist. This happens when an arc
+	// ArcVoid means that an arc does not exist. This happens when an arc
 	// is provisionally added as part of a comprehension, but when this
 	// comprehension has not yet yielded any results.
-	arcVoid
+	ArcVoid
 )
 
 func (v *Vertex) Clone() *Vertex {
@@ -746,7 +746,7 @@ func (v *Vertex) Elems() []*Vertex {
 
 // GetArc returns a Vertex for the outgoing arc with label f. It creates and
 // ads one if it doesn't yet exist.
-func (v *Vertex) GetArc(c *OpContext, f Feature, t arcType) (arc *Vertex, isNew bool) {
+func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew bool) {
 	arc = v.Lookup(f)
 	if arc != nil {
 		return arc, false
@@ -762,7 +762,7 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t arcType) (arc *Vertex, isNew 
 				"field %s not allowed by earlier comprehension or reference cycle", f)
 		}
 	}
-	arc = &Vertex{Parent: v, Label: f, arcType: t}
+	arc = &Vertex{Parent: v, Label: f, ArcType: t}
 	v.Arcs = append(v.Arcs, arc)
 	return arc, true
 }
@@ -795,7 +795,7 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	switch c.x.(type) {
 	case *OptionalField, *BulkOptionalField, *Ellipsis:
 	default:
-		v.arcType = arcMember
+		v.ArcType = ArcMember
 	}
 	for _, x := range v.Conjuncts {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?

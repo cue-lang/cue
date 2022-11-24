@@ -96,6 +96,7 @@ Disjuncts:    22
 -- out/eval --
 (struct){
   foo: (struct){
+    opt?: (int){ 1 }
     txt: (int){ 2 }
     #def: (int){ 3 }
     regular: (int){ 4 }

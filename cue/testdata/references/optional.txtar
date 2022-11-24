@@ -25,6 +25,7 @@ Disjuncts:    4
 -- out/eval --
 (struct){
   a: (struct){
+    foo?: (int){ int }
     b: (_|_){
       // [incomplete] a.b: cannot reference optional field: foo:
       //     ./in.cue:4:5

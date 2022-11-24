@@ -1722,7 +1722,7 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 			}
 			// TODO(errors): report error when this is a regular field.
 			c := MakeConjunct(nil, a, id)
-			n.insertField(a.Label, c)
+			n.insertField(a.Label, a.ArcType, c)
 			s.MarkField(a.Label)
 		}
 		return
@@ -1951,10 +1951,10 @@ func (n *nodeContext) addStruct(
 				n.aStruct = s
 				n.aStructID = closeInfo
 			}
-			n.insertField(x.Label, MakeConjunct(childEnv, x, closeInfo))
+			n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
 
 		case *LetField:
-			arc := n.insertField(x.Label, MakeConjunct(childEnv, x, closeInfo))
+			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
 			if x.IsMulti {
 				arc.MultiLet = x.IsMulti
 			}
@@ -1973,9 +1973,9 @@ func (n *nodeContext) addStruct(
 // route) is to not recursively evaluate those arcs, even for Finalize. This is
 // possible as it is not necessary to evaluate optional arcs to evaluate
 // disjunctions.
-func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
+func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 	ctx := n.ctx
-	arc, isNew := n.node.GetArc(ctx, f, ArcMember)
+	arc, isNew := n.node.GetArc(ctx, f, mode)
 	if f.IsLet() && !isNew {
 		arc.MultiLet = true
 		return arc
@@ -2079,7 +2079,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 		if f.IsInt() {
 			n.addErr(ctx.NewPosf(pos(d.field.Key), "integer fields not supported"))
 		}
-		n.insertField(f, MakeConjunct(d.env, d.field, d.id))
+		n.insertField(f, ArcMember, MakeConjunct(d.env, d.field, d.id))
 	}
 
 	progress = k < len(n.dynamicFields)
@@ -2149,11 +2149,11 @@ func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 
 		for _, a := range elems {
 			if a.Conjuncts == nil {
-				n.insertField(a.Label, MakeRootConjunct(nil, a))
+				n.insertField(a.Label, ArcMember, MakeRootConjunct(nil, a))
 				continue
 			}
 			for _, c := range a.Conjuncts {
-				n.insertField(a.Label, c)
+				n.insertField(a.Label, ArcMember, c)
 			}
 		}
 	}
@@ -2179,7 +2179,7 @@ outer:
 					n.addErr(err)
 					index++
 					c := MakeConjunct(e, x.Value, l.id)
-					n.insertField(label, c)
+					n.insertField(label, ArcMember, c)
 				})
 				hasComprehension = true
 				if err != nil {
@@ -2207,7 +2207,7 @@ outer:
 				label, err := MakeLabel(x.Source(), index, IntLabel)
 				n.addErr(err)
 				index++ // TODO: don't use insertField.
-				n.insertField(label, MakeConjunct(l.env, x, l.id))
+				n.insertField(label, ArcMember, MakeConjunct(l.env, x, l.id))
 			}
 
 			// Terminate early in case of runaway comprehension.

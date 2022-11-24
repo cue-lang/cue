@@ -25,13 +25,17 @@ Disjuncts:    15
 (struct){
   e: (#struct){ |((#struct){
       a: (string){ "hello" }
+      value?: (string){ string }
     }, (#struct){
       a: (string){ "hello" }
+      externalValue?: (string){ string }
     }) }
   #Example: (#struct){ |((#struct){
       a: (string){ string }
+      value?: (string){ string }
     }, (#struct){
       a: (string){ string }
+      externalValue?: (string){ string }
     }) }
 }
 -- out/compile --

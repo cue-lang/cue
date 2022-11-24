@@ -76,6 +76,7 @@ Disjuncts:    11
 -- out/eval --
 (struct){
   a: (struct){
+    foo?: (string){ string }
   }
   b: (struct){
     foo: (string){ "foo" }
@@ -84,6 +85,7 @@ Disjuncts:    11
     foo: (string){ "foo" }
   }
   d: (struct){
+    foo?: (string){ "bar" }
   }
   g1: (int){ 1 }
   g2: (int){ 2 }

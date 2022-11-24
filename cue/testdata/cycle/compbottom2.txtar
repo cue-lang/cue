@@ -404,6 +404,8 @@ Disjuncts:    205
         foo: (struct){
           a: (int){ 1 }
         }
+        raises?: (struct){
+        }
       }
       b: (struct){
         foo: (struct){
@@ -411,6 +413,8 @@ Disjuncts:    205
         }
         ret: (struct){
           a: (int){ 1 }
+        }
+        raises?: (struct){
         }
       }
     }
@@ -421,6 +425,8 @@ Disjuncts:    205
           //     ./mutualsamestruct.cue:30:6
           ret: (struct){
             a: (int){ 1 }
+          }
+          raises?: (struct){
           }
         }
         p2: (_|_){
@@ -475,8 +481,15 @@ Disjuncts:    205
     }
     defCloseSuccess: (struct){
       #Example: (#struct){
+        raises?: (#struct){
+          runtime?: (string){ string }
+        }
+        ret?: (_){ _ }
       }
       expr: (#struct){
+        raises?: (#struct){
+          runtime?: (string){ string }
+        }
         ret: (int){ 2 }
       }
     }

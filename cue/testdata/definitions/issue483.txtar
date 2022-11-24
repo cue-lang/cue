@@ -36,6 +36,11 @@ Disjuncts:    17
     }
   }
   #Type: (#struct){
+    alpha?: (#struct){
+      bravo?: (#struct){
+        charlie?: (bool){ bool }
+      }
+    }
   }
   #Root: (#struct){
   }

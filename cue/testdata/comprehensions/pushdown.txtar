@@ -632,7 +632,7 @@ letPushdown: {
 -- issue2113.cue --
 // Ensure that an enclosing Value clause of a nested comprehension is evaluated
 // before the nested comprehension itself is evaluated.
-nestedWithEmbeddingOK: { // TODO(broken)
+nestedWithEmbeddingOK: {
 	c: [1]
 	a: {
 		for k, v in c {
@@ -656,7 +656,7 @@ nestedWithDynamicFieldOK: { // TODO(broken)
 }
 
 // Errors in nested comprehensions should also be reported.
-errorPropagation: { // TODO(broken)
+errorPropagation: {
 	deployment: _
 	for k, v in deployment {
 		for k1, v2 in v.env2 { // Report this error.
@@ -706,11 +706,11 @@ Leaks:  16
 Freed:  387
 Reused: 380
 Allocs: 23
-Retain: 69
+Retain: 70
 
 Unifications: 389
-Conjuncts:    649
-Disjuncts:    432
+Conjuncts:    653
+Disjuncts:    433
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:
@@ -746,6 +746,7 @@ Result:
     w: (int){ 1 }
     v: (struct){
       y: (int){ 1 }
+      x: (int){ 1 }
       z: (int){ 1 }
       rw: (int){ 1 }
       rx: (int){ 1 }
@@ -774,7 +775,6 @@ Result:
           nz: (int){ 1 }
         }
       }
-      x: (int){ 1 }
     }
   }
   fail: (struct){
@@ -1335,9 +1335,7 @@ Result:
     c: (#list){
       0: (int){ 1 }
     }
-    a: (_|_){
-      // [cycle] nestedWithEmbeddingOK.a: circular dependency in evaluation of conditionals: a.x changed after evaluation:
-      //     ./issue2113.cue:8:7
+    a: (struct){
       x: (int){ 1 }
     }
   }
@@ -1351,8 +1349,12 @@ Result:
       y: (int){ 1 }
     }
   }
-  errorPropagation: (struct){
-    deployment: (struct){
+  errorPropagation: (_|_){
+    // [incomplete] errorPropagation: undefined field: env2:
+    //     ./issue2113.cue:30:19
+    deployment: (_|_){
+      // [incomplete] errorPropagation: undefined field: env2:
+      //     ./issue2113.cue:30:19
       elem: (struct){
         x2: (int){ 2 }
       }

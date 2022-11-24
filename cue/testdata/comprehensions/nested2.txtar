@@ -103,7 +103,7 @@ Allocs: 5
 Retain: 5
 
 Unifications: 43
-Conjuncts:    69
+Conjuncts:    78
 Disjuncts:    43
 -- out/eval --
 (struct){
@@ -131,8 +131,8 @@ Disjuncts:    43
     }
   }
   foo: (struct){
-    b: (int){ 20 }
     a: (int){ 10 }
+    b: (int){ 20 }
   }
   indirectlyNested: (struct){
     b: (bool){ true }
@@ -149,9 +149,9 @@ Disjuncts:    43
     b: (bool){ true }
   }
   indirectlyDoublyNested: (struct){
-    b: (int){ 1 }
-    c: (int){ 1 }
     a: (bool){ true }
+    c: (int){ 1 }
+    b: (int){ 1 }
   }
   issue1974: (struct){
     X: (struct){

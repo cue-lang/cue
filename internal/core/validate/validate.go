@@ -98,7 +98,7 @@ func (v *validator) validate(x *adt.Vertex) {
 	}
 
 	for _, a := range x.Arcs {
-		if a.Label.IsLet() {
+		if a.Label.IsLet() || !a.IsDefined(v.ctx) {
 			continue
 		}
 		if !v.AllErrors && v.err != nil {

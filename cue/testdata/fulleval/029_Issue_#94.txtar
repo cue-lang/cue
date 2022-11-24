@@ -85,14 +85,14 @@ index: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  21
-Reused: 18
+Freed:  22
+Reused: 19
 Allocs: 3
 Retain: 0
 
-Unifications: 21
-Conjuncts:    31
-Disjuncts:    21
+Unifications: 22
+Conjuncts:    32
+Disjuncts:    22
 -- out/eval --
 (struct){
   foo: (struct){

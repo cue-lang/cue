@@ -11,14 +11,14 @@ instance: #Type & {
 #Root: {...}
 -- out/eval/stats --
 Leaks:  0
-Freed:  11
-Reused: 5
-Allocs: 6
+Freed:  14
+Reused: 7
+Allocs: 7
 Retain: 3
 
-Unifications: 11
-Conjuncts:    31
-Disjuncts:    14
+Unifications: 14
+Conjuncts:    35
+Disjuncts:    17
 -- out/eval --
 (struct){
   out: (#struct){

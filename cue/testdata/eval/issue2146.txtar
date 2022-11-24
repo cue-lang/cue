@@ -41,18 +41,19 @@ p2: {
 
 -- out/eval/stats --
 Leaks:  37
-Freed:  143
-Reused: 134
-Allocs: 46
-Retain: 154
+Freed:  152
+Reused: 145
+Allocs: 44
+Retain: 77
 
-Unifications: 164
-Conjuncts:    544
-Disjuncts:    197
+Unifications: 173
+Conjuncts:    557
+Disjuncts:    206
 -- out/eval --
 (struct){
   p1: (struct){
     #A: (#struct){ |(*(#struct){
+        y: (int){ 1 }
         let list#1 = (#list){
           0: (_|_){
             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
@@ -63,7 +64,6 @@ Disjuncts:    197
         all: (#list){
           0: (int){ 1 }
         }
-        y: (int){ 1 }
       }, (#struct){
         let list#1 = (#list){
           0: (_|_){
@@ -79,6 +79,7 @@ Disjuncts:    197
         }
       }) }
     a: (#struct){
+      x: (int){ 3 }
       let list#1 = (#list){
         0: (int){ 3 }
         1: (_|_){
@@ -89,9 +90,9 @@ Disjuncts:    197
       all: (#list){
         0: (int){ 3 }
       }
-      x: (int){ 3 }
     }
     b: (#struct){
+      x: (int){ 3 }
       let list#1multi = [
         〈1;x〉,
         〈1;y〉,
@@ -99,11 +100,11 @@ Disjuncts:    197
       all: (#list){
         0: (int){ 3 }
       }
-      x: (int){ 3 }
     }
   }
   p2: (struct){
     #A: (#struct){ |(*(#struct){
+        y: (int){ 1 }
         let list#2 = (#list){
           0: (_|_){
             // [incomplete] p2.#A.list.0: cannot reference optional field: x:
@@ -114,7 +115,6 @@ Disjuncts:    197
         all: (#list){
           0: (int){ 1 }
         }
-        y: (int){ 1 }
       }, (#struct){
         let list#2 = (#list){
           0: (_|_){
@@ -130,6 +130,8 @@ Disjuncts:    197
         }
       }) }
     a: (#struct){
+      x: (int){ 3 }
+      y: (int){ 2 }
       let list#2 = (#list){
         0: (int){ 3 }
         1: (int){ 2 }
@@ -138,10 +140,10 @@ Disjuncts:    197
         0: (int){ 3 }
         1: (int){ 2 }
       }
-      x: (int){ 3 }
-      y: (int){ 2 }
     }
     b: (#struct){
+      x: (int){ 3 }
+      y: (int){ 2 }
       let list#2multi = [
         〈1;x〉,
         〈1;y〉,
@@ -150,8 +152,6 @@ Disjuncts:    197
         0: (int){ 3 }
         1: (int){ 2 }
       }
-      x: (int){ 3 }
-      y: (int){ 2 }
     }
   }
 }

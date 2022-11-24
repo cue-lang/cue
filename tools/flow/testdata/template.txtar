@@ -48,14 +48,14 @@ graph TD
 }
 -- out/run/t1/stats --
 Leaks:  0
-Freed:  41
-Reused: 34
+Freed:  42
+Reused: 35
 Allocs: 7
 Retain: 0
 
-Unifications: 24
-Conjuncts:    64
-Disjuncts:    41
+Unifications: 25
+Conjuncts:    65
+Disjuncts:    42
 -- out/run/t2 --
 graph TD
   t0("root.get [Terminated]")
@@ -90,24 +90,24 @@ graph TD
 }
 -- out/run/t2/stats --
 Leaks:  0
-Freed:  41
-Reused: 41
+Freed:  42
+Reused: 42
 Allocs: 0
 Retain: 0
 
-Unifications: 24
-Conjuncts:    68
-Disjuncts:    41
+Unifications: 25
+Conjuncts:    69
+Disjuncts:    42
 -- out/run/stats/totals --
 Leaks:  0
-Freed:  82
-Reused: 75
+Freed:  84
+Reused: 77
 Allocs: 7
 Retain: 0
 
-Unifications: 48
-Conjuncts:    132
-Disjuncts:    82
+Unifications: 50
+Conjuncts:    134
+Disjuncts:    84
 -- out/run/t3 --
 graph TD
   t0("root.get [Terminated]")

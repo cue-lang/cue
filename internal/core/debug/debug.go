@@ -221,8 +221,8 @@ func (w *printer) node(n adt.Node) {
 		}
 
 		for _, a := range x.Arcs {
-			w.string("\n")
 			if a.Label.IsLet() {
+				w.string("\n")
 				w.string("let ")
 				w.label(a.Label)
 				if a.MultiLet {
@@ -234,8 +234,13 @@ func (w *printer) node(n adt.Node) {
 					continue
 				}
 				w.node(a)
-			} else {
+			} else if !a.IsConstraint() {
+				// TODO: also show constraints.
+				w.string("\n")
 				w.label(a.Label)
+				if a.IsConstraint() {
+					w.string("?")
+				}
 				w.string(": ")
 				w.node(a)
 			}

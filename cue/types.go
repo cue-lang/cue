@@ -113,16 +113,7 @@ func (o *hiddenStructValue) At(i int) (key string, v Value) {
 func (o *hiddenStructValue) at(i int) (v *adt.Vertex, isOpt bool) {
 	f := o.features[i]
 	arc := o.obj.Lookup(f)
-	if arc == nil {
-		arc = &adt.Vertex{
-			Parent: o.v.v,
-			Label:  f,
-		}
-		o.obj.MatchAndInsert(o.ctx, arc)
-		arc.Finalize(o.ctx)
-		isOpt = true
-	}
-	return arc, isOpt
+	return arc, arc.IsConstraint()
 }
 
 // Lookup reports the field for the given key. The returned Value is invalid
@@ -1411,19 +1402,12 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		if f.IsHidden() && o.omitHidden {
 			continue
 		}
-		if arc := obj.Lookup(f); arc == nil {
-			if o.omitOptional {
-				continue
-			}
-			// ensure it really exists.
-			v := adt.Vertex{
-				Parent: obj,
-				Label:  f,
-			}
-			obj.MatchAndInsert(ctx, &v)
-			if len(v.Conjuncts) == 0 {
-				continue
-			}
+		arc := obj.Lookup(f)
+		if arc == nil {
+			continue
+		}
+		if arc.IsConstraint() && o.omitOptional {
+			continue
 		}
 		features[k] = f
 		k++

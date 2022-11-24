@@ -31,6 +31,9 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	if x == y {
 		return true
 	}
+	if x.ArcType < y.ArcType {
+		return false
+	}
 
 	if s.Defaults {
 		y = y.Default()
@@ -108,23 +111,19 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		a := x.Lookup(f)
 		aOpt := false
 		if a == nil {
-			// x.f is optional
+			continue // should not happen
+		}
+		aOpt = a.IsConstraint()
+		if aOpt {
 			if s.IgnoreOptional {
 				continue
 			}
-
-			a = &adt.Vertex{Label: f}
-			x.MatchAndInsert(ctx, a)
-			a.Finalize(ctx)
-
 			// If field a is optional and has value top, neither the
 			// omission of the field nor the field defined with any value
 			// may cause unification to fail.
 			if a.Kind() == adt.TopKind {
 				continue
 			}
-
-			aOpt = true
 		}
 
 		b := y.Lookup(f)
@@ -187,6 +186,10 @@ outer:
 
 			b = &adt.Vertex{Label: f}
 			y.MatchAndInsert(ctx, b)
+		} else if b.IsConstraint() {
+			if s.IgnoreOptional || s.Final {
+				continue
+			}
 		}
 
 		if !x.Accept(ctx, f) {

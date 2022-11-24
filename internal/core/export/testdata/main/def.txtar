@@ -11,6 +11,7 @@ c: {
 -- out/doc --
 []
 [a]
+[b]
 [c]
 -- out/value --
 == Simplified

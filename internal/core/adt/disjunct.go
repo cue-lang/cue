@@ -388,6 +388,15 @@ func (n *nodeContext) expandDisjuncts(
 	outer:
 		for _, d := range n.disjuncts {
 			for k, v := range p.disjuncts {
+				// As long as a vertex isn't finalized, it may be that potential
+				// errors are not yet detected. This may lead two structs that
+				// are identical except for closedness information,
+				// for instance, to appear identical.
+				if v.result.status < Finalized || d.result.status < Finalized {
+					break
+				}
+				// Even if a node is finalized, it may still have an
+				// "incomplete" component, that may change it down the line.
 				if !d.done() || !v.done() {
 					break
 				}

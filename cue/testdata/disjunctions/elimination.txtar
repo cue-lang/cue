@@ -378,14 +378,14 @@ issue2209: full: {
 
 -- out/eval/stats --
 Leaks:  0
-Freed:  2035
-Reused: 2015
+Freed:  2235
+Reused: 2215
 Allocs: 20
 Retain: 67
 
-Unifications: 1066
-Conjuncts:    2882
-Disjuncts:    2102
+Unifications: 1134
+Conjuncts:    3108
+Disjuncts:    2302
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){

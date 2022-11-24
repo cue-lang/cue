@@ -45,6 +45,9 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 	if x == y {
 		return true
 	}
+	if x.ArcType != y.ArcType {
+		return false
+	}
 	xk := x.Kind()
 	yk := y.Kind()
 
@@ -52,8 +55,10 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 		return false
 	}
 
-	if len(x.Arcs) != len(y.Arcs) {
-		return false
+	maxArcType := ArcMember
+	if flags&CheckStructural != 0 {
+		// Not ignore optional
+		maxArcType = ArcOptional
 	}
 
 	// TODO: this really should be subsumption.
@@ -68,11 +73,11 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 
 loop1:
 	for _, a := range x.Arcs {
-		if !a.IsDefined(ctx) {
+		if a.ArcType > maxArcType {
 			continue
 		}
 		for _, b := range y.Arcs {
-			if !b.IsDefined(ctx) {
+			if a.ArcType > maxArcType {
 				continue
 			}
 			if a.Label == b.Label {
@@ -85,16 +90,21 @@ loop1:
 		return false
 	}
 
-	// We do not need to do the following check, because of the pigeon-hole principle.
-	// loop2:
-	// 	for _, b := range y.Arcs {
-	// 		for _, a := range x.Arcs {
-	// 			if a.Label == b.Label {
-	// 				continue loop2
-	// 			}
-	// 		}
-	// 		return false
-	// 	}
+loop2:
+	for _, b := range y.Arcs {
+		if b.ArcType > maxArcType {
+			break
+		}
+		for _, a := range x.Arcs {
+			if a.Label == b.Label {
+				if a.ArcType > maxArcType {
+					break
+				}
+				continue loop2
+			}
+		}
+		return false
+	}
 
 	v, ok1 := x.BaseValue.(Value)
 	w, ok2 := y.BaseValue.(Value)
@@ -125,6 +135,7 @@ outer:
 			continue
 		}
 		if s.span()&DefinitionSpan == 0 {
+			// No need to check closedness.
 			if !s.StructLit.HasOptional() {
 				continue
 			}

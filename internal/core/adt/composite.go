@@ -230,10 +230,21 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
+// UpdateArcType updates v.ArcType if t is more restrictive.
+func (v *Vertex) UpdateArcType(t ArcType) {
+	if t < v.ArcType {
+		v.ArcType = t
+	}
+}
+
 // isDefined indicates whether this arc is a "value" field, and not a constraint
 // or void arc.
 func (v *Vertex) isDefined() bool {
 	return v.ArcType == ArcMember
+}
+
+func (v *Vertex) IsConstraint() bool {
+	return v.ArcType == ArcOptional
 }
 
 // IsDefined indicates whether this arc is defined meaning it is not a
@@ -254,6 +265,9 @@ const (
 	// ArcMember means that this arc is a normal non-optional field
 	// (including regular, hidden, and definition fields).
 	ArcMember ArcType = iota
+
+	// ArcOptional represents fields of the form foo?.
+	ArcOptional
 
 	// TODO: define a type for optional arcs. This will be needed for pulling
 	// in optional fields into the Vertex, which, in turn, is needed for
@@ -624,9 +638,9 @@ func (v *Vertex) OptionalTypes() OptionalType {
 // IsOptional reports whether a field is explicitly defined as optional,
 // as opposed to whether it is allowed by a pattern constraint.
 func (v *Vertex) IsOptional(label Feature) bool {
-	for _, s := range v.Structs {
-		if s.IsOptionalField(label) {
-			return true
+	for _, a := range v.Arcs {
+		if a.Label == label {
+			return a.IsConstraint()
 		}
 	}
 	return false
@@ -752,6 +766,7 @@ func (v *Vertex) Elems() []*Vertex {
 func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew bool) {
 	arc = v.Lookup(f)
 	if arc != nil {
+		arc.UpdateArcType(t)
 		return arc, false
 	}
 

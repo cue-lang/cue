@@ -27,14 +27,14 @@ r: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  4
-Reused: 1
+Freed:  5
+Reused: 2
 Allocs: 3
 Retain: 0
 
-Unifications: 4
-Conjuncts:    4
-Disjuncts:    4
+Unifications: 5
+Conjuncts:    5
+Disjuncts:    5
 -- out/eval --
 (struct){
   r: (struct){

@@ -62,12 +62,11 @@ func (o *StructLit) IsFile() bool {
 }
 
 type FieldInfo struct {
-	Label    Feature
-	Optional []Node
+	Label Feature
 }
 
 func (x *StructLit) HasOptional() bool {
-	return x.types&(HasField|HasPattern|HasAdditional) != 0
+	return x.types&(HasPattern|HasAdditional) != 0
 }
 
 func (x *StructLit) Source() ast.Node { return x.Src }
@@ -107,10 +106,8 @@ func (o *StructLit) Init() {
 		case *OptionalField:
 			p := o.fieldIndex(x.Label)
 			if p < 0 {
-				p = len(o.Fields)
 				o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
 			}
-			o.Fields[p].Optional = append(o.Fields[p].Optional, x)
 			o.types |= HasField
 
 		case *LetField:
@@ -170,15 +167,6 @@ func (o *StructLit) fieldIndex(f Feature) int {
 
 func (o *StructLit) OptionalTypes() OptionalType {
 	return o.types
-}
-
-func (o *StructLit) IsOptionalField(label Feature) bool {
-	for _, f := range o.Fields {
-		if f.Label == label && len(f.Optional) > 0 {
-			return true
-		}
-	}
-	return false
 }
 
 // FIELDS

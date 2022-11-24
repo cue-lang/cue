@@ -79,14 +79,14 @@ reg: 4
 }
 -- out/eval/stats --
 Leaks:  2
-Freed:  11
-Reused: 5
+Freed:  12
+Reused: 6
 Allocs: 8
 Retain: 3
 
-Unifications: 9
-Conjuncts:    18
-Disjuncts:    12
+Unifications: 10
+Conjuncts:    19
+Disjuncts:    13
 -- out/eval --
 (struct){
   obj: (struct){

@@ -234,7 +234,7 @@ func (w *printer) node(n adt.Node) {
 					continue
 				}
 				w.node(a)
-			} else if !a.IsConstraint() {
+			} else {
 				// TODO: also show constraints.
 				w.string("\n")
 				w.label(a.Label)

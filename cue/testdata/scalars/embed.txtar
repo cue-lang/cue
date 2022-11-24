@@ -256,6 +256,7 @@ Result:
     b: (int){ 1 }
   }
   optionalExists: ((string|struct)){ |((string){ string }, (struct){
+      value?: (string){ string }
     }) }
   optionalCheck: (struct){
     thing: (struct){

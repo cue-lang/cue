@@ -43,9 +43,16 @@ Result:
 (_|_){
   // [eval]
   #A: (#struct){ |(*(#struct){
+      b?: (int){ int }
     }, (#struct){
+      b?: (int){ int }
+      c?: (int){ int }
     }, (#struct){
+      b?: (int){ int }
+      d?: (int){ int }
     }, (#struct){
+      b?: (int){ int }
+      e?: (int){ int }
     }) }
   a: (#struct){
     b: (int){ 3 }
@@ -65,6 +72,7 @@ Result:
     //     ./in.cue:3:8
     //     ./in.cue:11:4
     //     ./in.cue:13:2
+    b?: (int){ int }
     c: (_|_){
       // [eval] b.c: field not allowed:
       //     ./in.cue:1:5
@@ -81,6 +89,7 @@ Result:
       //     ./in.cue:11:4
       //     ./in.cue:13:2
     }
+    e?: (int){ int }
   }
 }
 -- out/compile --

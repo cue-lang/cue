@@ -119,11 +119,13 @@ Disjuncts:    54
     }
     #Def: (_){
       _
+      bar?: (int){ int }
       #foo: (string){ string }
     }
     check: (string){
       string
       #foo: (string){ "bar" }
+      bar?: (int){ int }
     }
   }
   issue783: (struct){

@@ -84,6 +84,8 @@ Result:
         result: (list){
         }
       }, (#struct){
+        result?: (list){
+        }
         error: (string){ string }
       }) }
   }

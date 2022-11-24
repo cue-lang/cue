@@ -53,6 +53,10 @@ Disjuncts:    206
 (struct){
   p1: (struct){
     #A: (#struct){ |(*(#struct){
+        x?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./in.cue:10:8
+        }
         y: (int){ 1 }
         let list#1 = (#list){
           0: (_|_){
@@ -65,6 +69,8 @@ Disjuncts:    206
           0: (int){ 1 }
         }
       }, (#struct){
+        x?: (int){ int }
+        y?: (int){ int }
         let list#1 = (#list){
           0: (_|_){
             // [incomplete] p1.#A.list.0: cannot reference optional field: x:
@@ -80,6 +86,7 @@ Disjuncts:    206
       }) }
     a: (#struct){
       x: (int){ 3 }
+      y?: (int){ int }
       let list#1 = (#list){
         0: (int){ 3 }
         1: (_|_){
@@ -93,6 +100,7 @@ Disjuncts:    206
     }
     b: (#struct){
       x: (int){ 3 }
+      y?: (int){ int }
       let list#1multi = [
         〈1;x〉,
         〈1;y〉,
@@ -104,6 +112,10 @@ Disjuncts:    206
   }
   p2: (struct){
     #A: (#struct){ |(*(#struct){
+        x?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./in.cue:27:8
+        }
         y: (int){ 1 }
         let list#2 = (#list){
           0: (_|_){
@@ -116,6 +128,8 @@ Disjuncts:    206
           0: (int){ 1 }
         }
       }, (#struct){
+        x?: (int){ int }
+        y?: (int){ int }
         let list#2 = (#list){
           0: (_|_){
             // [incomplete] p2.#A.list.0: cannot reference optional field: x:

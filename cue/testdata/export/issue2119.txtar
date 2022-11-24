@@ -4,7 +4,7 @@ import (
 	"regexp"
 )
 
-simplified: { // TODO(broken)
+simplified: {
 	x: d: R={
 		".*"
 		[R+""][0]
@@ -12,7 +12,7 @@ simplified: { // TODO(broken)
 	out: yaml.Marshal(x)
 }
 
-original: { // TODO(broken)
+original: {
 	#testableRegexp: R={
 		string
 
@@ -43,27 +43,14 @@ Unifications: 24
 Conjuncts:    42
 Disjuncts:    24
 -- out/eval --
-Errors:
-simplified.out: error in call to encoding/yaml.Marshal: assertion failed: no BaseValue: state: finalized; requested: partial:
-    ./in.cue:11:7
-original.out: error in call to encoding/yaml.Marshal: assertion failed: no BaseValue: state: finalized; requested: partial:
-    ./in.cue:32:7
-
-Result:
-(_|_){
-  // [eval]
-  simplified: (_|_){
-    // [eval]
+(struct){
+  simplified: (struct){
     x: (struct){
       d: (string){ ".*" }
     }
-    out: (_|_){
-      // [eval] simplified.out: error in call to encoding/yaml.Marshal: assertion failed: no BaseValue: state: finalized; requested: partial:
-      //     ./in.cue:11:7
-    }
+    out: (string){ "d: .*\n" }
   }
-  original: (_|_){
-    // [eval]
+  original: (struct){
     #testableRegexp: (string){
       string
       #test: (#struct){
@@ -87,9 +74,6 @@ Result:
         }
       }
     }
-    out: (_|_){
-      // [eval] original.out: error in call to encoding/yaml.Marshal: assertion failed: no BaseValue: state: finalized; requested: partial:
-      //     ./in.cue:32:7
-    }
+    out: (string){ "{}\n" }
   }
 }

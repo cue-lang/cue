@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40a8c3c8_473dc653",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-24T09:42:26Z",
+      "side": 1,
+      "message": "You have explained this difference before, but I might need to hear it a handful of times before it sticks :) Is the difference explained somewhere on our site or docs? Assuming so, it would be nice to link or quote it here.",
+      "revId": "79dbd92b3e4f5cbfc69bfdd27f954b4c582a56ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27785543_88409132",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-24T09:42:26Z",
+      "side": 1,
+      "message": "nit: \"which\" makes this sentence clearer IMO",
+      "range": {
+        "startLine": 26,
+        "startChar": 50,
+        "endLine": 26,
+        "endChar": 54
+      },
+      "revId": "79dbd92b3e4f5cbfc69bfdd27f954b4c582a56ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8cb8c0a2_b3314476",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-11-24T09:42:26Z",
+      "side": 1,
+      "message": "duplicate, or perhaps forgotten?",
+      "revId": "79dbd92b3e4f5cbfc69bfdd27f954b4c582a56ff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

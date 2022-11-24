@@ -131,6 +131,13 @@ func (n *nodeContext) insertComprehension(
 	c *Comprehension,
 	ci CloseInfo,
 ) {
+	// TODO(perf): this implementation causes the parent's clauses
+	// to be evaluated for each nested comprehension. It would be
+	// possible to simply store the envComprehension of the parent's
+	// result and have each subcomprehension reuse those. This would
+	// also avoid the below allocation and would probably allow us
+	// to get rid of the ValueClause type.
+
 	ec := c.comp
 	if ec == nil {
 		ec = &envComprehension{
@@ -199,39 +206,6 @@ func (n *nodeContext) insertComprehension(
 
 				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
 				fields = append(fields, f)
-
-			case *Comprehension:
-				if _, ok := c.Value.(*StructLit); !ok {
-					// This is not a top-level comprehension, but instead
-					// was pushed down into a field and should be treated
-					// as a top-level comprehension.
-					decls = append(decls, d)
-					break
-				}
-
-				// TODO(perf): this implementation causes the parent's clauses
-				// to be evaluated for each nested comprehension. It would be
-				// possible to simply store the envComprehension of the parent's
-				// result and have each subcomprehension reuse those. This would
-				// also avoid the below allocation and would probably allow us
-				// to get rid of the ValueClause type.
-
-				// Proactively expand nested comprehensions to give maximal
-				// information in subfields about which conjuncts are available.
-				numFixed++
-				clauses := append(c.Clauses, &ValueClause{
-					Node: c.Value,
-					arc:  n.node,
-				})
-				clauses = append(clauses, f.Clauses...)
-				c := &Comprehension{
-					Clauses: clauses,
-					Value:   f.Value,
-
-					parent: c.parent,
-					arc:    n.node,
-				}
-				n.insertComprehension(env, c, ci)
 
 			default:
 				decls = append(decls, d)

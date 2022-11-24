@@ -175,13 +175,13 @@ out: #sub & {#p: _test.s1}
 -- out/eval/stats --
 Leaks:  0
 Freed:  2160
-Reused: 2133
-Allocs: 27
-Retain: 14
+Reused: 2134
+Allocs: 26
+Retain: 12
 
 Unifications: 1740
-Conjuncts:    8276
-Disjuncts:    2174
+Conjuncts:    8278
+Disjuncts:    2172
 -- out/eval --
 (struct){
   #AC: (#struct){
@@ -374,7 +374,7 @@ Disjuncts:    2174
         }
       }
       dict: (#struct){
-        r2_r1: (#struct){
+        r1: (#struct){
           a: (#struct){
             k: (string){ "simple" }
             d: (#struct){
@@ -382,7 +382,7 @@ Disjuncts:    2174
             }
           }
         }
-        r1: (#struct){
+        r2_r1: (#struct){
           a: (#struct){
             k: (string){ "simple" }
             d: (#struct){
@@ -427,7 +427,7 @@ Disjuncts:    2174
       }
     }
     dict: (#struct){
-      r2_r2_r1: (#struct){
+      r1: (#struct){
         a: (#struct){
           k: (string){ "simple" }
           d: (#struct){
@@ -443,7 +443,7 @@ Disjuncts:    2174
           }
         }
       }
-      r1: (#struct){
+      r2_r2_r1: (#struct){
         a: (#struct){
           k: (string){ "simple" }
           d: (#struct){

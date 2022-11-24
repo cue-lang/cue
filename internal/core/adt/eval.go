@@ -486,8 +486,8 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 
 	switch err := n.getErr(); {
 	case err != nil:
-		if err.Code < IncompleteError && n.node.arcType == arcVoid {
-			n.node.arcType = arcMember
+		if err.Code < IncompleteError && n.node.ArcType == ArcVoid {
+			n.node.ArcType = ArcMember
 		}
 		n.node.BaseValue = err
 		n.errs = nil
@@ -673,7 +673,7 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		err = incompleteSentinel
 	}
 	if err.Code < IncompleteError {
-		n.node.arcType = arcMember
+		n.node.ArcType = ArcMember
 	}
 	return err
 }
@@ -732,7 +732,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	if state <= Conjuncts &&
 		// Is allowed to go one step back. See Vertex.UpdateStatus.
 		n.node.status <= state+1 &&
-		n.node.arcType != arcVoid {
+		n.node.ArcType != ArcVoid {
 
 		n.node.UpdateStatus(Conjuncts)
 		return
@@ -1976,7 +1976,7 @@ func (n *nodeContext) addStruct(
 // disjunctions.
 func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	ctx := n.ctx
-	arc, isNew := n.node.GetArc(ctx, f, arcMember)
+	arc, isNew := n.node.GetArc(ctx, f, ArcMember)
 	if f.IsLet() && !isNew {
 		arc.MultiLet = true
 		return arc

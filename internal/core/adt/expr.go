@@ -1912,7 +1912,7 @@ func (x *ForClause) yield(s *compState) {
 		}
 
 		c.Unify(a, Partial)
-		if a.arcType == arcVoid {
+		if a.ArcType == ArcVoid {
 			continue
 		}
 

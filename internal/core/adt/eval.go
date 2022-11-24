@@ -1030,7 +1030,6 @@ func (n *nodeContext) clone() *nodeContext {
 	d.kindID = n.kindID
 	d.aStruct = n.aStruct
 	d.aStructID = n.aStructID
-	d.hasTop = n.hasTop
 
 	d.lowerBound = n.lowerBound
 	d.upperBound = n.upperBound

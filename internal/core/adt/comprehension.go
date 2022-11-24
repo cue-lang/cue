@@ -169,7 +169,7 @@ func (n *nodeContext) insertComprehension(
 			case *Field:
 				numFixed++
 
-				arc, _ := n.node.GetArc(n.ctx, f.Label, arcVoid)
+				arc, _ := n.node.GetArc(n.ctx, f.Label, ArcVoid)
 
 				// Create partial comprehension
 				c := &Comprehension{
@@ -193,7 +193,7 @@ func (n *nodeContext) insertComprehension(
 
 				numFixed++
 
-				arc, _ := n.node.GetArc(n.ctx, f.Label, arcVoid)
+				arc, _ := n.node.GetArc(n.ctx, f.Label, ArcVoid)
 				arc.MultiLet = f.IsMulti
 
 				// Create partial comprehension
@@ -405,7 +405,7 @@ func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, st
 
 		v := n.node
 		for c := d.leaf; c.parent != nil; c = c.parent {
-			v.arcType = arcMember
+			v.ArcType = ArcMember
 			v = c.arc
 		}
 

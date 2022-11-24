@@ -292,7 +292,11 @@ errorListDef: {
 [e5]
 [e6]
 [e7]
+[e8]
 [m1]
+[m1 foo]
+- foo is an optional field
+
 [m1 bar]
 - bar is a field
 

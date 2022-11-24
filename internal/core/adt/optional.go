@@ -25,14 +25,12 @@ func (o *StructInfo) MatchAndInsert(c *OpContext, arc *Vertex) {
 
 	// Match normal fields
 	matched := false
-outer:
+	// TODO: this could be lookup up more efficiently in the outer Vertex now.
+	// Keep this logic for now, though.
 	for _, f := range o.Fields {
 		if f.Label == arc.Label {
-			for _, e := range f.Optional {
-				arc.AddConjunct(MakeConjunct(env, e, closeInfo))
-			}
 			matched = true
-			break outer
+			break
 		}
 	}
 

@@ -92,6 +92,8 @@ func TestValueX(t *testing.T) {
 -- in.cue --
 	`
 
+	adt.Verbosity = 1
+
 	archive := txtar.Parse([]byte(in))
 	a := cuetxtar.Load(archive, t.TempDir())
 

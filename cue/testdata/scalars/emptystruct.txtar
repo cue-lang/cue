@@ -74,14 +74,14 @@ issue783: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  52
-Reused: 46
+Freed:  54
+Reused: 48
 Allocs: 6
 Retain: 0
 
-Unifications: 46
-Conjuncts:    105
-Disjuncts:    52
+Unifications: 48
+Conjuncts:    107
+Disjuncts:    54
 -- out/eval --
 (struct){
   elipsis: (struct){

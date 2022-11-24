@@ -63,7 +63,7 @@ func (s *Struct) IsOpen() bool {
 		return true
 	}
 	ot := s.node.OptionalTypes()
-	if ot&^(adt.HasField|adt.HasDynamic) != 0 {
+	if ot&^adt.HasDynamic != 0 {
 		return true
 	}
 	return false

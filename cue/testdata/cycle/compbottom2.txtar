@@ -264,14 +264,14 @@ nestedChain: {
 }
 -- out/eval/stats --
 Leaks:  1
-Freed:  143
-Reused: 134
+Freed:  150
+Reused: 141
 Allocs: 10
-Retain: 72
+Retain: 76
 
-Unifications: 144
-Conjuncts:    159
-Disjuncts:    194
+Unifications: 151
+Conjuncts:    166
+Disjuncts:    205
 -- out/eval --
 (struct){
   self: (struct){

@@ -533,14 +533,14 @@ n3: n1 & {n1}
 n4: n1 & {x: n1 & {y: n1 & {z: int}}}
 -- out/eval/stats --
 Leaks:  16
-Freed:  792
-Reused: 780
+Freed:  794
+Reused: 782
 Allocs: 28
 Retain: 65
 
-Unifications: 622
-Conjuncts:    1219
-Disjuncts:    841
+Unifications: 624
+Conjuncts:    1221
+Disjuncts:    843
 -- out/eval --
 Errors:
 a1.f.0: structural cycle

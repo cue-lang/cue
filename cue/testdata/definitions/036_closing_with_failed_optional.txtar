@@ -99,14 +99,14 @@ v1:
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  20
-Reused: 15
+Freed:  28
+Reused: 23
 Allocs: 5
 Retain: 1
 
-Unifications: 16
-Conjuncts:    31
-Disjuncts:    21
+Unifications: 24
+Conjuncts:    43
+Disjuncts:    29
 -- out/eval --
 (struct){
   #k1: (#struct){

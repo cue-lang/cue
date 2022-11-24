@@ -863,6 +863,20 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 		} else if a.state != nil {
 			c.Unify(a, Partial)
 		}
+
+		if a.IsConstraint() {
+			code := IncompleteError
+			if hasCycle {
+				code = CycleError
+			}
+			label := l.SelectorString(c.Runtime)
+			c.AddBottom(&Bottom{
+				Code:      code,
+				Permanent: x.status >= Conjuncts,
+				Err: c.NewPosf(pos,
+					"cannot reference optional field: %s", label),
+			})
+		}
 	} else {
 		if x.state != nil {
 			for _, e := range x.state.exprs {
@@ -895,12 +909,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 			err = c.NewPosf(pos, "index out of range [%d] with length %d",
 				l.Index(), len(x.Elems()))
 		} else {
-			if code != 0 && x.IsOptional(l) {
-				err = c.NewPosf(pos,
-					"cannot reference optional field: %s", label)
-			} else {
-				err = c.NewPosf(pos, "undefined field: %s", label)
-			}
+			err = c.NewPosf(pos, "undefined field: %s", label)
 		}
 		c.AddBottom(&Bottom{
 			Code:      code,

@@ -6,6 +6,14 @@ x: {
 	y: int
 }
 s: strings.MinRunes(4) & strings.MaxRunes(7)
+
+additional: {
+	...
+	env: _
+	confs: {
+		if env {}
+	}
+}
 -- out/definition --
 import "strings"
 
@@ -16,11 +24,21 @@ x: {
 	y: int
 }
 s: strings.MinRunes(4) & strings.MaxRunes(7)
+additional: {
+	env: _
+	confs: {
+		if env {}
+	}
+	...
+}
 -- out/doc --
 []
 [x]
 [x y]
 [s]
+[additional]
+[additional env]
+[additional confs]
 -- out/value --
 == Simplified
 {
@@ -28,6 +46,12 @@ s: strings.MinRunes(4) & strings.MaxRunes(7)
 		y: int64
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
 }
 == Raw
 {
@@ -35,6 +59,12 @@ s: strings.MinRunes(4) & strings.MaxRunes(7)
 		y: >=-9223372036854775808 & <=9223372036854775807 & int
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
 }
 == Final
 {
@@ -42,6 +72,10 @@ s: strings.MinRunes(4) & strings.MaxRunes(7)
 		y: int64
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env:   _
+		confs: _|_ // additional.confs: incomplete bool: _ (and 2 more errors)
+	}
 }
 == All
 {
@@ -49,6 +83,12 @@ s: strings.MinRunes(4) & strings.MaxRunes(7)
 		y: int64
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
 }
 == Eval
 {
@@ -56,4 +96,10 @@ s: strings.MinRunes(4) & strings.MaxRunes(7)
 		y: >=-9223372036854775808 & <=9223372036854775807 & int
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
+	additional: {
+		env: _
+		confs: {
+			if env {}
+		}
+	}
 }

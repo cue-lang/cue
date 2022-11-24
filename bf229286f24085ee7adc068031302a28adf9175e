@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f42db9a8_451bdb16",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-11-24T15:29:24Z",
+      "side": 1,
+      "message": "Maybe a comment here to record what we\u0027re doing here and why?",
+      "revId": "bf229286f24085ee7adc068031302a28adf9175e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

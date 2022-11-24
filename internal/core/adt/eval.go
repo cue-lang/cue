@@ -126,7 +126,9 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state VertexStatus) Value {
 				return &w
 			}
 		}
-		Assertf(false, "no BaseValue: state: %v; requested: %v", v.status, state)
+		// This may happen if the evaluator is invoked outside of regular
+		// evaluation, such as in dependency analysis.
+		return nil
 	}
 
 	if v.status < Finalized && v.state != nil {

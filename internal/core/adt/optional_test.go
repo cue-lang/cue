@@ -46,11 +46,6 @@ func TestOptionalTypes(t *testing.T) {
 		"\(bar)": int
 		`,
 		out: adt.HasPattern | adt.HasDynamic,
-	}, {
-		in: `
-		bar?: 3
-		`,
-		out: adt.HasField,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

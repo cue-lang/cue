@@ -78,9 +78,9 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state VertexStatus) Value {
 		// Use node itself to allow for cycle detection.
 		c.Unify(v, state)
 
-		if !v.isDefined() {
+		if v.ArcType == ArcVoid {
 			if v.status == Evaluating {
-				for ; v.Parent != nil && !v.isDefined(); v = v.Parent {
+				for ; v.Parent != nil && v.ArcType == ArcVoid; v = v.Parent {
 				}
 				err := c.Newf("cycle with field %v", r)
 				b := &Bottom{Code: CycleError, Err: err}
@@ -750,17 +750,17 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 			// correctly and that we are not regressing.
 			n.node.UpdateStatus(EvaluatingArcs)
 
-			wasVoid := !a.isDefined()
+			wasVoid := a.ArcType == ArcVoid
 
 			ctx.Unify(a, Finalized)
 
-			if !a.isDefined() {
+			if a.ArcType == ArcVoid {
 				continue
 			}
 
 			// Errors are allowed in let fields. Handle errors and failure to
 			// complete accordingly.
-			if !a.Label.IsLet() {
+			if !a.Label.IsLet() && a.ArcType == ArcMember {
 				// Don't set the state to Finalized if the child arcs are not done.
 				if state == Finalized && a.status < Finalized {
 					state = Conjuncts
@@ -1717,7 +1717,7 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 		n.node.Structs = append(n.node.Structs, x.Structs...)
 
 		for _, a := range x.Arcs {
-			if !a.IsDefined(ctx) {
+			if a.ArcType == ArcVoid {
 				continue
 			}
 			// TODO(errors): report error when this is a regular field.
@@ -1906,7 +1906,7 @@ func (n *nodeContext) addStruct(
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
-		case *Field, *LetField:
+		case *Field, *OptionalField, *LetField:
 			// handle in next iteration.
 
 		case *DynamicField:
@@ -1927,7 +1927,7 @@ func (n *nodeContext) addStruct(
 			// push and opo embedding type.
 			n.addExprConjunct(MakeConjunct(childEnv, x, id), Partial)
 
-		case *OptionalField, *BulkOptionalField, *Ellipsis:
+		case *BulkOptionalField, *Ellipsis:
 			// Nothing to do here. Note that the presence of these fields do not
 			// excluded embedded scalars: only when they match actual fields
 			// does it exclude those.
@@ -1952,6 +1952,9 @@ func (n *nodeContext) addStruct(
 				n.aStructID = closeInfo
 			}
 			n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
+
+		case *OptionalField:
+			n.insertField(x.Label, ArcOptional, MakeConjunct(childEnv, x, closeInfo))
 
 		case *LetField:
 			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))

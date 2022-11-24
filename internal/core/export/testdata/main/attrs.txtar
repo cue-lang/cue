@@ -198,9 +198,11 @@ dynamicSimple: {
 [comprehensions c3]
 [dynamicComplex]
 [dynamicComplex a]
+[dynamicComplex b]
 [dynamicComplex foo]
 [dynamicSimple]
 [dynamicSimple a]
+[dynamicSimple b]
 -- out/value --
 == Simplified
 {

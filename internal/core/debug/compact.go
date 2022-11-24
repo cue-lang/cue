@@ -62,8 +62,12 @@ func (w *compactPrinter) node(n adt.Node) {
 						continue
 					}
 					w.node(a)
-				} else {
+				} else if !a.IsConstraint() {
 					w.label(a.Label)
+					// TODO: remove if !a.IsConstraint()
+					if a.IsConstraint() {
+						w.string("?")
+					}
 					w.string(":")
 					w.node(a)
 				}

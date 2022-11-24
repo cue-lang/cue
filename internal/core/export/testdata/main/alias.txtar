@@ -133,6 +133,7 @@ issue1308: {
 [fieldAlias simple]
 [fieldAlias simple "a-b"]
 [fieldAlias simple foo]
+[fieldAlias simple bar]
 [fieldAlias simple "a-c"]
 [fieldAlias cross]
 [fieldAlias cross baz]
@@ -234,10 +235,10 @@ was known to compile and is known to be correct.
 {
 	fieldAlias: {
 		simple: {
-			"a-b":     4
-			foo:       4
-			bar?:      Y_1
-			Y_1="a-c": 5
+			"a-b": 4
+			foo:   4
+			bar?:  5
+			"a-c": 5
 		}
 		cross: {
 			baz: 3
@@ -338,10 +339,10 @@ was known to compile and is known to be correct.
 {
 	fieldAlias: {
 		simple: {
-			"a-b":     4
-			foo:       4
-			bar?:      Y_1
-			Y_1="a-c": 5
+			"a-b": 4
+			foo:   4
+			bar?:  5
+			"a-c": 5
 		}
 		cross: {
 			baz: 3
@@ -398,10 +399,10 @@ was known to compile and is known to be correct.
 {
 	fieldAlias: {
 		simple: {
-			"a-b":     4
-			foo:       4
-			bar?:      Y_1
-			Y_1="a-c": 5
+			"a-b": 4
+			foo:   4
+			bar?:  5
+			"a-c": 5
 		}
 		cross: {
 			baz: 3

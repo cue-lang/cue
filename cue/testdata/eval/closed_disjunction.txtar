@@ -15,14 +15,14 @@ b: #A & {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  32
-Reused: 26
-Allocs: 6
+Freed:  46
+Reused: 39
+Allocs: 7
 Retain: 0
 
-Unifications: 20
-Conjuncts:    46
-Disjuncts:    32
+Unifications: 34
+Conjuncts:    60
+Disjuncts:    46
 -- out/eval --
 Errors:
 b: 2 errors in empty disjunction:

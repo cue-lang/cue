@@ -33,14 +33,14 @@ explicitDefaultError: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  39
-Reused: 31
+Freed:  40
+Reused: 32
 Allocs: 8
 Retain: 0
 
-Unifications: 27
-Conjuncts:    55
-Disjuncts:    39
+Unifications: 28
+Conjuncts:    56
+Disjuncts:    40
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:

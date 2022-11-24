@@ -13,14 +13,14 @@ e: a: "hello"
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  11
-Reused: 5
+Freed:  15
+Reused: 9
 Allocs: 6
 Retain: 0
 
-Unifications: 7
-Conjuncts:    17
-Disjuncts:    11
+Unifications: 11
+Conjuncts:    21
+Disjuncts:    15
 -- out/eval --
 (struct){
   e: (#struct){ |((#struct){

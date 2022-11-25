@@ -29,6 +29,8 @@ workflows: [
 		// names for gerritstatusupdater. Therefore, this filename must only be
 		// change in combination with also updating the environment in which
 		// gerritstatusupdater is running for this repository.
+		//
+		// This name is also used by the CI badge in the top-level README.
 		file:   "trybot.yml"
 		schema: trybot
 	},

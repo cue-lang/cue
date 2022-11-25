@@ -25,6 +25,8 @@ trybot: _base.#bashWorkflow & {
 	// workflows, but also as the result label key, e.g. "TryBot-Result" would
 	// be the result label key for the "TryBot" workflow. Note the result label
 	// key is therefore tied to the configuration of this repository.
+	//
+	// This name also shows up in the CI badge in the top-level README.
 	name: "TryBot"
 
 	on: {

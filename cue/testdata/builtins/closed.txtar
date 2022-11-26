@@ -42,15 +42,15 @@ withSubfields: {
 	test: b: x: _
 }
 -- out/eval/stats --
-Leaks:  26
+Leaks:  38
 Freed:  166
 Reused: 155
-Allocs: 37
-Retain: 27
+Allocs: 49
+Retain: 39
 
-Unifications: 178
-Conjuncts:    354
-Disjuncts:    189
+Unifications: 190
+Conjuncts:    372
+Disjuncts:    195
 -- out/eval --
 Errors:
 b.x: field not allowed:

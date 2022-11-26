@@ -929,20 +929,22 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	// Not caching let expressions may lead to exponential behavior.
 	// The expr uses the expression of a Let field, which can never be used in
 	// any other context.
-	expr := arc.Conjuncts[0].Expr()
-	v, ok := e.cache[expr]
+	c := arc.Conjuncts[0]
+	expr := c.Expr()
+	key := cacheKey{expr, arc}
+	v, ok := e.cache[key]
 	if !ok {
 		if e.cache == nil {
-			e.cache = map[Expr]Value{}
+			e.cache = map[cacheKey]Value{}
 		}
 		n := &Vertex{
-			Parent:    n,
+			Parent:    arc.Parent,
 			Label:     x.Label,
 			IsDynamic: b != nil && b.Code == StructuralCycleError,
-			Conjuncts: []Conjunct{{e, expr, ctx.ci}},
+			Conjuncts: []Conjunct{c},
 		}
 		v = n
-		e.cache[expr] = n
+		e.cache[key] = n
 		nc := n.getNodeContext(ctx, 0)
 		nc.hasNonCycle = true // Allow a first cycle to be skipped.
 	}

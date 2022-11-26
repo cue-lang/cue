@@ -81,6 +81,9 @@ m1: {[string]: uint} & {
 	// bar is a field
 	bar: 4
 
+	// baz is a required field.
+	baz!: 5
+
 	// a comment too many.
 
 	...
@@ -208,6 +211,9 @@ m1:  {
 
 	// bar is a field
 	bar: 4
+
+	// baz is a required field.
+	baz!: 5
 	...
 }
 
@@ -299,6 +305,9 @@ errorListDef: {
 
 [m1 bar]
 - bar is a field
+
+[m1 baz]
+- baz is a required field.
 
 [y1]
 [y1 src]
@@ -396,6 +405,9 @@ _|_ // e3: index out of range [2] with length 2
 
 		// bar is a field
 		bar: 4
+
+		// baz is a required field.
+		baz!: 5
 	}
 	y1: {
 		src: [1, 2, 3]

@@ -250,12 +250,9 @@ func (c *collatedDecls) collate(env *adt.Environment, s *adt.StructLit) {
 			e.required = true
 			e.conjuncts = append(e.conjuncts, adt.MakeRootConjunct(env, x))
 			c.fields[x.Label] = e
-
-		case *adt.OptionalField:
-			e := c.fields[x.Label]
-			e.conjuncts = append(e.conjuncts, adt.MakeRootConjunct(env, x))
-			c.fields[x.Label] = e
-			c.hasOptional = true
+			if x.ArcType != adt.ArcMember {
+				c.hasOptional = true
+			}
 
 		case *adt.BulkOptionalField:
 			c.pattern = append(c.pattern, x)

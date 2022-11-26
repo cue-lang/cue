@@ -1906,7 +1906,7 @@ func (n *nodeContext) addStruct(
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
-		case *Field, *OptionalField, *LetField:
+		case *Field, *LetField:
 			// handle in next iteration.
 
 		case *DynamicField:
@@ -1947,14 +1947,11 @@ func (n *nodeContext) addStruct(
 	for _, d := range s.Decls {
 		switch x := d.(type) {
 		case *Field:
-			if x.Label.IsString() {
+			if x.Label.IsString() && x.ArcType == ArcMember {
 				n.aStruct = s
 				n.aStructID = closeInfo
 			}
-			n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
-
-		case *OptionalField:
-			n.insertField(x.Label, ArcOptional, MakeConjunct(childEnv, x, closeInfo))
+			n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
 
 		case *LetField:
 			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))

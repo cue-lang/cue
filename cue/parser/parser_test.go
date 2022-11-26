@@ -118,9 +118,13 @@ func TestParse(t *testing.T) {
 		 b?: "2"
 		 c?: 3
 
+		 d!: 2
+		 e: f!: 3
+
 		 "g\("en")"?: 4
+		 "h\("en")"!: 4
 		`,
-		`a: true, b?: "2", c?: 3, "g\("en")"?: 4`,
+		`a: true, b?: "2", c?: 3, d!: 2, e: {f!: 3}, "g\("en")"?: 4, "h\("en")"!: 4`,
 	}, {
 		"definition",
 		`#Def: {
@@ -371,8 +375,11 @@ func TestParse(t *testing.T) {
 			a: {
 				(a.b)
 			}
+
+			(x)?: 1
+			y: (x)!: 2
 		}`,
-		`{(x): {a: int}, x: "foo", a: {(a.b)}}`,
+		`{(x): {a: int}, x: "foo", a: {(a.b)}, (x)?: 1, y: {(x)!: 2}}`,
 	}, {
 		"foo",
 		`[

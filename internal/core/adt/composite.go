@@ -281,6 +281,29 @@ const (
 	ArcVoid
 )
 
+// ConstraintFromToken converts a given AST constraint token to the
+// corresponding ArcType.
+func ConstraintFromToken(t token.Token) ArcType {
+	switch t {
+	case token.OPTION:
+		return ArcOptional
+		// TODO
+		// case token.NOT:
+		// 	return ArcRequired
+	}
+	return ArcMember
+}
+
+// Token reports the token corresponding to the constraint represented by a,
+// or token.ILLEGAL otherwise.
+func (a ArcType) Token() (t token.Token) {
+	switch a {
+	case ArcOptional:
+		t = token.OPTION
+	}
+	return t
+}
+
 // Suffix reports the field suffix for the given ArcType if it is a
 // constraint or the empty string otherwise.
 func (a ArcType) Suffix() string {

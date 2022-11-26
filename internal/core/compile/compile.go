@@ -595,14 +595,12 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				return c.errf(x, "cannot use _ as label")
 			}
 
-			t := adt.ArcMember
-			if x.Optional != token.NoPos {
-				t = adt.ArcOptional
-			}
+			t, _ := internal.ConstraintToken(x)
+
 			return &adt.Field{
 				Src:     x,
 				Label:   label,
-				ArcType: t,
+				ArcType: adt.ConstraintFromToken(t),
 				Value:   value,
 			}
 

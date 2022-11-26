@@ -26,9 +26,9 @@ cmp stderr expect-stderr
 }
 
 -- expect-stderr --
-@tag not allowed within optional fields:
+@tag not allowed within field constraint:
     ./test.cue:5:18
-@tag not allowed within optional fields:
+@tag not allowed within field constraint:
     ./test.cue:6:33
 @tag not allowed within lists:
     ./test.cue:11:30

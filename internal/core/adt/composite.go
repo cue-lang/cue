@@ -245,7 +245,7 @@ func (v *Vertex) isDefined() bool {
 
 // IsConstraint reports whether the Vertex is an optional or required field.
 func (v *Vertex) IsConstraint() bool {
-	return v.ArcType == ArcOptional
+	return v.ArcType == ArcOptional || v.ArcType == ArcRequired
 }
 
 // IsDefined indicates whether this arc is defined meaning it is not a
@@ -267,7 +267,12 @@ const (
 	// (including regular, hidden, and definition fields).
 	ArcMember ArcType = iota
 
-	// ArcOptional represents fields of the form foo?.
+	// ArcRequired is like optional, but requires that a field be specified.
+	// Fields are of the form foo!.
+	ArcRequired
+
+	// ArcOptional represents fields of the form foo? and defines constraints
+	// for foo in case it is defined.
 	ArcOptional
 
 	// TODO: define a type for optional arcs. This will be needed for pulling
@@ -287,9 +292,8 @@ func ConstraintFromToken(t token.Token) ArcType {
 	switch t {
 	case token.OPTION:
 		return ArcOptional
-		// TODO
-		// case token.NOT:
-		// 	return ArcRequired
+	case token.NOT:
+		return ArcRequired
 	}
 	return ArcMember
 }
@@ -300,6 +304,8 @@ func (a ArcType) Token() (t token.Token) {
 	switch a {
 	case ArcOptional:
 		t = token.OPTION
+	case ArcRequired:
+		t = token.NOT
 	}
 	return t
 }
@@ -310,6 +316,8 @@ func (a ArcType) Suffix() string {
 	switch a {
 	case ArcOptional:
 		return "?"
+	case ArcRequired:
+		return "!"
 	}
 	return ""
 }
@@ -850,9 +858,7 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	switch f := c.x.(type) {
 	case *BulkOptionalField, *Ellipsis:
 	case *Field:
-		if f.ArcType == ArcMember {
-			v.ArcType = ArcMember
-		}
+		v.UpdateArcType(f.ArcType)
 	default:
 		v.ArcType = ArcMember
 	}

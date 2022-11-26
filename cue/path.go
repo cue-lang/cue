@@ -48,6 +48,8 @@ const (
 
 	// OptionalConstraint represents an optional constraint (?).
 	OptionalConstraint
+	// RequiredConstraint represents a required constraint (!).
+	RequiredConstraint
 	// PatternConstraint represents a selector of fields in a struct
 	// or array that match a constraint.
 	PatternConstraint
@@ -62,7 +64,7 @@ func (t SelectorType) LabelType() SelectorType {
 
 // ConstraintType reports the constraint type of t.
 func (t SelectorType) ConstraintType() SelectorType {
-	return t & 0b0110_0000
+	return t & 0b1110_0000
 }
 
 var selectorTypeStrings = [...]string{
@@ -73,6 +75,7 @@ var selectorTypeStrings = [...]string{
 	"HiddenLabel",
 	"HiddenDefinitionLabel",
 	"OptionalConstraint",
+	"RequiredConstraint",
 	"PatternConstraint",
 }
 

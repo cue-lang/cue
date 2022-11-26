@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -156,6 +157,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		for _, a := range src.Arcs {
 			if x, ok := e.fields[a.Label]; ok {
 				x.arc = a
+				x.arcType = a.ArcType
 				e.fields[a.Label] = x
 			}
 		}
@@ -232,7 +234,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		if f.IsLet() {
 			continue
 		}
-		field := e.fields[f]
+		field := e.getFields(f)
 		c := field.conjuncts
 
 		label := e.stringLabel(f)
@@ -261,9 +263,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			x.inDefinition--
 		}
 
-		if isOptional(a) {
-			d.Optional = token.Blank.Pos()
-		}
+		internal.SetConstraint(d, field.arcType.Token())
 		if x.cfg.ShowDocs {
 			docs := extractDocs(src, a)
 			ast.SetComments(d, docs)
@@ -317,6 +317,14 @@ type conjuncts struct {
 	isData bool
 }
 
+func (c *conjuncts) getFields(label adt.Feature) field {
+	f, ok := c.fields[label]
+	if !ok {
+		f.arcType = adt.ArcVoid
+	}
+	return f
+}
+
 func (c *conjuncts) addValueConjunct(src *adt.Vertex, env *adt.Environment, x adt.Elem) {
 	switch b, ok := x.(adt.BaseValue); {
 	case ok && src != nil && isTop(b) && !isTop(src.BaseValue):
@@ -326,8 +334,12 @@ func (c *conjuncts) addValueConjunct(src *adt.Vertex, env *adt.Environment, x ad
 	}
 }
 
-func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node) {
-	x := c.fields[f]
+func (c *conjuncts) addConjunct(f adt.Feature, t adt.ArcType, env *adt.Environment, n adt.Node) {
+	x := c.getFields(f)
+	if t < x.arcType {
+		x.arcType = t
+	}
+
 	v := adt.MakeRootConjunct(env, n)
 	x.conjuncts = append(x.conjuncts, conjunct{
 		c:  v,
@@ -338,6 +350,7 @@ func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node)
 }
 
 type field struct {
+	arcType   adt.ArcType
 	docs      []*ast.CommentGroup
 	arc       *adt.Vertex
 	conjuncts []conjunct
@@ -372,9 +385,11 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 
 		for _, d := range x.Decls {
 			var label adt.Feature
+			t := adt.ArcVoid
 			switch f := d.(type) {
 			case *adt.Field:
 				label = f.Label
+				t = f.ArcType
 				// TODO: mark optional here, if needed.
 			case *adt.LetField:
 				continue
@@ -389,7 +404,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			default:
 				panic(fmt.Sprintf("Unexpected type %T", d))
 			}
-			e.addConjunct(label, env, d)
+			e.addConjunct(label, t, env, d)
 		}
 		e.top().upCount--
 
@@ -428,7 +443,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 						continue
 					}
 
-					e.addConjunct(a.Label, env, a)
+					e.addConjunct(a.Label, a.ArcType, env, a)
 				}
 			}
 		}
@@ -471,28 +486,6 @@ func isTop(x adt.BaseValue) bool {
 	default:
 		return false
 	}
-}
-
-// TODO: find a better way to annotate optionality. Maybe a special conjunct
-// or store it in the field information?
-func isOptional(a []adt.Conjunct) bool {
-	if len(a) == 0 {
-		return false
-	}
-	for _, c := range a {
-		if v, ok := c.Elem().(*adt.Vertex); ok && !v.IsData() && len(v.Conjuncts) > 0 {
-			return isOptional(v.Conjuncts)
-		}
-		switch f := c.Source().(type) {
-		case nil:
-			return false
-		case *ast.Field:
-			if f.Optional == token.NoPos {
-				return false
-			}
-		}
-	}
-	return true
 }
 
 func isComplexStruct(s *adt.StructLit) bool {

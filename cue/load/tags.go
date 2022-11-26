@@ -228,8 +228,9 @@ func findTags(b *build.Instance) (tags []*tag, errs errors.Error) {
 			case *ast.Field:
 				// TODO: allow optional fields?
 				_, _, err := ast.LabelName(x.Label)
-				if err != nil || x.Optional != token.NoPos {
-					findInvalidTags(n, "@tag not allowed within optional fields")
+				_, ok := internal.ConstraintToken(x)
+				if err != nil || ok {
+					findInvalidTags(n, "@tag not allowed within field constraint")
 					return false
 				}
 

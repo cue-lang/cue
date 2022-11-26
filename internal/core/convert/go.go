@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/types"
@@ -694,7 +695,7 @@ func goTypeToValueRec(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type)
 			// The GO JSON decoder always allows a value to be undefined.
 			d := &ast.Field{Label: ast.NewIdent(name), Value: elem}
 			if isOptional(&f) {
-				d.Optional = token.Blank.Pos()
+				internal.SetConstraint(d, token.OPTION)
 			}
 			obj.Elts = append(obj.Elts, d)
 		}

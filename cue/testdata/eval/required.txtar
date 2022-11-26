@@ -93,6 +93,12 @@ Unifications: 20
 Conjuncts:    31
 Disjuncts:    20
 -- out/eval --
+Errors:
+self.t2.a: required field unspecified
+unify.t2.p1.a: required field unspecified
+unify.t2.p2.a: required field unspecified
+
+Result:
 (struct){
   self: (struct){
     t1: (struct){

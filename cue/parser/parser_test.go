@@ -375,8 +375,11 @@ func TestParse(t *testing.T) {
 			a: {
 				(a.b)
 			}
+
+			(x)?: 1
+			y: (x)!: 2
 		}`,
-		`{(x): {a: int}, x: "foo", a: {(a.b)}}`,
+		`{(x): {a: int}, x: "foo", a: {(a.b)}, (x)?: 1, y: {(x)!: 2}}`,
 	}, {
 		"foo",
 		`[

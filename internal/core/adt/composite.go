@@ -245,7 +245,7 @@ func (v *Vertex) isDefined() bool {
 
 // IsConstraint reports whether the Vertex is an optional or required field.
 func (v *Vertex) IsConstraint() bool {
-	return v.ArcType == ArcOptional
+	return v.ArcType == ArcOptional || v.ArcType == ArcRequired
 }
 
 // IsDefined indicates whether this arc is defined meaning it is not a
@@ -858,7 +858,7 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	case *Field:
 		v.UpdateArcType(f.ArcType)
 	default:
-		v.ArcType = ArcMember
+		// v.ArcType = ArcMember
 	}
 	for _, x := range v.Conjuncts {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?

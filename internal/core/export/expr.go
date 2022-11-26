@@ -375,9 +375,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			switch f := d.(type) {
 			case *adt.Field:
 				label = f.Label
-			case *adt.OptionalField:
-				// TODO: mark optional here.
-				label = f.Label
+				// TODO: mark optional here, if needed.
 			case *adt.LetField:
 				continue
 			case *adt.Ellipsis:
@@ -503,13 +501,6 @@ func isComplexStruct(s *adt.StructLit) bool {
 		case *adt.Field:
 			// TODO: remove this and also handle field annotation in expr().
 			// This allows structs to be merged. Ditto below.
-			if x.Src != nil {
-				if _, ok := x.Src.Label.(*ast.Alias); ok {
-					return ok
-				}
-			}
-
-		case *adt.OptionalField:
 			if x.Src != nil {
 				if _, ok := x.Src.Label.(*ast.Alias); ok {
 					return ok

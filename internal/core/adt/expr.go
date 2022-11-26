@@ -102,13 +102,9 @@ func (o *StructLit) Init() {
 			if o.fieldIndex(x.Label) < 0 {
 				o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
 			}
-
-		case *OptionalField:
-			p := o.fieldIndex(x.Label)
-			if p < 0 {
-				o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
+			if x.ArcType > ArcMember {
+				o.types |= HasField
 			}
-			o.types |= HasField
 
 		case *LetField:
 			if o.fieldIndex(x.Label) >= 0 {
@@ -174,8 +170,8 @@ func (o *StructLit) OptionalTypes() OptionalType {
 // Fields can also be used as expressions whereby the value field is the
 // expression this allows retaining more context.
 
-// Field represents a field with a fixed label. It can be a regular field,
-// definition or hidden field.
+// Field represents a regular field or field constraint with a fixed label.
+// The label can be a regular field, definition or hidden field.
 //
 //	foo: bar
 //	#foo: bar
@@ -187,27 +183,12 @@ func (o *StructLit) OptionalTypes() OptionalType {
 type Field struct {
 	Src *ast.Field
 
-	Label Feature
-	Value Expr
+	ArcType ArcType
+	Label   Feature
+	Value   Expr
 }
 
 func (x *Field) Source() ast.Node {
-	if x.Src == nil {
-		return nil
-	}
-	return x.Src
-}
-
-// An OptionalField represents an optional regular field.
-//
-//	foo?: expr
-type OptionalField struct {
-	Src   *ast.Field
-	Label Feature
-	Value Expr
-}
-
-func (x *OptionalField) Source() ast.Node {
 	if x.Src == nil {
 		return nil
 	}
@@ -1821,6 +1802,9 @@ type Comprehension struct {
 	// rather than an Expr, in the latter case to preserve as much position
 	// information as possible.
 	Value Node
+
+	// The type of field as which the comprehension is added.
+	arcType ArcType
 
 	// Only used for partial comprehensions.
 	comp   *envComprehension

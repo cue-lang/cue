@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -441,7 +442,7 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 			if !p.ShowOptional {
 				continue
 			}
-			f.Optional = token.NoSpace.Pos()
+			internal.SetConstraint(f, arc.ArcType.Token())
 		}
 
 		f.Value = e.vertex(arc)

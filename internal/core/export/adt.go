@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -420,10 +421,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		f := &ast.Field{
 			Label: e.stringLabel(x.Label),
 		}
-		if x.ArcType != adt.ArcMember {
-			// Backwards compatibility.
-			f.Optional = token.NoSpace.Pos()
-		}
+		internal.SetConstraint(f, x.ArcType.Token())
 		e.setField(x.Label, f)
 
 		f.Value = e.expr(env, x.Value)

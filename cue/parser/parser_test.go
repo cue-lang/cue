@@ -118,9 +118,13 @@ func TestParse(t *testing.T) {
 		 b?: "2"
 		 c?: 3
 
+		 d!: 2
+		 e: f!: 3
+
 		 "g\("en")"?: 4
+		 "h\("en")"!: 4
 		`,
-		`a: true, b?: "2", c?: 3, "g\("en")"?: 4`,
+		`a: true, b?: "2", c?: 3, d!: 2, e: {f!: 3}, "g\("en")"?: 4, "h\("en")"!: 4`,
 	}, {
 		"definition",
 		`#Def: {

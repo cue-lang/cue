@@ -55,7 +55,6 @@ func TestNilSource(t *testing.T) {
 		&NodeLink{},
 		&Null{},
 		&Num{},
-		&OptionalField{},
 		&SelectorExpr{},
 		&SliceExpr{},
 		&String{},

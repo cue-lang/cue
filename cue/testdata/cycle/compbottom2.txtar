@@ -270,7 +270,7 @@ Allocs: 10
 Retain: 76
 
 Unifications: 151
-Conjuncts:    166
+Conjuncts:    164
 Disjuncts:    205
 -- out/eval --
 (struct){
@@ -481,16 +481,16 @@ Disjuncts:    205
     }
     defCloseSuccess: (struct){
       #Example: (#struct){
+        ret?: (_){ _ }
         raises?: (#struct){
           runtime?: (string){ string }
         }
-        ret?: (_){ _ }
       }
       expr: (#struct){
+        ret: (int){ 2 }
         raises?: (#struct){
           runtime?: (string){ string }
         }
-        ret: (int){ 2 }
       }
     }
   }

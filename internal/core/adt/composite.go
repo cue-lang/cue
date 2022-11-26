@@ -281,6 +281,16 @@ const (
 	ArcVoid
 )
 
+// Suffix reports the field suffix for the given ArcType if it is a
+// constraint or the empty string otherwise.
+func (a ArcType) Suffix() string {
+	switch a {
+	case ArcOptional:
+		return "?"
+	}
+	return ""
+}
+
 func (v *Vertex) Clone() *Vertex {
 	c := *v
 	c.state = nil
@@ -814,8 +824,12 @@ func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 }
 
 func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
-	switch c.x.(type) {
-	case *OptionalField, *BulkOptionalField, *Ellipsis:
+	switch f := c.x.(type) {
+	case *BulkOptionalField, *Ellipsis:
+	case *Field:
+		if f.ArcType == ArcMember {
+			v.ArcType = ArcMember
+		}
 	default:
 		v.ArcType = ArcMember
 	}

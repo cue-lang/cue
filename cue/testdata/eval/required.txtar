@@ -1,0 +1,128 @@
+-- in.cue --
+self: t1: {
+	a?: int
+}
+
+self: t2: {
+	a!: int
+	a!: int
+}
+
+unify: t1: p1: {
+	a!: int
+	a: int
+}
+
+unify: t1: p2: {
+	a: int
+	a!: int
+}
+
+unify: t2: p1: {
+	a!: int
+	a?: int
+}
+
+unify: t2: p2: {
+	a?: int
+	a!: int
+}
+#Def: t1: {
+	a!: int
+}
+-- out/compile --
+--- in.cue
+{
+  self: {
+    t1: {
+      a?: int
+    }
+  }
+  self: {
+    t2: {
+      a!: int
+      a!: int
+    }
+  }
+  unify: {
+    t1: {
+      p1: {
+        a!: int
+        a: int
+      }
+    }
+  }
+  unify: {
+    t1: {
+      p2: {
+        a: int
+        a!: int
+      }
+    }
+  }
+  unify: {
+    t2: {
+      p1: {
+        a!: int
+        a?: int
+      }
+    }
+  }
+  unify: {
+    t2: {
+      p2: {
+        a?: int
+        a!: int
+      }
+    }
+  }
+  #Def: {
+    t1: {
+      a!: int
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  20
+Reused: 15
+Allocs: 5
+Retain: 0
+
+Unifications: 20
+Conjuncts:    31
+Disjuncts:    20
+-- out/eval --
+(struct){
+  self: (struct){
+    t1: (struct){
+      a?: (int){ int }
+    }
+    t2: (struct){
+      a!: (int){ int }
+    }
+  }
+  unify: (struct){
+    t1: (struct){
+      p1: (struct){
+        a: (int){ int }
+      }
+      p2: (struct){
+        a: (int){ int }
+      }
+    }
+    t2: (struct){
+      p1: (struct){
+        a!: (int){ int }
+      }
+      p2: (struct){
+        a!: (int){ int }
+      }
+    }
+  }
+  #Def: (#struct){
+    t1: (#struct){
+      a!: (int){ int }
+    }
+  }
+}

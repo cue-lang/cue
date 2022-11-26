@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -261,9 +262,12 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			x.inDefinition--
 		}
 
+		arcType := adt.ArcMember
 		if isOptional(a) {
-			d.Optional = token.Blank.Pos()
+			arcType = adt.ArcOptional
 		}
+		internal.SetConstraint(d, arcType.Token())
+
 		if x.cfg.ShowDocs {
 			docs := extractDocs(src, a)
 			ast.SetComments(d, docs)

@@ -27,7 +27,6 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -237,9 +236,7 @@ func (w *printer) node(n adt.Node) {
 			} else {
 				w.string("\n")
 				w.label(a.Label)
-				if a.IsConstraint() {
-					w.string("?")
-				}
+				w.string(a.ArcType.TokenString())
 				w.string(": ")
 				w.node(a)
 			}
@@ -298,20 +295,8 @@ func (w *printer) node(n adt.Node) {
 	case *adt.Field:
 		s := w.labelString(x.Label)
 		w.string(s)
+		w.string(x.ArcType.TokenString())
 		w.string(":")
-		if x.Label.IsDef() && !internal.IsDef(s) {
-			w.string(":")
-		}
-		w.string(" ")
-		w.node(x.Value)
-
-	case *adt.OptionalField:
-		s := w.labelString(x.Label)
-		w.string(s)
-		w.string("?:")
-		if x.Label.IsDef() && !internal.IsDef(s) {
-			w.string(":")
-		}
 		w.string(" ")
 		w.node(x.Value)
 

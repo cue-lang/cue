@@ -176,6 +176,7 @@ func (n *nodeContext) insertComprehension(
 					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
+					arcType: f.ArcType,
 
 					comp:   ec,
 					parent: c,
@@ -405,7 +406,7 @@ func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, st
 
 		v := n.node
 		for c := d.leaf; c.parent != nil; c = c.parent {
-			v.ArcType = ArcMember
+			v.UpdateArcType(c.arcType)
 			v = c.arc
 		}
 

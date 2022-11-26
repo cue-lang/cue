@@ -92,9 +92,6 @@ func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
 			switch x := e.(type) {
 			case *adt.Field:
 				sorted = append(sorted, x.Label)
-
-			case *adt.OptionalField:
-				sorted = append(sorted, x.Label)
 			}
 		}
 

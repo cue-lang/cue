@@ -140,10 +140,6 @@ func (w *Visitor) node(n adt.Node) {
 		w.feature(x.Label, x)
 		w.node(x.Value)
 
-	case *adt.OptionalField:
-		w.feature(x.Label, x)
-		w.node(x.Value)
-
 	case *adt.LetField:
 		w.feature(x.Label, x)
 		w.node(x.Value)

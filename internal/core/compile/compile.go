@@ -595,18 +595,15 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				return c.errf(x, "cannot use _ as label")
 			}
 
-			if x.Optional == token.NoPos {
-				return &adt.Field{
-					Src:   x,
-					Label: label,
-					Value: value,
-				}
-			} else {
-				return &adt.OptionalField{
-					Src:   x,
-					Label: label,
-					Value: value,
-				}
+			t := adt.ArcMember
+			if x.Optional != token.NoPos {
+				t = adt.ArcOptional
+			}
+			return &adt.Field{
+				Src:     x,
+				Label:   label,
+				ArcType: t,
+				Value:   value,
 			}
 
 		case *ast.ListLit:

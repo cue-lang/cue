@@ -82,9 +82,6 @@ func (m marked) markExpr(x adt.Expr) {
 			case *adt.Field:
 				m.markExpr(x.Value)
 
-			case *adt.OptionalField:
-				m.markExpr(x.Value)
-
 			case *adt.BulkOptionalField:
 				m.markExpr(x.Value)
 

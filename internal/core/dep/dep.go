@@ -291,11 +291,6 @@ func (c *visitor) markDecl(env *adt.Environment, d adt.Decl) {
 	case *adt.Field:
 		c.markSubExpr(env, x.Value)
 
-	case *adt.OptionalField:
-		// when dynamic, only continue if there is evidence of
-		// the field in the parallel actual evaluation.
-		c.markSubExpr(env, x.Value)
-
 	case *adt.BulkOptionalField:
 		c.markExpr(env, x.Filter)
 		// when dynamic, only continue if there is evidence of

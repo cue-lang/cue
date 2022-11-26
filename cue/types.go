@@ -1724,19 +1724,16 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 			expr = list
 
 		default:
-			var d adt.Decl
-			if sel.ConstraintType() == OptionalConstraint {
-				d = &adt.OptionalField{
-					Label: sel.sel.feature(v.idx),
-					Value: expr,
-				}
-			} else {
-				d = &adt.Field{
-					Label: sel.sel.feature(v.idx),
-					Value: expr,
-				}
+			f := &adt.Field{
+				Label: sel.sel.feature(v.idx),
+				Value: expr,
 			}
-			expr = &adt.StructLit{Decls: []adt.Decl{d}}
+			switch sel.ConstraintType() {
+			case OptionalConstraint:
+				f.ArcType = adt.ArcOptional
+			}
+
+			expr = &adt.StructLit{Decls: []adt.Decl{f}}
 		}
 	}
 	n := &adt.Vertex{}

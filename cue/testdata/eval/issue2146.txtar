@@ -1,0 +1,208 @@
+// Issue #2146
+//
+// Ensure that let expressions are uniqued not only per Environment, but also
+// per arc. This is relevant for disjunctions. Without it, an incorrect
+// result may be cached for an arbitrary Environment.
+-- in.cue --
+p1: {
+	#A: {
+		x?: int
+		y?: int
+	
+		let list = [x, y]
+		all:  [ for v in list if v != _|_ {v}]
+	
+		*{
+			x?: _|_
+			y:  1
+		} | _
+	}
+	
+	a: #A & { x: 3 }
+	b: #A & a
+}
+p2: {
+	#A: {
+		x?: int
+		y?: int
+	
+		let list = [x, y]
+		all:  [ for v in list if v != _|_ {v}]
+
+		_ | *{
+			x?: _|_
+			y:  1
+		}
+	}
+	
+	a: #A & { x: 3, y: 2 }
+	b: #A & a
+}
+
+-- out/eval/stats --
+Leaks:  37
+Freed:  143
+Reused: 134
+Allocs: 46
+Retain: 81
+
+Unifications: 164
+Conjuncts:    544
+Disjuncts:    197
+-- out/eval --
+(struct){
+  p1: (struct){
+    #A: (#struct){ |(*(#struct){
+        let list#1 = (#list){
+          0: (_|_){
+            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+            //     ./in.cue:6:15
+          }
+          1: (int){ 1 }
+        }
+        all: (#list){
+          0: (int){ 1 }
+        }
+        y: (int){ 1 }
+      }, (#struct){
+        let list#1 = (#list){
+          0: (_|_){
+            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+            //     ./in.cue:6:15
+          }
+          1: (_|_){
+            // [incomplete] p1.#A.list.1: cannot reference optional field: y:
+            //     ./in.cue:6:18
+          }
+        }
+        all: (#list){
+        }
+      }) }
+    a: (#struct){
+      let list#1 = (#list){
+        0: (int){ 3 }
+        1: (_|_){
+          // [incomplete] p1.a.list.1: cannot reference optional field: y:
+          //     ./in.cue:6:18
+        }
+      }
+      all: (#list){
+        0: (int){ 3 }
+      }
+      x: (int){ 3 }
+    }
+    b: (#struct){
+      let list#1 = [
+        〈1;x〉,
+        〈1;y〉,
+      ] // multi
+      all: (#list){
+        0: (int){ 3 }
+      }
+      x: (int){ 3 }
+    }
+  }
+  p2: (struct){
+    #A: (#struct){ |(*(#struct){
+        let list#2 = (#list){
+          0: (_|_){
+            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+            //     ./in.cue:23:15
+          }
+          1: (int){ 1 }
+        }
+        all: (#list){
+          0: (int){ 1 }
+        }
+        y: (int){ 1 }
+      }, (#struct){
+        let list#2 = (#list){
+          0: (_|_){
+            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+            //     ./in.cue:23:15
+          }
+          1: (_|_){
+            // [incomplete] p2.#A.list.1: cannot reference optional field: y:
+            //     ./in.cue:23:18
+          }
+        }
+        all: (#list){
+        }
+      }) }
+    a: (#struct){
+      let list#2 = (#list){
+        0: (int){ 3 }
+        1: (int){ 2 }
+      }
+      all: (#list){
+        0: (int){ 3 }
+        1: (int){ 2 }
+      }
+      x: (int){ 3 }
+      y: (int){ 2 }
+    }
+    b: (#struct){
+      let list#2 = [
+        〈1;x〉,
+        〈1;y〉,
+      ] // multi
+      all: (#list){
+        0: (int){ 3 }
+        1: (int){ 2 }
+      }
+      x: (int){ 3 }
+      y: (int){ 2 }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  p1: {
+    #A: {
+      x?: int
+      y?: int
+      let list#1 = [
+        〈1;x〉,
+        〈1;y〉,
+      ]
+      all: [
+        for _, v in 〈1;let list#1〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈1;v〉
+        },
+      ]
+      (*{
+        x?: _|_(explicit error (_|_ literal) in source)
+        y: 1
+      }|_)
+    }
+    a: (〈0;#A〉 & {
+      x: 3
+    })
+    b: (〈0;#A〉 & 〈0;a〉)
+  }
+  p2: {
+    #A: {
+      x?: int
+      y?: int
+      let list#2 = [
+        〈1;x〉,
+        〈1;y〉,
+      ]
+      all: [
+        for _, v in 〈1;let list#2〉 if (〈0;v〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈1;v〉
+        },
+      ]
+      (_|*{
+        x?: _|_(explicit error (_|_ literal) in source)
+        y: 1
+      })
+    }
+    a: (〈0;#A〉 & {
+      x: 3
+      y: 2
+    })
+    b: (〈0;#A〉 & 〈0;a〉)
+  }
+}

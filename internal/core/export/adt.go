@@ -420,21 +420,10 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		f := &ast.Field{
 			Label: e.stringLabel(x.Label),
 		}
-
-		e.setField(x.Label, f)
-
-		f.Value = e.expr(env, x.Value)
-		f.Attrs = extractFieldAttrs(nil, x)
-
-		return f
-
-	case *adt.OptionalField:
-		e.setDocs(x)
-		f := &ast.Field{
-			Label:    e.stringLabel(x.Label),
-			Optional: token.NoSpace.Pos(),
+		if x.ArcType != adt.ArcMember {
+			// Backwards compatibility.
+			f.Optional = token.NoSpace.Pos()
 		}
-
 		e.setField(x.Label, f)
 
 		f.Value = e.expr(env, x.Value)

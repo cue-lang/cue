@@ -162,9 +162,9 @@ func isDominator(c adt.Conjunct) (ok, mayRemove bool) {
 	if !c.CloseInfo.IsInOneOf(dominatorNode) {
 		return false, false
 	}
-	switch c.Field().(type) {
-	case *adt.OptionalField: // bulk constraints handled elsewhere.
-		return true, false
+	switch f := c.Field().(type) {
+	case *adt.Field: // bulk constraints handled elsewhere.
+		return true, f.ArcType == adt.ArcMember
 	}
 	return true, true
 }

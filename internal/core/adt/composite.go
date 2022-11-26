@@ -93,7 +93,12 @@ type Environment struct {
 
 	// TODO: This can probably move into the nodeContext, making it a map from
 	// conjunct to Value.
-	cache map[Expr]Value
+	cache map[cacheKey]Value
+}
+
+type cacheKey struct {
+	Expr Expr
+	Arc  *Vertex
 }
 
 func (e *Environment) up(count int32) *Environment {
@@ -110,10 +115,11 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 	if v, ok := x.(Value); ok {
 		return v
 	}
-	v, ok := e.cache[x]
+	key := cacheKey{x, nil}
+	v, ok := e.cache[key]
 	if !ok {
 		if e.cache == nil {
-			e.cache = map[Expr]Value{}
+			e.cache = map[cacheKey]Value{}
 		}
 		env, src := c.e, c.src
 		c.e, c.src = e, x.Source()
@@ -124,7 +130,7 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 		c.e, c.src = env, src
 		c.errs = err
 		if b, ok := v.(*Bottom); !ok || !b.IsIncomplete() {
-			e.cache[x] = v
+			e.cache[key] = v
 		}
 	}
 	return v

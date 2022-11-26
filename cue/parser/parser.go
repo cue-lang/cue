@@ -867,8 +867,10 @@ func (p *parser) parseField() (decl ast.Decl) {
 		return e
 	}
 
-	if p.tok == token.OPTION {
+	switch p.tok {
+	case token.OPTION, token.NOT:
 		m.Optional = p.pos
+		m.Constraint = p.tok
 		p.next()
 	}
 
@@ -916,7 +918,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		}
 
 		label, expr, _, ok := p.parseLabel(true)
-		if !ok || (p.tok != token.COLON && p.tok != token.OPTION) {
+		if !ok || (p.tok != token.COLON && p.tok != token.OPTION && p.tok != token.NOT) {
 			if expr == nil {
 				expr = p.parseRHS()
 			}
@@ -927,8 +929,10 @@ func (p *parser) parseField() (decl ast.Decl) {
 		m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 		m = field
 
-		if p.tok == token.OPTION {
+		switch p.tok {
+		case token.OPTION, token.NOT:
 			m.Optional = p.pos
+			m.Constraint = p.tok
 			p.next()
 		}
 

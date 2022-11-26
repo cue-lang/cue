@@ -312,8 +312,9 @@ func (a *Attribute) Split() (key, body string) {
 
 // A Field represents a field declaration in a struct.
 type Field struct {
-	Label    Label // must have at least one element.
-	Optional token.Pos
+	Label      Label       // must have at least one element.
+	Optional   token.Pos   // Deprecated
+	Constraint token.Token // token.ILLEGAL, token.OPTION, or token.NOT
 
 	// No TokenPos: Value must be an StructLit with one field.
 	TokenPos token.Pos

@@ -1732,6 +1732,8 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 			switch sel.ConstraintType() {
 			case OptionalConstraint:
 				f.ArcType = adt.ArcOptional
+			case RequiredConstraint:
+				f.ArcType = adt.ArcRequired
 			}
 
 			expr = &adt.StructLit{Decls: []adt.Decl{f}}

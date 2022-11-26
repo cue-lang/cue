@@ -300,7 +300,7 @@ func TestSelectorTypeString(t *testing.T) {
 	if got, want := (StringLabel | OptionalConstraint).String(), "StringLabel|OptionalConstraint"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
-	if got, want := SelectorType(255).String(), "StringLabel|IndexLabel|DefinitionLabel|HiddenLabel|HiddenDefinitionLabel|OptionalConstraint|PatternConstraint"; got != want {
+	if got, want := SelectorType(255).String(), "StringLabel|IndexLabel|DefinitionLabel|HiddenLabel|HiddenDefinitionLabel|OptionalConstraint|RequiredConstraint|PatternConstraint"; got != want {
 		t.Errorf("unexpected SelectorType.String result; got %q want %q", got, want)
 	}
 }

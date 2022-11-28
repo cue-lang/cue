@@ -34,24 +34,19 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/value"
 )
 
-// Disallow
-// - block comments
-// - old-style field comprehensions
-// - space separator syntax
-const syntaxVersion = -1000 + 100*2 + 1
-
 var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
 
 var defaultConfig = config{
 	loadCfg: &load.Config{
 		ParseFile: func(name string, src interface{}) (*ast.File, error) {
-			version := syntaxVersion
+			version := internal.APIVersionSupported
 			if requestedVersion != "" {
 				switch {
 				case strings.HasPrefix(requestedVersion, "v0.1"):

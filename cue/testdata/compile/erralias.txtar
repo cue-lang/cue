@@ -4,7 +4,7 @@
 [Y="foo"]: 3
 a:         Y
 
-"\(b)" :: 3
+"\(b)": 3
 b:        "foo"
 
 c: {}
@@ -16,8 +16,6 @@ unreferenced alias or let clause X:
     ./in.cue:1:2
 a: reference "Y" not found:
     ./in.cue:4:12
-definitions not supported for interpolations:
-    ./in.cue:6:1
 for[].a: reference "E" not found:
     ./in.cue:10:16
 --- in.cue

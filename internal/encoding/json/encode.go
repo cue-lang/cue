@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 )
 
@@ -230,7 +231,7 @@ func (e *encoder) encodeDecls(decls []ast.Decl, endPos token.Pos) error {
 			continue
 
 		case *ast.Field:
-			if x.Token == token.ISA {
+			if internal.IsDefinition(x.Label) {
 				return errors.Newf(x.TokenPos, "json: definition not allowed")
 			}
 			if x.Optional != token.NoPos {

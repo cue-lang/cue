@@ -166,7 +166,7 @@ f4: {
 		out: "json: multiple embedded values",
 	}, {
 		name: "disallowDefinitions",
-		in:   `a :: 2 `,
+		in:   `#a: 2 `,
 		out:  "json: definition not allowed",
 	}, {
 		name: "disallowOptionals",

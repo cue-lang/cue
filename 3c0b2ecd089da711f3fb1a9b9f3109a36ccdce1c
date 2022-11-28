@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83a6435f_0103c34f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-28T15:18:35Z",
+      "side": 1,
+      "message": "Noting for reference the following anomoly that we spotted whilst verifying that this was just an ordering problem. \n\nThe Cascaad diff was entirely ordering related. We confirmed this by running with CUE_DEBUG_SORT_ARCS\u003d2, and there was no longer a diff.\n\nThe vector diff with that CL also appeared to be ordering related. But whilst running with CUE_DEBUG_SORT_ARCS\u003d2 showed the ordering related diffs disappearing, it introduced a different diff. A repro is shown below.\n\n    # Setting the variable is critical. With it unset, there\n    # is no diff.\n    env CUE_DEBUG_SORT_ARCS\u003d2\n\n    exec cue eval -e components.sinks.statsd\n    cmp stdout stdout.golden\n\n    -- x.cue --\n    package metadata\n\n    import \"strings\"\n\n    #Interface: {\n            {binary: #InterfaceBinary} |\n            {socket: #InterfaceSocket}\n    }\n\n    #InterfaceBinary: {\n            name: string\n    }\n\n    #InterfaceSocket: {\n            direction: \"incoming\" | \"outgoing\"\n    }\n\n    #Schema: [string]: #SchemaField\n\n    #SchemaField: {\n            if type.object !\u003d _|_ {\n                    category: strings.ToTitle(name)\n            }\n            name:     string\n            required: bool\n            type:     #Type \u0026 {_args: required}\n    }\n\n    #Type: {\n            {\"array\": {}} | {}\n    }\n\n    components: {\n            #Component: {\n                    kind:          string\n                    configuration: #Schema\n                    type:          string\n                    features:      #Features\n            }\n\n            #Components: [Type\u003dstring]: #Component \u0026 {\n                    type: Type\n            }\n\n            #Features: {\n\n                    healthcheck: {\n                            enabled: bool\n                    }\n\n                    exposes?: #FeaturesExpose\n                    send?:    #FeaturesSend\n            }\n\n            #FeaturesExpose: {\n                    for: {\n                            interface?: #Interface\n                    }\n            }\n\n            #FeaturesSend: {\n                    to?: {\n                            interface?: #Interface\n                    }\n            }\n\n            sinks: #Components\n    }\n\n    components: sinks: [Name\u003dstring]: {\n            kind: \"sink\"\n\n            features: _\n\n            configuration: {\n                    if features.send !\u003d _|_ \u0026\u0026 features.send.batch !\u003d _|_ {\n                            if features.send.batch.enabled {\n                                    batch: {\n                                            required: false\n                                    }\n                            }\n                    }\n            }\n\n    }\n\n    components: sinks: statsd: {\n            features: send: to: interface: socket: direction: \"outgoing\"\n\n            configuration: sinks.socket.configuration\n    }\n\n    components: sinks: socket: {}\n    -- stdout.golden --\n    configuration: {}\n    features: {\n        healthcheck: {\n            enabled: bool\n        }\n        send: {\n            to: {\n                interface: {\n                    binary: {\n                        name: string\n                    }\n                    socket: {\n                        direction: \"outgoing\"\n                    }\n                } | {\n                    socket: {\n                        direction: \"outgoing\"\n                    }\n                }\n            }\n        }\n    }\n    kind: \"sink\"\n    type: \"statsd\"\n\nWe might need to revisit this at a later date.",
+      "revId": "3c0b2ecd089da711f3fb1a9b9f3109a36ccdce1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

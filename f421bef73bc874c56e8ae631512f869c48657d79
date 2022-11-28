@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36be4869_42d0ab3e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-28T17:49:35Z",
+      "side": 1,
+      "message": "s/field/fields/?",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee4f4f1e_b2d7d959",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-28T17:49:35Z",
+      "side": 1,
+      "message": "Incomplete sentence.\n\n...is now consistent with cmd/cue?",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04e900cd_2efebf5f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-28T17:49:35Z",
+      "side": 1,
+      "message": "LGTM with some small nits.",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5635faef_175d1dea",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-28T17:49:35Z",
+      "side": 1,
+      "message": "Did you mean to leave this case lying around?",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44a844f1_d3b5014b",
+        "filename": "cue/testdata/compile/erralias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-28T17:49:35Z",
+      "side": 1,
+      "message": "Could probably delete this case given that it not longer demonstrates anything?",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

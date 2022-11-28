@@ -1,7 +1,5 @@
-# TODO: remove support for '::'; cuelang.org/issue/1543
-
 -- in.cue --
-size ::     2
+#size:     2
 #CellValue: 0 | 1 | 2 | 3
 cell: "0": "0": #CellValue
 cell: "0": "0": !=cell["0"]["1"]
@@ -100,7 +98,7 @@ Conjuncts:    191
 Disjuncts:    79
 -- out/eval --
 (struct){
-  size: (int){ 2 }
+  #size: (int){ 2 }
   #CellValue: (int){ |((int){ 0 }, (int){ 1 }, (int){ 2 }, (int){ 3 }) }
   cell: (struct){
     "0": (struct){
@@ -136,7 +134,7 @@ Disjuncts:    79
 -- out/compile --
 --- in.cue
 {
-  size:: 2
+  #size: 2
   #CellValue: (0|1|2|3)
   cell: {
     "0": {

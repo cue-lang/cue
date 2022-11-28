@@ -182,7 +182,7 @@ f4: {} # line 4
 		out: "yaml: multiple embedded values",
 	}, {
 		name: "disallowDefinitions",
-		in:   `a :: 2 `,
+		in:   `#a: 2 `,
 		out:  "yaml: definition not allowed",
 	}, {
 		name: "disallowOptionals",

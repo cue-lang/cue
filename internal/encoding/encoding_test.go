@@ -25,9 +25,10 @@ import (
 
 func TestValidate(t *testing.T) {
 	testCases := []struct {
-		form build.Form
-		in   string
-		err  string
+		form   build.Form
+		in     string
+		err    string
+		compat bool
 	}{{
 		form: "data",
 		in: `
@@ -40,7 +41,7 @@ func TestValidate(t *testing.T) {
 	}, {
 		form: "graph",
 		in: `
-		X=3
+		let X = 3
 		a: X
 		"b-b": 3
 		s: a
@@ -51,12 +52,12 @@ func TestValidate(t *testing.T) {
 		{form: "data", err: "references", in: `a: a`},
 		{form: "data", err: "expressions", in: `a: 1 + 3`},
 		{form: "data", err: "expressions", in: `a: 1 + 3`},
-		{form: "data", err: "definitions", in: `a :: 1`},
+		{form: "data", err: "definitions", in: `#a: 1`},
 		{form: "data", err: "constraints", in: `a: <1`},
 		{form: "data", err: "expressions", in: `a: !true`},
 		{form: "data", err: "expressions", in: `a: 1 | 2`},
 		{form: "data", err: "expressions", in: `a: 1 | *2`},
-		{form: "data", err: "references", in: `X=3, a: X`},
+		{form: "data", err: "references", in: `let X = 3, a: X`, compat: true},
 		{form: "data", err: "expressions", in: `2+2`},
 		{form: "data", err: "expressions", in: `"\(3)"`},
 		{form: "data", err: "expressions", in: `for x in [2] { a: 2 }`},
@@ -65,7 +66,11 @@ func TestValidate(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(path.Join(string(tc.form), tc.in), func(t *testing.T) {
-			f, err := parser.ParseFile("", tc.in, parser.ParseComments)
+			opts := []parser.Option{parser.ParseComments}
+			if tc.compat {
+				opts = append(opts, parser.FromVersion(-1000))
+			}
+			f, err := parser.ParseFile("", tc.in, opts...)
 			if err != nil {
 				t.Fatal(err)
 			}

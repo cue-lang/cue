@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 )
 
@@ -260,7 +261,7 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			continue
 
 		case *ast.Field:
-			if x.Token == token.ISA {
+			if internal.IsDefinition(x.Label) {
 				return nil, errors.Newf(x.TokenPos, "yaml: definition not allowed")
 			}
 			if x.Optional != token.NoPos {

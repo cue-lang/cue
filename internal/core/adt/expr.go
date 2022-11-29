@@ -1255,10 +1255,10 @@ func (x *BinaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	// Bottom here and require that one of the values be a Bottom literal.
 	if x.Op == EqualOp || x.Op == NotEqualOp {
 		if isLiteralBottom(x.X) {
-			return c.validate(env, x.Src, x.Y, x.Op)
+			return c.validate(env, x.Src, x.Y, x.Op, state)
 		}
 		if isLiteralBottom(x.Y) {
-			return c.validate(env, x.Src, x.X, x.Op)
+			return c.validate(env, x.Src, x.X, x.Op, state)
 		}
 	}
 
@@ -1276,13 +1276,13 @@ func (x *BinaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	return BinOp(c, x.Op, left, right)
 }
 
-func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r Value) {
+func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, state VertexStatus) (r Value) {
 	s := c.PushState(env, src)
 
 	match := op != EqualOp // non-error case
 
 	// Like value(), but retain the original, unwrapped result.
-	v := c.evalState(x, Partial)
+	v := c.evalState(x, state)
 	u, _ := c.getDefault(v)
 	u = Unwrap(u)
 
@@ -1355,6 +1355,12 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 		}
 
 	default:
+		if v.Kind().IsAnyOf(CompositKind) && v.Concreteness() > Concrete && state < Conjuncts {
+			c.PopState(s)
+			c.AddBottom(cycle)
+			return nil
+		}
+
 		c.verifyNonMonotonicResult(env, x, false)
 
 		if v.Concreteness() > Concrete {

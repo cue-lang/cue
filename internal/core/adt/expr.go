@@ -72,7 +72,7 @@ func (x *StructLit) HasOptional() bool {
 
 func (x *StructLit) Source() ast.Node { return x.Src }
 
-func (x *StructLit) evaluate(c *OpContext) Value {
+func (x *StructLit) evaluate(c *OpContext, state VertexStatus) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
@@ -314,7 +314,7 @@ func (x *ListLit) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ListLit) evaluate(c *OpContext) Value {
+func (x *ListLit) evaluate(c *OpContext, state VertexStatus) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
@@ -483,7 +483,7 @@ func (x *BoundExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *BoundExpr) evaluate(ctx *OpContext) Value {
+func (x *BoundExpr) evaluate(ctx *OpContext, state VertexStatus) Value {
 	v := ctx.value(x.Expr)
 	if isError(v) {
 		return v
@@ -783,7 +783,7 @@ func (x *LabelReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LabelReference) evaluate(ctx *OpContext) Value {
+func (x *LabelReference) evaluate(ctx *OpContext, state VertexStatus) Value {
 	label := ctx.relLabel(x.UpCount)
 	if label == 0 {
 		// There is no label. This may happen if a LabelReference is evaluated
@@ -1040,7 +1040,7 @@ func (x *SliceExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *SliceExpr) evaluate(c *OpContext) Value {
+func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	// TODO: strides
 
 	v := c.value(x.X)
@@ -1129,7 +1129,7 @@ func (x *Interpolation) Source() ast.Node {
 	return x.Src
 }
 
-func (x *Interpolation) evaluate(c *OpContext) Value {
+func (x *Interpolation) evaluate(c *OpContext, state VertexStatus) Value {
 	buf := bytes.Buffer{}
 	for _, e := range x.Parts {
 		v := c.value(e)
@@ -1171,7 +1171,7 @@ func (x *UnaryExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *UnaryExpr) evaluate(c *OpContext) Value {
+func (x *UnaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	if !c.concreteIsPossible(x.Op, x.X) {
 		return nil
 	}
@@ -1232,7 +1232,7 @@ func (x *BinaryExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *BinaryExpr) evaluate(c *OpContext) Value {
+func (x *BinaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		v := &Vertex{
@@ -1419,7 +1419,7 @@ func (x *CallExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *CallExpr) evaluate(c *OpContext) Value {
+func (x *CallExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	fun := c.value(x.Fun)
 	var b *Builtin
 	switch f := fun.(type) {
@@ -1722,7 +1722,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *DisjunctionExpr) evaluate(c *OpContext) Value {
+func (x *DisjunctionExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	e := c.Env(0)
 	v := &Vertex{Conjuncts: []Conjunct{{e, x, c.ci}}}
 	c.Unify(v, Finalized) // TODO: also partial okay?

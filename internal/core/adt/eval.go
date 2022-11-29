@@ -117,7 +117,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state VertexStatus) Value {
 
 	case nil:
 		if v.state != nil {
-			switch x := v.state.getValidators().(type) {
+			switch x := v.state.getValidators(Finalized).(type) {
 			case Value:
 				return x
 			default:
@@ -354,7 +354,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		}
 
 		if v.BaseValue == nil {
-			v.BaseValue = n.getValidators()
+			v.BaseValue = n.getValidators(Finalized)
 		}
 
 		// Free memory here?
@@ -576,7 +576,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 				}
 			}
 		} else if state == Finalized {
-			n.node.BaseValue = n.getValidators()
+			n.node.BaseValue = n.getValidators(Finalized)
 		}
 
 		if v == nil {
@@ -1299,7 +1299,7 @@ func (n *nodeContext) getErr() *Bottom {
 }
 
 // getValidators sets the vertex' Value in case there was no concrete value.
-func (n *nodeContext) getValidators() BaseValue {
+func (n *nodeContext) getValidators(state VertexStatus) BaseValue {
 	ctx := n.ctx
 
 	a := []Value{}
@@ -1342,7 +1342,9 @@ func (n *nodeContext) getValidators() BaseValue {
 	switch len(a) {
 	case 0:
 		// Src is the combined input.
-		v = &BasicType{K: n.kind}
+		if state >= Conjuncts || n.kind&^CompositKind == 0 {
+			v = &BasicType{K: n.kind}
+		}
 
 	case 1:
 		v = a[0]

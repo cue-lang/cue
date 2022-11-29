@@ -68,6 +68,7 @@ incompleteList: {
 	str:     strings.Join(x, "")
 }
 
+// TODO: add better error positions.
 incompleteListError: {
 	x:       y + []
 	y:       _
@@ -104,20 +105,20 @@ Leaks:  10
 Freed:  119
 Reused: 114
 Allocs: 15
-Retain: 32
+Retain: 37
 
 Unifications: 109
 Conjuncts:    265
-Disjuncts:    147
+Disjuncts:    152
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
-    ./in.cue:78:11
+    ./in.cue:79:11
 badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
-    ./in.cue:78:11
+    ./in.cue:79:11
 badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-    ./in.cue:84:11
     ./in.cue:85:11
+    ./in.cue:86:11
 
 Result:
 (_|_){
@@ -240,18 +241,15 @@ Result:
   incompleteListError: (struct){
     x: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:71:11
       //     ./in.cue:72:11
     }
     y: (_){ _ }
     decimal: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:71:11
       //     ./in.cue:72:11
     }
     str: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:71:11
       //     ./in.cue:72:11
     }
   }
@@ -260,30 +258,30 @@ Result:
     x: (int){ 2 }
     decimal: (_|_){
       // [eval] badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
-      //     ./in.cue:78:11
+      //     ./in.cue:79:11
     }
     str: (_|_){
       // [eval] badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
-      //     ./in.cue:78:11
+      //     ./in.cue:79:11
     }
   }
   badListError: (_|_){
     // [eval]
     x: (_|_){
       // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:84:11
       //     ./in.cue:85:11
+      //     ./in.cue:86:11
     }
     y: (string){ "foo" }
     decimal: (_|_){
       // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:84:11
       //     ./in.cue:85:11
+      //     ./in.cue:86:11
     }
     str: (_|_){
       // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:84:11
       //     ./in.cue:85:11
+      //     ./in.cue:86:11
     }
   }
   multipleErrors: (struct){
@@ -294,8 +292,8 @@ Result:
       }
       out: (_|_){
         // [incomplete] multipleErrors.#T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
-        //     ./in.cue:98:8
-        //     ./in.cue:95:4
+        //     ./in.cue:99:8
+        //     ./in.cue:96:4
       }
     }
   }

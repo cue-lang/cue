@@ -108,7 +108,7 @@ type Evaluator interface {
 
 	// evaluate evaluates the underlying expression. If the expression
 	// is incomplete, it may record the error in ctx and return nil.
-	evaluate(ctx *OpContext) Value
+	evaluate(ctx *OpContext, state VertexStatus) Value
 }
 
 // A Resolver represents a reference somewhere else within a tree that resolves

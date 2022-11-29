@@ -675,7 +675,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		return x
 
 	case Evaluator:
-		v := x.evaluate(c)
+		v := x.evaluate(c, state)
 		return v
 
 	case Resolver:
@@ -758,7 +758,7 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 		return x
 
 	case Evaluator:
-		v := x.evaluate(c)
+		v := x.evaluate(c, state)
 		return v
 
 	case Resolver:

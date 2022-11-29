@@ -625,8 +625,8 @@ func (c *OpContext) evaluateRec(v Conjunct, state VertexStatus) Value {
 // value evaluates expression v within the current environment. The result may
 // be nil if the result is incomplete. value leaves errors untouched to that
 // they can be collected by the caller.
-func (c *OpContext) value(x Expr) (result Value) {
-	v := c.evalState(x, Partial)
+func (c *OpContext) value(x Expr, state VertexStatus) (result Value) {
+	v := c.evalState(x, state)
 
 	v, _ = c.getDefault(v)
 	v = Unwrap(v)

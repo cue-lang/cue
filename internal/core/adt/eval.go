@@ -249,7 +249,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		v.status = Evaluating
 
 		// Use maybeSetCache for cycle breaking
-		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
+		for n.maybeSetCache(); n.expandOne(Partial); n.maybeSetCache() {
 		}
 
 		n.doNotify()
@@ -445,7 +445,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 
 	for {
 		// Use maybeSetCache for cycle breaking
-		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
+		for n.maybeSetCache(); n.expandOne(state); n.maybeSetCache() {
 		}
 
 		if aList, id := n.addLists(); aList != nil {
@@ -485,10 +485,10 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		//	}
 		n.node.LockArcs = true
 
-		n.injectComprehensions(&(n.selfComprehensions), false)
+		n.injectComprehensions(&(n.selfComprehensions), false, state)
 	}
 
-	for n.expandOne() {
+	for n.expandOne(state) {
 	}
 
 	switch err := n.getErr(); {
@@ -2000,7 +2000,7 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 // This seems to be too complicated and lead to iffy edge cases.
 // TODO(errors): detect when a field is added to a struct that is already used
 // in a for clause.
-func (n *nodeContext) expandOne() (done bool) {
+func (n *nodeContext) expandOne(state VertexStatus) (done bool) {
 	// Don't expand incomplete expressions if we detected a cycle.
 	if n.done() || (n.hasCycle && !n.hasNonCycle) {
 		return false
@@ -2012,7 +2012,7 @@ func (n *nodeContext) expandOne() (done bool) {
 		return true
 	}
 
-	if progress = n.injectComprehensions(&(n.comprehensions), true); progress {
+	if progress = n.injectComprehensions(&(n.comprehensions), true, state); progress {
 		return true
 	}
 
@@ -2159,7 +2159,7 @@ outer:
 		for j, elem := range l.list.Elems {
 			switch x := elem.(type) {
 			case *Comprehension:
-				err := c.yield(nil, l.env, x, func(e *Environment) {
+				err := c.yield(nil, l.env, x, Finalized, func(e *Environment) {
 					label, err := MakeLabel(x.Source(), index, IntLabel)
 					n.addErr(err)
 					index++

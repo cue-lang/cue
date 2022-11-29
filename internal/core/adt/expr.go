@@ -484,7 +484,7 @@ func (x *BoundExpr) Source() ast.Node {
 }
 
 func (x *BoundExpr) evaluate(ctx *OpContext, state VertexStatus) Value {
-	v := ctx.value(x.Expr)
+	v := ctx.value(x.Expr, Partial)
 	if isError(v) {
 		return v
 	}
@@ -827,7 +827,7 @@ func (x *DynamicReference) Source() ast.Node {
 func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Feature {
 	env = env.up(x.UpCount)
 	frame := ctx.PushState(env, x.Src)
-	v := ctx.value(x.Label)
+	v := ctx.value(x.Label, Partial)
 	ctx.PopState(frame)
 	return ctx.Label(x, v)
 }
@@ -835,7 +835,7 @@ func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Featu
 func (x *DynamicReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	e := ctx.Env(x.UpCount)
 	frame := ctx.PushState(e, x.Src)
-	v := ctx.value(x.Label)
+	v := ctx.value(x.Label, Partial)
 	ctx.PopState(frame)
 	f := ctx.Label(x.Label, v)
 	return ctx.lookup(e.Vertex, pos(x), f, state)
@@ -1008,7 +1008,7 @@ func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	// This may especially result in incorrect results when using embedded
 	// scalars.
 	n := ctx.node(x, x.X, true, Partial)
-	i := ctx.value(x.Index)
+	i := ctx.value(x.Index, Partial)
 	if n == emptyNode {
 		return n
 	}
@@ -1043,7 +1043,7 @@ func (x *SliceExpr) Source() ast.Node {
 func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	// TODO: strides
 
-	v := c.value(x.X)
+	v := c.value(x.X, Partial)
 	const as = "slice index"
 
 	switch v := v.(type) {
@@ -1060,10 +1060,10 @@ func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
 			hi = uint64(len(v.Arcs))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo), as)
+			lo = c.uint64(c.value(x.Lo, Partial), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi), as)
+			hi = c.uint64(c.value(x.Hi, Partial), as)
 			if hi > uint64(len(v.Arcs)) {
 				return c.NewErrf("index %d out of range", hi)
 			}
@@ -1093,10 +1093,10 @@ func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
 			hi = uint64(len(v.B))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo), as)
+			lo = c.uint64(c.value(x.Lo, Partial), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi), as)
+			hi = c.uint64(c.value(x.Hi, Partial), as)
 			if hi > uint64(len(v.B)) {
 				return c.NewErrf("index %d out of range", hi)
 			}
@@ -1132,7 +1132,7 @@ func (x *Interpolation) Source() ast.Node {
 func (x *Interpolation) evaluate(c *OpContext, state VertexStatus) Value {
 	buf := bytes.Buffer{}
 	for _, e := range x.Parts {
-		v := c.value(e)
+		v := c.value(e, Partial)
 		if x.K == BytesKind {
 			buf.Write(c.ToBytes(v))
 		} else {
@@ -1175,7 +1175,7 @@ func (x *UnaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	if !c.concreteIsPossible(x.Op, x.X) {
 		return nil
 	}
-	v := c.value(x.X)
+	v := c.value(x.X, Partial)
 	if isError(v) {
 		return v
 	}
@@ -1420,7 +1420,7 @@ func (x *CallExpr) Source() ast.Node {
 }
 
 func (x *CallExpr) evaluate(c *OpContext, state VertexStatus) Value {
-	fun := c.value(x.Fun)
+	fun := c.value(x.Fun, Partial)
 	var b *Builtin
 	switch f := fun.(type) {
 	case *Builtin:
@@ -1450,7 +1450,7 @@ func (x *CallExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	for i, a := range x.Args {
 		saved := c.errs
 		c.errs = nil
-		expr := c.value(a)
+		expr := c.value(a, state)
 
 		switch v := expr.(type) {
 		case nil:
@@ -1917,7 +1917,7 @@ func (x *IfClause) Source() ast.Node {
 
 func (x *IfClause) yield(s *compState) {
 	ctx := s.ctx
-	if ctx.BoolValue(ctx.value(x.Condition)) {
+	if ctx.BoolValue(ctx.value(x.Condition, s.state)) {
 		s.yield(ctx.e)
 	}
 }

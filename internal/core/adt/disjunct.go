@@ -138,7 +138,7 @@ func (n *nodeContext) expandDisjuncts(
 		n.node = node
 	}()
 
-	for n.expandOne() {
+	for n.expandOne(Partial) {
 	}
 
 	// save node to snapShot in nodeContex

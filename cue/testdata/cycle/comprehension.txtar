@@ -308,10 +308,10 @@ Leaks:  48
 Freed:  1268
 Reused: 1256
 Allocs: 60
-Retain: 127
+Retain: 125
 
 Unifications: 828
-Conjuncts:    2523
+Conjuncts:    2521
 Disjuncts:    1377
 -- out/eval --
 Errors:
@@ -557,7 +557,8 @@ Result:
       }
     }
     fail: (_|_){
-      // [cycle] cycle error
+      // [incomplete] selfReferential.fail.b: undefined field: x:
+      //     ./in.cue:300:7
       a: (struct){
       }
       b: (_|_){

@@ -260,10 +260,11 @@ func (n *nodeContext) insertComprehension(
 }
 
 type compState struct {
-	ctx  *OpContext
-	comp *Comprehension
-	i    int
-	f    YieldFunc
+	ctx   *OpContext
+	comp  *Comprehension
+	i     int
+	f     YieldFunc
+	state VertexStatus
 }
 
 // yield evaluates a Comprehension within the given Environment and and calls
@@ -272,12 +273,14 @@ func (c *OpContext) yield(
 	node *Vertex, // errors are associated with this node
 	env *Environment, // env for field for which this yield is called
 	comp *Comprehension,
+	state VertexStatus,
 	f YieldFunc, // called for every result
 ) *Bottom {
 	s := &compState{
-		ctx:  c,
-		comp: comp,
-		f:    f,
+		ctx:   c,
+		comp:  comp,
+		f:     f,
+		state: state,
 	}
 	y := comp.Clauses[0]
 
@@ -316,7 +319,7 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // injectComprehension evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool) (progress bool) {
+func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, state VertexStatus) (progress bool) {
 	ctx := n.ctx
 
 	all := *allP
@@ -338,7 +341,7 @@ func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool) (p
 				envs = append(envs, env)
 			}
 
-			if err := ctx.yield(d.node, d.env, d.comp, f); err != nil {
+			if err := ctx.yield(d.node, d.env, d.comp, state, f); err != nil {
 				if err.IsIncomplete() {
 					// TODO:  Detect that the nodes are actually equal
 					if allowCycle && err.ForCycle && err.Value == n.node {

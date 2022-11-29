@@ -99,20 +99,63 @@ hidden: {
 		[_foo]
 	}
 }
--- out/eval/stats --
-Leaks:  1
-Freed:  78
-Reused: 72
-Allocs: 7
-Retain: 13
 
-Unifications: 75
-Conjuncts:    144
-Disjuncts:    83
+-- issue2113.cue --
+// In all these tests, embedded scalars should resolve without error.
+merged: t1: p1: {
+	#fn: { #in2: _, _ }
+	#fn: { #in2: c1: string, #in2.c1 }
+	x: #fn & {#in2: {c1: "V 1"}, _}
+}
+merged: t1: p2: {
+	#fn: { #in2: c1: string, #in2.c1 }
+	#fn: { #in2: _, _ }
+	x: #fn & {#in2: {c1: "V 1"}, _}
+}
+merged: t1: p3: {
+	x: #fn & {#in2: {c1: "V 1"}, _}
+	#fn: { #in2: c1: string, #in2.c1 }
+	#fn: { #in2: _, _ }
+}
+// TODO(broken): these tests should resolve as above.
+merged: t2: p1: {
+	#fn: { #in2: {}, _ }
+	#fn: { #in2: c1: string, #in2.c1 }
+	x: #fn & {#in2: {c1: "V 1"}, _}
+}
+merged: t2: p2: {
+	#fn: { #in2: c1: string, #in2.c1 }
+	#fn: { #in2: {}, _ }
+	x: #fn & {#in2: {c1: "V 1"}, _}
+}
+merged: t2: p3: {
+	x: #fn & {#in2: {c1: "V 1"}, _}
+	#fn: { #in2: c1: string, #in2.c1 }
+	#fn: { #in2: {}, _ }
+}
+
+-- out/eval/stats --
+Leaks:  3
+Freed:  120
+Reused: 113
+Allocs: 10
+Retain: 45
+
+Unifications: 119
+Conjuncts:    297
+Disjuncts:    150
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
     ./in.cue:28:9
+merged.t2.p1.#fn: undefined field: c1:
+    ./issue2113.cue:20:32
+merged.t2.p1.x: undefined field: c1:
+    ./issue2113.cue:20:32
+merged.t2.p2.#fn: undefined field: c1:
+    ./issue2113.cue:24:32
+merged.t2.p3.#fn: undefined field: c1:
+    ./issue2113.cue:30:32
 
 Result:
 (_|_){
@@ -216,6 +259,106 @@ Result:
     issue794: (#list){
       _foo: (string){ "foo" }
       0: (string){ "foo" }
+    }
+  }
+  merged: (_|_){
+    // [eval]
+    t1: (struct){
+      p1: (struct){
+        #fn: (string){
+          string
+          #in2: (#struct){
+            c1: (string){ string }
+          }
+        }
+        x: (string){
+          "V 1"
+          #in2: (#struct){
+            c1: (string){ "V 1" }
+          }
+        }
+      }
+      p2: (struct){
+        #fn: (string){
+          string
+          #in2: (#struct){
+            c1: (string){ string }
+          }
+        }
+        x: (string){
+          "V 1"
+          #in2: (#struct){
+            c1: (string){ "V 1" }
+          }
+        }
+      }
+      p3: (struct){
+        x: (string){
+          "V 1"
+          #in2: (#struct){
+            c1: (string){ "V 1" }
+          }
+        }
+        #fn: (string){
+          string
+          #in2: (#struct){
+            c1: (string){ string }
+          }
+        }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval]
+        #fn: (_|_){
+          // [eval] merged.t2.p1.#fn: undefined field: c1:
+          //     ./issue2113.cue:20:32
+          #in2: (#struct){
+            c1: (string){ string }
+          }
+        }
+        x: (_|_){
+          // [eval] merged.t2.p1.x: undefined field: c1:
+          //     ./issue2113.cue:20:32
+          #in2: (#struct){
+            c1: (string){ "V 1" }
+          }
+        }
+      }
+      p2: (_|_){
+        // [eval]
+        #fn: (_|_){
+          // [eval] merged.t2.p2.#fn: undefined field: c1:
+          //     ./issue2113.cue:24:32
+          #in2: (#struct){
+            c1: (string){ string }
+          }
+        }
+        x: (string){
+          "V 1"
+          #in2: (#struct){
+            c1: (string){ "V 1" }
+          }
+        }
+      }
+      p3: (_|_){
+        // [eval]
+        x: (string){
+          "V 1"
+          #in2: (#struct){
+            c1: (string){ "V 1" }
+          }
+        }
+        #fn: (_|_){
+          // [eval] merged.t2.p3.#fn: undefined field: c1:
+          //     ./issue2113.cue:30:32
+          #in2: (#struct){
+            c1: (_|_){// string
+            }
+          }
+        }
+      }
     }
   }
 }
@@ -331,6 +474,141 @@ Result:
       [
         〈1;_foo〉,
       ]
+    }
+  }
+}
+--- issue2113.cue
+{
+  merged: {
+    t1: {
+      p1: {
+        #fn: {
+          #in2: _
+          _
+        }
+        #fn: {
+          #in2: {
+            c1: string
+          }
+          〈0;#in2〉.c1
+        }
+        x: (〈0;#fn〉 & {
+          #in2: {
+            c1: "V 1"
+          }
+          _
+        })
+      }
+    }
+  }
+  merged: {
+    t1: {
+      p2: {
+        #fn: {
+          #in2: {
+            c1: string
+          }
+          〈0;#in2〉.c1
+        }
+        #fn: {
+          #in2: _
+          _
+        }
+        x: (〈0;#fn〉 & {
+          #in2: {
+            c1: "V 1"
+          }
+          _
+        })
+      }
+    }
+  }
+  merged: {
+    t1: {
+      p3: {
+        x: (〈0;#fn〉 & {
+          #in2: {
+            c1: "V 1"
+          }
+          _
+        })
+        #fn: {
+          #in2: {
+            c1: string
+          }
+          〈0;#in2〉.c1
+        }
+        #fn: {
+          #in2: _
+          _
+        }
+      }
+    }
+  }
+  merged: {
+    t2: {
+      p1: {
+        #fn: {
+          #in2: {}
+          _
+        }
+        #fn: {
+          #in2: {
+            c1: string
+          }
+          〈0;#in2〉.c1
+        }
+        x: (〈0;#fn〉 & {
+          #in2: {
+            c1: "V 1"
+          }
+          _
+        })
+      }
+    }
+  }
+  merged: {
+    t2: {
+      p2: {
+        #fn: {
+          #in2: {
+            c1: string
+          }
+          〈0;#in2〉.c1
+        }
+        #fn: {
+          #in2: {}
+          _
+        }
+        x: (〈0;#fn〉 & {
+          #in2: {
+            c1: "V 1"
+          }
+          _
+        })
+      }
+    }
+  }
+  merged: {
+    t2: {
+      p3: {
+        x: (〈0;#fn〉 & {
+          #in2: {
+            c1: "V 1"
+          }
+          _
+        })
+        #fn: {
+          #in2: {
+            c1: string
+          }
+          〈0;#in2〉.c1
+        }
+        #fn: {
+          #in2: {}
+          _
+        }
+      }
     }
   }
 }

@@ -95,11 +95,11 @@ Leaks:  2
 Freed:  70
 Reused: 63
 Allocs: 9
-Retain: 6
+Retain: 10
 
 Unifications: 58
 Conjuncts:    104
-Disjuncts:    73
+Disjuncts:    77
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:
@@ -207,7 +207,7 @@ Result:
   }
   dedupTodo: (struct){
     #sub: (_|_){
-      // [incomplete] dedupTodo.#sub: c.n undefined as c is incomplete (type _):
+      // [incomplete] dedupTodo.#sub: c.n undefined (c is incomplete):
       //     ./in.cue:80:6
       c: (_){ _ }
     }

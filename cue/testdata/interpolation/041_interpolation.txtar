@@ -36,11 +36,11 @@ Leaks:  1
 Freed:  8
 Reused: 6
 Allocs: 3
-Retain: 3
+Retain: 8
 
 Unifications: 9
 Conjuncts:    17
-Disjuncts:    10
+Disjuncts:    15
 -- out/eval --
 Errors:
 e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):

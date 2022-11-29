@@ -769,7 +769,9 @@ func (v *Vertex) addConjunct(c Conjunct) {
 	}
 	for _, x := range v.Conjuncts {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
-		if x == c {
+		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo &&
+			x.x == c.x &&
+			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
 			return
 		}
 	}

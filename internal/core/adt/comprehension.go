@@ -410,7 +410,7 @@ func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, st
 
 		for _, env := range d.envs {
 			env = linkChildren(env, d.leaf)
-			n.addExprConjunct(Conjunct{env, d.expr, id})
+			n.addExprConjunct(Conjunct{env, d.expr, id}, state)
 		}
 	}
 

@@ -229,7 +229,7 @@ func (n *nodeContext) expandDisjuncts(
 						cn.node.state = cn
 
 						c := MakeConjunct(d.env, v.Val, d.cloneID)
-						cn.addExprConjunct(c)
+						cn.addExprConjunct(c, state)
 
 						newMode := mode(d.hasDefaults, v.Default)
 

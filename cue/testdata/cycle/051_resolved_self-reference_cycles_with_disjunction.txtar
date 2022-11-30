@@ -30,8 +30,6 @@ xa2: xa3 + 2
 xa3: 6 & xa1-2
 xa4: xa2 + 2
 
-// The second disjunct of xb1 can be eliminated as both disjuncts
-// of xb3 result in an incompatible sum when substituted.
 xb1: (xb2 & 8) | (xb4 & 9)
 xb2: xb3 + 2
 xb3: (6 & (xb1 - 2)) | (xb4 & 9)
@@ -65,7 +63,6 @@ xe4: xe2 + 1
 xe5: xe2 + 2
 xe1: 9
 
-// Only one solution.
 xf1: xf2 & 8 | xf4 & 9
 xf2: xf3 + 2
 xf3: 6 & xf1-2 | xf4 & 9
@@ -175,20 +172,20 @@ Leaks:  5
 Freed:  47
 Reused: 40
 Allocs: 12
-Retain: 37
+Retain: 27
 
 Unifications: 31
-Conjuncts:    149
-Disjuncts:    59
+Conjuncts:    133
+Disjuncts:    57
 -- out/eval --
 Errors:
 xe1: 2 errors in empty disjunction:
 xe1: conflicting values 8 and 9:
-    ./in.cue:43:12
-    ./in.cue:48:6
+    ./in.cue:41:12
+    ./in.cue:46:6
 xe3: conflicting values 7 and 6:
-    ./in.cue:45:6
-    ./in.cue:45:10
+    ./in.cue:43:6
+    ./in.cue:43:10
 
 Result:
 (_|_){
@@ -197,21 +194,27 @@ Result:
   xa2: (int){ 8 }
   xa3: (int){ 6 }
   xa4: (int){ 10 }
-  xb1: (int){ 9 }
+  xb1: (_|_){
+    // [incomplete] xb1: 2 errors in empty disjunction:
+    // xb1: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:16:6
+    // xb2: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:16:6
+  }
   xb2: (_|_){
     // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:18:6
+    //     ./in.cue:16:6
   }
   xb3: (int){ |((int){ 6 }, (int){ 9 }) }
   xb4: (_|_){
     // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:18:6
+    //     ./in.cue:16:6
   }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
   xc3: (_|_){
     // [incomplete] xc3: unresolved disjunction 8 | 9 (type int):
-    //     ./in.cue:29:10
+    //     ./in.cue:27:10
   }
   xc4: (int){ 9 }
   xc5: (int){ 10 }
@@ -223,46 +226,52 @@ Result:
   xe1: (_|_){
     // [eval] xe1: 2 errors in empty disjunction:
     // xe1: conflicting values 8 and 9:
-    //     ./in.cue:43:12
-    //     ./in.cue:48:6
+    //     ./in.cue:41:12
+    //     ./in.cue:46:6
     // xe3: conflicting values 7 and 6:
-    //     ./in.cue:45:6
-    //     ./in.cue:45:10
+    //     ./in.cue:43:6
+    //     ./in.cue:43:10
   }
   xe2: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:45:6
-    //     ./in.cue:45:10
+    //     ./in.cue:43:6
+    //     ./in.cue:43:10
   }
   xe3: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:45:6
-    //     ./in.cue:45:10
+    //     ./in.cue:43:6
+    //     ./in.cue:43:10
   }
   xe4: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:45:6
-    //     ./in.cue:45:10
+    //     ./in.cue:43:6
+    //     ./in.cue:43:10
   }
   xe5: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:45:6
-    //     ./in.cue:45:10
+    //     ./in.cue:43:6
+    //     ./in.cue:43:10
   }
-  xf1: (int){ 9 }
+  xf1: (_|_){
+    // [incomplete] xf1: 2 errors in empty disjunction:
+    // xf1: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:49:6
+    // xf2: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:49:6
+  }
   xf2: (_|_){
     // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:52:6
+    //     ./in.cue:49:6
   }
   xf3: (int){ |((int){ 6 }, (int){ 9 }) }
   xf4: (_|_){
     // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:52:6
+    //     ./in.cue:49:6
   }
   z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
   z3: (_|_){
     // [incomplete] z3: unresolved disjunction 11 | 13 (type int):
-    //     ./in.cue:58:5
+    //     ./in.cue:55:5
   }
 }

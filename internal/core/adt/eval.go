@@ -381,7 +381,10 @@ func (n *nodeContext) insertConjuncts(state VertexStatus) bool {
 		nInfos := len(n.node.Structs)
 		p := &n.conjuncts[0]
 		n.conjuncts = n.conjuncts[1:]
-		n.addExprConjunct(*p)
+		// Intially request a Partial state to allow cyclic references to
+		// resolve more naturally first. This results in better error messages
+		// and less operations.
+		n.addExprConjunct(*p, Partial)
 
 		// Record the OptionalTypes for all structs that were inferred by this
 		// Conjunct. This information can be used by algorithms such as trim.
@@ -1410,7 +1413,7 @@ func (n *nodeContext) addErr(err errors.Error) {
 // addExprConjuncts will attempt to evaluate an Expr and insert the value
 // into the nodeContext if successful or queue it for later evaluation if it is
 // incomplete or is not value.
-func (n *nodeContext) addExprConjunct(v Conjunct) {
+func (n *nodeContext) addExprConjunct(v Conjunct, state VertexStatus) {
 	env := v.Env
 	id := v.CloseInfo
 
@@ -1427,11 +1430,11 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 
 	case *BinaryExpr:
 		if x.Op == AndOp {
-			n.addExprConjunct(MakeConjunct(env, x.X, id))
-			n.addExprConjunct(MakeConjunct(env, x.Y, id))
+			n.addExprConjunct(MakeConjunct(env, x.X, id), state)
+			n.addExprConjunct(MakeConjunct(env, x.Y, id), state)
 			return
 		} else {
-			n.evalExpr(v)
+			n.evalExpr(v, state)
 		}
 
 	case *StructLit:
@@ -1454,14 +1457,14 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 
 	default:
 		// Must be Resolver or Evaluator.
-		n.evalExpr(v)
+		n.evalExpr(v, state)
 	}
 	n.ctx.stats.Conjuncts++
 }
 
 // evalExpr is only called by addExprConjunct. If an error occurs, it records
 // the error in n and returns nil.
-func (n *nodeContext) evalExpr(v Conjunct) {
+func (n *nodeContext) evalExpr(v Conjunct, state VertexStatus) {
 	// Require an Environment.
 	ctx := n.ctx
 
@@ -1469,7 +1472,14 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 
 	switch x := v.Expr().(type) {
 	case Resolver:
-		arc, err := ctx.Resolve(v, x)
+		// We elevate a field evaluated to the Conjuncts state to Finalized
+		// later. For now we allow partial evaluation so that we can break
+		// cycles and postpone incomplete evaluations until more information is
+		// available down the line.
+		if state == Finalized {
+			state = Conjuncts
+		}
+		arc, err := ctx.resolveState(v, x, state)
 		if err != nil && (!err.IsIncomplete() || err.Permanent) {
 			n.addBottom(err)
 			break
@@ -1511,7 +1521,7 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			if ok && b.IsIncomplete() && len(v.Conjuncts) > 0 {
 				for _, c := range v.Conjuncts {
 					c.CloseInfo = closeID
-					n.addExprConjunct(c)
+					n.addExprConjunct(c, state)
 				}
 				break
 			}
@@ -1623,7 +1633,7 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		// closedness conflicts resulting from unifying the referenced arc were
 		// already caught there and that we can ignore further errors here.
 		c.CloseInfo = closeInfo
-		n.addExprConjunct(c)
+		n.addExprConjunct(c, Partial)
 	}
 }
 
@@ -1673,7 +1683,7 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 
 			for _, c := range x.Conjuncts {
 				c.CloseInfo = id
-				n.addExprConjunct(c) // TODO: Pass from eval
+				n.addExprConjunct(c, Partial) // TODO: Pass from eval
 			}
 			return
 		}
@@ -1912,7 +1922,7 @@ func (n *nodeContext) addStruct(
 			id := closeInfo.SpawnEmbed(x)
 
 			// push and opo embedding type.
-			n.addExprConjunct(MakeConjunct(childEnv, x, id))
+			n.addExprConjunct(MakeConjunct(childEnv, x, id), Partial)
 
 		case *OptionalField, *BulkOptionalField, *Ellipsis:
 			// Nothing to do here. Note that the presence of these fields do not
@@ -1971,7 +1981,7 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	switch {
 	case arc.state != nil:
 		arc.Conjuncts = append(arc.Conjuncts, x)
-		arc.state.addExprConjunct(x)
+		arc.state.addExprConjunct(x, Partial)
 
 	case arc.Status() == 0:
 		arc.addConjunctUnchecked(x)
@@ -2023,7 +2033,7 @@ func (n *nodeContext) expandOne(state VertexStatus) (done bool) {
 	exprs := n.exprs
 	n.exprs = n.exprs[:0]
 	for _, x := range exprs {
-		n.addExprConjunct(x.c)
+		n.addExprConjunct(x.c, state)
 
 		// collect and and or
 	}

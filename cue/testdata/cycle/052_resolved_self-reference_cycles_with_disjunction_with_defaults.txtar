@@ -129,11 +129,11 @@ Leaks:  6
 Freed:  38
 Reused: 34
 Allocs: 10
-Retain: 28
+Retain: 29
 
 Unifications: 27
 Conjuncts:    93
-Disjuncts:    54
+Disjuncts:    55
 -- out/eval --
 Errors:
 xe1: 2 errors in empty disjunction:

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d061a812_d1211d8f",
+        "filename": "cue/testdata/cycle/051_resolved_self-reference_cycles_with_disjunction.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T13:26:27Z",
+      "side": 1,
+      "message": "First note: the def output is v0.2 output and does not have to conform.\n\nCUE is only required to report an error on one of the fields of a circular path. But in general it is a nice to have if all fields on the path are marked erroneous. This is what is happening here. So I would say it is a net improvement.",
+      "parentUuid": "9028aabc_9d6d4477",
+      "revId": "e1e3f18e0b92c080f48bdf372c8a02197f7aced3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b88233c6_bfa8016d",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-11-30T13:10:00Z",
       "side": 1,
       "message": "Ditto, but this time for xf1.",
+      "revId": "e1e3f18e0b92c080f48bdf372c8a02197f7aced3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8625240a_5f694884",
+        "filename": "cue/testdata/cycle/051_resolved_self-reference_cycles_with_disjunction.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T13:26:27Z",
+      "side": 1,
+      "message": "Ditto.",
+      "parentUuid": "b88233c6_bfa8016d",
       "revId": "e1e3f18e0b92c080f48bdf372c8a02197f7aced3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

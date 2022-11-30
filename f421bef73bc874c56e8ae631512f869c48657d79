@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea550c7b_dd80cbdd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T09:50:35Z",
+      "side": 1,
+      "message": "The whole comment didn\u0027t make sense. Corrected.",
+      "parentUuid": "36be4869_42d0ab3e",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee4f4f1e_b2d7d959",
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2463171_64e013cd",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T09:50:35Z",
+      "side": 1,
+      "message": "Hah, a lined dropped from the submission, but since current version are negative it still worked. Corrected.",
+      "parentUuid": "5635faef_175d1dea",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44a844f1_d3b5014b",
@@ -82,6 +118,24 @@
       "writtenOn": "2022-11-28T17:49:35Z",
       "side": 1,
       "message": "Could probably delete this case given that it not longer demonstrates anything?",
+      "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5392e75e_0c8b0251",
+        "filename": "cue/testdata/compile/erralias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T09:50:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44a844f1_d3b5014b",
       "revId": "f421bef73bc874c56e8ae631512f869c48657d79",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -39,15 +39,15 @@ release: _base.#bashWorkflow & {
 			},
 			json.#step & {
 				name: "Setup qemu"
-				uses: "docker/setup-qemu-action@v1"
+				uses: "docker/setup-qemu-action@v2"
 			},
 			json.#step & {
 				name: "Set up Docker Buildx"
-				uses: "docker/setup-buildx-action@v1"
+				uses: "docker/setup-buildx-action@v2"
 			},
 			json.#step & {
 				name: "Docker Login"
-				uses: "docker/login-action@v1"
+				uses: "docker/login-action@v2"
 				with: {
 					registry: "docker.io"
 					username: "cueckoo"

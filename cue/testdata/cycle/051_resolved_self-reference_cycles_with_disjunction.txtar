@@ -175,11 +175,11 @@ Leaks:  5
 Freed:  47
 Reused: 40
 Allocs: 12
-Retain: 37
+Retain: 27
 
 Unifications: 31
-Conjuncts:    149
-Disjuncts:    59
+Conjuncts:    133
+Disjuncts:    57
 -- out/eval --
 Errors:
 xe1: 2 errors in empty disjunction:
@@ -197,7 +197,13 @@ Result:
   xa2: (int){ 8 }
   xa3: (int){ 6 }
   xa4: (int){ 10 }
-  xb1: (int){ 9 }
+  xb1: (_|_){
+    // [incomplete] xb1: 2 errors in empty disjunction:
+    // xb1: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:18:6
+    // xb2: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:18:6
+  }
   xb2: (_|_){
     // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
     //     ./in.cue:18:6
@@ -249,7 +255,13 @@ Result:
     //     ./in.cue:45:6
     //     ./in.cue:45:10
   }
-  xf1: (int){ 9 }
+  xf1: (_|_){
+    // [incomplete] xf1: 2 errors in empty disjunction:
+    // xf1: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:52:6
+    // xf2: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:52:6
+  }
   xf2: (_|_){
     // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
     //     ./in.cue:52:6

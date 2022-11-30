@@ -39,7 +39,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 		v = x
 
 	case Resolver:
-		r, err := ctx.Resolve(c, x)
+		r, err := ctx.resolveState(c, x, Finalized)
 		if err != nil {
 			v = err
 			break

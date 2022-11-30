@@ -463,9 +463,13 @@ func (c *OpContext) PopArc(saved *Vertex) {
 // Should only be used to insert Conjuncts. TODO: perhaps only return Conjuncts
 // and error.
 func (c *OpContext) Resolve(x Conjunct, r Resolver) (*Vertex, *Bottom) {
+	return c.resolveState(x, r, Finalized)
+}
+
+func (c *OpContext) resolveState(x Conjunct, r Resolver, state VertexStatus) (*Vertex, *Bottom) {
 	s := c.PushConjunct(x)
 
-	arc := r.resolve(c, Partial)
+	arc := r.resolve(c, state)
 
 	err := c.PopState(s)
 	if err != nil {

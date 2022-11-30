@@ -16,6 +16,24 @@
       "message": "s/ultimate/ultimately/",
       "revId": "aa1352ac189069f1d185ef6c8127d88ee5d36419",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c007a6c4_c357adc6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T13:23:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59d2f34f_83f5c5fb",
+      "revId": "aa1352ac189069f1d185ef6c8127d88ee5d36419",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

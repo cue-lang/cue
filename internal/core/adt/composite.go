@@ -757,11 +757,13 @@ func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 		// This is likely a bug in the evaluator and should not happen.
 		return &Bottom{Err: errors.Newf(token.NoPos, "cannot add conjunct")}
 	}
-	v.addConjunct(c)
+	if !v.hasConjunct(c) {
+		v.addConjunctUnchecked(c)
+	}
 	return nil
 }
 
-func (v *Vertex) addConjunct(c Conjunct) {
+func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	switch c.x.(type) {
 	case *OptionalField, *BulkOptionalField, *Ellipsis:
 	default:
@@ -772,10 +774,10 @@ func (v *Vertex) addConjunct(c Conjunct) {
 		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo &&
 			x.x == c.x &&
 			x.Env.Up == c.Env.Up && x.Env.Vertex == c.Env.Vertex {
-			return
+			return true
 		}
 	}
-	v.addConjunctUnchecked(c)
+	return false
 }
 
 func (v *Vertex) addConjunctUnchecked(c Conjunct) {

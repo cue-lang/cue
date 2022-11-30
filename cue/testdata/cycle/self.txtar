@@ -270,7 +270,7 @@ Allocs: 23
 Retain: 33
 
 Unifications: 236
-Conjuncts:    700
+Conjuncts:    687
 Disjuncts:    435
 -- out/eval --
 Errors:
@@ -291,15 +291,6 @@ list.error2.a: conflicting values "3" and "2":
     ./in.cue:15:6
     ./in.cue:16:11
 list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
-list.error2.a.0: conflicting values "3" and "1":
-    ./in.cue:15:6
-    ./in.cue:16:6
-list.error2.a.1: conflicting values "1" and "2":
-    ./in.cue:16:6
-    ./in.cue:16:11
-list.error2.a.1: conflicting values "3" and "2":
-    ./in.cue:15:6
-    ./in.cue:16:11
 list.error2.a.2: conflicting values "1" and "2":
     ./in.cue:16:6
     ./in.cue:16:11
@@ -348,21 +339,12 @@ Result:
           // [eval] list.error2.a: conflicting values "3" and "1":
           //     ./in.cue:15:6
           //     ./in.cue:16:6
-          // list.error2.a.0: conflicting values "3" and "1":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:6
         }
         1: (_|_){
           // [eval] list.error2.a: conflicting values "1" and "2":
           //     ./in.cue:16:6
           //     ./in.cue:16:11
           // list.error2.a: conflicting values "3" and "2":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:11
-          // list.error2.a.1: conflicting values "1" and "2":
-          //     ./in.cue:16:6
-          //     ./in.cue:16:11
-          // list.error2.a.1: conflicting values "3" and "2":
           //     ./in.cue:15:6
           //     ./in.cue:16:11
         }

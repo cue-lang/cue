@@ -33,6 +33,24 @@
       "message": "This proves the value of having these stats in the test :)",
       "revId": "21d87d4214abc114dcc5c1ee4e84d72135ac642e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef81081e_ea69898b",
+        "filename": "cue/testdata/cycle/chain.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 219,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T13:21:34Z",
+      "side": 1,
+      "message": ":)",
+      "parentUuid": "76e39015_c79e7c3e",
+      "revId": "21d87d4214abc114dcc5c1ee4e84d72135ac642e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

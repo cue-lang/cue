@@ -16,6 +16,24 @@
       "message": "The loss of this error seems to be a net negative, no? i.e. we have dropped the error that referred to the index position, leaving only the reference to the entire list. Highlighted in this case by the fact that we have two errors referring to list.error2.a:\n\n    list.error2.a: conflicting values \"3\" and \"1\":\n    list.error2.a: conflicting values \"3\" and \"2\":\n    \nWas this intentional?",
       "revId": "27155e9be7c9b4304542432b50fb123dc3b03a4e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "174e4312_f2131dfe",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-11-30T13:21:34Z",
+      "side": 0,
+      "message": "This is not intentional. But generally speaking the bar is that as long as the error is reported somewhat accurately and near the position, it is good enough. To some extent this is a positive, as it removes duplicate errors. The index position would be a nice to have, but is also somewhat unclear, as there is no clear position for the values, given the circular reference.\n\nIt would be possible to investigate, but it is not worth the time at the moment.",
+      "parentUuid": "6e308da1_efc68320",
+      "revId": "27155e9be7c9b4304542432b50fb123dc3b03a4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

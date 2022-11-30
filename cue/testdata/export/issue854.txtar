@@ -28,11 +28,11 @@ Leaks:  4
 Freed:  2
 Reused: 0
 Allocs: 6
-Retain: 7
+Retain: 18
 
 Unifications: 6
-Conjuncts:    8
-Disjuncts:    8
+Conjuncts:    21
+Disjuncts:    11
 -- out/eval --
 (struct){
   theb: (_|_){

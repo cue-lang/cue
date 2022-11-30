@@ -44,14 +44,14 @@ issue1837: {
 	}
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  28
-Reused: 23
-Allocs: 9
-Retain: 44
+Leaks:  0
+Freed:  32
+Reused: 26
+Allocs: 6
+Retain: 40
 
 Unifications: 32
-Conjuncts:    101
+Conjuncts:    122
 Disjuncts:    35
 -- out/eval --
 (struct){

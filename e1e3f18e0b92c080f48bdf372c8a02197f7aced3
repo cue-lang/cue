@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e096a25b_97572487",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-30T13:10:00Z",
+      "side": 1,
+      "message": "Unclear that the changes in the txtars are as expected here.",
+      "revId": "e1e3f18e0b92c080f48bdf372c8a02197f7aced3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9028aabc_9d6d4477",
+        "filename": "cue/testdata/cycle/051_resolved_self-reference_cycles_with_disjunction.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-30T13:10:00Z",
+      "side": 1,
+      "message": "This seems to contradict the comment above:\n\n    // The second disjunct of xb1 can be eliminated as both disjuncts\n    // of xb3 result in an incompatible sum when substituted.\n    \n Not only that, it appears to contradict the def output",
+      "revId": "e1e3f18e0b92c080f48bdf372c8a02197f7aced3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b88233c6_bfa8016d",
+        "filename": "cue/testdata/cycle/051_resolved_self-reference_cycles_with_disjunction.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-30T13:10:00Z",
+      "side": 1,
+      "message": "Ditto, but this time for xf1.",
+      "revId": "e1e3f18e0b92c080f48bdf372c8a02197f7aced3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -709,7 +709,7 @@ Allocs: 23
 Retain: 70
 
 Unifications: 389
-Conjuncts:    644
+Conjuncts:    632
 Disjuncts:    433
 -- out/eval --
 Errors:

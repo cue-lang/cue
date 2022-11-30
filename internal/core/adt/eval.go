@@ -1964,13 +1964,18 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 		arc.MultiLet = true
 		return arc
 	}
-	arc.addConjunct(x)
+	if arc.hasConjunct(x) {
+		return arc
+	}
 
 	switch {
 	case arc.state != nil:
+		arc.Conjuncts = append(arc.Conjuncts, x)
 		arc.state.addExprConjunct(x)
 
 	case arc.Status() == 0:
+		arc.addConjunctUnchecked(x)
+
 	default:
 		n.addBottom(&Bottom{
 			Code: IncompleteError,

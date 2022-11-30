@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59d2f34f_83f5c5fb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-11-30T13:04:46Z",
+      "side": 1,
+      "message": "s/ultimate/ultimately/",
+      "revId": "aa1352ac189069f1d185ef6c8127d88ee5d36419",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

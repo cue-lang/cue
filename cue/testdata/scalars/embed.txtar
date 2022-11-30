@@ -117,7 +117,6 @@ merged: t1: p3: {
 	#fn: { #in2: c1: string, #in2.c1 }
 	#fn: { #in2: _, _ }
 }
-// TODO(broken): these tests should resolve as above.
 merged: t2: p1: {
 	#fn: { #in2: {}, _ }
 	#fn: { #in2: c1: string, #in2.c1 }
@@ -135,27 +134,19 @@ merged: t2: p3: {
 }
 
 -- out/eval/stats --
-Leaks:  3
-Freed:  120
-Reused: 113
-Allocs: 10
-Retain: 45
+Leaks:  1
+Freed:  123
+Reused: 115
+Allocs: 9
+Retain: 47
 
-Unifications: 119
-Conjuncts:    297
-Disjuncts:    150
+Unifications: 120
+Conjuncts:    307
+Disjuncts:    156
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
     ./in.cue:28:9
-merged.t2.p1.#fn: undefined field: c1:
-    ./issue2113.cue:20:32
-merged.t2.p1.x: undefined field: c1:
-    ./issue2113.cue:20:32
-merged.t2.p2.#fn: undefined field: c1:
-    ./issue2113.cue:24:32
-merged.t2.p3.#fn: undefined field: c1:
-    ./issue2113.cue:30:32
 
 Result:
 (_|_){
@@ -261,8 +252,7 @@ Result:
       0: (string){ "foo" }
     }
   }
-  merged: (_|_){
-    // [eval]
+  merged: (struct){
     t1: (struct){
       p1: (struct){
         #fn: (string){
@@ -307,30 +297,10 @@ Result:
         }
       }
     }
-    t2: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
-        #fn: (_|_){
-          // [eval] merged.t2.p1.#fn: undefined field: c1:
-          //     ./issue2113.cue:20:32
-          #in2: (#struct){
-            c1: (string){ string }
-          }
-        }
-        x: (_|_){
-          // [eval] merged.t2.p1.x: undefined field: c1:
-          //     ./issue2113.cue:20:32
-          #in2: (#struct){
-            c1: (string){ "V 1" }
-          }
-        }
-      }
-      p2: (_|_){
-        // [eval]
-        #fn: (_|_){
-          // [eval] merged.t2.p2.#fn: undefined field: c1:
-          //     ./issue2113.cue:24:32
+    t2: (struct){
+      p1: (struct){
+        #fn: (string){
+          string
           #in2: (#struct){
             c1: (string){ string }
           }
@@ -342,20 +312,31 @@ Result:
           }
         }
       }
-      p3: (_|_){
-        // [eval]
+      p2: (struct){
+        #fn: (string){
+          string
+          #in2: (#struct){
+            c1: (string){ string }
+          }
+        }
         x: (string){
           "V 1"
           #in2: (#struct){
             c1: (string){ "V 1" }
           }
         }
-        #fn: (_|_){
-          // [eval] merged.t2.p3.#fn: undefined field: c1:
-          //     ./issue2113.cue:30:32
+      }
+      p3: (struct){
+        x: (string){
+          "V 1"
           #in2: (#struct){
-            c1: (_|_){// string
-            }
+            c1: (string){ "V 1" }
+          }
+        }
+        #fn: (string){
+          string
+          #in2: (#struct){
+            c1: (string){ string }
           }
         }
       }

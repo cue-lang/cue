@@ -101,15 +101,15 @@ multipleErrors: {
 	}
 }
 -- out/eval/stats --
-Leaks:  10
-Freed:  119
-Reused: 114
-Allocs: 15
-Retain: 37
+Leaks:  7
+Freed:  122
+Reused: 117
+Allocs: 12
+Retain: 32
 
 Unifications: 109
-Conjuncts:    265
-Disjuncts:    152
+Conjuncts:    267
+Disjuncts:    150
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:

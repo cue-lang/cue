@@ -861,7 +861,11 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 			}
 		}
 		code := IncompleteError
-		if !x.Accept(c, l) {
+		// As long as we have incomplete information, we cannot mark the
+		// inability to look up a field as "final", as it may resolve down the
+		// line.
+		permanent := x.status > Conjuncts
+		if (state > Partial || permanent) && !x.Accept(c, l) {
 			code = 0
 		} else if hasCycle {
 			code = CycleError
@@ -886,7 +890,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 		}
 		c.AddBottom(&Bottom{
 			Code:      code,
-			Permanent: x.status >= Conjuncts,
+			Permanent: permanent,
 			Err:       err,
 		})
 	}

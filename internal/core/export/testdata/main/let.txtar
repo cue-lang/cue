@@ -261,6 +261,7 @@ unresolvedDisjunction: {
 		_args: {
 			required: bool
 		}
+
 		if !Args_B.required {
 			// `default` sets the default value.
 			default: bool | null
@@ -316,6 +317,8 @@ y: Y & Y_1
 [unresolvedDisjunction #TypePrimitive "*"]
 [unresolvedDisjunction #TypeBool]
 [unresolvedDisjunction #TypeBool default]
+- `default` sets the default value.
+
 [unresolvedDisjunction #TypeBool _args]
 [unresolvedDisjunction #TypeBool _args required]
 [unresolvedDisjunction #TypeBool Args]
@@ -572,6 +575,7 @@ y: Y & Y_1
 			_args: {
 				required: bool
 			}
+
 			if !Args.required {
 				// `default` sets the default value.
 				default: bool | null
@@ -769,6 +773,7 @@ y: Y & Y_1
 			_args: {
 				required: bool
 			}
+
 			if !Args.required {
 				// `default` sets the default value.
 				default: bool | null
@@ -881,6 +886,7 @@ y: Y & Y_1
 			_args: {
 				required: bool
 			}
+
 			if !Args.required {
 				default: bool | null
 			}

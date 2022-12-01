@@ -43,6 +43,27 @@ baz: bar & {
 	field1: int
 	field2: int
 }
+
+sub: {
+	// comment on comprehension
+	if true {
+		// comment inside of if comprehension
+		field1: int
+	}
+
+	// comprehension with nesting.
+	for x in [1]
+	// nested let
+	let y = x
+	// nested for
+	for z in [y]
+
+	// nested if
+	if z == 1 {
+		innerField: y
+	}
+
+}
 -- out.txt --
 -- out/doc --
 []
@@ -91,6 +112,11 @@ baz: bar & {
 [baz field2]
 - comment from bar on field 2
 
+[sub]
+[sub field1]
+- comment inside of if comprehension
+
+[sub innerField]
 -- out/definition --
 // foobar defines at least foo.
 package foobar
@@ -131,6 +157,25 @@ baz: bar & {
 	// comment from baz on field 1
 	field1: int
 	field2: int
+}
+sub: {
+	// comment on comprehension
+	if true {
+		// comment inside of if comprehension
+		field1: int
+	}
+
+	// comprehension with nesting.
+	for x in [1]
+	// nested let
+	let y = x
+	// nested for
+	for z in [y]
+
+	// nested if
+	if z == 1 {
+		innerField: y
+	}
 }
 -- out/value --
 == Simplified
@@ -175,6 +220,11 @@ baz: bar & {
 		// comment from bar on field 2
 		field2: int
 	}
+	sub: {
+		// comment inside of if comprehension
+		field1:     int
+		innerField: 1
+	}
 }
 == Raw
 {
@@ -218,6 +268,11 @@ baz: bar & {
 		// comment from bar on field 2
 		field2: int
 	}
+	sub: {
+		// comment inside of if comprehension
+		field1:     int
+		innerField: 1
+	}
 }
 == Final
 {
@@ -240,6 +295,10 @@ baz: bar & {
 	baz: {
 		field1: int
 		field2: int
+	}
+	sub: {
+		field1:     int
+		innerField: 1
 	}
 }
 == All
@@ -284,6 +343,11 @@ baz: bar & {
 		// comment from bar on field 2
 		field2: int
 	}
+	sub: {
+		// comment inside of if comprehension
+		field1:     int
+		innerField: 1
+	}
 }
 == Eval
 {
@@ -306,5 +370,9 @@ baz: bar & {
 	baz: {
 		field1: int
 		field2: int
+	}
+	sub: {
+		field1:     int
+		innerField: 1
 	}
 }

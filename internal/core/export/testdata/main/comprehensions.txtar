@@ -14,11 +14,21 @@ dropEmpty: {
 	a: #A
 	a: b: "c"
 }
+nested: {
+	if true
+	if true
+	
+	let x = [1]
+	for y in x {
+		y
+	}
+}
 -- out/definition --
 dropEmpty: {
 	k: "a"
 	#A: {
 		b: !=""
+
 		if k == "a" {
 			d: "\(b)"
 		}
@@ -28,6 +38,15 @@ dropEmpty: {
 	}
 	a: #A & {
 		b: "c"
+	}
+}
+nested: {
+	if true
+	if true
+
+	let x = [1]
+	for y in x {
+		y
 	}
 }
 -- out/doc --
@@ -40,6 +59,7 @@ dropEmpty: {
 [dropEmpty a]
 [dropEmpty a d]
 [dropEmpty a b]
+[nested]
 -- out/value --
 == Simplified
 {
@@ -50,6 +70,7 @@ dropEmpty: {
 			d: "c"
 		}
 	}
+	nested: 1
 }
 == Raw
 {
@@ -64,6 +85,7 @@ dropEmpty: {
 			d: "c"
 		}
 	}
+	nested: 1
 }
 == Final
 {
@@ -74,6 +96,7 @@ dropEmpty: {
 			d: "c"
 		}
 	}
+	nested: 1
 }
 == All
 {
@@ -88,6 +111,7 @@ dropEmpty: {
 			d: "c"
 		}
 	}
+	nested: 1
 }
 == Eval
 {
@@ -102,4 +126,5 @@ dropEmpty: {
 			d: "c"
 		}
 	}
+	nested: 1
 }

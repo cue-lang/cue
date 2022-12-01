@@ -37,12 +37,13 @@ func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 
 	// Collect docs directly related to this Vertex.
 	for _, x := range a {
+		// TODO: Is this still being used?
 		if v, ok := x.Elem().(*adt.Vertex); ok {
 			docs = append(docs, extractDocs(v, v.Conjuncts)...)
 			continue
 		}
 
-		switch f := x.Source().(type) {
+		switch f := x.Field().Source().(type) {
 		case *ast.Field:
 			if hasShorthandValue(f) {
 				continue

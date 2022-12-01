@@ -163,6 +163,7 @@ dynamicComplex: {
 	[string]: "foo" @step(2)
 	a?:       "foo" @step(3)
 	b?:       "foo" @step(4)
+
 	if true {}
 }
 dynamicSimple: {

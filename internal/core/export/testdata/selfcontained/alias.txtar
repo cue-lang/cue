@@ -20,6 +20,7 @@ a: B=b: {
 		y: B.enclosed.x
 		z: V
 
+		// Comment.
 		labelX: X
 		labelY: Y
 	}
@@ -38,15 +39,22 @@ a: B=b: {
 -- out/default --
 
 {
-	x:     string
-	y:     x
+	x: string
+	y: x
+
+	// TODO: use with non-concrete value. Right now, this causes the reference
+	// above to not shorten (it will point to b, instead of x, as x won't be
+	// reachable).
+	// Reevaluated after value aliases for embeddings are implemented.
 	z:     "string"
 	X=(z): 4
 	Y="y": "foo"
 	enclosed: {
-		x:      string
-		y:      enclosed.x
-		z:      x
+		x: string
+		y: enclosed.x
+		z: x
+
+		// Comment.
 		labelX: X
 		labelY: Y
 	}

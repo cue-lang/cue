@@ -16,6 +16,24 @@
       "message": "I wonder if we could just omit this field.",
       "revId": "cc6f29e04ce6db4546d4434544de6c748d02cff7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edd556df_c64f3622",
+        "filename": ".goreleaser.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T13:03:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b4162a3_4e3cb9d2",
+      "revId": "cc6f29e04ce6db4546d4434544de6c748d02cff7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

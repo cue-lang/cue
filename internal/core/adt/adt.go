@@ -33,7 +33,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 
 	var v Value
 
-	expr := c.Elem()
+	expr := c.Elem() // TODO: why is this not Expr?
 	switch x := expr.(type) {
 	case Value:
 		v = x

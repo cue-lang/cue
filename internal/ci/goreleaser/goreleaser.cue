@@ -1,6 +1,8 @@
 package goreleaser
 
 config: {
+	#latest: bool @tag(latest, type=bool)
+
 	project_name: "cue"
 	gomod: proxy: true
 	builds: [{
@@ -47,7 +49,11 @@ config: {
 			"^test:",
 		]
 	}
+
 	brews: [{
+		if !#latest {
+			skip_upload: true
+		}
 		tap: {
 			owner: "cue-lang"
 			name:  "homebrew-tap"
@@ -100,17 +106,21 @@ config: {
 			"--label=org.opencontainers.image.licenses=Apache 2.0",
 		]
 	}]
-	docker_manifests: [{
-		name_template: "docker.io/cuelang/cue:{{ .Version }}"
-		image_templates: [
-			"docker.io/cuelang/cue:{{ .Version }}-amd64",
-			"docker.io/cuelang/cue:{{ .Version }}-arm64",
-		]
-	}, {
-		name_template: "docker.io/cuelang/cue:latest"
-		image_templates: [
-			"docker.io/cuelang/cue:{{ .Version }}-amd64",
-			"docker.io/cuelang/cue:{{ .Version }}-arm64",
-		]
-	}]
+
+	docker_manifests: [
+		{
+			name_template: "docker.io/cuelang/cue:{{ .Version }}"
+			image_templates: [
+				"docker.io/cuelang/cue:{{ .Version }}-amd64",
+				"docker.io/cuelang/cue:{{ .Version }}-arm64",
+			]
+		},
+		if #latest {
+			name_template: "docker.io/cuelang/cue:latest"
+			image_templates: [
+				"docker.io/cuelang/cue:{{ .Version }}-amd64",
+				"docker.io/cuelang/cue:{{ .Version }}-arm64",
+			]
+		},
+	]
 }

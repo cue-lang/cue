@@ -27,6 +27,12 @@ _#cueVersionRef: "${GITHUB_REF##refs/tags/}"
 release: _base.#bashWorkflow & {
 
 	name: "Release"
+
+	// We only want a single release happening at a time to avoid
+	// race conditions on updating the latest docker images or
+	// homebrew tags.
+	concurrency: "one release at a time!"
+
 	on: push: tags: [_#releaseTagPattern]
 	jobs: goreleaser: {
 		"runs-on": _#linuxMachine
@@ -55,13 +61,18 @@ release: _base.#bashWorkflow & {
 				}
 			},
 			json.#step & {
-				name: "Run GoReleaser"
-				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
+				name: "Install GoReleaser"
 				uses: "goreleaser/goreleaser-action@v3"
 				with: {
-					args:    "release --rm-dist"
-					version: _#goreleaserVersion
+					"install-only": true
+					version:        _#goreleaserVersion
 				}
+			},
+			json.#step & {
+				name: "Run GoReleaser"
+				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
+				run:                 "cue cmd release"
+				"working-directory": "./internal/ci/goreleaser"
 			},
 			_base.#repositoryDispatch & {
 				name:           "Re-test cuelang.org"

@@ -1,6 +1,8 @@
 package goreleaser
 
 config: {
+	#latest: bool @tag(latest, type=bool)
+
 	project_name: "cue"
 	gomod: proxy: true
 	builds: [{
@@ -48,22 +50,25 @@ config: {
 			"^test:",
 		]
 	}
-	brews: [{
-		tap: {
-			owner: "cue-lang"
-			name:  "homebrew-tap"
-		}
-		commit_author: {
-			name:  "cueckoo"
-			email: "noreply@cuelang.org"
-		}
-		homepage:    "https://cuelang.org"
-		description: "CUE is an open source data constraint language which aims to simplify tasks involving defining and using data."
-		test: """
-			system \"#{bin}/cue version\"
 
-			"""
-	}]
+	if #latest {
+		brews: [{
+			tap: {
+				owner: "cue-lang"
+				name:  "homebrew-tap"
+			}
+			commit_author: {
+				name:  "cueckoo"
+				email: "noreply@cuelang.org"
+			}
+			homepage:    "https://cuelang.org"
+			description: "CUE is an open source data constraint language which aims to simplify tasks involving defining and using data."
+			test: """
+				system \"#{bin}/cue version\"
+
+				"""
+		}]
+	}
 
 	dockers: [{
 		image_templates: [
@@ -101,17 +106,21 @@ config: {
 			"--label=org.opencontainers.image.licenses=Apache 2.0",
 		]
 	}]
-	docker_manifests: [{
-		name_template: "docker.io/cuelang/cue:{{ .Version }}"
-		image_templates: [
-			"docker.io/cuelang/cue:{{ .Version }}-amd64",
-			"docker.io/cuelang/cue:{{ .Version }}-arm64",
-		]
-	}, {
-		name_template: "docker.io/cuelang/cue:latest"
-		image_templates: [
-			"docker.io/cuelang/cue:{{ .Version }}-amd64",
-			"docker.io/cuelang/cue:{{ .Version }}-arm64",
-		]
-	}]
+
+	docker_manifests: [
+		{
+			name_template: "docker.io/cuelang/cue:{{ .Version }}"
+			image_templates: [
+				"docker.io/cuelang/cue:{{ .Version }}-amd64",
+				"docker.io/cuelang/cue:{{ .Version }}-arm64",
+			]
+		},
+		if #latest {
+			name_template: "docker.io/cuelang/cue:latest"
+			image_templates: [
+				"docker.io/cuelang/cue:{{ .Version }}-amd64",
+				"docker.io/cuelang/cue:{{ .Version }}-arm64",
+			]
+		},
+	]
 }

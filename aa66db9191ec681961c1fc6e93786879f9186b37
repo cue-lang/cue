@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "095a4b46_f531b955",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T17:48:56Z",
+      "side": 1,
+      "message": "The unity failure is fine. It\u0027s simply the result of formatting changes as a result of this better comment handling. ",
+      "revId": "aa66db9191ec681961c1fc6e93786879f9186b37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70eff35e_ccafbdf8",
+        "filename": "cmd/cue/cmd/testdata/script/eval_ignore.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T17:48:56Z",
+      "side": 1,
+      "message": "Nice.",
+      "revId": "aa66db9191ec681961c1fc6e93786879f9186b37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "489e946d_34f50e32",
+        "filename": "internal/core/export/testdata/main/adt.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T17:48:56Z",
+      "side": 1,
+      "message": "Also nice.",
+      "revId": "aa66db9191ec681961c1fc6e93786879f9186b37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

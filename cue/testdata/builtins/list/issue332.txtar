@@ -13,15 +13,15 @@ r: #foo & {
 	#x: "hello"
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  25
-Reused: 19
-Allocs: 6
-Retain: 0
+Leaks:  2
+Freed:  23
+Reused: 17
+Allocs: 8
+Retain: 12
 
 Unifications: 25
 Conjuncts:    65
-Disjuncts:    25
+Disjuncts:    35
 -- out/eval --
 (struct){
   #d: (#struct){

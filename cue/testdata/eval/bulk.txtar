@@ -70,11 +70,11 @@ patternCycle: t1: p3: {
 }
 
 -- out/eval/stats --
-Leaks:  0
-Freed:  90
-Reused: 83
-Allocs: 7
-Retain: 6
+Leaks:  2
+Freed:  88
+Reused: 81
+Allocs: 9
+Retain: 8
 
 Unifications: 69
 Conjuncts:    135

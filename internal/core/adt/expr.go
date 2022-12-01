@@ -982,6 +982,10 @@ func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
 			return n
 		}
 	}
+	// TODO(eval): dynamic nodes should be fully evaluated here as the result
+	// will otherwise be discarded and there will be no other chance to check
+	// the struct is valid.
+
 	return c.lookup(n, x.Src.Sel.Pos(), x.Sel, state)
 }
 
@@ -1018,6 +1022,10 @@ func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 			return n
 		}
 	}
+	// TODO(eval): dynamic nodes should be fully evaluated here as the result
+	// will otherwise be discarded and there will be no other chance to check
+	// the struct is valid.
+
 	f := ctx.Label(x.Index, i)
 	return ctx.lookup(n, x.Src.Index.Pos(), f, state)
 }
@@ -1237,11 +1245,22 @@ func (x *BinaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	if x.Op == AndOp {
 		v := &Vertex{
 			IsDynamic: true,
-			Conjuncts: []Conjunct{
-				makeAnonymousConjunct(env, x, c.ci.Refs),
-			},
+			Conjuncts: []Conjunct{makeAnonymousConjunct(env, x, c.ci.Refs)},
 		}
-		c.Unify(v, Finalized)
+
+		// Do not fully evaluate the Vertex: if it is embedded within a
+		// a struct with arcs that are referenced from within this expression,
+		// it will end up adding "locked" fields, resulting in an error.
+		// It will be the responsibility of the "caller" to get the result
+		// to the required state. If the struct is already dynamic, we will
+		// evaluate the struct regardless to ensure that cycle reporting
+		// keeps working.
+		if env.Vertex.IsDynamic || c.inValidator > 0 {
+			c.Unify(v, Finalized)
+		} else {
+			c.Unify(v, Conjuncts)
+		}
+
 		return v
 	}
 
@@ -1282,7 +1301,9 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 	match := op != EqualOp // non-error case
 
 	// Like value(), but retain the original, unwrapped result.
+	c.inValidator++
 	v := c.evalState(x, state)
+	c.inValidator--
 	u, _ := c.getDefault(v)
 	u = Unwrap(u)
 

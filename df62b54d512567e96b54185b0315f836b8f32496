@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5f133e9_693f4e5c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-01T12:31:07Z",
+      "side": 1,
+      "message": "A suggestion to be able to test the homebrew integration a bit more.",
+      "revId": "df62b54d512567e96b54185b0315f836b8f32496",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e905457d_a84c9dac",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-01T12:31:07Z",
+      "side": 1,
+      "message": "none of the upstream examples use spaces or special characters in the concurrency group name, so I\u0027d personally feel safer with something like `concurrency: \"release\"`. You already describe what it does in the comment.",
+      "revId": "df62b54d512567e96b54185b0315f836b8f32496",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4945952_ad0d6c7f",
+        "filename": "internal/ci/goreleaser/goreleaser.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-01T12:31:07Z",
+      "side": 1,
+      "message": "unfortunately, this skips testing the homebrew integration altogether. I would personally prefer to keep homebrew always enabled, but set\n\n```\nif !#latest {\n  skip_upload: true\n}\n```\n\nSee https://goreleaser.com/customization/homebrew/\n\n    # Setting this will prevent goreleaser to actually try to commit the updated\n    # formula - instead, the formula file will be stored on the dist folder only,\n    # leaving the responsibility of publishing it to the user.\n    # If set to auto, the release will not be uploaded to the homebrew tap\n    # in case there is an indicator for prerelease in the tag e.g. v1.0.0-rc1\n    # Default is false.\n    skip_upload: true\n\nSkipping the upload isn\u0027t a full test either, but at least we will do everything else related to preparing the formula.",
+      "revId": "df62b54d512567e96b54185b0315f836b8f32496",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

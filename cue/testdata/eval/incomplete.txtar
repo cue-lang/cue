@@ -44,11 +44,11 @@ issue1837: {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  32
-Reused: 26
-Allocs: 6
-Retain: 40
+Leaks:  5
+Freed:  27
+Reused: 21
+Allocs: 11
+Retain: 45
 
 Unifications: 32
 Conjuncts:    122

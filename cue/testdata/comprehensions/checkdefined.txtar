@@ -73,15 +73,15 @@ structs: {
 }
 
 -- out/eval/stats --
-Leaks:  5
-Freed:  91
-Reused: 84
-Allocs: 12
-Retain: 16
+Leaks:  11
+Freed:  81
+Reused: 77
+Allocs: 15
+Retain: 22
 
-Unifications: 96
-Conjuncts:    122
-Disjuncts:    102
+Unifications: 92
+Conjuncts:    116
+Disjuncts:    96
 -- out/eval --
 (struct){
   xc: (#struct){

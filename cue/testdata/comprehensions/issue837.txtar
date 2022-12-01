@@ -64,29 +64,21 @@
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
 -- out/eval/stats --
-Leaks:  2
-Freed:  162
-Reused: 145
-Allocs: 19
-Retain: 11
+Leaks:  16
+Freed:  117
+Reused: 108
+Allocs: 25
+Retain: 68
 
-Unifications: 114
-Conjuncts:    307
-Disjuncts:    173
+Unifications: 107
+Conjuncts:    295
+Disjuncts:    185
 -- out/eval --
 Errors:
-_params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
-    ./in.cue:29:20
-    ./in.cue:35:13
-    ./in.cue:55:12
-    ./in.cue:56:22
-_params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
-    ./in.cue:29:20
-    ./in.cue:35:13
-    ./in.cue:55:12
-    ./in.cue:56:15
-_params.hsize.$_instances: 2 errors in empty disjunction::
-    ./in.cue:33:20
+#Configure.service.description.role: undefined field: role:
+    ./in.cue:40:19
+#DoDeploy.deployment.description.service.description.role: undefined field: role:
+    ./in.cue:40:19
 #RelabelService.out.labstr: undefined field: label:
     ./in.cue:51:14
 
@@ -179,18 +171,21 @@ Result:
           }
         }
         service: (_|_){
-          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
-          //     ./in.cue:29:20
-          //     ./in.cue:35:13
-          //     ./in.cue:55:12
-          //     ./in.cue:56:22
-          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
-          //     ./in.cue:29:20
-          //     ./in.cue:35:13
-          //     ./in.cue:55:12
-          //     ./in.cue:56:15
-          // _params.hsize.$_instances: 2 errors in empty disjunction::
-          //     ./in.cue:33:20
+          // [eval]
+          description: (_|_){
+            // [eval]
+            let configed#2 = (_|_){
+              // [eval]
+              labstr: (_|_){
+                // [eval] #DoDeploy.deployment.description.service.description.configed.labstr: undefined field: label:
+                //     ./in.cue:51:14
+              }
+            }
+            role: (_|_){
+              // [eval] #DoDeploy.deployment.description.service.description.role: undefined field: role:
+              //     ./in.cue:40:19
+            }
+          }
         }
       }
     }
@@ -206,32 +201,15 @@ Result:
       description: (_|_){
         // [eval]
         let configed#2 = (_|_){
-          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
-          //     ./in.cue:29:20
-          //     ./in.cue:35:13
-          //     ./in.cue:55:12
-          //     ./in.cue:56:22
-          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
-          //     ./in.cue:29:20
-          //     ./in.cue:35:13
-          //     ./in.cue:55:12
-          //     ./in.cue:56:15
-          // _params.hsize.$_instances: 2 errors in empty disjunction::
-          //     ./in.cue:33:20
+          // [eval]
+          labstr: (_|_){
+            // [eval] #Configure.service.description.configed.labstr: undefined field: label:
+            //     ./in.cue:51:14
+          }
         }
         role: (_|_){
-          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
-          //     ./in.cue:29:20
-          //     ./in.cue:35:13
-          //     ./in.cue:55:12
-          //     ./in.cue:56:22
-          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
-          //     ./in.cue:29:20
-          //     ./in.cue:35:13
-          //     ./in.cue:55:12
-          //     ./in.cue:56:15
-          // _params.hsize.$_instances: 2 errors in empty disjunction::
-          //     ./in.cue:33:20
+          // [eval] #Configure.service.description.role: undefined field: role:
+          //     ./in.cue:40:19
         }
       }
     }

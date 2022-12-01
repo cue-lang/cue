@@ -63,15 +63,15 @@ fib12: (fib & {n: 12}).out // Error
   }).out
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  137
-Reused: 123
-Allocs: 14
-Retain: 22
+Leaks:  16
+Freed:  180
+Reused: 169
+Allocs: 27
+Retain: 105
 
-Unifications: 137
-Conjuncts:    336
-Disjuncts:    154
+Unifications: 196
+Conjuncts:    464
+Disjuncts:    276
 -- out/eval --
 Errors:
 structural cycle:

@@ -254,6 +254,10 @@ type OpContext struct {
 	// enabled.
 	inConstraint int
 
+	// inValidator defines whether full evaluation need to be enforced, for
+	// instance when comparing against bottom.
+	inValidator int
+
 	// The current call is a validator. A builtin may return a boolean false
 	// along with an error message describing a validation error. If the latter
 	// is wrapped in an internal.ValidationError, it will only be interpreted

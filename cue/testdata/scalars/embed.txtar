@@ -133,16 +133,34 @@ merged: t2: p3: {
 	#fn: { #in2: {}, _ }
 }
 
+-- issue2163.cue --
+// TODO(broken)
+selfRefInEmbed: t1: {
+	#Func: {
+		#in: _
+		_
+	}
+	#fn: #Func
+	#fn: {
+		#in: _
+	
+		(#Func & {
+			_foo: #in
+			"buzz"
+		}) + "fiz"
+	}
+}
+
 -- out/eval/stats --
 Leaks:  1
-Freed:  123
-Reused: 115
+Freed:  132
+Reused: 124
 Allocs: 9
-Retain: 47
+Retain: 48
 
-Unifications: 120
-Conjuncts:    307
-Disjuncts:    156
+Unifications: 129
+Conjuncts:    327
+Disjuncts:    166
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
@@ -339,6 +357,19 @@ Result:
             c1: (string){ string }
           }
         }
+      }
+    }
+  }
+  selfRefInEmbed: (struct){
+    t1: (struct){
+      #Func: (_){
+        _
+        #in: (_){ _ }
+      }
+      #fn: (_|_){
+        // [incomplete] selfRefInEmbed.t1.#fn: cannot add field #in: was already used:
+        //     ./issue2163.cue:9:3
+        #in: (_){ _ }
       }
     }
   }
@@ -589,6 +620,25 @@ Result:
           #in2: {}
           _
         }
+      }
+    }
+  }
+}
+--- issue2163.cue
+{
+  selfRefInEmbed: {
+    t1: {
+      #Func: {
+        #in: _
+        _
+      }
+      #fn: 〈0;#Func〉
+      #fn: {
+        #in: _
+        ((〈1;#Func〉 & {
+          _foo: 〈1;#in〉
+          "buzz"
+        }) + "fiz")
       }
     }
   }

@@ -25,7 +25,22 @@ inline: patterns: {
 	f: {}
 }
 
-inline: acrossFields: {
+inline: acrossFields: fail1: {
+	f: {
+		in:  number
+		out: in + 1
+	}
+	k00: 0
+	k10: (f & {in: k00}).out
+	k20: (f & {in: k10}).out
+	k30: (f & {in: k20}).out
+
+	// invalid recursion is here.
+	k10: (f & {in: k30}).out
+}
+
+// Issue #2163
+inline: acrossFields: ok1: {
 	f: {
 		in:  number
 		out: in
@@ -35,7 +50,8 @@ inline: acrossFields: {
 	k20: (f & {in: k10}).out
 	k30: (f & {in: k20}).out
 
-	// invalid recursion is here.
+	// TODO: what is correct behavior here.
+	// This is borderline okay.
 	k10: (f & {in: k30}).out
 }
 -- out/compile --
@@ -91,36 +107,61 @@ inline: acrossFields: {
   }
   inline: {
     acrossFields: {
-      f: {
-        in: number
-        out: 〈0;in〉
+      fail1: {
+        f: {
+          in: number
+          out: (〈0;in〉 + 1)
+        }
+        k00: 0
+        k10: (〈0;f〉 & {
+          in: 〈1;k00〉
+        }).out
+        k20: (〈0;f〉 & {
+          in: 〈1;k10〉
+        }).out
+        k30: (〈0;f〉 & {
+          in: 〈1;k20〉
+        }).out
+        k10: (〈0;f〉 & {
+          in: 〈1;k30〉
+        }).out
       }
-      k00: 0
-      k10: (〈0;f〉 & {
-        in: 〈1;k00〉
-      }).out
-      k20: (〈0;f〉 & {
-        in: 〈1;k10〉
-      }).out
-      k30: (〈0;f〉 & {
-        in: 〈1;k20〉
-      }).out
-      k10: (〈0;f〉 & {
-        in: 〈1;k30〉
-      }).out
+    }
+  }
+  inline: {
+    acrossFields: {
+      ok1: {
+        f: {
+          in: number
+          out: 〈0;in〉
+        }
+        k00: 0
+        k10: (〈0;f〉 & {
+          in: 〈1;k00〉
+        }).out
+        k20: (〈0;f〉 & {
+          in: 〈1;k10〉
+        }).out
+        k30: (〈0;f〉 & {
+          in: 〈1;k20〉
+        }).out
+        k10: (〈0;f〉 & {
+          in: 〈1;k30〉
+        }).out
+      }
     }
   }
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  221
-Reused: 205
-Allocs: 18
-Retain: 38
+Leaks:  4
+Freed:  276
+Reused: 259
+Allocs: 21
+Retain: 47
 
-Unifications: 223
-Conjuncts:    699
-Disjuncts:    225
+Unifications: 280
+Conjuncts:    831
+Disjuncts:    282
 -- out/eval --
 Errors:
 structural cycle:
@@ -135,6 +176,12 @@ in: structural cycle:
     ./x.cue:35:8
 in: structural cycle:
     ./x.cue:38:8
+in: structural cycle:
+    ./x.cue:49:8
+in: structural cycle:
+    ./x.cue:50:8
+in: structural cycle:
+    ./x.cue:54:8
 
 Result:
 (_|_){
@@ -187,22 +234,49 @@ Result:
     }
     acrossFields: (_|_){
       // [structural cycle]
-      f: (struct){
-        in: (number){ number }
-        out: (number){ number }
+      fail1: (_|_){
+        // [structural cycle]
+        f: (struct){
+          in: (number){ number }
+          out: (_|_){
+            // [incomplete] inline.acrossFields.fail1.f.out: non-concrete value number in operand to +:
+            //     ./x.cue:30:8
+            //     ./x.cue:29:8
+          }
+        }
+        k00: (int){ 0 }
+        k10: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:38:8
+        }
+        k20: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:34:8
+        }
+        k30: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:35:8
+        }
       }
-      k00: (int){ 0 }
-      k10: (_|_){
-        // [structural cycle] in: structural cycle:
-        //     ./x.cue:38:8
-      }
-      k20: (_|_){
-        // [structural cycle] in: structural cycle:
-        //     ./x.cue:34:8
-      }
-      k30: (_|_){
-        // [structural cycle] in: structural cycle:
-        //     ./x.cue:35:8
+      ok1: (_|_){
+        // [structural cycle]
+        f: (struct){
+          in: (number){ number }
+          out: (number){ number }
+        }
+        k00: (int){ 0 }
+        k10: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:54:8
+        }
+        k20: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:49:8
+        }
+        k30: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:50:8
+        }
       }
     }
   }

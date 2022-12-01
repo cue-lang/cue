@@ -59,16 +59,29 @@ checkIncomplete: t1: {
 	f: blah: {}
 }
 
+-- structs.cue --
+structs: {
+	bare: t1: ({y: 2} & {x: 3}) != _|_
+	bare: f2: ({y: 2} & {x: 3}) == _|_
+	bare: f3: ({x: 1, y: 2} & {x: 3}) != _|_
+	bare: t4: ({x: 1, y: 2} & {x: 3}) == _|_
+
+	select: t1: ({y: 2} & {x: 3}).y != _|_
+	select: f2: ({y: 2} & {x: 3}).y == _|_
+	select: f3: ({x: 1, y: 2} & {x: 3}).y != _|_
+	select: t4: ({x: 1, y: 2} & {x: 3}).y == _|_
+}
+
 -- out/eval/stats --
 Leaks:  5
-Freed:  44
-Reused: 37
+Freed:  91
+Reused: 84
 Allocs: 12
 Retain: 16
 
-Unifications: 49
-Conjuncts:    52
-Disjuncts:    55
+Unifications: 96
+Conjuncts:    122
+Disjuncts:    102
 -- out/eval --
 (struct){
   xc: (#struct){
@@ -131,6 +144,20 @@ Disjuncts:    55
           a: (string){ string }
         }
       }
+    }
+  }
+  structs: (struct){
+    bare: (struct){
+      t1: (bool){ true }
+      f2: (bool){ false }
+      f3: (bool){ false }
+      t4: (bool){ true }
+    }
+    select: (struct){
+      t1: (bool){ true }
+      f2: (bool){ false }
+      f3: (bool){ false }
+      t4: (bool){ true }
     }
   }
 }
@@ -241,6 +268,71 @@ Disjuncts:    55
       f: {
         blah: {}
       }
+    }
+  }
+}
+--- structs.cue
+{
+  structs: {
+    bare: {
+      t1: (({
+        y: 2
+      } & {
+        x: 3
+      }) != _|_(explicit error (_|_ literal) in source))
+    }
+    bare: {
+      f2: (({
+        y: 2
+      } & {
+        x: 3
+      }) == _|_(explicit error (_|_ literal) in source))
+    }
+    bare: {
+      f3: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }) != _|_(explicit error (_|_ literal) in source))
+    }
+    bare: {
+      t4: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }) == _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      t1: (({
+        y: 2
+      } & {
+        x: 3
+      }).y != _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      f2: (({
+        y: 2
+      } & {
+        x: 3
+      }).y == _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      f3: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }).y != _|_(explicit error (_|_ literal) in source))
+    }
+    select: {
+      t4: (({
+        x: 1
+        y: 2
+      } & {
+        x: 3
+      }).y == _|_(explicit error (_|_ literal) in source))
     }
   }
 }

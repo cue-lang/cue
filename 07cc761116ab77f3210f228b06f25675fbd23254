@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8351279_40bfbce1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T14:11:43Z",
+      "side": 1,
+      "message": "Long line, please wrap for readability.",
+      "revId": "07cc761116ab77f3210f228b06f25675fbd23254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "35f9883b_1be8b44d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T14:11:43Z",
+      "side": 1,
+      "message": "LGTM with some small proposed changes.",
+      "revId": "07cc761116ab77f3210f228b06f25675fbd23254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0ec5567_fab29c87",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 408,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T14:11:43Z",
+      "side": 1,
+      "message": "Not part of this change?",
+      "revId": "07cc761116ab77f3210f228b06f25675fbd23254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46c602a2_ec751e2b",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T14:11:43Z",
+      "side": 1,
+      "message": "I would state more precisely with something like:\n\n\u003e directly query the source VCS rather than the proxy",
+      "revId": "07cc761116ab77f3210f228b06f25675fbd23254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c99417b_cad7282f",
+        "filename": "pkg/tool/exec/exec.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T14:11:43Z",
+      "side": 1,
+      "message": "Not part of this change?",
+      "revId": "07cc761116ab77f3210f228b06f25675fbd23254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -123,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc24a7de_3f6b54ce",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T14:25:43Z",
+      "side": 1,
+      "message": "I don\u0027t think it matters no, because the source VCS is the source of truth?\n\nI don\u0027t think it\u0027s a big point though.",
+      "parentUuid": "34a70441_816f8e82",
+      "revId": "07cc761116ab77f3210f228b06f25675fbd23254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c99417b_cad7282f",

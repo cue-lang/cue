@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b19a84be_daefb072",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-01T12:20:33Z",
+      "side": 1,
+      "message": "Thanks for this. I actually was meaning to do this soon as well, because the old schema doesn\u0027t yet have e.g. ubuntu-22.04.",
+      "revId": "e40f1006e1eac48f908f0f10ec040ecd4543b974",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

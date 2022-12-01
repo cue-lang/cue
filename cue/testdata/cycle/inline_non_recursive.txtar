@@ -60,15 +60,15 @@ issue1708: {
 }
 
 -- out/eval/stats --
-Leaks:  51
-Freed:  629
-Reused: 617
-Allocs: 63
-Retain: 102
+Leaks:  240
+Freed:  440
+Reused: 430
+Allocs: 250
+Retain: 1014
 
 Unifications: 680
 Conjuncts:    2709
-Disjuncts:    731
+Disjuncts:    1454
 -- out/eval --
 (struct){
   ok1: (struct){

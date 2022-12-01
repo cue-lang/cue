@@ -134,7 +134,6 @@ merged: t2: p3: {
 }
 
 -- issue2163.cue --
-// TODO(broken)
 selfRefInEmbed: t1: {
 	#Func: {
 		#in: _
@@ -152,15 +151,15 @@ selfRefInEmbed: t1: {
 }
 
 -- out/eval/stats --
-Leaks:  1
-Freed:  132
-Reused: 124
-Allocs: 9
-Retain: 48
+Leaks:  11
+Freed:  120
+Reused: 113
+Allocs: 18
+Retain: 51
 
-Unifications: 129
-Conjuncts:    327
-Disjuncts:    166
+Unifications: 127
+Conjuncts:    313
+Disjuncts:    157
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
@@ -366,9 +365,8 @@ Result:
         _
         #in: (_){ _ }
       }
-      #fn: (_|_){
-        // [incomplete] selfRefInEmbed.t1.#fn: cannot add field #in: was already used:
-        //     ./issue2163.cue:9:3
+      #fn: (string){
+        "buzzfiz"
         #in: (_){ _ }
       }
     }

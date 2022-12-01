@@ -153,35 +153,25 @@ inline: acrossFields: ok1: {
   }
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  276
-Reused: 259
-Allocs: 21
-Retain: 47
+Leaks:  268
+Freed:  168
+Reused: 162
+Allocs: 274
+Retain: 821
 
-Unifications: 280
-Conjuncts:    831
-Disjuncts:    282
+Unifications: 436
+Conjuncts:    1499
+Disjuncts:    795
 -- out/eval --
 Errors:
 structural cycle:
     ./x.cue:6:9
 structural cycle:
-    ./x.cue:12:24
+    ./x.cue:15:9
 structural cycle:
     ./x.cue:20:9
 in: structural cycle:
-    ./x.cue:34:8
-in: structural cycle:
-    ./x.cue:35:8
-in: structural cycle:
-    ./x.cue:38:8
-in: structural cycle:
-    ./x.cue:49:8
-in: structural cycle:
-    ./x.cue:50:8
-in: structural cycle:
-    ./x.cue:54:8
+    ./x.cue:30:8
 
 Result:
 (_|_){
@@ -203,14 +193,14 @@ Result:
       // [structural cycle]
       f2: (_|_){
         // [structural cycle] structural cycle:
-        //     ./x.cue:12:24
+        //     ./x.cue:15:9
       }
       fRec: (_|_){
         // [structural cycle]
         nn: (int){ int }
         out: (_|_){
           // [structural cycle] structural cycle:
-          //     ./x.cue:12:24
+          //     ./x.cue:15:9
         }
       }
       f: (_|_){
@@ -218,7 +208,7 @@ Result:
         n: (int){ int }
         out: (_|_){
           // [structural cycle] structural cycle:
-          //     ./x.cue:12:24
+          //     ./x.cue:15:9
         }
       }
     }
@@ -247,36 +237,26 @@ Result:
         k00: (int){ 0 }
         k10: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:38:8
+          //     ./x.cue:30:8
         }
         k20: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:34:8
+          //     ./x.cue:30:8
         }
         k30: (_|_){
           // [structural cycle] in: structural cycle:
-          //     ./x.cue:35:8
+          //     ./x.cue:30:8
         }
       }
-      ok1: (_|_){
-        // [structural cycle]
+      ok1: (struct){
         f: (struct){
           in: (number){ number }
           out: (number){ number }
         }
         k00: (int){ 0 }
-        k10: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:54:8
-        }
-        k20: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:49:8
-        }
-        k30: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:50:8
-        }
+        k10: (int){ 0 }
+        k20: (int){ 0 }
+        k30: (int){ 0 }
       }
     }
   }

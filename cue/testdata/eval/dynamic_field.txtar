@@ -64,11 +64,11 @@ noCycleError: {
 }
 
 -- out/eval/stats --
-Leaks:  0
-Freed:  56
-Reused: 49
-Allocs: 7
-Retain: 4
+Leaks:  2
+Freed:  54
+Reused: 47
+Allocs: 9
+Retain: 6
 
 Unifications: 56
 Conjuncts:    73

@@ -34,7 +34,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           args: release --rm-dist
-          version: v1.12.3
+          version: v1.13.1
         env:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
       - name: Re-test cuelang.org

@@ -15,6 +15,7 @@ val: list[3]
 
 -- expect/stdout --
 a: _|_ // a: conflicting values 5 and 4
-l: [1, _|_]
+l: [1, _|_, // l.1: conflicting values 3 and 2
+]
 list: [0, 1, 2]
 val: _|_ // val: index out of range [3] with length 3

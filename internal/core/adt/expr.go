@@ -1800,6 +1800,8 @@ func (x *Disjunction) Kind() Kind {
 }
 
 type Comprehension struct {
+	Syntax ast.Node
+
 	// Clauses is the list of for, if, and other clauses of a comprehension,
 	// not including the yielded value (in curly braces).
 	Clauses []Yielder
@@ -1842,10 +1844,10 @@ func (x *Comprehension) DidResolve() bool {
 }
 
 func (x *Comprehension) Source() ast.Node {
-	if x.Clauses == nil {
+	if x.Syntax == nil {
 		return nil
 	}
-	return x.Clauses[0].Source()
+	return x.Syntax
 }
 
 // A ForClause represents a for clause of a comprehension. It can be used

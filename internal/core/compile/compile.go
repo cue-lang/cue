@@ -790,6 +790,7 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 	}
 
 	return &adt.Comprehension{
+		Syntax:  x,
 		Clauses: a,
 		Value:   st,
 	}

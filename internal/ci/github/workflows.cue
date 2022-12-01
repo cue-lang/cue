@@ -73,7 +73,7 @@ _#windowsMachine: "windows-2022"
 // just once per CI workflow, to avoid duplicated work.
 #_isLatestLinux: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 
-_#goreleaserVersion: "v1.12.3"
+_#goreleaserVersion: "v1.13.1"
 
 _#testStrategy: {
 	"fail-fast": false

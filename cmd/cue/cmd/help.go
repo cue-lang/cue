@@ -405,7 +405,7 @@ the terminal:
 	// Say hello!
 	command: hello: {
 		print: exec.Run & {
-			cmd: "echo Hello \(who)! Welcome to \(city)."
+			cmd: ["echo", "Hello \(who)! Welcome to \(city)."]
 		}
 	}
 	EOF

@@ -15,7 +15,7 @@ command: release: {
 	env: os.Environ
 
 	let _env = env
-	let _githubActions = env.GITHUB_ACTIONS | ""
+	let _githubActions = env.GITHUB_ACTIONS | "" // "true" if running in CI
 	let _githubRef = path.Base(env.GITHUB_REF | "refs/tags/<not a github release>")
 
 	// Only run the full release as part of GitHub actions
@@ -33,11 +33,11 @@ command: release: {
 	latestCUE: exec.Run & {
 		env: {
 			_env
-			GOPROXY: "direct"
+			GOPROXY: "direct" // skip proxy.golang.org in case its @latest is lagging behind
 		}
 		$after: goMod
 		dir:    tempDir.path
-		cmd:    "go list -m -f {{.Version}} cuelang.org/go@latest"
+		cmd:    ["go", "list", "-m", "-f", "{{.Version}}", "cuelang.org/go@latest"]
 		stdout: string
 	}
 
@@ -49,7 +49,7 @@ command: release: {
 	}
 
 	cueModRoot: exec.Run & {
-		cmd:    "go list -m -f {{.Dir}} cuelang.org/go"
+		cmd:    ["go", "list", "-m", "-f", "{{.Dir}}", "cuelang.org/go"]
 		stdout: string
 	}
 
@@ -72,6 +72,6 @@ command: release: {
 		// Run at the root of the module
 		dir: strings.TrimSpace(cueModRoot.stdout)
 
-		cmd: "goreleaser release -f - --rm-dist \(snapshot)"
+		cmd: ["goreleaser", "release", "-f", "-", "--rm-dist", snapshot]
 	}
 }

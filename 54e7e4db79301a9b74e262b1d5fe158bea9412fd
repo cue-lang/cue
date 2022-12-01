@@ -16,6 +16,24 @@
       "message": "wouldn\u0027t it be better to use a list of strings here? otherwise any form of splitting on whitespace may bite us later on. same with the other command arguments.",
       "revId": "54e7e4db79301a9b74e262b1d5fe158bea9412fd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2911836a_d9195c53",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-01T13:50:07Z",
+      "side": 1,
+      "message": "Sounds good. I\u0027ll let you pick this up ;-)",
+      "parentUuid": "346f441a_821b28bb",
+      "revId": "54e7e4db79301a9b74e262b1d5fe158bea9412fd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

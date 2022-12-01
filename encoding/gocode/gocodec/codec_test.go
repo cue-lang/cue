@@ -74,7 +74,7 @@ func TestValidate(t *testing.T) {
 		// Not a typical constraint, but it is possible.
 		name:        "string list incompatible lengths",
 		value:       []string{"a", "b", "c"},
-		constraints: `4*[string]`,
+		constraints: "import \"list\"\nlist.MinItems(4)",
 		err:         fail,
 	}}
 

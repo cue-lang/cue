@@ -205,6 +205,12 @@ func TestDecode(t *testing.T) {
 		dst:   &map[uint8]int{},
 		err:   "key integer 300 overflows uint8",
 	}, {
+		value: `a: _ | *[0, ...]`,
+		dst:   &map[string]interface{}{},
+		want: map[string]interface{}{
+			"a": []interface{}{int(0)},
+		},
+	}, {
 		// Issue #1401
 		value: `a: b: _ | *[0, ...]`,
 		dst:   &map[string]interface{}{},

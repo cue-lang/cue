@@ -23,8 +23,9 @@ t0: [{}]
 t1: [...]
 t1: [...int]
 
+#e: [{}]
 e0: 2 * [{}]
-e0: [{}]
+e0: #e
 e1: [...int]
 e1: [...float]
 -- out/def --
@@ -103,12 +104,13 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
   t1: [
     ...int,
   ]
+  #e: [
+    {},
+  ]
   e0: (2 * [
     {},
   ])
-  e0: [
-    {},
-  ]
+  e0: 〈0;#e〉
   e1: [
     ...int,
   ]
@@ -118,14 +120,14 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
 }
 -- out/eval/stats --
 Leaks:  11
-Freed:  30
-Reused: 26
+Freed:  32
+Reused: 28
 Allocs: 15
 Retain: 34
 
-Unifications: 41
-Conjuncts:    75
-Disjuncts:    63
+Unifications: 43
+Conjuncts:    78
+Disjuncts:    65
 -- out/eval --
 Errors:
 e0: incompatible list lengths (1 and 2)
@@ -162,9 +164,13 @@ Result:
   }
   t1: (list){
   }
+  #e: (#list){
+    0: (#struct){
+    }
+  }
   e0: (_|_){
     // [eval] e0: incompatible list lengths (1 and 2)
-    0: (struct){
+    0: (#struct){
     }
     1: (struct){
     }

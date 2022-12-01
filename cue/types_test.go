@@ -274,6 +274,11 @@ func TestValueType(t *testing.T) {
 		incompleteKind: ListKind,
 		concrete:       false,
 	}, {
+		value:          `v: {...}`,
+		kind:           StructKind,
+		incompleteKind: StructKind,
+		concrete:       true,
+	}, {
 		value:    `v: {a: int, b: [1][a]}.b`,
 		kind:     BottomKind,
 		concrete: false,
@@ -1330,106 +1335,149 @@ func TestAllows(t *testing.T) {
 	}{{
 		desc: "allow new field in open struct",
 		in: `
-		x: {
-			a: int
-		}
-		`,
+			x: {
+				a: int
+			}
+			`,
 		sel:   Str("b"),
 		allow: true,
 	}, {
 		desc: "disallow new field in definition",
 		in: `
-		x: #Def
-		#Def: {
-			a: int
-		}
-		`,
+			x: #Def
+			#Def: {
+				a: int
+			}
+			`,
 		sel: Str("b"),
 	}, {
 		desc: "disallow new field in explicitly closed struct",
 		in: `
-		x: close({
-			a: int
-		})
-		`,
+			x: close({
+				a: int
+			})
+			`,
 		sel: Str("b"),
 	}, {
 		desc: "allow index in open list",
 		in: `
-		x: [...int]
-		`,
+			x: [...int]
+			`,
 		sel:   Index(100),
 		allow: true,
 	}, {
-		desc: "disallow index in closed list",
+		desc: "allow index in open list (implied)",
 		in: `
-		x: []
-		`,
+				x: []
+				`,
+		sel:   Index(100),
+		allow: true,
+	}, {
+		desc: "disallow index in closed list (def)",
+		in: `
+			#d: []
+			x: #d
+			`,
 		sel: Index(0),
 	}, {
-		desc: "allow existing index in closed list",
+		desc: "disallow index in closed list (close)",
 		in: `
-		x: [1]
-		`,
+				x: close([])
+				`,
+		sel: Index(0),
+	}, {
+		desc: "allow existing index in open list",
+		in: `
+			x: [1]
+			`,
+		sel:   Index(0),
+		allow: true,
+	}, {
+		desc: "allow existing index in closed list (def)",
+		in: `
+			#d: [1]
+			x: #d
+			`,
+		sel:   Index(0),
+		allow: true,
+	}, {
+		desc: "allow existing index in closed list (close)",
+		in: `
+			x: close([1])
+			`,
 		sel:   Index(0),
 		allow: true,
 	}, {
 		desc: "definition in non-def closed list",
 		in: `
-		x: [1]
-		`,
+			x: [1]
+			`,
 		sel:   Def("#foo"),
 		allow: true,
 	}, {
 		// TODO(disallow)
 		desc: "definition in def open list",
 		in: `
-		x: #Def
-		x: [1]
-		#Def: [...int]
-		`,
+			x: #Def
+			x: [1]
+			#Def: [...int]
+			`,
 		sel:   Def("#foo"),
 		allow: true,
 	}, {
 		desc: "field in def open list",
 		in: `
-		x: #Def
-		x: [1]
-		#Def: [...int]
-		`,
+			x: #Def
+			x: [1]
+			#Def: [...int]
+			`,
 		sel: Str("foo"),
 	}, {
 		desc: "definition in open scalar",
 		in: `
-		x: 1
-		`,
+			x: 1
+			`,
 		sel:   Def("#foo"),
 		allow: true,
 	}, {
 		desc: "field in scalar",
 		in: `
-		x: #Def
-		x: 1
-		#Def: int
-		`,
+			x: #Def
+			x: 1
+			#Def: int
+			`,
 		sel: Str("foo"),
 	}, {
-		desc: "any index in closed list",
+		desc: "any index in implicitly open list",
 		in: `
-		x: [1]
-		`,
-		sel: AnyIndex,
-	}, {
-		desc: "any index in open list",
-		in: `
-		x: [...int]
+			x: [1]
 			`,
 		sel:   AnyIndex,
 		allow: true,
 	}, {
+		desc: "any index in open list",
+		in: `
+			x: [...int]
+				`,
+		sel:   AnyIndex,
+		allow: true,
+	}, {
+		desc: "any index in closed list (through def)",
+		in: `
+			#d: [1]
+			x: #d
+			`,
+		sel: AnyIndex,
+	}, {
+		desc: "any index in closed list (through close)",
+		in: `
+			x: close([1])
+		`,
+		sel: AnyIndex,
+	}, {
 		desc: "definition in open scalar",
 		in: `
-		x: 1
+			x: 1
 		`,
 		sel:   anyDefinition,
 		allow: true,
@@ -1555,6 +1603,7 @@ func TestAllows(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc.allow)
 			}
 		})
+		break
 	}
 }
 
@@ -1696,11 +1745,14 @@ func TestLen(t *testing.T) {
 		input  string
 		length string
 	}{{
+		input:  "close([1, 3])",
+		length: "_|_ // len not supported for type _|_",
+	}, {
 		input:  "[1, 3]",
 		length: "2",
 	}, {
 		input:  "[1, 3, ...]",
-		length: "int & >=2",
+		length: "int & >=2", // TODO: should we just make this 2?
 	}, {
 		input:  `"foo"`,
 		length: "3",
@@ -3520,9 +3572,12 @@ func TestExpr(t *testing.T) {
 		input: `v: { {c: a}, b: a }, a: int`,
 		want:  `&({c:a} {b:a})`,
 	}, {
-		input: `v: [...number] | *[1, 2, 3]`,
+		input: `v: [...number] | *close([1, 2, 3])`,
 		// Filter defaults that are subsumed by another value.
 		want: `[...number]`,
+	}, {
+		input: `v: [...number] | *[1, 2, 3]`,
+		want:  `[...number]`,
 	}, {
 		input: `v: or([1, 2, 3])`,
 		want:  `|(1 2 3)`,

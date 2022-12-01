@@ -409,13 +409,13 @@ e5: {
 // validating values
 nestedList: {
 	v1e: {
-		x: [x | int, 1]
-		y: x & [[[2], 1], 1]
+		#x: [#x | int, 1]
+		y: #x & [[[2], 1], 1]
 	}
 
 	v2e: {
-		y: x & [[[2], 1], 1]
-		x: [x | int, 1]
+		y: #x & [[[2], 1], 1]
+		#x: [#x | int, 1]
 	}
 
 	v1: {
@@ -601,21 +601,21 @@ e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:397:10
 nestedList.v1e.y.0: 4 errors in empty disjunction:
 nestedList.v1e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
-    ./in.cue:411:11
-    ./in.cue:412:11
+    ./in.cue:411:13
+    ./in.cue:412:12
 nestedList.v1e.y.0.0: 2 errors in empty disjunction:
 nestedList.v1e.y.0.0: conflicting values int and [2] (mismatched types int and list):
-    ./in.cue:411:11
-    ./in.cue:412:12
+    ./in.cue:411:13
+    ./in.cue:412:13
 nestedList.v1e.y.0.0: incompatible list lengths (1 and 2)
 nestedList.v2e.y.0: 4 errors in empty disjunction:
 nestedList.v2e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
-    ./in.cue:416:11
-    ./in.cue:417:11
+    ./in.cue:416:12
+    ./in.cue:417:13
 nestedList.v2e.y.0.0: 2 errors in empty disjunction:
 nestedList.v2e.y.0.0: conflicting values int and [2] (mismatched types int and list):
-    ./in.cue:416:12
-    ./in.cue:417:11
+    ./in.cue:416:13
+    ./in.cue:417:13
 nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
 p2.#T.a.b.link: structural cycle
 p3.#U.#T.a.b.link: structural cycle
@@ -1433,7 +1433,7 @@ Result:
     // [eval]
     v1e: (_|_){
       // [eval]
-      x: (#list){
+      #x: (#list){
         0: (int){ int }
         1: (int){ 1 }
       }
@@ -1442,12 +1442,12 @@ Result:
         0: (_|_){
           // [eval] nestedList.v1e.y.0: 4 errors in empty disjunction:
           // nestedList.v1e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
-          //     ./in.cue:411:11
-          //     ./in.cue:412:11
+          //     ./in.cue:411:13
+          //     ./in.cue:412:12
           // nestedList.v1e.y.0.0: 2 errors in empty disjunction:
           // nestedList.v1e.y.0.0: conflicting values int and [2] (mismatched types int and list):
-          //     ./in.cue:411:11
-          //     ./in.cue:412:12
+          //     ./in.cue:411:13
+          //     ./in.cue:412:13
           // nestedList.v1e.y.0.0: incompatible list lengths (1 and 2)
           0: (#list){
             0: (int){ 2 }
@@ -1464,12 +1464,12 @@ Result:
         0: (_|_){
           // [eval] nestedList.v2e.y.0: 4 errors in empty disjunction:
           // nestedList.v2e.y.0: conflicting values int and [[2],1] (mismatched types int and list):
-          //     ./in.cue:416:11
-          //     ./in.cue:417:11
+          //     ./in.cue:416:12
+          //     ./in.cue:417:13
           // nestedList.v2e.y.0.0: 2 errors in empty disjunction:
           // nestedList.v2e.y.0.0: conflicting values int and [2] (mismatched types int and list):
-          //     ./in.cue:416:12
-          //     ./in.cue:417:11
+          //     ./in.cue:416:13
+          //     ./in.cue:417:13
           // nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
           0: (#list){
             0: (int){ 2 }
@@ -1478,7 +1478,7 @@ Result:
         }
         1: (int){ 1 }
       }
-      x: (#list){
+      #x: (#list){
         0: (int){ int }
         1: (int){ 1 }
       }
@@ -2333,11 +2333,11 @@ Result:
   }
   nestedList: {
     v1e: {
-      x: [
-        (〈1;x〉|int),
+      #x: [
+        (〈1;#x〉|int),
         1,
       ]
-      y: (〈0;x〉 & [
+      y: (〈0;#x〉 & [
         [
           [
             2,
@@ -2348,7 +2348,7 @@ Result:
       ])
     }
     v2e: {
-      y: (〈0;x〉 & [
+      y: (〈0;#x〉 & [
         [
           [
             2,
@@ -2357,8 +2357,8 @@ Result:
         ],
         1,
       ])
-      x: [
-        (〈1;x〉|int),
+      #x: [
+        (〈1;#x〉|int),
         1,
       ]
     }

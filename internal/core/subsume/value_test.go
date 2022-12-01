@@ -331,7 +331,7 @@ func TestValues(t *testing.T) {
 		510: {subsumes: true, in: `a: [{b: string}], b: [{b: "foo"}] `},
 		511: {subsumes: true, in: `a: [...{b: string}], b: [{b: "foo"}] `},
 		512: {subsumes: false, in: `a: [{b: "foo"}], b: [{b: string}] `},
-		513: {subsumes: false, in: `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `},
+		514: {subsumes: false, in: `a: #d: [{b: string}], b: #d: [{b: "foo"}, ...{b: "foo"}] `},
 		520: {subsumes: false, in: `a: [_, int, ...], b: [int, string, ...string] `},
 
 		// Closed structs.
@@ -368,6 +368,7 @@ func TestValues(t *testing.T) {
 		708: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subFinal},
 		709: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subFinal},
 		710: {subsumes: false, in: `a: {foo: [...string]}, b: {}`, mode: subFinal},
+		711: {subsumes: true, in: `a: [...{b: string}], b: [{b: "foo"}] `, mode: subFinal},
 
 		// Schema values
 		800: {subsumes: true, in: `a: close({}), b: {foo: 1}`, mode: subSchema},
@@ -411,9 +412,29 @@ func TestValues(t *testing.T) {
 		970: {subsumes: true, in: `a: [], b: [...int]`, mode: subDefaults},
 		971: {subsumes: true, in: `a: [2], b: [2, ...int]`, mode: subDefaults},
 
+		972: {subsumes: true, in: `a: [...2], b: [2]`, mode: subDefaults},
+		973: {subsumes: true, in: `a: [...int], b: [2]`, mode: subDefaults},
+		974: {subsumes: false, in: `a: [...2], b: [int]`, mode: subDefaults},
+		975: {subsumes: true, in: `a: [...int], b: [int]`, mode: subDefaults},
+
 		// Final
 		980: {subsumes: true, in: `a: [], b: [...int]`, mode: subFinal},
 		981: {subsumes: true, in: `a: [2], b: [2, ...int]`, mode: subFinal},
+
+		1000: {subsumes: true, in: `a: #d: [], b: #d: []`},
+		1001: {subsumes: true, in: `a: #d: [...], b: #d: []`},
+		1002: {subsumes: true, in: `a: #d: [...], b: #d: [...]`},
+		1003: {subsumes: false, in: `a: #d: [], b: #d: [...]`},
+
+		1004: {subsumes: true, in: `a: #d: [...], b: #d: [...int]`},
+		1005: {subsumes: true, in: `a: #d: [...number], b: #d: [...int]`},
+		1006: {subsumes: true, in: `a: #d: [...int], b: #d: [...number]`},
+		1007: {subsumes: true, in: `a: #d: [...{b: string}], b: #d: [{b: "foo"}] `},
+
+		1010: {subsumes: true, in: `a: #d, b: #e, #d: [], #e: [],`},
+		1011: {subsumes: true, in: `a: #d, b: #e, #d: [...], #e: [],`},
+		1012: {subsumes: true, in: `a: #d, b: #e, #d: [...], #e: [...],`},
+		1013: {subsumes: false, in: `a: #d, b: #e, #d: [], #e: [...],`},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

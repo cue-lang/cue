@@ -1,0 +1,192 @@
+// This test that closedness representations work the same for structs and
+// lists (new semantics).
+-- in.cue --
+import "list"
+
+builtin: {
+	a: close({})
+	b: close([])
+
+	c: close({...})
+	d: close([...])
+}
+
+def: {
+	l1: [...]
+	l2: [...int]
+	l3: [1, ...]
+
+	s1: {...}
+	s2: {[string]: int}
+}
+
+// TODO: bypass is complex struct.
+merge: {
+	l1: [...]
+	l1: [...int]
+	l1: [1, ...]
+
+	s1: {...}
+	s1: {a: 1, ...}
+}
+
+deps: {
+	a: [...]
+	b: {...}
+	#d: {
+		x: a
+		y: b
+	}
+	d: #d
+}
+
+incompleteConstraints: {
+	l0: [1, 2] & list.MaxItems(2)
+	l1: [1, 2] & list.MaxItems(3)
+	l2: [1, 2] & list.MinItems(1) // Could be dropped in definition
+	l3: [1, 2] & list.MinItems(3)
+}
+
+
+-- out/definition --
+import "list"
+
+builtin: {
+	a: close({})
+	b: close([])
+	c: close({
+		...
+	})
+	d: close([...])
+}
+def: {
+	l1: [...]
+	l2: [...int]
+	l3: [1, ...]
+	s1: {
+		...
+	}
+	s2: {
+		[string]: int
+	}
+}
+
+// TODO: bypass is complex struct.
+merge: {
+	l1: [...] & [...int] & [1, ...]
+	s1: {
+		a: 1
+		...
+	}
+}
+deps: {
+	a: [...]
+	b: {
+		...
+	}
+	#d: {
+		x: a
+		y: b
+	}
+	d: #d
+}
+incompleteConstraints: {
+	l0: [1, 2] & list.MaxItems(2)
+	l1: [1, 2] & list.MaxItems(3)
+	l2: [1, 2] & list.MinItems(1)
+	l3: [1, 2] & list.MinItems(3)
+}
+-- out/doc --
+[]
+[builtin]
+[builtin a]
+[builtin b]
+[builtin c]
+[builtin d]
+[def]
+[def l1]
+[def l2]
+[def l3]
+[def l3 0]
+[def s1]
+[def s2]
+[merge]
+- TODO: bypass is complex struct.
+
+[merge l1]
+[merge l1 0]
+[merge s1]
+[merge s1 a]
+[deps]
+[deps a]
+[deps b]
+[deps #d]
+[deps #d x]
+[deps #d y]
+[deps d]
+[deps d x]
+[deps d y]
+[incompleteConstraints]
+[incompleteConstraints l0]
+[incompleteConstraints l0 0]
+[incompleteConstraints l0 1]
+[incompleteConstraints l1]
+[incompleteConstraints l1 0]
+[incompleteConstraints l1 1]
+[incompleteConstraints l2]
+[incompleteConstraints l2 0]
+[incompleteConstraints l2 1]
+[incompleteConstraints l3]
+[incompleteConstraints l3 0]
+[incompleteConstraints l3 1]
+-- out/value --
+== Simplified
+_|_ // builtin.b: cannot use [] (type list) as struct in argument 1 to close
+== Raw
+_|_ // builtin.b: cannot use [] (type list) as struct in argument 1 to close
+== Final
+_|_ // builtin.b: cannot use [] (type list) as struct in argument 1 to close
+== All
+{
+	builtin: {
+		a: {}
+		b: _|_ // builtin.b: cannot use [] (type list) as struct in argument 1 to close
+		c: {}
+		d: _|_ // builtin.d: cannot use [] (type list) as struct in argument 1 to close
+	}
+	def: {
+		l1: [...]
+		l2: [...int]
+		l3: [1, ...]
+		s1: {}
+		s2: {}
+	}
+
+	// TODO: bypass is complex struct.
+	merge: {
+		l1: [1, ...int]
+		s1: {
+			a: 1
+		}
+	}
+	deps: {
+		a: [...]
+		b: {}
+		#d: {
+			x: [...]
+			y: {}
+		}
+		d: {
+			x: [...]
+			y: {}
+		}
+	}
+	incompleteConstraints: {
+		l0: [1, 2]
+		l1: [1, 2]
+		l2: [1, 2]
+		l3: _|_ // incompleteConstraints.l3: invalid value [1,2] (does not satisfy list.MinItems(3)): len(list) < MinItems(3) (2 < 3) (and 1 more errors)
+	}
+}
+== Eval
+_|_ // builtin.b: cannot use [] (type list) as struct in argument 1 to close

@@ -341,8 +341,10 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 		}
 		elem := e.vertex(a)
 
-		docs := ExtractDoc(a)
-		ast.SetComments(elem, docs)
+		if e.cfg.ShowDocs {
+			docs := ExtractDoc(a)
+			ast.SetComments(elem, docs)
+		}
 
 		l.Elts = append(l.Elts, elem)
 	}

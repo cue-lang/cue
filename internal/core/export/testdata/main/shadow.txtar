@@ -10,8 +10,8 @@ a: {
 	refs: {
 		Z="y": 1
 		outer: y
-		mid:   X // TODO(unshadow)
-		inner: Z // TODO(unshadow)
+		mid:   X // commentX
+		inner: Z // commentZ
 
 	}
 }
@@ -23,8 +23,8 @@ a: {
 	refs: {
 		y:     1
 		outer: y
-		mid:   X
-		inner: y
+		mid:   X // commentX
+		inner: y // commentZ
 	}
 }
 -- out/doc --

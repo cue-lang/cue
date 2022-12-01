@@ -351,10 +351,14 @@ func (e *exporter) getFieldAlias(f *ast.Field, name string) string {
 
 func setFieldAlias(f *ast.Field, name string) {
 	if _, ok := f.Label.(*ast.Alias); !ok {
+		x := f.Label.(ast.Expr)
 		f.Label = &ast.Alias{
 			Ident: ast.NewIdent(name),
-			Expr:  f.Label.(ast.Expr),
+			Expr:  x,
 		}
+		ast.SetComments(f.Label, ast.Comments(x))
+		ast.SetComments(x, nil)
+		// TODO: move position information.
 	}
 }
 

@@ -53,7 +53,7 @@ l6:   [1, #foo] & {
 n1:  1.0
 n10: 10
 
-// Ignored comment.
+// Not ignored comment.
 
 // t is true
 t: true
@@ -151,9 +151,12 @@ d2: {
 		foo:  C.name
 	}
 }
+
+// Issue #1910
 a: _
 comp: {
-	for k, v in [0] let w = v {
+	for k, v in [0]
+	let w = v {
 		"\(a)": w
 		"bar":  w
 	}
@@ -180,7 +183,13 @@ l6:   [1, #foo] & {
 }
 n1:  1.0
 n10: 10
-t:   true
+
+// Not ignored comment.
+
+// t is true
+t: true
+
+// Dangling comment.
 e1:  <n1
 e2:  >n1 & <n10
 e3:  l4[2]
@@ -205,6 +214,7 @@ m1:  {
 	bar: 4
 	...
 }
+
 if true {
 	x: int
 }
@@ -214,12 +224,15 @@ y1: {
 		"foo\(i)": v
 		"bar\(j)": w
 	}
+
 	for i, v in src {
 		"foo\(i)": v
 	}
-	x: [ for x in src let y = x {
-		y
-	}]
+	x: [
+		for x in src
+		let y = x {
+			y
+		}]
 }
 preserveKeyFieldInComprehension: {
 	for _, s in [1] {
@@ -338,7 +351,8 @@ _|_ // e3: index out of range [2] with length 2
 	// Issue #1910
 	a: _
 	comp: {
-		for k, v in [0] let w = v {
+		for k, v in [0]
+		let w = v {
 			"\(a)": w
 			"bar":  w
 		}

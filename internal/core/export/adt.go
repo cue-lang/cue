@@ -71,11 +71,19 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 				}
 			}
 			decl := e.decl(env, d)
+
+			// ast.SetComments(decl, e.)
 			// decl may be nil if it represents a let. Lets are added later, and
 			// only when they are still used.
 			if decl == nil {
 				continue
 			}
+
+			if e.cfg.ShowDocs {
+				ast.SetComments(decl, ast.Comments(d.Source()))
+			}
+			// TODO: use e.copyMeta for positions, but only when the original
+			// source is available.
 
 			if a != nil {
 				if f, ok := decl.(*ast.Field); ok {
@@ -419,7 +427,6 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		f.Value = e.expr(env, x.Value)
 		f.Attrs = extractFieldAttrs(nil, x)
 
-		// extractDocs(nil)
 		return f
 
 	case *adt.OptionalField:
@@ -434,7 +441,6 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		f.Value = e.expr(env, x.Value)
 		f.Attrs = extractFieldAttrs(nil, x)
 
-		// extractDocs(nil)
 		return f
 
 	case *adt.LetField:
@@ -507,7 +513,6 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 			alias: alias,
 			field: f,
 		})
-		// extractDocs(nil)
 
 		f.Value = e.expr(env, x.Value)
 		f.Attrs = extractFieldAttrs(nil, x)
@@ -517,6 +522,13 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}
+}
+
+func (e *exporter) copyMeta(dst, src ast.Node) {
+	if e.cfg.ShowDocs {
+		ast.SetComments(dst, ast.Comments(src))
+	}
+	astutil.CopyPosition(dst, src)
 }
 
 func (e *exporter) setField(label adt.Feature, f *ast.Field) {
@@ -570,6 +582,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			value := e.ident(x.Value)
 			src := e.innerExpr(env, x.Src)
 			clause := &ast.ForClause{Value: value, Source: src}
+			e.copyMeta(clause, x.Syntax)
 			c.Clauses = append(c.Clauses, clause)
 
 			_, saved := e.pushFrame(empty, nil)
@@ -586,6 +599,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 		case *adt.IfClause:
 			cond := e.innerExpr(env, x.Condition)
 			clause := &ast.IfClause{Condition: cond}
+			e.copyMeta(clause, x.Src)
 			c.Clauses = append(c.Clauses, clause)
 
 		case *adt.LetClause:
@@ -595,6 +609,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 				Ident: e.ident(x.Label),
 				Expr:  expr,
 			}
+			e.copyMeta(clause, x.Src)
 			c.Clauses = append(c.Clauses, clause)
 
 			_, saved := e.pushFrame(empty, nil)
@@ -610,6 +625,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 			panic(fmt.Sprintf("unknown field %T", x))
 		}
 	}
+	e.copyMeta(c, comp.Syntax)
 
 	// If this is an "unwrapped" comprehension, we need to also
 	// account for the curly braces of the original comprehension.

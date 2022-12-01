@@ -1648,8 +1648,12 @@ though.
 
 A list literal defines a new value of type list.
 A list may be open or closed.
-An open list is indicated with a `...` at the end of an element list,
+By default, lists are open adding elements.
+List literals occuring within the scope of a definition are closed by
+default, and can be kept open with an `...` at the end of an element list,
 optionally followed by a value for the remaining elements.
+Closing a list is equivalent to adding a `..._|_` to it
+or closing it with the `close` builtin.
 
 The length of a closed list is the number of elements it contains.
 The length of an open list is the number of elements as a lower bound
@@ -2641,8 +2645,8 @@ len([1, 2, ...])     >=2
 
 ### `close`
 
-The builtin function `close` converts a partially defined, or open, struct
-to a fully defined, or closed, struct.
+The builtin function `close` converts a partially defined, or open,
+struct or list to a fully defined, or closed, struct or list.
 
 
 ### `and`

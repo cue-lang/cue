@@ -141,6 +141,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5cb195b_ff519bdb",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-01T14:29:16Z",
+      "side": 1,
+      "message": "agreed it\u0027s not a big deal either way, though to me that was the main worry - avoid the proxy, which is the default, because it may not be up to date yet. different side of the same coin :)",
+      "parentUuid": "fc24a7de_3f6b54ce",
+      "revId": "07cc761116ab77f3210f228b06f25675fbd23254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c99417b_cad7282f",

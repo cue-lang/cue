@@ -908,7 +908,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 			p.errf(l.Pos(), "square bracket must have exactly one element")
 		}
 
-		tok := p.tok
 		label, expr, _, ok := p.parseLabel(true)
 		if !ok || (p.tok != token.COLON && p.tok != token.OPTION) {
 			if expr == nil {
@@ -921,7 +920,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 		m = field
 
-		if tok != token.LSS && p.tok == token.OPTION {
+		if p.tok == token.OPTION {
 			m.Optional = p.pos
 			p.next()
 		}

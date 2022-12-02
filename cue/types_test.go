@@ -270,9 +270,9 @@ func TestValueType(t *testing.T) {
 		closed:         true,
 	}, {
 		value:          `v: [...int]`,
-		kind:           BottomKind,
+		kind:           ListKind,
 		incompleteKind: ListKind,
-		concrete:       false,
+		concrete:       true,
 	}, {
 		value:          `v: {...}`,
 		kind:           StructKind,

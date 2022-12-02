@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fabb8d9_e83b31d5",
+        "filename": "internal/encoding/json/encode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-12-02T17:27:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "523adf23_09d41732",
+      "revId": "eabb5f5926c4ab2daebf87d483d33a2417982d18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f362d91f_f4ceed77",
@@ -48,6 +66,24 @@
       "writtenOn": "2022-11-30T17:25:02Z",
       "side": 1,
       "message": "Add a test case for hidden fields?",
+      "revId": "eabb5f5926c4ab2daebf87d483d33a2417982d18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5211076_ddac6d2f",
+        "filename": "internal/encoding/yaml/encode_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-12-02T17:27:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f362d91f_f4ceed77",
       "revId": "eabb5f5926c4ab2daebf87d483d33a2417982d18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

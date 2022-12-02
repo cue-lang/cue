@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f4d4499_00668234",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-12-02T18:17:07Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor comments and suggestions, thanks!",
+      "revId": "6c0a539a21207821109f4e869a5781a22425b7bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

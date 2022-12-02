@@ -53,10 +53,15 @@ var defaultConfig = config{
 					version = -1000 + 100
 				}
 			}
-			return parser.ParseFile(name, src,
+			options := []parser.Option{
 				parser.FromVersion(version),
 				parser.ParseComments,
-			)
+			}
+			// TODO: consolidate all options into a single CUE_DEBUG variable.
+			if os.Getenv("CUE_DEBUG_PARSER_TRACE") != "" {
+				options = append(options, parser.Trace)
+			}
+			return parser.ParseFile(name, src, options...)
 		},
 	},
 }

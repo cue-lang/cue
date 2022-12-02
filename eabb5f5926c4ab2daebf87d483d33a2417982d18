@@ -16,6 +16,24 @@
       "message": "This is an API-breaking change, right? Is that OK?",
       "revId": "eabb5f5926c4ab2daebf87d483d33a2417982d18",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63e4b576_b10fa837",
+        "filename": "cue/token/token.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-12-02T18:23:20Z",
+      "side": 0,
+      "message": "I think it is better to some extent, rather than silently changing behavior.",
+      "parentUuid": "36f0d3f0_7e316e2d",
+      "revId": "eabb5f5926c4ab2daebf87d483d33a2417982d18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

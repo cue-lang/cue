@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "456edaaf_b28fa639",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-12-02T18:16:48Z",
+      "side": 1,
+      "message": "// Deprecated: always token.COLON.\n?",
+      "revId": "af61a59c39a1c1ac02555a947ed046433f848a65",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60a4758a_02b5f84c",
+        "filename": "cue/format/testdata/simplify.input",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-12-02T18:16:48Z",
+      "side": 1,
+      "message": "Why did this need to change?",
+      "revId": "af61a59c39a1c1ac02555a947ed046433f848a65",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

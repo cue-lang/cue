@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36f0d3f0_7e316e2d",
+        "filename": "cue/token/token.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-12-02T18:16:48Z",
+      "side": 0,
+      "message": "This is an API-breaking change, right? Is that OK?",
+      "revId": "eabb5f5926c4ab2daebf87d483d33a2417982d18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

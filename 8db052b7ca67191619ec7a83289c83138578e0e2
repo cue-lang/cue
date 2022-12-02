@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8807dca_5d933265",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-02T21:29:22Z",
+      "side": 1,
+      "message": "Perhaps mention in the commit message what this syntax was once for.",
+      "revId": "8db052b7ca67191619ec7a83289c83138578e0e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -69,7 +69,7 @@ Disjuncts:    12
   }
   #Ands: (#struct){
     #: (#struct){
-      "Fn::And": (#list){
+      "Fn::And": (list){
         0: ((int|struct)){ |((int){ 3 }, (#struct){
             #: (#struct){
               "Fn::And": (list){

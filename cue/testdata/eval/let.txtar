@@ -106,9 +106,9 @@ Disjuncts:    59
     }
     let L3#15 = (struct){
     }
-    let L2#16 = (#list){
+    let L2#16 = (list){
     }
-    let L1#17 = (#list){
+    let L1#17 = (list){
     }
   }
   ignoreErrorInLet: (struct){

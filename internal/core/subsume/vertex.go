@@ -218,18 +218,32 @@ outer:
 func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 	ctx := s.ctx
 
-	if !y.IsData() && x.IsClosedList() && !y.IsClosedList() {
+	final := y.IsData() || s.Final
+
+	xClosed := x.IsClosedList() && !s.IgnoreClosedness
+	// TODO: this should not close for taking defaults. Do a more principled
+	// makeover of this package before making it public, though.
+	yClosed := s.Final || s.Defaults ||
+		(y.IsClosedList() && !s.IgnoreClosedness)
+
+	if xClosed && !yClosed && !final {
+		return false
+	}
+
+	xHasPattern := x.OptionalTypes()&(adt.HasPattern) != 0
+	if !final && !s.IgnoreOptional && xHasPattern {
+		// TODO: there are many cases where pattern constraints can be checked.
+		s.inexact = true
 		return false
 	}
 
 	xElems := x.Elems()
 	yElems := y.Elems()
 
+	yHasOptional := y.OptionalTypes()&(adt.HasPattern|adt.HasAdditional|adt.IsOpen) != 0
 	switch {
-	case len(xElems) == len(yElems):
+	case len(xElems) == len(yElems) && !yHasOptional:
 	case len(xElems) > len(yElems):
-		return false
-	case x.IsClosedList():
 		return false
 	default:
 		a := &adt.Vertex{Label: adt.AnyIndex}
@@ -243,10 +257,14 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 			}
 		}
 
-		if !y.IsClosedList() {
+		if !yClosed {
 			b := &adt.Vertex{Label: adt.AnyIndex}
 			y.MatchAndInsert(ctx, b)
 			b.Finalize(ctx)
+
+			if !s.vertices(a, b) {
+				return false
+			}
 		}
 	}
 

@@ -237,7 +237,7 @@ func (c *CallCtxt) CueList(i int) List {
 	if v == nil {
 		return List{}
 	}
-	return List{c.ctx, v, v.BaseValue.(*adt.ListMarker).IsOpen}
+	return List{c.ctx, v, !v.IsClosedList()}
 }
 
 func (c *CallCtxt) Iter(i int) (a cue.Iterator) {

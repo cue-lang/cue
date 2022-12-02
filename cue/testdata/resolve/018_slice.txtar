@@ -83,9 +83,9 @@ e7: cannot use "9" (type string) as type int in slice index:
 Result:
 (_|_){
   // [eval]
-  a: (#list){
+  a: (list){
   }
-  b: (#list){
+  b: (list){
   }
   e1: (_|_){
     // [eval] e1: index 1 out of range:

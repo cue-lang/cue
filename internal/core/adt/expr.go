@@ -404,8 +404,8 @@ func (x *Bytes) Kind() Kind       { return BytesKind }
 // vertices.
 
 type ListMarker struct {
-	Src    ast.Node
-	IsOpen bool
+	Src       ast.Node
+	NeedClose bool
 }
 
 func (x *ListMarker) Source() ast.Node { return x.Src }
@@ -421,6 +421,16 @@ type StructMarker struct {
 func (x *StructMarker) Source() ast.Node { return nil }
 func (x *StructMarker) Kind() Kind       { return StructKind }
 func (x *StructMarker) node()            {}
+
+func NeedsClose(x BaseValue) bool {
+	switch v := x.(type) {
+	case *StructMarker:
+		return v.NeedClose
+	case *ListMarker:
+		return v.NeedClose
+	}
+	return false
+}
 
 // Top represents all possible values. It can be used as a Value and Expr.
 type Top struct{ Src *ast.Ident }

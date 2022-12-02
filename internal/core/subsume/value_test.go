@@ -329,8 +329,9 @@ func TestValues(t *testing.T) {
 		508: {subsumes: false, in: `a: [1], b: [2] `},
 		509: {subsumes: false, in: `a: [1], b: [2, 3] `},
 		510: {subsumes: true, in: `a: [{b: string}], b: [{b: "foo"}] `},
-		511: {subsumes: true, in: `a: [...{b: string}], b: [{b: "foo"}] `},
+		511: {subsumes: false, in: `a: [...{b: string}], b: [{b: "foo"}] `}, // b/o open list semantics
 		512: {subsumes: false, in: `a: [{b: "foo"}], b: [{b: string}] `},
+		513: {subsumes: true, in: `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `},
 		514: {subsumes: false, in: `a: #d: [{b: string}], b: #d: [{b: "foo"}, ...{b: "foo"}] `},
 		520: {subsumes: false, in: `a: [_, int, ...], b: [int, string, ...string] `},
 
@@ -385,17 +386,17 @@ func TestValues(t *testing.T) {
 		950: {subsumes: true, in: `a: [], b: []`},
 		951: {subsumes: true, in: `a: [...], b: []`},
 		952: {subsumes: true, in: `a: [...], b: [...]`},
-		953: {subsumes: false, in: `a: [], b: [...]`},
+		953: {subsumes: true, in: `a: [], b: [...]`},
 
 		954: {subsumes: true, in: `a: [2], b: [2]`},
 		955: {subsumes: true, in: `a: [int], b: [2]`},
 		956: {subsumes: false, in: `a: [2], b: [int]`},
 		957: {subsumes: true, in: `a: [int], b: [int]`},
 
-		958: {subsumes: true, in: `a: [...2], b: [2]`},
-		959: {subsumes: true, in: `a: [...int], b: [2]`},
+		958: {subsumes: false, in: `a: [...2], b: [2]`},   // b/o open list semantics
+		959: {subsumes: false, in: `a: [...int], b: [2]`}, // b/o open list semantics
 		960: {subsumes: false, in: `a: [...2], b: [int]`},
-		961: {subsumes: true, in: `a: [...int], b: [int]`},
+		961: {subsumes: false, in: `a: [...int], b: [int]`}, // b/o open list semantics
 
 		962: {subsumes: false, in: `a: [2], b: [...2]`},
 		963: {subsumes: false, in: `a: [int], b: [...2]`},
@@ -428,7 +429,7 @@ func TestValues(t *testing.T) {
 
 		1004: {subsumes: true, in: `a: #d: [...], b: #d: [...int]`},
 		1005: {subsumes: true, in: `a: #d: [...number], b: #d: [...int]`},
-		1006: {subsumes: true, in: `a: #d: [...int], b: #d: [...number]`},
+		1006: {subsumes: false, in: `a: #d: [...int], b: #d: [...number]`},
 		1007: {subsumes: true, in: `a: #d: [...{b: string}], b: #d: [{b: "foo"}] `},
 
 		1010: {subsumes: true, in: `a: #d, b: #e, #d: [], #e: [],`},

@@ -45,14 +45,14 @@ Disjuncts:    13
 -- out/eval --
 (struct){
   a: (struct){
-    l: (#list){
+    l: (list){
       0: (string){ "foo" }
       1: (_){ _ }
     }
     v: (_){ _ }
   }
   b: (struct){
-    l: (#list){
+    l: (list){
       0: (string){ "foo" }
       1: (string){ "bar" }
     }

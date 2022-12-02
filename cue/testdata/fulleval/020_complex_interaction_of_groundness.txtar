@@ -71,7 +71,7 @@ Conjuncts:    33
 Disjuncts:    13
 -- out/eval --
 (struct){
-  res: (#list){
+  res: (list){
     0: (struct){
       d: (string){ "b" }
       s: (string){ "ab" }

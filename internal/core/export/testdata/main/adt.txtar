@@ -315,11 +315,11 @@ errorListDef: {
 [errorListDef 1]
 -- out/value --
 == Simplified
-_|_ // e3: index out of range [2] with length 2
+_|_ // e4: index 3 out of range
 == Raw
-_|_ // e3: index out of range [2] with length 2
+_|_ // e4: index 3 out of range
 == Final
-_|_ // e3: index out of range [2] with length 2
+_|_ // e4: index 3 out of range
 == All
 {
 	@foo(bar)
@@ -350,8 +350,8 @@ _|_ // e3: index out of range [2] with length 2
 		bar
 		line
 		"""
-	l1: [3, ...int]
-	l2: [...int]
+	l1: [3]
+	l2: []
 	l3: []
 	l4: [1, 2]
 	l5: {
@@ -370,9 +370,9 @@ _|_ // e3: index out of range [2] with length 2
 	t:   true
 	e1:  <1.0
 	e2:  >1.0 & <10
-	e3:  _|_ // e3: index out of range [2] with length 2
+	e3:  l4[2]
 	e4:  _|_ // e4: index 3 out of range
-	e5:  _|_ // e3: index out of range [2] with length 2
+	e5:  e1 + e2 - e3
 	e6:  false
 	e7:  true
 	e8?: true
@@ -406,4 +406,4 @@ _|_ // e3: index out of range [2] with length 2
 	}
 }
 == Eval
-_|_ // e3: index out of range [2] with length 2
+_|_ // e4: index 3 out of range

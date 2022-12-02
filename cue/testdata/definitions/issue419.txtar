@@ -37,7 +37,7 @@ Disjuncts:    17
     }, (#struct){
       b: (string){ string }
     }) }
-  l: (#list){
+  l: (list){
     0: (#struct){
       b: (string){ "bar" }
     }

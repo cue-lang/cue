@@ -1667,9 +1667,15 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 	ctx := n.ctx
 
 	if x, ok := v.(*Vertex); ok {
-		if m, ok := x.BaseValue.(*StructMarker); ok {
+		switch m := x.BaseValue.(type) {
+		case *StructMarker:
 			n.aStruct = x
 			n.aStructID = id
+			if m.NeedClose {
+				id.IsClosed = true
+			}
+
+		case *ListMarker:
 			if m.NeedClose {
 				id.IsClosed = true
 			}
@@ -2105,13 +2111,8 @@ func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 	}
 
 	isOpen := true
-	max := 0
+	max := len(n.node.Arcs)
 	var maxNode Expr
-
-	if m, ok := n.node.BaseValue.(*ListMarker); ok {
-		isOpen = m.IsOpen
-		max = len(n.node.Arcs)
-	}
 
 	c := n.ctx
 
@@ -2150,6 +2151,8 @@ func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 				continue
 			}
 			for _, c := range a.Conjuncts {
+				// Analoguous to structs.
+				c.CloseInfo.IsClosed = false
 				n.insertField(a.Label, c)
 			}
 		}
@@ -2169,6 +2172,8 @@ outer:
 		index := int64(0)
 		hasComprehension := false
 		for j, elem := range l.list.Elems {
+			l.id.IsClosed = false // Analogous construction to structs.
+
 			switch x := elem.(type) {
 			case *Comprehension:
 				err := c.yield(nil, l.env, x, Finalized, func(e *Environment) {
@@ -2217,7 +2222,17 @@ outer:
 		oneOfTheLists = l.list
 		anID = l.id
 
-		switch closed := n.lists[i].elipsis == nil; {
+		closed := l.id.IsInOneOf(DefinitionSpan)
+		if closed {
+			n.node.Closed = true
+		} else if l.id.IsClosed || n.node.Closed {
+			closed = true
+		}
+		if closed {
+			closed = n.lists[i].elipsis == nil
+		}
+
+		switch {
 		case int(index) < max:
 			if closed {
 				n.invalidListLength(int(index), max, l.list, maxNode)
@@ -2253,13 +2268,16 @@ outer:
 	}
 
 	for _, l := range n.lists {
-		if l.elipsis == nil || l.ignore {
+		if (l.elipsis == nil && !l.id.IsClosed) || l.ignore {
 			continue
 		}
 
 		s := l.list.info
 		if s == nil {
-			s = &StructLit{Decls: []Decl{l.elipsis}}
+			s = &StructLit{}
+			if l.elipsis != nil {
+				s.Decls = []Decl{l.elipsis}
+			}
 			s.Init()
 			l.list.info = s
 		}
@@ -2283,15 +2301,13 @@ outer:
 
 	if m, ok := n.node.BaseValue.(*ListMarker); !ok {
 		n.node.SetValue(c, Partial, &ListMarker{
-			Src:    ast.NewBinExpr(token.AND, sources...),
-			IsOpen: isOpen,
+			Src: ast.NewBinExpr(token.AND, sources...),
 		})
 	} else {
 		if expr, _ := m.Src.(ast.Expr); expr != nil {
 			sources = append(sources, expr)
 		}
 		m.Src = ast.NewBinExpr(token.AND, sources...)
-		m.IsOpen = m.IsOpen && isOpen
 	}
 
 	n.lists = n.lists[:0]

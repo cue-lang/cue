@@ -276,9 +276,9 @@ Disjuncts:    126
       }
       "ns/network": (#struct){
         spec: (#struct){
-          ingress: (#list){
+          ingress: (list){
             0: (#struct){
-              from: (#list){
+              from: (list){
                 0: (#struct){
                   namespaceSelector: (#struct){
                     matchLabels: (#struct){
@@ -289,9 +289,9 @@ Disjuncts:    126
               }
             }
           }
-          egress: (#list){
+          egress: (list){
             0: (#struct){
-              to: (#list){
+              to: (list){
                 0: (#struct){
                   namespaceSelector: (#struct){
                     matchLabels: (#struct){
@@ -310,9 +310,9 @@ Disjuncts:    126
       }
       "ns/network": (#struct){
         spec: (#struct){
-          ingress: (#list){
+          ingress: (list){
             0: (#struct){
-              from: (#list){
+              from: (list){
                 0: (#struct){
                   namespaceSelector: (#struct){
                     matchLabels: (#struct){
@@ -323,9 +323,9 @@ Disjuncts:    126
               }
             }
           }
-          egress: (#list){
+          egress: (list){
             0: (#struct){
-              to: (#list){
+              to: (list){
                 0: (#struct){
                   namespaceSelector: (#struct){
                     matchLabels: (#struct){

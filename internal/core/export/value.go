@@ -346,21 +346,24 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 
 		l.Elts = append(l.Elts, elem)
 	}
-	m, ok := v.BaseValue.(*adt.ListMarker)
-	if !e.cfg.TakeDefaults && ok && m.IsOpen {
-		ellipsis := &ast.Ellipsis{}
-		typ := &adt.Vertex{
-			Parent: v,
-			Label:  adt.AnyIndex,
-		}
-		v.MatchAndInsert(e.ctx, typ)
-		typ.Finalize(e.ctx)
-		if typ.Kind() != adt.TopKind {
-			ellipsis.Type = e.value(typ)
-		}
+	// TODO: this code adds ...T to lists, even when not printing definitions.
+	// Disabling this makes it on par with structs. If we want to enable this,
+	// we should consider doing this for structs too.
+	// m, ok := v.BaseValue.(*adt.ListMarker)
+	// if !e.cfg.TakeDefaults && ok && m.IsOpen {
+	// 	ellipsis := &ast.Ellipsis{}
+	// 	typ := &adt.Vertex{
+	// 		Parent: v,
+	// 		Label:  adt.AnyIndex,
+	// 	}
+	// 	v.MatchAndInsert(e.ctx, typ)
+	// 	typ.Finalize(e.ctx)
+	// 	if typ.Kind() != adt.TopKind {
+	// 		ellipsis.Type = e.value(typ)
+	// 	}
 
-		l.Elts = append(l.Elts, ellipsis)
-	}
+	// 	l.Elts = append(l.Elts, ellipsis)
+	// }
 	return l
 }
 

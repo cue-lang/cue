@@ -17,4 +17,4 @@ val: list[3]
 a: _|_ // a: conflicting values 5 and 4
 l: [1, _|_]
 list: [0, 1, 2]
-val: _|_ // val: index out of range [3] with length 3
+val: list[3]

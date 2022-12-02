@@ -657,7 +657,7 @@ Result:
     }
   }
   a4: (struct){
-    a: (#list){
+    a: (list){
       0: (int){ int }
     }
   }
@@ -684,29 +684,29 @@ Result:
     }
   }
   b1: (struct){
-    b: (#list){
+    b: (list){
       0: (int){ 1 }
     }
-    a: (#list){
+    a: (list){
       0: (int){ int }
     }
   }
   b2: (struct){
-    a: (#list){
+    a: (list){
       0: (int){ int }
     }
-    b: (#list){
+    b: (list){
       0: (int){ 1 }
     }
   }
   b3: (struct){
     x: (struct){
-      a: (#list){
+      a: (list){
         0: (int){ int }
       }
     }
     b: (struct){
-      a: (#list){
+      a: (list){
         0: (int){ 1 }
       }
     }
@@ -730,7 +730,7 @@ Result:
     }
     cond1: (_|_){
       // [structural cycle]
-      b: (#list){
+      b: (list){
         _z: (bool){ false }
         0: (int){ 1 }
       }
@@ -766,13 +766,13 @@ Result:
   }
   b5: (struct){
     b: (struct){
-      a: (#list){
+      a: (list){
         0: (int){ 1 }
       }
     }
     x: (struct){
       y: (struct){
-        a: (#list){
+        a: (list){
           0: (int){ int }
         }
       }
@@ -1067,10 +1067,10 @@ Result:
       }
     }
     a: (#struct){
-      a: (#list){
+      a: (list){
         0: (#struct){
           link: (#struct){
-            a: (#list){
+            a: (list){
               0: (#struct){
                 link: (#struct){
                   a: (list){
@@ -1099,10 +1099,10 @@ Result:
     }
     a: (_|_){
       // [structural cycle]
-      a: (#list){
+      a: (list){
         0: (struct){
           link: (struct){
-            a: (#list){
+            a: (list){
               0: (struct){
               }
             }
@@ -1136,10 +1136,10 @@ Result:
     }
     a: (_|_){
       // [structural cycle] p6.#U.#T.a.0.link: structural cycle
-      a: (#list){
+      a: (list){
         0: (struct){
           link: (struct){
-            a: (#list){
+            a: (list){
               0: (struct){
               }
             }
@@ -1484,13 +1484,13 @@ Result:
       }
     }
     v1: (struct){
-      x: (#list){
+      x: (list){
         0: (int){ int }
         1: (int){ 1 }
       }
-      y: (#list){
-        0: (#list){
-          0: (#list){
+      y: (list){
+        0: (list){
+          0: (list){
             0: (int){ 2 }
             1: (int){ 1 }
           }
@@ -1500,9 +1500,9 @@ Result:
       }
     }
     v2: (struct){
-      y: (#list){
-        0: (#list){
-          0: (#list){
+      y: (list){
+        0: (list){
+          0: (list){
             0: (int){ 2 }
             1: (int){ 1 }
           }
@@ -1510,7 +1510,7 @@ Result:
         }
         1: (int){ 1 }
       }
-      x: (#list){
+      x: (list){
         0: (int){ int }
         1: (int){ 1 }
       }

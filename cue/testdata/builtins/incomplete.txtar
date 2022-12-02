@@ -124,25 +124,25 @@ Result:
 (_|_){
   // [eval]
   list1: (struct){
-    Out1: (#list){
+    Out1: (list){
       0: (_|_){
         // [incomplete] list1._Sub: undefined field: b:
         //     ./in.cue:19:10
       }
     }
-    Out2: (#list){
+    Out2: (list){
       0: (_|_){
         // [incomplete] list1._Sub: undefined field: b:
         //     ./in.cue:19:10
       }
     }
-    Out3: (#list){
+    Out3: (list){
       0: (_|_){
         // [incomplete] list1._Sub: undefined field: b:
         //     ./in.cue:19:10
       }
     }
-    Top: (#list){
+    Top: (list){
       0: (_|_){
         // [incomplete] list1._Sub: undefined field: b:
         //     ./in.cue:19:10

@@ -58,7 +58,7 @@ Disjuncts:    65
     #c: (#list){
       0: (#struct){
         do: (string){ "f1" }
-        as: (#list){
+        as: (list){
           0: (string){ "go" }
         }
       }
@@ -70,16 +70,16 @@ Disjuncts:    65
       0: (#struct){
         do: (string){ "f2" }
         from: (#struct){
-          #c: (#list){
+          #c: (list){
             0: (#struct){
               do: (string){ "f1" }
-              as: (#list){
+              as: (list){
                 0: (string){ "go" }
                 1: (string){ |(*(string){ "." }, (string){ string }) }
               }
             }
           }
-          as: (#list){
+          as: (list){
             0: (string){ |(*(string){ "." }, (string){ string }) }
           }
         }

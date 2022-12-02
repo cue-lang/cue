@@ -67,7 +67,7 @@ Disjuncts:    13
   }
   B: (struct){
     baz: (string){ "baz" }
-    src: (#list){
+    src: (list){
       0: (string){ "foo" }
       1: (string){ "bar" }
     }

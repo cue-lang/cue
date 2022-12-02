@@ -27,6 +27,7 @@ package adt
 // just be inserted at the current ID.
 func isComplexStruct(ctx *OpContext, v *Vertex) bool {
 	return v.IsClosedStruct()
+	// TODO: this is not necessary: || v.IsClosedList()
 }
 
 // TODO: cleanup code and error messages. Reduce duplication in some related

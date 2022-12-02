@@ -200,7 +200,7 @@ Result:
     }
     c: (_|_){
       // [eval]
-      x: (#list){
+      x: (list){
       }
       result: (_|_){
         // [eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
@@ -212,7 +212,7 @@ Result:
     // [eval]
     a: (_|_){
       // [eval]
-      x: (#list){
+      x: (list){
         0: (string){ string }
       }
       result: (_|_){

@@ -67,12 +67,12 @@ Disjuncts:    26
     }
     CmustBeA: (struct){
       A: (struct){
-        x: (#list){
+        x: (list){
           0: (string){ string }
         }
       }
       C: (struct){
-        x: (#list){
+        x: (list){
           0: (string){ string }
         }
       }

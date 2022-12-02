@@ -97,7 +97,7 @@ Conjuncts:    23
 Disjuncts:    15
 -- out/eval --
 (struct){
-  res: (#list){
+  res: (list){
     0: (struct){
       x: (struct){
         b: (struct){

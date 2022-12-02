@@ -46,11 +46,11 @@ Disjuncts:    5
 -- out/eval --
 (struct){
   a: (struct){
-    b: (#list){
+    b: (list){
     }
   }
-  c: (#list){
+  c: (list){
   }
-  d: (#list){
+  d: (list){
   }
 }

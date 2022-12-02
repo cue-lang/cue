@@ -68,9 +68,9 @@ Result:
   }
   r4b: (struct){
   }
-  r5a: (#list){
+  r5a: (list){
   }
-  r5b: (#list){
+  r5b: (list){
   }
   s1a: (struct){
     x: (int){ int }
@@ -99,11 +99,11 @@ Result:
     }
   }
   s5a: (struct){
-    x: (#list){
+    x: (list){
     }
   }
   s5b: (struct){
-    x: (#list){
+    x: (list){
     }
   }
 }

@@ -64,10 +64,6 @@ ref: {...} // to compare the same behavior is used in the output
 
 -- out/list --
 Errors:
-maxItems.ok3: cannot use [0] (type list) as struct in argument 1 to close:
-    ./in.cue:57:13
-minItems.fail1: cannot use [] (type list) as struct in argument 1 to close:
-    ./in.cue:47:15
 repeat.t8.v: error in call to list.Repeat: negative count:
     ./in.cue:4:30
 concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list:
@@ -75,10 +71,10 @@ concat.t8.v: error in call to list.Concat: cannot use value 1 (type int) as list
     ./in.cue:31:10
 concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
     ./in.cue:30:9
-minItems.fail2: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
+minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1):
     ./in.cue:45:12
     ./in.cue:45:26
-    ./in.cue:48:9
+    ./in.cue:47:9
 maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems(1)): len(list) > MaxItems(1) (2 > 1):
     ./in.cue:54:12
     ./in.cue:54:26
@@ -175,15 +171,15 @@ unique: {
 // Issue #2099
 minItems: {
 	incomplete1: [...] & list.MinItems(1)
-	fail1:       _|_ // minItems.fail1: cannot use [] (type list) as struct in argument 1 to close
-	fail2:       _|_ // minItems.fail2: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1) (and 1 more errors)
-	ok1: [0, ...]
+	fail1:       _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1) (and 1 more errors)
+	fail2:       [] & list.MinItems(1)
+	ok1: [0]
 	ok2: [0]
 }
 maxItems: {
-	ok1: [...]
-	ok2: [0, ...]
-	ok3:   _|_ // maxItems.ok3: cannot use [0] (type list) as struct in argument 1 to close
+	ok1: []
+	ok2: [0]
+	ok3: [0]
 	fail1: _|_ // maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems(1)): len(list) > MaxItems(1) (2 > 1) (and 1 more errors)
 }
 ref: {}

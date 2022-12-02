@@ -82,22 +82,22 @@ _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and 
 == All
 {
 	a0: {
-		l: ["a", "b", ...]
+		l: ["a", "b"]
 	}
 	a1: {
-		l: ["a", "b", ...]
+		l: ["a", "b"]
 	}
 	a2: {
 		l: _|_ // a2.l: conflicting values ["a","b",...] and {} (mismatched types list and struct)
 	}
 	a3: {
-		l: ["a", "b", ...]
+		l: ["a", "b"]
 	}
 	a4: {
 		l: {
 			@decl(1)
 			#foo: 1
-			["a", "b", ...]
+			["a", "b"]
 		}
 	}
 }

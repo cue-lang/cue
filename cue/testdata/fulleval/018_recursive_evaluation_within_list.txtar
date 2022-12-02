@@ -70,7 +70,7 @@ Conjuncts:    44
 Disjuncts:    27
 -- out/eval --
 (struct){
-  l: (#list){
+  l: (list){
     0: (struct){
       d: (string){ "t" }
       c: (string){ "t" }
@@ -84,7 +84,7 @@ Disjuncts:    27
     d: (string){ string }
     c: (string){ string }
   }
-  l1: (#list){
+  l1: (list){
     0: (struct){
       d: (string){ "st" }
       c: (string){ "t" }

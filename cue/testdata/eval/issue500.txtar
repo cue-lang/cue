@@ -33,20 +33,20 @@ Disjuncts:    46
 (struct){
   a: (string){ "est" }
   b: (string){ "est" }
-  c: (#list){
+  c: (list){
     0: (string){ "e" }
     1: (string){ "s" }
     2: (string){ "t" }
   }
   d: (string){ "est" }
   e: (string){ "ab" }
-  f: (#list){
+  f: (list){
     0: (string){ "a" }
     1: (string){ "b" }
   }
   g: (string){ "ab" }
   h: (string){ "aaa" }
-  i: (#list){
+  i: (list){
     0: (string){ "b" }
     1: (string){ "b" }
     2: (string){ "b" }

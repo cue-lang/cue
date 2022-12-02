@@ -77,15 +77,6 @@ func (v *Vertex) Default() *Vertex {
 			}
 		}
 		return w
-
-	case *ListMarker:
-		m := *d
-		m.IsOpen = false
-
-		w := *v
-		w.BaseValue = &m
-		w.state = nil
-		return &w
 	}
 }
 

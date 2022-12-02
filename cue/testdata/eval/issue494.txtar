@@ -26,7 +26,7 @@ Conjuncts:    56
 Disjuncts:    26
 -- out/eval --
 (struct){
-  _Q: (#list){
+  _Q: (list){
     0: (struct){
       pos: (int){ 0 }
     }
@@ -35,35 +35,35 @@ Disjuncts:    26
     }
   }
   a: (struct){
-    ben: (#list){
+    ben: (list){
       0: (struct){
         pos: (int){ 0 }
       }
     }
   }
   b: (struct){
-    ben: (#list){
+    ben: (list){
       0: (struct){
         pos: (int){ 0 }
       }
     }
   }
   c: (struct){
-    ben: (#list){
+    ben: (list){
       0: (struct){
         l: (int){ 1 }
       }
     }
   }
   #d: (#struct){
-    ben: (#list){
+    ben: (list){
       0: (#struct){
         pos: (int){ 0 }
       }
     }
   }
   d: (#struct){
-    ben: (#list){
+    ben: (list){
       0: (#struct){
         pos: (int){ 0 }
       }

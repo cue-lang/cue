@@ -59,7 +59,7 @@ Allocs: 49
 Retain: 41
 
 Unifications: 202
-Conjuncts:    396
+Conjuncts:    402
 Disjuncts:    207
 -- out/eval --
 Errors:
@@ -67,8 +67,6 @@ b.x: field not allowed:
     ./in.cue:1:10
     ./in.cue:5:4
     ./in.cue:5:9
-lists.nested.ok1.p1.a: cannot use [int,[]] (type list) as struct in argument 1 to close:
-    ./in.cue:45:11
 
 Result:
 (_|_){
@@ -197,19 +195,13 @@ Result:
       }
     }
   }
-  lists: (_|_){
-    // [eval]
-    nested: (_|_){
-      // [eval]
-      ok1: (_|_){
-        // [eval]
-        p1: (_|_){
-          // [eval]
-          a: (_|_){
-            // [eval] lists.nested.ok1.p1.a: cannot use [int,[]] (type list) as struct in argument 1 to close:
-            //     ./in.cue:45:11
+  lists: (struct){
+    nested: (struct){
+      ok1: (struct){
+        p1: (struct){
+          a: (#list){
             0: (int){ 1 }
-            1: (#list){
+            1: (list){
               0: (int){ 1 }
               1: (int){ 2 }
               2: (int){ 3 }

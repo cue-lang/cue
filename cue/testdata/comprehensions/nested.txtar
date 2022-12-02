@@ -73,7 +73,7 @@ Disjuncts:    57
   service: (struct){
     "node-exporter": (struct){
       spec: (struct){
-        ports: (#list){
+        ports: (list){
           0: (struct){
             name: (string){ "metrics" }
             port: (int){ 9100 }
@@ -94,9 +94,9 @@ Disjuncts:    57
       spec: (struct){
         template: (struct){
           spec: (struct){
-            containers: (#list){
+            containers: (list){
               0: (struct){
-                ports: (#list){
+                ports: (list){
                   0: (struct){
                     containerPort: (int){ 9100 }
                     name: (string){ "scrape" }
@@ -117,7 +117,7 @@ Disjuncts:    57
     spec: (struct){
       template: (struct){
         spec: (struct){
-          containers: (#list){
+          containers: (list){
             0: (struct){
               name: (string){ string }
               ports: (list){

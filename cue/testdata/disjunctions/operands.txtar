@@ -48,9 +48,9 @@ Conjuncts:    33
 Disjuncts:    30
 -- out/eval --
 (struct){
-  list: (list){ |(*(#list){
+  list: (list){ |(*(list){
       0: (int){ 1 }
-    }, (#list){
+    }, (list){
       0: (int){ 2 }
     }) }
   condition: (bool){ |(*(bool){ true }, (bool){ false }) }
@@ -60,7 +60,7 @@ Disjuncts:    30
     }, (struct){
       a: (int){ 2 }
     }) }
-  forLoop: (#list){
+  forLoop: (list){
     0: (string){ "count: 1" }
   }
   conditional: (struct){

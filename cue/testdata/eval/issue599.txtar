@@ -109,7 +109,7 @@ Disjuncts:    47
       }
       bar: (#struct){
         n: (string){ "bar" }
-        depends_on: (#list){
+        depends_on: (list){
           0: (#struct){
             n: (string){ "foo" }
             depends_on: (list){

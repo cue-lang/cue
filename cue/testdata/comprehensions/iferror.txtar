@@ -161,6 +161,7 @@ Errors:
 issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
     ./in.cue:54:12
     ./in.cue:61:8
+issue1972.err1: incompatible list lengths (0 and 4)
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
     ./in.cue:1:8
@@ -192,7 +193,7 @@ Result:
     //     ./in.cue:16:7
     // incomplete: undefined field: d:
     //     ./in.cue:23:21
-    list: (#list){
+    list: (list){
       0: (int){ 1 }
       1: (int){ 2 }
       2: (int){ 3 }
@@ -214,7 +215,7 @@ Result:
           b: (string){ |(*(string){ "bar" }, (string){ string }) }
         }
       }
-      foo: (#list){
+      foo: (list){
         0: (#struct){
           a: (string){ "bar" }
           b: (string){ |(*(string){ "bar" }, (string){ string }) }
@@ -228,6 +229,7 @@ Result:
       // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
       //     ./in.cue:54:12
       //     ./in.cue:61:8
+      // issue1972.err1: incompatible list lengths (0 and 4)
       // issue1972.err1: invalid list index someCondition (type string):
       //     ./in.cue:65:6
       patchs: (list){

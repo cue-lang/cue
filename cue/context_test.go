@@ -57,7 +57,10 @@ func TestNewList(t *testing.T) {
 		out: `_|_ // 0: conflicting values "string" and int (mismatched types string and int)`,
 	}, {
 		v:   ctx.NewList().Unify(l123),
-		out: `_|_ // incompatible list lengths (0 and 3)`,
+		out: `[1, 2, 3]`,
+		// }, { // TODO: support way of closing lists, perhaps through Final
+		// 	v:   ctx.NewList().Unify(l123),
+		// 	out: `_|_ // incompatible list lengths (0 and 3)`,
 	}, {
 		v: ctx.NewList(
 			intList,

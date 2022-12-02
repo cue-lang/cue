@@ -43,7 +43,7 @@ Disjuncts:    7
     // [cycle] cycle error:
     //     ./in.cue:1:4
   }
-  c: (#list){
+  c: (list){
     0: (_){ _ }
     1: (_){ _ }
   }

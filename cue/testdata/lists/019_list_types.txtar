@@ -135,12 +135,12 @@ e0: incompatible list lengths (1 and 2)
 Result:
 (_|_){
   // [eval]
-  l0: (#list){
+  l0: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 3 }
   }
-  l2: (#list){
+  l2: (list){
     0: (struct){
       a: (int){ 1 }
     }
@@ -149,15 +149,15 @@ Result:
       b: (int){ 3 }
     }
   }
-  s1: (#list){
+  s1: (list){
     0: (int){ int }
   }
-  s2: (#list){
+  s2: (list){
     0: (int){ 2 }
   }
   i1: (int){ int }
   i2: (int){ 3 }
-  t0: (#list){
+  t0: (list){
     0: (struct){
       a: (int){ 8 }
     }
@@ -172,7 +172,7 @@ Result:
     // [eval] e0: incompatible list lengths (1 and 2)
     0: (#struct){
     }
-    1: (struct){
+    1: (#struct){
     }
   }
   e1: (list){

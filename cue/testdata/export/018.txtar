@@ -45,11 +45,11 @@ Conjuncts:    12
 Disjuncts:    7
 -- out/eval --
 (struct){
-  a: (#list){
+  a: (list){
     0: (int){ 1 }
     1: (int){ 2 }
   }
-  b: (#list){
+  b: (list){
     0: (int){ 1 }
     1: (int){ 2 }
   }

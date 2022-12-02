@@ -18,10 +18,10 @@ Disjuncts:    10
 -- out/eval --
 (struct){
   c: (#struct){
-    w: (#list){
+    w: (list){
       0: (#struct){
       }
-      1: (struct){
+      1: (#struct){
         b: (int){ int }
       }
     }

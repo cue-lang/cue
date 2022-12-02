@@ -35,5 +35,3 @@ a: conflicting values 5 and 4:
 l.1: conflicting values 3 and 2:
     ./bottom.cue:4:9
     ./bottom.cue:5:9
-val: index out of range [3] with length 3:
-    ./bottom.cue:8:11

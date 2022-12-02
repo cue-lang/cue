@@ -35,22 +35,22 @@ Conjuncts:    17
 Disjuncts:    15
 -- out/eval --
 (struct){
-  somelist: (list){ |(*(#list){
+  somelist: (list){ |(*(list){
     }, (list){
     }) }
-  foo: (#list){
+  foo: (list){
   }
-  otherlist: (#list){
+  otherlist: (list){
     0: (string){ "something" }
   }
-  z: (#list){
+  z: (list){
     0: (string){ "hello z: something" }
   }
-  extlist: (list){ |(*(#list){
+  extlist: (list){ |(*(list){
       0: (string){ "something" }
     }, (list){
     }) }
-  bar: (#list){
+  bar: (list){
     0: (string){ "hello bar: something" }
   }
 }

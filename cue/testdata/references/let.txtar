@@ -296,26 +296,26 @@ Conjuncts:    164
 Disjuncts:    119
 -- out/eval --
 (struct){
-  a1list: (#list){
+  a1list: (list){
     0: (int){ 1 }
   }
-  let A1#1 = (#list){
+  let A1#1 = (list){
     0: (int){ 1 }
   }
   a1: (int){ 101 }
-  a2list: (#list){
+  a2list: (list){
     0: (int){ 2 }
   }
-  let A2#2 = (#list){
+  let A2#2 = (list){
     0: (int){ 2 }
   }
   a2: (struct){
     b: (int){ 202 }
   }
-  a3list: (#list){
+  a3list: (list){
     0: (int){ 3 }
   }
-  let A3#3 = (#list){
+  let A3#3 = (list){
     0: (int){ 3 }
   }
   a3: (struct){
@@ -323,58 +323,58 @@ Disjuncts:    119
       c: (int){ 303 }
     }
   }
-  a4list: (#list){
+  a4list: (list){
     0: (int){ 4 }
   }
-  let A4#4 = (#list){
+  let A4#4 = (list){
     0: (int){ 4 }
   }
-  a4: (#list){
+  a4: (list){
     0: (struct){
       v: (int){ 404 }
     }
   }
-  a5list: (#list){
+  a5list: (list){
     0: (int){ 5 }
   }
-  let A5#5 = (#list){
+  let A5#5 = (list){
     0: (int){ 5 }
   }
   a5: (struct){
-    b: (#list){
+    b: (list){
       0: (struct){
         v: (int){ 505 }
       }
     }
   }
-  a6list: (#list){
+  a6list: (list){
     0: (int){ 6 }
   }
-  let A6#6 = (#list){
+  let A6#6 = (list){
     0: (int){ 6 }
   }
   a6: (struct){
     b: (struct){
-      c: (#list){
+      c: (list){
         0: (struct){
           v: (int){ 606 }
         }
       }
     }
   }
-  a7list: (#list){
+  a7list: (list){
     0: (int){ 7 }
   }
-  let A7#7 = (#list){
+  let A7#7 = (list){
     0: (int){ 7 }
   }
   a7: (struct){
     v: (int){ 707 }
   }
-  a8list: (#list){
+  a8list: (list){
     0: (int){ 8 }
   }
-  let A8#8 = (#list){
+  let A8#8 = (list){
     0: (int){ 8 }
   }
   a8: (struct){
@@ -382,10 +382,10 @@ Disjuncts:    119
       v: (int){ 808 }
     }
   }
-  a9list: (#list){
+  a9list: (list){
     0: (int){ 9 }
   }
-  let A9#9 = (#list){
+  let A9#9 = (list){
     0: (int){ 9 }
   }
   a9: (struct){
@@ -396,7 +396,7 @@ Disjuncts:    119
     }
   }
   incompleteLet: (struct){
-    input: (#list){
+    input: (list){
       0: (int){ 1 }
       1: (int){ 2 }
       2: (int){ 3 }
@@ -438,7 +438,7 @@ Disjuncts:    119
       }
     }
     inList: (struct){
-      p0: (#list){
+      p0: (list){
         let x#E = (struct){
           a: (int){ 1 }
         }
@@ -446,7 +446,7 @@ Disjuncts:    119
           a: (int){ 1 }
         }
       }
-      p1: (#list){
+      p1: (list){
         let x#F = (struct){
           a: (int){ 1 }
         }

@@ -106,7 +106,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		&n36, "(int){ -36 }",
 	}, {
-		[]int{1, 2, 3, 4}, `(#list){
+		[]int{1, 2, 3, 4}, `(list){
   0: (int){ 1 }
   1: (int){ 2 }
   2: (int){ 3 }
@@ -119,9 +119,9 @@ func TestConvert(t *testing.T) {
 		}{3, nil},
 		"(struct){\n  A: (int){ 3 }\n}",
 	}, {
-		[]interface{}{}, "(#list){\n}",
+		[]interface{}{}, "(list){\n}",
 	}, {
-		[]interface{}{nil}, "(#list){\n  0: (_){ _ }\n}",
+		[]interface{}{nil}, "(list){\n  0: (_){ _ }\n}",
 	}, {
 		map[string]interface{}{"a": 1, "x": nil}, `(struct){
   a: (int){ 1 }
@@ -132,10 +132,10 @@ func TestConvert(t *testing.T) {
 			"a": {1},
 			"b": {3, 4},
 		}, `(struct){
-  a: (#list){
+  a: (list){
     0: (int){ 1 }
   }
-  b: (#list){
+  b: (list){
     0: (int){ 3 }
     1: (int){ 4 }
   }

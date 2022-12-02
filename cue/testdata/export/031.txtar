@@ -36,12 +36,12 @@ Conjuncts:    13
 Disjuncts:    8
 -- out/eval --
 (struct){
-  A: (#list){
+  A: (list){
     0: (int){ &(>=0, int) }
   }
-  B: (list){ |((#list){
+  B: (list){ |((list){
       0: (int){ 10 }
-    }, (#list){
+    }, (list){
       0: (int){ 192 }
     }) }
 }

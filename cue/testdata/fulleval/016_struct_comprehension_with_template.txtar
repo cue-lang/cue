@@ -147,7 +147,7 @@ Conjuncts:    70
 Disjuncts:    55
 -- out/eval --
 (struct){
-  result: (#list){
+  result: (list){
     0: (struct){
       name: (string){ |(*(string){ "foo" }, (string){ string }) }
       type: (string){ "service" }

@@ -605,6 +605,8 @@ func (v *Vertex) accepts(ok, required bool) bool {
 	return ok || (!required && !v.Closed)
 }
 
+// IsClosedStruct reports whether additional fields may be freely added for
+// this struct according to the CUE spec.
 func (v *Vertex) IsClosedStruct() bool {
 	switch x := v.BaseValue.(type) {
 	default:
@@ -620,11 +622,25 @@ func (v *Vertex) IsClosedStruct() bool {
 	return isClosed(v)
 }
 
+// IsClosedList reports whether this list is of limited length. It returns
+// false if the list is open or if it has an additional items specification
+// (denoted ...T). Note that this differs from the definition in the spec.
+// The definition is different for historical reasons (lists used to be closed
+// by default).
 func (v *Vertex) IsClosedList() bool {
-	if x, ok := v.BaseValue.(*ListMarker); ok {
-		return !x.IsOpen
+	switch x := v.BaseValue.(type) {
+	default:
+		return false
+
+	case *ListMarker:
+		if x.NeedClose {
+			return true
+		}
 	}
-	return false
+	if v.OptionalTypes()&(HasAdditional|IsOpen) != 0 {
+		return false
+	}
+	return isClosed(v)
 }
 
 // TODO: return error instead of boolean? (or at least have version that does.)

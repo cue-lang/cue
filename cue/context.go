@@ -390,7 +390,7 @@ func (c *Context) EncodeType(x interface{}, option ...EncodeOption) Value {
 	return c.make(n)
 }
 
-// NewList creates a Value that is a list of the given values.
+// NewList creates a Value that is an open list of the given values.
 //
 // All Values must be created by c.
 func (c *Context) NewList(v ...Value) Value {

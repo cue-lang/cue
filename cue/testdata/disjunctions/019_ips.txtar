@@ -66,35 +66,35 @@ Conjuncts:    111
 Disjuncts:    65
 -- out/eval --
 (struct){
-  IP: (#list){
+  IP: (list){
     0: (int){ &(>=0, <=255, int) }
     1: (int){ &(>=0, <=255, int) }
     2: (int){ &(>=0, <=255, int) }
     3: (int){ &(>=0, <=255, int) }
   }
-  Private: (list){ |(*(#list){
+  Private: (list){ |(*(list){
       0: (int){ 192 }
       1: (int){ 168 }
       2: (int){ &(>=0, <=255, int) }
       3: (int){ &(>=0, <=255, int) }
-    }, (#list){
+    }, (list){
       0: (int){ 10 }
       1: (int){ &(>=0, <=255, int) }
       2: (int){ &(>=0, <=255, int) }
       3: (int){ &(>=0, <=255, int) }
-    }, (#list){
+    }, (list){
       0: (int){ 172 }
       1: (number){ &(>=16, <=32) }
       2: (int){ &(>=0, <=255, int) }
       3: (int){ &(>=0, <=255, int) }
     }) }
-  Inst: (#list){
+  Inst: (list){
     0: (int){ 10 }
     1: (int){ 10 }
     2: (int){ &(>=0, <=255, int) }
     3: (int){ &(>=0, <=255, int) }
   }
-  MyIP: (#list){
+  MyIP: (list){
     0: (int){ 10 }
     1: (int){ 10 }
     2: (int){ 10 }

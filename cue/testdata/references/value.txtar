@@ -38,7 +38,7 @@ Disjuncts:    13
       //     ./in.cue:8:18
     }
   }
-  listValueAlias: (#list){
+  listValueAlias: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 1 }

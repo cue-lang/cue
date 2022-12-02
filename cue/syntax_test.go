@@ -51,16 +51,16 @@ func TestSyntax(t *testing.T) {
 		in: `
 		x: {}
 		t: {name: string}
-		output: [ ... {t & x.value}]
+		output: [ ... {t & x.value}] // Don't show constraints consistent with struct.
 		`,
-		options: o(cue.ResolveReferences(true)),
+		options: o(cue.ResolveReferences(true)), // Deprecated: use Final.
 		out: `
 {
 	x: {}
 	t: {
 		name: string
 	}
-	output: [...t & x.value]
+	output: []
 }`,
 	}, {
 		name: "issue867",
@@ -165,7 +165,7 @@ func TestSyntax(t *testing.T) {
 		containers: [{
 			image: *"myimage" | string
 			name:  "main"
-			envs: [...string]
+			envs: []
 		}]
 		other: {
 			option: int

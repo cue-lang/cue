@@ -29,7 +29,7 @@ Conjuncts:    26
 Disjuncts:    18
 -- out/eval --
 (struct){
-  DeleteThis: (#list){
+  DeleteThis: (list){
     0: (string){ "this" }
     1: (string){ "that" }
   }

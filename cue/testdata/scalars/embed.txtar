@@ -187,12 +187,12 @@ Result:
   listEmbed: (_|_){
     // [eval]
     a1: (int){ 2 }
-    b3: (#list){
+    b3: (list){
       #foo: (int){ 1 }
       0: (int){ 1 }
       1: (int){ 2 }
     }
-    b4: (#list){
+    b4: (list){
       0: (int){ 1 }
       1: (int){ 2 }
       2: (int){ 1 }
@@ -210,7 +210,7 @@ Result:
       "foo"
       #bar: (string){ "bar" }
     }
-    s2: (#list){
+    s2: (list){
       0: (string){
         "foo"
         #bar: (string){ "bar" }
@@ -265,7 +265,7 @@ Result:
     }
   }
   hidden: (struct){
-    issue794: (#list){
+    issue794: (list){
       _foo: (string){ "foo" }
       0: (string){ "foo" }
     }

@@ -104,13 +104,13 @@ e5.3: invalid value 8 (out of bound <=5):
 Result:
 (_|_){
   // [eval]
-  list: (#list){
+  list: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 3 }
   }
   index: (int){ 2 }
-  unify: (#list){
+  unify: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 3 }

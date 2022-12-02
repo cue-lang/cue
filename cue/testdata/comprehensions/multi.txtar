@@ -33,18 +33,18 @@ Conjuncts:    37
 Disjuncts:    24
 -- out/eval --
 (struct){
-  list: (#list){
+  list: (list){
     0: (int){ 2 }
     1: (int){ 3 }
   }
-  a: (#list){
+  a: (list){
     0: (int){ 3 }
     1: (int){ 2 }
     2: (int){ 3 }
     3: (int){ 2 }
     4: (int){ 3 }
   }
-  b: (#list){
+  b: (list){
     0: (int){ 3 }
     1: (int){ 3 }
     2: (int){ 3 }
@@ -52,12 +52,12 @@ Disjuncts:    24
   issue574: (struct){
     greet: (bool){ true }
     bye: (bool){ true }
-    message1: (#list){
+    message1: (list){
       0: (string){ "hello" }
       1: (string){ "how are you doing?" }
       2: (string){ "bye" }
     }
-    message2: (#list){
+    message2: (list){
       0: (string){ "how are you doing?" }
       1: (string){ "bye" }
     }

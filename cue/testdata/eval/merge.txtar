@@ -43,7 +43,7 @@ Disjuncts:    25
     }
   }
   key: (string){ "app01" }
-  manifests: (#list){
+  manifests: (list){
     0: (struct){
       deployment: (struct){
         #map: (#struct){

@@ -323,19 +323,19 @@ Result:
   A: (struct){
     a: (struct){
       parent: (string){ "" }
-      children: (#list){
+      children: (list){
       }
     }
     b: (struct){
       parent: (string){ "a" }
-      children: (#list){
+      children: (list){
       }
     }
   }
   B: (struct){
     a: (struct){
       parent: (string){ "" }
-      children: (#list){
+      children: (list){
       }
     }
   }
@@ -343,19 +343,19 @@ Result:
     A: (struct){
       a: (struct){
         parent: (string){ "" }
-        children: (#list){
+        children: (list){
           0: (string){ "b" }
         }
       }
       b: (struct){
         parent: (string){ "a" }
-        children: (#list){
+        children: (list){
           0: (string){ "c" }
         }
       }
       c: (struct){
         parent: (string){ "b" }
-        children: (#list){
+        children: (list){
         }
       }
     }
@@ -428,7 +428,7 @@ Result:
       }
     }
     list: (struct){
-      panels: (#list){
+      panels: (list){
         0: (struct){
           id: (int){ 0 }
         }

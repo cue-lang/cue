@@ -63,7 +63,7 @@ Disjuncts:    46
     Var: (string){ string }
     Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
   }
-  x: (#list){
+  x: (list){
     0: (#struct){
       Var: (string){ "REPO1" }
       Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
@@ -75,7 +75,7 @@ Disjuncts:    46
   }
   z: (#struct){
     Args: (#struct){
-      Repos: (#list){
+      Repos: (list){
         0: (#struct){
           Var: (string){ "REPO1" }
           Pattern: (string){ |(*(string){ "*" }, (string){ string }) }

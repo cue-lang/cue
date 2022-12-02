@@ -92,7 +92,7 @@ Conjuncts:    39
 Disjuncts:    20
 -- out/eval --
 (struct){
-  a: (#list){
+  a: (list){
     0: (string){ "b" }
     1: (string){ "c" }
   }
@@ -102,7 +102,7 @@ Disjuncts:    20
     c: (int){ 3 }
     d: (int){ 4 }
   }
-  c: (#list){
+  c: (list){
     0: (int){ 1 }
     1: (int){ 1 }
     2: (int){ 1 }
@@ -110,7 +110,7 @@ Disjuncts:    20
     4: (int){ 2 }
     5: (int){ 3 }
   }
-  d: (#list){
+  d: (list){
     0: (int){ 0 }
     1: (int){ 1 }
   }

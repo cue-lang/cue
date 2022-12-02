@@ -536,10 +536,10 @@ Result:
   dynamicList: (struct){
     ok1: (struct){
       x: (string){ string }
-      y: (#list){
-        0: (#list){
-          0: (#list){
-            0: (#list){
+      y: (list){
+        0: (list){
+          0: (list){
+            0: (list){
               0: (string){ string }
             }
           }

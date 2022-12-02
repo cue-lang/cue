@@ -27,6 +27,7 @@ var (
 	stringParam = adt.Param{Value: &adt.BasicType{K: adt.StringKind}}
 	structParam = adt.Param{Value: &adt.BasicType{K: adt.StructKind}}
 	listParam   = adt.Param{Value: &adt.BasicType{K: adt.ListKind}}
+	vertexParam = adt.Param{Value: &adt.BasicType{K: adt.ListKind | adt.StructKind}}
 	intParam    = adt.Param{Value: &adt.BasicType{K: adt.IntKind}}
 )
 
@@ -79,21 +80,35 @@ var lenBuiltin = &adt.Builtin{
 
 var closeBuiltin = &adt.Builtin{
 	Name:   "close",
-	Params: []adt.Param{structParam},
+	Params: []adt.Param{vertexParam},
 	Result: adt.StructKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		s, ok := args[0].(*adt.Vertex)
 		if !ok {
 			return c.NewErrf("struct argument must be concrete")
 		}
-		if m, ok := s.BaseValue.(*adt.StructMarker); ok && m.NeedClose || s.Closed {
-			return s
+		switch x := s.BaseValue.(type) {
+		case *adt.StructMarker:
+			if x.NeedClose || s.Closed {
+				return s
+			}
+			v := s.Clone()
+			// TODO(perf): do not copy the arc, but rather find a way to mark the
+			// calling nodeContext.
+			v.BaseValue = &adt.StructMarker{NeedClose: true}
+			return v
+
+		case *adt.ListMarker:
+			if x.NeedClose || s.Closed {
+				return s
+			}
+			v := s.Clone()
+			// TODO(perf): do not copy the arc, but rather find a way to mark the
+			// calling nodeContext.
+			v.BaseValue = &adt.ListMarker{NeedClose: true}
+			return v
 		}
-		v := s.Clone()
-		// TODO(perf): do not copy the arc, but rather find a way to mark the
-		// calling nodeContext.
-		v.BaseValue = &adt.StructMarker{NeedClose: true}
-		return v
+		return s
 	},
 }
 

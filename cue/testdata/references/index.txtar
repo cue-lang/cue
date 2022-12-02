@@ -30,21 +30,19 @@ varNegativeIndex: {
 	a: [1, 2, 3][n]
 }
 -- out/eval/stats --
-Leaks:  15
+Leaks:  16
 Freed:  36
 Reused: 33
-Allocs: 18
-Retain: 15
+Allocs: 19
+Retain: 16
 
-Unifications: 43
-Conjuncts:    56
-Disjuncts:    48
+Unifications: 44
+Conjuncts:    58
+Disjuncts:    49
 -- out/eval --
 Errors:
 outOfBoundsDisjunction: invalid list index 1 (out of bounds):
     ./in.cue:7:36
-indexDoesNotDistribute: index out of range [0] with length 0:
-    ./in.cue:10:37
 doesNotDistributeType.a: invalid list index "3" (type string):
     ./in.cue:13:21
 stringIndexToList: invalid list index "" (type string):
@@ -59,8 +57,6 @@ indexOutOfBounds3: invalid list index 4 (out of bounds):
 negativeIndex: invalid index -1 (index must be non-negative):
     ./in.cue:20:20
     ./in.cue:20:30
-varIndexTooLarge.a: index out of range [3] with length 3:
-    ./in.cue:24:15
 varNegativeIndex.a: index n out of range [-1]:
     ./in.cue:29:5
     ./in.cue:28:5
@@ -78,12 +74,12 @@ Result:
     //     ./in.cue:7:36
   }
   indexDoesNotDistribute: (_|_){
-    // [eval] indexDoesNotDistribute: index out of range [0] with length 0:
+    // [incomplete] indexDoesNotDistribute: index out of range [0] with length 0:
     //     ./in.cue:10:37
   }
   doesNotDistributeType: (_|_){
     // [eval]
-    l: (#list){
+    l: (list){
     }
     a: (_|_){
       // [eval] doesNotDistributeType.a: invalid list index "3" (type string):
@@ -112,11 +108,10 @@ Result:
     //     ./in.cue:20:20
     //     ./in.cue:20:30
   }
-  varIndexTooLarge: (_|_){
-    // [eval]
+  varIndexTooLarge: (struct){
     n: (int){ 3 }
     a: (_|_){
-      // [eval] varIndexTooLarge.a: index out of range [3] with length 3:
+      // [incomplete] varIndexTooLarge.a: index out of range [3] with length 3:
       //     ./in.cue:24:15
     }
   }

@@ -100,7 +100,7 @@ Disjuncts:    21
 (struct){
   a: (int){ 100 }
   b: (int){ 200 }
-  c: (#list){
+  c: (list){
     0: (int){ 100 }
     1: (int){ 100 }
   }

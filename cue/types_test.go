@@ -267,12 +267,12 @@ func TestValueType(t *testing.T) {
 		kind:           ListKind,
 		incompleteKind: ListKind,
 		concrete:       true,
-		closed:         true,
+		closed:         false,
 	}, {
 		value:          `v: [...int]`,
 		kind:           ListKind,
 		incompleteKind: ListKind,
-		concrete:       true,
+		concrete:       true, // b/o new list semantics (implied default, same semantics as structs)
 	}, {
 		value:          `v: {...}`,
 		kind:           StructKind,
@@ -1746,10 +1746,10 @@ func TestLen(t *testing.T) {
 		length string
 	}{{
 		input:  "close([1, 3])",
-		length: "_|_ // len not supported for type _|_",
+		length: "2",
 	}, {
 		input:  "[1, 3]",
-		length: "2",
+		length: "int & >=2", // TODO: should we just make this 2?
 	}, {
 		input:  "[1, 3, ...]",
 		length: "int & >=2", // TODO: should we just make this 2?
@@ -3577,7 +3577,8 @@ func TestExpr(t *testing.T) {
 		want: `[...number]`,
 	}, {
 		input: `v: [...number] | *[1, 2, 3]`,
-		want:  `[...number]`,
+		// Note that [1, 2, 3] is not subsumed by v!!
+		want: `|([...number] [1,2,3])`,
 	}, {
 		input: `v: or([1, 2, 3])`,
 		want:  `|(1 2 3)`,

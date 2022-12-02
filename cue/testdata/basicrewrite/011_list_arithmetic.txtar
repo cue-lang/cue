@@ -63,19 +63,19 @@ e: cannot convert negative number to uint64:
 Result:
 (_|_){
   // [eval]
-  list: (#list){
+  list: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 3 }
   }
-  mul0: (#list){
+  mul0: (list){
   }
-  mul1: (#list){
+  mul1: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 3 }
   }
-  mul2: (#list){
+  mul2: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 3 }
@@ -83,19 +83,19 @@ Result:
     4: (int){ 2 }
     5: (int){ 3 }
   }
-  list1: (#list){
+  list1: (list){
     0: (int){ 1 }
   }
-  mul1_0: (#list){
+  mul1_0: (list){
   }
-  mul1_1: (#list){
+  mul1_1: (list){
     0: (int){ 1 }
   }
-  mul1_2: (#list){
+  mul1_2: (list){
     0: (int){ 1 }
     1: (int){ 1 }
   }
-  add1_2: (#list){
+  add1_2: (list){
     0: (int){ 1 }
     1: (int){ 2 }
     2: (int){ 3 }

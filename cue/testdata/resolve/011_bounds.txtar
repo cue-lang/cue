@@ -216,7 +216,7 @@ Result:
   // [eval]
   i1: (int){ 5 }
   i2: (int){ 5 }
-  i3: (#list){
+  i3: (list){
   }
   i4: (number){ &(!=2, !=4) }
   s1: (number){ &(>=0, <=10, !=1) }

@@ -753,7 +753,7 @@ Result:
       ry: (int){ 1 }
       rz: (int){ 1 }
       n1a: (struct){
-        na: (#list){
+        na: (list){
           0: (int){ 1 }
           1: (int){ 1 }
           2: (int){ 1 }
@@ -762,7 +762,7 @@ Result:
       }
       n2a: (struct){
         n1a: (struct){
-          na: (#list){
+          na: (list){
             0: (int){ 1 }
             1: (int){ 1 }
             2: (int){ 1 }
@@ -1332,7 +1332,7 @@ Result:
     }
   }
   nestedWithEmbeddingOK: (struct){
-    c: (#list){
+    c: (list){
       0: (int){ 1 }
     }
     a: (struct){

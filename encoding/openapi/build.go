@@ -413,7 +413,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			switch {
 			case isConcrete(v):
 				b.dispatch(f, v)
-				if !b.isNonCore() {
+				if !b.isNonCore() && v.Kind() != cue.ListKind {
 					b.set("enum", ast.NewList(b.decode(v)))
 				}
 			default:

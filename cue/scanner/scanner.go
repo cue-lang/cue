@@ -181,7 +181,7 @@ func (s *Scanner) interpretLineComment(text []byte) {
 }
 
 func (s *Scanner) scanComment() string {
-	// initial '/' already consumed; s.ch == '/' || s.ch == '*'
+	// initial '/' already consumed; s.ch == '/'
 	offs := s.offset - 1 // position of initial '/'
 	hasCR := false
 
@@ -211,50 +211,6 @@ exit:
 	}
 
 	return string(lit)
-}
-
-func (s *Scanner) findLineEnd() bool {
-	// initial '/' already consumed
-
-	defer func(offs int) {
-		// reset scanner state to where it was upon calling findLineEnd
-		s.ch = '/'
-		s.offset = offs
-		s.rdOffset = offs + 1
-		s.next() // consume initial '/' again
-	}(s.offset - 1)
-
-	// read ahead until a newline, EOF, or non-comment token is found
-	for s.ch == '/' || s.ch == '*' {
-		if s.ch == '/' {
-			//-style comment always contains a newline
-			return true
-		}
-		/*-style comment: look for newline */
-		s.next()
-		for s.ch >= 0 {
-			ch := s.ch
-			if ch == '\n' {
-				return true
-			}
-			s.next()
-			if ch == '*' && s.ch == '/' {
-				s.next()
-				break
-			}
-		}
-		s.skipWhitespace(0) // s.insertSemi is set
-		if s.ch < 0 || s.ch == '\n' {
-			return true
-		}
-		if s.ch != '/' {
-			// non-comment token
-			return false
-		}
-		s.next() // consume '/'
-	}
-
-	return false
 }
 
 func isLetter(ch rune) bool {
@@ -916,7 +872,7 @@ scanAgain:
 		case '/':
 			if s.ch == '/' {
 				// comment
-				if s.insertEOL && s.findLineEnd() {
+				if s.insertEOL {
 					// reset position to the beginning of the comment
 					s.ch = '/'
 					s.offset = s.file.Offset(pos)

@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "479d47ea_4a7e32ed",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1651,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-12-05T18:50:44Z",
+      "side": 1,
+      "message": "Is there a word missing here? Perhaps \"open /to/ adding elements?\"",
+      "revId": "7471fb58b520f3dbfcdf68c35581472221e54a49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43225e3e_333289b7",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1653,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-12-05T18:50:44Z",
+      "side": 1,
+      "message": "Since it\u0027s not clear whether the ellipsis literal deserves \"a\" or \"an\" as a definite article, consider writing the following:\n\n  can be kept open with an ellipsis (`...`) at",
+      "revId": "7471fb58b520f3dbfcdf68c35581472221e54a49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6c948c5a_0f2d0e74",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1655,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-12-05T18:50:44Z",
+      "side": 1,
+      "message": "Why is the second disjunct required there? Does the ellipsis not already tolerate no additional elements?",
+      "revId": "7471fb58b520f3dbfcdf68c35581472221e54a49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "303dd527_c7c234c4",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2648,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-12-05T18:50:44Z",
+      "side": 1,
+      "message": "This would read more clearly by transposing the cases:\n\n  converts an open or a partially defined",
+      "revId": "7471fb58b520f3dbfcdf68c35581472221e54a49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2bf43f0_a577653c",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2649,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-12-05T18:50:44Z",
+      "side": 1,
+      "message": "Likewise:\n\n  to a closed or fully defined struct",
+      "revId": "7471fb58b520f3dbfcdf68c35581472221e54a49",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

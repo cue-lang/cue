@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07f6731f_8fca9839",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-12-05T18:56:44Z",
+      "side": 1,
+      "message": "This is a clever move—something that I expect we\u0027d only remember to do later in response to a defect report.",
+      "revId": "84bef340f508fa4fde101e5126f0a75b2c5ee254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "935486e7_7d4dc3e7",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 352,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-12-05T18:56:44Z",
+      "side": 1,
+      "message": "Consider wrapping this in a block that the compiler will still ensure it remains correct syntactically. That is:\n\n  const showAditionalItemsSpecification \u003d false\n  if showAditionalItemsSpecification {\n    // ...\n  }",
+      "revId": "84bef340f508fa4fde101e5126f0a75b2c5ee254",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/sourcefs"
 )
 
 type overlayFile struct {
@@ -73,7 +74,7 @@ func (fs *fileSystem) init(c *Config) error {
 		dir, base := filepath.Split(filename)
 		m := fs.getDir(dir, true)
 
-		b, file, err := src.contents()
+		b, file, err := sourcefs.Contents(src)
 		if err != nil {
 			return err
 		}

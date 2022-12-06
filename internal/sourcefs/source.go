@@ -12,29 +12,59 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package load
+package sourcefs
 
 import (
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/internal/sourcefs"
+	"cuelang.org/go/cue/format"
 )
 
+// Contents returns the contents of a given source. It's defined
+// as a function rather than a public method so that it's not
+// available externally.
+func Contents(src Source) ([]byte, *ast.File, error) {
+	return src.contents()
+}
+
 // A Source represents file contents.
-type Source = sourcefs.Source
+type Source interface {
+	contents() ([]byte, *ast.File, error)
+}
 
 // FromString creates a Source from the given string.
 func FromString(s string) Source {
-	return sourcefs.FromString(s)
+	return stringSource(s)
 }
 
 // FromBytes creates a Source from the given bytes. The contents are not
 // copied and should not be modified.
 func FromBytes(b []byte) Source {
-	return sourcefs.FromBytes(b)
+	return bytesSource(b)
 }
 
 // FromFile creates a Source from the given *ast.File. The file should not be
 // modified. It is assumed the file is error-free.
 func FromFile(f *ast.File) Source {
-	return sourcefs.FromFile(f)
+	return (*fileSource)(f)
+}
+
+type stringSource string
+
+func (s stringSource) contents() ([]byte, *ast.File, error) {
+	return []byte(s), nil, nil
+}
+
+type bytesSource []byte
+
+func (s bytesSource) contents() ([]byte, *ast.File, error) {
+	return []byte(s), nil, nil
+}
+
+type fileSource ast.File
+
+func (s *fileSource) contents() ([]byte, *ast.File, error) {
+	f := (*ast.File)(s)
+	// TODO: wasteful formatting, but needed for now.
+	b, err := format.Node(f)
+	return b, f, err
 }

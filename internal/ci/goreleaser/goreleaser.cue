@@ -14,6 +14,9 @@ config: {
 		ldflags: [
 			"-s -w",
 		]
+		flags: [
+			"-trimpath",
+		]
 		goos: [
 			"darwin",
 			"linux",

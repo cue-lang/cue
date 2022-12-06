@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e8a27d8_166bef57",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-06T16:52:36Z",
+      "side": 1,
+      "message": "thinking aloud: this could simply be a *sourceFSFile for the root directory. you only use this map when using a short-cut to open a regular file, and that\u0027s optional.\n\nthe alternative, if we want to lean into such short-cuts, is to also have shortcuts for opening directories. It\u0027s a bit inconsistent to have it just for regular files.",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fd49cbd_5e3aaf6b",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-06T16:52:36Z",
+      "side": 1,
+      "message": "unused?",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dca6642_e77c8ac5",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-06T16:52:36Z",
+      "side": 1,
+      "message": "perhaps prevent further reads, or add a TODO about it",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a43a29ca_e480cb5c",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-06T16:52:36Z",
+      "side": 1,
+      "message": "I think you want len(v)+1 here, to skip the separator?",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2279c908_fc30fc8b",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-06T16:52:36Z",
+      "side": 1,
+      "message": "I\u0027d document why the trim is needed - it\u0027s not obvious to me, since volume names should not have leading separators.",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

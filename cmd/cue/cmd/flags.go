@@ -80,7 +80,7 @@ func addOrphanFlags(f *pflag.FlagSet) {
 	f.StringP(string(flagPackage), "p", "", "package name for non-CUE files")
 	f.StringP(string(flagSchema), "d", "",
 		"expression to select schema for evaluating values in non-CUE files")
-	f.StringArrayP(string(flagPath), "l", nil, "CUE expression for single path component")
+	f.StringArrayP(string(flagPath), "l", nil, `CUE expression for single path component (see 'cue help flags' for details)`)
 	f.Bool(string(flagList), false, "concatenate multiple objects into a list")
 	f.Bool(string(flagWithContext), false, "import as object with contextual data")
 	f.StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")

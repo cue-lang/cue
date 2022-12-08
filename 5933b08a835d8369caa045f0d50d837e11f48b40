@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c5b23e24_ba9c3d8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-08T10:02:41Z",
+      "side": 1,
+      "message": "What is the change in the tool file, cue fmt?\n\nI assume this makes the _binary_ reproducible, but not the tar archives yet.",
+      "revId": "5933b08a835d8369caa045f0d50d837e11f48b40",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c5c25b2_b4dfa7c3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-09T12:33:47Z",
+      "side": 1,
+      "message": "wrap the lines consistently?\n\nalso note the double space.",
+      "revId": "7e29b4c722d66e6434d22a613b21a0da3ab574d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73972c7b_afd87387",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-09T12:33:47Z",
+      "side": 1,
+      "message": "The Unity failure is not your fault; you\u0027ll be able to rebase to fix it once https://review.gerrithub.io/c/cue-unity/unity/+/547305 is merged.",
+      "revId": "7e29b4c722d66e6434d22a613b21a0da3ab574d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9bd33863_000fe2bc",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-09T12:33:47Z",
+      "side": 1,
+      "message": "nit: no need to change the quoting :)",
+      "revId": "7e29b4c722d66e6434d22a613b21a0da3ab574d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

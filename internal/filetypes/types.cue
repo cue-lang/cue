@@ -145,6 +145,8 @@ extensions: {
 	".jsonl":     tags.jsonl
 	".ldjson":    tags.jsonl
 	".ndjson":    tags.jsonl
+	".core":      tags.yaml
+	".pyml":      tags.yaml
 	".yaml":      tags.yaml
 	".yml":       tags.yaml
 	".txt":       tags.text

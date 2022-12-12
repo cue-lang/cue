@@ -71,6 +71,8 @@ func (d *decoder) clear(x reflect.Value) {
 	}
 }
 
+var valueType = reflect.TypeOf(Value{})
+
 func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	if !x.IsValid() {
 		d.addErr(errors.Newf(v.Pos(), "cannot decode into invalid value"))
@@ -85,6 +87,10 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 
 	if err := v.Err(); err != nil {
 		d.addErr(err)
+		return
+	}
+	if x.Type() == valueType {
+		x.Set(reflect.ValueOf(v))
 		return
 	}
 

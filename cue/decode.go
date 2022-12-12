@@ -34,6 +34,10 @@ import (
 // An error is returned if x is nil or not a pointer.
 //
 // If x is a struct, Decode will validate the constraints specified in the field tags.
+//
+// If x contains a [Value], that part of x will be set to the value
+// at the corresponding part of v. This allows decoding values
+// that aren't entirely concrete into a Go type.
 func (v Value) Decode(x interface{}) error {
 	var d decoder
 	w := reflect.ValueOf(x)
@@ -71,6 +75,8 @@ func (d *decoder) clear(x reflect.Value) {
 	}
 }
 
+var valueType = reflect.TypeOf(Value{})
+
 func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	if !x.IsValid() {
 		d.addErr(errors.Newf(v.Pos(), "cannot decode into invalid value"))
@@ -85,6 +91,10 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 
 	if err := v.Err(); err != nil {
 		d.addErr(err)
+		return
+	}
+	if x.Type() == valueType {
+		x.Set(reflect.ValueOf(v))
 		return
 	}
 

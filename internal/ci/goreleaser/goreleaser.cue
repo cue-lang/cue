@@ -9,8 +9,9 @@ config: {
 		env: [
 			"CGO_ENABLED=0",
 		]
-		main:   "./cmd/cue"
-		binary: "cue"
+		main:          "./cmd/cue"
+		binary:        "cue"
+		mod_timestamp: "{{ .CommitTimestamp }}"
 		ldflags: [
 			"-s -w",
 		]

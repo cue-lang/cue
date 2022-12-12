@@ -16,6 +16,24 @@
       "message": "What is the change in the tool file, cue fmt?\n\nI assume this makes the _binary_ reproducible, but not the tar archives yet.",
       "revId": "5933b08a835d8369caa045f0d50d837e11f48b40",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0edc677_dfe030a6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-12T05:49:36Z",
+      "side": 1,
+      "message": "\u003e What is the change in the tool file, cue fmt?\n\nProbably. I have it on my list to work out what happened there, but I suspect it\u0027s because of a recent CL which fixed comment retent",
+      "parentUuid": "c5b23e24_ba9c3d8b",
+      "revId": "5933b08a835d8369caa045f0d50d837e11f48b40",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

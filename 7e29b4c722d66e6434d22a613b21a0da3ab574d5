@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "8b24194e_e9d7473d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-12-14T09:11:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c5c25b2_b4dfa7c3",
+      "revId": "7e29b4c722d66e6434d22a613b21a0da3ab574d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "73972c7b_afd87387",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -65,6 +83,24 @@
       "writtenOn": "2022-12-09T12:33:47Z",
       "side": 1,
       "message": "nit: no need to change the quoting :)",
+      "revId": "7e29b4c722d66e6434d22a613b21a0da3ab574d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93e1a392_ff3041cd",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-12-14T09:11:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9bd33863_000fe2bc",
       "revId": "7e29b4c722d66e6434d22a613b21a0da3ab574d5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

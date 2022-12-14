@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "702b6c97_b032cb49",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-12-14T05:55:45Z",
+      "side": 1,
+      "message": "LGTM assuming the comments from Daniel are resolved and the change is rebased to allow unity to pass.",
+      "revId": "7e29b4c722d66e6434d22a613b21a0da3ab574d5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9bd33863_000fe2bc",

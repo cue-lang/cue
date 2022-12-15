@@ -17,6 +17,7 @@ config: {
 		flags: [
 			"-trimpath",
 		]
+		mod_timestamp: '{{ .CommitTimestamp }}'
 		goos: [
 			"darwin",
 			"linux",

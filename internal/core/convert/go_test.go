@@ -376,6 +376,13 @@ func TestConvertType(t *testing.T) {
 		`{
   Foobar?: (string & "foo,bar")
 }`,
+	}, {
+		struct {
+			Foobar string `cue:"\"foo,opt,bar\""`
+		}{},
+		`{
+  Foobar: (string & "foo,opt,bar")
+}`,
 	}}
 
 	r := runtime.New()

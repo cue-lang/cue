@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "433000e7_605da1b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2022-12-18T10:28:42Z",
+      "side": 1,
+      "message": "Did you perhaps forget about this CL when you sent https://review.gerrithub.io/c/cue-lang/cue/+/547507, which got merged?",
+      "revId": "94e9ed49c10a28eb7fd6f488b7774c220c50e76d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

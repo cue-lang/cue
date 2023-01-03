@@ -15,6 +15,8 @@
 package github
 
 import (
+	"cuelang.org/go/internal/ci/core"
+
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
@@ -31,8 +33,8 @@ trybot: _base.#bashWorkflow & {
 
 	on: {
 		push: {
-			branches: ["trybot/*/*", _#defaultBranch, _base.#testDefaultBranch] // do not run PR branches
-			"tags-ignore": [_#releaseTagPattern]
+			branches: ["trybot/*/*", core.#defaultBranch, _base.#testDefaultBranch] // do not run PR branches
+			"tags-ignore": [core.#releaseTagPattern]
 		}
 		pull_request: {}
 	}
@@ -42,7 +44,6 @@ trybot: _base.#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
-				_base.#installGo,
 				_base.#checkoutCode & {
 					// "pull_request" builds will by default use a merge commit,
 					// testing the PR's HEAD merged on top of the master branch.
@@ -50,6 +51,12 @@ trybot: _base.#bashWorkflow & {
 					// This doesn't affect "push" builds, which never used merge commits.
 					with: ref: "${{ github.event.pull_request.head.sha }}"
 				},
+				_base.#installGo,
+
+				// cachePre must come after installing Node and Go, because the cache locations
+				// are established by running each tool.
+				for v in _#cachePre {v},
+
 				_base.#earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
@@ -70,12 +77,13 @@ trybot: _base.#bashWorkflow & {
 				_#goCheck,
 				_base.#checkGitClean,
 				_#pullThroughProxy,
+				_#cachePost,
 			]
 		}
 	}
 
 	_#pullThroughProxy: json.#step & {
-		name: "Pull this commit through the proxy on \(_#defaultBranch)"
+		name: "Pull this commit through the proxy on \(core.#defaultBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
@@ -130,7 +138,7 @@ trybot: _base.#bashWorkflow & {
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-		if: "\(#_isLatestLinux)"
+		if:   "\(#_isLatestLinux)"
 		name: "Check"
 		run:  "go vet ./..."
 	}

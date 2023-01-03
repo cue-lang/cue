@@ -16,6 +16,9 @@
 package github
 
 import (
+	"strings"
+
+	"cuelang.org/go/internal/ci/core"
 	"cuelang.org/go/internal/ci/base"
 	"cuelang.org/go/internal/ci/gerrithub"
 
@@ -48,21 +51,7 @@ workflows: [
 	},
 ]
 
-// TODO: _#repositoryURL and _#unityURL should be extracted from codereview.cfg
-_#repositoryURL: "https://github.com/cue-lang/cue"
-_#unityURL:      "https://github.com/cue-unity/unity"
-
-_#defaultBranch:     "master"
-_#releaseTagPattern: "v*"
-
-// Use the latest Go version for extra checks,
-// such as running tests with the data race detector.
-_#latestStableGo: "1.19.x"
-
-// Use a specific latest version for release builds.
-// Note that we don't want ".x" for the sake of reproducibility,
-// so we instead pin a specific Go release.
-_#pinnedReleaseGo: "1.19.3"
+_#activeBranches: [core.#defaultBranch]
 
 _#linuxMachine:   "ubuntu-20.04"
 _#macosMachine:   "macos-11"
@@ -71,14 +60,12 @@ _#windowsMachine: "windows-2022"
 // #_isLatestLinux evaluates to true if the job is running on Linux with the
 // latest version of Go. This expression is often used to run certain steps
 // just once per CI workflow, to avoid duplicated work.
-#_isLatestLinux: "matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
-
-_#goreleaserVersion: "v1.13.1"
+#_isLatestLinux: "matrix.go-version == '\(core.#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": ["1.18.x", _#latestStableGo]
+		"go-version": ["1.18.x", core.#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -86,7 +73,7 @@ _#testStrategy: {
 // _gerrithub is an instance of ./gerrithub, parameterised by the properties of
 // this project
 _gerrithub: gerrithub & {
-	#repositoryURL:                      _#repositoryURL
+	#repositoryURL:                      core.#githubRepositoryURL
 	#botGitHubUser:                      "cueckoo"
 	#botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
 	#botGitHubUserEmail:                 "cueckoo@gmail.com"
@@ -102,8 +89,45 @@ _gerrithub: gerrithub & {
 // Perhaps rename the import to something more obviously not intended to be
 // used, and then rename the field base?
 _base: base & {
-	#repositoryURL:                "https://github.com/cue-lang/cue"
-	#defaultBranch:                _#defaultBranch
+	#repositoryURL:                core.#githubRepositoryURL
+	#defaultBranch:                core.#defaultBranch
 	#botGitHubUser:                "cueckoo"
 	#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
+}
+
+_#cacheDirs: [ "${{ steps.npm-cache-dir.outputs.dir }}", "${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download", "${{ steps.go-cache-dir.outputs.dir }}"]
+
+_#cachePre: [
+	json.#step & {
+		name: "Get npm cache directory"
+		id:   "npm-cache-dir"
+		run:  #"echo "dir=$(npm config get cache)" >> ${GITHUB_OUTPUT}"#
+	},
+	json.#step & {
+		name: "Get go mod cache directory"
+		id:   "go-mod-cache-dir"
+		run:  #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
+	},
+	json.#step & {
+		name: "Get go build/test cache directory"
+		id:   "go-cache-dir"
+		run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
+	},
+	json.#step & {
+		uses: "actions/cache@v3"
+		with: {
+			path: strings.Join(_#cacheDirs, "\n")
+
+			// GitHub actions caches are immutable. Therefore, use a key which is
+			// unique, but allow the restore to fallback to the most recent cache.
+			// The result is then saved under the new key which will benefit the
+			// next build
+			key:            "${{ runner.os }}-${{ github.run_id }}"
+			"restore-keys": "${{ runner.os }}"
+		}
+	},
+]
+
+_#cachePost: json.#step & {
+	run: "find \(strings.Join(_#cacheDirs, " ")) -type f -amin +7200 -delete -print"
 }

@@ -16,3 +16,4 @@ package ci
 
 //go:generate go run cuelang.org/go/cmd/cue cmd importjsonschema ./vendor
 //go:generate go run cuelang.org/go/cmd/cue cmd genworkflows
+//go:generate go run cuelang.org/go/cmd/cue@v0.5.0-beta.2 cmd gencodereviewcfg

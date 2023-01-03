@@ -15,6 +15,7 @@
 package github
 
 import (
+	"cuelang.org/go/internal/ci/core"
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
@@ -33,7 +34,7 @@ release: _base.#bashWorkflow & {
 	// homebrew tags.
 	concurrency: "release"
 
-	on: push: tags: [_#releaseTagPattern]
+	on: push: tags: [core.#releaseTagPattern]
 	jobs: goreleaser: {
 		"runs-on": _#linuxMachine
 		steps: [
@@ -41,7 +42,7 @@ release: _base.#bashWorkflow & {
 				with: "fetch-depth": 0
 			},
 			_base.#installGo & {
-				with: "go-version": _#pinnedReleaseGo
+				with: "go-version": core.#pinnedReleaseGo
 			},
 			json.#step & {
 				name: "Setup qemu"
@@ -65,7 +66,7 @@ release: _base.#bashWorkflow & {
 				uses: "goreleaser/goreleaser-action@v3"
 				with: {
 					"install-only": true
-					version:        _#goreleaserVersion
+					version:        core.#goreleaserVersion
 				}
 			},
 			json.#step & {
@@ -83,7 +84,7 @@ release: _base.#bashWorkflow & {
 			},
 			_base.#repositoryDispatch & {
 				name:           "Trigger unity build"
-				#repositoryURL: _#unityURL
+				#repositoryURL: core.#unityRepositoryURL
 				#arg: {
 					event_type: "Check against CUE \(_#cueVersionRef)"
 					client_payload: {

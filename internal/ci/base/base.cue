@@ -31,6 +31,11 @@ import (
 #botGitHubUser:                string
 #botGitHubUserTokenSecretsKey: string
 
+#doNotEditMessage: {
+	#generatedBy: string
+	"Code generated \(#generatedBy); DO NOT EDIT."
+}
+
 // #isDefaultBranch is an expression that evaluates to true if the
 // job is running as a result of pushing to the default branch, like master.
 // For the sake of testing CI, pushes to #testDefaultBranch branch also match.

@@ -55,7 +55,7 @@ _#linuxMachine: "ubuntu-20.04"
 
 #dispatchWorkflow: json.#Workflow & {
 	#type:                  #dispatchTrybot | #dispatchUnity
-	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}"
+	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
 	name:                   "Dispatch \(#type)"
 	on: ["repository_dispatch"]
 	jobs: [string]: defaults: run: shell: "bash"
@@ -64,7 +64,16 @@ _#linuxMachine: "ubuntu-20.04"
 			"runs-on": _#linuxMachine
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [
-				_#writeNetrcFile,
+				#writeNetrcFile,
+				// Hack to get the ref (e.g. refs/changes/38/547738/7) in a format we can use in a
+				// branch name, e.g. _547738_7
+				json.#step & {
+					id: "gerrithub_ref"
+					run: #"""
+						ref="$(echo ${{github.event.client_payload.payload.ref}} | sed -E 's/^refs\/changes\/[0-9]+\/([0-9]+)\/([0-9]+).*/\1\/\2/')"
+						echo "gerrithub_ref=$ref" >> $GITHUB_OUTPUT
+						"""#
+				},
 				json.#step & {
 					name: "Trigger \(#type)"
 					run:  """
@@ -76,16 +85,21 @@ _#linuxMachine: "ubuntu-20.04"
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(#botGitHubUser):${{ secrets.\(#botGitHubUserTokenSecretsKey) }} | base64)"
 						git fetch \(#gerritHubRepository) ${{ github.event.client_payload.payload.ref }}
 						git checkout -b \(_#branchNameExpression) FETCH_HEAD
-						git push \(#trybotRepositoryURL) \(_#branchNameExpression)
+						git remote add origin \(#trybotRepositoryURL)
+						git fetch origin ${{ github.event.client_payload.payload.branch }}
+						git push origin \(_#branchNameExpression)
+						echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
+						gh pr -R \(#trybotRepositoryURL) create -B ${{ github.event.client_payload.payload.branch }} -f
 						"""
 				},
 			]
 		}
 	}
+}
 
-	_#writeNetrcFile: json.#step & {
-		name: "Write netrc file for cueckoo Gerrithub"
-		run:  """
+#writeNetrcFile: json.#step & {
+	name: "Write netrc file for cueckoo Gerrithub"
+	run:  """
 			cat <<EOD > ~/.netrc
 			machine \(_#gerritHubHostname)
 			login \(#botGerritHubUser)
@@ -93,5 +107,4 @@ _#linuxMachine: "ubuntu-20.04"
 			EOD
 			chmod 600 ~/.netrc
 			"""
-	}
 }

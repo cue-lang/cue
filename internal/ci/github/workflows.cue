@@ -49,6 +49,10 @@ workflows: [
 		file:   "tip_triggers.yml"
 		schema: tip_triggers
 	},
+	{
+		file:   "push_tip_to_trybot.yml"
+		schema: push_tip_to_trybot
+	},
 ]
 
 _#activeBranches: [core.#defaultBranch]

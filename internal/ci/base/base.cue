@@ -31,6 +31,11 @@ import (
 #botGitHubUser:                string
 #botGitHubUserTokenSecretsKey: string
 
+#doNotEditMessage: {
+	#generatedBy: string
+	"Code generated \(#generatedBy); DO NOT EDIT."
+}
+
 // #isDefaultBranch is an expression that evaluates to true if the
 // job is running as a result of pushing to the default branch, like master.
 // For the sake of testing CI, pushes to #testDefaultBranch branch also match.
@@ -71,18 +76,6 @@ import (
 			fi
 		done
 		"""
-}
-
-#cacheGoModules: json.#step & {
-	name: "Cache Go modules"
-	uses: "actions/cache@v3"
-	with: {
-		path: "~/go/pkg/mod"
-		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"
-		"restore-keys": """
-			${{ runner.os }}-${{ matrix.go-version }}-go-
-			"""
-	}
 }
 
 #checkGitClean: json.#step & {

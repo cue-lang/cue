@@ -28,9 +28,15 @@ tip_triggers: _base.#bashWorkflow & {
 		"runs-on": _#linuxMachine
 		if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
 		steps: [
-			{
-				name: "Rebuild tip.cuelang.org"
-				run:  "\(_base.#curl) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CUELANGORGTIPREBUILDHOOK }}"
+			_base.#repositoryDispatch & {
+				name:           "Trigger tip.cuelang.org deploy"
+				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
+				#arg: {
+					event_type: "Rebuild tip against ${GITHUB_SHA}"
+					client_payload: {
+						type: "rebuild_tip"
+					}
+				}
 			},
 			_base.#repositoryDispatch & {
 				name:           "Trigger unity build"

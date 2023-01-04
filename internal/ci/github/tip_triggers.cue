@@ -33,6 +33,16 @@ tip_triggers: _base.#bashWorkflow & {
 				run:  "\(_base.#curl) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CUELANGORGTIPREBUILDHOOK }}"
 			},
 			_base.#repositoryDispatch & {
+				name:           "Trigger tip.cuelang.org deploy"
+				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
+				#arg: {
+					event_type: "Rebuild tip against ${GITHUB_SHA}"
+					client_payload: {
+						type: "rebuild_tip"
+					}
+				}
+			},
+			_base.#repositoryDispatch & {
 				name:           "Trigger unity build"
 				#repositoryURL: "https://github.com/cue-unity/unity"
 				#arg: {

@@ -288,11 +288,8 @@ func (i *streamingIterator) scan() bool {
 	}
 	i.v = v
 	if schema := i.b.encConfig.Schema; schema.Exists() {
-		i.e = schema.Err()
-		if i.e == nil {
-			i.v = i.v.Unify(schema) // TODO(required fields): don't merge in schema
-			i.e = i.v.Err()
-		}
+		i.v = i.v.Unify(schema) // TODO(required fields): don't merge in schema
+		i.e = i.v.Err()
 		if i.e != nil {
 			if err := i.v.Validate(); err != nil {
 				// Validate should always be non-nil, but just in case.
@@ -624,7 +621,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 				[]*build.Instance{schema},
 				true)[0]
 
-			if inst.err != nil {
+			if err := inst.err; err != nil {
 				return nil, err
 			}
 			p.instance = inst
@@ -633,8 +630,10 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 				v := cmd.ctx.BuildExpr(p.schema,
 					cue.InferBuiltins(true),
 					cue.Scope(inst.Value()))
-				if err := v.Err(); err != nil {
-					return nil, v.Validate()
+				// Note that we don't check v.Err as we don't care about
+				// incomplete errors.
+				if err := v.Validate(); err != nil {
+					return nil, err
 				}
 				p.encConfig.Schema = v
 			}

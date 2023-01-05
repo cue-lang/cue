@@ -1,0 +1,23 @@
+exec cue vet data.yaml schema.cue
+
+exec cue vet data2.yaml schema2.cue
+
+exec cue vet data.yaml schema2.cue -d x
+
+-- data.yaml --
+a: 200
+-- schema.cue --
+a: int
+if a > 100 {
+	b: true
+}
+-- data2.yaml --
+x:
+  a: 200
+-- schema2.cue --
+x: {
+	a: int
+	if a > 100 {
+		b: true
+	}
+}

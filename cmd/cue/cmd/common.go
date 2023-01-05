@@ -624,7 +624,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 				[]*build.Instance{schema},
 				true)[0]
 
-			if inst.err != nil {
+			if err := inst.err; err != nil {
 				return nil, err
 			}
 			p.instance = inst
@@ -634,7 +634,11 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 					cue.InferBuiltins(true),
 					cue.Scope(inst.Value()))
 				if err := v.Err(); err != nil {
-					return nil, v.Validate()
+					// Validate may give us a more detailed error.
+					if err2 := v.Validate(); err2 != nil {
+						err = err2
+					}
+					return nil, err
 				}
 				p.encConfig.Schema = v
 			}

@@ -1,0 +1,12 @@
+! exec cue vet data.yaml schema.cue -d '#schema'
+stderr 'non-concrete value int in operand to >'
+
+-- data.yaml --
+a: 200
+-- schema.cue --
+#schema: {
+	a: int
+	if a > 100 {
+		b: true
+	}
+}

@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package path
+package ospath
 
 import (
 	"strings"
@@ -105,8 +105,8 @@ func TestMatch(t *testing.T) {
 					// no escape allowed on windows.
 					continue
 				}
-				pattern = Clean(pattern, os)
-				s = Clean(s, os)
+				pattern = os.Clean(pattern)
+				s = os.Clean(s)
 			}
 			ok, err := Match(pattern, s, os)
 			if ok != tt.match || err != tt.err {

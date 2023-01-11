@@ -1,4 +1,4 @@
-// Copyright 2020 CUE Authors
+// Copyright 2023 CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,26 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package path
+// Note: the following build constraint taken directly from
+// the equivalent build constraint in Go 1.18.
+// TODO when we can assume Go 1.19, change
+// the following to:
+// // go:build unix || js
 
-import "cuelang.org/go/internal/ospath"
+//go:build aix || darwin || dragonfly || freebsd || (js && wasm) || linux || netbsd || openbsd || solaris
 
-// OS must be a valid runtime.GOOS value or "unix".
-type OS string
+package ospath
 
-const (
-	Unix    OS = "unix"
-	Windows OS = "windows"
-	Plan9   OS = "plan9"
-)
-
-func getOS(o OS) ospath.OS {
-	switch o {
-	case Windows:
-		return ospath.Windows
-	case Plan9:
-		return ospath.Plan9
-	default:
-		return ospath.Unix
-	}
-}
+var currentOS = Unix

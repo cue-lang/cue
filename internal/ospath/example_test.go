@@ -12,26 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package path
+// Copyright 2017 The Go Authors. All rights reserved.
+// Use of this source code is governed by a BSD-style
+// license that can be found in the LICENSE file.
 
-import "cuelang.org/go/internal/ospath"
+package ospath_test
 
-// OS must be a valid runtime.GOOS value or "unix".
-type OS string
+import (
+	"fmt"
 
-const (
-	Unix    OS = "unix"
-	Windows OS = "windows"
-	Plan9   OS = "plan9"
+	"cuelang.org/go/internal/ospath"
 )
 
-func getOS(o OS) ospath.OS {
-	switch o {
-	case Windows:
-		return ospath.Windows
-	case Plan9:
-		return ospath.Plan9
-	default:
-		return ospath.Unix
-	}
+func ExampleExt() {
+	fmt.Printf("No dots: %q\n", ospath.Unix.Ext("index"))
+	fmt.Printf("One dot: %q\n", ospath.Unix.Ext("index.js"))
+	fmt.Printf("Two dots: %q\n", ospath.Unix.Ext("main.test.js"))
+	// Output:
+	// No dots: ""
+	// One dot: ".js"
+	// Two dots: ".js"
 }

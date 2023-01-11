@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package path
+package ospath
 
 import (
 	"strings"
@@ -35,7 +35,7 @@ func isSlash(c uint8) bool {
 	return c == '\\' || c == '/'
 }
 
-func (os windowsInfo) IsPathSeparator(b byte) bool {
+func (os windowsInfo) isPathSeparator(b byte) bool {
 	return isSlash(b)
 }
 
@@ -62,8 +62,8 @@ func (os windowsInfo) isReservedName(path string) bool {
 	return false
 }
 
-// IsAbs reports whether the path is absolute.
-func (os windowsInfo) IsAbs(path string) (b bool) {
+// isAbs reports whether the path is absolute.
+func (os windowsInfo) isAbs(path string) (b bool) {
 	if os.isReservedName(path) {
 		return true
 	}
@@ -116,17 +116,6 @@ func (os windowsInfo) volumeNameLen(path string) int {
 	return 0
 }
 
-// HasPrefix exists for historical compatibility and should not be used.
-//
-// Deprecated: HasPrefix does not respect path boundaries and
-// does not ignore case when required.
-func (os windowsInfo) HasPrefix(p, prefix string) bool {
-	if strings.HasPrefix(p, prefix) {
-		return true
-	}
-	return strings.HasPrefix(strings.ToLower(p), strings.ToLower(prefix))
-}
-
 func (os windowsInfo) splitList(path string) []string {
 	// The same implementation is used in LookPath in os/exec;
 	// consider changing os/exec when changing this.
@@ -158,7 +147,7 @@ func (os windowsInfo) splitList(path string) []string {
 	return list
 }
 
-func (os windowsInfo) join(elem []string) string {
+func (os windowsInfo) join(elem ...string) string {
 	for i, e := range elem {
 		if e != "" {
 			return os.joinNonEmpty(elem[i:])
@@ -179,23 +168,23 @@ func (o windowsInfo) joinNonEmpty(elem []string) string {
 				break
 			}
 		}
-		return clean(elem[0]+strings.Join(elem[i:], string(windowsSeparator)), windows)
+		return Windows.Clean(elem[0] + strings.Join(elem[i:], string(windowsSeparator)))
 	}
 	// The following logic prevents Join from inadvertently creating a
 	// UNC path on Windows. Unless the first element is a UNC path, Join
 	// shouldn't create a UNC path. See golang.org/issue/9167.
-	p := clean(strings.Join(elem, string(windowsSeparator)), windows)
+	p := Windows.Clean(strings.Join(elem, string(windowsSeparator)))
 	if !isUNC(p) {
 		return p
 	}
 	// p == UNC only allowed when the first element is a UNC path.
-	head := clean(elem[0], windows)
+	head := Windows.Clean(elem[0])
 	if isUNC(head) {
 		return p
 	}
 	// head + tail == UNC, but joining two non-UNC paths should not result
 	// in a UNC path. Undo creation of UNC path.
-	tail := clean(strings.Join(elem[1:], string(windowsSeparator)), windows)
+	tail := Windows.Clean(strings.Join(elem[1:], string(windowsSeparator)))
 	if head[len(head)-1] == windowsSeparator {
 		return head + tail
 	}
@@ -204,7 +193,7 @@ func (o windowsInfo) joinNonEmpty(elem []string) string {
 
 // isUNC reports whether path is a UNC path.
 func isUNC(path string) bool {
-	return windows.volumeNameLen(path) > 2
+	return Windows.volumeNameLen(path) > 2
 }
 
 func (o windowsInfo) sameWord(a, b string) bool {

@@ -16,57 +16,51 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package path
+package ospath
 
 import "strings"
 
-const plan9Separator = '/'
-const plan9ListSeparator = '\000'
+type unixInfo struct{}
 
-type plan9Info struct{}
+var _ osInfo = unixInfo{}
 
-var _ osInfo = plan9Info{}
+const (
+	unixListSeparator = ':'
+	unixSeparator     = '/'
+)
 
-func (o plan9Info) IsPathSeparator(b byte) bool {
-	return b == plan9Separator
+func (o unixInfo) isPathSeparator(b byte) bool {
+	return b == unixSeparator
 }
 
 // IsAbs reports whether the path is absolute.
-func (o plan9Info) IsAbs(path string) bool {
-	return strings.HasPrefix(path, "/") || strings.HasPrefix(path, "#")
+func (o unixInfo) isAbs(path string) bool {
+	return strings.HasPrefix(path, "/")
 }
 
 // volumeNameLen returns length of the leading volume name on Windows.
 // It returns 0 elsewhere.
-func (o plan9Info) volumeNameLen(path string) int {
+func (o unixInfo) volumeNameLen(path string) int {
 	return 0
 }
 
-// HasPrefix exists for historical compatibility and should not be used.
-//
-// Deprecated: HasPrefix does not respect path boundaries and
-// does not ignore case when required.
-func (o plan9Info) HasPrefix(p, prefix string) bool {
-	return strings.HasPrefix(p, prefix)
-}
-
-func (o plan9Info) splitList(path string) []string {
+func (o unixInfo) splitList(path string) []string {
 	if path == "" {
 		return []string{}
 	}
-	return strings.Split(path, string(plan9ListSeparator))
+	return strings.Split(path, string(unixListSeparator))
 }
 
-func (o plan9Info) join(elem []string) string {
-	// If there's a bug here, fix the logic in ./path_unix.go too.
+func (o unixInfo) join(elem ...string) string {
+	// If there's a bug here, fix the logic in ./path_plan9.go too.
 	for i, e := range elem {
 		if e != "" {
-			return clean(strings.Join(elem[i:], string(plan9Separator)), plan9)
+			return Unix.Clean(strings.Join(elem[i:], string(unixSeparator)))
 		}
 	}
 	return ""
 }
 
-func (o plan9Info) sameWord(a, b string) bool {
+func (o unixInfo) sameWord(a, b string) bool {
 	return a == b
 }

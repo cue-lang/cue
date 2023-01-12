@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1ee608f_34d065fc",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-12T13:26:18Z",
+      "side": 1,
+      "message": "FWIW I thought it would be worth doing it for files because it\u0027s trivial to do (doing it for directories makes the addFile logic more complex) and maybe opening a file is more common than reading a directory. But maybe it\u0027s just premature optimization. I think I\u0027ll leave sourceFS as a wrapper type though, just so it\u0027s trivial to add caching logic like the files map in the future if we want.",
+      "parentUuid": "3e8a27d8_166bef57",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fd49cbd_5e3aaf6b",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-12-06T16:52:36Z",
       "side": 1,
       "message": "unused?",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b70885b5_8ca06281",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-12T13:26:18Z",
+      "side": 1,
+      "message": "good catch. it was a bug that it was assigning to entries not entries1.",
+      "parentUuid": "2fd49cbd_5e3aaf6b",
       "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8fb3fb7_860761f9",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 306,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-12T13:26:18Z",
+      "side": 1,
+      "message": "i\u0027ll add a note, but i\u0027m not convinced it\u0027s worth a TODO for the extra logic given that we are the only user of the FS implementation.",
+      "parentUuid": "7dca6642_e77c8ac5",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a43a29ca_e480cb5c",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98a2f0de_80bd5efe",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 335,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-12T13:26:18Z",
+      "side": 1,
+      "message": "I don\u0027t think so. I think we can just remove the prefix and leave the rest as is.",
+      "parentUuid": "a43a29ca_e480cb5c",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2279c908_fc30fc8b",
@@ -82,6 +154,24 @@
       "writtenOn": "2022-12-06T16:52:36Z",
       "side": 1,
       "message": "I\u0027d document why the trim is needed - it\u0027s not obvious to me, since volume names should not have leading separators.",
+      "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38150e25_d40ea81b",
+        "filename": "internal/sourcefs/sourcefs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 336,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-12T13:26:18Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "2279c908_fc30fc8b",
       "revId": "763ab3db9058ddfb1f8add5fdd6997a9d6984870",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

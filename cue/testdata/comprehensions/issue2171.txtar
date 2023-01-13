@@ -1,0 +1,39 @@
+// Sometimes an arc should not "Finalize" itself. See Issue #2171 in eval.go.
+-- in.cue --
+package x
+
+do: {
+	hello: {
+	}
+}
+
+for k, v in do {do: (k): v}
+-- out/compile --
+--- in.cue
+{
+  do: {
+    hello: {}
+  }
+  for k, v in 〈0;do〉 {
+    do: {
+      〈2;k〉: 〈2;v〉
+    }
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  3
+Reused: 0
+Allocs: 3
+Retain: 1
+
+Unifications: 3
+Conjuncts:    5
+Disjuncts:    4
+-- out/eval --
+(struct){
+  do: (struct){
+    hello: (struct){
+    }
+  }
+}

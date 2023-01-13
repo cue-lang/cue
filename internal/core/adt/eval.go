@@ -1494,7 +1494,9 @@ func (n *nodeContext) evalExpr(v Conjunct, state VertexStatus) {
 		// We complete the evaluation. Some optimizations will only work when an
 		// arc is already finalized. So this ensures that such optimizations get
 		// triggered more often.
-		if arc.status == Conjuncts {
+		// A node should not Finalize itself as it may erase the state object
+		// which is still assumed to be present down the line (see Issue #2171).
+		if arc.status == Conjuncts && arc != n.node {
 			arc.Finalize(ctx)
 		}
 

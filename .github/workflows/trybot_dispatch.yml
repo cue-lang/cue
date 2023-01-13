@@ -31,10 +31,10 @@ jobs:
           git config user.name cueckoo
           git config user.email cueckoo@gmail.com
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
-          git fetch https://review.gerrithub.io/a/cue-lang/cue ${{ github.event.client_payload.payload.ref }}
+          git fetch https://review.gerrithub.io/a/cue-lang/cue "${{ github.event.client_payload.payload.ref }}"
           git checkout -b trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }} FETCH_HEAD
           git remote add origin https://github.com/cue-lang/cue-trybot
-          git fetch origin ${{ github.event.client_payload.payload.branch }}
+          git fetch origin "${{ github.event.client_payload.payload.branch }}"
           git push origin trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}
           echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
-          gh pr -R https://github.com/cue-lang/cue-trybot create -B ${{ github.event.client_payload.payload.branch }} -f
+          gh pr --repo=https://github.com/cue-lang/cue-trybot create --base="${{ github.event.client_payload.payload.branch }}" --fill

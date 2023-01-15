@@ -934,6 +934,11 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	key := cacheKey{expr, arc}
 	v, ok := e.cache[key]
 	if !ok {
+		// Link in the right environment to ensure comprehension context is not
+		// lost. Use a Vertex to piggyback on cycle processing.
+		c.Env = e
+		c.x = expr
+
 		if e.cache == nil {
 			e.cache = map[cacheKey]Value{}
 		}

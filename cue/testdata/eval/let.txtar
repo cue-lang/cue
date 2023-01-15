@@ -38,6 +38,18 @@ ignoreErrorInLet: {
 	let X = 1 & 2
 	disjunction: *X | 3
 }
+-- issue2166.cue --
+letWithDynamicInComprehension: {
+	_i: {
+		a: "d"
+		b: "e"
+	}
+
+	for k, v in _i {
+		let T = v
+		(T): "1"
+	}
+}
 -- issue2063.cue --
 import (
 	"encoding/yaml"
@@ -67,14 +79,14 @@ keepDescending: t2: {
 
 -- out/eval/stats --
 Leaks:  6
-Freed:  48
-Reused: 39
+Freed:  57
+Reused: 48
 Allocs: 15
-Retain: 21
+Retain: 24
 
-Unifications: 52
-Conjuncts:    74
-Disjuncts:    59
+Unifications: 61
+Conjuncts:    91
+Disjuncts:    69
 -- out/eval --
 (struct){
   let A#1 = (int){ 9 }
@@ -148,6 +160,21 @@ Disjuncts:    59
       }
     }
   }
+  letWithDynamicInComprehension: (struct){
+    let T#1B = (_|_){
+      // [eval] letWithDynamicInComprehension.T: conflicting values "e" and "d":
+      //     ./issue2166.cue:3:6
+      //     ./issue2166.cue:4:6
+      //     ./issue2166.cue:7:2
+      //     ./issue2166.cue:8:11
+    }
+    _i: (struct){
+      a: (string){ "d" }
+      b: (string){ "e" }
+    }
+    d: (string){ "1" }
+    e: (string){ "1" }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -216,6 +243,19 @@ Disjuncts:    59
           Y: 〈import;strings〉.Join([], "")
         }
       }
+    }
+  }
+}
+--- issue2166.cue
+{
+  letWithDynamicInComprehension: {
+    _i: {
+      a: "d"
+      b: "e"
+    }
+    for k, v in 〈0;_i〉 {
+      let T#1B = 〈1;v〉
+      〈0;let T#1B〉: "1"
     }
   }
 }

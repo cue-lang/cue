@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "05a7fb21_e3d5e4d8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-16T16:30:31Z",
+      "side": 1,
+      "message": "Good catch. fixed.",
+      "parentUuid": "3a6f0396_ef294e82",
+      "range": {
+        "startLine": 11,
+        "startChar": 31,
+        "endLine": 11,
+        "endChar": 33
+      },
+      "revId": "254303a30b533f0a05dc054c26cb553e90d0886a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "cd74c12c_34f5d063",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -54,6 +78,24 @@
       "writtenOn": "2023-01-16T09:38:09Z",
       "side": 1,
       "message": "nit: trailing whitespace",
+      "revId": "254303a30b533f0a05dc054c26cb553e90d0886a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6523ab44_1b49894f",
+        "filename": "cue/testdata/eval/let.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-16T16:30:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "01c99621_c5bbc82e",
       "revId": "254303a30b533f0a05dc054c26cb553e90d0886a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -3,14 +3,14 @@
 // TODO: significantly reduce the number of counts in this evaluation.
 -- stats.txt --
 Leaks:  0
-Freed:  384153
-Reused: 384113
-Allocs: 40
+Freed:  995025
+Reused: 994976
+Allocs: 49
 Retain: 0
 
-Unifications: 285437
-Conjuncts:    1347594
-Disjuncts:    384153
+Unifications: 740771
+Conjuncts:    3143640
+Disjuncts:    995025
 
 -- in.cue --
 #Secret: {

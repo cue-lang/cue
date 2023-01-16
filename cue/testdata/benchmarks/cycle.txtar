@@ -7,7 +7,7 @@ Retain: 1
 
 Unifications: 15
 Conjuncts:    30
-Disjuncts:    25
+Disjuncts:    26
 
 -- in.cue --
 sameValues: SmustBeF: {

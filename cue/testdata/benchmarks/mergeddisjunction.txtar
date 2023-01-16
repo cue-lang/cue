@@ -11,14 +11,14 @@
 // Issue #651
 -- stats.txt --
 Leaks:  0
-Freed:  163
-Reused: 157
-Allocs: 6
+Freed:  283
+Reused: 275
+Allocs: 8
 Retain: 0
 
 Unifications: 99
-Conjuncts:    290
-Disjuncts:    163
+Conjuncts:    530
+Disjuncts:    283
 
 -- in.cue --
 list: [

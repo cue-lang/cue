@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c20c6d8_a636ff73",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "the diffstat shows we\u0027re ending up with 400 extra lines, whereas the commit message just seems to say you\u0027re moving code and lightly refactoring it. perhaps expand the message a bit - the changes seem to include 200 new lines of examples, for instance.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7c7ab9f_08008404",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "I skimmed the refactor via git, to see what lines were changed versus just moved, but I didn\u0027t carefully review those. I mainly focused on the API and examples.\n\nSGTM, but note that CI is red.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fa5a2ad_b6b3ca43",
+        "filename": "internal/ospath/current_plan9.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "can\u0027t help but wonder if build tags are necessary, given that this is a variable and not a constant. I imagine an init func with a switch over runtime.GOOS is practically the same, and saves us three files. I seem to recall that the compiler has known how to inline branches over constants like runtime.GOOS for some time.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f270678_a8171439",
+        "filename": "internal/ospath/current_unix.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "nit: wouldn\u0027t `unix || js` be more consistent here? not a difference right now, as js/wasm is its only port, but presumably we\u0027re only caring about GOOS for currentOS.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96d5112e_8e44d492",
+        "filename": "internal/ospath/example_nix_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "nit: since Go is adopting \"unix\" for build tags, might as well use \"unix\" in the filename rather than \"nix\".",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78b86a0c_bad8c839",
+        "filename": "internal/ospath/example_nix_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "huh, why doesn\u0027t Join take `...string` rather than `[]string`, just like https://pkg.go.dev/path/filepath#Join? these examples with the slice literals look a bit off to me :)\n\nI understand that we can\u0027t do `F(...string, OS)` as parameters, but if we move OS to the receiver, then we can use `(OS) F(...string)`. And, for consistency, we could consider changing non-methods to `F(OS, ...string)`, if that\u0027s not breaking.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5566f4e2_d3313a9a",
+        "filename": "internal/ospath/example_nix_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "is there a reason why the other examples use methods, but this one does not?",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9507fec_2c0f55ce",
+        "filename": "internal/ospath/example_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "I\u0027m slightly confused by this. The filename and the lack of \"on Unix\" in the output seems to imply that this behavior is not OS-specific, but you\u0027re still using `ospath.Unix`. Does this mean that, for Ext, it doesn\u0027t matter what OS I choose? If that\u0027s the case, then why have that API in the ospath package at all?",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b2f906c_cc509acc",
+        "filename": "internal/ospath/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "nit: this is derived at build time, via either build tags or runtime.GOOS (same result either way). so it\u0027s not _really_ reflecting the local system that runs the binary. for example, I can build a js/wasm binary but run it on linux/amd64 via wazero. I would say my local system is then GOOS\u003dlinux, not GOOS\u003djs. Or at least we an agree that it can be slightly confusing.\n\nHow about:\n\n// CurrentOS holds the OS which corresponds to runtime.GOOS.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "911e93e7_8a644b29",
+        "filename": "internal/ospath/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "nit: add a tiny bit of godoc here, since this type is in lots of places.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fc23bd3_14c47466",
+        "filename": "pkg/path/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-16T11:06:20Z",
+      "side": 1,
+      "message": "I know you\u0027re not changing this particular line, but: I find it weird that `getOS(\"foobar\")` gets me Unix :) imagine `Clean(\"//foo/bar\", OS(\"baz\"))` for example. perhaps it should panic.",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

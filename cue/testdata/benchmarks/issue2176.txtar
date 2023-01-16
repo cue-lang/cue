@@ -1,0 +1,1635 @@
+-- stats.txt --
+Leaks:  86
+Freed:  3303
+Reused: 3296
+Allocs: 93
+Retain: 525
+
+Unifications: 3381
+Conjuncts:    7871
+Disjuncts:    3820
+
+-- in.cue --
+import (
+	"strings"
+	"strconv"
+	"list"
+)
+
+#Datastream: {
+	message: string
+	message: strings.MinRunes(4)
+
+	marker: {
+		length: int
+		position: {
+			let characters = strings.Split(message, "")
+			let unique_combinations = {
+				// begin computation once we have more than x number of characters.
+				for i, _ in characters if i >= length-1 {
+					// this line is causing an increased evaluation time between cue versions.
+					// vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+					let combination = list.Slice(characters, i-length+1, i+1)
+
+					// last x number of characters are not unique.
+					if list.UniqueItems(list.Slice(characters, i-length+1, i+1)) {
+						"\(i+1)": combination
+					}
+				}
+			}
+			[ for i, _ in unique_combinations {i}][0]
+		}
+	}
+}
+
+input_short: """
+	mjqjpqmgbljsphdztnvjfqwrcgsmlb
+	"""
+input_long: """
+	qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw
+	"""
+
+input: *input_short | input_long
+
+datastream: #Datastream & {message: input}
+
+output: [string]: string
+output: {
+	"1": (datastream & {marker: length: 4}).marker.position
+	"2": (datastream & {marker: length: 14}).marker.position
+}
+-- out/eval/stats --
+Leaks:  86
+Freed:  3303
+Reused: 3296
+Allocs: 93
+Retain: 525
+
+Unifications: 3381
+Conjuncts:    7871
+Disjuncts:    3820
+-- out/eval --
+(struct){
+  #Datastream: (#struct){
+    message: (string){ strings.MinRunes(4) }
+    marker: (#struct){
+      length: (int){ int }
+      position: (_|_){
+        // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+        //     ./in.cue:14:21
+        //     ./in.cue:9:11
+        let characters#1 = (_|_){
+          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+          //     ./in.cue:14:21
+          //     ./in.cue:9:11
+        }
+        let unique_combinations#2 = (_|_){
+          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+          //     ./in.cue:14:21
+          //     ./in.cue:9:11
+          let combination#3 = (_|_){// for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+          }
+        }
+      }
+    }
+  }
+  input_short: (string){ "mjqjpqmgbljsphdztnvjfqwrcgsmlb" }
+  input_long: (string){ "qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw" }
+  input: (string){ |(*(string){ "mjqjpqmgbljsphdztnvjfqwrcgsmlb" }, (string){ "qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw" }) }
+  datastream: (#struct){
+    message: (string){ |(*(string){ "mjqjpqmgbljsphdztnvjfqwrcgsmlb" }, (string){ "qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw" }) }
+    marker: (#struct){
+      length: (int){ int }
+      position: (_|_){
+        // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
+        //     ./in.cue:17:36
+        //     ./in.cue:12:11
+        let characters#1 = (#list){
+          0: (string){ "m" }
+          1: (string){ "j" }
+          2: (string){ "q" }
+          3: (string){ "j" }
+          4: (string){ "p" }
+          5: (string){ "q" }
+          6: (string){ "m" }
+          7: (string){ "g" }
+          8: (string){ "b" }
+          9: (string){ "l" }
+          10: (string){ "j" }
+          11: (string){ "s" }
+          12: (string){ "p" }
+          13: (string){ "h" }
+          14: (string){ "d" }
+          15: (string){ "z" }
+          16: (string){ "t" }
+          17: (string){ "n" }
+          18: (string){ "v" }
+          19: (string){ "j" }
+          20: (string){ "f" }
+          21: (string){ "q" }
+          22: (string){ "w" }
+          23: (string){ "r" }
+          24: (string){ "c" }
+          25: (string){ "g" }
+          26: (string){ "s" }
+          27: (string){ "m" }
+          28: (string){ "l" }
+          29: (string){ "b" }
+        }
+        let unique_combinations#2 = (_|_){
+          // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
+          //     ./in.cue:17:36
+          //     ./in.cue:12:11
+          let combination#3 = (_|_){// for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+          }
+        }
+      }
+    }
+  }
+  output: (struct){
+    "1": (string){
+      "7"
+      let characters#1 = (#list){
+        0: (string){ "m" }
+        1: (string){ "j" }
+        2: (string){ "q" }
+        3: (string){ "j" }
+        4: (string){ "p" }
+        5: (string){ "q" }
+        6: (string){ "m" }
+        7: (string){ "g" }
+        8: (string){ "b" }
+        9: (string){ "l" }
+        10: (string){ "j" }
+        11: (string){ "s" }
+        12: (string){ "p" }
+        13: (string){ "h" }
+        14: (string){ "d" }
+        15: (string){ "z" }
+        16: (string){ "t" }
+        17: (string){ "n" }
+        18: (string){ "v" }
+        19: (string){ "j" }
+        20: (string){ "f" }
+        21: (string){ "q" }
+        22: (string){ "w" }
+        23: (string){ "r" }
+        24: (string){ "c" }
+        25: (string){ "g" }
+        26: (string){ "s" }
+        27: (string){ "m" }
+        28: (string){ "l" }
+        29: (string){ "b" }
+      }
+      let unique_combinations#2 = (struct){
+        let combination#3 = (_|_){
+          // [eval]
+          0: (_|_){
+            // [eval] output."1".unique_combinations.combination.0: conflicting values "b" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "c" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "d" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "f" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "g" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "h" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "j" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "l" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "n" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "p" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "q" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "r" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "s" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "t" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "v" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "w" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.0: conflicting values "z" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+          }
+          1: (_|_){
+            // [eval] output."1".unique_combinations.combination.1: conflicting values "b" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "c" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "d" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "f" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "g" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "h" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "l" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "m" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "n" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "p" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "q" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "r" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "s" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "t" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "v" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "w" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.1: conflicting values "z" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+          }
+          2: (_|_){
+            // [eval] output."1".unique_combinations.combination.2: conflicting values "b" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "c" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "d" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "f" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "g" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "h" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "j" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "l" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "m" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "n" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "p" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "r" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "s" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "t" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "v" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "w" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.2: conflicting values "z" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+          }
+          3: (_|_){
+            // [eval] output."1".unique_combinations.combination.3: conflicting values "b" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "c" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "d" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "f" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "g" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "h" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "l" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "m" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "n" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "p" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "q" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "r" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "s" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "t" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "v" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "w" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+            // output."1".unique_combinations.combination.3: conflicting values "z" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:46:7
+          }
+        }
+        "7": (#list){
+          0: (string){ "j" }
+          1: (string){ "p" }
+          2: (string){ "q" }
+          3: (string){ "m" }
+        }
+        "8": (#list){
+          0: (string){ "p" }
+          1: (string){ "q" }
+          2: (string){ "m" }
+          3: (string){ "g" }
+        }
+        "9": (#list){
+          0: (string){ "q" }
+          1: (string){ "m" }
+          2: (string){ "g" }
+          3: (string){ "b" }
+        }
+        "10": (#list){
+          0: (string){ "m" }
+          1: (string){ "g" }
+          2: (string){ "b" }
+          3: (string){ "l" }
+        }
+        "11": (#list){
+          0: (string){ "g" }
+          1: (string){ "b" }
+          2: (string){ "l" }
+          3: (string){ "j" }
+        }
+        "12": (#list){
+          0: (string){ "b" }
+          1: (string){ "l" }
+          2: (string){ "j" }
+          3: (string){ "s" }
+        }
+        "13": (#list){
+          0: (string){ "l" }
+          1: (string){ "j" }
+          2: (string){ "s" }
+          3: (string){ "p" }
+        }
+        "14": (#list){
+          0: (string){ "j" }
+          1: (string){ "s" }
+          2: (string){ "p" }
+          3: (string){ "h" }
+        }
+        "15": (#list){
+          0: (string){ "s" }
+          1: (string){ "p" }
+          2: (string){ "h" }
+          3: (string){ "d" }
+        }
+        "16": (#list){
+          0: (string){ "p" }
+          1: (string){ "h" }
+          2: (string){ "d" }
+          3: (string){ "z" }
+        }
+        "17": (#list){
+          0: (string){ "h" }
+          1: (string){ "d" }
+          2: (string){ "z" }
+          3: (string){ "t" }
+        }
+        "18": (#list){
+          0: (string){ "d" }
+          1: (string){ "z" }
+          2: (string){ "t" }
+          3: (string){ "n" }
+        }
+        "19": (#list){
+          0: (string){ "z" }
+          1: (string){ "t" }
+          2: (string){ "n" }
+          3: (string){ "v" }
+        }
+        "20": (#list){
+          0: (string){ "t" }
+          1: (string){ "n" }
+          2: (string){ "v" }
+          3: (string){ "j" }
+        }
+        "21": (#list){
+          0: (string){ "n" }
+          1: (string){ "v" }
+          2: (string){ "j" }
+          3: (string){ "f" }
+        }
+        "22": (#list){
+          0: (string){ "v" }
+          1: (string){ "j" }
+          2: (string){ "f" }
+          3: (string){ "q" }
+        }
+        "23": (#list){
+          0: (string){ "j" }
+          1: (string){ "f" }
+          2: (string){ "q" }
+          3: (string){ "w" }
+        }
+        "24": (#list){
+          0: (string){ "f" }
+          1: (string){ "q" }
+          2: (string){ "w" }
+          3: (string){ "r" }
+        }
+        "25": (#list){
+          0: (string){ "q" }
+          1: (string){ "w" }
+          2: (string){ "r" }
+          3: (string){ "c" }
+        }
+        "26": (#list){
+          0: (string){ "w" }
+          1: (string){ "r" }
+          2: (string){ "c" }
+          3: (string){ "g" }
+        }
+        "27": (#list){
+          0: (string){ "r" }
+          1: (string){ "c" }
+          2: (string){ "g" }
+          3: (string){ "s" }
+        }
+        "28": (#list){
+          0: (string){ "c" }
+          1: (string){ "g" }
+          2: (string){ "s" }
+          3: (string){ "m" }
+        }
+        "29": (#list){
+          0: (string){ "g" }
+          1: (string){ "s" }
+          2: (string){ "m" }
+          3: (string){ "l" }
+        }
+        "30": (#list){
+          0: (string){ "s" }
+          1: (string){ "m" }
+          2: (string){ "l" }
+          3: (string){ "b" }
+        }
+      }
+    }
+    "2": (string){
+      "19"
+      let characters#1 = (#list){
+        0: (string){ "m" }
+        1: (string){ "j" }
+        2: (string){ "q" }
+        3: (string){ "j" }
+        4: (string){ "p" }
+        5: (string){ "q" }
+        6: (string){ "m" }
+        7: (string){ "g" }
+        8: (string){ "b" }
+        9: (string){ "l" }
+        10: (string){ "j" }
+        11: (string){ "s" }
+        12: (string){ "p" }
+        13: (string){ "h" }
+        14: (string){ "d" }
+        15: (string){ "z" }
+        16: (string){ "t" }
+        17: (string){ "n" }
+        18: (string){ "v" }
+        19: (string){ "j" }
+        20: (string){ "f" }
+        21: (string){ "q" }
+        22: (string){ "w" }
+        23: (string){ "r" }
+        24: (string){ "c" }
+        25: (string){ "g" }
+        26: (string){ "s" }
+        27: (string){ "m" }
+        28: (string){ "l" }
+        29: (string){ "b" }
+      }
+      let unique_combinations#2 = (struct){
+        let combination#3 = (_|_){
+          // [eval]
+          0: (_|_){
+            // [eval] output."2".unique_combinations.combination.0: conflicting values "b" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "d" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "g" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "h" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "j" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "l" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "p" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "q" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "s" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "t" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.0: conflicting values "z" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          1: (_|_){
+            // [eval] output."2".unique_combinations.combination.1: conflicting values "b" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "d" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "g" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "h" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "l" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "m" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "n" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "p" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "q" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "s" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "t" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.1: conflicting values "z" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          2: (_|_){
+            // [eval] output."2".unique_combinations.combination.2: conflicting values "b" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "d" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "g" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "h" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "j" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "l" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "m" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "n" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "p" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "s" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "t" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "v" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.2: conflicting values "z" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          3: (_|_){
+            // [eval] output."2".unique_combinations.combination.3: conflicting values "b" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "d" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "g" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "h" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "l" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "m" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "n" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "p" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "q" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "s" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "t" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "v" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.3: conflicting values "z" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          4: (_|_){
+            // [eval] output."2".unique_combinations.combination.4: conflicting values "b" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "d" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "f" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "g" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "h" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "j" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "l" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "m" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "n" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "q" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "s" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "t" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "v" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.4: conflicting values "z" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          5: (_|_){
+            // [eval] output."2".unique_combinations.combination.5: conflicting values "b" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "d" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "f" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "g" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "h" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "j" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "l" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "m" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "n" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "p" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "s" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "t" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "v" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.5: conflicting values "z" and "q":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          6: (_|_){
+            // [eval] output."2".unique_combinations.combination.6: conflicting values "b" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "d" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "f" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "g" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "h" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "j" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "l" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "n" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "p" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "q" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "s" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "t" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "v" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "w" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.6: conflicting values "z" and "m":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          7: (_|_){
+            // [eval] output."2".unique_combinations.combination.7: conflicting values "b" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "d" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "f" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "h" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "j" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "l" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "n" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "p" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "q" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "r" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "s" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "t" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "v" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "w" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.7: conflicting values "z" and "g":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          8: (_|_){
+            // [eval] output."2".unique_combinations.combination.8: conflicting values "c" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "d" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "f" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "h" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "j" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "l" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "n" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "p" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "q" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "r" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "s" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "t" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "v" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "w" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.8: conflicting values "z" and "b":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          9: (_|_){
+            // [eval] output."2".unique_combinations.combination.9: conflicting values "c" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "d" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "f" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "g" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "h" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "j" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "n" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "p" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "q" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "r" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "s" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "t" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "v" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "w" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.9: conflicting values "z" and "l":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          10: (_|_){
+            // [eval] output."2".unique_combinations.combination.10: conflicting values "c" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "d" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "f" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "g" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "h" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "n" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "p" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "q" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "r" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "s" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "t" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "v" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "w" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.10: conflicting values "z" and "j":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          11: (_|_){
+            // [eval] output."2".unique_combinations.combination.11: conflicting values "c" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "d" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "f" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "g" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "h" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "j" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "m" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "n" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "p" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "q" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "r" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "t" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "v" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "w" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.11: conflicting values "z" and "s":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          12: (_|_){
+            // [eval] output."2".unique_combinations.combination.12: conflicting values "c" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "d" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "f" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "g" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "h" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "j" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "l" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "m" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "n" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "q" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "r" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "s" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "t" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "v" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "w" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.12: conflicting values "z" and "p":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+          13: (_|_){
+            // [eval] output."2".unique_combinations.combination.13: conflicting values "b" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "c" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "d" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "f" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "g" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "j" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "l" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "m" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "n" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "q" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "r" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "s" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "t" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "v" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "w" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+            // output."2".unique_combinations.combination.13: conflicting values "z" and "h":
+            //     ./in.cue:14:21
+            //     ./in.cue:17:5
+            //     ./in.cue:47:7
+          }
+        }
+        "19": (#list){
+          0: (string){ "q" }
+          1: (string){ "m" }
+          2: (string){ "g" }
+          3: (string){ "b" }
+          4: (string){ "l" }
+          5: (string){ "j" }
+          6: (string){ "s" }
+          7: (string){ "p" }
+          8: (string){ "h" }
+          9: (string){ "d" }
+          10: (string){ "z" }
+          11: (string){ "t" }
+          12: (string){ "n" }
+          13: (string){ "v" }
+        }
+        "25": (#list){
+          0: (string){ "s" }
+          1: (string){ "p" }
+          2: (string){ "h" }
+          3: (string){ "d" }
+          4: (string){ "z" }
+          5: (string){ "t" }
+          6: (string){ "n" }
+          7: (string){ "v" }
+          8: (string){ "j" }
+          9: (string){ "f" }
+          10: (string){ "q" }
+          11: (string){ "w" }
+          12: (string){ "r" }
+          13: (string){ "c" }
+        }
+        "26": (#list){
+          0: (string){ "p" }
+          1: (string){ "h" }
+          2: (string){ "d" }
+          3: (string){ "z" }
+          4: (string){ "t" }
+          5: (string){ "n" }
+          6: (string){ "v" }
+          7: (string){ "j" }
+          8: (string){ "f" }
+          9: (string){ "q" }
+          10: (string){ "w" }
+          11: (string){ "r" }
+          12: (string){ "c" }
+          13: (string){ "g" }
+        }
+        "27": (#list){
+          0: (string){ "h" }
+          1: (string){ "d" }
+          2: (string){ "z" }
+          3: (string){ "t" }
+          4: (string){ "n" }
+          5: (string){ "v" }
+          6: (string){ "j" }
+          7: (string){ "f" }
+          8: (string){ "q" }
+          9: (string){ "w" }
+          10: (string){ "r" }
+          11: (string){ "c" }
+          12: (string){ "g" }
+          13: (string){ "s" }
+        }
+        "28": (#list){
+          0: (string){ "d" }
+          1: (string){ "z" }
+          2: (string){ "t" }
+          3: (string){ "n" }
+          4: (string){ "v" }
+          5: (string){ "j" }
+          6: (string){ "f" }
+          7: (string){ "q" }
+          8: (string){ "w" }
+          9: (string){ "r" }
+          10: (string){ "c" }
+          11: (string){ "g" }
+          12: (string){ "s" }
+          13: (string){ "m" }
+        }
+        "29": (#list){
+          0: (string){ "z" }
+          1: (string){ "t" }
+          2: (string){ "n" }
+          3: (string){ "v" }
+          4: (string){ "j" }
+          5: (string){ "f" }
+          6: (string){ "q" }
+          7: (string){ "w" }
+          8: (string){ "r" }
+          9: (string){ "c" }
+          10: (string){ "g" }
+          11: (string){ "s" }
+          12: (string){ "m" }
+          13: (string){ "l" }
+        }
+        "30": (#list){
+          0: (string){ "t" }
+          1: (string){ "n" }
+          2: (string){ "v" }
+          3: (string){ "j" }
+          4: (string){ "f" }
+          5: (string){ "q" }
+          6: (string){ "w" }
+          7: (string){ "r" }
+          8: (string){ "c" }
+          9: (string){ "g" }
+          10: (string){ "s" }
+          11: (string){ "m" }
+          12: (string){ "l" }
+          13: (string){ "b" }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Datastream: {
+    message: string
+    message: 〈import;strings〉.MinRunes(4)
+    marker: {
+      length: int
+      position: {
+        let characters#1 = 〈import;strings〉.Split(〈2;message〉, "")
+        let unique_combinations#2 = {
+          for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
+            let combination#3 = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+            if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
+              "\((〈2;i〉 + 1))": 〈1;let combination#3〉
+            }
+          }
+        }
+        [
+          for i, _ in 〈1;let unique_combinations#2〉 {
+            〈1;i〉
+          },
+        ][0]
+      }
+    }
+  }
+  input_short: "mjqjpqmgbljsphdztnvjfqwrcgsmlb"
+  input_long: "qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw"
+  input: (*〈0;input_short〉|〈0;input_long〉)
+  datastream: (〈0;#Datastream〉 & {
+    message: 〈1;input〉
+  })
+  output: {
+    [string]: string
+  }
+  output: {
+    "1": (〈1;datastream〉 & {
+      marker: {
+        length: 4
+      }
+    }).marker.position
+    "2": (〈1;datastream〉 & {
+      marker: {
+        length: 14
+      }
+    }).marker.position
+  }
+}

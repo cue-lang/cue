@@ -153,6 +153,30 @@
       },
       "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ea4c5731_f32bda75",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-16T09:03:17Z",
+      "side": 1,
+      "message": "I\u0027m still not keen on referencing external documentation here. It is inappropriate and sets a bad precedence.\n\nI would just fully list everything, possibly leaving out values that cannot occur because we are not supporting the architecture.\nI think keeping a parallel list in a test is fine. This list is not expected to change often.",
+      "parentUuid": "cd1abc22_781887b5",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

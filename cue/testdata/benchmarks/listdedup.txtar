@@ -11,7 +11,7 @@ Retain: 1
 
 Unifications: 18724
 Conjuncts:    100730
-Disjuncts:    24096
+Disjuncts:    24097
 
 -- in.cue --
 A: #Task

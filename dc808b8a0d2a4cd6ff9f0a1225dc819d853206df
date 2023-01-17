@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c2d4e05_aaf83db4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-17T12:51:55Z",
+      "side": 1,
+      "message": "LGTM but ISTM that it would be good to add a comment saying that the main important thing about this test is the run time, rather than some subtle aspect of the output of this rather large example.",
+      "revId": "dc808b8a0d2a4cd6ff9f0a1225dc819d853206df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

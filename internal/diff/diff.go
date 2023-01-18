@@ -16,7 +16,6 @@ package diff
 
 import (
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/errors"
 )
 
 // Profile configures a diff operation.
@@ -165,9 +164,7 @@ func (e Edit) XPos() int  { return int(e.xPos - 1) }
 func (e Edit) YPos() int  { return int(e.yPos - 1) }
 
 type differ struct {
-	cfg     Profile
-	options []cue.Option
-	errs    errors.Error
+	cfg Profile
 }
 
 func (d *differ) diffValue(x, y cue.Value) (Kind, *EditScript) {

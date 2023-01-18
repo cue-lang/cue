@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
-	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -290,10 +289,6 @@ func (s *Scanner) scanIdentifier() string {
 		s.next()
 	}
 	return string(s.src[offs:s.offset])
-}
-
-func isExtendedIdent(r rune) bool {
-	return strings.IndexRune("-_#$%. ", r) >= 0
 }
 
 func digitVal(ch rune) int {

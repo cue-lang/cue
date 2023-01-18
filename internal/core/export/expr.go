@@ -338,7 +338,6 @@ func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node)
 }
 
 type field struct {
-	docs      []*ast.CommentGroup
 	arc       *adt.Vertex
 	conjuncts []conjunct
 }

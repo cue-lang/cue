@@ -811,66 +811,6 @@ func (v Value) Default() (Value, bool) {
 	// 	return Value{v.idx, x}, isDefault
 }
 
-// TODO: this should go: record preexpanded disjunctions in Vertex.
-func hasDisjunction(expr adt.Expr) bool {
-	switch x := expr.(type) {
-	case *adt.DisjunctionExpr:
-		return true
-	case *adt.Conjunction:
-		for _, v := range x.Values {
-			if hasDisjunction(v) {
-				return true
-			}
-		}
-	case *adt.BinaryExpr:
-		switch x.Op {
-		case adt.OrOp:
-			return true
-		case adt.AndOp:
-			return hasDisjunction(x.X) || hasDisjunction(x.Y)
-		}
-	}
-	return false
-}
-
-// TODO: this should go: record preexpanded disjunctions in Vertex.
-func stripNonDefaults(expr adt.Expr) (r adt.Expr, stripped bool) {
-	switch x := expr.(type) {
-	case *adt.DisjunctionExpr:
-		if !x.HasDefaults {
-			return x, false
-		}
-		d := *x
-		d.Values = []adt.Disjunct{}
-		for _, v := range x.Values {
-			if v.Default {
-				d.Values = append(d.Values, v)
-			}
-		}
-		if len(d.Values) == 1 {
-			return d.Values[0].Val, true
-		}
-		return &d, true
-
-	case *adt.BinaryExpr:
-		if x.Op != adt.AndOp {
-			return x, false
-		}
-		a, sa := stripNonDefaults(x.X)
-		b, sb := stripNonDefaults(x.Y)
-		if sa || sb {
-			bin := *x
-			bin.X = a
-			bin.Y = b
-			return &bin, true
-		}
-		return x, false
-
-	default:
-		return x, false
-	}
-}
-
 // Label reports he label used to obtain this value from the enclosing struct.
 //
 // TODO: get rid of this somehow. Probably by including a FieldInfo struct
@@ -1372,10 +1312,6 @@ func (v Value) structValData(ctx *adt.OpContext) (structValue, *adt.Bottom) {
 		omitDefinitions: true,
 		omitOptional:    true,
 	})
-}
-
-func (v Value) structValFull(ctx *adt.OpContext) (structValue, *adt.Bottom) {
-	return v.structValOpts(ctx, options{allowScalar: true})
 }
 
 // structVal returns an structVal or an error if v is not a struct.

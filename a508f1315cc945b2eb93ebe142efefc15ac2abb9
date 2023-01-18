@@ -121,6 +121,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b33d22be_5aaacf4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:35:12Z",
+      "side": 1,
+      "message": "... forgot to delete this draft.",
+      "parentUuid": "d16e1462_f6e46a2d",
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6fbc01f9_425fc8c1",

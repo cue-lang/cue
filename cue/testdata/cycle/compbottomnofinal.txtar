@@ -365,7 +365,7 @@ Retain: 129
 
 Unifications: 111
 Conjuncts:    194
-Disjuncts:    127
+Disjuncts:    130
 -- out/eval --
 (struct){
   minimal: (struct){
@@ -445,10 +445,6 @@ Disjuncts:    127
       #X: (_|_){
         // [cycle] medium.p3.#X: cycle with field Y.port:
         //     ./in.cue:114:7
-        port: (_|_){
-          // [cycle] medium.p3.#X: cycle with field Y.port:
-          //     ./in.cue:114:7
-        }
       }
     }
     p4: (struct){
@@ -459,10 +455,6 @@ Disjuncts:    127
       #X: (_|_){
         // [cycle] medium.p4.#X: cycle with field Y.port:
         //     ./in.cue:134:7
-        port: (_|_){
-          // [cycle] medium.p4.#X: cycle with field Y.port:
-          //     ./in.cue:134:7
-        }
       }
       #Y: (_|_){
         // [cycle] medium.p4.#X: cycle with field Y.port:
@@ -547,14 +539,9 @@ Disjuncts:    127
     }
     p3: (struct){
       X: (string){ "user@mod.test" }
-      #X: (_|_){
-        // [cycle] large.p3.Y: undefined field: port:
-        //     ./in.cue:308:10
+      #X: (#struct){
         userinfo: (string){ "user@" }
-        port: (_|_){
-          // [cycle] large.p3.Y: undefined field: port:
-          //     ./in.cue:308:10
-        }
+        port: (string){ "" }
         host: (string){ "mod.test" }
       }
       Y: (struct){
@@ -574,14 +561,9 @@ Disjuncts:    127
     }
     p4: (struct){
       X: (string){ "user@mod.test" }
-      #X: (_|_){
-        // [cycle] large.p4.Y: undefined field: port:
-        //     ./in.cue:351:10
+      #X: (#struct){
         userinfo: (string){ "user@" }
-        port: (_|_){
-          // [cycle] large.p4.Y: undefined field: port:
-          //     ./in.cue:351:10
-        }
+        port: (string){ "" }
         host: (string){ "mod.test" }
       }
       #Y: (#struct){

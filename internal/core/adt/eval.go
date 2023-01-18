@@ -496,6 +496,9 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 
 	switch err := n.getErr(); {
 	case err != nil:
+		if err.Code < IncompleteError && n.node.arcType == arcVoid {
+			n.node.arcType = arcMember
+		}
 		n.node.BaseValue = err
 		n.errs = nil
 
@@ -619,15 +622,7 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		if c.err == nil {
 			continue
 		}
-		// TODO: Current flow doesn't handle adding errors to parents well.
-		//       Fix this, though, as this is a more appropriate location to
-		//       report the error.
-		// if c.node != nil {
-		// 	c.node.AddErr(n.ctx, c.err)
-		// 	continue
-		// }
 		err = CombineErrors(nil, err, c.err)
-		n.node.arcType = arcMember
 
 		// TODO: use this code once possible.
 		//
@@ -655,16 +650,8 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		if c.err == nil {
 			continue
 		}
-		// TODO: Current flow doesn't handle adding errors to parents well.
-		//       Fix this, though, as this is a more appropriate location to
-		//       report the error.
-		// if c.node != nil {
-		// 	c.node.AddErr(n.ctx, c.err)
-		// 	continue
-		// }
+
 		err = CombineErrors(nil, err, c.err)
-		// n.node.arcType &^= arcVoid
-		n.node.arcType = arcMember
 
 		// TODO: use this code once possible.
 		//
@@ -694,6 +681,9 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 	if err == nil {
 		// safeguard.
 		err = incompleteSentinel
+	}
+	if err.Code < IncompleteError {
+		n.node.arcType = arcMember
 	}
 	return err
 }

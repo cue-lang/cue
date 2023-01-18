@@ -70,6 +70,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "547e7215_727ae32b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:34:52Z",
+      "side": 1,
+      "message": "I think you forgot \"Fixes #2208\", by the way",
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "4a442205_3c944f74",
@@ -83,6 +100,23 @@
       "writtenOn": "2023-01-18T16:34:08Z",
       "side": 1,
       "message": "Nice commit message, thank you.\n\nI wonder, why do we only check the arc type in the first bit of added code, but not the second?",
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d16e1462_f6e46a2d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:34:52Z",
+      "side": 1,
+      "message": "Also, I ",
       "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

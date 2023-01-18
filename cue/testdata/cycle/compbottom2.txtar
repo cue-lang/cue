@@ -279,10 +279,6 @@ Disjuncts:    163
       a: (_|_){
         // [cycle] self.fail.a: cycle with field a.b:
         //     ./in.cue:6:7
-        b: (_|_){
-          // [cycle] self.fail.a: cycle with field a.b:
-          //     ./in.cue:6:7
-        }
       }
     }
     isConcreteFail: (struct){
@@ -492,10 +488,6 @@ Disjuncts:    163
       #E: (_|_){
         // [cycle] nestedChain.cycleFail: cycle with field #E.y:
         //     ./nestedchain.cue:7:6
-        x: (_|_){
-          // [cycle] nestedChain.cycleFail: cycle with field #E.y:
-          //     ./nestedchain.cue:7:6
-        }
       }
     }
     brokenCycleSuccess: (struct){
@@ -511,10 +503,6 @@ Disjuncts:    163
         // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
         //     ./nestedchain.cue:28:6
         y: (bool){ true }
-        x: (_|_){
-          // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
-          //     ./nestedchain.cue:28:6
-        }
       }
     }
     trippleSuccess: (struct){

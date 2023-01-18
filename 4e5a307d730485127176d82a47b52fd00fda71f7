@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "caa2fcb9_3407346c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T14:16:51Z",
+      "side": 1,
+      "message": "See https://review.gerrithub.io/c/cue-lang/cue/+/541758 previously, which never got over the finish line.\n\nMarcel might be reluctant to removing some unused fields or code if they\u0027re going to be used soon, and we can always revert bits. But I do think that removing unused code helps everyone. It makes the module zips smaller for users, and allows us to understand and refactor the codebase with slightly fewer distractions.",
+      "revId": "4e5a307d730485127176d82a47b52fd00fda71f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

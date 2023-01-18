@@ -104,14 +104,6 @@ Result:
     // fib: non-concrete value int in operand to <:
     //     ./in.cue:10:5
     //     ./in.cue:5:5
-    out: (_|_){
-      // [incomplete] fib: non-concrete value int in operand to >=:
-      //     ./in.cue:7:5
-      //     ./in.cue:5:5
-      // fib: non-concrete value int in operand to <:
-      //     ./in.cue:10:5
-      //     ./in.cue:5:5
-    }
     n: (int){ int }
   }
   fib1: (int){ 1 }

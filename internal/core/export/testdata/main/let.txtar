@@ -316,9 +316,6 @@ y: Y & Y_1
 [unresolvedDisjunction #TypePrimitive Args required]
 [unresolvedDisjunction #TypePrimitive "*"]
 [unresolvedDisjunction #TypeBool]
-[unresolvedDisjunction #TypeBool default]
-- `default` sets the default value.
-
 [unresolvedDisjunction #TypeBool _args]
 [unresolvedDisjunction #TypeBool _args required]
 [unresolvedDisjunction #TypeBool Args]

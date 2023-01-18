@@ -564,6 +564,46 @@ allArcsSuccess: p2: {
 	}
 }
 
+-- issue2208.cue --
+voidErrorIncomplete: {
+	#Schema: [string]: {
+		required: bool
+		if !required {
+		}
+	}
+
+	root: #Schema
+	root: {
+		if false {
+			child: required: false
+		}
+	}
+}
+
+// TODO: should these always be errors, or only for cue vet?
+// voidErrorFatal: pattern: {
+// 	#Schema: [string]: {
+// 		if "str" + 3 {
+// 		}
+// 	}
+//
+// 	root: #Schema
+// 	root: {
+// 		if false {
+// 			child: required: false
+// 		}
+// 	}
+// }
+//
+// voidErrorFatal: field: {
+// 	root: {
+// 		if false {
+// 			child: 2 + "str"
+// 		}
+// 	}
+// }
+
+
 -- issue1759.cue --
 // Tests derived from Unity.
 unity: success1: {
@@ -703,14 +743,14 @@ unifyDynamicReflectSuccess: {
 
 -- out/eval/stats --
 Leaks:  16
-Freed:  387
-Reused: 380
+Freed:  392
+Reused: 385
 Allocs: 23
-Retain: 68
+Retain: 69
 
-Unifications: 389
-Conjuncts:    636
-Disjuncts:    433
+Unifications: 394
+Conjuncts:    644
+Disjuncts:    439
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:
@@ -781,10 +821,6 @@ Result:
     a: (_|_){
       // [cycle] fail.a: cycle with field a.b:
       //     ./in.cue:30:6
-      b: (_|_){
-        // [cycle] fail.a: cycle with field a.b:
-        //     ./in.cue:30:6
-      }
     }
   }
   embed: (_|_){
@@ -910,10 +946,6 @@ Result:
       #a: (_|_){
         // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
         //     ./in.cue:172:7
-        c: (_|_){
-          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-          //     ./in.cue:172:7
-        }
         b: (bool){ bool }
       }
       x: (#struct){
@@ -1030,11 +1062,6 @@ Result:
         // [incomplete] closedCheck.success1.#D: non-concrete value string in operand to !=:
         //     ./in.cue:267:6
         //     ./in.cue:266:6
-        e: (_|_){
-          // [incomplete] closedCheck.success1.#D: non-concrete value string in operand to !=:
-          //     ./in.cue:267:6
-          //     ./in.cue:266:6
-        }
         d: (string){ string }
       }
     }
@@ -1083,11 +1110,6 @@ Result:
   }
   voidEliminationSuccess: (struct){
     t1: (struct){
-      a: (_|_){
-        // [incomplete] voidEliminationSuccess.t1.a: operand b of '!' not concrete (was bool):
-        //     ./in.cue:326:7
-        b: (bool){ bool }
-      }
     }
     t2: (struct){
       components: (struct){
@@ -1376,6 +1398,12 @@ Result:
           out: (string){ "test" }
         }
       }
+    }
+  }
+  voidErrorIncomplete: (struct){
+    #Schema: (#struct){
+    }
+    root: (#struct){
     }
   }
   unifyDynamicReflectSuccess: (struct){
@@ -2221,6 +2249,25 @@ Result:
           〈2;k〉: {
             out: "test"
           }
+        }
+      }
+    }
+  }
+}
+--- issue2208.cue
+{
+  voidErrorIncomplete: {
+    #Schema: {
+      [string]: {
+        required: bool
+        if !〈0;required〉 {}
+      }
+    }
+    root: 〈0;#Schema〉
+    root: {
+      if false {
+        child: {
+          required: false
         }
       }
     }

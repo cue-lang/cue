@@ -1,0 +1,113 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34b78c46_479d254b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:34:08Z",
+      "side": 1,
+      "message": "change",
+      "range": {
+        "startLine": 16,
+        "startChar": 5,
+        "endLine": 16,
+        "endChar": 12
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f26dcf1_44f2abc2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:34:08Z",
+      "side": 1,
+      "message": "removes",
+      "range": {
+        "startLine": 19,
+        "startChar": 15,
+        "endLine": 19,
+        "endChar": 21
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abfaa9c6_083f8831",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:34:08Z",
+      "side": 1,
+      "message": "note to self: this would be easier to read as snake case, like comp_bottom_no_final :)",
+      "range": {
+        "startLine": 20,
+        "startChar": 3,
+        "endLine": 20,
+        "endChar": 20
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a442205_3c944f74",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:34:08Z",
+      "side": 1,
+      "message": "Nice commit message, thank you.\n\nI wonder, why do we only check the arc type in the first bit of added code, but not the second?",
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6fbc01f9_425fc8c1",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-18T16:34:08Z",
+      "side": 1,
+      "message": "only?",
+      "range": {
+        "startLine": 583,
+        "startChar": 43,
+        "endLine": 583,
+        "endChar": 49
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

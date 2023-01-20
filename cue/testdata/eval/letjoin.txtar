@@ -87,10 +87,10 @@ Disjuncts:    69
       }
     }
     xy: (struct){
-      let X#1 = {
+      let X#1multi = {
         b: 〈2;a〉
         c: 1
-      } // multi
+      }
       v: (int){ 1 }
     }
   }
@@ -141,10 +141,10 @@ Disjuncts:    69
         r: (int){ 2 }
       }
       y: (struct){
-        let X#2 = {
+        let X#2multi = {
           b: 〈2;a〉
           c: 1
-        } // multi
+        }
         v: (int){ 1 }
       }
     }

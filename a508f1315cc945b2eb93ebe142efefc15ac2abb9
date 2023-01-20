@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8255ac51_8dc04b8a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T09:17:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "34b78c46_479d254b",
+      "range": {
+        "startLine": 16,
+        "startChar": 5,
+        "endLine": 16,
+        "endChar": 12
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f26dcf1_44f2abc2",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-01-18T16:34:08Z",
       "side": 1,
       "message": "removes",
+      "range": {
+        "startLine": 19,
+        "startChar": 15,
+        "endLine": 19,
+        "endChar": 21
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6c65498_593ec0dc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T09:17:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f26dcf1_44f2abc2",
       "range": {
         "startLine": 19,
         "startChar": 15,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "034dd3c6_645176e0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T09:17:56Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "abfaa9c6_083f8831",
+      "range": {
+        "startLine": 20,
+        "startChar": 3,
+        "endLine": 20,
+        "endChar": 20
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "547e7215_727ae32b",
@@ -83,6 +155,24 @@
       "writtenOn": "2023-01-18T16:34:52Z",
       "side": 1,
       "message": "I think you forgot \"Fixes #2208\", by the way",
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e8a44a8_8ef74000",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T09:17:56Z",
+      "side": 1,
+      "message": "Added Closes #2208, as it technically was already fixed.",
+      "parentUuid": "547e7215_727ae32b",
       "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -152,6 +242,30 @@
       "writtenOn": "2023-01-18T16:34:08Z",
       "side": 1,
       "message": "only?",
+      "range": {
+        "startLine": 583,
+        "startChar": 43,
+        "endLine": 583,
+        "endChar": 49
+      },
+      "revId": "a508f1315cc945b2eb93ebe142efefc15ac2abb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4ce43ba_5bea3b60",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 583,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T09:17:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6fbc01f9_425fc8c1",
       "range": {
         "startLine": 583,
         "startChar": 43,

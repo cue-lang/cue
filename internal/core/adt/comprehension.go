@@ -194,6 +194,7 @@ func (n *nodeContext) insertComprehension(
 				numFixed++
 
 				arc, _ := n.node.GetArc(n.ctx, f.Label, arcVoid)
+				arc.MultiLet = f.IsMulti
 
 				// Create partial comprehension
 				c := &Comprehension{

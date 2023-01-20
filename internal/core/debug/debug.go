@@ -315,6 +315,9 @@ func (w *printer) node(n adt.Node) {
 		w.string("let ")
 		s := w.labelString(x.Label)
 		w.string(s)
+		if x.IsMulti {
+			w.string("multi")
+		}
 		w.string(" = ")
 		w.node(x.Value)
 

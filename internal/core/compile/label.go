@@ -99,6 +99,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 // A labeler converts an AST node to a string representation.
 type labeler interface {
 	labelString() string
+	isComprehension() bool
 }
 
 type fieldLabel ast.Field
@@ -135,6 +136,8 @@ func (l *fieldLabel) labelString() string {
 	return "<unknown>"
 }
 
+func (l *fieldLabel) isComprehension() bool { return false }
+
 type forScope ast.ForClause
 
 func (l *forScope) labelString() string {
@@ -142,9 +145,13 @@ func (l *forScope) labelString() string {
 	return "for[]"
 }
 
+func (l *forScope) isComprehension() bool { return true }
+
 type letScope ast.LetClause
 
 func (l *letScope) labelString() string {
 	// TODO: include more info in square brackets.
 	return "let[]"
 }
+
+func (l *letScope) isComprehension() bool { return true }

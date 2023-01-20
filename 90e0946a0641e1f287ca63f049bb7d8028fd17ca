@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "971cedf8_6e1c8cc0",
+        "filename": "cue/testdata/eval/let.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-20T16:51:06Z",
+      "side": 1,
+      "message": "nit: mixing spaces and tabs for indentation",
+      "revId": "90e0946a0641e1f287ca63f049bb7d8028fd17ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04a5bb21_75a36712",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-20T16:51:06Z",
+      "side": 1,
+      "message": "thoughts on using https://cuelang.org/issue/2218 instead for issue links in code? that means visiting them is easy, without having to somehow teach the editor about our issue tracker.",
+      "range": {
+        "startLine": 114,
+        "startChar": 8,
+        "endLine": 114,
+        "endChar": 19
+      },
+      "revId": "90e0946a0641e1f287ca63f049bb7d8028fd17ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5cbe759_4065da73",
+        "filename": "internal/core/compile/label.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-20T16:51:06Z",
+      "side": 1,
+      "message": "is this never used?",
+      "revId": "90e0946a0641e1f287ca63f049bb7d8028fd17ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

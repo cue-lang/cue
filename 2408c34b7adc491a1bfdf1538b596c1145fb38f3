@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7f9c547_64de8ce4",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 783,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-20T16:51:06Z",
+      "side": 1,
+      "message": "perhaps easier to read as\n\n// Check if any references in the expression refer to a for comprehension.",
+      "revId": "2408c34b7adc491a1bfdf1538b596c1145fb38f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

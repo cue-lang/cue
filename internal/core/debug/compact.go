@@ -126,6 +126,9 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string("let ")
 		s := w.labelString(x.Label)
 		w.string(s)
+		if x.IsMulti {
+			w.string("m")
+		}
 		w.string("=")
 		w.node(x.Value)
 

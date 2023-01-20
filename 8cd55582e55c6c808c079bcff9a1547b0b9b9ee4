@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "73e42de8_5ae9adcb",
+        "filename": "internal/ospath/current_plan9.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-20T10:06:02Z",
+      "side": 1,
+      "message": "Ack. No need to assume that unknown means Unix with a switch, though.",
+      "parentUuid": "9ba3ecfe_29f6e0d3",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f270678_a8171439",
@@ -136,6 +154,24 @@
       "side": 1,
       "message": "Won\u0027t that make the test run only on unix platforms?",
       "parentUuid": "96d5112e_8e44d492",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cd867ae_7ff5a37c",
+        "filename": "internal/ospath/example_nix_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-20T10:06:02Z",
+      "side": 1,
+      "message": "Actually not; the filename underscore suffixes only apply for GOOS and GOARCH, and unix is neither. unix is an extra build tag just like cgo or go1.18. `go help buildconstraint` goes into detail.\n\nBut you could also argue that any filename containing _unix could be understood to also use `//go:build unix`, and you don\u0027t here, so if that\u0027s your point of view I agree with leaving the filename as is :)",
+      "parentUuid": "6bc25e4a_c7a9f40e",
       "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -346,6 +382,24 @@
       "side": 1,
       "message": "Yeah, it\u0027s a bit odd, but changing it could break existing code, so I think it\u0027s worth leaving as is for now at least.",
       "parentUuid": "0fc23bd3_14c47466",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3aa51748_4799677d",
+        "filename": "pkg/path/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-20T10:06:02Z",
+      "side": 1,
+      "message": "Fine with me, but I reckon we should have a TODO at least. It\u0027s odd for `Clean(\"//foo/bar\", OS(\"baz\"))` to work like Unix, in terms of API.",
+      "parentUuid": "997c714e_9900dcdd",
       "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

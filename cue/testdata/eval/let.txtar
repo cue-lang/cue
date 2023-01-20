@@ -38,6 +38,68 @@ ignoreErrorInLet: {
 	let X = 1 & 2
 	disjunction: *X | 3
 }
+-- incomprehension.cue --
+// for comprehensions in list do not have to split the let as each instance
+// is already associated with a separate environment.
+list: {
+	l: [ 1, 2, 3 ]
+	c: [
+		for v in l {
+			let X = v*4 // can share
+			X
+		}
+	]
+}
+
+referencesForDirectly: {
+	l: [ 1, 2, 3 ]
+	for k, v in l {
+		let Y = v*4 // multi
+		"\(k)": Y
+	}
+}
+
+referencesForViaLet: {
+	l: [ 1, 2, 3 ]
+	for k, v in l let X = v*4 {
+		let Y = X // multi
+		"\(k)": Y
+	}
+}
+
+letClauseReferencesInert: {
+	x: 2
+	l: [ 1, 2, 3 ]
+	for k, v in l let X = x {
+		let Y = X // can share
+		"\(k)": Y
+	}
+}
+
+// for indirect references, it is okay to not "split" a let clause, as the
+// it will only fail as a result of not splitting if the referred values
+// would fail as well.
+indirectReference: {
+	l: [ 1, 2, 3 ]
+	for k, v in l {
+		y: v // fails if v differs for each y.
+		let X = y*4 // can share, as y fails if let fails.
+		"\(k)": X
+	}
+}
+
+nestedFor: {
+	for k, y in [ 4, 5 ] {
+		let X = {
+			for x in [ 1, 2 ] {
+				let X = x
+				"\(X)": X
+			}
+		}
+		"\(k)": X
+	}
+}
+
 -- issue2166.cue --
 letWithDynamicInComprehension: {
 	_i: {
@@ -50,6 +112,25 @@ letWithDynamicInComprehension: {
 		(T): "1"
 	}
 }
+-- issue2218.cue --
+_parent_configs: {
+	PARENT: true
+}
+_configs: {
+	CHILD1: {
+		property: true
+	}
+	CHILD2: {
+		property: true
+		parent:      "PARENT"
+	}
+}
+disabled_parent_test: {for k, v in _configs {
+	let parent_config = (*_parent_configs[v.parent] | false)
+    "\(k)": {
+        "parent_config": parent_config
+    }
+}}
 -- issue2063.cue --
 import (
 	"encoding/yaml"
@@ -78,17 +159,31 @@ keepDescending: t2: {
 }
 
 -- out/eval/stats --
-Leaks:  6
-Freed:  57
-Reused: 48
-Allocs: 15
-Retain: 24
+Leaks:  53
+Freed:  159
+Reused: 150
+Allocs: 62
+Retain: 151
 
-Unifications: 61
-Conjuncts:    91
-Disjuncts:    69
+Unifications: 198
+Conjuncts:    384
+Disjuncts:    240
 -- out/eval --
-(struct){
+Errors:
+indirectReference.y: conflicting values 2 and 1:
+    ./incomprehension.cue:42:7
+    ./incomprehension.cue:42:10
+    ./incomprehension.cue:43:2
+    ./incomprehension.cue:44:6
+indirectReference.y: conflicting values 3 and 1:
+    ./incomprehension.cue:42:7
+    ./incomprehension.cue:42:13
+    ./incomprehension.cue:43:2
+    ./incomprehension.cue:44:6
+
+Result:
+(_|_){
+  // [eval]
   let A#1 = (int){ 9 }
   let B#2 = (int){ 18 }
   let C#3 = (int){ 36 }
@@ -131,12 +226,156 @@ Disjuncts:    69
     }
     disjunction: (int){ 3 }
   }
+  list: (struct){
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    c: (#list){
+      0: (int){
+        4
+        let X#19 = (int){ 4 }
+      }
+      1: (int){
+        8
+        let X#19 = (int){ 8 }
+      }
+      2: (int){
+        12
+        let X#19 = (int){ 12 }
+      }
+    }
+  }
+  referencesForDirectly: (struct){
+    let Y#1Amulti = (〈1;v〉 * 4)
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    "0": (int){ 4 }
+    "1": (int){ 8 }
+    "2": (int){ 12 }
+  }
+  referencesForViaLet: (struct){
+    let Y#1Bmulti = 〈1;X〉
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    "0": (int){ 4 }
+    "1": (int){ 8 }
+    "2": (int){ 12 }
+  }
+  letClauseReferencesInert: (struct){
+    let Y#1C = (int){ 2 }
+    x: (int){ 2 }
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    "0": (int){ 2 }
+    "1": (int){ 2 }
+    "2": (int){ 2 }
+  }
+  indirectReference: (_|_){
+    // [eval]
+    y: (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+    }
+    let X#1D = (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+    }
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    "0": (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+    }
+    "1": (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+    }
+    "2": (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+      //     ./incomprehension.cue:43:2
+      //     ./incomprehension.cue:44:6
+    }
+  }
+  nestedFor: (struct){
+    let X#1Emulti = {
+      for _, x in [
+        1,
+        2,
+      ] {
+        let X#1Fmulti = 〈1;x〉
+        "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+      }
+    }
+    "0": (struct){
+      let X#1Fmulti = 〈1;x〉
+      "1": (int){ 1 }
+      "2": (int){ 2 }
+    }
+    "1": (struct){
+      let X#1Fmulti = 〈1;x〉
+      "1": (int){ 1 }
+      "2": (int){ 2 }
+    }
+  }
   keepDescending: (struct){
     t1: (struct){
       ec: (struct){
       }
       bs: (struct){
-        let m#19 = (_|_){
+        let m#21 = (_|_){
           // [incomplete] keepDescending.t1.bs.m: undefined field: b:
           //     ./issue2063.cue:10:14
         }
@@ -150,7 +389,7 @@ Disjuncts:    69
       ec: (struct){
       }
       bs: (struct){
-        let m#1A = (_|_){
+        let m#22 = (_|_){
           // [incomplete] keepDescending.t2.bs.m: undefined field: b:
           //     ./issue2063.cue:21:14
         }
@@ -161,19 +400,34 @@ Disjuncts:    69
     }
   }
   letWithDynamicInComprehension: (struct){
-    let T#1B = (_|_){
-      // [eval] letWithDynamicInComprehension.T: conflicting values "e" and "d":
-      //     ./issue2166.cue:3:6
-      //     ./issue2166.cue:4:6
-      //     ./issue2166.cue:7:2
-      //     ./issue2166.cue:8:11
-    }
+    let T#23multi = 〈1;v〉
     _i: (struct){
       a: (string){ "d" }
       b: (string){ "e" }
     }
     d: (string){ "1" }
     e: (string){ "1" }
+  }
+  _parent_configs: (struct){
+    PARENT: (bool){ true }
+  }
+  _configs: (struct){
+    CHILD1: (struct){
+      property: (bool){ true }
+    }
+    CHILD2: (struct){
+      property: (bool){ true }
+      parent: (string){ "PARENT" }
+    }
+  }
+  disabled_parent_test: (struct){
+    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+    CHILD1: (struct){
+      parent_config: (bool){ false }
+    }
+    CHILD2: (struct){
+      parent_config: (bool){ |(*(bool){ true }, (bool){ false }) }
+    }
   }
 }
 -- out/compile --
@@ -218,14 +472,93 @@ Disjuncts:    69
     disjunction: (*〈0;let X#18〉|3)
   }
 }
+--- incomprehension.cue
+{
+  list: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    c: [
+      for _, v in 〈1;l〉 {
+        let X#19 = (〈1;v〉 * 4)
+        〈0;let X#19〉
+      },
+    ]
+  }
+  referencesForDirectly: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 {
+      let Y#1Amulti = (〈1;v〉 * 4)
+      "\(〈1;k〉)": 〈0;let Y#1A〉
+    }
+  }
+  referencesForViaLet: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 let X = (〈0;v〉 * 4) {
+      let Y#1Bmulti = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#1B〉
+    }
+  }
+  letClauseReferencesInert: {
+    x: 2
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 let X = 〈1;x〉 {
+      let Y#1C = 〈1;X〉
+      "\(〈2;k〉)": 〈0;let Y#1C〉
+    }
+  }
+  indirectReference: {
+    l: [
+      1,
+      2,
+      3,
+    ]
+    for k, v in 〈0;l〉 {
+      y: 〈1;v〉
+      let X#1D = (〈0;y〉 * 4)
+      "\(〈1;k〉)": 〈0;let X#1D〉
+    }
+  }
+  nestedFor: {
+    for k, y in [
+      4,
+      5,
+    ] {
+      let X#1Emulti = {
+        for _, x in [
+          1,
+          2,
+        ] {
+          let X#1Fmulti = 〈1;x〉
+          "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+        }
+      }
+      "\(〈1;k〉)": 〈0;let X#1E〉
+    }
+  }
+}
 --- issue2063.cue
 {
   keepDescending: {
     t1: {
       ec: {}
       bs: {
-        let m#19 = 〈1;ec〉.b
-        if (〈0;let m#19〉 == _|_(explicit error (_|_ literal) in source)) {}
+        let m#21 = 〈1;ec〉.b
+        if (〈0;let m#21〉 == _|_(explicit error (_|_ literal) in source)) {}
         x: {
           y: ""
         }
@@ -237,8 +570,8 @@ Disjuncts:    69
       x: 〈import;"encoding/yaml"〉.Marshal(〈0;bs〉)
       ec: {}
       bs: {
-        let m#1A = 〈1;ec〉.b
-        if (〈0;let m#1A〉.b == _|_(explicit error (_|_ literal) in source)) {}
+        let m#22 = 〈1;ec〉.b
+        if (〈0;let m#22〉.b == _|_(explicit error (_|_ literal) in source)) {}
         X: {
           Y: 〈import;strings〉.Join([], "")
         }
@@ -254,8 +587,31 @@ Disjuncts:    69
       b: "e"
     }
     for k, v in 〈0;_i〉 {
-      let T#1B = 〈1;v〉
-      〈0;let T#1B〉: "1"
+      let T#23multi = 〈1;v〉
+      〈0;let T#23〉: "1"
+    }
+  }
+}
+--- issue2218.cue
+{
+  _parent_configs: {
+    PARENT: true
+  }
+  _configs: {
+    CHILD1: {
+      property: true
+    }
+    CHILD2: {
+      property: true
+      parent: "PARENT"
+    }
+  }
+  disabled_parent_test: {
+    for k, v in 〈1;_configs〉 {
+      let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+      "\(〈1;k〉)": {
+        parent_config: 〈1;let parent_config#24〉
+      }
     }
   }
 }

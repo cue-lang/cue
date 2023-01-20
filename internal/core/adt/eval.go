@@ -1955,7 +1955,10 @@ func (n *nodeContext) addStruct(
 			n.insertField(x.Label, MakeConjunct(childEnv, x, closeInfo))
 
 		case *LetField:
-			n.insertField(x.Label, MakeConjunct(childEnv, x, closeInfo))
+			arc := n.insertField(x.Label, MakeConjunct(childEnv, x, closeInfo))
+			if x.IsMulti {
+				arc.MultiLet = x.IsMulti
+			}
 		}
 	}
 }

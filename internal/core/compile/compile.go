@@ -105,6 +105,17 @@ type compiler struct {
 	stack      []frame
 	inSelector int
 
+	// refersToForVariable tracks whether an expression refers to a key or
+	// value produced by a for comprehension embedded within a struct.
+	// An Environment associated with such a comprehension value is collapsed
+	// onto the destination.
+	// Tracking this is necessary for let fields, which should not be unified
+	// into the destination when referring to such values.
+	// See Issue #2218.
+	// TODO(perf): use this to compute when a field can be structure shared
+	// across different iterations of the same field.
+	refersToForVariable bool
+
 	fileScope map[adt.Feature]bool
 
 	num literal.NumInfo
@@ -144,6 +155,10 @@ type frame struct {
 	field ast.Decl
 	// scope   map[ast.Node]bool
 	upCount int32 // 1 for field, 0 for embedding.
+
+	// isComprehensionVar indicates that this scope refers to a for clause
+	// that is part of a comprehension embedded in a struct.
+	isComprehensionVar bool
 
 	aliases map[string]aliasEntry
 }
@@ -421,7 +436,10 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 	k := len(c.stack) - 1
 	for ; k >= 0; k-- {
-		if c.stack[k].scope == n.Scope {
+		if f := c.stack[k]; f.scope == n.Scope {
+			if f.isComprehensionVar {
+				c.refersToForVariable = true
+			}
 			break
 		}
 		upCount += c.stack[k].upCount
@@ -653,12 +671,18 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		// In practice this amounts to the same thing, as let expressions cannot
 		// be addressed from outside their scope. But it will matter once
 		// expressions may refer to a let from within the let.
+
+		savedUses := c.refersToForVariable
+		c.refersToForVariable = false
 		value := c.labeledExpr(x, (*letScope)(x), x.Expr)
+		refsCompVar := c.refersToForVariable
+		c.refersToForVariable = savedUses || refsCompVar
 
 		return &adt.LetField{
-			Src:   x,
-			Label: entry.feature,
-			Value: value,
+			Src:     x,
+			Label:   entry.feature,
+			IsMulti: refsCompVar,
+			Value:   value,
 		}
 
 	// case: *ast.Alias: // TODO(value alias)
@@ -676,7 +700,7 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		}
 
 	case *ast.Comprehension:
-		return c.comprehension(x)
+		return c.comprehension(x, false)
 
 	case *ast.EmbedDecl: // Deprecated
 		return c.expr(x.Expr)
@@ -720,7 +744,7 @@ func (c *compiler) elem(n ast.Expr) adt.Elem {
 		}
 
 	case *ast.Comprehension:
-		return c.comprehension(x)
+		return c.comprehension(x, true)
 
 	case ast.Expr:
 		return c.expr(x)
@@ -728,7 +752,7 @@ func (c *compiler) elem(n ast.Expr) adt.Elem {
 	return nil
 }
 
-func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
+func (c *compiler) comprehension(x *ast.Comprehension, inList bool) adt.Elem {
 	var a []adt.Yielder
 	for _, v := range x.Clauses {
 		switch x := v.(type) {
@@ -743,8 +767,9 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 				Value:  c.label(x.Value),
 				Src:    c.expr(x.Source),
 			}
-			c.pushScope((*forScope)(x), 1, v)
+			f := c.pushScope((*forScope)(x), 1, v)
 			defer c.popScope()
+			f.isComprehensionVar = !inList
 			a = append(a, y)
 
 		case *ast.IfClause:
@@ -755,13 +780,21 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 			a = append(a, y)
 
 		case *ast.LetClause:
+			// TODO: check if references in expression refer to for comprehension.
+			savedUses := c.refersToForVariable
+			c.refersToForVariable = false
+			expr := c.expr(x.Expr)
+			refsCompVar := c.refersToForVariable
+			c.refersToForVariable = savedUses || refsCompVar
+
 			y := &adt.LetClause{
 				Src:   x,
 				Label: c.label(x.Ident),
-				Expr:  c.expr(x.Expr),
+				Expr:  expr,
 			}
-			c.pushScope((*letScope)(x), 1, v)
+			f := c.pushScope((*letScope)(x), 1, v)
 			defer c.popScope()
+			f.isComprehensionVar = !inList && refsCompVar
 			a = append(a, y)
 		}
 

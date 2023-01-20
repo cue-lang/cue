@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a0d156a_db4f3682",
+        "filename": "cue/testdata/eval/let.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T17:47:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "971cedf8_6e1c8cc0",
+      "revId": "90e0946a0641e1f287ca63f049bb7d8028fd17ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "04a5bb21_75a36712",
@@ -41,6 +59,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c658970c_c79975ed",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T17:47:10Z",
+      "side": 1,
+      "message": "Forgot we had those. Good idea.",
+      "parentUuid": "04a5bb21_75a36712",
+      "range": {
+        "startLine": 114,
+        "startChar": 8,
+        "endLine": 114,
+        "endChar": 19
+      },
+      "revId": "90e0946a0641e1f287ca63f049bb7d8028fd17ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5cbe759_4065da73",
@@ -54,6 +96,24 @@
       "writtenOn": "2023-01-20T16:51:06Z",
       "side": 1,
       "message": "is this never used?",
+      "revId": "90e0946a0641e1f287ca63f049bb7d8028fd17ca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b042269_1098d6bc",
+        "filename": "internal/core/compile/label.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T17:47:10Z",
+      "side": 1,
+      "message": "Ah yes, indeed, can go now. Removed",
+      "parentUuid": "a5cbe759_4065da73",
       "revId": "90e0946a0641e1f287ca63f049bb7d8028fd17ca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

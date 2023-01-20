@@ -232,7 +232,11 @@ func (x *OptionalField) Source() ast.Node {
 type LetField struct {
 	Src   *ast.LetClause
 	Label Feature
-	Value Expr
+	// IsMulti is true when this let field should be replicated for each
+	// incarnation. This is the case when its expression refers to the
+	// variables of a for comprehension embedded within a struct.
+	IsMulti bool
+	Value   Expr
 }
 
 func (x *LetField) Source() ast.Node {

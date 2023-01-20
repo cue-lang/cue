@@ -92,10 +92,10 @@ Disjuncts:    197
       x: (int){ 3 }
     }
     b: (#struct){
-      let list#1 = [
+      let list#1multi = [
         〈1;x〉,
         〈1;y〉,
-      ] // multi
+      ]
       all: (#list){
         0: (int){ 3 }
       }
@@ -142,10 +142,10 @@ Disjuncts:    197
       y: (int){ 2 }
     }
     b: (#struct){
-      let list#2 = [
+      let list#2multi = [
         〈1;x〉,
         〈1;y〉,
-      ] // multi
+      ]
       all: (#list){
         0: (int){ 3 }
         1: (int){ 2 }

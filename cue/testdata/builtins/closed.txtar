@@ -118,7 +118,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = 〈0;a〉 // multi
+            let X#1multi = 〈0;a〉
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -128,7 +128,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = 〈0;a〉 // multi
+            let X#1multi = 〈0;a〉
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -139,7 +139,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = 〈0;a〉 // multi
+            let X#1multi = 〈0;a〉
             uint: (#struct){
               a: (#struct){
                 b: (bool){ true }
@@ -149,7 +149,7 @@ Result:
             a: (#struct){
               b: (bool){ true }
             }
-            let X#1 = 〈0;a〉 // multi
+            let X#1multi = 〈0;a〉
             string: (#struct){
               a: (#struct){
                 b: (bool){ true }

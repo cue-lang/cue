@@ -53,10 +53,12 @@ func (w *compactPrinter) node(n adt.Node) {
 				if a.Label.IsLet() {
 					w.string("let ")
 					w.label(a.Label)
+					if a.MultiLet {
+						w.string("m")
+					}
 					w.string("=")
 					if c := a.Conjuncts[0]; a.MultiLet {
 						w.node(c.Expr())
-						w.string(" // multi")
 						continue
 					}
 					w.node(a)

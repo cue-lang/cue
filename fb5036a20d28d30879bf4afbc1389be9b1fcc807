@@ -16,6 +16,24 @@
       "message": "Interesting that we seem to have near duplicates of the node printer.",
       "revId": "fb5036a20d28d30879bf4afbc1389be9b1fcc807",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bbdc182_bd9077c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-20T18:55:40Z",
+      "side": 1,
+      "message": "Sometimes having duplicates is easier than layering all kinds of abstractions over it, especially if it isn\u0027t clear yet how things might diverge.\nAt some point they could merge. (Not a nerd snipe.)",
+      "parentUuid": "4b50a42a_03ed3621",
+      "revId": "fb5036a20d28d30879bf4afbc1389be9b1fcc807",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

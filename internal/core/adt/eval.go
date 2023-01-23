@@ -235,6 +235,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		fallthrough
 
 	case Partial, Conjuncts:
+		// TODO: remove this optimization or make it correct.
 		// No need to do further processing when we have errors and all values
 		// have been considered.
 		// TODO: is checkClosed really still necessary here?
@@ -1348,10 +1349,9 @@ func (n *nodeContext) getValidators(state VertexStatus) BaseValue {
 
 // TODO: this function can probably go as this is now handled in the nodeContext.
 func (n *nodeContext) maybeSetCache() {
-	if n.node.Status() > Partial { // n.node.BaseValue != nil
-		return
-	}
-	if n.scalar != nil {
+	// Set BaseValue to scalar, but only if it was not set before. Most notably,
+	// errors should not be discarded.
+	if n.scalar != nil && isCyclePlaceholder(n.node.BaseValue) {
 		n.node.BaseValue = n.scalar
 	}
 	// NOTE: this is now handled by associating the nodeContext

@@ -153,15 +153,15 @@ inline: acrossFields: ok1: {
   }
 }
 -- out/eval/stats --
-Leaks:  268
-Freed:  168
-Reused: 162
-Allocs: 274
-Retain: 821
+Leaks:  247
+Freed:  141
+Reused: 136
+Allocs: 252
+Retain: 734
 
-Unifications: 436
-Conjuncts:    1499
-Disjuncts:    795
+Unifications: 388
+Conjuncts:    1297
+Disjuncts:    688
 -- out/eval --
 Errors:
 structural cycle:

@@ -15,6 +15,10 @@ t8: {
 	y: json.Marshal({a: x})
 }
 t9: json.MarshalStream([{a: 1}, {b: int | *2}])
+t10: json.Marshal({a: #"\ " & < >"#})
+t11: json.HTMLEscape(t10)
+t12: json.MarshalStream([{a: #"\ " & < >"#}, {b: ""}])
+t13: json.HTMLEscape(t12)
 
 unmarshalStream: {
 	t1:    json.UnmarshalStream(#"{"a": 1}{"b": 2}"#)
@@ -59,6 +63,18 @@ t8: {
 t9: """
 	{"a":1}
 	{"b":2}
+
+	"""
+t10: "{\"a\":\"\\\\ \\\" & < >\"}"
+t11: "{\"a\":\"\\\\ \\\" \\u0026 \\u003c \\u003e\"}"
+t12: """
+	{"a":"\\\\ \\" & < >"}
+	{"b":""}
+
+	"""
+t13: """
+	{"a":"\\\\ \\" \\u0026 \\u003c \\u003e"}
+	{"b":""}
 
 	"""
 unmarshalStream: {

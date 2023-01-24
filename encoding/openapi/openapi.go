@@ -15,7 +15,6 @@
 package openapi
 
 import (
-	"encoding/json"
 	"fmt"
 	"strings"
 
@@ -24,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	cuejson "cuelang.org/go/encoding/json"
+	internaljson "cuelang.org/go/internal/encoding/json"
 )
 
 // A Config defines options for converting CUE to and from OpenAPI.
@@ -95,7 +95,7 @@ func Gen(inst cue.InstanceOrValue, c *Config) ([]byte, error) {
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(all)
+	return internaljson.Marshal(all)
 }
 
 // Generate generates the set of OpenAPI schema for all top-level types of the
@@ -128,7 +128,7 @@ func (g *Generator) All(inst cue.InstanceOrValue) (*OrderedMap, error) {
 }
 
 func toCUE(name string, x interface{}) (v ast.Expr, err error) {
-	b, err := json.Marshal(x)
+	b, err := internaljson.Marshal(x)
 	if err == nil {
 		v, err = cuejson.Extract(name, b)
 	}

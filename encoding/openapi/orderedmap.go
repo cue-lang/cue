@@ -20,7 +20,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/encoding/json"
+	internaljson "cuelang.org/go/internal/encoding/json"
 )
 
 // An OrderedMap is a set of key-value pairs that preserves the order in which
@@ -177,5 +177,5 @@ func (m *OrderedMap) getMap(key string) *OrderedMap {
 func (m *OrderedMap) MarshalJSON() (b []byte, err error) {
 	// This is a pointer receiever to enforce that we only store pointers to
 	// OrderedMap in the output.
-	return json.Encode((*ast.StructLit)(m))
+	return internaljson.Encode((*ast.StructLit)(m))
 }

@@ -38,6 +38,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/core/validate"
+	internaljson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/types"
 )
 
@@ -158,13 +159,13 @@ func (o *structValue) marshalJSON() (b []byte, err errors.Error) {
 	n := o.Len()
 	for i := 0; i < n; i++ {
 		k, v := o.At(i)
-		s, err := json.Marshal(k)
+		s, err := internaljson.Marshal(k)
 		if err != nil {
 			return nil, unwrapJSONError(err)
 		}
 		b = append(b, s...)
 		b = append(b, ':')
-		bb, err := json.Marshal(v)
+		bb, err := internaljson.Marshal(v)
 		if err != nil {
 			return nil, unwrapJSONError(err)
 		}
@@ -303,7 +304,7 @@ func marshalList(l *Iterator) (b []byte, err errors.Error) {
 	b = append(b, '[')
 	if l.Next() {
 		for i := 0; ; i++ {
-			x, err := json.Marshal(l.Value())
+			x, err := internaljson.Marshal(l.Value())
 			if err != nil {
 				return nil, unwrapJSONError(err)
 			}
@@ -920,7 +921,7 @@ func (v Value) MarshalJSON() (b []byte, err error) {
 func (v Value) marshalJSON() (b []byte, err error) {
 	v, _ = v.Default()
 	if v.v == nil {
-		return json.Marshal(nil)
+		return internaljson.Marshal(nil)
 	}
 	ctx := newContext(v.idx)
 	x := v.eval(ctx)
@@ -935,17 +936,17 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	// TODO: implement marshalles in value.
 	switch k := x.Kind(); k {
 	case adt.NullKind:
-		return json.Marshal(nil)
+		return internaljson.Marshal(nil)
 	case adt.BoolKind:
-		return json.Marshal(x.(*adt.Bool).B)
+		return internaljson.Marshal(x.(*adt.Bool).B)
 	case adt.IntKind, adt.FloatKind, adt.NumKind:
 		b, err := x.(*adt.Num).X.MarshalText()
 		b = bytes.TrimLeft(b, "+")
 		return b, err
 	case adt.StringKind:
-		return json.Marshal(x.(*adt.String).Str)
+		return internaljson.Marshal(x.(*adt.String).Str)
 	case adt.BytesKind:
-		return json.Marshal(x.(*adt.Bytes).B)
+		return internaljson.Marshal(x.(*adt.Bytes).B)
 	case adt.ListKind:
 		i, _ := v.List()
 		return marshalList(&i)

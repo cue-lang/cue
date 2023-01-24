@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
+	internaljson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/internal/types"
 )
 
@@ -304,7 +305,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "encoding.TextMarshaler"))
 		}
-		b, err = json.Marshal(string(b))
+		b, err = internaljson.Marshal(string(b))
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "json"))
 		}

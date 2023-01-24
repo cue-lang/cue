@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	cuejson "cuelang.org/go/encoding/json"
+	internaljson "cuelang.org/go/internal/encoding/json"
 )
 
 // Compact generates the JSON-encoded src with insignificant space characters
@@ -70,7 +71,7 @@ func HTMLEscape(src []byte) string {
 
 // Marshal returns the JSON encoding of v.
 func Marshal(v cue.Value) (string, error) {
-	b, err := json.Marshal(v)
+	b, err := internaljson.Marshal(v)
 	return string(b), err
 }
 
@@ -83,7 +84,7 @@ func MarshalStream(v cue.Value) (string, error) {
 	}
 	buf := &bytes.Buffer{}
 	for iter.Next() {
-		b, err := json.Marshal(iter.Value())
+		b, err := internaljson.Marshal(iter.Value())
 		if err != nil {
 			return "", err
 		}

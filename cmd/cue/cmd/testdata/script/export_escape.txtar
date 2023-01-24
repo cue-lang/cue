@@ -16,7 +16,7 @@ specialHTML: "& < >"
 {
     "simple": "hello",
     "specialJSON": "\\ \"",
-    "specialHTML": "\u0026 \u003c \u003e"
+    "specialHTML": "& < >"
 }
 -- stdout-escape.golden --
 {

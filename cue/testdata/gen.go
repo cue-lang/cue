@@ -16,7 +16,6 @@ package main
 
 import (
 	"bytes"
-	"encoding/json"
 	"flag"
 	"fmt"
 	"go/ast"
@@ -36,6 +35,7 @@ import (
 	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	internaljson "cuelang.org/go/internal/encoding/json"
 	"cuelang.org/go/pkg/encoding/yaml"
 	"cuelang.org/go/tools/fix"
 )
@@ -307,7 +307,7 @@ func (e *extractor) populate(src []byte) {
 		e.a.Files = append(e.a.Files,
 			txtar.File{Name: "out/yaml", Data: []byte(s)})
 
-		b, err := json.Marshal(v)
+		b, err := internaljson.Marshal(v)
 		if err != nil {
 			fmt.Fprintln(e.header, "#bug: true")
 			e.warnf("Could not encode as JSON: %v", err)

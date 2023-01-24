@@ -715,6 +715,7 @@ func (b *buildPlan) parseFlags() (err error) {
 		PkgName:       flagPackage.String(b.cmd),
 		Strict:        flagStrict.Bool(b.cmd),
 		InlineImports: flagInlineImports.Bool(b.cmd),
+		EscapeHTML:    flagEscape.Bool(b.cmd),
 	}
 	return nil
 }

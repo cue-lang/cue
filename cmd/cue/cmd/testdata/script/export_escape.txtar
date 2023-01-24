@@ -1,0 +1,26 @@
+# Verify that export with and without --escape works as expected.
+
+exec cue export --out json file.cue
+cmp stdout stdout.golden
+
+exec cue export --out json --escape file.cue
+cmp stdout stdout-escape.golden
+
+-- file.cue --
+package hello
+
+simple: "hello"
+specialJSON: #"\ ""#
+specialHTML: "& < >"
+-- stdout.golden --
+{
+    "simple": "hello",
+    "specialJSON": "\\ \"",
+    "specialHTML": "& < >"
+}
+-- stdout-escape.golden --
+{
+    "simple": "hello",
+    "specialJSON": "\\ \"",
+    "specialHTML": "\u0026 \u003c \u003e"
+}

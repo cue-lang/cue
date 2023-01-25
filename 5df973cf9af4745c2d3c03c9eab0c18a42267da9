@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d7f1e87_4ab6e613",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1355,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-25T15:12:03Z",
+      "side": 1,
+      "message": "Given that it was a subtle change, perhaps this could use a comment?",
+      "revId": "5df973cf9af4745c2d3c03c9eab0c18a42267da9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

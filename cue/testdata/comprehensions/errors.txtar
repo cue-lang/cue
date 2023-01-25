@@ -61,7 +61,10 @@ Result:
     #list: (_|_){
       // [eval] circularFor.#list: invalid operand tail != null (found bool, want list or struct):
       //     ./in.cue:12:12
-      tail: (null){ null }
+      tail: (_|_){
+        // [eval] circularFor.#list: invalid operand tail != null (found bool, want list or struct):
+        //     ./in.cue:12:12
+      }
     }
   }
   userError: (_|_){

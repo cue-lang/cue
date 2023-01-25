@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "841104cb_ee30a0ba",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-25T16:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b94395bb_fd1e6b9a",
+      "range": {
+        "startLine": 17,
+        "startChar": 32,
+        "endLine": 19,
+        "endChar": 6
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b61e34e_89c41e8b",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-01-25T15:38:41Z",
       "side": 1,
       "message": "nit: proactively",
+      "range": {
+        "startLine": 20,
+        "startChar": 40,
+        "endLine": 20,
+        "endChar": 52
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "295c5273_db016482",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-25T16:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b61e34e_89c41e8b",
       "range": {
         "startLine": 20,
         "startChar": 40,
@@ -70,6 +118,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2b693f4_ab9c46c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-25T16:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d9c7234_961e046d",
+      "range": {
+        "startLine": 21,
+        "startChar": 10,
+        "endLine": 21,
+        "endChar": 12
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c94bfcf_cf0b3eb1",
@@ -93,6 +165,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d728898d_5137a766",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-25T16:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8c94bfcf_cf0b3eb1",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2685b104_5dfa0c19",
@@ -106,6 +202,30 @@
       "writtenOn": "2023-01-25T15:38:41Z",
       "side": 1,
       "message": "also struggling with this one :)",
+      "range": {
+        "startLine": 28,
+        "startChar": 29,
+        "endLine": 29,
+        "endChar": 49
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "368fc074_036dae18",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-25T16:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2685b104_5dfa0c19",
       "range": {
         "startLine": 28,
         "startChar": 29,
@@ -167,6 +287,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c7a05ad_ad1a1949",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-25T16:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d397ff2c_df55c583",
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d688193f_5a464369",
@@ -180,6 +318,24 @@
       "writtenOn": "2023-01-25T15:55:59Z",
       "side": 1,
       "message": "perhaps explain why you think it could be removed?",
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15293bee_7f0504a7",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-25T16:30:10Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d688193f_5a464369",
       "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

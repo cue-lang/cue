@@ -131,6 +131,57 @@
       "message": "First review of the commit message before I look at the code.",
       "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e67c786_2f5c1ee8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:55:59Z",
+      "side": 1,
+      "message": "Will probably do a second review in the morning, to try and better understand the commit message and the code changes.",
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d397ff2c_df55c583",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:55:59Z",
+      "side": 1,
+      "message": "is this comment misplaced now?\n\nI\u0027d also make the new comment not be inline, for consistency",
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d688193f_5a464369",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:55:59Z",
+      "side": 1,
+      "message": "perhaps explain why you think it could be removed?",
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

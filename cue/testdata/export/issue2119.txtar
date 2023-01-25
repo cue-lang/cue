@@ -33,15 +33,15 @@ original: {
 	out: yaml.Marshal(rule)
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  21
-Reused: 12
-Allocs: 12
+Leaks:  4
+Freed:  20
+Reused: 11
+Allocs: 13
 Retain: 4
 
 Unifications: 24
 Conjuncts:    42
-Disjuncts:    25
+Disjuncts:    24
 -- out/eval --
 (struct){
   simplified: (struct){

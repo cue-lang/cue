@@ -63,8 +63,8 @@ Junk: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
-Reused: 7
-Allocs: 8
+Reused: 6
+Allocs: 9
 Retain: 4
 
 Unifications: 11

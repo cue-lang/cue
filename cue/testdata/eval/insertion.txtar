@@ -1,0 +1,322 @@
+# Tests various patterns of insertion of conjuncts.
+# See https://cuelang.org/issues/2169
+
+-- a.cue --
+embeddingDirect: t1: {
+	#a: _
+	_
+} & {
+	#a: "s"
+	#a
+}
+
+embeddingExpr: t1: {
+	#a: _
+	_
+} & {
+	#a: "s"
+	[ #a ][0]
+}
+
+unifiedDirect: {
+	t1: {
+		#a: _
+		_
+	}
+	t1: {
+		#a
+		#a: _
+	}
+	t1: {
+		_
+		#a: "s"
+	}
+}
+
+
+unifiedExpr: {
+	t1: {
+		#a: _
+		_
+	}
+	t1: {
+		[ #a ][0]
+		#a: _
+	}
+	t1: {
+		#a: "s"
+		_
+	}
+}
+
+// These two embeddings both add fields to each other's original source, which
+// then, in turn, needs to be added.
+cross: t1: {
+	a: {
+		b: {v: 1, a: w: 2}
+		// from b.a: {x: 2, b: y: 5}
+	}
+	b: {
+		a: {x: 2, b: y: 5}
+		// from a.b: {v: 1, a: v: 2}
+	}
+	a
+	b
+}
+
+-- complex.cue --
+// Multiple levels of insertion
+recursive: t1: {
+	e: {}
+	c: d: e: f: 1
+	c.d
+	c: d:
+		// This part gets embedded within t1, which ends up adding new fields
+		// to here, when then again need to be embedded in t1, which then
+		// will add more fields to node e.
+		c: d: e: g: 1
+}
+
+-- issue2169.cue --
+embeddedFunctionalExpr: {
+	#fn: {
+		#in: _
+		_
+	} & {
+		#in: "str"
+
+		({
+			#t: _
+			#t
+		} & {
+			#t: #in
+			_
+		}) + ""
+	}
+	#fn
+}
+-- out/eval/stats --
+Leaks:  13
+Freed:  55
+Reused: 51
+Allocs: 17
+Retain: 36
+
+Unifications: 68
+Conjuncts:    225
+Disjuncts:    87
+-- out/eval --
+(struct){
+  embeddingDirect: (struct){
+    t1: (_|_){
+      // [incomplete] embeddingDirect.t1: cannot add field #a: was already used:
+      //     ./a.cue:5:2
+      #a: (_){ _ }
+    }
+  }
+  embeddingExpr: (struct){
+    t1: (_|_){
+      // [incomplete] embeddingExpr.t1: cannot add field #a: was already used:
+      //     ./a.cue:13:2
+      #a: (_){ _ }
+    }
+  }
+  unifiedDirect: (struct){
+    t1: (string){
+      "s"
+      #a: (string){ "s" }
+    }
+  }
+  unifiedExpr: (struct){
+    t1: (string){
+      "s"
+      #a: (string){ "s" }
+    }
+  }
+  cross: (struct){
+    t1: (_|_){
+      // [incomplete] cross.t1: cannot add field a: was already used:
+      //     ./a.cue:52:13
+      // cross.t1: cannot add field a: was already used:
+      //     ./a.cue:56:3
+      a: (struct){
+        b: (struct){
+          v: (int){ 1 }
+          a: (struct){
+            w: (int){ 2 }
+          }
+        }
+      }
+      b: (struct){
+        a: (struct){
+          x: (int){ 2 }
+          b: (struct){
+            y: (int){ 5 }
+          }
+          w: (int){ 2 }
+        }
+        v: (int){ 1 }
+      }
+      v: (int){ 1 }
+    }
+  }
+  recursive: (struct){
+    t1: (struct){
+      e: (struct){
+        f: (int){ 1 }
+      }
+      c: (struct){
+        d: (struct){
+          e: (struct){
+            f: (int){ 1 }
+          }
+          c: (struct){
+            d: (struct){
+              e: (struct){
+                g: (int){ 1 }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  embeddedFunctionalExpr: (_|_){
+    // [incomplete] embeddedFunctionalExpr: cannot add field #in: was already used:
+    //     ./issue2169.cue:6:3
+    // embeddedFunctionalExpr: non-concrete value _ in operand to +:
+    //     ./issue2169.cue:8:3
+    //     ./issue2169.cue:8:4
+    #fn: (_|_){
+      // [incomplete] embeddedFunctionalExpr.#fn: cannot add field #in: was already used:
+      //     ./issue2169.cue:6:3
+      // embeddedFunctionalExpr.#fn: non-concrete value _ in operand to +:
+      //     ./issue2169.cue:8:3
+      //     ./issue2169.cue:8:4
+      #in: (_){ _ }
+    }
+    #in: (_){ _ }
+  }
+}
+-- out/compile --
+--- a.cue
+{
+  embeddingDirect: {
+    t1: ({
+      #a: _
+      _
+    } & {
+      #a: "s"
+      〈0;#a〉
+    })
+  }
+  embeddingExpr: {
+    t1: ({
+      #a: _
+      _
+    } & {
+      #a: "s"
+      [
+        〈1;#a〉,
+      ][0]
+    })
+  }
+  unifiedDirect: {
+    t1: {
+      #a: _
+      _
+    }
+    t1: {
+      〈0;#a〉
+      #a: _
+    }
+    t1: {
+      _
+      #a: "s"
+    }
+  }
+  unifiedExpr: {
+    t1: {
+      #a: _
+      _
+    }
+    t1: {
+      [
+        〈1;#a〉,
+      ][0]
+      #a: _
+    }
+    t1: {
+      #a: "s"
+      _
+    }
+  }
+  cross: {
+    t1: {
+      a: {
+        b: {
+          v: 1
+          a: {
+            w: 2
+          }
+        }
+      }
+      b: {
+        a: {
+          x: 2
+          b: {
+            y: 5
+          }
+        }
+      }
+      〈0;a〉
+      〈0;b〉
+    }
+  }
+}
+--- complex.cue
+{
+  recursive: {
+    t1: {
+      e: {}
+      c: {
+        d: {
+          e: {
+            f: 1
+          }
+        }
+      }
+      〈0;c〉.d
+      c: {
+        d: {
+          c: {
+            d: {
+              e: {
+                g: 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+--- issue2169.cue
+{
+  embeddedFunctionalExpr: {
+    #fn: ({
+      #in: _
+      _
+    } & {
+      #in: "str"
+      (({
+        #t: _
+        〈0;#t〉
+      } & {
+        #t: 〈1;#in〉
+        _
+      }) + "")
+    })
+    〈0;#fn〉
+  }
+}

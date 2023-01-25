@@ -70,15 +70,15 @@ patternCycle: t1: p3: {
 }
 
 -- out/eval/stats --
-Leaks:  2
-Freed:  88
-Reused: 81
-Allocs: 9
-Retain: 8
+Leaks:  4
+Freed:  80
+Reused: 73
+Allocs: 11
+Retain: 12
 
-Unifications: 69
-Conjuncts:    135
-Disjuncts:    96
+Unifications: 63
+Conjuncts:    129
+Disjuncts:    90
 -- out/eval --
 Errors:
 t1.c.z: field not allowed:
@@ -189,9 +189,12 @@ Result:
           // [eval] patternCycle.issue2109.p2.countries: cyclic pattern constraint:
           //     ./issue2109.cue:15:15
           //     ./issue2109.cue:17:13
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
+          0: (_|_){// "US"
+          }
+          1: (_|_){// "GB"
+          }
+          2: (_|_){// "AU"
+          }
         }
       }
       p3: (_|_){
@@ -202,9 +205,12 @@ Result:
           // [eval] patternCycle.issue2109.p3.countries: cyclic pattern constraint:
           //     ./issue2109.cue:21:15
           //     ./issue2109.cue:22:13
-          0: (string){ "US" }
-          1: (string){ "GB" }
-          2: (string){ "AU" }
+          0: (_|_){// "US"
+          }
+          1: (_|_){// "GB"
+          }
+          2: (_|_){// "AU"
+          }
         }
       }
     }

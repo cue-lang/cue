@@ -96,29 +96,27 @@ embeddedFunctionalExpr: {
 	#fn
 }
 -- out/eval/stats --
-Leaks:  13
-Freed:  55
-Reused: 51
+Leaks:  12
+Freed:  53
+Reused: 48
 Allocs: 17
-Retain: 36
+Retain: 23
 
-Unifications: 68
-Conjuncts:    225
-Disjuncts:    87
+Unifications: 65
+Conjuncts:    191
+Disjuncts:    74
 -- out/eval --
 (struct){
   embeddingDirect: (struct){
-    t1: (_|_){
-      // [incomplete] embeddingDirect.t1: cannot add field #a: was already used:
-      //     ./a.cue:5:2
-      #a: (_){ _ }
+    t1: (string){
+      "s"
+      #a: (string){ string }
     }
   }
   embeddingExpr: (struct){
-    t1: (_|_){
-      // [incomplete] embeddingExpr.t1: cannot add field #a: was already used:
-      //     ./a.cue:13:2
-      #a: (_){ _ }
+    t1: (string){
+      "s"
+      #a: (string){ string }
     }
   }
   unifiedDirect: (struct){
@@ -134,18 +132,17 @@ Disjuncts:    87
     }
   }
   cross: (struct){
-    t1: (_|_){
-      // [incomplete] cross.t1: cannot add field a: was already used:
-      //     ./a.cue:52:13
-      // cross.t1: cannot add field a: was already used:
-      //     ./a.cue:56:3
+    t1: (struct){
       a: (struct){
         b: (struct){
           v: (int){ 1 }
           a: (struct){
             w: (int){ 2 }
           }
+          y: (int){ 5 }
         }
+        x: (int){ 2 }
+        w: (int){ 2 }
       }
       b: (struct){
         a: (struct){
@@ -156,19 +153,25 @@ Disjuncts:    87
           w: (int){ 2 }
         }
         v: (int){ 1 }
+        y: (int){ 5 }
       }
+      x: (int){ 2 }
+      y: (int){ 5 }
       v: (int){ 1 }
+      w: (int){ 2 }
     }
   }
   recursive: (struct){
     t1: (struct){
       e: (struct){
         f: (int){ 1 }
+        g: (int){ 1 }
       }
       c: (struct){
         d: (struct){
           e: (struct){
             f: (int){ 1 }
+            g: (int){ 1 }
           }
           c: (struct){
             d: (struct){
@@ -181,21 +184,13 @@ Disjuncts:    87
       }
     }
   }
-  embeddedFunctionalExpr: (_|_){
-    // [incomplete] embeddedFunctionalExpr: cannot add field #in: was already used:
-    //     ./issue2169.cue:6:3
-    // embeddedFunctionalExpr: non-concrete value _ in operand to +:
-    //     ./issue2169.cue:8:3
-    //     ./issue2169.cue:8:4
-    #fn: (_|_){
-      // [incomplete] embeddedFunctionalExpr.#fn: cannot add field #in: was already used:
-      //     ./issue2169.cue:6:3
-      // embeddedFunctionalExpr.#fn: non-concrete value _ in operand to +:
-      //     ./issue2169.cue:8:3
-      //     ./issue2169.cue:8:4
-      #in: (_){ _ }
+  embeddedFunctionalExpr: (string){
+    "str"
+    #fn: (string){
+      "str"
+      #in: (string){ string }
     }
-    #in: (_){ _ }
+    #in: (string){ string }
   }
 }
 -- out/compile --

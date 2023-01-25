@@ -29,13 +29,13 @@ package foo
 -- out/eval/stats --
 Leaks:  0
 Freed:  25
-Reused: 18
-Allocs: 7
-Retain: 4
+Reused: 19
+Allocs: 6
+Retain: 1
 
 Unifications: 21
 Conjuncts:    69
-Disjuncts:    29
+Disjuncts:    26
 -- out/eval --
 (#struct){
   #theme: (#struct){

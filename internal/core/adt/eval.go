@@ -731,6 +731,10 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 		DebugSortArcs(n.ctx, n.node)
 	}
 
+	if n.node.hasAllConjuncts || n.node.Parent == nil {
+		n.node.setParentDone()
+	}
+
 	// At this point, if this arc is of type arcVoid, it means that the value
 	// may still be modified by child arcs. So in this case we must now process
 	// all arcs to be sure we get the correct result.
@@ -1482,12 +1486,18 @@ func (n *nodeContext) evalExpr(v Conjunct, state VertexStatus) {
 		// We complete the evaluation. Some optimizations will only work when an
 		// arc is already finalized. So this ensures that such optimizations get
 		// triggered more often.
+		//
+		// NOTE(let finalization): aside from being an optimization, this also
+		// ensures that let arcs that are not contained as fields of arcs, but
+		// rather are held in the cash, are finalized. This, in turn, is
+		// necessary to trigger the notification mechanism, where appropriate.
+		//
 		// A node should not Finalize itself as it may erase the state object
-		// which is still assumed to be present down the line (see Issue #2171).
-		if arc.status == Conjuncts && arc != n.node {
+		// which is still assumed to be present down the line
+		// (see https://cuelang.org/issues/2171).
+		if arc.status == Conjuncts && arc != n.node && arc.hasAllConjuncts {
 			arc.Finalize(ctx)
 		}
-
 		ci, skip := n.markCycle(arc, v.Env, x, v.CloseInfo)
 		if skip {
 			return
@@ -1618,6 +1628,10 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	// Don't add conjuncts if a node is referring to itself.
 	if n.node == arc {
 		return
+	}
+
+	if arc.state != nil {
+		arc.state.addNotify(n.node)
 	}
 
 	for _, c := range arc.Conjuncts {
@@ -1975,8 +1989,7 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 
 	switch {
 	case arc.state != nil:
-		arc.Conjuncts = append(arc.Conjuncts, x)
-		arc.state.addExprConjunct(x, Partial)
+		arc.state.addConjunctDynamic(x)
 
 	case arc.Status() == 0:
 		arc.addConjunctUnchecked(x)

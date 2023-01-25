@@ -161,8 +161,15 @@ type Vertex struct {
 	// Label is the feature leading to this vertex.
 	Label Feature
 
+	// TODO: move the following status fields to nodeContext.
+
 	// status indicates the evaluation progress of this vertex.
 	status VertexStatus
+
+	// hasAllConjuncts indicates that the set of conjuncts is complete.
+	// This is the case if the conjuncts of all its ancestors have been
+	// processed.
+	hasAllConjuncts bool
 
 	// isData indicates that this Vertex is to be interepreted as data: pattern
 	// and additional constraints, as well as optional fields, should be
@@ -350,6 +357,27 @@ func (v *Vertex) UpdateStatus(s VertexStatus) {
 		// panic("not finalized")
 	}
 	v.status = s
+}
+
+// setParentDone signals v that the conjuncts of all ancestors have been
+// processed.
+// If all conjuncts of this node have been set, all arcs will be notified
+// of this parent being done.
+//
+// Note: once a note has started evaluation (state != nil), insertField will
+// cause all conjuncts to be immediately processed. This means that if all
+// ancestors of this node processed their conjuncts, and if this node has
+// processed all its conjuncts as well, all nodes that it embedded will have
+// received all their conjuncts as well, after which this node will have been
+// notified of these conjuncts.
+func (v *Vertex) setParentDone() {
+	v.hasAllConjuncts = true
+	// Could set "Conjuncts" flag of arc at this point.
+	if n := v.state; n != nil && len(n.conjuncts) == 0 {
+		for _, a := range v.Arcs {
+			a.setParentDone()
+		}
+	}
 }
 
 // Value returns the Value of v without definitions if it is a scalar
@@ -784,6 +812,26 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
 	if n := v.state; n != nil {
 		n.conjuncts = append(n.conjuncts, c)
+		// TODO: can we remove notifyConjunct here? This method is only
+		// used if either Unprocessed is 0, in which case there will be no
+		// notification recipients, or for "pushed down" comprehensions,
+		// which should also have been added at an earlier point.
+		n.notifyConjunct(c)
+	}
+}
+
+func (n *nodeContext) addConjunctDynamic(c Conjunct) {
+	n.node.Conjuncts = append(n.node.Conjuncts, c)
+	n.addExprConjunct(c, Partial)
+	n.notifyConjunct(c)
+
+}
+
+func (n *nodeContext) notifyConjunct(c Conjunct) {
+	for _, arc := range n.notify {
+		if !arc.hasConjunct(c) {
+			arc.state.addConjunctDynamic(c)
+		}
 	}
 }
 

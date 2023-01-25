@@ -169,15 +169,15 @@ C:
   }
 }
 -- out/eval/stats --
-Leaks:  2
-Freed:  47
-Reused: 29
-Allocs: 20
+Leaks:  20
+Freed:  29
+Reused: 25
+Allocs: 24
 Retain: 20
 
 Unifications: 49
-Conjuncts:    60
-Disjuncts:    55
+Conjuncts:    48
+Disjuncts:    37
 -- out/eval --
 (struct){
   a: (struct){

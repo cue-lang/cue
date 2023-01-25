@@ -1,0 +1,136 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b94395bb_fd1e6b9a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:38:41Z",
+      "side": 1,
+      "message": "I\u0027m failing to parse this sentence.\n\nMaybe: s/such the/such a/\n\nor s/such the/the/",
+      "range": {
+        "startLine": 17,
+        "startChar": 32,
+        "endLine": 19,
+        "endChar": 6
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b61e34e_89c41e8b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:38:41Z",
+      "side": 1,
+      "message": "nit: proactively",
+      "range": {
+        "startLine": 20,
+        "startChar": 40,
+        "endLine": 20,
+        "endChar": 52
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d9c7234_961e046d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:38:41Z",
+      "side": 1,
+      "message": "\"it will proactively evaluate it\" is a bit confusing, as you reference two different \"it\"s. how about:\n\nwe will proactively evaluate the conjunct and add it...",
+      "range": {
+        "startLine": 21,
+        "startChar": 10,
+        "endLine": 21,
+        "endChar": 12
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c94bfcf_cf0b3eb1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:38:41Z",
+      "side": 1,
+      "message": "added?",
+      "range": {
+        "startLine": 27,
+        "startChar": 0,
+        "endLine": 27,
+        "endChar": 2
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2685b104_5dfa0c19",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:38:41Z",
+      "side": 1,
+      "message": "also struggling with this one :)",
+      "range": {
+        "startLine": 28,
+        "startChar": 29,
+        "endLine": 29,
+        "endChar": 49
+      },
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4030a25f_eff8b4ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-25T15:38:41Z",
+      "side": 1,
+      "message": "First review of the commit message before I look at the code.",
+      "revId": "816f1fc7285b4bf4603c7dce65e9c10f4214afd8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

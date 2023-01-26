@@ -52,7 +52,7 @@ const (
 )
 
 // importPkg returns details about the CUE package named by the import path,
-// interpreting local import paths relative to the srcDir directory.
+// interpreting local import paths relative to l.cfg.Dir.
 // If the path is a local import path naming a package that can be imported
 // using a standard import path, the returned package will set p.ImportPath
 // to that path.
@@ -111,10 +111,6 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	if p.PkgName != "" {
 		// If we have an explicit package name, we can ignore other packages.
 		fp.ignoreOther = true
-	}
-
-	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
-		panic("")
 	}
 
 	var dirs [][2]string

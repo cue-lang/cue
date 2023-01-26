@@ -19,7 +19,7 @@ $ cue version
 
 </pre>
 
-### Does this issue reproduce with the latest release?
+### Does this issue reproduce with the latest stable release?
 
 
 

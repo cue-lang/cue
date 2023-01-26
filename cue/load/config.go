@@ -22,14 +22,13 @@ import (
 	"path/filepath"
 	"strings"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/compile"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -562,21 +561,21 @@ func (c *Config) completeModule() error {
 	if err != nil {
 		return errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 	}
+	// TODO disallow non-data-mode CUE.
 
-	r := runtime.New()
-	v, err := compile.Files(nil, r, "_", file)
-	if err != nil {
+	ctx := (*cue.Context)(runtime.New())
+	v := ctx.BuildFile(file)
+	if err := v.Validate(); err != nil {
 		return errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 	}
-	ctx := eval.NewContext(r, v)
-	v.Finalize(ctx)
-	prefix := v.Lookup(ctx.StringLabel("module"))
-	if prefix == nil {
+	prefix := v.LookupPath(cue.MakePath(cue.Str("module")))
+	if prefix.Err() != nil {
+		// TODO check better for not-found?
 		return nil
 	}
-	name := ctx.StringValue(prefix.Value())
-	if err := ctx.Err(); err != nil {
-		return err.Err
+	name, err := prefix.String()
+	if err != nil {
+		return err
 	}
 	if c.Module == "" {
 		c.Module = name
@@ -585,11 +584,7 @@ func (c *Config) completeModule() error {
 	if c.Module == name {
 		return nil
 	}
-	pos := token.NoPos
-	if src := prefix.Value().Source(); src != nil {
-		pos = src.Pos()
-	}
-	return errors.Newf(pos, "inconsistent modules: got %q, want %q", name, c.Module)
+	return errors.Newf(prefix.Pos(), "inconsistent modules: got %q, want %q", name, c.Module)
 }
 
 func (c Config) isRoot(dir string) bool {

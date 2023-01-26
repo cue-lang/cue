@@ -197,14 +197,13 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		// silently skipped as not matching the pattern.
 		// Do not take root, as we want to stay relative
 		// to one dir only.
-		dir, e := filepath.Rel(c.Dir, path)
+		relPath, e := filepath.Rel(c.Dir, path)
 		if e != nil {
-			panic(err)
-		} else {
-			dir = "./" + dir
+			panic(err) // Should never happend because c.Dir is absolute.
 		}
+		relPath = "./" + filepath.ToSlash(relPath)
 		// TODO: consider not doing these checks here.
-		inst := c.newRelInstance(token.NoPos, dir, pkgName)
+		inst := c.newRelInstance(token.NoPos, relPath, pkgName)
 		pkgs := l.importPkg(token.NoPos, inst)
 		for _, p := range pkgs {
 			if err := p.Err; err != nil && (p == nil || len(p.InvalidFiles) == 0) {

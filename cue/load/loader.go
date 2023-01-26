@@ -156,12 +156,6 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// ModInit() // TODO: support modules
 	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc())
 
-	_, err := filepath.Abs(cfg.Dir)
-	if err != nil {
-		return cfg.newErrInstance(pos, toImportPath(cfg.Dir),
-			errors.Wrapf(err, pos, "could not convert '%s' to absolute path", cfg.Dir))
-	}
-
 	for _, bf := range files {
 		f := bf.Filename
 		if f == "-" {

@@ -113,10 +113,6 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		fp.ignoreOther = true
 	}
 
-	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
-		panic("")
-	}
-
 	var dirs [][2]string
 	genDir := GenPath(cfg.ModuleRoot)
 	if strings.HasPrefix(p.Dir, genDir) {

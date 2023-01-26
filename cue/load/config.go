@@ -15,6 +15,7 @@
 package load
 
 import (
+	"fmt"
 	"io"
 	"os"
 	pathpkg "path"
@@ -35,7 +36,7 @@ import (
 const (
 	cueSuffix  = ".cue"
 	modDir     = "cue.mod"
-	configFile = "module.cue"
+	moduleFile = "module.cue"
 	pkgDir     = "pkg"
 )
 
@@ -303,7 +304,12 @@ func (c *Config) newInstance(pos token.Pos, p importPath) *build.Instance {
 	return i
 }
 
+// newRelInstance returns a build instance from the given relative
+// directory or relative import path.
 func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Instance {
+	if !isLocalImport(path) {
+		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
+	}
 	fs := c.fileSystem
 
 	var err errors.Error
@@ -316,17 +322,9 @@ func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	p.Root = c.ModuleRoot
 	p.Module = c.Module
 
-	if isLocalImport(path) {
-		if c.Dir == "" {
-			err = errors.Append(err, errors.Newf(pos, "cwd unknown"))
-		}
-		dir = filepath.Join(c.Dir, filepath.FromSlash(path))
-	}
+	dir = filepath.Join(c.Dir, filepath.FromSlash(path))
 
-	if path == "" {
-		err = errors.Append(err, errors.Newf(pos,
-			"import %q: invalid import path", path))
-	} else if path != cleanImport(path) {
+	if path != cleanImport(path) {
 		err = errors.Append(err, c.loader.errPkgf(nil,
 			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
 	}
@@ -480,7 +478,8 @@ func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 
 // Complete updates the configuration information. After calling complete,
 // the following invariants hold:
-//   - c.ModuleRoot != ""
+//   - c.Dir is an absolute path.
+//   - c.ModuleRoot is an absolute path
 //   - c.Module is set to the module import prefix if there is a cue.mod file
 //     with the module property.
 //   - c.loader != nil
@@ -517,60 +516,16 @@ func (c Config) complete() (cfg *Config, err error) {
 		if root := c.findRoot(c.Dir); root != "" {
 			c.ModuleRoot = root
 		}
+	} else if !filepath.IsAbs(c.ModuleRoot) {
+		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
 	}
-
+	if err := c.completeModule(); err != nil {
+		return nil, err
+	}
 	c.loader = &loader{
 		cfg:       &c,
 		buildTags: make(map[string]bool),
 	}
-
-	// TODO: also make this work if run from outside the module?
-	switch {
-	case true:
-		mod := filepath.Join(c.ModuleRoot, modDir)
-		info, cerr := c.fileSystem.stat(mod)
-		if cerr != nil {
-			break
-		}
-		if info.IsDir() {
-			mod = filepath.Join(mod, configFile)
-		}
-		f, cerr := c.fileSystem.openFile(mod)
-		if cerr != nil {
-			break
-		}
-
-		// TODO: move to full build again
-		file, err := parser.ParseFile("load", f)
-		if err != nil {
-			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
-		}
-
-		r := runtime.New()
-		v, err := compile.Files(nil, r, "_", file)
-		if err != nil {
-			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
-		}
-		ctx := eval.NewContext(r, v)
-		v.Finalize(ctx)
-		prefix := v.Lookup(ctx.StringLabel("module"))
-		if prefix != nil {
-			name := ctx.StringValue(prefix.Value())
-			if err := ctx.Err(); err != nil {
-				return &c, err.Err
-			}
-			pos := token.NoPos
-			src := prefix.Value().Source()
-			if src != nil {
-				pos = src.Pos()
-			}
-			if c.Module != "" && c.Module != name {
-				return &c, errors.Newf(pos, "inconsistent modules: got %q, want %q", name, c.Module)
-			}
-			c.Module = name
-		}
-	}
-
 	c.loadFunc = c.loader.loadFunc()
 
 	if c.Context == nil {
@@ -579,8 +534,62 @@ func (c Config) complete() (cfg *Config, err error) {
 			build.ParseFile(c.loader.cfg.ParseFile),
 		)
 	}
-
 	return &c, nil
+}
+
+// completeModule fills out c.Module if it's empty or checks it for
+// consistency with the module file otherwise.
+func (c *Config) completeModule() error {
+	// TODO: also make this work if run from outside the module?
+	mod := filepath.Join(c.ModuleRoot, modDir)
+	info, cerr := c.fileSystem.stat(mod)
+	if cerr != nil {
+		return nil
+	}
+	// TODO remove support for legacy non-directory module.cue file
+	// by returning an error if info.IsDir is false.
+	if info.IsDir() {
+		mod = filepath.Join(mod, moduleFile)
+	}
+	f, cerr := c.fileSystem.openFile(mod)
+	if cerr != nil {
+		return nil
+	}
+	defer f.Close()
+
+	// TODO: move to full build again
+	file, err := parser.ParseFile("load", f)
+	if err != nil {
+		return errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
+	}
+
+	r := runtime.New()
+	v, err := compile.Files(nil, r, "_", file)
+	if err != nil {
+		return errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
+	}
+	ctx := eval.NewContext(r, v)
+	v.Finalize(ctx)
+	prefix := v.Lookup(ctx.StringLabel("module"))
+	if prefix == nil {
+		return nil
+	}
+	name := ctx.StringValue(prefix.Value())
+	if err := ctx.Err(); err != nil {
+		return err.Err
+	}
+	if c.Module == "" {
+		c.Module = name
+		return nil
+	}
+	if c.Module == name {
+		return nil
+	}
+	pos := token.NoPos
+	if src := prefix.Value().Source(); src != nil {
+		pos = src.Pos()
+	}
+	return errors.Newf(pos, "inconsistent modules: got %q, want %q", name, c.Module)
 }
 
 func (c Config) isRoot(dir string) bool {
@@ -590,14 +599,11 @@ func (c Config) isRoot(dir string) bool {
 	return err == nil
 }
 
-// findRoot returns the module root or "" if none was found.
-func (c Config) findRoot(dir string) string {
+// findRoot returns the module root that's ancestor
+// of the given absolute directory path, or "" if none was found.
+func (c Config) findRoot(absDir string) string {
 	fs := &c.fileSystem
 
-	absDir, err := filepath.Abs(dir)
-	if err != nil {
-		return ""
-	}
 	abs := absDir
 	for {
 		if c.isRoot(abs) {

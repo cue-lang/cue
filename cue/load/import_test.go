@@ -34,8 +34,11 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 }
 
 func TestEmptyImport(t *testing.T) {
-	p, err := getInst("", "")
-	if err == nil {
+	c, _ := (&Config{}).complete()
+	l := loader{cfg: c}
+	inst := c.newInstance(token.NoPos, "")
+	p := l.importPkg(token.NoPos, inst)[0]
+	if p.Err == nil {
 		t.Fatal(`Import("") returned nil error.`)
 	}
 	if p == nil {

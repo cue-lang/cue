@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c0e7e253_51cb3648",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-26T09:05:27Z",
+      "side": 1,
+      "message": "FYI Rog, your review is of PS2, and some of the comments (like those for the commit message) are now fixed.",
+      "revId": "fc58e6dd885248ad8d1839032d0252384f502719",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

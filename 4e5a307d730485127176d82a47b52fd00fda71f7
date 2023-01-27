@@ -33,6 +33,24 @@
       "message": "Generally okay with it, but I wonder if some of the removals require a TODO instead. \n\nI anything I prefer a more piecemeal approach on parts of code where it is desired. This is a bit big to consider at once and it doesn\u0027t seem to be high priority.",
       "revId": "4e5a307d730485127176d82a47b52fd00fda71f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d46c1df_e7fbc260",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-01-27T11:44:05Z",
+      "side": 1,
+      "message": "\u003e Generally okay with it, but I wonder if some of the removals require a TODO instead. \n\nAny specific cases you\u0027re thinking of here?\n\n\u003e I anything I prefer a more piecemeal approach on parts of code where it is desired. This is a bit big to consider at once and it doesn\u0027t seem to be high priority.\n\nFWIW my thought was that this is all mechanical as pointed out by staticcheck, and fairly clearly can\u0027t affect any public facing APIs, so even if it does affect disparate parts of the code, it would seem OK to do, and even though not strictly high priority, it\u0027s very low risk and makes understanding and refactoring the code easier, which I think is a reasonably high priority.",
+      "parentUuid": "eb4733ab_2eb396bf",
+      "revId": "4e5a307d730485127176d82a47b52fd00fda71f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

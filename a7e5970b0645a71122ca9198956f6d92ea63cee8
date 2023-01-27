@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3988a415_764cf765",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-27T15:09:36Z",
+      "side": 1,
+      "message": "nit: note that your commit message goes over git\u0027s recommended column limit at times (72), and Gerrit shows that by wrapping your lines too.",
+      "revId": "a7e5970b0645a71122ca9198956f6d92ea63cee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

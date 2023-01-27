@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "be328bfd_74724de1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-27T15:12:56Z",
+      "side": 1,
+      "message": "I\u0027m slightly confused by this CL: it\u0027s not just starting to use a module.cue schema, it\u0027s also adding new fields like replacements and dependencies. It seems to me like we should first make the refactor without adding the new fields, which should largely cause no functional changes, and then add the extra fields as a new CL.",
+      "revId": "55fa15a3609cee1a6aef7380b4c15f51055a400e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

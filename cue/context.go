@@ -245,7 +245,10 @@ func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 // }
 
 func (c *Context) make(v *adt.Vertex) Value {
-	return newValueRoot(c.runtime(), newContext(c.runtime()), v)
+	opCtx := newContext(c.runtime())
+	x := newValueRoot(c.runtime(), opCtx, v)
+	adt.AddStats(opCtx)
+	return x
 }
 
 // An EncodeOption defines options for the various encoding-related methods of

@@ -1,0 +1,64 @@
+env CUE_STATS_FILE=stats.json
+exec cue eval x.cue
+cmp stats.json out/stats.json
+
+# overwrite existing files.
+env CUE_STATS_FILE=overwrite_stats.json
+exec cue eval x.cue
+cmp overwrite_stats.json out/stats.json
+
+env CUE_STATS_FILE=stats.cue
+exec cue eval x.cue
+cmp stats.cue out/stats.cue
+
+env CUE_STATS_FILE=stats.yaml
+exec cue eval x.cue
+cmp stats.yaml out/stats.yaml
+
+# default output is JSON.
+env CUE_STATS_FILE=-
+exec cue eval x.cue
+cmp stderr out/stderr
+
+-- x.cue --
+a: 1
+b: 2
+c: a | b
+-- overwrite_stats.json --
+contents overwritten
+-- out/stats.json --
+{
+    "Unifications": 4,
+    "Disjuncts": 6,
+    "Conjuncts": 8,
+    "Freed": 6,
+    "Reused": 2,
+    "Allocs": 4,
+    "Retained": 0
+}
+-- out/stats.cue --
+Unifications: 4
+Disjuncts:    6
+Conjuncts:    8
+Freed:        6
+Reused:       2
+Allocs:       4
+Retained:     0
+-- out/stats.yaml --
+Unifications: 4
+Disjuncts: 6
+Conjuncts: 8
+Freed: 6
+Reused: 2
+Allocs: 4
+Retained: 0
+-- out/stderr --
+{
+    "Unifications": 4,
+    "Disjuncts": 6,
+    "Conjuncts": 8,
+    "Freed": 6,
+    "Reused": 2,
+    "Allocs": 4,
+    "Retained": 0
+}

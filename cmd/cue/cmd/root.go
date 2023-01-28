@@ -26,6 +26,9 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/filetypes"
 )
 
 // TODO: commands
@@ -42,12 +45,38 @@ import (
 
 type runFunction func(cmd *Command, args []string) error
 
+func statsEncoder(cmd *Command) *encoding.Encoder {
+	file := os.Getenv("CUE_STATS_FILE")
+	if file == "" {
+		return nil
+	}
+
+	stats, err := filetypes.ParseFile(file, filetypes.Export)
+	exitOnErr(cmd, err, true)
+
+	statsEnc, err := encoding.NewEncoder(stats, &encoding.Config{
+		Stdout: cmd.OutOrStderr(),
+		Force:  true,
+	})
+	exitOnErr(cmd, err, true)
+
+	return statsEnc
+}
+
 func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c.Command = cmd
+
+		statsEnc := statsEncoder(c)
+
 		err := f(c, args)
 		if err != nil {
 			exitOnErr(c, err, true)
+		}
+
+		if statsEnc != nil {
+			statsEnc.Encode(c.ctx.Encode(adt.TotalStats()))
+			statsEnc.Close()
 		}
 		return err
 	}

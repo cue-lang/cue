@@ -711,6 +711,9 @@ func (n *nodeContext) checkClosed(state VertexStatus) bool {
 	ignore := state != Finalized || n.skipNonMonotonicChecks()
 
 	v := n.node
+	if v.Parent != nil && v.Parent.state != nil && v.Parent.state.disjCheckSafe {
+		ignore = false
+	}
 	if !v.Label.IsInt() && v.Parent != nil && !ignore && v.isDefined() {
 		ctx := n.ctx
 		// Visit arcs recursively to validate and compute error.
@@ -984,6 +987,17 @@ type nodeContext struct {
 
 	// Disjunction handling
 	disjunctions []envDisjunct
+
+	// disjCheckSafe indicates whether it is safe to filter disjunctions, even
+	// if not all conjuncts are added. This is the case if a conjunct is
+	// encountered that is already complete and closed.
+	//
+	// TODO(disjunctions): this mechanism is not entirely accurate, but is
+	// a temporarily measure to circumvent an overzealous block on
+	// disjunctions, as well as some bugs in the disjunction algorithm.
+	// All this can be addressed much more easily once optional fields are
+	// included as regular arcs.
+	disjCheckSafe bool
 
 	// usedDefault indicates the for each of possibly multiple parent
 	// disjunctions whether it is unified with a default disjunct or not.
@@ -1500,6 +1514,11 @@ func (n *nodeContext) evalExpr(v Conjunct, state VertexStatus) {
 		if arc.status == Conjuncts && arc != n.node && arc.hasAllConjuncts {
 			arc.Finalize(ctx)
 		}
+
+		if arc.Closed {
+			n.disjCheckSafe = true
+		}
+
 		ci, skip := n.markCycle(arc, v.Env, x, v.CloseInfo)
 		if skip {
 			return

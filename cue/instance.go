@@ -210,6 +210,8 @@ func (inst *hiddenInstance) Doc() []*ast.CommentGroup {
 func (inst *Instance) Value() Value {
 	ctx := newContext(inst.index)
 	inst.root.Finalize(ctx)
+	// TODO: consider including these statistics as well.
+	// adt.AddStats(ctx)
 	return newVertexRoot(inst.index, ctx, inst.root)
 }
 

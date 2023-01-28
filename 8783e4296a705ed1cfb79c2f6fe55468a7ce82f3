@@ -47,6 +47,54 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e732820b_3d64e2a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-28T19:54:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "243e09ed_424d30da",
+      "range": {
+        "startLine": 24,
+        "startChar": 41,
+        "endLine": 24,
+        "endChar": 50
+      },
+      "revId": "8783e4296a705ed1cfb79c2f6fe55468a7ce82f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f41dc476_4c66d3f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-28T19:54:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e98c69e3_34f5ff16",
+      "range": {
+        "startLine": 23,
+        "startChar": 18,
+        "endLine": 24,
+        "endChar": 35
+      },
+      "revId": "8783e4296a705ed1cfb79c2f6fe55468a7ce82f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b2e90635_5c1c145a",
@@ -60,6 +108,24 @@
       "writtenOn": "2023-01-28T12:22:39Z",
       "side": 1,
       "message": "I don\u0027t get this bit of code. if it\u0027s already true, setting to true will do nothing.\n\nIs this a no-op that can be deleted, or did you mean to propagate disjCheckSafe to a different node context?",
+      "revId": "8783e4296a705ed1cfb79c2f6fe55468a7ce82f3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b34d978e_f6a3ec7f",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-28T19:54:40Z",
+      "side": 1,
+      "message": "Good catch. It was went to propagate it down. But that is not necessary as Closed already is. (In fact, it is not correct as closedness from the close builtin doesn\u0027t propagate.)\n\nRemoved",
+      "parentUuid": "b2e90635_5c1c145a",
       "revId": "8783e4296a705ed1cfb79c2f6fe55468a7ce82f3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

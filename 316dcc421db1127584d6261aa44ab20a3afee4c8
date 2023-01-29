@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31bf66d6_668d5de0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-29T18:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fc9f7f0f_27379306",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9875a03e_3b1af63d",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-01-29T17:05:19Z",
       "side": 1,
       "message": "nit: this test would also pass if the output file was left untouched. perhaps include a \"prev_stats.json\" in the txtar with some dummy data, and see that the command overwrites it.",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36d72aed_96395536",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-29T18:57:43Z",
+      "side": 1,
+      "message": "Good point. Fixed. Also verified the test fails if I remove the \"Force\" option.",
+      "parentUuid": "9875a03e_3b1af63d",
       "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8de0561d_87d2cc86",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-29T18:57:43Z",
+      "side": 1,
+      "message": "removed todo",
+      "parentUuid": "b285b27e_f6dd21b4",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cbb9754d_a5d55e68",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-01-29T17:05:19Z",
       "side": 1,
       "message": "document why we\u0027re not doing it now?",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5db5a8ad_aeae37e2",
+        "filename": "cue/instance.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-29T18:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cbb9754d_a5d55e68",
       "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cba92b13_56fdecb2",
+        "filename": "internal/core/adt/prof.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-29T18:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "22666126_9b4b361e",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e418dbd_02afd7ef",
@@ -103,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69048c51_0e03fa0f",
+        "filename": "internal/core/adt/prof.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-29T18:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e418dbd_02afd7ef",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b5df0253_93b272a6",
@@ -116,6 +224,24 @@
       "writtenOn": "2023-01-29T17:05:19Z",
       "side": 1,
       "message": "it\u0027s a bit subtle that a shallow copy is enough here; at first I was sure that this func was potentially racy if there was any pointer-like data :) perhaps briefly mention that.",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bfb162b_4abf09f7",
+        "filename": "internal/core/adt/prof.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-29T18:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b5df0253_93b272a6",
       "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

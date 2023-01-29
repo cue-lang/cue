@@ -1,0 +1,39 @@
+# cuelang.org/issues/345
+
+stdin foo.json
+exec cue vet x.cue json: -
+
+exec cue export foo.json x.cue
+cmp stdout out/x.json
+-- foo.json --
+{
+    "ports": [
+        2,
+        5,
+        7,
+        2,
+        76,
+        98,
+        3
+    ],
+    "newPort": 99
+}
+-- x.cue --
+import "list"
+
+ports: [... int]
+newPort: list.Max(ports) + 1
+
+-- out/x.json --
+{
+    "ports": [
+        2,
+        5,
+        7,
+        2,
+        76,
+        98,
+        3
+    ],
+    "newPort": 99
+}

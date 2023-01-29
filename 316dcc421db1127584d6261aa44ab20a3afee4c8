@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc9f7f0f_27379306",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-29T17:05:19Z",
+      "side": 1,
+      "message": "clarify that it\u0027s _evaluator_ stats?",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9875a03e_3b1af63d",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-29T17:05:19Z",
+      "side": 1,
+      "message": "nit: this test would also pass if the output file was left untouched. perhaps include a \"prev_stats.json\" in the txtar with some dummy data, and see that the command overwrites it.",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b285b27e_f6dd21b4",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-29T17:05:19Z",
+      "side": 1,
+      "message": "I personally think JSON is fine.",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbb9754d_a5d55e68",
+        "filename": "cue/instance.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-29T17:05:19Z",
+      "side": 1,
+      "message": "document why we\u0027re not doing it now?",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22666126_9b4b361e",
+        "filename": "internal/core/adt/prof.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-29T17:05:19Z",
+      "side": 1,
+      "message": "nit: I think the general rule would be to call the mutex `countsMu`; then it\u0027s apparent from the name that it protects `counts`.",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e418dbd_02afd7ef",
+        "filename": "internal/core/adt/prof.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-29T17:05:19Z",
+      "side": 1,
+      "message": "nit: slightly confusing that AddStats doesn\u0027t include the word \"Global\" whereas this one does.\n\nHow about AddStats and TotalStats? That\u0027s more intuitive to me; I add towards a total, which I can retrieve at a later time.",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5df0253_93b272a6",
+        "filename": "internal/core/adt/prof.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-29T17:05:19Z",
+      "side": 1,
+      "message": "it\u0027s a bit subtle that a shallow copy is enough here; at first I was sure that this func was potentially racy if there was any pointer-like data :) perhaps briefly mention that.",
+      "revId": "316dcc421db1127584d6261aa44ab20a3afee4c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -293,7 +293,7 @@ var pkg = &internal.Package{
 		T:    number | string
 		x:    T
 		y:    T
-		less: true && x < y
+		less: x < y
 	}
 	Descending: {
 		Comparer

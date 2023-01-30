@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ebec4e0a_69e7a32f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-30T08:26:26Z",
+      "side": 1,
+      "message": "I wonder if we can add this benchmark without having six thousand lines of generated output code. Not hugely important, as I assume that those lines won\u0027t change often, but it\u0027s still a bit of noise.",
+      "revId": "027f9b4459d389a6068ca5862a38d6fce6ae503c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "00f66117_848dea28",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-30T09:54:53Z",
+      "side": 1,
+      "message": "At this level of usage they are unlikely to change too much. But it is a concern indeed. But for cases where the benefit is too great, like here, it is worth using it. We should strive to minimize it indeed, but this issue has come up multiple times over time, and the gains are large, and potentially even larger with further optimizations.",
+      "parentUuid": "0eccf765_4e7ecf50",
+      "range": {
+        "startLine": 10,
+        "startChar": 25,
+        "endLine": 10,
+        "endChar": 34
+      },
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2821d199_404afd46",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-01-30T08:28:56Z",
       "side": 1,
       "message": "FYI, for the future: https://pkg.go.dev/golang.org/x/perf/cmd/benchstat",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "688e35b8_c9af56d3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-30T09:54:53Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2821d199_404afd46",
       "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +113,24 @@
       "writtenOn": "2023-01-30T08:28:56Z",
       "side": 1,
       "message": "do we want a change in behavior for the errors?",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41bbda2a_8ff0b953",
+        "filename": "pkg/list/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-01-30T09:54:53Z",
+      "side": 1,
+      "message": "I think it is fine. The only thing that could improve is that instead of using \"list\", we use the actual file name in the package.\n\nBut line reporting is a bit brittle, which should be fixed in future CLs. For now this means that some positions will appear and reappear.\n\nNote that it is not always easy to determine what the right set of positions is anyway. We need to come up with some principled approach about this.",
+      "parentUuid": "2f652d64_e131d4bf",
       "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

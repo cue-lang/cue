@@ -1,0 +1,38 @@
+# https://cuelang.org/issues/1926
+
+exec cue export foo.cue dev.json
+exec cue vet    foo.cue dev.json
+
+exec cue export foo.cue prd.json
+exec cue vet    foo.cue prd.json
+
+-- foo.cue --
+package foo
+
+_env: =~"(prd)-"
+
+#Foo
+
+#Foo: {
+	env: "dev" | _env
+	baz: bool | *false
+
+	if env == "dev" {
+		_defaults.dev
+	}
+}
+
+_defaults: {
+	"dev": {
+		baz: true
+	}
+}
+
+-- prd.json --
+{
+	"env": "prd-foo"
+}
+-- dev.json --
+{
+	"env": "dev"
+}

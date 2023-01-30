@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0eccf765_4e7ecf50",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-30T08:28:56Z",
+      "side": 1,
+      "message": "How likely is this low-level API to change over time? If upcoming evaluator refactors are likely to change it, I imagine we want to keep direct uses in CUE\u0027s std to a minimum.",
+      "range": {
+        "startLine": 10,
+        "startChar": 25,
+        "endLine": 10,
+        "endChar": 34
+      },
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2821d199_404afd46",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-30T08:28:56Z",
+      "side": 1,
+      "message": "FYI, for the future: https://pkg.go.dev/golang.org/x/perf/cmd/benchstat",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1dc694f6_d58c7edb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-30T08:28:56Z",
+      "side": 1,
+      "message": "Is t",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f652d64_e131d4bf",
+        "filename": "pkg/list/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-30T08:28:56Z",
+      "side": 1,
+      "message": "do we want a change in behavior for the errors?",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

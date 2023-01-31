@@ -442,7 +442,6 @@ func (p list) sanitize() list {
 	}
 	a := make(list, len(p))
 	copy(a, p)
-	a.Sort()
 	a.RemoveMultiples()
 	return a
 }

@@ -33,6 +33,24 @@
       "message": "Is this plan to follow-up this CL with another one that tests this workflow in a non-publish mode for every commit on master (as opposed to a release)?",
       "revId": "4c5ded2ee21663a4127f3a291486ddc222f9d9d6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffc4a6fd_812d6034",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-31T16:11:53Z",
+      "side": 1,
+      "message": "Yes, that\u0027s what I mentioned in the comment above :) I can do it the other way around if you prefer, though it would perhaps be weird to first merge the broken test. I guess I could do both at once.",
+      "parentUuid": "d492f109_a30f72e4",
+      "revId": "4c5ded2ee21663a4127f3a291486ddc222f9d9d6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

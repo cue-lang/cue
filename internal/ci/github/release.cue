@@ -34,7 +34,10 @@ release: _base.#bashWorkflow & {
 	// homebrew tags.
 	concurrency: "release"
 
-	on: push: tags: [core.#releaseTagPattern]
+	on: push: {
+		tags: [core.#releaseTagPattern]
+		branches: _#activeBranchPatterns
+	}
 	jobs: goreleaser: {
 		"runs-on": _#linuxMachine
 		steps: [
@@ -62,6 +65,10 @@ release: _base.#bashWorkflow & {
 				}
 			},
 			json.#step & {
+				name: "Install CUE"
+				run:  "go install ./cmd/cue"
+			},
+			json.#step & {
 				name: "Install GoReleaser"
 				uses: "goreleaser/goreleaser-action@v3"
 				with: {
@@ -70,7 +77,9 @@ release: _base.#bashWorkflow & {
 				}
 			},
 			json.#step & {
-				name: "Run GoReleaser"
+				// Note that the logic for what gets run at release time
+				// is defined with the release command in CUE.
+				name: "Run GoReleaser with CUE"
 				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
 				run:                 "cue cmd release"
 				"working-directory": "./internal/ci/goreleaser"

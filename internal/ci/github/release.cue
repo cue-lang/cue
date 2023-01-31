@@ -62,6 +62,10 @@ release: _base.#bashWorkflow & {
 				}
 			},
 			json.#step & {
+				name: "Install CUE"
+				run:  "go install cuelang.org/go/cmd/cue@v0.5.0-beta.2"
+			},
+			json.#step & {
 				name: "Install GoReleaser"
 				uses: "goreleaser/goreleaser-action@v3"
 				with: {
@@ -70,7 +74,7 @@ release: _base.#bashWorkflow & {
 				}
 			},
 			json.#step & {
-				name: "Run GoReleaser"
+				name: "Run GoReleaser with CUE"
 				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
 				run:                 "cue cmd release"
 				"working-directory": "./internal/ci/goreleaser"

@@ -33,7 +33,7 @@ trybot: _base.#bashWorkflow & {
 
 	on: {
 		push: {
-			branches: ["trybot/*/*", core.#defaultBranch, _base.#testDefaultBranch] // do not run PR branches
+			branches: ["trybot/*/*"] + _#activeBranches // do not run PR branches
 			"tags-ignore": [core.#releaseTagPattern]
 		}
 		pull_request: {}
@@ -60,18 +60,18 @@ trybot: _base.#bashWorkflow & {
 				_base.#earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
-					if: "\(#_isLatestLinux)"
+					if: "\(_#isLatestLinux)"
 				},
 				json.#step & {
-					if:  "\(_base.#isDefaultBranch)"
+					if:  "\(_#isActiveBranch)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,
 				_#goTest & {
-					if: "(\(_base.#isDefaultBranch)) || !( \(#_isLatestLinux) )"
+					if: "(\(_#isActiveBranch)) || !( \(_#isLatestLinux) )"
 				},
 				_#goTestRace & {
-					if: "\(#_isLatestLinux)"
+					if: "\(_#isLatestLinux)"
 				},
 				_#goCheck,
 				_base.#checkGitClean,
@@ -114,7 +114,7 @@ trybot: _base.#bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "(\(_base.#isDefaultBranch)) && (\(#_isLatestLinux))"
+		if: "(\(_#isActiveBranch)) && (\(_#isLatestLinux))"
 	}
 
 	_#goGenerate: json.#step & {
@@ -122,7 +122,7 @@ trybot: _base.#bashWorkflow & {
 		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
-		if: "\(#_isLatestLinux)"
+		if: "\(_#isLatestLinux)"
 	}
 
 	_#goTest: json.#step & {
@@ -137,7 +137,7 @@ trybot: _base.#bashWorkflow & {
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-		if:   "\(#_isLatestLinux)"
+		if:   "\(_#isLatestLinux)"
 		name: "Check"
 		run:  "go vet ./..."
 	}

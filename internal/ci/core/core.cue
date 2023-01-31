@@ -30,8 +30,9 @@ _#URLPath: {
 
 #goreleaserVersion: "v1.13.1"
 
-#defaultBranch:     "master"
-#releaseTagPattern: "v*"
+#defaultBranch:        "master"
+#releaseBranchPattern: "release-branch.*"
+#releaseTagPattern:    "v*"
 
 #codeReview: {
 	gerrit?:      string

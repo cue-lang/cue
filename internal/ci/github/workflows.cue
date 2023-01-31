@@ -55,16 +55,25 @@ workflows: [
 	},
 ]
 
-_#activeBranches: [core.#defaultBranch]
+_#activeBranches: [core.#defaultBranch, _base.#testDefaultBranch, core.#releaseBranchPattern]
+
+// #isActiveBranch is an expression that evaluates to true if the
+// job is running as a result of pushing to one of _#activeBranches.
+// For the sake of testing CI, pushes to #testDefaultBranch branch also match.
+// It would be nice to use the "contains" builtin for simplicity,
+// but array literals are not yet supported in expressions.
+_#isActiveBranch: strings.Join([ for branch in _#activeBranches {
+	"github.ref == 'refs/heads/\(branch)'"
+}], " || ")
 
 _#linuxMachine:   "ubuntu-20.04"
 _#macosMachine:   "macos-11"
 _#windowsMachine: "windows-2022"
 
-// #_isLatestLinux evaluates to true if the job is running on Linux with the
+// _#isLatestLinux evaluates to true if the job is running on Linux with the
 // latest version of Go. This expression is often used to run certain steps
 // just once per CI workflow, to avoid duplicated work.
-#_isLatestLinux: "matrix.go-version == '\(core.#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+_#isLatestLinux: "matrix.go-version == '\(core.#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
 
 _#testStrategy: {
 	"fail-fast": false

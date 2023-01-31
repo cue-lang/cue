@@ -55,16 +55,49 @@ workflows: [
 	},
 ]
 
-_#activeBranches: [core.#defaultBranch]
+// _#protectedBranchPatterns is a list of glob patterns to match the protected
+// git branches which are continuously used during development on Gerrit.
+// This includes the default branch and release branches,
+// but excludes any others like feature branches or short-lived branches.
+// Note that #testDefaultBranch is excluded as it is GitHub-only.
+_#protectedBranchPatterns: [core.#defaultBranch, core.#releaseBranchPattern]
+
+// _#matchPattern returns a GitHub Actions expression which evaluates whether a
+// variable matches a globbing pattern. For literal patterns it uses "==",
+// and for suffix patterns it uses "startsWith".
+// See https://docs.github.com/en/actions/learn-github-actions/expressions.
+_#matchPattern: {
+	variable: string
+	pattern: string
+	expr: [
+		if strings.HasSuffix(pattern, "*") {
+			let prefix = strings.TrimSuffix(pattern, "*")
+			"startsWith(\(variable), '\(prefix)')"
+		},
+		{
+			"\(variable) == '\(pattern)'"
+		},
+	][0]
+}
+
+// _#isProtectedBranch is an expression that evaluates to true if the
+// job is running as a result of pushing to one of _#protectedBranchPatterns.
+// It would be nice to use the "contains" builtin for simplicity,
+// but array literals are not yet supported in expressions.
+_#isProtectedBranch: "(" + strings.Join([ for branch in _#protectedBranchPatterns {
+	(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+}], " || ") + ")"
+
+_#isReleaseTag: (_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(core.#releaseTagPattern)"}).expr
 
 _#linuxMachine:   "ubuntu-20.04"
 _#macosMachine:   "macos-11"
 _#windowsMachine: "windows-2022"
 
-// #_isLatestLinux evaluates to true if the job is running on Linux with the
+// _#isLatestLinux evaluates to true if the job is running on Linux with the
 // latest version of Go. This expression is often used to run certain steps
 // just once per CI workflow, to avoid duplicated work.
-#_isLatestLinux: "matrix.go-version == '\(core.#latestStableGo)' && matrix.os == '\(_#linuxMachine)'"
+_#isLatestLinux: "(matrix.go-version == '\(core.#latestStableGo)' && matrix.os == '\(_#linuxMachine)')"
 
 _#testStrategy: {
 	"fail-fast": false

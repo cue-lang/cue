@@ -36,13 +36,6 @@ import (
 	"Code generated \(#generatedBy); DO NOT EDIT."
 }
 
-// #isDefaultBranch is an expression that evaluates to true if the
-// job is running as a result of pushing to the default branch, like master.
-// For the sake of testing CI, pushes to #testDefaultBranch branch also match.
-// It would be nice to use the "contains" builtin for simplicity,
-// but array literals are not yet supported in expressions.
-#isDefaultBranch: "github.ref == 'refs/heads/\(#defaultBranch)' || github.ref == 'refs/heads/\(#testDefaultBranch)'"
-
 #bashWorkflow: json.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"
 }

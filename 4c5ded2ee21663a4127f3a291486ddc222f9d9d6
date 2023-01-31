@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "110ec898_e93aca00",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-01-31T15:50:29Z",
+      "side": 1,
+      "message": "FYI Paul: the change to dry-run goreleaser on master will come as a follow-up CL.",
+      "revId": "4c5ded2ee21663a4127f3a291486ddc222f9d9d6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

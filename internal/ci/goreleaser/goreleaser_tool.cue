@@ -16,11 +16,12 @@ command: release: {
 
 	let _env = env
 
-	let _githubActions = env.GITHUB_ACTIONS | "" // "true" if running in CI
-	let _githubRef = path.Base(env.GITHUB_REF | "refs/tags/<not a github release>")
+	let _githubRef = env.GITHUB_REF | "refs/no_ref_kind/not_a_release" // filled when running in CI
+	let _githubRefKind = path.Base(path.Dir(_githubRef)) // "tags" for git tags, "heads" for git branches
+	let _githubRefName = path.Base(_githubRef)
 
-	// Only run the full release as part of GitHub actions
-	let snapshot = [ if _githubActions != "true" {"--snapshot"}, ""][0]
+	// Only run the full release when running on GitHub actions for a tag.
+	let snapshot = [ if _githubRefKind != "tags" {"--snapshot"}, ""][0]
 
 	tempDir: file.MkdirTemp & {
 		path: string
@@ -59,7 +60,8 @@ command: release: {
 		text: """
 			snapshot: \(snapshot)
 			latest CUE version: \(latestCUEVersion)
-			release version: \(_githubRef)
+			release kind: \(_githubRefKind)
+			release name: \(_githubRefName)
 			"""
 	}
 
@@ -68,7 +70,7 @@ command: release: {
 
 		// Set the goreleaser configuration to be stdin
 		stdin: yaml.Marshal(config & {
-			#latest: path.Base(_githubRef) == strings.TrimSpace(latestCUE.stdout)
+			#latest: _githubRefName == strings.TrimSpace(latestCUE.stdout)
 		})
 
 		// Run at the root of the module

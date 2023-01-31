@@ -5,6 +5,10 @@ name: Release
   push:
     tags:
       - v*
+    branches:
+      - ci/test
+      - master
+      - release-branch.*
 concurrency: release
 jobs:
   goreleaser:
@@ -31,17 +35,21 @@ jobs:
           registry: docker.io
           username: cueckoo
           password: ${{ secrets.CUECKOO_DOCKER_PAT }}
+      - name: Install CUE
+        run: go install ./cmd/cue
       - name: Install GoReleaser
         uses: goreleaser/goreleaser-action@v3
         with:
           install-only: true
           version: v1.13.1
-      - name: Run GoReleaser
+      - name: Run GoReleaser with CUE
         run: cue cmd release
         working-directory: ./internal/ci/goreleaser
         env:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
-      - name: Re-test cuelang.org
+      - if: (github.ref == 'refs/tags/v*')
+        name: Re-test cuelang.org
         run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
-      - name: Trigger unity build
+      - if: (github.ref == 'refs/tags/v*')
+        name: Trigger unity build
         run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Check against CUE ${GITHUB_REF##refs/tags/}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'

@@ -16,6 +16,23 @@
       "message": "FYI Paul: the change to dry-run goreleaser on master will come as a follow-up CL.",
       "revId": "4c5ded2ee21663a4127f3a291486ddc222f9d9d6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d492f109_a30f72e4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-01-31T16:07:35Z",
+      "side": 1,
+      "message": "Is this plan to follow-up this CL with another one that tests this workflow in a non-publish mode for every commit on master (as opposed to a release)?",
+      "revId": "4c5ded2ee21663a4127f3a291486ddc222f9d9d6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

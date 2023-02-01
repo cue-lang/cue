@@ -32,7 +32,7 @@ Leaks:  0
 Freed:  24
 Reused: 17
 Allocs: 7
-Retain: 1
+Retain: 2
 
 Unifications: 18
 Conjuncts:    34

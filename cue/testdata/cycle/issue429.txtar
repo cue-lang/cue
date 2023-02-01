@@ -53,10 +53,10 @@ Leaks:  0
 Freed:  96
 Reused: 89
 Allocs: 7
-Retain: 7
+Retain: 8
 
 Unifications: 40
-Conjuncts:    149
+Conjuncts:    150
 Disjuncts:    96
 -- out/eval --
 Errors:

@@ -14,11 +14,11 @@ Leaks:  0
 Freed:  6
 Reused: 1
 Allocs: 5
-Retain: 2
+Retain: 6
 
 Unifications: 6
 Conjuncts:    9
-Disjuncts:    8
+Disjuncts:    12
 -- out/eval --
 Errors:
 issue595.files: undefined field: nam:

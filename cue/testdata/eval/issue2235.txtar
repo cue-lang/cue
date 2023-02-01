@@ -101,24 +101,16 @@ for clusterName, cluster in clusters {
 clusters: foo: {}
 -- out/eval/stats --
 Leaks:  3
-Freed:  94
-Reused: 68
-Allocs: 29
-Retain: 67
+Freed:  101
+Reused: 76
+Allocs: 28
+Retain: 128
 
-Unifications: 97
-Conjuncts:    256
-Disjuncts:    157
+Unifications: 104
+Conjuncts:    273
+Disjuncts:    200
 -- out/eval --
-Errors:
-clusters.foo.globalIngressControllers.admin.objects.namespaced.ingress.Service: cannot add to field svc
-t1.x: cannot add to field params
-t2.m: cannot add to field X
-t3.foo: cannot add to field out
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   shorewallParams: (#struct){
     KUBERNETES_FOO_INGRESS_ADMIN: (#list){
       0: (string){ "127.0.0.1" }
@@ -180,10 +172,8 @@ Result:
       }
     }
   }
-  clusters: (_|_){
-    // [eval]
-    foo: (_|_){
-      // [eval]
+  clusters: (struct){
+    foo: (#struct){
       clusterName: (string){ "foo" }
       shorewallPrefix: (string){ "KUBERNETES_FOO" }
       objects: (#struct){
@@ -207,19 +197,13 @@ Result:
           }
         }
       }
-      globalIngressControllers: (_|_){
-        // [eval]
-        admin: (_|_){
-          // [eval]
+      globalIngressControllers: (#struct){
+        admin: (#struct){
           class: (string){ "admin" }
-          objects: (_|_){
-            // [eval]
-            namespaced: (_|_){
-              // [eval]
-              ingress: (_|_){
-                // [eval]
-                Service: (_|_){
-                  // [eval] clusters.foo.globalIngressControllers.admin.objects.namespaced.ingress.Service: cannot add to field svc
+          objects: (#struct){
+            namespaced: (#struct){
+              ingress: (#struct){
+                Service: (#struct){
                   "admin-nginx-ingress-controller": (#struct){
                     spec: (#struct){
                       externalIPs: (#list){
@@ -261,28 +245,30 @@ Result:
       }
     }
   }
-  t1: (_|_){
-    // [eval]
+  t1: (struct){
     params: (struct){
+      a: (struct){
+      }
     }
-    x: (_|_){
-      // [eval] t1.x: cannot add to field params
+    x: (struct){
       y: (struct){
         a: (struct){
         }
       }
     }
   }
-  t2: (_|_){
-    // [eval]
+  t2: (struct){
     out: (struct){
+      z: (struct){
+      }
     }
     let X#2 = (struct){
       y: (struct){
+        z: (struct){
+        }
       }
     }
-    m: (_|_){
-      // [eval] t2.m: cannot add to field X
+    m: (struct){
       x: (struct){
         y: (struct){
           z: (struct){
@@ -291,12 +277,10 @@ Result:
       }
     }
   }
-  t3: (_|_){
-    // [eval]
+  t3: (struct){
     out: (struct){
     }
-    foo: (_|_){
-      // [eval] t3.foo: cannot add to field out
+    foo: (struct){
       bar: (struct){
       }
     }

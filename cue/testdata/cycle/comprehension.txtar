@@ -308,11 +308,11 @@ Leaks:  48
 Freed:  1268
 Reused: 1256
 Allocs: 60
-Retain: 125
+Retain: 198
 
 Unifications: 828
-Conjuncts:    2521
-Disjuncts:    1377
+Conjuncts:    2522
+Disjuncts:    1443
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle

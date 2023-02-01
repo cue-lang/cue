@@ -82,11 +82,11 @@ Leaks:  2
 Freed:  50
 Reused: 47
 Allocs: 5
-Retain: 7
+Retain: 8
 
 Unifications: 52
 Conjuncts:    107
-Disjuncts:    55
+Disjuncts:    56
 -- out/eval --
 Errors:
 schema.next: structural cycle

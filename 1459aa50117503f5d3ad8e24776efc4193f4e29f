@@ -33,6 +33,40 @@
       "message": "Also, this passed ci/test; see the last two runs at https://github.com/cue-lang/cue/actions?query\u003dbranch%3Aci%2Ftest",
       "revId": "1459aa50117503f5d3ad8e24776efc4193f4e29f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2e76a07_e0f40907",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T20:12:22Z",
+      "side": 1,
+      "message": "Removing +2 until we fix the glob vs \u003d\u003d thing",
+      "revId": "1459aa50117503f5d3ad8e24776efc4193f4e29f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9c95928_0ba576b4",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 8
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T20:12:22Z",
+      "side": 1,
+      "message": "Per our offline chat, I\u0027m not sure this is correct. The comprehension is iterating over a list of glob patterns. That\u0027s not going to work with `\u003d\u003d`. So it might be we need to separate a list of branches, distinct from a list of glob patterns.",
+      "revId": "1459aa50117503f5d3ad8e24776efc4193f4e29f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

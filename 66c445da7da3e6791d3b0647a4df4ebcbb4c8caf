@@ -1,5 +1,57 @@
 {
-  "comments": [],
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe667d32_9a8068a3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:30:31Z",
+      "side": 1,
+      "message": "Thanks for adding the additional comment - I think it should be helpful, but I don\u0027t quite understand it :)",
+      "revId": "66c445da7da3e6791d3b0647a4df4ebcbb4c8caf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffb63141_45583191",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 856,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:30:31Z",
+      "side": 1,
+      "message": "\"Otherwise\" seems odd here, because AFAICS the else branch only seems to be taken when a.status \u003e\u003d state - i.e. when a\u0027s status _is_ of the required level already.",
+      "revId": "66c445da7da3e6791d3b0647a4df4ebcbb4c8caf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b131594_2bb2a3d5",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 858,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:30:31Z",
+      "side": 1,
+      "message": "\u003e The ensures that need to rely on hasAllConjuncts\n\nI can\u0027t parse this.",
+      "revId": "66c445da7da3e6791d3b0647a4df4ebcbb4c8caf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ],
   "submitRequirementResults": [
     {
       "submitRequirement": {

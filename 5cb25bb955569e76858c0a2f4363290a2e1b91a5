@@ -69,6 +69,24 @@
       "parentUuid": "42a1f933_e5147fad",
       "revId": "5cb25bb955569e76858c0a2f4363290a2e1b91a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b514fa8_928d13fe",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T10:28:56Z",
+      "side": 1,
+      "message": "\u003e  I don\u0027t expect that to happen, but I can add a second check for releaseTagPattern if this is what worries you.\n\nYes, that\u0027s the case I was thinking about. \n\nCurrently we do only run this for tags which match v*. We\u0027re expanding that, so I would think it safest to guard the mutative release actions to only the cases we previously allowed.",
+      "parentUuid": "71accd8d_6a53672b",
+      "revId": "5cb25bb955569e76858c0a2f4363290a2e1b91a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

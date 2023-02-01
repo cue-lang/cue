@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fa3ec5e_42d9c486",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T12:02:48Z",
+      "side": 1,
+      "message": "Any thoughts about backwards incompatibility?",
+      "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5598263a_246fbb65",
@@ -65,6 +82,24 @@
       "writtenOn": "2023-02-01T11:07:57Z",
       "side": 1,
       "message": "It would\u0027ve been kinda nice to have added these tests before the code changes so we can see the resulting difference.",
+      "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee76b3ab_4be07d34",
+        "filename": "pkg/encoding/json/testdata/gen.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T12:02:48Z",
+      "side": 1,
+      "message": "I\u0027ve started doing that, as per Rog\u0027s request, and I quite like it indeed.",
+      "parentUuid": "969aa43e_056da000",
       "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04dc2120_64b8b85f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c00734fb_36657215",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4b5d5e6_24990018",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-02-01T17:11:45Z",
       "side": 1,
       "message": "s/lays/lies/",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84dbf270_d9459016",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4b5d5e6_24990018",
       "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99a9f18a_eaa1a989",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1014,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de3b5e79_08d8a22e",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70a8ec05_256d662f",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-02-01T17:11:45Z",
       "side": 1,
       "message": "\"data\" isn\u0027t really defined anywhere AFAICS. I wonder whether it might be worth doing that.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d2e4a0f_015049a7",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1092,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "I\u0027ve removed this paragraph, actually, as it is not necessary.",
+      "parentUuid": "70a8ec05_256d662f",
       "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f911ea13_ed386cef",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1096,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dbbbff9c_1570ba65",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "675103da_e8eeccea",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-02-01T17:11:45Z",
       "side": 1,
       "message": "s/constraints/constraint/\n\nAnother possible phrasing:\n\nAn optional field constraint with a bottom value does _not_ invalidate\nthe struct that contains it, but precludes that field from becoming defined.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd94568f_f1e8128a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1097,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "changed it slightly still.",
+      "parentUuid": "675103da_e8eeccea",
       "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -122,6 +230,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b4b8a716_60b740fe",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "I removed the earlier paragraph.",
+      "parentUuid": "542d4ea7_7d74bbe9",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f03f51da_6f9df0b1",
         "filename": "doc/ref/spec.md",
         "patchSetId": 1
@@ -139,6 +265,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fccdd9a4_c8ce7f92",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1157,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "Note that these are commented out. Added TODO why these are here.",
+      "parentUuid": "f03f51da_6f9df0b1",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7f058234_3efa6812",
         "filename": "doc/ref/spec.md",
         "patchSetId": 1
@@ -150,6 +294,24 @@
       "writtenOn": "2023-02-01T17:11:45Z",
       "side": 1,
       "message": "This looks like a hangover from the previous table-oriented presentation.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bd09a5e_ad0363c9",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1276,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7f058234_3efa6812",
       "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,24 @@
       "message": "nit: the space broke the link.\n\nwe might also want to have cuelang.org/proposal as a URL shortcut, so we could use https://cuelang.org/proposal/1951-required-fields-v2.md here.",
       "revId": "b4169855fc9c19273c495674913fe485a6364456",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4ff7396_07b17fd4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46f5eb45_ff89cadd",
+      "revId": "b4169855fc9c19273c495674913fe485a6364456",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1011,7 +1011,7 @@ int & 2 & >1.0 & <3.0   // _|_
 A _struct_ is a set of elements called _fields_, each of
 which has a name, called a _label_, and value.
 
-We say a label is defined for a struct if the struct has a field with the
+We say a label is _defined_ for a struct if the struct has a field with the
 corresponding label.
 The value for a label `f` of struct `a` is denoted `a.f`.
 A struct `a` is an instance of `b`, or `a ⊑ b`, if for any label `f`
@@ -1026,24 +1026,102 @@ instance. It can be considered the type of all structs.
 {a: 1} ⊑ {}
 {a: 1, b: 1} ⊑ {a: 1}
 {a: 1} ⊑ {a: int}
-{a: 1, b: 1.0} ⊑ {a: int, b: float}
+{a: 1, b: 1.0} ⊑ {a: int, b: number}
 
 {} ⋢ {a: 1}
 {a: 2} ⋢ {a: 1}
 {a: 1} ⋢ {b: 1}
 ```
 
-A field may be required or optional.
 The successful unification of structs `a` and `b` is a new struct `c` which
 has all fields of both `a` and `b`, where
-the value of a field `f` in `c` is `a.f & b.f` if `f` is in both `a` and `b`,
+the value of a field `f` in `c` is `a.f & b.f` if `f` is defined in both `a` and `b`,
 or just `a.f` or `b.f` if `f` is in just `a` or `b`, respectively.
-If a field `f` is in both `a` and `b`, `c.f` is optional only if both
-`a.f` and `b.f` are optional.
 Any [references](#references) to `a` or `b`
 in their respective field values need to be replaced with references to `c`.
-The result of a unification is bottom (`_|_`) if any of its non-optional
+The result of a unification is bottom (`_|_`) if any of its defined
 fields evaluates to bottom, recursively.
+
+A struct literal may contain multiple fields with the same label,
+the result of which is the unification of all those fields.
+
+```
+StructLit       = "{" { Declaration "," } "}" .
+Declaration     = Field | Ellipsis | Embedding | LetClause | attribute .
+Ellipsis        = "..." [ Expression ] .
+Embedding       = Comprehension | AliasExpr .
+Field           = Label ":" { Label ":" } AliasExpr { attribute } .
+Label           = [ identifier "=" ] LabelExpr .
+LabelExpr       = LabelName [ "?" | "!" ] | "[" AliasExpr "]" .
+LabelName       = identifier | simple_string_lit  .
+
+attribute       = "@" identifier "(" attr_tokens ")" .
+attr_tokens     = { attr_token |
+                    "(" attr_tokens ")" |
+                    "[" attr_tokens "]" |
+                    "{" attr_tokens "}" } .
+attr_token      = /* any token except '(', ')', '[', ']', '{', or '}' */
+```
+
+```
+Expression                             Result
+{a: int, a: 1}                         {a: 1}
+{a: int} & {a: 1}                      {a: 1}
+{a: >=1 & <=7} & {a: >=5 & <=9}        {a: >=5 & <=7}
+{a: >=1 & <=7, a: >=5 & <=9}           {a: >=5 & <=7}
+
+{a: 1} & {b: 2}                        {a: 1, b: 2}
+{a: 1, b: int} & {b: 2}                {a: 1, b: 2}
+
+{a: 1} & {a: 2}                        _|_
+```
+
+
+#### Field constraints
+
+A struct may declare _field constraints_ which define values
+that should be unified with a given field once it is defined.
+The existence of a field constraint declares, but does not define, that field.
+
+Syntactically, a field is marked as a constraint
+by following its label with an _optional_ marker `?`
+or _required_ marker `!`.
+These markers are not part of the field name.
+
+A struct that has a required field constraint with a bottom value
+evaluates to bottom.
+An optional field constraint with a bottom value does _not_ invalidate
+the struct that contains it
+as long as it is not unified with a defined field.
+
+The subsumption relation for fields with the various markers is defined as
+```
+{a?: x} ⊑ {a!: x} ⊑ {a: x}
+```
+for any given `x`.
+
+Implementations may error upon encountering a required field constraint
+when manifesting CUE as data.
+
+```
+Expression                             Result
+{foo?: 3} & {foo: 3}                   {foo: 3}
+{foo!: 3} & {foo: 3}                   {foo: 3}
+
+{foo!: int} & {foo: int}               {foo:  int}
+{foo!: int} & {foo?: <1}               {foo!: <1}
+{foo!: int} & {foo: <=3}               {foo:  <=3}
+{foo!: int} & {foo: 3}                 {foo:  3}
+
+{foo!: 3} & {foo: int}                 {foo: 3}
+{foo!: 3} & {foo: <=4}                 {foo: 3}
+
+{foo?: 1} & {foo?: 2}                  {foo?: _|_} // No error
+{foo?: 1} & {foo!: 2}                  _|_
+{foo?: 1} & {foo: 2}                   _|_
+```
+
+<!-- see https://github.com/cue-lang/proposal/blob/main/designs/1951-required-fields-v2.md -->
 
 <!--NOTE: About bottom values for optional fields being okay.
 
@@ -1060,40 +1138,38 @@ definitions, when tightening an optional field leads to unintentionally
 discarding it.
 It could be a role of vet checkers to identify such cases (and suggest users
 to explicitly use `_|_` to discard a field, for instance).
+
+TODO: These examples show also how field constraints interact with defaults.
+Should we included this? Probably not necessary, as this is an orthogonal
+concern.
+```
+Expression                             Result
+a: { foo?: string }                    a: { foo?: string }
+b: { foo: "bar" }                      b: { foo: "bar" }
+c: { foo?: *"baz" | string }           c: { foo?: *"baz" | string }
+
+d: a & b                               { foo: "bar" }
+e: b & c                               { foo: "bar" }
+f: a & c                               { foo?: *"baz" | string }
+g: a & { foo?: number }                { foo?: _|_ } // This is fine
+h: b & { foo?: number }                _|_
+i: c & { foo: string }                 { foo: *"baz" | string }
+```
 -->
 
-Syntactically, a field is marked as optional by following its label with a `?`.
-The question mark is not part of the field name.
-A struct literal may contain multiple fields with the same label,
-the result of which is the unification of all those fields.
 
-These examples illustrate required fields only.
-Examples with optional fields follow below.
+#### Pattern and default constraints
 
-```
-Expression                             Result (without optional fields)
-{a: int, a: 1}                         {a: 1}
-{a: int} & {a: 1}                      {a: 1}
-{a: >=1 & <=7} & {a: >=5 & <=9}        {a: >=5 & <=7}
-{a: >=1 & <=7, a: >=5 & <=9}           {a: >=5 & <=7}
-
-{a: 1} & {b: 2}                        {a: 1, b: 2}
-{a: 1, b: int} & {b: 2}                {a: 1, b: 2}
-
-{a: 1} & {a: 2}                        _|_
-```
-
-A struct may define constraints that apply to fields that are added when unified
-with another struct using pattern or default constraints (_Note_: default
-constraints are not yet implemented).
+A struct may define constraints that apply to a collection of fields.
 
 A _pattern constraint_, denoted `[pattern]: value`, defines a pattern, which
 is a value of type string, and a value to unify with fields whose label
 unifies with the pattern.
-When unifying structs `a` and `b`,
-a pattern constraint `[p]: v` declared in `a`
-defines that the value `v` should unify with any field in the resulting struct `c`
-whose label unifies with pattern `p`.
+For a given struct `a` with pattern constraint `[p]: v`, `v` is unified
+with any field with name `f` in `a` for which `p & f` is not bottom.
+When unifying struct `a` and `b`,
+any pattern constraint declared in `a` and `b`
+are also declared in the result of unification.
 
 <!-- TODO: Update grammar and support this.
 A pattern constraints with a pattern preceded by `...` indicates
@@ -1107,10 +1183,10 @@ When unifying structs `a` and `b`,
 a default constraint `...v` declared in `a`
 defines that the value `v` should unify with any field in the resulting struct `c`
 whose label does not unify with any of the patterns of the pattern
-constraints defined for `a` _and_ for which there exists no field in `a`
-with that label.
+constraints defined for `a` _and_ for which there exists no field declaration
+in `a` with that label.
 The token `...` is a shorthand for `..._`.
-_Note_: default constraints are not yet implemented.
+_Note_: default constraints of the form `..._` are not yet implemented.
 
 
 ```
@@ -1197,36 +1273,6 @@ future extensions and relaxations:
 -->
 
 ```
-StructLit       = "{" { Declaration "," } "}" .
-Declaration     = Field | Ellipsis | Embedding | LetClause | attribute .
-Ellipsis        = "..." [ Expression ] .
-Embedding       = Comprehension | AliasExpr .
-Field           = Label ":" { Label ":" } AliasExpr { attribute } .
-Label           = [ identifier "=" ] LabelExpr .
-LabelExpr       = LabelName [ "?" ] | "[" AliasExpr "]" .
-LabelName       = identifier | simple_string_lit  .
-
-attribute       = "@" identifier "(" attr_tokens ")" .
-attr_tokens     = { attr_token |
-                    "(" attr_tokens ")" |
-                    "[" attr_tokens "]" |
-                    "{" attr_tokens "}" } .
-attr_token      = /* any token except '(', ')', '[', ']', '{', or '}' */
-```
-
-```
-Expression                             Result (without optional fields)
-a: { foo?: string }                    {}
-b: { foo: "bar" }                      { foo: "bar" }
-c: { foo?: *"bar" | string }           {}
-
-d: a & b                               { foo: "bar" }
-e: b & c                               { foo: "bar" }
-f: a & c                               {}
-g: a & { foo?: number }                {}
-h: b & { foo?: number }                _|_
-i: c & { foo: string }                 { foo: "bar" }
-
 intMap: [string]: int
 intMap: {
     t1: 43
@@ -1238,7 +1284,7 @@ nameMap: [string]: {
     nickName:  *firstName | string
 }
 
-nameMap: hank: { firstName: "Hank" }
+nameMap: hank: firstName: "Hank"
 ```
 
 The optional field set defined by `nameMap` matches every field,

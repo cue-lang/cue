@@ -1,0 +1,437 @@
+// Test various orders
+// https//cuelang.org/issues/2235
+
+-- reductions.cue --
+// Each of these tests triggers a slightly different path.
+
+t1: {
+	params: x.y
+	x: y: {}
+	for _ in x {
+		if true {
+			x: y: a: {}
+		}
+	}
+}
+
+t2: {
+	out: X.y
+	let X = m.x
+	m: x: y: {}
+	for v in m {
+		if true {
+			m: x: y: z: {}
+		}
+	}
+}
+
+t3: {
+	out: foo.bar
+
+	foo: bar: {}
+
+	for _ in foo {
+		for name, _ in foo {
+			foo: (name): _
+		}
+	}
+}
+
+-- issue2235.cue --
+package kubecluster
+
+import (
+	"strings"
+	"net"
+)
+
+shorewallParams: close({
+	[=~"^[A-Z0-9_]+$"]: [...net.IP]
+})
+
+#Cluster: {
+	clusterName:     string
+	shorewallPrefix: "KUBERNETES_\(strings.ToUpper(clusterName))"
+}
+
+clusters: [CLUSTER=string]: #Cluster & {
+	clusterName: CLUSTER
+}
+
+#Cluster: {
+	globalIngressControllers: [string]: #GlobalIngressController
+	globalIngressControllers: admin:    #GlobalIngressController & {
+		class: "admin"
+	}
+	for _, c in globalIngressControllers {
+		objects: c.objects
+	}
+}
+
+for clusterName, cluster in clusters {
+	for class, controller in cluster.globalIngressControllers {
+		let svc = controller.objects.namespaced.ingress.Service["\(class)-nginx-ingress-controller"]
+
+		shorewallParams: "\(cluster.shorewallPrefix)_INGRESS_\(strings.ToUpper(class))": svc.spec.externalIPs
+	}
+}
+
+#GlobalIngressController: {
+	class: string
+
+	objects: namespaced: ingress: {
+		Service: "\(class)-nginx-ingress-controller": {
+			spec: {
+				externalIPs: ["127.0.0.1"]
+			}
+		}
+	}
+
+	for kind, objs in objects.namespaced.ingress {
+		for name, obj in objs {
+			objects: namespaced: ingress: "\(kind)": "\(name)": metadata: labels: {
+				"ingress-class": class
+				stack:           "ingress"
+				...
+			}
+		}
+	}
+}
+
+clusters: foo: {}
+-- out/eval/stats --
+Leaks:  3
+Freed:  94
+Reused: 68
+Allocs: 29
+Retain: 67
+
+Unifications: 97
+Conjuncts:    256
+Disjuncts:    157
+-- out/eval --
+Errors:
+clusters.foo.globalIngressControllers.admin.objects.namespaced.ingress.Service: cannot add to field svc
+t1.x: cannot add to field params
+t2.m: cannot add to field X
+t3.foo: cannot add to field out
+
+Result:
+(_|_){
+  // [eval]
+  shorewallParams: (#struct){
+    KUBERNETES_FOO_INGRESS_ADMIN: (#list){
+      0: (string){ "127.0.0.1" }
+    }
+  }
+  #Cluster: (#struct){
+    clusterName: (string){ string }
+    shorewallPrefix: (_|_){
+      // [incomplete] #Cluster.shorewallPrefix: invalid interpolation: error in call to strings.ToUpper: non-concrete value string:
+      //     ./issue2235.cue:14:19
+      //     ./issue2235.cue:13:19
+      //     ./issue2235.cue:14:33
+    }
+    objects: (#struct){
+      namespaced: (#struct){
+        ingress: (#struct){
+          Service: (#struct){
+            "admin-nginx-ingress-controller": (#struct){
+              spec: (#struct){
+                externalIPs: (#list){
+                  0: (string){ "127.0.0.1" }
+                }
+              }
+              metadata: (#struct){
+                labels: (#struct){
+                  "ingress-class": (string){ "admin" }
+                  stack: (string){ "ingress" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    globalIngressControllers: (#struct){
+      admin: (#struct){
+        class: (string){ "admin" }
+        objects: (#struct){
+          namespaced: (#struct){
+            ingress: (#struct){
+              Service: (#struct){
+                "admin-nginx-ingress-controller": (#struct){
+                  spec: (#struct){
+                    externalIPs: (#list){
+                      0: (string){ "127.0.0.1" }
+                    }
+                  }
+                  metadata: (#struct){
+                    labels: (#struct){
+                      "ingress-class": (string){ "admin" }
+                      stack: (string){ "ingress" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  clusters: (_|_){
+    // [eval]
+    foo: (_|_){
+      // [eval]
+      clusterName: (string){ "foo" }
+      shorewallPrefix: (string){ "KUBERNETES_FOO" }
+      objects: (#struct){
+        namespaced: (#struct){
+          ingress: (#struct){
+            Service: (#struct){
+              "admin-nginx-ingress-controller": (#struct){
+                spec: (#struct){
+                  externalIPs: (#list){
+                    0: (string){ "127.0.0.1" }
+                  }
+                }
+                metadata: (#struct){
+                  labels: (#struct){
+                    "ingress-class": (string){ "admin" }
+                    stack: (string){ "ingress" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      globalIngressControllers: (_|_){
+        // [eval]
+        admin: (_|_){
+          // [eval]
+          class: (string){ "admin" }
+          objects: (_|_){
+            // [eval]
+            namespaced: (_|_){
+              // [eval]
+              ingress: (_|_){
+                // [eval]
+                Service: (_|_){
+                  // [eval] clusters.foo.globalIngressControllers.admin.objects.namespaced.ingress.Service: cannot add to field svc
+                  "admin-nginx-ingress-controller": (#struct){
+                    spec: (#struct){
+                      externalIPs: (#list){
+                        0: (string){ "127.0.0.1" }
+                      }
+                    }
+                    metadata: (#struct){
+                      labels: (#struct){
+                        "ingress-class": (string){ "admin" }
+                        stack: (string){ "ingress" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  #GlobalIngressController: (_|_){
+    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
+    //     ./issue2235.cue:43:12
+    //     ./issue2235.cue:40:9
+    class: (string){ string }
+    objects: (#struct){
+      namespaced: (#struct){
+        ingress: (_|_){
+          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
+          //     ./issue2235.cue:43:12
+          //     ./issue2235.cue:40:9
+          Service: (_|_){
+            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
+            //     ./issue2235.cue:43:12
+            //     ./issue2235.cue:40:9
+          }
+        }
+      }
+    }
+  }
+  t1: (_|_){
+    // [eval]
+    params: (struct){
+    }
+    x: (_|_){
+      // [eval] t1.x: cannot add to field params
+      y: (struct){
+        a: (struct){
+        }
+      }
+    }
+  }
+  t2: (_|_){
+    // [eval]
+    out: (struct){
+    }
+    let X#2 = (struct){
+      y: (struct){
+      }
+    }
+    m: (_|_){
+      // [eval] t2.m: cannot add to field X
+      x: (struct){
+        y: (struct){
+          z: (struct){
+          }
+        }
+      }
+    }
+  }
+  t3: (_|_){
+    // [eval]
+    out: (struct){
+    }
+    foo: (_|_){
+      // [eval] t3.foo: cannot add to field out
+      bar: (struct){
+      }
+    }
+  }
+  let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
+}
+-- out/compile --
+--- issue2235.cue
+{
+  shorewallParams: close({
+    [=~"^[A-Z0-9_]+$"]: [
+      ...〈import;net〉.IP,
+    ]
+  })
+  #Cluster: {
+    clusterName: string
+    shorewallPrefix: "KUBERNETES_\(〈import;strings〉.ToUpper(〈0;clusterName〉))"
+  }
+  clusters: {
+    [string]: (〈1;#Cluster〉 & {
+      clusterName: 〈1;-〉
+    })
+  }
+  #Cluster: {
+    globalIngressControllers: {
+      [string]: 〈2;#GlobalIngressController〉
+    }
+    globalIngressControllers: {
+      admin: (〈2;#GlobalIngressController〉 & {
+        class: "admin"
+      })
+    }
+    for _, c in 〈0;globalIngressControllers〉 {
+      objects: 〈1;c〉.objects
+    }
+  }
+  for clusterName, cluster in 〈0;clusters〉 {
+    for class, controller in 〈1;cluster〉.globalIngressControllers {
+      let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
+      shorewallParams: {
+        "\(〈4;cluster〉.shorewallPrefix)_INGRESS_\(〈import;strings〉.ToUpper(〈2;class〉))": 〈1;let svc#1〉.spec.externalIPs
+      }
+    }
+  }
+  #GlobalIngressController: {
+    class: string
+    objects: {
+      namespaced: {
+        ingress: {
+          Service: {
+            "\(〈4;class〉)-nginx-ingress-controller": {
+              spec: {
+                externalIPs: [
+                  "127.0.0.1",
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+    for kind, objs in 〈0;objects〉.namespaced.ingress {
+      for name, obj in 〈1;objs〉 {
+        objects: {
+          namespaced: {
+            ingress: {
+              "\(〈6;kind〉)": {
+                "\(〈5;name〉)": {
+                  metadata: {
+                    labels: {
+                      "ingress-class": 〈11;class〉
+                      stack: "ingress"
+                      ...
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  clusters: {
+    foo: {}
+  }
+}
+--- reductions.cue
+{
+  t1: {
+    params: 〈0;x〉.y
+    x: {
+      y: {}
+    }
+    for _, _ in 〈0;x〉 {
+      if true {
+        x: {
+          y: {
+            a: {}
+          }
+        }
+      }
+    }
+  }
+  t2: {
+    out: 〈0;let X#2〉.y
+    let X#2 = 〈0;m〉.x
+    m: {
+      x: {
+        y: {}
+      }
+    }
+    for _, v in 〈0;m〉 {
+      if true {
+        m: {
+          x: {
+            y: {
+              z: {}
+            }
+          }
+        }
+      }
+    }
+  }
+  t3: {
+    out: 〈0;foo〉.bar
+    foo: {
+      bar: {}
+    }
+    for _, _ in 〈0;foo〉 {
+      for name, _ in 〈2;foo〉 {
+        foo: {
+          〈2;name〉: _
+        }
+      }
+    }
+  }
+}

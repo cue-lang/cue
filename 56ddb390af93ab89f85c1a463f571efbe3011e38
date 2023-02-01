@@ -16,6 +16,24 @@
       "message": "interesting that this has gone. probably of no import though.",
       "revId": "56ddb390af93ab89f85c1a463f571efbe3011e38",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "542253a3_360aae96",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T17:25:54Z",
+      "side": 0,
+      "message": "Yes, the current implementation will not always (and doesn\u0027t have to) report errors that involve multiple locations in all locations. It only needs to report it in one. It still does so. In the future we may want to have stricter requirements for this.",
+      "parentUuid": "bd971f68_86ae47be",
+      "revId": "56ddb390af93ab89f85c1a463f571efbe3011e38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

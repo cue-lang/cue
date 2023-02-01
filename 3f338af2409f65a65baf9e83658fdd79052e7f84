@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c00734fb_36657215",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "s/added/add/",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4b5d5e6_24990018",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "s/lays/lies/",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de3b5e79_08d8a22e",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1014,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "Maybe \"defined\" should be italicized here?",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70a8ec05_256d662f",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1092,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "\"data\" isn\u0027t really defined anywhere AFAICS. I wonder whether it might be worth doing that.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbbbff9c_1570ba65",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1096,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "\"itself\" reads a bit oddly here and is probably redundant enough to be removed.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "675103da_e8eeccea",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1097,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "s/constraints/constraint/\n\nAnother possible phrasing:\n\nAn optional field constraint with a bottom value does _not_ invalidate\nthe struct that contains it, but precludes that field from becoming defined.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "542d4ea7_7d74bbe9",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "The \"may\" here seems slightly at odds with \"once a struct is output as data,\nthe corresponding field _must_ be defined.\"",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f03f51da_6f9df0b1",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1157,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "This set of examples seems to largely overlap with the examples just after line 1110 above, but maybe that\u0027s fine.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f058234_3efa6812",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1276,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T17:11:45Z",
+      "side": 1,
+      "message": "This looks like a hangover from the previous table-oriented presentation.",
+      "revId": "3f338af2409f65a65baf9e83658fdd79052e7f84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

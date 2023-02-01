@@ -16,6 +16,23 @@
       "message": "Fixed the problem spotted by ci/test; push_tip_to_trybot shouldn\u0027t run for ci/test as that branch is not on Gerrit.\n\nChanged \"active branch\" to exclude ci/test. I ended up calling them \"protected branches\", because that\u0027s what they really are. I thought about \"gerrit branches\", though that requires the reader to know the distinction of branches between github and gerrit. And master is a github branch, too - which is confusing.\n\nBeyond the change to push_tip_to_trybot, you\u0027ll notice that ci/test no longer runs the long tests. I _think_ that is okay, because the main purpose of it, for now, is to test CI configs and triggers - not to run more Go tests. But we can always change that later if needed.",
       "revId": "1459aa50117503f5d3ad8e24776efc4193f4e29f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "270882bc_5b5394d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T19:47:16Z",
+      "side": 1,
+      "message": "Also, this passed ci/test; see the last two runs at https://github.com/cue-lang/cue/actions?query\u003dbranch%3Aci%2Ftest",
+      "revId": "1459aa50117503f5d3ad8e24776efc4193f4e29f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

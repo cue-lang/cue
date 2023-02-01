@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39030da7_dd125da4",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T16:23:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "456edaaf_b28fa639",
+      "revId": "af61a59c39a1c1ac02555a947ed046433f848a65",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "60a4758a_02b5f84c",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-12-02T18:16:48Z",
       "side": 1,
       "message": "Why did this need to change?",
+      "revId": "af61a59c39a1c1ac02555a947ed046433f848a65",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fd34b4b_138a3d4b",
+        "filename": "cue/format/testdata/simplify.input",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T16:23:14Z",
+      "side": 1,
+      "message": "Not sure anymore. Reverted.",
+      "parentUuid": "60a4758a_02b5f84c",
       "revId": "af61a59c39a1c1ac02555a947ed046433f848a65",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "315b1f4d_4b017b13",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0d2902d8_5b8be0d5",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "94ef8c9e_758b51e9",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "29394ab5_f1f0c24c",
+        "filename": "internal/ci/github/push_tip_to_trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "Hm, how important is that? Presumably, if we care about recovering failures, we could add retries and then watch for failures - similar to what we do with the \"pull through proxy\" job.\n\nFetching and pushing all active branches will require more templating, because doing that with a glob pattern (for the release branches) is more complex with git. That\u0027s why I initially decided against it.",
+      "parentUuid": "94ef8c9e_758b51e9",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cdfe74df_8d2bacbe",
         "filename": "internal/ci/github/release.cue",
         "patchSetId": 4
@@ -48,6 +84,24 @@
       "writtenOn": "2023-02-01T15:16:11Z",
       "side": 1,
       "message": "I would add a comment in here that says the logic for what gets run at release time is defined with the release command.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bf06277_071a37c7",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdfe74df_8d2bacbe",
       "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9dd5a347_fa2b21d4",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "I wasn\u0027t sure one way or another, which is why I asked you via DM earlier :) I can add the conditionals.",
+      "parentUuid": "33b8a64f_00536229",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "67a78aa4_9744d6e3",
         "filename": "internal/ci/github/trybot.cue",
         "patchSetId": 4
@@ -82,6 +154,24 @@
       "writtenOn": "2023-02-01T15:16:11Z",
       "side": 1,
       "message": "Using `+` for list concatenation is deprecated. Please use https://pkg.go.dev/cuelang.org/go/pkg/list#Concat\n\nPlease can you also follow-up to ensure that we have something in the v0.6 milestone that covers reporting use of `+` as an error?",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "933a39cf_316913ef",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "Done; see https://github.com/cue-lang/cue/issues/2237.",
+      "parentUuid": "67a78aa4_9744d6e3",
       "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2801d43_a507936a",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "751192e0_e9bc9e53",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de68e7c5_185f8c47",
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbe00ea7_07826463",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "Good point. Done, and also renamed to clarify that they are patterns.",
+      "parentUuid": "de68e7c5_185f8c47",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53961e4f_05642912",
@@ -133,6 +259,24 @@
       "writtenOn": "2023-02-01T15:16:11Z",
       "side": 1,
       "message": "I would perhaps wrap the result of the join in `()` to avoid the caller having to do that?\n\nNot sure what the best form is here.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de55d75a_6f4b378f",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T15:52:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53961e4f_05642912",
       "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

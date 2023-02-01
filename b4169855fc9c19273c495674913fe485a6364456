@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46f5eb45_ff89cadd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T16:52:30Z",
+      "side": 1,
+      "message": "nit: the space broke the link.\n\nwe might also want to have cuelang.org/proposal as a URL shortcut, so we could use https://cuelang.org/proposal/1951-required-fields-v2.md here.",
+      "revId": "b4169855fc9c19273c495674913fe485a6364456",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

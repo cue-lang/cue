@@ -12,7 +12,7 @@ Leaks:  4
 Freed:  11
 Reused: 8
 Allocs: 7
-Retain: 5
+Retain: 8
 
 Unifications: 15
 Conjuncts:    30

@@ -64,11 +64,11 @@ Leaks:  0
 Freed:  10
 Reused: 3
 Allocs: 7
-Retain: 3
+Retain: 7
 
 Unifications: 10
 Conjuncts:    33
-Disjuncts:    13
+Disjuncts:    17
 -- out/eval --
 (struct){
   res: (#list){

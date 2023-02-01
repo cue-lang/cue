@@ -100,11 +100,11 @@ Leaks:  12
 Freed:  53
 Reused: 48
 Allocs: 17
-Retain: 23
+Retain: 31
 
 Unifications: 65
 Conjuncts:    191
-Disjuncts:    74
+Disjuncts:    77
 -- out/eval --
 (struct){
   embeddingDirect: (struct){

@@ -48,11 +48,11 @@ Leaks:  3
 Freed:  13
 Reused: 10
 Allocs: 6
-Retain: 12
+Retain: 17
 
 Unifications: 16
 Conjuncts:    37
-Disjuncts:    25
+Disjuncts:    30
 -- out/eval --
 (struct){
   a: (#list){

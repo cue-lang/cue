@@ -67,11 +67,11 @@ Leaks:  16
 Freed:  180
 Reused: 169
 Allocs: 27
-Retain: 105
+Retain: 224
 
 Unifications: 196
 Conjuncts:    464
-Disjuncts:    276
+Disjuncts:    292
 -- out/eval --
 Errors:
 structural cycle:

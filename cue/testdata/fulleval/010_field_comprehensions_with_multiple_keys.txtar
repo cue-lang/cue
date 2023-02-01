@@ -173,11 +173,11 @@ Leaks:  20
 Freed:  29
 Reused: 25
 Allocs: 24
-Retain: 20
+Retain: 62
 
 Unifications: 49
 Conjuncts:    48
-Disjuncts:    37
+Disjuncts:    67
 -- out/eval --
 (struct){
   a: (struct){

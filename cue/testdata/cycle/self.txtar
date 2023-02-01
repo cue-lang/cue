@@ -267,11 +267,11 @@ Leaks:  14
 Freed:  414
 Reused: 405
 Allocs: 23
-Retain: 33
+Retain: 42
 
 Unifications: 236
 Conjuncts:    687
-Disjuncts:    435
+Disjuncts:    439
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:
@@ -344,9 +344,6 @@ Result:
           // [eval] list.error2.a: conflicting values "1" and "2":
           //     ./in.cue:16:6
           //     ./in.cue:16:11
-          // list.error2.a: conflicting values "3" and "1":
-          //     ./in.cue:15:6
-          //     ./in.cue:16:6
           // list.error2.a: conflicting values "3" and "2":
           //     ./in.cue:15:6
           //     ./in.cue:16:11

@@ -852,11 +852,18 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 
 	var hasCycle bool
 
-	if a != nil && state > a.status {
-		c.Unify(a, state)
-	}
-
-	if a == nil {
+	if a != nil {
+		// Ensure that a's status is at least of the required level. Otherwise,
+		// ensure that any remaining unprocessed conjuncts are processed by
+		// calling c.Unify(a, Partial). The ensures that need to rely on
+		// hasAllConjuncts, but that are finalized too early, get conjuncts
+		// processed beforehand.
+		if state > a.status {
+			c.Unify(a, state)
+		} else if a.state != nil {
+			c.Unify(a, Partial)
+		}
+	} else {
 		if x.state != nil {
 			for _, e := range x.state.exprs {
 				if isCyclePlaceholder(e.err) {

@@ -64,11 +64,11 @@ Leaks:  291
 Freed:  389
 Reused: 379
 Allocs: 301
-Retain: 1014
+Retain: 1047
 
 Unifications: 680
 Conjuncts:    2709
-Disjuncts:    1403
+Disjuncts:    1414
 -- out/eval --
 (struct){
   ok1: (struct){

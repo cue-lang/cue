@@ -381,11 +381,11 @@ Leaks:  0
 Freed:  2035
 Reused: 2015
 Allocs: 20
-Retain: 35
+Retain: 67
 
 Unifications: 1066
 Conjuncts:    2882
-Disjuncts:    2070
+Disjuncts:    2102
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){

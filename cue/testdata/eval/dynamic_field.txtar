@@ -68,11 +68,11 @@ Leaks:  2
 Freed:  54
 Reused: 47
 Allocs: 9
-Retain: 6
+Retain: 9
 
 Unifications: 56
 Conjuncts:    73
-Disjuncts:    58
+Disjuncts:    61
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:

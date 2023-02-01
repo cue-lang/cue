@@ -100,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1de5ce90_713b9e91",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T09:05:57Z",
+      "side": 1,
+      "message": "Err, can\u0027t remember what I was writing here.",
+      "parentUuid": "1dc694f6_d58c7edb",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f652d64_e131d4bf",
@@ -131,6 +149,24 @@
       "side": 1,
       "message": "I think it is fine. The only thing that could improve is that instead of using \"list\", we use the actual file name in the package.\n\nBut line reporting is a bit brittle, which should be fixed in future CLs. For now this means that some positions will appear and reappear.\n\nNote that it is not always easy to determine what the right set of positions is anyway. We need to come up with some principled approach about this.",
       "parentUuid": "2f652d64_e131d4bf",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f2339d7_04f8726e",
+        "filename": "pkg/list/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T09:05:57Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "41bbda2a_8ff0b953",
       "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

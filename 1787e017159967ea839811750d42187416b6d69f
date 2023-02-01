@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48f2888f_a1f51219",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T09:05:57Z",
+      "side": 0,
+      "message": "the previous code always returned `true` when there was an error. is that behavior that we should maintain?",
+      "revId": "1787e017159967ea839811750d42187416b6d69f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

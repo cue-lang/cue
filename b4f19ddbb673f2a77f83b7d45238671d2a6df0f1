@@ -16,6 +16,23 @@
       "message": "Testing +2",
       "revId": "b4f19ddbb673f2a77f83b7d45238671d2a6df0f1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "615928d8_de67caa2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T16:23:26Z",
+      "side": 1,
+      "message": "LGTM with outstanding issues resolved.",
+      "revId": "b4f19ddbb673f2a77f83b7d45238671d2a6df0f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

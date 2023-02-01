@@ -120,6 +120,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4aa7b43c_fdf328c4",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T10:20:47Z",
+      "side": 1,
+      "message": "nit: if the methods are all pointer methods, I\u0027d make the constructor return the pointer value (or alternatively have:\n```\nfunc (v *valueSorter) init(list []cue.Value, cmp cue.Value)\n```\n)",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8120977_6456e661",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T10:20:47Z",
+      "side": 1,
+      "message": "shouldn\u0027t we be using the non-deprecated API, to avoid being a bad example if nothing else?",
+      "revId": "122cdd05acc7af7ac7d7729793c0c9bd70233ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2f652d64_e131d4bf",
         "filename": "pkg/list/testdata/gen.txtar",
         "patchSetId": 1

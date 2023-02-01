@@ -832,6 +832,14 @@ func (n *nodeContext) addConjunctDynamic(c Conjunct) {
 func (n *nodeContext) notifyConjunct(c Conjunct) {
 	for _, arc := range n.notify {
 		if !arc.hasConjunct(c) {
+			if arc.state == nil {
+				// TODO: continuing here is likely to result in a faulty
+				// (incomplete) configuration. But this may be okay. The
+				// CUE_DEBUG=0 flag disables this assertion.
+				n.ctx.Assertf(n.ctx.pos(), Debug, "unexpected nil state")
+				n.ctx.addErrf(0, n.ctx.pos(), "cannot add to field %v", arc.Label)
+				continue
+			}
 			arc.state.addConjunctDynamic(c)
 		}
 	}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fa7d31b_1d03f0d8",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T09:32:04Z",
+      "side": 1,
+      "message": "Oops, I had forgotten what repo I was in. Done.",
+      "parentUuid": "53b69f19_8324169f",
+      "revId": "5cb25bb955569e76858c0a2f4363290a2e1b91a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42a1f933_e5147fad",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-02-01T09:13:05Z",
       "side": 1,
       "message": "I would seek to re-use logic we already have for workflows here. \n\nIf you look in the cuelang.org/go/internal/ci/core CUE package, you will notice that we have #releaseTagPattern. That\u0027s not ideal because it\u0027s a pattern as used by https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#onpushbranchestagsbranches-ignoretags-ignore. But we should ensure consistency between the determination for a release here at in the workflows.",
+      "revId": "5cb25bb955569e76858c0a2f4363290a2e1b91a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71accd8d_6a53672b",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T09:32:04Z",
+      "side": 1,
+      "message": "This is already the case via the CI triggers - release.cue only runs on tags matching the release pattern, or in the default or ci/test branches. When it\u0027s a branch, then the kind won\u0027t be \"tags\".\n\nThe only way this could go wrong is if we manually ran `cue cmd release` with GITHUB_REF\u003drefs/tags/some-other-tag. I don\u0027t expect that to happen, but I can add a second check for releaseTagPattern if this is what worries you.",
+      "parentUuid": "42a1f933_e5147fad",
       "revId": "5cb25bb955569e76858c0a2f4363290a2e1b91a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

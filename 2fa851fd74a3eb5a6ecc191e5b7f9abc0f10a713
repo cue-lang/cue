@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0f63c97_ebd202b7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T16:43:55Z",
+      "side": 1,
+      "message": "LGTM with a couple of trivial thoughts, thanks!",
+      "revId": "2fa851fd74a3eb5a6ecc191e5b7f9abc0f10a713",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b08f4fa_d179ecde",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 856,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T16:43:55Z",
+      "side": 1,
+      "message": "a little more commentary on the subtlety surrounding these conditions might be nice.",
+      "revId": "2fa851fd74a3eb5a6ecc191e5b7f9abc0f10a713",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

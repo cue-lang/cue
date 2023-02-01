@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd971f68_86ae47be",
+        "filename": "cue/testdata/cycle/self.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-01T16:43:55Z",
+      "side": 0,
+      "message": "interesting that this has gone. probably of no import though.",
+      "revId": "56ddb390af93ab89f85c1a463f571efbe3011e38",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

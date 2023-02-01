@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a4399ad_03118edb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T17:33:27Z",
+      "side": 1,
+      "message": "Still LGTM, pending `ci/test` test.",
+      "revId": "0e85d38c1b23cb31d4eef98aeff3ee4d1eb5cbc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "932dbe31_f0b6d7e7",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 6
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T17:33:27Z",
+      "side": 1,
+      "message": "nit: put this in parentheses too.",
+      "revId": "0e85d38c1b23cb31d4eef98aeff3ee4d1eb5cbc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3bbb7ec_c0ee234f",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T17:33:27Z",
+      "side": 1,
+      "message": "Yeh, this is why I dislike the fact that GitHub has developed their own \"approach\" here. Would be nice if this was CUE all the way down, but that\u0027s a pipe dream for now.",
+      "revId": "0e85d38c1b23cb31d4eef98aeff3ee4d1eb5cbc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

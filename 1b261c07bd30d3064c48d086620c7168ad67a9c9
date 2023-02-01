@@ -89,6 +89,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6b5a50a_16e0e0e2",
+        "filename": "internal/ci/github/push_tip_to_trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T16:22:04Z",
+      "side": 1,
+      "message": "Per our offline chat, this change is necessary because of the change to _#activeBranches now being a list of GitHub \"patterns\"",
+      "parentUuid": "66cb14ba_b2931cba",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdfe74df_8d2bacbe",

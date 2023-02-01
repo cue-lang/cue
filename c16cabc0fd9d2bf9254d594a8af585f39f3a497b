@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c55dda6_a8f177c0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-01T09:07:00Z",
+      "side": 1,
+      "message": "nit: I don\u0027t think we use periods in commit messages",
+      "revId": "c16cabc0fd9d2bf9254d594a8af585f39f3a497b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

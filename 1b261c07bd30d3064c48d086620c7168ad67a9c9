@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d2902d8_5b8be0d5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "I would say this is more precisely using snapshot mode when not doing a release.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94ef8c9e_758b51e9",
+        "filename": "internal/ci/github/push_tip_to_trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "The implication of making this more specific is that if a sync fails for some reason, a later change on a different branch cannot heal the earlier one. That is why I made it more general in the first place.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdfe74df_8d2bacbe",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "I would add a comment in here that says the logic for what gets run at release time is defined with the release command.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33b8a64f_00536229",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "Any reason this and the next step are not guarded to run only on releases?\n\nThey should be, no?",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67a78aa4_9744d6e3",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "Using `+` for list concatenation is deprecated. Please use https://pkg.go.dev/cuelang.org/go/pkg/list#Concat\n\nPlease can you also follow-up to ensure that we have something in the v0.6 milestone that covers reporting use of `+` as an error?",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "751192e0_e9bc9e53",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "See my earlier comment about adding `()` in the definition of `_#isActiveBranch`. Would make this read much more easily.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de68e7c5_185f8c47",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "This needs a comment, because it actually contains a list of patterns now (in the general case). Without a comment, the reader might reasonably expect each item to be a branch as opposed to a GitHub-specific pattern. That significantly impacts where this list can be used.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53961e4f_05642912",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "I would perhaps wrap the result of the join in `()` to avoid the caller having to do that?\n\nNot sure what the best form is here.",
+      "revId": "1b261c07bd30d3064c48d086620c7168ad67a9c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

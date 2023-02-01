@@ -87,6 +87,24 @@
       "parentUuid": "71accd8d_6a53672b",
       "revId": "5cb25bb955569e76858c0a2f4363290a2e1b91a5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "307154bb_24e0f521",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-01T15:16:11Z",
+      "side": 1,
+      "message": "Any update here?",
+      "parentUuid": "4b514fa8_928d13fe",
+      "revId": "5cb25bb955569e76858c0a2f4363290a2e1b91a5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -163,11 +163,11 @@ Leaks:  53
 Freed:  159
 Reused: 150
 Allocs: 62
-Retain: 151
+Retain: 236
 
 Unifications: 198
 Conjuncts:    384
-Disjuncts:    240
+Disjuncts:    249
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:

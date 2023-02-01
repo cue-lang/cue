@@ -73,11 +73,11 @@ Leaks:  0
 Freed:  37
 Reused: 30
 Allocs: 7
-Retain: 26
+Retain: 34
 
 Unifications: 37
 Conjuncts:    61
-Disjuncts:    57
+Disjuncts:    61
 -- out/eval --
 (struct){
   builtinCyclePerm0: (struct){

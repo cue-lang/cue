@@ -140,11 +140,11 @@ Leaks:  0
 Freed:  51
 Reused: 41
 Allocs: 10
-Retain: 4
+Retain: 7
 
 Unifications: 27
 Conjuncts:    70
-Disjuncts:    55
+Disjuncts:    58
 -- out/eval --
 (struct){
   result: (#list){

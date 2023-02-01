@@ -924,6 +924,15 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	//
 	//     In other words, a Vertex is not necessarily erroneous when a let
 	//     field contained in that Vertex is erroneous.
+
+	// TODO(order): Do not finalize? Although it is safe to finalize a let
+	// by itself, it is not necessarily safe, at this point, to finalize any
+	// references it makes. Originally, let finalization was requested to
+	// detect cases where multi-mode should be enabled. With the recent compiler
+	// changes, though, this should be detected statically. Leave this on for
+	// now, though, as it is not entirely clear it is fine to remove this.
+	// We can reevaluate this once we have redone some of the planned order of
+	// evaluation work.
 	ctx.Unify(arc, Finalized)
 	b, ok := arc.BaseValue.(*Bottom)
 	if !arc.MultiLet && !ok {

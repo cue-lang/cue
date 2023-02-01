@@ -95,11 +95,11 @@ Leaks:  2
 Freed:  70
 Reused: 63
 Allocs: 9
-Retain: 10
+Retain: 15
 
 Unifications: 58
 Conjuncts:    104
-Disjuncts:    77
+Disjuncts:    81
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:

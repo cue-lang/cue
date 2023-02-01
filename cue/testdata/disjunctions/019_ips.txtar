@@ -59,11 +59,11 @@ Leaks:  3
 Freed:  54
 Reused: 48
 Allocs: 9
-Retain: 10
+Retain: 14
 
 Unifications: 48
 Conjuncts:    111
-Disjuncts:    64
+Disjuncts:    68
 -- out/eval --
 (struct){
   IP: (#list){

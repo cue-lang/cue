@@ -82,7 +82,7 @@ Leaks:  2
 Freed:  11
 Reused: 5
 Allocs: 8
-Retain: 2
+Retain: 3
 
 Unifications: 9
 Conjuncts:    18

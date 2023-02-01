@@ -852,11 +852,14 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 
 	var hasCycle bool
 
-	if a != nil && state > a.status {
-		c.Unify(a, state)
-	}
-
-	if a == nil {
+	if a != nil {
+		if state > a.status {
+			c.Unify(a, state)
+		} else if a.state != nil {
+			// Ensure any dangling conjuncts are processed.
+			c.Unify(a, Partial)
+		}
+	} else {
 		if x.state != nil {
 			for _, e := range x.state.exprs {
 				if isCyclePlaceholder(e.err) {

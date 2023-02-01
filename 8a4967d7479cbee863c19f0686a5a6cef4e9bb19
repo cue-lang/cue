@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b3f46ae2_46d8361a",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T16:29:03Z",
+      "side": 1,
+      "message": "bottom. It is used quite a bit in CUE code.",
+      "parentUuid": "4d9690e0_8dc14283",
+      "revId": "8a4967d7479cbee863c19f0686a5a6cef4e9bb19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c686f1af_673b018e",
         "filename": "pkg/list/sort.go",
         "patchSetId": 2
@@ -71,6 +89,48 @@
       "writtenOn": "2023-02-01T10:20:47Z",
       "side": 1,
       "message": "pre finalize and... ?",
+      "revId": "8a4967d7479cbee863c19f0686a5a6cef4e9bb19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a45f799_0c71fde8",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T16:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c686f1af_673b018e",
+      "range": {
+        "startLine": 124,
+        "startChar": 41,
+        "endLine": 124,
+        "endChar": 57
+      },
+      "revId": "8a4967d7479cbee863c19f0686a5a6cef4e9bb19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe04db63_75a148df",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T16:29:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f82b0aeb_421aec27",
       "revId": "8a4967d7479cbee863c19f0686a5a6cef4e9bb19",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

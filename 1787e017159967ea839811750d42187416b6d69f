@@ -16,6 +16,24 @@
       "message": "the previous code always returned `true` when there was an error. is that behavior that we should maintain?",
       "revId": "1787e017159967ea839811750d42187416b6d69f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "02c61239_bd75bb51",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-01T16:29:03Z",
+      "side": 0,
+      "message": "Good point. It shouldn\u0027t matter, as the error will win, but it can\u0027t hurt to retain the behavior.",
+      "parentUuid": "48f2888f_a1f51219",
+      "revId": "1787e017159967ea839811750d42187416b6d69f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -75,14 +75,6 @@ func (p *printer) Write(b []byte) (n int, err error) {
 	return len(b), nil
 }
 
-func (p *printer) write(b []byte) {
-	_, _ = p.Write(b)
-}
-
-func (p *printer) printLen(align int, str string) {
-	fmt.Fprintf(p, "% -[1]*s", align, str)
-}
-
 func (p *printer) println(s string) {
 	fmt.Fprintln(p, s)
 }

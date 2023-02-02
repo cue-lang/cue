@@ -41,7 +41,6 @@ type protoError struct {
 }
 
 var (
-	newline    = token.Newline.Pos()
 	newSection = token.NewSection.Pos()
 )
 

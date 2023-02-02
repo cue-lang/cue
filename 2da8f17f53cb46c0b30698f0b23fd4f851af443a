@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b223d5d5_c13b238f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-02T11:12:45Z",
+      "side": 1,
+      "message": "Good point, done. I\u0027ve also explained why it\u0027s relevant.",
+      "parentUuid": "400eb01c_bd0230cd",
+      "revId": "2da8f17f53cb46c0b30698f0b23fd4f851af443a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "91f3fb06_81148381",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1

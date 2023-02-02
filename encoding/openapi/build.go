@@ -44,7 +44,6 @@ type buildContext struct {
 	nameFunc      func(inst cue.Value, path cue.Path) string
 	descFunc      func(v cue.Value) string
 	fieldFilter   *regexp.Regexp
-	evalDepth     int // detect cycles when resolving references
 
 	schemas *OrderedMap
 
@@ -517,28 +516,6 @@ outer:
 		}
 	}
 	return a
-}
-
-func countNodes(v cue.Value) (n int) {
-	switch op, a := v.Expr(); op {
-	case cue.OrOp, cue.AndOp:
-		for _, v := range a {
-			n += countNodes(v)
-		}
-		n += len(a) - 1
-	default:
-		switch v.Kind() {
-		case cue.ListKind:
-			for i, _ := v.List(); i.Next(); {
-				n += countNodes(i.Value())
-			}
-		case cue.StructKind:
-			for i, _ := v.Fields(); i.Next(); {
-				n += countNodes(i.Value()) + 1
-			}
-		}
-	}
-	return n + 1
 }
 
 // isConcrete reports whether v is concrete and not a struct (recursively).

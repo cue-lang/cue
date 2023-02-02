@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3b42634_2fad345e",
+        "filename": ".github/workflows/release.yml",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-02T11:32:09Z",
+      "side": 1,
+      "message": "Easiest seen here, but this comparison will not work. \n\nPer our exchange yesterday, this will need to use `startsWith()` minus the `*`. So will require some refactoring elsewhere.",
+      "revId": "6ae13343b6018b01d824bca964b84e3655a46e4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "51f658e5_067bd31a",

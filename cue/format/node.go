@@ -20,7 +20,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
-	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
@@ -445,17 +444,6 @@ func (f *formatter) importSpec(x *ast.ImportSpec) {
 	}
 	f.expr(x.Path)
 	f.print(newline)
-}
-
-func isValidIdent(ident string) bool {
-	var scan scanner.Scanner
-	scan.Init(token.NewFile("check", -1, len(ident)), []byte(ident), nil, 0)
-
-	_, tok, lit := scan.Scan()
-	if tok == token.IDENT || tok.IsKeyword() {
-		return lit == ident
-	}
-	return false
 }
 
 func (f *formatter) label(l ast.Label, optional bool) {

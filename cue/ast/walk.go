@@ -236,10 +236,6 @@ func (f *inspector) Token(t token.Token) {
 	f.current.pos++
 }
 
-func (f *inspector) setPos(i int8) {
-	f.current.pos = i
-}
-
 func (f *inspector) visitComments(pos int8) {
 	c := &f.current
 	for ; len(c.cg) > 0; c.cg = c.cg[1:] {

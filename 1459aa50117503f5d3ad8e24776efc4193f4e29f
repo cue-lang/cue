@@ -67,6 +67,24 @@
       "message": "Per our offline chat, I\u0027m not sure this is correct. The comprehension is iterating over a list of glob patterns. That\u0027s not going to work with `\u003d\u003d`. So it might be we need to separate a list of branches, distinct from a list of glob patterns.",
       "revId": "1459aa50117503f5d3ad8e24776efc4193f4e29f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abb9f09b_4db288a0",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 8
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-02T10:22:11Z",
+      "side": 1,
+      "message": "Done; see the latest patchset diff.",
+      "parentUuid": "f9c95928_0ba576b4",
+      "revId": "1459aa50117503f5d3ad8e24776efc4193f4e29f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

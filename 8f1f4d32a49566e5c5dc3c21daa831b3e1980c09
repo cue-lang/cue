@@ -177,6 +177,30 @@
       },
       "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d328b6c4_6b111245",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-02T09:11:40Z",
+      "side": 1,
+      "message": "\u003e I\u0027m still not keen on referencing external documentation here. It is inappropriate and sets a bad precedence.\n\nI\u0027m in the same boat.\n\nAlso, isn\u0027t the actual list here a function of the Go version used to be cmd/cue?",
+      "parentUuid": "ea4c5731_f32bda75",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "dec8c630_d0af39eb",
+        "filename": ".github/workflows/release.yml",
+        "patchSetId": 9
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-02T11:42:31Z",
+      "side": 1,
+      "message": "Done; used a func-like definition to reuse the logic.",
+      "parentUuid": "f3b42634_2fad345e",
+      "revId": "6ae13343b6018b01d824bca964b84e3655a46e4e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "51f658e5_067bd31a",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 9

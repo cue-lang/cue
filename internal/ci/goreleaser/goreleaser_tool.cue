@@ -1,9 +1,9 @@
 package goreleaser
 
 import (
+	"encoding/yaml"
 	"path"
 	"strings"
-	"encoding/yaml"
 
 	"tool/file"
 	"tool/exec"
@@ -18,11 +18,6 @@ command: release: {
 
 	let _githubRef = env.GITHUB_REF | "refs/no_ref_kind/not_a_release" // filled when running in CI
 	let _githubRefName = path.Base(_githubRef)
-
-	// Only run the full release when running on GitHub actions for a release tag.
-	// Keep in sync with core.#releaseTagPattern, which is a globbing pattern
-	// rather than a regular expression.
-	let snapshot = [ if _githubRef !~ "refs/tags/v.*" {"--snapshot"}, "" ][0]
 
 	tempDir: file.MkdirTemp & {
 		path: string
@@ -57,12 +52,23 @@ command: release: {
 		stdout: string
 	}
 
+	let goreleaserCmd = [
+		"goreleaser", "release", "-f", "-", "--rm-dist",
+
+		// Only run the full release when running on GitHub actions for a release tag.
+		// Keep in sync with core.#releaseTagPattern, which is a globbing pattern
+		// rather than a regular expression.
+		if _githubRef !~ "refs/tags/v.*" {
+			"--snapshot"
+		},
+	]
+
 	info: cli.Print & {
 		text: """
-			snapshot: \(snapshot)
 			latest CUE version: \(latestCUEVersion)
 			git ref: \(_githubRef)
 			release name: \(_githubRefName)
+			goreleaser cmd: \(strings.Join(goreleaserCmd, " "))
 			"""
 	}
 
@@ -77,6 +83,6 @@ command: release: {
 		// Run at the root of the module
 		dir: strings.TrimSpace(cueModRoot.stdout)
 
-		cmd: ["goreleaser", "release", "-f", "-", "--rm-dist", snapshot]
+		cmd: goreleaserCmd
 	}
 }

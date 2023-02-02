@@ -30,8 +30,7 @@ import (
 type Option func(*options)
 
 type options struct {
-	simplify   bool
-	deprecated bool
+	simplify bool
 }
 
 // Simplify enables fixes that simplify the code, but are not strictly

@@ -36,15 +36,6 @@ func (p *PackageError) Position() token.Pos         { return p.Pos }
 func (p *PackageError) InputPositions() []token.Pos { return nil }
 func (p *PackageError) Path() []string              { return p.ImportStack }
 
-func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
-	err := &PackageError{
-		ImportStack: l.stk.Copy(),
-		Message:     errors.NewMessage(format, args),
-	}
-	err.fillPos(l.cfg.Dir, importPos)
-	return err
-}
-
 func (p *PackageError) fillPos(cwd string, positions []token.Pos) {
 	if len(positions) > 0 && !p.Pos.IsValid() {
 		p.Pos = positions[0]

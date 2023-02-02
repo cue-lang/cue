@@ -90,7 +90,6 @@ err:    import failed: relative import paths not allowed ("./file")
 path:   ""
 module: mod.test/test
 root:   $CWD/testdata
-dir:    $CWD/testdata/cue.mod/gen
 display:`,
 	}, {
 		cfg:  dirCfg,
@@ -333,7 +332,8 @@ var pkgInfo = template.Must(template.New("pkg").Parse(`
 path:   {{if .ImportPath}}{{.ImportPath}}{{else}}""{{end}}
 module: {{if .Module}}{{.Module}}{{else}}""{{end}}
 root:   {{.Root}}
-dir:    {{.Dir}}
+{{if .Dir}}dir:    {{.Dir}}
+{{end -}}
 display:{{.DisplayPath}}
 {{if .Files -}}
 files:

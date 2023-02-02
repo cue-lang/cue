@@ -97,7 +97,7 @@ trybot: _base.#bashWorkflow & {
 				# avoid stopping too early. We also use a "failed" file as "go get" runs
 				# in a subshell via the pipe.
 				rm -f failed
-				if ! GOPROXY=https://proxy.golang.org go get cuelang.org/go/cmd/cue@$v; then
+				if ! GOPROXY=https://proxy.golang.org go get cuelang.org/go@$v; then
 					touch failed
 				fi |& tee output.txt
 

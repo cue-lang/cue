@@ -33,6 +33,20 @@ import (
 	"cuelang.org/go/internal/cli"
 )
 
+type tagger struct {
+	cfg          *Config
+	tags         []*tag // tags found in files
+	buildTags    map[string]bool
+	replacements map[ast.Node]ast.Node
+}
+
+func newTagger(c *Config) *tagger {
+	return &tagger{
+		cfg:       c,
+		buildTags: make(map[string]bool),
+	}
+}
+
 // A TagVar represents an injection variable.
 type TagVar struct {
 	// Func returns an ast for a tag variable. It is only called once
@@ -168,18 +182,18 @@ func parseTag(pos token.Pos, body string) (t *tag, err errors.Error) {
 	return t, nil
 }
 
-func (t *tag) inject(value string, l *loader) errors.Error {
+func (t *tag) inject(value string, tg *tagger) errors.Error {
 	e, err := cli.ParseValue(token.NoPos, t.key, value, t.kind)
-	t.injectValue(e, l)
+	t.injectValue(e, tg)
 	return err
 }
 
-func (t *tag) injectValue(x ast.Expr, l *loader) {
+func (t *tag) injectValue(x ast.Expr, tg *tagger) {
 	injected := ast.NewBinExpr(token.AND, t.field.Value, x)
-	if l.replacements == nil {
-		l.replacements = map[ast.Node]ast.Node{}
+	if tg.replacements == nil {
+		tg.replacements = make(map[ast.Node]ast.Node)
 	}
-	l.replacements[t.field.Value] = injected
+	tg.replacements[t.field.Value] = injected
 	t.field.Value = injected
 	t.hasReplacement = true
 }
@@ -239,16 +253,16 @@ func findTags(b *build.Instance) (tags []*tag, errs errors.Error) {
 	return tags, errs
 }
 
-func injectTags(tags []string, l *loader) errors.Error {
+func (tg *tagger) injectTags(tags []string) errors.Error {
 	// Parses command line args
 	for _, s := range tags {
 		p := strings.Index(s, "=")
-		found := l.buildTags[s]
+		found := tg.buildTags[s]
 		if p > 0 { // key-value
-			for _, t := range l.tags {
+			for _, t := range tg.tags {
 				if t.key == s[:p] {
 					found = true
-					if err := t.inject(s[p+1:], l); err != nil {
+					if err := t.inject(s[p+1:], tg); err != nil {
 						return err
 					}
 				}
@@ -257,11 +271,11 @@ func injectTags(tags []string, l *loader) errors.Error {
 				return errors.Newf(token.NoPos, "no tag for %q", s[:p])
 			}
 		} else { // shorthand
-			for _, t := range l.tags {
+			for _, t := range tg.tags {
 				for _, sh := range t.shorthands {
 					if sh == s {
 						found = true
-						if err := t.inject(s, l); err != nil {
+						if err := t.inject(s, tg); err != nil {
 							return err
 						}
 					}
@@ -273,17 +287,17 @@ func injectTags(tags []string, l *loader) errors.Error {
 		}
 	}
 
-	if l.cfg.TagVars != nil {
+	if tg.cfg.TagVars != nil {
 		vars := map[string]ast.Expr{}
 
 		// Inject tag variables if the tag wasn't already set.
-		for _, t := range l.tags {
+		for _, t := range tg.tags {
 			if t.hasReplacement || t.vars == "" {
 				continue
 			}
 			x, ok := vars[t.vars]
 			if !ok {
-				tv, ok := l.cfg.TagVars[t.vars]
+				tv, ok := tg.cfg.TagVars[t.vars]
 				if !ok {
 					return errors.Newf(token.NoPos,
 						"tag variable '%s' not found", t.vars)
@@ -297,7 +311,7 @@ func injectTags(tags []string, l *loader) errors.Error {
 				vars[t.vars] = tag
 			}
 			if x != nil {
-				t.injectValue(x, l)
+				t.injectValue(x, tg)
 			}
 		}
 	}
@@ -329,7 +343,7 @@ func shouldBuildFile(f *ast.File, fp *fileProcessor) errors.Error {
 		tagMap[t] = !strings.ContainsRune(t, '=')
 	}
 
-	c := checker{tags: tagMap, loader: fp.c.loader}
+	c := checker{tags: tagMap, tagger: fp.tagger}
 	include := c.shouldInclude(expr)
 	if c.err != nil {
 		return c.err
@@ -365,7 +379,7 @@ func getBuildAttr(f *ast.File) (*ast.Attribute, errors.Error) {
 }
 
 type checker struct {
-	loader *loader
+	tagger *tagger
 	tags   map[string]bool
 	err    errors.Error
 }
@@ -373,7 +387,7 @@ type checker struct {
 func (c *checker) shouldInclude(expr ast.Expr) bool {
 	switch x := expr.(type) {
 	case *ast.Ident:
-		c.loader.buildTags[x.Name] = true
+		c.tagger.buildTags[x.Name] = true
 		return c.tags[x.Name]
 
 	case *ast.BinaryExpr:

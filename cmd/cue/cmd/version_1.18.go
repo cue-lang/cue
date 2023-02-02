@@ -21,6 +21,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"runtime"
 	"runtime/debug"
 	"time"
 
@@ -77,7 +78,8 @@ func runVersion(cmd *Command, args []string) error {
 		}
 	}
 
-	fmt.Fprintf(w, "cue version %v\n\n", version)
+	fmt.Fprintf(w, "cue version %s\n\n", version)
+	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	for _, s := range bi.Settings {
 		if s.Value == "" {
 			// skip empty build settings

@@ -123,12 +123,6 @@ type compiler struct {
 	errs errors.Error
 }
 
-func (c *compiler) reset() {
-	c.fileScope = nil
-	c.stack = c.stack[:0]
-	c.errs = nil
-}
-
 func (c *compiler) errf(n ast.Node, format string, args ...interface{}) *adt.Bottom {
 	err := &compilerError{
 		n:       n,

@@ -494,38 +494,6 @@ func TestIsAbs(t *testing.T) {
 	}
 }
 
-// // simpleJoin builds a file name from the directory and path.
-// // It does not use Join because we don't want ".." to be evaluated.
-// func simpleJoin(dir, path string) string {
-// 	return dir + string(Separator) + path
-// }
-
-// Test directories relative to temporary directory.
-// The tests are run in absTestDirs[0].
-var absTestDirs = []string{
-	"a",
-	"a/b",
-	"a/b/c",
-}
-
-// Test paths relative to temporary directory. $ expands to the directory.
-// The tests are run in absTestDirs[0].
-// We create absTestDirs first.
-var absTests = []string{
-	".",
-	"b",
-	"b/",
-	"../a",
-	"../a/b",
-	"../a/b/./c/../../.././a",
-	"../a/b/./c/../../.././a/",
-	"$",
-	"$/.",
-	"$/a/../a/b",
-	"$/a/b/c/../../.././a",
-	"$/a/b/c/../../.././a/",
-}
-
 type RelTests struct {
 	root, path, want string
 }

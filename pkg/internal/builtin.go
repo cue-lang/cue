@@ -189,10 +189,6 @@ func (x *Builtin) name(ctx *adt.OpContext) string {
 	return fmt.Sprintf("%s.%s", x.Pkg.StringValue(ctx), x.Name)
 }
 
-func (x *Builtin) isValidator() bool {
-	return len(x.Params) == 1 && x.Result == adt.BoolKind
-}
-
 func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	ctx := call.ctx
 	switch err := errVal.(type) {

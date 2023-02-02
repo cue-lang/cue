@@ -46,16 +46,6 @@ func (c *OpContext) Stats() *stats.Counts {
 	return &c.stats
 }
 
-// TODO: Note: NewContext takes essentially a cue.Value. By making this
-// type more central, we can perhaps avoid context creation.
-
-// func NewContext(r Runtime, v *Vertex) *OpContext {
-// 	e := NewUnifier(r)
-// 	return e.NewContext(v)
-// }
-
-var structSentinel = &StructMarker{}
-
 var incompleteSentinel = &Bottom{
 	Code: IncompleteError,
 	Err:  errors.Newf(token.NoPos, "incomplete"),
@@ -1398,7 +1388,6 @@ type envList struct {
 	id      CloseInfo
 	ignore  bool // has a self-referencing comprehension and is postponed
 	self    bool // was added as a postponed self-referencing comprehension
-	index   int
 }
 
 type envCheck struct {
@@ -1662,28 +1651,6 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		c.CloseInfo = closeInfo
 		n.addExprConjunct(c, Partial)
 	}
-}
-
-// isDef reports whether an expressions is a reference that references a
-// definition anywhere in its selection path.
-//
-// TODO(performance): this should be merged with resolve(). But for now keeping
-// this code isolated makes it easier to see what it is for.
-func isDef(x Expr) bool {
-	switch r := x.(type) {
-	case *FieldReference:
-		return r.Label.IsDef()
-
-	case *SelectorExpr:
-		if r.Sel.IsDef() {
-			return true
-		}
-		return isDef(r.X)
-
-	case *IndexExpr:
-		return isDef(r.X)
-	}
-	return false
 }
 
 func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) {

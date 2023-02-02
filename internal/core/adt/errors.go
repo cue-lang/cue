@@ -128,17 +128,6 @@ func isError(v Value) bool {
 	return ok
 }
 
-// isIncomplete reports whether v is associated with an incomplete error.
-func isIncomplete(v *Vertex) bool {
-	if v == nil {
-		return true
-	}
-	if b, ok := v.BaseValue.(*Bottom); ok {
-		return b.IsIncomplete()
-	}
-	return false
-}
-
 // AddChildError updates x to record an error that occurred in one of
 // its descendent arcs. The resulting error will record the worst error code of
 // the current error or recursive error.

@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
 
@@ -110,24 +109,5 @@ func (f flagName) String(cmd *Command) string {
 
 func (f flagName) StringArray(cmd *Command) []string {
 	v, _ := cmd.Flags().GetStringArray(string(f))
-	return v
-}
-
-type stringFlag struct {
-	name  string
-	short string
-	text  string
-	def   string
-}
-
-func (f *stringFlag) Add(cmd *cobra.Command) {
-	cmd.Flags().StringP(f.name, f.short, f.def, f.text)
-}
-
-func (f *stringFlag) String(cmd *Command) string {
-	v, err := cmd.Flags().GetString(f.name)
-	if err != nil {
-		return f.def
-	}
 	return v
 }

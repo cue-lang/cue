@@ -118,20 +118,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 	return a
 }
 
-// Mode flags for loadImport and download (in get.go).
-const (
-	// resolveImport means that loadImport should do import path expansion.
-	// That is, resolveImport means that the import path came from
-	// a source file and has not been expanded yet to account for
-	// vendoring or possible module adjustment.
-	// Every import path should be loaded initially with resolveImport,
-	// and then the expanded version (for example with the /vendor/ in it)
-	// gets recorded as the canonical import path. At that point, future loads
-	// of that package must not pass resolveImport, because
-	// disallowVendor will reject direct use of paths containing /vendor/.
-	resolveImport = 1 << iota
-)
-
 type loader struct {
 	cfg          *Config
 	stk          importStack

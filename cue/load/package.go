@@ -14,10 +14,6 @@
 
 package load
 
-import (
-	"unicode/utf8"
-)
-
 // Package rules:
 //
 // - the package clause defines a namespace.
@@ -30,20 +26,3 @@ import (
 // The contents of a namespace depends on the directory that is selected as the
 // starting point to load a package. An instance defines a package-directory
 // pair.
-
-// safeArg reports whether arg is a "safe" command-line argument,
-// meaning that when it appears in a command-line, it probably
-// doesn't have some special meaning other than its own name.
-// Obviously args beginning with - are not safe (they look like flags).
-// Less obviously, args beginning with @ are not safe (they look like
-// GNU binutils flagfile specifiers, sometimes called "response files").
-// To be conservative, we reject almost any arg beginning with non-alphanumeric ASCII.
-// We accept leading . _ and / as likely in file system paths.
-// There is a copy of this function in cmd/compile/internal/gc/noder.go.
-func safeArg(name string) bool {
-	if name == "" {
-		return false
-	}
-	c := name[0]
-	return '0' <= c && c <= '9' || 'A' <= c && c <= 'Z' || 'a' <= c && c <= 'z' || c == '.' || c == '_' || c == '/' || c >= utf8.RuneSelf
-}

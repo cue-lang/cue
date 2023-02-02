@@ -464,21 +464,3 @@ func (v *validator) validate(n ast.Node) bool {
 	}
 	return ok
 }
-
-// simplify reformats a File. To be used as a wrapper for Extract functions.
-//
-// It currently does so by formatting the file using fmt.Format and then
-// reparsing it. This is not ideal, but the package format does not provide a
-// way to do so differently.
-func simplify(f *ast.File, err error) (*ast.File, error) {
-	if err != nil {
-		return nil, err
-	}
-	// This needs to be a function that modifies f in order to maintain line
-	// number information.
-	b, err := format.Node(f, format.Simplify())
-	if err != nil {
-		return nil, err
-	}
-	return parser.ParseFile(f.Filename, b, parser.ParseComments)
-}

@@ -198,10 +198,6 @@ func (d *decoder) uint(n cue.Value) ast.Expr {
 	return n.Syntax(cue.Final()).(ast.Expr)
 }
 
-func (d *decoder) bool(n cue.Value) ast.Expr {
-	return n.Syntax(cue.Final()).(ast.Expr)
-}
-
 func (d *decoder) boolValue(n cue.Value) bool {
 	x, err := n.Bool()
 	if err != nil {

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "98352164_f45b20dc",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 10
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-02T12:51:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "10932201_d2699ce4",
+      "revId": "d4799a830149947d3db982635c617d099e97aeb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfa53dc4_02bab442",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-02-02T12:20:45Z",
       "side": 1,
       "message": "Nit for a later CL. We should DRY-up the use of \"refs/tags/v\". It\u0027s used here as a CUE regular expression, as a GitHub pattern, and as a startWith() prefix.",
+      "revId": "d4799a830149947d3db982635c617d099e97aeb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e99fc229_0e3be9fe",
+        "filename": "internal/ci/goreleaser/goreleaser_tool.cue",
+        "patchSetId": 10
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-02T12:51:04Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "cfa53dc4_02bab442",
       "revId": "d4799a830149947d3db982635c617d099e97aeb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -80,16 +80,6 @@ type encoder struct {
 	errs errors.Error
 }
 
-func (e *encoder) addErr(err errors.Error) {
-	e.errs = errors.Append(e.errs, err)
-}
-
-func (e *encoder) addErrf(p token.Pos, schema cue.Value, format string, args ...interface{}) {
-	format = "%s: " + format
-	args = append([]interface{}{schema.Path()}, args...)
-	e.addErr(errors.Newf(p, format, args...))
-}
-
 func (e *encoder) rewriteDecls(schema cue.Value, decls []ast.Decl) {
 	for _, f := range decls {
 		field, ok := f.(*ast.Field)

@@ -68,9 +68,9 @@ _#protectedBranchPatterns: [core.#defaultBranch, core.#releaseBranchPattern]
 // See https://docs.github.com/en/actions/learn-github-actions/expressions.
 _#matchPattern: {
 	variable: string
-	pattern: string
-	expr: [
-		if strings.HasSuffix(pattern, "*") {
+	pattern:  string
+	expr:     [
+			if strings.HasSuffix(pattern, "*") {
 			let prefix = strings.TrimSuffix(pattern, "*")
 			"startsWith(\(variable), '\(prefix)')"
 		},

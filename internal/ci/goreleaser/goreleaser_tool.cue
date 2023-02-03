@@ -9,6 +9,8 @@ import (
 	"tool/exec"
 	"tool/os"
 	"tool/cli"
+
+	"cuelang.org/go/internal/ci/core"
 )
 
 command: release: {
@@ -58,7 +60,7 @@ command: release: {
 		// Only run the full release when running on GitHub actions for a release tag.
 		// Keep in sync with core.#releaseTagPattern, which is a globbing pattern
 		// rather than a regular expression.
-		if _githubRef !~ "refs/tags/v.*" {
+		if _githubRef !~ "refs/tags/\(core.#releaseTagPrefix).*" {
 			"--snapshot"
 		},
 	]

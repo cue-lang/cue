@@ -38,6 +38,7 @@ release: _base.#bashWorkflow & {
 
 	on: push: {
 		tags: [core.#releaseTagPattern]
+		"tags-ignore": [core.#zeroReleaseTagPattern]
 		branches: list.Concat([[_base.#testDefaultBranch], _#protectedBranchPatterns])
 	}
 	jobs: goreleaser: {

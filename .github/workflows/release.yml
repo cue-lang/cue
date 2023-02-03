@@ -5,6 +5,8 @@ name: Release
   push:
     tags:
       - v*
+    tags-ignore:
+      - '*-0.dev'
     branches:
       - ci/test
       - master

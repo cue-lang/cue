@@ -37,7 +37,7 @@ release: _base.#bashWorkflow & {
 	concurrency: "release"
 
 	on: push: {
-		tags: [core.#releaseTagPattern]
+		tags: [core.#releaseTagPattern, "!" + core.#zeroReleaseTagPattern]
 		branches: list.Concat([[_base.#testDefaultBranch], _#protectedBranchPatterns])
 	}
 	jobs: goreleaser: {

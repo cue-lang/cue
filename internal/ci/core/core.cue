@@ -30,9 +30,39 @@ _#URLPath: {
 
 #goreleaserVersion: "v1.13.1"
 
-#defaultBranch:        "master"
-#releaseBranchPattern: "release-branch.*"
-#releaseTagPattern:    "v*"
+#defaultBranch: "master"
+
+// #releaseBranchPrefix is the git branch name prefix used to identify
+// release branches.
+#releaseBranchPrefix: "release-branch."
+
+// #releaseBranchPattern is the GitHub pattern that corresponds to
+// #releaseBranchPrefix. For docs on glob patterns see:
+//
+// https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
+#releaseBranchPattern: #releaseBranchPrefix + "*"
+
+// #releaseTagPrefix is the prefix used to identify all git tag that correspond
+// to semver releases
+#releaseTagPrefix: "v"
+
+// #releaseTagPattern is the GitHub glob pattern that corresponds to
+// #releaseTagPrefix. For docs on glob patterns see:
+//
+// https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#filter-pattern-cheat-sheet
+#releaseTagPattern: #releaseTagPrefix + "*"
+
+// #zeroReleaseTagSuffix is the suffix used to identify all "zero" releases.
+// When we create a release branch for v0.$X.0, it's likely that commits on the
+// default branch will from that point onwards be intended for the $X+1
+// version. However, unless we tag the next commit after the release branch, it
+// might be the case that pseudo versions of those later commits refer to the
+// $X release.
+//
+// A "zero" tag fixes this when applied to the first commit after a release
+// branch. Critically, the -0.dev pre-release suffix is ordered before -alpha.
+// tags.
+#zeroReleaseTagSuffix: "-0.dev"
 
 #codeReview: {
 	gerrit?:      string

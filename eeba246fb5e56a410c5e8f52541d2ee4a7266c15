@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8ffca49_f517dc4d",
+        "filename": "internal/ci/github/workflows.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-02-03T20:51:23Z",
+      "side": 1,
+      "message": "The trybot failures related to this line are a function of https://github.com/cue-lang/cue/issues/2244",
+      "revId": "eeba246fb5e56a410c5e8f52541d2ee4a7266c15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

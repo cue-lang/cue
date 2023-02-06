@@ -40,24 +40,25 @@ func IsValidIdent(ident string) bool {
 	}
 
 	// TODO: use consumed again to allow #0.
-	// consumed := false
+	consumed := false
 	if strings.HasPrefix(ident, "_") {
 		ident = ident[1:]
-		// consumed = true
+		consumed = true
 		if len(ident) == 0 {
 			return true
 		}
 	}
 	if strings.HasPrefix(ident, "#") {
 		ident = ident[1:]
-		// consumed = true
+		// Note: _#0 is not allowed by the spec, although _0 is.
+		consumed = false
 	}
 
-	// if !consumed {
-	if r, _ := utf8.DecodeRuneInString(ident); isDigit(r) {
-		return false
+	if !consumed {
+		if r, _ := utf8.DecodeRuneInString(ident); isDigit(r) {
+			return false
+		}
 	}
-	// }
 
 	for _, r := range ident {
 		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {

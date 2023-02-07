@@ -16,6 +16,23 @@
       "message": "Probably needs a rebase but should be fine post that.",
       "revId": "e1b203cabdf167e32e0655466bb8f94479694bea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcb1dacd_36931ab6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-07T16:06:52Z",
+      "side": 1,
+      "message": "Yet another case where a user reported a bug and was confused by the term \"latest\" :) https://github.com/cue-lang/cue/issues/2252\n\nRebasing and merging now, for the sake of future bug reports.",
+      "revId": "e1b203cabdf167e32e0655466bb8f94479694bea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

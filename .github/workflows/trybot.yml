@@ -66,6 +66,7 @@ jobs:
           		exit 1
           	fi
           done
+      - run: go env
       - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))
         run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')

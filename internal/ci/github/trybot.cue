@@ -65,6 +65,9 @@ trybot: _base.#bashWorkflow & {
 					if: _#isLatestLinux
 				},
 				json.#step & {
+					run: "go env"
+				},
+				json.#step & {
 					if:  _#isProtectedBranch
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},

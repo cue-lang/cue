@@ -22,14 +22,11 @@ import (
 	"path/filepath"
 	"strings"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/runtime"
 )
 
 const (
@@ -142,6 +139,12 @@ type Config struct {
 	// Module specifies the module prefix. If not empty, this value must match
 	// the module field of an existing cue.mod file.
 	Module string
+
+	// modFile holds the contents of the module file, or nil
+	// if no module file was present. If non-nil, then
+	// after calling Config.complete, modFile.Module will be
+	// equal to Module.
+	modFile *modFile
 
 	// Package defines the name of the package to be loaded. If this is not set,
 	// the package must be uniquely defined from its context. Special values:
@@ -518,7 +521,7 @@ func (c Config) complete() (cfg *Config, err error) {
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
 	}
-	if err := c.completeModule(); err != nil {
+	if err := c.loadModule(); err != nil {
 		return nil, err
 	}
 	c.loader = &loader{
@@ -534,57 +537,6 @@ func (c Config) complete() (cfg *Config, err error) {
 		)
 	}
 	return &c, nil
-}
-
-// completeModule fills out c.Module if it's empty or checks it for
-// consistency with the module file otherwise.
-func (c *Config) completeModule() error {
-	// TODO: also make this work if run from outside the module?
-	mod := filepath.Join(c.ModuleRoot, modDir)
-	info, cerr := c.fileSystem.stat(mod)
-	if cerr != nil {
-		return nil
-	}
-	// TODO remove support for legacy non-directory module.cue file
-	// by returning an error if info.IsDir is false.
-	if info.IsDir() {
-		mod = filepath.Join(mod, moduleFile)
-	}
-	f, cerr := c.fileSystem.openFile(mod)
-	if cerr != nil {
-		return nil
-	}
-	defer f.Close()
-
-	// TODO: move to full build again
-	file, err := parser.ParseFile("load", f)
-	if err != nil {
-		return errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
-	}
-	// TODO disallow non-data-mode CUE.
-
-	ctx := (*cue.Context)(runtime.New())
-	v := ctx.BuildFile(file)
-	if err := v.Validate(); err != nil {
-		return errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
-	}
-	prefix := v.LookupPath(cue.MakePath(cue.Str("module")))
-	if prefix.Err() != nil {
-		// TODO check better for not-found?
-		return nil
-	}
-	name, err := prefix.String()
-	if err != nil {
-		return err
-	}
-	if c.Module == "" {
-		c.Module = name
-		return nil
-	}
-	if c.Module == name {
-		return nil
-	}
-	return errors.Newf(prefix.Pos(), "inconsistent modules: got %q, want %q", name, c.Module)
 }
 
 func (c Config) isRoot(dir string) bool {

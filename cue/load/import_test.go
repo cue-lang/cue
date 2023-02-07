@@ -16,6 +16,7 @@ package load
 
 import (
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -23,7 +24,13 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-const testdata = "./testdata/"
+func testMod(dir string) string {
+	cwd, err := os.Getwd()
+	if err != nil {
+		panic(err)
+	}
+	return filepath.Join(cwd, "testdata", dir)
+}
 
 func getInst(pkg, cwd string) (*build.Instance, error) {
 	c, _ := (&Config{Dir: cwd}).complete()
@@ -50,17 +57,19 @@ func TestEmptyImport(t *testing.T) {
 }
 
 func TestEmptyFolderImport(t *testing.T) {
-	_, err := getInst(".", testdata+"empty")
+	path := filepath.Join(testMod("testmod"), "empty")
+	_, err := getInst(".", path)
 	if _, ok := err.(*NoFilesError); !ok {
-		t.Fatal(`Import("testdata/empty") did not return NoCUEError.`)
+		t.Fatalf(`Import(%q) did not return NoCUEError.`, path)
 	}
 }
 
 func TestMultiplePackageImport(t *testing.T) {
-	_, err := getInst(".", testdata+"multi")
+	path := filepath.Join(testMod("testmod"), "multi")
+	_, err := getInst(".", path)
 	mpe, ok := err.(*MultiplePackageError)
 	if !ok {
-		t.Fatal(`Import("testdata/multi") did not return MultiplePackageError.`)
+		t.Fatalf(`Import(%q) did not return MultiplePackageError.`, path)
 	}
 	mpe.Dir = ""
 	want := &MultiplePackageError{

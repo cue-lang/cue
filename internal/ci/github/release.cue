@@ -42,6 +42,7 @@ release: _base.#bashWorkflow & {
 	}
 	jobs: goreleaser: {
 		"runs-on": _#linuxMachine
+		if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
 		steps: [
 			_base.#checkoutCode & {
 				with: "fetch-depth": 0

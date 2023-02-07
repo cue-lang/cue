@@ -17,6 +17,7 @@ jobs:
     defaults:
       run:
         shell: bash
+    if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3

@@ -35,7 +35,7 @@ func testMod(dir string) string {
 func getInst(pkg, cwd string) (*build.Instance, error) {
 	c, _ := (&Config{Dir: cwd}).complete()
 	l := loader{cfg: c}
-	inst := c.newRelInstance(token.NoPos, pkg, c.Package)
+	inst := l.newRelInstance(token.NoPos, pkg, c.Package)
 	p := l.importPkg(token.NoPos, inst)[0]
 	return p, p.Err
 }
@@ -43,7 +43,7 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 func TestEmptyImport(t *testing.T) {
 	c, _ := (&Config{}).complete()
 	l := loader{cfg: c}
-	inst := c.newInstance(token.NoPos, "")
+	inst := l.newInstance(token.NoPos, "")
 	p := l.importPkg(token.NoPos, inst)[0]
 	if p.Err == nil {
 		t.Fatal(`Import("") returned nil error.`)

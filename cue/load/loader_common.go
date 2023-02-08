@@ -68,8 +68,9 @@ type loaderIntf interface {
 }
 
 func newLoader(c *Config, tg *tagger) loaderIntf {
-	// TODO when modules are enabled, return a different
-	// implementation of loaderIntf.
+	if c.RemoteModules {
+		return newModLoader(c, tg)
+	}
 	return newLegacyLoader(c, tg)
 }
 

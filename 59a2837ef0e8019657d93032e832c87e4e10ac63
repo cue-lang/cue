@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb07099d_6670a138",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-08T11:52:21Z",
+      "side": 1,
+      "message": "nit: wrapping again :)",
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "845fb318_d2538acd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-08T11:52:21Z",
+      "side": 1,
+      "message": "we ought to have a follow-up issue or TODO about this.",
+      "range": {
+        "startLine": 16,
+        "startChar": 58,
+        "endLine": 17,
+        "endChar": 28
+      },
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a04cf08_8a0d3b50",
+        "filename": "cue/load/module.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-08T11:52:21Z",
+      "side": 1,
+      "message": "presumably these are all new additions, still. if you just want this to be a no-op refactor, I don\u0027t think we should be adding the new fields.",
+      "range": {
+        "startLine": 21,
+        "startChar": 34,
+        "endLine": 25,
+        "endChar": 34
+      },
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c97f552_905e5218",
+        "filename": "cue/load/moduleschema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-08T11:52:21Z",
+      "side": 1,
+      "message": "why do we need the `*` for a default there? it should work without it, I think.",
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

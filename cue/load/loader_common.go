@@ -51,6 +51,28 @@ const (
 	allowAnonymous
 )
 
+// loaderIntf represents the interface in common between
+// the non-module loader and the module-aware loader.
+type loaderIntf interface {
+	// loader returns the instance loading function defined by
+	// the loader.
+	buildLoadFunc() build.LoadFunc
+
+	// importPaths returns the matching paths to use for the given command line.
+	// It calls ImportPathsQuiet and then WarnUnmatched.
+	importPaths(patterns []string) []*match
+
+	// cueFilesPackage creates a package for building a collection of CUE files
+	// (typically named on the command line).
+	cueFilesPackage(files []*build.File) *build.Instance
+}
+
+func newLoader(c *Config, tg *tagger) loaderIntf {
+	// TODO when modules are enabled, return a different
+	// implementation of loaderIntf.
+	return newLegacyLoader(c, tg)
+}
+
 func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 	p.Root = root
 
@@ -112,24 +134,28 @@ type fileProcessor struct {
 	ignoreOther      bool // ignore files from other packages
 	allPackages      bool
 
-	c    *Config
-	pkgs map[string]*build.Instance
-	pkg  *build.Instance
+	c      *fileProcessorConfig
+	tagger *tagger
+	pkgs   map[string]*build.Instance
+	pkg    *build.Instance
 
 	err errors.Error
 }
 
-func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
+type fileProcessorConfig = Config
+
+func newFileProcessor(c *fileProcessorConfig, p *build.Instance, tg *tagger) *fileProcessor {
 	return &fileProcessor{
 		imported: make(map[string][]token.Pos),
 		allTags:  make(map[string]bool),
 		c:        c,
 		pkgs:     map[string]*build.Instance{"_": p},
 		pkg:      p,
+		tagger:   tg,
 	}
 }
 
-func countCUEFiles(c *Config, p *build.Instance) int {
+func countCUEFiles(c *fileProcessorConfig, p *build.Instance) int {
 	count := len(p.BuildFiles)
 	for _, f := range p.IgnoredFiles {
 		if c.Tools && strings.HasSuffix(f.Filename, "_tool.cue") {
@@ -313,7 +339,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	}
 	switch {
 	case isTest:
-		if fp.c.loader.cfg.Tests {
+		if fp.c.Tests {
 			p.BuildFiles = append(p.BuildFiles, file)
 		} else {
 			file.ExcludeReason = excludeError{errors.Newf(pos,
@@ -321,7 +347,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		}
 	case isTool:
-		if fp.c.loader.cfg.Tools {
+		if fp.c.Tools {
 			p.BuildFiles = append(p.BuildFiles, file)
 		} else {
 			file.ExcludeReason = excludeError{errors.Newf(pos,

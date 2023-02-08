@@ -74,7 +74,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		return retErr(err)
 	}
 
-	fp := newFileProcessor(cfg, p)
+	fp := newFileProcessor(cfg, p, l.tagger)
 
 	if p.PkgName == "" {
 		if l.cfg.Package == "*" {
@@ -209,60 +209,54 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	return all
 }
 
-// loadFunc creates a LoadFunc that can be used to create new build.Instances.
-func (l *loader) loadFunc() build.LoadFunc {
-
-	return func(pos token.Pos, path string) *build.Instance {
-		cfg := l.cfg
-
-		impPath := importPath(path)
-		if isLocalImport(path) {
-			return cfg.newErrInstance(pos, impPath,
-				errors.Newf(pos, "relative import paths not allowed (%q)", path))
-		}
-
-		// is it a builtin?
-		if strings.IndexByte(strings.Split(path, "/")[0], '.') == -1 {
-			if l.cfg.StdRoot != "" {
-				p := cfg.newInstance(pos, impPath)
-				_ = l.importPkg(pos, p)
-				return p
-			}
-			return nil
-		}
-
-		p := cfg.newInstance(pos, impPath)
-		_ = l.importPkg(pos, p)
-		return p
+// _loadFunc is the method used for the value of l.loadFunc.
+func (l *loader) _loadFunc(pos token.Pos, path string) *build.Instance {
+	impPath := importPath(path)
+	if isLocalImport(path) {
+		return l.cfg.newErrInstance(errors.Newf(pos, "relative import paths not allowed (%q)", path))
 	}
+
+	// is it a builtin?
+	if strings.IndexByte(strings.Split(path, "/")[0], '.') == -1 {
+		if l.cfg.StdRoot != "" {
+			p := l.newInstance(pos, impPath)
+			_ = l.importPkg(pos, p)
+			return p
+		}
+		return nil
+	}
+
+	p := l.newInstance(pos, impPath)
+	_ = l.importPkg(pos, p)
+	return p
 }
 
 // newRelInstance returns a build instance from the given
 // relative import path.
-func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Instance {
+func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Instance {
 	if !isLocalImport(path) {
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
-	fs := c.fileSystem
+	fs := l.cfg.fileSystem
 
 	var err errors.Error
 	dir := path
 
-	p := c.Context.NewInstance(path, c.loadFunc)
+	p := l.cfg.Context.NewInstance(path, l.loadFunc)
 	p.PkgName = pkgName
 	p.DisplayPath = filepath.ToSlash(path)
 	// p.ImportPath = string(dir) // compute unique ID.
-	p.Root = c.ModuleRoot
-	p.Module = c.Module
+	p.Root = l.cfg.ModuleRoot
+	p.Module = l.cfg.Module
 
-	dir = filepath.Join(c.Dir, filepath.FromSlash(path))
+	dir = filepath.Join(l.cfg.Dir, filepath.FromSlash(path))
 
 	if path != cleanImport(path) {
-		err = errors.Append(err, c.loader.errPkgf(nil,
+		err = errors.Append(err, l.errPkgf(nil,
 			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
 	}
 
-	if importPath, e := c.importPathFromAbsDir(fsPath(dir), path); e != nil {
+	if importPath, e := l.importPathFromAbsDir(fsPath(dir), path); e != nil {
 		// Detect later to keep error messages consistent.
 	} else {
 		p.ImportPath = string(importPath)
@@ -282,19 +276,19 @@ func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	return p
 }
 
-func (c *Config) importPathFromAbsDir(absDir fsPath, key string) (importPath, errors.Error) {
-	if c.ModuleRoot == "" {
+func (l *loader) importPathFromAbsDir(absDir fsPath, key string) (importPath, errors.Error) {
+	if l.cfg.ModuleRoot == "" {
 		return "", errors.Newf(token.NoPos,
 			"cannot determine import path for %q (root undefined)", key)
 	}
 
 	dir := filepath.Clean(string(absDir))
-	if !strings.HasPrefix(dir, c.ModuleRoot) {
+	if !strings.HasPrefix(dir, l.cfg.ModuleRoot) {
 		return "", errors.Newf(token.NoPos,
 			"cannot determine import path for %q (dir outside of root)", key)
 	}
 
-	pkg := filepath.ToSlash(dir[len(c.ModuleRoot):])
+	pkg := filepath.ToSlash(dir[len(l.cfg.ModuleRoot):])
 	switch {
 	case strings.HasPrefix(pkg, "/cue.mod/"):
 		pkg = pkg[len("/cue.mod/"):]
@@ -311,14 +305,14 @@ func (c *Config) importPathFromAbsDir(absDir fsPath, key string) (importPath, er
 				"invalid package %q (root of %s)", key, pkgDir)
 		}
 
-	case c.Module == "":
+	case l.cfg.Module == "":
 		return "", errors.Newf(token.NoPos,
 			"cannot determine import path for %q (no module)", key)
 	default:
-		pkg = c.Module + pkg
+		pkg = l.cfg.Module + pkg
 	}
 
-	name := c.Package
+	name := l.cfg.Package
 	switch name {
 	case "_", "*":
 		name = ""
@@ -327,15 +321,15 @@ func (c *Config) importPathFromAbsDir(absDir fsPath, key string) (importPath, er
 	return addImportQualifier(importPath(pkg), name)
 }
 
-func (c *Config) newInstance(pos token.Pos, p importPath) *build.Instance {
-	dir, name, err := c.absDirFromImportPath(pos, p)
-	i := c.Context.NewInstance(dir, c.loadFunc)
+func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
+	dir, name, err := l.cfg.absDirFromImportPath(pos, p)
+	i := l.cfg.Context.NewInstance(dir, l.loadFunc)
 	i.Dir = dir
 	i.PkgName = name
 	i.DisplayPath = string(p)
 	i.ImportPath = string(p)
-	i.Root = c.ModuleRoot
-	i.Module = c.Module
+	i.Root = l.cfg.ModuleRoot
+	i.Module = l.cfg.Module
 	i.Err = errors.Append(i.Err, err)
 
 	return i

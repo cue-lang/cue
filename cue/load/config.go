@@ -290,6 +290,19 @@ func (c *Config) stdin() io.Reader {
 	return c.Stdin
 }
 
+func (c *Config) newFileProcessorConfig() *fileProcessorConfig {
+	return &fileProcessorConfig{
+		Tags:        c.Tags,
+		AllCUEFiles: c.AllCUEFiles,
+		Tests:       c.Tests,
+		Tools:       c.Tools,
+		filesMode:   c.filesMode,
+		DataFiles:   c.DataFiles,
+		Stdin:       c.Stdin,
+		fileSystem:  c.fileSystem,
+	}
+}
+
 func toImportPath(dir string) importPath {
 	return importPath(filepath.ToSlash(dir))
 }

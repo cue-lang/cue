@@ -95,7 +95,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 		}
 	}
 
-	fp := newFileProcessor(cfg, pkg, l.tagger)
+	fp := newFileProcessor(cfg.newFileProcessorConfig(), pkg, l.tagger)
 	for _, file := range files {
 		fp.add(token.NoPos, cfg.Dir, file, allowAnonymous)
 	}

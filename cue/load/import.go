@@ -74,7 +74,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		return retErr(err)
 	}
 
-	fp := newFileProcessor(cfg, p, l.tagger)
+	fp := newFileProcessor(cfg.newFileProcessorConfig(), p, l.tagger)
 
 	if p.PkgName == "" {
 		if l.cfg.Package == "*" {

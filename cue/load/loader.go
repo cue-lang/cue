@@ -14,7 +14,7 @@
 
 package load
 
-// Files in package are to a large extent based on Go files from the following
+// Files in this package are to a large extent based on Go files from the following
 // Go packages:
 //    - cmd/go/internal/load
 //    - go/build
@@ -22,7 +22,6 @@ package load
 import (
 	"path/filepath"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -35,26 +34,24 @@ import (
 	_ "cuelang.org/go/pkg"
 )
 
-// Mode flags for loadImport and download (in get.go).
-const (
-	// resolveImport means that loadImport should do import path expansion.
-	// That is, resolveImport means that the import path came from
-	// a source file and has not been expanded yet to account for
-	// vendoring or possible module adjustment.
-	// Every import path should be loaded initially with resolveImport,
-	// and then the expanded version (for example with the /vendor/ in it)
-	// gets recorded as the canonical import path. At that point, future loads
-	// of that package must not pass resolveImport, because
-	// disallowVendor will reject direct use of paths containing /vendor/.
-	resolveImport = 1 << iota
-)
-
 type loader struct {
-	cfg          *Config
-	stk          importStack
-	tags         []*tag // tags found in files
-	buildTags    map[string]bool
-	replacements map[ast.Node]ast.Node
+	cfg      *Config
+	tagger   *tagger
+	stk      importStack
+	loadFunc build.LoadFunc
+}
+
+func newLegacyLoader(c *Config, tg *tagger) *loader {
+	l := &loader{
+		cfg:    c,
+		tagger: tg,
+	}
+	l.loadFunc = l._loadFunc
+	return l
+}
+
+func (l *loader) buildLoadFunc() build.LoadFunc {
+	return l.loadFunc
 }
 
 func (l *loader) abs(filename string) string {
@@ -76,11 +73,10 @@ func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface
 // cueFilesPackage creates a package for building a collection of CUE files
 // (typically named on the command line).
 func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
-	pos := token.NoPos
 	cfg := l.cfg
 	cfg.filesMode = true
 	// ModInit() // TODO: support modules
-	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc())
+	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc)
 
 	for _, bf := range files {
 		f := bf.Filename
@@ -92,18 +88,16 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 		}
 		fi, err := cfg.fileSystem.stat(f)
 		if err != nil {
-			return cfg.newErrInstance(pos, toImportPath(f),
-				errors.Wrapf(err, pos, "could not find file"))
+			return cfg.newErrInstance(errors.Wrapf(err, token.NoPos, "could not find file %v", f))
 		}
 		if fi.IsDir() {
-			return cfg.newErrInstance(token.NoPos, toImportPath(f),
-				errors.Newf(pos, "file is a directory %v", f))
+			return cfg.newErrInstance(errors.Newf(token.NoPos, "file is a directory %v", f))
 		}
 	}
 
-	fp := newFileProcessor(cfg, pkg)
+	fp := newFileProcessor(cfg, pkg, l.tagger)
 	for _, file := range files {
-		fp.add(pos, cfg.Dir, file, allowAnonymous)
+		fp.add(token.NoPos, cfg.Dir, file, allowAnonymous)
 	}
 
 	// TODO: ModImportFromFiles(files)

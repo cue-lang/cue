@@ -113,7 +113,7 @@ err:    import failed: relative import paths not allowed ("./file"):
 path:   ""
 module: mod.test/test
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen
+dir:    ""
 display:""`,
 	}, {
 		cfg:  dirCfg,

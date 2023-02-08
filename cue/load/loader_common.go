@@ -16,6 +16,8 @@ package load
 
 import (
 	"bytes"
+	"io"
+	"os"
 	"path"
 	pathpkg "path"
 	"path/filepath"
@@ -143,7 +145,44 @@ type fileProcessor struct {
 	err errors.Error
 }
 
-type fileProcessorConfig = Config
+type fileProcessorConfig struct {
+	// Tags defines boolean tags or key-value pairs to select files to build
+	// or be injected as values in fields.
+	Tags []string
+
+	// Include all files, regardless of tags.
+	AllCUEFiles bool
+
+	// If Tests is set, the loader includes not just the packages
+	// matching a particular pattern but also any related test packages.
+	Tests bool
+
+	// If Tools is set, the loader includes tool files associated with
+	// a package.
+	Tools bool
+
+	// filesMode indicates that files are specified
+	// explicitly on the command line.
+	filesMode bool
+
+	// If DataFiles is set, the loader includes entries for directories that
+	// have no CUE files, but have recognized data files that could be converted
+	// to CUE.
+	DataFiles bool
+
+	// Stdin defines an alternative for os.Stdin for the file "-". When used,
+	// the corresponding build.File will be associated with the full buffer.
+	Stdin io.Reader
+
+	fileSystem
+}
+
+func (c *fileProcessorConfig) stdin() io.Reader {
+	if c.Stdin == nil {
+		return os.Stdin
+	}
+	return c.Stdin
+}
 
 func newFileProcessor(c *fileProcessorConfig, p *build.Instance, tg *tagger) *fileProcessor {
 	return &fileProcessor{

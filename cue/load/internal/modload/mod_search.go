@@ -28,6 +28,14 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+// A match represents the result of matching a single package pattern.
+type match struct {
+	Pattern string // the pattern itself
+	Literal bool   // whether it is a literal (no wildcards)
+	Pkgs    []*build.Instance
+	Err     errors.Error
+}
+
 // TODO: should be matched from module file only.
 // The pattern is either "all" (all packages), "std" (standard packages),
 // "cmd" (standard commands), or a path including "...".

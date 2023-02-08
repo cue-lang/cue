@@ -22,7 +22,6 @@ package load
 import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 
 	// Trigger the unconditional loading of all core builtin packages if load
@@ -43,11 +42,18 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 	newC, err := c.complete()
 	if err != nil {
-		return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
+		return []*build.Instance{c.newErrInstance(err)}
 	}
 	c = newC
+	tg := newTagger(c)
+	l := newLoader(c, tg)
 
-	l := c.loader
+	if c.Context == nil {
+		c.Context = build.NewContext(
+			build.Loader(l.buildLoadFunc()),
+			build.ParseFile(c.ParseFile),
+		)
+	}
 
 	// TODO: require packages to be placed before files. At some point this
 	// could be relaxed.
@@ -60,7 +66,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if len(args) == 0 || i > 0 {
 		for _, m := range l.importPaths(args[:i]) {
 			if m.Err != nil {
-				inst := c.newErrInstance(token.NoPos, "", m.Err)
+				inst := c.newErrInstance(m.Err)
 				a = append(a, inst)
 				continue
 			}
@@ -71,7 +77,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if args = args[i:]; len(args) > 0 {
 		files, err := filetypes.ParseArgs(args)
 		if err != nil {
-			return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
+			return []*build.Instance{c.newErrInstance(err)}
 		}
 		a = append(a, l.cueFilesPackage(files))
 	}
@@ -81,19 +87,19 @@ func Instances(args []string, c *Config) []*build.Instance {
 		if err != nil {
 			p.ReportError(err)
 		}
-		l.tags = append(l.tags, tags...)
+		tg.tags = append(tg.tags, tags...)
 	}
 
 	// TODO(api): have API call that returns an error which is the aggregate
 	// of all build errors. Certain errors, like these, hold across builds.
-	if err := injectTags(c.Tags, l); err != nil {
+	if err := tg.injectTags(c.Tags); err != nil {
 		for _, p := range a {
 			p.ReportError(err)
 		}
 		return a
 	}
 
-	if l.replacements == nil {
+	if tg.replacements == nil {
 		return a
 	}
 
@@ -101,7 +107,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		for _, f := range p.Files {
 			ast.Walk(f, nil, func(n ast.Node) {
 				if ident, ok := n.(*ast.Ident); ok {
-					if v, ok := l.replacements[ident.Node]; ok {
+					if v, ok := tg.replacements[ident.Node]; ok {
 						ident.Node = v
 					}
 				}

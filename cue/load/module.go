@@ -26,7 +26,7 @@ type modFile struct {
 func (c *Config) loadModule() error {
 	// TODO: also make this work if run from outside the module?
 	mod := filepath.Join(c.ModuleRoot, modDir)
-	info, cerr := c.fileSystem.stat(mod)
+	info, cerr := c.fs.Stat(mod)
 	if cerr != nil {
 		return nil
 	}
@@ -35,7 +35,7 @@ func (c *Config) loadModule() error {
 	if info.IsDir() {
 		mod = filepath.Join(mod, moduleFile)
 	}
-	f, cerr := c.fileSystem.openFile(mod)
+	f, cerr := c.fs.OpenFile(mod)
 	if cerr != nil {
 		return nil
 	}

@@ -22,6 +22,7 @@ package load
 import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/load/internal/fileprocessor"
 	"cuelang.org/go/internal/filetypes"
 
 	// Trigger the unconditional loading of all core builtin packages if load
@@ -45,7 +46,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	c = newC
-	tg := newTagger(c)
+	tg := fileprocessor.NewTagger(c.newFileProcessorConfig())
 	l := newLoader(c, tg)
 
 	if c.Context == nil {
@@ -83,23 +84,23 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	for _, p := range a {
-		tags, err := findTags(p)
+		tags, err := fileprocessor.FindTags(p)
 		if err != nil {
 			p.ReportError(err)
 		}
-		tg.tags = append(tg.tags, tags...)
+		tg.AddTags(tags)
 	}
 
 	// TODO(api): have API call that returns an error which is the aggregate
 	// of all build errors. Certain errors, like these, hold across builds.
-	if err := tg.injectTags(c.Tags); err != nil {
+	if err := tg.InjectTags(c.Tags); err != nil {
 		for _, p := range a {
 			p.ReportError(err)
 		}
 		return a
 	}
 
-	if tg.replacements == nil {
+	if !tg.HasReplacement() {
 		return a
 	}
 
@@ -107,7 +108,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		for _, f := range p.Files {
 			ast.Walk(f, nil, func(n ast.Node) {
 				if ident, ok := n.(*ast.Ident); ok {
-					if v, ok := tg.replacements[ident.Node]; ok {
+					if v, ok := tg.Replacements()[ident.Node]; ok {
 						ident.Node = v
 					}
 				}

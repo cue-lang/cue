@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/load/internal/fileprocessor"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
 
@@ -36,12 +37,12 @@ import (
 
 type modLoader struct {
 	cfg      *Config
-	tagger   *tagger
+	tagger   *fileprocessor.Tagger
 	stk      importStack
 	loadFunc build.LoadFunc
 }
 
-func newModLoader(c *Config, tg *tagger) *modLoader {
+func newModLoader(c *Config, tg *fileprocessor.Tagger) *modLoader {
 	l := &modLoader{
 		cfg:    c,
 		tagger: tg,
@@ -86,7 +87,7 @@ func (l *modLoader) cueFilesPackage(files []*build.File) *build.Instance {
 		if !filepath.IsAbs(f) {
 			f = filepath.Join(cfg.Dir, f)
 		}
-		fi, err := cfg.fileSystem.stat(f)
+		fi, err := cfg.fs.Stat(f)
 		if err != nil {
 			return cfg.newErrInstance(errors.Wrapf(err, token.NoPos, "could not find file"))
 		}
@@ -95,15 +96,15 @@ func (l *modLoader) cueFilesPackage(files []*build.File) *build.Instance {
 		}
 	}
 
-	fp := newFileProcessor(cfg.newFileProcessorConfig(), pkg, l.tagger)
+	fp := fileprocessor.New(cfg.newFileProcessorConfig(), pkg, l.tagger)
 	for _, file := range files {
-		fp.add(token.NoPos, cfg.Dir, file, allowAnonymous)
+		fp.Add(token.NoPos, cfg.Dir, file, fileprocessor.AllowAnonymous)
 	}
 
 	// TODO: ModImportFromFiles(files)
 	pkg.Dir = cfg.Dir
 	rewriteFiles(pkg, pkg.Dir, true)
-	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
+	for _, err := range errors.Errors(fp.Finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError
 		if len(pkg.OrphanedFiles) == 0 || !errors.As(err, &x) {
 			pkg.ReportError(err)

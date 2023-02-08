@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package load
+package fileprocessor
 
 import (
 	"io"
@@ -49,9 +49,9 @@ var readImportsTests = []readTest{
 	},
 	{
 		`package p
-		
+
 		// comment
-		
+
 		import "x"
 		import _ "x"
 		import a "x"

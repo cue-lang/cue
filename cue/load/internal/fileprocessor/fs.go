@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package load
+package fileprocessor
 
 import (
 	"bytes"
@@ -29,7 +29,7 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-type overlayFile struct {
+type OverlayFile struct {
 	basename string
 	contents []byte
 	file     *ast.File
@@ -37,34 +37,28 @@ type overlayFile struct {
 	isDir    bool
 }
 
-func (f *overlayFile) Name() string       { return f.basename }
-func (f *overlayFile) Size() int64        { return int64(len(f.contents)) }
-func (f *overlayFile) Mode() os.FileMode  { return 0644 }
-func (f *overlayFile) ModTime() time.Time { return f.modtime }
-func (f *overlayFile) IsDir() bool        { return f.isDir }
-func (f *overlayFile) Sys() interface{}   { return nil }
+func (f *OverlayFile) Name() string       { return f.basename }
+func (f *OverlayFile) Size() int64        { return int64(len(f.contents)) }
+func (f *OverlayFile) Mode() os.FileMode  { return 0644 }
+func (f *OverlayFile) ModTime() time.Time { return f.modtime }
+func (f *OverlayFile) IsDir() bool        { return f.isDir }
+func (f *OverlayFile) Sys() interface{}   { return nil }
 
-// A fileSystem specifies the supporting context for a build.
-type fileSystem struct {
-	overlayDirs map[string]map[string]*overlayFile
+// A FileSystem specifies the supporting context for a build.
+type FileSystem struct {
+	overlayDirs map[string]map[string]*OverlayFile
 	cwd         string
 }
 
-func (fs *fileSystem) getDir(dir string, create bool) map[string]*overlayFile {
-	dir = filepath.Clean(dir)
-	m, ok := fs.overlayDirs[dir]
-	if !ok && create {
-		m = map[string]*overlayFile{}
-		fs.overlayDirs[dir] = m
+// NewFileSystem creates a filesystem given an absolute path
+// for interpreting relative paths, and an overlay map mapping
+// filepath paths to data sources.
+func NewFileSystem(dir string, overlay map[string]Source) (*FileSystem, error) {
+	fs := &FileSystem{
+		cwd: dir,
 	}
-	return m
-}
 
-func (fs *fileSystem) init(c *Config) error {
-	fs.cwd = c.Dir
-
-	overlay := c.Overlay
-	fs.overlayDirs = map[string]map[string]*overlayFile{}
+	fs.overlayDirs = map[string]map[string]*OverlayFile{}
 
 	// Organize overlay
 	for filename, src := range overlay {
@@ -75,9 +69,9 @@ func (fs *fileSystem) init(c *Config) error {
 
 		b, file, err := src.contents()
 		if err != nil {
-			return err
+			return nil, err
 		}
-		m[base] = &overlayFile{
+		m[base] = &OverlayFile{
 			basename: base,
 			contents: b,
 			file:     file,
@@ -92,7 +86,7 @@ func (fs *fileSystem) init(c *Config) error {
 			}
 			m := fs.getDir(dir, true)
 			if m[base] == nil {
-				m[base] = &overlayFile{
+				m[base] = &OverlayFile{
 					basename: base,
 					modtime:  time.Now(),
 					isDir:    true,
@@ -100,29 +94,40 @@ func (fs *fileSystem) init(c *Config) error {
 			}
 		}
 	}
-	return nil
+	return fs, nil
 }
 
-func (fs *fileSystem) joinPath(elem ...string) string {
+func (fs *FileSystem) getDir(dir string, create bool) map[string]*OverlayFile {
+	dir = filepath.Clean(dir)
+	m, ok := fs.overlayDirs[dir]
+	if !ok && create {
+		m = map[string]*OverlayFile{}
+		fs.overlayDirs[dir] = m
+	}
+	return m
+}
+
+func (fs *FileSystem) joinPath(elem ...string) string {
 	return filepath.Join(elem...)
 }
 
-func (fs *fileSystem) splitPathList(s string) []string {
+func (fs *FileSystem) splitPathList(s string) []string {
 	return filepath.SplitList(s)
 }
 
-func (fs *fileSystem) isAbsPath(path string) bool {
+func (fs *FileSystem) IsAbsPath(path string) bool {
 	return filepath.IsAbs(path)
 }
 
-func (fs *fileSystem) makeAbs(path string) string {
-	if fs.isAbsPath(path) {
+func (fs *FileSystem) makeAbs(path string) string {
+	if fs.IsAbsPath(path) {
 		return path
 	}
 	return filepath.Clean(filepath.Join(fs.cwd, path))
 }
 
-func (fs *fileSystem) isDir(path string) bool {
+// IsDir reports whether the given path represents a directory.
+func (fs *FileSystem) IsDir(path string) bool {
 	path = fs.makeAbs(path)
 	if fs.getDir(path, false) != nil {
 		return true
@@ -131,7 +136,7 @@ func (fs *fileSystem) isDir(path string) bool {
 	return err == nil && fi.IsDir()
 }
 
-func (fs *fileSystem) hasSubdir(root, dir string) (rel string, ok bool) {
+func (fs *FileSystem) hasSubdir(root, dir string) (rel string, ok bool) {
 	// Try using paths we received.
 	if rel, ok = hasSubdir(root, dir); ok {
 		return
@@ -165,7 +170,9 @@ func hasSubdir(root, dir string) (rel string, ok bool) {
 	return filepath.ToSlash(dir[len(root):]), true
 }
 
-func (fs *fileSystem) readDir(path string) ([]os.FileInfo, errors.Error) {
+// ReadDir reads the contents of the directory at the given path,
+// returning a slice ordered by name.
+func (fs *FileSystem) ReadDir(path string) ([]os.FileInfo, errors.Error) {
 	path = fs.makeAbs(path)
 	m := fs.getDir(path, false)
 	items, err := ioutil.ReadDir(path)
@@ -194,7 +201,7 @@ func (fs *fileSystem) readDir(path string) ([]os.FileInfo, errors.Error) {
 	return items, nil
 }
 
-func (fs *fileSystem) getOverlay(path string) *overlayFile {
+func (fs *FileSystem) getOverlay(path string) *OverlayFile {
 	dir, base := filepath.Split(path)
 	if m := fs.getDir(dir, false); m != nil {
 		return m[base]
@@ -202,7 +209,8 @@ func (fs *fileSystem) getOverlay(path string) *overlayFile {
 	return nil
 }
 
-func (fs *fileSystem) stat(path string) (os.FileInfo, errors.Error) {
+// Stat returns information on the file at the given path.
+func (fs *FileSystem) Stat(path string) (os.FileInfo, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		return fi, nil
@@ -214,7 +222,7 @@ func (fs *fileSystem) stat(path string) (os.FileInfo, errors.Error) {
 	return fi, nil
 }
 
-func (fs *fileSystem) lstat(path string) (os.FileInfo, errors.Error) {
+func (fs *FileSystem) lstat(path string) (os.FileInfo, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		return fi, nil
@@ -226,7 +234,8 @@ func (fs *fileSystem) lstat(path string) (os.FileInfo, errors.Error) {
 	return fi, nil
 }
 
-func (fs *fileSystem) openFile(path string) (io.ReadCloser, errors.Error) {
+// OpenFile opens the file at the given path.
+func (fs *FileSystem) OpenFile(path string) (io.ReadCloser, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		return ioutil.NopCloser(bytes.NewReader(fi.contents)), nil
@@ -239,11 +248,13 @@ func (fs *fileSystem) openFile(path string) (io.ReadCloser, errors.Error) {
 	return f, nil
 }
 
-var skipDir = errors.Newf(token.NoPos, "skip directory")
+var SkipDir = errors.Newf(token.NoPos, "skip directory")
 
-type walkFunc func(path string, info os.FileInfo, err errors.Error) errors.Error
+type WalkFunc func(path string, info os.FileInfo, err errors.Error) errors.Error
 
-func (fs *fileSystem) walk(root string, f walkFunc) error {
+// Walk walks all files under the given root path, calling f for each.
+// The contract is similar to that of filepath.Walk.
+func (fs *FileSystem) Walk(root string, f WalkFunc) error {
 	fi, err := fs.lstat(root)
 	if err != nil {
 		err = f(root, fi, err)
@@ -252,19 +263,19 @@ func (fs *fileSystem) walk(root string, f walkFunc) error {
 	} else {
 		err = fs.walkRec(root, fi, f)
 	}
-	if err == skipDir {
+	if err == SkipDir {
 		return nil
 	}
 	return err
 
 }
 
-func (fs *fileSystem) walkRec(path string, info os.FileInfo, f walkFunc) errors.Error {
+func (fs *FileSystem) walkRec(path string, info os.FileInfo, f WalkFunc) errors.Error {
 	if !info.IsDir() {
 		return f(path, info, nil)
 	}
 
-	dir, err := fs.readDir(path)
+	dir, err := fs.ReadDir(path)
 	err1 := f(path, info, err)
 
 	// If err != nil, walk can't walk into this directory.
@@ -282,7 +293,7 @@ func (fs *fileSystem) walkRec(path string, info os.FileInfo, f walkFunc) errors.
 		filename := fs.joinPath(path, info.Name())
 		err = fs.walkRec(filename, info, f)
 		if err != nil {
-			if !info.IsDir() || err != skipDir {
+			if !info.IsDir() || err != SkipDir {
 				return err
 			}
 		}

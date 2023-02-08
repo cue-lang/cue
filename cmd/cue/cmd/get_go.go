@@ -552,7 +552,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			e.done[path] = true
 			p := p.Imports[path]
 			if p == nil {
-				return fmt.Errorf("cloud not find package for path:\n%s", path)
+				return fmt.Errorf("could not find a package for path:\n%s", path)
 			}
 			if err := e.extractPkg(root, p); err != nil {
 				return err

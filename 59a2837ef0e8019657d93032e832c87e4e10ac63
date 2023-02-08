@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e7c3303_12ff611b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-08T12:59:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb07099d_6670a138",
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "845fb318_d2538acd",
@@ -31,6 +49,30 @@
       "writtenOn": "2023-02-08T11:52:21Z",
       "side": 1,
       "message": "we ought to have a follow-up issue or TODO about this.",
+      "range": {
+        "startLine": 16,
+        "startChar": 58,
+        "endLine": 17,
+        "endChar": 28
+      },
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eae44c58_374a7698",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-08T12:59:56Z",
+      "side": 1,
+      "message": "I just looked into this and it\u0027s actually not as bad as all that. I added a test to give reassurance in this respect.",
+      "parentUuid": "845fb318_d2538acd",
       "range": {
         "startLine": 16,
         "startChar": 58,

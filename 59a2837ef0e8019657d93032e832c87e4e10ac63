@@ -64,6 +64,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9108759_060e18e3",
+        "filename": "cue/load/module.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-08T12:08:25Z",
+      "side": 1,
+      "message": "good point. done.",
+      "parentUuid": "6a04cf08_8a0d3b50",
+      "range": {
+        "startLine": 21,
+        "startChar": 34,
+        "endLine": 25,
+        "endChar": 34
+      },
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c97f552_905e5218",
@@ -77,6 +101,24 @@
       "writtenOn": "2023-02-08T11:52:21Z",
       "side": 1,
       "message": "why do we need the `*` for a default there? it should work without it, I think.",
+      "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27df4965_50aa8485",
+        "filename": "cue/load/moduleschema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-08T12:08:25Z",
+      "side": 1,
+      "message": "Ah, they\u0027re exclusive to each other, so yeah that works, thanks.",
+      "parentUuid": "4c97f552_905e5218",
       "revId": "59a2837ef0e8019657d93032e832c87e4e10ac63",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

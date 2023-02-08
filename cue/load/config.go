@@ -130,8 +130,6 @@ type Config struct {
 	// If Context is nil, the load cannot be cancelled.
 	Context *build.Context
 
-	loader *loader
-
 	// A Module is a collection of packages and instances that are within the
 	// directory hierarchy rooted at the module root. The module root can be
 	// marked with a cue.mod file.
@@ -276,8 +274,6 @@ type Config struct {
 	Stdin io.Reader
 
 	fileSystem
-
-	loadFunc build.LoadFunc
 }
 
 func (c *Config) stdin() io.Reader {
@@ -371,6 +367,9 @@ func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 //     with the module property.
 //   - c.loader != nil
 //   - c.cache != ""
+//
+// It does not initialize c.Context, because that requires the
+// loader in order to use for build.Loader.
 func (c Config) complete() (cfg *Config, err error) {
 	// Each major CUE release should add a tag here.
 	// Old tags should not be removed. That is, the cue1.x tag is present
@@ -408,18 +407,6 @@ func (c Config) complete() (cfg *Config, err error) {
 	}
 	if err := c.completeModule(); err != nil {
 		return nil, err
-	}
-	c.loader = &loader{
-		cfg:       &c,
-		buildTags: make(map[string]bool),
-	}
-	c.loadFunc = c.loader.loadFunc()
-
-	if c.Context == nil {
-		c.Context = build.NewContext(
-			build.Loader(c.loadFunc),
-			build.ParseFile(c.loader.cfg.ParseFile),
-		)
 	}
 	return &c, nil
 }
@@ -519,8 +506,10 @@ func (c Config) findRoot(absDir string) string {
 	}
 }
 
-func (c Config) newErrInstance(pos token.Pos, path importPath, err error) *build.Instance {
-	i := c.newInstance(pos, path)
+func (c *Config) newErrInstance(err error) *build.Instance {
+	i := c.Context.NewInstance("", nil)
+	i.Root = c.ModuleRoot
+	i.Module = c.Module
 	i.Err = errors.Promote(err, "instance")
 	return i
 }

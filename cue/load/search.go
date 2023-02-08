@@ -194,7 +194,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		}
 		relPath = "./" + filepath.ToSlash(relPath)
 		// TODO: consider not doing these checks here.
-		inst := c.newRelInstance(token.NoPos, relPath, pkgName)
+		inst := l.newRelInstance(token.NoPos, relPath, pkgName)
 		pkgs := l.importPkg(token.NoPos, inst)
 		for _, p := range pkgs {
 			if err := p.Err; err != nil && (p == nil || len(p.InvalidFiles) == 0) {
@@ -261,9 +261,9 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 
 		var p *build.Instance
 		if isLocalImport(a) {
-			p = l.cfg.newRelInstance(token.NoPos, a, pkgName)
+			p = l.newRelInstance(token.NoPos, a, pkgName)
 		} else {
-			p = l.cfg.newInstance(token.NoPos, importPath(orig))
+			p = l.newInstance(token.NoPos, importPath(orig))
 		}
 
 		pkgs := l.importPkg(token.NoPos, p)

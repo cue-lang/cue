@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fea9329_6345c191",
+        "filename": "cue/ast/ident.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-08T09:17:21Z",
+      "side": 1,
+      "message": "is this TODO now fixed? should we add that as a test case too?",
+      "revId": "bb45a13ed5226ce1122a3ee5d9943fe4bdb5b1be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

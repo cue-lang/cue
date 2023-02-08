@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build ignore
-
 package load
 
 // Files in this package are to a large extent based on Go files from the following
@@ -36,15 +34,15 @@ import (
 	_ "cuelang.org/go/pkg"
 )
 
-type loader struct {
+type modLoader struct {
 	cfg      *Config
 	tagger   *tagger
 	stk      importStack
 	loadFunc build.LoadFunc
 }
 
-func newLegacyLoader(c *Config, tg *tagger) *loader {
-	l := &loader{
+func newModLoader(c *Config, tg *tagger) *modLoader {
+	l := &modLoader{
 		cfg:    c,
 		tagger: tg,
 	}
@@ -52,18 +50,18 @@ func newLegacyLoader(c *Config, tg *tagger) *loader {
 	return l
 }
 
-func (l *loader) buildLoadFunc() build.LoadFunc {
+func (l *modLoader) buildLoadFunc() build.LoadFunc {
 	return l.loadFunc
 }
 
-func (l *loader) abs(filename string) string {
+func (l *modLoader) abs(filename string) string {
 	if !isLocalImport(filename) {
 		return filename
 	}
 	return filepath.Join(l.cfg.Dir, filename)
 }
 
-func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
+func (l *modLoader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
 	err := &PackageError{
 		ImportStack: l.stk.Copy(),
 		Message:     errors.NewMessage(format, args),
@@ -74,7 +72,7 @@ func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface
 
 // cueFilesPackage creates a package for building a collection of CUE files
 // (typically named on the command line).
-func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
+func (l *modLoader) cueFilesPackage(files []*build.File) *build.Instance {
 	cfg := l.cfg
 	cfg.filesMode = true
 	// ModInit() // TODO: support modules
@@ -90,7 +88,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 		}
 		fi, err := cfg.fileSystem.stat(f)
 		if err != nil {
-			return cfg.newErrInstance(errors.Wrapf(err, token.NoPos, "could not find file %v", f))
+			return cfg.newErrInstance(errors.Wrapf(err, token.NoPos, "could not find file"))
 		}
 		if fi.IsDir() {
 			return cfg.newErrInstance(errors.Newf(token.NoPos, "file is a directory %v", f))
@@ -131,7 +129,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	return pkg
 }
 
-func (l *loader) addFiles(dir string, p *build.Instance) {
+func (l *modLoader) addFiles(dir string, p *build.Instance) {
 	for _, f := range p.BuildFiles {
 		d := encoding.NewDecoder(f, &encoding.Config{
 			Stdin:     l.cfg.stdin(),

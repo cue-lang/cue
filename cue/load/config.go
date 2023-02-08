@@ -272,6 +272,10 @@ type Config struct {
 	// alternative file contents provided by the map.
 	Overlay map[string]Source
 
+	// RemoteModules specifies whether the experimental modules
+	// versioning and fetching code should be used.
+	RemoteModules bool
+
 	// Stdin defines an alternative for os.Stdin for the file "-". When used,
 	// the corresponding build.File will be associated with the full buffer.
 	Stdin io.Reader

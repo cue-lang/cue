@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/load/internal/fileprocessor"
 	"cuelang.org/go/cue/token"
 )
 
@@ -153,12 +154,12 @@ func (l *modLoader) matchPackagesInFS(pattern, pkgName string) *match {
 	// TODO(legacy): remove
 	pkgDir2 := filepath.Join(root, "pkg")
 
-	_ = c.fileSystem.walk(root, func(path string, fi os.FileInfo, err errors.Error) errors.Error {
+	_ = c.fs.Walk(root, func(path string, fi os.FileInfo, err errors.Error) errors.Error {
 		if err != nil || !fi.IsDir() {
 			return nil
 		}
 		if path == pkgDir || path == pkgDir2 {
-			return skipDir
+			return fileprocessor.SkipDir
 		}
 
 		top := path == root
@@ -167,13 +168,13 @@ func (l *modLoader) matchPackagesInFS(pattern, pkgName string) *match {
 		_, elem := filepath.Split(path)
 		dot := strings.HasPrefix(elem, ".") && elem != "." && elem != ".."
 		if dot || strings.HasPrefix(elem, "_") || (elem == "testdata" && !top) {
-			return skipDir
+			return fileprocessor.SkipDir
 		}
 
 		if !top {
 			// Ignore other modules found in subdirectories.
-			if _, err := c.fileSystem.stat(filepath.Join(path, modDir)); err == nil {
-				return skipDir
+			if _, err := c.fs.Stat(filepath.Join(path, modDir)); err == nil {
+				return fileprocessor.SkipDir
 			}
 		}
 

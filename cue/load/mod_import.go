@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/load/internal/fileprocessor"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 )
@@ -55,8 +56,6 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 	defer l.stk.Pop()
 
 	cfg := l.cfg
-	ctxt := &cfg.fileSystem
-
 	if p.Err != nil {
 		return []*build.Instance{p}
 	}
@@ -74,12 +73,12 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 		return retErr(err)
 	}
 
-	fp := newFileProcessor(cfg.newFileProcessorConfig(), p, l.tagger)
+	fp := fileprocessor.New(cfg.newFileProcessorConfig(), p, l.tagger)
 
 	if p.PkgName == "" {
 		if l.cfg.Package == "*" {
-			fp.ignoreOther = true
-			fp.allPackages = true
+			fp.IgnoreOther = true
+			fp.AllPackages = true
 			p.PkgName = "_"
 		} else {
 			p.PkgName = l.cfg.Package
@@ -87,7 +86,7 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 	}
 	if p.PkgName != "" {
 		// If we have an explicit package name, we can ignore other packages.
-		fp.ignoreOther = true
+		fp.IgnoreOther = true
 	}
 
 	var dirs [][2]string
@@ -115,7 +114,7 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 
 	found := false
 	for _, d := range dirs {
-		info, err := ctxt.stat(d[1])
+		info, err := cfg.fs.Stat(d[1])
 		if err == nil && info.IsDir() {
 			found = true
 			break
@@ -141,8 +140,8 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 	}
 
 	for _, d := range dirs {
-		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
-			files, err := ctxt.readDir(dir)
+		for dir := filepath.Clean(d[1]); cfg.fs.IsDir(dir); {
+			files, err := cfg.fs.ReadDir(dir)
 			if err != nil && !os.IsNotExist(err) {
 				return retErr(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
 			}
@@ -151,7 +150,7 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 					continue
 				}
 				if f.Name() == "-" {
-					if _, err := cfg.fileSystem.stat("-"); !os.IsNotExist(err) {
+					if _, err := cfg.fs.Stat("-"); !os.IsNotExist(err) {
 						continue
 					}
 				}
@@ -163,7 +162,7 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 					})
 					continue // skip unrecognized file types
 				}
-				fp.add(pos, dir, file, importComment)
+				fp.Add(pos, dir, file, fileprocessor.ImportComment)
 			}
 
 			if p.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {
@@ -172,7 +171,7 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 
 			// From now on we just ignore files that do not belong to the same
 			// package.
-			fp.ignoreOther = true
+			fp.IgnoreOther = true
 
 			parent, _ := filepath.Split(dir)
 			parent = filepath.Clean(parent)
@@ -186,7 +185,7 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 
 	all := []*build.Instance{}
 
-	for _, p := range fp.pkgs {
+	for _, p := range fp.Pkgs {
 		impPath, err := addImportQualifier(importPath(p.ImportPath), p.PkgName)
 		p.ImportPath = string(impPath)
 		if err != nil {
@@ -195,7 +194,7 @@ func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instanc
 
 		all = append(all, p)
 		rewriteFiles(p, cfg.ModuleRoot, false)
-		if errs := fp.finalize(p); errs != nil {
+		if errs := fp.Finalize(p); errs != nil {
 			p.ReportError(errs)
 			return all
 		}
@@ -237,7 +236,7 @@ func (l *modLoader) newRelInstance(pos token.Pos, path, pkgName string) *build.I
 	if !isLocalImport(path) {
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
-	fs := l.cfg.fileSystem
+	fs := l.cfg.fs
 
 	var err errors.Error
 	dir := path
@@ -264,7 +263,7 @@ func (l *modLoader) newRelInstance(pos token.Pos, path, pkgName string) *build.I
 
 	p.Dir = dir
 
-	if fs.isAbsPath(path) || strings.HasPrefix(path, "/") {
+	if fs.IsAbsPath(path) || strings.HasPrefix(path, "/") {
 		err = errors.Append(err, errors.Newf(pos,
 			"absolute import path %q not allowed", path))
 	}

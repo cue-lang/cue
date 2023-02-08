@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build ignore
-
 package load
 
 import (
@@ -32,7 +30,7 @@ import (
 // TODO: should be matched from module file only.
 // The pattern is either "all" (all packages), "std" (standard packages),
 // "cmd" (standard commands), or a path including "...".
-func (l *loader) matchPackages(pattern, pkgName string) *match {
+func (l *modLoader) matchPackages(pattern, pkgName string) *match {
 	// cfg := l.cfg
 	m := &match{
 		Pattern: pattern,
@@ -125,7 +123,7 @@ func (l *loader) matchPackages(pattern, pkgName string) *match {
 // beginning ./ or ../, meaning it should scan the tree rooted
 // at the given directory. There are ... in the pattern too.
 // (See go help packages for pattern syntax.)
-func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
+func (l *modLoader) matchPackagesInFS(pattern, pkgName string) *match {
 	c := l.cfg
 	m := &match{
 		Pattern: pattern,
@@ -222,14 +220,14 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 
 // importPaths returns the matching paths to use for the given command line.
 // It calls ImportPathsQuiet and then WarnUnmatched.
-func (l *loader) importPaths(patterns []string) []*match {
+func (l *modLoader) importPaths(patterns []string) []*match {
 	matches := l.importPathsQuiet(patterns)
 	warnUnmatched(matches)
 	return matches
 }
 
 // importPathsQuiet is like ImportPaths but does not warn about patterns with no matches.
-func (l *loader) importPathsQuiet(patterns []string) []*match {
+func (l *modLoader) importPathsQuiet(patterns []string) []*match {
 	var out []*match
 	for _, a := range cleanPatterns(patterns) {
 		if isMetaPackage(a) {

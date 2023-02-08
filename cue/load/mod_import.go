@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:build ignore
-
 package load
 
 import (
@@ -52,7 +50,7 @@ import (
 //	        is present.
 //	_       anonymous files (which may be marked with _)
 //	*       all packages
-func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
+func (l *modLoader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	l.stk.Push(p.ImportPath)
 	defer l.stk.Pop()
 
@@ -212,7 +210,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 }
 
 // _loadFunc is the method used for the value of l.loadFunc.
-func (l *loader) _loadFunc(pos token.Pos, path string) *build.Instance {
+func (l *modLoader) _loadFunc(pos token.Pos, path string) *build.Instance {
 	impPath := importPath(path)
 	if isLocalImport(path) {
 		return l.cfg.newErrInstance(errors.Newf(pos, "relative import paths not allowed (%q)", path))
@@ -235,7 +233,7 @@ func (l *loader) _loadFunc(pos token.Pos, path string) *build.Instance {
 
 // newRelInstance returns a build instance from the given
 // relative import path.
-func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Instance {
+func (l *modLoader) newRelInstance(pos token.Pos, path, pkgName string) *build.Instance {
 	if !isLocalImport(path) {
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
@@ -278,7 +276,7 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	return p
 }
 
-func (l *loader) importPathFromAbsDir(absDir fsPath, key string) (importPath, errors.Error) {
+func (l *modLoader) importPathFromAbsDir(absDir fsPath, key string) (importPath, errors.Error) {
 	if l.cfg.ModuleRoot == "" {
 		return "", errors.Newf(token.NoPos,
 			"cannot determine import path for %q (root undefined)", key)
@@ -323,7 +321,7 @@ func (l *loader) importPathFromAbsDir(absDir fsPath, key string) (importPath, er
 	return addImportQualifier(importPath(pkg), name)
 }
 
-func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
+func (l *modLoader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	dir, name, err := l.cfg.absDirFromImportPath(pos, p)
 	i := l.cfg.Context.NewInstance(dir, l.loadFunc)
 	i.Dir = dir

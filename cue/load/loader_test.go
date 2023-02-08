@@ -331,7 +331,9 @@ dir:    $CWD/testdata/testmod/tagsbad
 display:./tagsbad`,
 	}}
 	for i, tc := range testCases {
-		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {
+		testName := strconv.Itoa(i) + "/" + strings.Join(tc.args, ":")
+		runTest := func(t *testing.T, withModules bool) {
+			tc.cfg.RemoteModules = withModules
 			pkgs := Instances(tc.args, tc.cfg)
 
 			buf := &bytes.Buffer{}
@@ -354,6 +356,14 @@ display:./tagsbad`,
 				t.Errorf("\n%s", diff.Diff(want, got))
 				t.Logf("\n%s", got)
 			}
+		}
+		t.Run(testName, func(t *testing.T) {
+			t.Run("remoteModules=false", func(t *testing.T) {
+				runTest(t, false)
+			})
+			t.Run("remoteModules=true", func(t *testing.T) {
+				runTest(t, true)
+			})
 		})
 	}
 }

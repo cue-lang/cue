@@ -23,12 +23,12 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/load/internal/fileprocessor"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
 
 const (
-	cueSuffix  = ".cue"
 	modDir     = "cue.mod"
 	moduleFile = "module.cue"
 	pkgDir     = "pkg"
@@ -280,7 +280,7 @@ type Config struct {
 	// the corresponding build.File will be associated with the full buffer.
 	Stdin io.Reader
 
-	fileSystem
+	fs *fileprocessor.FileSystem
 }
 
 func (c *Config) stdin() io.Reader {
@@ -290,16 +290,18 @@ func (c *Config) stdin() io.Reader {
 	return c.Stdin
 }
 
-func (c *Config) newFileProcessorConfig() *fileProcessorConfig {
-	return &fileProcessorConfig{
+func (c *Config) newFileProcessorConfig() *fileprocessor.Config {
+	return &fileprocessor.Config{
+		Dir:         c.Dir,
 		Tags:        c.Tags,
+		TagVars:     c.TagVars,
 		AllCUEFiles: c.AllCUEFiles,
 		Tests:       c.Tests,
 		Tools:       c.Tools,
-		filesMode:   c.filesMode,
+		FilesMode:   c.filesMode,
 		DataFiles:   c.DataFiles,
 		Stdin:       c.Stdin,
-		fileSystem:  c.fileSystem,
+		FS:          c.fs,
 	}
 }
 
@@ -409,9 +411,11 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	// TODO: we could populate this already with absolute file paths,
 	// but relative paths cannot be added. Consider what is reasonable.
-	if err := c.fileSystem.init(&c); err != nil {
+	fs, err := fileprocessor.NewFileSystem(c.Dir, c.Overlay)
+	if err != nil {
 		return nil, err
 	}
+	c.fs = fs
 
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
@@ -432,17 +436,14 @@ func (c Config) complete() (cfg *Config, err error) {
 }
 
 func (c Config) isRoot(dir string) bool {
-	fs := &c.fileSystem
 	// Note: cue.mod used to be a file. We still allow both to match.
-	_, err := fs.stat(filepath.Join(dir, modDir))
+	_, err := c.fs.Stat(filepath.Join(dir, modDir))
 	return err == nil
 }
 
 // findRoot returns the module root that's ancestor
 // of the given absolute directory path, or "" if none was found.
 func (c Config) findRoot(absDir string) string {
-	fs := &c.fileSystem
-
 	abs := absDir
 	for {
 		if c.isRoot(abs) {
@@ -463,7 +464,7 @@ func (c Config) findRoot(absDir string) string {
 
 	// TODO(legacy): remove this capability at some point.
 	for {
-		info, err := fs.stat(filepath.Join(abs, pkgDir))
+		info, err := c.fs.Stat(filepath.Join(abs, pkgDir))
 		if err == nil && info.IsDir() {
 			return abs
 		}

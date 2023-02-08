@@ -20,16 +20,13 @@ package load
 //    - go/build
 
 import (
-	pathpkg "path"
 	"path/filepath"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
-	"cuelang.org/go/internal/filetypes"
 
 	// Trigger the unconditional loading of all core builtin packages if load
 	// is used. This was deemed the simplest way to avoid having to import
@@ -37,86 +34,6 @@ import (
 	// of cases, while not introducing an import cycle.
 	_ "cuelang.org/go/pkg"
 )
-
-// Instances returns the instances named by the command line arguments 'args'.
-// If errors occur trying to load an instance it is returned with Incomplete
-// set. Errors directly related to loading the instance are recorded in this
-// instance, but errors that occur loading dependencies are recorded in these
-// dependencies.
-func Instances(args []string, c *Config) []*build.Instance {
-	if c == nil {
-		c = &Config{}
-	}
-	newC, err := c.complete()
-	if err != nil {
-		return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
-	}
-	c = newC
-
-	l := c.loader
-
-	// TODO: require packages to be placed before files. At some point this
-	// could be relaxed.
-	i := 0
-	for ; i < len(args) && filetypes.IsPackage(args[i]); i++ {
-	}
-
-	a := []*build.Instance{}
-
-	if len(args) == 0 || i > 0 {
-		for _, m := range l.importPaths(args[:i]) {
-			if m.Err != nil {
-				inst := c.newErrInstance(token.NoPos, "", m.Err)
-				a = append(a, inst)
-				continue
-			}
-			a = append(a, m.Pkgs...)
-		}
-	}
-
-	if args = args[i:]; len(args) > 0 {
-		files, err := filetypes.ParseArgs(args)
-		if err != nil {
-			return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
-		}
-		a = append(a, l.cueFilesPackage(files))
-	}
-
-	for _, p := range a {
-		tags, err := findTags(p)
-		if err != nil {
-			p.ReportError(err)
-		}
-		l.tags = append(l.tags, tags...)
-	}
-
-	// TODO(api): have API call that returns an error which is the aggregate
-	// of all build errors. Certain errors, like these, hold across builds.
-	if err := injectTags(c.Tags, l); err != nil {
-		for _, p := range a {
-			p.ReportError(err)
-		}
-		return a
-	}
-
-	if l.replacements == nil {
-		return a
-	}
-
-	for _, p := range a {
-		for _, f := range p.Files {
-			ast.Walk(f, nil, func(n ast.Node) {
-				if ident, ok := n.(*ast.Ident); ok {
-					if v, ok := l.replacements[ident.Node]; ok {
-						ident.Node = v
-					}
-				}
-			})
-		}
-	}
-
-	return a
-}
 
 // Mode flags for loadImport and download (in get.go).
 const (
@@ -145,6 +62,15 @@ func (l *loader) abs(filename string) string {
 		return filename
 	}
 	return filepath.Join(l.cfg.Dir, filename)
+}
+
+func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
+	err := &PackageError{
+		ImportStack: l.stk.Copy(),
+		Message:     errors.NewMessage(format, args),
+	}
+	err.fillPos(l.cfg.Dir, importPos)
+	return err
 }
 
 // cueFilesPackage creates a package for building a collection of CUE files
@@ -223,30 +149,4 @@ func (l *loader) addFiles(dir string, p *build.Instance) {
 		}
 		d.Close()
 	}
-}
-
-func cleanImport(path string) string {
-	orig := path
-	path = pathpkg.Clean(path)
-	if strings.HasPrefix(orig, "./") && path != ".." && !strings.HasPrefix(path, "../") {
-		path = "./" + path
-	}
-	return path
-}
-
-// An importStack is a stack of import paths, possibly with the suffix " (test)" appended.
-// The import path of a test package is the import path of the corresponding
-// non-test package with the suffix "_test" added.
-type importStack []string
-
-func (s *importStack) Push(p string) {
-	*s = append(*s, p)
-}
-
-func (s *importStack) Pop() {
-	*s = (*s)[0 : len(*s)-1]
-}
-
-func (s *importStack) Copy() []string {
-	return append([]string{}, *s...)
 }

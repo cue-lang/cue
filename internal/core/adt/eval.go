@@ -1369,6 +1369,10 @@ func (n *nodeContext) getValidators(state VertexStatus) BaseValue {
 func (n *nodeContext) maybeSetCache() {
 	// Set BaseValue to scalar, but only if it was not set before. Most notably,
 	// errors should not be discarded.
+	_, isErr := n.node.BaseValue.(*Bottom)
+	if n.scalar != nil && (!isErr || isCyclePlaceholder(n.node.BaseValue)) {
+		n.node.BaseValue = n.scalar
+	}
 	if n.scalar != nil && isCyclePlaceholder(n.node.BaseValue) {
 		n.node.BaseValue = n.scalar
 	}

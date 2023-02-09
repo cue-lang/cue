@@ -110,13 +110,13 @@ Disjuncts:    77
   embeddingDirect: (struct){
     t1: (string){
       "s"
-      #a: (string){ string }
+      #a: (string){ "s" }
     }
   }
   embeddingExpr: (struct){
     t1: (string){
       "s"
-      #a: (string){ string }
+      #a: (string){ "s" }
     }
   }
   unifiedDirect: (struct){
@@ -188,9 +188,9 @@ Disjuncts:    77
     "str"
     #fn: (string){
       "str"
-      #in: (string){ string }
+      #in: (string){ "str" }
     }
-    #in: (string){ string }
+    #in: (string){ "str" }
   }
 }
 -- out/compile --

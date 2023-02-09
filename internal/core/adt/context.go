@@ -876,6 +876,9 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 		// inability to look up a field as "final", as it may resolve down the
 		// line.
 		permanent := x.status > Conjuncts
+		if m, ok := x.BaseValue.(*ListMarker); ok && !m.IsOpen {
+			permanent = true
+		}
 		if (state > Partial || permanent) && !x.Accept(c, l) {
 			code = 0
 		} else if hasCycle {

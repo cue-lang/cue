@@ -92,15 +92,15 @@ e7: def["b"]
   e7: 〈0;def〉["b"]
 }
 -- out/eval/stats --
-Leaks:  16
+Leaks:  10
 Freed:  32
 Reused: 26
-Allocs: 22
-Retain: 23
+Allocs: 16
+Retain: 16
 
-Unifications: 40
-Conjuncts:    61
-Disjuncts:    53
+Unifications: 34
+Conjuncts:    48
+Disjuncts:    46
 -- out/eval --
 Errors:
 c: invalid list index "3" (type string):

@@ -30,15 +30,15 @@ varNegativeIndex: {
 	a: [1, 2, 3][n]
 }
 -- out/eval/stats --
-Leaks:  15
+Leaks:  12
 Freed:  36
 Reused: 33
-Allocs: 18
-Retain: 15
+Allocs: 15
+Retain: 12
 
-Unifications: 43
-Conjuncts:    56
-Disjuncts:    48
+Unifications: 40
+Conjuncts:    50
+Disjuncts:    45
 -- out/eval --
 Errors:
 outOfBoundsDisjunction: invalid list index 1 (out of bounds):

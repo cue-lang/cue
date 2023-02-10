@@ -257,19 +257,6 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		if !n.done() {
 			switch {
-			case len(n.disjunctions) > 0 && isCyclePlaceholder(v.BaseValue):
-				// We disallow entering computations of disjunctions with
-				// incomplete data.
-				if state == Finalized {
-					b := c.NewErrf("incomplete cause disjunction")
-					b.Code = IncompleteError
-					n.errs = CombineErrors(nil, n.errs, b)
-					v.SetValue(n.ctx, Finalized, b)
-				} else {
-					n.node.UpdateStatus(Partial)
-				}
-				return
-
 			case state < Conjuncts:
 				n.node.UpdateStatus(Partial)
 				return

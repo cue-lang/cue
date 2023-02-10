@@ -25,23 +25,22 @@ a: cell.a
 b: cell.b
 -- out/eval/stats --
 Leaks:  0
-Freed:  35
-Reused: 29
-Allocs: 6
-Retain: 5
+Freed:  47
+Reused: 39
+Allocs: 8
+Retain: 7
 
 Unifications: 11
-Conjuncts:    70
-Disjuncts:    33
+Conjuncts:    103
+Disjuncts:    47
 -- out/eval --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }
   foo: (_|_){
-    // [incomplete] foo: incomplete cause disjunction
+    // [incomplete] foo: unresolved disjunction 0 | 1 (type int):
+    //     ./in.cue:4:6
   }
-  bar: (_|_){
-    // [incomplete] bar: incomplete cause disjunction
-  }
+  bar: (int){ |((int){ 0 }, (int){ 1 }) }
   Foo: (int){ 1 }
   Bar: (int){ 0 }
   cell: (struct){

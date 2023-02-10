@@ -45,6 +45,11 @@ issue1969: oko: {
 
 	if Y != _|_ {Y}
 }
+-- issue2245.cue --
+yo: { f: int, g: f < 10 }
+okyo: { if yo != _|_ {a: 1} }
+okyog: { if yo.g != _|_ {a: 1} }
+
 -- incomplete.cue --
 // Comparing to string is not an error. But for legacy reasons we want to still
 // support this. We intend to have more clean and precise behavior with the
@@ -74,14 +79,14 @@ structs: {
 
 -- out/eval/stats --
 Leaks:  11
-Freed:  81
-Reused: 77
+Freed:  89
+Reused: 85
 Allocs: 15
-Retain: 24
+Retain: 26
 
-Unifications: 92
-Conjuncts:    116
-Disjuncts:    97
+Unifications: 100
+Conjuncts:    134
+Disjuncts:    105
 -- out/eval --
 (struct){
   xc: (#struct){
@@ -105,10 +110,12 @@ Disjuncts:    97
   okc2: (struct){
   }
   oko2: (struct){
+    a: (int){ 1 }
   }
   okc3: (struct){
   }
   oko3: (struct){
+    a: (int){ 1 }
   }
   issue1969: (struct){
     okc: (struct){
@@ -135,6 +142,10 @@ Disjuncts:    97
           //     ./in.cue:39:13
         }
       }
+      s: (_|_){
+        // [incomplete] issue1969.oko.X: undefined field: undefined:
+        //     ./in.cue:39:13
+      }
     }
   }
   checkIncomplete: (struct){
@@ -145,6 +156,19 @@ Disjuncts:    97
         }
       }
     }
+  }
+  yo: (struct){
+    f: (int){ int }
+    g: (_|_){
+      // [incomplete] yo.g: non-concrete value int in operand to <:
+      //     ./issue2245.cue:1:18
+      //     ./issue2245.cue:1:10
+    }
+  }
+  okyo: (struct){
+    a: (int){ 1 }
+  }
+  okyog: (struct){
   }
   structs: (struct){
     bare: (struct){
@@ -268,6 +292,18 @@ Disjuncts:    97
       f: {
         blah: {}
       }
+    }
+  }
+}
+--- issue2245.cue
+{
+  yo: {
+    f: int
+    g: (〈0;f〉 < 10)
+  }
+  okyo: {
+    if (〈1;yo〉 != _|_(explicit error (_|_ literal) in source)) {
+      a: 1
     }
   }
 }

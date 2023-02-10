@@ -98,31 +98,31 @@ graph TD
 }
 -- out/run/t1/stats --
 Leaks:  0
-Freed:  38
-Reused: 31
+Freed:  41
+Reused: 34
 Allocs: 7
 Retain: 0
 
 Unifications: 24
-Conjuncts:    51
-Disjuncts:    37
+Conjuncts:    64
+Disjuncts:    41
 -- out/run/t2/stats --
 Leaks:  0
-Freed:  38
-Reused: 38
+Freed:  41
+Reused: 41
 Allocs: 0
 Retain: 0
 
 Unifications: 24
-Conjuncts:    55
-Disjuncts:    37
+Conjuncts:    68
+Disjuncts:    41
 -- out/run/stats/totals --
 Leaks:  0
-Freed:  76
-Reused: 69
+Freed:  82
+Reused: 75
 Allocs: 7
 Retain: 0
 
 Unifications: 48
-Conjuncts:    106
-Disjuncts:    74
+Conjuncts:    132
+Disjuncts:    82

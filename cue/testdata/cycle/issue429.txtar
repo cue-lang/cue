@@ -50,14 +50,14 @@ er3: #nonEmptyRange & {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  96
-Reused: 89
+Freed:  98
+Reused: 91
 Allocs: 7
-Retain: 8
+Retain: 12
 
 Unifications: 40
-Conjuncts:    150
-Disjuncts:    96
+Conjuncts:    154
+Disjuncts:    101
 -- out/eval --
 Errors:
 er3.min: 2 errors in empty disjunction:
@@ -134,11 +134,9 @@ Result:
   }
   #nonEmptyRange: (#struct){
     min: (_|_){
-      // [incomplete] #nonEmptyRange.min: incomplete cause disjunction
+      // [cycle] cycle error
     }
-    max: (_|_){
-      // [incomplete] #nonEmptyRange.min: incomplete cause disjunction
-    }
+    max: (number){ >1 }
   }
   r1: (#struct){
     min: (int){ 3 }

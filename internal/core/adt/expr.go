@@ -1398,7 +1398,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 			// builtin.
 			match = op == EqualOp
 
-		case anyError(v):
+		case isFinalError(v):
 			// Need to recursively check for errors, so we need to evaluate the
 			// Vertex in case it hadn't been evaluated yet.
 			match = op == EqualOp
@@ -1428,17 +1428,10 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 	return &Bool{src, match}
 }
 
-// TODO(perf): keep track of the presence of recursive errors so that we can
-// avoid traversing the arcs here.
-func anyError(n *Vertex) bool {
+func isFinalError(n *Vertex) bool {
 	n = n.Indirect()
-	if _, ok := Unwrap(n).(*Bottom); ok {
+	if b, ok := Unwrap(n).(*Bottom); ok && b.Code < IncompleteError {
 		return true
-	}
-	for _, arc := range n.Arcs {
-		if anyError(arc) {
-			return true
-		}
 	}
 	return false
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a34c76f3_95488856",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-11T15:35:40Z",
+      "side": 1,
+      "message": "did you mean the new 4 lines to replace these existing 3 lines? it seems to me like these 3 lines are now unnecessary.",
+      "revId": "086ed6705d9c8adbf03d8af5cf8abd2cf20a458e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

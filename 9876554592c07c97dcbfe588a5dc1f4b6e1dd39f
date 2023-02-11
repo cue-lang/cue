@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "53ef376d_2113561e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-02-11T15:33:30Z",
+      "side": 1,
+      "message": "It also helps against unexpected extra lines or duplicate matches. FYI, in cases where duplicates are the only worry, you can also do:\n\n    stderr -count\u003d1 \u0027incomplete\u0027",
+      "revId": "9876554592c07c97dcbfe588a5dc1f4b6e1dd39f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

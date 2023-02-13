@@ -42,9 +42,11 @@ import (
 )
 
 var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
+var cueRegistry = os.Getenv("CUE_REGISTRY")
 
 var defaultConfig = config{
 	loadCfg: &load.Config{
+		Registry: cueRegistry,
 		ParseFile: func(name string, src interface{}) (*ast.File, error) {
 			version := internal.APIVersionSupported
 			if requestedVersion != "" {

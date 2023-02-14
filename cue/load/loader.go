@@ -35,16 +35,20 @@ import (
 )
 
 type loader struct {
-	cfg      *Config
-	tagger   *tagger
-	stk      importStack
-	loadFunc build.LoadFunc
+	cfg       *Config
+	tagger    *tagger
+	stk       importStack
+	loadFunc  build.LoadFunc
+	deps      *dependencies
+	regClient *registryClient
 }
 
-func newLegacyLoader(c *Config, tg *tagger) *loader {
+func newLoader(c *Config, tg *tagger, deps *dependencies, regClient *registryClient) *loader {
 	l := &loader{
-		cfg:    c,
-		tagger: tg,
+		cfg:       c,
+		tagger:    tg,
+		deps:      deps,
+		regClient: regClient,
 	}
 	l.loadFunc = l._loadFunc
 	return l

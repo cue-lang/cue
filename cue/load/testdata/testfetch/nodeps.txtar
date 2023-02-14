@@ -1,0 +1,11 @@
+-- out/modfetch --
+{
+	a: "hello"
+}
+-- cue.mod/module.cue --
+module: "main.org"
+
+-- main.cue --
+package main
+
+a: "hello"

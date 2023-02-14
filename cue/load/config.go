@@ -15,7 +15,9 @@
 package load
 
 import (
+	"fmt"
 	"io"
+	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
@@ -276,7 +278,11 @@ type Config struct {
 	// the corresponding build.File will be associated with the full buffer.
 	Stdin io.Reader
 
-	fileSystem
+	// Registry holds the URL of the CUE registry. If it has no scheme, https:// is assumed
+	// as a prefix. THIS IS EXPERIMENTAL FOR NOW. DO NOT USE.
+	Registry string
+
+	fileSystem fileSystem
 }
 
 func (c *Config) stdin() io.Reader {
@@ -313,53 +319,6 @@ func addImportQualifier(pkg importPath, name string) (importPath, errors.Error) 
 	}
 
 	return pkg, nil
-}
-
-// absDirFromImportPath converts a giving import path to an absolute directory
-// and a package name. The root directory must be set.
-//
-// The returned directory may not exist.
-func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name string, err errors.Error) {
-	if c.ModuleRoot == "" {
-		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
-	}
-
-	// Extract the package name.
-
-	name = string(p)
-	switch i := strings.LastIndexAny(name, "/:"); {
-	case i < 0:
-	case p[i] == ':':
-		name = string(p[i+1:])
-		p = p[:i]
-
-	default: // p[i] == '/'
-		name = string(p[i+1:])
-	}
-
-	// TODO: fully test that name is a valid identifier.
-	if name == "" {
-		err = errors.Newf(pos, "empty package name in import path %q", p)
-	} else if strings.IndexByte(name, '.') >= 0 {
-		err = errors.Newf(pos,
-			"cannot determine package name for %q (set explicitly with ':')", p)
-	}
-
-	// Determine the directory.
-
-	sub := filepath.FromSlash(string(p))
-	switch hasPrefix := strings.HasPrefix(string(p), c.Module); {
-	case hasPrefix && len(sub) == len(c.Module):
-		absDir = c.ModuleRoot
-
-	case hasPrefix && p[len(c.Module)] == '/':
-		absDir = filepath.Join(c.ModuleRoot, sub[len(c.Module)+1:])
-
-	default:
-		absDir = filepath.Join(GenPath(c.ModuleRoot), sub)
-	}
-
-	return absDir, name, err
 }
 
 // Complete updates the configuration information. After calling complete,
@@ -407,6 +366,16 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
+	}
+	if c.Registry != "" {
+		u, err := url.Parse(c.Registry)
+		if err != nil {
+			return nil, fmt.Errorf("invalid registry URL %q: %v", c.Registry, err)
+		}
+		if u.Scheme == "" {
+			u.Scheme = "https"
+			c.Registry = u.String()
+		}
 	}
 	if err := c.loadModule(); err != nil {
 		return nil, err

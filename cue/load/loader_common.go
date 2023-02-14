@@ -67,12 +67,6 @@ type loaderIntf interface {
 	cueFilesPackage(files []*build.File) *build.Instance
 }
 
-func newLoader(c *Config, tg *tagger) loaderIntf {
-	// TODO when modules are enabled, return a different
-	// implementation of loaderIntf.
-	return newLegacyLoader(c, tg)
-}
-
 func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 	p.Root = root
 

@@ -56,6 +56,10 @@ type TxTarTest struct {
 
 	// ToDo is a map of tests that should be skipped now, but should be fixed.
 	ToDo map[string]string
+
+	// LoadConfig is passed to load.Instances when loading instances.
+	// It's copied before doing that and the Dir and Overlay fields are overwritten.
+	LoadConfig load.Config
 }
 
 // A Test represents a single test based on a .txtar file.
@@ -92,7 +96,8 @@ type Test struct {
 	buf      *bytes.Buffer // the default buffer
 	outFiles []file
 
-	Archive *txtar.Archive
+	Archive    *txtar.Archive
+	LoadConfig load.Config
 
 	// The absolute path of the current test directory.
 	Dir string
@@ -233,6 +238,7 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // Instance returns the single instance representing the
 // root directory in the txtar file.
 func (t *Test) Instance() *build.Instance {
+	t.Helper()
 	return t.Instances()[0]
 }
 
@@ -256,13 +262,17 @@ func (t *Test) Instances(args ...string) []*build.Instance {
 // RawInstances returns the intstances represented by this .txtar file. The
 // returned instances are not checked for errors.
 func (t *Test) RawInstances(args ...string) []*build.Instance {
-	return Load(t.Archive, t.Dir, args...)
+	return loadWithConfig(t.Archive, t.Dir, t.LoadConfig, args...)
 }
 
 // Load loads the intstances of a txtar file. By default, it only loads
 // files in the root directory. Relative files in the archive are given an
 // absolute location by prefixing it with dir.
 func Load(a *txtar.Archive, dir string, args ...string) []*build.Instance {
+	return loadWithConfig(a, dir, load.Config{}, args...)
+}
+
+func loadWithConfig(a *txtar.Archive, dir string, cfg load.Config, args ...string) []*build.Instance {
 	auto := len(args) == 0
 	overlay := map[string]load.Source{}
 	for _, f := range a.Files {
@@ -272,12 +282,10 @@ func Load(a *txtar.Archive, dir string, args ...string) []*build.Instance {
 		overlay[filepath.Join(dir, f.Name)] = load.FromBytes(f.Data)
 	}
 
-	cfg := &load.Config{
-		Dir:     dir,
-		Overlay: overlay,
-	}
+	cfg.Dir = dir
+	cfg.Overlay = overlay
 
-	return load.Instances(args, cfg)
+	return load.Instances(args, &cfg)
 }
 
 // Run runs tests defined in txtar files in x.Root or its subdirectories.
@@ -311,13 +319,13 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 			if err != nil {
 				t.Fatalf("error parsing txtar file: %v", err)
 			}
-
 			tc := &Test{
 				T:       t,
 				Archive: a,
 				Dir:     filepath.Dir(filepath.Join(dir, fullpath)),
 
-				prefix: path.Join("out", x.Name),
+				prefix:     path.Join("out", x.Name),
+				LoadConfig: x.LoadConfig,
 			}
 
 			if tc.HasTag("skip") {
@@ -355,7 +363,6 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					}
 				}
 			}
-
 			f(tc)
 
 			index := make(map[string]int, len(a.Files))
@@ -396,7 +403,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					continue
 				}
 
-				t.Errorf("result for %s differs:\n%s",
+				t.Errorf("result for %s differs: (-want +got)\n%s",
 					sub.name,
 					cmp.Diff(string(gold.Data), string(result)))
 			}

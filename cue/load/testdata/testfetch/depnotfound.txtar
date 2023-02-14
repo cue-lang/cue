@@ -1,0 +1,11 @@
+-- out/modfetch/error --
+instance: example.com@v0.0.1: module.cue HTTP GET request failed: cannot get module: no module found for example.com@v0.0.1
+
+-- cue.mod/module.cue --
+module: "main.org"
+
+deps: "example.com": v: "v0.0.1"
+
+-- main.cue --
+package main
+import _ "example.com:main"

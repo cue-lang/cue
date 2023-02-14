@@ -51,28 +51,6 @@ const (
 	allowAnonymous
 )
 
-// loaderIntf represents the interface in common between
-// the non-module loader and the module-aware loader.
-type loaderIntf interface {
-	// loader returns the instance loading function defined by
-	// the loader.
-	buildLoadFunc() build.LoadFunc
-
-	// importPaths returns the matching paths to use for the given command line.
-	// It calls ImportPathsQuiet and then WarnUnmatched.
-	importPaths(patterns []string) []*match
-
-	// cueFilesPackage creates a package for building a collection of CUE files
-	// (typically named on the command line).
-	cueFilesPackage(files []*build.File) *build.Instance
-}
-
-func newLoader(c *Config, tg *tagger) loaderIntf {
-	// TODO when modules are enabled, return a different
-	// implementation of loaderIntf.
-	return newLegacyLoader(c, tg)
-}
-
 func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 	p.Root = root
 

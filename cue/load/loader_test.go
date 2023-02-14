@@ -62,7 +62,7 @@ module: invalid module.cue file: conflicting values 123 and "" (mismatched types
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
 module: invalid module.cue file: conflicting values 123 and =~"^[^@]+$" (mismatched types int and string):
     $cueroot/cue/load/moduleschema.cue:4:10
-    $cueroot/cue/load/moduleschema.cue:9:21
+    $cueroot/cue/load/moduleschema.cue:21:21
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
 path:   ""
 module: ""

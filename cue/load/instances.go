@@ -20,6 +20,8 @@ package load
 //    - go/build
 
 import (
+	"os"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/filetypes"
@@ -45,8 +47,24 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	c = newC
+	// TODO use predictable location
+	var deps *dependencies
+	var regClient *registryClient
+	if c.Registry != "" {
+		// TODO use configured cache directory.
+		tmpDir, err := os.MkdirTemp("", "cue-load-")
+		if err != nil {
+			return []*build.Instance{c.newErrInstance(err)}
+		}
+		regClient = newRegistryClient(c.Registry, tmpDir)
+		deps1, err := resolveDependencies(c.modFile, regClient)
+		if err != nil {
+			return []*build.Instance{c.newErrInstance(err)}
+		}
+		deps = deps1
+	}
 	tg := newTagger(c)
-	l := newLoader(c, tg)
+	l := newLoader(c, tg, deps, regClient)
 
 	if c.Context == nil {
 		c.Context = build.NewContext(

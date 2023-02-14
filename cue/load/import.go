@@ -69,11 +69,6 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		return []*build.Instance{p}
 	}
 
-	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
-		err := errors.Newf(token.NoPos, "module root not defined", p.DisplayPath)
-		return retErr(err)
-	}
-
 	fp := newFileProcessor(cfg, p, l.tagger)
 
 	if p.PkgName == "" {
@@ -322,7 +317,7 @@ func (l *loader) importPathFromAbsDir(absDir fsPath, key string) (importPath, er
 }
 
 func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
-	dir, name, err := l.cfg.absDirFromImportPath(pos, p)
+	dir, name, err := l.absDirFromImportPath(pos, p)
 	i := l.cfg.Context.NewInstance(dir, l.loadFunc)
 	i.Dir = dir
 	i.PkgName = name
@@ -333,4 +328,74 @@ func (l *loader) newInstance(pos token.Pos, p importPath) *build.Instance {
 	i.Err = errors.Append(i.Err, err)
 
 	return i
+}
+
+// absDirFromImportPath converts a giving import path to an absolute directory
+// and a package name. The root directory must be set.
+//
+// The returned directory may not exist.
+func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name string, err errors.Error) {
+	if l.cfg.ModuleRoot == "" {
+		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
+	}
+
+	// Extract the package name.
+
+	name = string(p)
+	switch i := strings.LastIndexAny(name, "/:"); {
+	case i < 0:
+	case p[i] == ':':
+		name = string(p[i+1:])
+		p = p[:i]
+
+	default: // p[i] == '/'
+		name = string(p[i+1:])
+	}
+
+	// TODO: fully test that name is a valid identifier.
+	if name == "" {
+		err = errors.Newf(pos, "empty package name in import path %q", p)
+	} else if strings.IndexByte(name, '.') >= 0 {
+		err = errors.Newf(pos,
+			"cannot determine package name for %q (set explicitly with ':')", p)
+	}
+
+	// Determine the directory.
+
+	sub := filepath.FromSlash(string(p))
+	switch hasPrefix := strings.HasPrefix(string(p), l.cfg.Module); {
+	case hasPrefix && len(sub) == len(l.cfg.Module):
+		absDir = l.cfg.ModuleRoot
+
+	case hasPrefix && p[len(l.cfg.Module)] == '/':
+		absDir = filepath.Join(l.cfg.ModuleRoot, sub[len(l.cfg.Module)+1:])
+
+	default:
+		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
+		if l.cfg.Registry != "" {
+			var err error
+			absDir, err = l.externalPackageDir(p)
+			if err != nil {
+				// TODO why can't we use %w ?
+				return "", name, errors.Newf(token.NoPos, "cannot get directory for external module %q: %v", p, err)
+			}
+		} else {
+			absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), sub)
+		}
+	}
+
+	return absDir, name, err
+}
+
+func (l *loader) externalPackageDir(p importPath) (dir string, err error) {
+	m, subPath, ok := l.deps.lookup(p)
+	if !ok {
+		return "", fmt.Errorf("no dependency found for import path %q", p)
+	}
+
+	dir, err = l.regClient.getModContents(m)
+	if err != nil {
+		return "", fmt.Errorf("cannot get contents for %v: %v", m, err)
+	}
+	return filepath.Join(dir, filepath.FromSlash(subPath)), nil
 }

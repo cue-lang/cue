@@ -962,7 +962,14 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	case *types.Array:
 		return supportedType(stack, x.Elem())
 	case *types.Map:
-		if b, ok := x.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
+		typ := x.Key()
+		if b, ok := typ.Underlying().(*types.Basic); !ok || b.Kind() != types.String {
+			ptr := types.NewPointer(typ)
+			for _, iface := range toString {
+				if types.Implements(typ, iface) || types.Implements(ptr, iface) {
+					return supportedType(stack, x.Elem())
+				}
+			}
 			return false
 		}
 		return supportedType(stack, x.Elem())
@@ -1115,7 +1122,9 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 
 	case *types.Map:
 		if b, ok := x.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
-			panic(fmt.Sprintf("unsupported map key type %T", x.Key()))
+			if alt := e.altType(x.Key()); alt == nil {
+				panic(fmt.Sprintf("unsupported map key type %T", x.Key()))
+			}
 		}
 
 		f := &cueast.Field{

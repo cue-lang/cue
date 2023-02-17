@@ -30,7 +30,7 @@ type Counts struct {
 	// These counters account for several key operations.
 
 	// Unifications counts the number of calls to adt.Unify
-	Unifications int
+	Unifications int64
 
 	// Disjuncts indicates the number of total disjuncts processed as part
 	// of a Unify operation. A unification with no | operator counts as a
@@ -40,7 +40,7 @@ type Counts struct {
 	// If Disjuncts is much larger than Unification, this may indicate room
 	// for optimization. In particular, most practical uses of disjunctions
 	// should allow for near-linear processing.
-	Disjuncts int
+	Disjuncts int64
 
 	// Conjuncts is an estimate of the number of conjunctions processed during
 	// the calls to Unify. This includes the conjuncts added in the compilation
@@ -49,7 +49,7 @@ type Counts struct {
 	//
 	// A number of Conjuncts much larger than Disjuncts may indicate non-linear
 	// algorithmic behavior.
-	Conjuncts int
+	Conjuncts int64
 
 	// Buffer counters
 	//
@@ -57,11 +57,15 @@ type Counts struct {
 	// with temporary buffers. Reuse of this buffer is critical for performance.
 	// The following counters track this.
 
-	Freed    int // Number of buffers returned to the free pool.
-	Reused   int // Number of times a buffer is reused instead of allocated.
-	Allocs   int // Total number of allocated buffer objects.
-	Retained int // Number of times a buffer is retained upon finalization.
+	Freed    int64 // Number of buffers returned to the free pool.
+	Reused   int64 // Number of times a buffer is reused instead of allocated.
+	Allocs   int64 // Total number of allocated buffer objects.
+	Retained int64 // Number of times a buffer is retained upon finalization.
 }
+
+// TODO: None of the methods below protect against overflows or underflows.
+// If those start happening in practice, or if the counters get large enough,
+// add checks on each of the operations.
 
 func (c *Counts) Add(other Counts) {
 	c.Unifications += other.Unifications
@@ -92,7 +96,7 @@ func (c Counts) Since(start Counts) Counts {
 // the original nodes has been eliminated or the original nodes are also not
 // referred to. But Leaks may have notable impact on performance, and thus
 // should be avoided.
-func (s Counts) Leaks() int {
+func (s Counts) Leaks() int64 {
 	return s.Allocs + s.Reused - s.Freed
 }
 

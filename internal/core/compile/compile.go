@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/wasm"
 )
 
 // A Scope represents a nested scope of Vertices.
@@ -45,6 +46,8 @@ type Config struct {
 	// which get resolved to an ImportReference. Use this option to
 	// automatically resolve identifiers to imports.
 	Imports func(x *ast.Ident) (pkgPath string)
+
+	WasmCompiler wasm.Compiler
 
 	// pkgPath is used to qualify the scope of hidden fields. The default
 	// scope is "_".

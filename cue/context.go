@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/wasm"
 )
 
 // A Context is used for creating CUE Values.
@@ -105,6 +106,12 @@ func InferBuiltins(elide bool) BuildOption {
 	}
 }
 
+// Wasm gives access to Wasm to parsed content.
+// Use [cuelang.org/go/cue/wasm.Compiler] for getting the compiler.
+func Wasm(compiler wasm.Compiler) BuildOption {
+	return func(o *runtime.Config) { o.Config.WasmCompiler = compiler }
+}
+
 func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
 	cfg.Runtime = (*runtime.Runtime)(c)
 	for _, f := range options {
@@ -136,11 +143,12 @@ func (c *Context) makeError(err errors.Error) Value {
 
 // BuildInstances creates a Value for each of the given instances and reports
 // the combined errors or nil if there were no errors.
-func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
+func (c *Context) BuildInstances(instances []*build.Instance, options ...BuildOption) ([]Value, error) {
 	var errs errors.Error
 	var a []Value
 	for _, b := range instances {
-		v, err := c.runtime().Build(nil, b)
+		cfg := c.parseOptions(options)
+		v, err := c.runtime().Build(&cfg, b)
 		if err != nil {
 			errs = errors.Append(errs, err)
 			a = append(a, c.makeError(err))

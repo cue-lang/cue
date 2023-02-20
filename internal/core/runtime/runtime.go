@@ -34,11 +34,16 @@ func (r *Runtime) BuildData(b *build.Instance) (x interface{}, ok bool) {
 	return x, ok
 }
 
+type Option interface{ runtimeOption(r *Runtime) }
+
 // New creates a new Runtime. The builtins registered with RegisterBuiltin
 // are available for
-func New() *Runtime {
+func New(options ...Option) *Runtime {
 	r := &Runtime{}
 	r.Init()
+	for _, opt := range options {
+		opt.runtimeOption(r)
+	}
 	return r
 }
 

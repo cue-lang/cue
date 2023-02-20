@@ -73,6 +73,7 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	if cfg != nil {
 		cc = &cfg.Config
 	}
+
 	if cfg != nil && cfg.ImportPath != "" {
 		b.ImportPath = cfg.ImportPath
 		b.PkgName = astutil.ImportPathName(b.ImportPath)

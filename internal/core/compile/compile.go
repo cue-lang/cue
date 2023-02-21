@@ -590,6 +590,17 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			value = c.labeledExpr(x, (*fieldLabel)(x), v)
 		}
 
+		if attr, ok := lookupExternAttr(x); ok {
+			f, err := newExternFunc(*attr)
+			if err != nil {
+				return c.errf(x, "can't instantiate function: %w", err)
+			}
+			// TODO: remove the check.
+			if f != nil {
+				value = f
+			}
+		}
+
 		switch l := lab.(type) {
 		case *ast.Ident, *ast.BasicLit:
 			label := c.label(lab)

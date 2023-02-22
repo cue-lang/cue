@@ -19,7 +19,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 // MinFields validates the minimum number of fields that are part of a struct.
@@ -27,14 +27,14 @@ import (
 //
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
-func MinFields(object internal.Struct, n int) (bool, error) {
+func MinFields(object pkg.Struct, n int) (bool, error) {
 	count := object.Len()
 	code := adt.EvalError
 	if object.IsOpen() {
 		code = adt.IncompleteError
 	}
 	if count < n {
-		return false, internal.ValidationError{B: &adt.Bottom{
+		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: code,
 			Err:  errors.Newf(token.NoPos, "len(fields) < MinFields(%[2]d) (%[1]d < %[2]d)", count, n),
 		}}
@@ -47,10 +47,10 @@ func MinFields(object internal.Struct, n int) (bool, error) {
 //
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
-func MaxFields(object internal.Struct, n int) (bool, error) {
+func MaxFields(object pkg.Struct, n int) (bool, error) {
 	count := object.Len()
 	if count > n {
-		return false, internal.ValidationError{B: &adt.Bottom{
+		return false, pkg.ValidationError{B: &adt.Bottom{
 			Code: adt.EvalError,
 			Err:  errors.Newf(token.NoPos, "len(fields) > MaxFields(%[2]d) (%[1]d > %[2]d)", count, n),
 		}}

@@ -22,8 +22,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
+	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/third_party/yaml"
-	"cuelang.org/go/pkg/internal"
 )
 
 // Marshal returns the YAML encoding of v.
@@ -126,7 +126,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 		}
 		if err := x.Validate(cue.Concrete(true)); err != nil {
 			// Strip error codes: incomplete errors are terminal in this case.
-			var b internal.Bottomer
+			var b pkg.Bottomer
 			if errors.As(err, &b) {
 				err = b.Bottom().Err
 			}

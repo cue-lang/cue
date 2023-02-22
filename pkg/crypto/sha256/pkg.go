@@ -4,17 +4,17 @@ package sha256
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("crypto/sha256", pkg)
+	pkg.Register("crypto/sha256", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name:  "Size",
 		Const: "32",
 	}, {
@@ -25,11 +25,11 @@ var pkg = &internal.Package{
 		Const: "64",
 	}, {
 		Name: "Sum256",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret = Sum256(data)
@@ -37,11 +37,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sum224",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret = Sum224(data)

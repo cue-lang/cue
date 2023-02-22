@@ -4,24 +4,24 @@ package base64
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("encoding/base64", pkg)
+	pkg.Register("encoding/base64", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "EncodedLen",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			encoding, n := c.Value(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = EncodedLen(encoding, n)
@@ -29,12 +29,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "DecodedLen",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			encoding, x := c.Value(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = DecodedLen(encoding, x)
@@ -42,12 +42,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Encode",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			encoding, src := c.Value(0), c.Bytes(1)
 			if c.Do() {
 				c.Ret, c.Err = Encode(encoding, src)
@@ -55,12 +55,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Decode",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			encoding, s := c.Value(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = Decode(encoding, s)

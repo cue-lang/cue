@@ -15,12 +15,15 @@
 package compile
 
 import (
+	"path/filepath"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/extern"
+	"cuelang.org/go/internal/wasm"
 )
 
 func lookupExternAttr(f *ast.Field) (*internal.Attr, bool) {
@@ -34,7 +37,7 @@ func lookupExternAttr(f *ast.Field) (*internal.Attr, bool) {
 	return nil, false
 }
 
-func newExternFunc(attr internal.Attr) (b *adt.Builtin, err error) {
+func newExternFunc(c *compiler, dir string, attr internal.Attr) (b *adt.Builtin, err error) {
 	sig, ok, err := attr.Lookup(0, "sig")
 	if err != nil {
 		return nil, err
@@ -43,7 +46,7 @@ func newExternFunc(attr internal.Attr) (b *adt.Builtin, err error) {
 		return nil, errors.Newf(token.NoPos, "missing sig key")
 	}
 
-	name, ok, err := attr.Lookup(0, "name")
+	funcName, ok, err := attr.Lookup(0, "name")
 	if err != nil {
 		return nil, err
 	}
@@ -51,17 +54,59 @@ func newExternFunc(attr internal.Attr) (b *adt.Builtin, err error) {
 		return nil, errors.Newf(token.NoPos, "missing name key")
 	}
 
-	f, err := extern.ParseOneFuncSig(sig)
+	wasmFile, err := attr.String(0)
+	if err != nil {
+		return nil, errors.Newf(token.NoPos, "missing file name: %w", err)
+	}
+	wasmFile = filepath.Join(dir, wasmFile)
+
+	fnSig, err := extern.ParseOneFuncSig(sig)
 	if err != nil {
 		return nil, err
 	}
 
-	// TODO: return newBuiltin(name, f), nil
-	_ = name
-	_ = f
+	inst, err := loadWasmInstance(c, wasmFile)
+	if err != nil {
+		return nil, err
+	}
+	fn, err := inst.Func(funcName)
+	if err != nil {
+		return nil, err
+	}
+
+	toBuiltin(*fnSig, fn)
+	// TODO
 	return nil, nil
 }
 
-func newBuiltin(name string, f *extern.FuncSig) *adt.Builtin {
-	panic("TODO")
+func compileAndLoad(c wasm.Compiler, name string) (wasm.Instance, error) {
+	l, err := c.Compile(name)
+	if err != nil {
+		return nil, err
+	}
+	inst, err := l.Load()
+	if err != nil {
+		return nil, err
+	}
+	return inst, nil
+}
+
+func loadWasmInstance(c *compiler, filename string) (wasm.Instance, error) {
+	if c.wasmInstances == nil {
+		c.wasmInstances = make(map[string]wasm.Instance)
+	}
+	if inst, ok := c.wasmInstances[filename]; ok {
+		return inst, nil
+	}
+
+	inst, err := compileAndLoad(c.WasmCompiler, filename)
+	if err != nil {
+		return nil, err
+	}
+	c.wasmInstances[filename] = inst
+	return inst, nil
+}
+
+func toBuiltin(sig extern.FuncSig, fn wasm.Func) {
+
 }

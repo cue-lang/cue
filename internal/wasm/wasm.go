@@ -32,11 +32,13 @@ type Loadable interface {
 	Load() (Instance, error)
 }
 
+type Func func(args ...any) (any, error)
+
 type Instance interface {
 	// Func searches the Wasm instance for the named function,
 	// returning it if found, otherwise returning the encountered
 	// error.
 	//
 	// The function uses the Wasm calling convention.
-	Func(name string) (func(args ...any) any, error)
+	Func(name string) (Func, error)
 }

@@ -15,6 +15,7 @@
 package compile
 
 import (
+	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -121,6 +122,8 @@ type compiler struct {
 
 	fileScope map[adt.Feature]bool
 
+	wasmInstances map[string]wasm.Instance
+
 	num literal.NumInfo
 
 	errs errors.Error
@@ -129,6 +132,7 @@ type compiler struct {
 func (c *compiler) reset() {
 	c.fileScope = nil
 	c.stack = c.stack[:0]
+	c.wasmInstances = nil
 	c.errs = nil
 }
 
@@ -591,9 +595,10 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		}
 
 		if attr, ok := lookupExternAttr(x); ok {
-			f, err := newExternFunc(*attr)
+			where := filepath.Dir(x.Pos().Filename())
+			f, err := newExternFunc(c, where, *attr)
 			if err != nil {
-				return c.errf(x, "can't instantiate function: %w", err)
+				return c.errf(x, "can't instantiate function: %v", err)
 			}
 			// TODO: remove the check.
 			if f != nil {

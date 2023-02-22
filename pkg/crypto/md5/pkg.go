@@ -4,17 +4,17 @@ package md5
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("crypto/md5", pkg)
+	pkg.Register("crypto/md5", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name:  "Size",
 		Const: "16",
 	}, {
@@ -22,11 +22,11 @@ var pkg = &internal.Package{
 		Const: "64",
 	}, {
 		Name: "Sum",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret = Sum(data)

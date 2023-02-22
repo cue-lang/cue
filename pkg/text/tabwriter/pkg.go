@@ -4,23 +4,23 @@ package tabwriter
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("text/tabwriter", pkg)
+	pkg.Register("text/tabwriter", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Write",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Value(0)
 			if c.Do() {
 				c.Ret, c.Err = Write(data)

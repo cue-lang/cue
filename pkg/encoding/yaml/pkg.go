@@ -4,23 +4,23 @@ package yaml
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("encoding/yaml", pkg)
+	pkg.Register("encoding/yaml", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Marshal",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			v := c.Value(0)
 			if c.Do() {
 				c.Ret, c.Err = Marshal(v)
@@ -28,11 +28,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MarshalStream",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			v := c.Value(0)
 			if c.Do() {
 				c.Ret, c.Err = MarshalStream(v)
@@ -40,11 +40,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Unmarshal",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.TopKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret, c.Err = Unmarshal(data)
@@ -52,11 +52,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "UnmarshalStream",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.TopKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret, c.Err = UnmarshalStream(data)
@@ -64,12 +64,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Validate",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 			{Kind: adt.TopKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			b, v := c.Bytes(0), c.Value(1)
 			if c.Do() {
 				c.Ret, c.Err = Validate(b, v)
@@ -77,12 +77,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ValidatePartial",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 			{Kind: adt.TopKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			b, v := c.Bytes(0), c.Value(1)
 			if c.Do() {
 				c.Ret, c.Err = ValidatePartial(b, v)

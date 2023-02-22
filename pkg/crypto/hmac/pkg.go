@@ -4,17 +4,17 @@ package hmac
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("crypto/hmac", pkg)
+	pkg.Register("crypto/hmac", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name:  "MD5",
 		Const: "\"MD5\"",
 	}, {
@@ -40,13 +40,13 @@ var pkg = &internal.Package{
 		Const: "\"SHA512_256\"",
 	}, {
 		Name: "Sign",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.BytesKind | adt.StringKind},
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			hashName, key, data := c.String(0), c.Bytes(1), c.Bytes(2)
 			if c.Do() {
 				c.Ret, c.Err = Sign(hashName, key, data)

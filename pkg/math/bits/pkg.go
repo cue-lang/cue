@@ -4,24 +4,24 @@ package bits
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("math/bits", pkg)
+	pkg.Register("math/bits", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Lsh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, n := c.BigInt(0), c.Uint(1)
 			if c.Do() {
 				c.Ret = Lsh(x, n)
@@ -29,12 +29,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Rsh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, n := c.BigInt(0), c.Uint(1)
 			if c.Do() {
 				c.Ret = Rsh(x, n)
@@ -42,12 +42,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "At",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, i := c.BigInt(0), c.Uint(1)
 			if c.Do() {
 				c.Ret, c.Err = At(x, i)
@@ -55,13 +55,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Set",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, i, bit := c.BigInt(0), c.Int(1), c.Uint(2)
 			if c.Do() {
 				c.Ret = Set(x, i, bit)
@@ -69,12 +69,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "And",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
 			if c.Do() {
 				c.Ret = And(a, b)
@@ -82,12 +82,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Or",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
 			if c.Do() {
 				c.Ret = Or(a, b)
@@ -95,12 +95,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Xor",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
 			if c.Do() {
 				c.Ret = Xor(a, b)
@@ -108,12 +108,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Clear",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
 			if c.Do() {
 				c.Ret = Clear(a, b)
@@ -121,11 +121,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "OnesCount",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.BigInt(0)
 			if c.Do() {
 				c.Ret = OnesCount(x)
@@ -133,11 +133,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Len",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.BigInt(0)
 			if c.Do() {
 				c.Ret = Len(x)

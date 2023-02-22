@@ -203,7 +203,7 @@ func TestMain(m *testing.M) {
 
 // homeEnvName extracts the logic from os.UserHomeDir to get the
 // name of the environment variable that should be used when
-// seting the user's home directory
+// setting the user's home directory
 func homeEnvName() string {
 	switch goruntime.GOOS {
 	case "windows":

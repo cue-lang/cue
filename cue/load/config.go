@@ -252,7 +252,7 @@ type Config struct {
 	// to CUE.
 	DataFiles bool
 
-	// StdRoot specifies an alternative directory for standard libaries.
+	// StdRoot specifies an alternative directory for standard libraries.
 	// This is mostly used for bootstrapping.
 	StdRoot string
 

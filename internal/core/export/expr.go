@@ -370,7 +370,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 			e.attrs = extractDeclAttrs(e.attrs, x.Src)
 		}
 
-		// Only add if it only has no bulk fields or elipsis.
+		// Only add if it only has no bulk fields or ellipsis.
 		if isComplexStruct(x) {
 			_, saved := e.pushFrame(src, nil)
 			e.embed = append(e.embed, e.adt(env, x))

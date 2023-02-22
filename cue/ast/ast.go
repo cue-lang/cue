@@ -501,8 +501,8 @@ type StructLit struct {
 
 // NewStruct creates a struct from the given fields.
 //
-// A field is either a *Field, an *Elipsis, *LetClause, a *CommentGroup, or a
-// Label, optionally followed by a a token.OPTION to indicate the field is
+// A field is either a *Field, an *Ellipsis, *LetClause, a *CommentGroup, or a
+// Label, optionally followed by a token.OPTION to indicate the field is
 // optional, optionally followed by a token.ISA to indicate the field is a
 // definition followed by an expression for the field value.
 //

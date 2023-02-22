@@ -329,7 +329,7 @@ func (p *parser) consumeCommentGroup(prevLine, n int) (comments *ast.CommentGrou
 
 // Advance to the next non-comment  In the process, collect
 // any comment groups encountered, and refield the last lead and
-// and line comments.
+// line comments.
 //
 // A lead comment is a comment group that starts and ends in a
 // line without any other tokens and that is followed by a non-comment

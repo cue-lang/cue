@@ -338,7 +338,7 @@ func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
 
 	// TODO(perf): more aggressively determine whether a struct is open or
 	// closed: open structs do not have to be checked, yet they can particularly
-	// be the ones with performance isssues, for instanced as a result of
+	// be the ones with performance issues, for instanced as a result of
 	// embedded for comprehensions.
 	for _, s := range n.Structs {
 		if !s.useForAccept() {

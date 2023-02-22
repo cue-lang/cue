@@ -53,7 +53,7 @@ type Encoder struct {
 // IsConcrete reports whether the output is required to be concrete.
 //
 // INTERNAL ONLY: this is just to work around a problem related to issue #553
-// of catching errors ony after syntax generation, dropping line number
+// of catching errors only after syntax generation, dropping line number
 // information.
 func (e *Encoder) IsConcrete() bool {
 	return e.concrete

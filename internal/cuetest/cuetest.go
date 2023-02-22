@@ -71,7 +71,7 @@ var FormatTxtar = os.Getenv(envFormatTxtar) != ""
 // Condition adds support for CUE-specific testscript conditions within
 // testscript scripts. Supported conditions include:
 //
-// [long] - evalutates to true when the long build tag is specified
+// [long] - evaluates to true when the long build tag is specified
 //
 // [golang.org/issue/N] - evaluates to true unless CUE_NON_ISSUES
 // is set to a regexp that matches the condition, i.e. golang.org/issue/N

@@ -403,7 +403,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 
 	if count > 0 { // TODO: implement IsAny.
 		// TODO: perhaps find optimal representation. For now we assume the
-		// representation as is is already optimized for human consumption.
+		// representation as is already optimized for human consumption.
 		if values.IncompleteKind()&cue.StructKind != cue.StructKind && !isRef {
 			values = values.Eval()
 		}

@@ -280,7 +280,7 @@ func TestParseDefinitions(t *testing.T) {
 			}
 			if !tc.instanceOnly {
 				t.Run("Value", func(t *testing.T) {
-					// New style call, wih cue.Value
+					// New style call, with cue.Value
 					ctx := cuecontext.New()
 					v := ctx.BuildInstance(inst)
 					if err := v.Err(); err != nil {

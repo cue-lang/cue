@@ -171,7 +171,7 @@ type Vertex struct {
 	// processed.
 	hasAllConjuncts bool
 
-	// isData indicates that this Vertex is to be interepreted as data: pattern
+	// isData indicates that this Vertex is to be interpreted as data: pattern
 	// and additional constraints, as well as optional fields, should be
 	// ignored.
 	isData bool

@@ -131,7 +131,7 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, 
 }
 
 // Expr exports the given unevaluated expression (schema mode).
-// It does not resolve references that point outside the given expession.
+// It does not resolve references that point outside the given expression.
 func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
 	return Simplified.Expr(r, pkgID, n)
 }

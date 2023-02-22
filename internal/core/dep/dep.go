@@ -250,7 +250,7 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	// It is possible that a reference cannot be resolved because it is
 	// incomplete. In this case, we should check whether subexpressions of the
 	// reference can be resolved to mark those dependencies. For instance,
-	// prefix paths of selectors and the value or index of an index experssion
+	// prefix paths of selectors and the value or index of an index expression
 	// may independently resolve to a valid dependency.
 
 	switch x := r.(type) {

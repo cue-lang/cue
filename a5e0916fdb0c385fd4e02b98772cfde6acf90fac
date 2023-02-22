@@ -16,6 +16,24 @@
       "message": "Is this intended / expected?",
       "revId": "a5e0916fdb0c385fd4e02b98772cfde6acf90fac",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "256b0bd3_6edc64ff",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-22T10:24:57Z",
+      "side": 1,
+      "message": "Yes, as discussed online, the directory is pretty much meaningless in this case so the behavior change should be fine.",
+      "parentUuid": "00cde696_5d89d69c",
+      "revId": "a5e0916fdb0c385fd4e02b98772cfde6acf90fac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

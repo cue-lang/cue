@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/cue/wasm"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
@@ -723,7 +724,8 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []
 	// TODO:
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
-	instances, err := cmd.ctx.BuildInstances(binst)
+	// Be more selective where Wasm is enabled?
+	instances, err := cmd.ctx.BuildInstances(binst, cue.Wasm(wasm.Compiler()))
 	exitIfErr(cmd, nil, err, true)
 
 	insts := make([]*instance, len(instances))

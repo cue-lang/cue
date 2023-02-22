@@ -4,17 +4,17 @@ package time
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("time", pkg)
+	pkg.Register("time", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name:  "Nanosecond",
 		Const: "1",
 	}, {
@@ -34,11 +34,11 @@ var pkg = &internal.Package{
 		Const: "3600000000000",
 	}, {
 		Name: "Duration",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Duration(s)
@@ -46,11 +46,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FormatDuration",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			d := c.Int64(0)
 			if c.Do() {
 				c.Ret = FormatDuration(d)
@@ -58,11 +58,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ParseDuration",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = ParseDuration(s)
@@ -166,11 +166,11 @@ var pkg = &internal.Package{
 		Const: "6",
 	}, {
 		Name: "Time",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Time(s)
@@ -178,12 +178,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Format",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			value, layout := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = Format(value, layout)
@@ -191,12 +191,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FormatString",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			layout, value := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = FormatString(layout, value)
@@ -204,12 +204,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Parse",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			layout, value := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = Parse(layout, value)
@@ -217,12 +217,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Unix",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			sec, nsec := c.Int64(0), c.Int64(1)
 			if c.Do() {
 				c.Ret = Unix(sec, nsec)
@@ -230,11 +230,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Split",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.TopKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			t := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Split(t)

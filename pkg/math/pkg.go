@@ -4,17 +4,17 @@ package math
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("math", pkg)
+	pkg.Register("math", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name:  "MaxExp",
 		Const: "2147483647",
 	}, {
@@ -52,12 +52,12 @@ var pkg = &internal.Package{
 		Const: "1",
 	}, {
 		Name: "Jacobi",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, y := c.BigInt(0), c.BigInt(1)
 			if c.Do() {
 				c.Ret = Jacobi(x, y)
@@ -68,11 +68,11 @@ var pkg = &internal.Package{
 		Const: "62",
 	}, {
 		Name: "Floor",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Floor(x)
@@ -80,11 +80,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Ceil",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Ceil(x)
@@ -92,11 +92,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Trunc",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Trunc(x)
@@ -104,11 +104,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Round",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Round(x)
@@ -116,11 +116,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "RoundToEven",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = RoundToEven(x)
@@ -128,12 +128,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MultipleOf",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
 			if c.Do() {
 				c.Ret, c.Err = MultipleOf(x, y)
@@ -141,11 +141,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Abs",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Abs(x)
@@ -153,11 +153,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Acosh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Acosh(x)
@@ -165,11 +165,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Asin",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Asin(x)
@@ -177,11 +177,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Acos",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Acos(x)
@@ -189,11 +189,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Asinh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Asinh(x)
@@ -201,11 +201,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Atan",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Atan(x)
@@ -213,12 +213,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Atan2",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			y, x := c.Float64(0), c.Float64(1)
 			if c.Do() {
 				c.Ret = Atan2(y, x)
@@ -226,11 +226,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Atanh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Atanh(x)
@@ -238,11 +238,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Cbrt",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Cbrt(x)
@@ -283,12 +283,12 @@ var pkg = &internal.Package{
 		Const: "0.43429448190325182765112891891660508229439700580366656611445378",
 	}, {
 		Name: "Copysign",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
 			if c.Do() {
 				c.Ret = Copysign(x, y)
@@ -296,12 +296,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Dim",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
 			if c.Do() {
 				c.Ret, c.Err = Dim(x, y)
@@ -309,11 +309,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Erf",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Erf(x)
@@ -321,11 +321,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Erfc",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Erfc(x)
@@ -333,11 +333,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Erfinv",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Erfinv(x)
@@ -345,11 +345,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Erfcinv",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Erfcinv(x)
@@ -357,11 +357,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Exp",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Exp(x)
@@ -369,11 +369,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Exp2",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Exp2(x)
@@ -381,11 +381,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Expm1",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Expm1(x)
@@ -393,11 +393,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Gamma",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Gamma(x)
@@ -405,12 +405,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Hypot",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			p, q := c.Float64(0), c.Float64(1)
 			if c.Do() {
 				c.Ret = Hypot(p, q)
@@ -418,11 +418,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "J0",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = J0(x)
@@ -430,11 +430,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Y0",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Y0(x)
@@ -442,11 +442,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "J1",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = J1(x)
@@ -454,11 +454,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Y1",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Y1(x)
@@ -466,12 +466,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Jn",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			n, x := c.Int(0), c.Float64(1)
 			if c.Do() {
 				c.Ret = Jn(n, x)
@@ -479,12 +479,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Yn",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			n, x := c.Int(0), c.Float64(1)
 			if c.Do() {
 				c.Ret = Yn(n, x)
@@ -492,12 +492,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Ldexp",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			frac, exp := c.Float64(0), c.Int(1)
 			if c.Do() {
 				c.Ret = Ldexp(frac, exp)
@@ -505,11 +505,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Log",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Log(x)
@@ -517,11 +517,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Log10",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Log10(x)
@@ -529,11 +529,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Log2",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret, c.Err = Log2(x)
@@ -541,11 +541,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Log1p",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Log1p(x)
@@ -553,11 +553,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Logb",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Logb(x)
@@ -565,11 +565,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Ilogb",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Ilogb(x)
@@ -577,12 +577,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Mod",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Float64(0), c.Float64(1)
 			if c.Do() {
 				c.Ret = Mod(x, y)
@@ -590,12 +590,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Pow",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
 			if c.Do() {
 				c.Ret, c.Err = Pow(x, y)
@@ -603,11 +603,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Pow10",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			n := c.Int32(0)
 			if c.Do() {
 				c.Ret = Pow10(n)
@@ -615,12 +615,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Remainder",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, y := c.Float64(0), c.Float64(1)
 			if c.Do() {
 				c.Ret = Remainder(x, y)
@@ -628,11 +628,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Signbit",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
 				c.Ret = Signbit(x)
@@ -640,11 +640,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Cos",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Cos(x)
@@ -652,11 +652,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sin",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Sin(x)
@@ -664,11 +664,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sinh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Sinh(x)
@@ -676,11 +676,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Cosh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Cosh(x)
@@ -688,11 +688,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sqrt",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Sqrt(x)
@@ -700,11 +700,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Tan",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Tan(x)
@@ -712,11 +712,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Tanh",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Float64(0)
 			if c.Do() {
 				c.Ret = Tanh(x)

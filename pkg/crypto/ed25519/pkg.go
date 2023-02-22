@@ -4,28 +4,28 @@ package ed25519
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("crypto/ed25519", pkg)
+	pkg.Register("crypto/ed25519", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name:  "PublicKeySize",
 		Const: "32",
 	}, {
 		Name: "Valid",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 			{Kind: adt.BytesKind | adt.StringKind},
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			publicKey, message, signature := c.Bytes(0), c.Bytes(1), c.Bytes(2)
 			if c.Do() {
 				c.Ret, c.Err = Valid(publicKey, message, signature)

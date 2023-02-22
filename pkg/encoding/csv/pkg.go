@@ -4,23 +4,23 @@ package csv
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("encoding/csv", pkg)
+	pkg.Register("encoding/csv", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Encode",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.Value(0)
 			if c.Do() {
 				c.Ret, c.Err = Encode(x)
@@ -28,11 +28,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Decode",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			r := c.Reader(0)
 			if c.Do() {
 				c.Ret, c.Err = Decode(r)

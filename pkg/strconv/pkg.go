@@ -4,23 +4,23 @@ package strconv
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("strconv", pkg)
+	pkg.Register("strconv", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Unquote",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Unquote(s)
@@ -28,11 +28,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ParseBool",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			str := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = ParseBool(str)
@@ -40,11 +40,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FormatBool",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BoolKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			b := c.Bool(0)
 			if c.Do() {
 				c.Ret = FormatBool(b)
@@ -52,12 +52,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ParseComplex",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.TopKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, bitSize := c.String(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = ParseComplex(s, bitSize)
@@ -65,12 +65,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ParseFloat",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, bitSize := c.String(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = ParseFloat(s, bitSize)
@@ -81,13 +81,13 @@ var pkg = &internal.Package{
 		Const: "64",
 	}, {
 		Name: "ParseUint",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, base, bitSize := c.String(0), c.Int(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = ParseUint(s, base, bitSize)
@@ -95,13 +95,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ParseInt",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, base, bitSize := c.String(0), c.Int(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = ParseInt(s, base, bitSize)
@@ -109,11 +109,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Atoi",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Atoi(s)
@@ -121,14 +121,14 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FormatFloat",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			f, fmt, prec, bitSize := c.Float64(0), c.Byte(1), c.Int(2), c.Int(3)
 			if c.Do() {
 				c.Ret = FormatFloat(f, fmt, prec, bitSize)
@@ -136,12 +136,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FormatUint",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			i, base := c.BigInt(0), c.Int(1)
 			if c.Do() {
 				c.Ret = FormatUint(i, base)
@@ -149,12 +149,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FormatInt",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			i, base := c.BigInt(0), c.Int(1)
 			if c.Do() {
 				c.Ret = FormatInt(i, base)
@@ -162,11 +162,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Quote",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = Quote(s)
@@ -174,11 +174,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "QuoteToASCII",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = QuoteToASCII(s)
@@ -186,11 +186,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "QuoteToGraphic",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = QuoteToGraphic(s)
@@ -198,11 +198,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "QuoteRune",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			r := c.Rune(0)
 			if c.Do() {
 				c.Ret = QuoteRune(r)
@@ -210,11 +210,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "QuoteRuneToASCII",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			r := c.Rune(0)
 			if c.Do() {
 				c.Ret = QuoteRuneToASCII(r)
@@ -222,11 +222,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "QuoteRuneToGraphic",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			r := c.Rune(0)
 			if c.Do() {
 				c.Ret = QuoteRuneToGraphic(r)
@@ -234,11 +234,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "IsPrint",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			r := c.Rune(0)
 			if c.Do() {
 				c.Ret = IsPrint(r)
@@ -246,11 +246,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "IsGraphic",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			r := c.Rune(0)
 			if c.Do() {
 				c.Ret = IsGraphic(r)

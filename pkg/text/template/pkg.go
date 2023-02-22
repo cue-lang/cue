@@ -4,24 +4,24 @@ package template
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("text/template", pkg)
+	pkg.Register("text/template", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Execute",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.TopKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			templ, data := c.String(0), c.Value(1)
 			if c.Do() {
 				c.Ret, c.Err = Execute(templ, data)
@@ -29,11 +29,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "HTMLEscape",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = HTMLEscape(s)
@@ -41,11 +41,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "JSEscape",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = JSEscape(s)

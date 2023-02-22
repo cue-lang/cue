@@ -48,17 +48,17 @@ package os
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("tool/os", pkg)
+	pkg.Register("tool/os", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{},
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{},
 	CUE: `{
 	Value: bool | number | *string | null
 	Name:  !="" & !~"^[$]"

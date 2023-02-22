@@ -77,11 +77,11 @@ package {{.GoPkg}}
 {{if .CUEPkg -}}
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register({{printf "%q" .CUEPkg}}, pkg)
+	pkg.Register({{printf "%q" .CUEPkg}}, p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
@@ -157,7 +157,7 @@ func generate(cuePkgPath string) error {
 	}
 
 	if !skipRegister {
-		fmt.Fprintf(g.w, "var pkg = &internal.Package{\nNative: []*internal.Builtin{")
+		fmt.Fprintf(g.w, "var p = &pkg.Package{\nNative: []*pkg.Builtin{")
 		g.first = true
 		for _, filename := range pkg.GoFiles {
 			if filename == genFile {
@@ -334,7 +334,7 @@ func (g *generator) genFunc(x *ast.FuncDecl) {
 		}
 	}
 
-	fmt.Fprintf(g.w, "Params: []internal.Param{\n")
+	fmt.Fprintf(g.w, "Params: []pkg.Param{\n")
 	for _, k := range kind {
 		fmt.Fprintf(g.w, "{Kind: %s},\n", k)
 	}
@@ -350,7 +350,7 @@ func (g *generator) genFunc(x *ast.FuncDecl) {
 		init = fmt.Sprintf("%s := %s", argList, valList)
 	}
 
-	fmt.Fprintf(g.w, "Func: func(c *internal.CallCtxt) {")
+	fmt.Fprintf(g.w, "Func: func(c *pkg.CallCtxt) {")
 	defer fmt.Fprintln(g.w, "},")
 	fmt.Fprintln(g.w)
 	if init != "" {
@@ -382,9 +382,9 @@ func (g *generator) goKind(expr ast.Expr) string {
 		return "error"
 	case "internal.Decimal":
 		return "decimal"
-	case "internal.List":
+	case "pkg.List":
 		return "cueList"
-	case "internal.Struct":
+	case "pkg.Struct":
 		return "struct"
 	case "[]*internal.Decimal":
 		return "decimalList"

@@ -4,24 +4,24 @@ package structs
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("struct", pkg)
+	pkg.Register("struct", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "MinFields",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StructKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			object, n := c.Struct(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = MinFields(object, n)
@@ -29,12 +29,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MaxFields",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StructKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			object, n := c.Struct(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = MaxFields(object, n)

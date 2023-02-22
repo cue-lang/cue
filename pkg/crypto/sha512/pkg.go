@@ -4,17 +4,17 @@ package sha512
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("crypto/sha512", pkg)
+	pkg.Register("crypto/sha512", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name:  "Size",
 		Const: "64",
 	}, {
@@ -31,11 +31,11 @@ var pkg = &internal.Package{
 		Const: "128",
 	}, {
 		Name: "Sum512",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret = Sum512(data)
@@ -43,11 +43,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sum384",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret = Sum384(data)
@@ -55,11 +55,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sum512_224",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret = Sum512_224(data)
@@ -67,11 +67,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sum512_256",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			data := c.Bytes(0)
 			if c.Do() {
 				c.Ret = Sum512_256(data)

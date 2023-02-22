@@ -4,24 +4,24 @@ package strings
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("strings", pkg)
+	pkg.Register("strings", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "ByteAt",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			b, i := c.Bytes(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = ByteAt(b, i)
@@ -29,13 +29,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ByteSlice",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.BytesKind | adt.StringKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BytesKind | adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			b, start, end := c.Bytes(0), c.Int(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = ByteSlice(b, start, end)
@@ -43,11 +43,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Runes",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = Runes(s)
@@ -55,12 +55,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MinRunes",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, min := c.String(0), c.Int(1)
 			if c.Do() {
 				c.Ret = MinRunes(s, min)
@@ -68,12 +68,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MaxRunes",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, max := c.String(0), c.Int(1)
 			if c.Do() {
 				c.Ret = MaxRunes(s, max)
@@ -81,11 +81,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ToTitle",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = ToTitle(s)
@@ -93,11 +93,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ToCamel",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = ToCamel(s)
@@ -105,13 +105,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "SliceRunes",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, start, end := c.String(0), c.Int(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = SliceRunes(s, start, end)
@@ -119,12 +119,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Compare",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a, b := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = Compare(a, b)
@@ -132,12 +132,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Count",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, substr := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = Count(s, substr)
@@ -145,12 +145,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Contains",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, substr := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = Contains(s, substr)
@@ -158,12 +158,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ContainsAny",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, chars := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = ContainsAny(s, chars)
@@ -171,12 +171,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "LastIndex",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, substr := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = LastIndex(s, substr)
@@ -184,12 +184,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "IndexAny",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, chars := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = IndexAny(s, chars)
@@ -197,12 +197,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "LastIndexAny",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, chars := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = LastIndexAny(s, chars)
@@ -210,13 +210,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "SplitN",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, sep, n := c.String(0), c.String(1), c.Int(2)
 			if c.Do() {
 				c.Ret = SplitN(s, sep, n)
@@ -224,13 +224,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "SplitAfterN",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, sep, n := c.String(0), c.String(1), c.Int(2)
 			if c.Do() {
 				c.Ret = SplitAfterN(s, sep, n)
@@ -238,12 +238,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Split",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, sep := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = Split(s, sep)
@@ -251,12 +251,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "SplitAfter",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, sep := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = SplitAfter(s, sep)
@@ -264,11 +264,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Fields",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = Fields(s)
@@ -276,12 +276,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Join",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			elems, sep := c.StringList(0), c.String(1)
 			if c.Do() {
 				c.Ret = Join(elems, sep)
@@ -289,12 +289,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "HasPrefix",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, prefix := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = HasPrefix(s, prefix)
@@ -302,12 +302,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "HasSuffix",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, suffix := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = HasSuffix(s, suffix)
@@ -315,12 +315,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Repeat",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, count := c.String(0), c.Int(1)
 			if c.Do() {
 				c.Ret = Repeat(s, count)
@@ -328,11 +328,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ToUpper",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = ToUpper(s)
@@ -340,11 +340,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ToLower",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = ToLower(s)
@@ -352,12 +352,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Trim",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, cutset := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = Trim(s, cutset)
@@ -365,12 +365,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "TrimLeft",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, cutset := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = TrimLeft(s, cutset)
@@ -378,12 +378,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "TrimRight",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, cutset := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = TrimRight(s, cutset)
@@ -391,11 +391,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "TrimSpace",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = TrimSpace(s)
@@ -403,12 +403,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "TrimPrefix",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, prefix := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = TrimPrefix(s, prefix)
@@ -416,12 +416,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "TrimSuffix",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, suffix := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = TrimSuffix(s, suffix)
@@ -429,14 +429,14 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Replace",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, old, new, n := c.String(0), c.String(1), c.String(2), c.Int(3)
 			if c.Do() {
 				c.Ret = Replace(s, old, new, n)
@@ -444,12 +444,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Index",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s, substr := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret = Index(s, substr)

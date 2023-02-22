@@ -4,24 +4,24 @@ package regexp
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("regexp", pkg)
+	pkg.Register("regexp", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Find",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, s := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = Find(pattern, s)
@@ -29,13 +29,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FindAll",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, s, n := c.String(0), c.String(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = FindAll(pattern, s, n)
@@ -43,13 +43,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FindAllNamedSubmatch",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, s, n := c.String(0), c.String(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = FindAllNamedSubmatch(pattern, s, n)
@@ -57,13 +57,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FindAllSubmatch",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, s, n := c.String(0), c.String(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = FindAllSubmatch(pattern, s, n)
@@ -71,12 +71,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FindNamedSubmatch",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StructKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, s := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = FindNamedSubmatch(pattern, s)
@@ -84,12 +84,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FindSubmatch",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, s := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = FindSubmatch(pattern, s)
@@ -97,13 +97,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ReplaceAll",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, src, repl := c.String(0), c.String(1), c.String(2)
 			if c.Do() {
 				c.Ret, c.Err = ReplaceAll(pattern, src, repl)
@@ -111,13 +111,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ReplaceAllLiteral",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, src, repl := c.String(0), c.String(1), c.String(2)
 			if c.Do() {
 				c.Ret, c.Err = ReplaceAllLiteral(pattern, src, repl)
@@ -125,11 +125,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Valid",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Valid(pattern)
@@ -137,12 +137,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Match",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			pattern, s := c.String(0), c.String(1)
 			if c.Do() {
 				c.Ret, c.Err = Match(pattern, s)
@@ -150,11 +150,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "QuoteMeta",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = QuoteMeta(s)

@@ -4,24 +4,24 @@ package list
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("list", pkg)
+	pkg.Register("list", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Drop",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, n := c.List(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = Drop(x, n)
@@ -29,12 +29,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FlattenN",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.TopKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			xs, depth := c.Value(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = FlattenN(xs, depth)
@@ -42,12 +42,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Repeat",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, count := c.List(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = Repeat(x, count)
@@ -55,11 +55,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Concat",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a := c.List(0)
 			if c.Do() {
 				c.Ret, c.Err = Concat(a)
@@ -67,12 +67,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Take",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, n := c.List(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = Take(x, n)
@@ -80,13 +80,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Slice",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.IntKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x, i, j := c.List(0), c.Int(1), c.Int(2)
 			if c.Do() {
 				c.Ret, c.Err = Slice(x, i, j)
@@ -94,12 +94,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MinItems",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			list, n := c.CueList(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = MinItems(list, n)
@@ -107,12 +107,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MaxItems",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.IntKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			list, n := c.CueList(0), c.Int(1)
 			if c.Do() {
 				c.Ret, c.Err = MaxItems(list, n)
@@ -120,11 +120,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "UniqueItems",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a := c.List(0)
 			if c.Do() {
 				c.Ret = UniqueItems(a)
@@ -132,12 +132,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Contains",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.TopKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a, v := c.List(0), c.Value(1)
 			if c.Do() {
 				c.Ret = Contains(a, v)
@@ -145,11 +145,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Avg",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
 				c.Ret, c.Err = Avg(xs)
@@ -157,11 +157,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Max",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
 				c.Ret, c.Err = Max(xs)
@@ -169,11 +169,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Min",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
 				c.Ret, c.Err = Min(xs)
@@ -181,11 +181,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Product",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
 				c.Ret, c.Err = Product(xs)
@@ -193,13 +193,13 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Range",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 			{Kind: adt.NumKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			start, limit, step := c.Decimal(0), c.Decimal(1), c.Decimal(2)
 			if c.Do() {
 				c.Ret, c.Err = Range(start, limit, step)
@@ -207,11 +207,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sum",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.NumKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			xs := c.DecimalList(0)
 			if c.Do() {
 				c.Ret, c.Err = Sum(xs)
@@ -219,12 +219,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Sort",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.TopKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			list, cmp := c.List(0), c.Value(1)
 			if c.Do() {
 				c.Ret, c.Err = Sort(list, cmp)
@@ -232,12 +232,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "SortStable",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.TopKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			list, cmp := c.List(0), c.Value(1)
 			if c.Do() {
 				c.Ret, c.Err = SortStable(list, cmp)
@@ -245,11 +245,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "SortStrings",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.ListKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a := c.StringList(0)
 			if c.Do() {
 				c.Ret = SortStrings(a)
@@ -257,12 +257,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "IsSorted",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 			{Kind: adt.TopKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			list, cmp := c.List(0), c.Value(1)
 			if c.Do() {
 				c.Ret = IsSorted(list, cmp)
@@ -270,11 +270,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "IsSortedStrings",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.ListKind},
 		},
 		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			a := c.StringList(0)
 			if c.Do() {
 				c.Ret = IsSortedStrings(a)

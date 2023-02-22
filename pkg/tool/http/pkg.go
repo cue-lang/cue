@@ -53,17 +53,17 @@ package http
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("tool/http", pkg)
+	pkg.Register("tool/http", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{},
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{},
 	CUE: `{
 	Get: Do & {
 		method: "GET"

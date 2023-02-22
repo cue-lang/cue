@@ -4,23 +4,23 @@ package uuid
 
 import (
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/pkg/internal"
+	"cuelang.org/go/internal/pkg"
 )
 
 func init() {
-	internal.Register("uuid", pkg)
+	pkg.Register("uuid", p)
 }
 
 var _ = adt.TopKind // in case the adt package isn't used
 
-var pkg = &internal.Package{
-	Native: []*internal.Builtin{{
+var p = &pkg.Package{
+	Native: []*pkg.Builtin{{
 		Name: "Valid",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.BottomKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret = Valid(s)
@@ -28,11 +28,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Parse",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			s := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Parse(s)
@@ -40,11 +40,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ToString",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.String(0)
 			if c.Do() {
 				c.Ret = ToString(x)
@@ -52,11 +52,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "URN",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = URN(x)
@@ -64,11 +64,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "FromInt",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.IntKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			i := c.BigInt(0)
 			if c.Do() {
 				c.Ret, c.Err = FromInt(i)
@@ -76,11 +76,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "ToInt",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.String(0)
 			if c.Do() {
 				c.Ret = ToInt(x)
@@ -88,11 +88,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Variant",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Variant(x)
@@ -100,11 +100,11 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "Version",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 		},
 		Result: adt.IntKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			x := c.String(0)
 			if c.Do() {
 				c.Ret, c.Err = Version(x)
@@ -112,12 +112,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "SHA1",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			space, data := c.String(0), c.Bytes(1)
 			if c.Do() {
 				c.Ret, c.Err = SHA1(space, data)
@@ -125,12 +125,12 @@ var pkg = &internal.Package{
 		},
 	}, {
 		Name: "MD5",
-		Params: []internal.Param{
+		Params: []pkg.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.BytesKind | adt.StringKind},
 		},
 		Result: adt.StringKind,
-		Func: func(c *internal.CallCtxt) {
+		Func: func(c *pkg.CallCtxt) {
 			space, data := c.String(0), c.Bytes(1)
 			if c.Do() {
 				c.Ret, c.Err = MD5(space, data)

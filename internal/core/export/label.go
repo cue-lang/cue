@@ -56,7 +56,7 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 //
 // If f is a hidden field that comes from an expanded package, it will mangle
 // the name by expending it with the MD5 hash of the package name. This is to
-// avoid collissions of the hidden identifiers when namespaces are merged.
+// avoid collisions of the hidden identifiers when namespaces are merged.
 // It uses the MD5 hash to allow hidden fields from the same package to
 // still match across inlining and unifications.
 //

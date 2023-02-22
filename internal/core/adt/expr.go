@@ -219,7 +219,7 @@ func (x *LetField) Source() ast.Node {
 //
 //	[expr]: expr
 type BulkOptionalField struct {
-	Src    *ast.Field // Elipsis or Field
+	Src    *ast.Field // Ellipsis or Field
 	Filter Expr
 	Value  Expr
 	Label  Feature // for reference and formatting
@@ -865,7 +865,7 @@ func (x *LetReference) resolve(ctx *OpContext, state vertexStatus) *Vertex {
 	n := e.Vertex
 
 	// No need to Unify n, as Let references can only result from evaluating
-	// an experssion within n, in which case evaluation must already have
+	// an expression within n, in which case evaluation must already have
 	// started.
 	if n.status < evaluating {
 		panic("unexpected node state < Evaluating")

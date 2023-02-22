@@ -245,7 +245,7 @@ type RefNode struct {
 	//      x: b: {Y} | null
 	//
 	// In both cases there are not structural cycles and thus need to be
-	// distinguised from regular structural cycles.
+	// distinguished from regular structural cycles.
 	Node *Vertex
 
 	Next  *RefNode

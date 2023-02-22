@@ -49,7 +49,7 @@ package adt
 // With this rewrite, any dependencies in comprehension expressions will follow
 // the same rules, more or less, as with normal evaluation.
 //
-// Note that a singe comprehension may be distributed across multiple fields.
+// Note that a single comprehension may be distributed across multiple fields.
 // The evaluator will ensure, however, that a comprehension is only evaluated
 // once.
 //
@@ -96,7 +96,7 @@ type envYield struct {
 	*envComprehension                // The original comprehension.
 	leaf              *Comprehension // The leaf Comprehension
 
-	// Values specific to the field corresponsing to this envYield
+	// Values specific to the field corresponding to this envYield
 
 	// This envYield was added to selfComprehensions
 	self bool
@@ -266,7 +266,7 @@ type compState struct {
 	state vertexStatus
 }
 
-// yield evaluates a Comprehension within the given Environment and and calls
+// yield evaluates a Comprehension within the given Environment and calls
 // f for each result.
 func (c *OpContext) yield(
 	node *Vertex, // errors are associated with this node

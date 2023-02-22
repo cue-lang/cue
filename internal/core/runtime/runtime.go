@@ -18,7 +18,7 @@ import (
 	"cuelang.org/go/cue/build"
 )
 
-// A Runtime maintains data structures for indexing and resuse for evaluation.
+// A Runtime maintains data structures for indexing and reuse for evaluation.
 type Runtime struct {
 	index *index
 

@@ -307,7 +307,7 @@ func (c *OpContext) unify(v *Vertex, state vertexStatus) {
 
 				// TODO: use a more principled form of dereferencing. For instance,
 				// disjuncts could already be assumed to be the given Vertex, and
-				// the the main vertex could be dereferenced during evaluation.
+				// the main vertex could be dereferenced during evaluation.
 				for _, a := range d.Arcs {
 					for _, x := range a.Conjuncts {
 						// All the environments for embedded structs need to be
@@ -377,7 +377,7 @@ func (n *nodeContext) insertConjuncts(state vertexStatus) bool {
 		nInfos := len(n.node.Structs)
 		p := &n.conjuncts[0]
 		n.conjuncts = n.conjuncts[1:]
-		// Intially request a Partial state to allow cyclic references to
+		// Initially request a Partial state to allow cyclic references to
 		// resolve more naturally first. This results in better error messages
 		// and less operations.
 		n.addExprConjunct(*p, partial)
@@ -926,7 +926,7 @@ type arcKey struct {
 
 // A nodeContext is used to collate all conjuncts of a value to facilitate
 // unification. Conceptually order of unification does not matter. However,
-// order has relevance when performing checks of non-monotic properities. Such
+// order has relevance when performing checks of non-monotic properties. Such
 // checks should only be performed once the full value is known.
 type nodeContext struct {
 	nextFree *nodeContext
@@ -2083,7 +2083,7 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 	}
 
 	// No progress, report error later if needed: unification with
-	// disjuncts may resolve this later later on.
+	// disjuncts may resolve this later on.
 	return false
 }
 

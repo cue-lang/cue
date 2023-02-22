@@ -29,8 +29,8 @@ func roundContext(rounder string) *apd.Context {
 }
 
 // TODO: for now we convert Decimals to int. This allows the desired type to be
-// conveyed. This has the disadvantage tht a number like 1E10000 will need to be
-// expanded. Eventually it would be better to to unify number types and allow
+// conveyed. This has the disadvantage that a number like 1E10000 will need to be
+// expanded. Eventually it would be better to unify number types and allow
 // anything that results in an integer to pose as an integer type.
 func toInt(d *internal.Decimal) *big.Int {
 	i := &d.Coeff

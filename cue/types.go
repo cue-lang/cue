@@ -464,7 +464,7 @@ func (v Value) Uint64() (uint64, error) {
 	return i, nil
 }
 
-// trimZeros trims 0's for better JSON respresentations.
+// trimZeros trims 0's for better JSON representations.
 func trimZeros(s string) string {
 	n1 := len(s)
 	s2 := strings.TrimRight(s, "0")
@@ -1133,7 +1133,7 @@ func (v Value) Pos() token.Pos {
 // TODO: IsFinal: this value can never be changed.
 
 // IsClosed reports whether a list of struct is closed. It reports false when
-// when the value is not a list or struct.
+// the value is not a list or struct.
 //
 // Deprecated: use Allows(AnyString) and Allows(AnyIndex) or Kind/IncompleteKind.
 func (v hiddenValue) IsClosed() bool {
@@ -1804,7 +1804,7 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 //
 // Subsumes reports whether w is an instance of v.
 //
-// Without options, Subsumes checks whether v is a backwards compatbile schema
+// Without options, Subsumes checks whether v is a backwards compatible schema
 // of w.
 //
 // By default, Subsumes tests whether two values are compatible
@@ -2153,7 +2153,7 @@ func Docs(include bool) Option {
 // Definitions indicates whether definitions should be included.
 //
 // Definitions may still be included for certain functions if they are referred
-// to by other other values.
+// to by other values.
 func Definitions(include bool) Option {
 	return func(p *options) {
 		p.hasHidden = true

@@ -12,6 +12,47 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package wasm provides optional Wasm support to CUE.
+//
+// When Wasm is enabled via [cuelang.org/go/cue.Wasm], CUE can make
+// use of user-defined functions provided as Wasm modules.
+//
+// To make use of Wasm modules in CUE, use an extern attribute in your
+// CUE code, like this:
+//
+//	myAdd: _ @extern("foo.wasm", abi=c, name=add, sig="func(int32, int32): int32")
+//
+// The first parameter should specify the Wasm module to import the
+// function from and is interpreted relative to location of the CUE
+// file itself. Name is the Wasm name of the function you are importing,
+// which may be different from its CUE name, for example the Wasm add
+// function is imported as myAdd in CUE.
+//
+// Sig specifies the type signature of the imported Wasm function.
+// Functions signatures belong to the following grammar:
+//
+//	ident	:= "bool" |  "int8" |  "int16" |  "int32" |  "int64"
+//	                  | "uint8" | "uint16" | "uint32" | "uint64"
+//	                  | "float32" | "float64" .
+//	list	:= ident [ { "," ident } ]
+//	func	:= "func" "(" [ list ] ")" ":" ident .
+//
+// The extern attribute is ignored when Wasm support is not enabled
+// in CUE, therefore in that mode, the type of myAdd above would be
+// _. When Wasm is enabled, myAdd will be a callable CUE function of
+// the specified homonymous argument and return types.
+//
+// The Wasm module must contain an exported function with the specified
+// name, signature, and abi. Currently only the C abi is supported and
+// must be explicitely specified in the attribute.
+//
+// The Wasm module is instantiated in a sandbox with no access to the
+// outside world.
+//
+// It is critical that functions made available to CUE via this mechanism
+// are pure and total, that is, they always terminate and they have
+// no side effects with their behavior being determined purely by their
+// arguments.
 package wasm
 
 import (
@@ -19,6 +60,9 @@ import (
 	"fmt"
 	"os"
 
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/extern"
+	"cuelang.org/go/internal/pkg"
 	"cuelang.org/go/internal/wasm"
 
 	"github.com/tetratelabs/wazero"
@@ -26,44 +70,46 @@ import (
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
 
-var defaultCompiler compiler
+var defaultRuntime runtime
 
-func Compiler() wasm.Compiler {
-	return &defaultCompiler
+// Runtime returns a Wasm runtime that can be used by CUE by passing
+// its return value to [cuelang.org/go/cue.Wasm].
+func Runtime() wasm.Runtime {
+	return &defaultRuntime
 }
 
 func init() {
 	ctx := context.Background()
-	defaultCompiler = compiler{
+	defaultRuntime = runtime{
 		ctx:     ctx,
 		Runtime: newRuntime(ctx),
 	}
 }
 
-type compiler struct {
+type runtime struct {
 	ctx context.Context
 	wazero.Runtime
 }
 
-func (c *compiler) Compile(name string) (wasm.Loadable, error) {
+func (r *runtime) Compile(name string) (wasm.Loadable, error) {
 	buf, err := os.ReadFile(name)
 	if err != nil {
 		return nil, fmt.Errorf("can't compile Wasm module: %w", err)
 	}
 
-	mod, err := c.Runtime.CompileModule(c.ctx, buf)
+	mod, err := r.Runtime.CompileModule(r.ctx, buf)
 	if err != nil {
 		return nil, fmt.Errorf("can't compile Wasm module: %w", err)
 	}
 	return &module{
-		compiler:       c,
+		runtime:        r,
 		name:           name,
 		CompiledModule: mod,
 	}, nil
 }
 
 type module struct {
-	*compiler
+	*runtime
 	name string
 	wazero.CompiledModule
 }
@@ -87,24 +133,52 @@ type instance struct {
 	instance api.Module
 }
 
-func (i *instance) Func(name string) (wasm.Func, error) {
-	wf := i.instance.ExportedFunction(name)
-	if wf == nil {
+func (i *instance) Func(name string, fSig extern.FuncSig) (*adt.Builtin, error) {
+	fsig := toFnTyp(fSig)
+	b, err := loadBuiltin(i, name, fsig)
+	if err != nil {
+		return nil, err
+	}
+	return pkg.ToBuiltin(b), nil
+}
+
+func loadFunc(i *instance, name string) (api.Function, error) {
+	f := i.instance.ExportedFunction(name)
+	if f == nil {
 		return nil, fmt.Errorf("can't find function %q in Wasm module %v", name, i.module.Name())
 	}
-	f := func(args ...any) (any, error) {
-		var wargs []uint64
-		for n, a := range args {
-			x, ok := a.(uint64)
-			if !ok {
-				return nil, fmt.Errorf("Wasm call with non-uint64 arguments: argument %d is %T", n, a)
-			}
-			wargs = append(wargs, x)
-		}
-		res, err := wf.Call(i.ctx, wargs...)
-		return res[0], err
-	}
 	return f, nil
+}
+
+func loadBuiltin(i *instance, name string, fSig fnTyp) (*pkg.Builtin, error) {
+	fn, err := loadFunc(i, name)
+	if err != nil {
+		return nil, err
+	}
+	b := &pkg.Builtin{
+		Name:   name,
+		Params: params(fSig),
+		Result: fSig.Ret.kind(),
+		Func:   toCallCtxFunc(i, fn, fSig),
+	}
+	return b, nil
+}
+
+func toCallCtxFunc(i *instance, fn api.Function, fSig fnTyp) func(*pkg.CallCtxt) {
+	return func(c *pkg.CallCtxt) {
+		var args []uint64
+		for k, t := range fSig.Args {
+			args = append(args, loadArg(c, k, t))
+		}
+		if c.Do() {
+			results, err := fn.Call(i.ctx, args...)
+			if err != nil {
+				c.Err = err
+				return
+			}
+			c.Ret = decodeRet(results[0], fSig.Ret)
+		}
+	}
 }
 
 func newRuntime(ctx context.Context) wazero.Runtime {

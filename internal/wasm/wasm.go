@@ -17,8 +17,13 @@
 // [cuelang.org/go/cue] depend on Wasm.
 package wasm
 
-// A Compiler is a Wasm runtime that can compile Wasm modules.
-type Compiler interface {
+import (
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/extern"
+)
+
+// A Runtime is a Wasm runtime that can compile Wasm modules.
+type Runtime interface {
 	// Compile takes a Wasm module file and compiles it into the
 	// internal representation used by the Wasm runtime. It returns
 	// the compiled module, or any encountered errors.
@@ -32,13 +37,26 @@ type Loadable interface {
 	Load() (Instance, error)
 }
 
-type Func func(args ...any) (any, error)
-
+// An Instance is a Wasm module loaded into memory, ready to be used.
 type Instance interface {
 	// Func searches the Wasm instance for the named function,
 	// returning it if found, otherwise returning the encountered
 	// error.
 	//
-	// The function uses the Wasm calling convention.
-	Func(name string) (Func, error)
+	// The function is returned as a builtin.
+	Func(name string, fSig extern.FuncSig) (*adt.Builtin, error)
+}
+
+// CompileAndLoad is a convenience function that compiled and module
+// then loads it into memory.
+func CompileAndLoad(r Runtime, filename string) (Instance, error) {
+	l, err := r.Compile(filename)
+	if err != nil {
+		return nil, err
+	}
+	i, err := l.Load()
+	if err != nil {
+		return nil, err
+	}
+	return i, nil
 }

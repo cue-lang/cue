@@ -725,7 +725,7 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
 	// Be more selective where Wasm is enabled?
-	instances, err := cmd.ctx.BuildInstances(binst, cue.Wasm(wasm.Compiler()))
+	instances, err := cmd.ctx.BuildInstances(binst, cue.Wasm(wasm.Runtime()))
 	exitIfErr(cmd, nil, err, true)
 
 	insts := make([]*instance, len(instances))

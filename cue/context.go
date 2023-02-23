@@ -107,9 +107,9 @@ func InferBuiltins(elide bool) BuildOption {
 }
 
 // Wasm gives access to Wasm to parsed content.
-// Use [cuelang.org/go/cue/wasm.Compiler] for getting the compiler.
-func Wasm(compiler wasm.Compiler) BuildOption {
-	return func(o *runtime.Config) { o.Config.WasmCompiler = compiler }
+// Use [cuelang.org/go/cue/wasm.Runtime] for getting the runtime.
+func Wasm(r wasm.Runtime) BuildOption {
+	return func(o *runtime.Config) { o.Config.WasmRuntime = r }
 }
 
 func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {

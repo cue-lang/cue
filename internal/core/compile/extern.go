@@ -69,26 +69,11 @@ func newExternFunc(c *compiler, dir string, attr internal.Attr) (b *adt.Builtin,
 	if err != nil {
 		return nil, err
 	}
-	fn, err := inst.Func(funcName)
+	b, err = inst.Func(funcName, *fnSig)
 	if err != nil {
 		return nil, err
 	}
-
-	toBuiltin(*fnSig, fn)
-	// TODO
-	return nil, nil
-}
-
-func compileAndLoad(c wasm.Compiler, name string) (wasm.Instance, error) {
-	l, err := c.Compile(name)
-	if err != nil {
-		return nil, err
-	}
-	inst, err := l.Load()
-	if err != nil {
-		return nil, err
-	}
-	return inst, nil
+	return b, err
 }
 
 func loadWasmInstance(c *compiler, filename string) (wasm.Instance, error) {
@@ -99,14 +84,10 @@ func loadWasmInstance(c *compiler, filename string) (wasm.Instance, error) {
 		return inst, nil
 	}
 
-	inst, err := compileAndLoad(c.WasmCompiler, filename)
+	inst, err := wasm.CompileAndLoad(c.WasmRuntime, filename)
 	if err != nil {
 		return nil, err
 	}
 	c.wasmInstances[filename] = inst
 	return inst, nil
-}
-
-func toBuiltin(sig extern.FuncSig, fn wasm.Func) {
-
 }

@@ -22,6 +22,10 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
+func Predeclared(s string) adt.Expr {
+	return predeclared(ast.NewIdent(s))
+}
+
 func predeclared(n *ast.Ident) adt.Expr {
 	// TODO: consider supporting GraphQL-style names:
 	// String, Bytes, Boolean, Integer, Number.

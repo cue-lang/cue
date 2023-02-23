@@ -48,7 +48,7 @@ type Config struct {
 	// automatically resolve identifiers to imports.
 	Imports func(x *ast.Ident) (pkgPath string)
 
-	WasmCompiler wasm.Compiler
+	WasmRuntime wasm.Runtime
 
 	// pkgPath is used to qualify the scope of hidden fields. The default
 	// scope is "_".
@@ -594,7 +594,7 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			value = c.labeledExpr(x, (*fieldLabel)(x), v)
 		}
 
-		if attr, ok := lookupExternAttr(x); ok {
+		if attr, ok := lookupExternAttr(x); ok && c.WasmRuntime != nil {
 			where := filepath.Dir(x.Pos().Filename())
 			f, err := newExternFunc(c, where, *attr)
 			if err != nil {

@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "253e2e6b_9c709934",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 1,
+      "message": "Some documentation of what the API of this server is would be great.\n\nIf it is documented somewhere else, then please include a pointer to that documentation here.",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30d6f09b_7032b543",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 1,
+      "message": "I tend to not use abbreviations if it just resembles a single (non-compound) word. So either `a` or `archive`. I find this a bit hard to read, but maybe that is just a matter of getting used to. Is there precedence for this in Go?",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1393947a_5db4e2b7",
+        "filename": "cue/load/internal/registrytest/testdata/simple.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 1,
+      "message": "I wonder why it is example.com_v0.0.1 instead of example.com@v0.0.1. The Go cache directory uses the latter format.",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ee6dc7f_bf7ddc76",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 1,
+      "message": "should this be sorted?",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d94361c_5e577b7a",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 1,
+      "message": "These kind of refactorings are much better done in a separate CL. Now it is quite hard to see where it went as the CL is so large.\n\nAlso documenting whether anything changed is good.",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48e0c565_427f9176",
+        "filename": "cue/load/module_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 1,
+      "message": "return here and unindent next block?",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

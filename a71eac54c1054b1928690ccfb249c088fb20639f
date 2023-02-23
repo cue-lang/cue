@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95b7a75f_49d51ea3",
+        "filename": "cue/load/loader_common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 0,
+      "message": "Why is this deleted?",
+      "revId": "a71eac54c1054b1928690ccfb249c088fb20639f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fd5c899_148d5133",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T15:41:28Z",
+      "side": 0,
+      "message": "Now parseModFile is hoisted, it makes sense to me that this is kept in the same place.\n\nOr maybe it is better to keep parseModFile in this file.",
+      "revId": "a71eac54c1054b1928690ccfb249c088fb20639f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

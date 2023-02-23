@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ac494c1_7a63a3c1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07b9b622_f3bbf1d4",
+      "revId": "5f9dba14be09ebb9a3fd667d6a6a65967857606c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "47382819_d4c8feac",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-02-23T15:41:28Z",
       "side": 1,
       "message": "Perhaps add a TODO explaining why this is commented out.",
+      "revId": "5f9dba14be09ebb9a3fd667d6a6a65967857606c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1cff710b_94a0080f",
+        "filename": "cue/load/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "It\u0027s been removed.",
+      "parentUuid": "47382819_d4c8feac",
       "revId": "5f9dba14be09ebb9a3fd667d6a6a65967857606c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

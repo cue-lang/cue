@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0f92692_cea89562",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "253e2e6b_9c709934",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30d6f09b_7032b543",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-02-23T15:41:28Z",
       "side": 1,
       "message": "I tend to not use abbreviations if it just resembles a single (non-compound) word. So either `a` or `archive`. I find this a bit hard to read, but maybe that is just a matter of getting used to. Is there precedence for this in Go?",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a36030d0_9d374376",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "I think it\u0027s pretty common to use a short abbreviation for a receiver. Sometimes I don\u0027t find a single letter quite suggestive enough (for example, I\u0027ll usually use \"req\" rather than \"r\" for an *http.Request). I agree it can be awkward to read in a doc comment, but a single letter \"a\" at the end of a sentence isn\u0027t ideal either (I still kinda think they should\u0027ve gone with `[ident]` for parameter names as well as other doc references.\n\nA brief glance through a couple of packages in the stdlib turns up a bunch of examples (e.g. \"resp\" for \"response\", \"srv\" for \"server\", \"lc\" for listenConfig, etc).\n\nAlso \"ar\" is a pretty common abbreviation for \"archive\" e.g. tar, txtar or even the \"ar\" command itself, little used as that is these days 😊",
+      "parentUuid": "30d6f09b_7032b543",
       "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f868410e_e5f7ea6b",
+        "filename": "cue/load/internal/registrytest/testdata/simple.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "I went with exactly the format used by https://pkg.go.dev/github.com/rogpeppe/go-internal/goproxytest which came directly from the Go command\u0027s test scripts.\nI figured that it was fit for purpose, so didn\u0027t bother to reinvent this wheel.",
+      "parentUuid": "1393947a_5db4e2b7",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2ee6dc7f_bf7ddc76",
         "filename": "cue/load/module.go",
         "patchSetId": 3
@@ -65,6 +119,24 @@
       "writtenOn": "2023-02-23T15:41:28Z",
       "side": 1,
       "message": "should this be sorted?",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e22261ea_05c726d0",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "I don\u0027t understand the question. How is sorting an concern here?",
+      "parentUuid": "2ee6dc7f_bf7ddc76",
       "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b773c93_6108e4b4",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d94361c_5e577b7a",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "48e0c565_427f9176",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-02-23T15:41:28Z",
       "side": 1,
       "message": "return here and unindent next block?",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dccc4a5d_2069b090",
+        "filename": "cue/load/module_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T17:26:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "48e0c565_427f9176",
       "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

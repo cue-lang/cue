@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1826fd2e_2f605d67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T23:35:06Z",
+      "side": 1,
+      "message": "Great catches!\n\nThis can mostly be fixed by calling astutil.Sanitize on the input files after processing. This doesn\u0027t seem to remove the let case, though, which is arguably a bug in Sanitize.",
+      "parentUuid": "cc1837a2_69fb02f2",
+      "revId": "5e35c95caf20195508aa9f11d9f770f6f262f8e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b38c546_0483575f",
@@ -37,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e616a7c4_d211682d",
+        "filename": "internal/updater/updater.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T23:35:06Z",
+      "side": 1,
+      "message": "I see why you suggested the original API that you did. Although this would be then somewhat easier if one did:\n\n// Edit modifies the original file at path so that it contains exactly the\n// data inside want. It tries to preserve comments and formatting\n// as much as possible. It canonicalizes field order within a struct literal.\nfunc Edit(original *ast.File, path cue.Path, p want cue.Value) (*ast.File, error) {",
+      "parentUuid": "2b38c546_0483575f",
+      "revId": "5e35c95caf20195508aa9f11d9f770f6f262f8e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "2afb574d_270ced1f",
         "filename": "internal/updater/updater.go",
         "patchSetId": 3
@@ -48,6 +84,24 @@
       "writtenOn": "2023-02-23T14:34:25Z",
       "side": 1,
       "message": "s/returns whether/reports whether/",
+      "revId": "5e35c95caf20195508aa9f11d9f770f6f262f8e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f7de728_a2d2ac33",
+        "filename": "internal/updater/updater.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-23T23:35:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2afb574d_270ced1f",
       "revId": "5e35c95caf20195508aa9f11d9f770f6f262f8e8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

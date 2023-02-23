@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc1837a2_69fb02f2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T14:34:25Z",
+      "side": 1,
+      "message": "This looks great, but given the more general problem that\u0027s being solved here, there a couple of cases where I noticed that it could do a bit better:\n\n- it can produce invalid code when there are let statements that become no longer used. For example, updating `x: false` in the code below will result in invalid CUE:\n\n```\nlet _v \u003d true\nx: _v\n```\n\n- it can introduce unwanted value changes when a reference changes because of an inserted value. For example, updating `b: a: 2` in the code below will result in the value of `b.c` changing too:\n\n```\na: 1\nb: {\n\tc: a\n}\n```\n\nMaybe those fixes could be made in a subsequent CL though, so I\u0027ll +2 this as is.\n",
+      "revId": "5e35c95caf20195508aa9f11d9f770f6f262f8e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b38c546_0483575f",
+        "filename": "internal/updater/updater.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T14:34:25Z",
+      "side": 1,
+      "message": "I think we also need the ability to remove paths (for example when dependencies are removed).",
+      "revId": "5e35c95caf20195508aa9f11d9f770f6f262f8e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2afb574d_270ced1f",
+        "filename": "internal/updater/updater.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-23T14:34:25Z",
+      "side": 1,
+      "message": "s/returns whether/reports whether/",
+      "revId": "5e35c95caf20195508aa9f11d9f770f6f262f8e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

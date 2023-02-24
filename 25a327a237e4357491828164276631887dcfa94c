@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb6f4ddf_628d8cae",
+        "filename": "internal/updater/updater_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-24T09:02:32Z",
+      "side": 1,
+      "message": "This doesn\u0027t look like the test case it sounds like it\u0027s supposed to be.",
+      "revId": "25a327a237e4357491828164276631887dcfa94c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

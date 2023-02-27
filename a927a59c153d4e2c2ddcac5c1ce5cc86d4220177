@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7d6e6c66_89f6662d",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:38:05Z",
+      "side": 1,
+      "message": "In general, i\u0027m unclear why the compiler should have to know about wasm at all.",
+      "parentUuid": "fe8db5c6_fcafba95",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "06174157_c1735876",
         "filename": "internal/core/runtime/build.go",
         "patchSetId": 1

@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02cd0c21_4428ac1a",
+        "filename": "cue/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:35:24Z",
+      "side": 1,
+      "message": "This should not be here. \n\nAs discussed. We should have a generic interface like \"Decorator\" in cue/context and then a separate package that includes wasm.\n\nI know the linker should drop this when not used, but it nonetheless seems to set the wrong precedence. \n\nThe cue package is supposed to be light weight.",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "05998932_b8c4b6a2",
+        "filename": "cue/wasm/wasm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:35:24Z",
+      "side": 1,
+      "message": "I would make this an internal package for now.\n\nThe package should definitely be documented if it is not.",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe8db5c6_fcafba95",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:35:24Z",
+      "side": 1,
+      "message": "The compiler should not refer to wasm.",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06174157_c1735876",
+        "filename": "internal/core/runtime/build.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:35:24Z",
+      "side": 1,
+      "message": "remove",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0de0d869_5cdb53e1",
+        "filename": "internal/core/runtime/runtime.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:35:24Z",
+      "side": 1,
+      "message": "I wouldn\u0027t use the relatively expensive Option mechanism for an internal package if not necessary.",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

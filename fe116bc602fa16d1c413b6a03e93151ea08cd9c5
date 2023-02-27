@@ -16,6 +16,24 @@
       "message": "Should not live in compiler, but rather in runtime through an abstract interface so as to not create linker dependencies when unused.",
       "revId": "fe116bc602fa16d1c413b6a03e93151ea08cd9c5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "805b6733_83a66793",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-02-27T09:34:49Z",
+      "side": 1,
+      "message": "But wasm.Instance is an abstract interface.\n\nIt cannot live in the runtime for reasons previously explain.",
+      "parentUuid": "880e1a53_51ff2caf",
+      "revId": "fe116bc602fa16d1c413b6a03e93151ea08cd9c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

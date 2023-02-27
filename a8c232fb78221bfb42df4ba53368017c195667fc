@@ -16,6 +16,24 @@
       "message": "This doesn\u0027t belong in the compiler.\n\nAttributes should be analyzed during the build phase. WASM has nothing to do with CUE",
       "revId": "a8c232fb78221bfb42df4ba53368017c195667fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "613440d0_603f7826",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-02-27T09:34:38Z",
+      "side": 1,
+      "message": "I agree that this is an inversion of control, but we are stuck between a rock and a hard place.\n\nWasm injection can only be done in the compiler because it is the only place that has access to both the AST and the adt. The parser cannot refer to adt\u0027s, it is driven by the compiler and it would cause an import cycle.\n\nThe proper way to do it would be two step: first analyze the signatures in the parser, then pass a new type, ast.FuncSig that the compiler could use to load the Wasm function and generate the adt.Builtin from. However, we said we don\u0027t want real CUE function signatures yet, so with this extra constraint, I couldn\u0027t see any other way except analyzing the attribues from here.",
+      "parentUuid": "40044aa7_6b01a1a0",
+      "revId": "a8c232fb78221bfb42df4ba53368017c195667fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

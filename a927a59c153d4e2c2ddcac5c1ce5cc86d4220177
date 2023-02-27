@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "42b85048_8e4f8916",
+        "filename": "cue/wasm/wasm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:46:40Z",
+      "side": 1,
+      "message": "I guess there needs to be a wasm package that exports the decorator. This package can be that. But it will certainly not be this API.",
+      "parentUuid": "05998932_b8c4b6a2",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fe8db5c6_fcafba95",
         "filename": "internal/core/compile/compile.go",
         "patchSetId": 1

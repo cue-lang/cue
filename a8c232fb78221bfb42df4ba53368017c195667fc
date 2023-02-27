@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40044aa7_6b01a1a0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:41:04Z",
+      "side": 1,
+      "message": "This doesn\u0027t belong in the compiler.\n\nAttributes should be analyzed during the build phase. WASM has nothing to do with CUE",
+      "revId": "a8c232fb78221bfb42df4ba53368017c195667fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fd63e493_2f9252b2",
+        "filename": "cue/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-02-27T09:34:05Z",
+      "side": 1,
+      "message": "Perhaps I misunderstood the word \"generic\".\n\nI did start with injecting Wasm through cue/context, as we discussed, but it soon became apparent the functionality provided by cuecontext.Option is not the right functionality we need. In particular, those options become runtime options and we need Wasm functionality at built time (for some notion of build time). To be more concrete, we need access to the Wasm runtime at the moment we create an adt.Builtin, and we do not have a runtime at that point. Nor do we need access to the Wasm runtime in the runtime at all.\n\nI did consider changing what a cuecontext.Option could do, such that it could perhaps create default build options, but that seemed very invasive and magic, and opened up questions about what happens when the user supplies build options both via the context mechanism, so I decided against.",
+      "parentUuid": "02cd0c21_4428ac1a",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "05998932_b8c4b6a2",
         "filename": "cue/wasm/wasm.go",
         "patchSetId": 1
@@ -49,6 +67,24 @@
       "side": 1,
       "message": "I guess there needs to be a wasm package that exports the decorator. This package can be that. But it will certainly not be this API.",
       "parentUuid": "05998932_b8c4b6a2",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e65d958a_e76e337f",
+        "filename": "cue/wasm/wasm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-02-27T09:34:05Z",
+      "side": 1,
+      "message": "The package is documented in a subsequent commit in the chain. Similarly, the API is changed in a subsequent commit.",
+      "parentUuid": "42b85048_8e4f8916",
       "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -90,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dcd2073b_7519f666",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-02-27T09:34:05Z",
+      "side": 1,
+      "message": "Several iterations of where exactly to put Wasm were tried, starting with just the parser and ending with the runtime, in the end, putting it in the compiler fit the model best.\n\nThe compiler takes the AST (syntax) and converts it to the internal representation (adt.*) which is exactly what the Wasm loading process does. It takes some syntactical representation of a Wasm declaration (here through an attribute, but see below) and converts it to what is required for the evaluator to use it (an adt.Builtin).\n\nWhen we will have actual function signatures in native CUE, having Wasm here will fit the model even better. The compiler sees an ast.Func and generates an adt.Func (or an adt.Builtin).",
+      "parentUuid": "7d6e6c66_89f6662d",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "06174157_c1735876",
         "filename": "internal/core/runtime/build.go",
         "patchSetId": 1
@@ -101,6 +155,24 @@
       "writtenOn": "2023-02-27T08:35:24Z",
       "side": 1,
       "message": "remove",
+      "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d97b368a_e5a77615",
+        "filename": "internal/core/runtime/build.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 76,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-02-27T09:34:05Z",
+      "side": 1,
+      "message": "Remove what?",
+      "parentUuid": "06174157_c1735876",
       "revId": "a927a59c153d4e2c2ddcac5c1ce5cc86d4220177",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

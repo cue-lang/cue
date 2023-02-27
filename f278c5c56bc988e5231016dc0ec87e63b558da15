@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f53f60f5_acbfa679",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 728,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:57:55Z",
+      "side": 1,
+      "message": "Not that this should be here, but in the future, please change names once in a CL chain: it is easy to modify the earlier CL.",
+      "revId": "f278c5c56bc988e5231016dc0ec87e63b558da15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17314630_c0394b24",
+        "filename": "cue/wasm/wasm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:57:55Z",
+      "side": 1,
+      "message": "Not agreed upon API.",
+      "revId": "f278c5c56bc988e5231016dc0ec87e63b558da15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bad5b5ba_a1f666ec",
+        "filename": "cue/wasm/wasm.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:57:55Z",
+      "side": 1,
+      "message": "s/above//",
+      "revId": "f278c5c56bc988e5231016dc0ec87e63b558da15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

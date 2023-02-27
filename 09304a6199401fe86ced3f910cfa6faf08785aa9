@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "589e6850_91d66678",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T08:38:56Z",
+      "side": 1,
+      "message": "I thought we suggested including this in the parser and enabling it through an option?",
+      "revId": "09304a6199401fe86ced3f910cfa6faf08785aa9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

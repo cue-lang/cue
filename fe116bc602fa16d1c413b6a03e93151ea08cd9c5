@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "880e1a53_51ff2caf",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-27T09:15:41Z",
+      "side": 1,
+      "message": "Should not live in compiler, but rather in runtime through an abstract interface so as to not create linker dependencies when unused.",
+      "revId": "fe116bc602fa16d1c413b6a03e93151ea08cd9c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

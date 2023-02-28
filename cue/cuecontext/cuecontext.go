@@ -22,10 +22,20 @@ import (
 )
 
 // Option controls a build context.
-type Option interface{ buildOption() }
+type Option func(r *runtime.Runtime)
 
 // New creates a new Context.
 func New(options ...Option) *cue.Context {
 	r := runtime.New()
+	for _, fn := range options {
+		fn(r)
+	}
 	return (*cue.Context)(r)
+}
+
+// Interpreter associates an interpreter for external code with this context.
+func Interpreter(key string, i runtime.Interpreter) Option {
+	return func(r *runtime.Runtime) {
+		r.SetInterpreter(key, i)
+	}
 }

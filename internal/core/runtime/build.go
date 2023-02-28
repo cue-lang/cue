@@ -80,6 +80,8 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	v, err = compile.Files(cc, x, b.ID(), b.Files...)
 	errs = errors.Append(errs, err)
 
+	errs = errors.Append(errs, x.injectImplementations(b, v))
+
 	if errs != nil {
 		v = adt.ToVertex(&adt.Bottom{Err: errs})
 		b.Err = errs

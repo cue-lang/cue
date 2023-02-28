@@ -1,0 +1,299 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68e2e81e_861fed52",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "This looks pretty good to me. I have a bunch of nits and some small API suggestions, but nothing major.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8b85f59_f939321b",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "I\u0027m not that keen on the way that this exposes the internal\nruntime.Runtime type to public view in the API docs.\n\nAssuming we don\u0027t need to be able to create new kinds of cuecontext options in\nother packages, how about hiding it inside a struct?\n\ntype Option struct {\n   apply func(*runtime.Runtime)\n}",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "18ca8007_70483f4c",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "Again, this exposes an internal type to external view. Perhaps the cue package could define an alias for runtime.Interpreter to avoid that?\n\nAlso, this should document the key argument.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f8a35a0_c48fd5e7",
+        "filename": "internal/attrs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "It looks like this TODO is already the case.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2ac844b_be0a3c7e",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "What\u0027s an \"extern type\" ?",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44cdc43b_c3e517b5",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "s/built/build/ ?\n\nor just\ns/built instance //\n\nAlso, functions/methods named Init are often associated with side-effects, but this doesn\u0027t seem like it is. How about using a less generic method name such as NewCompiler ?\n\nAlso, out of interest, why is a compiler defined per-instance rather than per-context?",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59b014e2_416dbebe",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "It would be nice to document the association of functions and attributes a little more here. Presumably the attribute here is the @extern attribute associated with the function declaration?\nAlso, what does it mean for funcName (a by-value argument) to be \"set to\" something? Do you actually mean something like:\n\n\u003e The Builtin.Name field is set to the \"name\" value in a if it exists,\n\u003e or funcName otherwise.\n\n?",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "107a61a0_7b0302b6",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "maybe a doc comment here at least to say what argument is mutated?",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30504e44_3c46cb50",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "ISTM that this would be nicer/more obvious as a local variable.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce1d51df_2eae1917",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "This whole function is a bit long, but I don\u0027t think it really needs to be. Personally I might be inclined to move this loop into its own function (it doesn\u0027t need to be an externDecorator method AFAICS).\n\nSomething like:\n\n    // externAttr returns any file-level @extern(name) attribute\n    // in f and the f\u0027s declarations from the package directive\n    // onwards.\n    // It\u0027s an error if more than one @extern attribute is found,\n    func externAttr(f *ast.File) (externAttr *ast.Attribute, rest []ast.Decl, err error)",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "069772d5_7411d84f",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "ISTM that this block could live happily outside the loop, where it would be clearer that it can only be run once.",
+      "range": {
+        "startLine": 141,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 0
+      },
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4c8f549_e42a29dd",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "// Collect all *ast.Fields with extern attributes into d.fields.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f0dd731_9de31c15",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "this could likewise be factored into a method with a somewhat easier to understand contract, i think.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf6f5111_0201ae55",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "shouldn\u0027t this return after finding an error?\nIf not, maybe comment why it\u0027s OK.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa84e31e_e51d369d",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "Given that walk.Visitor is undocumented, it might be nice to add a comment\nsaying what this is doing.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfdc4243_981da9cb",
+        "filename": "internal/core/runtime/runtime.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "Maybe mention what the key represents here?",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3640227_e11dd1e5",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-02-28T17:44:51Z",
+      "side": 1,
+      "message": "In general I\u0027d concur. I think it could be somewhat frustrating trying to work out why one\u0027s legitimate-looking @extern attributes are being ignored.\n\nOne possibility for making it a bit more efficient might be to update the parser so that it can keep track of the set of attribute kinds that it\u0027s seen, so there\u0027s no need to scan again.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

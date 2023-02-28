@@ -1,0 +1,8 @@
+-- compile.cue --
+@extern("test")
+
+package ok
+
+foo: _ @extern("file.xx", fail)
+-- out/extern --
+TEST: fail compilation

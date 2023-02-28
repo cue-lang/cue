@@ -22,10 +22,27 @@ import (
 )
 
 // Option controls a build context.
-type Option interface{ buildOption() }
+type Option struct {
+	apply func(r *runtime.Runtime)
+}
 
 // New creates a new Context.
 func New(options ...Option) *cue.Context {
 	r := runtime.New()
+	for _, o := range options {
+		o.apply(r)
+	}
 	return (*cue.Context)(r)
+}
+
+// An ExternInterpreter creates a compiler that can produce implementations of
+// functions written in a language other than CUE. It is currently for internal
+// use only.
+type ExternInterpreter = runtime.Interpreter
+
+// Interpreter associates an interpreter for external code with this context.
+func Interpreter(i ExternInterpreter) Option {
+	return Option{func(r *runtime.Runtime) {
+		r.SetInterpreter(i)
+	}}
 }

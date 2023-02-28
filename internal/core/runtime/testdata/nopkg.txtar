@@ -1,0 +1,10 @@
+-- cue.mod/modules.cue --
+-- no_package.cue --
+@extern("test")
+
+
+Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")
+
+-- out/extern --
+extern attribute without package clause:
+    ./no_package.cue:1:1

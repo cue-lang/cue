@@ -51,7 +51,7 @@ type Attr struct {
 	Body   string
 	Kind   AttrKind
 	Fields []KeyValue
-	Err    error
+	Err    errors.Error
 }
 
 // NewNonExisting creates a non-existing attribute.

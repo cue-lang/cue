@@ -1,0 +1,12 @@
+-- init.cue --
+@extern("test")
+
+// Package name failinit is used as a marker in the test code to fail
+// initialization.
+package failinit
+
+
+foo: _ @extern("file.xx")
+
+-- out/extern --
+TEST: fail initialization

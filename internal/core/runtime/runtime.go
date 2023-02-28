@@ -23,6 +23,10 @@ type Runtime struct {
 	index *index
 
 	loaded map[*build.Instance]interface{}
+
+	// interpreters implement extern functionality. The map key corresponds to
+	// the kind in a file-level @extern(kind) attribute.
+	interpreters map[string]Interpreter
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {

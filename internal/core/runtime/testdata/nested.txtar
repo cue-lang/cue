@@ -1,0 +1,34 @@
+-- cue.mod/modules.cue --
+-- file1.cue --
+@extern("test")
+
+package foo
+
+
+a: Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")
+
+a: Rename: _ @extern(file1.xx, name=Emaner, abi=c, sig="func(int)int")
+
+-- file2.cue --
+@extern("test")
+
+package foo
+
+
+a: foo: Bar: {
+	@other()
+	@extern(file2.xx, abi=c, sig="func(int)int")
+	_
+}
+
+-- extern/out --
+-- out/extern --
+{
+	a: {
+		Foo:    implFoo1
+		Rename: implEmaner1
+		foo: {
+			Bar: implBar2
+		}
+	}
+}

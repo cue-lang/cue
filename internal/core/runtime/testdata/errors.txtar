@@ -1,0 +1,113 @@
+-- cue.mod/modules.cue --
+
+-- invalid_file_attr.cue --
+@extern("test" foo)
+
+package foo
+
+-- invalid_field_attr.cue --
+
+@extern("test")
+
+// Foo
+
+package foo
+
+Fn1: _ @extern("file1.xx" abi sig)
+
+-- empty_extern.cue --
+@extern()
+
+package foo
+
+Fn2: _ @extern("file1.xx" abi sig)
+
+
+-- unknown_interpreter.cue --
+@extern("wazem")
+
+package foo
+
+Fn3: _ @extern("file1.xx" abi sig)
+
+-- double_extern_a.cue --
+@extern("test")
+@extern("test")
+
+package foo
+
+Fn4a: _ @extern("file1.xx")
+
+-- double_extern_b.cue --
+@extern("test")
+@extern("test")
+@extern("test")
+
+package foo
+
+Fn4b: _ @extern("file1.xx")
+
+-- package_attr.cue --
+@extern("test")
+
+package foo
+
+@extern("file1.xx")
+Fn5: _
+
+-- duplicate.cue --
+@extern("test")
+
+package foo
+
+
+Fn6: _ @extern("file1.xx",sig=func(int)int) @extern("file1.xx", sig=func(int)bool)
+
+Fn7: {
+	@extern("file1.xx",sig=func(int)int)
+	_
+} @extern("file1.xx", sig=func(int)bool)
+
+-- non_ident.cue --
+@extern("test")
+
+package foo
+
+
+"a-b": _ @extern("file1.xx",sig=func(int)int)
+
+[string]: _ @extern("file1.xx",sig=func(int)int)
+
+-- late_extern.cue --
+package foo
+
+@extern("test")
+
+
+Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")
+
+-- out/extern --
+only one file-level extern attribute allowed per file:
+    ./double_extern_a.cue:2:1
+only one file-level extern attribute allowed per file:
+    ./double_extern_b.cue:2:1
+duplicate extern attributes:
+    ./duplicate.cue:6:45
+duplicate extern attributes:
+    ./duplicate.cue:11:3
+interpreter name must be non-empty:
+    ./empty_extern.cue:1:1
+invalid attribute: expected comma:
+    ./invalid_field_attr.cue:8:8
+invalid attribute: expected comma:
+    ./invalid_file_attr.cue:1:1
+extern attribute must appear before package clause:
+    ./late_extern.cue:3:1
+can only define functions for fields with identifier names, found "a-b":
+    ./non_ident.cue:6:10
+can only define functions for fields with identifier names, found [string]:
+    ./non_ident.cue:8:13
+extern attribute not associated with field:
+    ./package_attr.cue:5:1
+no interpreter defined for "wazem":
+    ./unknown_interpreter.cue:1:1

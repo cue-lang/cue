@@ -1,0 +1,13 @@
+// This file is ordered first and is added as a convenience debugging tool.
+// Do not remove.
+-- a_debug.cue --
+@extern("test")
+
+package foo
+
+Foo: _ @extern(file1.xx, abi=c, sig="func(int)int")
+
+-- out/extern --
+{
+	Foo: implFoo1
+}

@@ -30,9 +30,15 @@ func Features(x adt.Expr, f func(label adt.Feature, src adt.Node)) {
 	w.Elem(x)
 }
 
+// A Visitor walks over all elements in an ADT, recursively.
 type Visitor struct {
+	// Feature is invoked for all field names.
 	Feature func(f adt.Feature, src adt.Node)
-	Before  func(adt.Node) bool
+
+	// Before is invoked for all invoked for all nodes in pre-order traversal.
+	// Return false prevents the visitor from visiting the nodes descendant
+	// elements.
+	Before func(adt.Node) bool
 }
 
 func (w *Visitor) Elem(x adt.Elem) {

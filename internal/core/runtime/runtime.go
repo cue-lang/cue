@@ -23,6 +23,9 @@ type Runtime struct {
 	index *index
 
 	loaded map[*build.Instance]interface{}
+
+	// interpreters implement extern functionality.
+	interpreters map[string]Interpreter
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {

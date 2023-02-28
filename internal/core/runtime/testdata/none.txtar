@@ -1,0 +1,7 @@
+-- cue.mod/modules.cue --
+-- in.cue --
+a: 2
+-- out/extern --
+{
+	a: 2
+}

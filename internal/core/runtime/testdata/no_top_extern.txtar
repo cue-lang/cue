@@ -1,0 +1,21 @@
+// TODO: We do not generate an error here as it allows files to be processed
+// faster. But maybe it is more user-friendly to report the error.
+-- cue.mod/modules.cue --
+-- in.cue --
+// Missing @extern("test")
+@dummy()
+
+package foo
+
+
+Foo: _ @extern(file.xx, abi=c, sig="func(int)int")
+
+-- extern/out --
+-- out/extern/config --
+{
+	Foo: _
+}
+-- out/extern --
+{
+	Foo: _
+}

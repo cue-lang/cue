@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd0da59f_0ce56888",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-28T07:44:00Z",
+      "side": 1,
+      "message": "No test changes.",
+      "revId": "f278c5c56bc988e5231016dc0ec87e63b558da15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f53f60f5_acbfa679",
@@ -48,6 +65,40 @@
       "writtenOn": "2023-02-27T08:57:55Z",
       "side": 1,
       "message": "s/above//",
+      "revId": "f278c5c56bc988e5231016dc0ec87e63b558da15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fd5f45c_8924264c",
+        "filename": "internal/core/compile/predeclared.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-28T07:44:00Z",
+      "side": 1,
+      "message": "Even though this is internal, this is still a public interface. So please document. \n\nAlso, it clearly does not do what it says. There are far more predeclared identifiers.\n\nSo why duplicate this code?\nWhy do you only need a subset?\nWhich subset?",
+      "revId": "f278c5c56bc988e5231016dc0ec87e63b558da15",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "907a4691_662e8489",
+        "filename": "internal/core/compile/predeclared.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-02-28T07:44:00Z",
+      "side": 1,
+      "message": "This is not the place to put this TODO.",
       "revId": "f278c5c56bc988e5231016dc0ec87e63b558da15",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

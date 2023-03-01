@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04b0c19d_54ace716",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8b85f59_f939321b",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18ca8007_70483f4c",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-02-28T17:44:51Z",
       "side": 1,
       "message": "Again, this exposes an internal type to external view. Perhaps the cue package could define an alias for runtime.Interpreter to avoid that?\n\nAlso, this should document the key argument.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d374ec4c_1fc659ce",
+        "filename": "cue/cuecontext/cuecontext.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "18ca8007_70483f4c",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "228a604f_afba1020",
+        "filename": "internal/attrs.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1f8a35a0_c48fd5e7",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2ac844b_be0a3c7e",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-02-28T17:44:51Z",
       "side": 1,
       "message": "What\u0027s an \"extern type\" ?",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e52bbe3f_d77f8f2e",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2ac844b_be0a3c7e",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "757d2999_318e93c9",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44cdc43b_c3e517b5",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "59b014e2_416dbebe",
@@ -116,6 +206,24 @@
       "writtenOn": "2023-02-28T17:44:51Z",
       "side": 1,
       "message": "It would be nice to document the association of functions and attributes a little more here. Presumably the attribute here is the @extern attribute associated with the function declaration?\nAlso, what does it mean for funcName (a by-value argument) to be \"set to\" something? Do you actually mean something like:\n\n\u003e The Builtin.Name field is set to the \"name\" value in a if it exists,\n\u003e or funcName otherwise.\n\n?",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56ee3c3a_ab60b56a",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Updated the comment. Except for \"name\", the attributes are really implementation specific and it is a bit premature to already define some standard.",
+      "parentUuid": "59b014e2_416dbebe",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d745286d_4a59b726",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "107a61a0_7b0302b6",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30504e44_3c46cb50",
@@ -154,6 +280,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "278f06ce_881738e3",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "30504e44_3c46cb50",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce1d51df_2eae1917",
@@ -167,6 +311,24 @@
       "writtenOn": "2023-02-28T17:44:51Z",
       "side": 1,
       "message": "This whole function is a bit long, but I don\u0027t think it really needs to be. Personally I might be inclined to move this loop into its own function (it doesn\u0027t need to be an externDecorator method AFAICS).\n\nSomething like:\n\n    // externAttr returns any file-level @extern(name) attribute\n    // in f and the f\u0027s declarations from the package directive\n    // onwards.\n    // It\u0027s an error if more than one @extern attribute is found,\n    func externAttr(f *ast.File) (externAttr *ast.Attribute, rest []ast.Decl, err error)",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54cd38e4_abb45502",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done.\n\nThough, I generally think long functions are fine as long as the flow is mostly linear and if the algorithm is simple. It avoids having to jump back and forth between functions, and it avoid unnecessary boilerplate.\n\nSo not sure if this is better in the end, but either way.",
+      "parentUuid": "ce1d51df_2eae1917",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -196,6 +358,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ef0d6645_7ea889a9",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "It can be run more than once, actually (to catch duplicate attribute errors).\n\nI\u0027ve changed the break on line 147 to continue to make it a bit clearer that it processes everything up to the package clause or the first error.",
+      "parentUuid": "069772d5_7411d84f",
+      "range": {
+        "startLine": 141,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 0
+      },
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b4c8f549_e42a29dd",
         "filename": "internal/core/runtime/extern.go",
         "patchSetId": 1
@@ -207,6 +393,24 @@
       "writtenOn": "2023-02-28T17:44:51Z",
       "side": 1,
       "message": "// Collect all *ast.Fields with extern attributes into d.fields.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7263d68_a8732940",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4c8f549_e42a29dd",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -230,6 +434,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "85fb3a64_d78119d7",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done.\n\nThough in my mind it just adds unnecessary boilerplate and the order of execution of the functions is somewhat less clear. So I\u0027m not so sure if this is actually an improvement.",
+      "parentUuid": "6f0dd731_9de31c15",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cf6f5111_0201ae55",
         "filename": "internal/core/runtime/extern.go",
         "patchSetId": 1
@@ -241,6 +463,24 @@
       "writtenOn": "2023-02-28T17:44:51Z",
       "side": 1,
       "message": "shouldn\u0027t this return after finding an error?\nIf not, maybe comment why it\u0027s OK.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e35b4f9_734c5aca",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Yep. Good catch.",
+      "parentUuid": "cf6f5111_0201ae55",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -262,6 +502,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac2e6777_a3fa73aa",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fa84e31e_e51d369d",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfdc4243_981da9cb",
@@ -279,6 +537,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8a6ba8c_05062f16",
+        "filename": "internal/core/runtime/runtime.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfdc4243_981da9cb",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3640227_e11dd1e5",
@@ -292,6 +568,24 @@
       "writtenOn": "2023-02-28T17:44:51Z",
       "side": 1,
       "message": "In general I\u0027d concur. I think it could be somewhat frustrating trying to work out why one\u0027s legitimate-looking @extern attributes are being ignored.\n\nOne possibility for making it a bit more efficient might be to update the parser so that it can keep track of the set of attribute kinds that it\u0027s seen, so there\u0027s no need to scan again.",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da553208_83e2a48f",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Yeah, I though about that too. Though I wouldn\u0027t do that now.\n\nAnother approach is that the compiler is initialized earlier. It could then watch for *.wasm files in the build.Instance so that this code is only called if there is a chance it may be used.\n\nIt does, at least, catch perhaps the most frustrating case of using an @extern(\"wasm\") after a package clause.",
+      "parentUuid": "c3640227_e11dd1e5",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

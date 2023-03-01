@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4170e4f_17ac0e5f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T12:42:14Z",
+      "side": 1,
+      "message": "Did the first round of fixes. Most things should be fixed.\n\nI split the long function into smaller chunks. Personally I don\u0027t think this improves things overall, as it a) introduces more boilerplate, and b) makes it harder to see in which order code is called.\n\nBut either way is fine, so I\u0027m fine with leaving it split.",
+      "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

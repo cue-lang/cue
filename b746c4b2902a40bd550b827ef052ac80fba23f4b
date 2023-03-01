@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e5db0cf_8d2533d7",
+        "filename": "internal/updater/pathiter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T14:59:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53249fce_ae48e8fc",
+      "revId": "b746c4b2902a40bd550b827ef052ac80fba23f4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9744459_3d7be8bd",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-02-23T14:27:23Z",
       "side": 1,
       "message": "Maybe say something about the order that they\u0027re visited in? (say explicitly that they\u0027re visited in arbitrary order, for example)",
+      "revId": "b746c4b2902a40bd550b827ef052ac80fba23f4b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f58ef049_93cd8de8",
+        "filename": "internal/updater/pathiter.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T14:59:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9744459_3d7be8bd",
       "revId": "b746c4b2902a40bd550b827ef052ac80fba23f4b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

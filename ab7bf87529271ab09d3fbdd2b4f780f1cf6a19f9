@@ -179,6 +179,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b36a9635_b9dd1051",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-01T13:26:58Z",
+      "side": 1,
+      "message": "MVS should be deterministic regardless of what order the versions are returned in, so there should be no indeterminism in the final result, but I\u0027m happy to sort it if you think it\u0027s worth doing.",
+      "parentUuid": "d6f89646_39042380",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8d94361c_5e577b7a",
         "filename": "cue/load/module.go",
         "patchSetId": 3

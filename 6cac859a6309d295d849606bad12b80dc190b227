@@ -351,6 +351,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b32d914_2687f517",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "17ae61d7_254bcb28",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "069772d5_7411d84f",
@@ -388,6 +406,30 @@
       "side": 1,
       "message": "It can be run more than once, actually (to catch duplicate attribute errors).\n\nI\u0027ve changed the break on line 147 to continue to make it a bit clearer that it processes everything up to the package clause or the first error.",
       "parentUuid": "069772d5_7411d84f",
+      "range": {
+        "startLine": 141,
+        "startChar": 0,
+        "endLine": 163,
+        "endChar": 0
+      },
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "484396fc_00b3c055",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef0d6645_7ea889a9",
       "range": {
         "startLine": 141,
         "startChar": 0,
@@ -464,6 +506,24 @@
       "side": 1,
       "message": "Done.\n\nThough in my mind it just adds unnecessary boilerplate and the order of execution of the functions is somewhat less clear. So I\u0027m not so sure if this is actually an improvement.",
       "parentUuid": "6f0dd731_9de31c15",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8848ad08_612fa05e",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85fb3a64_d78119d7",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

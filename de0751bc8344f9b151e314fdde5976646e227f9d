@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50db801e_775554fe",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f59556a6_fd9e9340",
+      "range": {
+        "startLine": 46,
+        "startChar": 0,
+        "endLine": 48,
+        "endChar": 0
+      },
+      "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5622a0f_10162a4f",
@@ -54,6 +78,24 @@
       "writtenOn": "2023-03-01T13:17:21Z",
       "side": 1,
       "message": "Lots nicer, thanks!",
+      "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fcfc862_40ba4166",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f5622a0f_10162a4f",
       "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "114235e3_4e9b2a55",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Ah, good catch. I returned an index into f.Decls before and didn\u0027t change the comment.",
+      "parentUuid": "d23c2484_dc2a6e18",
+      "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cbe7aaf_e94e65d1",
@@ -88,6 +148,24 @@
       "writtenOn": "2023-03-01T13:17:21Z",
       "side": 1,
       "message": "s/gets/initializes/ ?\n\nalso:\n\n// The pos argument represents the position of the file-level\n// @extern attribute.",
+      "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1437907b_fe7e0e82",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6cbe7aaf_e94e65d1",
       "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -109,6 +187,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38ff778b_7a599d5f",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f1002c5_1f7914d9",
+      "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "20464cd2_c826af9d",
@@ -122,6 +218,24 @@
       "writtenOn": "2023-03-01T13:17:21Z",
       "side": 1,
       "message": "nit: extra tab.",
+      "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "764acc8b_0681a464",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:29:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "20464cd2_c826af9d",
       "revId": "de0751bc8344f9b151e314fdde5976646e227f9d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

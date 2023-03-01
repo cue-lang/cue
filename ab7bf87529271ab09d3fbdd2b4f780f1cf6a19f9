@@ -71,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60b89176_4816d086",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:18:38Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a36030d0_9d374376",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1393947a_5db4e2b7",
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "I don\u0027t understand the question. How is sorting an concern here?",
       "parentUuid": "2ee6dc7f_bf7ddc76",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6f89646_39042380",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:18:38Z",
+      "side": 1,
+      "message": "It seems slightly icky to me that this function would return a list of versions in non-reproducible order.",
+      "parentUuid": "e22261ea_05c726d0",
       "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

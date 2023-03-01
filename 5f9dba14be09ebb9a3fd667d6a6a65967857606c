@@ -69,6 +69,24 @@
       "parentUuid": "47382819_d4c8feac",
       "revId": "5f9dba14be09ebb9a3fd667d6a6a65967857606c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3a29e43_aa469da4",
+        "filename": "cue/load/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:18:38Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1cff710b_94a0080f",
+      "revId": "5f9dba14be09ebb9a3fd667d6a6a65967857606c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

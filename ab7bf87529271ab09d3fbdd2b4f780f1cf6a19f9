@@ -213,6 +213,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "199cf822_536e5262",
+        "filename": "cue/load/module.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-01T13:32:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aaada685_37ea1ce7",
+      "revId": "ab7bf87529271ab09d3fbdd2b4f780f1cf6a19f9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d94361c_5e577b7a",

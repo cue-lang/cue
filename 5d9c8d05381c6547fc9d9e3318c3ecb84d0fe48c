@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3aebb3f_aa66be28",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-01T13:17:21Z",
+      "side": 1,
+      "message": "LGTM modulo a few more minor nits, thanks!",
+      "revId": "5d9c8d05381c6547fc9d9e3318c3ecb84d0fe48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "61f7f8d7_b4ed526c",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-01T13:17:21Z",
+      "side": 1,
+      "message": "Maybe use `Kind` here because most other places seem to use that terminology (e.g. \"findExternFileAttr reports the extern kind of...\") and it\u0027s nice to be consistent.",
+      "revId": "5d9c8d05381c6547fc9d9e3318c3ecb84d0fe48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -335,6 +335,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "17ae61d7_254bcb28",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-01T13:17:21Z",
+      "side": 1,
+      "message": "FWIW from my p.o.v., a long function makes it hard to see the data flow between the different parts: it\u0027s not always obvious which parts mutate which global variables (that was definitely the case for me here).\n\nIf a function is long and the parts aren\u0027t too intimately linked, it seems nice to split it up (but I also don\u0027t like unnecessary splitting!)",
+      "parentUuid": "54cd38e4_abb45502",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "069772d5_7411d84f",
         "filename": "internal/core/runtime/extern.go",
         "patchSetId": 1

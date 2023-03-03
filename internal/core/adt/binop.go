@@ -110,7 +110,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			x := c.Elems(left)
 			y := c.Elems(right)
 			if len(x) != len(y) {
-				return c.newBool(false)
+				return c.newBool(true)
 			}
 			for i, e := range x {
 				a, _ := c.Concrete(nil, e, op)

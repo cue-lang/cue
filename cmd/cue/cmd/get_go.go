@@ -211,7 +211,7 @@ restrictive enum interpretation of #Switch remains.
 	}
 
 	cmd.Flags().StringP(string(flagExclude), "e", "",
-		"comma-separated list of regexps of entries")
+		"comma-separated list of regexps of identifiers to omit")
 
 	cmd.Flags().Bool(string(flagLocal), false,
 		"generates files in the main module locally")
@@ -762,7 +762,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			for i, name := range v.Names {
-				if name.Name == "_" {
+				if name.Name == "_" || e.filter(name.Name) {
 					continue
 				}
 				f := e.def(v.Doc, name.Name, nil, k == 0)

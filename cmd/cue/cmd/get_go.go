@@ -23,6 +23,7 @@ import (
 	"io"
 	"io/fs"
 	"io/ioutil"
+	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -238,6 +239,7 @@ func (e *extractor) initExclusions(str string) {
 func (e *extractor) filter(name string) bool {
 	for _, ex := range e.exclusions {
 		if ex.MatchString(name) {
+			log.Printf("excluding %s", name)
 			return true
 		}
 	}
@@ -762,7 +764,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			for i, name := range v.Names {
-				if name.Name == "_" {
+				if name.Name == "_" || e.filter(name.Name) {
 					continue
 				}
 				f := e.def(v.Doc, name.Name, nil, k == 0)

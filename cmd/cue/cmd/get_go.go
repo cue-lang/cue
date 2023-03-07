@@ -762,7 +762,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			for i, name := range v.Names {
-				if name.Name == "_" {
+				if name.Name == "_" || e.filter(name.Name) {
 					continue
 				}
 				f := e.def(v.Doc, name.Name, nil, k == 0)

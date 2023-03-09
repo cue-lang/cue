@@ -34,6 +34,24 @@
       "parentUuid": "8e0f2f8f_fe79b051",
       "revId": "aeb7fb116e94135cd4f8aba71c96923749970743",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f00495d_fd6d782a",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 728,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-09T20:07:03Z",
+      "side": 1,
+      "message": "Yes it is. See https://review.gerrithub.io/c/cue-lang/cue/+/550265",
+      "parentUuid": "2db4b61f_ef83df73",
+      "revId": "aeb7fb116e94135cd4f8aba71c96923749970743",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

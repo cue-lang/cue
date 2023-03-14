@@ -226,6 +226,9 @@ func DebugStr(x interface{}) (out string) {
 		out += DebugStr(v.Path)
 		return out
 
+	case *ast.Func:
+		return fmt.Sprintf("func(%v): %v", DebugStr(v.Args), DebugStr(v.Ret))
+
 	case []ast.Decl:
 		if len(v) == 0 {
 			return ""

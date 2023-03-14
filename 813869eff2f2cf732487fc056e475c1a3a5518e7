@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6d535fa7_566e3a75",
+        "filename": "cue/testdata/cycle/025_cannot_resolve_references_that_would_be_ambiguous.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-14T13:05:37Z",
+      "side": 1,
+      "message": "They are both errors, but right now the implementation is free to only report the error for one of them.\n\nNot ideal, and this is something I expect to be addressed by the planned eval redo.",
+      "parentUuid": "4efdabf2_362b6484",
+      "revId": "813869eff2f2cf732487fc056e475c1a3a5518e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "00b09a87_9d0a77ba",
         "filename": "tools/flow/testdata/template.txtar",
         "patchSetId": 2
@@ -48,6 +66,24 @@
       "writtenOn": "2023-02-11T15:43:37Z",
       "side": 1,
       "message": "is there a particular reason why these are moving?",
+      "revId": "813869eff2f2cf732487fc056e475c1a3a5518e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95c6bc91_29877456",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-14T13:05:37Z",
+      "side": 1,
+      "message": "It is the new convention, but out of place in this CL indeed.\n\nMoved back.",
+      "parentUuid": "00b09a87_9d0a77ba",
       "revId": "813869eff2f2cf732487fc056e475c1a3a5518e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

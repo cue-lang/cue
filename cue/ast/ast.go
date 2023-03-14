@@ -476,6 +476,18 @@ type Interpolation struct {
 	label
 }
 
+// A Func node represents a function type.
+//
+// This is an experimental type and the contents will change without notice.
+type Func struct {
+	Func token.Pos // position of "func"
+	Args []Expr    // list of elements; or nil
+	Ret  Expr      // return type, must not be nil
+
+	comments
+	expr
+}
+
 // A StructLit node represents a literal struct.
 type StructLit struct {
 	Lbrace token.Pos // position of "{"
@@ -748,6 +760,8 @@ func (x *BasicLit) Pos() token.Pos       { return x.ValuePos }
 func (x *BasicLit) pos() *token.Pos      { return &x.ValuePos }
 func (x *Interpolation) Pos() token.Pos  { return x.Elts[0].Pos() }
 func (x *Interpolation) pos() *token.Pos { return x.Elts[0].pos() }
+func (x *Func) Pos() token.Pos           { return x.Func }
+func (x *Func) pos() *token.Pos          { return &x.Func }
 func (x *StructLit) Pos() token.Pos      { return getPos(x) }
 func (x *StructLit) pos() *token.Pos {
 	if x.Lbrace == token.NoPos && len(x.Elts) > 0 {
@@ -790,6 +804,7 @@ func (x *Ident) End() token.Pos {
 func (x *BasicLit) End() token.Pos { return x.ValuePos.Add(len(x.Value)) }
 
 func (x *Interpolation) End() token.Pos { return x.Elts[len(x.Elts)-1].Pos() }
+func (x *Func) End() token.Pos          { return x.Ret.End() }
 func (x *StructLit) End() token.Pos {
 	if x.Rbrace == token.NoPos && len(x.Elts) > 0 {
 		return x.Elts[len(x.Elts)-1].End()

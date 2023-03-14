@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2f221f46_8931fd88",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-14T12:58:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "145a3cdb_500e0bf7",
+      "range": {
+        "startLine": 9,
+        "startChar": 39,
+        "endLine": 9,
+        "endChar": 47
+      },
+      "revId": "22bf85e46495aafe485d9e682ea1c677c40d194a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "1d74fb42_44b7addd",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -37,6 +61,24 @@
       "writtenOn": "2023-02-11T15:39:28Z",
       "side": 1,
       "message": "Is this a necessary step for 2244? If so, perhaps briefly mention that in the commit message.",
+      "revId": "22bf85e46495aafe485d9e682ea1c677c40d194a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d519ae2c_4f879c38",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-14T12:58:28Z",
+      "side": 1,
+      "message": "Not necessary, but was discovered in the process. I can mention.",
+      "parentUuid": "1d74fb42_44b7addd",
       "revId": "22bf85e46495aafe485d9e682ea1c677c40d194a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +96,24 @@
       "writtenOn": "2023-02-11T15:39:28Z",
       "side": 1,
       "message": "nit: I\u0027d personally write this as\n\n    if m, _ :\u003d x.BaseValue.(*ListMarker); m !\u003d nil \u0026\u0026 !m.IsOpen {\n\nshould be the same in practice, as long as we\u0027re avoiding typed nils, which I hope we are anyway. I prefer the nil check because it\u0027s one less variable to declare, and you don\u0027t have a conditional branch in `!m.IsOpen` due to the nil check.\n\ntotally a nit though, so if you have a preference for or consistency with the \"ok\" route, please ignore.",
+      "revId": "22bf85e46495aafe485d9e682ea1c677c40d194a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bf2a19f_883919d1",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 879,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-14T12:58:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "526b1767_7ed65f7c",
       "revId": "22bf85e46495aafe485d9e682ea1c677c40d194a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

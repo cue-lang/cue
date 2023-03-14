@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cde9a3f9_13206f5d",
+        "filename": "cue/testdata/cycle/025_cannot_resolve_references_that_would_be_ambiguous.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-14T14:30:22Z",
+      "side": 1,
+      "message": "I asked this question again at the offiste, I think :) SGTM.",
+      "parentUuid": "6d535fa7_566e3a75",
+      "revId": "813869eff2f2cf732487fc056e475c1a3a5518e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "00b09a87_9d0a77ba",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "It is the new convention, but out of place in this CL indeed.\n\nMoved back.",
       "parentUuid": "00b09a87_9d0a77ba",
+      "revId": "813869eff2f2cf732487fc056e475c1a3a5518e7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3d21bd1_11010285",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-14T14:30:22Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "95c6bc91_29877456",
       "revId": "813869eff2f2cf732487fc056e475c1a3a5518e7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

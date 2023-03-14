@@ -16,6 +16,24 @@
       "message": "did you mean the new 4 lines to replace these existing 3 lines? it seems to me like these 3 lines are now unnecessary.",
       "revId": "086ed6705d9c8adbf03d8af5cf8abd2cf20a458e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de92232d_ed1b98fb",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1378,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-14T12:54:46Z",
+      "side": 1,
+      "message": "Yep. Changed.",
+      "parentUuid": "a34c76f3_95488856",
+      "revId": "086ed6705d9c8adbf03d8af5cf8abd2cf20a458e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

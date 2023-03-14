@@ -839,6 +839,16 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 	case *ast.Ident:
 		return c.resolve(n)
 
+	case *ast.Func:
+		// We don't yet support function types natively in
+		// CUE.  ast.Func exists only to support external
+		// interpreters. Function values (really, adt.Builtin)
+		// are only created by the runtime, or injected by
+		// external interpreters.
+		//
+		// TODO: revise this when we add function types.
+		return c.resolve(ast.NewIdent("_"))
+
 	case *ast.StructLit:
 		c.pushScope(nil, 1, n)
 		v := &adt.StructLit{Src: n}

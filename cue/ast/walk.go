@@ -91,6 +91,10 @@ func walk(v visitor, node Node) {
 			walk(v, a)
 		}
 
+	case *Func:
+		walkExprList(v, n.Args)
+		walk(v, n.Ret)
+
 	case *StructLit:
 		walkDeclList(v, n.Elts)
 

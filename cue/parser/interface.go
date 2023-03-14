@@ -47,6 +47,15 @@ var (
 		p.mode |= parseCommentsMode
 	}
 
+	// ParseFuncs causes function declarations to be parsed.
+	//
+	// This is an experimental function and the API is likely to
+	// change or dissapear.
+	ParseFuncs Option = parseFuncs
+	parseFuncs        = func(p *parser) {
+		p.mode |= parseFuncsMode
+	}
+
 	// Trace causes parsing to print a trace of parsed productions.
 	Trace    Option = traceOpt
 	traceOpt        = func(p *parser) {
@@ -122,6 +131,7 @@ const (
 	packageClauseOnlyMode mode = 1 << iota // stop parsing after package clause
 	importsOnlyMode                        // stop parsing after import declarations
 	parseCommentsMode                      // parse comments and add them to AST
+	parseFuncsMode                         // parse function declarations (experimental)
 	partialMode
 	traceMode             // print a trace of parsed productions
 	declarationErrorsMode // report declaration errors

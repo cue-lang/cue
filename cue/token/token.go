@@ -96,6 +96,7 @@ const (
 	FOR
 	IN
 	LET
+	FUNC
 
 	TRUE
 	FALSE
@@ -168,10 +169,11 @@ var tokens = [...]string{
 	TRUE:  "true",
 	NULL:  "null",
 
-	FOR: "for",
-	IF:  "if",
-	IN:  "in",
-	LET: "let",
+	FOR:  "for",
+	IF:   "if",
+	IN:   "in",
+	LET:  "let",
+	FUNC: "func",
 }
 
 // String returns the string corresponding to the token tok.

@@ -666,6 +666,24 @@
       "parentUuid": "c3640227_e11dd1e5",
       "revId": "6cac859a6309d295d849606bad12b80dc190b227",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6933b57_17075708",
+        "filename": "internal/core/runtime/testdata/no_top_extern.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-15T09:23:37Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "da553208_83e2a48f",
+      "revId": "6cac859a6309d295d849606bad12b80dc190b227",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "document it briefly? initially I thought Pos might mean syntax position information.",
       "revId": "d38de715c702508a075085a9f437c9ac586c433a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19ea2960_d931cd50",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 977,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-15T13:27:15Z",
+      "side": 1,
+      "message": "Done. Also moved it closer to conjuncts. It started as a boolean, which made it better to put it there, but now it makes more sense to put it closer to conjuncts.",
+      "parentUuid": "7444bd4e_dd4e55e2",
+      "revId": "d38de715c702508a075085a9f437c9ac586c433a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

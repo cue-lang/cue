@@ -356,7 +356,9 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 func (n *nodeContext) insertConjuncts(state VertexStatus) bool {
 	// Exit early if we have a concrete value and only need partial results.
 	if state == Partial {
-		for _, c := range n.conjuncts {
+		for n.conjunctsPos < len(n.conjuncts) {
+			c := n.conjuncts[n.conjunctsPos]
+			n.conjunctsPos++
 			if v, ok := c.Elem().(Value); ok && IsConcrete(v) {
 				n.addValueConjunct(c.Env, v, c.CloseInfo)
 			}
@@ -950,6 +952,11 @@ type nodeContext struct {
 	// processing. It does NOT need to be copied.
 	conjuncts       []Conjunct
 	cyclicConjuncts []cyclicConjunct
+
+	// conjunctsPos is an index into conjuncts indicating the next conjunct
+	// to process. This is used to avoids processing a conjunct twice in some
+	// cases where there is an evaluation cycle.
+	conjunctsPos int
 
 	// notify is used to communicate errors in cyclic dependencies.
 	// TODO: also use this to communicate increasingly more concrete values.

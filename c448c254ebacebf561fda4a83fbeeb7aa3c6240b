@@ -16,6 +16,23 @@
       "message": "Personally, I would just copy the package wrapping code, if not too much trouble. I expect it to be different in the end anyway, so this avoids some entanglements.",
       "revId": "c448c254ebacebf561fda4a83fbeeb7aa3c6240b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ddb5002_ee2b991f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-15T12:36:08Z",
+      "side": 1,
+      "message": "Personally, I would just copy the package wrapping code, if not too much trouble. I expect it to be different in the end anyway, so this avoids some entanglements.",
+      "revId": "c448c254ebacebf561fda4a83fbeeb7aa3c6240b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

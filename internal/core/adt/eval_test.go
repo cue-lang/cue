@@ -155,3 +155,14 @@ func BenchmarkUnifyAPI(b *testing.B) {
 		}
 	}
 }
+
+func TestIssue2293(t *testing.T) {
+	adt.Verbosity = 1
+
+	ctx := cuecontext.New()
+	c := `a: {}, a`
+	v1 := ctx.CompileString(c)
+	v2 := ctx.CompileString(c)
+
+	v1.Unify(v2)
+}

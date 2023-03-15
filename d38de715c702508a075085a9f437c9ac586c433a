@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7444bd4e_dd4e55e2",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 977,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-15T11:14:25Z",
+      "side": 1,
+      "message": "document it briefly? initially I thought Pos might mean syntax position information.",
+      "revId": "d38de715c702508a075085a9f437c9ac586c433a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

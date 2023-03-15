@@ -125,11 +125,11 @@ z3:  8
   z3: 8
 }
 -- out/eval/stats --
-Leaks:  6
-Freed:  38
+Leaks:  4
+Freed:  40
 Reused: 34
 Allocs: 10
-Retain: 38
+Retain: 36
 
 Unifications: 27
 Conjuncts:    93

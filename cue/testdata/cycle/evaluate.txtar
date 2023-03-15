@@ -107,11 +107,11 @@ closeFail: {
 }
 
 -- out/eval/stats --
-Leaks:  67
-Freed:  94
-Reused: 90
-Allocs: 71
-Retain: 137
+Leaks:  66
+Freed:  95
+Reused: 91
+Allocs: 70
+Retain: 136
 
 Unifications: 149
 Conjuncts:    289

@@ -168,15 +168,15 @@ z3:  z1-3 & 8
   z3: 8
 }
 -- out/eval/stats --
-Leaks:  5
-Freed:  47
+Leaks:  4
+Freed:  48
 Reused: 40
 Allocs: 12
-Retain: 36
+Retain: 35
 
 Unifications: 31
-Conjuncts:    133
-Disjuncts:    57
+Conjuncts:    136
+Disjuncts:    58
 -- out/eval --
 Errors:
 xe1: 2 errors in empty disjunction:

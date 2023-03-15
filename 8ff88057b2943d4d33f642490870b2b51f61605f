@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbc7c497_5f1ae4eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-15T15:56:04Z",
+      "side": 1,
+      "message": "LGTM with a couple of tiny nits, thanks.",
+      "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5c7b24c_97ea14ae",
@@ -14,6 +31,40 @@
       "writtenOn": "2023-03-15T13:18:16Z",
       "side": 1,
       "message": "I guess it is safe to say WILL, instead of MAY.\n\nFor instance: Lparen, Rparen, []Expr -\u003e something else allowing named args.\nPossibly better name for Ret.",
+      "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d4bf50b_d3f6c24a",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-15T15:56:04Z",
+      "side": 1,
+      "message": "or just `return \u0026ast.Ident{ ...`",
+      "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a2379fa_92f4fa6a",
+        "filename": "cue/token/token.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-15T15:56:04Z",
+      "side": 1,
+      "message": "document as experimental?",
       "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

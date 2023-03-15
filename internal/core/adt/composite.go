@@ -196,6 +196,9 @@ type Vertex struct {
 	// Used for cycle detection.
 	IsDynamic bool
 
+	// hasVoidArc is set if this Vertex has a void arc (e.g. for comprehensions)
+	hasVoidArc bool
+
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
 
@@ -764,6 +767,9 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 	}
 	arc = &Vertex{Parent: v, Label: f, ArcType: t}
 	v.Arcs = append(v.Arcs, arc)
+	if t == ArcVoid {
+		v.hasVoidArc = true
+	}
 	return arc, true
 }
 

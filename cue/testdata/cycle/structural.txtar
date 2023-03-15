@@ -532,11 +532,11 @@ n2: n1 & {a: n1}
 n3: n1 & {n1}
 n4: n1 & {x: n1 & {y: n1 & {z: int}}}
 -- out/eval/stats --
-Leaks:  17
-Freed:  791
-Reused: 779
-Allocs: 29
-Retain: 66
+Leaks:  16
+Freed:  792
+Reused: 780
+Allocs: 28
+Retain: 65
 
 Unifications: 622
 Conjuncts:    1219

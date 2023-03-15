@@ -46,6 +46,16 @@ graph TD
 		body: ""
 	}
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  41
+Reused: 34
+Allocs: 7
+Retain: 0
+
+Unifications: 24
+Conjuncts:    64
+Disjuncts:    41
 -- out/run/t2 --
 graph TD
   t0("root.get [Terminated]")
@@ -78,34 +88,6 @@ graph TD
 		stdout: "foo"
 	}
 }
--- out/run/t3 --
-graph TD
-  t0("root.get [Terminated]")
-  t0-->t2
-  t1("root.convert [Terminated]")
-  t1-->t0
-  t2("foo [Terminated]")
-
--- out/run/t3/value --
-{
-	$id: "tool/exec.Run"
-	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
-	env: {}
-	stdout:  "foo"
-	stderr:  null
-	stdin:   (*null | string | bytes) & get.response.body
-	success: bool
-}
--- out/run/t1/stats --
-Leaks:  0
-Freed:  41
-Reused: 34
-Allocs: 7
-Retain: 0
-
-Unifications: 24
-Conjuncts:    64
-Disjuncts:    41
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  41
@@ -126,3 +108,21 @@ Retain: 0
 Unifications: 48
 Conjuncts:    132
 Disjuncts:    82
+-- out/run/t3 --
+graph TD
+  t0("root.get [Terminated]")
+  t0-->t2
+  t1("root.convert [Terminated]")
+  t1-->t0
+  t2("foo [Terminated]")
+
+-- out/run/t3/value --
+{
+	$id: "tool/exec.Run"
+	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	env: {}
+	stdout:  "foo"
+	stderr:  null
+	stdin:   (*null | string | bytes) & get.response.body
+	success: bool
+}

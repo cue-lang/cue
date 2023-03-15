@@ -263,15 +263,15 @@ nestedChain: {
 	}
 }
 -- out/eval/stats --
-Leaks:  3
-Freed:  141
-Reused: 132
-Allocs: 12
-Retain: 66
+Leaks:  1
+Freed:  143
+Reused: 134
+Allocs: 10
+Retain: 72
 
 Unifications: 144
 Conjuncts:    159
-Disjuncts:    186
+Disjuncts:    194
 -- out/eval --
 (struct){
   self: (struct){

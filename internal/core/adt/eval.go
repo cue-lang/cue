@@ -356,7 +356,9 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 func (n *nodeContext) insertConjuncts(state VertexStatus) bool {
 	// Exit early if we have a concrete value and only need partial results.
 	if state == Partial {
-		for _, c := range n.conjuncts {
+		for n.evaluatingConjunctsPos < len(n.conjuncts) {
+			c := n.conjuncts[n.evaluatingConjunctsPos]
+			n.evaluatingConjunctsPos++
 			if v, ok := c.Elem().(Value); ok && IsConcrete(v) {
 				n.addValueConjunct(c.Env, v, c.CloseInfo)
 			}
@@ -971,6 +973,8 @@ type nodeContext struct {
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
 	depth       int32
+
+	evaluatingConjunctsPos int
 
 	// Disjunction handling
 	disjunctions []envDisjunct

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5c7b24c_97ea14ae",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-15T13:18:16Z",
+      "side": 1,
+      "message": "I guess it is safe to say WILL, instead of MAY.\n\nFor instance: Lparen, Rparen, []Expr -\u003e something else allowing named args.\nPossibly better name for Ret.",
+      "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

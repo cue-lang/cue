@@ -357,15 +357,15 @@ large: {
 	}
 }
 -- out/eval/stats --
-Leaks:  16
-Freed:  95
-Reused: 84
-Allocs: 27
-Retain: 292
+Leaks:  7
+Freed:  108
+Reused: 97
+Allocs: 18
+Retain: 311
 
-Unifications: 111
-Conjuncts:    227
-Disjuncts:    206
+Unifications: 115
+Conjuncts:    238
+Disjuncts:    230
 -- out/eval --
 (struct){
   minimal: (struct){
@@ -529,12 +529,9 @@ Disjuncts:    206
         host: (string){ "mod.test" }
       }
       #Y: (#struct){
-        host: (_|_){// (string){ "mod.test" }
-        }
-        port: (_|_){// (string){ "" }
-        }
-        userinfo: (_|_){// (string){ "user" }
-        }
+        host: (string){ "mod.test" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
       }
     }
     p3: (struct){
@@ -554,8 +551,7 @@ Disjuncts:    206
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
-        port: (_|_){// (string){ "" }
-        }
+        port: (string){ "" }
         userinfo: (string){ "user" }
       }
     }

@@ -732,7 +732,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	if state <= Conjuncts &&
 		// Is allowed to go one step back. See Vertex.UpdateStatus.
 		n.node.status <= state+1 &&
-		n.node.ArcType != ArcVoid {
+		(!n.node.hasVoidArc || n.node.ArcType == ArcMember) {
 
 		n.node.UpdateStatus(Conjuncts)
 		return
@@ -752,7 +752,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 
 			wasVoid := !a.isDefined()
 
-			ctx.Unify(a, state)
+			ctx.Unify(a, Finalized)
 
 			if !a.isDefined() {
 				continue

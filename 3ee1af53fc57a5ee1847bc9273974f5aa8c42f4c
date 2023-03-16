@@ -16,6 +16,24 @@
       "message": "I would prefer a setup where we use CUE_DEBUG with options. We are getting a bit too many environment variables.\n\nBut this can be done in a later CL cleaning up all the others too. Perhaps add a TODO.",
       "revId": "3ee1af53fc57a5ee1847bc9273974f5aa8c42f4c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abbe8732_13fc0d7a",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-16T09:35:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3df527a3_b8803cf5",
+      "revId": "3ee1af53fc57a5ee1847bc9273974f5aa8c42f4c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

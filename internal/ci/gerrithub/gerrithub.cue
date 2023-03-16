@@ -65,8 +65,9 @@ _#linuxMachine: "ubuntu-20.04"
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [
 				#writeNetrcFile,
-				// Hack to get the ref (e.g. refs/changes/38/547738/7) in a format we can use in a
-				// branch name, e.g. _547738_7
+				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
+				// care about the CL number and patchset, (e.g. 547738/7).
+				// Note that gerrithub_ref is two path elements.
 				json.#step & {
 					id: "gerrithub_ref"
 					run: #"""

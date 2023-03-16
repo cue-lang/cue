@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5cd57dc6_44c019d5",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-16T09:35:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e5c7b24c_97ea14ae",
+      "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1d4bf50b_d3f6c24a",
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9f76e85_af4f0389",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1179,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-16T09:35:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d4bf50b_d3f6c24a",
+      "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a2379fa_92f4fa6a",
@@ -82,6 +118,24 @@
       "writtenOn": "2023-03-15T15:56:04Z",
       "side": 1,
       "message": "document as experimental?",
+      "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d420180a_2aa5c5d8",
+        "filename": "cue/token/token.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-16T09:35:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a2379fa_92f4fa6a",
       "revId": "8ff88057b2943d4d33f642490870b2b51f61605f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

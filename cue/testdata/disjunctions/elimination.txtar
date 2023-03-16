@@ -261,6 +261,8 @@ issue1940: {
 }
 
 -- issue2209full.cue --
+// TODO: fix
+
 issue2209: simplified: t1: {
 	#SpecFoo: foo: min: 1
 	#SpecBar: bar: min: 1
@@ -373,21 +375,162 @@ issue2209: full: {
 		}
 	}
 }
--- complex.cue --
 
+
+-- issue2246.cue --
+issue2246: simplified: {
+	#FormFoo: fooID: string
+	#FormBar: barID: string
+	#Form: { #FormFoo | #FormBar }
+	
+	data: {fooID: "123"}
+	out1: #Form & data
+	out2: #Form & out1
+}
+issue2246: full: {
+	data: forms: [{
+		fooID: "00-0000001"
+	}]
+	
+	form1040: (#compute & {in: data}).out
+	
+	#K1: {
+		#_base: common: 3
+		#FormFoo: {
+			#_base
+			fooID: string
+		}
+		#FormBar: {
+			#_base
+			barID: string
+		}
+		#Form: {
+			#FormFoo | #FormBar
+		}
+	}
+	
+	#Input: {
+		forms: [...#K1.#Form]
+	}
+	
+	#summarizeReturn: {
+		in:  #Input
+		out: [ for k in in.forms { k.common } ]
+	}
+	
+	#compute: {
+		in:  #Input
+		out: (#summarizeReturn & {"in": in}).out
+	}
+}
+
+-- issue2263.cue --
+issue2263: simplified: {
+	metrics: #Metric
+	#Metric: {
+		#IDSource | {}
+		#TargetAverage | {}
+	}
+
+	metrics: {
+		id:  "foo"
+		avg: 60
+	}
+
+	#IDSource: id: string
+	#TargetAverage: avg: number
+}
+issue2263: full: {
+	metrics: [...#Metric]
+
+	metrics: [{
+		id:  "foo"
+		avg: 60
+	}, {
+		id:    "bar"
+		value: 80
+	}, {
+		uri: "baz"
+		avg: 70
+	}, {
+		uri:   "qux"
+		value: 90
+	}]
+
+	#Metric: {
+		#Source
+		#Target
+	}
+
+	#Source:
+		#IDSource |
+		#URISource
+
+	#Target:
+		#TargetAverage |
+		#TargetValue
+
+	#IDSource: {
+		id: string
+	}
+
+	#URISource: {
+		uri: string
+	}
+
+	#TargetAverage: {
+		avg: number
+	}
+
+	#TargetValue: {
+		value: number
+	}
+}
 
 -- out/eval/stats --
-Leaks:  0
-Freed:  2035
-Reused: 2015
+Leaks:  4
+Freed:  2151
+Reused: 2135
 Allocs: 20
-Retain: 67
+Retain: 119
 
-Unifications: 1066
-Conjuncts:    2882
-Disjuncts:    2102
+Unifications: 1196
+Conjuncts:    3205
+Disjuncts:    2270
 -- out/eval --
-(struct){
+Errors:
+issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+    ./issue2209full.cue:43:7
+    ./issue2209full.cue:48:13
+    ./issue2209full.cue:67:10
+    ./issue2209full.cue:83:16
+    ./issue2209full.cue:87:13
+    ./issue2209full.cue:107:20
+issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+    ./issue2209full.cue:43:7
+    ./issue2209full.cue:48:13
+    ./issue2209full.cue:55:16
+    ./issue2209full.cue:71:4
+    ./issue2209full.cue:72:13
+    ./issue2209full.cue:92:13
+issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+    ./issue2209full.cue:43:7
+    ./issue2209full.cue:48:13
+    ./issue2209full.cue:67:10
+    ./issue2209full.cue:83:16
+    ./issue2209full.cue:92:13
+    ./issue2209full.cue:105:20
+issue2209.simplified.t3.BAZ: undefined field: y:
+    ./issue2209full.cue:35:9
+issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+    ./issue2209full.cue:77:25
+
+Result:
+(_|_){
+  // [eval]
   disambiguateClosed: (struct){
     b: (#struct){ |((#struct){
         x: (bool){ true }
@@ -795,8 +938,10 @@ Disjuncts:    2102
       }
     }
   }
-  issue2209: (struct){
-    simplified: (struct){
+  issue2209: (_|_){
+    // [eval]
+    simplified: (_|_){
+      // [eval]
       t1: (struct){
         #SpecFoo: (#struct){
           foo: (#struct){
@@ -814,7 +959,6 @@ Disjuncts:    2102
           }
         }
         out: (struct){ |((struct){
-            minBar: (int){ 1 }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -823,7 +967,7 @@ Disjuncts:    2102
             nullFoo: (null){ null }
             minFoo: (int){ int }
           }, (struct){
-            minBar: (int){ 1 }
+            minBar: (int){ int }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -831,7 +975,6 @@ Disjuncts:    2102
             }
             nullFoo: (null){ null }
           }, (struct){
-            minBar: (int){ 1 }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -840,7 +983,7 @@ Disjuncts:    2102
             nullBar: (null){ null }
             minFoo: (int){ int }
           }, (struct){
-            minBar: (int){ 1 }
+            minBar: (int){ int }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -849,140 +992,60 @@ Disjuncts:    2102
             nullBar: (null){ null }
           }) }
       }
-      t2: (struct){ |((struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
+      t2: (_|_){
+        // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+        //     ./issue2209full.cue:24:17
+        BAZ: (_|_){
+          // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+          //     ./issue2209full.cue:24:17
+        }
+        #SpecFoo: (#struct){
+          foo: (#struct){
+          }
+        }
+        #SpecBar: (#struct){
+          bar: (#struct){
+            x: (int){ 1 }
+          }
+        }
+        spec: (#struct){ |(*(#struct){
+            bar: (struct){
+            }
             foo: (#struct){
             }
-          }
-          #SpecBar: (#struct){
+          }, (#struct){
             bar: (#struct){
               x: (int){ 1 }
             }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          b2: (int){ int }
-        }) }
-      t3: (struct){ |((struct){
-          #A: (#struct){
+          }) }
+        b2: (int){ int }
+      }
+      t3: (_|_){
+        // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
+        //     ./issue2209full.cue:35:9
+        #A: (#struct){
+          v: (int){ 1 }
+        }
+        BAZ: (_|_){
+          // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
+          //     ./issue2209full.cue:35:9
+        }
+        S: (#struct){ |(*(#struct){
+            x: (int){ 1 }
             v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
+          }, (#struct){
             x: (int){ 1 }
             y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-        }) }
+          }) }
+        #B: (#struct){
+          x: (int){ 1 }
+          y: (int){ 1 }
+        }
+        b2: (int){ int }
+      }
     }
-    full: (struct){
+    full: (_|_){
+      // [eval]
       Foo: (#struct){
         spec: (#struct){
           foo: (#struct){
@@ -999,37 +1062,116 @@ Disjuncts:    2102
               maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
             }) }
           _X: (#struct){
-            spec: (#struct){
-              foo: (#struct){
-                min: (int){ |(*(int){ 10 }, (int){ int }) }
-                max: (int){ |(*(int){ 20 }, (int){ int }) }
-              }
-            }
+            spec: (#struct){ |(*(#struct){
+                foo: (#struct){
+                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+                }
+              }, (#struct){
+                foo: (#struct){
+                }
+                bar: (#struct){
+                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+                }
+              }) }
           }
         }
       }
-      Bar: (#struct){
+      Bar: (_|_){
+        // [eval]
         spec: (#struct){
           bar: (#struct){
             min: (int){ |(*(int){ 30 }, (int){ int }) }
             max: (int){ |(*(int){ 40 }, (int){ int }) }
           }
         }
-        resource: (#struct){
-          spec: (#struct){ |(*(#struct){
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            }, (#struct){
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            }) }
-          _X: (#struct){
-            spec: (#struct){
-              bar: (#struct){
-                min: (int){ |(*(int){ 30 }, (int){ int }) }
-                max: (int){ |(*(int){ 40 }, (int){ int }) }
-              }
+        resource: (_|_){
+          // [eval]
+          spec: (_|_){
+            // [eval] issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+            // issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+            // issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+            //     ./issue2209full.cue:43:7
+            //     ./issue2209full.cue:48:13
+            //     ./issue2209full.cue:67:10
+            //     ./issue2209full.cue:83:16
+            //     ./issue2209full.cue:87:13
+            //     ./issue2209full.cue:107:20
+            // issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+            //     ./issue2209full.cue:43:7
+            //     ./issue2209full.cue:48:13
+            //     ./issue2209full.cue:55:16
+            //     ./issue2209full.cue:71:4
+            //     ./issue2209full.cue:72:13
+            //     ./issue2209full.cue:92:13
+            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+            //     ./issue2209full.cue:43:7
+            //     ./issue2209full.cue:48:13
+            //     ./issue2209full.cue:67:10
+            //     ./issue2209full.cue:83:16
+            //     ./issue2209full.cue:92:13
+            //     ./issue2209full.cue:105:20
+            // issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+            //     ./issue2209full.cue:77:25
+            minFoo: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+              //     ./issue2209full.cue:43:7
+              //     ./issue2209full.cue:48:13
+              //     ./issue2209full.cue:55:16
+              //     ./issue2209full.cue:71:4
+              //     ./issue2209full.cue:72:13
+              //     ./issue2209full.cue:92:13
+              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+              //     ./issue2209full.cue:43:7
+              //     ./issue2209full.cue:48:13
+              //     ./issue2209full.cue:67:10
+              //     ./issue2209full.cue:83:16
+              //     ./issue2209full.cue:92:13
+              //     ./issue2209full.cue:105:20
             }
+            maxFoo: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.maxFoo: 2 errors in empty disjunction:
+              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
+              //     ./issue2209full.cue:43:7
+              //     ./issue2209full.cue:48:13
+              //     ./issue2209full.cue:56:16
+              //     ./issue2209full.cue:71:4
+              //     ./issue2209full.cue:73:13
+              //     ./issue2209full.cue:93:13
+              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and int (mismatched types null and int):
+              //     ./issue2209full.cue:43:7
+              //     ./issue2209full.cue:48:13
+              //     ./issue2209full.cue:67:10
+              //     ./issue2209full.cue:83:16
+              //     ./issue2209full.cue:93:13
+              //     ./issue2209full.cue:106:20
+            }
+            minBar: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+              //     ./issue2209full.cue:77:25
+            }
+            maxBar: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.maxBar: undefined field: max:
+              //     ./issue2209full.cue:78:25
+            }
+          }
+          _X: (#struct){
+            spec: (#struct){ |(*(#struct){
+                bar: (#struct){
+                }
+                foo: (#struct){
+                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+                }
+              }, (#struct){
+                bar: (#struct){
+                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+                }
+              }) }
           }
         }
       }
@@ -1128,10 +1270,162 @@ Disjuncts:    2102
       }
     }
   }
+  issue2246: (struct){
+    simplified: (struct){
+      #FormFoo: (#struct){
+        fooID: (string){ string }
+      }
+      #FormBar: (#struct){
+        barID: (string){ string }
+      }
+      #Form: (#struct){ |((#struct){
+          fooID: (string){ string }
+        }, (#struct){
+          barID: (string){ string }
+        }) }
+      data: (struct){
+        fooID: (string){ "123" }
+      }
+      out1: (#struct){
+        fooID: (string){ "123" }
+      }
+      out2: (#struct){
+        fooID: (string){ "123" }
+      }
+    }
+    full: (struct){
+      data: (struct){
+        forms: (#list){
+          0: (struct){
+            fooID: (string){ "00-0000001" }
+          }
+        }
+      }
+      form1040: (#list){
+        0: (int){ 3 }
+      }
+      #K1: (#struct){
+        #_base: (#struct){
+          common: (int){ 3 }
+        }
+        #FormFoo: (#struct){
+          common: (int){ 3 }
+          fooID: (string){ string }
+        }
+        #FormBar: (#struct){
+          common: (int){ 3 }
+          barID: (string){ string }
+        }
+        #Form: (#struct){ |((#struct){
+            common: (int){ 3 }
+            fooID: (string){ string }
+          }, (#struct){
+            common: (int){ 3 }
+            barID: (string){ string }
+          }) }
+      }
+      #Input: (#struct){
+        forms: (list){
+        }
+      }
+      #summarizeReturn: (#struct){
+        in: (#struct){
+          forms: (list){
+          }
+        }
+        out: (#list){
+        }
+      }
+      #compute: (#struct){
+        in: (#struct){
+          forms: (list){
+          }
+        }
+        out: (#list){
+        }
+      }
+    }
+  }
+  issue2263: (struct){
+    simplified: (struct){
+      metrics: (#struct){
+        id: (string){ "foo" }
+        avg: (int){ 60 }
+      }
+      #Metric: (#struct){ |((#struct){
+          id: (string){ string }
+          avg: (number){ number }
+        }, (#struct){
+          id: (string){ string }
+        }, (#struct){
+          avg: (number){ number }
+        }, (#struct){
+        }) }
+      #IDSource: (#struct){
+        id: (string){ string }
+      }
+      #TargetAverage: (#struct){
+        avg: (number){ number }
+      }
+    }
+    full: (struct){
+      metrics: (#list){
+        0: (#struct){
+          id: (string){ "foo" }
+          avg: (int){ 60 }
+        }
+        1: (#struct){
+          id: (string){ "bar" }
+          value: (int){ 80 }
+        }
+        2: (#struct){
+          uri: (string){ "baz" }
+          avg: (int){ 70 }
+        }
+        3: (#struct){
+          uri: (string){ "qux" }
+          value: (int){ 90 }
+        }
+      }
+      #Metric: (#struct){ |((#struct){
+          id: (string){ string }
+          avg: (number){ number }
+        }, (#struct){
+          id: (string){ string }
+          value: (number){ number }
+        }, (#struct){
+          uri: (string){ string }
+          avg: (number){ number }
+        }, (#struct){
+          uri: (string){ string }
+          value: (number){ number }
+        }) }
+      #Source: (#struct){ |((#struct){
+          id: (string){ string }
+        }, (#struct){
+          uri: (string){ string }
+        }) }
+      #Target: (#struct){ |((#struct){
+          avg: (number){ number }
+        }, (#struct){
+          value: (number){ number }
+        }) }
+      #IDSource: (#struct){
+        id: (string){ string }
+      }
+      #URISource: (#struct){
+        uri: (string){ string }
+      }
+      #TargetAverage: (#struct){
+        avg: (number){ number }
+      }
+      #TargetValue: (#struct){
+        value: (number){ number }
+      }
+    }
+  }
 }
 -- out/compile --
---- complex.cue
-{}
 --- in.cue
 {
   disambiguateClosed: {
@@ -2016,6 +2310,141 @@ Disjuncts:    2102
           hoge?: (null|bool)
           fuga?: (null|bool)
         }
+      }
+    }
+  }
+}
+--- issue2246.cue
+{
+  issue2246: {
+    simplified: {
+      #FormFoo: {
+        fooID: string
+      }
+      #FormBar: {
+        barID: string
+      }
+      #Form: {
+        (〈1;#FormFoo〉|〈1;#FormBar〉)
+      }
+      data: {
+        fooID: "123"
+      }
+      out1: (〈0;#Form〉 & 〈0;data〉)
+      out2: (〈0;#Form〉 & 〈0;out1〉)
+    }
+  }
+  issue2246: {
+    full: {
+      data: {
+        forms: [
+          {
+            fooID: "00-0000001"
+          },
+        ]
+      }
+      form1040: (〈0;#compute〉 & {
+        in: 〈1;data〉
+      }).out
+      #K1: {
+        #_base: {
+          common: 3
+        }
+        #FormFoo: {
+          〈1;#_base〉
+          fooID: string
+        }
+        #FormBar: {
+          〈1;#_base〉
+          barID: string
+        }
+        #Form: {
+          (〈1;#FormFoo〉|〈1;#FormBar〉)
+        }
+      }
+      #Input: {
+        forms: [
+          ...〈2;#K1〉.#Form,
+        ]
+      }
+      #summarizeReturn: {
+        in: 〈1;#Input〉
+        out: [
+          for _, k in 〈1;in〉.forms {
+            〈1;k〉.common
+          },
+        ]
+      }
+      #compute: {
+        in: 〈1;#Input〉
+        out: (〈1;#summarizeReturn〉 & {
+          in: 〈1;in〉
+        }).out
+      }
+    }
+  }
+}
+--- issue2263.cue
+{
+  issue2263: {
+    simplified: {
+      metrics: 〈0;#Metric〉
+      #Metric: {
+        (〈1;#IDSource〉|{})
+        (〈1;#TargetAverage〉|{})
+      }
+      metrics: {
+        id: "foo"
+        avg: 60
+      }
+      #IDSource: {
+        id: string
+      }
+      #TargetAverage: {
+        avg: number
+      }
+    }
+  }
+  issue2263: {
+    full: {
+      metrics: [
+        ...〈1;#Metric〉,
+      ]
+      metrics: [
+        {
+          id: "foo"
+          avg: 60
+        },
+        {
+          id: "bar"
+          value: 80
+        },
+        {
+          uri: "baz"
+          avg: 70
+        },
+        {
+          uri: "qux"
+          value: 90
+        },
+      ]
+      #Metric: {
+        〈1;#Source〉
+        〈1;#Target〉
+      }
+      #Source: (〈0;#IDSource〉|〈0;#URISource〉)
+      #Target: (〈0;#TargetAverage〉|〈0;#TargetValue〉)
+      #IDSource: {
+        id: string
+      }
+      #URISource: {
+        uri: string
+      }
+      #TargetAverage: {
+        avg: number
+      }
+      #TargetValue: {
+        value: number
       }
     }
   }

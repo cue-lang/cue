@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "afd5035b_073a916c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5c63d28_e0e2bfc8",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a3fc6de0_c55a247e",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ed4cd2b_58ff12b4",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 246,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a5f23b0f_acae06e3",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e59e080_8f4ddcf3",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-03-16T12:36:13Z",
       "side": 1,
       "message": "s/, that/c/ that/\n\ns/change it/change/ ?",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1711ca21_62ea0e89",
+        "filename": "internal/core/adt/disjunct.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e59e080_8f4ddcf3",
       "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a737a5f2_a87ff73e",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1d9972f6_79dc961e",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7aba052d_6661ecfe",
@@ -99,6 +171,24 @@
       "writtenOn": "2023-03-16T12:36:13Z",
       "side": 1,
       "message": "Maybe a comment here? It seems odd to me that this isn\u0027t symmetric with the code in loop1.",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "410147c7_f2b66749",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7aba052d_6661ecfe",
       "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6f029a0_b1469bd9",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Removed comment.",
+      "parentUuid": "044fb66d_91d1bc38",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "28d6aa00_975a9471",
@@ -133,6 +241,24 @@
       "writtenOn": "2023-03-16T12:36:13Z",
       "side": 1,
       "message": "either TODO or remove?",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed014a44_f7018ad6",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28d6aa00_975a9471",
       "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +280,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce21f8be_7d6cdf79",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 706,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0940ed83_174f0330",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b9dffe7_50db9361",
@@ -167,6 +311,24 @@
       "writtenOn": "2023-03-16T12:36:13Z",
       "side": 1,
       "message": "TODO or remove",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6cfe072d_54018591",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1743,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b9dffe7_50db9361",
       "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +350,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "01aaa985_1430bb0c",
+        "filename": "internal/core/debug/compact.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Removed in next CL. Added TODO",
+      "parentUuid": "1fe77b46_4d2a32c9",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd0dba91_47e59e27",
@@ -201,6 +381,24 @@
       "writtenOn": "2023-03-16T12:36:13Z",
       "side": 1,
       "message": "I don\u0027t think this can happen.",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "baf6b6ad_6ff14d30",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Removed in next CL. Added TODO",
+      "parentUuid": "dd0dba91_47e59e27",
       "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -224,6 +422,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "82cdb282_aeb4af58",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Yes, I think so. The name is just wrong then. I don\u0027t see a reason to treat these two differently here.",
+      "parentUuid": "d63f9f32_9e5a86c8",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fe13eee0_2f35a742",
         "filename": "internal/core/subsume/vertex.go",
         "patchSetId": 1
@@ -241,6 +457,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4f45c77_dddc0db3",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Actually, it _can_ happen for some weird reason. Wrote it more defensively.",
+      "parentUuid": "fe13eee0_2f35a742",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a48f39de_0e7516ba",
         "filename": "internal/core/subsume/vertex.go",
         "patchSetId": 1
@@ -252,6 +486,24 @@
       "writtenOn": "2023-03-16T12:36:13Z",
       "side": 1,
       "message": "can this happen?",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f8019ea_1b0d01ea",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-16T17:47:08Z",
+      "side": 1,
+      "message": "Same as above",
+      "parentUuid": "a48f39de_0e7516ba",
       "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

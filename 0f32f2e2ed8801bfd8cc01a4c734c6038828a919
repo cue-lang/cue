@@ -438,6 +438,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b337461_3b4dee24",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-16T18:48:26Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "82cdb282_aeb4af58",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fe13eee0_2f35a742",
@@ -469,6 +487,24 @@
       "side": 1,
       "message": "Actually, it _can_ happen for some weird reason. Wrote it more defensively.",
       "parentUuid": "fe13eee0_2f35a742",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "adabfc7b_03ab8696",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-16T18:48:26Z",
+      "side": 1,
+      "message": "Is this perhaps a symptom of something else that\u0027s wrong? If optional fields are expressed as actual fields, then this seems odd. Maybe expand further in the comment, because in the next condition, x.f is optional too AFAICS.",
+      "parentUuid": "d4f45c77_dddc0db3",
       "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

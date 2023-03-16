@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8e9e087_e1262dd6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-16T11:59:11Z",
+      "side": 1,
+      "message": "s/if a subfield/when a subfield/",
+      "revId": "05134a22eb0b6cec988d65c107d7ebc3ef6ddb1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "432e9952_462dd2b8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-16T11:59:11Z",
+      "side": 1,
+      "message": "once optional fields are introduced it will no longer be sufficient",
+      "revId": "05134a22eb0b6cec988d65c107d7ebc3ef6ddb1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0eb77e44_80602d8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-16T11:59:11Z",
+      "side": 1,
+      "message": "LGTM, but it seems a bit odd that there are no tests that show behaviour changes. If this change is deliberately a no-op, maybe say so in the CL description?",
+      "revId": "05134a22eb0b6cec988d65c107d7ebc3ef6ddb1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2909c91f_f8df422d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-16T11:59:11Z",
+      "side": 1,
+      "message": "Why not \"hasVoidArc\" ?",
+      "revId": "05134a22eb0b6cec988d65c107d7ebc3ef6ddb1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

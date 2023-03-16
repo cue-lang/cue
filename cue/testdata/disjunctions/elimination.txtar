@@ -378,16 +378,48 @@ issue2209: full: {
 
 -- out/eval/stats --
 Leaks:  0
-Freed:  2035
-Reused: 2015
+Freed:  1843
+Reused: 1823
 Allocs: 20
-Retain: 67
+Retain: 55
 
-Unifications: 1066
-Conjuncts:    2882
-Disjuncts:    2102
+Unifications: 956
+Conjuncts:    2620
+Disjuncts:    1898
 -- out/eval --
-(struct){
+Errors:
+issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+    ./issue2209full.cue:41:7
+    ./issue2209full.cue:46:13
+    ./issue2209full.cue:65:10
+    ./issue2209full.cue:81:16
+    ./issue2209full.cue:85:13
+    ./issue2209full.cue:105:20
+issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+    ./issue2209full.cue:41:7
+    ./issue2209full.cue:46:13
+    ./issue2209full.cue:53:16
+    ./issue2209full.cue:69:4
+    ./issue2209full.cue:70:13
+    ./issue2209full.cue:90:13
+issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+    ./issue2209full.cue:41:7
+    ./issue2209full.cue:46:13
+    ./issue2209full.cue:65:10
+    ./issue2209full.cue:81:16
+    ./issue2209full.cue:90:13
+    ./issue2209full.cue:103:20
+issue2209.simplified.t3.BAZ: undefined field: y:
+    ./issue2209full.cue:33:9
+issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+    ./issue2209full.cue:75:25
+
+Result:
+(_|_){
+  // [eval]
   disambiguateClosed: (struct){
     b: (#struct){ |((#struct){
         x: (bool){ true }
@@ -795,8 +827,10 @@ Disjuncts:    2102
       }
     }
   }
-  issue2209: (struct){
-    simplified: (struct){
+  issue2209: (_|_){
+    // [eval]
+    simplified: (_|_){
+      // [eval]
       t1: (struct){
         #SpecFoo: (#struct){
           foo: (#struct){
@@ -814,7 +848,6 @@ Disjuncts:    2102
           }
         }
         out: (struct){ |((struct){
-            minBar: (int){ 1 }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -823,7 +856,7 @@ Disjuncts:    2102
             nullFoo: (null){ null }
             minFoo: (int){ int }
           }, (struct){
-            minBar: (int){ 1 }
+            minBar: (int){ int }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -831,7 +864,6 @@ Disjuncts:    2102
             }
             nullFoo: (null){ null }
           }, (struct){
-            minBar: (int){ 1 }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -840,7 +872,7 @@ Disjuncts:    2102
             nullBar: (null){ null }
             minFoo: (int){ int }
           }, (struct){
-            minBar: (int){ 1 }
+            minBar: (int){ int }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
@@ -849,140 +881,60 @@ Disjuncts:    2102
             nullBar: (null){ null }
           }) }
       }
-      t2: (struct){ |((struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
+      t2: (_|_){
+        // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+        //     ./issue2209full.cue:22:17
+        BAZ: (_|_){
+          // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+          //     ./issue2209full.cue:22:17
+        }
+        #SpecFoo: (#struct){
+          foo: (#struct){
+          }
+        }
+        #SpecBar: (#struct){
+          bar: (#struct){
+            x: (int){ 1 }
+          }
+        }
+        spec: (#struct){ |(*(#struct){
+            bar: (struct){
+            }
             foo: (#struct){
             }
-          }
-          #SpecBar: (#struct){
+          }, (#struct){
             bar: (#struct){
               x: (int){ 1 }
             }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          BAZ: (int){ 1 }
-          #SpecFoo: (#struct){
-            foo: (#struct){
-            }
-          }
-          #SpecBar: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          spec: (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }
-          b2: (int){ int }
-        }) }
-      t3: (struct){ |((struct){
-          #A: (#struct){
+          }) }
+        b2: (int){ int }
+      }
+      t3: (_|_){
+        // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
+        //     ./issue2209full.cue:33:9
+        #A: (#struct){
+          v: (int){ 1 }
+        }
+        BAZ: (_|_){
+          // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
+          //     ./issue2209full.cue:33:9
+        }
+        S: (#struct){ |(*(#struct){
+            x: (int){ 1 }
             v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
+          }, (#struct){
             x: (int){ 1 }
             y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          f1: (int){ int }
-          b2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-          f2: (int){ int }
-        }, (struct){
-          #A: (#struct){
-            v: (int){ 1 }
-          }
-          BAZ: (int){ 1 }
-          S: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          #B: (#struct){
-            x: (int){ 1 }
-            y: (int){ 1 }
-          }
-          b2: (int){ int }
-        }) }
+          }) }
+        #B: (#struct){
+          x: (int){ 1 }
+          y: (int){ 1 }
+        }
+        b2: (int){ int }
+      }
     }
-    full: (struct){
+    full: (_|_){
+      // [eval]
       Foo: (#struct){
         spec: (#struct){
           foo: (#struct){
@@ -999,37 +951,116 @@ Disjuncts:    2102
               maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
             }) }
           _X: (#struct){
-            spec: (#struct){
-              foo: (#struct){
-                min: (int){ |(*(int){ 10 }, (int){ int }) }
-                max: (int){ |(*(int){ 20 }, (int){ int }) }
-              }
-            }
+            spec: (#struct){ |(*(#struct){
+                foo: (#struct){
+                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+                }
+              }, (#struct){
+                foo: (#struct){
+                }
+                bar: (#struct){
+                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+                }
+              }) }
           }
         }
       }
-      Bar: (#struct){
+      Bar: (_|_){
+        // [eval]
         spec: (#struct){
           bar: (#struct){
             min: (int){ |(*(int){ 30 }, (int){ int }) }
             max: (int){ |(*(int){ 40 }, (int){ int }) }
           }
         }
-        resource: (#struct){
-          spec: (#struct){ |(*(#struct){
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            }, (#struct){
-              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
-              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
-            }) }
-          _X: (#struct){
-            spec: (#struct){
-              bar: (#struct){
-                min: (int){ |(*(int){ 30 }, (int){ int }) }
-                max: (int){ |(*(int){ 40 }, (int){ int }) }
-              }
+        resource: (_|_){
+          // [eval]
+          spec: (_|_){
+            // [eval] issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+            // issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+            // issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+            //     ./issue2209full.cue:41:7
+            //     ./issue2209full.cue:46:13
+            //     ./issue2209full.cue:65:10
+            //     ./issue2209full.cue:81:16
+            //     ./issue2209full.cue:85:13
+            //     ./issue2209full.cue:105:20
+            // issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+            //     ./issue2209full.cue:41:7
+            //     ./issue2209full.cue:46:13
+            //     ./issue2209full.cue:53:16
+            //     ./issue2209full.cue:69:4
+            //     ./issue2209full.cue:70:13
+            //     ./issue2209full.cue:90:13
+            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+            //     ./issue2209full.cue:41:7
+            //     ./issue2209full.cue:46:13
+            //     ./issue2209full.cue:65:10
+            //     ./issue2209full.cue:81:16
+            //     ./issue2209full.cue:90:13
+            //     ./issue2209full.cue:103:20
+            // issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+            //     ./issue2209full.cue:75:25
+            minFoo: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+              //     ./issue2209full.cue:41:7
+              //     ./issue2209full.cue:46:13
+              //     ./issue2209full.cue:53:16
+              //     ./issue2209full.cue:69:4
+              //     ./issue2209full.cue:70:13
+              //     ./issue2209full.cue:90:13
+              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+              //     ./issue2209full.cue:41:7
+              //     ./issue2209full.cue:46:13
+              //     ./issue2209full.cue:65:10
+              //     ./issue2209full.cue:81:16
+              //     ./issue2209full.cue:90:13
+              //     ./issue2209full.cue:103:20
             }
+            maxFoo: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.maxFoo: 2 errors in empty disjunction:
+              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
+              //     ./issue2209full.cue:41:7
+              //     ./issue2209full.cue:46:13
+              //     ./issue2209full.cue:54:16
+              //     ./issue2209full.cue:69:4
+              //     ./issue2209full.cue:71:13
+              //     ./issue2209full.cue:91:13
+              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and int (mismatched types null and int):
+              //     ./issue2209full.cue:41:7
+              //     ./issue2209full.cue:46:13
+              //     ./issue2209full.cue:65:10
+              //     ./issue2209full.cue:81:16
+              //     ./issue2209full.cue:91:13
+              //     ./issue2209full.cue:104:20
+            }
+            minBar: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+              //     ./issue2209full.cue:75:25
+            }
+            maxBar: (_|_){
+              // [eval] issue2209.full.Bar.resource.spec.maxBar: undefined field: max:
+              //     ./issue2209full.cue:76:25
+            }
+          }
+          _X: (#struct){
+            spec: (#struct){ |(*(#struct){
+                bar: (#struct){
+                }
+                foo: (#struct){
+                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+                }
+              }, (#struct){
+                bar: (#struct){
+                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+                }
+              }) }
           }
         }
       }

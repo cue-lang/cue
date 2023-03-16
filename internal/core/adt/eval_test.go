@@ -106,6 +106,103 @@ func TestX(t *testing.T) {
 module: "mod.test"
 
 -- in.cue --
+a: {
+	metrics: #Metric
+	#Metric: {
+		#IDSource | {}
+		#TargetAverage | {}
+	}
+
+	metrics: {
+		id:  "foo"
+		avg: 60
+	}
+
+	#IDSource: id: string
+	#TargetAverage: avg: number
+}
+
+b: {
+	Foo: #Obj & {spec: foo: {}}
+	Bar: #Obj & {spec: bar: {}}
+
+	#Obj: X={
+		spec: *#SpecFoo | #SpecBar
+
+		out: #Out & {
+			_Xspec: X.spec
+			if _Xspec.foo != _|_ {
+				minFoo: _Xspec.foo.min
+			}
+			if _Xspec.bar != _|_ {
+				minBar: _Xspec.bar.min
+			}
+		}
+	}
+
+	#SpecFoo: foo: min: int | *10
+	#SpecBar: bar: min: int | *20
+
+	#Out: {
+		{minFoo: int} | {minBar: int}
+
+		*{nullFoo: null} | {nullBar: null}
+	}
+}
+
+c: {
+	#FormFoo: fooID: string
+	#FormBar: barID: string
+	#Form: { #FormFoo | #FormBar }
+
+	data: {fooID: "123"}
+	out1: #Form & data
+	out2: #Form & out1
+}
+
+// m: {
+// 	if: {
+// 		[
+// 			if [#str][0] != "" {
+// 				let prefix = "baar"
+// 				prefix
+// 			},
+// 			"foo"
+// 		][0]
+// 		#str: "refs/tags/v*"
+// 	}
+// 	if: number | string
+// }
+
+// m: {
+// 	if: {
+// 		[
+// 			if [#str][0] != "" {
+// 				let prefix = "baar"
+// 				prefix
+// 			},
+// 			"foo"
+// 		][0]
+// 		#str: "refs/tags/v*"
+// 	}
+// 	if: number | string
+// }
+
+// merged: t2: p2: {
+// 	x: { #in2: c1: string, #in2.c1 } &
+// 		{ #in2: c1: "V 1",  _ }
+// }
+
+// m2: {
+// 	if: { [][0] }
+// 	if: number | string
+// }
+
+// _fn: {
+// 	in: _
+// 	out: in.f
+// }
+// fnExists: _fn != _|_
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {

@@ -67,15 +67,15 @@ _#protectedBranchPatterns: [core.#defaultBranch, core.#releaseBranchPattern]
 // and for suffix patterns it uses "startsWith".
 // See https://docs.github.com/en/actions/learn-github-actions/expressions.
 _#matchPattern: {
-	variable: string
-	pattern:  string
-	expr:     [
-			if strings.HasSuffix(pattern, "*") {
-			let prefix = strings.TrimSuffix(pattern, "*")
-			"startsWith(\(variable), '\(prefix)')"
+	#variable: string
+	#pattern:  string
+	[
+		if strings.HasSuffix(#pattern, "*") {
+			let prefix = strings.TrimSuffix(#pattern, "*")
+			"startsWith(\(#variable), '\(prefix)')"
 		},
 		{
-			"\(variable) == '\(pattern)'"
+			"\(#variable) == '\(#pattern)'"
 		},
 	][0]
 }
@@ -85,10 +85,10 @@ _#matchPattern: {
 // It would be nice to use the "contains" builtin for simplicity,
 // but array literals are not yet supported in expressions.
 _#isProtectedBranch: "(" + strings.Join([ for branch in _#protectedBranchPatterns {
-	(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+	_#matchPattern & {#variable: "github.ref", #pattern: "refs/heads/\(branch)", _}
 }], " || ") + ")"
 
-_#isReleaseTag: (_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(core.#releaseTagPattern)"}).expr
+_#isReleaseTag: _#matchPattern & {#variable: "github.ref", #pattern: "refs/tags/\(core.#releaseTagPattern)", _}
 
 _#linuxMachine:   "ubuntu-20.04"
 _#macosMachine:   "macos-11"

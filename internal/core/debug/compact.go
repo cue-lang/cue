@@ -136,9 +136,7 @@ func (w *compactPrinter) node(n adt.Node) {
 
 	case *adt.DynamicField:
 		w.node(x.Key)
-		if x.IsOptional() {
-			w.string("?")
-		}
+		w.string(x.ArcType.TokenString())
 		w.string(":")
 		w.node(x.Value)
 

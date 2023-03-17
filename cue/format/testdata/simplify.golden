@@ -30,7 +30,9 @@ quux: 5
 // Issue #294
 "\("x")": "x"
 
-(x): "foo"
+(x):  "foo"
+(x)?: "foo"
+(x)!: "foo"
 
 a: {
 	foo: 2

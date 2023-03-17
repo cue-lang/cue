@@ -467,6 +467,7 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		srcKey := x.Key
 
 		f := &ast.Field{}
+		internal.SetConstraint(f, x.ArcType.Token())
 
 		v, _ := e.ctx.Evaluate(env, x.Key)
 

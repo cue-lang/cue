@@ -88,5 +88,5 @@ Disjuncts:    11
     foo?: (string){ "bar" }
   }
   g1: (int){ 1 }
-  g2: (int){ 2 }
+  g2?: (int){ 2 }
 }

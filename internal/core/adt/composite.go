@@ -859,6 +859,8 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	case *BulkOptionalField, *Ellipsis:
 	case *Field:
 		v.UpdateArcType(f.ArcType)
+	case *DynamicField:
+		v.UpdateArcType(f.ArcType)
 	default:
 		v.ArcType = ArcMember
 	}

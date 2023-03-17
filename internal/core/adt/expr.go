@@ -252,13 +252,11 @@ func (x *Ellipsis) Source() ast.Node {
 //	"\(expr)": expr
 //	(expr): expr
 type DynamicField struct {
-	Src   *ast.Field
-	Key   Expr
-	Value Expr
-}
+	Src *ast.Field
 
-func (x *DynamicField) IsOptional() bool {
-	return x.Src.Optional != token.NoPos
+	ArcType ArcType
+	Key     Expr
+	Value   Expr
 }
 
 func (x *DynamicField) Source() ast.Node {

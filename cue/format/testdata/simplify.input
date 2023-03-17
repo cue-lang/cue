@@ -33,6 +33,8 @@ a:
 "\("x")": "x"
 
 (x): "foo"
+(x)?: "foo"
+(x)!: "foo"
 
 a: {
     [string]: _

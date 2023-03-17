@@ -2079,7 +2079,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 		if f.IsInt() {
 			n.addErr(ctx.NewPosf(pos(d.field.Key), "integer fields not supported"))
 		}
-		n.insertField(f, ArcMember, MakeConjunct(d.env, d.field, d.id))
+		n.insertField(f, d.field.ArcType, MakeConjunct(d.env, d.field, d.id))
 	}
 
 	progress = k < len(n.dynamicFields)

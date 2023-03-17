@@ -63,16 +63,23 @@ noCycleError: {
 	foo: baz: {}
 }
 
+-- constraints.cue --
+constraints: {
+	t1: "foo"
+	t2: "bar"
+	(t1)?: (t2)!: 3
+}
+
 -- out/eval/stats --
 Leaks:  2
-Freed:  54
-Reused: 47
+Freed:  59
+Reused: 52
 Allocs: 9
-Retain: 9
+Retain: 11
 
-Unifications: 56
-Conjuncts:    73
-Disjuncts:    61
+Unifications: 61
+Conjuncts:    79
+Disjuncts:    66
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:
@@ -83,6 +90,13 @@ invalid interpolation: conflicting values 2 and 1:
 Result:
 (_|_){
   // [eval]
+  constraints: (struct){
+    t1: (string){ "foo" }
+    t2: (string){ "bar" }
+    foo?: (struct){
+      bar!: (int){ 3 }
+    }
+  }
   a: (string){ "foo" }
   e: (int){ 2 }
   b: (string){ "bar" }
@@ -178,6 +192,16 @@ Result:
   }
 }
 -- out/compile --
+--- constraints.cue
+{
+  constraints: {
+    t1: "foo"
+    t2: "bar"
+    〈0;t1〉?: {
+      〈1;t2〉!: 3
+    }
+  }
+}
 --- in.cue
 {
   a: "foo"

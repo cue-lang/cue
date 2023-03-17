@@ -511,6 +511,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e7874256_dd89888c",
+        "filename": "internal/core/subsume/vertex.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-17T16:17:00Z",
+      "side": 1,
+      "message": "It only happens in the context of other packages, like OpenAPI. I can imagine this happens when a Vertex is composed of parts of various evaluated Vertices, where optional fields are not copied, but still present in the StructInfos.\n\nThe old optional fields won\u0027t be fully gone until the eval rewrite, so I\u0027m fine that this is the way it is for now.",
+      "parentUuid": "adabfc7b_03ab8696",
+      "revId": "0f32f2e2ed8801bfd8cc01a4c734c6038828a919",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a48f39de_0e7516ba",
         "filename": "internal/core/subsume/vertex.go",
         "patchSetId": 1

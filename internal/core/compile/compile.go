@@ -626,17 +626,23 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			}
 
 		case *ast.ParenExpr:
+			t, _ := internal.ConstraintToken(x)
+
 			return &adt.DynamicField{
-				Src:   x,
-				Key:   c.expr(l),
-				Value: value,
+				Src:     x,
+				Key:     c.expr(l),
+				ArcType: adt.ConstraintFromToken(t),
+				Value:   value,
 			}
 
 		case *ast.Interpolation:
+			t, _ := internal.ConstraintToken(x)
+
 			return &adt.DynamicField{
-				Src:   x,
-				Key:   c.expr(l),
-				Value: value,
+				Src:     x,
+				Key:     c.expr(l),
+				ArcType: adt.ConstraintFromToken(t),
+				Value:   value,
 			}
 		}
 

@@ -69,7 +69,7 @@ jobs:
           		exit 1
           	fi
           done
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
         run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
         name: Generate

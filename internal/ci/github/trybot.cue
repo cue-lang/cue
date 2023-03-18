@@ -69,7 +69,7 @@ trybot: _base.#bashWorkflow & {
 					if: _#isLatestLinux
 				},
 				json.#step & {
-					if:  _#isProtectedBranch
+					if: "\(_#isProtectedBranch) || \(_#isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,

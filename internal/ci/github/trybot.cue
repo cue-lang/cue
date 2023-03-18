@@ -35,7 +35,9 @@ trybot: _base.#bashWorkflow & {
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", _base.#testDefaultBranch], _#protectedBranchPatterns]) // do not run PR branches
+			// Note that this does not include any "trybot/..." pattern,
+			// because we run trybot workflows for CLs via pull requests.
+			branches: list.Concat([[_base.#testDefaultBranch], _#protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [core.#releaseTagPattern]
 		}
 		pull_request: {}

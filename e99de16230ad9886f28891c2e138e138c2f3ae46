@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7af263db_6c085c2a",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-18T18:12:28Z",
+      "side": 1,
+      "message": "I would add a brief comment here referencing the #restoreGitModTimes comment.",
+      "revId": "e99de16230ad9886f28891c2e138e138c2f3ae46",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

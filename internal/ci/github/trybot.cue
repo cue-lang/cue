@@ -51,8 +51,12 @@ trybot: _base.#bashWorkflow & {
 					// testing the PR's HEAD merged on top of the master branch.
 					// For consistency with Gerrit, avoid that merge commit entirely.
 					// This doesn't affect "push" builds, which never used merge commits.
-					with: ref: "${{ github.event.pull_request.head.sha }}"
+					with: {
+						ref: "${{ github.event.pull_request.head.sha }}"
+						"fetch-depth": 0 // see #restoreGitModTimes's doc
+					}
 				},
+				_base.#restoreGitModTimes,
 				_base.#installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations

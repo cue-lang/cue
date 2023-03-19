@@ -39,6 +39,10 @@ trybot: _base.#bashWorkflow & {
 			"tags-ignore": [core.#releaseTagPattern]
 		}
 		pull_request: {}
+		schedule: [
+			// Run at 0215 each day, 15 mins after the cache eviction
+			{cron: "15 2 * * *"},
+		]
 	}
 
 	jobs: {

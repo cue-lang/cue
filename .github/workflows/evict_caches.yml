@@ -1,0 +1,30 @@
+# Code generated internal/ci/ci_tool.cue; DO NOT EDIT.
+
+name: Evict caches
+"on":
+  push:
+    branches:
+      - ci/test
+  schedule:
+    - cron: 0 2 * * *
+jobs:
+  test:
+    if: ${{github.repository == 'cue-lang/cue'}}
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: |-
+          for i in cue-lang/cue cue-lang/cue-trybot
+          do
+          	echo "Evicting caches for $i"
+          	cd $(mktemp -d)
+          	git init
+          	git remote add origin $i
+          	echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
+          	for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
+          	do
+          		gh action-cache delete --confirm $j
+          	done
+          done

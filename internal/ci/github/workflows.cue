@@ -147,6 +147,21 @@ _#cachePre: [
 	},
 	json.#step & {
 		uses: "actions/cache@v3"
+		if:   _#isProtectedBranch
+		with: {
+			path: strings.Join(_#cacheDirs, "\n")
+
+			// GitHub actions caches are immutable. Therefore, use a key which is
+			// unique, but allow the restore to fallback to the most recent cache.
+			// The result is then saved under the new key which will benefit the
+			// next build
+			key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
+			"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
+		}
+	},
+	json.#step & {
+		uses: "actions/cache/restore@v3"
+		if:   "! \(_#isProtectedBranch)"
 		with: {
 			path: strings.Join(_#cacheDirs, "\n")
 

@@ -20,7 +20,7 @@ jobs:
           - 1.18.x
           - 1.19.x
         os:
-          - ubuntu-20.04
+          - ubuntu-22.04
           - macos-11
           - windows-2022
     runs-on: ${{ matrix.os }}
@@ -63,7 +63,7 @@ jobs:
             ${{ steps.go-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Early git and code sanity checks
         run: |-
           # Ensure the recent commit messages have Signed-off-by headers.
@@ -80,23 +80,23 @@ jobs:
           		exit 1
           	fi
           done
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         run: echo CUE_LONG=true >> $GITHUB_ENV
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Generate
         run: go generate ./...
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || !(matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || !(matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Test
         run: go test ./...
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Test with -race
         run: go test -race ./...
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Check
         run: go vet ./...
       - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Pull this commit through the proxy on master
         run: |-
           v=$(git rev-parse HEAD)

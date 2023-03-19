@@ -90,7 +90,7 @@ _#isProtectedBranch: "(" + strings.Join([ for branch in _#protectedBranchPattern
 
 _#isReleaseTag: (_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(core.#releaseTagPattern)"}).expr
 
-_#linuxMachine:   "ubuntu-20.04"
+_#linuxMachine:   "ubuntu-22.04"
 _#macosMachine:   "macos-11"
 _#windowsMachine: "windows-2022"
 

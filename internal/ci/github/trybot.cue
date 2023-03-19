@@ -46,17 +46,7 @@ trybot: _base.#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
-				_base.#checkoutCode & {
-					// "pull_request" builds will by default use a merge commit,
-					// testing the PR's HEAD merged on top of the master branch.
-					// For consistency with Gerrit, avoid that merge commit entirely.
-					// This doesn't affect "push" builds, which never used merge commits.
-					with: {
-						ref: "${{ github.event.pull_request.head.sha }}"
-						"fetch-depth": 0 // see #restoreGitModTimes's doc
-					}
-				},
-				_base.#restoreGitModTimes,
+				for v in _base.#checkoutCode {v},
 				_base.#installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
@@ -69,7 +59,7 @@ trybot: _base.#bashWorkflow & {
 					if: _#isLatestLinux
 				},
 				json.#step & {
-					if: "\(_#isProtectedBranch) || \(_#isLatestLinux)"
+					if:  "\(_#isProtectedBranch) || \(_#isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,

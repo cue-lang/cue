@@ -44,9 +44,7 @@ release: _base.#bashWorkflow & {
 		"runs-on": _#linuxMachine
 		if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
 		steps: [
-			_base.#checkoutCode & {
-				with: "fetch-depth": 0
-			},
+			for v in _base.#checkoutCode {v},
 			_base.#installGo & {
 				with: "go-version": core.#pinnedReleaseGo
 			},

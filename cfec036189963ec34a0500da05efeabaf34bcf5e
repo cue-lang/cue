@@ -68,6 +68,24 @@
       "message": "please don\u0027t merge yet, testing in ci/test.",
       "revId": "cfec036189963ec34a0500da05efeabaf34bcf5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95380fc4_47b8e3f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-19T12:03:49Z",
+      "side": 1,
+      "message": "success! all testscript packages are now cached: https://github.com/cue-lang/cue/actions/runs/4460511726/jobs/7833699652\n\none package remains stubborn, encoding/gocode, but that\u0027s likely a separate problem and fix for another CL.",
+      "parentUuid": "12db4096_a895c447",
+      "revId": "cfec036189963ec34a0500da05efeabaf34bcf5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

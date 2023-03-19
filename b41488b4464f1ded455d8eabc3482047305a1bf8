@@ -50,6 +50,24 @@
       "message": "Is there ever a time we _don\u0027t_ want to fix the modified times? Seems generally useful given that we are very Go based.\n\nI\u0027d suggest repurposing base.#checkoutCode as follows therefore:\n\n```\n#checkoutCode: [\n    #checkoutCode: json.#step \u0026 {\n            name: \"Checkout code\"\n            uses: \"actions/checkout@v3\"\n\n            // \"pull_request\" builds will by default use a merge commit,\n            // testing the PR\u0027s HEAD merged on top of the master branch.\n            // For consistency with Gerrit, avoid that merge commit entirely.\n            // This doesn\u0027t affect \"push\" builds, which never used merge commits.\n            with: {\n                    ref: \"${{ github.event.pull_request.head.sha }}\"\n                    \"fetch-depth\": 0 // see the docs below\n            }\n    },\n\n    // Restore modified times to work around https://go.dev/issues/58571,\n    // as otherwise we would get lots of unnecessary Go test cache misses.\n    // Note that this action requires actions/checkout to use a fetch-depth of 0.\n    // Since this is a third-party action which runs arbitrary code,\n    // we pin a commit hash for v2 to be in control of code updates.\n    // Also note that git-restore-mtime does not update all directories,\n    // per the bug report at https://github.com/MestreLion/git-tools/issues/47,\n    // so we first reset all directory timestamps to a static time as a fallback.\n    // TODO(mvdan): May be unnecessary once the Go bug above is fixed.\n    json.#step \u0026 {\n            name: \"Reset git directory modification times\"\n            run:  \"find . -not -path \u0027*/.*\u0027 -type d -exec touch -t 202211302355 {} \u0027;\u0027\"\n    },\n    json.#step \u0026 {\n            name: \"Restore git file modification times\"\n            uses: \"chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe\"\n    },\n]\n```\n\n\nThen \"splat\" it as follows to use it:\n\n```\nfor v in _base.#checkoutCode {v},\n```",
       "revId": "b41488b4464f1ded455d8eabc3482047305a1bf8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d821593_88ddbe79",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-19T11:46:50Z",
+      "side": 1,
+      "message": "You\u0027re right. I initially put it inline because I thought we don\u0027t always need to do the extra work, e.g. in the release workflow which has no caching. But then again, the full clone and extra steps don\u0027t even add up to an extra second, so there\u0027s no need to worry.\n\nThe release workflow was already doing a full clone anyway, so that\u0027s a small win.\n\nDone.",
+      "parentUuid": "67d8df9b_31cd47d1",
+      "revId": "b41488b4464f1ded455d8eabc3482047305a1bf8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

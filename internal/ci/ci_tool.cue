@@ -33,13 +33,12 @@ import (
 
 _goos: string @tag(os,var=os)
 
-// genworkflows regenerates the GitHub workflow Yaml definitions.
+// gen.workflows regenerates the GitHub workflow Yaml definitions.
 //
 // See internal/ci/gen.go for details on how this step fits into the sequence
 // of generating our CI workflow definitions, and updating various txtar tests
 // with files from that process.
-command: genworkflows: {
-
+command: gen: workflows: {
 	for w in github.workflows {
 		"\(w.file)": file.Create & {
 			_dir:     path.FromSlash("../../.github/workflows", path.Unix)
@@ -50,7 +49,7 @@ command: genworkflows: {
 	}
 }
 
-command: gencodereviewcfg: file.Create & {
+command: gen: codereviewcfg: file.Create & {
 	_dir:     path.FromSlash("../../", path.Unix)
 	filename: path.Join([_dir, "codereview.cfg"], _goos)
 	let res = core.#toCodeReviewCfg & {#input: core.codeReview, _}

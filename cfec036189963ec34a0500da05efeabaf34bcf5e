@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5878de2b_ed1442cb",
+        "filename": ".github/workflows/release.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-19T11:56:28Z",
+      "side": 1,
+      "message": "yes. per the docs, which I tweaked slightly in PS2:\n\n```\n// \"pull_request\" builds will by default use a merge commit,\n// testing the PR\u0027s HEAD merged on top of the master branch.\n// For consistency with Gerrit, avoid that merge commit entirely.\n// This doesn\u0027t affect builds by other events like \"push\",\n// since github.event.pull_request is unset so ref remains empty.\n```\n\nit already works for push events in the trybot workflow, so I\u0027m pretty sure it will work for push events in the release workflow.",
+      "parentUuid": "640f6dcf_2edf888b",
+      "revId": "cfec036189963ec34a0500da05efeabaf34bcf5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "8831c422_bc870f49",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -31,6 +49,23 @@
       "writtenOn": "2023-03-19T11:51:58Z",
       "side": 1,
       "message": "LGTM with one question/comment",
+      "revId": "cfec036189963ec34a0500da05efeabaf34bcf5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12db4096_a895c447",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-19T11:56:28Z",
+      "side": 1,
+      "message": "please don\u0027t merge yet, testing in ci/test.",
       "revId": "cfec036189963ec34a0500da05efeabaf34bcf5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

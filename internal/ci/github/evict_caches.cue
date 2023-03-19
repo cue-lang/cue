@@ -44,9 +44,6 @@ evict_caches: _base.#bashWorkflow & {
 	name: "Evict caches"
 
 	on: {
-		push: {
-			branches: [_base.#testDefaultBranch]
-		}
 		schedule: [
 			// We will run a schedule trybot build 15 minutes later to repopulate the caches
 			{cron: "0 2 * * *"},

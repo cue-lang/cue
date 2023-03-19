@@ -53,6 +53,10 @@ workflows: [
 		file:   "push_tip_to_trybot.yml"
 		schema: push_tip_to_trybot
 	},
+	{
+		file:   "evict_caches.yml"
+		schema: evict_caches
+	},
 ]
 
 // _#protectedBranchPatterns is a list of glob patterns to match the protected

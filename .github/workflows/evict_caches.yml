@@ -1,0 +1,38 @@
+# Code generated internal/ci/ci_tool.cue; DO NOT EDIT.
+
+name: Evict caches
+"on":
+  push:
+    branches:
+      - ci/test
+  schedule:
+    - cron: 0 2 * * *
+jobs:
+  test:
+    if: ${{github.repository == 'cue-lang/cue'}}
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - uses: actions/setup-go@v4
+        with:
+          go-version: "1.20"
+      - run: |-
+          set -eux
+
+          echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
+          CGO_ENABLED=0 gh extension install actions/gh-actions-cache
+          go version -m $(which gh)
+          go version -m /home/runner/.local/share/gh/extensions/gh-actions-cache/gh-actions-cache
+          for i in https://github.com/cue-lang/cue https://github.com/cue-lang/cue-trybot
+          do
+          	echo "Evicting caches for $i"
+          	cd $(mktemp -d)
+          	git init
+          	git remote add origin $i
+          	for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
+          	do
+          		gh actions-cache delete --confirm $j
+          	done
+          done

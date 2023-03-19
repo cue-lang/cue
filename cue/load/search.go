@@ -17,7 +17,7 @@ package load
 import (
 	// TODO: remove this usage
 
-	"os"
+	"io/fs"
 	"path"
 	"path/filepath"
 	"strings"
@@ -153,8 +153,8 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 	// TODO(legacy): remove
 	pkgDir2 := filepath.Join(root, "pkg")
 
-	_ = c.fileSystem.walk(root, func(path string, fi os.FileInfo, err errors.Error) errors.Error {
-		if err != nil || !fi.IsDir() {
+	_ = c.fileSystem.walk(root, func(path string, entry fs.DirEntry, err errors.Error) errors.Error {
+		if err != nil || !entry.IsDir() {
 			return nil
 		}
 		if path == pkgDir || path == pkgDir2 {

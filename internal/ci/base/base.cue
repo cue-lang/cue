@@ -53,16 +53,6 @@ import (
 	uses: "actions/checkout@v3"
 }
 
-// #restoreGitModTimes works around test cache misses due to https://go.dev/issues/58571.
-// Note that this action requires actions/checkout to use a fetch-depth of 0.
-// Since this is a third-party action which runs arbitrary code,
-// we pin a commit hash for v2 to be in control of code updates.
-// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
-#restoreGitModTimes: json.#step & {
-	name: "Restore git file modification times"
-	uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
-}
-
 #earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
 	run: """

@@ -2,9 +2,6 @@
 
 name: Evict caches
 "on":
-  push:
-    branches:
-      - ci/test
   schedule:
     - cron: 0 2 * * *
 jobs:

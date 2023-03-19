@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "640f6dcf_2edf888b",
+        "filename": ".github/workflows/release.yml",
+        "patchSetId": 2
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-19T11:51:58Z",
+      "side": 1,
+      "message": "Is this right for the release flow?",
+      "revId": "cfec036189963ec34a0500da05efeabaf34bcf5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8831c422_bc870f49",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-19T11:51:58Z",
+      "side": 1,
+      "message": "LGTM with one question/comment",
+      "revId": "cfec036189963ec34a0500da05efeabaf34bcf5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

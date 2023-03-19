@@ -17,7 +17,7 @@ package load
 import (
 	"bytes"
 	"io"
-	"io/ioutil"
+	iofs "io/fs"
 	"os"
 	"path/filepath"
 	"sort"
@@ -165,10 +165,10 @@ func hasSubdir(root, dir string) (rel string, ok bool) {
 	return filepath.ToSlash(dir[len(root):]), true
 }
 
-func (fs *fileSystem) readDir(path string) ([]os.FileInfo, errors.Error) {
+func (fs *fileSystem) readDir(path string) ([]iofs.DirEntry, errors.Error) {
 	path = fs.makeAbs(path)
 	m := fs.getDir(path, false)
-	items, err := ioutil.ReadDir(path)
+	items, err := os.ReadDir(path)
 	if err != nil {
 		if !os.IsNotExist(err) || m == nil {
 			return nil, errors.Wrapf(err, token.NoPos, "readDir")
@@ -179,12 +179,12 @@ func (fs *fileSystem) readDir(path string) ([]os.FileInfo, errors.Error) {
 		for i, fi := range items {
 			done[fi.Name()] = true
 			if o := m[fi.Name()]; o != nil {
-				items[i] = o
+				items[i] = iofs.FileInfoToDirEntry(o)
 			}
 		}
 		for _, o := range m {
 			if !done[o.Name()] {
-				items = append(items, o)
+				items = append(items, iofs.FileInfoToDirEntry(o))
 			}
 		}
 		sort.Slice(items, func(i, j int) bool {
@@ -229,7 +229,7 @@ func (fs *fileSystem) lstat(path string) (os.FileInfo, errors.Error) {
 func (fs *fileSystem) openFile(path string) (io.ReadCloser, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
-		return ioutil.NopCloser(bytes.NewReader(fi.contents)), nil
+		return io.NopCloser(bytes.NewReader(fi.contents)), nil
 	}
 
 	f, err := os.Open(path)
@@ -241,16 +241,17 @@ func (fs *fileSystem) openFile(path string) (io.ReadCloser, errors.Error) {
 
 var skipDir = errors.Newf(token.NoPos, "skip directory")
 
-type walkFunc func(path string, info os.FileInfo, err errors.Error) errors.Error
+type walkFunc func(path string, entry iofs.DirEntry, err errors.Error) errors.Error
 
 func (fs *fileSystem) walk(root string, f walkFunc) error {
-	fi, err := fs.lstat(root)
+	info, err := fs.lstat(root)
+	entry := iofs.FileInfoToDirEntry(info)
 	if err != nil {
-		err = f(root, fi, err)
-	} else if !fi.IsDir() {
+		err = f(root, entry, err)
+	} else if !info.IsDir() {
 		return errors.Newf(token.NoPos, "path %q is not a directory", root)
 	} else {
-		err = fs.walkRec(root, fi, f)
+		err = fs.walkRec(root, entry, f)
 	}
 	if err == skipDir {
 		return nil
@@ -259,13 +260,13 @@ func (fs *fileSystem) walk(root string, f walkFunc) error {
 
 }
 
-func (fs *fileSystem) walkRec(path string, info os.FileInfo, f walkFunc) errors.Error {
-	if !info.IsDir() {
-		return f(path, info, nil)
+func (fs *fileSystem) walkRec(path string, entry iofs.DirEntry, f walkFunc) errors.Error {
+	if !entry.IsDir() {
+		return f(path, entry, nil)
 	}
 
 	dir, err := fs.readDir(path)
-	err1 := f(path, info, err)
+	err1 := f(path, entry, err)
 
 	// If err != nil, walk can't walk into this directory.
 	// err1 != nil means walkFn want walk to skip this directory or stop walking.
@@ -278,11 +279,11 @@ func (fs *fileSystem) walkRec(path string, info os.FileInfo, f walkFunc) errors.
 		return err1
 	}
 
-	for _, info := range dir {
-		filename := fs.joinPath(path, info.Name())
-		err = fs.walkRec(filename, info, f)
+	for _, entry := range dir {
+		filename := fs.joinPath(path, entry.Name())
+		err = fs.walkRec(filename, entry, f)
 		if err != nil {
-			if !info.IsDir() || err != skipDir {
+			if !entry.IsDir() || err != skipDir {
 				return err
 			}
 		}

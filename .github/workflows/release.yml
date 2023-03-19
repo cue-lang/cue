@@ -25,7 +25,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
       - name: Reset git directory modification times
-        run: find . -not -path '*/.*' -type d -exec touch -t 202211302355 {} ';'
+        run: touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
       - name: Install Go

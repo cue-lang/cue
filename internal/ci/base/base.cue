@@ -74,7 +74,7 @@ import (
 	// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
 	json.#step & {
 		name: "Reset git directory modification times"
-		run:  "find . -not -path '*/.*' -type d -exec touch -t 202211302355 {} ';'"
+		run:  "touch -t 202211302355 $(find * -type d)"
 	},
 	json.#step & {
 		name: "Restore git file modification times"

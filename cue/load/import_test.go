@@ -33,7 +33,11 @@ func testMod(dir string) string {
 }
 
 func getInst(pkg, cwd string) (*build.Instance, error) {
-	c, _ := (&Config{Dir: cwd}).complete()
+	// Set ModuleRoot to cwd as well; otherwise we walk the parent directories
+	// all the way to the root of the git repository, causing Go's test caching
+	// to never kick in, as the .git directory almost always changes.
+	// Moreover, it's extra work that isn't useful to the tests.
+	c, _ := (&Config{ModuleRoot: cwd, Dir: cwd}).complete()
 	l := loader{cfg: c}
 	inst := l.newRelInstance(token.NoPos, pkg, c.Package)
 	p := l.importPkg(token.NoPos, inst)[0]

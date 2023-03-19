@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c44a4dde_0b9dcb58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-19T23:04:55Z",
+      "side": 1,
+      "message": "I had comments about `go version -m` and `setup-go`, but those are gone in PS3 :) ",
+      "revId": "6c7eef969da636b8cf57d2f02ec4de777af39f20",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

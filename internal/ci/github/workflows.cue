@@ -145,17 +145,27 @@ _#cachePre: [
 		id:   "go-cache-dir"
 		run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
 	},
-	json.#step & {
-		uses: "actions/cache@v3"
-		with: {
-			path: strings.Join(_#cacheDirs, "\n")
+	for _, v in [
+		{
+			if:   _#isProtectedBranch
+			uses: "actions/cache@v3"
+		},
+		{
+			if:   "! \(_#isProtectedBranch)"
+			uses: "actions/cache/restore@v3"
+		},
+	] {
+		v & json.#step & {
+			with: {
+				path: strings.Join(_#cacheDirs, "\n")
 
-			// GitHub actions caches are immutable. Therefore, use a key which is
-			// unique, but allow the restore to fallback to the most recent cache.
-			// The result is then saved under the new key which will benefit the
-			// next build
-			key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
-			"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
+				// GitHub actions caches are immutable. Therefore, use a key which is
+				// unique, but allow the restore to fallback to the most recent cache.
+				// The result is then saved under the new key which will benefit the
+				// next build
+				key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
+				"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
+			}
 		}
 	},
 ]

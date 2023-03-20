@@ -14,6 +14,6 @@ jobs:
     if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Trigger tip.cuelang.org deploy
-        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Rebuild tip against ${GITHUB_SHA}\",\"client_payload\":{\"type\":\"rebuild_tip\"}}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
+        run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -f --request POST --data-binary "{\"event_type\":\"Rebuild tip against ${GITHUB_SHA}\",\"client_payload\":{\"type\":\"rebuild_tip\"}}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
       - name: Trigger unity build
-        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Check against ${GITHUB_SHA}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'
+        run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -f --request POST --data-binary "{\"event_type\":\"Check against ${GITHUB_SHA}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'

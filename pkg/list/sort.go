@@ -112,7 +112,7 @@ func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
 		Parent:    v.V.Parent,
 		Conjuncts: v.V.Conjuncts,
 	}
-	ctx.Unify(n, adt.Conjuncts)
+	n.CompleteArcs(ctx)
 
 	s = valueSorter{
 		a:    list,

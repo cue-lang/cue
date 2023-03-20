@@ -320,7 +320,7 @@ func (c *OpContext) Env(upCount int32) *Environment {
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
 	e := c.e.up(upCount)
-	c.Unify(e.Vertex, Partial)
+	c.unify(e.Vertex, Partial)
 	return e.Vertex
 }
 
@@ -779,7 +779,7 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 		}
 
 		if v.isUndefined() || state > v.status {
-			c.Unify(v, state)
+			c.unify(v, state)
 		}
 
 		return v
@@ -859,9 +859,9 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 		// hasAllConjuncts, but that are finalized too early, get conjuncts
 		// processed beforehand.
 		if state > a.status {
-			c.Unify(a, state)
+			c.unify(a, state)
 		} else if a.state != nil {
-			c.Unify(a, Partial)
+			c.unify(a, Partial)
 		}
 
 		if a.IsConstraint() {
@@ -1329,6 +1329,6 @@ func (c *OpContext) NewList(values ...Value) *Vertex {
 	for _, x := range values {
 		list.Elems = append(list.Elems, x)
 	}
-	c.Unify(v, Finalized)
+	v.Finalize(c)
 	return v
 }

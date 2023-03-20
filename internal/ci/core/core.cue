@@ -26,7 +26,7 @@ _#URLPath: {
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-#pinnedReleaseGo: "1.19.3"
+#pinnedReleaseGo: "1.19.7"
 
 #goreleaserVersion: "v1.13.1"
 

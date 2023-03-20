@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "180b87ae_d211de0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-20T22:22:35Z",
+      "side": 1,
+      "message": "I actually wonder if the pinning helps us; it might just be busy work. Since Go binaries report what Go version was used to build them, they are already reproducible in that way since the Go version can be figured out easily.\n\nOne reason to pin could be that building the same release twice on CI should result in the same binaries, but I don\u0027t think we\u0027ll ever be doing that. If one release is bad, we are going to need a new git tag.",
+      "revId": "30b9e82232b7edeb5c3d8eb418277ed253f0ee6e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

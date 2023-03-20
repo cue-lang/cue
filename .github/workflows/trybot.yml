@@ -11,8 +11,6 @@ name: TryBot
     tags-ignore:
       - v*
   pull_request: {}
-  schedule:
-    - cron: 15 2 * * *
 jobs:
   test:
     strategy:

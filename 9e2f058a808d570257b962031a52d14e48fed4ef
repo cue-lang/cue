@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b2c70f0_a85d4071",
+        "filename": "internal/ci/base/base.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-20T10:31:43Z",
+      "side": 1,
+      "message": "hm; why don\u0027t newlines get in the way here?",
+      "revId": "9e2f058a808d570257b962031a52d14e48fed4ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

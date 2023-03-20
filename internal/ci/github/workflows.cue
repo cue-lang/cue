@@ -34,6 +34,8 @@ workflows: [
 		// gerritstatusupdater is running for this repository.
 		//
 		// This name is also used by the CI badge in the top-level README.
+		//
+		// This name is also used in the evict_caches lookups.
 		file:   "trybot.yml"
 		schema: trybot
 	},

@@ -687,7 +687,7 @@ func linkParent(p *parent, node, arc *adt.Vertex) *parent {
 func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 	// TODO: right now this is necessary because disjunctions do not have
 	// populated conjuncts.
-	if v, ok := v.(*adt.Vertex); ok && v.Status() >= adt.Partial {
+	if v, ok := v.(*adt.Vertex); ok && !v.IsUnprocessed() {
 		return Value{base.idx, v, nil}
 	}
 	n := &adt.Vertex{Label: base.v.Label}

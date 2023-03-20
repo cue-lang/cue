@@ -51,7 +51,7 @@ func Make(ctx *adt.OpContext, v adt.Value) cue.Value {
 func MakeError(r *runtime.Runtime, err errors.Error) cue.Value {
 	b := &adt.Bottom{Err: err}
 	node := &adt.Vertex{BaseValue: b}
-	node.UpdateStatus(adt.Finalized)
+	node.ForceDone()
 	node.AddConjunct(adt.MakeRootConjunct(nil, b))
 	return (*cue.Context)(r).Encode(node)
 }

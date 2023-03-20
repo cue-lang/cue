@@ -450,7 +450,7 @@ func (n *nodeContext) makeError() {
 		Code: code,
 		Err:  n.disjunctError(),
 	}
-	n.node.SetValue(n.ctx, Finalized, b)
+	n.node.SetValue(n.ctx, b)
 }
 
 func mode(hasDefault, marked bool) defaultMode {

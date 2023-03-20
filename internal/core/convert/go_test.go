@@ -263,6 +263,11 @@ func TestX(t *testing.T) {
 	t.Error(got)
 }
 
+type EmbeddedObj struct {
+	B int `json:"b"`
+	D string
+}
+
 func TestConvertType(t *testing.T) {
 	testCases := []struct {
 		goTyp interface{}
@@ -369,7 +374,31 @@ func TestConvertType(t *testing.T) {
 	}, {
 		time.Now, // a function
 		"_|_(unsupported Go type (func() time.Time))",
-	}}
+	}, {
+		struct {
+			A           string `json:"a"`
+			EmbeddedObj `json:",inline"`
+			C           string `json:"c,omitempty"`
+		}{},
+		`{
+  a: string
+  {
+    b: ((int & >=-9223372036854775808) & <=9223372036854775807)
+    D: string
+  }
+  c?: string
+}`}, {
+		struct {
+			A string
+			*EmbeddedObj
+		}{},
+		`{
+  A: string
+  (*null|{
+    b: ((int & >=-9223372036854775808) & <=9223372036854775807)
+    D: string
+  })
+}`}}
 
 	r := runtime.New()
 

@@ -406,7 +406,7 @@ func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, st
 
 		v := n.node
 		for c := d.leaf; c.parent != nil; c = c.parent {
-			v.UpdateArcType(c.arcType)
+			v.updateArcType(c.arcType)
 			v = c.arc
 		}
 

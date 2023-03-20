@@ -121,8 +121,10 @@ let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
 
 	name: string
 	run:  #"""
-			\#(#curl) -H "Content-Type: application/json" -u \#(#botGitHubUser):${{ secrets.\#(#botGitHubUserTokenSecretsKey) }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(_#repositoryPath)/dispatches
+			\#(#curlGitHubAPI) --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(_#repositoryPath)/dispatches
 			"""#
 }
 
-#curl: "curl -f -s"
+#curlGitHubAPI: #"""
+	curl -f -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(#botGitHubUserTokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
+	"""#

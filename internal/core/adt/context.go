@@ -520,9 +520,9 @@ func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 	return err
 }
 
-// Concrete returns the concrete value of x after evaluating it.
+// concrete returns the concrete value of x after evaluating it.
 // msg is used to mention the context in which an error occurred, if any.
-func (c *OpContext) Concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
+func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
 
 	w, complete := c.Evaluate(env, x)
 

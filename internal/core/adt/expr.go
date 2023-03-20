@@ -1277,8 +1277,8 @@ func (x *BinaryExpr) evaluate(c *OpContext, state vertexStatus) Value {
 		}
 	}
 
-	left, _ := c.Concrete(env, x.X, x.Op)
-	right, _ := c.Concrete(env, x.Y, x.Op)
+	left, _ := c.concrete(env, x.X, x.Op)
+	right, _ := c.concrete(env, x.Y, x.Op)
 
 	if err := CombineErrors(x.Src, left, right); err != nil {
 		return err

@@ -320,7 +320,7 @@ func (c *OpContext) Env(upCount int32) *Environment {
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
 	e := c.e.up(upCount)
-	c.unify(e.Vertex, Partial)
+	c.unify(e.Vertex, partial)
 	return e.Vertex
 }
 
@@ -467,10 +467,10 @@ func (c *OpContext) PopArc(saved *Vertex) {
 // Should only be used to insert Conjuncts. TODO: perhaps only return Conjuncts
 // and error.
 func (c *OpContext) Resolve(x Conjunct, r Resolver) (*Vertex, *Bottom) {
-	return c.resolveState(x, r, Finalized)
+	return c.resolveState(x, r, finalized)
 }
 
-func (c *OpContext) resolveState(x Conjunct, r Resolver, state VertexStatus) (*Vertex, *Bottom) {
+func (c *OpContext) resolveState(x Conjunct, r Resolver, state vertexStatus) (*Vertex, *Bottom) {
 	s := c.PushConjunct(x)
 
 	arc := r.resolve(c, state)
@@ -493,7 +493,7 @@ func (c *OpContext) resolveState(x Conjunct, r Resolver, state VertexStatus) (*V
 func (c *OpContext) Lookup(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	s := c.PushState(env, r.Source())
 
-	arc := r.resolve(c, Partial)
+	arc := r.resolve(c, partial)
 
 	err := c.PopState(s)
 
@@ -586,7 +586,7 @@ func (c *OpContext) getDefault(v Value) (result Value, ok bool) {
 func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	val := c.evalState(x, Partial)
+	val := c.evalState(x, partial)
 
 	complete = true
 
@@ -612,7 +612,7 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 	return val, true
 }
 
-func (c *OpContext) evaluateRec(v Conjunct, state VertexStatus) Value {
+func (c *OpContext) evaluateRec(v Conjunct, state vertexStatus) Value {
 	x := v.Expr()
 	s := c.PushConjunct(v)
 
@@ -633,7 +633,7 @@ func (c *OpContext) evaluateRec(v Conjunct, state VertexStatus) Value {
 // value evaluates expression v within the current environment. The result may
 // be nil if the result is incomplete. value leaves errors untouched to that
 // they can be collected by the caller.
-func (c *OpContext) value(x Expr, state VertexStatus) (result Value) {
+func (c *OpContext) value(x Expr, state vertexStatus) (result Value) {
 	v := c.evalState(x, state)
 
 	v, _ = c.getDefault(v)
@@ -641,7 +641,7 @@ func (c *OpContext) value(x Expr, state VertexStatus) (result Value) {
 	return v
 }
 
-func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
+func (c *OpContext) evalState(v Expr, state vertexStatus) (result Value) {
 	savedSrc := c.src
 	c.src = v.Source()
 	err := c.errs
@@ -655,7 +655,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 				switch b.Code {
 				case IncompleteError:
 				case CycleError:
-					if state == Partial {
+					if state == partial {
 						break
 					}
 					fallthrough
@@ -728,7 +728,7 @@ func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
 // unifyNode returns a possibly partially evaluated node value.
 //
 // TODO: maybe return *Vertex, *Bottom
-func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
+func (c *OpContext) unifyNode(v Expr, state vertexStatus) (result Value) {
 	savedSrc := c.src
 	c.src = v.Source()
 	err := c.errs
@@ -790,7 +790,7 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 	}
 }
 
-func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStatus) *Vertex {
+func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state vertexStatus) *Vertex {
 	if l == InvalidLabel || x == nil {
 		// TODO: is it possible to have an invalid label here? Maybe through the
 		// API?
@@ -861,7 +861,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 		if state > a.status {
 			c.unify(a, state)
 		} else if a.state != nil {
-			c.unify(a, Partial)
+			c.unify(a, partial)
 		}
 
 		if a.IsConstraint() {
@@ -872,7 +872,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 			label := l.SelectorString(c.Runtime)
 			c.AddBottom(&Bottom{
 				Code:      code,
-				Permanent: x.status >= Conjuncts,
+				Permanent: x.status >= conjuncts,
 				Err: c.NewPosf(pos,
 					"cannot reference optional field: %s", label),
 			})
@@ -889,11 +889,11 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 		// As long as we have incomplete information, we cannot mark the
 		// inability to look up a field as "final", as it may resolve down the
 		// line.
-		permanent := x.status > Conjuncts
+		permanent := x.status > conjuncts
 		if m, _ := x.BaseValue.(*ListMarker); m != nil && !m.IsOpen {
 			permanent = true
 		}
-		if (state > Partial || permanent) && !x.Accept(c, l) {
+		if (state > partial || permanent) && !x.Accept(c, l) {
 			code = 0
 		} else if hasCycle {
 			code = CycleError
@@ -965,7 +965,7 @@ func pos(x Node) token.Pos {
 	return x.Source().Pos()
 }
 
-func (c *OpContext) node(orig Node, x Expr, scalar bool, state VertexStatus) *Vertex {
+func (c *OpContext) node(orig Node, x Expr, scalar bool, state vertexStatus) *Vertex {
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
 	v := c.unifyNode(x, state)

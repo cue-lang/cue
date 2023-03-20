@@ -71,7 +71,7 @@ func (x *StructLit) HasOptional() bool {
 
 func (x *StructLit) Source() ast.Node { return x.Src }
 
-func (x *StructLit) evaluate(c *OpContext, state VertexStatus) Value {
+func (x *StructLit) evaluate(c *OpContext, state vertexStatus) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
@@ -285,7 +285,7 @@ func (x *ListLit) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ListLit) evaluate(c *OpContext, state VertexStatus) Value {
+func (x *ListLit) evaluate(c *OpContext, state vertexStatus) Value {
 	e := c.Env(0)
 	v := &Vertex{
 		Parent:    e.Vertex,
@@ -454,8 +454,8 @@ func (x *BoundExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *BoundExpr) evaluate(ctx *OpContext, state VertexStatus) Value {
-	v := ctx.value(x.Expr, Partial)
+func (x *BoundExpr) evaluate(ctx *OpContext, state vertexStatus) Value {
+	v := ctx.value(x.Expr, partial)
 	if isError(v) {
 		return v
 	}
@@ -683,7 +683,7 @@ func (x *NodeLink) Kind() Kind {
 }
 func (x *NodeLink) Source() ast.Node { return x.Node.Source() }
 
-func (x *NodeLink) resolve(c *OpContext, state VertexStatus) *Vertex {
+func (x *NodeLink) resolve(c *OpContext, state vertexStatus) *Vertex {
 	return x.Node
 }
 
@@ -703,7 +703,7 @@ func (x *FieldReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *FieldReference) resolve(c *OpContext, state VertexStatus) *Vertex {
+func (x *FieldReference) resolve(c *OpContext, state vertexStatus) *Vertex {
 	n := c.relNode(x.UpCount)
 	pos := pos(x)
 	return c.lookup(n, pos, x.Label, state)
@@ -727,7 +727,7 @@ func (x *ValueReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ValueReference) resolve(c *OpContext, state VertexStatus) *Vertex {
+func (x *ValueReference) resolve(c *OpContext, state vertexStatus) *Vertex {
 	if x.UpCount == 0 {
 		return c.vertex
 	}
@@ -754,7 +754,7 @@ func (x *LabelReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LabelReference) evaluate(ctx *OpContext, state VertexStatus) Value {
+func (x *LabelReference) evaluate(ctx *OpContext, state vertexStatus) Value {
 	label := ctx.relLabel(x.UpCount)
 	if label == 0 {
 		// There is no label. This may happen if a LabelReference is evaluated
@@ -798,15 +798,15 @@ func (x *DynamicReference) Source() ast.Node {
 func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Feature {
 	env = env.up(x.UpCount)
 	frame := ctx.PushState(env, x.Src)
-	v := ctx.value(x.Label, Partial)
+	v := ctx.value(x.Label, partial)
 	ctx.PopState(frame)
 	return ctx.Label(x, v)
 }
 
-func (x *DynamicReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
+func (x *DynamicReference) resolve(ctx *OpContext, state vertexStatus) *Vertex {
 	e := ctx.Env(x.UpCount)
 	frame := ctx.PushState(e, x.Src)
-	v := ctx.value(x.Label, Partial)
+	v := ctx.value(x.Label, partial)
 	ctx.PopState(frame)
 	f := ctx.Label(x.Label, v)
 	return ctx.lookup(e.Vertex, pos(x), f, state)
@@ -832,7 +832,7 @@ func (x *ImportReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ImportReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
+func (x *ImportReference) resolve(ctx *OpContext, state vertexStatus) *Vertex {
 	path := x.ImportPath.StringValue(ctx)
 	v := ctx.Runtime.LoadImport(path)
 	if v == nil {
@@ -860,14 +860,14 @@ func (x *LetReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
+func (x *LetReference) resolve(ctx *OpContext, state vertexStatus) *Vertex {
 	e := ctx.Env(x.UpCount)
 	n := e.Vertex
 
 	// No need to Unify n, as Let references can only result from evaluating
 	// an experssion within n, in which case evaluation must already have
 	// started.
-	if n.status < Evaluating {
+	if n.status < evaluating {
 		panic("unexpected node state < Evaluating")
 	}
 
@@ -963,16 +963,16 @@ func (x *SelectorExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
+func (x *SelectorExpr) resolve(c *OpContext, state vertexStatus) *Vertex {
 	// TODO: the node should really be evaluated as AllConjunctsDone, but the
 	// order of evaluation is slightly off, causing too much to be evaluated.
 	// This may especially result in incorrect results when using embedded
 	// scalars.
-	n := c.node(x, x.X, x.Sel.IsRegular(), Partial)
+	n := c.node(x, x.X, x.Sel.IsRegular(), partial)
 	if n == emptyNode {
 		return n
 	}
-	if n.status == Partial {
+	if n.status == partial {
 		if b := n.state.incompleteErrors(false); b != nil && b.Code < CycleError {
 			c.AddBottom(b)
 			return n
@@ -1001,18 +1001,18 @@ func (x *IndexExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
+func (x *IndexExpr) resolve(ctx *OpContext, state vertexStatus) *Vertex {
 	// TODO: support byte index.
 	// TODO: the node should really be evaluated as AllConjunctsDone, but the
 	// order of evaluation is slightly off, causing too much to be evaluated.
 	// This may especially result in incorrect results when using embedded
 	// scalars.
-	n := ctx.node(x, x.X, true, Partial)
-	i := ctx.value(x.Index, Partial)
+	n := ctx.node(x, x.X, true, partial)
+	i := ctx.value(x.Index, partial)
 	if n == emptyNode {
 		return n
 	}
-	if n.status == Partial {
+	if n.status == partial {
 		if b := n.state.incompleteErrors(false); b != nil && b.Code < CycleError {
 			ctx.AddBottom(b)
 			return n
@@ -1044,10 +1044,10 @@ func (x *SliceExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
+func (x *SliceExpr) evaluate(c *OpContext, state vertexStatus) Value {
 	// TODO: strides
 
-	v := c.value(x.X, Partial)
+	v := c.value(x.X, partial)
 	const as = "slice index"
 
 	switch v := v.(type) {
@@ -1064,10 +1064,10 @@ func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
 			hi = uint64(len(v.Arcs))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo, Partial), as)
+			lo = c.uint64(c.value(x.Lo, partial), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi, Partial), as)
+			hi = c.uint64(c.value(x.Hi, partial), as)
 			if hi > uint64(len(v.Arcs)) {
 				return c.NewErrf("index %d out of range", hi)
 			}
@@ -1088,7 +1088,7 @@ func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
 			arc.Label = label
 			n.Arcs = append(n.Arcs, &arc)
 		}
-		n.status = Finalized
+		n.status = finalized
 		return n
 
 	case *Bytes:
@@ -1097,10 +1097,10 @@ func (x *SliceExpr) evaluate(c *OpContext, state VertexStatus) Value {
 			hi = uint64(len(v.B))
 		)
 		if x.Lo != nil {
-			lo = c.uint64(c.value(x.Lo, Partial), as)
+			lo = c.uint64(c.value(x.Lo, partial), as)
 		}
 		if x.Hi != nil {
-			hi = c.uint64(c.value(x.Hi, Partial), as)
+			hi = c.uint64(c.value(x.Hi, partial), as)
 			if hi > uint64(len(v.B)) {
 				return c.NewErrf("index %d out of range", hi)
 			}
@@ -1133,10 +1133,10 @@ func (x *Interpolation) Source() ast.Node {
 	return x.Src
 }
 
-func (x *Interpolation) evaluate(c *OpContext, state VertexStatus) Value {
+func (x *Interpolation) evaluate(c *OpContext, state vertexStatus) Value {
 	buf := bytes.Buffer{}
 	for _, e := range x.Parts {
-		v := c.value(e, Partial)
+		v := c.value(e, partial)
 		if x.K == BytesKind {
 			buf.Write(c.ToBytes(v))
 		} else {
@@ -1175,11 +1175,11 @@ func (x *UnaryExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *UnaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
+func (x *UnaryExpr) evaluate(c *OpContext, state vertexStatus) Value {
 	if !c.concreteIsPossible(x.Op, x.X) {
 		return nil
 	}
-	v := c.value(x.X, Partial)
+	v := c.value(x.X, partial)
 	if isError(v) {
 		return v
 	}
@@ -1236,7 +1236,7 @@ func (x *BinaryExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *BinaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
+func (x *BinaryExpr) evaluate(c *OpContext, state vertexStatus) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		v := &Vertex{
@@ -1291,7 +1291,7 @@ func (x *BinaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	return BinOp(c, x.Op, left, right)
 }
 
-func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, state VertexStatus) (r Value) {
+func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, state vertexStatus) (r Value) {
 	s := c.PushState(env, src)
 
 	match := op != EqualOp // non-error case
@@ -1323,7 +1323,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 			return nil
 
 		case IncompleteError:
-			c.evalState(x, Finalized)
+			c.evalState(x, finalized)
 
 			// We have a nonmonotonic use of a failure. Referenced fields should
 			// not be added anymore.
@@ -1342,7 +1342,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 		//
 		v.Finalize(c)
 
-		if v.status == EvaluatingArcs {
+		if v.status == evaluatingArcs {
 			// We have a cycle, which may be an error. Cycle errors may occur
 			// in chains that are themselves not a cycle. It suffices to check
 			// for non-monotonic results at the end for this particular path.
@@ -1372,7 +1372,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 		}
 
 	default:
-		if v.Kind().IsAnyOf(CompositKind) && v.Concreteness() > Concrete && state < Conjuncts {
+		if v.Kind().IsAnyOf(CompositKind) && v.Concreteness() > Concrete && state < conjuncts {
 			c.PopState(s)
 			c.AddBottom(cycle)
 			return nil
@@ -1388,7 +1388,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 			match = op == EqualOp
 		}
 
-		c.evalState(x, Partial)
+		c.evalState(x, partial)
 	}
 
 	c.PopState(s)
@@ -1435,8 +1435,8 @@ func (x *CallExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *CallExpr) evaluate(c *OpContext, state VertexStatus) Value {
-	fun := c.value(x.Fun, Partial)
+func (x *CallExpr) evaluate(c *OpContext, state vertexStatus) Value {
+	fun := c.value(x.Fun, partial)
 	var b *Builtin
 	switch f := fun.(type) {
 	case *Builtin:
@@ -1496,7 +1496,7 @@ func (x *CallExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	if result == nil {
 		return nil
 	}
-	return c.evalState(result, Partial)
+	return c.evalState(result, partial)
 }
 
 // A Builtin is a value representing a native function call.
@@ -1738,7 +1738,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *DisjunctionExpr) evaluate(c *OpContext, state VertexStatus) Value {
+func (x *DisjunctionExpr) evaluate(c *OpContext, state vertexStatus) Value {
 	e := c.Env(0)
 	v := &Vertex{Conjuncts: []Conjunct{{e, x, c.ci}}}
 	v.Finalize(c) // TODO: also partial okay?
@@ -1862,8 +1862,8 @@ func (x *ForClause) Source() ast.Node {
 
 func (x *ForClause) yield(s *compState) {
 	c := s.ctx
-	n := c.node(x, x.Src, true, Conjuncts)
-	if n.status == Evaluating && !n.LockArcs {
+	n := c.node(x, x.Src, true, conjuncts)
+	if n.status == evaluating && !n.LockArcs {
 		c.AddBottom(&Bottom{
 			Code:     CycleError,
 			ForCycle: true,
@@ -1881,7 +1881,7 @@ func (x *ForClause) yield(s *compState) {
 			continue
 		}
 
-		c.unify(a, Partial)
+		c.unify(a, partial)
 		if a.ArcType == ArcVoid {
 			continue
 		}
@@ -1892,7 +1892,7 @@ func (x *ForClause) yield(s *compState) {
 			// Using Finalized here ensures that no nodeContext is allocated,
 			// preventing a leak, as this "helper" struct bypasses normal
 			// processing, eluding the deallocation step.
-			status:    Finalized,
+			status:    finalized,
 			IsDynamic: true,
 		}
 

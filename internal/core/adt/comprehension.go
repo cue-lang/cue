@@ -268,7 +268,7 @@ type compState struct {
 	comp  *Comprehension
 	i     int
 	f     YieldFunc
-	state VertexStatus
+	state vertexStatus
 }
 
 // yield evaluates a Comprehension within the given Environment and and calls
@@ -277,7 +277,7 @@ func (c *OpContext) yield(
 	node *Vertex, // errors are associated with this node
 	env *Environment, // env for field for which this yield is called
 	comp *Comprehension,
-	state VertexStatus,
+	state vertexStatus,
 	f YieldFunc, // called for every result
 ) *Bottom {
 	s := &compState{
@@ -323,7 +323,7 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // injectComprehension evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, state VertexStatus) (progress bool) {
+func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, state vertexStatus) (progress bool) {
 	ctx := n.ctx
 
 	all := *allP

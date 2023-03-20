@@ -126,7 +126,7 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 		// Save and restore errors to ensure that only relevant errors are
 		// associated with the cash.
 		err := c.errs
-		v = c.evalState(x, Partial) // TODO: should this be Finalized?
+		v = c.evalState(x, partial) // TODO: should this be finalized?
 		c.e, c.src = env, src
 		c.errs = err
 		if b, ok := v.(*Bottom); !ok || !b.IsIncomplete() {
@@ -164,7 +164,7 @@ type Vertex struct {
 	// TODO: move the following status fields to nodeContext.
 
 	// status indicates the evaluation progress of this vertex.
-	status VertexStatus
+	status vertexStatus
 
 	// hasAllConjuncts indicates that the set of conjuncts is complete.
 	// This is the case if the conjuncts of all its ancestors have been
@@ -353,71 +353,77 @@ func (s *StructInfo) useForAccept() bool {
 	return true
 }
 
-// VertexStatus indicates the evaluation progress of a Vertex.
-type VertexStatus int8
+// vertexStatus indicates the evaluation progress of a Vertex.
+type vertexStatus int8
 
 const (
-	// Unprocessed indicates a Vertex has not been processed before.
+	// unprocessed indicates a Vertex has not been processed before.
 	// Value must be nil.
-	Unprocessed VertexStatus = iota
+	unprocessed vertexStatus = iota
 
-	// Evaluating means that the current Vertex is being evaluated. If this is
+	// evaluating means that the current Vertex is being evaluated. If this is
 	// encountered it indicates a reference cycle. Value must be nil.
-	Evaluating
+	evaluating
 
-	// Partial indicates that the result was only partially evaluated. It will
+	// partial indicates that the result was only partially evaluated. It will
 	// need to be fully evaluated to get a complete results.
 	//
 	// TODO: this currently requires a renewed computation. Cache the
 	// nodeContext to allow reusing the computations done so far.
-	Partial
+	partial
 
-	// Conjuncts is the state reached when all conjuncts have been evaluated,
+	// conjuncts is the state reached when all conjuncts have been evaluated,
 	// but without recursively processing arcs.
-	Conjuncts
+	conjuncts
 
-	// EvaluatingArcs indicates that the arcs of the Vertex are currently being
+	// evaluatingArcs indicates that the arcs of the Vertex are currently being
 	// evaluated. If this is encountered it indicates a structural cycle.
 	// Value does not have to be nil
-	EvaluatingArcs
+	evaluatingArcs
 
-	// Finalized means that this node is fully evaluated and that the results
+	// finalized means that this node is fully evaluated and that the results
 	// are save to use without further consideration.
-	Finalized
+	finalized
 )
 
-func (s VertexStatus) String() string {
+func (s vertexStatus) String() string {
 	switch s {
-	case Unprocessed:
+	case unprocessed:
 		return "unprocessed"
-	case Evaluating:
+	case evaluating:
 		return "evaluating"
-	case Partial:
+	case partial:
 		return "partial"
-	case Conjuncts:
+	case conjuncts:
 		return "conjuncts"
-	case EvaluatingArcs:
+	case evaluatingArcs:
 		return "evaluatingArcs"
-	case Finalized:
+	case finalized:
 		return "finalized"
 	default:
 		return "unknown"
 	}
 }
 
-func (v *Vertex) Status() VertexStatus {
+func (v *Vertex) Status() vertexStatus {
 	return v.status
 }
 
 // ForceDone prevents v from being evaluated.
 func (v *Vertex) ForceDone() {
-	v.updateStatus(Finalized)
+	v.updateStatus(finalized)
 }
 
-func (v *Vertex) updateStatus(s VertexStatus) {
+// IsUnprocessed reports whether v is unprocessed.
+func (v *Vertex) IsUnprocessed() bool {
+	return v.status == unprocessed
+}
+
+func (v *Vertex) updateStatus(s vertexStatus) {
 	Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
 
-	if s == Finalized && v.BaseValue == nil {
+	if s == finalized && v.BaseValue == nil {
+		// TODO: for debugging.
 		// panic("not finalized")
 	}
 	v.status = s
@@ -490,7 +496,7 @@ func (v *Vertex) ToDataSingle() *Vertex {
 	w := *v
 	w.isData = true
 	w.state = nil
-	w.status = Finalized
+	w.status = finalized
 	return &w
 }
 
@@ -508,7 +514,7 @@ func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	}
 	w := *v
 	w.state = nil
-	w.status = Finalized
+	w.status = finalized
 
 	w.BaseValue = toDataAll(ctx, w.BaseValue)
 	w.Arcs = arcs
@@ -585,13 +591,13 @@ func (v *Vertex) Finalize(c *OpContext) {
 	// case the caller did not handle existing errors in the context.
 	err := c.errs
 	c.errs = nil
-	c.unify(v, Finalized)
+	c.unify(v, finalized)
 	c.errs = err
 }
 
 // CompleteArcs ensures the set of arcs has been computed.
 func (v *Vertex) CompleteArcs(c *OpContext) {
-	c.unify(v, Conjuncts)
+	c.unify(v, conjuncts)
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
@@ -600,10 +606,10 @@ func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
 
 // SetValue sets the value of a node.
 func (v *Vertex) SetValue(ctx *OpContext, value BaseValue) *Bottom {
-	return v.setValue(ctx, Finalized, value)
+	return v.setValue(ctx, finalized, value)
 }
 
-func (v *Vertex) setValue(ctx *OpContext, state VertexStatus, value BaseValue) *Bottom {
+func (v *Vertex) setValue(ctx *OpContext, state vertexStatus, value BaseValue) *Bottom {
 	v.BaseValue = value
 	v.updateStatus(state)
 	return nil
@@ -616,7 +622,7 @@ func ToVertex(v Value) *Vertex {
 		return x
 	default:
 		n := &Vertex{
-			status:    Finalized,
+			status:    finalized,
 			BaseValue: x,
 		}
 		n.AddConjunct(MakeRootConjunct(nil, v))
@@ -674,7 +680,7 @@ func (v *Vertex) Kind() Kind {
 	// not known at this time what the type is.
 	switch {
 	// TODO: using this line would be more stable.
-	// case v.status != Finalized && v.state != nil:
+	// case v.status != finalized && v.state != nil:
 	case v.state != nil:
 		return v.state.kind
 	case v.BaseValue == nil:
@@ -906,7 +912,7 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 // it, whilst doing the same for any vertices on the notify list, recursively.
 func (n *nodeContext) addConjunctDynamic(c Conjunct) {
 	n.node.Conjuncts = append(n.node.Conjuncts, c)
-	n.addExprConjunct(c, Partial)
+	n.addExprConjunct(c, partial)
 	n.notifyConjunct(c)
 
 }

@@ -16,6 +16,24 @@
       "message": "did you forget to commit base.cue? the new curl definition doesn\u0027t appear to exist",
       "revId": "2a240765c30b46f41ff3f25c2537cbf769041f7c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e709a60_7d63e9b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-20T10:01:13Z",
+      "side": 1,
+      "message": "but also, why didn\u0027t CI catch that via `go generate ./...`?",
+      "parentUuid": "f713ce23_d605a157",
+      "revId": "2a240765c30b46f41ff3f25c2537cbf769041f7c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

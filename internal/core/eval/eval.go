@@ -28,7 +28,7 @@ func Evaluate(r adt.Runtime, v *adt.Vertex) {
 		Runtime: r,
 		Format:  format,
 	})
-	c.Unify(v, adt.Finalized)
+	v.Finalize(c)
 }
 
 func New(r adt.Runtime) *Unifier {
@@ -38,10 +38,6 @@ func New(r adt.Runtime) *Unifier {
 type Unifier struct {
 	r adt.Runtime
 	e *adt.OpContext
-}
-
-func (e *Unifier) Unify(ctx *adt.OpContext, v *adt.Vertex, state adt.VertexStatus) {
-	e.e.Unify(v, state)
 }
 
 func (e *Unifier) Stats() *stats.Counts {

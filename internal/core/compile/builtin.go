@@ -143,7 +143,7 @@ var orBuiltin = &adt.Builtin{
 			&adt.DisjunctionExpr{Values: d, HasDefaults: false},
 			closeInfo,
 		))
-		c.Unify(v, adt.Conjuncts)
+		v.CompleteArcs(c)
 		return v
 	},
 }

@@ -196,7 +196,7 @@ y: conflicting values 4 and 2:
 			if err != nil {
 				t.Fatal(err)
 			}
-			ctx.Unify(v, adt.Finalized)
+			v.Finalize(ctx)
 			if tc.lookup != "" {
 				v = v.Lookup(adt.MakeIdentLabel(r, tc.lookup, "main"))
 			}

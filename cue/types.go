@@ -2368,8 +2368,8 @@ func (v Value) Expr() (Op, []Value) {
 					b.AddConjunct(adt.MakeRootConjunct(env, disjunct.Val))
 
 					ctx := eval.NewContext(v.idx, nil)
-					ctx.Unify(&a, adt.Finalized)
-					ctx.Unify(&b, adt.Finalized)
+					a.Finalize(ctx)
+					b.Finalize(ctx)
 					if allowed(ctx, v.v, &b) != nil {
 						// Everything subsumed bottom
 						continue outerExpr

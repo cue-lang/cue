@@ -207,7 +207,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 			n := &Vertex{}
 			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
-			c.Unify(n, Conjuncts)
+			n.CompleteArcs(c)
 
 			return n
 		}
@@ -269,7 +269,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 			n := &Vertex{}
 			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
-			c.Unify(n, Conjuncts)
+			n.CompleteArcs(c)
 
 			return n
 		}

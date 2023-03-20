@@ -15,6 +15,8 @@
 package github
 
 import (
+	"strings"
+
 	"cuelang.org/go/internal/ci/core"
 
 	"github.com/SchemaStore/schemastore/src/schemas/json"
@@ -45,7 +47,6 @@ evict_caches: _base.#bashWorkflow & {
 
 	on: {
 		schedule: [
-			// We will run a schedule trybot build 15 minutes later to repopulate the caches
 			{cron: "0 2 * * *"},
 		]
 	}
@@ -57,6 +58,7 @@ evict_caches: _base.#bashWorkflow & {
 			"runs-on": _#linuxMachine
 			steps: [
 				json.#step & {
+					let branchPatterns = strings.Join(_#protectedBranchPatterns, " ")
 					run: """
 					set -eux
 
@@ -71,6 +73,22 @@ evict_caches: _base.#bashWorkflow & {
 						for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
 						do
 							gh actions-cache delete --confirm $j
+						done
+					done
+
+					# Now trigger the most recent workflow run on each of the default branches
+					for j in $(curl -s -L   -H "Accept: application/vnd.github+json"   -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}"  -H "X-GitHub-Api-Version: 2022-11-28"   https://api.github.com/repos/\(core.#githubRepositoryPath)/branches | jq -r '.[] | .name')
+					do
+						for i in \(branchPatterns)
+						do
+							if [[ "$j" = $i ]]
+							then
+								echo "$j is a match with $i"
+								id=$(curl -s -L   -H "Accept: application/vnd.github+json"   -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}"  -H "X-GitHub-Api-Version: 2022-11-28"   "https://api.github.com/repos/\(core.#githubRepositoryPath)/actions/workflows/trybot.yml/runs?branch=$j&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+								curl -s -L   -X POST   -H "Accept: application/vnd.github+json"   -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}"  -H "X-GitHub-Api-Version: 2022-11-28"   https://api.github.com/repos/\(core.#githubRepositoryPath)/actions/runs/$id/rerun
+								id=$(curl -s -L   -H "Accept: application/vnd.github+json"   -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}"  -H "X-GitHub-Api-Version: 2022-11-28"   "https://api.github.com/repos/\(core.#githubRepositoryPath)-trybot/actions/workflows/trybot.yml/runs?branch=$j&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+								curl -s -L   -X POST   -H "Accept: application/vnd.github+json"   -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}"  -H "X-GitHub-Api-Version: 2022-11-28"   https://api.github.com/repos/\(core.#githubRepositoryPath)-trybot/actions/runs/$id/rerun
+							fi
 						done
 					done
 					"""

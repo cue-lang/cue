@@ -76,7 +76,7 @@ var incompleteSentinel = &Bottom{
 func (c *OpContext) evaluate(v *Vertex, r Resolver, state VertexStatus) Value {
 	if v.isUndefined() {
 		// Use node itself to allow for cycle detection.
-		c.Unify(v, state)
+		c.unify(v, state)
 
 		if v.ArcType == ArcVoid {
 			if v.status == Evaluating {
@@ -145,10 +145,12 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state VertexStatus) Value {
 	return v
 }
 
-// Unify fully unifies all values of a Vertex to completion and stores
-// the result in the Vertex. If unify was called on v before it returns
-// the cached results.
-func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
+// unify unifies values of a Vertex to and stores the result in the Vertex. If
+// unify was called on v before it returns the cached results.
+// state can be used to indicate to which extent processing should continue.
+// state == finalized means it is evaluated to completion. See vertexStatus
+// for more details.
+func (c *OpContext) unify(v *Vertex, state VertexStatus) {
 	// defer c.PopVertex(c.PushVertex(v))
 	if Debug {
 		c.nest++
@@ -752,7 +754,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 
 			wasVoid := a.ArcType == ArcVoid
 
-			ctx.Unify(a, Finalized)
+			ctx.unify(a, Finalized)
 
 			if a.ArcType == ArcVoid {
 				continue
@@ -1619,7 +1621,7 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		// is necessary to prevent lookups in unevaluated structs.
 		// TODO(cycles): this can probably most easily be fixed with a
 		// having a more recursive implementation.
-		n.ctx.Unify(arc, Partial)
+		n.ctx.unify(arc, Partial)
 	}
 
 	// Don't add conjuncts if a node is referring to itself.

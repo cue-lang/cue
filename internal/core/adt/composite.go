@@ -256,7 +256,7 @@ func (v *Vertex) IsDefined(c *OpContext) bool {
 	if v.isDefined() {
 		return true
 	}
-	c.Unify(v, Finalized)
+	v.Finalize(c)
 	return v.isDefined()
 }
 
@@ -566,7 +566,7 @@ func (v *Vertex) IsErr() bool {
 }
 
 func (v *Vertex) Err(c *OpContext, state VertexStatus) *Bottom {
-	c.Unify(v, state)
+	c.unify(v, state)
 	if b, ok := v.BaseValue.(*Bottom); ok {
 		return b
 	}
@@ -580,8 +580,13 @@ func (v *Vertex) Finalize(c *OpContext) {
 	// case the caller did not handle existing errors in the context.
 	err := c.errs
 	c.errs = nil
-	c.Unify(v, Finalized)
+	c.unify(v, Finalized)
 	c.errs = err
+}
+
+// CompleteArcs ensures the set of arcs has been computed.
+func (v *Vertex) CompleteArcs(c *OpContext) {
+	c.unify(v, Conjuncts)
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {

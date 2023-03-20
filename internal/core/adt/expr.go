@@ -82,7 +82,7 @@ func (x *StructLit) evaluate(c *OpContext, state VertexStatus) Value {
 	// used in a context where more conjuncts are added. It may also lead
 	// to disjuncts being in a partially expanded state, leading to
 	// misaligned nodeContexts.
-	c.Unify(v, Conjuncts)
+	v.CompleteArcs(c)
 	return v
 }
 
@@ -292,7 +292,7 @@ func (x *ListLit) evaluate(c *OpContext, state VertexStatus) Value {
 		IsDynamic: true,
 		Conjuncts: []Conjunct{{e, x, c.ci}},
 	}
-	c.Unify(v, Conjuncts)
+	v.CompleteArcs(c)
 	return v
 }
 
@@ -900,7 +900,7 @@ func (x *LetReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	// now, though, as it is not entirely clear it is fine to remove this.
 	// We can reevaluate this once we have redone some of the planned order of
 	// evaluation work.
-	ctx.Unify(arc, Finalized)
+	arc.Finalize(ctx)
 	b, ok := arc.BaseValue.(*Bottom)
 	if !arc.MultiLet && !ok {
 		return arc
@@ -1252,9 +1252,9 @@ func (x *BinaryExpr) evaluate(c *OpContext, state VertexStatus) Value {
 		// evaluate the struct regardless to ensure that cycle reporting
 		// keeps working.
 		if env.Vertex.IsDynamic || c.inValidator > 0 {
-			c.Unify(v, Finalized)
+			v.Finalize(c)
 		} else {
-			c.Unify(v, Conjuncts)
+			v.CompleteArcs(c)
 		}
 
 		return v
@@ -1340,7 +1340,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op, stat
 		// - walk over all fields and verify that fields are not contradicting
 		//   previously marked fields.
 		//
-		c.Unify(v, Finalized)
+		v.Finalize(c)
 
 		if v.status == EvaluatingArcs {
 			// We have a cycle, which may be an error. Cycle errors may occur
@@ -1606,7 +1606,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 				IsDynamic: true,
 				Conjuncts: []Conjunct{{env, x, c.ci}},
 			}
-			c.Unify(n, Finalized)
+			n.Finalize(c)
 			if _, ok := n.BaseValue.(*Bottom); ok {
 				c.addErrf(0, pos(a),
 					"cannot use %s as %s in argument %d to %s",
@@ -1741,7 +1741,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 func (x *DisjunctionExpr) evaluate(c *OpContext, state VertexStatus) Value {
 	e := c.Env(0)
 	v := &Vertex{Conjuncts: []Conjunct{{e, x, c.ci}}}
-	c.Unify(v, Finalized) // TODO: also partial okay?
+	v.Finalize(c) // TODO: also partial okay?
 	// TODO: if the disjunction result originated from a literal value, we may
 	// consider the result closed to create more permanent errors.
 	return v
@@ -1881,7 +1881,7 @@ func (x *ForClause) yield(s *compState) {
 			continue
 		}
 
-		c.Unify(a, Partial)
+		c.unify(a, Partial)
 		if a.ArcType == ArcVoid {
 			continue
 		}

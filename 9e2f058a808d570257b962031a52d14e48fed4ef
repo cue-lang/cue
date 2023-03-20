@@ -16,6 +16,24 @@
       "message": "hm; why don\u0027t newlines get in the way here?",
       "revId": "9e2f058a808d570257b962031a52d14e48fed4ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bee9b0d_b21e08f6",
+        "filename": "internal/ci/base/base.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-20T10:35:13Z",
+      "side": 1,
+      "message": "There is no trailing newline. To have a trailing newline you have to have a blank line before the closing quotes:\n\nhttps://tip.cuelang.org/play/?id\u003dj0mjYUdRziG#cue@export@json",
+      "parentUuid": "6b2c70f0_a85d4071",
+      "revId": "9e2f058a808d570257b962031a52d14e48fed4ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

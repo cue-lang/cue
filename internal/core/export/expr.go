@@ -53,7 +53,7 @@ var empty *adt.Vertex
 func init() {
 	// TODO: Consider setting a non-nil BaseValue.
 	empty = &adt.Vertex{}
-	empty.UpdateStatus(adt.Finalized)
+	empty.ForceDone()
 }
 
 // innerExpr is like expr, but prohibits inlining in certain cases.

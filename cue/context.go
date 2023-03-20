@@ -129,7 +129,7 @@ func (c *Context) BuildInstance(i *build.Instance, options ...BuildOption) Value
 func (c *Context) makeError(err errors.Error) Value {
 	b := &adt.Bottom{Err: err}
 	node := &adt.Vertex{BaseValue: b}
-	node.UpdateStatus(adt.Finalized)
+	node.ForceDone()
 	node.AddConjunct(adt.MakeRootConjunct(nil, b))
 	return c.make(node)
 }

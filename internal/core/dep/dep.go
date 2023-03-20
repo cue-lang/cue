@@ -97,7 +97,7 @@ var empty *adt.Vertex
 func init() {
 	// TODO: Consider setting a non-nil BaseValue.
 	empty = &adt.Vertex{}
-	empty.UpdateStatus(adt.Finalized)
+	empty.ForceDone()
 }
 
 func visit(c *adt.OpContext, n *adt.Vertex, f VisitFunc, all, top bool) (err error) {

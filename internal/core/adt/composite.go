@@ -409,7 +409,12 @@ func (v *Vertex) Status() VertexStatus {
 	return v.status
 }
 
-func (v *Vertex) UpdateStatus(s VertexStatus) {
+// SetDone prevents v from being evaluated.
+func (v *Vertex) SetDone() {
+	v.updateStatus(Finalized)
+}
+
+func (v *Vertex) updateStatus(s VertexStatus) {
 	Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
 
 	if s == Finalized && v.BaseValue == nil {
@@ -565,8 +570,8 @@ func (v *Vertex) IsErr() bool {
 	return false
 }
 
-func (v *Vertex) Err(c *OpContext, state VertexStatus) *Bottom {
-	c.unify(v, state)
+func (v *Vertex) Err(c *OpContext) *Bottom {
+	v.Finalize(c)
 	if b, ok := v.BaseValue.(*Bottom); ok {
 		return b
 	}
@@ -590,12 +595,17 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
-	v.SetValue(ctx, Finalized, CombineErrors(nil, v.Value(), b))
+	v.SetValue(ctx, CombineErrors(nil, v.Value(), b))
 }
 
-func (v *Vertex) SetValue(ctx *OpContext, state VertexStatus, value BaseValue) *Bottom {
+// SetValue sets the value of a node.
+func (v *Vertex) SetValue(ctx *OpContext, value BaseValue) *Bottom {
+	return v.setValue(ctx, Finalized, value)
+}
+
+func (v *Vertex) setValue(ctx *OpContext, state VertexStatus, value BaseValue) *Bottom {
 	v.BaseValue = value
-	v.UpdateStatus(state)
+	v.updateStatus(state)
 	return nil
 }
 

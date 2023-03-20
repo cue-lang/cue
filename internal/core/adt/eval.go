@@ -84,7 +84,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state VertexStatus) Value {
 				}
 				err := c.Newf("cycle with field %v", r)
 				b := &Bottom{Code: CycleError, Err: err}
-				v.SetValue(c, v.status, b)
+				v.setValue(c, v.status, b)
 				return b
 				// TODO: use this instead, as is usual for incomplete errors,
 				// and also move this block one scope up to also apply to
@@ -198,7 +198,7 @@ func (c *OpContext) unify(v *Vertex, state VertexStatus) {
 
 		defer c.PopArc(c.PushArc(v))
 
-		v.UpdateStatus(Evaluating)
+		v.updateStatus(Evaluating)
 
 		if p := v.Parent; p != nil && p.state != nil && v.Label.IsString() {
 			for _, s := range p.state.node.Structs {
@@ -228,7 +228,7 @@ func (c *OpContext) unify(v *Vertex, state VertexStatus) {
 		n.conjuncts = v.Conjuncts
 		if n.insertConjuncts(state) {
 			n.maybeSetCache()
-			v.UpdateStatus(Partial)
+			v.updateStatus(Partial)
 			return
 		}
 
@@ -258,14 +258,14 @@ func (c *OpContext) unify(v *Vertex, state VertexStatus) {
 		if !n.done() {
 			switch {
 			case state < Conjuncts:
-				n.node.UpdateStatus(Partial)
+				n.node.updateStatus(Partial)
 				return
 
 			case state == Conjuncts:
 				if err := n.incompleteErrors(true); err != nil && err.Code < CycleError {
 					n.node.AddErr(c, err)
 				} else {
-					n.node.UpdateStatus(Partial)
+					n.node.updateStatus(Partial)
 				}
 				return
 			}
@@ -346,7 +346,7 @@ func (c *OpContext) unify(v *Vertex, state VertexStatus) {
 		}
 
 		// Free memory here?
-		v.UpdateStatus(Finalized)
+		v.updateStatus(Finalized)
 
 	case Finalized:
 	}
@@ -708,7 +708,7 @@ func (n *nodeContext) checkClosed(state VertexStatus) bool {
 			// conflicts at the appropriate place, to allow valid fields to
 			// be represented normally and, most importantly, to avoid
 			// recursive processing of a disallowed field.
-			v.SetValue(ctx, Finalized, err)
+			v.SetValue(ctx, err)
 			return false
 		}
 	}
@@ -734,11 +734,11 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 		n.node.status <= state+1 &&
 		(!n.node.hasVoidArc || n.node.ArcType == ArcMember) {
 
-		n.node.UpdateStatus(Conjuncts)
+		n.node.updateStatus(Conjuncts)
 		return
 	}
 
-	n.node.UpdateStatus(EvaluatingArcs)
+	n.node.updateStatus(EvaluatingArcs)
 
 	ctx := n.ctx
 
@@ -748,7 +748,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 		for _, a := range n.node.Arcs {
 			// Call UpdateStatus here to be absolutely sure the status is set
 			// correctly and that we are not regressing.
-			n.node.UpdateStatus(EvaluatingArcs)
+			n.node.updateStatus(EvaluatingArcs)
 
 			wasVoid := a.ArcType == ArcVoid
 
@@ -851,7 +851,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	}
 	n.node.Structs = n.node.Structs[:k]
 
-	n.node.UpdateStatus(Finalized)
+	n.node.updateStatus(Finalized)
 }
 
 // TODO: this is now a sentinel. Use a user-facing error that traces where
@@ -2285,7 +2285,7 @@ outer:
 	}
 
 	if m, ok := n.node.BaseValue.(*ListMarker); !ok {
-		n.node.SetValue(c, Partial, &ListMarker{
+		n.node.setValue(c, Partial, &ListMarker{
 			Src:    ast.NewBinExpr(token.AND, sources...),
 			IsOpen: isOpen,
 		})

@@ -1909,7 +1909,7 @@ func (x *ForClause) yield(s *compState) {
 			v := &Vertex{Label: x.Key}
 			key := a.Label.ToValue(c)
 			v.AddConjunct(MakeRootConjunct(c.Env(0), key))
-			v.SetValue(c, Finalized, key)
+			v.SetValue(c, key)
 			n.Arcs = append(n.Arcs, v)
 		}
 

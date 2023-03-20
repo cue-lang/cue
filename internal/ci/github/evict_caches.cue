@@ -15,6 +15,8 @@
 package github
 
 import (
+	"strings"
+
 	"cuelang.org/go/internal/ci/core"
 
 	"github.com/SchemaStore/schemastore/src/schemas/json"
@@ -45,7 +47,6 @@ evict_caches: _base.#bashWorkflow & {
 
 	on: {
 		schedule: [
-			// We will run a schedule trybot build 15 minutes later to repopulate the caches
 			{cron: "0 2 * * *"},
 		]
 	}
@@ -57,23 +58,54 @@ evict_caches: _base.#bashWorkflow & {
 			"runs-on": _#linuxMachine
 			steps: [
 				json.#step & {
-					run: """
-					set -eux
+					let branchPatterns = strings.Join(_#protectedBranchPatterns, " ")
 
-					echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
-					gh extension install actions/gh-actions-cache
-					for i in \(core.#githubRepositoryURL) \(core.#githubRepositoryURL)-trybot
-					do
-						echo "Evicting caches for $i"
-						cd $(mktemp -d)
-						git init
-						git remote add origin $i
-						for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
+					// rerunLatestWorkflow runs the latest trybot workflow in the
+					// specified repo for branches that match the specified branch.
+					let rerunLatestWorkflow = {
+						#repo:   string
+						#branch: string
+						"""
+						id=$(\(_base.#curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/trybot.yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+						\(_base.#curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
+
+						"""
+					}
+
+					run: """
+						set -eux
+
+						echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
+						gh extension install actions/gh-actions-cache
+						for i in \(core.#githubRepositoryURL) \(core.#githubRepositoryURL)-trybot
 						do
-							gh actions-cache delete --confirm $j
+							echo "Evicting caches for $i"
+							cd $(mktemp -d)
+							git init
+							git remote add origin $i
+							for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
+							do
+								gh actions-cache delete --confirm $j
+							done
 						done
-					done
-					"""
+
+						# Now trigger the most recent workflow run on each of the default branches.
+						# We do this by listing all the branches on the main repo and finding those
+						# which match the protected branch patterns (globs).
+						for j in $(\(_base.#curlGitHubAPI) -f https://api.github.com/repos/\(core.#githubRepositoryPath)/branches | jq -r '.[] | .name')
+						do
+							for i in \(branchPatterns)
+							do
+								if [[ "$j" != $i ]]; then
+									continue
+								fi
+
+								echo "$j is a match with $i"
+								\(rerunLatestWorkflow & {#repo: core.#githubRepositoryPath, #branch: "$j", _})
+								\(rerunLatestWorkflow & {#repo: core.#githubRepositoryPath + "-trybot", #branch: "$j", _})
+							done
+						done
+						"""
 				},
 			]
 		}

@@ -230,8 +230,8 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
-// UpdateArcType updates v.ArcType if t is more restrictive.
-func (v *Vertex) UpdateArcType(t ArcType) {
+// updateArcType updates v.ArcType if t is more restrictive.
+func (v *Vertex) updateArcType(t ArcType) {
 	if t < v.ArcType {
 		v.ArcType = t
 	}
@@ -828,7 +828,7 @@ func (v *Vertex) Elems() []*Vertex {
 func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew bool) {
 	arc = v.Lookup(f)
 	if arc != nil {
-		arc.UpdateArcType(t)
+		arc.updateArcType(t)
 		return arc, false
 	}
 
@@ -878,9 +878,9 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	switch f := c.x.(type) {
 	case *BulkOptionalField, *Ellipsis:
 	case *Field:
-		v.UpdateArcType(f.ArcType)
+		v.updateArcType(f.ArcType)
 	case *DynamicField:
-		v.UpdateArcType(f.ArcType)
+		v.updateArcType(f.ArcType)
 	default:
 		v.ArcType = ArcMember
 	}

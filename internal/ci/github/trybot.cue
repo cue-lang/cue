@@ -24,9 +24,18 @@ import (
 workflows: trybot: _repo.bashWorkflow & {
 	name: _repo.trybot.name
 
+	// Declare an instance of _#isProtectedBranch for use in this workflow
+	let _isProtectedBranch = _repo.isProtectedBranch & {
+		#trailers: [_repo.trybot.trailer]
+		_
+	}
+
 	on: {
 		push: {
-			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([
+					// [_repo.testDefaultBranch],
+					_repo.protectedBranchPatterns,
+			])        // do not run PR branches
 			"tags-ignore": [_repo.releaseTagPattern]
 		}
 		pull_request: {}
@@ -37,10 +46,18 @@ workflows: trybot: _repo.bashWorkflow & {
 			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
 
+			// Only run the trybot workflow if we have the trybot trailer, or
+			// if we have no special trailers. Note this condition applies
+			// after and in addition to the "on" condition above.
+			if: "\(_repo.containsTrailer & {#trailer: _repo.trybot.trailer, _}) || ! \(_repo.containsSpecialTrailers)"
+
 			let goCaches = _repo.setupGoActionsCaches
 
+			let checkoutCode = _repo.checkoutCode
+
 			steps: [
-				for v in _repo.checkoutCode {v},
+				for v in checkoutCode {v},
+
 				_repo.installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
@@ -53,12 +70,12 @@ workflows: trybot: _repo.bashWorkflow & {
 					if: _repo.isLatestLinux
 				},
 				json.#step & {
-					if:  "\(_repo.isProtectedBranch) || \(_repo.isLatestLinux)"
+					if:  "\(_isProtectedBranch) || \(_repo.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_goGenerate,
 				_goTest & {
-					if: "\(_repo.isProtectedBranch) || !\(_repo.isLatestLinux)"
+					if: "\(_isProtectedBranch) || !\(_repo.isLatestLinux)"
 				},
 				_goTestRace & {
 					if: _repo.isLatestLinux
@@ -111,7 +128,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(_repo.isProtectedBranch) && \(_repo.isLatestLinux)"
+		if: "\(_isProtectedBranch) && \(_repo.isLatestLinux)"
 	}
 
 	_goGenerate: json.#step & {

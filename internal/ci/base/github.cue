@@ -42,6 +42,7 @@ checkoutCode: {
 
 	[
 		#actionsCheckout,
+
 		// Restore modified times to work around https://go.dev/issues/58571,
 		// as otherwise we would get lots of unnecessary Go test cache misses.
 		// Note that this action requires actions/checkout to use a fetch-depth of 0.
@@ -58,6 +59,26 @@ checkoutCode: {
 		json.#step & {
 			name: "Restore git file modification times"
 			uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
+		},
+
+		for trailer in _specialTrailers {
+			let stepName = strings.Replace(trailer, "-", "", -1)
+			json.#step & {
+				id:  stepName
+				run: """
+					git log -1
+					git log -1 --pretty='%(trailers:key=\(trailer),valueonly)'
+					x="$(git log -1 --pretty='%(trailers:key=\(trailer),valueonly)')"
+					if [[ "$x" == "" ]]
+					then
+					    x=null
+					fi
+					echo "x is $x"
+					echo "value<<EOD" >> $GITHUB_OUTPUT
+					echo "$x" >> $GITHUB_OUTPUT
+					echo "EOD" >> $GITHUB_OUTPUT
+					"""
+			}
 		},
 	]
 }
@@ -192,9 +213,20 @@ setupGoActionsCaches: {
 // It would be nice to use the "contains" builtin for simplicity,
 // but array literals are not yet supported in expressions.
 isProtectedBranch: {
-	"(" + strings.Join([ for branch in protectedBranchPatterns {
-		(_matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
-	}], " || ") + ")"
+	#trailers: [...string]
+	"(" + strings.Join([
+		"(" + strings.Join([ for branch in protectedBranchPatterns {
+			(_matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+		}], " || ") + ")",
+		if len(#trailers) > 0 {
+			"(" + strings.Join([
+				for trailer in #trailers {
+					let stepName = strings.Replace(trailer, "-", "", -1)
+					"fromJSON(steps.\(stepName).outputs.value) == null"
+				},
+			], " && ") + ")"
+		},
+	], " && ") + ")"
 }
 
 // #isReleaseTag creates a GitHub expression, based on the given release tag
@@ -219,4 +251,16 @@ repositoryDispatch: json.#step & {
 	run:  #"""
 			\#(curlGitHubAPI) -f --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(#githubRepositoryPath)/dispatches
 			"""#
+}
+
+_specialTrailers: [trybot.trailer, unity.trailer]
+
+containsTrailer: {
+	#trailer: string
+	"(contains(github.event.head_commit.message, '\\n\(#trailer): '))"
+}
+
+containsSpecialTrailers: {
+	let parts = [ for v in _specialTrailers {containsTrailer & {#trailer: v, _}}]
+	"(" + strings.Join(parts, "||") + ")"
 }

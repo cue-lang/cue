@@ -4,7 +4,6 @@ name: TryBot
 "on":
   push:
     branches:
-      - trybot/*/*
       - ci/test
       - master
       - release-branch.*
@@ -37,6 +36,16 @@ jobs:
         run: touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
+      - id: TryBotTrailer
+        run: |-
+          x="$(git log -1 --pretty='%(trailers:key=TryBot-Trailer,valueonly)')"
+          if [[ "$x" == "" ]]
+          then
+          	x=null
+          fi
+          echo "value<<EOD" >> $GITHUB_OUTPUT
+          echo "$x" >> $GITHUB_OUTPUT
+          echo "EOD" >> $GITHUB_OUTPUT
       - name: Install Go
         uses: actions/setup-go@v3
         with:
@@ -47,7 +56,7 @@ jobs:
       - id: go-cache-dir
         name: Get go build/test cache directory
         run: echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))
+      - if: ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (fromJSON(steps.TryBotTrailer.outputs.value) == null))
         uses: actions/cache@v3
         with:
           path: |-
@@ -55,7 +64,7 @@ jobs:
             ${{ steps.go-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
-      - if: '! (github.ref == ''refs/heads/master'' || startsWith(github.ref, ''refs/heads/release-branch.''))'
+      - if: '! ((github.ref == ''refs/heads/master'' || startsWith(github.ref, ''refs/heads/release-branch.'')) && (fromJSON(steps.TryBotTrailer.outputs.value) == null))'
         uses: actions/cache/restore@v3
         with:
           path: |-
@@ -63,7 +72,7 @@ jobs:
             ${{ steps.go-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
-      - if: github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || github.ref == 'refs/heads/ci/test')
+      - if: github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))) || github.ref == 'refs/heads/ci/test')
         run: go clean -testcache
       - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Early git and code sanity checks
@@ -119,12 +128,12 @@ jobs:
           	echo "commit author email address does not match signed-off-by trailer"
           	exit 1
           fi
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
+      - if: ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (fromJSON(steps.TryBotTrailer.outputs.value) == null)) || (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Generate
         run: go generate ./...
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || !(matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
+      - if: ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (fromJSON(steps.TryBotTrailer.outputs.value) == null)) || !(matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Test
         run: go test ./...
       - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
@@ -135,7 +144,7 @@ jobs:
         run: go vet ./...
       - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
+      - if: ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (fromJSON(steps.TryBotTrailer.outputs.value) == null)) && (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         name: Pull this commit through the proxy on master
         run: |-
           v=$(git rev-parse HEAD)

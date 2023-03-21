@@ -10,6 +10,11 @@ import (
 	"cuelang.org/go/internal/ci/base"
 )
 
+// The machines that we use
+#linuxMachine:   "ubuntu-22.04"
+#macosMachine:   "macos-11"
+#windowsMachine: "windows-2022"
+
 // Define core URLs that will be used in the codereview.cfg and GitHub workflows
 #githubRepositoryURL:  "https://github.com/cue-lang/cue"
 #gerritRepositoryURL:  "https://review.gerrithub.io/a/cue-lang/cue"
@@ -74,3 +79,16 @@ codeReview: base.#codeReview & {
 	gerrit:      #gerritRepositoryURL
 	"cue-unity": #unityRepositoryURL
 }
+
+// #protectedBranchPatterns is a list of glob patterns to match the protected
+// git branches which are continuously used during development on Gerrit.
+// This includes the default branch and release branches,
+// but excludes any others like feature branches or short-lived branches.
+// Note that #testDefaultBranch is excluded as it is GitHub-only.
+#protectedBranchPatterns: [#defaultBranch, #releaseBranchPattern]
+
+// #isLatestLinux returns a GitHub expression that evaluates to true if the job
+// is running on Linux with the latest version of Go. This expression is often
+// used to run certain steps just once per CI workflow, to avoid duplicated
+// work.
+#isLatestLinux: "(matrix.go-version == '\(#latestStableGo)' && matrix.os == '\(#linuxMachine)')"

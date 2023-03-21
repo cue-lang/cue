@@ -12,8 +12,24 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// package core is a collection of features that are common to CUE projects and
-// the workflows they specify.
+// package base is a collection of workflows, jobs, stes etc that are common to
+// CUE projects and the workflows they specify. The package itself needs to be
+// instantiated to parameterise many of the exported definitions.
+//
+// For example a package using base would do something like this:
+//
+//     package workflows
+//
+//     import "cuelang.org/go/internal/ci/base"
+//
+//     // Create an instance of base
+//     _base: base & {
+//         #repositoryURL:                core.#githubRepositoryURL
+//         #defaultBranch:                core.#defaultBranch
+//         #botGitHubUser:                "cueckoo"
+//         #botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
+//     }
+//
 package base
 
 import (
@@ -26,6 +42,7 @@ import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
+// Package parameters
 #repositoryURL:                string
 #defaultBranch:                string
 #testDefaultBranch:            "ci/test"

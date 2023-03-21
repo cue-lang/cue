@@ -49,16 +49,15 @@ _#gerritHubHostname: "review.gerrithub.io"
 
 _#linuxMachine: "ubuntu-20.04"
 
-#dispatchWorkflow: json.#Workflow & {
-	#type:                  string
-	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
-	name:                   "Dispatch \(#type)"
+#trybotWorkflow: json.#Workflow & {
+	_#branchNameExpression: "\(#trybotKey)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
+	name:                   "Dispatch \(#trybotKey)"
 	on: ["repository_dispatch"]
 	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
-		(#type): {
+		(#trybotKey): {
 			"runs-on": _#linuxMachine
-			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
+			if:        "${{ github.event.client_payload.type == '\(#trybotKey)' }}"
 			steps: [
 				#writeNetrcFile,
 				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
@@ -72,7 +71,7 @@ _#linuxMachine: "ubuntu-20.04"
 						"""#
 				},
 				json.#step & {
-					name: "Trigger \(#type)"
+					name: "Trigger \(#trybotKey)"
 					run:  """
 						mkdir tmpgit
 						cd tmpgit

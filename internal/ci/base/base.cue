@@ -145,3 +145,66 @@ let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
 #curlGitHubAPI: #"""
 	curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(#botGitHubUserTokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
 	"""#
+
+#setupGoActionsCaches: {
+	// #protectedBranchExpr is a GitHub expression
+	// (https://docs.github.com/en/actions/learn-github-actions/expressions)
+	// that evaluates to true if the workflow is running for a commit against a
+	// protected branch.
+	#protectedBranchExpr: string
+
+	let goModCacheDirID = "go-mod-cache-dir"
+	let goCacheDirID = "go-cache-dir"
+
+	// cacheDirs is a convenience variable that includes
+	// GitHub expressions that represent the directories
+	// that participate in Go caching.
+	let cacheDirs = [ "${{ steps.\(goModCacheDirID).outputs.dir }}/cache/download", "${{ steps.\(goCacheDirID).outputs.dir }}"]
+
+	// pre is the list of steps required to establish and initialise the correct
+	// caches for Go-based workflows.
+	pre: [
+		json.#step & {
+			name: "Get go mod cache directory"
+			id:   goModCacheDirID
+			run:  #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
+		},
+		json.#step & {
+			name: "Get go build/test cache directory"
+			id:   goCacheDirID
+			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
+		},
+		for _, v in [
+			{
+				if:   #protectedBranchExpr
+				uses: "actions/cache@v3"
+			},
+			{
+				if:   "! \(#protectedBranchExpr)"
+				uses: "actions/cache/restore@v3"
+			},
+		] {
+			v & json.#step & {
+				with: {
+					path: strings.Join(cacheDirs, "\n")
+
+					// GitHub actions caches are immutable. Therefore, use a key which is
+					// unique, but allow the restore to fallback to the most recent cache.
+					// The result is then saved under the new key which will benefit the
+					// next build
+					key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
+					"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
+				}
+			}
+		},
+	]
+
+	// post is the list of steps that need to be run at the end of
+	// a workflow to "tidy up" following the earlier pre
+	post: [
+		json.#step & {
+			let qCacheDirs = [ for v in cacheDirs {"'\(v)'"}]
+			run: "find \(strings.Join(qCacheDirs, " ")) -type f -amin +7200 -delete -print"
+		},
+	]
+}

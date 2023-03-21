@@ -6,6 +6,8 @@ package core
 import (
 	"list"
 	"strings"
+
+	"cuelang.org/go/internal/ci/base"
 )
 
 // Define core URLs that will be used in the codereview.cfg and GitHub workflows
@@ -67,24 +69,8 @@ zeroReleaseTagSuffix: "-0.dev"
 // zeroReleaseTagSuffix.
 zeroReleaseTagPattern: "*" + zeroReleaseTagSuffix
 
-#codeReview: {
-	gerrit?:      string
-	github?:      string
-	"cue-unity"?: string
-}
-
-codeReview: #codeReview & {
+codeReview: base.#codeReview & {
 	github:      githubRepositoryURL
 	gerrit:      gerritRepositoryURL
 	"cue-unity": unityRepositoryURL
-}
-
-// #toCodeReviewCfg converts a #codeReview instance to
-// the key: value
-#toCodeReviewCfg: {
-	#input: #codeReview
-	let parts = [ for k, v in #input {k + ": " + v}]
-
-	// Per https://pkg.go.dev/golang.org/x/review/git-codereview#hdr-Configuration
-	strings.Join(parts, "\n")
 }

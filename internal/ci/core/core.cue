@@ -1,3 +1,5 @@
+// package core contains data values that are commont to all workflows
+// in this repository.
 package core
 
 import (

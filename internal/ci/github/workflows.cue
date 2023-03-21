@@ -131,45 +131,5 @@ _base: base & {
 	#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
 }
 
-_#cacheDirs: [ "${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download", "${{ steps.go-cache-dir.outputs.dir }}"]
 
-_#cachePre: [
-	json.#step & {
-		name: "Get go mod cache directory"
-		id:   "go-mod-cache-dir"
-		run:  #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
-	},
-	json.#step & {
-		name: "Get go build/test cache directory"
-		id:   "go-cache-dir"
-		run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
-	},
-	for _, v in [
-		{
-			if:   _#isProtectedBranch
-			uses: "actions/cache@v3"
-		},
-		{
-			if:   "! \(_#isProtectedBranch)"
-			uses: "actions/cache/restore@v3"
-		},
-	] {
-		v & json.#step & {
-			with: {
-				path: strings.Join(_#cacheDirs, "\n")
 
-				// GitHub actions caches are immutable. Therefore, use a key which is
-				// unique, but allow the restore to fallback to the most recent cache.
-				// The result is then saved under the new key which will benefit the
-				// next build
-				key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
-				"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
-			}
-		}
-	},
-]
-
-_#cachePost: json.#step & {
-	let qCacheDirs = [ for v in _#cacheDirs {"'\(v)'"}]
-	run: "find \(strings.Join(qCacheDirs, " ")) -type f -amin +7200 -delete -print"
-}

@@ -23,7 +23,7 @@ import (
 // push_tip_to_trybot "syncs" active branches to the trybot repo.
 // Since the workflow is triggered by a push to any of the branches,
 // the step only needs to sync the pushed branch.
-push_tip_to_trybot: _base.#bashWorkflow & {
+workflows: push_tip_to_trybot: _base.#bashWorkflow & {
 
 	name: "Push tip to trybot"
 	on: {

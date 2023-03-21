@@ -55,10 +55,10 @@ workflows: evict_caches: _base.#bashWorkflow & {
 		test: {
 			// We only want to run this in the main repo
 			if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
-			"runs-on": _#linuxMachine
+			"runs-on": core.linuxMachine
 			steps: [
 				json.#step & {
-					let branchPatterns = strings.Join(_#protectedBranchPatterns, " ")
+					let branchPatterns = strings.Join(core.protectedBranchPatterns, " ")
 
 					// rerunLatestWorkflow runs the latest trybot workflow in the
 					// specified repo for branches that match the specified branch.

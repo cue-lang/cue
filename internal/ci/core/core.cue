@@ -1,3 +1,6 @@
+// package core contains data values that are commont to all CUE
+// configurations.  This not only includes GitHub workflows, but also things
+// like gerrit configuration etc.
 package core
 
 import (

@@ -3,6 +3,7 @@ package base
 // This file contains gerrithub related definitions etc
 
 import (
+	encjson "encoding/json"
 	"strings"
 
 	"github.com/SchemaStore/schemastore/src/schemas/json"
@@ -16,44 +17,150 @@ trybotWorkflows: {
 	"evict_caches":              evictCaches
 }
 
+#dispatch: {
+	type:         string
+	CL:           int
+	patchset:     int
+	targetBranch: string
+	ref:          string
+}
+
 trybotDispatchWorkflow: bashWorkflow & {
-	_#branchNameExpression: "\(trybot.key)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
-	name:                   "Dispatch \(trybot.key)"
-	on: ["repository_dispatch"]
+	#dummyDispatch: #dispatch
+	name:           "Dispatch \(trybot.key)"
+	on: {
+		repository_dispatch: {}
+		push: {
+			// To enable testing of the dispatch itself
+			branches: [testDefaultBranch]
+		}
+	}
 	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
 		(trybot.key): {
 			"runs-on": linuxMachine
-			if:        "${{ github.event.client_payload.type == '\(trybot.key)' }}"
+
+			// We set the "on" conditions above, but this would otherwise mean we
+			// run for all dispatch events.
+			if: "${{ github.ref == 'refs/heads/\(testDefaultBranch)' || github.event.client_payload.type == '\(trybot.key)' }}"
+
+			// See the comment below about the need for cases
+			let cases = [
+				{
+					condition:  "!="
+					expr:       "fromJSON(steps.payload.outputs.value)"
+					nameSuffix: "fake data"
+				},
+				{
+					condition:  "=="
+					expr:       "github.event.client_payload"
+					nameSuffix: "repository_dispatch payload"
+				},
+			]
+
 			steps: [
 				writeNetrcFile,
-				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
-				// care about the CL number and patchset, (e.g. 547738/7).
-				// Note that gerrithub_ref is two path elements.
+
 				json.#step & {
-					id: "gerrithub_ref"
-					run: #"""
-						ref="$(echo ${{github.event.client_payload.payload.ref}} | sed -E 's/^refs\/changes\/[0-9]+\/([0-9]+)\/([0-9]+).*/\1\/\2/')"
-						echo "gerrithub_ref=$ref" >> $GITHUB_OUTPUT
+					name: "Write fake payload"
+					id:   "payload"
+					if:   "github.repository == '\(githubRepositoryPath)' && github.ref == 'refs/heads/\(testDefaultBranch)'"
+					run:  #"""
+						cat <<EOD >> $GITHUB_OUTPUT
+						value<<DOE
+						\#(encjson.Marshal(#dummyDispatch))
+						DOE
+						EOD
 						"""#
 				},
-				json.#step & {
-					name: "Trigger \(trybot.key)"
-					run:  """
+
+				// GitHub does not allow steps with the same ID, even if (by virtue
+				// of runtime 'if' expressions) both would not actually run. So
+				// we have to duplciate the steps that follow with those same
+				// runtime expressions
+				//
+				// Hence we have to create two steps, one to trigger if the
+				// repository_dispatch payload is set, and one if not (i.e. we use
+				// the fake payload).
+				for v in cases {
+					json.#step & {
+						name: "Trigger \(trybot.name) (\(v.nameSuffix))"
+						if:   "github.event.client_payload.type \(v.condition) '\(trybot.key)'"
+						run:  """
+						set -x
+
 						mkdir tmpgit
 						cd tmpgit
 						git init
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
-						git fetch \(gerritHubRepositoryURL) "${{ github.event.client_payload.payload.ref }}"
-						git checkout -b \(_#branchNameExpression) FETCH_HEAD
-						git remote add origin \(trybotRepositoryURL)
-						git fetch origin "${{ github.event.client_payload.payload.branch }}"
-						git push origin \(_#branchNameExpression)
-						echo ${{ secrets.\(botGitHubUserTokenSecretsKey) }} | gh auth login --with-token
-						gh pr --repo=\(trybotRepositoryURL) create --base="${{ github.event.client_payload.payload.branch }}" --fill
+						git remote add origin  \(gerritHubRepositoryURL)
+
+						# We also (temporarily) get the default branch in order that
+						# we can "restore" the trybot repo to a good state for the
+						# current (i.e. previous) implementation of trybots which
+						# used PRs. If the target branch in the trybot repo is not
+						# current, then PR creation will fail because GitHub claims
+						# it cannot find any link between the commit in a PR (i.e.
+						# the CL under test in the previous setup) and the target
+						# branch which, under the new setup, might well currently
+						# be the commit from a CL.
+						git fetch origin ${{ \(v.expr).targetBranch }}
+
+						git fetch origin ${{ \(v.expr).ref }}
+						git checkout -b ${{ \(v.expr).targetBranch }} FETCH_HEAD
+
+						# Error if we already have dispatchTrailer according to git log logic.
+						# See earlier check for GitHub expression logic check.
+						x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
+						if [ "$x" != "" ]
+						then
+							 echo "Ref ${{ \(v.expr).ref }} already has a \(dispatchTrailer)"
+							 exit 1
+						fi
+
+						# Add the trailer because we don't have it yet. GitHub expressions do not have a
+						# substitute or quote capability. So we do that in shell. We also strip out the
+						# indenting added by toJSON. We ensure that the type field is first in order
+						# that we can safely check for specific types of dispatch trailer.
+						trailer="$(cat <<EOD | jq -c '{type} + .'
+						${{ toJSON(\(v.expr)) }}
+						EOD
+						)"
+						git log -1 --format=%B | git interpret-trailers --trailer "\(dispatchTrailer): $trailer" | git commit --amend -F -
+						git log -1
+
+						success=false
+						for try in {1..20}; do
+							echo "Push to trybot try $try"
+							if git push -f \(trybotRepositoryURL) ${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
+								success=true
+								break
+							fi
+							sleep 1
+						done
+						if ! $success; then
+							echo "Giving up"
+							exit 1
+						fi
+
+						# Restore the default branch on the trybot repo to be the tip of the main repo
+						success=false
+						for try in {1..20}; do
+							echo "Push to trybot try $try"
+							if git push -f \(trybotRepositoryURL) origin/${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
+								success=true
+								break
+							fi
+							sleep 1
+						done
+						if ! $success; then
+							echo "Giving up"
+							exit 1
+						fi
 						"""
+					}
 				},
 			]
 		}

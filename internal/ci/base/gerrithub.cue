@@ -3,48 +3,95 @@ package base
 // This file contains gerrithub related definitions etc
 
 import (
+	encjson "encoding/json"
+
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
+#dispatch: {
+	type:         string
+	CL:           int
+	patchset:     int
+	targetBranch: string
+	ref:          string
+}
+
+dummyDispatch: #dispatch & {
+	type:         trybot.key
+	CL:           551352
+	patchset:     _
+	targetBranch: "master"
+	ref:          "refs/changes/\(mod(CL, 100))/\(CL)/\(patchset)"
+}
+
 trybotDispatchWorkflow: json.#Workflow & {
-	#type:                  string
-	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
-	name:                   "Dispatch \(#type)"
-	on: ["repository_dispatch"]
+	#type: string
+	name:  "Dispatch \(#type)"
+	on: {
+		repository_dispatch: {}
+		push: {
+			// To enable testing of the dispatch itself
+			branches: [testDefaultBranch]
+		}
+	}
 	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
 		(#type): {
 			"runs-on": linuxMachine
-			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
+
+			// We set the "on" conditions above, but this would otherwise mean we
+			// run for all dispatch events.
+			if: "${{ github.ref == 'refs/heads/\(testDefaultBranch)' || github.event.client_payload.type == '\(#type)' }}"
+
 			steps: [
 				writeNetrcFile,
-				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
-				// care about the CL number and patchset, (e.g. 547738/7).
-				// Note that gerrithub_ref is two path elements.
+
 				json.#step & {
-					id: "gerrithub_ref"
+					id:  "payload"
+					if:  "github.repository == '\(githubRepositoryPath)' && github.ref == 'refs/heads/\(testDefaultBranch)'"
 					run: #"""
-						ref="$(echo ${{github.event.client_payload.payload.ref}} | sed -E 's/^refs\/changes\/[0-9]+\/([0-9]+)\/([0-9]+).*/\1\/\2/')"
-						echo "gerrithub_ref=$ref" >> $GITHUB_OUTPUT
+						cat <<EOD >> $GITHUB_OUTPUT
+						value<<DOE
+						\#(encjson.Indent(encjson.Marshal(dummyDispatch), "", "  "))
+						DOE
+						EOD
 						"""#
 				},
-				json.#step & {
-					name: "Trigger \(#type)"
-					run:  """
+
+				// GitHub does not allow steps with the same ID, even if (by virtue of
+				// runtime 'if' expressions) both would not actually run. So we have
+				// to duplciate the steps that follow with those same runtime expressions
+				for v in [{condition: "!=", expr: "fromJSON(steps.payload.outputs.value)"}, {condition: "==", expr: "github.event.client_payload"}] {
+					json.#step & {
+						name: "Trigger \(#type)"
+						if:   "github.event.client_payload.type \(v.condition) '\(#type)'"
+						run:  """
+						set -x
+
 						mkdir tmpgit
 						cd tmpgit
 						git init
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
-						git fetch \(gerritHubRepositoryURL) "${{ github.event.client_payload.payload.ref }}"
-						git checkout -b \(_#branchNameExpression) FETCH_HEAD
-						git remote add origin \(trybotRepositoryURL)
-						git fetch origin "${{ github.event.client_payload.payload.branch }}"
-						git push origin \(_#branchNameExpression)
-						echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
-						gh pr --repo=\(trybotRepositoryURL) create --base="${{ github.event.client_payload.payload.branch }}" --fill
+						git fetch \(gerritHubRepositoryURL) "${{ \(v.expr).ref }}"
+						git checkout -b ${{ \(v.expr).targetBranch }} FETCH_HEAD
+
+						# Error if we already have the trailer
+						x="$(git log -1 --pretty='%(trailers:key=\(trybot.trailer),valueonly)')"
+						if [ "$x" != "" ]
+						then
+							echo "Ref ${{ \(v.expr).ref }} already has a =\(trybot.trailer)"
+							exit 1
+						fi
+
+						# Add the trailer because we don't have it yet
+						git log -1 --format=%B | git interpret-trailers --trailer "\(trybot.trailer): ${{ toJSON(\(v.expr)) }}" | git commit --amend -F -
+						git log -1
+
+						git push -f \(trybotRepositoryURL) ${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}
 						"""
+					}
 				},
 			]
 		}

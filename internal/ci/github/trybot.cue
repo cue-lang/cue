@@ -26,9 +26,15 @@ import (
 workflows: trybot: core.bashWorkflow & {
 	name: core.trybot.name
 
+	// Declare an instance of _#isProtectedBranch for use in this workflow
+	let _isProtectedBranch = core.isProtectedBranch & {
+		#trailers: [core.trybot.trailer]
+		_
+	}
+
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", core.testDefaultBranch], core.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([[core.testDefaultBranch], core.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [core.releaseTagPattern]
 		}
 		pull_request: {}
@@ -39,10 +45,13 @@ workflows: trybot: core.bashWorkflow & {
 			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
 
-			let goCaches = core.setupGoActionsCaches & {#protectedBranchExpr: core.isProtectedBranch, _}
+			let goCaches = core.setupGoActionsCaches & {#protectedBranchExpr: _isProtectedBranch, _}
+
+			let checkoutCode = core.checkoutCode & {#trailers: [core.trybot.trailer], _}
 
 			steps: [
-				for v in core.checkoutCode {v},
+				for v in checkoutCode {v},
+
 				core.installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
@@ -65,12 +74,12 @@ workflows: trybot: core.bashWorkflow & {
 					if: core.isLatestLinux
 				},
 				json.#step & {
-					if:  "\(core.isProtectedBranch) || \(core.isLatestLinux)"
+					if:  "\(_isProtectedBranch) || \(core.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_goGenerate,
 				_goTest & {
-					if: "\(core.isProtectedBranch) || !\(core.isLatestLinux)"
+					if: "\(_isProtectedBranch) || !\(core.isLatestLinux)"
 				},
 				_goTestRace & {
 					if: core.isLatestLinux
@@ -123,7 +132,7 @@ workflows: trybot: core.bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(core.isProtectedBranch) && \(core.isLatestLinux)"
+		if: "\(_isProtectedBranch) && \(core.isLatestLinux)"
 	}
 
 	_goGenerate: json.#step & {

@@ -24,9 +24,18 @@ import (
 workflows: trybot: repo.bashWorkflow & {
 	name: repo.trybot.name
 
+	// Declare an instance of _#isProtectedBranch for use in this workflow
+	let _isProtectedBranch = repo.isProtectedBranch & {
+		#trailers: [repo.trybot.trailer]
+		_
+	}
+
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", repo.testDefaultBranch], repo.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([
+					// [repo.testDefaultBranch],
+					repo.protectedBranchPatterns,
+			])        // do not run PR branches
 			"tags-ignore": [repo.releaseTagPattern]
 		}
 		pull_request: {}
@@ -37,10 +46,18 @@ workflows: trybot: repo.bashWorkflow & {
 			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
 
-			let goCaches = repo.setupGoActionsCaches & {#protectedBranchExpr: repo.isProtectedBranch, _}
+			// Only run the trybot workflow if we have the trybot trailer, or
+			// if we have no special trailers. Note this condition applies
+			// after and in addition to the "on" condition above.
+			if: "\(repo.containsTrailer & {#trailer: repo.trybot.trailer, _}) || ! \(repo.containsSpecialTrailers)"
+
+			let goCaches = repo.setupGoActionsCaches & {#protectedBranchExpr: _isProtectedBranch, _}
+
+			let checkoutCode = repo.checkoutCode & {#trailers: [repo.trybot.trailer], _}
 
 			steps: [
-				for v in repo.checkoutCode {v},
+				for v in checkoutCode {v},
+
 				repo.installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
@@ -63,12 +80,12 @@ workflows: trybot: repo.bashWorkflow & {
 					if: repo.isLatestLinux
 				},
 				json.#step & {
-					if:  "\(repo.isProtectedBranch) || \(repo.isLatestLinux)"
+					if:  "\(_isProtectedBranch) || \(repo.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_goGenerate,
 				_goTest & {
-					if: "\(repo.isProtectedBranch) || !\(repo.isLatestLinux)"
+					if: "\(_isProtectedBranch) || !\(repo.isLatestLinux)"
 				},
 				_goTestRace & {
 					if: repo.isLatestLinux
@@ -121,7 +138,7 @@ workflows: trybot: repo.bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(repo.isProtectedBranch) && \(repo.isLatestLinux)"
+		if: "\(_isProtectedBranch) && \(repo.isLatestLinux)"
 	}
 
 	_goGenerate: json.#step & {

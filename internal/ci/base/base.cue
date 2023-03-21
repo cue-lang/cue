@@ -68,39 +68,62 @@ import (
 	}
 }
 
-#checkoutCode: [
-	json.#step & {
-		name: "Checkout code"
-		uses: "actions/checkout@v3"
+#checkoutCode: {
+	#trailers: [...string]
 
-		// "pull_request" builds will by default use a merge commit,
-		// testing the PR's HEAD merged on top of the master branch.
-		// For consistency with Gerrit, avoid that merge commit entirely.
-		// This doesn't affect builds by other events like "push",
-		// since github.event.pull_request is unset so ref remains empty.
-		with: {
-			ref:           "${{ github.event.pull_request.head.sha }}"
-			"fetch-depth": 0 // see the docs below
-		}
-	},
-	// Restore modified times to work around https://go.dev/issues/58571,
-	// as otherwise we would get lots of unnecessary Go test cache misses.
-	// Note that this action requires actions/checkout to use a fetch-depth of 0.
-	// Since this is a third-party action which runs arbitrary code,
-	// we pin a commit hash for v2 to be in control of code updates.
-	// Also note that git-restore-mtime does not update all directories,
-	// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
-	// so we first reset all directory timestamps to a static time as a fallback.
-	// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
-	json.#step & {
-		name: "Reset git directory modification times"
-		run:  "touch -t 202211302355 $(find * -type d)"
-	},
-	json.#step & {
-		name: "Restore git file modification times"
-		uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
-	},
-]
+	[
+		json.#step & {
+			name: "Checkout code"
+			uses: "actions/checkout@v3"
+
+			// "pull_request" builds will by default use a merge commit,
+			// testing the PR's HEAD merged on top of the master branch.
+			// For consistency with Gerrit, avoid that merge commit entirely.
+			// This doesn't affect builds by other events like "push",
+			// since github.event.pull_request is unset so ref remains empty.
+			with: {
+				ref:           "${{ github.event.pull_request.head.sha }}"
+				"fetch-depth": 0 // see the docs below
+			}
+		},
+		// Restore modified times to work around https://go.dev/issues/58571,
+		// as otherwise we would get lots of unnecessary Go test cache misses.
+		// Note that this action requires actions/checkout to use a fetch-depth of 0.
+		// Since this is a third-party action which runs arbitrary code,
+		// we pin a commit hash for v2 to be in control of code updates.
+		// Also note that git-restore-mtime does not update all directories,
+		// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
+		// so we first reset all directory timestamps to a static time as a fallback.
+		// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
+		json.#step & {
+			name: "Reset git directory modification times"
+			run:  "touch -t 202211302355 $(find * -type d)"
+		},
+		json.#step & {
+			name: "Restore git file modification times"
+			uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
+		},
+
+		for trailer in #trailers {
+			let stepName = strings.Replace(trailer, "-", "", -1)
+			json.#step & {
+				id:  stepName
+				run: """
+					git log -1
+					x="$(git log -1 --pretty='%(trailers:key=\(trailer),valueonly)')"
+					if [[ "$x" == "" ]]
+					then
+						x=rubbish
+					fi
+					echo "Found trailer $x"
+					echo "value<<EOD" >> $GITHUB_OUTPUT
+					echo "$x" >> $GITHUB_OUTPUT
+					echo "EOD" >> $GITHUB_OUTPUT
+					"""
+			}
+		},
+	]
+}
 
 #earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
@@ -311,12 +334,23 @@ _#matchPattern: {
 
 // #isProtectedBranch is an expression that evaluates to true if the
 // job is running as a result of pushing to one of _#protectedBranchPatterns.
-// It would be nice to use the "contains" builtin for simplicity,
-// but array literals are not yet supported in expressions.
+// Note that use of this expression requires the existence of steps that
+// test whether the provided #trailers have been set on the commit under test.
 #isProtectedBranch: {
-	"(" + strings.Join([ for branch in #protectedBranchPatterns {
-		(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
-	}], " || ") + ")"
+	#trailers: [...string]
+	"(" + strings.Join([
+		"(" + strings.Join([ for branch in #protectedBranchPatterns {
+			(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+		}], " || ") + ")",
+		if len(#trailers) > 0 {
+			"(" + strings.Join([
+				for trailer in #trailers {
+					let stepName = strings.Replace(trailer, "-", "", -1)
+					"fromJSON(steps.\(stepName).outputs.value) == null"
+				},
+			], " && ") + ")"
+		},
+	], " && ") + ")"
 }
 
 // #isReleaseTag creates a GitHub expression, based on the given release tag
@@ -325,6 +359,8 @@ _#matchPattern: {
 #isReleaseTag: {
 	(_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(#releaseTagPattern)"}).expr
 }
+
+let _trailerSuffix = "-Trailer"
 
 // Define some shared keys and human-readable names.
 //
@@ -340,11 +376,13 @@ _#matchPattern: {
 // the result label key for the "TryBot" workflow. This name also shows up in
 // the CI badge in the top-level README.
 #trybot: {
-	key:  "trybot" & strings.ToLower(name)
-	name: "TryBot"
+	key:     "trybot" & strings.ToLower(name)
+	name:    "TryBot"
+	trailer: name + _trailerSuffix
 }
 
 #unity: {
-	key:  "unity" & strings.ToLower(name)
-	name: "Unity"
+	key:     "unity" & strings.ToLower(name)
+	name:    "Unity"
+	trailer: name + _trailerSuffix
 }

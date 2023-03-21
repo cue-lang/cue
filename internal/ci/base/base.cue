@@ -167,3 +167,23 @@ let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
 #curlGitHubAPI: #"""
 	curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(#botGitHubUserTokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
 	"""#
+
+// #codeReview defines the schema of a codereview.cfg file that
+// sits at the root of a repository. codereview.cfg is the configuration
+// file that drives golang.org/x/review/git-codereview. This config
+// file is also used by github.com/cue-sh/tools/cmd/cueckoo.
+#codeReview: {
+	gerrit?:      string
+	github?:      string
+	"cue-unity"?: string
+}
+
+// #toCodeReviewCfg converts a #codeReview instance to
+// the key: value
+#toCodeReviewCfg: {
+	#input: #codeReview
+	let parts = [ for k, v in #input {k + ": " + v}]
+
+	// Per https://pkg.go.dev/golang.org/x/review/git-codereview#hdr-Configuration
+	strings.Join(parts, "\n")
+}

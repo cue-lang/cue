@@ -38,10 +38,10 @@ release: _base.#bashWorkflow & {
 
 	on: push: {
 		tags: [core.#releaseTagPattern, "!" + core.#zeroReleaseTagPattern]
-		branches: list.Concat([[_base.#testDefaultBranch], _#protectedBranchPatterns])
+		branches: list.Concat([[_base.#testDefaultBranch], core.#protectedBranchPatterns])
 	}
 	jobs: goreleaser: {
-		"runs-on": _#linuxMachine
+		"runs-on": core.#linuxMachine
 		if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
 		steps: [
 			for v in _base.#checkoutCode {v},
@@ -87,7 +87,7 @@ release: _base.#bashWorkflow & {
 			},
 			_base.#repositoryDispatch & {
 				name:           "Re-test cuelang.org"
-				if:             _#isReleaseTag
+				if:             _base.#isReleaseTag
 				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
 				#arg: {
 					event_type: "Re-test post release of \(_#cueVersionRef)"
@@ -95,7 +95,7 @@ release: _base.#bashWorkflow & {
 			},
 			_base.#repositoryDispatch & {
 				name:           "Trigger unity build"
-				if:             _#isReleaseTag
+				if:             _base.#isReleaseTag
 				#repositoryURL: core.#unityRepositoryURL
 				#arg: {
 					event_type: "Check against CUE \(_#cueVersionRef)"

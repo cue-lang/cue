@@ -7,7 +7,6 @@ name: Release
       - v*
       - '!*-0.dev'
     branches:
-      - ci/test
       - master
       - release-branch.*
 concurrency: release
@@ -28,6 +27,35 @@ jobs:
         run: touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
+      - id: DispatchTrailer
+        name: Try to extract Dispatch-Trailer
+        run: |-
+          x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
+          if [[ "$x" == "" ]]
+          then
+              x=null
+          fi
+          echo "x is $x"
+          echo "value<<EOD" >> $GITHUB_OUTPUT
+          echo "$x" >> $GITHUB_OUTPUT
+          echo "EOD" >> $GITHUB_OUTPUT
+      - if: |-
+          ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) && (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"'))
+        name: Check we don't have Dispatch-Trailer on a protected branch
+        run: |-
+          echo "github.event.head_commit.message contains Dispatch-Trailer"
+          echo "github.event.head_commit.message value"
+          cat <<EOD
+          ${{ github.event.head_commit.message }}
+          EOD
+          echo "containsDispatchTrailer expression"
+          cat <<EOD
+          (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"'))
+          EOD
+          false
       - name: Install Go
         uses: actions/setup-go@v4
         with:

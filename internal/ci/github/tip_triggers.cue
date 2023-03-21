@@ -20,7 +20,7 @@ import (
 
 // The tip_triggers workflow. This fires for each new commit that hits the
 // default branch.
-tip_triggers: _base.#bashWorkflow & {
+workflows: tip_triggers: _base.#bashWorkflow & {
 
 	name: "Triggers on push to tip"
 	on: push: branches: [core.#defaultBranch]

@@ -27,7 +27,7 @@ import (
 _#cueVersionRef: "${GITHUB_REF##refs/tags/}"
 
 // The release workflow
-release: _base.#bashWorkflow & {
+workflows: release: _base.#bashWorkflow & {
 
 	name: "Release"
 

@@ -218,3 +218,57 @@ let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
 	let parts = strings.Split(#url, "/")
 	strings.Join(list.Slice(parts, 3, len(parts)), "/")
 }
+
+#setupGoActionsCaches: {
+	// #protectedBranchExpr is a GitHub expression
+	// (https://docs.github.com/en/actions/learn-github-actions/expressions)
+	// that evaluates to true if the workflow is running for a commit against a
+	// protected branch.
+	#protectedBranchExpr: string
+
+	let goModCacheDirID = "go-mod-cache-dir"
+	let goCacheDirID = "go-cache-dir"
+
+	// cacheDirs is a convenience variable that includes
+	// GitHub expressions that represent the directories
+	// that participate in Go caching.
+	let cacheDirs = [ "${{ steps.\(goModCacheDirID).outputs.dir }}/cache/download", "${{ steps.\(goCacheDirID).outputs.dir }}"]
+
+	// pre is the list of steps required to establish and initialise the correct
+	// caches for Go-based workflows.
+	[
+		json.#step & {
+			name: "Get go mod cache directory"
+			id:   goModCacheDirID
+			run:  #"echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}"#
+		},
+		json.#step & {
+			name: "Get go build/test cache directory"
+			id:   goCacheDirID
+			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
+		},
+		for _, v in [
+			{
+				if:   #protectedBranchExpr
+				uses: "actions/cache@v3"
+			},
+			{
+				if:   "! \(#protectedBranchExpr)"
+				uses: "actions/cache/restore@v3"
+			},
+		] {
+			v & json.#step & {
+				with: {
+					path: strings.Join(cacheDirs, "\n")
+
+					// GitHub actions caches are immutable. Therefore, use a key which is
+					// unique, but allow the restore to fallback to the most recent cache.
+					// The result is then saved under the new key which will benefit the
+					// next build
+					key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
+					"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
+				}
+			}
+		},
+	]
+}

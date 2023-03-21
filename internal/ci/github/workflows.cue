@@ -25,41 +25,34 @@ import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-workflows: [...{file: string, schema: (json.#Workflow & {})}]
-workflows: [
-	{
-		// Note: the name of the file corresponds to the environment variable
-		// names for gerritstatusupdater. Therefore, this filename must only be
-		// change in combination with also updating the environment in which
-		// gerritstatusupdater is running for this repository.
-		//
-		// This name is also used by the CI badge in the top-level README.
-		//
-		// This name is also used in the evict_caches lookups.
-		file:   "trybot.yml"
-		schema: trybot
-	},
-	{
-		file:   "trybot_dispatch.yml"
-		schema: trybot_dispatch
-	},
-	{
-		file:   "release.yml"
-		schema: release
-	},
-	{
-		file:   "tip_triggers.yml"
-		schema: tip_triggers
-	},
-	{
-		file:   "push_tip_to_trybot.yml"
-		schema: push_tip_to_trybot
-	},
-	{
-		file:   "evict_caches.yml"
-		schema: evict_caches
-	},
-]
+// Note: the name of the workflows (and hence the corresponding .yml filenames)
+// correspond to the environment variable names for gerritstatusupdater.
+// Therefore, this filename must only be change in combination with also
+// updating the environment in which gerritstatusupdater is running for this
+// repository.
+//
+// This name is also used by the CI badge in the top-level README.
+//
+// This name is also used in the evict_caches lookups.
+//
+// i.e. don't change the names of workflows!
+//
+// In addition to separately declaring the workflows themselves, we define the
+// shape of #workflows here as a cross-check that we don't accidentally change
+// the name of workflows without reading this comment.
+//
+// We explicitly use close() here instead of a definition in order that we can
+// cue export the github package as a test.
+workflows: close({
+	[string]: json.#Workflow
+
+	trybot:             _
+	trybot_dispatch:    _
+	release:            _
+	tip_triggers:       _
+	push_tip_to_trybot: _
+	evict_caches:       _
+})
 
 // _#protectedBranchPatterns is a list of glob patterns to match the protected
 // git branches which are continuously used during development on Gerrit.

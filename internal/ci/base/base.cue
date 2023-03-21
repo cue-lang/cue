@@ -295,3 +295,26 @@ _#matchPattern: {
 #isReleaseTag: {
 	(_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(#releaseTagPattern)"}).expr
 }
+
+// Define some shared keys and human-readable names.
+//
+// #trybot.key and #unity.key are shared with
+// github.com/cue-sh/tools/cmd/cueckoo.  The keys are used across various CUE
+// workflows and their consistency in those various locations is therefore
+// crucial. As such, we assert specific values for the keys here rather than
+// just deriving values from the human-readable names.
+//
+// #trybot.name is by the trybot GitHub workflow and by gerritstatusupdater as
+// an identifier in the status updates that are posted as reviews for this
+// workflows, but also as the result label key, e.g.  "TryBot-Result" would be
+// the result label key for the "TryBot" workflow. This name also shows up in
+// the CI badge in the top-level README.
+#trybot: {
+	key:  "trybot" & strings.ToLower(name)
+	name: "TryBot"
+}
+
+#unity: {
+	key:  "unity" & strings.ToLower(name)
+	name: "Unity"
+}

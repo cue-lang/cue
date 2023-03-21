@@ -57,6 +57,7 @@ workflows: close({
 _gerrithub: gerrithub & {
 	#repositoryURL:                      core.githubRepositoryURL
 	#trybotKey:                          _base.#trybot.key
+	#trybotTrailer:                      _base.#trybot.trailer
 	#botGitHubUser:                      "cueckoo"
 	#botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
 	#botGitHubUserEmail:                 "cueckoo@gmail.com"

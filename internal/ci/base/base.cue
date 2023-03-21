@@ -265,3 +265,9 @@ _#matchPattern: {
 #isReleaseTag: {
 	(_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(#releaseTagPattern)"}).expr
 }
+
+// #trybotKey and #unityKey are defined by github.com/cue-sh/tools/cmd/cueckoo.
+// They are used as keys across various CUE workflows and their consistency in
+// those various locations is therefore crucial.
+#trybotKey: "trybot"
+#unityKey:  "unity"

@@ -44,7 +44,7 @@ import (
 workflows: close({
 	[string]: json.#Workflow
 
-	trybot:             _
+	(_base.#trybotKey): _
 	trybot_dispatch:    _
 	release:            _
 	tip_triggers:       _
@@ -56,6 +56,7 @@ workflows: close({
 // this project
 _gerrithub: gerrithub & {
 	#repositoryURL:                      core.#githubRepositoryURL
+	#trybotKey:                          _base.#trybotKey
 	#botGitHubUser:                      "cueckoo"
 	#botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
 	#botGitHubUserEmail:                 "cueckoo@gmail.com"

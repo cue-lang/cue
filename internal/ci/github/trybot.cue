@@ -45,13 +45,18 @@ trybot: _base.#bashWorkflow & {
 		test: {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
+
+			let goCaches = _base.#setupGoActionsCaches & {
+				#protectedBranchExpr: _#isProtectedBranch
+			}
+
 			steps: [
 				for v in _base.#checkoutCode {v},
 				_base.#installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
-				for v in _#cachePre {v},
+				for v in goCaches.pre {v},
 
 				_base.#earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
@@ -72,7 +77,8 @@ trybot: _base.#bashWorkflow & {
 				_#goCheck,
 				_base.#checkGitClean,
 				_#pullThroughProxy,
-				_#cachePost,
+
+				for v in goCaches.post {v},
 			]
 		}
 	}

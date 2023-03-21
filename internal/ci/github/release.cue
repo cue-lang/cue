@@ -38,7 +38,10 @@ workflows: release: core.bashWorkflow & {
 
 	on: push: {
 		tags: [core.releaseTagPattern, "!" + core.zeroReleaseTagPattern]
-		branches: list.Concat([[core.testDefaultBranch], core.protectedBranchPatterns])
+		branches: list.Concat([
+				// [core.testDefaultBranch],
+				core.protectedBranchPatterns,
+		])
 	}
 	jobs: goreleaser: {
 		"runs-on": core.linuxMachine

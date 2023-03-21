@@ -44,18 +44,19 @@ import (
 workflows: close({
 	[string]: json.#Workflow
 
-	trybot:             _
-	trybot_dispatch:    _
-	release:            _
-	tip_triggers:       _
-	push_tip_to_trybot: _
-	evict_caches:       _
+	(_base.#trybot.key): _
+	trybot_dispatch:     _
+	release:             _
+	tip_triggers:        _
+	push_tip_to_trybot:  _
+	evict_caches:        _
 })
 
 // _gerrithub is an instance of ./gerrithub, parameterised by the properties of
 // this project
 _gerrithub: gerrithub & {
 	#repositoryURL:                      core.#githubRepositoryURL
+	#trybotKey:                          _base.#trybot.key
 	#botGitHubUser:                      "cueckoo"
 	#botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
 	#botGitHubUserEmail:                 "cueckoo@gmail.com"

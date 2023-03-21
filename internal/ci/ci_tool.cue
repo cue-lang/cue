@@ -52,7 +52,7 @@ command: gen: workflows: {
 command: gen: codereviewcfg: file.Create & {
 	_dir:     path.FromSlash("../../", path.Unix)
 	filename: path.Join([_dir, "codereview.cfg"], _goos)
-	let res = core.#toCodeReviewCfg & {#input: core.codeReview, _}
+	let res = base.#toCodeReviewCfg & {#input: core.codeReview, _}
 	let donotedit = base.#doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
 	contents: "# \(donotedit)\n\n\(res)\n"
 }

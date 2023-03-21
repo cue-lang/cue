@@ -38,9 +38,11 @@ checkoutCode: {
 			"fetch-depth": 0 // see the docs below
 		}
 	}
+	#trailers: [...string]
 
 	[
 		#actionsCheckout,
+
 		// Restore modified times to work around https://go.dev/issues/58571,
 		// as otherwise we would get lots of unnecessary Go test cache misses.
 		// Note that this action requires actions/checkout to use a fetch-depth of 0.
@@ -57,6 +59,23 @@ checkoutCode: {
 		json.#step & {
 			name: "Restore git file modification times"
 			uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
+		},
+
+		for trailer in #trailers {
+			let stepName = strings.Replace(trailer, "-", "", -1)
+			json.#step & {
+				id:  stepName
+				run: """
+					x="$(git log -1 --pretty='%(trailers:key=\(trailer),valueonly)')"
+					if [[ "$x" == "" ]]
+					then
+						x=null
+					fi
+					echo "value<<EOD" >> $GITHUB_OUTPUT
+					echo "$x" >> $GITHUB_OUTPUT
+					echo "EOD" >> $GITHUB_OUTPUT
+					"""
+			}
 		},
 	]
 }
@@ -176,14 +195,25 @@ setupGoActionsCaches: {
 	]
 }
 
-// #isProtectedBranch is an expression that evaluates to true if the
+// isProtectedBranch is an expression that evaluates to true if the
 // job is running as a result of pushing to one of _#protectedBranchPatterns.
-// It would be nice to use the "contains" builtin for simplicity,
-// but array literals are not yet supported in expressions.
+// Note that use of this expression requires the existence of steps that
+// test whether the provided #trailers have been set on the commit under test.
 isProtectedBranch: {
-	"(" + strings.Join([ for branch in protectedBranchPatterns {
-		(_matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
-	}], " || ") + ")"
+	#trailers: [...string]
+	"(" + strings.Join([
+		"(" + strings.Join([ for branch in protectedBranchPatterns {
+			(_matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+		}], " || ") + ")",
+		if len(#trailers) > 0 {
+			"(" + strings.Join([
+				for trailer in #trailers {
+					let stepName = strings.Replace(trailer, "-", "", -1)
+					"fromJSON(steps.\(stepName).outputs.value) == null"
+				},
+			], " && ") + ")"
+		},
+	], " && ") + ")"
 }
 
 // #isReleaseTag creates a GitHub expression, based on the given release tag

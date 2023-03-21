@@ -67,6 +67,8 @@ codeReview: #codeReview & {
 	gerrit: gerritHubRepositoryURL
 }
 
+let _trailerSuffix = "-Trailer"
+
 // Define some shared keys and human-readable names.
 //
 // trybot.key and unity.key are shared with
@@ -81,11 +83,13 @@ codeReview: #codeReview & {
 // the result label key for the "TryBot" workflow. This name also shows up in
 // the CI badge in the top-level README.
 trybot: {
-	key:  "trybot" & strings.ToLower(name)
-	name: "TryBot"
+	key:     "trybot" & strings.ToLower(name)
+	name:    "TryBot"
+	trailer: name + _trailerSuffix
 }
 
 unity: {
-	key:  "unity" & strings.ToLower(name)
-	name: "Unity"
+	key:     "unity" & strings.ToLower(name)
+	name:    "Unity"
+	trailer: name + _trailerSuffix
 }

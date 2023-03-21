@@ -2,14 +2,17 @@
 
 name: Dispatch trybot
 "on":
-  - repository_dispatch
+  repository_dispatch: {}
+  push:
+    branches:
+      - ci/test
 jobs:
   trybot:
     runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
-    if: ${{ github.event.client_payload.type == 'trybot' }}
+    if: ${{ github.ref == 'refs/heads/ci/test' || github.event.client_payload.type == 'trybot' }}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
@@ -19,22 +22,177 @@ jobs:
           password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
           EOD
           chmod 600 ~/.netrc
-      - id: gerrithub_ref
+      - id: payload
+        if: github.repository == 'cue-lang/cue' && github.ref == 'refs/heads/ci/test'
         run: |-
-          ref="$(echo ${{github.event.client_payload.payload.ref}} | sed -E 's/^refs\/changes\/[0-9]+\/([0-9]+)\/([0-9]+).*/\1\/\2/')"
-          echo "gerrithub_ref=$ref" >> $GITHUB_OUTPUT
-      - name: Trigger trybot
+          cat <<EOD >> $GITHUB_OUTPUT
+          value<<DOE
+          {"type":"trybot","CL":551352,"patchset":61,"targetBranch":"master","ref":"refs/changes/52/551352/61"}
+          DOE
+          EOD
+      - if: '((contains(github.event.head_commit.message, ''\nTryBot-Trailer: {''))||(contains(github.event.head_commit.message, ''\nUnity-Trailer: {'')))'
+        run: echo "contains special trailers according to containsSpecialTrailers" && false
+      - if: github.event.client_payload.type != 'trybot'
+        name: Trigger TryBot
         run: |-
+          set -x
+
           mkdir tmpgit
           cd tmpgit
           git init
           git config user.name cueckoo
           git config user.email cueckoo@gmail.com
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
-          git fetch https://review.gerrithub.io/a/cue-lang/cue "${{ github.event.client_payload.payload.ref }}"
-          git checkout -b trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }} FETCH_HEAD
-          git remote add origin https://github.com/cue-lang/cue-trybot
-          git fetch origin "${{ github.event.client_payload.payload.branch }}"
-          git push origin trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}
-          echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
-          gh pr --repo=https://github.com/cue-lang/cue-trybot create --base="${{ github.event.client_payload.payload.branch }}" --fill
+          git remote add origin  https://review.gerrithub.io/a/cue-lang/cue
+
+          # We also (temporarily) get the default branch in order that
+          # we can "restore" the trybot repo to a good state for the
+          # current (i.e. previous) implementation of trybots which
+          # used PRs. If the target branch in the trybot repo is not
+          # current, then PR creation will fail because GitHub claims
+          # it cannot find any link between the commit in a PR (i.e.
+          # the CL under test in the previous setup) and the target
+          # branch which, under the new setup, might well currently
+          # be the commit from a CL.
+          git fetch origin ${{ fromJSON(steps.payload.outputs.value).targetBranch }}
+
+          git fetch origin ${{ fromJSON(steps.payload.outputs.value).ref }}
+          git checkout -b ${{ fromJSON(steps.payload.outputs.value).targetBranch }} FETCH_HEAD
+
+          # Error if we already have TryBot-Trailer according to git log logic.
+          # See earlier check for GitHub expression logic check.
+          x="$(git log -1 --pretty='%(trailers:key=TryBot-Trailer,valueonly)')"
+          if [ "$x" != "" ]
+          then
+              echo "Ref ${{ fromJSON(steps.payload.outputs.value).ref }} already has a TryBot-Trailer"
+              exit 1
+          fi
+          # Error if we already have Unity-Trailer according to git log logic.
+          # See earlier check for GitHub expression logic check.
+          x="$(git log -1 --pretty='%(trailers:key=Unity-Trailer,valueonly)')"
+          if [ "$x" != "" ]
+          then
+              echo "Ref ${{ fromJSON(steps.payload.outputs.value).ref }} already has a Unity-Trailer"
+              exit 1
+          fi
+
+          # Add the trailer because we don't have it yet. GitHub expressions do not have a
+          # substitute or quote capability. So we do that in shell. We also strip out the
+          # indenting added by toJSON.
+          trailer="$(cat <<EOD | jq -r --indent 0
+          ${{ toJSON(fromJSON(steps.payload.outputs.value)) }}
+          EOD
+          )"
+          git log -1 --format=%B | git interpret-trailers --trailer "TryBot-Trailer: $trailer" | git commit --amend -F -
+          git log -1
+
+          success=false
+          for try in {1..20}; do
+          	echo "Push to trybot try $try"
+          	if git push -f https://github.com/cue-lang/cue-trybot ${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
+          		success=true
+          		break
+          	fi
+          	sleep 1
+          done
+          if ! $success; then
+          	echo "Giving up"
+          	exit 1
+          fi
+
+          # Restore the default branch on the trybot repo to be the tip of the main repo
+          success=false
+          for try in {1..20}; do
+          	echo "Push to trybot try $try"
+          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
+          		success=true
+          		break
+          	fi
+          	sleep 1
+          done
+          if ! $success; then
+          	echo "Giving up"
+          	exit 1
+          fi
+      - if: github.event.client_payload.type == 'trybot'
+        name: Trigger TryBot
+        run: |-
+          set -x
+
+          mkdir tmpgit
+          cd tmpgit
+          git init
+          git config user.name cueckoo
+          git config user.email cueckoo@gmail.com
+          git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
+          git remote add origin  https://review.gerrithub.io/a/cue-lang/cue
+
+          # We also (temporarily) get the default branch in order that
+          # we can "restore" the trybot repo to a good state for the
+          # current (i.e. previous) implementation of trybots which
+          # used PRs. If the target branch in the trybot repo is not
+          # current, then PR creation will fail because GitHub claims
+          # it cannot find any link between the commit in a PR (i.e.
+          # the CL under test in the previous setup) and the target
+          # branch which, under the new setup, might well currently
+          # be the commit from a CL.
+          git fetch origin ${{ github.event.client_payload.targetBranch }}
+
+          git fetch origin ${{ github.event.client_payload.ref }}
+          git checkout -b ${{ github.event.client_payload.targetBranch }} FETCH_HEAD
+
+          # Error if we already have TryBot-Trailer according to git log logic.
+          # See earlier check for GitHub expression logic check.
+          x="$(git log -1 --pretty='%(trailers:key=TryBot-Trailer,valueonly)')"
+          if [ "$x" != "" ]
+          then
+              echo "Ref ${{ github.event.client_payload.ref }} already has a TryBot-Trailer"
+              exit 1
+          fi
+          # Error if we already have Unity-Trailer according to git log logic.
+          # See earlier check for GitHub expression logic check.
+          x="$(git log -1 --pretty='%(trailers:key=Unity-Trailer,valueonly)')"
+          if [ "$x" != "" ]
+          then
+              echo "Ref ${{ github.event.client_payload.ref }} already has a Unity-Trailer"
+              exit 1
+          fi
+
+          # Add the trailer because we don't have it yet. GitHub expressions do not have a
+          # substitute or quote capability. So we do that in shell. We also strip out the
+          # indenting added by toJSON.
+          trailer="$(cat <<EOD | jq -r --indent 0
+          ${{ toJSON(github.event.client_payload) }}
+          EOD
+          )"
+          git log -1 --format=%B | git interpret-trailers --trailer "TryBot-Trailer: $trailer" | git commit --amend -F -
+          git log -1
+
+          success=false
+          for try in {1..20}; do
+          	echo "Push to trybot try $try"
+          	if git push -f https://github.com/cue-lang/cue-trybot ${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
+          		success=true
+          		break
+          	fi
+          	sleep 1
+          done
+          if ! $success; then
+          	echo "Giving up"
+          	exit 1
+          fi
+
+          # Restore the default branch on the trybot repo to be the tip of the main repo
+          success=false
+          for try in {1..20}; do
+          	echo "Push to trybot try $try"
+          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
+          		success=true
+          		break
+          	fi
+          	sleep 1
+          done
+          if ! $success; then
+          	echo "Giving up"
+          	exit 1
+          fi

@@ -24,14 +24,7 @@ import (
 
 // The trybot workflow.
 workflows: trybot: _base.#bashWorkflow & {
-	// Note: the name of this workflow is used by gerritstatusupdater as an
-	// identifier in the status updates that are posted as reviews for this
-	// workflows, but also as the result label key, e.g. "TryBot-Result" would
-	// be the result label key for the "TryBot" workflow. Note the result label
-	// key is therefore tied to the configuration of this repository.
-	//
-	// This name also shows up in the CI badge in the top-level README.
-	name: "TryBot"
+	name: _base.#trybot.name
 
 	on: {
 		push: {

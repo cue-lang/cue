@@ -47,7 +47,7 @@ import (
 let _#repositoryURLNoScheme = strings.Split(#repositoryURL, "//")[1]
 #gerritHubRepository: *("https://\(#gerritHubHostname)/a/" + path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)) | _
 
-#dispatchWorkflow: json.#Workflow & {
+#trybotDispatchWorkflow: json.#Workflow & {
 	#type:                  string
 	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
 	name:                   "Dispatch \(#type)"

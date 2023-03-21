@@ -42,7 +42,7 @@ import (
 //
 // In testing with @mvdan, this resulted in cache sizes for Linux dropping from
 // ~1GB to ~125MB. This is a considerable saving.
-evict_caches: _base.#bashWorkflow & {
+workflows: evict_caches: _base.#bashWorkflow & {
 	name: "Evict caches"
 
 	on: {

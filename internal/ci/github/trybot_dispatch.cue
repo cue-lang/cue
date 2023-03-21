@@ -14,5 +14,15 @@
 
 package github
 
+dummyDispatch: _repo.#dispatch & {
+	type:         _repo.trybot.key
+	CL:           551352
+	patchset:     _
+	targetBranch: "master"
+	ref:          "refs/changes/\(mod(CL, 100))/\(CL)/\(patchset)"
+}
+
 // The trybot_dispatch workflow.
-workflows: trybot_dispatch: _repo.bashWorkflow & _repo.trybotDispatchWorkflow
+workflows: trybot_dispatch: _repo.bashWorkflow & _repo.trybotDispatchWorkflow & {
+	#dummyDispatch: dummyDispatch
+}

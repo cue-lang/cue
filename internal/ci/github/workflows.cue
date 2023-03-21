@@ -88,11 +88,24 @@ _#matchPattern: {
 
 // _#isProtectedBranch is an expression that evaluates to true if the
 // job is running as a result of pushing to one of _#protectedBranchPatterns.
-// It would be nice to use the "contains" builtin for simplicity,
-// but array literals are not yet supported in expressions.
-_#isProtectedBranch: "(" + strings.Join([ for branch in _#protectedBranchPatterns {
-	(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
-}], " || ") + ")"
+// Note that use of this expression requires the existence of steps that
+// test whether the provided #trailers have been set on the commit under test.
+_#isProtectedBranch: {
+	#trailers: [...string]
+	"(" + strings.Join([
+		"(" + strings.Join([ for branch in _#protectedBranchPatterns {
+			(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+		}], " || ") + ") ",
+		if len(#trailers) > 0 {
+			"(" + strings.Join([
+				for trailer in #trailers {
+					let stepName = strings.Replace(trailer, "-", "", -1)
+					"( fromJSON(steps.\(stepName).outputs.value) == null) )"
+				},
+			], " && ") + ")"
+		},
+	], " && ") + ")"
+}
 
 _#isReleaseTag: (_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(core.#releaseTagPattern)"}).expr
 
@@ -137,6 +150,3 @@ _base: base & {
 	#botGitHubUser:                "cueckoo"
 	#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
 }
-
-
-

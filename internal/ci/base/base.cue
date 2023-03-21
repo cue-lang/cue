@@ -48,6 +48,8 @@ import (
 #testDefaultBranch:            "ci/test"
 #botGitHubUser:                string
 #botGitHubUserTokenSecretsKey: string
+#protectedBranchPatterns: [...string]
+#releaseTagPattern: string
 
 #doNotEditMessage: {
 	#generatedBy: string
@@ -267,4 +269,59 @@ let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
 			}
 		},
 	]
+}
+
+// #codeReview defines the schema of a codereview.cfg file that
+// sits at the root of a repository. codereview.cfg is the configuration
+// file that drives golang.org/x/review/git-codereview. This config
+// file is also used by github.com/cue-sh/tools/cmd/cueckoo.
+#codeReview: {
+	gerrit?:      string
+	github?:      string
+	"cue-unity"?: string
+}
+
+// #toCodeReviewCfg converts a #codeReview instance to
+// the key: value
+#toCodeReviewCfg: {
+	#input: #codeReview
+	let parts = [ for k, v in #input {k + ": " + v}]
+
+	// Per https://pkg.go.dev/golang.org/x/review/git-codereview#hdr-Configuration
+	strings.Join(parts, "\n")
+}
+
+// _#matchPattern returns a GitHub Actions expression which evaluates whether a
+// variable matches a globbing pattern. For literal patterns it uses "==",
+// and for suffix patterns it uses "startsWith".
+// See https://docs.github.com/en/actions/learn-github-actions/expressions.
+_#matchPattern: {
+	variable: string
+	pattern:  string
+	expr:     [
+			if strings.HasSuffix(pattern, "*") {
+			let prefix = strings.TrimSuffix(pattern, "*")
+			"startsWith(\(variable), '\(prefix)')"
+		},
+		{
+			"\(variable) == '\(pattern)'"
+		},
+	][0]
+}
+
+// #isProtectedBranch is an expression that evaluates to true if the
+// job is running as a result of pushing to one of _#protectedBranchPatterns.
+// It would be nice to use the "contains" builtin for simplicity,
+// but array literals are not yet supported in expressions.
+#isProtectedBranch: {
+	"(" + strings.Join([ for branch in #protectedBranchPatterns {
+		(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+	}], " || ") + ")"
+}
+
+// #isReleaseTag creates a GitHub expression, based on the given release tag
+// pattern, that evaluates to true if called in the context of a workflow that
+// is part of a release.
+#isReleaseTag: {
+	(_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(#releaseTagPattern)"}).expr
 }

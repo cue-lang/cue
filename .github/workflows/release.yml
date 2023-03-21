@@ -7,7 +7,6 @@ name: Release
       - v*
       - '!*-0.dev'
     branches:
-      - ci/test
       - master
       - release-branch.*
 concurrency: release
@@ -28,6 +27,32 @@ jobs:
         run: touch -t 202211302355 $(find * -type d)
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
+      - id: TryBotTrailer
+        run: |-
+          git log -1
+          git log -1 --pretty='%(trailers:key=TryBot-Trailer,valueonly)'
+          x="$(git log -1 --pretty='%(trailers:key=TryBot-Trailer,valueonly)')"
+          if [[ "$x" == "" ]]
+          then
+              x=null
+          fi
+          echo "x is $x"
+          echo "value<<EOD" >> $GITHUB_OUTPUT
+          echo "$x" >> $GITHUB_OUTPUT
+          echo "EOD" >> $GITHUB_OUTPUT
+      - id: UnityTrailer
+        run: |-
+          git log -1
+          git log -1 --pretty='%(trailers:key=Unity-Trailer,valueonly)'
+          x="$(git log -1 --pretty='%(trailers:key=Unity-Trailer,valueonly)')"
+          if [[ "$x" == "" ]]
+          then
+              x=null
+          fi
+          echo "x is $x"
+          echo "value<<EOD" >> $GITHUB_OUTPUT
+          echo "$x" >> $GITHUB_OUTPUT
+          echo "EOD" >> $GITHUB_OUTPUT
       - name: Install Go
         uses: actions/setup-go@v4
         with:

@@ -19,6 +19,32 @@ password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
 EOD
 chmod 600 ~/.netrc
 
-ref="$(echo ${{github.event.client_payload.payload.ref}} | sed -E 's/^refs\/changes\/[0-9]+\/([0-9]+)\/([0-9]+).*/\1\/\2/')"
-echo "gerrithub_ref=$ref" >> $GITHUB_OUTPUT
+mkdir tmpgit
+cd tmpgit
+git init
+git config user.name cueckoo
+git config user.email cueckoo@gmail.com
+git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
+git fetch https://review.gerrithub.io/a/cue-lang/cue "${{ github.event.client_payload.refs }}"
+git checkout -b ${{ github.event.client_payload.targetBranch }} FETCH_HEAD
+
+# Fail if we already have a trybot trailer
+currTrailer="$(git log -1 --pretty='%(trailers:key=TryBot-Trailer,valueonly)')"
+if [[ "$currTrailer" != "" ]]; then
+	echo "Commit for refs ${{ github.event.client_payload.refs }} already has TryBot-Trailer"
+	exit 1
+fi
+
+trailer="$(cat <<EOD | tr '\n' ' '
+${{ toJSON(github.event.client_payload) }}
+EOD
+)"
+
+git log -1 --format=%B | git interpret-trailers --trailer "TryBot-Trailer: $trailer" | git commit --amend -F -
+
+for try in {1..20}; do
+	echo $try
+  	git push -f https://github.com/cue-lang/cue-trybot ${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }} && break
+  	sleep 1
+done
 ABCDEF

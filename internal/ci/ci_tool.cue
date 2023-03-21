@@ -39,12 +39,13 @@ _goos: string @tag(os,var=os)
 // of generating our CI workflow definitions, and updating various txtar tests
 // with files from that process.
 command: gen: workflows: {
-	for w in github.workflows {
-		"\(w.file)": file.Create & {
+	for _workflowName, _workflow in github.workflows {
+		let _filename = _workflowName + ".yml"
+		(_filename): file.Create & {
 			_dir:     path.FromSlash("../../.github/workflows", path.Unix)
-			filename: path.Join([_dir, w.file], _goos)
+			filename: path.Join([_dir, _filename], _goos)
 			let donotedit = base.#doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
-			contents: "# \(donotedit)\n\n\(yaml.Marshal(w.schema))"
+			contents: "# \(donotedit)\n\n\(yaml.Marshal(_workflow))"
 		}
 	}
 }

@@ -23,7 +23,7 @@ import (
 )
 
 // The trybot workflow.
-trybot: _base.#bashWorkflow & {
+workflows: trybot: _base.#bashWorkflow & {
 	// Note: the name of this workflow is used by gerritstatusupdater as an
 	// identifier in the status updates that are posted as reviews for this
 	// workflows, but also as the result label key, e.g. "TryBot-Result" would

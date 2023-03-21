@@ -24,6 +24,12 @@ import (
 
 // The trybot workflow.
 trybot: _base.#bashWorkflow & {
+	// Declare an instance of _#isProtectedBranch for use in this workflow
+	let _isProtectedBranch = _#isProtectedBranch & {
+		#trailers: [core.#TrybotTrailer]
+		_
+	}
+
 	// Note: the name of this workflow is used by gerritstatusupdater as an
 	// identifier in the status updates that are posted as reviews for this
 	// workflows, but also as the result label key, e.g. "TryBot-Result" would
@@ -50,8 +56,14 @@ trybot: _base.#bashWorkflow & {
 				#protectedBranchExpr: _#isProtectedBranch
 			}
 
+			let checkoutCode = _base.#checkoutCode & {
+				#trailers: ["Trybot"]
+				_
+			}
+
 			steps: [
-				for v in _base.#checkoutCode {v},
+				for v in checkoutCode {v},
+
 				_base.#installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
@@ -64,12 +76,12 @@ trybot: _base.#bashWorkflow & {
 					if: _#isLatestLinux
 				},
 				json.#step & {
-					if:  "\(_#isProtectedBranch) || \(_#isLatestLinux)"
+					if:  "\(_isProtectedBranch) || \(_#isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,
 				_#goTest & {
-					if: "\(_#isProtectedBranch) || !\(_#isLatestLinux)"
+					if: "\(_isProtectedBranch) || !\(_#isLatestLinux)"
 				},
 				_#goTestRace & {
 					if: _#isLatestLinux
@@ -116,7 +128,7 @@ trybot: _base.#bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(_#isProtectedBranch) && \(_#isLatestLinux)"
+		if: "\(_isProtectedBranch) && \(_#isLatestLinux)"
 	}
 
 	_#goGenerate: json.#step & {

@@ -15,6 +15,9 @@ import (
 #githubRepositoryPath: _#URLPath & {#url: #githubRepositoryURL, _}
 #unityRepositoryURL:   "https://github.com/cue-unity/unity"
 
+#TrybotTrailer: "Trybot-Trailer"
+#UnityTrailer:  "Unity-Trailer"
+
 // Not ideal, but hack together something that gives us the path
 // of a URL. In lieu of cuelang.org/issue/1433
 _#URLPath: {

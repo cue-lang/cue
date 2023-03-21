@@ -31,7 +31,8 @@ import (
 
 #repositoryURL:                      string
 #gerritHubRepositoryURL:             string
-#trybotRepositoryURL:                *(#repositoryURL + "-" + #dispatchTrybot) | string
+#trybotKey:                          string
+#trybotRepositoryURL:                *(#repositoryURL + "-" + #trybotKey) | string
 #botGitHubUser:                      string
 #botGitHubUserTokenSecretsKey:       string
 #botGitHubUserEmail:                 string
@@ -48,19 +49,14 @@ _#gerritHubHostname: "review.gerrithub.io"
 
 _#linuxMachine: "ubuntu-20.04"
 
-// These constants are defined by github.com/cue-sh/tools/cmd/cueckoo
-// TODO: they probably belong elsewhere
-#dispatchTrybot: "trybot"
-#dispatchUnity:  "unity"
-
 #dispatchWorkflow: json.#Workflow & {
-	#type:                  #dispatchTrybot | #dispatchUnity
+	#type:                  string
 	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
 	name:                   "Dispatch \(#type)"
 	on: ["repository_dispatch"]
 	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
-		"\(#type)": {
+		(#type): {
 			"runs-on": _#linuxMachine
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [

@@ -28,6 +28,9 @@ jobs:
       run:
         shell: bash
     steps:
+      - if: runner.os == 'Windows'
+        run: Set-MpPreference -DisableRealtimeMonitoring $true
+        shell: powershell
       - name: Checkout code
         uses: actions/checkout@v3
         with:

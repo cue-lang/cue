@@ -46,6 +46,12 @@ trybot: _base.#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
+				json.#step & {
+					if:    "runner.os == 'Windows'"
+					run:   "Set-MpPreference -DisableRealtimeMonitoring $true"
+					shell: "powershell"
+				},
+
 				for v in _base.#checkoutCode {v},
 				_base.#installGo,
 

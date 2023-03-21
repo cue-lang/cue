@@ -7,7 +7,6 @@ name: Release
       - v*
       - '!*-0.dev'
     branches:
-      - ci/test
       - master
       - release-branch.*
 concurrency: release

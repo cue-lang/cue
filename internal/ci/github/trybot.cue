@@ -26,7 +26,10 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	on: {
 		push: {
-			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([
+					// [_repo.testDefaultBranch],
+					_repo.protectedBranchPatterns,
+			])        // do not run PR branches
 			"tags-ignore": [_repo.releaseTagPattern]
 		}
 		pull_request: {}
@@ -44,6 +47,11 @@ workflows: trybot: _repo.bashWorkflow & {
 				#os:        "${{ matrix.os }}"
 				_
 			}
+
+			// Only run the trybot workflow if we have the trybot trailer, or
+			// if we have no special trailers. Note this condition applies
+			// after and in addition to the "on" condition above.
+			if: "\(_repo.containsSpecialTrailer & {#trailer: _repo.trybot.trailer, _}) || ! \(_repo.containsSpecialTrailers)"
 
 			steps: [
 				for v in _repo.checkoutCode {v},

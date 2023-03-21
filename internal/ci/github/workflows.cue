@@ -44,4 +44,13 @@ workflows: close({
 
 	release:      _
 	tip_triggers: _
+	trybot_dispatch: #dummyDispatch: dummyDispatch
 })
+
+dummyDispatch: _repo.#dispatch & {
+	type:         _repo.trybot.key
+	CL:           551352
+	patchset:     _
+	targetBranch: "master"
+	ref:          "refs/changes/\(mod(CL, 100))/\(CL)/\(patchset)"
+}

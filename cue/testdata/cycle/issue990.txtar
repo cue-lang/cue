@@ -174,14 +174,14 @@ out: #sub & {#p: _test.s1}
 }
 -- out/eval/stats --
 Leaks:  6
-Freed:  3932
-Reused: 3909
+Freed:  3232
+Reused: 3209
 Allocs: 29
 Retain: 43
 
-Unifications: 3116
-Conjuncts:    15808
-Disjuncts:    3975
+Unifications: 2588
+Conjuncts:    12056
+Disjuncts:    3275
 -- out/eval --
 (struct){
   #AC: (#struct){

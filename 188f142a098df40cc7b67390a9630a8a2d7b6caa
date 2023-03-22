@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a48c3278_d4486f91",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:20Z",
+      "side": 1,
+      "message": "This name bugs me the wrong way, but I don\u0027t have a better suggestion. Perhaps Roger does.",
+      "range": {
+        "startLine": 412,
+        "startChar": 3,
+        "endLine": 412,
+        "endChar": 11
+      },
+      "revId": "188f142a098df40cc7b67390a9630a8a2d7b6caa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

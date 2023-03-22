@@ -50,6 +50,24 @@
       "message": "Maybe include ArcType as an explicit field here, even if the zero value is what we want, so it\u0027s clear what it will be by default?",
       "revId": "68aee58a09515d0d54c25c0a035957209dc6f4a9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c40be4e_81954c66",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1729,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-22T09:39:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59f7b82c_425c5ada",
+      "revId": "68aee58a09515d0d54c25c0a035957209dc6f4a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

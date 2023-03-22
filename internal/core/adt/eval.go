@@ -515,63 +515,21 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 
 		// We are no longer evaluating.
 
-		// Either set to Conjunction or error.
-		// TODO: verify and simplify the below code to determine whether
-		// something is a struct.
-		markStruct := false
-		if n.aStruct != nil {
-			markStruct = true
-		} else if len(n.node.Structs) > 0 {
-			markStruct = n.kind&StructKind != 0 && !n.hasTop
-		}
-		v := n.node.Value()
-		if n.node.BaseValue == nil && markStruct {
-			n.node.BaseValue = &StructMarker{}
-			v = n.node
-		}
-		if v != nil && IsConcrete(v) {
-			// Also check when we already have errors as we may find more
-			// serious errors and would like to know about all errors anyway.
+		n.validateValue(state)
 
-			if n.lowerBound != nil {
-				if b := ctx.Validate(n.lowerBound, v); b != nil {
-					// TODO(errors): make Validate return boolean and generate
-					// optimized conflict message. Also track and inject IDs
-					// to determine origin location.s
-					if e, _ := b.Err.(*ValueError); e != nil {
-						e.AddPosition(n.lowerBound)
-						e.AddPosition(v)
-					}
+		v := n.node.Value()
+
+		// TODO(perf): only delay processing of actual non-monotonic checks.
+		skip := n.skipNonMonotonicChecks()
+		if v != nil && IsConcrete(v) && !skip {
+			for _, v := range n.checks {
+				// TODO(errors): make Validate return bottom and generate
+				// optimized conflict message. Also track and inject IDs
+				// to determine origin location.s
+				if b := ctx.Validate(v, n.node); b != nil {
 					n.addBottom(b)
 				}
 			}
-			if n.upperBound != nil {
-				if b := ctx.Validate(n.upperBound, v); b != nil {
-					// TODO(errors): make Validate return boolean and generate
-					// optimized conflict message. Also track and inject IDs
-					// to determine origin location.s
-					if e, _ := b.Err.(*ValueError); e != nil {
-						e.AddPosition(n.upperBound)
-						e.AddPosition(v)
-					}
-					n.addBottom(b)
-				}
-			}
-			// MOVE BELOW
-			// TODO(perf): only delay processing of actual non-monotonic checks.
-			skip := n.skipNonMonotonicChecks()
-			if v := n.node.Value(); v != nil && IsConcrete(v) && !skip {
-				for _, v := range n.checks {
-					// TODO(errors): make Validate return bottom and generate
-					// optimized conflict message. Also track and inject IDs
-					// to determine origin location.s
-					if b := ctx.Validate(v, n.node); b != nil {
-						n.addBottom(b)
-					}
-				}
-			}
-		} else if state == finalized {
-			n.node.BaseValue = n.getValidators(finalized)
 		}
 
 		if v == nil {
@@ -600,6 +558,64 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 	}
 
 	n.completeArcs(state)
+}
+
+// validateValue checks collected bound validators and checks them against
+// the current value. If there is no value, it sets the current value
+// to these validators itself.
+//
+// Before it does this, it also checks whether n is of another incompatible
+// type, like struct. This prevents validators from being inadvertently set.
+// TODO: optimize this function for new implementation.
+func (n *nodeContext) validateValue(state vertexStatus) {
+	ctx := n.ctx
+
+	// Either set to Conjunction or error.
+	// TODO: verify and simplify the below code to determine whether
+	// something is a struct.
+	markStruct := false
+	if n.aStruct != nil {
+		markStruct = true
+	} else if len(n.node.Structs) > 0 {
+		markStruct = n.kind&StructKind != 0 && !n.hasTop
+	}
+	v := n.node.Value()
+	if n.node.BaseValue == nil && markStruct {
+		n.node.BaseValue = &StructMarker{}
+		v = n.node
+	}
+	if v != nil && IsConcrete(v) {
+		// Also check when we already have errors as we may find more
+		// serious errors and would like to know about all errors anyway.
+
+		if n.lowerBound != nil {
+			if b := ctx.Validate(n.lowerBound, v); b != nil {
+				// TODO(errors): make Validate return boolean and generate
+				// optimized conflict message. Also track and inject IDs
+				// to determine origin location.s
+				if e, _ := b.Err.(*ValueError); e != nil {
+					e.AddPosition(n.lowerBound)
+					e.AddPosition(v)
+				}
+				n.addBottom(b)
+			}
+		}
+		if n.upperBound != nil {
+			if b := ctx.Validate(n.upperBound, v); b != nil {
+				// TODO(errors): make Validate return boolean and generate
+				// optimized conflict message. Also track and inject IDs
+				// to determine origin location.s
+				if e, _ := b.Err.(*ValueError); e != nil {
+					e.AddPosition(n.upperBound)
+					e.AddPosition(v)
+				}
+				n.addBottom(b)
+			}
+		}
+
+	} else if state == finalized {
+		n.node.BaseValue = n.getValidators(finalized)
+	}
 }
 
 // incompleteErrors reports all errors from uncompleted conjuncts.

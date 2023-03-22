@@ -17,6 +17,7 @@
 package base
 
 import (
+	"list"
 	"strings"
 	"path"
 	"strconv"
@@ -186,4 +187,13 @@ let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
 
 	// Per https://pkg.go.dev/golang.org/x/review/git-codereview#hdr-Configuration
 	strings.Join(parts, "\n")
+}
+
+// #URLPath is a temporary measure to derive the path part of a URL.
+//
+// TODO: remove when cuelang.org/issue/1433 lands.
+#URLPath: {
+	#url: string
+	let parts = strings.Split(#url, "/")
+	strings.Join(list.Slice(parts, 3, len(parts)), "/")
 }

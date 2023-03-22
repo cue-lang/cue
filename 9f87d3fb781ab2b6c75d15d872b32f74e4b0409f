@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "adf25d49_d0aae84a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-22T09:26:11Z",
+      "side": 1,
+      "message": "I played with this a bit. One thing that doesn\u0027t seem quite right to me: running `cue eval` on the code below:\n\n    a: x!: 5\n\nresults in:\n\n    a: {}\n\nIt seems fine to omit optional fields in `cue eval` but it doesn\u0027t seem right to omit required fields entirely.\n\nAlso, running `cue export` on the code above prints:\n\n    a.x: required field unspecified\n\nbut doesn\u0027t include any source code location of where the required field is defined, which feels like it\u0027ll make diagnosing required-field issues harder.\n",
+      "revId": "9f87d3fb781ab2b6c75d15d872b32f74e4b0409f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11130092_8624d94b",

@@ -1,25 +1,14 @@
 package core
 
 import (
-	"list"
-	"strings"
-
 	"cuelang.org/go/internal/ci/base"
 )
 
 // Define core URLs that will be used in the codereview.cfg and GitHub workflows
 #githubRepositoryURL:  "https://github.com/cue-lang/cue"
 #gerritRepositoryURL:  "https://review.gerrithub.io/a/cue-lang/cue"
-#githubRepositoryPath: _#URLPath & {#url: #githubRepositoryURL, _}
+#githubRepositoryPath: base.#URLPath & {#url: #githubRepositoryURL, _}
 #unityRepositoryURL:   "https://github.com/cue-unity/unity"
-
-// Not ideal, but hack together something that gives us the path
-// of a URL. In lieu of cuelang.org/issue/1433
-_#URLPath: {
-	#url: string
-	let parts = strings.Split(#url, "/")
-	strings.Join(list.Slice(parts, 3, len(parts)), "/")
-}
 
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "90f6903e_00625639",
+        "filename": "internal/core/export/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-22T09:56:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da8e88f5_1d0750f0",
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e401e9c_fe51326c",
@@ -88,6 +106,48 @@
       "writtenOn": "2023-03-22T09:17:28Z",
       "side": 1,
       "message": "\"unspecified\" here doesn\u0027t read quite right to my eyes. Maybe just \"required field\" or even something a bit more wordy like \"field is required but not present\"?",
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d04b182c_f67ab98e",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-22T09:56:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "793c64be_35c20207",
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6e795da_0877a71e",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-22T09:56:12Z",
+      "side": 1,
+      "message": "Agree. Went with Rog\u0027s suggestion.",
+      "parentUuid": "5e401e9c_fe51326c",
+      "range": {
+        "startLine": 105,
+        "startChar": 37,
+        "endLine": 105,
+        "endChar": 48
+      },
       "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1996,6 +1996,17 @@ func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 	return arc
 }
 
+func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) *Vertex {
+	ctx := n.ctx
+	arc, isNew := n.node.GetArc(ctx, f, mode)
+	if f.IsLet() && !isNew {
+		arc.MultiLet = true
+		return arc
+	}
+	arc.addConjunctUnchecked(x)
+	return arc
+}
+
 // expandOne adds dynamic fields to a node until a fixed point is reached.
 // On each iteration, dynamic fields that cannot resolve due to incomplete
 // values are skipped. They will be retried on the next iteration until no

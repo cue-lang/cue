@@ -3,6 +3,23 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "d28491e1_ad255171",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-22T09:17:28Z",
+      "side": 1,
+      "message": "LGTM modulo a couple of minor thoughts, thanks!",
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ec7a9a7e_a57cd9e2",
         "filename": "internal/core/adt/composite.go",
         "patchSetId": 4
@@ -14,6 +31,23 @@
       "writtenOn": "2023-03-22T09:13:09Z",
       "side": 1,
       "message": "This answered my question from the previous CL.",
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da8e88f5_1d0750f0",
+        "filename": "internal/core/export/expr.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 320,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-22T09:17:28Z",
+      "side": 1,
+      "message": "Why is this `getFields` rather than `getField` ?",
       "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -37,6 +71,23 @@
         "endLine": 105,
         "endChar": 48
       },
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "793c64be_35c20207",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-22T09:17:28Z",
+      "side": 1,
+      "message": "\"unspecified\" here doesn\u0027t read quite right to my eyes. Maybe just \"required field\" or even something a bit more wordy like \"field is required but not present\"?",
       "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

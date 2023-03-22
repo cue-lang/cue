@@ -36,7 +36,7 @@ workflows: trybot: _base.#bashWorkflow & {
 	on: {
 		push: {
 			branches: list.Concat([["trybot/*/*", _base.#testDefaultBranch], _#protectedBranchPatterns]) // do not run PR branches
-			"tags-ignore": [core.#releaseTagPattern]
+			"tags-ignore": [core.releaseTagPattern]
 		}
 		pull_request: {}
 	}
@@ -77,7 +77,7 @@ workflows: trybot: _base.#bashWorkflow & {
 	}
 
 	_#pullThroughProxy: json.#step & {
-		name: "Pull this commit through the proxy on \(core.#defaultBranch)"
+		name: "Pull this commit through the proxy on \(core.defaultBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)

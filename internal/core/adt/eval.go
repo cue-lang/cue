@@ -297,6 +297,10 @@ func (c *OpContext) unify(v *Vertex, state vertexStatus) {
 			// The conjuncts will have too much information. Better have no
 			// information than incorrect information.
 			for _, d := range d.Values {
+				d, ok := d.(*Vertex)
+				if !ok {
+					continue
+				}
 				// We clear the conjuncts for now. As these disjuncts are for API
 				// use only, we will fill them out when necessary (using Defaults).
 				d.Conjuncts = nil
@@ -884,7 +888,7 @@ func isCyclePlaceholder(v BaseValue) bool {
 }
 
 func (n *nodeContext) createDisjunct() *Disjunction {
-	a := make([]*Vertex, len(n.disjuncts))
+	a := make([]Value, len(n.disjuncts))
 	p := 0
 	hasDefaults := false
 	for i, x := range n.disjuncts {

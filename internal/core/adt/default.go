@@ -56,7 +56,7 @@ func (v *Vertex) Default() *Vertex {
 		case 0:
 			return v
 		case 1:
-			w = d.Values[0].Default()
+			w = ToVertex(Default(d.Values[0]))
 		default:
 			x := *v
 			x.state = nil

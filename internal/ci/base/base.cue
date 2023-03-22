@@ -62,10 +62,7 @@ linuxMachine: string
 let _#repositoryURLNoScheme = strings.Split(githubRepositoryURL, "//")[1]
 gerritHubRepository: *("https://\(gerritHubHostname)/a/" + path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)) | _
 
-codeReview: #codeReview & {
-	github: githubRepositoryURL
-	gerrit: gerritHubRepositoryURL
-}
+let _trailerSuffix = "-Trailer"
 
 // Define some shared keys and human-readable names.
 //
@@ -81,11 +78,13 @@ codeReview: #codeReview & {
 // the result label key for the "TryBot" workflow. This name also shows up in
 // the CI badge in the top-level README.
 trybot: {
-	key:  "trybot" & strings.ToLower(name)
-	name: "TryBot"
+	key:     "trybot" & strings.ToLower(name)
+	name:    "TryBot"
+	trailer: name + _trailerSuffix
 }
 
 unity: {
-	key:  "unity" & strings.ToLower(name)
-	name: "Unity"
+	key:     "unity" & strings.ToLower(name)
+	name:    "Unity"
+	trailer: name + _trailerSuffix
 }

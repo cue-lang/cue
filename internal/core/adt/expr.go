@@ -1770,7 +1770,7 @@ type Disjunction struct {
 
 	// Values are the non-error disjuncts of this expression. The first
 	// NumDefault values are default values.
-	Values []*Vertex
+	Values []Value
 
 	Errors *Bottom // []bottom
 

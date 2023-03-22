@@ -546,9 +546,14 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 	// to avoid issues with the closedness algorithm down the line.
 	case *Disjunction:
 		d := *x
-		d.Values = make([]*Vertex, len(x.Values))
+		d.Values = make([]Value, len(x.Values))
 		for i, v := range x.Values {
-			d.Values[i] = v.ToDataAll(ctx)
+			switch x := v.(type) {
+			case *Vertex:
+				d.Values[i] = x.ToDataAll(ctx)
+			default:
+				d.Values[i] = x
+			}
 		}
 		return &d
 
@@ -739,7 +744,11 @@ func (v *Vertex) IsClosedList() bool {
 func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 	if x, ok := v.BaseValue.(*Disjunction); ok {
 		for _, v := range x.Values {
-			if v.Accept(ctx, f) {
+			x, ok := v.(*Vertex)
+			if !ok {
+				continue
+			}
+			if x.Accept(ctx, f) {
 				return true
 			}
 		}

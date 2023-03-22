@@ -38,20 +38,20 @@ var (
 	// windowsDefault is the default for VolumeName.
 	windowsDefault = &adt.Disjunction{
 		NumDefaults: 1,
-		Values: append([]*adt.Vertex{
+		Values: append([]adt.Value{
 			newStr("windows"),
 			newStr("unix"),
 			newStr("plan9")}, unixOS...),
 	}
 
-	allOS = append([]*adt.Vertex{
+	allOS = append([]adt.Value{
 		newStr("unix"),
 		newStr("windows"),
 		newStr("plan9"),
 	}, unixOS...)
 
 	// These all fall back to unix
-	unixOS = []*adt.Vertex{
+	unixOS = []adt.Value{
 		newStr("aix"),
 		newStr("android"),
 		newStr("darwin"),
@@ -70,10 +70,8 @@ var (
 	}
 )
 
-func newStr(s string) *adt.Vertex {
-	v := &adt.Vertex{}
-	v.SetValue(nil, &adt.String{Str: s})
-	return v
+func newStr(s string) adt.Value {
+	return &adt.String{Str: s}
 }
 
 var pkg = &internal.Package{

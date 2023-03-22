@@ -319,103 +319,113 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
 func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, state vertexStatus) (progress bool) {
-	ctx := n.ctx
-
 	all := *allP
 	workRemaining := false
 
 	// We use variables, instead of range, as the list may grow dynamically.
 	for i := 0; i < len(*allP); i++ {
 		all = *allP // update list as long as it is non-empty.
-		d := all[i]
 
-		if d.self && allowCycle {
-			continue
-		}
-
-		// Compute environments, if needed.
-		if !d.done {
-			var envs []*Environment
-			f := func(env *Environment) {
-				envs = append(envs, env)
-			}
-
-			if err := ctx.yield(d.node, d.env, d.comp, state, f); err != nil {
-				if err.IsIncomplete() {
-					// TODO:  Detect that the nodes are actually equal
-					if allowCycle && err.ForCycle && err.Value == n.node {
-						n.selfComprehensions = append(n.selfComprehensions, d)
-						progress = true
-						all[i].self = true
-						continue
-					}
-					d.err = err
-					workRemaining = true
-
-					// TODO: add this when it can be done without breaking other
-					// things.
-					//
-					// // Add comprehension to ensure incomplete error is inserted.
-					// // This ensures that the error is reported in the Vertex
-					// // where the comprehension was defined, and not just in the
-					// // node below. This, in turn, is necessary to support
-					// // certain logic, like export, that expects to be able to
-					// // detect an "incomplete" error at the first level where it
-					// // is necessary.
-					// n := d.node.getNodeContext(ctx)
-					// n.addBottom(err)
-
-				} else {
-					// continue to collect other errors.
-					d.node.state.addBottom(err)
-					d.done = true
-					progress = true
-				}
-				if d.node != nil {
-					ctx.PopArc(d.node)
-				}
-				continue
-			}
-
-			d.envs = envs
-
-			if len(d.envs) > 0 {
-				for _, s := range d.structs {
-					s.Init()
-				}
-			}
-			d.structs = nil
-			d.done = true
-		}
-
-		if all[i].inserted {
-			continue
-		}
-		all[i].inserted = true
-
-		progress = true
-
-		if len(d.envs) == 0 {
-			continue
-		}
-
-		v := n.node
-		for c := d.leaf; c.parent != nil; c = c.parent {
-			v.updateArcType(c.arcType)
-			v = c.arc
-		}
-
-		id := d.id
-
-		for _, env := range d.envs {
-			env = linkChildren(env, d.leaf)
-			n.addExprConjunct(Conjunct{env, d.expr, id}, state)
+		if n.processComprehension(&all[i], allowCycle, state) {
+			progress = true
+		} else {
+			workRemaining = true
 		}
 	}
 
 	if !workRemaining {
 		*allP = all[:0] // Signal that all work is done.
 	}
+	return progress
+}
+
+// processComprehension processes a single Comprehension conjunctx
+func (n *nodeContext) processComprehension(d *envYield, allowCycle bool, state vertexStatus) (progress bool) {
+	ctx := n.ctx
+
+	if d.self && allowCycle {
+		return false
+	}
+
+	// Compute environments, if needed.
+	if !d.done {
+		var envs []*Environment
+		f := func(env *Environment) {
+			envs = append(envs, env)
+		}
+
+		if err := ctx.yield(d.node, d.env, d.comp, state, f); err != nil {
+			if err.IsIncomplete() {
+				// TODO:  Detect that the nodes are actually equal
+				if allowCycle && err.ForCycle && err.Value == n.node {
+					n.selfComprehensions = append(n.selfComprehensions, *d)
+					progress = true
+					d.self = true
+					return
+				}
+				d.err = err
+
+				// TODO: add this when it can be done without breaking other
+				// things.
+				//
+				// // Add comprehension to ensure incomplete error is inserted.
+				// // This ensures that the error is reported in the Vertex
+				// // where the comprehension was defined, and not just in the
+				// // node below. This, in turn, is necessary to support
+				// // certain logic, like export, that expects to be able to
+				// // detect an "incomplete" error at the first level where it
+				// // is necessary.
+				// n := d.node.getNodeContext(ctx)
+				// n.addBottom(err)
+
+			} else {
+				// continue to collect other errors.
+				d.node.state.addBottom(err)
+				d.done = true
+				progress = true
+				d.inserted = true
+			}
+			if d.node != nil {
+				ctx.PopArc(d.node)
+			}
+			return
+		}
+
+		d.envs = envs
+
+		if len(d.envs) > 0 {
+			for _, s := range d.structs {
+				s.Init()
+			}
+		}
+		d.structs = nil
+		d.done = true
+	}
+
+	if d.inserted {
+		return
+	}
+	d.inserted = true
+
+	progress = true
+
+	if len(d.envs) == 0 {
+		return
+	}
+
+	v := n.node
+	for c := d.leaf; c.parent != nil; c = c.parent {
+		v.updateArcType(c.arcType)
+		v = c.arc
+	}
+
+	id := d.id
+
+	for _, env := range d.envs {
+		env = linkChildren(env, d.leaf)
+		n.addExprConjunct(Conjunct{env, d.expr, id}, state)
+	}
+
 	return progress
 }
 

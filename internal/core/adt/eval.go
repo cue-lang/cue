@@ -912,69 +912,32 @@ type nodeContext struct {
 	nextFree *nodeContext
 	refCount int
 
-	ctx  *OpContext
-	node *Vertex
+	nodeContextState
 
-	// TODO: (this is CL is first step)
-	// filter *Vertex a subset of composite with concrete fields for
-	// bloom-like filtering of disjuncts. We should first verify, however,
-	// whether some breath-first search gives sufficient performance, as this
-	// should already ensure a quick-fail for struct disjunctions with
-	// discriminators.
+	// Slices
 
-	arcMap []arcKey
+	arcMap []arcKey // not copied for cloning
 
-	// snapshot holds the last value of the vertex before calling postDisjunct.
-	snapshot Vertex
-
-	// Result holds the last evaluated value of the vertex after calling
-	// postDisjunct.
-	result Vertex
-
-	// Current value (may be under construction)
-	scalar   Value // TODO: use Value in node.
-	scalarID CloseInfo
-
-	// Concrete conjuncts
-	kind       Kind
-	kindExpr   Expr        // expr that adjust last value (for error reporting)
-	kindID     CloseInfo   // for error tracing
-	lowerBound *BoundValue // > or >=
-	upperBound *BoundValue // < or <=
-	checks     []Validator // BuiltinValidator, other bound values.
-	postChecks []envCheck  // Check non-monotic constraints, among other things.
-	errs       *Bottom
+	// notify is used to communicate errors in cyclic dependencies.
+	// TODO: also use this to communicate increasingly more concrete values.
+	notify []*Vertex
 
 	// Conjuncts holds a reference to the Vertex Arcs that still need
 	// processing. It does NOT need to be copied.
 	conjuncts       []Conjunct
 	cyclicConjuncts []cyclicConjunct
 
-	// conjunctsPos is an index into conjuncts indicating the next conjunct
-	// to process. This is used to avoids processing a conjunct twice in some
-	// cases where there is an evaluation cycle.
-	conjunctsPos int
-
-	// notify is used to communicate errors in cyclic dependencies.
-	// TODO: also use this to communicate increasingly more concrete values.
-	notify []*Vertex
-
-	// Struct information
 	dynamicFields      []envDynamic
 	comprehensions     []envYield
 	selfComprehensions []envYield // comprehensions iterating over own struct.
-	aStruct            Expr
-	aStructID          CloseInfo
 
 	// Expression conjuncts
 	lists  []envList
 	vLists []*Vertex
 	exprs  []envExpr
 
-	hasTop      bool
-	hasCycle    bool // has conjunct with structural cycle
-	hasNonCycle bool // has conjunct without structural cycle
-	depth       int32
+	checks     []Validator // BuiltinValidator, other bound values.
+	postChecks []envCheck  // Check non-monotic constraints, among other things.
 
 	// Disjunction handling
 	disjunctions []envDisjunct
@@ -985,10 +948,54 @@ type nodeContext struct {
 	// be treated as a marked disjunction.
 	usedDefault []defaultInfo
 
-	defaultMode  defaultMode
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
+
+	// snapshot holds the last value of the vertex before calling postDisjunct.
+	snapshot Vertex
+
+	// Result holds the last evaluated value of the vertex after calling
+	// postDisjunct.
+	result Vertex
+}
+
+type nodeContextState struct {
+	ctx  *OpContext
+	node *Vertex
+
+	// State info
+
+	hasTop      bool
+	hasCycle    bool // has conjunct with structural cycle
+	hasNonCycle bool // has conjunct without structural cycle
+
+	depth       int32
+	defaultMode defaultMode
+
+	// Value info
+
+	kind     Kind
+	kindExpr Expr      // expr that adjust last value (for error reporting)
+	kindID   CloseInfo // for error tracing
+
+	// Current value (may be under construction)
+	scalar   Value // TODO: use Value in node.
+	scalarID CloseInfo
+
+	aStruct   Expr
+	aStructID CloseInfo
+
+	lowerBound *BoundValue // > or >=
+	upperBound *BoundValue // < or <=
+	errs       *Bottom
+
+	// Slice positions
+
+	// conjunctsPos is an index into conjuncts indicating the next conjunct
+	// to process. This is used to avoids processing a conjunct twice in some
+	// cases where there is an evaluation cycle.
+	conjunctsPos int
 }
 
 // Logf substitutes args in format. Arguments of type Feature, Value, and Expr
@@ -1020,39 +1027,24 @@ func (n *nodeContext) clone() *nodeContext {
 
 	d.refCount++
 
-	d.ctx = n.ctx
-	d.node = n.node
-
-	d.scalar = n.scalar
-	d.scalarID = n.scalarID
-	d.kind = n.kind
-	d.kindExpr = n.kindExpr
-	d.kindID = n.kindID
-	d.aStruct = n.aStruct
-	d.aStructID = n.aStructID
-
-	d.lowerBound = n.lowerBound
-	d.upperBound = n.upperBound
-	d.errs = n.errs
-	d.hasTop = n.hasTop
-	d.hasCycle = n.hasCycle
-	d.hasNonCycle = n.hasNonCycle
-	d.depth = n.depth
+	d.nodeContextState = n.nodeContextState
 
 	d.arcMap = append(d.arcMap, n.arcMap...)
-	d.cyclicConjuncts = append(d.cyclicConjuncts, n.cyclicConjuncts...)
 	d.notify = append(d.notify, n.notify...)
-	d.checks = append(d.checks, n.checks...)
-	d.postChecks = append(d.postChecks, n.postChecks...)
+
+	d.conjuncts = append(d.conjuncts, n.conjuncts...)
+	d.cyclicConjuncts = append(d.cyclicConjuncts, n.cyclicConjuncts...)
 	d.dynamicFields = append(d.dynamicFields, n.dynamicFields...)
 	d.comprehensions = append(d.comprehensions, n.comprehensions...)
 	d.selfComprehensions = append(d.selfComprehensions, n.selfComprehensions...)
 	d.lists = append(d.lists, n.lists...)
 	d.vLists = append(d.vLists, n.vLists...)
 	d.exprs = append(d.exprs, n.exprs...)
-	d.usedDefault = append(d.usedDefault, n.usedDefault...)
+	d.checks = append(d.checks, n.checks...)
+	d.postChecks = append(d.postChecks, n.postChecks...)
 
-	// No need to clone d.disjunctions
+	d.usedDefault = append(d.usedDefault, n.usedDefault...)
+	// Do not clone other disjunction-related slices.
 
 	return d
 }
@@ -1063,9 +1055,11 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		c.freeListNode = n.nextFree
 
 		*n = nodeContext{
-			ctx:                c,
-			node:               node,
-			kind:               TopKind,
+			nodeContextState: nodeContextState{
+				ctx:  c,
+				node: node,
+				kind: TopKind,
+			},
 			arcMap:             n.arcMap[:0],
 			cyclicConjuncts:    n.cyclicConjuncts[:0],
 			notify:             n.notify[:0],
@@ -1088,11 +1082,11 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 	}
 	c.stats.Allocs++
 
-	return &nodeContext{
+	return &nodeContext{nodeContextState: nodeContextState{
 		ctx:  c,
 		node: node,
 		kind: TopKind,
-	}
+	}}
 }
 
 func (v *Vertex) getNodeContext(c *OpContext, ref int) *nodeContext {

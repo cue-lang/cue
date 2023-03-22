@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2717a518_e0f93cc3",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:05:59Z",
+      "side": 0,
+      "message": "I like that this goes away.",
+      "revId": "5816bf158228343500d9d2502f8c343b0ad61880",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17781e98_37253f0f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:05:59Z",
+      "side": 1,
+      "message": "update for new field types.",
+      "revId": "db43546c169d536ccf9e9ef9ef866b9074b185b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9965e23c_6602ca4f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1806,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:05:59Z",
+      "side": 1,
+      "message": "a comment would help here.",
+      "range": {
+        "startLine": 1806,
+        "startChar": 0,
+        "endLine": 1806,
+        "endChar": 1
+      },
+      "revId": "db43546c169d536ccf9e9ef9ef866b9074b185b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0623e355_218832a5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:43Z",
+      "side": 1,
+      "message": "Phrasing suggestion:\n\nHoist the fields that need copying when cloning to make cloning\nless error prone in anticipation for the new evaluator which will\nmove things around.",
+      "range": {
+        "startLine": 9,
+        "startChar": 0,
+        "endLine": 13,
+        "endChar": 46
+      },
+      "revId": "692eb4464210aa7b0a0c9924654014e2a4e97415",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ba55cf8_d76f6b97",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 917,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:43Z",
+      "side": 1,
+      "message": "Can you expand on this comment? Or perhaps delete it altogether.",
+      "range": {
+        "startLine": 917,
+        "startChar": 1,
+        "endLine": 917,
+        "endChar": 10
+      },
+      "revId": "692eb4464210aa7b0a0c9924654014e2a4e97415",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a212f5ab_66e38f56",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 940,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:43Z",
+      "side": 1,
+      "message": "monotonic?",
+      "range": {
+        "startLine": 940,
+        "startChar": 37,
+        "endLine": 940,
+        "endChar": 45
+      },
+      "revId": "692eb4464210aa7b0a0c9924654014e2a4e97415",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a0c56d9_0e71d8a0",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1047,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:43Z",
+      "side": 1,
+      "message": "Can you be explicit about exactly what is not being copied, and why?",
+      "revId": "692eb4464210aa7b0a0c9924654014e2a4e97415",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

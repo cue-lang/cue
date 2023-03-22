@@ -75,13 +75,50 @@ jobs:
           # recently. Increase it to 5 or 10 soon, to also cover CL chains.
           for commit in $(git rev-list --max-count=1 HEAD); do
           	if ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then
-          		echo -e "
-          Recent commit is lacking Signed-off-by:
-          "
+          		echo -e "\nRecent commit is lacking Signed-off-by:\n"
           		git show --quiet $commit
           		exit 1
           	fi
           done
+
+          # Ensure that commit messages have a blank second line.
+          # We know that a commit message must be longer than a single
+          # line because each commit must be signed-off.
+          if git log --format=%B -n 1 HEAD | sed -n '2{/^$/{q1}}'; then
+          	echo "second line of commit message must be blank"
+          	exit 1
+          fi
+
+          # Ensure that the commit author is the same as the signed-off-by.  This
+          # is a basic requirement of DCO. It is enforced by Gerrit (although
+          # noting that in Gerrit the author name does not have to match, only
+          # the email address), but _not_ by the DCO GitHub app:
+          #
+          #   https://github.com/dcoapp/app/issues/201
+          #
+          # Provide a sanity check as part of GitHub workflows that should enforce
+          # this, e.g. trybot workflows.
+          #
+          # We do so by comparing the commit author and "Signed-off-by" trailer for
+          # strict equality. Whilst this is more strict than Gerrit, it should
+          # generally be the case, and we can always relax this when presented with
+          # specific situations where it is is a problem.
+
+          # commit author email address
+          commitauthor="$(git log -1 --pretty="%ae")"
+
+          # signed-off-by trailer email address. There is no way to parse just the
+          # email address from the trailer in the same way as git log, so instead
+          # grab the relevant trailer and then take the last whitespace-delimited
+          # part as the "<>" contained email address.
+          # Getting the Signed-off-by trailer in this way causes blank
+          # lines for some reason. Use awk to remove them.
+          commitsigner="$(git log -1 --pretty='%(trailers:key=Signed-off-by,valueonly)' | sed -ne 's/.* <\(.*\)>/\1/p')"
+
+          if [[ "$commitauthor" != "$commitsigner" ]]; then
+          	echo "commit author email address does not match signed-off-by trailer"
+          	exit 1
+          fi
       - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')
         run: echo CUE_LONG=true >> $GITHUB_ENV
       - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-22.04')

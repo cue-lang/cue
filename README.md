@@ -13,6 +13,11 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+<!--
+
+TOP OF STACK COMMIT
+
+-->
 [![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
 [![Github](https://github.com/cue-lang/cue/actions/workflows/trybot.yml/badge.svg)](https://github.com/cue-lang/cue/actions/workflows/trybot.yml?query=branch%3Amaster+event%3Apush)
 [![GolangCI](https://golangci.com/badges/github.com/cue-lang/cue.svg)](https://golangci.com/r/github.com/cue-lang/cue)

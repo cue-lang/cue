@@ -165,4 +165,3 @@ jobs:
 
           echo "giving up after a number of retries"
           exit 1
-      - run: find '${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download' '${{ steps.go-cache-dir.outputs.dir }}' -type f -amin +7200 -delete -print

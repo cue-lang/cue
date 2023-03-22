@@ -1769,8 +1769,8 @@ type Disjunction struct {
 	Src ast.Expr
 
 	// Values are the non-error disjuncts of this expression. The first
-	// NumDefault values are default values.
-	Values []*Vertex
+	// NumDefaults values are default values.
+	Values []Value
 
 	Errors *Bottom // []bottom
 

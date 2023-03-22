@@ -480,7 +480,7 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 		//	}
 		n.node.LockArcs = true
 
-		n.injectComprehensions(&(n.selfComprehensions), false, state)
+		n.injectSelfComprehensions(state)
 	}
 
 	for n.expandOne(state) {
@@ -2061,7 +2061,7 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 		return true
 	}
 
-	if progress = n.injectComprehensions(&(n.comprehensions), true, state); progress {
+	if progress = n.injectComprehensions(state); progress {
 		return true
 	}
 

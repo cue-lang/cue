@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b69bab4_8f70b4ba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:55:05Z",
+      "side": 1,
+      "message": "LGTM with minor comments.",
+      "revId": "2f08bf842c478340ba0863010cef98464acaeeff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "340f487c_a82ad200",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:55:05Z",
+      "side": 1,
+      "message": "\"old\" and \"new\" are relative concepts, whose meaning will be lost to time when we will only have the new implementation. I would remove this comment because I think it\u0027s confusing.\n\nThis method seems useful on its own, I don\u0027t think we need to justify its existence in a comment. After all, it is a useful property of every other function that it allows abstracting behavior on the behalf of its callers.",
+      "range": {
+        "startLine": 561,
+        "startChar": 0,
+        "endLine": 562,
+        "endChar": 18
+      },
+      "revId": "2f08bf842c478340ba0863010cef98464acaeeff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

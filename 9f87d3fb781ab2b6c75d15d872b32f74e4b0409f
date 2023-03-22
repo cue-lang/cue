@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e36ebdf_2f804bfa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:15:38Z",
+      "side": 1,
+      "message": "I am pleasantly surprised how straightforward and trivial this is.",
+      "revId": "9f87d3fb781ab2b6c75d15d872b32f74e4b0409f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

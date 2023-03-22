@@ -33,6 +33,23 @@
       "message": "Here\u0027s another required-field anomaly: this passes `cue vet`, but I don\u0027t think it should:\n```\n#A: a!: int\n#A: #B\n\n#B: b!: int\n```",
       "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6c8f2f1_4df612cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-22T12:10:14Z",
+      "side": 1,
+      "message": "Unity setup is back up and running. Running trybots from this point onwards will also cause unity to run and report back.",
+      "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1039,7 +1039,7 @@ func (n *nodeContext) clone() *nodeContext {
 	d.hasNonCycle = n.hasNonCycle
 	d.depth = n.depth
 
-	// d.arcMap = append(d.arcMap, n.arcMap...) // XXX add?
+	d.arcMap = append(d.arcMap, n.arcMap...)
 	d.cyclicConjuncts = append(d.cyclicConjuncts, n.cyclicConjuncts...)
 	d.notify = append(d.notify, n.notify...)
 	d.checks = append(d.checks, n.checks...)

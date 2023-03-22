@@ -55,14 +55,14 @@ eval: true
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  82
-Reused: 70
-Allocs: 12
+Freed:  70
+Reused: 59
+Allocs: 11
 Retain: 1
 
 Unifications: 28
-Conjuncts:    165
-Disjuncts:    83
+Conjuncts:    131
+Disjuncts:    71
 -- out/eval --
 (struct){
   #Foo: (#struct){

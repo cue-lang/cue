@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "2ae2fcf4_acd716cf",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-22T09:09:21Z",
+      "side": 1,
+      "message": "Maybe comment saying what the possible values of this are?",
+      "revId": "9f814cb3d6af2d3590854d1718b651dbdfd5074c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5cab121_8dcc35ee",
         "filename": "cue/parser/parser.go",
         "patchSetId": 3

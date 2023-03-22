@@ -16,6 +16,23 @@
       "message": "We currently don\u0027t have unity running (I am in the process of fixing that).\n\nWill manually do that and report back.",
       "revId": "9c621181c2fe1352155630c9ece223fbf05a5a8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbdf87fb_9f727ac3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-22T12:10:22Z",
+      "side": 1,
+      "message": "Unity setup is back up and running. Running trybots from this point onwards will also cause unity to run and report back.",
+      "revId": "9c621181c2fe1352155630c9ece223fbf05a5a8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

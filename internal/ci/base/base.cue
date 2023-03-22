@@ -33,6 +33,7 @@
 package base
 
 import (
+	"list"
 	"strings"
 	"path"
 	"strconv"
@@ -287,4 +288,13 @@ _#matchPattern: {
 #unity: {
 	key:  "unity" & strings.ToLower(name)
 	name: "Unity"
+}
+
+// #URLPath is a temporary measure to derive the path part of a URL.
+//
+// TODO: remove when cuelang.org/issue/1433 lands.
+#URLPath: {
+	#url: string
+	let parts = strings.Split(#url, "/")
+	strings.Join(list.Slice(parts, 3, len(parts)), "/")
 }

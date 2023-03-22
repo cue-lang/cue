@@ -26,7 +26,7 @@ import (
 // project which "vendors" the various workflow-related
 // packages can specify "cue" as the value so that unity
 // tests can specify the cmd/cue binary to use.
-_cueCmd: string | *"go run cuelang.org/go/cmd/cue@v0.5.0-beta.2" @tag(cue_cmd)
+_cueCmd: string | *"go run cuelang.org/go/cmd/cue@v0.5.0-beta.5" @tag(cue_cmd)
 
 // For the commands below, note we use simple yet hacky path resolution, rather
 // than anything that might derive the module root using go list or similar, in

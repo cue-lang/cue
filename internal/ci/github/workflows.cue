@@ -59,7 +59,7 @@ workflows: close({
 // This includes the default branch and release branches,
 // but excludes any others like feature branches or short-lived branches.
 // Note that #testDefaultBranch is excluded as it is GitHub-only.
-_#protectedBranchPatterns: [core.#defaultBranch, core.#releaseBranchPattern]
+_#protectedBranchPatterns: [core.defaultBranch, core.releaseBranchPattern]
 
 // _#matchPattern returns a GitHub Actions expression which evaluates whether a
 // variable matches a globbing pattern. For literal patterns it uses "==",
@@ -87,7 +87,7 @@ _#isProtectedBranch: "(" + strings.Join([ for branch in _#protectedBranchPattern
 	(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
 }], " || ") + ")"
 
-_#isReleaseTag: (_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(core.#releaseTagPattern)"}).expr
+_#isReleaseTag: (_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(core.releaseTagPattern)"}).expr
 
 _#linuxMachine:   "ubuntu-22.04"
 _#macosMachine:   "macos-11"
@@ -96,12 +96,12 @@ _#windowsMachine: "windows-2022"
 // _#isLatestLinux evaluates to true if the job is running on Linux with the
 // latest version of Go. This expression is often used to run certain steps
 // just once per CI workflow, to avoid duplicated work.
-_#isLatestLinux: "(matrix.go-version == '\(core.#latestStableGo)' && matrix.os == '\(_#linuxMachine)')"
+_#isLatestLinux: "(matrix.go-version == '\(core.latestStableGo)' && matrix.os == '\(_#linuxMachine)')"
 
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		"go-version": ["1.18.x", core.#latestStableGo]
+		"go-version": ["1.18.x", core.latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -109,7 +109,7 @@ _#testStrategy: {
 // _gerrithub is an instance of ./gerrithub, parameterised by the properties of
 // this project
 _gerrithub: gerrithub & {
-	#repositoryURL:                      core.#githubRepositoryURL
+	#repositoryURL:                      core.githubRepositoryURL
 	#botGitHubUser:                      "cueckoo"
 	#botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
 	#botGitHubUserEmail:                 "cueckoo@gmail.com"
@@ -125,8 +125,8 @@ _gerrithub: gerrithub & {
 // Perhaps rename the import to something more obviously not intended to be
 // used, and then rename the field base?
 _base: base & {
-	#repositoryURL:                core.#githubRepositoryURL
-	#defaultBranch:                core.#defaultBranch
+	#repositoryURL:                core.githubRepositoryURL
+	#defaultBranch:                core.defaultBranch
 	#botGitHubUser:                "cueckoo"
 	#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
 }

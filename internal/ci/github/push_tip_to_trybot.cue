@@ -34,7 +34,7 @@ workflows: push_tip_to_trybot: _base.#bashWorkflow & {
 
 	jobs: push: {
 		"runs-on": _#linuxMachine
-		if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
+		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
 		steps: [
 			_gerrithub.#writeNetrcFile,
 			json.#step & {

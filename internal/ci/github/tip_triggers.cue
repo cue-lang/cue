@@ -23,10 +23,10 @@ import (
 workflows: tip_triggers: _base.#bashWorkflow & {
 
 	name: "Triggers on push to tip"
-	on: push: branches: [core.#defaultBranch]
+	on: push: branches: [core.defaultBranch]
 	jobs: push: {
-		"runs-on": core.#linuxMachine
-		if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
+		"runs-on": core.linuxMachine
+		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
 		steps: [
 			_base.#repositoryDispatch & {
 				name:           "Trigger tip.cuelang.org deploy"

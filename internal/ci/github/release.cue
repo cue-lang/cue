@@ -37,16 +37,16 @@ workflows: release: _base.#bashWorkflow & {
 	concurrency: "release"
 
 	on: push: {
-		tags: [core.#releaseTagPattern, "!" + core.#zeroReleaseTagPattern]
-		branches: list.Concat([[_base.#testDefaultBranch], core.#protectedBranchPatterns])
+		tags: [core.releaseTagPattern, "!" + core.zeroReleaseTagPattern]
+		branches: list.Concat([[_base.#testDefaultBranch], core.protectedBranchPatterns])
 	}
 	jobs: goreleaser: {
-		"runs-on": core.#linuxMachine
-		if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
+		"runs-on": core.linuxMachine
+		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
 		steps: [
 			for v in _base.#checkoutCode {v},
 			_base.#installGo & {
-				with: "go-version": core.#pinnedReleaseGo
+				with: "go-version": core.pinnedReleaseGo
 			},
 			json.#step & {
 				name: "Setup qemu"
@@ -74,7 +74,7 @@ workflows: release: _base.#bashWorkflow & {
 				uses: "goreleaser/goreleaser-action@v3"
 				with: {
 					"install-only": true
-					version:        core.#goreleaserVersion
+					version:        core.goreleaserVersion
 				}
 			},
 			json.#step & {
@@ -96,7 +96,7 @@ workflows: release: _base.#bashWorkflow & {
 			_base.#repositoryDispatch & {
 				name:           "Trigger unity build"
 				if:             _base.#isReleaseTag
-				#repositoryURL: core.#unityRepositoryURL
+				#repositoryURL: core.unityRepositoryURL
 				#arg: {
 					event_type: "Check against CUE \(_#cueVersionRef)"
 					client_payload: {

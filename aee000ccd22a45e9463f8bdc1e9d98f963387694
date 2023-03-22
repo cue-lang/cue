@@ -16,6 +16,24 @@
       "message": "Tested on `ci/test` in https://github.com/cue-lang/cue/actions/runs/4490003988",
       "revId": "aee000ccd22a45e9463f8bdc1e9d98f963387694",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7938698d_95ae58fc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-22T12:56:12Z",
+      "side": 1,
+      "message": "Sent that too early. \n\nThose tests show that the testcache is cleaned on the `ci/test` branch, as expected.",
+      "parentUuid": "773ed12b_e6fc1c73",
+      "revId": "aee000ccd22a45e9463f8bdc1e9d98f963387694",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -318,34 +318,69 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // injectComprehension evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, state vertexStatus) (progress bool) {
-	all := *allP
+func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
 	workRemaining := false
 
 	// We use variables, instead of range, as the list may grow dynamically.
-	for i := 0; i < len(*allP); i++ {
-		all = *allP // update list as long as it is non-empty.
-
-		if n.processComprehension(&all[i], allowCycle, state) {
-			progress = true
-		} else {
-			workRemaining = true
+	for i := 0; i < len(n.comprehensions); i++ {
+		d := &n.comprehensions[i]
+		if d.self || d.inserted {
+			continue
 		}
+		if err := n.processComprehension(d, state); err != nil {
+			// TODO:  Detect that the nodes are actually equal
+			if err.ForCycle && err.Value == n.node {
+				n.selfComprehensions = append(n.selfComprehensions, *d)
+				progress = true
+				d.self = true
+				return
+			}
+
+			d.err = err
+			workRemaining = true
+
+			continue
+
+			// TODO: add this when it can be done without breaking other
+			// things.
+			//
+			// // Add comprehension to ensure incomplete error is inserted.
+			// // This ensures that the error is reported in the Vertex
+			// // where the comprehension was defined, and not just in the
+			// // node below. This, in turn, is necessary to support
+			// // certain logic, like export, that expects to be able to
+			// // detect an "incomplete" error at the first level where it
+			// // is necessary.
+			// n := d.node.getNodeContext(ctx)
+			// n.addBottom(err)
+
+		}
+		progress = true
 	}
 
 	if !workRemaining {
-		*allP = all[:0] // Signal that all work is done.
+		n.comprehensions = n.comprehensions[:0] // Signal that all work is done.
 	}
+
 	return progress
 }
 
-// processComprehension processes a single Comprehension conjunctx
-func (n *nodeContext) processComprehension(d *envYield, allowCycle bool, state vertexStatus) (progress bool) {
-	ctx := n.ctx
-
-	if d.self && allowCycle {
-		return false
+// injectSelfComprehensions processes comprehensions that were earlier marked
+// as iterating over the node in which they are defined. Such comprehensions
+// are legal as long as they do not modify the arc set of the node.
+func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
+	// We use variables, instead of range, as the list may grow dynamically.
+	for i := 0; i < len(n.selfComprehensions); i++ {
+		n.processComprehension(&n.selfComprehensions[i], state)
 	}
+	n.selfComprehensions = n.selfComprehensions[:0] // Signal that all work is done.
+}
+
+// processComprehension processes a single Comprehension conjunct.
+// It returns an incomplete error if there was one. Fatal errors are
+// processed as a "successfully" completed computation.
+func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bottom {
+	ctx := n.ctx
 
 	// Compute environments, if needed.
 	if !d.done {
@@ -356,39 +391,17 @@ func (n *nodeContext) processComprehension(d *envYield, allowCycle bool, state v
 
 		if err := ctx.yield(d.node, d.env, d.comp, state, f); err != nil {
 			if err.IsIncomplete() {
-				// TODO:  Detect that the nodes are actually equal
-				if allowCycle && err.ForCycle && err.Value == n.node {
-					n.selfComprehensions = append(n.selfComprehensions, *d)
-					progress = true
-					d.self = true
-					return
-				}
-				d.err = err
-
-				// TODO: add this when it can be done without breaking other
-				// things.
-				//
-				// // Add comprehension to ensure incomplete error is inserted.
-				// // This ensures that the error is reported in the Vertex
-				// // where the comprehension was defined, and not just in the
-				// // node below. This, in turn, is necessary to support
-				// // certain logic, like export, that expects to be able to
-				// // detect an "incomplete" error at the first level where it
-				// // is necessary.
-				// n := d.node.getNodeContext(ctx)
-				// n.addBottom(err)
-
-			} else {
-				// continue to collect other errors.
-				d.node.state.addBottom(err)
-				d.done = true
-				progress = true
-				d.inserted = true
+				return err
 			}
+
+			// continue to collect other errors.
+			d.node.state.addBottom(err)
+			d.done = true
+			d.inserted = true
 			if d.node != nil {
 				ctx.PopArc(d.node)
 			}
-			return
+			return nil
 		}
 
 		d.envs = envs
@@ -402,15 +415,10 @@ func (n *nodeContext) processComprehension(d *envYield, allowCycle bool, state v
 		d.done = true
 	}
 
-	if d.inserted {
-		return
-	}
 	d.inserted = true
 
-	progress = true
-
 	if len(d.envs) == 0 {
-		return
+		return nil
 	}
 
 	v := n.node
@@ -426,7 +434,7 @@ func (n *nodeContext) processComprehension(d *envYield, allowCycle bool, state v
 		n.addExprConjunct(Conjunct{env, d.expr, id}, state)
 	}
 
-	return progress
+	return nil
 }
 
 // linkChildren adds environments for the chain of vertices to a result

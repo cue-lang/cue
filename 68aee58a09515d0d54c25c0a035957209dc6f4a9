@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4619d18_b45fcccd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-22T09:04:47Z",
+      "side": 1,
+      "message": "LGTM, thanks!",
+      "revId": "68aee58a09515d0d54c25c0a035957209dc6f4a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59f7b82c_425c5ada",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1729,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-22T09:04:47Z",
+      "side": 1,
+      "message": "Maybe include ArcType as an explicit field here, even if the zero value is what we want, so it\u0027s clear what it will be by default?",
+      "revId": "68aee58a09515d0d54c25c0a035957209dc6f4a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

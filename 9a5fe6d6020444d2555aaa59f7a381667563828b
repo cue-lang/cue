@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c98582e5_3880a150",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:26Z",
+      "side": 1,
+      "message": "s/making/make/",
+      "range": {
+        "startLine": 10,
+        "startChar": 3,
+        "endLine": 10,
+        "endChar": 10
+      },
+      "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2583372a_800a4f2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:26Z",
+      "side": 1,
+      "message": "LGTM with minor comments.",
+      "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83805aa6_e0152639",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:26Z",
+      "side": 1,
+      "message": "s/Finalized/finalized/",
+      "range": {
+        "startLine": 129,
+        "startChar": 54,
+        "endLine": 129,
+        "endChar": 63
+      },
+      "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d43be4a5_e2a1c556",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T17:54:26Z",
+      "side": 1,
+      "message": "I realize this is not part of this CL, but why is this commented out? I should at least have an explanation as a TODO.",
+      "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

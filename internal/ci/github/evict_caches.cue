@@ -54,7 +54,7 @@ workflows: evict_caches: _base.#bashWorkflow & {
 	jobs: {
 		test: {
 			// We only want to run this in the main repo
-			if:        "${{github.repository == '\(core.#githubRepositoryPath)'}}"
+			if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
 			"runs-on": _#linuxMachine
 			steps: [
 				json.#step & {
@@ -77,7 +77,7 @@ workflows: evict_caches: _base.#bashWorkflow & {
 
 						echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
 						gh extension install actions/gh-actions-cache
-						for i in \(core.#githubRepositoryURL) \(core.#githubRepositoryURL)-trybot
+						for i in \(core.githubRepositoryURL) \(core.githubRepositoryURL)-trybot
 						do
 							echo "Evicting caches for $i"
 							cd $(mktemp -d)
@@ -92,7 +92,7 @@ workflows: evict_caches: _base.#bashWorkflow & {
 						# Now trigger the most recent workflow run on each of the default branches.
 						# We do this by listing all the branches on the main repo and finding those
 						# which match the protected branch patterns (globs).
-						for j in $(\(_base.#curlGitHubAPI) -f https://api.github.com/repos/\(core.#githubRepositoryPath)/branches | jq -r '.[] | .name')
+						for j in $(\(_base.#curlGitHubAPI) -f https://api.github.com/repos/\(core.githubRepositoryPath)/branches | jq -r '.[] | .name')
 						do
 							for i in \(branchPatterns)
 							do
@@ -101,8 +101,8 @@ workflows: evict_caches: _base.#bashWorkflow & {
 								fi
 
 								echo "$j is a match with $i"
-								\(rerunLatestWorkflow & {#repo: core.#githubRepositoryPath, #branch: "$j", _})
-								\(rerunLatestWorkflow & {#repo: core.#githubRepositoryPath + "-trybot", #branch: "$j", _})
+								\(rerunLatestWorkflow & {#repo: core.githubRepositoryPath, #branch: "$j", _})
+								\(rerunLatestWorkflow & {#repo: core.githubRepositoryPath + "-trybot", #branch: "$j", _})
 							done
 						done
 						"""

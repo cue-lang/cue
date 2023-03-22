@@ -85,6 +85,24 @@
       "message": "Took a couple of hours, but I reduced the Vector failure in Unity to:\n\n```\nexec cue eval in.cue\ncmp stdout stdout.golden\n\n-- in.cue --\n#Out: {\n\tyes: bool\n\tinput: [string]: _\n\n\tif yes {\n\t\tunused: _\n\t}\n\tfor k, _ in input {\n\t\t(k)?: _\n\t}\n}\n\nout: #Out \u0026 {\n\tyes: true\n\tinput: mode: _\n}\n-- stdout.golden --\n#Out: {\n    yes: bool\n    input: {\n        [string]: _\n    }\n\n    if yes {\n        unused: _\n    }\n    for k, _ in input {\n        (k): _\n    }\n}\nout: {\n    yes:    true\n    unused: _\n    mode:   _\n    input: {\n        mode: _\n    }\n}\n```\n\nWhen run with master (0b681f5d193a55893fdec8386f4a72a6effcebb1) it passes, but with PS6 here, it fails:\n\n```\n\u003e cmp stdout stdout.golden\n--- stdout\n+++ stdout.golden\n@@ -8,12 +8,13 @@\n         unused: _\n     }\n     for k, _ in input {\n-        (k)?: _\n+        (k): _\n     }\n }\n out: {\n     yes:    true\n     unused: _\n+    mode:   _\n     input: {\n         mode: _\n     }\n\nFAIL: /tmp/testscript1896212744/in.txtar/script.txtar:2: stdout and stdout.golden differ\n```\n\nNote that `+` is CUE master, and `-` is this CL in the diff above. It\u0027s a bit backwards in testscript at the moment.\n\nI _think_ the change in output is wanted. The input code used `(k)?:`, so the output using `(k):` seems weird. `mode:` disappearing is the same story, because as an optional field it should not show up in the output.\n\nSo I think this is the kind of Unity failure that we\u0027re OK with, and we just want to update the golden files. I don\u0027t think this should actually break Vector.",
       "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5398fb7c_adc1bfe1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-22T12:50:32Z",
+      "side": 1,
+      "message": "That said, I think we should add the reduced test case as a regression test, for the sake of \"locking in\" the desired behavior.",
+      "parentUuid": "4be9ecad_97f6da87",
+      "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

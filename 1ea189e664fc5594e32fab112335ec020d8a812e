@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec7a9a7e_a57cd9e2",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:13:09Z",
+      "side": 1,
+      "message": "This answered my question from the previous CL.",
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e401e9c_fe51326c",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:13:09Z",
+      "side": 1,
+      "message": "Perhaps \"not specified\" is better than unspecified? Not having strong feeling either way.",
+      "range": {
+        "startLine": 105,
+        "startChar": 37,
+        "endLine": 105,
+        "endChar": 48
+      },
+      "revId": "1ea189e664fc5594e32fab112335ec020d8a812e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

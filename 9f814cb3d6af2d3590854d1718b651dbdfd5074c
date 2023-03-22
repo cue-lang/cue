@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5cab121_8dcc35ee",
+        "filename": "cue/parser/parser.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 934,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:06:10Z",
+      "side": 1,
+      "message": "Since Optional is now deprecated, should we set this at all?",
+      "range": {
+        "startLine": 934,
+        "startChar": 3,
+        "endLine": 934,
+        "endChar": 14
+      },
+      "revId": "9f814cb3d6af2d3590854d1718b651dbdfd5074c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "550ceb10_dc7c1d0d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:06:10Z",
+      "side": 1,
+      "message": "don\u0027t we need this already?",
+      "revId": "9f814cb3d6af2d3590854d1718b651dbdfd5074c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd011936_d1226d6e",
+        "filename": "internal/internal.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:06:10Z",
+      "side": 1,
+      "message": "Suggested rephrasing:\n\nConstraintToken reports which constraint token (? or !) is associated\nwith a field (if any), taking into account compatibility of deprecated\nfields.",
+      "range": {
+        "startLine": 348,
+        "startChar": 0,
+        "endLine": 350,
+        "endChar": 11
+      },
+      "revId": "9f814cb3d6af2d3590854d1718b651dbdfd5074c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "daecbf4c_3d2c74f1",
+        "filename": "internal/internal.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 366,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:06:10Z",
+      "side": 1,
+      "message": "Probably I am missing something very obvious here, in which case feel free to ignore, but I don\u0027t quite understand why we still need to look at the Optional field.",
+      "revId": "9f814cb3d6af2d3590854d1718b651dbdfd5074c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

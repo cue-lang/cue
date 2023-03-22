@@ -82,7 +82,6 @@ trybot: _base.#bashWorkflow & {
 				_#goCheck,
 				_base.#checkGitClean,
 				_#pullThroughProxy,
-				_#cachePost,
 			]
 		}
 	}

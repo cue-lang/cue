@@ -175,8 +175,3 @@ _#cachePre: [
 		}
 	},
 ]
-
-_#cachePost: json.#step & {
-	let qCacheDirs = [ for v in _#cacheDirs {"'\(v)'"}]
-	run: "find \(strings.Join(qCacheDirs, " ")) -type f -amin +7200 -delete -print"
-}

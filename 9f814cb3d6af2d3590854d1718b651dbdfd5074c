@@ -58,6 +58,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3017a982_9045b6e0",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 291,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-03-22T09:18:55Z",
+      "side": 1,
+      "message": "Nevermind, saw your next CL.",
+      "parentUuid": "550ceb10_dc7c1d0d",
+      "revId": "9f814cb3d6af2d3590854d1718b651dbdfd5074c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd011936_d1226d6e",

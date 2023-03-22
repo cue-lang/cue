@@ -169,8 +169,6 @@ func (n *nodeContext) insertComprehension(
 			case *Field:
 				numFixed++
 
-				arc, _ := n.node.GetArc(n.ctx, f.Label, ArcVoid)
-
 				// Create partial comprehension
 				c := &Comprehension{
 					Syntax:  c.Syntax,
@@ -183,19 +181,15 @@ func (n *nodeContext) insertComprehension(
 					arc:    n.node,
 				}
 
-				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
+				conjunct := MakeConjunct(env, c, ci)
+				n.node.state.insertFieldUnchecked(f.Label, ArcVoid, conjunct)
 				fields = append(fields, f)
 				// TODO: adjust ci to embed?
-
-				// TODO: this also needs to be done for optional fields.
 
 			case *LetField:
 				// TODO: consider merging this case with the LetField case.
 
 				numFixed++
-
-				arc, _ := n.node.GetArc(n.ctx, f.Label, ArcVoid)
-				arc.MultiLet = f.IsMulti
 
 				// Create partial comprehension
 				c := &Comprehension{
@@ -208,7 +202,8 @@ func (n *nodeContext) insertComprehension(
 					arc:    n.node,
 				}
 
-				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
+				conjunct := MakeConjunct(env, c, ci)
+				n.node.state.insertFieldUnchecked(f.Label, ArcVoid, conjunct)
 				fields = append(fields, f)
 
 			default:

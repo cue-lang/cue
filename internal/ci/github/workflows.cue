@@ -55,7 +55,7 @@ workflows: close({
 // _gerrithub is an instance of ./gerrithub, parameterised by the properties of
 // this project
 _gerrithub: gerrithub & {
-	#repositoryURL:                      core.githubRepositoryURL
+	#githubRepositoryURL:                core.githubRepositoryURL
 	#trybotKey:                          _base.trybot.key
 	#botGitHubUser:                      core.botGitHubUser
 	#botGitHubUserTokenSecretsKey:       core.botGitHubUserTokenSecretsKey

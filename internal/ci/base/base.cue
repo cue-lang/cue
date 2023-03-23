@@ -35,7 +35,7 @@ import (
 )
 
 #params: {
-	repositoryURL:                string
+	githubRepositoryURL:          string
 	defaultBranch:                string
 	testDefaultBranch:            *"ci/test" | string
 	botGitHubUser:                string

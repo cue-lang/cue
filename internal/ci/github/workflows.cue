@@ -18,7 +18,6 @@ package github
 import (
 	"cuelang.org/go/internal/ci/core"
 	"cuelang.org/go/internal/ci/base"
-	"cuelang.org/go/internal/ci/gerrithub"
 
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
@@ -51,21 +50,6 @@ workflows: close({
 	push_tip_to_trybot:  _
 	evict_caches:        _
 })
-
-// _gerrithub is an instance of ./gerrithub, parameterised by the properties of
-// this project
-_gerrithub: gerrithub & {
-	#githubRepositoryURL:                core.githubRepositoryURL
-	#trybotKey:                          _base.#trybot.key
-	#botGitHubUser:                      core.botGitHubUser
-	#botGitHubUserTokenSecretsKey:       core.botGitHubUserTokenSecretsKey
-	#botGitHubUserEmail:                 core.botGitHubUserEmail
-	#botGerritHubUser:                   core.botGitHubUser
-	#botGerritHubUserPasswordSecretsKey: core.botGerritHubUserPasswordSecretsKey
-	#botGerritHubUserEmail:              core.botGitHubUserEmail
-	#gerritHubHostname:                  core.gerritHubHostname
-	#linuxMachine:                       core.linuxMachine
-}
 
 // _base is an instance of ./base, parameterised by the configuration in core
 //

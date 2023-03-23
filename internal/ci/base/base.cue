@@ -34,14 +34,17 @@ import (
 	"strings"
 )
 
-// Package parameters
-#repositoryURL:                string
-#defaultBranch:                string
-#testDefaultBranch:            "ci/test"
-#botGitHubUser:                string
-#botGitHubUserTokenSecretsKey: string
-#protectedBranchPatterns: [...string]
-#releaseTagPattern: string
+#params: {
+	repositoryURL:                string
+	defaultBranch:                string
+	testDefaultBranch:            *"ci/test" | string
+	botGitHubUser:                string
+	botGitHubUserTokenSecretsKey: string
+	releaseTagPattern:            string
+	protectedBranchPatterns: [...string]
+}
+
+params: #params
 
 // Define some shared keys and human-readable names.
 //

@@ -119,7 +119,7 @@ import (
 }
 
 #curlGitHubAPI: #"""
-	curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(#botGitHubUserTokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
+	curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(params.botGitHubUserTokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
 	"""#
 
 #setupGoActionsCaches: {
@@ -181,7 +181,7 @@ import (
 // It would be nice to use the "contains" builtin for simplicity,
 // but array literals are not yet supported in expressions.
 #isProtectedBranch: {
-	"(" + strings.Join([ for branch in #protectedBranchPatterns {
+	"(" + strings.Join([ for branch in params.protectedBranchPatterns {
 		(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
 	}], " || ") + ")"
 }
@@ -190,7 +190,7 @@ import (
 // pattern, that evaluates to true if called in the context of a workflow that
 // is part of a release.
 #isReleaseTag: {
-	(_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(#releaseTagPattern)"}).expr
+	(_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(params.releaseTagPattern)"}).expr
 }
 
 #checkGitClean: json.#step & {
@@ -198,9 +198,9 @@ import (
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
 
-let _#repositoryURL = #repositoryURL
-let _#botGitHubUser = #botGitHubUser
-let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
+let _#repositoryURL = params.repositoryURL
+let _#botGitHubUser = params.botGitHubUser
+let _#botGitHubUserTokenSecretsKey = params.botGitHubUserTokenSecretsKey
 
 #repositoryDispatch: json.#step & {
 	#repositoryURL:                *_#repositoryURL | string

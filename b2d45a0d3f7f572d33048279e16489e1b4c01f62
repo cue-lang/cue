@@ -103,6 +103,24 @@
       "parentUuid": "4be9ecad_97f6da87",
       "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0998dbae_aa3cec65",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-23T07:19:17Z",
+      "side": 1,
+      "message": "The new behavior is correct and is in fact tested in unit tests. There were similar \"breakages\" in the old test.\n\ncmd eval does not show optional fields in data fields by default, if you add the -O flag, you\u0027ll see that the mode is actually there in the new implementation.\n\nThe problem is that the old implementation inadvertently accepted `(k)?: v`, but just ignored the `?`. Now it has meaning. An easy `cue fix` would be to remove the `?` in the vector code.",
+      "parentUuid": "5398fb7c_adc1bfe1",
+      "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

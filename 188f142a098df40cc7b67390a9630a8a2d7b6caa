@@ -22,6 +22,30 @@
       },
       "revId": "188f142a098df40cc7b67390a9630a8a2d7b6caa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d0e97b3_638dd61f",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-23T11:12:45Z",
+      "side": 1,
+      "message": "I agree, I\u0027m not that keen on SetDone.\n\nMaybe just Done ?\nOr EvaluationComplete ?\n\nI have to say that I don\u0027t fully understand the difference between this and the Finalize method in terms of when might be an appropriate situation to call each.",
+      "parentUuid": "a48c3278_d4486f91",
+      "range": {
+        "startLine": 412,
+        "startChar": 3,
+        "endLine": 412,
+        "endChar": 11
+      },
+      "revId": "188f142a098df40cc7b67390a9630a8a2d7b6caa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

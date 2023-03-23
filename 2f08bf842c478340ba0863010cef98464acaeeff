@@ -39,6 +39,30 @@
       },
       "revId": "2f08bf842c478340ba0863010cef98464acaeeff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bde4f01_00543b4d",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-23T11:20:11Z",
+      "side": 1,
+      "message": "I agree with Aram. It would be nicer to have a comment that actually describes what the method does (i.e. what value is it validating and how?)",
+      "parentUuid": "340f487c_a82ad200",
+      "range": {
+        "startLine": 561,
+        "startChar": 0,
+        "endLine": 562,
+        "endChar": 18
+      },
+      "revId": "2f08bf842c478340ba0863010cef98464acaeeff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

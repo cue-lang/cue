@@ -39,15 +39,13 @@ import (
 #botGerritHubUser:                   *#botGitHubUser | string
 #botGerritHubUserPasswordSecretsKey: string
 #botGerritHubUserEmail:              *#botGitHubUserEmail | string
+#gerritHubHostname:                  string
+#linuxMachine:                       string
 
 // Pending cuelang.org/issue/1433, hack around defaulting #gerritHubRepository
 // based on #repository
 let _#repositoryURLNoScheme = strings.Split(#repositoryURL, "//")[1]
-#gerritHubRepository: *("https://\(_#gerritHubHostname)/a/" + path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)) | _
-
-_#gerritHubHostname: "review.gerrithub.io"
-
-_#linuxMachine: "ubuntu-20.04"
+#gerritHubRepository: *("https://\(#gerritHubHostname)/a/" + path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)) | _
 
 #dispatchWorkflow: json.#Workflow & {
 	#type:                  string
@@ -57,7 +55,7 @@ _#linuxMachine: "ubuntu-20.04"
 	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
 		(#type): {
-			"runs-on": _#linuxMachine
+			"runs-on": #linuxMachine
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [
 				#writeNetrcFile,
@@ -98,7 +96,7 @@ _#linuxMachine: "ubuntu-20.04"
 	name: "Write netrc file for cueckoo Gerrithub"
 	run:  """
 			cat <<EOD > ~/.netrc
-			machine \(_#gerritHubHostname)
+			machine \(#gerritHubHostname)
 			login \(#botGerritHubUser)
 			password ${{ secrets.\(#botGerritHubUserPasswordSecretsKey) }}
 			EOD

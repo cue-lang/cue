@@ -63,6 +63,8 @@ _gerrithub: gerrithub & {
 	#botGerritHubUser:                   core.botGitHubUser
 	#botGerritHubUserPasswordSecretsKey: core.botGerritHubUserPasswordSecretsKey
 	#botGerritHubUserEmail:              core.botGitHubUserEmail
+	#gerritHubHostname:                  core.gerritHubHostname
+	#linuxMachine:                       core.linuxMachine
 }
 
 // _base is an instance of ./base, parameterised by the properties of this

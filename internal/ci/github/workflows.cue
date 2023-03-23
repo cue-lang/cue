@@ -67,17 +67,15 @@ _gerrithub: gerrithub & {
 	#linuxMachine:                       core.linuxMachine
 }
 
-// _base is an instance of ./base, parameterised by the properties of this
-// project
+// _base is an instance of ./base, parameterised by the configuration in core
 //
 // TODO: revisit the naming strategy here. _base and base are very similar.
 // Perhaps rename the import to something more obviously not intended to be
 // used, and then rename the field base?
-_base: base & {params: {
-	repositoryURL:                core.githubRepositoryURL
-	defaultBranch:                core.defaultBranch
-	botGitHubUser:                core.botGitHubUser
-	botGitHubUserTokenSecretsKey: core.botGitHubUserTokenSecretsKey
-	protectedBranchPatterns:      core.protectedBranchPatterns
-	releaseTagPattern:            core.releaseTagPattern
-}}
+_base: base & {
+	params: {
+		for k, _ in base.#params {
+			(k): core[k]
+		}
+	}
+}

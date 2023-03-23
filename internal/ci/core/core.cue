@@ -7,6 +7,8 @@ import (
 	"cuelang.org/go/internal/ci/base"
 )
 
+base.params
+
 // The machines that we use
 linuxMachine:   "ubuntu-22.04"
 macosMachine:   "macos-11"

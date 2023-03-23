@@ -57,12 +57,12 @@ workflows: close({
 _gerrithub: gerrithub & {
 	#repositoryURL:                      core.githubRepositoryURL
 	#trybotKey:                          _base.trybot.key
-	#botGitHubUser:                      "cueckoo"
-	#botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
-	#botGitHubUserEmail:                 "cueckoo@gmail.com"
-	#botGerritHubUser:                   #botGitHubUser
-	#botGerritHubUserPasswordSecretsKey: "CUECKOO_GERRITHUB_PASSWORD"
-	#botGerritHubUserEmail:              #botGitHubUserEmail
+	#botGitHubUser:                      core.botGitHubUser
+	#botGitHubUserTokenSecretsKey:       core.botGitHubUserTokenSecretsKey
+	#botGitHubUserEmail:                 core.botGitHubUserEmail
+	#botGerritHubUser:                   core.botGitHubUser
+	#botGerritHubUserPasswordSecretsKey: core.botGerritHubUserPasswordSecretsKey
+	#botGerritHubUserEmail:              core.botGitHubUserEmail
 }
 
 // _base is an instance of ./base, parameterised by the properties of this
@@ -74,8 +74,8 @@ _gerrithub: gerrithub & {
 _base: base & {
 	#repositoryURL:                core.githubRepositoryURL
 	#defaultBranch:                core.defaultBranch
-	#botGitHubUser:                "cueckoo"
-	#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"
+	#botGitHubUser:                core.botGitHubUser
+	#botGitHubUserTokenSecretsKey: core.botGitHubUserTokenSecretsKey
 	#protectedBranchPatterns:      core.protectedBranchPatterns
 	#releaseTagPattern:            core.releaseTagPattern
 }

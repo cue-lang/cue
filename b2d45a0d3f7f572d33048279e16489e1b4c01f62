@@ -121,6 +121,23 @@
       "parentUuid": "5398fb7c_adc1bfe1",
       "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d74c3ea2_4e648c5d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-23T07:34:40Z",
+      "side": 1,
+      "message": "I suggest we commit this in and file an issue for v0.6 to add a cue fix and/or cue version-specific behavior to disable this. Maybe the optional CUE fix mode is sufficient.",
+      "revId": "b2d45a0d3f7f572d33048279e16489e1b4c01f62",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

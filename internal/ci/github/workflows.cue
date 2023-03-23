@@ -17,7 +17,6 @@ package github
 
 import (
 	"cuelang.org/go/internal/ci/core"
-	"cuelang.org/go/internal/ci/base"
 
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
@@ -56,22 +55,4 @@ workflows: close({
 // TODO: revisit the naming strategy here. _base and base are very similar.
 // Perhaps rename the import to something more obviously not intended to be
 // used, and then rename the field base?
-_base: base & {
-	githubRepositoryURL:          core.githubRepositoryURL
-	defaultBranch:                core.defaultBranch
-	botGitHubUser:                core.botGitHubUser
-	botGitHubUserTokenSecretsKey: core.botGitHubUserTokenSecretsKey
-	protectedBranchPatterns:      core.protectedBranchPatterns
-	releaseTagPattern:            core.releaseTagPattern
-
-	githubRepositoryURL:                core.githubRepositoryURL
-	trybotKey:                          _base.#trybot.key
-	botGitHubUser:                      core.botGitHubUser
-	botGitHubUserTokenSecretsKey:       core.botGitHubUserTokenSecretsKey
-	botGitHubUserEmail:                 core.botGitHubUserEmail
-	botGerritHubUser:                   core.botGitHubUser
-	botGerritHubUserPasswordSecretsKey: core.botGerritHubUserPasswordSecretsKey
-	botGerritHubUserEmail:              core.botGitHubUserEmail
-	gerritHubHostname:                  core.gerritHubHostname
-	linuxMachine:                       core.linuxMachine
-}
+_base: core

@@ -49,8 +49,8 @@ import (
 	}
 }
 
-#checkoutCode: [
-	json.#step & {
+#checkoutCode: {
+	#actionsCheckout: json.#step & {
 		name: "Checkout code"
 		uses: "actions/checkout@v3"
 
@@ -63,25 +63,29 @@ import (
 			ref:           "${{ github.event.pull_request.head.sha }}"
 			"fetch-depth": 0 // see the docs below
 		}
-	},
-	// Restore modified times to work around https://go.dev/issues/58571,
-	// as otherwise we would get lots of unnecessary Go test cache misses.
-	// Note that this action requires actions/checkout to use a fetch-depth of 0.
-	// Since this is a third-party action which runs arbitrary code,
-	// we pin a commit hash for v2 to be in control of code updates.
-	// Also note that git-restore-mtime does not update all directories,
-	// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
-	// so we first reset all directory timestamps to a static time as a fallback.
-	// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
-	json.#step & {
-		name: "Reset git directory modification times"
-		run:  "touch -t 202211302355 $(find * -type d)"
-	},
-	json.#step & {
-		name: "Restore git file modification times"
-		uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
-	},
-]
+	}
+
+	[
+		#actionsCheckout,
+		// Restore modified times to work around https://go.dev/issues/58571,
+		// as otherwise we would get lots of unnecessary Go test cache misses.
+		// Note that this action requires actions/checkout to use a fetch-depth of 0.
+		// Since this is a third-party action which runs arbitrary code,
+		// we pin a commit hash for v2 to be in control of code updates.
+		// Also note that git-restore-mtime does not update all directories,
+		// per the bug report at https://github.com/MestreLion/git-tools/issues/47,
+		// so we first reset all directory timestamps to a static time as a fallback.
+		// TODO(mvdan): May be unnecessary once the Go bug above is fixed.
+		json.#step & {
+			name: "Reset git directory modification times"
+			run:  "touch -t 202211302355 $(find * -type d)"
+		},
+		json.#step & {
+			name: "Restore git file modification times"
+			uses: "chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe"
+		},
+	]
+}
 
 #earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"

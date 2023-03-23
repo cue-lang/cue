@@ -60,7 +60,7 @@ _#linuxMachine: "ubuntu-20.04"
 			"runs-on": _#linuxMachine
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [
-				#writeNetrcFile,
+				_#writeNetrcFile,
 				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
 				// care about the CL number and patchset, (e.g. 547738/7).
 				// Note that gerrithub_ref is two path elements.
@@ -94,7 +94,37 @@ _#linuxMachine: "ubuntu-20.04"
 	}
 }
 
-#writeNetrcFile: json.#step & {
+#pushTipToTrybotWorkflow: json.#Workflow & {
+	jobs: [string]: defaults: run: shell: "bash"
+
+	name: "Push tip to \(#trybotKey)"
+
+	concurrency: "push_tip_to_trybot"
+
+	jobs: push: {
+		steps: [
+			_#writeNetrcFile,
+			json.#step & {
+				name: "Push tip to trybot"
+				run:  """
+						mkdir tmpgit
+						cd tmpgit
+						git init
+						git config user.name \(#botGitHubUser)
+						git config user.email \(#botGitHubUserEmail)
+						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(#botGitHubUser):${{ secrets.\(#botGitHubUserTokenSecretsKey) }} | base64)"
+						git remote add origin \(#gerritHubRepository)
+						git remote add trybot \(#trybotRepositoryURL)
+						git fetch origin "${{ github.ref }}"
+						git push trybot "FETCH_HEAD:${{ github.ref }}"
+						"""
+			},
+		]
+	}
+
+}
+
+_#writeNetrcFile: json.#step & {
 	name: "Write netrc file for cueckoo Gerrithub"
 	run:  """
 			cat <<EOD > ~/.netrc

@@ -1,51 +1,10 @@
-// Copyright 2022 The CUE Authors
-//
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at
-//
-//     http://www.apache.org/licenses/LICENSE-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
+package base
 
-// package gerritHub is a collection of features that are common to projects
-// that choose to make GerritHub their source of truth, using GitHub Actions
-// for CI.
-//
-// See the documentation for gerritstatusupdater for more information:
-//
-//   github.com/cue-lang/cuelang.org/internal/functions/gerritstatusupdater
-//
-package gerrithub
+// This file contains gerrithub related definitions etc
 
 import (
-	"path"
-	"strings"
-
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
-
-#githubRepositoryURL:                string
-#gerritHubRepositoryURL:             string
-#trybotKey:                          string
-#trybotRepositoryURL:                *(#githubRepositoryURL + "-" + #trybotKey) | string
-#botGitHubUser:                      string
-#botGitHubUserTokenSecretsKey:       string
-#botGitHubUserEmail:                 string
-#botGerritHubUser:                   *#botGitHubUser | string
-#botGerritHubUserPasswordSecretsKey: string
-#botGerritHubUserEmail:              *#botGitHubUserEmail | string
-#gerritHubHostname:                  string
-#linuxMachine:                       string
-
-// Pending cuelang.org/issue/1433, hack around defaulting #gerritHubRepository
-// based on #repository
-let _#repositoryURLNoScheme = strings.Split(#githubRepositoryURL, "//")[1]
-#gerritHubRepository: *("https://\(#gerritHubHostname)/a/" + path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)) | _
 
 #trybotDispatchWorkflow: json.#Workflow & {
 	#type:                  string
@@ -58,7 +17,7 @@ let _#repositoryURLNoScheme = strings.Split(#githubRepositoryURL, "//")[1]
 			"runs-on": #linuxMachine
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [
-				_#writeNetrcFile,
+				#writeNetrcFile,
 				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
 				// care about the CL number and patchset, (e.g. 547738/7).
 				// Note that gerrithub_ref is two path elements.
@@ -95,13 +54,13 @@ let _#repositoryURLNoScheme = strings.Split(#githubRepositoryURL, "//")[1]
 #pushTipToTrybotWorkflow: json.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"
 
-	name: "Push tip to \(#trybotKey)"
+	name: "Push tip to \(trybot.key)"
 
 	concurrency: "push_tip_to_trybot"
 
 	jobs: push: {
 		steps: [
-			_#writeNetrcFile,
+			#writeNetrcFile,
 			json.#step & {
 				name: "Push tip to trybot"
 				run:  """
@@ -122,7 +81,7 @@ let _#repositoryURLNoScheme = strings.Split(#githubRepositoryURL, "//")[1]
 
 }
 
-_#writeNetrcFile: json.#step & {
+#writeNetrcFile: json.#step & {
 	name: "Write netrc file for cueckoo Gerrithub"
 	run:  """
 			cat <<EOD > ~/.netrc

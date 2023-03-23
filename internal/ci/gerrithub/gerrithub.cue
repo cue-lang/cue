@@ -29,10 +29,10 @@ import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-#repositoryURL:                      string
+#githubRepositoryURL:                string
 #gerritHubRepositoryURL:             string
 #trybotKey:                          string
-#trybotRepositoryURL:                *(#repositoryURL + "-" + #trybotKey) | string
+#trybotRepositoryURL:                *(#githubRepositoryURL + "-" + #trybotKey) | string
 #botGitHubUser:                      string
 #botGitHubUserTokenSecretsKey:       string
 #botGitHubUserEmail:                 string
@@ -44,7 +44,7 @@ import (
 
 // Pending cuelang.org/issue/1433, hack around defaulting #gerritHubRepository
 // based on #repository
-let _#repositoryURLNoScheme = strings.Split(#repositoryURL, "//")[1]
+let _#repositoryURLNoScheme = strings.Split(#githubRepositoryURL, "//")[1]
 #gerritHubRepository: *("https://\(#gerritHubHostname)/a/" + path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)) | _
 
 #trybotDispatchWorkflow: json.#Workflow & {

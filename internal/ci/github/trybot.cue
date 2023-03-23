@@ -28,7 +28,7 @@ workflows: trybot: _base.#bashWorkflow & {
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", _base.#testDefaultBranch], core.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([["trybot/*/*", _base.testDefaultBranch], core.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [core.releaseTagPattern]
 		}
 		pull_request: {}
@@ -55,7 +55,7 @@ workflows: trybot: _base.#bashWorkflow & {
 				// subsequent CLs in the trybot repo can leverage the updated
 				// cache. Therefore, we instead perform a clean of the testcache.
 				json.#step & {
-					if:  "github.repository == '\(core.githubRepositoryPath)' && (\(_base.#isProtectedBranch) || github.ref == 'refs/heads/\(_base.#testDefaultBranch)')"
+					if:  "github.repository == '\(core.githubRepositoryPath)' && (\(_base.#isProtectedBranch) || github.ref == 'refs/heads/\(_base.testDefaultBranch)')"
 					run: "go clean -testcache"
 				},
 

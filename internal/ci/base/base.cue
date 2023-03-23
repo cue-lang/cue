@@ -31,17 +31,31 @@
 package base
 
 import (
+	"path"
 	"strings"
 )
 
-// Package parameters
 #githubRepositoryURL:          string
 #defaultBranch:                string
-#testDefaultBranch:            "ci/test"
+#testDefaultBranch:            *"ci/test" | _
 #botGitHubUser:                string
 #botGitHubUserTokenSecretsKey: string
+#releaseTagPattern:            string
 #protectedBranchPatterns: [...string]
-#releaseTagPattern: string
+
+#linuxMachine:                       string
+#gerritHubHostname:                  string
+#gerritHubRepositoryURL:             string
+#trybotRepositoryURL:                *(#githubRepositoryURL + "-" + trybot.key) | string
+#botGitHubUserEmail:                 string
+#botGerritHubUser:                   *#botGitHubUser | string
+#botGerritHubUserPasswordSecretsKey: string
+#botGerritHubUserEmail:              *#botGitHubUserEmail | string
+
+// Pending cuelang.org/issue/1433, hack around defaulting #gerritHubRepository
+// based on #repository
+let _#repositoryURLNoScheme = strings.Split(#githubRepositoryURL, "//")[1]
+#gerritHubRepository: *("https://\(#gerritHubHostname)/a/" + path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)) | _
 
 // Define some shared keys and human-readable names.
 //

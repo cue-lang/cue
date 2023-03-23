@@ -16,6 +16,23 @@
       "message": "LGTM.",
       "revId": "1eccab02fc56edbda6ebaa8364bcb386f20b2b05",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd00a2c3_33cddc96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-23T11:15:32Z",
+      "side": 1,
+      "message": "It might only be because the implementation is being done, but I really like the way the API is being consolidated somewhat in these CLs.",
+      "revId": "1eccab02fc56edbda6ebaa8364bcb386f20b2b05",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

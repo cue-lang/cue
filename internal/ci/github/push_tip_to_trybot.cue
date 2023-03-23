@@ -16,43 +16,17 @@ package github
 
 import (
 	"cuelang.org/go/internal/ci/core"
-
-	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
 // push_tip_to_trybot "syncs" active branches to the trybot repo.
 // Since the workflow is triggered by a push to any of the branches,
 // the step only needs to sync the pushed branch.
-workflows: push_tip_to_trybot: _base.#bashWorkflow & {
-
-	name: "Push tip to trybot"
+workflows: push_tip_to_trybot: _gerrithub.#pushTipToTrybotWorkflow & {
 	on: {
 		push: branches: core.protectedBranchPatterns
 	}
-
-	concurrency: "push_tip_to_trybot"
-
 	jobs: push: {
 		"runs-on": core.linuxMachine
 		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
-		steps: [
-			_gerrithub.#writeNetrcFile,
-			json.#step & {
-				name: "Push tip to trybot"
-				run:  """
-						mkdir tmpgit
-						cd tmpgit
-						git init
-						git config user.name \(_gerrithub.#botGitHubUser)
-						git config user.email \(_gerrithub.#botGitHubUserEmail)
-						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(_gerrithub.#botGitHubUser):${{ secrets.\(_gerrithub.#botGitHubUserTokenSecretsKey) }} | base64)"
-						git remote add origin \(_gerrithub.#gerritHubRepository)
-						git remote add trybot \(_gerrithub.#trybotRepositoryURL)
-						git fetch origin "${{ github.ref }}"
-						git push trybot "FETCH_HEAD:${{ github.ref }}"
-						"""
-			},
-		]
 	}
-
 }

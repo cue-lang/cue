@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6981bc31_8911d3e7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 10
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-24T22:55:11Z",
+      "side": 1,
+      "message": "FWIW I\u0027m still regularly confused between core and base.",
+      "revId": "caebca5a54fb4d9532a34731265f6d34568920d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

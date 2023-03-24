@@ -43,7 +43,7 @@ trybotRepositoryURL:    *("https://github.com/" + trybotRepositoryPath) | string
 
 defaultBranch:           *"master" | string
 testDefaultBranch:       *"ci/test" | _
-protectedBranchPatterns: *[defaultBranch] | string
+protectedBranchPatterns: *[defaultBranch] | [...string]
 releaseTagPrefix:        *"v" | string
 releaseTagPattern:       *(releaseTagPrefix + "*") | string
 

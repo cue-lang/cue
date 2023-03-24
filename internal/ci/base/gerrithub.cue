@@ -6,7 +6,7 @@ import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-#trybotDispatchWorkflow: json.#Workflow & {
+trybotDispatchWorkflow: json.#Workflow & {
 	#type:                  string
 	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
 	name:                   "Dispatch \(#type)"
@@ -17,7 +17,7 @@ import (
 			"runs-on": linuxMachine
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [
-				#writeNetrcFile,
+				writeNetrcFile,
 				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
 				// care about the CL number and patchset, (e.g. 547738/7).
 				// Note that gerrithub_ref is two path elements.
@@ -51,7 +51,7 @@ import (
 	}
 }
 
-#pushTipToTrybotWorkflow: json.#Workflow & {
+pushTipToTrybotWorkflow: json.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"
 
 	name: "Push tip to \(trybot.key)"
@@ -60,7 +60,7 @@ import (
 
 	jobs: push: {
 		steps: [
-			#writeNetrcFile,
+			writeNetrcFile,
 			json.#step & {
 				name: "Push tip to trybot"
 				run:  """
@@ -81,7 +81,7 @@ import (
 
 }
 
-#writeNetrcFile: json.#step & {
+writeNetrcFile: json.#step & {
 	name: "Write netrc file for cueckoo Gerrithub"
 	run:  """
 			cat <<EOD > ~/.netrc

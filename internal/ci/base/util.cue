@@ -7,11 +7,11 @@ import (
 	"strings"
 )
 
-// _#matchPattern returns a GitHub Actions expression which evaluates whether a
+// _matchPattern returns a GitHub Actions expression which evaluates whether a
 // variable matches a globbing pattern. For literal patterns it uses "==",
 // and for suffix patterns it uses "startsWith".
 // See https://docs.github.com/en/actions/learn-github-actions/expressions.
-_#matchPattern: {
+_matchPattern: {
 	variable: string
 	pattern:  string
 	expr:     [
@@ -25,7 +25,7 @@ _#matchPattern: {
 	][0]
 }
 
-#doNotEditMessage: {
+doNotEditMessage: {
 	#generatedBy: string
 	"Code generated \(#generatedBy); DO NOT EDIT."
 }
@@ -33,7 +33,7 @@ _#matchPattern: {
 // #URLPath is a temporary measure to derive the path part of a URL.
 //
 // TODO: remove when cuelang.org/issue/1433 lands.
-#URLPath: {
+URLPath: {
 	#url: string
 	let parts = strings.Split(#url, "/")
 	strings.Join(list.Slice(parts, 3, len(parts)), "/")

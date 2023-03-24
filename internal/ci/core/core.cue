@@ -10,7 +10,11 @@ import (
 base
 
 githubRepositoryPath: "cue-lang/cue"
-unityRepositoryURL:   "https://github.com/cue-unity/unity"
+
+unityRepositoryPath: "cue-unity/unity"
+unityRepositoryURL:  "https://github.com/" + unityRepositoryPath
+
+cuelangRepositoryPath: "cue-lang/cuelang.org"
 
 defaultBranch:        _
 releaseBranchPrefix:  "release-branch."

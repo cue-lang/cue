@@ -42,17 +42,10 @@ import (
 workflows: close({
 	[string]: json.#Workflow
 
-	(_base.trybot.key): _
+	(core.trybot.key):  _
 	trybot_dispatch:    _
 	release:            _
 	tip_triggers:       _
 	push_tip_to_trybot: _
 	evict_caches:       _
 })
-
-// _base is an instance of ./base, parameterised by the configuration in core
-//
-// TODO: revisit the naming strategy here. _base and base are very similar.
-// Perhaps rename the import to something more obviously not intended to be
-// used, and then rename the field base?
-_base: core

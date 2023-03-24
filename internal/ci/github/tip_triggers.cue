@@ -20,7 +20,7 @@ import (
 
 // The tip_triggers workflow. This fires for each new commit that hits the
 // default branch.
-workflows: tip_triggers: _base.#bashWorkflow & {
+workflows: tip_triggers: core.#bashWorkflow & {
 
 	name: "Triggers on push to tip"
 	on: push: branches: [core.defaultBranch]
@@ -28,7 +28,7 @@ workflows: tip_triggers: _base.#bashWorkflow & {
 		"runs-on": core.linuxMachine
 		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
 		steps: [
-			_base.#repositoryDispatch & {
+			core.#repositoryDispatch & {
 				name:           "Trigger tip.cuelang.org deploy"
 				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
 				#arg: {
@@ -38,7 +38,7 @@ workflows: tip_triggers: _base.#bashWorkflow & {
 					}
 				}
 			},
-			_base.#repositoryDispatch & {
+			core.#repositoryDispatch & {
 				name:           "Trigger unity build"
 				#repositoryURL: "https://github.com/cue-unity/unity"
 				#arg: {

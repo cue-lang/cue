@@ -4,7 +4,6 @@ package base
 
 import (
 	encjson "encoding/json"
-	"path"
 	"strings"
 	"strconv"
 
@@ -198,22 +197,14 @@ checkGitClean: json.#step & {
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
 
-let _#repositoryURL = githubRepositoryURL
-let _#botGitHubUser = botGitHubUser
-let _#botGitHubUserTokenSecretsKey = botGitHubUserTokenSecretsKey
-
 repositoryDispatch: json.#step & {
-	#repositoryURL:                *_#repositoryURL | string
-	#botGitHubUser:                *_#botGitHubUser | string
-	#botGitHubUserTokenSecretsKey: *_#botGitHubUserTokenSecretsKey | string
+	#githubRepositoryPath:         *githubRepositoryPath | string
+	#botGitHubUser:                *botGitHubUser | string
+	#botGitHubUserTokenSecretsKey: *botGitHubUserTokenSecretsKey | string
 	#arg:                          _
-
-	// Pending a nicer fix in cuelang.org/issue/1433
-	let _#repositoryURLNoScheme = strings.Split(#repositoryURL, "//")[1]
-	let _#repositoryPath = path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)
 
 	name: string
 	run:  #"""
-			\#(curlGitHubAPI) -f --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(_#repositoryPath)/dispatches
+			\#(curlGitHubAPI) -f --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(#githubRepositoryPath)/dispatches
 			"""#
 }

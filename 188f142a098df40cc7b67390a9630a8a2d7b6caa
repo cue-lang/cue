@@ -46,6 +46,30 @@
       },
       "revId": "188f142a098df40cc7b67390a9630a8a2d7b6caa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "310a6063_cf7961b9",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 412,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-24T08:00:17Z",
+      "side": 1,
+      "message": "Changed it to ForceDone\n\nDone is not a good name. To me that means it tells whether it is done or not. At the very least it is ambiguous.\n\nThe difference with Finalize is that it triggers an evaluation. Using SetDone prevents it from being evaluated. This is useful when the caller manually constructed a completed Vertex.\n\nI\u0027m not sweating it too much as it is an internal method that will likely go aways as well in the new evaluator.",
+      "parentUuid": "4d0e97b3_638dd61f",
+      "range": {
+        "startLine": 412,
+        "startChar": 3,
+        "endLine": 412,
+        "endChar": 11
+      },
+      "revId": "188f142a098df40cc7b67390a9630a8a2d7b6caa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

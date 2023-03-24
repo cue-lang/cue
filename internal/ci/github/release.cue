@@ -86,17 +86,17 @@ workflows: release: core.bashWorkflow & {
 				"working-directory": "./internal/ci/goreleaser"
 			},
 			core.repositoryDispatch & {
-				name:           "Re-test cuelang.org"
-				if:             core.isReleaseTag
-				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
+				name:                  "Re-test cuelang.org"
+				if:                    core.isReleaseTag
+				#githubRepositoryPath: core.cuelangRepositoryPath
 				#arg: {
 					event_type: "Re-test post release of \(_cueVersionRef)"
 				}
 			},
 			core.repositoryDispatch & {
-				name:           "Trigger unity build"
-				if:             core.isReleaseTag
-				#repositoryURL: core.unityRepositoryURL
+				name:                  "Trigger unity build"
+				if:                    core.isReleaseTag
+				#githubRepositoryPath: core.unityRepositoryPath
 				#arg: {
 					event_type: "Check against CUE \(_cueVersionRef)"
 					client_payload: {

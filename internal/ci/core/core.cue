@@ -10,7 +10,7 @@ import (
 // Define core URLs that will be used in the codereview.cfg and GitHub workflows
 githubRepositoryURL:  "https://github.com/cue-lang/cue"
 gerritRepositoryURL:  "https://review.gerrithub.io/a/cue-lang/cue"
-githubRepositoryPath: base.#URLPath & {#url: githubRepositoryURL, _}
+githubRepositoryPath: "cue-lang/cue"
 unityRepositoryURL:   "https://github.com/cue-unity/unity"
 
 // Use the latest Go version for extra checks,

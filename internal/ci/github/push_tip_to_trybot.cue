@@ -21,7 +21,7 @@ import (
 // push_tip_to_trybot "syncs" active branches to the trybot repo.
 // Since the workflow is triggered by a push to any of the branches,
 // the step only needs to sync the pushed branch.
-workflows: push_tip_to_trybot: _base.#pushTipToTrybotWorkflow & {
+workflows: push_tip_to_trybot: core.#pushTipToTrybotWorkflow & {
 	on: {
 		push: branches: core.protectedBranchPatterns
 	}

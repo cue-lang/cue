@@ -23,12 +23,12 @@ import (
 )
 
 // The trybot workflow.
-workflows: trybot: _base.#bashWorkflow & {
-	name: _base.trybot.name
+workflows: trybot: core.#bashWorkflow & {
+	name: core.trybot.name
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", _base.testDefaultBranch], core.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([["trybot/*/*", core.testDefaultBranch], core.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [core.releaseTagPattern]
 		}
 		pull_request: {}
@@ -39,11 +39,11 @@ workflows: trybot: _base.#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 
-			let goCaches = _base.#setupGoActionsCaches & {#protectedBranchExpr: _base.#isProtectedBranch, _}
+			let goCaches = core.#setupGoActionsCaches & {#protectedBranchExpr: core.#isProtectedBranch, _}
 
 			steps: [
-				for v in _base.#checkoutCode {v},
-				_base.#installGo,
+				for v in core.#checkoutCode {v},
+				core.#installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
@@ -55,28 +55,28 @@ workflows: trybot: _base.#bashWorkflow & {
 				// subsequent CLs in the trybot repo can leverage the updated
 				// cache. Therefore, we instead perform a clean of the testcache.
 				json.#step & {
-					if:  "github.repository == '\(core.githubRepositoryPath)' && (\(_base.#isProtectedBranch) || github.ref == 'refs/heads/\(_base.testDefaultBranch)')"
+					if:  "github.repository == '\(core.githubRepositoryPath)' && (\(core.#isProtectedBranch) || github.ref == 'refs/heads/\(core.testDefaultBranch)')"
 					run: "go clean -testcache"
 				},
 
-				_base.#earlyChecks & {
+				core.#earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
 					if: core.isLatestLinux
 				},
 				json.#step & {
-					if:  "\(_base.#isProtectedBranch) || \(core.isLatestLinux)"
+					if:  "\(core.#isProtectedBranch) || \(core.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,
 				_#goTest & {
-					if: "\(_base.#isProtectedBranch) || !\(core.isLatestLinux)"
+					if: "\(core.#isProtectedBranch) || !\(core.isLatestLinux)"
 				},
 				_#goTestRace & {
 					if: core.isLatestLinux
 				},
 				_#goCheck,
-				_base.#checkGitClean,
+				core.#checkGitClean,
 				_#pullThroughProxy,
 			]
 		}
@@ -123,7 +123,7 @@ workflows: trybot: _base.#bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(_base.#isProtectedBranch) && \(core.isLatestLinux)"
+		if: "\(core.#isProtectedBranch) && \(core.isLatestLinux)"
 	}
 
 	_#goGenerate: json.#step & {

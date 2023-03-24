@@ -14,7 +14,11 @@
 
 package github
 
+import (
+	"cuelang.org/go/internal/ci/core"
+)
+
 // The trybot_dispatch workflow.
-workflows: trybot_dispatch: _base.#bashWorkflow & _base.#trybotDispatchWorkflow & {
-	#type: _base.trybot.key
+workflows: trybot_dispatch: core.#bashWorkflow & core.#trybotDispatchWorkflow & {
+	#type: core.trybot.key
 }

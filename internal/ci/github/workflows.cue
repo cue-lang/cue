@@ -42,10 +42,10 @@ import (
 workflows: close({
 	[string]: json.#Workflow
 
-	(core.#trybot.key): _
-	trybot_dispatch:     _
-	release:             _
-	tip_triggers:        _
-	push_tip_to_trybot:  _
-	evict_caches:        _
+	(core.trybot.key):  _
+	trybot_dispatch:    _
+	release:            _
+	tip_triggers:       _
+	push_tip_to_trybot: _
+	evict_caches:       _
 })

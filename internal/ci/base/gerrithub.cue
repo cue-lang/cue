@@ -37,7 +37,7 @@ dispatchWorkflow: json.#Workflow & {
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
-						git fetch \(gerritHubRepository) "${{ github.event.client_payload.payload.ref }}"
+						git fetch \(gerritHubRepositoryURL) "${{ github.event.client_payload.payload.ref }}"
 						git checkout -b \(_#branchNameExpression) FETCH_HEAD
 						git remote add origin \(trybotRepositoryURL)
 						git fetch origin "${{ github.event.client_payload.payload.branch }}"
@@ -70,7 +70,7 @@ pushTipToTrybotWorkflow: json.#Workflow & {
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
-						git remote add origin \(gerritHubRepository)
+						git remote add origin \(gerritHubRepositoryURL)
 						git remote add trybot \(trybotRepositoryURL)
 						git fetch origin "${{ github.ref }}"
 						git push trybot "FETCH_HEAD:${{ github.ref }}"

@@ -205,8 +205,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 				},
 			}
 
-			n := &Vertex{}
-			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
+			n := c.newInlineVertex(nil, nil, MakeConjunct(c.Env(0), list, c.ci))
 			n.CompleteArcs(c)
 
 			return n
@@ -267,8 +266,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 				return err
 			}
 
-			n := &Vertex{}
-			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
+			n := c.newInlineVertex(nil, nil, MakeConjunct(c.Env(0), list, c.ci))
 			n.CompleteArcs(c)
 
 			return n

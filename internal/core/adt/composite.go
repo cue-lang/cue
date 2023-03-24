@@ -230,6 +230,18 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
+// newInlineVertex creates a Vertex that is needed for computation, but for
+// which there is no CUE path defined from the root Vertex.
+func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct) *Vertex {
+	return &Vertex{
+		Parent:    parent,
+		BaseValue: v,
+		IsDynamic: true,
+		ArcType:   ArcMember,
+		Conjuncts: a,
+	}
+}
+
 // updateArcType updates v.ArcType if t is more restrictive.
 func (v *Vertex) updateArcType(t ArcType) {
 	if t < v.ArcType {

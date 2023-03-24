@@ -447,9 +447,7 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 		for n.maybeSetCache(); n.expandOne(state); n.maybeSetCache() {
 		}
 
-		if aList, id := n.addLists(); aList != nil {
-			n.updateNodeType(ListKind, aList, id)
-		} else {
+		if !n.addLists() {
 			break
 		}
 	}
@@ -2140,10 +2138,13 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
+func (n *nodeContext) addLists() (progress bool) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
-		return nil, CloseInfo{}
+		return false
 	}
+
+	var oneOfTheLists Expr
+	var anID CloseInfo
 
 	isOpen := true
 	max := 0
@@ -2338,7 +2339,9 @@ outer:
 	n.lists = n.lists[:0]
 	n.vLists = n.vLists[:0]
 
-	return oneOfTheLists, anID
+	n.updateNodeType(ListKind, oneOfTheLists, anID)
+
+	return true
 }
 
 func (n *nodeContext) invalidListLength(na, nb int, a, b Expr) {

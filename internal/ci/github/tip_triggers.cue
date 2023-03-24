@@ -29,8 +29,8 @@ workflows: tip_triggers: core.bashWorkflow & {
 		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
 		steps: [
 			core.repositoryDispatch & {
-				name:           "Trigger tip.cuelang.org deploy"
-				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
+				name:                  "Trigger tip.cuelang.org deploy"
+				#githubRepositoryPath: core.cuelangRepositoryPath
 				#arg: {
 					event_type: "Rebuild tip against ${GITHUB_SHA}"
 					client_payload: {
@@ -39,8 +39,8 @@ workflows: tip_triggers: core.bashWorkflow & {
 				}
 			},
 			core.repositoryDispatch & {
-				name:           "Trigger unity build"
-				#repositoryURL: "https://github.com/cue-unity/unity"
+				name:                  "Trigger unity build"
+				#githubRepositoryPath: core.unityRepositoryPath
 				#arg: {
 					event_type: "Check against ${GITHUB_SHA}"
 					client_payload: {

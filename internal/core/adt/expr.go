@@ -1882,7 +1882,7 @@ func (x *ForClause) yield(s *compState) {
 		}
 
 		c.unify(a, partial)
-		if a.ArcType == ArcVoid {
+		if !a.definitelyExists() {
 			continue
 		}
 
@@ -1894,6 +1894,7 @@ func (x *ForClause) yield(s *compState) {
 			// processing, eluding the deallocation step.
 			status:    finalized,
 			IsDynamic: true,
+			ArcType:   ArcMember,
 		}
 
 		if x.Value != InvalidLabel {
@@ -1901,6 +1902,7 @@ func (x *ForClause) yield(s *compState) {
 				Label:     x.Value,
 				BaseValue: a,
 				IsDynamic: true,
+				ArcType:   ArcPending,
 			}
 			n.Arcs = append(n.Arcs, b)
 		}

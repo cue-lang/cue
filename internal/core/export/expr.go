@@ -320,7 +320,7 @@ type conjuncts struct {
 func (c *conjuncts) getField(label adt.Feature) field {
 	f, ok := c.fields[label]
 	if !ok {
-		f.arcType = adt.ArcVoid
+		f.arcType = adt.ArcNotPresent
 	}
 	return f
 }
@@ -385,7 +385,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 
 		for _, d := range x.Decls {
 			var label adt.Feature
-			t := adt.ArcVoid
+			t := adt.ArcNotPresent
 			switch f := d.(type) {
 			case *adt.Field:
 				label = f.Label

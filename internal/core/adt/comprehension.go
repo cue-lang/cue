@@ -182,7 +182,7 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcVoid, conjunct)
+				n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				fields = append(fields, f)
 				// TODO: adjust ci to embed?
 
@@ -203,7 +203,7 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcVoid, conjunct)
+				n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				fields = append(fields, f)
 
 			default:

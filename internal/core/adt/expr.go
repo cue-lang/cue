@@ -73,11 +73,7 @@ func (x *StructLit) Source() ast.Node { return x.Src }
 
 func (x *StructLit) evaluate(c *OpContext, state vertexStatus) Value {
 	e := c.Env(0)
-	v := &Vertex{
-		Parent:    e.Vertex,
-		IsDynamic: true,
-		Conjuncts: []Conjunct{{e, x, c.ci}},
-	}
+	v := c.newInlineVertex(e.Vertex, nil, Conjunct{e, x, c.ci})
 	// evaluate may not finalize a field, as the resulting value may be
 	// used in a context where more conjuncts are added. It may also lead
 	// to disjuncts being in a partially expanded state, leading to
@@ -287,11 +283,7 @@ func (x *ListLit) Source() ast.Node {
 
 func (x *ListLit) evaluate(c *OpContext, state vertexStatus) Value {
 	e := c.Env(0)
-	v := &Vertex{
-		Parent:    e.Vertex,
-		IsDynamic: true,
-		Conjuncts: []Conjunct{{e, x, c.ci}},
-	}
+	v := c.newInlineVertex(e.Vertex, nil, Conjunct{e, x, c.ci})
 	v.CompleteArcs(c)
 	return v
 }
@@ -1239,10 +1231,7 @@ func (x *BinaryExpr) Source() ast.Node {
 func (x *BinaryExpr) evaluate(c *OpContext, state vertexStatus) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
-		v := &Vertex{
-			IsDynamic: true,
-			Conjuncts: []Conjunct{makeAnonymousConjunct(env, x, c.ci.Refs)},
-		}
+		v := c.newInlineVertex(nil, nil, makeAnonymousConjunct(env, x, c.ci.Refs))
 
 		// Do not fully evaluate the Vertex: if it is embedded within a
 		// a struct with arcs that are referenced from within this expression,
@@ -1602,10 +1591,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 		if _, ok := v.(*BasicType); !ok {
 			env := c.Env(0)
 			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
-			n := &Vertex{
-				IsDynamic: true,
-				Conjuncts: []Conjunct{{env, x, c.ci}},
-			}
+			n := c.newInlineVertex(nil, nil, Conjunct{env, x, c.ci})
 			n.Finalize(c)
 			if _, ok := n.BaseValue.(*Bottom); ok {
 				c.addErrf(0, pos(a),
@@ -1740,7 +1726,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 
 func (x *DisjunctionExpr) evaluate(c *OpContext, state vertexStatus) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x, c.ci}}}
+	v := c.newInlineVertex(nil, nil, Conjunct{e, x, c.ci})
 	v.Finalize(c) // TODO: also partial okay?
 	// TODO: if the disjunction result originated from a literal value, we may
 	// consider the result closed to create more permanent errors.

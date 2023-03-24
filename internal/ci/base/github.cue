@@ -11,11 +11,11 @@ import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-#bashWorkflow: json.#Workflow & {
+bashWorkflow: json.#Workflow & {
 	jobs: [string]: defaults: run: shell: "bash"
 }
 
-#installGo: json.#step & {
+installGo: json.#step & {
 	name: "Install Go"
 	uses: "actions/setup-go@v3"
 	with: {
@@ -23,7 +23,7 @@ import (
 	}
 }
 
-#checkoutCode: {
+checkoutCode: {
 	#actionsCheckout: json.#step & {
 		name: "Checkout code"
 		uses: "actions/checkout@v3"
@@ -61,7 +61,7 @@ import (
 	]
 }
 
-#earlyChecks: json.#step & {
+earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
 	run: #"""
 		# Ensure the recent commit messages have Signed-off-by headers.
@@ -118,11 +118,11 @@ import (
 		"""#
 }
 
-#curlGitHubAPI: #"""
+curlGitHubAPI: #"""
 	curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.\#(botGitHubUserTokenSecretsKey) }}" -H "X-GitHub-Api-Version: 2022-11-28"
 	"""#
 
-#setupGoActionsCaches: {
+setupGoActionsCaches: {
 	// #protectedBranchExpr is a GitHub expression
 	// (https://docs.github.com/en/actions/learn-github-actions/expressions)
 	// that evaluates to true if the workflow is running for a commit against a
@@ -180,20 +180,20 @@ import (
 // job is running as a result of pushing to one of _#protectedBranchPatterns.
 // It would be nice to use the "contains" builtin for simplicity,
 // but array literals are not yet supported in expressions.
-#isProtectedBranch: {
+isProtectedBranch: {
 	"(" + strings.Join([ for branch in protectedBranchPatterns {
-		(_#matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
+		(_matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
 	}], " || ") + ")"
 }
 
 // #isReleaseTag creates a GitHub expression, based on the given release tag
 // pattern, that evaluates to true if called in the context of a workflow that
 // is part of a release.
-#isReleaseTag: {
-	(_#matchPattern & {variable: "github.ref", pattern: "refs/tags/\(releaseTagPattern)"}).expr
+isReleaseTag: {
+	(_matchPattern & {variable: "github.ref", pattern: "refs/tags/\(releaseTagPattern)"}).expr
 }
 
-#checkGitClean: json.#step & {
+checkGitClean: json.#step & {
 	name: "Check that git is clean at the end of the job"
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
@@ -202,7 +202,7 @@ let _#repositoryURL = githubRepositoryURL
 let _#botGitHubUser = botGitHubUser
 let _#botGitHubUserTokenSecretsKey = botGitHubUserTokenSecretsKey
 
-#repositoryDispatch: json.#step & {
+repositoryDispatch: json.#step & {
 	#repositoryURL:                *_#repositoryURL | string
 	#botGitHubUser:                *_#botGitHubUser | string
 	#botGitHubUserTokenSecretsKey: *_#botGitHubUserTokenSecretsKey | string
@@ -214,6 +214,6 @@ let _#botGitHubUserTokenSecretsKey = botGitHubUserTokenSecretsKey
 
 	name: string
 	run:  #"""
-			\#(#curlGitHubAPI) -f --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(_#repositoryPath)/dispatches
+			\#(curlGitHubAPI) -f --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(_#repositoryPath)/dispatches
 			"""#
 }

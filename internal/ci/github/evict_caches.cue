@@ -42,7 +42,7 @@ import (
 //
 // In testing with @mvdan, this resulted in cache sizes for Linux dropping from
 // ~1GB to ~125MB. This is a considerable saving.
-workflows: evict_caches: core.#bashWorkflow & {
+workflows: evict_caches: core.bashWorkflow & {
 	name: "Evict caches"
 
 	on: {
@@ -66,8 +66,8 @@ workflows: evict_caches: core.#bashWorkflow & {
 						#repo:   string
 						#branch: string
 						"""
-						id=$(\(core.#curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/trybot.yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
-						\(core.#curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
+						id=$(\(core.curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/trybot.yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+						\(core.curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
 
 						"""
 					}
@@ -92,7 +92,7 @@ workflows: evict_caches: core.#bashWorkflow & {
 						# Now trigger the most recent workflow run on each of the default branches.
 						# We do this by listing all the branches on the main repo and finding those
 						# which match the protected branch patterns (globs).
-						for j in $(\(core.#curlGitHubAPI) -f https://api.github.com/repos/\(core.githubRepositoryPath)/branches | jq -r '.[] | .name')
+						for j in $(\(core.curlGitHubAPI) -f https://api.github.com/repos/\(core.githubRepositoryPath)/branches | jq -r '.[] | .name')
 						do
 							for i in \(branchPatterns)
 							do

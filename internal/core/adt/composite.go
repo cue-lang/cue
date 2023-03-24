@@ -196,8 +196,8 @@ type Vertex struct {
 	// Used for cycle detection.
 	IsDynamic bool
 
-	// hasVoidArc is set if this Vertex has a void arc (e.g. for comprehensions)
-	hasVoidArc bool
+	// hasPendingArc is set if this Vertex has a void arc (e.g. for comprehensions)
+	hasPendingArc bool
 
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
@@ -275,16 +275,28 @@ const (
 	// for foo in case it is defined.
 	ArcOptional
 
+	// ArcPending means that it is not known yet whether an arc exists and that
+	// its conjuncts need to be processed to find out. This happens when an arc
+	// is provisionally added as part of a comprehension, but when this
+	// comprehension has not yet yielded any results.
+	ArcPending
+
+	// ArcNotPresent indicates that this arc is not present and, unlike
+	// ArcPending, needs no further processing.
+	ArcNotPresent
+
 	// TODO: define a type for optional arcs. This will be needed for pulling
 	// in optional fields into the Vertex, which, in turn, is needed for
 	// structure sharing, among other things.
 	// We could also define types for required fields and potentially lets.
-
-	// ArcVoid means that an arc does not exist. This happens when an arc
-	// is provisionally added as part of a comprehension, but when this
-	// comprehension has not yet yielded any results.
-	ArcVoid
 )
+
+// definitelyExists reports whether an arc is a constraint or member arc.
+// TODO: we should check that users of this call ensure there are no
+// ArcPendings.
+func (v *Vertex) definitelyExists() bool {
+	return v.ArcType < ArcPending
+}
 
 // ConstraintFromToken converts a given AST constraint token to the
 // corresponding ArcType.
@@ -318,6 +330,12 @@ func (a ArcType) Suffix() string {
 		return "?"
 	case ArcRequired:
 		return "!"
+
+	// For debugging internal state. This is not CUE syntax.
+	case ArcPending:
+		return "*"
+	case ArcNotPresent:
+		return "-"
 	}
 	return ""
 }
@@ -850,8 +868,8 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 	}
 	arc = &Vertex{Parent: v, Label: f, ArcType: t}
 	v.Arcs = append(v.Arcs, arc)
-	if t == ArcVoid {
-		v.hasVoidArc = true
+	if t == ArcPending {
+		v.hasPendingArc = true
 	}
 	return arc, true
 }

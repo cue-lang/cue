@@ -375,7 +375,7 @@ Disjuncts:    230
       port: (string){ "" }
     }
     b: (struct){
-      port: (_|_){
+      port*: (_|_){
         // [cycle] minimal.b: cycle with field a.port:
         //     ./in.cue:18:6
       }
@@ -518,7 +518,7 @@ Disjuncts:    230
       Y: (struct){
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
-        port: (_|_){
+        port*: (_|_){
           // [cycle] large.p2.Y: undefined field: port:
           //     ./in.cue:267:10
         }
@@ -544,7 +544,7 @@ Disjuncts:    230
       Y: (struct){
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
-        port: (_|_){
+        port*: (_|_){
           // [cycle] large.p3.Y: undefined field: port:
           //     ./in.cue:308:10
         }
@@ -570,7 +570,7 @@ Disjuncts:    230
       Y: (struct){
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
-        port: (_|_){
+        port*: (_|_){
           // [cycle] large.p4.Y: undefined field: port:
           //     ./in.cue:351:10
         }

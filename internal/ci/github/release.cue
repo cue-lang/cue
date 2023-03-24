@@ -27,7 +27,7 @@ import (
 _#cueVersionRef: "${GITHUB_REF##refs/tags/}"
 
 // The release workflow
-workflows: release: core.#bashWorkflow & {
+workflows: release: core.bashWorkflow & {
 
 	name: "Release"
 
@@ -44,8 +44,8 @@ workflows: release: core.#bashWorkflow & {
 		"runs-on": core.linuxMachine
 		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
 		steps: [
-			for v in core.#checkoutCode {v},
-			core.#installGo & {
+			for v in core.checkoutCode {v},
+			core.installGo & {
 				with: "go-version": core.pinnedReleaseGo
 			},
 			json.#step & {
@@ -85,17 +85,17 @@ workflows: release: core.#bashWorkflow & {
 				run:                 "cue cmd release"
 				"working-directory": "./internal/ci/goreleaser"
 			},
-			core.#repositoryDispatch & {
+			core.repositoryDispatch & {
 				name:           "Re-test cuelang.org"
-				if:             core.#isReleaseTag
+				if:             core.isReleaseTag
 				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
 				#arg: {
 					event_type: "Re-test post release of \(_#cueVersionRef)"
 				}
 			},
-			core.#repositoryDispatch & {
+			core.repositoryDispatch & {
 				name:           "Trigger unity build"
-				if:             core.#isReleaseTag
+				if:             core.isReleaseTag
 				#repositoryURL: core.unityRepositoryURL
 				#arg: {
 					event_type: "Check against CUE \(_#cueVersionRef)"

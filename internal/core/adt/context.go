@@ -1302,11 +1302,7 @@ func (c *OpContext) newBool(b bool) Value {
 }
 
 func (c *OpContext) newList(src ast.Node, parent *Vertex) *Vertex {
-	return &Vertex{
-		Parent:    parent,
-		BaseValue: &ListMarker{},
-		IsDynamic: true,
-	}
+	return c.newInlineVertex(parent, &ListMarker{})
 }
 
 // Str reports a debug string of x.
@@ -1321,10 +1317,7 @@ func (c *OpContext) Str(x Node) string {
 func (c *OpContext) NewList(values ...Value) *Vertex {
 	// TODO: consider making this a literal list instead.
 	list := &ListLit{}
-	v := &Vertex{
-		IsDynamic: true,
-		Conjuncts: []Conjunct{{Env: nil, x: list}},
-	}
+	v := c.newInlineVertex(nil, nil, Conjunct{Env: nil, x: list})
 
 	for _, x := range values {
 		list.Elems = append(list.Elems, x)

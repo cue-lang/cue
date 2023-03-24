@@ -230,6 +230,19 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
+// newInlineVertex creates a Vertex that is computed outside of the tree
+// under evaluation.
+func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct) *Vertex {
+	n := &Vertex{
+		Parent:    parent,
+		BaseValue: v,
+		IsDynamic: true,
+		ArcType:   ArcMember,
+		Conjuncts: a,
+	}
+	return n
+}
+
 // updateArcType updates v.ArcType if t is more restrictive.
 func (v *Vertex) updateArcType(t ArcType) {
 	if t < v.ArcType {

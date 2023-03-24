@@ -19,6 +19,6 @@ import (
 )
 
 // The trybot_dispatch workflow.
-workflows: trybot_dispatch: core.#bashWorkflow & core.#dispatchWorkflow & {
-	#type: core.#trybot.key
+workflows: trybot_dispatch: core.bashWorkflow & core.dispatchWorkflow & {
+	#type: core.trybot.key
 }

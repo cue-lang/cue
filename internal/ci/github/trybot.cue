@@ -36,7 +36,7 @@ workflows: trybot: core.bashWorkflow & {
 
 	jobs: {
 		test: {
-			strategy:  _#testStrategy
+			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
 
 			let goCaches = core.setupGoActionsCaches & {#protectedBranchExpr: core.isProtectedBranch, _}
@@ -68,21 +68,21 @@ workflows: trybot: core.bashWorkflow & {
 					if:  "\(core.isProtectedBranch) || \(core.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
-				_#goGenerate,
-				_#goTest & {
+				_goGenerate,
+				_goTest & {
 					if: "\(core.isProtectedBranch) || !\(core.isLatestLinux)"
 				},
-				_#goTestRace & {
+				_goTestRace & {
 					if: core.isLatestLinux
 				},
-				_#goCheck,
+				_goCheck,
 				core.checkGitClean,
-				_#pullThroughProxy,
+				_pullThroughProxy,
 			]
 		}
 	}
 
-	_#testStrategy: {
+	_testStrategy: {
 		"fail-fast": false
 		matrix: {
 			"go-version": ["1.18.x", core.latestStableGo]
@@ -90,7 +90,7 @@ workflows: trybot: core.bashWorkflow & {
 		}
 	}
 
-	_#pullThroughProxy: json.#step & {
+	_pullThroughProxy: json.#step & {
 		name: "Pull this commit through the proxy on \(core.defaultBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
@@ -126,7 +126,7 @@ workflows: trybot: core.bashWorkflow & {
 		if: "\(core.isProtectedBranch) && \(core.isLatestLinux)"
 	}
 
-	_#goGenerate: json.#step & {
+	_goGenerate: json.#step & {
 		name: "Generate"
 		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
@@ -134,12 +134,12 @@ workflows: trybot: core.bashWorkflow & {
 		if: core.isLatestLinux
 	}
 
-	_#goTest: json.#step & {
+	_goTest: json.#step & {
 		name: "Test"
 		run:  "go test ./..."
 	}
 
-	_#goCheck: json.#step & {
+	_goCheck: json.#step & {
 		// These checks can vary between platforms, as different code can be built
 		// based on GOOS and GOARCH build tags.
 		// However, CUE does not have any such build tags yet, and we don't use
@@ -151,7 +151,7 @@ workflows: trybot: core.bashWorkflow & {
 		run:  "go vet ./..."
 	}
 
-	_#goTestRace: json.#step & {
+	_goTestRace: json.#step & {
 		name: "Test with -race"
 		run:  "go test -race ./..."
 	}

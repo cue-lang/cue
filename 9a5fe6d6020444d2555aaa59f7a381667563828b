@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "e9e0fd5a_c5e71b36",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-24T08:26:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c98582e5_3880a150",
+      "range": {
+        "startLine": 10,
+        "startChar": 3,
+        "endLine": 10,
+        "endChar": 10
+      },
+      "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2583372a_800a4f2b",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -64,6 +88,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d19dcfb8_464b6a89",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-24T08:26:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83805aa6_e0152639",
+      "range": {
+        "startLine": 129,
+        "startChar": 54,
+        "endLine": 129,
+        "endChar": 63
+      },
+      "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d43be4a5_e2a1c556",
@@ -77,6 +125,24 @@
       "writtenOn": "2023-03-22T17:54:26Z",
       "side": 1,
       "message": "I realize this is not part of this CL, but why is this commented out? I should at least have an explanation as a TODO.",
+      "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f56b9d05_8be96434",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 426,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-24T08:26:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d43be4a5_e2a1c556",
       "revId": "9a5fe6d6020444d2555aaa59f7a381667563828b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -19,7 +19,7 @@ import (
 
 // #toCodeReviewCfg converts a #codeReview instance to
 // the key: value
-#toCodeReviewCfg: {
+toCodeReviewCfg: {
 	#input: #codeReview
 	let parts = [ for k, v in #input {k + ": " + v}]
 

@@ -14,7 +14,7 @@ import (
 	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
 		(#type): {
-			"runs-on": #linuxMachine
+			"runs-on": linuxMachine
 			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
 			steps: [
 				#writeNetrcFile,
@@ -34,16 +34,16 @@ import (
 						mkdir tmpgit
 						cd tmpgit
 						git init
-						git config user.name \(#botGitHubUser)
-						git config user.email \(#botGitHubUserEmail)
-						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(#botGitHubUser):${{ secrets.\(#botGitHubUserTokenSecretsKey) }} | base64)"
-						git fetch \(#gerritHubRepository) "${{ github.event.client_payload.payload.ref }}"
+						git config user.name \(botGitHubUser)
+						git config user.email \(botGitHubUserEmail)
+						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
+						git fetch \(gerritHubRepositoryURL) "${{ github.event.client_payload.payload.ref }}"
 						git checkout -b \(_#branchNameExpression) FETCH_HEAD
-						git remote add origin \(#trybotRepositoryURL)
+						git remote add origin \(trybotRepositoryURL)
 						git fetch origin "${{ github.event.client_payload.payload.branch }}"
 						git push origin \(_#branchNameExpression)
 						echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
-						gh pr --repo=\(#trybotRepositoryURL) create --base="${{ github.event.client_payload.payload.branch }}" --fill
+						gh pr --repo=\(trybotRepositoryURL) create --base="${{ github.event.client_payload.payload.branch }}" --fill
 						"""
 				},
 			]
@@ -67,11 +67,11 @@ import (
 						mkdir tmpgit
 						cd tmpgit
 						git init
-						git config user.name \(#botGitHubUser)
-						git config user.email \(#botGitHubUserEmail)
-						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(#botGitHubUser):${{ secrets.\(#botGitHubUserTokenSecretsKey) }} | base64)"
-						git remote add origin \(#gerritHubRepository)
-						git remote add trybot \(#trybotRepositoryURL)
+						git config user.name \(botGitHubUser)
+						git config user.email \(botGitHubUserEmail)
+						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
+						git remote add origin \(gerritHubRepositoryURL)
+						git remote add trybot \(trybotRepositoryURL)
 						git fetch origin "${{ github.ref }}"
 						git push trybot "FETCH_HEAD:${{ github.ref }}"
 						"""
@@ -85,9 +85,9 @@ import (
 	name: "Write netrc file for cueckoo Gerrithub"
 	run:  """
 			cat <<EOD > ~/.netrc
-			machine \(#gerritHubHostname)
-			login \(#botGerritHubUser)
-			password ${{ secrets.\(#botGerritHubUserPasswordSecretsKey) }}
+			machine \(gerritHubHostname)
+			login \(botGerritHubUser)
+			password ${{ secrets.\(botGerritHubUserPasswordSecretsKey) }}
 			EOD
 			chmod 600 ~/.netrc
 			"""

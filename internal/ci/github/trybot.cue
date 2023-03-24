@@ -23,8 +23,8 @@ import (
 )
 
 // The trybot workflow.
-workflows: trybot: core.#bashWorkflow & {
-	name: core.#trybot.name
+workflows: trybot: core.bashWorkflow & {
+	name: core.trybot.name
 
 	on: {
 		push: {
@@ -39,11 +39,11 @@ workflows: trybot: core.#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 
-			let goCaches = core.#setupGoActionsCaches & {#protectedBranchExpr: core.#isProtectedBranch, _}
+			let goCaches = core.setupGoActionsCaches & {#protectedBranchExpr: core.isProtectedBranch, _}
 
 			steps: [
-				for v in core.#checkoutCode {v},
-				core.#installGo,
+				for v in core.checkoutCode {v},
+				core.installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
@@ -55,28 +55,28 @@ workflows: trybot: core.#bashWorkflow & {
 				// subsequent CLs in the trybot repo can leverage the updated
 				// cache. Therefore, we instead perform a clean of the testcache.
 				json.#step & {
-					if:  "github.repository == '\(core.githubRepositoryPath)' && (\(core.#isProtectedBranch) || github.ref == 'refs/heads/\(core.testDefaultBranch)')"
+					if:  "github.repository == '\(core.githubRepositoryPath)' && (\(core.isProtectedBranch) || github.ref == 'refs/heads/\(core.testDefaultBranch)')"
 					run: "go clean -testcache"
 				},
 
-				core.#earlyChecks & {
+				core.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
 					if: core.isLatestLinux
 				},
 				json.#step & {
-					if:  "\(core.#isProtectedBranch) || \(core.isLatestLinux)"
+					if:  "\(core.isProtectedBranch) || \(core.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_#goGenerate,
 				_#goTest & {
-					if: "\(core.#isProtectedBranch) || !\(core.isLatestLinux)"
+					if: "\(core.isProtectedBranch) || !\(core.isLatestLinux)"
 				},
 				_#goTestRace & {
 					if: core.isLatestLinux
 				},
 				_#goCheck,
-				core.#checkGitClean,
+				core.checkGitClean,
 				_#pullThroughProxy,
 			]
 		}
@@ -123,7 +123,7 @@ workflows: trybot: core.#bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(core.#isProtectedBranch) && \(core.isLatestLinux)"
+		if: "\(core.isProtectedBranch) && \(core.isLatestLinux)"
 	}
 
 	_#goGenerate: json.#step & {

@@ -21,10 +21,10 @@ import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-// _#cueVersionRef is a workflow job-runtime expression that evaluates to the
+// _cueVersionRef is a workflow job-runtime expression that evaluates to the
 // git tag (version) that is being released. Defining as a "constant" here for
 // re-use below
-_#cueVersionRef: "${GITHUB_REF##refs/tags/}"
+_cueVersionRef: "${GITHUB_REF##refs/tags/}"
 
 // The release workflow
 workflows: release: core.bashWorkflow & {
@@ -90,7 +90,7 @@ workflows: release: core.bashWorkflow & {
 				if:             core.isReleaseTag
 				#repositoryURL: "https://github.com/cue-lang/cuelang.org"
 				#arg: {
-					event_type: "Re-test post release of \(_#cueVersionRef)"
+					event_type: "Re-test post release of \(_cueVersionRef)"
 				}
 			},
 			core.repositoryDispatch & {
@@ -98,12 +98,12 @@ workflows: release: core.bashWorkflow & {
 				if:             core.isReleaseTag
 				#repositoryURL: core.unityRepositoryURL
 				#arg: {
-					event_type: "Check against CUE \(_#cueVersionRef)"
+					event_type: "Check against CUE \(_cueVersionRef)"
 					client_payload: {
 						type: "unity"
 						payload: {
 							versions: """
-							"\(_#cueVersionRef)"
+							"\(_cueVersionRef)"
 							"""
 						}
 					}

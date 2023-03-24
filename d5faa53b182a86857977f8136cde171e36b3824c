@@ -50,6 +50,24 @@
       "message": "I know it was wrong before, but still worth pointing out maybe: this comment is out of date - it doesn\u0027t mention the state parameter, which presumably influences behaviour such that sometimes it actually doesn\u0027t \"fully unify all values of a Vertex to completion\".",
       "revId": "d5faa53b182a86857977f8136cde171e36b3824c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4ab5cd2_1d550fe3",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-24T08:25:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "668321a6_b5795f70",
+      "revId": "d5faa53b182a86857977f8136cde171e36b3824c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

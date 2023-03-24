@@ -78,9 +78,9 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state vertexStatus) Value {
 		// Use node itself to allow for cycle detection.
 		c.unify(v, state)
 
-		if v.ArcType == ArcVoid {
+		if v.ArcType == ArcPending {
 			if v.status == evaluating {
-				for ; v.Parent != nil && v.ArcType == ArcVoid; v = v.Parent {
+				for ; v.Parent != nil && v.ArcType == ArcPending; v = v.Parent {
 				}
 				err := c.Newf("cycle with field %v", r)
 				b := &Bottom{Code: CycleError, Err: err}
@@ -492,7 +492,7 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 
 	switch err := n.getErr(); {
 	case err != nil:
-		if err.Code < IncompleteError && n.node.ArcType == ArcVoid {
+		if err.Code < IncompleteError && n.node.ArcType == ArcPending {
 			n.node.ArcType = ArcMember
 		}
 		n.node.BaseValue = err
@@ -754,7 +754,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 	if state <= conjuncts &&
 		// Is allowed to go one step back. See Vertex.UpdateStatus.
 		n.node.status <= state+1 &&
-		(!n.node.hasVoidArc || n.node.ArcType == ArcMember) {
+		(!n.node.hasPendingArc || n.node.ArcType == ArcMember) {
 
 		n.node.updateStatus(conjuncts)
 		return
@@ -772,11 +772,11 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 			// correctly and that we are not regressing.
 			n.node.updateStatus(evaluatingArcs)
 
-			wasVoid := a.ArcType == ArcVoid
+			wasVoid := a.ArcType == ArcPending
 
 			ctx.unify(a, finalized)
 
-			if a.ArcType == ArcVoid {
+			if a.ArcType == ArcPending {
 				continue
 			}
 
@@ -1744,7 +1744,7 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 		n.node.Structs = append(n.node.Structs, x.Structs...)
 
 		for _, a := range x.Arcs {
-			if a.ArcType == ArcVoid {
+			if !a.exists() {
 				continue
 			}
 			// TODO(errors): report error when this is a regular field.

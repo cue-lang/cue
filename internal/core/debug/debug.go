@@ -220,6 +220,9 @@ func (w *printer) node(n adt.Node) {
 		}
 
 		for _, a := range x.Arcs {
+			if a.ArcType == adt.ArcNonExisting {
+				continue
+			}
 			if a.Label.IsLet() {
 				w.string("\n")
 				w.string("let ")

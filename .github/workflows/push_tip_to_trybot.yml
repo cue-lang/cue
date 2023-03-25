@@ -13,6 +13,7 @@ jobs:
     defaults:
       run:
         shell: bash
+    if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
@@ -34,4 +35,3 @@ jobs:
           git remote add trybot https://github.com/cue-lang/cue-trybot
           git fetch origin "${{ github.ref }}"
           git push trybot "FETCH_HEAD:${{ github.ref }}"
-    if: ${{github.repository == 'cue-lang/cue'}}

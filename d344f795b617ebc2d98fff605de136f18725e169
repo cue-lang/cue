@@ -16,6 +16,24 @@
       "message": "nit: you can use this to deduplicate githubRepositoryURL as well as gerritHubRepositoryURL",
       "revId": "d344f795b617ebc2d98fff605de136f18725e169",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98e1ba52_45555503",
+        "filename": "internal/ci/core/core.cue",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-25T17:38:31Z",
+      "side": 1,
+      "message": "Done in a later CL. This was intended to be a more mechanical CL to move configuration around.",
+      "parentUuid": "96457620_816aee22",
+      "revId": "d344f795b617ebc2d98fff605de136f18725e169",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

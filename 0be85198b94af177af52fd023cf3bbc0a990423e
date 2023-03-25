@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b545c89d_9557a7b2",
+        "filename": "internal/ci/base/util.cue",
+        "patchSetId": 10
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-25T09:39:48Z",
+      "side": 1,
+      "message": "I know this isn\u0027t particularly helpful, but I would avoid the name `util.cue`. Assuming we can\u0027t come up with a good name, and this is just where we collect any definitions that don\u0027t fit in the other filenames, how about `other.cue`?\n\nOr, if the purpose is to collect little expression or string helpers, perhaps `helpers.cue`.",
+      "revId": "0be85198b94af177af52fd023cf3bbc0a990423e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

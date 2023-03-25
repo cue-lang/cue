@@ -43,7 +43,7 @@ import (
 )
 
 // Package parameters
-#githubRepositoryURL:          string
+#repositoryURL:                string
 #defaultBranch:                string
 #testDefaultBranch:            "ci/test"
 #botGitHubUser:                string
@@ -168,7 +168,7 @@ import (
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
 
-let _#repositoryURL = #githubRepositoryURL
+let _#repositoryURL = #repositoryURL
 let _#botGitHubUser = #botGitHubUser
 let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
 

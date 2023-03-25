@@ -49,7 +49,7 @@ _#gerritHubHostname: "review.gerrithub.io"
 
 _#linuxMachine: "ubuntu-20.04"
 
-#trybotDispatchWorkflow: json.#Workflow & {
+#dispatchWorkflow: json.#Workflow & {
 	#type:                  string
 	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
 	name:                   "Dispatch \(#type)"

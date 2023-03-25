@@ -13,18 +13,10 @@ macosMachine:   "macos-11"
 windowsMachine: "windows-2022"
 
 // Define core URLs that will be used in the codereview.cfg and GitHub workflows
-githubRepositoryURL:    "https://github.com/cue-lang/cue"
-gerritHubHostname:      "review.gerrithub.io"
-gerritHubRepositoryURL: "https://\(gerritHubHostname)/a/cue-lang/cue"
-githubRepositoryPath:   "cue-lang/cue"
-unityRepositoryURL:     "https://github.com/cue-unity/unity"
-
-botGitHubUser:                      "cueckoo"
-botGitHubUserTokenSecretsKey:       "CUECKOO_GITHUB_PAT"
-botGitHubUserEmail:                 "cueckoo@gmail.com"
-botGerritHubUser:                   botGitHubUser
-botGerritHubUserPasswordSecretsKey: "CUECKOO_GERRITHUB_PASSWORD"
-botGerritHubUserEmail:              botGitHubUserEmail
+githubRepositoryURL:  "https://github.com/cue-lang/cue"
+gerritRepositoryURL:  "https://review.gerrithub.io/a/cue-lang/cue"
+githubRepositoryPath: "cue-lang/cue"
+unityRepositoryURL:   "https://github.com/cue-unity/unity"
 
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
@@ -73,7 +65,7 @@ zeroReleaseTagPattern: "*" + zeroReleaseTagSuffix
 
 codeReview: base.#codeReview & {
 	github:      githubRepositoryURL
-	gerrit:      gerritHubRepositoryURL
+	gerrit:      gerritRepositoryURL
 	"cue-unity": unityRepositoryURL
 }
 

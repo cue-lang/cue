@@ -15,4 +15,5 @@
 package ci
 
 //go:generate go run cuelang.org/go/cmd/cue cmd importjsonschema ./vendor
+//go:generate go run cuelang.org/go/cmd/cue cmd removeWorkflowFiles
 //go:generate go run cuelang.org/go/cmd/cue cmd gen

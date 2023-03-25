@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2fcafc8_7af3453e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-25T09:56:21Z",
+      "side": 1,
+      "message": "Values like githubRepositoryURL, gerritHubRepositoryURL, or releaseTagPattern are derived entirely from other values which are the actual input parameters, like \"repository path\".\n\nI would not use `*\"...\" | string` for those derived values, because I don\u0027t think we should ever replace them directly. I would just use `\"...\"` and avoid the disjunction and default.",
+      "revId": "7da7709aa19c4439dfe29cce45fab4afb013c93d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69d58c9a_d8a070b7",
+        "filename": "internal/ci/base/base.cue",
+        "patchSetId": 9
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-25T09:56:21Z",
+      "side": 1,
+      "message": "nit: string rather than _",
+      "revId": "7da7709aa19c4439dfe29cce45fab4afb013c93d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

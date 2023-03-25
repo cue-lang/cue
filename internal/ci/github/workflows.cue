@@ -72,7 +72,7 @@ _gerrithub: gerrithub & {
 // Perhaps rename the import to something more obviously not intended to be
 // used, and then rename the field base?
 _base: base & {
-	#githubRepositoryURL:          core.githubRepositoryURL
+	#repositoryURL:                core.githubRepositoryURL
 	#defaultBranch:                core.defaultBranch
 	#botGitHubUser:                "cueckoo"
 	#botGitHubUserTokenSecretsKey: "CUECKOO_GITHUB_PAT"

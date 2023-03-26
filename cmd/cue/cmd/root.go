@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -279,10 +280,19 @@ func New(args []string) (cmd *Command, err error) {
 		// "fix":   {"fix", nil},
 	}
 
-	// handle help, --help and -h on root 'cue' command
-	if args[0] == "help" || args[0] == "--help" || args[0] == "-h" {
-		// Allow errors.
-		_ = addSubcommands(cmd, sub, args[1:], true)
+	if args[0] == "help" {
+		if len(args) >= 2 && sub[args[1]] != nil {
+			// addSubcommands adds helpful information to each of the help docs,
+			// for example `cue help cmd` shows the available commands by loading
+			// `*_tools.cue` files.
+			//
+			// Ignore errors, since this is a help command and the extra content
+			// is an extra that shouldn't prevent help text from being shown.
+			//
+			// TODO: `cue cmd -h` does not trigger this, and maybe it should for
+			// consistency with `cue help cmd`.
+			_ = addSubcommands(cmd, sub, args[1:], true)
+		}
 		return cmd, nil
 	}
 
@@ -294,6 +304,9 @@ func New(args []string) (cmd *Command, err error) {
 	// it.
 	err = cmd.cmd.ParseFlags(args)
 	if err != nil {
+		if errors.Is(err, pflag.ErrHelp) {
+			return cmd, nil
+		}
 		return nil, err
 	}
 

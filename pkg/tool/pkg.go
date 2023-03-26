@@ -41,15 +41,16 @@
 //		// otherwise depend on its output.
 //		Tasks
 //
+//		// $usage summarizes how a command takes arguments.
 //		//
 //		// Example:
 //		//     mycmd [-n] names
 //		$usage?: string
 //
-//		// short is short description of what the command does.
+//		// $short is short description of what the command does.
 //		$short?: string
 //
-//		// long is a longer description that spans multiple lines and
+//		// $long is a longer description that spans multiple lines and
 //		// likely contain examples of usage of the command.
 //		$long?: string
 //	}
@@ -70,7 +71,7 @@
 //	Task: {
 //		$type: "tool.Task" // legacy field 'kind' still supported for now.
 //
-//		// kind indicates the operation to run. It must be of the form
+//		// $id indicates the operation to run. It must be of the form
 //		// packagePath.Operation.
 //		$id: =~#"\."#
 //

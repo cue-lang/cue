@@ -33,6 +33,23 @@
       "message": "Also, for some context, I found this while investigating Go test cache issues. The fix for the root cause was https://review.gerrithub.io/c/cue-lang/cue/+/551247, but I also noticed that we were using lstat on far more files than I expected. So I made a TODO list reminder to look into it, and ioutil.ReadDir was to blame.",
       "revId": "f5e605afa7106b5c9dbe228259aeb01adba1bf48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0975d822_dfe848bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-26T19:37:19Z",
+      "side": 1,
+      "message": "I\u0027ll defer to Rog here because he has looked at this code more recently.",
+      "revId": "f5e605afa7106b5c9dbe228259aeb01adba1bf48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

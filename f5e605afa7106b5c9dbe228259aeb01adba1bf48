@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab46a8c9_87556235",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-26T14:49:17Z",
+      "side": 1,
+      "message": "FYI Roger, this is the patch I showed you last week.",
+      "revId": "f5e605afa7106b5c9dbe228259aeb01adba1bf48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

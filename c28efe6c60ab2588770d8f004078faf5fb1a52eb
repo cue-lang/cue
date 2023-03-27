@@ -20,6 +20,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ff60cb8b_6ea07683",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "What happens if they don\u0027t?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cacd82e9_2dfc02c6",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -31,6 +48,74 @@
       "writtenOn": "2023-03-27T08:17:11Z",
       "side": 1,
       "message": "Awesome! Just some initial high-level feedback.\n\nAwesome that the tests are so small now. Do you expect the binaries to change often? If so, it may still cause largish changes over time, as binaries don\u0027t diff well.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3ec652a_4ad0f8a5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "LGTM modulo a bunch of comments and suggestions, thanks!",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "db5aff5d_9c066b09",
+        "filename": "cue/load/import.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "This is indeed an error, but perhaps let\u0027s leave it for another CL where we can fix other related formatting mismatches. I submitted https://review.gerrithub.io/c/cue-lang/cue/+/551766 to that end.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44d750e0_4bfa33bb",
+        "filename": "cue/wasm/abi.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "Why not use an integral type and `iota`, or even custom constants so checking for the kind could just be a bitmask operation?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e479e180_48f86666",
+        "filename": "cue/wasm/abi.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "Perhaps document why the fields are exported here?",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +133,24 @@
       "writtenOn": "2023-03-27T08:17:11Z",
       "side": 1,
       "message": "What is the significance of the square brackets?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "690499b8_61d4f262",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "https://tip.golang.org/doc/comment#links\n\n\nIt looks like we could just use `[cuecontext.New]` though.",
+      "parentUuid": "faa8610d_e30e0dab",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -82,6 +185,108 @@
       "writtenOn": "2023-03-27T08:17:11Z",
       "side": 1,
       "message": "I would just call this New, unless you think there will be another kind of constructor.\n\n(Gerrit seems buggy and my responses end up in a somewhat wrong location)",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f00abe82_f897461d",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "In general, a doc comment can avoid describing the error path because\nthat can be taken as a given (see any number of examples in the standard library for precedent). In general I find the description a bit hard to take in, and it doesn\u0027t actually say how `funcName` is used.\n\nHow about something like this instead?\n\n\n    Compile searches for a Wasm function described by the given `@extern` attribute and returns it as an [adt.Builtin] with the given function name.\n\n?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8bed04b_10d90933",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "It seems a shame that none of these errors have an an associated position, which might easily make it harder to diagnose and fix wasm issues. Would it be possible to extract a position from the attribute, maybe?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0be910c1_870423df",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "Again, no need to describe the error path.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8abff9f_d75f6611",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "Maybe these errors should be associated with the position of e ?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f76bd1ef_f32bb475",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "A more informative error might be more appropriate here, assuming it\u0027s something that can ever happen in practice. If not, maybe comment to that effect?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee1db216_07345b2e",
+        "filename": "cue/wasm/testdata/eval.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-27T14:06:07Z",
+      "side": 1,
+      "message": "I get that wasm files themselves can\u0027t be held in txtar files nicely, but I do think it\u0027s nicer if textual test files are held directly inside the txtar files.\n\nInstead of requiring each test to do the copy manually, how about using a Setup that automatically copies some or all of the wasm files into the work directory?\n\nYou could make it selective by having a convention that an empty `.wasm` file is replaced by the actual Wasm file from the test data, perhaps. Or that a `.wasm` file contains the file name of the testdata file that\u0027s to replace it. Note that Setup is called after all files have been extracted, which should make this quite feasible.",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

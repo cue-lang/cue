@@ -73,7 +73,7 @@ pushTipToTrybotWorkflow: json.#Workflow & {
 						git remote add origin \(gerritHubRepositoryURL)
 						git remote add trybot \(trybotRepositoryURL)
 						git fetch origin "${{ github.ref }}"
-						git push trybot "FETCH_HEAD:${{ github.ref }}"
+						git push -f trybot "FETCH_HEAD:${{ github.ref }}"
 						"""
 			},
 		]

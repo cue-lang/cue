@@ -230,7 +230,7 @@ func (c *buildContext) isInternal(sel cue.Selector) bool {
 
 func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
 	panic(&openapiError{
-		errors.NewMessage(format, args),
+		errors.NewMessagef(format, args...),
 		cue.MakePath(b.ctx.path...),
 		v.Pos(),
 	})

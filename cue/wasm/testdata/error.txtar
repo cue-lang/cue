@@ -1,0 +1,18 @@
+exec /bin/cp -r $TESTDATA/nowasm .
+exec /bin/cp -r $TESTDATA/wrongsig .
+exec /bin/cp -r $TESTDATA/wrongwasm .
+
+! exec cue eval ./nowasm ./wrongsig ./wrongwasm
+cmp stderr eval.out
+
+-- eval.out --
+can't load from external module: invalid function signature: expected ':', found newline:
+    ./wrongsig/foo.cue:4:8
+can't load from external module: invalid function signature: not an identifier:
+    ./wrongsig/foo.cue:5:8
+can't load from external module: invalid function signature: expected operand, found ')':
+    ./wrongsig/foo.cue:6:8
+can't load from external module: load "foo.wasm": file not found:
+    ./wrongwasm/foo.cue:4:8
+can't load from external module: load "foo.wasm1": invalid file name:
+    ./wrongwasm/foo.cue:5:8

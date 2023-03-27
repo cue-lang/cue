@@ -1,0 +1,45 @@
+exec /bin/cp -r $TESTDATA/basic .
+exec /bin/cp -r $TESTDATA/morewasm .
+exec /bin/cp -r $TESTDATA/noload .
+exec /bin/cp -r $TESTDATA/unusedwasm .
+
+exec cue eval -a ./basic ./morewasm ./noload ./unusedwasm
+cmp stdout eval.out
+
+-- eval.out --
+add: add
+mul: mul
+not: not()
+x0:  3
+x1:  1
+x2:  101
+y0:  15.0
+y1:  -8.425
+y2:  7.006652
+z:   false
+// ---
+add:     add
+isPrime: is_prime()
+fact:    fact
+a0:      -42
+b1:      true
+b2:      false
+c1:      5040
+neg32:   neg32
+mul:     mul
+not:     not()
+x0:      3
+x1:      1
+x2:      101
+y0:      15.0
+y1:      -8.425
+y2:      7.006652
+c2:      362880
+z:       false
+// ---
+x: 42
+// ---
+add: add
+x0:  3
+x1:  1
+x2:  101

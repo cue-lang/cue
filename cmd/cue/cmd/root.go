@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/cue/wasm"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -115,7 +116,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	c := &Command{
 		Command: cmd,
 		root:    cmd,
-		ctx:     cuecontext.New(),
+		ctx:     cuecontext.New(cuecontext.Interpreter(wasm.NewInterpreter())),
 	}
 
 	cmdCmd := newCmdCmd(c)

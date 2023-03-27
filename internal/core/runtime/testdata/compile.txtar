@@ -5,4 +5,5 @@ package ok
 
 foo: _ @extern("file.xx", fail)
 -- out/extern --
-TEST: fail compilation
+can't load from external module: TEST: fail compilation:
+    ./compile.cue:5:8

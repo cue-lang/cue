@@ -78,7 +78,7 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 		if b.Const != "" {
 			v = mustParseConstBuiltin(ctx, b.Name, b.Const)
 		} else {
-			v = toBuiltin(ctx, b)
+			v = ToBuiltin(b)
 		}
 		st.Decls = append(st.Decls, &adt.Field{
 			Label: f,
@@ -108,7 +108,8 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 	return obj
 }
 
-func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
+// ToBuiltin converts a Builtin into an adt.Builtin.
+func ToBuiltin(b *Builtin) *adt.Builtin {
 	params := make([]adt.Param, len(b.Params))
 	for i, p := range b.Params {
 		params[i].Value = p.Value

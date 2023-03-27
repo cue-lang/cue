@@ -16,7 +16,7 @@
 package github
 
 import (
-	"cuelang.org/go/internal/ci/core"
+	"cuelang.org/go/internal/ci/repo"
 
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
@@ -42,7 +42,7 @@ import (
 workflows: close({
 	[string]: json.#Workflow
 
-	(core.trybot.key):  _
+	(repo.trybot.key):  _
 	trybot_dispatch:    _
 	release:            _
 	tip_triggers:       _

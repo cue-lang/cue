@@ -17,7 +17,7 @@ package github
 import (
 	"list"
 
-	"cuelang.org/go/internal/ci/core"
+	"cuelang.org/go/internal/ci/repo"
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
@@ -27,7 +27,7 @@ import (
 _cueVersionRef: "${GITHUB_REF##refs/tags/}"
 
 // The release workflow
-workflows: release: core.bashWorkflow & {
+workflows: release: repo.bashWorkflow & {
 
 	name: "Release"
 
@@ -37,16 +37,16 @@ workflows: release: core.bashWorkflow & {
 	concurrency: "release"
 
 	on: push: {
-		tags: [core.releaseTagPattern, "!" + core.zeroReleaseTagPattern]
-		branches: list.Concat([[core.testDefaultBranch], core.protectedBranchPatterns])
+		tags: [repo.releaseTagPattern, "!" + repo.zeroReleaseTagPattern]
+		branches: list.Concat([[repo.testDefaultBranch], repo.protectedBranchPatterns])
 	}
 	jobs: goreleaser: {
-		"runs-on": core.linuxMachine
-		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
+		"runs-on": repo.linuxMachine
+		if:        "${{github.repository == '\(repo.githubRepositoryPath)'}}"
 		steps: [
-			for v in core.checkoutCode {v},
-			core.installGo & {
-				with: "go-version": core.pinnedReleaseGo
+			for v in repo.checkoutCode {v},
+			repo.installGo & {
+				with: "go-version": repo.pinnedReleaseGo
 			},
 			json.#step & {
 				name: "Setup qemu"
@@ -74,7 +74,7 @@ workflows: release: core.bashWorkflow & {
 				uses: "goreleaser/goreleaser-action@v3"
 				with: {
 					"install-only": true
-					version:        core.goreleaserVersion
+					version:        repo.goreleaserVersion
 				}
 			},
 			json.#step & {
@@ -85,18 +85,18 @@ workflows: release: core.bashWorkflow & {
 				run:                 "cue cmd release"
 				"working-directory": "./internal/ci/goreleaser"
 			},
-			core.repositoryDispatch & {
+			repo.repositoryDispatch & {
 				name:                  "Re-test cuelang.org"
-				if:                    core.isReleaseTag
-				#githubRepositoryPath: core.cuelangRepositoryPath
+				if:                    repo.isReleaseTag
+				#githubRepositoryPath: repo.cuelangRepositoryPath
 				#arg: {
 					event_type: "Re-test post release of \(_cueVersionRef)"
 				}
 			},
-			core.repositoryDispatch & {
+			repo.repositoryDispatch & {
 				name:                  "Trigger unity build"
-				if:                    core.isReleaseTag
-				#githubRepositoryPath: core.unityRepositoryPath
+				if:                    repo.isReleaseTag
+				#githubRepositoryPath: repo.unityRepositoryPath
 				#arg: {
 					event_type: "Check against CUE \(_cueVersionRef)"
 					client_payload: {

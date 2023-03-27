@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c600a716_f516709a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-27T16:39:09Z",
+      "side": 1,
+      "message": "Another release preparation step that I think we should do before we branch off v0.6.",
+      "revId": "e92506338770c150e76495b2567aae1a8b37ca19",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

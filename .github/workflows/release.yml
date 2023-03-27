@@ -49,7 +49,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           install-only: true
-          version: v1.13.1
+          version: v1.16.2
       - name: Run GoReleaser with CUE
         run: cue cmd release
         working-directory: ./internal/ci/goreleaser

@@ -575,7 +575,7 @@ func (c *OpContext) getDefault(v Value) (result Value, ok bool) {
 
 	if d.NumDefaults != 1 {
 		c.addErrf(IncompleteError, c.pos(),
-			"unresolved disjunction %s (type %s)", d, d.Kind())
+			"unresolved disjunction %v (type %s)", d, d.Kind())
 		return nil, false
 	}
 	return c.getDefault(d.Values[0])
@@ -805,7 +805,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state vertexStat
 	switch x.BaseValue.(type) {
 	case *StructMarker:
 		if l.Typ() == IntLabel {
-			c.addErrf(0, pos, "invalid struct selector %s (type int)", l)
+			c.addErrf(0, pos, "invalid struct selector %v (type int)", l)
 			return nil
 		}
 
@@ -814,17 +814,17 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state vertexStat
 		case l.Typ() == IntLabel:
 			switch {
 			case l.Index() < 0:
-				c.addErrf(0, pos, "invalid list index %s (index must be non-negative)", l)
+				c.addErrf(0, pos, "invalid list index %v (index must be non-negative)", l)
 				return nil
 			case l.Index() > len(x.Arcs):
-				c.addErrf(0, pos, "invalid list index %s (out of bounds)", l)
+				c.addErrf(0, pos, "invalid list index %v (out of bounds)", l)
 				return nil
 			}
 
 		case l.IsDef(), l.IsHidden(), l.IsLet():
 
 		default:
-			c.addErrf(0, pos, "invalid list index %s (type string)", l)
+			c.addErrf(0, pos, "invalid list index %v (type string)", l)
 			return nil
 		}
 
@@ -843,7 +843,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state vertexStat
 			// return nil
 		} else if !l.IsDef() && !l.IsHidden() && !l.IsLet() {
 			c.addErrf(0, pos,
-				"invalid selector %s for value of type %s", l, kind)
+				"invalid selector %v for value of type %s", l, kind)
 			return nil
 		}
 	}
@@ -1121,7 +1121,7 @@ func (c *OpContext) uint64(v Value, as string) uint64 {
 	}
 	if !x.X.Coeff.IsUint64() {
 		// TODO: improve message
-		c.AddErrf("cannot convert number %s to uint64", x.X)
+		c.AddErrf("cannot convert number %s to uint64", &x.X)
 		return 0
 	}
 	return x.X.Coeff.Uint64()

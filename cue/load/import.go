@@ -70,7 +70,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	}
 
 	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
-		err := errors.Newf(token.NoPos, "module root not defined", p.DisplayPath)
+		err := errors.Newf(token.NoPos, "package in %q is outside of module root", p.DisplayPath)
 		return retErr(err)
 	}
 
@@ -125,8 +125,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	if !found {
 		return retErr(
 			&PackageError{
-				Message: errors.NewMessage("cannot find package %q",
-					[]interface{}{p.DisplayPath}),
+				Message: errors.NewMessagef("cannot find package %q", p.DisplayPath),
 			})
 	}
 

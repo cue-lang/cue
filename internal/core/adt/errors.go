@@ -301,7 +301,7 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *Va
 		v:       c.errNode(),
 		pos:     p,
 		auxpos:  a,
-		Message: errors.NewMessage(format, args),
+		Message: errors.NewMessagef(format, args...),
 	}
 }
 

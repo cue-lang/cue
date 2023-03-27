@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebab84f3_4a0d145e",
+        "filename": "internal/ci/repo/repo.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-27T16:02:04Z",
+      "side": 1,
+      "message": "nit: this does not include workflows any longer, right?",
+      "revId": "3b14c52f213ec55952e543ea6ec87d793fca25bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08936011_ab0ca39b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-27T08:17:11Z",
+      "side": 1,
+      "message": "I wonder if cue/wasm is the right location for this.\n\nIf there is any chance we have more than one interpreter in the future, I would use\n\ncue/interpreter/wasm\n\nor \n\ninterpreter/wasm\n\nThis is analogous to encoding, for instance.\n\nWhen in doubt, to avoid bike shedding, we could put it in internal/wasm for now.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cacd82e9_2dfc02c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-27T08:17:11Z",
+      "side": 1,
+      "message": "Awesome! Just some initial high-level feedback.\n\nAwesome that the tests are so small now. Do you expect the binaries to change often? If so, it may still cause largish changes over time, as binaries don\u0027t diff well.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faa8610d_e30e0dab",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-27T08:17:11Z",
+      "side": 1,
+      "message": "What is the significance of the square brackets?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "473fd79c_3f65d833",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-27T08:17:11Z",
+      "side": 1,
+      "message": "Personally, I would put the public interface in the file with the same name as the package. That is the first place I would look for it, at least.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f37d2c8f_a74497a0",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-27T08:17:11Z",
+      "side": 1,
+      "message": "I would just call this New, unless you think there will be another kind of constructor.\n\n(Gerrit seems buggy and my responses end up in a somewhat wrong location)",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "607a06aa_68ee683e",
+        "filename": "cue/wasm/testdata/morewasm/bar.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-27T08:17:11Z",
+      "side": 1,
+      "message": "Why not use txtar files instead of directories?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

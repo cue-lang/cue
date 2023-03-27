@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "007f508d_5bfc81ec",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-27T15:12:34Z",
+      "side": 1,
+      "message": "LGTM assuming trybots are good with full cache hits for 1.19.x",
+      "revId": "7ccd793be2f28deb241d97f3aa71428b7d7de7fa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

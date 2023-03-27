@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd0352a9_c13d2e0c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-27T15:52:13Z",
+      "side": 1,
+      "message": "release workflow run on ci/test: https://github.com/cue-lang/cue/actions/runs/4533889959/jobs/7987382042",
+      "revId": "eab627811a0e4f393c6782592da1aa552465da26",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

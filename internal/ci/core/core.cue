@@ -30,12 +30,12 @@ windowsMachine: "windows-2022"
 
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
-latestStableGo: "1.19.x"
+latestStableGo: "1.20.x"
 
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.19.7"
+pinnedReleaseGo: "1.20.2"
 
 goreleaserVersion: "v1.13.1"
 

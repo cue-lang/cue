@@ -1,7 +1,7 @@
-// package core contains data values that are commont to all CUE
-// configurations. This not only includes GitHub workflows, but also things
-// like gerrit configuration etc.
-package core
+// package repo contains data values that are common to all CUE configurations
+// in this repo. The list of configurations includes GitHub workflows, but also
+// things like gerrit configuration etc.
+package repo
 
 import (
 	"cuelang.org/go/internal/ci/base"

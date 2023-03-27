@@ -15,18 +15,18 @@
 package github
 
 import (
-	"cuelang.org/go/internal/ci/core"
+	"cuelang.org/go/internal/ci/repo"
 )
 
 // push_tip_to_trybot "syncs" active branches to the trybot repo.
 // Since the workflow is triggered by a push to any of the branches,
 // the step only needs to sync the pushed branch.
-workflows: push_tip_to_trybot: core.pushTipToTrybotWorkflow & {
+workflows: push_tip_to_trybot: repo.pushTipToTrybotWorkflow & {
 	on: {
-		push: branches: core.protectedBranchPatterns
+		push: branches: repo.protectedBranchPatterns
 	}
 	jobs: push: {
-		"runs-on": core.linuxMachine
-		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
+		"runs-on": repo.linuxMachine
+		if:        "${{github.repository == '\(repo.githubRepositoryPath)'}}"
 	}
 }

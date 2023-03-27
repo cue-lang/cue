@@ -1,6 +1,6 @@
 module cuelang.org/go
 
-go 1.18
+go 1.19
 
 require (
 	github.com/cockroachdb/apd/v2 v2.0.2

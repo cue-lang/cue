@@ -85,7 +85,7 @@ workflows: trybot: core.bashWorkflow & {
 	_testStrategy: {
 		"fail-fast": false
 		matrix: {
-			"go-version": ["1.18.x", core.latestStableGo]
+			"go-version": ["1.19.x", core.latestStableGo]
 			os: [core.linuxMachine, core.macosMachine, core.windowsMachine]
 		}
 	}

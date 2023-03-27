@@ -55,7 +55,7 @@ command: release: {
 	}
 
 	let goreleaserCmd = [
-		"goreleaser", "release", "-f", "-", "--rm-dist",
+		"goreleaser", "release", "-f", "-", "--clean",
 
 		// Only run the full release when running on GitHub actions for a release tag.
 		// Keep in sync with repo.releaseTagPattern, which is a globbing pattern

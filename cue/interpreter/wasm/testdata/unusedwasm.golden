@@ -1,0 +1,6 @@
+{
+	add: add @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
+	x0:  3
+	x1:  1
+	x2:  101
+}

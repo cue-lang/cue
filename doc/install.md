@@ -6,7 +6,7 @@ Currently CUE can only be installed from source.
 
 ### Prerequisites
 
-Go 1.18 or higher (see below)
+Go 1.19 or higher (see below)
 
 ### Installing CUE
 

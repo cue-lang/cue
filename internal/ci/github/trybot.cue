@@ -17,19 +17,19 @@ package github
 import (
 	"list"
 
-	"cuelang.org/go/internal/ci/core"
+	"cuelang.org/go/internal/ci/repo"
 
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
 // The trybot workflow.
-workflows: trybot: core.bashWorkflow & {
-	name: core.trybot.name
+workflows: trybot: repo.bashWorkflow & {
+	name: repo.trybot.name
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", core.testDefaultBranch], core.protectedBranchPatterns]) // do not run PR branches
-			"tags-ignore": [core.releaseTagPattern]
+			branches: list.Concat([["trybot/*/*", repo.testDefaultBranch], repo.protectedBranchPatterns]) // do not run PR branches
+			"tags-ignore": [repo.releaseTagPattern]
 		}
 		pull_request: {}
 	}
@@ -39,11 +39,11 @@ workflows: trybot: core.bashWorkflow & {
 			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
 
-			let goCaches = core.setupGoActionsCaches & {#protectedBranchExpr: core.isProtectedBranch, _}
+			let goCaches = repo.setupGoActionsCaches & {#protectedBranchExpr: repo.isProtectedBranch, _}
 
 			steps: [
-				for v in core.checkoutCode {v},
-				core.installGo,
+				for v in repo.checkoutCode {v},
+				repo.installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
@@ -55,28 +55,28 @@ workflows: trybot: core.bashWorkflow & {
 				// subsequent CLs in the trybot repo can leverage the updated
 				// cache. Therefore, we instead perform a clean of the testcache.
 				json.#step & {
-					if:  "github.repository == '\(core.githubRepositoryPath)' && (\(core.isProtectedBranch) || github.ref == 'refs/heads/\(core.testDefaultBranch)')"
+					if:  "github.repository == '\(repo.githubRepositoryPath)' && (\(repo.isProtectedBranch) || github.ref == 'refs/heads/\(repo.testDefaultBranch)')"
 					run: "go clean -testcache"
 				},
 
-				core.earlyChecks & {
+				repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
-					if: core.isLatestLinux
+					if: repo.isLatestLinux
 				},
 				json.#step & {
-					if:  "\(core.isProtectedBranch) || \(core.isLatestLinux)"
+					if:  "\(repo.isProtectedBranch) || \(repo.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_goGenerate,
 				_goTest & {
-					if: "\(core.isProtectedBranch) || !\(core.isLatestLinux)"
+					if: "\(repo.isProtectedBranch) || !\(repo.isLatestLinux)"
 				},
 				_goTestRace & {
-					if: core.isLatestLinux
+					if: repo.isLatestLinux
 				},
 				_goCheck,
-				core.checkGitClean,
+				repo.checkGitClean,
 				_pullThroughProxy,
 			]
 		}
@@ -85,13 +85,13 @@ workflows: trybot: core.bashWorkflow & {
 	_testStrategy: {
 		"fail-fast": false
 		matrix: {
-			"go-version": ["1.18.x", core.latestStableGo]
-			os: [core.linuxMachine, core.macosMachine, core.windowsMachine]
+			"go-version": ["1.18.x", repo.latestStableGo]
+			os: [repo.linuxMachine, repo.macosMachine, repo.windowsMachine]
 		}
 	}
 
 	_pullThroughProxy: json.#step & {
-		name: "Pull this commit through the proxy on \(core.defaultBranch)"
+		name: "Pull this commit through the proxy on \(repo.defaultBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
@@ -123,7 +123,7 @@ workflows: trybot: core.bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(core.isProtectedBranch) && \(core.isLatestLinux)"
+		if: "\(repo.isProtectedBranch) && \(repo.isLatestLinux)"
 	}
 
 	_goGenerate: json.#step & {
@@ -131,7 +131,7 @@ workflows: trybot: core.bashWorkflow & {
 		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
-		if: core.isLatestLinux
+		if: repo.isLatestLinux
 	}
 
 	_goTest: json.#step & {
@@ -146,7 +146,7 @@ workflows: trybot: core.bashWorkflow & {
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-		if:   "\(core.isLatestLinux)"
+		if:   "\(repo.isLatestLinux)"
 		name: "Check"
 		run:  "go vet ./..."
 	}

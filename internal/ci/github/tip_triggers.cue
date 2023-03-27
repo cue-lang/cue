@@ -15,22 +15,22 @@
 package github
 
 import (
-	"cuelang.org/go/internal/ci/core"
+	"cuelang.org/go/internal/ci/repo"
 )
 
 // The tip_triggers workflow. This fires for each new commit that hits the
 // default branch.
-workflows: tip_triggers: core.bashWorkflow & {
+workflows: tip_triggers: repo.bashWorkflow & {
 
 	name: "Triggers on push to tip"
-	on: push: branches: [core.defaultBranch]
+	on: push: branches: [repo.defaultBranch]
 	jobs: push: {
-		"runs-on": core.linuxMachine
-		if:        "${{github.repository == '\(core.githubRepositoryPath)'}}"
+		"runs-on": repo.linuxMachine
+		if:        "${{github.repository == '\(repo.githubRepositoryPath)'}}"
 		steps: [
-			core.repositoryDispatch & {
+			repo.repositoryDispatch & {
 				name:                  "Trigger tip.cuelang.org deploy"
-				#githubRepositoryPath: core.cuelangRepositoryPath
+				#githubRepositoryPath: repo.cuelangRepositoryPath
 				#arg: {
 					event_type: "Rebuild tip against ${GITHUB_SHA}"
 					client_payload: {
@@ -38,9 +38,9 @@ workflows: tip_triggers: core.bashWorkflow & {
 					}
 				}
 			},
-			core.repositoryDispatch & {
+			repo.repositoryDispatch & {
 				name:                  "Trigger unity build"
-				#githubRepositoryPath: core.unityRepositoryPath
+				#githubRepositoryPath: repo.unityRepositoryPath
 				#arg: {
 					event_type: "Check against ${GITHUB_SHA}"
 					client_payload: {

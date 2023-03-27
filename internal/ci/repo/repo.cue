@@ -37,7 +37,7 @@ latestStableGo: "1.20.x"
 // so we instead pin a specific Go release.
 pinnedReleaseGo: "1.20.2"
 
-goreleaserVersion: "v1.13.1"
+goreleaserVersion: "v1.16.2"
 
 // zeroReleaseTagSuffix is the suffix used to identify all "zero" releases.
 // When we create a release branch for v0.$X.0, it's likely that commits on the

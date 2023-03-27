@@ -295,14 +295,14 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 		default:
 			if k := w.Kind(); k&adt.NumKind == 0 {
 				err := c.ctx.NewErrf(
-					"invalid list element %d in argument %d to call: cannot use value %s (%s) as number",
+					"invalid list element %d in argument %d to call: cannot use value %v (%s) as number",
 					j, i, w, k)
 				c.Err = &callError{err}
 				return a
 			}
 
 			err := c.ctx.NewErrf(
-				"non-concrete value %s for element %d of number list argument %d",
+				"non-concrete value %v for element %d of number list argument %d",
 				w, j, i)
 			err.Code = adt.IncompleteError
 			c.Err = &callError{err}
@@ -333,14 +333,14 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 		default:
 			if k := w.Kind(); k&adt.StringKind == 0 {
 				err := c.ctx.NewErrf(
-					"invalid list element %d in argument %d to call: cannot use value %s (%s) as string",
+					"invalid list element %d in argument %d to call: cannot use value %v (%s) as string",
 					j, i, w, k)
 				c.Err = &callError{err}
 				return a
 			}
 
 			err := c.ctx.NewErrf(
-				"non-concrete value %s for element %d of string list argument %d",
+				"non-concrete value %v for element %d of string list argument %d",
 				w, j, i)
 			err.Code = adt.IncompleteError
 			c.Err = &callError{err}

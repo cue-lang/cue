@@ -37,7 +37,7 @@ func (n *nodeError) Error() string {
 func nodeErrorf(n ast.Node, format string, args ...interface{}) *nodeError {
 	return &nodeError{
 		n:       n,
-		Message: errors.NewMessage(format, args),
+		Message: errors.NewMessagef(format, args...),
 	}
 }
 

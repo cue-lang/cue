@@ -240,7 +240,7 @@ var constraints = []*constraint{
 
 	p1("examples", func(n cue.Value, s *state) {
 		if n.Kind() != cue.ListKind {
-			s.errf(n, `value of "examples" must be an array, found %v`, n.Kind)
+			s.errf(n, `value of "examples" must be an array, found %v`, n.Kind())
 		}
 		// TODO: implement examples properly.
 		// for _, n := range s.listItems("examples", n, true) {
@@ -488,7 +488,7 @@ var constraints = []*constraint{
 
 	p2("required", func(n cue.Value, s *state) {
 		if n.Kind() != cue.ListKind {
-			s.errf(n, `value of "required" must be list of strings, found %v`, n.Kind)
+			s.errf(n, `value of "required" must be list of strings, found %v`, n.Kind())
 			return
 		}
 
@@ -573,7 +573,7 @@ var constraints = []*constraint{
 	p2("patternProperties", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
 		if n.Kind() != cue.StructKind {
-			s.errf(n, `value of "patternProperties" must be an an object, found %v`, n.Kind)
+			s.errf(n, `value of "patternProperties" must be an an object, found %v`, n.Kind())
 		}
 		obj := s.object(n)
 		existing := excludeFields(s.obj.Elts)

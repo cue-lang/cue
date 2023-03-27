@@ -133,7 +133,7 @@ func (c *compiler) errf(n ast.Node, format string, args ...interface{}) *adt.Bot
 	err := &compilerError{
 		n:       n,
 		path:    c.path(),
-		Message: errors.NewMessage(format, args),
+		Message: errors.NewMessagef(format, args...),
 	}
 	c.errs = errors.Append(c.errs, err)
 	return &adt.Bottom{Err: err}

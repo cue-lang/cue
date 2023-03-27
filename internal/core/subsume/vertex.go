@@ -55,7 +55,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 
 	case *adt.ListMarker:
 		if !y.IsList() {
-			s.errf("list does not subsume %s (type %s)", y, y.Kind())
+			s.errf("list does not subsume %v (type %s)", y, y.Kind())
 			return false
 		}
 		if !s.listVertices(x, y) {
@@ -145,7 +145,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		if b == nil {
 			// y.f is optional
 			if !aOpt {
-				s.errf("required field is optional in subsumed value: %s", f)
+				s.errf("required field is optional in subsumed value: %v", f)
 				return false
 			}
 
@@ -170,7 +170,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		s.gt = a
 		s.lt = y
 
-		s.errf("field %s not present in %s", f, y)
+		s.errf("field %v not present in %v", f, y)
 		return false
 	}
 
@@ -211,7 +211,7 @@ outer:
 			if s.Profile.IgnoreClosedness {
 				continue
 			}
-			s.errf("field not allowed in closed struct: %s", f)
+			s.errf("field not allowed in closed struct: %v", f)
 			return false
 		}
 

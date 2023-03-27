@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d767dcf4_ea682a81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-27T15:06:54Z",
+      "side": 1,
+      "message": "LGTM assuming trybots. The runs I looked at seemed to show sensible output from the setup-go step, i.e. not doing anything with caching. And the go test step for the 1.18 linux matrix entry had a full cache hit.",
+      "revId": "7d057902ab142b54bf6a3bd9cbf1832fc2b25eb8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

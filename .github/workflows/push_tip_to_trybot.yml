@@ -33,5 +33,14 @@ jobs:
           git remote add origin https://review.gerrithub.io/a/cue-lang/cue
           git remote add trybot https://github.com/cue-lang/cue-trybot
           git fetch origin "${{ github.ref }}"
-          git push trybot "FETCH_HEAD:${{ github.ref }}"
+
+          # Very rough exponential backoff of retries
+          sleepInterval=1
+          for try in {1..20}
+          do
+          	echo Push to trybot try $try
+          	git push -f trybot "FETCH_HEAD:${{ github.ref }}" && break
+          	sleep $sleepInterval
+          	sleepInterval=$(( sleepInterval * 2 ))
+          done
     if: ${{github.repository == 'cue-lang/cue'}}

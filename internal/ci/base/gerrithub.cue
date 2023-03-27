@@ -73,7 +73,16 @@ pushTipToTrybotWorkflow: json.#Workflow & {
 						git remote add origin \(gerritHubRepositoryURL)
 						git remote add trybot \(trybotRepositoryURL)
 						git fetch origin "${{ github.ref }}"
-						git push trybot "FETCH_HEAD:${{ github.ref }}"
+
+						# Very rough exponential backoff of retries
+						sleepInterval=1
+						for try in {1..20}
+						do
+							echo Push to trybot try $try
+							git push -f trybot "FETCH_HEAD:${{ github.ref }}" && break
+							sleep $sleepInterval
+							sleepInterval=$(( sleepInterval * 2 ))
+						done
 						"""
 			},
 		]

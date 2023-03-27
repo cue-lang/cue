@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "203b3be8_0b0c73b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-27T15:13:25Z",
+      "side": 1,
+      "message": "The approach looks good to me - seems clever and harmless to use a hint like that.",
+      "revId": "08265371815f7328f231002a3597adef1418d45f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

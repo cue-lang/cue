@@ -119,7 +119,7 @@ func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, clon
 }
 
 func (n *nodeContext) expandDisjuncts(
-	state vertexStatus,
+	state VertexStatus,
 	parent *nodeContext,
 	parentMode defaultMode, // default mode of this disjunct
 	recursive, last bool) {
@@ -138,7 +138,7 @@ func (n *nodeContext) expandDisjuncts(
 		n.node = node
 	}()
 
-	for n.expandOne(partial) {
+	for n.expandOne(Partial) {
 	}
 
 	// save node to snapShot in nodeContex
@@ -202,7 +202,7 @@ func (n *nodeContext) expandDisjuncts(
 	case len(n.disjunctions) > 0:
 		// Process full disjuncts to ensure that erroneous disjuncts are
 		// eliminated as early as possible.
-		state = finalized
+		state = Finalized
 
 		n.disjuncts = append(n.disjuncts, n)
 
@@ -392,7 +392,7 @@ func (n *nodeContext) expandDisjuncts(
 				// errors are not yet detected. This may lead two structs that
 				// are identical except for closedness information,
 				// for instance, to appear identical.
-				if v.result.status < finalized || d.result.status < finalized {
+				if v.result.status < Finalized || d.result.status < Finalized {
 					break
 				}
 				// Even if a node is finalized, it may still have an
@@ -450,7 +450,7 @@ func (n *nodeContext) makeError() {
 		Code: code,
 		Err:  n.disjunctError(),
 	}
-	n.node.SetValue(n.ctx, b)
+	n.node.SetValue(n.ctx, Finalized, b)
 }
 
 func mode(hasDefault, marked bool) defaultMode {
@@ -481,7 +481,7 @@ func clone(v Vertex) Vertex {
 		v.Arcs = make([]*Vertex, len(a))
 		for i, arc := range a {
 			switch arc.status {
-			case finalized:
+			case Finalized:
 				v.Arcs[i] = arc
 
 			case 0:

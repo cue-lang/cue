@@ -318,7 +318,9 @@ func (w *printer) node(n adt.Node) {
 
 	case *adt.DynamicField:
 		w.node(x.Key)
-		w.string(x.ArcType.Suffix())
+		if x.IsOptional() {
+			w.string("?")
+		}
 		w.string(": ")
 		w.node(x.Value)
 

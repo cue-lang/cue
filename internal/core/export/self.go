@@ -181,7 +181,7 @@ func (p *pivotter) markDeps(v *adt.Vertex) {
 				return nil
 			}
 
-		case node.IsUnprocessed():
+		case node.Status() == adt.Unprocessed:
 			// This may happen for DynamicReferences.
 			return nil
 		}

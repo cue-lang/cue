@@ -159,15 +159,15 @@ keepDescending: t2: {
 }
 
 -- out/eval/stats --
-Leaks:  45
-Freed:  161
-Reused: 152
-Allocs: 54
-Retain: 248
+Leaks:  53
+Freed:  159
+Reused: 150
+Allocs: 62
+Retain: 236
 
-Unifications: 192
+Unifications: 198
 Conjuncts:    384
-Disjuncts:    247
+Disjuncts:    249
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:
@@ -248,14 +248,7 @@ Result:
     }
   }
   referencesForDirectly: (struct){
-    let Y#1A = (_|_){
-      // [eval] referencesForDirectly.Y: conflicting values 12 and 4:
-      //     ./incomprehension.cue:15:2
-      //     ./incomprehension.cue:16:11
-      // referencesForDirectly.Y: conflicting values 8 and 4:
-      //     ./incomprehension.cue:15:2
-      //     ./incomprehension.cue:16:11
-    }
+    let Y#1Amulti = (〈1;v〉 * 4)
     l: (#list){
       0: (int){ 1 }
       1: (int){ 2 }
@@ -266,16 +259,7 @@ Result:
     "2": (int){ 12 }
   }
   referencesForViaLet: (struct){
-    let Y#1B = (_|_){
-      // [eval] referencesForViaLet.Y: conflicting values 12 and 4:
-      //     ./incomprehension.cue:23:2
-      //     ./incomprehension.cue:23:24
-      //     ./incomprehension.cue:24:11
-      // referencesForViaLet.Y: conflicting values 8 and 4:
-      //     ./incomprehension.cue:23:2
-      //     ./incomprehension.cue:23:24
-      //     ./incomprehension.cue:24:11
-    }
+    let Y#1Bmulti = 〈1;X〉
     l: (#list){
       0: (int){ 1 }
       1: (int){ 2 }
@@ -366,10 +350,14 @@ Result:
     }
   }
   nestedFor: (struct){
-    let X#1E = (struct){
-      let X#1Fmulti = 〈1;x〉
-      "1": (int){ 1 }
-      "2": (int){ 2 }
+    let X#1Emulti = {
+      for _, x in [
+        1,
+        2,
+      ] {
+        let X#1Fmulti = 〈1;x〉
+        "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+      }
     }
     "0": (struct){
       let X#1Fmulti = 〈1;x〉
@@ -412,13 +400,7 @@ Result:
     }
   }
   letWithDynamicInComprehension: (struct){
-    let T#23 = (_|_){
-      // [eval] letWithDynamicInComprehension.T: conflicting values "e" and "d":
-      //     ./issue2166.cue:3:6
-      //     ./issue2166.cue:4:6
-      //     ./issue2166.cue:7:2
-      //     ./issue2166.cue:8:11
-    }
+    let T#23multi = 〈1;v〉
     _i: (struct){
       a: (string){ "d" }
       b: (string){ "e" }
@@ -439,12 +421,12 @@ Result:
     }
   }
   disabled_parent_test: (struct){
-    let parent_config#24 = (bool){ false }
+    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
     CHILD1: (struct){
       parent_config: (bool){ false }
     }
     CHILD2: (struct){
-      parent_config: (bool){ false }
+      parent_config: (bool){ |(*(bool){ true }, (bool){ false }) }
     }
   }
 }

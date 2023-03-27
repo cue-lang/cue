@@ -62,7 +62,7 @@ func (c *CallCtxt) Struct(i int) Struct {
 	x := c.args[i]
 	switch v, ok := x.(*adt.Vertex); {
 	case ok && !v.IsList():
-		v.CompleteArcs(c.ctx)
+		c.ctx.Unify(v, adt.Conjuncts)
 		return Struct{c.ctx, v}
 
 	case v != nil:

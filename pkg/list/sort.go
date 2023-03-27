@@ -83,7 +83,7 @@ func (s *valueSorter) Less(i, j int) bool {
 
 	s.less.Finalize(s.ctx)
 	isLess := s.ctx.BoolValue(s.less)
-	if b := s.less.Err(s.ctx); b != nil && s.err == nil {
+	if b := s.less.Err(s.ctx, adt.Finalized); b != nil && s.err == nil {
 		s.err = b.Err
 		return true
 	}
@@ -112,7 +112,7 @@ func makeValueSorter(list []cue.Value, cmp cue.Value) (s valueSorter) {
 		Parent:    v.V.Parent,
 		Conjuncts: v.V.Conjuncts,
 	}
-	n.CompleteArcs(ctx)
+	ctx.Unify(n, adt.Conjuncts)
 
 	s = valueSorter{
 		a:    list,

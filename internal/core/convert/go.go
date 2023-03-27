@@ -414,7 +414,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 			// There is no closedness or cycle info for Go structs, so we
 			// pass an empty CloseInfo.
 			v.AddStruct(obj, env, adt.CloseInfo{})
-			v.SetValue(ctx, &adt.StructMarker{})
+			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()
 			for i := 0; i < value.NumField(); i++ {
@@ -464,7 +464,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 					arc.Label = f
 				} else {
 					arc = &adt.Vertex{Label: f, BaseValue: sub}
-					arc.ForceDone()
+					arc.UpdateStatus(adt.Finalized)
 					arc.AddConjunct(adt.MakeRootConjunct(nil, sub))
 				}
 				v.Arcs = append(v.Arcs, arc)
@@ -474,7 +474,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 		case reflect.Map:
 			v := &adt.Vertex{BaseValue: &adt.StructMarker{}}
-			v.SetValue(ctx, &adt.StructMarker{})
+			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()
 			switch key := t.Key(); key.Kind() {
@@ -518,7 +518,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 						arc.Label = f
 					} else {
 						arc = &adt.Vertex{Label: f, BaseValue: sub}
-						arc.ForceDone()
+						arc.UpdateStatus(adt.Finalized)
 						arc.AddConjunct(adt.MakeRootConjunct(nil, sub))
 					}
 					v.Arcs = append(v.Arcs, arc)

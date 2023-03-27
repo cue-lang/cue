@@ -601,7 +601,7 @@ func newErrValue(v Value, b *adt.Bottom) Value {
 		node.Label = v.v.Label
 		node.Parent = v.v.Parent
 	}
-	node.ForceDone()
+	node.UpdateStatus(adt.Finalized)
 	node.AddConjunct(adt.MakeRootConjunct(nil, b))
 	return makeChildValue(v.parent(), node)
 }
@@ -612,7 +612,7 @@ func newVertexRoot(idx *runtime.Runtime, ctx *adt.OpContext, x *adt.Vertex) Valu
 		// with an error value.
 		x.Finalize(ctx)
 	} else {
-		x.ForceDone()
+		x.UpdateStatus(adt.Finalized)
 	}
 	return makeValue(idx, x, nil)
 }
@@ -687,7 +687,7 @@ func linkParent(p *parent, node, arc *adt.Vertex) *parent {
 func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 	// TODO: right now this is necessary because disjunctions do not have
 	// populated conjuncts.
-	if v, ok := v.(*adt.Vertex); ok && !v.IsUnprocessed() {
+	if v, ok := v.(*adt.Vertex); ok && v.Status() >= adt.Partial {
 		return Value{base.idx, v, nil}
 	}
 	n := &adt.Vertex{Label: base.v.Label}
@@ -699,7 +699,7 @@ func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 
 func remakeFinal(base Value, env *adt.Environment, v adt.Value) Value {
 	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label, BaseValue: v}
-	n.ForceDone()
+	n.UpdateStatus(adt.Finalized)
 	return makeChildValue(base.parent(), n)
 }
 
@@ -1864,7 +1864,7 @@ func (v Value) Unify(w Value) Value {
 	n.Label = v.v.Label
 	n.Closed = v.v.Closed || w.v.Closed
 
-	if err := n.Err(ctx); err != nil {
+	if err := n.Err(ctx, adt.Finalized); err != nil {
 		return makeValue(v.idx, n, v.parent_)
 	}
 	if err := allowed(ctx, v.v, n); err != nil {
@@ -1900,7 +1900,7 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	n.Parent = v.v.Parent
 	n.Label = v.v.Label
 
-	if err := n.Err(ctx); err != nil {
+	if err := n.Err(ctx, adt.Finalized); err != nil {
 		return makeValue(v.idx, n, v.parent_)
 	}
 	if err := allowed(ctx, accept.v, n); err != nil {
@@ -2368,8 +2368,8 @@ func (v Value) Expr() (Op, []Value) {
 					b.AddConjunct(adt.MakeRootConjunct(env, disjunct.Val))
 
 					ctx := eval.NewContext(v.idx, nil)
-					a.Finalize(ctx)
-					b.Finalize(ctx)
+					ctx.Unify(&a, adt.Finalized)
+					ctx.Unify(&b, adt.Finalized)
 					if allowed(ctx, v.v, &b) != nil {
 						// Everything subsumed bottom
 						continue outerExpr

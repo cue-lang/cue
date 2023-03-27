@@ -75,8 +75,8 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 				return c.newBool(false)
 			}
 			for i, e := range x {
-				a, _ := c.concrete(nil, e, op)
-				b, _ := c.concrete(nil, y[i], op)
+				a, _ := c.Concrete(nil, e, op)
+				b, _ := c.Concrete(nil, y[i], op)
 				if !test(c, EqualOp, a, b) {
 					return c.newBool(false)
 				}
@@ -113,8 +113,8 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 				return c.newBool(false)
 			}
 			for i, e := range x {
-				a, _ := c.concrete(nil, e, op)
-				b, _ := c.concrete(nil, y[i], op)
+				a, _ := c.Concrete(nil, e, op)
+				b, _ := c.Concrete(nil, y[i], op)
 				if !test(c, EqualOp, a, b) {
 					return c.newBool(true)
 				}
@@ -207,7 +207,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 			n := &Vertex{}
 			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
-			n.CompleteArcs(c)
+			c.Unify(n, Conjuncts)
 
 			return n
 		}
@@ -269,7 +269,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 			n := &Vertex{}
 			n.AddConjunct(MakeConjunct(c.Env(0), list, c.ci))
-			n.CompleteArcs(c)
+			c.Unify(n, Conjuncts)
 
 			return n
 		}

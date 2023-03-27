@@ -169,6 +169,8 @@ func (n *nodeContext) insertComprehension(
 			case *Field:
 				numFixed++
 
+				arc, _ := n.node.GetArc(n.ctx, f.Label, ArcVoid)
+
 				// Create partial comprehension
 				c := &Comprehension{
 					Syntax:  c.Syntax,
@@ -181,15 +183,19 @@ func (n *nodeContext) insertComprehension(
 					arc:    n.node,
 				}
 
-				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcVoid, conjunct)
+				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
 				fields = append(fields, f)
 				// TODO: adjust ci to embed?
+
+				// TODO: this also needs to be done for optional fields.
 
 			case *LetField:
 				// TODO: consider merging this case with the LetField case.
 
 				numFixed++
+
+				arc, _ := n.node.GetArc(n.ctx, f.Label, ArcVoid)
+				arc.MultiLet = f.IsMulti
 
 				// Create partial comprehension
 				c := &Comprehension{
@@ -202,8 +208,7 @@ func (n *nodeContext) insertComprehension(
 					arc:    n.node,
 				}
 
-				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcVoid, conjunct)
+				arc.addConjunctUnchecked(MakeConjunct(env, c, ci))
 				fields = append(fields, f)
 
 			default:
@@ -263,7 +268,7 @@ type compState struct {
 	comp  *Comprehension
 	i     int
 	f     YieldFunc
-	state vertexStatus
+	state VertexStatus
 }
 
 // yield evaluates a Comprehension within the given Environment and and calls
@@ -272,7 +277,7 @@ func (c *OpContext) yield(
 	node *Vertex, // errors are associated with this node
 	env *Environment, // env for field for which this yield is called
 	comp *Comprehension,
-	state vertexStatus,
+	state VertexStatus,
 	f YieldFunc, // called for every result
 ) *Bottom {
 	s := &compState{
@@ -318,7 +323,7 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // injectComprehension evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, state vertexStatus) (progress bool) {
+func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, state VertexStatus) (progress bool) {
 	ctx := n.ctx
 
 	all := *allP
@@ -401,7 +406,7 @@ func (n *nodeContext) injectComprehensions(allP *[]envYield, allowCycle bool, st
 
 		v := n.node
 		for c := d.leaf; c.parent != nil; c = c.parent {
-			v.updateArcType(c.arcType)
+			v.UpdateArcType(c.arcType)
 			v = c.arc
 		}
 

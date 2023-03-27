@@ -72,7 +72,7 @@ var (
 
 func newStr(s string) *adt.Vertex {
 	v := &adt.Vertex{}
-	v.SetValue(nil, &adt.String{Str: s})
+	v.SetValue(nil, adt.Finalized, &adt.String{Str: s})
 	return v
 }
 

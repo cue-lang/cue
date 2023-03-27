@@ -100,15 +100,15 @@ for clusterName, cluster in clusters {
 
 clusters: foo: {}
 -- out/eval/stats --
-Leaks:  1
-Freed:  99
-Reused: 74
-Allocs: 26
-Retain: 120
+Leaks:  3
+Freed:  101
+Reused: 76
+Allocs: 28
+Retain: 128
 
-Unifications: 100
-Conjuncts:    262
-Disjuncts:    190
+Unifications: 104
+Conjuncts:    273
+Disjuncts:    200
 -- out/eval --
 (struct){
   shorewallParams: (#struct){
@@ -285,19 +285,7 @@ Disjuncts:    190
       }
     }
   }
-  let svc#1 = (struct){
-    spec: (struct){
-      externalIPs: (#list){
-        0: (string){ "127.0.0.1" }
-      }
-    }
-    metadata: (struct){
-      labels: (struct){
-        "ingress-class": (string){ "admin" }
-        stack: (string){ "ingress" }
-      }
-    }
-  }
+  let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
 }
 -- out/compile --
 --- issue2235.cue

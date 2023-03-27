@@ -12,14 +12,14 @@ require (
 	github.com/kylelemons/godebug v1.1.0
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20220428173112-74888fd59c2b
-	github.com/rogpeppe/go-internal v1.9.0
+	github.com/rogpeppe/go-internal v1.10.0
 	github.com/spf13/cobra v1.4.0
 	github.com/spf13/pflag v1.0.5
 	github.com/stretchr/testify v1.2.2
-	golang.org/x/mod v0.6.0-dev.0.20220818022119-ed83ed61efb9
-	golang.org/x/net v0.0.0-20220722155237-a158d28d115b
-	golang.org/x/text v0.3.8
-	golang.org/x/tools v0.1.12
+	golang.org/x/mod v0.9.0
+	golang.org/x/net v0.8.0
+	golang.org/x/text v0.8.0
+	golang.org/x/tools v0.7.0
 	gopkg.in/yaml.v3 v3.0.1
 )
 
@@ -30,9 +30,8 @@ require (
 	github.com/kr/text v0.1.0 // indirect
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e // indirect
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	golang.org/x/sys v0.0.0-20220722155257-8c9f86f7a55f // indirect
+	golang.org/x/sys v0.6.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

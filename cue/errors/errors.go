@@ -74,11 +74,21 @@ type Message struct {
 	args   []interface{}
 }
 
-// NewMessage creates an error message for human consumption. The arguments
+// NewMessagef creates an error message for human consumption. The arguments
 // are for later consumption, allowing the message to be localized at a later
 // time. The passed argument list should not be modified.
-func NewMessage(format string, args []interface{}) Message {
+func NewMessagef(format string, args ...interface{}) Message {
+	if false {
+		// Let go vet know that we're expecting printf-like arguments.
+		_ = fmt.Sprintf(format, args...)
+	}
 	return Message{format: format, args: args}
+}
+
+// NewMessagef creates an error message for human consumption.
+// Deprecated: Use NewMessagef instead.
+func NewMessage(format string, args []interface{}) Message {
+	return NewMessagef(format, args...)
 }
 
 // Msg returns a printf-style format string and its arguments for human
@@ -162,7 +172,7 @@ func Path(err error) []string {
 func Newf(p token.Pos, format string, args ...interface{}) Error {
 	return &posError{
 		pos:     p,
-		Message: NewMessage(format, args),
+		Message: NewMessagef(format, args...),
 	}
 }
 
@@ -171,7 +181,7 @@ func Newf(p token.Pos, format string, args ...interface{}) Error {
 func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
 	pErr := &posError{
 		pos:     p,
-		Message: NewMessage(format, args),
+		Message: NewMessagef(format, args...),
 	}
 	return Wrap(pErr, err)
 }

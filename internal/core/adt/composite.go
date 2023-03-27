@@ -837,10 +837,10 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 		// TODO(errors): add positions.
 		if f.IsInt() {
 			c.addErrf(EvalError, token.NoPos,
-				"element at index %s not allowed by earlier comprehension or reference cycle", f)
+				"element at index %v not allowed by earlier comprehension or reference cycle", f)
 		} else {
 			c.addErrf(EvalError, token.NoPos,
-				"field %s not allowed by earlier comprehension or reference cycle", f)
+				"field %v not allowed by earlier comprehension or reference cycle", f)
 		}
 	}
 	arc = &Vertex{Parent: v, Label: f, ArcType: t}

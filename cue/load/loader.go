@@ -68,7 +68,7 @@ func (l *loader) abs(filename string) string {
 func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
 	err := &PackageError{
 		ImportStack: l.stk.Copy(),
-		Message:     errors.NewMessage(format, args),
+		Message:     errors.NewMessagef(format, args...),
 	}
 	err.fillPos(l.cfg.Dir, importPos)
 	return err

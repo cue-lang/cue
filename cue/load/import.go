@@ -120,8 +120,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	if !found {
 		return retErr(
 			&PackageError{
-				Message: errors.NewMessage("cannot find package %q",
-					[]interface{}{p.DisplayPath}),
+				Message: errors.NewMessagef("cannot find package %q", p.DisplayPath),
 			})
 	}
 

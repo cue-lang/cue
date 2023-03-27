@@ -1215,7 +1215,7 @@ func (x *UnaryExpr) evaluate(c *OpContext, state vertexStatus) Value {
 			"operand %s of '%s' not concrete (was %s)", x.X, op, k)
 		return nil
 	}
-	return c.NewErrf("invalid operation %s (%s %s)", x, op, k)
+	return c.NewErrf("invalid operation %v (%s %s)", x, op, k)
 }
 
 // BinaryExpr is a binary expression.
@@ -1566,7 +1566,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 	fun := x // right now always x.
 	if len(args) > len(x.Params) {
 		c.addErrf(0, p,
-			"too many arguments in call to %s (have %d, want %d)",
+			"too many arguments in call to %v (have %d, want %d)",
 			fun, len(args), len(x.Params))
 		return nil
 	}
@@ -1574,7 +1574,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 		v := x.Params[i].Default()
 		if v == nil {
 			c.addErrf(0, p,
-				"not enough arguments in call to %s (have %d, want %d)",
+				"not enough arguments in call to %v (have %d, want %d)",
 				fun, len(args), len(x.Params))
 			return nil
 		}
@@ -1594,7 +1594,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 				code = b.Code
 			}
 			c.addErrf(code, pos(a),
-				"cannot use %s (type %s) as %s in argument %d to %s",
+				"cannot use %s (type %s) as %s in argument %d to %v",
 				a, k, x.Params[i].Kind(), i+1, fun)
 			return nil
 		}
@@ -1609,7 +1609,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, validate bool, args []Value) E
 			n.Finalize(c)
 			if _, ok := n.BaseValue.(*Bottom); ok {
 				c.addErrf(0, pos(a),
-					"cannot use %s as %s in argument %d to %s",
+					"cannot use %s as %s in argument %d to %v",
 					a, v, i+1, fun)
 				return nil
 			}

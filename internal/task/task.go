@@ -84,7 +84,7 @@ func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interfa
 	err := &taskError{
 		task:    c.Obj,
 		v:       v,
-		Message: errors.NewMessage(format, args),
+		Message: errors.NewMessagef(format, args...),
 	}
 	c.Err = errors.Append(c.Err, errors.Wrap(err, wrap))
 }

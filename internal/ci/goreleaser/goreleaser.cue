@@ -29,6 +29,7 @@ config: {
 		]
 	}]
 	archives: [{
+		rlcp:          true
 		name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
 		files: [
 			"LICENSE",

@@ -326,6 +326,7 @@ func (d *externDecorator) processADTNode(n adt.Node) bool {
 
 	b, err := c.Compile(name, &attr)
 	if err != nil {
+		err = errors.Newf(info.attr.Pos(), "can't load from external module: %v", err)
 		d.errs = errors.Append(d.errs, err)
 		return true
 	}

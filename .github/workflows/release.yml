@@ -29,8 +29,9 @@ jobs:
       - name: Restore git file modification times
         uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
       - name: Install Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
+          cache: false
           go-version: 1.19.7
       - name: Setup qemu
         uses: docker/setup-qemu-action@v2

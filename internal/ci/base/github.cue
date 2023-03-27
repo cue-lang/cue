@@ -16,8 +16,10 @@ bashWorkflow: json.#Workflow & {
 
 installGo: json.#step & {
 	name: "Install Go"
-	uses: "actions/setup-go@v3"
+	uses: "actions/setup-go@v4"
 	with: {
+		// We do our own caching in setupGoActionsCaches.
+		cache:        false
 		"go-version": *"${{ matrix.go-version }}" | string
 	}
 }
@@ -139,6 +141,8 @@ setupGoActionsCaches: {
 	// pre is the list of steps required to establish and initialise the correct
 	// caches for Go-based workflows.
 	[
+		// TODO: once https://github.com/actions/setup-go/issues/54 is fixed,
+		// we could use `go env` outputs from the setup-go step.
 		json.#step & {
 			name: "Get go mod cache directory"
 			id:   goModCacheDirID

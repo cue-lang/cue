@@ -16,6 +16,24 @@
       "message": "nit: this does not include workflows any longer, right?",
       "revId": "3b14c52f213ec55952e543ea6ec87d793fca25bc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4aac3cf_5b61dc35",
+        "filename": "internal/ci/repo/repo.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-27T16:08:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ebab84f3_4a0d145e",
+      "revId": "3b14c52f213ec55952e543ea6ec87d793fca25bc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

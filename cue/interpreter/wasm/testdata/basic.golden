@@ -1,0 +1,12 @@
+{
+	add: add   @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
+	mul: mul   @extern("foo.wasm", abi=c, sig="func(float64, float64): float64")
+	not: not() @extern("foo.wasm", abi=c, sig="func(bool): bool")
+	x0:  3
+	x1:  1
+	x2:  101
+	y0:  15.0
+	y1:  -8.425
+	y2:  7.006652
+	z:   false
+}

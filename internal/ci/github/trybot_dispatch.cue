@@ -15,4 +15,4 @@
 package github
 
 // The trybot_dispatch workflow.
-workflows: trybot_dispatch: repo.bashWorkflow & repo.trybotDispatchWorkflow
+workflows: trybot_dispatch: _repo.bashWorkflow & _repo.trybotDispatchWorkflow

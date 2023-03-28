@@ -21,13 +21,13 @@ import (
 )
 
 // The trybot workflow.
-workflows: trybot: repo.bashWorkflow & {
-	name: repo.trybot.name
+workflows: trybot: _repo.bashWorkflow & {
+	name: _repo.trybot.name
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", repo.testDefaultBranch], repo.protectedBranchPatterns]) // do not run PR branches
-			"tags-ignore": [repo.releaseTagPattern]
+			branches: list.Concat([["trybot/*/*", _repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
+			"tags-ignore": [_repo.releaseTagPattern]
 		}
 		pull_request: {}
 	}
@@ -37,11 +37,11 @@ workflows: trybot: repo.bashWorkflow & {
 			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
 
-			let goCaches = repo.setupGoActionsCaches & {#protectedBranchExpr: repo.isProtectedBranch, _}
+			let goCaches = _repo.setupGoActionsCaches & {#protectedBranchExpr: _repo.isProtectedBranch, _}
 
 			steps: [
-				for v in repo.checkoutCode {v},
-				repo.installGo,
+				for v in _repo.checkoutCode {v},
+				_repo.installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
@@ -53,28 +53,28 @@ workflows: trybot: repo.bashWorkflow & {
 				// subsequent CLs in the trybot repo can leverage the updated
 				// cache. Therefore, we instead perform a clean of the testcache.
 				json.#step & {
-					if:  "github.repository == '\(repo.githubRepositoryPath)' && (\(repo.isProtectedBranch) || github.ref == 'refs/heads/\(repo.testDefaultBranch)')"
+					if:  "github.repository == '\(_repo.githubRepositoryPath)' && (\(_repo.isProtectedBranch) || github.ref == 'refs/heads/\(_repo.testDefaultBranch)')"
 					run: "go clean -testcache"
 				},
 
-				repo.earlyChecks & {
+				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
-					if: repo.isLatestLinux
+					if: _repo.isLatestLinux
 				},
 				json.#step & {
-					if:  "\(repo.isProtectedBranch) || \(repo.isLatestLinux)"
+					if:  "\(_repo.isProtectedBranch) || \(_repo.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_goGenerate,
 				_goTest & {
-					if: "\(repo.isProtectedBranch) || !\(repo.isLatestLinux)"
+					if: "\(_repo.isProtectedBranch) || !\(_repo.isLatestLinux)"
 				},
 				_goTestRace & {
-					if: repo.isLatestLinux
+					if: _repo.isLatestLinux
 				},
 				_goCheck,
-				repo.checkGitClean,
+				_repo.checkGitClean,
 				_pullThroughProxy,
 			]
 		}
@@ -83,13 +83,13 @@ workflows: trybot: repo.bashWorkflow & {
 	_testStrategy: {
 		"fail-fast": false
 		matrix: {
-			"go-version": ["1.19.x", repo.latestStableGo]
-			os: [repo.linuxMachine, repo.macosMachine, repo.windowsMachine]
+			"go-version": ["1.19.x", _repo.latestStableGo]
+			os: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
 		}
 	}
 
 	_pullThroughProxy: json.#step & {
-		name: "Pull this commit through the proxy on \(repo.defaultBranch)"
+		name: "Pull this commit through the proxy on \(_repo.defaultBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
@@ -121,7 +121,7 @@ workflows: trybot: repo.bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(repo.isProtectedBranch) && \(repo.isLatestLinux)"
+		if: "\(_repo.isProtectedBranch) && \(_repo.isLatestLinux)"
 	}
 
 	_goGenerate: json.#step & {
@@ -129,7 +129,7 @@ workflows: trybot: repo.bashWorkflow & {
 		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
-		if: repo.isLatestLinux
+		if: _repo.isLatestLinux
 	}
 
 	_goTest: json.#step & {
@@ -144,7 +144,7 @@ workflows: trybot: repo.bashWorkflow & {
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-		if:   "\(repo.isLatestLinux)"
+		if:   "\(_repo.isLatestLinux)"
 		name: "Check"
 		run:  "go vet ./..."
 	}

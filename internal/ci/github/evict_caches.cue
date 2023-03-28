@@ -21,7 +21,7 @@ import (
 )
 
 // The evict_caches removes "old" GitHub actions caches from the main repo and
-// the accompanying trybot repo. The job is only run in the main repo, because
+// the accompanying trybot _repo. The job is only run in the main repo, because
 // that is the only place where the credentials exist.
 //
 // The GitHub actions caches in the main and trybot repos can get large. So
@@ -40,7 +40,7 @@ import (
 //
 // In testing with @mvdan, this resulted in cache sizes for Linux dropping from
 // ~1GB to ~125MB. This is a considerable saving.
-workflows: evict_caches: repo.bashWorkflow & {
+workflows: evict_caches: _repo.bashWorkflow & {
 	name: "Evict caches"
 
 	on: {
@@ -52,11 +52,11 @@ workflows: evict_caches: repo.bashWorkflow & {
 	jobs: {
 		test: {
 			// We only want to run this in the main repo
-			if:        "${{github.repository == '\(repo.githubRepositoryPath)'}}"
-			"runs-on": repo.linuxMachine
+			if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
+			"runs-on": _repo.linuxMachine
 			steps: [
 				json.#step & {
-					let branchPatterns = strings.Join(repo.protectedBranchPatterns, " ")
+					let branchPatterns = strings.Join(_repo.protectedBranchPatterns, " ")
 
 					// rerunLatestWorkflow runs the latest trybot workflow in the
 					// specified repo for branches that match the specified branch.
@@ -64,8 +64,8 @@ workflows: evict_caches: repo.bashWorkflow & {
 						#repo:   string
 						#branch: string
 						"""
-						id=$(\(repo.curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/trybot.yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
-						\(repo.curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
+						id=$(\(_repo.curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/trybot.yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+						\(_repo.curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
 
 						"""
 					}
@@ -75,7 +75,7 @@ workflows: evict_caches: repo.bashWorkflow & {
 
 						echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
 						gh extension install actions/gh-actions-cache
-						for i in \(repo.githubRepositoryURL) \(repo.githubRepositoryURL)-trybot
+						for i in \(_repo.githubRepositoryURL) \(_repo.githubRepositoryURL)-trybot
 						do
 							echo "Evicting caches for $i"
 							cd $(mktemp -d)
@@ -90,7 +90,7 @@ workflows: evict_caches: repo.bashWorkflow & {
 						# Now trigger the most recent workflow run on each of the default branches.
 						# We do this by listing all the branches on the main repo and finding those
 						# which match the protected branch patterns (globs).
-						for j in $(\(repo.curlGitHubAPI) -f https://api.github.com/repos/\(repo.githubRepositoryPath)/branches | jq -r '.[] | .name')
+						for j in $(\(_repo.curlGitHubAPI) -f https://api.github.com/repos/\(_repo.githubRepositoryPath)/branches | jq -r '.[] | .name')
 						do
 							for i in \(branchPatterns)
 							do
@@ -99,8 +99,8 @@ workflows: evict_caches: repo.bashWorkflow & {
 								fi
 
 								echo "$j is a match with $i"
-								\(rerunLatestWorkflow & {#repo: repo.githubRepositoryPath, #branch: "$j", _})
-								\(rerunLatestWorkflow & {#repo: repo.githubRepositoryPath + "-trybot", #branch: "$j", _})
+								\(rerunLatestWorkflow & {#repo: _repo.githubRepositoryPath, #branch: "$j", _})
+								\(rerunLatestWorkflow & {#repo: _repo.githubRepositoryPath + "-trybot", #branch: "$j", _})
 							done
 						done
 						"""

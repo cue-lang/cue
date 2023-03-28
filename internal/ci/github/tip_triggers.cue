@@ -16,17 +16,17 @@ package github
 
 // The tip_triggers workflow. This fires for each new commit that hits the
 // default branch.
-workflows: tip_triggers: repo.bashWorkflow & {
+workflows: tip_triggers: _repo.bashWorkflow & {
 
 	name: "Triggers on push to tip"
-	on: push: branches: [repo.defaultBranch]
+	on: push: branches: [_repo.defaultBranch]
 	jobs: push: {
-		"runs-on": repo.linuxMachine
-		if:        "${{github.repository == '\(repo.githubRepositoryPath)'}}"
+		"runs-on": _repo.linuxMachine
+		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
 		steps: [
-			repo.repositoryDispatch & {
+			_repo.repositoryDispatch & {
 				name:                  "Trigger tip.cuelang.org deploy"
-				#githubRepositoryPath: repo.cuelangRepositoryPath
+				#githubRepositoryPath: _repo.cuelangRepositoryPath
 				#arg: {
 					event_type: "Rebuild tip against ${GITHUB_SHA}"
 					client_payload: {
@@ -34,9 +34,9 @@ workflows: tip_triggers: repo.bashWorkflow & {
 					}
 				}
 			},
-			repo.repositoryDispatch & {
+			_repo.repositoryDispatch & {
 				name:                  "Trigger unity build"
-				#githubRepositoryPath: repo.unityRepositoryPath
+				#githubRepositoryPath: _repo.unityRepositoryPath
 				#arg: {
 					event_type: "Check against ${GITHUB_SHA}"
 					client_payload: {

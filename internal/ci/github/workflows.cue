@@ -40,7 +40,7 @@ import (
 workflows: close({
 	[string]: json.#Workflow
 
-	(repo.trybot.key):  _
+	(_repo.trybot.key):  _
 	trybot_dispatch:    _
 	release:            _
 	tip_triggers:       _

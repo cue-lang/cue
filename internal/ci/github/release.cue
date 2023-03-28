@@ -26,7 +26,7 @@ import (
 _cueVersionRef: "${GITHUB_REF##refs/tags/}"
 
 // The release workflow
-workflows: release: repo.bashWorkflow & {
+workflows: release: _repo.bashWorkflow & {
 
 	name: "Release"
 
@@ -36,16 +36,16 @@ workflows: release: repo.bashWorkflow & {
 	concurrency: "release"
 
 	on: push: {
-		tags: [repo.releaseTagPattern, "!" + repo.zeroReleaseTagPattern]
-		branches: list.Concat([[repo.testDefaultBranch], repo.protectedBranchPatterns])
+		tags: [_repo.releaseTagPattern, "!" + _repo.zeroReleaseTagPattern]
+		branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns])
 	}
 	jobs: goreleaser: {
-		"runs-on": repo.linuxMachine
-		if:        "${{github.repository == '\(repo.githubRepositoryPath)'}}"
+		"runs-on": _repo.linuxMachine
+		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
 		steps: [
-			for v in repo.checkoutCode {v},
-			repo.installGo & {
-				with: "go-version": repo.pinnedReleaseGo
+			for v in _repo.checkoutCode {v},
+			_repo.installGo & {
+				with: "go-version": _repo.pinnedReleaseGo
 			},
 			json.#step & {
 				name: "Setup qemu"
@@ -73,7 +73,7 @@ workflows: release: repo.bashWorkflow & {
 				uses: "goreleaser/goreleaser-action@v3"
 				with: {
 					"install-only": true
-					version:        repo.goreleaserVersion
+					version:        _repo.goreleaserVersion
 				}
 			},
 			json.#step & {
@@ -84,18 +84,18 @@ workflows: release: repo.bashWorkflow & {
 				run:                 "cue cmd release"
 				"working-directory": "./internal/ci/goreleaser"
 			},
-			repo.repositoryDispatch & {
+			_repo.repositoryDispatch & {
 				name:                  "Re-test cuelang.org"
-				if:                    repo.isReleaseTag
-				#githubRepositoryPath: repo.cuelangRepositoryPath
+				if:                    _repo.isReleaseTag
+				#githubRepositoryPath: _repo.cuelangRepositoryPath
 				#arg: {
 					event_type: "Re-test post release of \(_cueVersionRef)"
 				}
 			},
-			repo.repositoryDispatch & {
+			_repo.repositoryDispatch & {
 				name:                  "Trigger unity build"
-				if:                    repo.isReleaseTag
-				#githubRepositoryPath: repo.unityRepositoryPath
+				if:                    _repo.isReleaseTag
+				#githubRepositoryPath: _repo.unityRepositoryPath
 				#arg: {
 					event_type: "Check against CUE \(_cueVersionRef)"
 					client_payload: {

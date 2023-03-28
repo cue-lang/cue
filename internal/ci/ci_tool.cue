@@ -20,7 +20,7 @@ import (
 	"tool/file"
 
 	"cuelang.org/go/internal/ci/base"
-	"cuelang.org/go/internal/ci/core"
+	"cuelang.org/go/internal/ci/repo"
 	"cuelang.org/go/internal/ci/github"
 )
 
@@ -33,27 +33,42 @@ import (
 
 _goos: string @tag(os,var=os)
 
-// genworkflows regenerates the GitHub workflow Yaml definitions.
+// gen.workflows regenerates the GitHub workflow Yaml definitions.
 //
 // See internal/ci/gen.go for details on how this step fits into the sequence
 // of generating our CI workflow definitions, and updating various txtar tests
 // with files from that process.
-command: genworkflows: {
+command: gen: {
+	_dir: path.FromSlash("../../.github/workflows", path.Unix)
 
-	for w in github.workflows {
-		"\(w.file)": file.Create & {
-			_dir:     path.FromSlash("../../.github/workflows", path.Unix)
-			filename: path.Join([_dir, w.file], _goos)
-			let donotedit = base.#doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
-			contents: "# \(donotedit)\n\n\(yaml.Marshal(w.schema))"
+	workflows: {
+		remove: {
+			glob: file.Glob & {
+				glob: path.Join([_dir, "*.yml"], _goos)
+				files: [...string]
+			}
+			for _, _filename in glob.files {
+				"delete \(_filename)": file.RemoveAll & {
+					path: _filename
+				}
+			}
+		}
+		for _workflowName, _workflow in github.workflows {
+			let _filename = _workflowName + ".yml"
+			"generate \(_filename)": file.Create & {
+				$after: [ for v in remove {v}]
+				filename: path.Join([_dir, _filename], _goos)
+				let donotedit = base.doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
+				contents: "# \(donotedit)\n\n\(yaml.Marshal(_workflow))"
+			}
 		}
 	}
 }
 
-command: gencodereviewcfg: file.Create & {
+command: gen: codereviewcfg: file.Create & {
 	_dir:     path.FromSlash("../../", path.Unix)
 	filename: path.Join([_dir, "codereview.cfg"], _goos)
-	let res = core.#toCodeReviewCfg & {#input: core.codeReview, _}
-	let donotedit = base.#doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
+	let res = base.toCodeReviewCfg & {#input: repo.codeReview, _}
+	let donotedit = base.doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
 	contents: "# \(donotedit)\n\n\(res)\n"
 }

@@ -1,0 +1,51 @@
+# Code generated internal/ci/ci_tool.cue; DO NOT EDIT.
+
+name: Evict caches
+"on":
+  schedule:
+    - cron: 0 2 * * *
+jobs:
+  test:
+    if: ${{github.repository == 'cue-lang/cue'}}
+    runs-on: ubuntu-22.04
+    defaults:
+      run:
+        shell: bash
+    steps:
+      - run: |-
+          set -eux
+
+          echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
+          gh extension install actions/gh-actions-cache
+          for i in https://github.com/cue-lang/cue https://github.com/cue-lang/cue-trybot
+          do
+          	echo "Evicting caches for $i"
+          	cd $(mktemp -d)
+          	git init
+          	git remote add origin $i
+          	for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
+          	do
+          		gh actions-cache delete --confirm $j
+          	done
+          done
+
+          # Now trigger the most recent workflow run on each of the default branches.
+          # We do this by listing all the branches on the main repo and finding those
+          # which match the protected branch patterns (globs).
+          for j in $(curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -f https://api.github.com/repos/cue-lang/cue/branches | jq -r '.[] | .name')
+          do
+          	for i in master release-branch.*
+          	do
+          		if [[ "$j" != $i ]]; then
+          			continue
+          		fi
+
+          		echo "$j is a match with $i"
+          		id=$(curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/cue-lang/cue/actions/workflows/trybot.yml/runs?branch=$j&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+          curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -X POST https://api.github.com/repos/cue-lang/cue/actions/runs/$id/rerun
+
+          		id=$(curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/cue-lang/cue-trybot/actions/workflows/trybot.yml/runs?branch=$j&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+          curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -X POST https://api.github.com/repos/cue-lang/cue-trybot/actions/runs/$id/rerun
+
+          	done
+          done

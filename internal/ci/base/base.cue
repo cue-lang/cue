@@ -12,88 +12,75 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// package core is a collection of features that are common to CUE projects and
-// the workflows they specify.
+// package base is a collection of workflows, jobs, stes etc that are common to
+// CUE projects and the workflows they specify. The package itself needs to be
+// instantiated to parameterise many of the exported definitions.
+//
+// For example a package using base would do something like this:
+//
+//     package workflows
+//
+//     import "cuelang.org/go/internal/ci/base"
+//
+//     // Create an instance of base
+//     _base: base & core { params: {
+//         // any values you need to set that are outside of core
+//         ...
+//     }}
+//
 package base
 
 import (
 	"strings"
-	"path"
-	"strconv"
-	encjson "encoding/json"
-
-	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-#repositoryURL:                string
-#defaultBranch:                string
-#testDefaultBranch:            "ci/test"
-#botGitHubUser:                string
-#botGitHubUserTokenSecretsKey: string
+// Package parameters
+githubRepositoryPath:   *(URLPath & {#url: githubRepositoryURL, _}) | string
+githubRepositoryURL:    *("https://github.com/" + githubRepositoryPath) | string
+gerritHubHostname:      "review.gerrithub.io"
+gerritHubRepositoryURL: *("https://\(gerritHubHostname)/a/" + githubRepositoryPath) | string
+trybotRepositoryPath:   *(githubRepositoryPath + "-" + trybot.key) | string
+trybotRepositoryURL:    *("https://github.com/" + trybotRepositoryPath) | string
 
-#doNotEditMessage: {
-	#generatedBy: string
-	"Code generated \(#generatedBy); DO NOT EDIT."
+defaultBranch:           *"master" | string
+testDefaultBranch:       *"ci/test" | _
+protectedBranchPatterns: *[defaultBranch] | [...string]
+releaseTagPrefix:        *"v" | string
+releaseTagPattern:       *(releaseTagPrefix + "*") | string
+
+botGitHubUser:                      string
+botGitHubUserTokenSecretsKey:       *(strings.ToUpper(botGitHubUser) + "_GITHUB_PAT") | string
+botGitHubUserEmail:                 string
+botGerritHubUser:                   *botGitHubUser | string
+botGerritHubUserPasswordSecretsKey: *(strings.ToUpper(botGitHubUser) + "_GERRITHUB_PASSWORD") | string
+botGerritHubUserEmail:              *botGitHubUserEmail | string
+
+linuxMachine: string
+
+codeReview: #codeReview & {
+	github: githubRepositoryURL
+	gerrit: gerritHubRepositoryURL
 }
 
-#bashWorkflow: json.#Workflow & {
-	jobs: [string]: defaults: run: shell: "bash"
+// Define some shared keys and human-readable names.
+//
+// trybot.key and unity.key are shared with
+// github.com/cue-sh/tools/cmd/cueckoo.  The keys are used across various CUE
+// workflows and their consistency in those various locations is therefore
+// crucial. As such, we assert specific values for the keys here rather than
+// just deriving values from the human-readable names.
+//
+// trybot.name is by the trybot GitHub workflow and by gerritstatusupdater as
+// an identifier in the status updates that are posted as reviews for this
+// workflows, but also as the result label key, e.g.  "TryBot-Result" would be
+// the result label key for the "TryBot" workflow. This name also shows up in
+// the CI badge in the top-level README.
+trybot: {
+	key:  "trybot" & strings.ToLower(name)
+	name: "TryBot"
 }
 
-#installGo: json.#step & {
-	name: "Install Go"
-	uses: "actions/setup-go@v3"
-	with: {
-		"go-version": *"${{ matrix.go-version }}" | string
-	}
+unity: {
+	key:  "unity" & strings.ToLower(name)
+	name: "Unity"
 }
-
-#checkoutCode: json.#step & {
-	name: "Checkout code"
-	uses: "actions/checkout@v3"
-}
-
-#earlyChecks: json.#step & {
-	name: "Early git and code sanity checks"
-	run: """
-		# Ensure the recent commit messages have Signed-off-by headers.
-		# TODO: Remove once this is enforced for admins too;
-		# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229
-		# TODO: Our --max-count here is just 1, because we've made mistakes very
-		# recently. Increase it to 5 or 10 soon, to also cover CL chains.
-		for commit in $(git rev-list --max-count=1 HEAD); do
-			if ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then
-				echo -e "\nRecent commit is lacking Signed-off-by:\n"
-				git show --quiet $commit
-				exit 1
-			fi
-		done
-		"""
-}
-
-#checkGitClean: json.#step & {
-	name: "Check that git is clean at the end of the job"
-	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
-}
-
-let _#repositoryURL = #repositoryURL
-let _#botGitHubUser = #botGitHubUser
-let _#botGitHubUserTokenSecretsKey = #botGitHubUserTokenSecretsKey
-
-#repositoryDispatch: json.#step & {
-	#repositoryURL:                *_#repositoryURL | string
-	#botGitHubUser:                *_#botGitHubUser | string
-	#botGitHubUserTokenSecretsKey: *_#botGitHubUserTokenSecretsKey | string
-	#arg:                          _
-
-	// Pending a nicer fix in cuelang.org/issue/1433
-	let _#repositoryURLNoScheme = strings.Split(#repositoryURL, "//")[1]
-	let _#repositoryPath = path.Base(path.Dir(_#repositoryURLNoScheme)) + "/" + path.Base(_#repositoryURLNoScheme)
-
-	name: string
-	run:  #"""
-			\#(#curl) -H "Content-Type: application/json" -u \#(#botGitHubUser):${{ secrets.\#(#botGitHubUserTokenSecretsKey) }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(#arg))) https://api.github.com/repos/\#(_#repositoryPath)/dispatches
-			"""#
-}
-
-#curl: "curl -f -s"

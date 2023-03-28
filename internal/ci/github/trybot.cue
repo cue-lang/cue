@@ -17,74 +17,79 @@ package github
 import (
 	"list"
 
-	"cuelang.org/go/internal/ci/core"
-
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
 // The trybot workflow.
-trybot: _base.#bashWorkflow & {
-	// Note: the name of this workflow is used by gerritstatusupdater as an
-	// identifier in the status updates that are posted as reviews for this
-	// workflows, but also as the result label key, e.g. "TryBot-Result" would
-	// be the result label key for the "TryBot" workflow. Note the result label
-	// key is therefore tied to the configuration of this repository.
-	//
-	// This name also shows up in the CI badge in the top-level README.
-	name: "TryBot"
+workflows: trybot: _repo.bashWorkflow & {
+	name: _repo.trybot.name
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", _base.#testDefaultBranch], _#protectedBranchPatterns]) // do not run PR branches
-			"tags-ignore": [core.#releaseTagPattern]
+			branches: list.Concat([["trybot/*/*", _repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
+			"tags-ignore": [_repo.releaseTagPattern]
 		}
 		pull_request: {}
 	}
 
 	jobs: {
 		test: {
-			strategy:  _#testStrategy
+			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
+
+			let goCaches = _repo.setupGoActionsCaches & {#protectedBranchExpr: _repo.isProtectedBranch, _}
+
 			steps: [
-				_base.#checkoutCode & {
-					// "pull_request" builds will by default use a merge commit,
-					// testing the PR's HEAD merged on top of the master branch.
-					// For consistency with Gerrit, avoid that merge commit entirely.
-					// This doesn't affect "push" builds, which never used merge commits.
-					with: ref: "${{ github.event.pull_request.head.sha }}"
-				},
-				_base.#installGo,
+				for v in _repo.checkoutCode {v},
+				_repo.installGo,
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
-				for v in _#cachePre {v},
+				for v in goCaches {v},
 
-				_base.#earlyChecks & {
+				// All tests on protected branches should skip the test cache.
+				// The canonical way to do this is with -count=1. However, we
+				// want the resulting test cache to be valid and current so that
+				// subsequent CLs in the trybot repo can leverage the updated
+				// cache. Therefore, we instead perform a clean of the testcache.
+				json.#step & {
+					if:  "github.repository == '\(_repo.githubRepositoryPath)' && (\(_repo.isProtectedBranch) || github.ref == 'refs/heads/\(_repo.testDefaultBranch)')"
+					run: "go clean -testcache"
+				},
+
+				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
-					if: _#isLatestLinux
+					if: _repo.isLatestLinux
 				},
 				json.#step & {
-					if:  _#isProtectedBranch
+					if:  "\(_repo.isProtectedBranch) || \(_repo.isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
-				_#goGenerate,
-				_#goTest & {
-					if: "\(_#isProtectedBranch) || !\(_#isLatestLinux)"
+				_goGenerate,
+				_goTest & {
+					if: "\(_repo.isProtectedBranch) || !\(_repo.isLatestLinux)"
 				},
-				_#goTestRace & {
-					if: _#isLatestLinux
+				_goTestRace & {
+					if: _repo.isLatestLinux
 				},
-				_#goCheck,
-				_base.#checkGitClean,
-				_#pullThroughProxy,
-				_#cachePost,
+				_goCheck,
+				_repo.checkGitClean,
+				_pullThroughProxy,
 			]
 		}
 	}
 
-	_#pullThroughProxy: json.#step & {
-		name: "Pull this commit through the proxy on \(core.#defaultBranch)"
+	_testStrategy: {
+		"fail-fast": false
+		matrix: {
+			"go-version": ["1.19.x", _repo.latestStableGo]
+			os: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
+		}
+	}
+
+	_pullThroughProxy: json.#step & {
+		name: "Pull this commit through the proxy on \(_repo.defaultBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
@@ -97,7 +102,7 @@ trybot: _base.#bashWorkflow & {
 				# avoid stopping too early. We also use a "failed" file as "go get" runs
 				# in a subshell via the pipe.
 				rm -f failed
-				if ! GOPROXY=https://proxy.golang.org go get cuelang.org/go/cmd/cue@$v; then
+				if ! GOPROXY=https://proxy.golang.org go get cuelang.org/go@$v; then
 					touch failed
 				fi |& tee output.txt
 
@@ -116,35 +121,35 @@ trybot: _base.#bashWorkflow & {
 			echo "giving up after a number of retries"
 			exit 1
 			"""
-		if: "\(_#isProtectedBranch) && \(_#isLatestLinux)"
+		if: "\(_repo.isProtectedBranch) && \(_repo.isLatestLinux)"
 	}
 
-	_#goGenerate: json.#step & {
+	_goGenerate: json.#step & {
 		name: "Generate"
 		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
-		if: _#isLatestLinux
+		if: _repo.isLatestLinux
 	}
 
-	_#goTest: json.#step & {
+	_goTest: json.#step & {
 		name: "Test"
 		run:  "go test ./..."
 	}
 
-	_#goCheck: json.#step & {
+	_goCheck: json.#step & {
 		// These checks can vary between platforms, as different code can be built
 		// based on GOOS and GOARCH build tags.
 		// However, CUE does not have any such build tags yet, and we don't use
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-		if:   "\(_#isLatestLinux)"
+		if:   "\(_repo.isLatestLinux)"
 		name: "Check"
 		run:  "go vet ./..."
 	}
 
-	_#goTestRace: json.#step & {
+	_goTestRace: json.#step & {
 		name: "Test with -race"
 		run:  "go test -race ./..."
 	}

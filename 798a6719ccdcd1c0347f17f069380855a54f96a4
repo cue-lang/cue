@@ -16,6 +16,24 @@
       "message": "NewMessagef",
       "revId": "798a6719ccdcd1c0347f17f069380855a54f96a4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96861656_aa65a4a6",
+        "filename": "cue/errors/errors.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-28T20:39:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "943680b8_b66bcabc",
+      "revId": "798a6719ccdcd1c0347f17f069380855a54f96a4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

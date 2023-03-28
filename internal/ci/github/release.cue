@@ -17,7 +17,6 @@ package github
 import (
 	"list"
 
-	"cuelang.org/go/internal/ci/repo"
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 

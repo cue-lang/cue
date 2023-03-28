@@ -19,6 +19,4 @@ import (
 )
 
 // The trybot_dispatch workflow.
-workflows: trybot_dispatch: repo.bashWorkflow & repo.trybotDispatchWorkflow & {
-	#type: repo.trybot.key
-}
+workflows: trybot_dispatch: repo.bashWorkflow & repo.trybotDispatchWorkflow

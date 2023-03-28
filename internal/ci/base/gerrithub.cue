@@ -7,15 +7,14 @@ import (
 )
 
 trybotDispatchWorkflow: json.#Workflow & {
-	#type:                  string
-	_#branchNameExpression: "\(#type)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
-	name:                   "Dispatch \(#type)"
+	_#branchNameExpression: "\(trybot.key)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
+	name:                   "Dispatch \(trybot.key)"
 	on: ["repository_dispatch"]
 	jobs: [string]: defaults: run: shell: "bash"
 	jobs: {
-		(#type): {
+		(trybot.key): {
 			"runs-on": linuxMachine
-			if:        "${{ github.event.client_payload.type == '\(#type)' }}"
+			if:        "${{ github.event.client_payload.type == '\(trybot.key)' }}"
 			steps: [
 				writeNetrcFile,
 				// Out of the entire ref (e.g. refs/changes/38/547738/7) we only
@@ -29,7 +28,7 @@ trybotDispatchWorkflow: json.#Workflow & {
 						"""#
 				},
 				json.#step & {
-					name: "Trigger \(#type)"
+					name: "Trigger \(trybot.key)"
 					run:  """
 						mkdir tmpgit
 						cd tmpgit

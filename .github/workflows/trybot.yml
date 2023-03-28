@@ -42,12 +42,18 @@ jobs:
         with:
           cache: false
           go-version: ${{ matrix.go-version }}
+      - if: runner.os == 'Windows'
+        name: Get go mod cache directory
+        run: |-
+          go env -w GOCACHE=/d/tmp/go/cache
+          go env -w GOMODCACHE=/d/tmp/go/modcache
       - id: go-mod-cache-dir
         name: Get go mod cache directory
         run: echo "dir=$(go env GOMODCACHE)" >> ${GITHUB_OUTPUT}
       - id: go-cache-dir
         name: Get go build/test cache directory
         run: echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
+      - run: go env
       - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))
         uses: actions/cache@v3
         with:

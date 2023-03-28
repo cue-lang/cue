@@ -141,6 +141,15 @@ setupGoActionsCaches: {
 	// pre is the list of steps required to establish and initialise the correct
 	// caches for Go-based workflows.
 	[
+		// Set special cache locations on windows
+		json.#step & {
+			if:   "runner.os == 'Windows'"
+			name: "Get go mod cache directory"
+			run: """
+				go env -w GOCACHE=/d/tmp/go/cache
+				go env -w GOMODCACHE=/d/tmp/go/modcache
+				"""
+		},
 		// TODO: once https://github.com/actions/setup-go/issues/54 is fixed,
 		// we could use `go env` outputs from the setup-go step.
 		json.#step & {
@@ -152,6 +161,9 @@ setupGoActionsCaches: {
 			name: "Get go build/test cache directory"
 			id:   goCacheDirID
 			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
+		},
+		json.#step & {
+			run: "go env"
 		},
 		for _, v in [
 			{

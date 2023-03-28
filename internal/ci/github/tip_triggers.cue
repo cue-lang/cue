@@ -14,10 +14,6 @@
 
 package github
 
-import (
-	"cuelang.org/go/internal/ci/repo"
-)
-
 // The tip_triggers workflow. This fires for each new commit that hits the
 // default branch.
 workflows: tip_triggers: repo.bashWorkflow & {

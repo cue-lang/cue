@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2e37cb0_7ab23901",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-03-28T10:26:07Z",
+      "side": 1,
+      "message": "note that this is changing the YAML in ways which are likely breaking - the payload type, the job name, the workflow name. adding a +2 with the assumption that you\u0027re aware of this and have checked that it\u0027s OK, but I\u0027m a bit worried.",
+      "revId": "3068fb68e4a8e457dae6e9f034ba7f39bcde9143",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

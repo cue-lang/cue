@@ -23,6 +23,6 @@ package github
 // in a single file, and that keeps the different in import
 // path down to a single file.
 
-import _repo "cuelang.org/go/internal/ci/repo"
+import repo "cuelang.org/go/internal/ci/repo"
 
-repo: _repo
+_repo: repo

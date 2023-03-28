@@ -14,15 +14,15 @@
 
 package github
 
-// push_tip_to_trybot "syncs" active branches to the trybot repo.
+// push_tip_to_trybot "syncs" active branches to the trybot _repo.
 // Since the workflow is triggered by a push to any of the branches,
 // the step only needs to sync the pushed branch.
-workflows: push_tip_to_trybot: repo.pushTipToTrybotWorkflow & {
+workflows: push_tip_to_trybot: _repo.pushTipToTrybotWorkflow & {
 	on: {
-		push: branches: repo.protectedBranchPatterns
+		push: branches: _repo.protectedBranchPatterns
 	}
 	jobs: push: {
-		"runs-on": repo.linuxMachine
-		if:        "${{github.repository == '\(repo.githubRepositoryPath)'}}"
+		"runs-on": _repo.linuxMachine
+		if:        "${{github.repository == '\(_repo.githubRepositoryPath)'}}"
 	}
 }

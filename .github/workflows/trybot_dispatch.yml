@@ -1,15 +1,15 @@
 # Code generated internal/ci/ci_tool.cue; DO NOT EDIT.
 
-name: Dispatch trybot
+name: Dispatch TryBot
 "on":
   - repository_dispatch
 jobs:
-  trybot:
+  TryBot:
     runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
-    if: ${{ github.event.client_payload.type == 'trybot' }}
+    if: ${{ github.event.client_payload.type == 'TryBot' }}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
@@ -23,7 +23,7 @@ jobs:
         run: |-
           ref="$(echo ${{github.event.client_payload.payload.ref}} | sed -E 's/^refs\/changes\/[0-9]+\/([0-9]+)\/([0-9]+).*/\1\/\2/')"
           echo "gerrithub_ref=$ref" >> $GITHUB_OUTPUT
-      - name: Trigger trybot
+      - name: Trigger TryBot
         run: |-
           mkdir tmpgit
           cd tmpgit
@@ -32,9 +32,9 @@ jobs:
           git config user.email cueckoo@gmail.com
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
           git fetch https://review.gerrithub.io/a/cue-lang/cue "${{ github.event.client_payload.payload.ref }}"
-          git checkout -b trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }} FETCH_HEAD
+          git checkout -b TryBot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }} FETCH_HEAD
           git remote add origin https://github.com/cue-lang/cue-trybot
           git fetch origin "${{ github.event.client_payload.payload.branch }}"
-          git push origin trybot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}
+          git push origin TryBot/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}
           echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
           gh pr --repo=https://github.com/cue-lang/cue-trybot create --base="${{ github.event.client_payload.payload.branch }}" --fill

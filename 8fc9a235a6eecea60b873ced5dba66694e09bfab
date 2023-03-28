@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b8aeef96_e19da10f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-28T13:32:02Z",
+      "side": 1,
+      "message": "The unity break is expected, correct? \n\nBecause unity was re-baselined after c3138e362ec88061b8a83368ccc66511581a7263 which happened later:\n\n  $ git merge-base --is-ancestor c3138e362ec88061b8a83368ccc66511581a7263 origin/release-branch.v0.5\n  \nFails.",
+      "revId": "8fc9a235a6eecea60b873ced5dba66694e09bfab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

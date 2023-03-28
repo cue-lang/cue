@@ -6,7 +6,7 @@ import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
 
-trybotDispatchWorkflow: json.#Workflow & {
+trybotDispatchWorkflow: bashWorkflow & {
 	_#branchNameExpression: "\(trybot.key)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
 	name:                   "Dispatch \(trybot.key)"
 	on: ["repository_dispatch"]
@@ -50,8 +50,16 @@ trybotDispatchWorkflow: json.#Workflow & {
 	}
 }
 
-pushTipToTrybotWorkflow: json.#Workflow & {
+pushTipToTrybotWorkflow: bashWorkflow & {
 	jobs: [string]: defaults: run: shell: "bash"
+
+	on: {
+		push: branches: protectedBranchPatterns
+	}
+	jobs: push: {
+		"runs-on": linuxMachine
+		if:        "${{github.repository == '\(githubRepositoryPath)'}}"
+	}
 
 	name: "Push tip to \(trybot.key)"
 

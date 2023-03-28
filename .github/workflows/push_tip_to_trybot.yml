@@ -13,6 +13,7 @@ jobs:
     defaults:
       run:
         shell: bash
+    if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
@@ -47,4 +48,3 @@ jobs:
           	 echo "Giving up"
           	 exit 1
           fi
-    if: ${{github.repository == 'cue-lang/cue'}}

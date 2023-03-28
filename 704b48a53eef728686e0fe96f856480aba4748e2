@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0df42bd7_2d9611f0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-28T13:03:37Z",
+      "side": 1,
+      "message": "The diff in .github is not significant. As you can see there is no semantic change, just a reordering. ",
+      "revId": "704b48a53eef728686e0fe96f856480aba4748e2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

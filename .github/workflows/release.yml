@@ -5,6 +5,7 @@ name: Release
   push:
     tags:
       - v*
+      - '!*-0.dev'
     branches:
       - ci/test
       - master
@@ -12,19 +13,26 @@ name: Release
 concurrency: release
 jobs:
   goreleaser:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     defaults:
       run:
         shell: bash
+    if: ${{github.repository == 'cue-lang/cue'}}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
         with:
+          ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
+      - name: Reset git directory modification times
+        run: touch -t 202211302355 $(find * -type d)
+      - name: Restore git file modification times
+        uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
       - name: Install Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
-          go-version: 1.19.7
+          cache: false
+          go-version: 1.20.2
       - name: Setup qemu
         uses: docker/setup-qemu-action@v2
       - name: Set up Docker Buildx
@@ -41,7 +49,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v3
         with:
           install-only: true
-          version: v1.13.1
+          version: v1.16.2
       - name: Run GoReleaser with CUE
         run: cue cmd release
         working-directory: ./internal/ci/goreleaser
@@ -49,7 +57,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Re-test cuelang.org
-        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
+        run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -f --request POST --data-binary "{\"event_type\":\"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
       - if: startsWith(github.ref, 'refs/tags/v')
         name: Trigger unity build
-        run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\":\"Check against CUE ${GITHUB_REF##refs/tags/}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'
+        run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -f --request POST --data-binary "{\"event_type\":\"Check against CUE ${GITHUB_REF##refs/tags/}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity/dispatches'

@@ -17,10 +17,10 @@ jobs:
       fail-fast: false
       matrix:
         go-version:
-          - 1.18.x
           - 1.19.x
+          - 1.20.x
         os:
-          - ubuntu-20.04
+          - ubuntu-22.04
           - macos-11
           - windows-2022
     runs-on: ${{ matrix.os }}
@@ -32,9 +32,15 @@ jobs:
         uses: actions/checkout@v3
         with:
           ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Reset git directory modification times
+        run: touch -t 202211302355 $(find * -type d)
+      - name: Restore git file modification times
+        uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
       - name: Install Go
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@v4
         with:
+          cache: false
           go-version: ${{ matrix.go-version }}
       - id: go-mod-cache-dir
         name: Get go mod cache directory
@@ -42,14 +48,25 @@ jobs:
       - id: go-cache-dir
         name: Get go build/test cache directory
         run: echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
-      - uses: actions/cache@v3
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))
+        uses: actions/cache@v3
         with:
           path: |-
             ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
             ${{ steps.go-cache-dir.outputs.dir }}
           key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: '! (github.ref == ''refs/heads/master'' || startsWith(github.ref, ''refs/heads/release-branch.''))'
+        uses: actions/cache/restore@v3
+        with:
+          path: |-
+            ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
+            ${{ steps.go-cache-dir.outputs.dir }}
+          key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
+          restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
+      - if: github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || github.ref == 'refs/heads/ci/test')
+        run: go clean -testcache
+      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
         name: Early git and code sanity checks
         run: |-
           # Ensure the recent commit messages have Signed-off-by headers.
@@ -59,30 +76,67 @@ jobs:
           # recently. Increase it to 5 or 10 soon, to also cover CL chains.
           for commit in $(git rev-list --max-count=1 HEAD); do
           	if ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then
-          		echo -e "
-          Recent commit is lacking Signed-off-by:
-          "
+          		echo -e "\nRecent commit is lacking Signed-off-by:\n"
           		git show --quiet $commit
           		exit 1
           	fi
           done
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))
+
+          # Ensure that commit messages have a blank second line.
+          # We know that a commit message must be longer than a single
+          # line because each commit must be signed-off.
+          if git log --format=%B -n 1 HEAD | sed -n '2{/^$/{q1}}'; then
+          	echo "second line of commit message must be blank"
+          	exit 1
+          fi
+
+          # Ensure that the commit author is the same as the signed-off-by.  This
+          # is a basic requirement of DCO. It is enforced by Gerrit (although
+          # noting that in Gerrit the author name does not have to match, only
+          # the email address), but _not_ by the DCO GitHub app:
+          #
+          #   https://github.com/dcoapp/app/issues/201
+          #
+          # Provide a sanity check as part of GitHub workflows that should enforce
+          # this, e.g. trybot workflows.
+          #
+          # We do so by comparing the commit author and "Signed-off-by" trailer for
+          # strict equality. Whilst this is more strict than Gerrit, it should
+          # generally be the case, and we can always relax this when presented with
+          # specific situations where it is is a problem.
+
+          # commit author email address
+          commitauthor="$(git log -1 --pretty="%ae")"
+
+          # signed-off-by trailer email address. There is no way to parse just the
+          # email address from the trailer in the same way as git log, so instead
+          # grab the relevant trailer and then take the last whitespace-delimited
+          # part as the "<>" contained email address.
+          # Getting the Signed-off-by trailer in this way causes blank
+          # lines for some reason. Use awk to remove them.
+          commitsigner="$(git log -1 --pretty='%(trailers:key=Signed-off-by,valueonly)' | sed -ne 's/.* <\(.*\)>/\1/p')"
+
+          if [[ "$commitauthor" != "$commitsigner" ]]; then
+          	echo "commit author email address does not match signed-off-by trailer"
+          	exit 1
+          fi
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
         run: echo CUE_LONG=true >> $GITHUB_ENV
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
         name: Generate
         run: go generate ./...
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || !(matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || !(matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
         name: Test
         run: go test ./...
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
         name: Test with -race
         run: go test -race ./...
-      - if: (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
         name: Check
         run: go vet ./...
       - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (matrix.go-version == '1.19.x' && matrix.os == 'ubuntu-20.04')
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
         name: Pull this commit through the proxy on master
         run: |-
           v=$(git rev-parse HEAD)
@@ -96,7 +150,7 @@ jobs:
           	# avoid stopping too early. We also use a "failed" file as "go get" runs
           	# in a subshell via the pipe.
           	rm -f failed
-          	if ! GOPROXY=https://proxy.golang.org go get cuelang.org/go/cmd/cue@$v; then
+          	if ! GOPROXY=https://proxy.golang.org go get cuelang.org/go@$v; then
           		touch failed
           	fi |& tee output.txt
 
@@ -114,4 +168,3 @@ jobs:
 
           echo "giving up after a number of retries"
           exit 1
-      - run: find '${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download' '${{ steps.go-cache-dir.outputs.dir }}' -type f -amin +7200 -delete -print

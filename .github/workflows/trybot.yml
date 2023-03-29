@@ -49,7 +49,7 @@ jobs:
         name: Get go build/test cache directory
         run: echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
       - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.'))
-        uses: actions/cache@v3
+        uses: actions/cache/save@v3
         with:
           path: |-
             ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download

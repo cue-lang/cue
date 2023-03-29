@@ -124,11 +124,17 @@ curlGitHubAPI: #"""
 	"""#
 
 setupGoActionsCaches: {
-	// #protectedBranchExpr is a GitHub expression
-	// (https://docs.github.com/en/actions/learn-github-actions/expressions)
-	// that evaluates to true if the workflow is running for a commit against a
-	// protected branch.
-	#protectedBranchExpr: string
+	// #readonly determines whether we ever want to write the cache back. The
+	// writing of a cache back (for any given cache key) should only happen on a
+	// protected branch. But running a workflow on a protected branch often
+	// implies that we want to skip the cache to ensure we catch flakes early.
+	// Hence the concept of clearing the testcache to ensure we catch flakes
+	// early can be defaulted based on #readonly. In the general case the two
+	// concepts are orthogonal, hence they are kept as two parameters, even
+	// though in our case we could get away with a single parameter that
+	// encapsulates our needs.
+	#readonly:       *false | bool
+	#cleanTestCache: *!#readonly | bool
 
 	let goModCacheDirID = "go-mod-cache-dir"
 	let goCacheDirID = "go-cache-dir"
@@ -137,6 +143,19 @@ setupGoActionsCaches: {
 	// GitHub expressions that represent the directories
 	// that participate in Go caching.
 	let cacheDirs = [ "${{ steps.\(goModCacheDirID).outputs.dir }}/cache/download", "${{ steps.\(goCacheDirID).outputs.dir }}"]
+
+	let cacheStep = json.#step & {
+		with: {
+			path: strings.Join(cacheDirs, "\n")
+
+			// GitHub actions caches are immutable. Therefore, use a key which is
+			// unique, but allow the restore to fallback to the most recent cache.
+			// The result is then saved under the new key which will benefit the
+			// next build
+			key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
+			"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
+		}
+	}
 
 	// pre is the list of steps required to establish and initialise the correct
 	// caches for Go-based workflows.
@@ -153,34 +172,45 @@ setupGoActionsCaches: {
 			id:   goCacheDirID
 			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
 		},
-		for _, v in [
-			{
-				if:   #protectedBranchExpr
-				uses: "actions/cache@v3"
-			},
-			{
-				if:   "! \(#protectedBranchExpr)"
-				uses: "actions/cache/restore@v3"
-			},
-		] {
-			v & json.#step & {
-				with: {
-					path: strings.Join(cacheDirs, "\n")
 
-					// GitHub actions caches are immutable. Therefore, use a key which is
-					// unique, but allow the restore to fallback to the most recent cache.
-					// The result is then saved under the new key which will benefit the
-					// next build
-					key:            "${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}"
-					"restore-keys": "${{ runner.os }}-${{ matrix.go-version }}"
-				}
+		// Only if we are not running in readonly mode do we want a step that
+		// uses actions/cache/save (write). Even then, the use of the write step
+		// should be predicated on us running on a protected branch. Because
+		// it's impossible for anything else to write such a cache.
+		if !#readonly {
+			cacheStep & {
+				if:   isProtectedBranch
+				uses: "actions/cache/save@v3"
+			}
+		},
+
+		cacheStep & {
+			// If we are readonly, there is no condition on when we run this step.
+			// It should always be run, becase there is no alternative. But if we
+			// are not readonly, then we need to predicate this step on us not
+			// being on a protected branch.
+			if !#readonly {
+				if: "! \(isProtectedBranch)"
+			}
+			uses: "actions/cache/restore@v3"
+		},
+
+		if #cleanTestCache {
+			// All tests on protected branches should skip the test cache.
+			// The canonical way to do this is with -count=1. However, we
+			// want the resulting test cache to be valid and current so that
+			// subsequent CLs in the trybot repo can leverage the updated
+			// cache. Therefore, we instead perform a clean of the testcache.
+			json.#step & {
+				if:  *"github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || github.ref == 'refs/heads/\(testDefaultBranch)')" | string
+				run: "go clean -testcache"
 			}
 		},
 	]
 }
 
-// #isProtectedBranch is an expression that evaluates to true if the
-// job is running as a result of pushing to one of _#protectedBranchPatterns.
+// isProtectedBranch is an expression that evaluates to true if the
+// job is running as a result of pushing to one of protectedBranchPatterns.
 // It would be nice to use the "contains" builtin for simplicity,
 // but array literals are not yet supported in expressions.
 isProtectedBranch: {

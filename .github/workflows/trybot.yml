@@ -4,7 +4,6 @@ name: TryBot
 "on":
   push:
     branches:
-      - trybot/*/*
       - ci/test
       - master
       - release-branch.*

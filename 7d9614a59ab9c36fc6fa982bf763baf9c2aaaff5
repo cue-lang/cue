@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51d3f4fe_cadbc23e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:11:28Z",
+      "side": 1,
+      "message": "s/does/",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f04a23c_7cdccccf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:11:28Z",
+      "side": 1,
+      "message": "s/are/is/",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4472f273_c26a05f3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:11:28Z",
+      "side": 1,
+      "message": "s/These/This/",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df8c5fa3_fdf80e2b",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:11:28Z",
+      "side": 1,
+      "message": "I\u0027m finding it difficult to understand this. Does \"outside\" mean after or before the rest of the evaluation, or that it\u0027s already computed?",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51a5b03b_f2a27f71",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:11:28Z",
+      "side": 1,
+      "message": "Or just `return \u0026Vertex{`",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

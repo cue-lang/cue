@@ -26,7 +26,7 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", _repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [_repo.releaseTagPattern]
 		}
 		pull_request: {}
@@ -46,16 +46,6 @@ workflows: trybot: _repo.bashWorkflow & {
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
 				for v in goCaches {v},
-
-				// All tests on protected branches should skip the test cache.
-				// The canonical way to do this is with -count=1. However, we
-				// want the resulting test cache to be valid and current so that
-				// subsequent CLs in the trybot repo can leverage the updated
-				// cache. Therefore, we instead perform a clean of the testcache.
-				json.#step & {
-					if:  "github.repository == '\(_repo.githubRepositoryPath)' && (\(_repo.isProtectedBranch) || github.ref == 'refs/heads/\(_repo.testDefaultBranch)')"
-					run: "go clean -testcache"
-				},
 
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,

@@ -176,6 +176,16 @@ setupGoActionsCaches: {
 				}
 			}
 		},
+
+		// All tests on protected branches should skip the test cache.
+		// The canonical way to do this is with -count=1. However, we
+		// want the resulting test cache to be valid and current so that
+		// subsequent CLs in the trybot repo can leverage the updated
+		// cache. Therefore, we instead perform a clean of the testcache.
+		json.#step & {
+			if:  "github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || github.ref == 'refs/heads/\(testDefaultBranch)')"
+			run: "go clean -testcache"
+		},
 	]
 }
 

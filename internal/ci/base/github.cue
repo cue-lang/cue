@@ -124,11 +124,7 @@ curlGitHubAPI: #"""
 	"""#
 
 setupGoActionsCaches: {
-	// #protectedBranchExpr is a GitHub expression
-	// (https://docs.github.com/en/actions/learn-github-actions/expressions)
-	// that evaluates to true if the workflow is running for a commit against a
-	// protected branch.
-	#protectedBranchExpr: string
+	#cleanTestCache: *true | bool
 
 	let goModCacheDirID = "go-mod-cache-dir"
 	let goCacheDirID = "go-cache-dir"
@@ -154,12 +150,12 @@ setupGoActionsCaches: {
 			run:  #"echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}"#
 		},
 		for _, v in [
-			{
-				if:   #protectedBranchExpr
+			if #cleanTestCache {
+				if:   isProtectedBranch
 				uses: "actions/cache@v3"
 			},
 			{
-				if:   "! \(#protectedBranchExpr)"
+				if:   "! \(isProtectedBranch)"
 				uses: "actions/cache/restore@v3"
 			},
 		] {
@@ -176,11 +172,23 @@ setupGoActionsCaches: {
 				}
 			}
 		},
+
+		if #cleanTestCache {
+			// All tests on protected branches should skip the test cache.
+			// The canonical way to do this is with -count=1. However, we
+			// want the resulting test cache to be valid and current so that
+			// subsequent CLs in the trybot repo can leverage the updated
+			// cache. Therefore, we instead perform a clean of the testcache.
+			json.#step & {
+				if:  *"github.repository == '\(githubRepositoryPath)' && (\(isProtectedBranch) || github.ref == 'refs/heads/\(testDefaultBranch)')" | string
+				run: "go clean -testcache"
+			}
+		},
 	]
 }
 
-// #isProtectedBranch is an expression that evaluates to true if the
-// job is running as a result of pushing to one of _#protectedBranchPatterns.
+// isProtectedBranch is an expression that evaluates to true if the
+// job is running as a result of pushing to one of protectedBranchPatterns.
 // It would be nice to use the "contains" builtin for simplicity,
 // but array literals are not yet supported in expressions.
 isProtectedBranch: {

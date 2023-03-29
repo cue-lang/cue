@@ -21,6 +21,8 @@ import (
 	"os"
 	"regexp"
 	"testing"
+
+	"cuelang.org/go/internal/tdtest"
 )
 
 const (
@@ -93,6 +95,11 @@ func Condition(cond string) (bool, error) {
 		return Long, nil
 	}
 	return false, fmt.Errorf("unknown condition %v", cond)
+}
+
+// NewTD creates a new table-driven test using the CUE testing defaults.
+func NewTD[TC any](t *testing.T, table []TC) *tdtest.Set[TC] {
+	return tdtest.New(t, table, &tdtest.Config{Update: UpdateGoldenFiles})
 }
 
 // IssueSkip causes the test t to be skipped unless the issue identified

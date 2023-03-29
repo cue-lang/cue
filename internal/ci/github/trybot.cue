@@ -75,7 +75,6 @@ workflows: trybot: _repo.bashWorkflow & {
 				},
 				_goCheck,
 				_repo.checkGitClean,
-				_pullThroughProxy,
 			]
 		}
 	}
@@ -86,42 +85,6 @@ workflows: trybot: _repo.bashWorkflow & {
 			"go-version": ["1.19.x", _repo.latestStableGo]
 			os: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
 		}
-	}
-
-	_pullThroughProxy: json.#step & {
-		name: "Pull this commit through the proxy on \(_repo.defaultBranch)"
-		run: """
-			v=$(git rev-parse HEAD)
-			cd $(mktemp -d)
-			go mod init test
-
-			# Try up to five times if we get a 410 error, which either the proxy or sumdb
-			# can return if they haven't retrieved the requested version yet.
-			for i in {1..5}; do
-				# GitHub Actions defaults to "set -eo pipefail", so we use an if clause to
-				# avoid stopping too early. We also use a "failed" file as "go get" runs
-				# in a subshell via the pipe.
-				rm -f failed
-				if ! GOPROXY=https://proxy.golang.org go get cuelang.org/go@$v; then
-					touch failed
-				fi |& tee output.txt
-
-				if [[ -f failed ]]; then
-					if grep -q '410 Gone' output.txt; then
-						echo "got a 410; retrying"
-						sleep 1s # do not be too impatient
-						continue
-					fi
-					exit 1 # some other failure; stop
-				else
-					exit 0 # success; stop
-				fi
-			done
-
-			echo "giving up after a number of retries"
-			exit 1
-			"""
-		if: "\(_repo.isProtectedBranch) && \(_repo.isLatestLinux)"
 	}
 
 	_goGenerate: json.#step & {

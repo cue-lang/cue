@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4d477cb_c667fb36",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T11:40:00Z",
+      "side": 1,
+      "message": "s/ in / as /\n?",
+      "revId": "773d7db07da5485ffb0243ebaaeaae099e9a689c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6a187da_eea24823",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 744,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T11:40:00Z",
+      "side": 1,
+      "message": "FWIW I have no idea what this method does.",
+      "revId": "773d7db07da5485ffb0243ebaaeaae099e9a689c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c102d75d_eaa26c23",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 747,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T11:40:00Z",
+      "side": 1,
+      "message": "if x, ok :\u003d v.(*Vertex); ok \u0026\u0026 x.Accept(ctx, f) {\n        return true\n    }\n?",
+      "revId": "773d7db07da5485ffb0243ebaaeaae099e9a689c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdce47f5_0e11c529",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 300,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T11:40:00Z",
+      "side": 1,
+      "message": "or just shadow d?",
+      "revId": "773d7db07da5485ffb0243ebaaeaae099e9a689c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eba51fb5_250eab91",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1772,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T11:40:00Z",
+      "side": 1,
+      "message": "s/NumDefault/NumDefaults/",
+      "revId": "773d7db07da5485ffb0243ebaaeaae099e9a689c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

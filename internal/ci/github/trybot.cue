@@ -26,7 +26,7 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	on: {
 		push: {
-			branches: list.Concat([["trybot/*/*", _repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
+			branches: list.Concat([[_repo.testDefaultBranch], _repo.protectedBranchPatterns]) // do not run PR branches
 			"tags-ignore": [_repo.releaseTagPattern]
 		}
 		pull_request: {}

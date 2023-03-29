@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3fdd331_a0a55490",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:03:46Z",
+      "side": 1,
+      "message": "ArcNonExisting\n\nAlthough I think that probably ArcNonExistent (ArcNonexistent would also work) reads better.\nOr ArcNotPresent?",
+      "revId": "0991fd1d0db15149e6da79db234430e25dd56c87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76773adb_3e36f8fe",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:03:46Z",
+      "side": 1,
+      "message": "LGTM with a couple of naming suggestions, thanks!",
+      "revId": "0991fd1d0db15149e6da79db234430e25dd56c87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16010e56_eda97ff4",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 317,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:03:46Z",
+      "side": 1,
+      "message": "I don\u0027t quite understand why this is `*` (pending) and not `-` (non-existent).",
+      "revId": "0991fd1d0db15149e6da79db234430e25dd56c87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5856b8d5_4a42cfd3",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:03:46Z",
+      "side": 1,
+      "message": "s/fined/find/",
+      "revId": "0991fd1d0db15149e6da79db234430e25dd56c87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10670cf2_69e0012d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 297,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-03-29T14:03:46Z",
+      "side": 1,
+      "message": "I\u0027m slightly puzzled by this. This method is often used negated, as in `if !v.exists()`, but isn\u0027t it the case that if an arc is of type ArcPending, it might or might not exist? So AFAICS `if !v.exists()` doesn\u0027t imply that the vertex doesn\u0027t actually exist, as a naive reading of that condition might imply, just that it doesn\u0027t definitely not exist. Maybe a better name might be `definitelyExists` ?",
+      "revId": "0991fd1d0db15149e6da79db234430e25dd56c87",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -3,8 +3,18 @@ package base
 // This file contains gerrithub related definitions etc
 
 import (
+	"strings"
+
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 )
+
+// trybotWorkflows is a template for trybot-based repos
+trybotWorkflows: {
+	(trybot.key):                json.#Workflow
+	"\(trybot.key)_dispatch":    trybotDispatchWorkflow
+	"push_tip_to_\(trybot.key)": pushTipToTrybotWorkflow
+	"evict_caches":              evictCaches
+}
 
 trybotDispatchWorkflow: bashWorkflow & {
 	_#branchNameExpression: "\(trybot.key)/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}/${{ steps.gerrithub_ref.outputs.gerrithub_ref }}"
@@ -99,6 +109,99 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 		]
 	}
 
+}
+
+// evictCaches removes "old" GitHub actions caches from the main repo and the
+// accompanying trybot  The job is only run in the main repo, because
+// that is the only place where the credentials exist.
+//
+// The GitHub actions caches in the main and trybot repos can get large. So
+// large in fact we got the following warning from GitHub:
+//
+//   "Approaching total cache storage limit (34.5 GB of 10 GB Used)"
+//
+// Yes, you did read that right.
+//
+// Not only does this have the effect of causing us to breach "limits" it also
+// means that we can't be sure that individual caches are not bloated.
+//
+// Fix that by purging the actions caches on a daily basis at 0200, followed 15
+// mins later by a re-run of the tip trybots to repopulate the caches so they
+// are warm and minimal.
+//
+// In testing with @mvdan, this resulted in cache sizes for Linux dropping from
+// ~1GB to ~125MB. This is a considerable saving.
+//
+// Note this currently removes all cache entries, regardless of whether they
+// are go-related or not. We should revisit this later.
+evictCaches: bashWorkflow & {
+	name: "Evict caches"
+
+	on: {
+		schedule: [
+			{cron: "0 2 * * *"},
+		]
+	}
+
+	jobs: {
+		test: {
+			// We only want to run this in the main repo
+			if:        "${{github.repository == '\(githubRepositoryPath)'}}"
+			"runs-on": linuxMachine
+			steps: [
+				json.#step & {
+					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
+
+					// rerunLatestWorkflow runs the latest trybot workflow in the
+					// specified repo for branches that match the specified branch.
+					let rerunLatestWorkflow = {
+						#repo:   string
+						#branch: string
+						"""
+						id=$(\(curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/\(trybot.key).yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
+						\(curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
+
+						"""
+					}
+
+					run: """
+						set -eux
+
+						echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
+						gh extension install actions/gh-actions-cache
+						for i in \(githubRepositoryURL) \(trybotRepositoryURL)
+						do
+							echo "Evicting caches for $i"
+							cd $(mktemp -d)
+							git init
+							git remote add origin $i
+							for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
+							do
+								gh actions-cache delete --confirm $j
+							done
+						done
+
+						# Now trigger the most recent workflow run on each of the default branches.
+						# We do this by listing all the branches on the main repo and finding those
+						# which match the protected branch patterns (globs).
+						for j in $(\(curlGitHubAPI) -f https://api.github.com/repos/\(githubRepositoryPath)/branches | jq -r '.[] | .name')
+						do
+							for i in \(branchPatterns)
+							do
+								if [[ "$j" != $i ]]; then
+									continue
+								fi
+
+								echo "$j is a match with $i"
+								\(rerunLatestWorkflow & {#repo: githubRepositoryPath, #branch: "$j", _})
+								\(rerunLatestWorkflow & {#repo: trybotRepositoryPath, #branch: "$j", _})
+							done
+						done
+						"""
+				},
+			]
+		}
+	}
 }
 
 writeNetrcFile: json.#step & {

@@ -37,29 +37,40 @@ workflows: trybot: _repo.bashWorkflow & {
 			strategy:  _testStrategy
 			"runs-on": "${{ matrix.os }}"
 
+			let goVersion = "${{ matrix.go-version }}"
+
+			let _setupGoActionsCaches = _repo.setupGoActionsCaches & {
+				#goVersion: goVersion
+				#os:        "${{ matrix.os }}"
+				_
+			}
+
 			steps: [
 				for v in _repo.checkoutCode {v},
-				_repo.installGo,
+
+				_repo.installGo & {
+					with: "go-version": goVersion
+				},
 
 				// cachePre must come after installing Node and Go, because the cache locations
 				// are established by running each tool.
-				for v in _repo.setupGoActionsCaches {v},
+				for v in _setupGoActionsCaches {v},
 
 				_repo.earlyChecks & {
 					// These checks don't vary based on the Go version or OS,
 					// so we only need to run them on one of the matrix jobs.
-					if: _repo.isLatestLinux
+					if: _isLatestLinux
 				},
 				json.#step & {
-					if:  "\(_repo.isProtectedBranch) || \(_repo.isLatestLinux)"
+					if:  "\(_repo.isProtectedBranch) || \(_isLatestLinux)"
 					run: "echo CUE_LONG=true >> $GITHUB_ENV"
 				},
 				_goGenerate,
 				_goTest & {
-					if: "\(_repo.isProtectedBranch) || !\(_repo.isLatestLinux)"
+					if: "\(_repo.isProtectedBranch) || !\(_isLatestLinux)"
 				},
 				_goTestRace & {
-					if: _repo.isLatestLinux
+					if: _isLatestLinux
 				},
 				_goCheck,
 				_repo.checkGitClean,
@@ -75,12 +86,18 @@ workflows: trybot: _repo.bashWorkflow & {
 		}
 	}
 
+	// _isLatestLinux returns a GitHub expression that evaluates to true if the job
+	// is running on Linux with the latest version of Go. This expression is often
+	// used to run certain steps just once per CI workflow, to avoid duplicated
+	// work.
+	_isLatestLinux: "(matrix.go-version == '\(_repo.latestStableGo)' && matrix.os == '\(_repo.linuxMachine)')"
+
 	_goGenerate: json.#step & {
 		name: "Generate"
 		run:  "go generate ./..."
 		// The Go version corresponds to the precise version specified in
 		// the matrix. Skip windows for now until we work out why re-gen is flaky
-		if: _repo.isLatestLinux
+		if: _isLatestLinux
 	}
 
 	_goTest: json.#step & {
@@ -95,7 +112,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
-		if:   "\(_repo.isLatestLinux)"
+		if:   "\(_isLatestLinux)"
 		name: "Check"
 		run:  "go vet ./..."
 	}

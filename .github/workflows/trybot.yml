@@ -53,16 +53,16 @@ jobs:
           path: |-
             ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
             ${{ steps.go-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
+          key: ${{ matrix.os }}-${{ matrix.go-version }}-${{ github.run_id }}
+          restore-keys: ${{ matrix.os }}-${{ matrix.go-version }}
       - if: '! (github.ref == ''refs/heads/master'' || startsWith(github.ref, ''refs/heads/release-branch.''))'
         uses: actions/cache/restore@v3
         with:
           path: |-
             ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
             ${{ steps.go-cache-dir.outputs.dir }}
-          key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
-          restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
+          key: ${{ matrix.os }}-${{ matrix.go-version }}-${{ github.run_id }}
+          restore-keys: ${{ matrix.os }}-${{ matrix.go-version }}
       - if: github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || github.ref == 'refs/heads/ci/test')
         run: go clean -testcache
       - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')

@@ -18,11 +18,11 @@ jobs:
         go-version:
           - 1.19.x
           - 1.20.x
-        os:
+        runner:
           - ubuntu-22.04
           - macos-11
           - windows-2022
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.runner }}
     defaults:
       run:
         shell: bash
@@ -65,7 +65,7 @@ jobs:
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
       - if: github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || github.ref == 'refs/heads/ci/test')
         run: go clean -testcache
-      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.20.x' && matrix.runner == 'ubuntu-22.04')
         name: Early git and code sanity checks
         run: |-
           # Ensure the recent commit messages have Signed-off-by headers.
@@ -119,18 +119,18 @@ jobs:
           	echo "commit author email address does not match signed-off-by trailer"
           	exit 1
           fi
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || (matrix.go-version == '1.20.x' && matrix.runner == 'ubuntu-22.04')
         run: echo CUE_LONG=true >> $GITHUB_ENV
-      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.20.x' && matrix.runner == 'ubuntu-22.04')
         name: Generate
         run: go generate ./...
-      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || !(matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
+      - if: (github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) || !(matrix.go-version == '1.20.x' && matrix.runner == 'ubuntu-22.04')
         name: Test
         run: go test ./...
-      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.20.x' && matrix.runner == 'ubuntu-22.04')
         name: Test with -race
         run: go test -race ./...
-      - if: (matrix.go-version == '1.20.x' && matrix.os == 'ubuntu-22.04')
+      - if: (matrix.go-version == '1.20.x' && matrix.runner == 'ubuntu-22.04')
         name: Check
         run: go vet ./...
       - name: Check that git is clean at the end of the job

@@ -56,9 +56,3 @@ zeroReleaseTagSuffix: "-0.dev"
 zeroReleaseTagPattern: "*" + zeroReleaseTagSuffix
 
 codeReview: "cue-unity": unityRepositoryURL
-
-// isLatestLinux returns a GitHub expression that evaluates to true if the job
-// is running on Linux with the latest version of Go. This expression is often
-// used to run certain steps just once per CI workflow, to avoid duplicated
-// work.
-isLatestLinux: "(matrix.go-version == '\(latestStableGo)' && matrix.os == '\(linuxMachine)')"

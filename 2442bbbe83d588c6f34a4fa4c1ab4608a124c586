@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1af782be_816eacda",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-03-30T10:52:50Z",
+      "side": 1,
+      "message": "Removing hold, this is ready for review along with the others in the stack.",
+      "revId": "2442bbbe83d588c6f34a4fa4c1ab4608a124c586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

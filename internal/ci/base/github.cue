@@ -20,7 +20,7 @@ installGo: json.#step & {
 	with: {
 		// We do our own caching in setupGoActionsCaches.
 		cache:        false
-		"go-version": *"${{ matrix.go-version }}" | string
+		"go-version": string
 	}
 }
 
@@ -135,6 +135,7 @@ setupGoActionsCaches: {
 	// encapsulates our needs.
 	#readonly:       *false | bool
 	#cleanTestCache: *!#readonly | bool
+	#goVersion:      string
 
 	let goModCacheDirID = "go-mod-cache-dir"
 	let goCacheDirID = "go-cache-dir"
@@ -144,7 +145,7 @@ setupGoActionsCaches: {
 	// that participate in Go caching.
 	let cacheDirs = [ "${{ steps.\(goModCacheDirID).outputs.dir }}/cache/download", "${{ steps.\(goCacheDirID).outputs.dir }}"]
 
-	let cacheRestoreKeys = "${{ runner.os }}-${{ matrix.go-version }}"
+	let cacheRestoreKeys = "${{ runner.os }}-\(#goVersion)"
 
 	let cacheStep = json.#step & {
 		with: {

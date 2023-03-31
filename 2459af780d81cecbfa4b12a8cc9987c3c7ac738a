@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "559157be_e7d5e547",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-31T20:43:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3aa6fd92_ce0372db",
+      "revId": "2459af780d81cecbfa4b12a8cc9987c3c7ac738a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b261b246_3631b270",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-29T14:05:58Z",
       "side": 1,
       "message": "It would be nice to document what this function does...",
+      "revId": "2459af780d81cecbfa4b12a8cc9987c3c7ac738a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47e5caf0_b8aa95e8",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2128,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-03-31T20:43:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b261b246_3631b270",
       "revId": "2459af780d81cecbfa4b12a8cc9987c3c7ac738a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

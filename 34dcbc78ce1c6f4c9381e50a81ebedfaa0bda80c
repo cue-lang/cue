@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2352f0a_746096ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T15:04:47Z",
+      "side": 1,
+      "message": "Now that we have merged all other CI changes, these will have to be force-approved because we can\u0027t trigger CI the old way.",
+      "revId": "34dcbc78ce1c6f4c9381e50a81ebedfaa0bda80c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

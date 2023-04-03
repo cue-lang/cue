@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "007c4a3c_65ef64f0",
+        "filename": ".github/workflows/trybot_dispatch.yml",
+        "patchSetId": 151
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Per our chat, I will leave this for a follow-up.",
+      "parentUuid": "5434529e_3767c079",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ca13a7c_fa7b2794",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-04-03T10:19:26Z",
       "side": 1,
       "message": "heh, we end up with `toJSON(fromJSON(x))`. surely we can just use `x` here?\n\nand in fact I wonder if we could then avoid the `jq -c` dance, assuming it was this `toJSON` and `fromJSON` roundtrip that reordered keys.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bca15055_0a9229f9",
+        "filename": ".github/workflows/trybot_dispatch.yml",
+        "patchSetId": 151
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Per our chat, I will leave this for a follow-up.",
+      "parentUuid": "8ca13a7c_fa7b2794",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46303712_98bcd8e5",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Per our chat, I will leave this for a follow-up.",
+      "parentUuid": "c72eb884_0cc8ffb6",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b2d09b42_8b6b8db6",
@@ -99,6 +153,24 @@
       "writtenOn": "2023-04-03T10:19:26Z",
       "side": 1,
       "message": "I don\u0027t follow this. why is it important to never use the empty string as the result value?",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0017de69_160424da",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Because otherwise the call to `fromJSON()` in subsequent steps does not work. Setting a value of null is more \"precise\".",
+      "parentUuid": "b2d09b42_8b6b8db6",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +192,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "07054811_219b9e33",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Per our chat, I will leave this for a follow-up.",
+      "parentUuid": "64c0b673_71e18007",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aeaafaa0_423dc206",
@@ -133,6 +223,24 @@
       "writtenOn": "2023-04-03T10:19:26Z",
       "side": 1,
       "message": "perhaps document that we use a heredoc so that JSON\u0027s use of double quotes does not get interpreted as shell.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ef05109_fd9e910d",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Per our chat, I will leave this for a follow-up.",
+      "parentUuid": "aeaafaa0_423dc206",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +262,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0e36303_fc39a14e",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "If you look a couple of lines above, that happens already. The reason it can\u0027t appear on this line is that if we don\u0027t specify `#type` then we can\u0027t include a trailing `\"`.",
+      "parentUuid": "2c7addfc_93fc4dc0",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67e8cea3_cce8fb5e",
@@ -171,6 +297,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c8541aa_485306bb",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Fixed. It was to make my testing less noisy",
+      "parentUuid": "67e8cea3_cce8fb5e",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d201a052_b6fd8f0a",
@@ -184,6 +328,24 @@
       "writtenOn": "2023-04-03T10:19:26Z",
       "side": 1,
       "message": "why is this commented out?",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5bddaab_3221cc61",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T12:13:10Z",
+      "side": 1,
+      "message": "Fixed. It was to make my testing less noisy",
+      "parentUuid": "d201a052_b6fd8f0a",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

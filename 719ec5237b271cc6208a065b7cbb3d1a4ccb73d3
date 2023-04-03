@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c357cff9_8647d9ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T20:03:06Z",
+      "side": 1,
+      "message": "This has been tested by pushing to ci/test:\n\nhttps://github.com/cue-lang/cue/actions/runs/4600741589\n\nwhich led to:\n\nhttps://github.com/cue-lang/cue-trybot/actions/runs/4600744366",
+      "revId": "719ec5237b271cc6208a065b7cbb3d1a4ccb73d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

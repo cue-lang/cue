@@ -27,12 +27,17 @@ jobs:
         run: |-
           mkdir tmpgit
           cd tmpgit
-          git init
+          git init -b initialbranch
           git config user.name cueckoo
           git config user.email cueckoo@gmail.com
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
           git remote add origin https://review.gerrithub.io/a/cue-lang/cue
           git remote add trybot https://github.com/cue-lang/cue-trybot
+
+          # We fetch full depth here to ensure that from a consistency
+          # perspective, the conditions in the trybot repo on the
+          # default branch match the main repo for all workflows this
+          # might trigger.
           git fetch origin "${{ github.ref }}"
 
           success=false

@@ -65,7 +65,12 @@ trybotDispatchWorkflow: bashWorkflow & {
 					name: "Write fake payload"
 					id:   "payload"
 					if:   "github.repository == '\(githubRepositoryPath)' && github.ref == 'refs/heads/\(testDefaultBranch)'"
-					run:  #"""
+
+					// Use bash heredocs so that JSON's use of double quotes does
+					// not get interpreted as shell.  Both in the running of the
+					// command itself, which itself is the echo-ing of a command to
+					// $GITHUB_OUTPUT.
+					run: #"""
 						cat <<EOD >> $GITHUB_OUTPUT
 						value<<DOE
 						\#(encjson.Marshal(#dummyDispatch))
@@ -83,38 +88,27 @@ trybotDispatchWorkflow: bashWorkflow & {
 				// repository_dispatch payload is set, and one if not (i.e. we use
 				// the fake payload).
 				for v in cases {
+					let localBranchExpr = "local_${{ \(v.expr).targetBranch }}"
+					let targetBranchExpr = "${{ \(v.expr).targetBranch }}"
 					json.#step & {
 						name: "Trigger \(trybot.name) (\(v.nameSuffix))"
 						if:   "github.event.client_payload.type \(v.condition) '\(trybot.key)'"
 						run:  """
-						set -x
-
 						mkdir tmpgit
 						cd tmpgit
-						git init
+						git init -b initialbranch
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
 						git remote add origin  \(gerritHubRepositoryURL)
 
-						# We also (temporarily) get the default branch in order that
-						# we can "restore" the trybot repo to a good state for the
-						# current (i.e. previous) implementation of trybots which
-						# used PRs. If the target branch in the trybot repo is not
-						# current, then PR creation will fail because GitHub claims
-						# it cannot find any link between the commit in a PR (i.e.
-						# the CL under test in the previous setup) and the target
-						# branch which, under the new setup, might well currently
-						# be the commit from a CL.
-						git fetch origin ${{ \(v.expr).targetBranch }}
-
 						git fetch origin ${{ \(v.expr).ref }}
-						git checkout -b ${{ \(v.expr).targetBranch }} FETCH_HEAD
+						git checkout -b \(localBranchExpr) FETCH_HEAD
 
 						# Error if we already have dispatchTrailer according to git log logic.
 						# See earlier check for GitHub expression logic check.
 						x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
-						if [ "$x" != "" ]
+						if [[ "$x" != "" ]]
 						then
 							 echo "Ref ${{ \(v.expr).ref }} already has a \(dispatchTrailer)"
 							 exit 1
@@ -124,6 +118,9 @@ trybotDispatchWorkflow: bashWorkflow & {
 						# substitute or quote capability. So we do that in shell. We also strip out the
 						# indenting added by toJSON. We ensure that the type field is first in order
 						# that we can safely check for specific types of dispatch trailer.
+						#
+						# Use bash heredoc so that JSON's use of double quotes does
+						# not get interpreted as shell.
 						trailer="$(cat <<EOD | jq -c '{type} + .'
 						${{ toJSON(\(v.expr)) }}
 						EOD
@@ -134,22 +131,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 						success=false
 						for try in {1..20}; do
 							echo "Push to trybot try $try"
-							if git push -f \(trybotRepositoryURL) ${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
-								success=true
-								break
-							fi
-							sleep 1
-						done
-						if ! $success; then
-							echo "Giving up"
-							exit 1
-						fi
-
-						# Restore the default branch on the trybot repo to be the tip of the main repo
-						success=false
-						for try in {1..20}; do
-							echo "Push to trybot try $try"
-							if git push -f \(trybotRepositoryURL) origin/${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
+							if git push -f \(trybotRepositoryURL) \(localBranchExpr):\(targetBranchExpr); then
 								success=true
 								break
 							fi
@@ -190,12 +172,13 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 				run:  """
 						mkdir tmpgit
 						cd tmpgit
-						git init
+						git init -b initialbranch
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
 						git remote add origin \(gerritHubRepositoryURL)
 						git remote add trybot \(trybotRepositoryURL)
+
 						git fetch origin "${{ github.ref }}"
 
 						success=false
@@ -272,15 +255,13 @@ evictCaches: bashWorkflow & {
 					}
 
 					run: """
-						set -eux
-
 						echo ${{ secrets.\(botGitHubUserTokenSecretsKey) }} | gh auth login --with-token
 						gh extension install actions/gh-actions-cache
 						for i in \(githubRepositoryURL) \(trybotRepositoryURL)
 						do
 							echo "Evicting caches for $i"
 							cd $(mktemp -d)
-							git init
+							git init -b initialbranch
 							git remote add origin $i
 							for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
 							do

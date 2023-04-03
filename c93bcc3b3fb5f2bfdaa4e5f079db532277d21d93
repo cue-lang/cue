@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfad1abb_e9ce3963",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-03T16:36:46Z",
+      "side": 1,
+      "message": "LGTM module one minor query, thanks!",
+      "revId": "c93bcc3b3fb5f2bfdaa4e5f079db532277d21d93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5916ee3_78cf0c7b",
+        "filename": "cue/testdata/eval/required.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-03T16:36:46Z",
+      "side": 1,
+      "message": "Why isn\u0027t this also an error, given that `#A` is closed and doesn\u0027t have a field `b` ?",
+      "revId": "c93bcc3b3fb5f2bfdaa4e5f079db532277d21d93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

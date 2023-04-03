@@ -16,6 +16,23 @@
       "message": "still LGTM",
       "revId": "e21baa3cea5f31a3435d6f83d6cfe4beca95751e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bcf02e4_561cb24e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 153
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T14:08:19Z",
+      "side": 1,
+      "message": "Removing hold, and will submit as chief cueckoo because we can\u0027t run trybots on this change. ",
+      "revId": "e21baa3cea5f31a3435d6f83d6cfe4beca95751e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

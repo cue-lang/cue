@@ -67,7 +67,12 @@ trybotDispatchWorkflow: bashWorkflow & {
 					name: "Write fake payload"
 					id:   "payload"
 					if:   "github.repository == '\(githubRepositoryPath)' && github.ref == 'refs/heads/\(testDefaultBranch)'"
-					run:  #"""
+
+					// Use bash heredocs so that JSON's use of double quotes does
+					// not get interpreted as shell.  Both in the running of the
+					// command itself, which itself is the echo-ing of a command to
+					// $GITHUB_OUTPUT.
+					run: #"""
 						cat <<EOD >> $GITHUB_OUTPUT
 						value<<DOE
 						\#(encjson.Marshal(#dummyDispatch))
@@ -85,38 +90,27 @@ trybotDispatchWorkflow: bashWorkflow & {
 				// repository_dispatch payload is set, and one if not (i.e. we use
 				// the fake payload).
 				for v in cases {
+					let localBranchExpr = "local_${{ \(v.expr).targetBranch }}"
+					let targetBranchExpr = "${{ \(v.expr).targetBranch }}"
 					json.#step & {
 						name: "Trigger \(trybot.name) (\(v.nameSuffix))"
 						if:   "github.event.client_payload.type \(v.condition) '\(trybot.key)'"
 						run:  """
-						set -x
-
 						mkdir tmpgit
 						cd tmpgit
-						git init
+						git init -b initialbranch
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
 						git remote add origin  \(gerritHubRepositoryURL)
 
-						# We also (temporarily) get the default branch in order that
-						# we can "restore" the trybot repo to a good state for the
-						# current (i.e. previous) implementation of trybots which
-						# used PRs. If the target branch in the trybot repo is not
-						# current, then PR creation will fail because GitHub claims
-						# it cannot find any link between the commit in a PR (i.e.
-						# the CL under test in the previous setup) and the target
-						# branch which, under the new setup, might well currently
-						# be the commit from a CL.
-						git fetch origin ${{ \(v.expr).targetBranch }}
-
 						git fetch origin ${{ \(v.expr).ref }}
-						git checkout -b ${{ \(v.expr).targetBranch }} FETCH_HEAD
+						git checkout -b \(localBranchExpr) FETCH_HEAD
 
 						# Error if we already have dispatchTrailer according to git log logic.
 						# See earlier check for GitHub expression logic check.
 						x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
-						if [ "$x" != "" ]
+						if [[ "$x" != "" ]]
 						then
 							 echo "Ref ${{ \(v.expr).ref }} already has a \(dispatchTrailer)"
 							 exit 1
@@ -126,7 +120,10 @@ trybotDispatchWorkflow: bashWorkflow & {
 						# substitute or quote capability. So we do that in shell. We also strip out the
 						# indenting added by toJSON. We ensure that the type field is first in order
 						# that we can safely check for specific types of dispatch trailer.
-						trailer="$(cat <<EOD | jq -c '{type} + .'
+						#
+						# Use bash heredoc so that JSON's use of double quotes does
+						# not get interpreted as shell.
+						trailer="$(cat <<EOD | jq -r -c '{type} + .'
 						${{ toJSON(\(v.expr)) }}
 						EOD
 						)"
@@ -136,22 +133,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 						success=false
 						for try in {1..20}; do
 							echo "Push to trybot try $try"
-							if git push -f \(trybotRepositoryURL) ${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
-								success=true
-								break
-							fi
-							sleep 1
-						done
-						if ! $success; then
-							echo "Giving up"
-							exit 1
-						fi
-
-						# Restore the default branch on the trybot repo to be the tip of the main repo
-						success=false
-						for try in {1..20}; do
-							echo "Push to trybot try $try"
-							if git push -f \(trybotRepositoryURL) origin/${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
+							if git push -f \(trybotRepositoryURL) \(localBranchExpr):\(targetBranchExpr); then
 								success=true
 								break
 							fi
@@ -192,12 +174,13 @@ pushTipToTrybotWorkflow: bashWorkflow & {
 				run:  """
 						mkdir tmpgit
 						cd tmpgit
-						git init
+						git init -b initialbranch
 						git config user.name \(botGitHubUser)
 						git config user.email \(botGitHubUserEmail)
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
 						git remote add origin \(gerritHubRepositoryURL)
 						git remote add trybot \(trybotRepositoryURL)
+
 						git fetch origin "${{ github.ref }}"
 
 						success=false
@@ -250,6 +233,10 @@ evictCaches: bashWorkflow & {
 		schedule: [
 			{cron: "0 2 * * *"},
 		]
+		push: {
+			// To enable testing of the dispatch itself
+			branches: [testDefaultBranch]
+		}
 	}
 
 	jobs: {
@@ -258,23 +245,12 @@ evictCaches: bashWorkflow & {
 			if:        "${{github.repository == '\(githubRepositoryPath)'}}"
 			"runs-on": linuxMachine
 			steps: [
+				for v in checkoutCode {v},
+
 				json.#step & {
-					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
-
-					// rerunLatestWorkflow runs the latest trybot workflow in the
-					// specified repo for branches that match the specified branch.
-					let rerunLatestWorkflow = {
-						#repo:   string
-						#branch: string
-						"""
-						id=$(\(curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/\(trybot.key).yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
-						\(curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
-
-						"""
-					}
-
-					run: """
-						set -eux
+					name: "Delete caches"
+					run:  """
+						set -x
 
 						echo ${{ secrets.\(botGitHubUserTokenSecretsKey) }} | gh auth login --with-token
 						gh extension install actions/gh-actions-cache
@@ -282,13 +258,28 @@ evictCaches: bashWorkflow & {
 						do
 							echo "Evicting caches for $i"
 							cd $(mktemp -d)
-							git init
+							git init -b initialbranch
 							git remote add origin $i
 							for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
 							do
-								gh actions-cache delete --confirm $j
+							   gh actions-cache delete --confirm $j
 							done
 						done
+						"""
+				},
+
+				json.#step & {
+					name: "Trigger workflow runs to repopulate caches"
+					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
+
+					run: """
+						# Prepare git for pushes to trybot repo. Note
+						# because we have already checked out code we don't
+						# need origin. Fetch origin default branch for later use
+						git config user.name \(botGitHubUser)
+						git config user.email \(botGitHubUserEmail)
+						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
+						git remote add trybot \(trybotRepositoryURL)
 
 						# Now trigger the most recent workflow run on each of the default branches.
 						# We do this by listing all the branches on the main repo and finding those
@@ -298,12 +289,50 @@ evictCaches: bashWorkflow & {
 							for i in \(branchPatterns)
 							do
 								if [[ "$j" != $i ]]; then
-									continue
+								   continue
 								fi
 
-								echo "$j is a match with $i"
-								\(rerunLatestWorkflow & {#repo: githubRepositoryPath, #branch: "$j", _})
-								\(rerunLatestWorkflow & {#repo: trybotRepositoryPath, #branch: "$j", _})
+								echo Branch: $j
+								sha=$(\(curlGitHubAPI) "https://api.github.com/repos/\(githubRepositoryPath)/commits/$j" | jq -r '.sha')
+								echo Latest commit: $sha
+
+								echo "Trigger workflow on \(githubRepositoryPath)"
+								\(curlGitHubAPI) --fail-with-body -X POST https://api.github.com/repos/\(githubRepositoryPath)/actions/workflows/\(trybot.key+workflowFileExtension)/dispatches -d "{\\"ref\\":\\"$j\\"}"
+
+								# Ensure that the trybot repo has the latest commit for
+								# this branch.  If the force-push results in a commit
+								# being pushed, that will trigger the trybot workflows
+								# so we don't need to do anything, otherwise we need to
+								# trigger the most recent commit on that branch
+								git remote -v
+								git fetch origin refs/heads/$j
+								git log -1 FETCH_HEAD
+
+								success=false
+								for try in {1..20}; do
+									echo "Push to trybot try $try"
+									exitCode=0; push="$(git push -f trybot FETCH_HEAD:$j 2>&1)" || exitCode=$?
+									echo "$push"
+									if [ $exitCode -eq 0 ]; then
+										success=true
+										break
+									fi
+									sleep 1
+								done
+								if ! $success; then
+									echo "Giving up"
+									exit 1
+								fi
+
+								if $(echo "$push" | grep up-to-date)
+								then
+									# We are up-to-date, i.e. the push did nothing, hence we need to trigger a workflow_dispatch
+									# in the trybot repo.
+									echo "Trigger workflow on \(trybotRepositoryPath)"
+									\(curlGitHubAPI) --fail-with-body -X POST https://api.github.com/repos/\(trybotRepositoryPath)/actions/workflows/\(trybot.key+workflowFileExtension)/dispatches -d "{\\"ref\\":\\"$j\\"}"
+								else
+									echo "Force-push to \(trybotRepositoryPath) did work; nothing to do"
+								fi
 							done
 						done
 						"""

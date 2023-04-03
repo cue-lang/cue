@@ -46,9 +46,14 @@ jobs:
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
           if [[ "$x" == "" ]]
           then
-              x=null
+             # Some steps rely on the presence or otherwise of the Dispatch-Trailer.
+             # We know that we don't have a Dispatch-Trailer in this situation,
+             # hence we use the JSON value null in order to represent that state.
+             # This means that GitHub expressions can determine whether a Dispatch-Trailer
+             # is present or not by checking whether the fromJSON() result of the
+             # output from this step is the JSON value null or not.
+             x=null
           fi
-          echo "x is $x"
           echo "value<<EOD" >> $GITHUB_OUTPUT
           echo "$x" >> $GITHUB_OUTPUT
           echo "EOD" >> $GITHUB_OUTPUT

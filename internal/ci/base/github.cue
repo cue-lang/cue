@@ -67,12 +67,19 @@ checkoutCode: {
 				name: "Try to extract \(dispatchTrailer)"
 				id:   stepName
 				run:  """
+					set -eu
+
 					x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
 					if [[ "$x" == "" ]]
 					then
-					    x=null
+					   # Some steps rely on the presence or otherwise of the Dispatch-Trailer.
+					   # We know that we don't have a Dispatch-Trailer in this situation,
+					   # hence we use the JSON value null in order to represent that state.
+					   # This means that GitHub expressions can determine whether a Dispatch-Trailer
+					   # is present or not by checking whether the fromJSON() result of the
+					   # output from this step is the JSON value null or not.
+					   x=null
 					fi
-					echo "x is $x"
 					echo "value<<EOD" >> $GITHUB_OUTPUT
 					echo "$x" >> $GITHUB_OUTPUT
 					echo "EOD" >> $GITHUB_OUTPUT
@@ -86,6 +93,8 @@ checkoutCode: {
 			name: "Check we don't have \(dispatchTrailer) on a protected branch"
 			if:   "\(isProtectedBranch) && \(containsDispatchTrailer)"
 			run:  """
+				set -eu
+
 				echo "\(_dispatchTrailerVariable) contains \(dispatchTrailer)"
 				echo "\(_dispatchTrailerVariable) value"
 				cat <<EOD
@@ -104,6 +113,8 @@ checkoutCode: {
 earlyChecks: json.#step & {
 	name: "Early git and code sanity checks"
 	run: #"""
+		set -eu
+
 		# Ensure the recent commit messages have Signed-off-by headers.
 		# TODO: Remove once this is enforced for admins too;
 		# see https://bugs.chromium.org/p/gerrit/issues/detail?id=15229
@@ -314,6 +325,12 @@ dispatchTrailer: "Dispatch-Trailer"
 // approximation of the logic employed by git log.
 containsDispatchTrailer: {
 	#type?: string
+
+	// If we have a value for #type, then match against that value.
+	// Otherwise the best we can do is match against:
+	//
+	//     Dispatch-Trailer: {"type:}
+	//
 	let _typeCheck = [ if #type != _|_ {#type + "\""}, ""][0]
 	"""
 	(contains(\(_dispatchTrailerVariable), '\n\(dispatchTrailer): {"type":"\(_typeCheck)'))

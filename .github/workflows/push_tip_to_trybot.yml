@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
+          set -eu
+
           cat <<EOD > ~/.netrc
           machine review.gerrithub.io
           login cueckoo
@@ -25,9 +27,11 @@ jobs:
           chmod 600 ~/.netrc
       - name: Push tip to trybot
         run: |-
+          set -eu
+
           mkdir tmpgit
           cd tmpgit
-          git init
+          git init -b initialbranch
           git config user.name cueckoo
           git config user.email cueckoo@gmail.com
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"

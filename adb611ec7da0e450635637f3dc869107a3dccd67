@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42e1cb89_d18ad190",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T15:24:36Z",
+      "side": 1,
+      "message": "Ready to merge on a CR+2, I think.",
+      "revId": "adb611ec7da0e450635637f3dc869107a3dccd67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -236,6 +236,30 @@
       },
       "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2ec5769d_931647c6",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T15:24:36Z",
+      "side": 1,
+      "message": "Marcel and I had a brief chat about this CL last week. We agree that listing the GOARCH values just like we did with GOOS is fine. We\u0027ve gone in a circle as to whether or not to link to Go\u0027s documentation. I personally don\u0027t mind too much, but I tend to agree that we should avoid linking to Go docs. We\u0027re inclined to get this merged and bikeshed on the best way to maintain the documentation at a later time :) \n\n\u003e Also, isn\u0027t the actual list here a function of the Go version used to be (build?) cmd/cue? \n\nYes, though we can\u0027t control what Go version that is, as a user might have run `go install` themselves. This is a current snapshot of the list, which seems good enough for now.",
+      "parentUuid": "d328b6c4_6b111245",
+      "range": {
+        "startLine": 354,
+        "startChar": 0,
+        "endLine": 360,
+        "endChar": 54
+      },
+      "revId": "8f1f4d32a49566e5c5dc3c21daa831b3e1980c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

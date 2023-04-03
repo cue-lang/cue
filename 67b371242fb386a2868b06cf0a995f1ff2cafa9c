@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9365c2c9_76b783b5",
+        "filename": ".github/workflows/trybot_dispatch.yml",
+        "patchSetId": 151
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T16:54:55Z",
+      "side": 1,
+      "message": "There isn\u0027t a way to avoid it AFAICT. This expression evaluation is inherently a runtime thing. The only value that a step can output is a string value. Hence if a later step needs to depend on part of the structure of a previous step (structure that is encoded in JSON) it needs to call `fromJSON()`. I can\u0027t imagine this is very expensive in the JavaScript runtime.",
+      "parentUuid": "007c4a3c_65ef64f0",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8ca13a7c_fa7b2794",
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "Per our chat, I will leave this for a follow-up.",
       "parentUuid": "8ca13a7c_fa7b2794",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7eb15e7d_77c6df55",
+        "filename": ".github/workflows/trybot_dispatch.yml",
+        "patchSetId": 151
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T16:54:55Z",
+      "side": 1,
+      "message": "This is simply a side effect of us drying things up using CUE in the fake data situation. So again I\u0027m tempted to leave it. The source CUE is made much more readable by the current structure, a structure which we are forced into by virtue of https://github.com/cue-lang/cue/blob/c67fe60c23f5e14b2a8dac6e72db7ef6abac9460/internal/ci/base/gerrithub.cue#L77-L84",
+      "parentUuid": "bca15055_0a9229f9",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -140,6 +176,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39951c14_5bae38ff",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T16:54:55Z",
+      "side": 1,
+      "message": "Addressed in CL 552141.",
+      "parentUuid": "46303712_98bcd8e5",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b2d09b42_8b6b8db6",
@@ -193,6 +247,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "14474886_80ed5187",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T16:54:55Z",
+      "side": 1,
+      "message": "Addressed in CL 552141.",
+      "parentUuid": "b3912b95_9eeb79b2",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64c0b673_71e18007",
@@ -228,6 +300,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b41ebf3_cca6dbe4",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T16:54:55Z",
+      "side": 1,
+      "message": "Addressed in CL 552141.",
+      "parentUuid": "07054811_219b9e33",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aeaafaa0_423dc206",
@@ -259,6 +349,24 @@
       "side": 1,
       "message": "Per our chat, I will leave this for a follow-up.",
       "parentUuid": "aeaafaa0_423dc206",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74226dbe_e8910599",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T16:54:55Z",
+      "side": 1,
+      "message": "Addressed in CL 552141.",
+      "parentUuid": "6ef05109_fd9e910d",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -312,6 +420,24 @@
       "side": 1,
       "message": "huh, I missed that, and it\u0027s a bit subtle. I would also document this in the follow-up.",
       "parentUuid": "f0e36303_fc39a14e",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "029c9f22_21d4d4af",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-03T16:54:55Z",
+      "side": 1,
+      "message": "Addressed in CL 552141.",
+      "parentUuid": "0470c9f8_b7b7393e",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -28,7 +28,7 @@ jobs:
         run: |-
           cat <<EOD >> $GITHUB_OUTPUT
           value<<DOE
-          {"type":"trybot","patchset":153,"CL":551352,"targetBranch":"master","ref":"refs/changes/52/551352/153"}
+          {"type":"trybot","patchset":5,"CL":551352,"targetBranch":"master","ref":"refs/changes/52/551352/5"}
           DOE
           EOD
       - if: github.event.client_payload.type != 'trybot'
@@ -61,7 +61,7 @@ jobs:
           # Error if we already have dispatchTrailer according to git log logic.
           # See earlier check for GitHub expression logic check.
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
-          if [ "$x" != "" ]
+          if [[ "$x" != "" ]]
           then
           	 echo "Ref ${{ fromJSON(steps.payload.outputs.value).ref }} already has a Dispatch-Trailer"
           	 exit 1
@@ -71,6 +71,9 @@ jobs:
           # substitute or quote capability. So we do that in shell. We also strip out the
           # indenting added by toJSON. We ensure that the type field is first in order
           # that we can safely check for specific types of dispatch trailer.
+          #
+          # Use bash heredoc so that JSON's use of double quotes does
+          # not get interpreted as shell.
           trailer="$(cat <<EOD | jq -c '{type} + .'
           ${{ toJSON(fromJSON(steps.payload.outputs.value)) }}
           EOD
@@ -82,21 +85,6 @@ jobs:
           for try in {1..20}; do
           	echo "Push to trybot try $try"
           	if git push -f https://github.com/cue-lang/cue-trybot ${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
-          		success=true
-          		break
-          	fi
-          	sleep 1
-          done
-          if ! $success; then
-          	echo "Giving up"
-          	exit 1
-          fi
-
-          # Restore the default branch on the trybot repo to be the tip of the main repo
-          success=false
-          for try in {1..20}; do
-          	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
           		success=true
           		break
           	fi
@@ -136,7 +124,7 @@ jobs:
           # Error if we already have dispatchTrailer according to git log logic.
           # See earlier check for GitHub expression logic check.
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
-          if [ "$x" != "" ]
+          if [[ "$x" != "" ]]
           then
           	 echo "Ref ${{ github.event.client_payload.ref }} already has a Dispatch-Trailer"
           	 exit 1
@@ -146,6 +134,9 @@ jobs:
           # substitute or quote capability. So we do that in shell. We also strip out the
           # indenting added by toJSON. We ensure that the type field is first in order
           # that we can safely check for specific types of dispatch trailer.
+          #
+          # Use bash heredoc so that JSON's use of double quotes does
+          # not get interpreted as shell.
           trailer="$(cat <<EOD | jq -c '{type} + .'
           ${{ toJSON(github.event.client_payload) }}
           EOD
@@ -157,21 +148,6 @@ jobs:
           for try in {1..20}; do
           	echo "Push to trybot try $try"
           	if git push -f https://github.com/cue-lang/cue-trybot ${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
-          		success=true
-          		break
-          	fi
-          	sleep 1
-          done
-          if ! $success; then
-          	echo "Giving up"
-          	exit 1
-          fi
-
-          # Restore the default branch on the trybot repo to be the tip of the main repo
-          success=false
-          for try in {1..20}; do
-          	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
           		success=true
           		break
           	fi

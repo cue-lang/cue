@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "5434529e_3767c079",
+        "filename": ".github/workflows/trybot_dispatch.yml",
+        "patchSetId": 151
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "we end up calling `fromJSON(steps.payload.outputs.value)` at least nine times; I wonder if there\u0027s a way to avoid that. I can\u0027t imagine it will be terribly efficient on the github actions side.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ca13a7c_fa7b2794",
+        "filename": ".github/workflows/trybot_dispatch.yml",
+        "patchSetId": 151
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "heh, we end up with `toJSON(fromJSON(x))`. surely we can just use `x` here?\n\nand in fact I wonder if we could then avoid the `jq -c` dance, assuming it was this `toJSON` and `fromJSON` roundtrip that reordered keys.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "4719c171_c7b042f3",
@@ -14,6 +48,142 @@
       "writtenOn": "2023-04-03T09:06:08Z",
       "side": 1,
       "message": "Marking with a hold so that we can carefully coordinate the \"atomic\" submit of this and relates CLs/PRs.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cabfcd6_5122bfdb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 151
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "did part of the review on the generated config, as it is at times easier to see the resulting behavior without the templating in the way.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c72eb884_0cc8ffb6",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "nit: use `if [[ $x !\u003d \"\" ]]; then`. [[ is almost always better with bash, it\u0027s got fewer footguns, and doesn\u0027t need as much quoting to be safe.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2d09b42_8b6b8db6",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "I don\u0027t follow this. why is it important to never use the empty string as the result value?",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64c0b673_71e18007",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "presumably just for debugging, delete?",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aeaafaa0_423dc206",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "perhaps document that we use a heredoc so that JSON\u0027s use of double quotes does not get interpreted as shell.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c7addfc_93fc4dc0",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "nit: I would include a JSON double quote after the type name, so that when matching `trybot`, we match `\"type\":\"trybot\"` but not `\"type\":\"trybot-foo\"`.",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67e8cea3_cce8fb5e",
+        "filename": "internal/ci/github/release.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "why is this commented out?",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d201a052_b6fd8f0a",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T10:19:26Z",
+      "side": 1,
+      "message": "why is this commented out?",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -65,7 +65,12 @@ trybotDispatchWorkflow: bashWorkflow & {
 					name: "Write fake payload"
 					id:   "payload"
 					if:   "github.repository == '\(githubRepositoryPath)' && github.ref == 'refs/heads/\(testDefaultBranch)'"
-					run:  #"""
+
+					// Use bash heredocs so that JSON's use of double quotes does
+					// not get interpreted as shell.  Both in the running of the
+					// command itself, which itself is the echo-ing of a command to
+					// $GITHUB_OUTPUT.
+					run: #"""
 						cat <<EOD >> $GITHUB_OUTPUT
 						value<<DOE
 						\#(encjson.Marshal(#dummyDispatch))
@@ -114,7 +119,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 						# Error if we already have dispatchTrailer according to git log logic.
 						# See earlier check for GitHub expression logic check.
 						x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
-						if [ "$x" != "" ]
+						if [[ "$x" != "" ]]
 						then
 							 echo "Ref ${{ \(v.expr).ref }} already has a \(dispatchTrailer)"
 							 exit 1
@@ -124,6 +129,9 @@ trybotDispatchWorkflow: bashWorkflow & {
 						# substitute or quote capability. So we do that in shell. We also strip out the
 						# indenting added by toJSON. We ensure that the type field is first in order
 						# that we can safely check for specific types of dispatch trailer.
+						#
+						# Use bash heredoc so that JSON's use of double quotes does
+						# not get interpreted as shell.
 						trailer="$(cat <<EOD | jq -c '{type} + .'
 						${{ toJSON(\(v.expr)) }}
 						EOD
@@ -135,21 +143,6 @@ trybotDispatchWorkflow: bashWorkflow & {
 						for try in {1..20}; do
 							echo "Push to trybot try $try"
 							if git push -f \(trybotRepositoryURL) ${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
-								success=true
-								break
-							fi
-							sleep 1
-						done
-						if ! $success; then
-							echo "Giving up"
-							exit 1
-						fi
-
-						# Restore the default branch on the trybot repo to be the tip of the main repo
-						success=false
-						for try in {1..20}; do
-							echo "Push to trybot try $try"
-							if git push -f \(trybotRepositoryURL) origin/${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
 								success=true
 								break
 							fi

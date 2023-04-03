@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
+          set -eu
+
           cat <<EOD > ~/.netrc
           machine review.gerrithub.io
           login cueckoo
@@ -25,6 +27,8 @@ jobs:
           chmod 600 ~/.netrc
       - name: Push tip to trybot
         run: |-
+          set -eu
+
           mkdir tmpgit
           cd tmpgit
           git init

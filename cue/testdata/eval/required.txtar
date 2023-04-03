@@ -30,6 +30,13 @@ unify: t2: p2: {
 #Def: t1: {
 	a!: int
 }
+
+allowed: issue2306: {
+	#A: a!: int
+	#A: #B
+
+	#B: b!: int
+}
 -- out/compile --
 --- in.cue
 {
@@ -81,17 +88,28 @@ unify: t2: p2: {
       a!: int
     }
   }
+  allowed: {
+    issue2306: {
+      #A: {
+        a!: int
+      }
+      #A: 〈0;#B〉
+      #B: {
+        b!: int
+      }
+    }
+  }
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  20
-Reused: 15
-Allocs: 5
-Retain: 0
+Freed:  27
+Reused: 21
+Allocs: 6
+Retain: 1
 
-Unifications: 20
-Conjuncts:    31
-Disjuncts:    20
+Unifications: 27
+Conjuncts:    40
+Disjuncts:    28
 -- out/eval --
 Errors:
 self.t2.a: field is required but not present
@@ -129,6 +147,22 @@ Result:
   #Def: (#struct){
     t1: (#struct){
       a!: (int){ int }
+    }
+  }
+  allowed: (struct){
+    issue2306: (struct){
+      #A: (#struct){
+        a!: (_|_){
+          // [eval] allowed.issue2306.#A.a: field not allowed:
+          //     ./in.cue:34:6
+          //     ./in.cue:35:6
+          //     ./in.cue:37:6
+        }
+        b!: (int){ int }
+      }
+      #B: (#struct){
+        b!: (int){ int }
+      }
     }
   }
 }

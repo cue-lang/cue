@@ -720,7 +720,7 @@ func (n *nodeContext) checkClosed(state vertexStatus) bool {
 	ignore := state != finalized || n.skipNonMonotonicChecks()
 
 	v := n.node
-	if !v.Label.IsInt() && v.Parent != nil && !ignore && v.isDefined() {
+	if !v.Label.IsInt() && v.Parent != nil && !ignore && v.ArcType <= ArcRequired {
 		ctx := n.ctx
 		// Visit arcs recursively to validate and compute error.
 		if _, err := verifyArc2(ctx, v.Label, v, v.Closed); err != nil {

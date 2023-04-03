@@ -104,6 +104,7 @@ jobs:
           github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || github.ref == 'refs/heads/ci/test')
         run: go clean -testcache
+      - run: echo hello world!
       - if: (matrix.go-version == '1.20.x' && matrix.runner == 'ubuntu-22.04')
         name: Early git and code sanity checks
         run: |-

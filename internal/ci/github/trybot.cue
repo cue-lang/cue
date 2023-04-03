@@ -60,7 +60,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				for v in _setupGoActionsCaches {v},
 
 				json.#step & {
-					run: "echo hello world"
+					run: "echo hello world!"
 				},
 
 				_repo.earlyChecks & {

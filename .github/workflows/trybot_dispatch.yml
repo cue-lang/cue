@@ -91,21 +91,6 @@ jobs:
           	echo "Giving up"
           	exit 1
           fi
-
-          # Restore the default branch on the trybot repo to be the tip of the main repo
-          success=false
-          for try in {1..20}; do
-          	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
-          		success=true
-          		break
-          	fi
-          	sleep 1
-          done
-          if ! $success; then
-          	echo "Giving up"
-          	exit 1
-          fi
       - if: github.event.client_payload.type == 'trybot'
         name: Trigger TryBot (repository_dispatch payload)
         run: |-
@@ -157,21 +142,6 @@ jobs:
           for try in {1..20}; do
           	echo "Push to trybot try $try"
           	if git push -f https://github.com/cue-lang/cue-trybot ${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
-          		success=true
-          		break
-          	fi
-          	sleep 1
-          done
-          if ! $success; then
-          	echo "Giving up"
-          	exit 1
-          fi
-
-          # Restore the default branch on the trybot repo to be the tip of the main repo
-          success=false
-          for try in {1..20}; do
-          	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
           		success=true
           		break
           	fi

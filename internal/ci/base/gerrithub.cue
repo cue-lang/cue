@@ -144,21 +144,6 @@ trybotDispatchWorkflow: bashWorkflow & {
 							echo "Giving up"
 							exit 1
 						fi
-
-						# Restore the default branch on the trybot repo to be the tip of the main repo
-						success=false
-						for try in {1..20}; do
-							echo "Push to trybot try $try"
-							if git push -f \(trybotRepositoryURL) origin/${{ \(v.expr).targetBranch }}:${{ \(v.expr).targetBranch }}; then
-								success=true
-								break
-							fi
-							sleep 1
-						done
-						if ! $success; then
-							echo "Giving up"
-							exit 1
-						fi
 						"""
 					}
 				},

@@ -175,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3912b95_9eeb79b2",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T12:16:35Z",
+      "side": 1,
+      "message": "Ack; in your follow-up, it would be good to document this.",
+      "parentUuid": "0017de69_160424da",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "64c0b673_71e18007",
@@ -276,6 +294,24 @@
       "side": 1,
       "message": "If you look a couple of lines above, that happens already. The reason it can\u0027t appear on this line is that if we don\u0027t specify `#type` then we can\u0027t include a trailing `\"`.",
       "parentUuid": "2c7addfc_93fc4dc0",
+      "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0470c9f8_b7b7393e",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 151
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T12:16:35Z",
+      "side": 1,
+      "message": "huh, I missed that, and it\u0027s a bit subtle. I would also document this in the follow-up.",
+      "parentUuid": "f0e36303_fc39a14e",
       "revId": "67b371242fb386a2868b06cf0a995f1ff2cafa9c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

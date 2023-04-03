@@ -21,7 +21,7 @@ jobs:
           do
           	echo "Evicting caches for $i"
           	cd $(mktemp -d)
-          	git init
+          	git init -b initialbranch
           	git remote add origin $i
           	for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
           	do

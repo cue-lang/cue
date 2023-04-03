@@ -16,6 +16,8 @@ jobs:
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
+          set -eu
+
           cat <<EOD > ~/.netrc
           machine review.gerrithub.io
           login cueckoo
@@ -26,42 +28,33 @@ jobs:
         if: github.repository == 'cue-lang/cue' && github.ref == 'refs/heads/ci/test'
         name: Write fake payload
         run: |-
+          set -eu
+
           cat <<EOD >> $GITHUB_OUTPUT
           value<<DOE
-          {"type":"trybot","patchset":153,"CL":551352,"targetBranch":"master","ref":"refs/changes/52/551352/153"}
+          {"type":"trybot","CL":552141,"patchset":10,"targetBranch":"master","ref":"refs/changes/41/552141/10"}
           DOE
           EOD
       - if: github.event.client_payload.type != 'trybot'
         name: Trigger TryBot (fake data)
         run: |-
-          set -x
+          set -eux
 
           mkdir tmpgit
           cd tmpgit
-          git init
+          git init -b initialbranch
           git config user.name cueckoo
           git config user.email cueckoo@gmail.com
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
           git remote add origin  https://review.gerrithub.io/a/cue-lang/cue
 
-          # We also (temporarily) get the default branch in order that
-          # we can "restore" the trybot repo to a good state for the
-          # current (i.e. previous) implementation of trybots which
-          # used PRs. If the target branch in the trybot repo is not
-          # current, then PR creation will fail because GitHub claims
-          # it cannot find any link between the commit in a PR (i.e.
-          # the CL under test in the previous setup) and the target
-          # branch which, under the new setup, might well currently
-          # be the commit from a CL.
-          git fetch origin ${{ fromJSON(steps.payload.outputs.value).targetBranch }}
-
           git fetch origin ${{ fromJSON(steps.payload.outputs.value).ref }}
-          git checkout -b ${{ fromJSON(steps.payload.outputs.value).targetBranch }} FETCH_HEAD
+          git checkout -b local_${{ fromJSON(steps.payload.outputs.value).targetBranch }} FETCH_HEAD
 
           # Error if we already have dispatchTrailer according to git log logic.
           # See earlier check for GitHub expression logic check.
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
-          if [ "$x" != "" ]
+          if [[ "$x" != "" ]]
           then
           	 echo "Ref ${{ fromJSON(steps.payload.outputs.value).ref }} already has a Dispatch-Trailer"
           	 exit 1
@@ -71,6 +64,9 @@ jobs:
           # substitute or quote capability. So we do that in shell. We also strip out the
           # indenting added by toJSON. We ensure that the type field is first in order
           # that we can safely check for specific types of dispatch trailer.
+          #
+          # Use bash heredoc so that JSON's use of double quotes does
+          # not get interpreted as shell.
           trailer="$(cat <<EOD | jq -c '{type} + .'
           ${{ toJSON(fromJSON(steps.payload.outputs.value)) }}
           EOD
@@ -81,22 +77,7 @@ jobs:
           success=false
           for try in {1..20}; do
           	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot ${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
-          		success=true
-          		break
-          	fi
-          	sleep 1
-          done
-          if ! $success; then
-          	echo "Giving up"
-          	exit 1
-          fi
-
-          # Restore the default branch on the trybot repo to be the tip of the main repo
-          success=false
-          for try in {1..20}; do
-          	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
+          	if git push -f https://github.com/cue-lang/cue-trybot local_${{ fromJSON(steps.payload.outputs.value).targetBranch }}:${{ fromJSON(steps.payload.outputs.value).targetBranch }}; then
           		success=true
           		break
           	fi
@@ -109,34 +90,23 @@ jobs:
       - if: github.event.client_payload.type == 'trybot'
         name: Trigger TryBot (repository_dispatch payload)
         run: |-
-          set -x
+          set -eux
 
           mkdir tmpgit
           cd tmpgit
-          git init
+          git init -b initialbranch
           git config user.name cueckoo
           git config user.email cueckoo@gmail.com
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
           git remote add origin  https://review.gerrithub.io/a/cue-lang/cue
 
-          # We also (temporarily) get the default branch in order that
-          # we can "restore" the trybot repo to a good state for the
-          # current (i.e. previous) implementation of trybots which
-          # used PRs. If the target branch in the trybot repo is not
-          # current, then PR creation will fail because GitHub claims
-          # it cannot find any link between the commit in a PR (i.e.
-          # the CL under test in the previous setup) and the target
-          # branch which, under the new setup, might well currently
-          # be the commit from a CL.
-          git fetch origin ${{ github.event.client_payload.targetBranch }}
-
           git fetch origin ${{ github.event.client_payload.ref }}
-          git checkout -b ${{ github.event.client_payload.targetBranch }} FETCH_HEAD
+          git checkout -b local_${{ github.event.client_payload.targetBranch }} FETCH_HEAD
 
           # Error if we already have dispatchTrailer according to git log logic.
           # See earlier check for GitHub expression logic check.
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
-          if [ "$x" != "" ]
+          if [[ "$x" != "" ]]
           then
           	 echo "Ref ${{ github.event.client_payload.ref }} already has a Dispatch-Trailer"
           	 exit 1
@@ -146,6 +116,9 @@ jobs:
           # substitute or quote capability. So we do that in shell. We also strip out the
           # indenting added by toJSON. We ensure that the type field is first in order
           # that we can safely check for specific types of dispatch trailer.
+          #
+          # Use bash heredoc so that JSON's use of double quotes does
+          # not get interpreted as shell.
           trailer="$(cat <<EOD | jq -c '{type} + .'
           ${{ toJSON(github.event.client_payload) }}
           EOD
@@ -156,22 +129,7 @@ jobs:
           success=false
           for try in {1..20}; do
           	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot ${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
-          		success=true
-          		break
-          	fi
-          	sleep 1
-          done
-          if ! $success; then
-          	echo "Giving up"
-          	exit 1
-          fi
-
-          # Restore the default branch on the trybot repo to be the tip of the main repo
-          success=false
-          for try in {1..20}; do
-          	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot origin/${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
+          	if git push -f https://github.com/cue-lang/cue-trybot local_${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
           		success=true
           		break
           	fi

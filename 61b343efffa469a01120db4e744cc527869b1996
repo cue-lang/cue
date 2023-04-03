@@ -16,6 +16,23 @@
       "message": "Interesting, Joan was added as a reviewer automatically. I guess that happened because of the Signed-Off-By trailer.",
       "revId": "61b343efffa469a01120db4e744cc527869b1996",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e14c73d4_f08f2653",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-03T16:34:15Z",
+      "side": 1,
+      "message": "Copying my PR review.",
+      "revId": "61b343efffa469a01120db4e744cc527869b1996",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

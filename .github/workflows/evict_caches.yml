@@ -4,6 +4,9 @@ name: Evict caches
 "on":
   schedule:
     - cron: 0 2 * * *
+  push:
+    branches:
+      - ci/test
 jobs:
   test:
     if: ${{github.repository == 'cue-lang/cue'}}
@@ -12,40 +15,47 @@ jobs:
       run:
         shell: bash
     steps:
-      - run: |-
-          set -eux
-
-          echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token
-          gh extension install actions/gh-actions-cache
-          for i in https://github.com/cue-lang/cue https://github.com/cue-lang/cue-trybot
-          do
-          	echo "Evicting caches for $i"
-          	cd $(mktemp -d)
-          	git init
-          	git remote add origin $i
-          	for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
-          	do
-          		gh actions-cache delete --confirm $j
-          	done
-          done
-
-          # Now trigger the most recent workflow run on each of the default branches.
-          # We do this by listing all the branches on the main repo and finding those
-          # which match the protected branch patterns (globs).
-          for j in $(curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -f https://api.github.com/repos/cue-lang/cue/branches | jq -r '.[] | .name')
-          do
-          	for i in master release-branch.*
-          	do
-          		if [[ "$j" != $i ]]; then
-          			continue
-          		fi
-
-          		echo "$j is a match with $i"
-          		id=$(curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/cue-lang/cue/actions/workflows/trybot.yml/runs?branch=$j&event=push&per_page=1" | jq '.workflow_runs[] | .id')
-          curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -X POST https://api.github.com/repos/cue-lang/cue/actions/runs/$id/rerun
-
-          		id=$(curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" "https://api.github.com/repos/cue-lang/cue-trybot/actions/workflows/trybot.yml/runs?branch=$j&event=push&per_page=1" | jq '.workflow_runs[] | .id')
-          curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" -X POST https://api.github.com/repos/cue-lang/cue-trybot/actions/runs/$id/rerun
-
-          	done
-          done
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Reset git directory modification times
+        run: touch -t 202211302355 $(find * -type d)
+      - name: Restore git file modification times
+        uses: chetan/git-restore-mtime-action@075f9bc9d159805603419d50f794bd9f33252ebe
+      - id: DispatchTrailer
+        name: Try to extract Dispatch-Trailer
+        run: |-
+          x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
+          if [[ "$x" == "" ]]
+          then
+             # Some steps rely on the presence or otherwise of the Dispatch-Trailer.
+             # We know that we don't have a Dispatch-Trailer in this situation,
+             # hence we use the JSON value null in order to represent that state.
+             # This means that GitHub expressions can determine whether a Dispatch-Trailer
+             # is present or not by checking whether the fromJSON() result of the
+             # output from this step is the JSON value null or not.
+             x=null
+          fi
+          echo "value<<EOD" >> $GITHUB_OUTPUT
+          echo "$x" >> $GITHUB_OUTPUT
+          echo "EOD" >> $GITHUB_OUTPUT
+      - if: |-
+          ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) && (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"'))
+        name: Check we don't have Dispatch-Trailer on a protected branch
+        run: |-
+          echo "github.event.head_commit.message contains Dispatch-Trailer"
+          echo "github.event.head_commit.message value"
+          cat <<EOD
+          ${{ github.event.head_commit.message }}
+          EOD
+          echo "containsDispatchTrailer expression"
+          cat <<EOD
+          (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"'))
+          EOD
+          false
+      - run: "echo ${{ secrets.CUECKOO_GITHUB_PAT }} | gh auth login --with-token\ngh extension install actions/gh-actions-cache\nfor i in https://github.com/cue-lang/cue https://github.com/cue-lang/cue-trybot\ndo\n\techo \"Evicting caches for $i\"\n\tcd $(mktemp -d)\n\tgit init -b initialbranch\n\tgit remote add origin $i\n\tfor j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')\n\tdo\n\t\tgh actions-cache delete --confirm $j\n\tdone\ndone\n\n# Prepare git for pushes to trybot repo. Note\n# because we have already checked out code we don't\n# need origin\ngit config user.name cueckoo\ngit config user.email cueckoo@gmail.com\ngit config http.https://github.com/.extraheader \"AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)\"\ngit remote add trybot https://github.com/cue-lang/cue-trybot\n\n# Now trigger the most recent workflow run on each of the default branches.\n# We do this by listing all the branches on the main repo and finding those\n# which match the protected branch patterns (globs).\nfor j in $(curl -s -L -H \"Accept: application/vnd.github+json\" -H \"Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}\" -H \"X-GitHub-Api-Version: 2022-11-28\" -f https://api.github.com/repos/cue-lang/cue/branches | jq -r '.[] | .name')\ndo\n\tfor i in master release-branch.*\n\tdo\n\t\tif [[ \"$j\" != $i ]]; then\n\t\t   continue\n\t\tfi\n\n\t\techo Branch: $i\n\t\tsha=$(curl -s -L -H \"Accept: application/vnd.github+json\" -H \"Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}\" -H \"X-GitHub-Api-Version: 2022-11-28\" \"https://api.github.com/repos/cue-lang/cue/commits/$j\" | jq -r '.sha')\n\t\techo Latest commit: $sha\n\n\t\techo \"$j is a match with $i\"\n\t\tid=$(curl -s -L -H \"Accept: application/vnd.github+json\" -H \"Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}\" -H \"X-GitHub-Api-Version: 2022-11-28\" \"https://api.github.com/repos/cue-lang/cue/actions/workflows/trybot.yml/runs?branch=$j&event=push&head_sha=$sha&per_page=1\" | jq -r '.workflow_runs[] | .id')\nif [[ \"$id\" != \"\" ]]\nthen\n\techo Workflow ID for that sha: $id\n\tcurl -s -L -H \"Accept: application/vnd.github+json\" -H \"Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}\" -H \"X-GitHub-Api-Version: 2022-11-28\" -X POST https://api.github.com/repos/cue-lang/cue/actions/runs/$id/rerun\n\techo Successfull triggered re-run\nelse\n\techo \"$sha has not run the trybot workflow; skipping\"\nfi\n\n\n\t\t# Ensure that the trybot repo has the latest commit for\n\t\t# this branch.  If the force-push results in a commit\n\t\t# being pushed, that will trigger the trybot workflows\n\t\t# so we don't need to do anything, otherwise we need to\n\t\t# trigger the most recent commit on that branch\n\t\tif git push -f trybot origin/$j:$j 2>&1 | grep up-to-date\n\t\tthen\n\t\t   \n\t\tfi\n\tdone\ndone"

@@ -207,6 +207,8 @@ func resolveExpr(ctx *adt.OpContext, v Value, x ast.Expr) adt.Value {
 	if err != nil {
 		return &adt.Bottom{Err: err}
 	}
+	// TODO: perhaps create Vertex with conjunct and resolve instead.
+	// This will result in Vertex with the original expression in Conjuncts.
 	return adt.Resolve(ctx, c)
 }
 

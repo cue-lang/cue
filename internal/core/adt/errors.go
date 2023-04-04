@@ -206,6 +206,18 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 	}
 }
 
+const RequiredNotPresentError = "field is required but not present"
+
+func NewRequiredNotPresentError(ctx *OpContext, v *Vertex) *Bottom {
+	saved := ctx.PushArc(v)
+	b := &Bottom{
+		Code: IncompleteError,
+		Err:  ctx.Newf(RequiredNotPresentError),
+	}
+	ctx.PopArc(saved)
+	return b
+}
+
 // A ValueError is returned as a result of evaluating a value.
 type ValueError struct {
 	r      Runtime

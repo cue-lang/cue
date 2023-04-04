@@ -88,10 +88,10 @@ const (
 //
 // TODO: remove
 type structValue struct {
-	ctx      *adt.OpContext
-	v        Value
-	obj      *adt.Vertex
-	features []adt.Feature
+	ctx  *adt.OpContext
+	v    Value
+	obj  *adt.Vertex
+	arcs []*adt.Vertex
 }
 
 type hiddenStructValue = structValue
@@ -101,18 +101,17 @@ func (o *hiddenStructValue) Len() int {
 	if o.obj == nil {
 		return 0
 	}
-	return len(o.features)
+	return len(o.arcs)
 }
 
 // At reports the key and value of the ith field, i < o.Len().
 func (o *hiddenStructValue) At(i int) (key string, v Value) {
-	f := o.features[i]
-	return o.v.idx.LabelStr(f), newChildValue(o, i)
+	arc := o.arcs[i]
+	return o.v.idx.LabelStr(arc.Label), newChildValue(o, i)
 }
 
 func (o *hiddenStructValue) at(i int) *adt.Vertex {
-	f := o.features[i]
-	return o.obj.Lookup(f)
+	return o.arcs[i]
 }
 
 // Lookup reports the field for the given key. The returned Value is invalid
@@ -122,7 +121,7 @@ func (o *hiddenStructValue) Lookup(key string) Value {
 	i := 0
 	len := o.Len()
 	for ; i < len; i++ {
-		if o.features[i] == f {
+		if o.arcs[i].Label == f {
 			break
 		}
 	}
@@ -1386,9 +1385,12 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		}
 	}
 
+	// features are topologically sorted.
+	// TODO(sort): make sort order part of the evaluator and eliminate this.
 	features := export.VertexFeatures(ctx, obj)
 
-	k := 0
+	arcs := make([]*adt.Vertex, 0, len(obj.Arcs))
+
 	for _, f := range features {
 		if f.IsLet() {
 			continue
@@ -1403,14 +1405,23 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		if arc == nil {
 			continue
 		}
-		if arc.IsConstraint() && o.omitOptional {
-			continue
+		if o.omitOptional {
+			switch arc.ArcType {
+			case adt.ArcOptional:
+				continue
+			case adt.ArcRequired:
+				arc = &adt.Vertex{
+					Label:     arc.Label,
+					Parent:    arc.Parent,
+					Conjuncts: arc.Conjuncts,
+					BaseValue: adt.NewRequiredNotPresentError(ctx, arc),
+				}
+				arc.ForceDone()
+			}
 		}
-		features[k] = f
-		k++
+		arcs = append(arcs, arc)
 	}
-	features = features[:k]
-	return structValue{ctx, v, obj, features}, nil
+	return structValue{ctx, v, obj, arcs}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value
@@ -1476,8 +1487,8 @@ func (s *hiddenStruct) Field(i int) FieldInfo {
 // it interprets name as an arbitrary string for a regular field.
 func (s *hiddenStruct) FieldByName(name string, isIdent bool) (FieldInfo, error) {
 	f := s.v.idx.Label(name, isIdent)
-	for i, a := range s.features {
-		if a == f {
+	for i, a := range s.arcs {
+		if a.Label == f {
 			return s.Field(i), nil
 		}
 	}
@@ -1501,12 +1512,7 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 		return &Iterator{idx: v.idx, ctx: ctx}, v.toErr(err)
 	}
 
-	arcs := []*adt.Vertex{}
-	for i := range obj.features {
-		arc := obj.at(i)
-		arcs = append(arcs, arc)
-	}
-	return &Iterator{idx: v.idx, ctx: ctx, val: v, arcs: arcs}, nil
+	return &Iterator{idx: v.idx, ctx: ctx, val: v, arcs: obj.arcs}, nil
 }
 
 // Lookup reports the value at a path starting from v. The empty path returns v
@@ -2214,7 +2220,8 @@ func (v Value) Validate(opts ...Option) error {
 
 // Walk descends into all values of v, calling f. If f returns false, Walk
 // will not descent further. It only visits values that are part of the data
-// model, so this excludes optional fields, hidden fields, and definitions.
+// model, so this excludes definitions and optional, required, and hidden
+// fields.
 func (v Value) Walk(before func(Value) bool, after func(Value)) {
 	ctx := v.ctx()
 	switch v.Kind() {
@@ -2222,9 +2229,17 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 		if before != nil && !before(v) {
 			return
 		}
-		obj, _ := v.structValData(ctx)
+		obj, _ := v.structValOpts(ctx, options{
+			omitHidden:      true,
+			omitDefinitions: true,
+		})
 		for i := 0; i < obj.Len(); i++ {
 			_, v := obj.At(i)
+			// TODO: should we error on required fields, or visit them anyway?
+			// Walk is not designed to error at this moment, though.
+			if v.v.ArcType != adt.ArcMember {
+				continue
+			}
 			v.Walk(before, after)
 		}
 	case ListKind:

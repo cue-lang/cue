@@ -798,6 +798,9 @@ func TestFields(t *testing.T) {
 		if step1.value > 100 {
 		}`,
 		err: "undefined field: value",
+	}, {
+		value: `{a!: 1, b?: 2, c: 3}`,
+		err:   "a: field is required but not present",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -895,6 +898,11 @@ func TestLookup(t *testing.T) {
 	[string]: int64
 } & #V
 v: #X
+
+a: {
+	b!: 1
+	c: 2
+}
 `)
 	if err != nil {
 		t.Fatalf("compile: %v", err)
@@ -904,48 +912,74 @@ v: #X
 	// 	log.Fatalf("parseExpr: %v", err)
 	// }
 	// v := inst.Eval(expr)
-	testCases := []struct {
-		ref  []string
-		raw  string
-		eval string
-	}{{
-		ref:  []string{"v", "x"},
-		raw:  ">=-9223372036854775808 & <=9223372036854775807 & int",
-		eval: "int64",
+
+	type testCase struct {
+		ref    []string
+		result string
+		syntax string
+	}
+	testCases := []testCase{{
+		ref: []string{"a"},
+		result: `{
+	b!: 1
+	c:  2
+}`,
+		syntax: "{b!: 1, c: 2}",
+	}, {
+		// Allow descending into structs even if it has a required field error.
+		ref:    []string{"a", "c"},
+		result: "2",
+		syntax: "2",
+	}, {
+		ref:    []string{"a", "b"},
+		result: "_|_ // a.b: field is required but not present",
+		syntax: "1",
+	}, {
+		ref:    []string{"v", "x"},
+		result: "int64",
+		syntax: "int64",
 	}}
 	for _, tc := range testCases {
-		v := inst.Lookup(tc.ref...)
+		t.Run("", func(t *testing.T) {
+			v := inst.Lookup(tc.ref...)
 
-		if got := fmt.Sprintf("%#v", v); got != tc.raw {
-			t.Errorf("got %v; want %v", got, tc.raw)
-		}
-
-		got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
-		if got != tc.eval {
-			t.Errorf("got %v; want %v", got, tc.eval)
-		}
-
-		v = inst.Lookup()
-		for _, ref := range tc.ref {
-			s, err := v.Struct()
-			if err != nil {
-				t.Fatal(err)
+			if got := fmt.Sprintf("%+v", v); got != tc.result {
+				t.Errorf("got %v; want %v", got, tc.result)
 			}
-			fi, err := s.FieldByName(ref, false)
-			if err != nil {
-				t.Fatal(err)
+
+			got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
+			if got != tc.syntax {
+				t.Errorf("got %v; want %v", got, tc.syntax)
 			}
-			v = fi.Value
-		}
 
-		if got := fmt.Sprintf("%#v", v); got != tc.raw {
-			t.Errorf("got %v; want %v", got, tc.raw)
-		}
+			v = inst.Lookup()
+			for _, ref := range tc.ref {
+				s, err := v.Struct()
+				if err != nil {
+					t.Fatal(err)
+				}
+				fi, err := s.FieldByName(ref, false)
+				if err != nil {
+					t.Fatal(err)
+				}
+				v = fi.Value
 
-		got = fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
-		if got != tc.eval {
-			t.Errorf("got %v; want %v", got, tc.eval)
-		}
+				// Struct gets all fields. Skip tests with optional fields,
+				// as the result will differ.
+				if v.v.ArcType != adt.ArcMember {
+					return
+				}
+			}
+
+			if got := fmt.Sprintf("%+v", v); got != tc.result {
+				t.Errorf("got %v; want %v", got, tc.result)
+			}
+
+			got = fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
+			if got != tc.syntax {
+				t.Errorf("got %v; want %v", got, tc.syntax)
+			}
+		})
 	}
 }
 
@@ -2594,11 +2628,12 @@ func docStr(docs []*ast.CommentGroup) string {
 // TODO: unwrap marshal error
 // TODO: improve error messages
 func TestMarshalJSON(t *testing.T) {
-	testCases := []struct {
+	type testCase struct {
 		value string
 		json  string
 		err   string
-	}{{
+	}
+	testCases := []testCase{{
 		value: `""`,
 		json:  `""`,
 	}, {
@@ -2662,6 +2697,9 @@ func TestMarshalJSON(t *testing.T) {
 	}, {
 		value: `{foo?: 1, bar?: 2, baz: 3}`,
 		json:  `{"baz":3}`,
+	}, {
+		value: `{foo!: 1, bar: 2}`,
+		err:   "cue: marshal error: foo: field is required but not present",
 	}, {
 		// Has an unresolved cycle, but should not matter as all fields involved
 		// are optional

@@ -11,7 +11,9 @@ import (
 
 // trybotWorkflows is a template for trybot-based repos
 trybotWorkflows: {
-	(trybot.key):                json.#Workflow
+	(trybot.key): json.#Workflow & {
+		on: workflow_dispatch: {}
+	}
 	"\(trybot.key)_dispatch":    trybotDispatchWorkflow
 	"push_tip_to_\(trybot.key)": pushTipToTrybotWorkflow
 	"evict_caches":              evictCaches

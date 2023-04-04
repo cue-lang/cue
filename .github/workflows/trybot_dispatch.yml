@@ -28,7 +28,7 @@ jobs:
         run: |-
           cat <<EOD >> $GITHUB_OUTPUT
           value<<DOE
-          {"type":"trybot","CL":552141,"patchset":41,"targetBranch":"master","ref":"refs/changes/41/552141/41"}
+          {"type":"trybot","CL":552206,"patchset":4,"targetBranch":"master","ref":"refs/changes/6/552206/4"}
           DOE
           EOD
       - if: github.event.client_payload.type != 'trybot'

@@ -98,7 +98,7 @@ func (v *validator) validate(x *adt.Vertex) {
 	}
 
 	for _, a := range x.Arcs {
-		if a.ArcType == adt.ArcRequired && v.inDefinition == 0 {
+		if a.ArcType == adt.ArcRequired && v.Concrete {
 			v.add(adt.NewRequiredNotPresentError(v.ctx, a))
 			continue
 		}

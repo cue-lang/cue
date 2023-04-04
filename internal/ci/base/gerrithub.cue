@@ -24,7 +24,10 @@ trybotWorkflows: {
 	CL:           int
 	patchset:     int
 	targetBranch: *defaultBranch | string
-	ref:          *"refs/changes/\(mod(CL, 100))/\(CL)/\(patchset)" | string
+
+	let p = strings.Split("\(CL)", "")
+	let rightMostTwo = p[len(p)-2] + p[len(p)-1]
+	ref: *"refs/changes/\(rightMostTwo)/\(CL)/\(patchset)" | string
 }
 
 trybotDispatchWorkflow: bashWorkflow & {
@@ -233,6 +236,10 @@ evictCaches: bashWorkflow & {
 		schedule: [
 			{cron: "0 2 * * *"},
 		]
+		// push: {
+		// 	// To enable testing of the dispatch itself
+		// 	branches: [testDefaultBranch]
+		// }
 	}
 
 	jobs: {
@@ -241,23 +248,12 @@ evictCaches: bashWorkflow & {
 			if:        "${{github.repository == '\(githubRepositoryPath)'}}"
 			"runs-on": linuxMachine
 			steps: [
+				for v in checkoutCode {v},
+
 				json.#step & {
-					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
-
-					// rerunLatestWorkflow runs the latest trybot workflow in the
-					// specified repo for branches that match the specified branch.
-					let rerunLatestWorkflow = {
-						#repo:   string
-						#branch: string
-						"""
-						id=$(\(curlGitHubAPI) "https://api.github.com/repos/\(#repo)/actions/workflows/\(trybot.key).yml/runs?branch=\(#branch)&event=push&per_page=1" | jq '.workflow_runs[] | .id')
-						\(curlGitHubAPI) -X POST https://api.github.com/repos/\(#repo)/actions/runs/$id/rerun
-
-						"""
-					}
-
-					run: """
-						set -eux
+					name: "Delete caches"
+					run:  """
+						set -x
 
 						echo ${{ secrets.\(botGitHubUserTokenSecretsKey) }} | gh auth login --with-token
 						gh extension install actions/gh-actions-cache
@@ -265,13 +261,28 @@ evictCaches: bashWorkflow & {
 						do
 							echo "Evicting caches for $i"
 							cd $(mktemp -d)
-							git init
+							git init -b initialbranch
 							git remote add origin $i
 							for j in $(gh actions-cache list -L 100 | grep refs/ | awk '{print $1}')
 							do
-								gh actions-cache delete --confirm $j
+							   gh actions-cache delete --confirm $j
 							done
 						done
+						"""
+				},
+
+				json.#step & {
+					name: "Trigger workflow runs to repopulate caches"
+					let branchPatterns = strings.Join(protectedBranchPatterns, " ")
+
+					run: """
+						# Prepare git for pushes to trybot repo. Note
+						# because we have already checked out code we don't
+						# need origin. Fetch origin default branch for later use
+						git config user.name \(botGitHubUser)
+						git config user.email \(botGitHubUserEmail)
+						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n \(botGitHubUser):${{ secrets.\(botGitHubUserTokenSecretsKey) }} | base64)"
+						git remote add trybot \(trybotRepositoryURL)
 
 						# Now trigger the most recent workflow run on each of the default branches.
 						# We do this by listing all the branches on the main repo and finding those
@@ -281,12 +292,50 @@ evictCaches: bashWorkflow & {
 							for i in \(branchPatterns)
 							do
 								if [[ "$j" != $i ]]; then
-									continue
+								   continue
 								fi
 
-								echo "$j is a match with $i"
-								\(rerunLatestWorkflow & {#repo: githubRepositoryPath, #branch: "$j", _})
-								\(rerunLatestWorkflow & {#repo: trybotRepositoryPath, #branch: "$j", _})
+								echo Branch: $j
+								sha=$(\(curlGitHubAPI) "https://api.github.com/repos/\(githubRepositoryPath)/commits/$j" | jq -r '.sha')
+								echo Latest commit: $sha
+
+								echo "Trigger workflow on \(githubRepositoryPath)"
+								\(curlGitHubAPI) --fail-with-body -X POST https://api.github.com/repos/\(githubRepositoryPath)/actions/workflows/\(trybot.key+workflowFileExtension)/dispatches -d "{\\"ref\\":\\"$j\\"}"
+
+								# Ensure that the trybot repo has the latest commit for
+								# this branch.  If the force-push results in a commit
+								# being pushed, that will trigger the trybot workflows
+								# so we don't need to do anything, otherwise we need to
+								# trigger the most recent commit on that branch
+								git remote -v
+								git fetch origin refs/heads/$j
+								git log -1 FETCH_HEAD
+
+								success=false
+								for try in {1..20}; do
+									echo "Push to trybot try $try"
+									exitCode=0; push="$(git push -f trybot FETCH_HEAD:$j 2>&1)" || exitCode=$?
+									echo "$push"
+									if [ $exitCode -eq 0 ]; then
+										success=true
+										break
+									fi
+									sleep 1
+								done
+								if ! $success; then
+									echo "Giving up"
+									exit 1
+								fi
+
+								if echo "$push" | grep up-to-date
+								then
+									# We are up-to-date, i.e. the push did nothing, hence we need to trigger a workflow_dispatch
+									# in the trybot repo.
+									echo "Trigger workflow on \(trybotRepositoryPath)"
+									\(curlGitHubAPI) --fail-with-body -X POST https://api.github.com/repos/\(trybotRepositoryPath)/actions/workflows/\(trybot.key+workflowFileExtension)/dispatches -d "{\\"ref\\":\\"$j\\"}"
+								else
+									echo "Force-push to \(trybotRepositoryPath) did work; nothing to do"
+								fi
 							done
 						done
 						"""

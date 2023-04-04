@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90e34189_abbcc2f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T15:38:19Z",
+      "side": 1,
+      "message": "nit: leading space",
+      "revId": "cb1f86660595203bd015922559c4f33bd3783af8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1747e39_c04fd8f3",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T15:38:19Z",
+      "side": 1,
+      "message": "this comment still talks about constraints. should it be updated? I also wonder if the TODO still applies.",
+      "revId": "cb1f86660595203bd015922559c4f33bd3783af8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

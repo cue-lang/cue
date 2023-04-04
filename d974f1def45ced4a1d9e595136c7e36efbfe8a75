@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3605be4c_eca3b04a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "I like this idea. I\u0027ve got a bunch of suggestions, none of which are showstoppers. I do think the argument order of Equals is worth fixing though.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19456a1e_d89dbab6",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "It seems a pity that we have to remember to call this everywhere. I\u0027m trying to think of a use case for enabling this on a test-specific basis but have failed so far.\n\nI\u0027m wondering about something like this instead:\n\n```\nvar UpdateTests \u003d os.Getenv(\"SOME_DEFAULT_ENV\") !\u003d \"\"\n\nfunc Run[TC any](t *testing.T, tests []TC, f func(*T, TC))\n```\n\nAssuming we don\u0027t want `tdtest` to depend on `cuetest`, `cuetest` could have an init function:\n\n```\nfunc init() {\n    tdtest.UpdateTests \u003d UpdateGoldenFiles\n}\n```\n\nThen the only thing this leaves out is the `Select` method, which is fairly easily implemented as an independent function (and arguably it\u0027s more useful as such).",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbcac272_886e1aca",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "TIL about `reflect.Indirect`. Kinda useful. I don\u0027t think you really need it though: why not just assume that it\u0027s a slice of struct, not pointer-to-struct?",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e0d4376_56418a48",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "Is this intended to call finalizeWriter ?",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a5c5c99_d3ff6d96",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "I think the arguments of this are not in the order I\u0027d expect.\nUsually, the \"got\" value comes first - that is, I\u0027d put the value I\u0027ve got before the value that I\u0027m wanting.\n\n   if something !\u003d \"wanted value\" {\n\ntestify uses an inconsistent ordering, and it always bugs me 😊\n\nAlso, maybe include the word \"check\" in the name to indicate what it\u0027s actually doing (it\u0027s not immediately clear whether a failure will be fatal or not).\nIn time, we might want an `AssertEqual` variant that does end up calling t.Fatal.\n\nAlso, maybe use `fieldValue` rather than `field`, because otherwise it seems like it might be expecting the name of the field rather than its value.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81ec1015_8abd4e82",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "or just include the field by value and leave it zero?",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55ce277d_bcb01b5e",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "or maybe use t.Cleanup to avoid the need for this, which would mean that the checks happen even if something calls t.Fatal.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0dca8c74_731d1c8b",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "unused field.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07359691_290e2ccb",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "unused field.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9351eab5_0fee2448",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "tbh I tend to prefer `reflect.TypeOf(new(T)).Elem()` because it works on all types, even interface types (not that that\u0027s a particular issue here because it must be a struct literal, but still, it\u0027s just a more standard idiom).",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b925c8ea_5f3ee7ad",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T13:49:32Z",
+      "side": 1,
+      "message": "When there are several table-driven tests in a package, this will be called for all of them, which is arguably a bit excessive.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

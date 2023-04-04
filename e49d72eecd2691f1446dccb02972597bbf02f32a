@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7488ade9_420ed083",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1412,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T16:27:07Z",
+      "side": 1,
+      "message": "I don\u0027t understand why we\u0027re doing this only when omitOptional is true. Maybe add a comment?",
+      "revId": "e49d72eecd2691f1446dccb02972597bbf02f32a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9b51a4b_79c72d12",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T16:27:07Z",
+      "side": 1,
+      "message": "Why export this?",
+      "revId": "e49d72eecd2691f1446dccb02972597bbf02f32a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

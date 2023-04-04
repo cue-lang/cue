@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "13d6c96e_948173e9",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T14:23:35Z",
+      "side": 1,
+      "message": "Personally, I was thinking of not enabling it for many of the simpler tests, just as an extra safety measure. In general I like to be specific about this. I\u0027m already quite sad that we do not explicitly pass UpdateGoldenFiles to our cuetxtar.Config.\nI\u0027m even less a fan of using env variables in general purpose packages. There is no excuse for that, in my opinion.\n\nHaving Select as a separate function seems a possibility. Although it requires some coordination on how the position numbers are encoded in the name.",
+      "parentUuid": "19456a1e_d89dbab6",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbcac272_886e1aca",
         "filename": "internal/tdtest/tdtest.go",
         "patchSetId": 1
@@ -82,6 +100,24 @@
       "writtenOn": "2023-04-04T13:49:32Z",
       "side": 1,
       "message": "I think the arguments of this are not in the order I\u0027d expect.\nUsually, the \"got\" value comes first - that is, I\u0027d put the value I\u0027ve got before the value that I\u0027m wanting.\n\n   if something !\u003d \"wanted value\" {\n\ntestify uses an inconsistent ordering, and it always bugs me 😊\n\nAlso, maybe include the word \"check\" in the name to indicate what it\u0027s actually doing (it\u0027s not immediately clear whether a failure will be fatal or not).\nIn time, we might want an `AssertEqual` variant that does end up calling t.Fatal.\n\nAlso, maybe use `fieldValue` rather than `field`, because otherwise it seems like it might be expecting the name of the field rather than its value.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2c306dd_0760da81",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T14:23:35Z",
+      "side": 1,
+      "message": "This was deliberate. For this purpose the want, get order is much clearer, as it is easier to spot the struct fields that are used. The want value is often larger and definitely less regular.\n\nAlso, it keeps things consistent with t.EqualWriter.\n\nI imagined doing something like:\n\nt.Field(tc.foo).Equals(any)\nt.Field(tc.foo).EqualsWriter()\n\nBut that seemed needlessly verbose for the sole purpose of making it clear that got and want are swapped.\n\nAn idiom can make less sense in the face of changes. With t.Run, it is no longer necessary to write much more than \"got %v; want %v\", as the location in the file is sufficient. Especially for smaller tests. So this also changed the idiom on how to write error messages.",
+      "parentUuid": "2a5c5c99_d3ff6d96",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

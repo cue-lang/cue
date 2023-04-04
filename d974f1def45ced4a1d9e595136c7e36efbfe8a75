@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f06023f7_eb49abf7",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T15:33:32Z",
+      "side": 1,
+      "message": "If you don\u0027t want to enable it, then surely one can just avoid using tdtest.T.Equal ?\n\n\u003e Having Select as a separate function seems a possibility. Although it requires some coordination on how the position numbers are encoded in the name.\n\nFor the record, something like this might do the trick:\n\nhttps://go.dev/play/p/MsJ4c8y1hLe\n\nHaving a convention for /NNN/ seems kinda reasonable to me.",
+      "parentUuid": "13d6c96e_948173e9",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbcac272_886e1aca",
         "filename": "internal/tdtest/tdtest.go",
         "patchSetId": 1
@@ -118,6 +136,41 @@
       "side": 1,
       "message": "This was deliberate. For this purpose the want, get order is much clearer, as it is easier to spot the struct fields that are used. The want value is often larger and definitely less regular.\n\nAlso, it keeps things consistent with t.EqualWriter.\n\nI imagined doing something like:\n\nt.Field(tc.foo).Equals(any)\nt.Field(tc.foo).EqualsWriter()\n\nBut that seemed needlessly verbose for the sole purpose of making it clear that got and want are swapped.\n\nAn idiom can make less sense in the face of changes. With t.Run, it is no longer necessary to write much more than \"got %v; want %v\", as the location in the file is sufficient. Especially for smaller tests. So this also changed the idiom on how to write error messages.",
       "parentUuid": "2a5c5c99_d3ff6d96",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "47d9ec44_23975d96",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T15:33:32Z",
+      "side": 1,
+      "message": "\u003e The want value is often larger and definitely less regular\n\nPresumably you mean the _got_ value there?\nIt\u0027s confusion like that which makes me inclined to stick to convention, even if there\u0027s a slight readability down side.\n\nI guess there\u0027s the saving grace that at least if you do set `CUE_UPDATE\u003d1`, you\u0027ll get an error if you\u0027ve put the field reference in the wrong argument (but there\u0027s no way of making sure that you\u0027ve got it right without doing that - maybe CI should try it or something?)",
+      "parentUuid": "a2c306dd_0760da81",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae21728e_47ab942d",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T15:33:32Z",
+      "side": 1,
+      "message": "Is this method really common enough that it\u0027s worth the single line of code that it saves?\n\nISTM that the following is arguably clearer, and fails at the part of the code that actually checks the value:\n\n```\nvar buf strings.Builder\ndoSomethingWithWriter(\u0026buf)\nt.Equal(foo.bar, buf.String())\n```",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -220,6 +273,23 @@
       "writtenOn": "2023-04-04T13:49:32Z",
       "side": 1,
       "message": "When there are several table-driven tests in a package, this will be called for all of them, which is arguably a bit excessive.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25686ef2_a98c2aab",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T15:33:32Z",
+      "side": 1,
+      "message": "composite",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

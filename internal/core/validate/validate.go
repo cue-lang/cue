@@ -99,12 +99,7 @@ func (v *validator) validate(x *adt.Vertex) {
 
 	for _, a := range x.Arcs {
 		if a.ArcType == adt.ArcRequired && v.inDefinition == 0 {
-			saved := v.ctx.PushArc(a)
-			v.add(&adt.Bottom{
-				Code: adt.IncompleteError,
-				Err:  v.ctx.Newf("field is required but not present"),
-			})
-			v.ctx.PopArc(saved)
+			v.add(adt.NewRequiredNotPresentError(v.ctx, a))
 			continue
 		}
 

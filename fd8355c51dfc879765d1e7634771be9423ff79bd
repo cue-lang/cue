@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "346f5f11_b0227cb7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T21:30:12Z",
+      "side": 1,
+      "message": "I\u0027ve gone with the CL NNN approach. We use that consistently, and it\u0027s something we could relatively easily write logic for if required. In any case, if we did migrate elsewhere, we could (I\u0027m told) import the old Gerrit CLs into a new Gerrit instance. So the CL-based links would continue to work.",
+      "parentUuid": "8c57f5bf_7a98cf68",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "7b1e2864_4cfc9001",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 11
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5523f2d0_b98c69f4",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T21:30:12Z",
+      "side": 1,
+      "message": "Correct, other than nicer visual separation for the reader.",
+      "parentUuid": "0968add9_9b29c6b3",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "df3e1369_74dcc0e1",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-04-04T21:16:44Z",
       "side": 1,
       "message": "nit: space indentation?",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccc7d023_c3db3a99",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T21:30:12Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3e1369_74dcc0e1",
       "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "956a57b3_f9cf9f13",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T21:30:12Z",
+      "side": 1,
+      "message": "Yeh just for debugging for now. Can remove at a later date.",
+      "parentUuid": "6d66ab26_116220cb",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cde03749_a73ffb7a",
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4078b1a_4c5b3788",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T21:30:12Z",
+      "side": 1,
+      "message": "One day I will remember this. Done.",
+      "parentUuid": "cde03749_a73ffb7a",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11e16825_60447d63",
@@ -116,6 +206,24 @@
       "writtenOn": "2023-04-04T21:16:44Z",
       "side": 1,
       "message": "FYI, you can just do `grep up-to-date \u003c\u003c\u003c\"$push\"`. it\u0027s a bashism, but we are already relying on bash.",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f0e2ee0_a07df9bd",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T21:30:12Z",
+      "side": 1,
+      "message": "I don\u0027t trust myself to write shell scripts on the best of days, so will leave this for now because my small head has only just grasped this form!",
+      "parentUuid": "11e16825_60447d63",
       "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

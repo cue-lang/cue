@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "335b27e4_0a7984f7",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T16:18:47Z",
+      "side": 1,
+      "message": "No need for the parens FWIW.",
+      "revId": "9e8c816f9e2a25d8844cf962608304b2aece032a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3f3c7da_d457bd92",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T07:33:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51d3f4fe_cadbc23e",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f04a23c_7cdccccf",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfc31e55_9224d8a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T07:33:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f04a23c_7cdccccf",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4472f273_c26a05f3",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-03-29T14:11:28Z",
       "side": 1,
       "message": "s/These/This/",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c15f3e3_035a980d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T07:33:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4472f273_c26a05f3",
       "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +125,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "db62fd84_6b87c27d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 233,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T07:33:50Z",
+      "side": 1,
+      "message": "changed.",
+      "parentUuid": "df8c5fa3_fdf80e2b",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "51a5b03b_f2a27f71",
         "filename": "internal/core/adt/composite.go",
         "patchSetId": 1
@@ -82,6 +154,24 @@
       "writtenOn": "2023-03-29T14:11:28Z",
       "side": 1,
       "message": "Or just `return \u0026Vertex{`",
+      "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2cfbcd36_7043e419",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T07:33:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51a5b03b_f2a27f71",
       "revId": "7d9614a59ab9c36fc6fa982bf763baf9c2aaaff5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

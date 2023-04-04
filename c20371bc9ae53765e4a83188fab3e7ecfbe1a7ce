@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89f10960_a71a20a5",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T16:20:31Z",
+      "side": 1,
+      "message": "or just:\nreturn o.obj.Lookup(o.features[i])",
+      "revId": "c20371bc9ae53765e4a83188fab3e7ecfbe1a7ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

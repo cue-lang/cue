@@ -210,14 +210,14 @@ func unwrapJSONError(err error) errors.Error {
 
 // An Iterator iterates over values.
 type Iterator struct {
-	val   Value
-	idx   *runtime.Runtime
-	ctx   *adt.OpContext
-	arcs  []*adt.Vertex
-	p     int
-	cur   Value
-	f     adt.Feature
-	isOpt bool
+	val     Value
+	idx     *runtime.Runtime
+	ctx     *adt.OpContext
+	arcs    []*adt.Vertex
+	p       int
+	cur     Value
+	f       adt.Feature
+	arcType adt.ArcType
 }
 
 type hiddenIterator = Iterator
@@ -234,7 +234,7 @@ func (i *Iterator) Next() bool {
 	p := linkParent(i.val.parent_, i.val.v, arc)
 	i.cur = makeValue(i.val.idx, arc, p)
 	i.f = arc.Label
-	i.isOpt = arc.ArcType == adt.ArcOptional
+	i.arcType = arc.ArcType
 	i.p++
 	return true
 }
@@ -247,7 +247,7 @@ func (i *Iterator) Value() Value {
 
 // Selector reports the field label of this iteration.
 func (i *Iterator) Selector() Selector {
-	return featureToSel(i.f, i.idx)
+	return wrapConstraint(featureToSel(i.f, i.idx), fromArcType(i.arcType))
 }
 
 // Label reports the label of the value if i iterates over struct fields and ""
@@ -271,7 +271,12 @@ func (i *hiddenIterator) IsHidden() bool {
 
 // IsOptional reports if a field is optional.
 func (i *Iterator) IsOptional() bool {
-	return i.isOpt
+	return i.arcType == adt.ArcOptional
+}
+
+// FieldType reports the type of the field.
+func (i *Iterator) FieldType() SelectorType {
+	return featureToSelType(i.f, i.arcType)
 }
 
 // IsDefinition reports if a field is a definition.
@@ -1455,11 +1460,15 @@ type Struct struct {
 type hiddenStruct = Struct
 
 // FieldInfo contains information about a struct field.
+//
+// Deprecated: only used by deprecated functions.
 type FieldInfo struct {
 	Selector string
 	Name     string // Deprecated: use Selector
 	Pos      int
 	Value    Value
+
+	SelectorType SelectorType
 
 	IsDefinition bool
 	IsOptional   bool
@@ -1474,12 +1483,13 @@ func (s *hiddenStruct) Len() int {
 func (s *hiddenStruct) Field(i int) FieldInfo {
 	a := s.at(i)
 	opt := a.ArcType == adt.ArcOptional
+	selType := featureToSelType(a.Label, a.ArcType)
 	ctx := s.v.ctx()
 
 	v := makeChildValue(s.v, a)
 	name := s.v.idx.LabelStr(a.Label)
 	str := a.Label.SelectorString(ctx)
-	return FieldInfo{str, name, i, v, a.Label.IsDef(), opt, a.Label.IsHidden()}
+	return FieldInfo{str, name, i, v, selType, a.Label.IsDef(), opt, a.Label.IsHidden()}
 }
 
 // FieldByName looks up a field for the given name. If isIdent is true, it will

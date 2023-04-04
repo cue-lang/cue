@@ -213,9 +213,22 @@ var selectorTests = []struct {
 	isString:     true,
 	isConstraint: true,
 }, {
-	sel:          Def("foo").Optional(),
+	sel:          Str("foo").Required(),
+	stype:        StringLabel | RequiredConstraint,
+	string:       "foo!",
+	unquoted:     "foo",
+	isString:     true,
+	isConstraint: true,
+}, {
+	sel:          Def("foo").Required().Optional(),
 	stype:        DefinitionLabel | OptionalConstraint,
 	string:       "#foo?",
+	isDefinition: true,
+	isConstraint: true,
+}, {
+	sel:          Def("foo").Optional().Required(),
+	stype:        DefinitionLabel | RequiredConstraint,
+	string:       "#foo!",
 	isDefinition: true,
 	isConstraint: true,
 }, {

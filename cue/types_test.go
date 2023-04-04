@@ -848,7 +848,7 @@ func TestAllFields(t *testing.T) {
 		err   string
 	}{{
 		value: `{a:1,"_b":2,c:3,_d:4}`,
-		res:   "{a:1,_b:2,c:3,_d:4,}",
+		res:   `{a:1,"_b":2,c:3,_d:4,}`,
 	}, {
 		value: `{_a:"a"}`,
 		res:   `{_a:"a",}`,
@@ -859,6 +859,9 @@ func TestAllFields(t *testing.T) {
 		// Issue #1879
 		value: `{a: 1, if false { b: 2 }}`,
 		res:   `{a:1,}`,
+	}, {
+		value: `{a!:1,b?:2,c:3}`,
+		res:   `{a!:1,b?:2,c:3,}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -870,10 +873,7 @@ func TestAllFields(t *testing.T) {
 
 			buf := []byte{'{'}
 			for iter.Next() {
-				buf = append(buf, iter.Label()...)
-				if iter.IsOptional() {
-					buf = append(buf, '?')
-				}
+				buf = append(buf, iter.Selector().String()...)
 				buf = append(buf, ':')
 				b, err := iter.Value().MarshalJSON()
 				checkFatal(t, err, tc.err, "Obj.At")
@@ -883,6 +883,45 @@ func TestAllFields(t *testing.T) {
 			buf = append(buf, '}')
 			if got := string(buf); got != tc.res {
 				t.Errorf("got %v; want %v", got, tc.res)
+			}
+		})
+	}
+}
+
+func TestFieldType(t *testing.T) {
+	testCases := []struct {
+		value string
+		want  string
+	}{{
+		value: `{a:1,"_b":2,c:3,_d:4,#def: 1}`,
+		want: `
+		StringLabel
+		StringLabel
+		StringLabel
+		HiddenLabel
+		DefinitionLabel`,
+	}, {
+		value: `{a!:1,b?:2,c:3}`,
+		want: `
+		StringLabel|RequiredConstraint
+		StringLabel|OptionalConstraint
+		StringLabel`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.value, func(t *testing.T) {
+			obj := getInstance(t, tc.value).Value()
+
+			iter, err := obj.Fields(All())
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			b := &strings.Builder{}
+			for iter.Next() {
+				fmt.Fprint(b, "\n\t\t", iter.FieldType())
+			}
+			if got := b.String(); got != tc.want {
+				t.Errorf("got:%v\nwant:%v", got, tc.want)
 			}
 		})
 	}

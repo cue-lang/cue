@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b1e2864_4cfc9001",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T20:45:19Z",
+      "side": 1,
+      "message": "Patchset 11 was force-pushed to ci/test on GitHub to simulate a run of the cache eviction. That ran successfully in https://github.com/cue-lang/cue/actions/runs/4611997351/jobs/8152384620.\n\nAs you can see from the \"Delete caches\" step in that run, a number of caches were deleted in both the cue and cue-trybot repos. \n\nAs you can see from the \"Trigger workflows to repopulate caches\" step in that run, there were two workflow_dispatch triggers for the master and release-branch.v0.5 branch in the cue-lang/cue repo (https://github.com/cue-lang/cue/actions/runs/4612001625 and https://github.com/cue-lang/cue/actions/runs/4612002052 respectively). The push to the cue-trybot repo \"did some work\" for the master branch, hence no workflow_dispatch was required. The force push resulted in https://github.com/cue-lang/cue-trybot/actions/runs/4612001614 running. For the release-branch.v0.5 branch, the force push was up-to-date so we had to make a workflow_dispatch call to trigger the trybot workflow on the tip commit. This resulted in https://github.com/cue-lang/cue-trybot/actions/runs/4612001614.\n\nWhilst there is a slight race between the attempt to force push to the trybot protected branches and, in the case the force push is up-to-date, the subsequent trigger of the workflow_dispatch, this is running at a time of night when nobody should be working :) In any case the impact is relatively harmless just slow workflow runs.",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

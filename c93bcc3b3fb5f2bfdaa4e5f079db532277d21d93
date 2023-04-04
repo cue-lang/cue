@@ -33,6 +33,24 @@
       "message": "Why isn\u0027t this also an error, given that `#A` is closed and doesn\u0027t have a field `b` ?",
       "revId": "c93bcc3b3fb5f2bfdaa4e5f079db532277d21d93",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "09da797d_ef830f91",
+        "filename": "cue/testdata/eval/required.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-04T07:14:33Z",
+      "side": 1,
+      "message": "#A does have a field b because it references #B. Also, a vertex is only closed upon reference. There is no reference to #A.",
+      "parentUuid": "e5916ee3_78cf0c7b",
+      "revId": "c93bcc3b3fb5f2bfdaa4e5f079db532277d21d93",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

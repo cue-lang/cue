@@ -1693,7 +1693,7 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 //
 // Any reference in v referring to the value at the given path will resolve to x
 // in the newly created value. The resulting value is not validated.
-func (v Value) FillPath(p Path, x interface{}) Value {
+func (v Value) FillPath(p Path, x any) Value {
 	if v.v == nil {
 		// TODO: panic here?
 		return v
@@ -1702,20 +1702,9 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	if err := p.Err(); err != nil {
 		return newErrValue(v, mkErr(v.idx, nil, 0, "invalid path: %v", err))
 	}
-	var expr adt.Expr
-	switch x := x.(type) {
-	case Value:
-		if v.idx != x.idx {
-			panic("values are not from the same runtime")
-		}
-		expr = x.v
-	case ast.Expr:
-		n := getScopePrefix(v, p)
-		// TODO: inject import path of current package?
-		expr = resolveExpr(ctx, n, x)
-	default:
-		expr = convert.GoValueToValue(ctx, x, true)
-	}
+
+	var expr adt.Expr = v.convertExpr(ctx, p, x)
+
 	for i := len(p.path) - 1; i >= 0; i-- {
 		switch sel := p.path[i]; sel.Type() {
 		case StringLabel | PatternConstraint:
@@ -1763,6 +1752,107 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	n.Finalize(ctx)
 	w := makeValue(v.idx, n, v.parent_)
 	return v.Unify(w)
+}
+
+func (v Value) convertExpr(ctx *adt.OpContext, p Path, x any) (expr adt.Value) {
+	switch x := x.(type) {
+	case Value:
+		if v.idx != x.idx {
+			panic("values are not from the same runtime")
+		}
+		expr = x.v
+	case ast.Expr:
+		n := getScopePrefix(v, p)
+		// TODO: inject import path of current package?
+		expr = resolveExpr(ctx, n, x)
+	default:
+		expr = convert.GoValueToValue(ctx, x, true)
+	}
+	return expr
+}
+
+// Patch creates a new value by replacing v with the value of x at the given
+// path. References elsewhere in v that point to or within the path keep
+// referring to the old value.
+//
+// THIS IS AN EXPERIMENTAL FUNCTION.
+//
+// If x is an cue/ast.Expr, it will be evaluated within the context of the
+// given path: identifiers that are not resolved within the expression are
+// resolved as if they were defined at the path position.
+//
+// If x is a Value, it will be used as is. It panics if x is not created
+// from the same Runtime as v.
+//
+// Otherwise, the given Go value will be converted to CUE using the same rules
+// as Context.Encode.
+//
+// Any reference in v referring to the value at the given path will resolve to x
+// in the newly created value. The resulting value is not validated.
+func (v Value) Patch(p Path, x any) Value {
+	if v.v == nil {
+		// TODO: panic here?
+		return v
+	}
+	if v.v.BaseValue == nil {
+		panic("uninitialized value")
+	}
+	ctx := v.ctx()
+	if err := p.Err(); err != nil {
+		return newErrValue(v, mkErr(v.idx, nil, 0, "invalid path: %v", err))
+	}
+
+	// Unlike with FillPath, the error here does not percolate up. So check
+	// and convert to an error here.
+	value := v.convertExpr(ctx, p, x)
+	if b, ok := value.(*adt.Bottom); ok && !b.IsIncomplete() {
+		return newErrValue(v, b)
+	}
+
+	orig := v.v
+
+	patch := &adt.Vertex{
+		Parent: orig.Parent,
+		Label:  orig.Label,
+	}
+	newRoot := patch
+
+outer:
+	for _, sel := range p.path {
+		switch {
+		case orig.BaseValue != nil:
+			*patch = *orig
+		case orig.Label.IsInt():
+			patch.SetValue(ctx, &adt.ListMarker{})
+		default:
+			patch.SetValue(ctx, &adt.StructMarker{})
+		}
+
+		f := sel.sel.feature(ctx)
+
+		child := &adt.Vertex{
+			Parent: patch,
+			Label:  f,
+		}
+		p := patch
+		patch = child
+
+		for i, a := range p.Arcs {
+			// TODO: use match to allow replacing multiple arcs.
+			if a.Label == f {
+				orig = a
+				p.Arcs[i] = child
+				continue outer
+			}
+		}
+
+		orig = child
+		p.Arcs = append(p.Arcs, child)
+	}
+
+	patch.SetValue(ctx, value)
+
+	return makeValue(v.idx, newRoot, nil)
 }
 
 // Template returns a function that represents the template definition for a

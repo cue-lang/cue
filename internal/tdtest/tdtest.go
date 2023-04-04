@@ -23,6 +23,7 @@
 package tdtest
 
 import (
+	"bufio"
 	"fmt"
 	"go/token"
 	"reflect"
@@ -172,4 +173,24 @@ func (t *T) Select(tests ...any) {
 		}
 	}
 	t.Skip("not selected")
+}
+
+// Indent indents the given string with tabs. Trailing and leading spacing
+// is optimized for the string to inserted in a table-driven test.
+func Indent(text string, indentSize int) string {
+	if !strings.Contains(text, "\n") {
+		return text
+	}
+
+	var buf strings.Builder
+	scanner := bufio.NewScanner(strings.NewReader(text))
+
+	buf.WriteString("\n")
+	for scanner.Scan() {
+		line := scanner.Text()
+		buf.WriteString(strings.Repeat("\t", indentSize))
+		fmt.Fprintln(&buf, line)
+	}
+
+	return strings.TrimRight(buf.String(), " \t\n")
 }

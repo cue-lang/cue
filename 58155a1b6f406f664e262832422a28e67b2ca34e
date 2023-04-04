@@ -16,6 +16,23 @@
       "message": "Tested the trybot_dispatch change in https://github.com/cue-lang/cue/actions/runs/4610021756 which lead to https://github.com/cue-lang/cue-trybot/actions/runs/4610024552 (which updated this CL in patchset 42).\n\nThis is now ready for re-review. \n\nI\u0027ve split out cache eviction fixes into 552206.",
       "revId": "58155a1b6f406f664e262832422a28e67b2ca34e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47160e04_c5b7e80a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 42
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T16:46:17Z",
+      "side": 1,
+      "message": "still LGTM",
+      "revId": "58155a1b6f406f664e262832422a28e67b2ca34e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

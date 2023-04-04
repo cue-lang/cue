@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fa1c251_49d0206a",
+        "filename": "cmd/cue/cmd/testdata/script/vet_req.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-04T16:30:59Z",
+      "side": 1,
+      "message": "Interesting. TIL that `-c\u003dfalse` is different both from omitting `-c` and specifying `-c`. Kind weird tbh - could use some documentation I guess.",
+      "revId": "08a61c489b9325a2225dfbc6fc3c5cf020ac7063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

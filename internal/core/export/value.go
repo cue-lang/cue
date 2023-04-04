@@ -74,11 +74,9 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 
 	case *adt.Bottom:
 		switch {
-		case n.IsConstraint():
-			// Constraints may always be the original value.
-			// TODO: this was included for backwards compatibility. But
-			// should we show the error here? It signifies that this field
-			// may not be used.
+		case n.ArcType == adt.ArcOptional:
+			// Optional fields may always be the original value.
+
 		case e.cfg.ShowErrors && x.ChildError:
 			// TODO(perf): use precompiled arc statistics
 			if len(n.Arcs) > 0 && n.Arcs[0].Label.IsInt() && !e.showArcs(n) && attrs == nil {
@@ -438,12 +436,14 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 			continue
 		}
 
-		if isOptional := arc.IsConstraint(); isOptional {
-			if !p.ShowOptional {
-				continue
-			}
-			internal.SetConstraint(f, arc.ArcType.Token())
+		if arc.ArcType == adt.ArcOptional && !p.ShowOptional {
+			continue
 		}
+		// TODO: report an error for required fields in Final mode?
+		// This package typically does not create errors that did not result
+		// from evaluation already.
+
+		internal.SetConstraint(f, arc.ArcType.Token())
 
 		f.Value = e.vertex(arc)
 

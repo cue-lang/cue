@@ -1,0 +1,15 @@
+! exec cue vet in.cue
+cmp stdout expect-stdout1
+cmp stderr expect-stderr1
+
+exec cue vet -c=false in.cue
+cmp stdout expect-stdout2
+cmp stderr expect-stderr2
+
+-- in.cue --
+x!: string
+-- expect-stdout1 --
+-- expect-stderr1 --
+some instances are incomplete; use the -c flag to show errors or suppress this message
+-- expect-stdout2 --
+-- expect-stderr2 --

@@ -780,7 +780,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 
 			// Errors are allowed in let fields. Handle errors and failure to
 			// complete accordingly.
-			if !a.Label.IsLet() && a.ArcType == ArcMember {
+			if !a.Label.IsLet() && a.ArcType <= ArcRequired {
 				// Don't set the state to Finalized if the child arcs are not done.
 				if state == finalized && a.status < finalized {
 					state = conjuncts

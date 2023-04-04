@@ -111,13 +111,8 @@ Unifications: 27
 Conjuncts:    40
 Disjuncts:    28
 -- out/eval --
-Errors:
-self.t2.a: field is required but not present
-unify.t2.p1.a: field is required but not present
-unify.t2.p2.a: field is required but not present
-
-Result:
-(struct){
+(_|_){
+  // [eval]
   self: (struct){
     t1: (struct){
       a?: (int){ int }
@@ -149,9 +144,12 @@ Result:
       a!: (int){ int }
     }
   }
-  allowed: (struct){
-    issue2306: (struct){
-      #A: (#struct){
+  allowed: (_|_){
+    // [eval]
+    issue2306: (_|_){
+      // [eval]
+      #A: (_|_){
+        // [eval]
         a!: (_|_){
           // [eval] allowed.issue2306.#A.a: field not allowed:
           //     ./in.cue:34:6

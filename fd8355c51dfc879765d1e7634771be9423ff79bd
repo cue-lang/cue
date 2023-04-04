@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c57f5bf_7a98cf68",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T21:16:44Z",
+      "side": 1,
+      "message": "nit: use CL numbers when referring to changes, ideally like https://cuelang.org/cl/NNN, so that they are clickable and will survive history rewrites or future VCS migrations. also in the other paragraphs.",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "7b1e2864_4cfc9001",
@@ -14,6 +31,91 @@
       "writtenOn": "2023-04-04T20:45:19Z",
       "side": 1,
       "message": "Patchset 11 was force-pushed to ci/test on GitHub to simulate a run of the cache eviction. That ran successfully in https://github.com/cue-lang/cue/actions/runs/4611997351/jobs/8152384620.\n\nAs you can see from the \"Delete caches\" step in that run, a number of caches were deleted in both the cue and cue-trybot repos. \n\nAs you can see from the \"Trigger workflows to repopulate caches\" step in that run, there were two workflow_dispatch triggers for the master and release-branch.v0.5 branch in the cue-lang/cue repo (https://github.com/cue-lang/cue/actions/runs/4612001625 and https://github.com/cue-lang/cue/actions/runs/4612002052 respectively). The push to the cue-trybot repo \"did some work\" for the master branch, hence no workflow_dispatch was required. The force push resulted in https://github.com/cue-lang/cue-trybot/actions/runs/4612001614 running. For the release-branch.v0.5 branch, the force push was up-to-date so we had to make a workflow_dispatch call to trigger the trybot workflow on the tip commit. This resulted in https://github.com/cue-lang/cue-trybot/actions/runs/4612001614.\n\nWhilst there is a slight race between the attempt to force push to the trybot protected branches and, in the case the force push is up-to-date, the subsequent trigger of the workflow_dispatch, this is running at a time of night when nobody should be working :) In any case the impact is relatively harmless just slow workflow runs.",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0968add9_9b29c6b3",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T21:16:44Z",
+      "side": 1,
+      "message": "there\u0027s strictly no need for this step to be separate, right?",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df3e1369_74dcc0e1",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 295,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T21:16:44Z",
+      "side": 1,
+      "message": "nit: space indentation?",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d66ab26_116220cb",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T21:16:44Z",
+      "side": 1,
+      "message": "do we want to keep the remote and log commands around? I guess I don\u0027t mind the continuous debuggability as long as they\u0027re not too verbose.",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cde03749_a73ffb7a",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 319,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T21:16:44Z",
+      "side": 1,
+      "message": "nit: use `[[`",
+      "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11e16825_60447d63",
+        "filename": "internal/ci/base/gerrithub.cue",
+        "patchSetId": 11
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-04T21:16:44Z",
+      "side": 1,
+      "message": "FYI, you can just do `grep up-to-date \u003c\u003c\u003c\"$push\"`. it\u0027s a bashism, but we are already relying on bash.",
       "revId": "fd8355c51dfc879765d1e7634771be9423ff79bd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

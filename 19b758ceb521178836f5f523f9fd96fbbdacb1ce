@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16cf23ff_2cfc0c8b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-04T21:43:53Z",
+      "side": 1,
+      "message": "For completeness, patchset 12 was also tested via a push to ci/test to ensure the feedback changes hadn\u0027t broken anything. Links to the various workflow runs:\n\nevict_caches: https://github.com/cue-lang/cue/actions/runs/4612496432\nrelease-branch.v0.5 workflow_dispatch https://github.com/cue-lang/cue/actions/runs/4612499335\nmaster workflow_dispatch https://github.com/cue-lang/cue/actions/runs/4612499202\n\nAnd on the trybot repo:\nmaster workflow_dispatch: https://github.com/cue-lang/cue-trybot/actions/runs/4612499299\nrelease-branch.v0.5 workflow_dispatch: https://github.com/cue-lang/cue-trybot/actions/runs/4612499407",
+      "revId": "19b758ceb521178836f5f523f9fd96fbbdacb1ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

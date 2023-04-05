@@ -26,15 +26,11 @@
 package build
 
 import (
-	"context"
-
 	"cuelang.org/go/cue/ast"
 )
 
 // A Context keeps track of state of building instances and caches work.
 type Context struct {
-	ctxt context.Context
-
 	loader    LoadFunc
 	parseFunc func(str string, src interface{}) (*ast.File, error)
 
@@ -80,14 +76,13 @@ func (inst *Instance) Complete() error {
 func (c *Context) init() {
 	if !c.initialized {
 		c.initialized = true
-		c.ctxt = context.Background()
 		c.imports = map[string]*Instance{}
 	}
 }
 
 // Options:
 // - certain parse modes
-// - parallellism
+// - parallelism
 // - error handler (allows cancelling the context)
 // - file set.
 

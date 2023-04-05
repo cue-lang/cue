@@ -247,10 +247,46 @@ type exporter struct {
 	labelAlias  map[adt.Expr]adt.Feature
 	valueAlias  map[*ast.Alias]*ast.Alias
 	letAlias    map[*ast.LetClause]*ast.LetClause
+	references  map[*adt.Vertex]*referenceInfo
 
 	usedHidden map[string]bool
 
 	pivotter *pivotter
+}
+
+type referenceInfo struct {
+	field      *ast.Field
+	references []*ast.Ident
+}
+
+func (e *exporter) linkField(v *adt.Vertex, f *ast.Field) {
+	if v == nil {
+		return
+	}
+	refs := e.references[v]
+	if refs == nil {
+		// TODO(perf): do a first sweep to only mark referenced arcs or keep
+		// track of that information elsewhere.
+		e.references[v] = &referenceInfo{field: f}
+		return
+	}
+	for _, r := range refs.references {
+		r.Node = f.Value
+	}
+	refs.references = refs.references[:0]
+}
+
+func (e *exporter) linkIdentifier(v *adt.Vertex, ident *ast.Ident) {
+	refs := e.references[v]
+	if refs == nil {
+		refs = &referenceInfo{}
+		e.references[v] = refs
+	}
+	if refs.field == nil {
+		refs.references = append(refs.references, ident)
+		return
+	}
+	ident.Node = refs.field.Value
 }
 
 // newExporter creates and initializes an exporter.
@@ -261,6 +297,8 @@ func newExporter(p *Profile, r adt.Runtime, pkgID string, v adt.Value) *exporter
 		ctx:   eval.NewContext(r, n),
 		index: r,
 		pkgID: pkgID,
+
+		references: map[*adt.Vertex]*referenceInfo{},
 	}
 
 	e.markUsedFeatures(v)
@@ -606,8 +644,10 @@ func (e *exporter) popFrame(saved []frame) {
 			setFieldAlias(f.field, f.alias)
 			node = f.field
 		}
-		for _, r := range f.references {
-			r.Node = node
+		if node != nil {
+			for _, r := range f.references {
+				r.Node = node
+			}
 		}
 	}
 

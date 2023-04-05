@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62bea57e_e203eeb5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T10:26:14Z",
+      "side": 1,
+      "message": "LGTM with a couple of trivial thoughts, thanks!",
+      "revId": "187afbc3394683b1f3dd4704b5b3998becaa4023",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b6c611f7_42c78934",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T10:26:14Z",
+      "side": 1,
+      "message": "s/their/the/",
+      "revId": "187afbc3394683b1f3dd4704b5b3998becaa4023",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01a7b136_d7f2c72d",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T10:26:14Z",
+      "side": 1,
+      "message": "errors.Is(err, pflag.ErrHelp) for robustness?",
+      "revId": "187afbc3394683b1f3dd4704b5b3998becaa4023",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

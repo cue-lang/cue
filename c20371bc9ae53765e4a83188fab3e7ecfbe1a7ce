@@ -16,6 +16,24 @@
       "message": "or just:\nreturn o.obj.Lookup(o.features[i])",
       "revId": "c20371bc9ae53765e4a83188fab3e7ecfbe1a7ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b9277d3_2d9facdd",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T11:58:09Z",
+      "side": 1,
+      "message": "Ack. Will be merged in later CL.",
+      "parentUuid": "89f10960_a71a20a5",
+      "revId": "c20371bc9ae53765e4a83188fab3e7ecfbe1a7ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

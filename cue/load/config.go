@@ -124,9 +124,6 @@ type Config struct {
 	// packages at loading time.
 
 	// Context specifies the context for the load operation.
-	// If the context is cancelled, the loader may stop early
-	// and return an ErrCancelled error.
-	// If Context is nil, the load cannot be cancelled.
 	Context *build.Context
 
 	// A Module is a collection of packages and instances that are within the

@@ -164,7 +164,8 @@ func (t *T) Equal(actual, field any, msgAndArgs ...any) {
 		info, ci := t.getCallInfo()
 		t.updateField(info, ci, actual)
 	case len(msgAndArgs) == 0:
-		t.Errorf("unexpected value:\ngot:  %v;\nwant: %v", actual, field)
+		_, ci := t.getCallInfo()
+		t.Errorf("unexpected value for field %s:\ngot:  %v;\nwant: %v", ci.fieldName, actual, field)
 	default:
 		format := msgAndArgs[0].(string) + ":\ngot:  %v;\nwant: %v"
 		args := append(msgAndArgs[1:], actual, field)

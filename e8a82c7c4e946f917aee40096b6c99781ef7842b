@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eabeff56_38794cab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:29:01Z",
+      "side": 1,
+      "message": "Most comments changed. I tried to switch the field positions for Equal, but I find it really yucky.",
+      "revId": "e8a82c7c4e946f917aee40096b6c99781ef7842b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

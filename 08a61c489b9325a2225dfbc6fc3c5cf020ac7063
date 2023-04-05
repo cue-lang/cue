@@ -34,6 +34,24 @@
       "parentUuid": "3fa1c251_49d0206a",
       "revId": "08a61c489b9325a2225dfbc6fc3c5cf020ac7063",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d51e425e_a18350eb",
+        "filename": "cmd/cue/cmd/testdata/script/vet_req.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:09:46Z",
+      "side": 1,
+      "message": "tbh I think that `cue vet` printing a \"not concrete\" warning but exiting with a zero status code is probably just fine. I could buy `-c\u003dfalse` being used to suppress the message, but I don\u0027t think it should change the exit status.",
+      "parentUuid": "e9c156b6_ccffcb1a",
+      "revId": "08a61c489b9325a2225dfbc6fc3c5cf020ac7063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

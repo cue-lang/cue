@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c493cf65_e7744476",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "I still want to be able to enable it manually for a test.\n\n\u003e Having a convention for /NNN/ seems kinda reasonable to me.\nIn principle yes, although that is not what t.Run does by default (don\u0027t remember why). Probably makes sense to handle that case as well.\n\nAlso, where would you place the init function?\n\n\u003d\u003d\nEither way, found a different solution by having a wrapper for new in cuetest that uses the CUE defaults for testing. \n\nThe code can override the update setting on a per-test basis using t.Update()\n\nI use a similar approach for Select.",
+      "parentUuid": "f06023f7_eb49abf7",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbcac272_886e1aca",
         "filename": "internal/tdtest/tdtest.go",
         "patchSetId": 1
@@ -84,6 +102,24 @@
       "writtenOn": "2023-04-04T13:49:32Z",
       "side": 1,
       "message": "TIL about `reflect.Indirect`. Kinda useful. I don\u0027t think you really need it though: why not just assume that it\u0027s a slice of struct, not pointer-to-struct?",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1239a67_9bab345e",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fbcac272_886e1aca",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -101,6 +137,24 @@
       "writtenOn": "2023-04-04T13:49:32Z",
       "side": 1,
       "message": "Is this intended to call finalizeWriter ?",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "232ad94a_8cad3e0b",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Removed writers alltogether",
+      "parentUuid": "0e0d4376_56418a48",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -175,6 +229,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5035c32a_a0c5b033",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "ae21728e_47ab942d",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81ec1015_8abd4e82",
@@ -188,6 +260,24 @@
       "writtenOn": "2023-04-04T13:49:32Z",
       "side": 1,
       "message": "or just include the field by value and leave it zero?",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d334664a_2b9d07e5",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "81ec1015_8abd4e82",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -209,6 +299,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15b89fab_adbb1d54",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "55ce277d_bcb01b5e",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0dca8c74_731d1c8b",
@@ -222,6 +330,24 @@
       "writtenOn": "2023-04-04T13:49:32Z",
       "side": 1,
       "message": "unused field.",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a071a23d_314ddb64",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0dca8c74_731d1c8b",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -243,6 +369,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "27a3747a_be715c64",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "07359691_290e2ccb",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9351eab5_0fee2448",
@@ -256,6 +400,24 @@
       "writtenOn": "2023-04-04T13:49:32Z",
       "side": 1,
       "message": "tbh I tend to prefer `reflect.TypeOf(new(T)).Elem()` because it works on all types, even interface types (not that that\u0027s a particular issue here because it must be a struct literal, but still, it\u0027s just a more standard idiom).",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a2d8f1c_4f8f8ca9",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9351eab5_0fee2448",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -277,6 +439,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e184deac_80841122",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Wrapped in sync.Once.",
+      "parentUuid": "b925c8ea_5f3ee7ad",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25686ef2_a98c2aab",
@@ -290,6 +470,24 @@
       "writtenOn": "2023-04-04T15:33:32Z",
       "side": 1,
       "message": "composite",
+      "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "872de3b4_f12174a2",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T14:27:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25686ef2_a98c2aab",
       "revId": "d974f1def45ced4a1d9e595136c7e36efbfe8a75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

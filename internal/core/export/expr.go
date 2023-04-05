@@ -259,6 +259,8 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 		d.Value = e.mergeValues(f, field.arc, c, a...)
 
+		e.linkField(field.arc, d)
+
 		if f.IsDef() {
 			x.inDefinition--
 		}

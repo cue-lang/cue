@@ -297,6 +297,24 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 	switch x := r.(type) {
 	case *adt.FieldReference:
 		ident, _ := e.newIdentForField(x.Src, x.Label, x.UpCount)
+
+		// Use low-level lookup to bypass structural cycle detection. This is
+		// fine as we do not recurse on the result and it is necessary to detect
+		// shadowing even when a configuration has a structural cycle.
+		for i := 0; i < int(x.UpCount); i++ {
+			env = env.Up
+		}
+
+		// Exclude comprehensions and other temporary/ inlined Vertices, which
+		// cannot be properly resolved, throwing off the sanitize. Also,
+		// comprehensions originate from a single source and do not need to be
+		// handled.
+		if v := env.Vertex; !v.IsDynamic {
+			if v = v.Lookup(x.Label); v != nil {
+				e.linkIdentifier(v, ident)
+			}
+		}
+
 		return ident
 
 	case *adt.ValueReference:
@@ -424,8 +442,31 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 		internal.SetConstraint(f, x.ArcType.Token())
 		e.setField(x.Label, f)
 
-		f.Value = e.expr(env, x.Value)
 		f.Attrs = extractFieldAttrs(nil, x)
+
+		st, ok := x.Value.(*adt.StructLit)
+		if !ok {
+			f.Value = e.expr(env, x.Value)
+			return f
+
+		}
+
+		top := e.frame(0)
+		var src *adt.Vertex
+		if top.node != nil {
+			src = top.node.Lookup(x.Label)
+		}
+
+		// Instead of calling e.expr directly, we inline the case for
+		// *adt.StructLit, so that we can pass src.
+		c := adt.MakeRootConjunct(env, st)
+		f.Value = e.mergeValues(adt.InvalidLabel, src, []conjunct{{c: c, up: 0}}, c)
+
+		if top.node != nil {
+			if v := top.node.Lookup(x.Label); v != nil {
+				e.linkField(v, f)
+			}
+		}
 
 		return f
 

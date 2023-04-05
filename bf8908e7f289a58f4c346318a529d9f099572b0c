@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c51178f_684beaca",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "s/implemenation/implementation/",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1de92e83_5305466c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "LGTM with a few suggestions for doc comments, thanks!",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c8287b98_329d0068",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "debugging remnant",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2bb0d95_cb6663a0",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "It might be nice to have a comment in this section saying what it\u0027s doing?",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a9275a2_6e4bc143",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "doc comment?",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f7b0e42_cf97ac4a",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "a doc comment would be nice. What does \"link\" mean in this context?",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2389612_f9e4dbcc",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "ditto.",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9cce3d5_73ee27ee",
+        "filename": "internal/core/export/testdata/main/shadow.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-05T15:15:36Z",
+      "side": 1,
+      "message": "s/good/ok/ ?",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

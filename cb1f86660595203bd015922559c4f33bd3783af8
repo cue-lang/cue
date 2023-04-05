@@ -33,6 +33,24 @@
       "message": "this comment still talks about constraints. should it be updated? I also wonder if the TODO still applies.",
       "revId": "cb1f86660595203bd015922559c4f33bd3783af8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06d6f255_31348962",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-05T12:01:30Z",
+      "side": 1,
+      "message": "removed.",
+      "parentUuid": "e1747e39_c04fd8f3",
+      "revId": "cb1f86660595203bd015922559c4f33bd3783af8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

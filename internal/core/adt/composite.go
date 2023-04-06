@@ -772,6 +772,11 @@ func (v *Vertex) IsClosedList() bool {
 
 // TODO: return error instead of boolean? (or at least have version that does.)
 func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
+	// TODO(v0.6): move f.IsHidden from below to here.
+	if f.IsLet() {
+		return true
+	}
+
 	if x, ok := v.BaseValue.(*Disjunction); ok {
 		for _, v := range x.Values {
 			if x, ok := v.(*Vertex); ok && x.Accept(ctx, f) {

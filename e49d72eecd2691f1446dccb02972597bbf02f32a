@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1b1b46d_d66d3285",
+        "filename": "cue/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1412,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T08:38:28Z",
+      "side": 1,
+      "message": "omitHidden is typically implied by final and concrete. But made it explicit.",
+      "parentUuid": "7488ade9_420ed083",
+      "revId": "e49d72eecd2691f1446dccb02972597bbf02f32a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9b51a4b_79c72d12",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-04-04T16:27:07Z",
       "side": 1,
       "message": "Why export this?",
+      "revId": "e49d72eecd2691f1446dccb02972597bbf02f32a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47e304de_a7c4525b",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T08:38:28Z",
+      "side": 1,
+      "message": "It was needed at some point. Removed.",
+      "parentUuid": "b9b51a4b_79c72d12",
       "revId": "e49d72eecd2691f1446dccb02972597bbf02f32a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

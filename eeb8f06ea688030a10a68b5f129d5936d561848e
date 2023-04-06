@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "067849f4_1a229200",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-06T21:50:46Z",
+      "side": 1,
+      "message": "I worry about this from a philosophical perspective - it seems like a dangerous primitive to have available, but I see that it could be useful...\nOther than that, just a few minor suggestions and LGTM, thanks!",
+      "revId": "eeb8f06ea688030a10a68b5f129d5936d561848e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "101aa996_2e2c7daa",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1763,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-06T21:50:46Z",
+      "side": 1,
+      "message": "or just return x.v (and below) ?",
+      "revId": "eeb8f06ea688030a10a68b5f129d5936d561848e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97acab84_72f3d32d",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1776,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-06T21:50:46Z",
+      "side": 1,
+      "message": "I think there should be a stronger notice that this can break configuration invariants. For example, patching a value will not change anything that depends on that value, and will override any existing constraints on the value (for example it might be constrained to being a string but this API could change it to anything).",
+      "revId": "eeb8f06ea688030a10a68b5f129d5936d561848e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbcdfbd8_1650f957",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1782,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-06T21:50:46Z",
+      "side": 1,
+      "message": "I\u0027m not sure what this means. Specifically, it\u0027s not clear to me what parts of the current CUE evaluation would be treated as if they were lexically in scope.",
+      "revId": "eeb8f06ea688030a10a68b5f129d5936d561848e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f06fc430_88f1bea4",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1814,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-06T21:50:46Z",
+      "side": 1,
+      "message": "Maybe include include a comment on the basic patch strategy that\u0027s being used here.",
+      "revId": "eeb8f06ea688030a10a68b5f129d5936d561848e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31334f03_889c5978",
+        "filename": "cue/value_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-06T21:50:46Z",
+      "side": 1,
+      "message": "It would be good to have some tests that explicitly test that we can break invariants without consequence, and also for patching using ast.Expr and cue.Value, and that the latter does actually panic if the contexts don\u0027t match.\n\nAlso, a test for patching an element of a list would be nice. Out of interest, what\u0027s supposed to happen if you patch a list outside of its bounds?",
+      "revId": "eeb8f06ea688030a10a68b5f129d5936d561848e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

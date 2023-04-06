@@ -52,6 +52,24 @@
       "parentUuid": "e9c156b6_ccffcb1a",
       "revId": "08a61c489b9325a2225dfbc6fc3c5cf020ac7063",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65745907_829b554c",
+        "filename": "cmd/cue/cmd/testdata/script/vet_req.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T07:56:55Z",
+      "side": 1,
+      "message": "The way errors are caught is to watch for output to stderr. So it would be a bit of a tricky change.",
+      "parentUuid": "d51e425e_a18350eb",
+      "revId": "08a61c489b9325a2225dfbc6fc3c5cf020ac7063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -364,7 +364,6 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				}
 			}
 			f(tc)
-
 			index := make(map[string]int, len(a.Files))
 			for i, f := range a.Files {
 				index[f.Name] = i
@@ -396,7 +395,6 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 						continue
 					}
 				}
-
 				if cuetest.UpdateGoldenFiles {
 					update = true
 					gold.Data = result
@@ -407,6 +405,10 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					sub.name,
 					cmp.Diff(string(gold.Data), string(result)))
 			}
+			// TODO if there's an out/$testName/$name file present
+			// where testName matches the current test and there's no
+			// output for that name, we should probably
+			// fail unless it's empty.
 
 			// Add remaining unrelated files, ignoring files that were already
 			// added.

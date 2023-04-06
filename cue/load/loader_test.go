@@ -140,7 +140,9 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/other
 display:./other
 files:
-	$CWD/testdata/testmod/other/main.cue`,
+	$CWD/testdata/testmod/other/main.cue
+imports:
+	./file:`,
 	}, {
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test

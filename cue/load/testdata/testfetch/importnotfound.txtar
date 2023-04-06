@@ -1,0 +1,31 @@
+-- out/modfetch/nonexistent-imports --
+main.org/foo
+nonexistent1.com/x
+nonexistent2.com/y
+nonexistent3.com/z
+-- out/modfetch/error --
+import failed: import failed: cannot find package "nonexistent3.com/z":
+    ./main.cue:3:2
+    ./foo/foo.cue:3:2
+import failed: cannot find package "nonexistent1.com/x":
+    ./main.cue:4:2
+import failed: cannot find package "nonexistent2.com/y":
+    ./main.cue:5:2
+-- cue.mod/module.cue --
+module: "main.org"
+
+-- main.cue --
+package main
+import (
+	"main.org/foo"
+	"nonexistent1.com/x"
+	"nonexistent2.com/y"
+)
+main
+x.foo
+-- foo/foo.cue --
+package foo
+import (
+	"nonexistent3.com/z"
+)
+z.foo

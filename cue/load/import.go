@@ -120,7 +120,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	if !found {
 		return retErr(
 			&PackageError{
-				Message: errors.NewMessagef("cannot find package %q", p.DisplayPath),
+				Message:    errors.NewMessagef("cannot find package %q", p.DisplayPath),
+				IsNotExist: true,
 			})
 	}
 
@@ -372,11 +373,10 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	default:
 		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
 		if l.cfg.Registry != "" {
-			var err error
+			var err errors.Error
 			absDir, err = l.externalPackageDir(p)
 			if err != nil {
-				// TODO why can't we use %w ?
-				return "", name, errors.Newf(token.NoPos, "cannot get directory for external module %q: %v", p, err)
+				return "", name, err
 			}
 		} else {
 			absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), sub)
@@ -386,15 +386,18 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	return absDir, name, err
 }
 
-func (l *loader) externalPackageDir(p importPath) (dir string, err error) {
+func (l *loader) externalPackageDir(p importPath) (string, errors.Error) {
 	m, subPath, ok := l.deps.lookup(p)
 	if !ok {
-		return "", fmt.Errorf("no dependency found for import path %q", p)
+		return "", &PackageError{
+			Message:    errors.NewMessagef("cannot find package %q", p),
+			IsNotExist: true,
+		}
 	}
 
-	dir, err = l.regClient.getModContents(m)
+	dir, err := l.regClient.getModContents(m)
 	if err != nil {
-		return "", fmt.Errorf("cannot get contents for %v: %v", m, err)
+		return "", errors.Wrapf(err, token.NoPos, "cannot get contents for %v", m)
 	}
 	return filepath.Join(dir, filepath.FromSlash(subPath)), nil
 }

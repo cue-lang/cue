@@ -30,6 +30,7 @@ type PackageError struct {
 	Pos            token.Pos // position of error
 	errors.Message           // the error itself
 	IsImportCycle  bool      // the error is an import cycle
+	IsNotExist     bool      // the error is that the package does not exist in the dependencies.
 }
 
 func (p *PackageError) Position() token.Pos         { return p.Pos }

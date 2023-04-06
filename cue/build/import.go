@@ -87,6 +87,7 @@ func (inst *Instance) complete() errors.Error {
 
 	sort.Strings(paths)
 
+	var impErr errors.Error
 	if inst.loadFunc != nil {
 		for i, path := range paths {
 			isLocal := IsLocalImport(path)
@@ -105,7 +106,9 @@ func (inst *Instance) complete() errors.Error {
 					continue
 				}
 				if imp.Err != nil {
-					return errors.Wrapf(imp.Err, pos, "import failed")
+					// Even though there's an error, carry on because we want
+					// the imports to exist so we can see them in the final result.
+					impErr = errors.Append(impErr, errors.Wrapf(imp.Err, pos, "import failed"))
 				}
 				imp.ImportPath = path
 				// imp.parent = inst
@@ -122,6 +125,9 @@ func (inst *Instance) complete() errors.Error {
 				inst.Incomplete = true
 			}
 		}
+	}
+	if impErr != nil {
+		return impErr
 	}
 
 	inst.ImportPaths = paths

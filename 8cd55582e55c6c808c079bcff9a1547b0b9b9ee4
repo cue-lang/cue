@@ -402,6 +402,24 @@
       "parentUuid": "997c714e_9900dcdd",
       "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "87d58736_07a3a3ed",
+        "filename": "pkg/path/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-06T13:30:09Z",
+      "side": 1,
+      "message": "Actually, I just looked at this a bit more and it seems OK to me. The actual OS argument that can be passed to the relevant path functions is constrained to be a disjunction of all possible OS values (so, for example, `path.Clean(\"//foo/bar\", \"baz\")` will fail before it ever gets around to calling `getOS`).\n\nI\u0027ve added a comment to make that clearer.",
+      "parentUuid": "3aa51748_4799677d",
+      "revId": "8cd55582e55c6c808c079bcff9a1547b0b9b9ee4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

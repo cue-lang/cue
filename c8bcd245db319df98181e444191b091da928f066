@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abfe30eb_5833add2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-06T17:13:36Z",
+      "side": 1,
+      "message": "Do you mean that lines 779-808 do not affect the case where f.IsHidden()\u003d\u003dtrue? I would say that, then, because \"always passes\" doesn\u0027t really make sense to me.",
+      "revId": "c8bcd245db319df98181e444191b091da928f066",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

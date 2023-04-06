@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "087a6ec7_b259ebc0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T07:57:12Z",
+      "side": 1,
+      "message": "But would be in favor of that.",
+      "revId": "08a61c489b9325a2225dfbc6fc3c5cf020ac7063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3fa1c251_49d0206a",

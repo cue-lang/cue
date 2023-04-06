@@ -2109,12 +2109,12 @@ func TestSubsumes(t *testing.T) {
 }
 
 func TestUnify(t *testing.T) {
-	a := []string{"a"}
-	b := []string{"b"}
+	a := "a"
+	b := "b"
 	testCases := []struct {
 		value string
-		pathA []string
-		pathB []string
+		pathA string
+		pathB string
 		want  string
 	}{{
 		value: `4`,
@@ -2144,12 +2144,23 @@ func TestUnify(t *testing.T) {
 		pathA: a,
 		pathB: b,
 		want:  `{"a":"foo"}`,
+	}, {
+		// Issue #2325
+		value: `#T: {
+			...
+		}
+		b: {
+			let foobar = {}
+			 _fb: foobar
+		}`,
+		pathA: "#T",
+		pathB: b,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
 			v := getInstance(t, tc.value).Value()
-			x := v.Lookup(tc.pathA...)
-			y := v.Lookup(tc.pathB...)
+			x := v.LookupPath(ParsePath(tc.pathA))
+			y := v.LookupPath(ParsePath(tc.pathB))
 			b, err := x.Unify(y).MarshalJSON()
 			if err != nil {
 				t.Fatal(err)

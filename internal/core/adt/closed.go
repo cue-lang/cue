@@ -480,7 +480,7 @@ func verifyArc(ctx *OpContext, s *StructInfo, f Feature, label Value) bool {
 	o := s.StructLit
 	env := s.Env
 
-	if isRegular && (len(o.Additional) > 0 || o.IsOpen) {
+	if len(o.Additional) > 0 || o.IsOpen {
 		return true
 	}
 

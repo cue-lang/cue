@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "f86f4767_69d9a15d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T09:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c51178f_684beaca",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "1de92e83_5305466c",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fb83368_b641695f",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T09:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c8287b98_329d0068",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f2bb0d95_cb6663a0",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-04-05T15:15:36Z",
       "side": 1,
       "message": "It might be nice to have a comment in this section saying what it\u0027s doing?",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a792c93c_b9d45c43",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 461,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T09:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f2bb0d95_cb6663a0",
       "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fcbe106_83bd379d",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T09:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a9275a2_6e4bc143",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0f7b0e42_cf97ac4a",
@@ -99,6 +171,24 @@
       "writtenOn": "2023-04-05T15:15:36Z",
       "side": 1,
       "message": "a doc comment would be nice. What does \"link\" mean in this context?",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5da78d2d_0f07a607",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T09:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f7b0e42_cf97ac4a",
       "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21cf679a_3ffec10b",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T09:39:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2389612_f9e4dbcc",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9cce3d5_73ee27ee",
@@ -133,6 +241,24 @@
       "writtenOn": "2023-04-05T15:15:36Z",
       "side": 1,
       "message": "s/good/ok/ ?",
+      "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b63d041_8fb6b4f5",
+        "filename": "internal/core/export/testdata/main/shadow.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-06T09:39:09Z",
+      "side": 1,
+      "message": "Changed. Zoolander reference got lost and is arguably also out of place.:)",
+      "parentUuid": "e9cce3d5_73ee27ee",
       "revId": "bf8908e7f289a58f4c346318a529d9f099572b0c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

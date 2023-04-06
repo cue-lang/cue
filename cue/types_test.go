@@ -31,6 +31,8 @@ import (
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/tdtest"
 )
 
 func getInstance(t *testing.T, body string) *Instance {
@@ -2111,12 +2113,13 @@ func TestSubsumes(t *testing.T) {
 func TestUnify(t *testing.T) {
 	a := "a"
 	b := "b"
-	testCases := []struct {
+	type testCase struct {
 		value string
 		pathA string
 		pathB string
 		want  string
-	}{{
+	}
+	testCases := []testCase{{
 		value: `4`,
 		want:  `4`,
 	}, {
@@ -2156,21 +2159,26 @@ func TestUnify(t *testing.T) {
 		pathA: "#T",
 		pathB: b,
 		want:  `{}`,
+	}, {
+		value: `
+		a: #A: "foo"
+		#B: {...}
+		`,
+		pathA: a,
+		pathB: "#B",
+		want:  `{}`,
 	}}
-	for _, tc := range testCases {
-		t.Run(tc.value, func(t *testing.T) {
-			v := getInstance(t, tc.value).Value()
-			x := v.LookupPath(ParsePath(tc.pathA))
-			y := v.LookupPath(ParsePath(tc.pathB))
-			b, err := x.Unify(y).MarshalJSON()
-			if err != nil {
-				t.Fatal(err)
-			}
-			if got := string(b); got != tc.want {
-				t.Errorf("got %v; want %v", got, tc.want)
-			}
-		})
-	}
+	// TODO(tdtest): use cuetest.Run when supported.
+	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+		v := getInstance(t.T, tc.value).Value()
+		x := v.LookupPath(ParsePath(tc.pathA))
+		y := v.LookupPath(ParsePath(tc.pathB))
+		b, err := x.Unify(y).MarshalJSON()
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Equal(string(b), tc.want)
+	})
 }
 
 func TestEquals(t *testing.T) {

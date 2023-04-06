@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5b17204a_d942623f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-06T17:19:59Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8fb808c_9c2f7c0e",
+      "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5e5c7839_4ebc1aba",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c3a1a12_0deb0eff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-06T17:19:59Z",
+      "side": 1,
+      "message": "I have added one paragraph to the commit message explaining why I think this is a necessary change, even if it could break some users.",
+      "parentUuid": "9fa3ec5e_42d9c486",
+      "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5598263a_246fbb65",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-02-01T11:07:57Z",
       "side": 1,
       "message": "Ha, was this flag totally ignored before?",
+      "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08d2d801_cb0180bb",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 718,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-06T17:19:59Z",
+      "side": 1,
+      "message": "yup, a bit embarrassing. but to be honest, we didn\u0027t have tests covering HTML escaping either :)",
+      "parentUuid": "5598263a_246fbb65",
       "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -100,6 +154,24 @@
       "side": 1,
       "message": "I\u0027ve started doing that, as per Rog\u0027s request, and I quite like it indeed.",
       "parentUuid": "969aa43e_056da000",
+      "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b27c4f3d_37e51b54",
+        "filename": "pkg/encoding/json/testdata/gen.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-06T17:19:59Z",
+      "side": 1,
+      "message": "good idea - split up :)",
+      "parentUuid": "ee76b3ab_4be07d34",
       "revId": "8ed2a126baebf5791d5c7bb5fa74d567d4df7584",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

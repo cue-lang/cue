@@ -87,8 +87,8 @@ jobs:
         name: Get go build/test cache directory
         run: echo "dir=$(go env GOCACHE)" >> ${GITHUB_OUTPUT}
       - if: |-
-          ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"'))))
+          (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
         uses: actions/cache@v3
         with:
           path: |-
@@ -97,8 +97,8 @@ jobs:
           key: ${{ runner.os }}-${{ matrix.go-version }}-${{ github.run_id }}
           restore-keys: ${{ runner.os }}-${{ matrix.go-version }}
       - if: |-
-          ! ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"'))))
+          ! (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
         uses: actions/cache/restore@v3
         with:
           path: |-

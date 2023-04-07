@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56b67cf1_6bb8927e",
+        "filename": "cue/load/errors.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-07T15:29:14Z",
+      "side": 1,
+      "message": "we might have designed these IsX features differently if errors.Is and errors.As already existed from day one. for example,\n\n\tif errors.Is(err, load.ErrNotExist) {\n\nfeels nicer than either of\n\n\tif perr :\u003d new(load.PackageError); errors.As(err, \u0026perr) \u0026\u0026 err.IsNotExist {\n\n\tif perr, ok :\u003d err.(*load.PackageError); ok \u0026\u0026 perr.IsNotExist {",
+      "revId": "e03e781e7160681e8f5608ab6a1feb2181657756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96030b1c_7f474556",
+        "filename": "cue/load/module_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-07T15:29:14Z",
+      "side": 1,
+      "message": "add a TODO to use https://github.com/golang/go/issues/57436 when we can use Go 1.21 and later",
+      "revId": "e03e781e7160681e8f5608ab6a1feb2181657756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

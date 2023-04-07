@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ffb1c86c_45b047ad",
+        "filename": "cue/load/import.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 378,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-07T15:29:14Z",
+      "side": 0,
+      "message": "what was the reason? do we still care?",
+      "revId": "102150dedd937090ffee149b1675ff1b0bef89cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

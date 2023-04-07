@@ -31,8 +31,8 @@ trybotWorkflows: {
 }
 
 trybotDispatchWorkflow: bashWorkflow & {
-	#dummyDispatch: #dispatch
-	name:           "Dispatch \(trybot.key)"
+	#dummyDispatch?: #dispatch
+	name:            "Dispatch \(trybot.key)"
 	on: {
 		repository_dispatch: {}
 		push: {
@@ -45,9 +45,11 @@ trybotDispatchWorkflow: bashWorkflow & {
 		(trybot.key): {
 			"runs-on": linuxMachine
 
+			let goodDummyData = [ if encjson.Marshal(#dummyDispatch) != _|_ {true}, false][0]
+
 			// We set the "on" conditions above, but this would otherwise mean we
 			// run for all dispatch events.
-			if: "${{ github.ref == 'refs/heads/\(testDefaultBranch)' || github.event.client_payload.type == '\(trybot.key)' }}"
+			if: "${{ (\(isTestDefaultBranch) && \(goodDummyData)) || github.event.client_payload.type == '\(trybot.key)' }}"
 
 			// See the comment below about the need for cases
 			let cases = [
@@ -69,7 +71,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 				json.#step & {
 					name: "Write fake payload"
 					id:   "payload"
-					if:   "github.repository == '\(githubRepositoryPath)' && github.ref == 'refs/heads/\(testDefaultBranch)'"
+					if:   "github.repository == '\(githubRepositoryPath)' && \(isTestDefaultBranch)"
 
 					// Use bash heredocs so that JSON's use of double quotes does
 					// not get interpreted as shell.  Both in the running of the
@@ -78,7 +80,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 					run: #"""
 						cat <<EOD >> $GITHUB_OUTPUT
 						value<<DOE
-						\#(encjson.Marshal(#dummyDispatch))
+						\#(*encjson.Marshal(#dummyDispatch) | "null")
 						DOE
 						EOD
 						"""#
@@ -236,10 +238,6 @@ evictCaches: bashWorkflow & {
 		schedule: [
 			{cron: "0 2 * * *"},
 		]
-		push: {
-			// To enable testing of the dispatch itself
-			branches: [testDefaultBranch]
-		}
 	}
 
 	jobs: {

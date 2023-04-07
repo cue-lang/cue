@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fa55645_f1d5366f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-07T14:19:04Z",
+      "side": 1,
+      "message": "We briefly mentioned this fix with Marcel yesterday - it\u0027s an easy fix and one that we want sooner than later. For context, the PR without DCO was https://github.com/cue-lang/cue/pull/2290; the fix is trivial, which I re-applied and got the testdata changes with CUE_UPDATE\u003dtrue.",
+      "revId": "97346d456d46db319b03b1403f23955d2cea60c9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

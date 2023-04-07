@@ -16,6 +16,23 @@
       "message": "PTAL",
       "revId": "24d20af4ed904c2d6e8e1963783134b51673dfdf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "745092bb_23a227a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-07T09:54:09Z",
+      "side": 1,
+      "message": "Roger and Marcel are fine with this, and all comments are addressed, so submitting.",
+      "revId": "24d20af4ed904c2d6e8e1963783134b51673dfdf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

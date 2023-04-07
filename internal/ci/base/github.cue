@@ -62,10 +62,9 @@ checkoutCode: {
 		},
 
 		{
-			let stepName = strings.Replace(dispatchTrailer, "-", "", -1)
 			json.#step & {
 				name: "Try to extract \(dispatchTrailer)"
-				id:   stepName
+				id:   dispatchTrailerStepID
 				run:  """
 					x="$(git log -1 --pretty='%(trailers:key=\(dispatchTrailer),valueonly)')"
 					if [[ "$x" == "" ]]
@@ -78,7 +77,7 @@ checkoutCode: {
 					   # output from this step is the JSON value null or not.
 					   x=null
 					fi
-					echo "value<<EOD" >> $GITHUB_OUTPUT
+					echo "\(_dispatchTrailerDecodeStepOutputVar)<<EOD" >> $GITHUB_OUTPUT
 					echo "$x" >> $GITHUB_OUTPUT
 					echo "EOD" >> $GITHUB_OUTPUT
 					"""
@@ -188,7 +187,11 @@ setupGoActionsCaches: {
 	// cacheDirs is a convenience variable that includes
 	// GitHub expressions that represent the directories
 	// that participate in Go caching.
-	let cacheDirs = [ "${{ steps.\(goModCacheDirID).outputs.dir }}/cache/download", "${{ steps.\(goCacheDirID).outputs.dir }}"]
+	let cacheDirs = [
+		"${{ steps.\(goModCacheDirID).outputs.dir }}/cache/download",
+		"${{ steps.\(goCacheDirID).outputs.dir }}",
+		"~/.cache/dockercache",
+	]
 
 	let cacheRestoreKeys = "\(#os)-\(#goVersion)"
 
@@ -301,6 +304,19 @@ repositoryDispatch: json.#step & {
 //
 // NOTE: keep this consistent with gerritstatusupdater parsing logic.
 dispatchTrailer: "Dispatch-Trailer"
+
+// dispatchTrailerStepID is the ID of the step that attempts
+// to extract a Dispatch-Trailer value from the commit at HEAD
+dispatchTrailerStepID: strings.Replace(dispatchTrailer, "-", "", -1)
+
+// _dispatchTrailerDecodeStepOutputVar is the name of the output
+// variable int he dispatchTrailerStepID step
+_dispatchTrailerDecodeStepOutputVar: "value"
+
+// dispatchTrailerExpr is a GitHub expression that can be dereferenced
+// to get values from the JSON-decded Dispatch-Trailer value that
+// is extracted during the dispatchTrailerStepID step.
+dispatchTrailerExpr: "fromJSON(steps.\(dispatchTrailerStepID).outputs.\(_dispatchTrailerDecodeStepOutputVar))"
 
 // containsDispatchTrailer returns a GitHub expression that looks at the commit
 // message of the head commit of the event that triggered the workflow, an

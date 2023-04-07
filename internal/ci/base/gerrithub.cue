@@ -31,8 +31,8 @@ trybotWorkflows: {
 }
 
 trybotDispatchWorkflow: bashWorkflow & {
-	#dummyDispatch: #dispatch
-	name:           "Dispatch \(trybot.key)"
+	#dummyDispatch?: #dispatch
+	name:            "Dispatch \(trybot.key)"
 	on: {
 		repository_dispatch: {}
 		push: {
@@ -78,7 +78,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 					run: #"""
 						cat <<EOD >> $GITHUB_OUTPUT
 						value<<DOE
-						\#(encjson.Marshal(#dummyDispatch))
+						\#(*encjson.Marshal(#dummyDispatch) | "null")
 						DOE
 						EOD
 						"""#
@@ -236,10 +236,6 @@ evictCaches: bashWorkflow & {
 		schedule: [
 			{cron: "0 2 * * *"},
 		]
-		push: {
-			// To enable testing of the dispatch itself
-			branches: [testDefaultBranch]
-		}
 	}
 
 	jobs: {

@@ -77,10 +77,13 @@ b: [
 	123, // elem 0 line comment
 
 	// trailing elem 0
+	// inbetween comment 1
 	// inbetween comment 2
+	// doc elem 1
 	456, // elem 1 line comment
 
 	// trailing elem 1
+	// final floating 1
 
 	// final floating 2
 ]

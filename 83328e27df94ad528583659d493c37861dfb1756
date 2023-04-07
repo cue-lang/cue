@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90315711_03d991c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-07T15:56:26Z",
+      "side": 1,
+      "message": "Something to include in the first v0.6 alpha, in case the txtpbfmt update needs to be reverted due to any breakage spotted as part of the alpha/beta process.",
+      "revId": "83328e27df94ad528583659d493c37861dfb1756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

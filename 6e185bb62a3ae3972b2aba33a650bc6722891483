@@ -16,6 +16,24 @@
       "message": "These seem to be incorrect results. Maybe a similar bug?",
       "revId": "6e185bb62a3ae3972b2aba33a650bc6722891483",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2024bca5_2c71cb3d",
+        "filename": "cue/testdata/lists/021_list_equality.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-11T07:10:10Z",
+      "side": 1,
+      "message": "Figured it out via DM: out/def is not actually used by the tests, it\u0027s a snapshot from an old CUE version. What matters for now is out/eval.",
+      "parentUuid": "13ce39f4_07d01a3b",
+      "revId": "6e185bb62a3ae3972b2aba33a650bc6722891483",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

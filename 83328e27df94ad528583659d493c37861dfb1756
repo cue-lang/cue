@@ -16,6 +16,23 @@
       "message": "Something to include in the first v0.6 alpha, in case the txtpbfmt update needs to be reverted due to any breakage spotted as part of the alpha/beta process.",
       "revId": "83328e27df94ad528583659d493c37861dfb1756",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4267476_ec5598c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-11T04:51:45Z",
+      "side": 1,
+      "message": "Will leave to @mpvl to finally approve, as he owns the txtpb interactions. ",
+      "revId": "83328e27df94ad528583659d493c37861dfb1756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

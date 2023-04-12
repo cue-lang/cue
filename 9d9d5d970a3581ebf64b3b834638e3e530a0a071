@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba964960_12eede51",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:36:10Z",
+      "side": 1,
+      "message": "Rendered versions of patchset 3 available at:\n\nhttps://github.com/cue-lang/cue/blob/9d9d5d970a3581ebf64b3b834638e3e530a0a071/doc/ref/v0.5.0-release-notes.md\n\nhttps://github.com/cue-lang/cue/blob/9d9d5d970a3581ebf64b3b834638e3e530a0a071/doc/ref/v0.6.0-alpha.1-release.notes.md",
+      "revId": "9d9d5d970a3581ebf64b3b834638e3e530a0a071",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

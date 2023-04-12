@@ -1,6 +1,6 @@
 package github
 
 dummyDispatch: {
-    CL:       552206
-    patchset: 12
+    CL:       552504
+    patchset: 2
 }

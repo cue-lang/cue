@@ -581,6 +581,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "95de545f_81541af1",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T09:04:58Z",
+      "side": 1,
+      "message": "I would put this under a separate section `## Language changes`, instead of `## API`.",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af87cc0d_d1d7e4e9",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T09:04:58Z",
+      "side": 1,
+      "message": "s/regular value/regular field/",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "84e5c4a0_65f41464",
         "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
         "patchSetId": 2
@@ -592,6 +626,91 @@
       "writtenOn": "2023-04-12T09:02:28Z",
       "side": 1,
       "message": "align/format?",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d8eefc1_d7a9da73",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T09:04:58Z",
+      "side": 1,
+      "message": "spacing",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0b5449a_251cc69e",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T09:04:58Z",
+      "side": 1,
+      "message": "s/This is/Note that this is/\ns/because as a general rule schema/because our new guidelines suggest schemas/\ns/onlys/only/",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d149f5a3_9c6fe7c4",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T09:04:58Z",
+      "side": 1,
+      "message": "s/./, but we will use this for illustration purposes./",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6126638a_b2448761",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T09:04:58Z",
+      "side": 1,
+      "message": "s/mode/mode,/",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e22dc4a_4a81b40c",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T09:04:58Z",
+      "side": 1,
+      "message": "s/doesn\u0027t/does not/",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

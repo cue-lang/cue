@@ -221,6 +221,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c899401d_c642059b",
+        "filename": "doc/ref/v0.5.0-release-notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 133,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T08:50:55Z",
+      "side": 1,
+      "message": "It actually does allow it as long as the two comprehensions result in the same set of fields.\n\nReplace this whole paragraph with:?\n\nCUE does not allow cyclic dependencies between comprehensions if they result in an ambiguous set of fields.\nIt does allow cascading insertions as in:\n\n```\na?: int\nb?: int\nif a !\u003d _|_ {\n    b: 2\n}\nif b !\u003d _|_ {\n    c: 3\n    d: 4\n}\n\n```\n\nThe way this works is that for fields with a fixed prefix path in a comprehension value, the comprehension is assigned to these respective fields.",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1f80d134_bca64602",
         "filename": "doc/ref/v0.5.0-release-notes.md",
         "patchSetId": 2
@@ -244,6 +261,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ebae54ea_f1d6848d",
+        "filename": "doc/ref/v0.5.0-release-notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T08:50:55Z",
+      "side": 1,
+      "message": "replace this paragraph with\n\nWith this rewrite, dependencies in comprehension expressions are handled analogously to other expressions.",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "df947daf_5b49d0b5",
         "filename": "doc/ref/v0.5.0-release-notes.md",
         "patchSetId": 2
@@ -261,6 +295,40 @@
         "endLine": 167,
         "endChar": 9
       },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9ecac8f_9152698f",
+        "filename": "doc/ref/v0.5.0-release-notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T08:50:55Z",
+      "side": 1,
+      "message": "This text doesn\u0027t explain the solution taken.\nAdd paragraph.\n\nThe new algorithm, a variant of Tomabechi\u0027s and Van Lohuizen\u0027s algorithm, looks at references equality on conjuncts, instead of node equality. This simplifies the accounting and allows for far simpler and precise accounting when using references instead of the traditional node equivalence.",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e04c789e_3a7e5013",
+        "filename": "doc/ref/v0.5.0-release-notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T08:50:55Z",
+      "side": 1,
+      "message": "I think it is fine to remove this detail until the next paragraph. This didn\u0027t really change from the previous implementation, so may just be confusing.\n\nIf you want to keep it, I would add a `#### More background info on cycles` or something like that.",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -307,6 +375,23 @@
         "endLine": 236,
         "endChar": 13
       },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a62a3b4e_505c19a1",
+        "filename": "doc/ref/v0.5.0-release-notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-04-12T08:50:55Z",
+      "side": 1,
+      "message": "I would put this paragraph at the end of the `per-field comprehensions` section.",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

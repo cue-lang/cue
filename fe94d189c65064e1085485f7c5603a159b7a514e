@@ -52,6 +52,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "46b7d18a_56e69c42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T09:04:24Z",
+      "side": 1,
+      "message": "Also, 0.6 jumps Go versions as well, dropping support for 1.18.x, and bumps dependencies like txtpbfmt and golang.org/x/... - we should at least mention that.",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "305aaeab_8bcb5d93",

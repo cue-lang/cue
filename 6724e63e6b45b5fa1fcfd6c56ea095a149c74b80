@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5971481_c4d13c3d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T10:26:57Z",
+      "side": 1,
+      "message": "Release workflow test results: https://github.com/cue-lang/cue/actions/runs/4676917023",
+      "revId": "6724e63e6b45b5fa1fcfd6c56ea095a149c74b80",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe468816_e752db5f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Applied the round of v0.6.0-alpha.1 suggested changes.",
+      "revId": "8c793b813ca796e67ea17fedfc198ce6a0a9a7c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

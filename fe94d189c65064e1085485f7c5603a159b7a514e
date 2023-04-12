@@ -1012,6 +1012,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0fa2380_e9ca28fe",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "TIL. Done.",
+      "parentUuid": "cd0cb725_f2e9bc2e",
+      "range": {
+        "startLine": 8,
+        "startChar": 50,
+        "endLine": 8,
+        "endChar": 54
+      },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14d78e1d_2deb9d62",
@@ -1025,6 +1049,30 @@
       "writtenOn": "2023-04-12T09:02:28Z",
       "side": 1,
       "message": "ditto parentheses",
+      "range": {
+        "startLine": 19,
+        "startChar": 59,
+        "endLine": 19,
+        "endChar": 61
+      },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a9595c25_f75d14c9",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14d78e1d_2deb9d62",
       "range": {
         "startLine": 19,
         "startChar": 59,
@@ -1058,6 +1106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45586e4f_76b29abc",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a4733eae_6c90d995",
+      "range": {
+        "startLine": 23,
+        "startChar": 76,
+        "endLine": 24,
+        "endChar": 66
+      },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95de545f_81541af1",
@@ -1075,6 +1147,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05f14e90_df56f384",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Huh, that\u0027s a heading just gone missing. Good spot, thanks. Done.",
+      "parentUuid": "95de545f_81541af1",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af87cc0d_d1d7e4e9",
@@ -1088,6 +1178,24 @@
       "writtenOn": "2023-04-12T09:04:58Z",
       "side": 1,
       "message": "s/regular value/regular field/",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee374b43_70c64fbc",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "af87cc0d_d1d7e4e9",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -1126,6 +1234,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "113b113b_2a9239ed",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Fixed per reply to @mpvl by running `cue fmt`.",
+      "parentUuid": "84e5c4a0_65f41464",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93078558_30a90d50",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Ran `cue fmt` on all blocks. Done.",
+      "parentUuid": "9d8eefc1_d7a9da73",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d0b5449a_251cc69e",
@@ -1139,6 +1283,24 @@
       "writtenOn": "2023-04-12T09:04:58Z",
       "side": 1,
       "message": "s/This is/Note that this is/\ns/because as a general rule schema/because our new guidelines suggest schemas/\ns/onlys/only/",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c12880e5_b80ee3d7",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0b5449a_251cc69e",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -1160,6 +1322,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "710abd23_9c570381",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d149f5a3_9c6fe7c4",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6126638a_b2448761",
@@ -1173,6 +1353,24 @@
       "writtenOn": "2023-04-12T09:04:58Z",
       "side": 1,
       "message": "s/mode/mode,/",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ea80e68_b2500993",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6126638a_b2448761",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -1194,6 +1392,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd8d25cc_4d9007f7",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9e22dc4a_4a81b40c",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21491f60_e0b6d956",
@@ -1207,6 +1423,24 @@
       "writtenOn": "2023-04-12T09:02:28Z",
       "side": 1,
       "message": "nit: join with the previous line",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c94a70c5_cdcebba9",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T09:35:21Z",
+      "side": 1,
+      "message": "I\u0027m just doing what `gq` in Vim is telling me!",
+      "parentUuid": "21491f60_e0b6d956",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

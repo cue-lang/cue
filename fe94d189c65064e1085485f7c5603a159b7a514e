@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82d6bf70_a348df5e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T09:02:28Z",
+      "side": 1,
+      "message": "review for 0.6.",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "305aaeab_8bcb5d93",
@@ -472,6 +489,109 @@
       "writtenOn": "2023-04-12T08:48:24Z",
       "side": 1,
       "message": "I would simply not mention it :) I would only explicitly mention it in a changelog once we support and document a way for users to get the stats out of cmd/cue, which we don\u0027t right now as the env var is for internal use only.",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd0cb725_f2e9bc2e",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T09:02:28Z",
+      "side": 1,
+      "message": "nit: replace mentions of main or master with HEAD, so it will survive any future default branch renames.",
+      "range": {
+        "startLine": 8,
+        "startChar": 50,
+        "endLine": 8,
+        "endChar": 54
+      },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14d78e1d_2deb9d62",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T09:02:28Z",
+      "side": 1,
+      "message": "ditto parentheses",
+      "range": {
+        "startLine": 19,
+        "startChar": 59,
+        "endLine": 19,
+        "endChar": 61
+      },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4733eae_6c90d995",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T09:02:28Z",
+      "side": 1,
+      "message": "add:\n\n\u003e , and encoding/json only escapes HTML when HTMLEscape is used.",
+      "range": {
+        "startLine": 23,
+        "startChar": 76,
+        "endLine": 24,
+        "endChar": 66
+      },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84e5c4a0_65f41464",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T09:02:28Z",
+      "side": 1,
+      "message": "align/format?",
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21491f60_e0b6d956",
+        "filename": "doc/ref/v0.6.0-alpha.1-release.notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T09:02:28Z",
+      "side": 1,
+      "message": "nit: join with the previous line",
       "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

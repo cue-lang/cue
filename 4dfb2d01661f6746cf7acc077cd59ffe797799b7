@@ -16,6 +16,23 @@
       "message": "Release workflow test results: https://github.com/cue-lang/cue/actions/runs/4676911166",
       "revId": "4dfb2d01661f6746cf7acc077cd59ffe797799b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "31544368_504deb6d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-12T10:28:29Z",
+      "side": 1,
+      "message": "Perhaps mention why we\u0027re downgrading from 1.20, as we upgraded by accident.",
+      "revId": "4dfb2d01661f6746cf7acc077cd59ffe797799b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

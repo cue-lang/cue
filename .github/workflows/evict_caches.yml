@@ -4,9 +4,6 @@ name: Evict caches
 "on":
   schedule:
     - cron: 0 2 * * *
-  push:
-    branches:
-      - ci/test
 jobs:
   test:
     if: ${{github.repository == 'cue-lang/cue'}}

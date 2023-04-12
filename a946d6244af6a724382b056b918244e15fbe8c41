@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "390fdca2_b6030b1f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T11:25:02Z",
+      "side": 1,
+      "message": "Rendered version of patchset 6 available at:\n\nhttps://github.com/cue-lang/cue/blob/a946d6244af6a724382b056b918244e15fbe8c41/doc/ref/v0.5.0-release-notes.md\n\nhttps://github.com/cue-lang/cue/blob/a946d6244af6a724382b056b918244e15fbe8c41/doc/ref/v0.6.0-alpha.1-release.notes.md",
+      "revId": "a946d6244af6a724382b056b918244e15fbe8c41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

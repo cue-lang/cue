@@ -133,6 +133,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7e8c1ec_e5c928bb",
+        "filename": "doc/ref/v0.5.0-release-notes.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-12T11:44:58Z",
+      "side": 1,
+      "message": "Link included. PTAL, @mvdan",
+      "parentUuid": "496bbc50_1c00f77a",
+      "range": {
+        "startLine": 29,
+        "startChar": 43,
+        "endLine": 29,
+        "endChar": 55
+      },
+      "revId": "fe94d189c65064e1085485f7c5603a159b7a514e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fdfcb604_8ed97380",

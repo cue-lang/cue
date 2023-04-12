@@ -236,10 +236,6 @@ evictCaches: bashWorkflow & {
 		schedule: [
 			{cron: "0 2 * * *"},
 		]
-		push: {
-			// To enable testing of the dispatch itself
-			branches: [testDefaultBranch]
-		}
 	}
 
 	jobs: {

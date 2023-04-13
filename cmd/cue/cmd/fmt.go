@@ -79,6 +79,9 @@ func newFmtCmd(c *Command) *cobra.Command {
 
 						files = append(files, f)
 					}
+					if err := d.Err(); err != nil {
+						exitOnErr(cmd, err, true)
+					}
 
 					e, err := encoding.NewEncoder(file, &cfg)
 					exitOnErr(cmd, err, true)
@@ -87,7 +90,9 @@ func newFmtCmd(c *Command) *cobra.Command {
 						err := e.EncodeFile(f)
 						exitOnErr(cmd, err, false)
 					}
-					e.Close()
+					if err := e.Close(); err != nil {
+						exitOnErr(cmd, err, true)
+					}
 				}
 			}
 			return nil

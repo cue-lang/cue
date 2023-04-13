@@ -69,7 +69,6 @@ func newFmtCmd(c *Command) *cobra.Command {
 				for _, file := range inst.BuildFiles {
 					files := []*ast.File{}
 					d := encoding.NewDecoder(file, &cfg)
-					defer d.Close()
 					for ; !d.Done(); d.Next() {
 						f := d.File()
 
@@ -79,6 +78,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 
 						files = append(files, f)
 					}
+					// Do not defer this Close call, as we are looping over builds,
+					// and otherwise we would hold all of their files open at once.
+					// Note that we always call Close after NewDecoder as well.
+					d.Close()
 					if err := d.Err(); err != nil {
 						exitOnErr(cmd, err, true)
 					}

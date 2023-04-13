@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37d7c395_6be20088",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-13T19:08:20Z",
+      "side": 1,
+      "message": "Here\u0027s the imported PR for the struct field tag fix I mentioned earlier.",
+      "revId": "74e624ee5e1ec5d732185d09a8b7d721e94bf0f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

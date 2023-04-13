@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Generated with go run cuelang.org/go/internal/cmd/qgo -exclude=Escaper$,Must,Parse -stripstr extract text/template
+// Originally generated with: go run qgo.go -exclude=Escaper$,Must,Parse -stripstr extract text/template
 
 package template
 

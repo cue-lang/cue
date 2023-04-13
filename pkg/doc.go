@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pkg define CUE standard packages.
+// Package pkg defines CUE standard packages.
 //
 // Many of the standard packages are modeled after and generated from the Go
 // core packages. The types, values, and functions are defined as their Go
@@ -36,3 +36,5 @@
 // in non-hermetic influences into configurations by using packages defined
 // in the tool subdirectory.
 package pkg
+
+//go:generate go run gen.go

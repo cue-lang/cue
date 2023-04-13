@@ -12,6 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build ignore
+
 // qgo builds CUE builtin packages from Go packages.
 package main
 
@@ -80,7 +82,7 @@ func init() {
 func main() {
 	flag.Parse()
 
-	genLine = "// Generated with go run cuelang.org/go/internal/cmd/qgo " + strings.Join(os.Args[1:], " ")
+	genLine = "// Originally generated with: go run qgo.go " + strings.Join(os.Args[1:], " ")
 
 	args := flag.Args()
 	if len(args) == 0 {

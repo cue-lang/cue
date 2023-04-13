@@ -1,6 +1,5 @@
-# TODO: revert to cue eval -i post fix for #1786
-! exec cue eval lists.cue
-cmp stderr expect-stderr
+exec cue eval -i lists.cue
+cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
 title = "Lists"
@@ -39,17 +38,8 @@ myIP: [10, 2, 3, 4]
 yourIP: PrivateIP
 yourIP: [11, 1, 2, 3]
 
--- expect-stderr --
-yourIP: 3 errors in empty disjunction:
-yourIP.0: conflicting values 10 and 11:
-    ./lists.cue:6:13
-    ./lists.cue:13:9
-    ./lists.cue:14:10
-yourIP.0: conflicting values 172 and 11:
-    ./lists.cue:8:6
-    ./lists.cue:13:9
-    ./lists.cue:14:10
-yourIP.0: conflicting values 192 and 11:
-    ./lists.cue:7:6
-    ./lists.cue:13:9
-    ./lists.cue:14:10
+-- expect-stdout-cue --
+IP: [uint8, uint8, uint8, uint8]
+PrivateIP: [10, uint8, uint8, uint8] | [192, 168, uint8, uint8] | [172, uint & >=16 & <=32, uint8, uint8]
+myIP: [10, 2, 3, 4]
+yourIP: _|_ // yourIP: 3 errors in empty disjunction: (and 3 more errors)

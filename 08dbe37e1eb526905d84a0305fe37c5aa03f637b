@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36e3c905_79f21246",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-13T19:20:39Z",
+      "side": 1,
+      "message": "Would be good to document how to trigger a dummy dispatch then.",
+      "revId": "08dbe37e1eb526905d84a0305fe37c5aa03f637b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,6 +1,5 @@
-# TODO: revert to cue eval -i post fix for #1786
-! exec cue eval -c defs.cue
-cmp stderr expect-stderr
+exec cue eval -ic defs.cue
+cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
 title = "Definitions"
@@ -27,8 +26,12 @@ msg: "Hello \(#Name)!"
 a:   #A & { field: 3 }
 err: #A & { feild: 3 }
 
--- expect-stderr --
-err.feild: field not allowed:
-    ./defs.cue:5:5
-    ./defs.cue:10:6
-    ./defs.cue:10:13
+-- expect-stdout-cue --
+msg: "Hello world!"
+a: {
+    field: 3
+}
+err: {
+    field: int
+    feild: _|_ // err.feild: field not allowed
+}

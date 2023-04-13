@@ -1,4 +1,4 @@
-exec cue export interpolation.cue
+exec cue eval interpolation.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
@@ -19,3 +19,5 @@ Interpolation may also be used in multiline string and byte literals.
 
 -- expect-stdout-cue --
 "You are 14 dollars over budget!"
+#cost:   102
+#budget: 88

@@ -1,6 +1,5 @@
-# TODO: revert to cue eval -i post fix for #1786
-! exec cue eval structs.cue
-cmp stderr expect-stderr
+exec cue eval -i structs.cue
+cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
 title = "Closed structs"
@@ -27,8 +26,11 @@ b: a & {
     feild: 3
 }
 
--- expect-stderr --
-b.feild: field not allowed:
-    ./structs.cue:1:10
-    ./structs.cue:5:4
-    ./structs.cue:6:5
+-- expect-stdout-cue --
+a: {
+    field: int
+}
+b: {
+    field: int
+    feild: _|_ // b.feild: field not allowed
+}

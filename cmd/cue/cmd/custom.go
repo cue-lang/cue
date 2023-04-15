@@ -39,9 +39,7 @@ import (
 	"cuelang.org/go/tools/flow"
 )
 
-const (
-	commandSection = "command"
-)
+const commandSection = "command"
 
 func lookupString(obj cue.Value, key, def string) string {
 	str, err := obj.Lookup(key).String()
@@ -60,7 +58,25 @@ func splitLine(s string) (line, tail string) {
 	return
 }
 
-func addCustom(c *Command, parent *cobra.Command, typ, name string, tools *cue.Instance) (*cobra.Command, error) {
+// addCustomCommands is only used in `cue help cmd`, which doesn't show errors.
+func addCustomCommands(c *Command, cmd *cobra.Command, typ string, tools *cue.Instance) {
+	commands := tools.Lookup(typ)
+	if !commands.Exists() {
+		return
+	}
+	fields, err := commands.Fields()
+	if err != nil {
+		return
+	}
+	for fields.Next() {
+		sub, err := customCommand(c, commandSection, fields.Label(), tools)
+		if err == nil {
+			cmd.AddCommand(sub)
+		}
+	}
+}
+
+func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Command, error) {
 	if tools == nil {
 		return nil, errors.New("no commands defined")
 	}
@@ -116,7 +132,6 @@ outer:
 			return doTasks(cmd, typ, name, tools)
 		}),
 	}
-	parent.AddCommand(sub)
 
 	// TODO: implement var/flag handling.
 	return sub, nil

@@ -30,6 +30,7 @@ run 'cue help cmd' or go to cuelang.org/pkg/cmd.
 For more information on writing CUE configuration files see cuelang.org.
 
 Usage:
+  cue [flags]
   cue [command]
 
 Available Commands:
@@ -50,7 +51,6 @@ Available Commands:
 
 Flags:
   -E, --all-errors   print all available errors
-  -h, --help         help for cue
   -i, --ignore       proceed in the presence of errors
   -s, --simplify     simplify output
       --strict       report errors for lossy mappings

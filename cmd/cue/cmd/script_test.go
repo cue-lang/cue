@@ -163,11 +163,10 @@ func TestX(t *testing.T) {
 		args, err := shlex.Split(cmd)
 		check(err)
 
-		c, err := New(args[1:])
-		check(err)
+		c := New()
 		b := &bytes.Buffer{}
 		c.SetOutput(b)
-		err = c.Run(context.Background())
+		err = c.Run(context.Background(), args[1:])
 		// Always create an error to show
 		t.Error(err, "\n", b.String())
 		return
@@ -219,17 +218,14 @@ func mainTestStdinPipe() error {
 	// Like MainTest, but sets stdin to a pipe,
 	// to emulate stdin reads like a terminal.
 	inTest = true
-	cmd, err := New(os.Args[1:])
-	if err != nil {
-		return err
-	}
+	cmd := New()
 	pr, pw, err := os.Pipe()
 	if err != nil {
 		return err
 	}
 	cmd.SetInput(pr)
 	_ = pw // we don't write to stdin at all, for now
-	return cmd.Run(context.Background())
+	return cmd.Run(context.Background(), os.Args[1:])
 }
 
 func testCmd() error {

@@ -25,6 +25,51 @@ import (
 // The user can then scroll up to get a more in-depth explanation. But is
 // this how users use it?
 
+// newHelpCmd is largely borrowed from cobra,
+// but knows how to load custom commands in `cue help cmd`.
+func newHelpCmd(c *Command) *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "help [command]",
+		Short: "Help about any command",
+		Long: `Help provides help for any command in the application.
+Simply type ` + c.Name() + ` help [path to command] for full details.`,
+		Run: func(_ *cobra.Command, args []string) {
+			cmd, _, e := c.Root().Find(args)
+			if len(args) > 0 && args[0] == "cmd" {
+				// args is one of:
+				//
+				//	["cmd"]
+				//	["cmd", "mycmd"]
+				//	["cmd", "mycmd", "./mypkg"]
+				//
+				// We want to skip the first two arguments in pkgArgs.
+				pkgArgs := args[1:]
+				if len(pkgArgs) > 0 {
+					pkgArgs = pkgArgs[1:]
+				}
+
+				tools, err := buildTools(c, pkgArgs)
+				if err == nil {
+					addCustomCommands(c, cmd, commandSection, tools)
+					// For the sake of `cue help cmd mycmd`, find the command again.
+					cmd, _, e = c.Root().Find(args)
+				}
+			}
+			if cmd == nil || e != nil {
+				c.Printf("Unknown help topic %#q\n", args)
+				cobra.CheckErr(c.Root().Usage())
+			} else {
+				cobra.CheckErr(cmd.Help())
+			}
+		},
+	}
+	return cmd
+}
+
+// TODO(mvdan): having the help topics as top-level commands means that `cue topic`
+// is taken and works as well as `cue help topic`, which is unnecessary.
+// Consider removing support for the short form at some point.
+
 func newHelpTopics(c *Command) []*cobra.Command {
 	return []*cobra.Command{
 		inputsHelp,

@@ -371,10 +371,7 @@ func run(t *testing.T, dir, command string, cfg *config) {
 		}
 		cfg.Stdout = buf
 	}
-	cmd, err := cmd.New(args)
-	if err != nil {
-		t.Fatal(err)
-	}
+	cmd, _ := cmd.New(args)
 	if cfg.Stdout != nil {
 		cmd.SetOutput(cfg.Stdout)
 	} else {
@@ -383,7 +380,7 @@ func run(t *testing.T, dir, command string, cfg *config) {
 	if cfg.Stdin != nil {
 		cmd.SetInput(cfg.Stdin)
 	}
-	if err = cmd.Run(context.Background()); err != nil {
+	if err := cmd.Run(context.Background()); err != nil {
 		if cfg.Stdout == nil {
 			logf(t, "Output:\n%s", buf.String())
 		}

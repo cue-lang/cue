@@ -773,7 +773,6 @@ func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance,
 }
 
 func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
-
 	cfg := &load.Config{
 		Tools: true,
 	}

@@ -3,9 +3,11 @@
 cmp stderr cmd_baddisplay.out
 
 -- cmd_baddisplay.out --
-command "notool" is not defined
-Ensure commands are defined in a "_tool.cue" file.
-Run 'cue help' to show available commands.
+unknown 'cue' subcommand: "notool"
+
+Ensure custom commands are defined in a "_tool.cue" file.
+Run 'cue help cmd' to list available custom commands.
+Run 'cue help' to see the built-in 'cue' commands.
 -- task.cue --
 package home
 message: "Hello world!"

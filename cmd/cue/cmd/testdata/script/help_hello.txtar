@@ -25,9 +25,6 @@ Hello can be used to say hello to the world.
 Usage:
   cue cmd hello [flags]
 
-Flags:
-  -h, --help   help for hello
-
 Global Flags:
   -E, --all-errors   print all available errors
   -i, --ignore       proceed in the presence of errors

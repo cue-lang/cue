@@ -14,46 +14,49 @@
 
 package cmd
 
-import "testing"
+import (
+	"context"
+	"io"
+	"testing"
+)
 
 func TestHelp(t *testing.T) {
-	cmd, err := New([]string{"help"})
-	if err != nil || cmd == nil {
+	// TODO(mvdan): consider rewriting in testscript, capturing stdout/stderr
+	run := func(args ...string) error {
+		cmd, _ := New(args)
+		cmd.SetOutput(io.Discard)
+		ctx := context.Background()
+		return cmd.Run(ctx)
+	}
+	if err := run("help"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 
-	cmd, err = New([]string{"--help"})
-	if err != nil || cmd == nil {
+	if err := run("--help"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 
-	cmd, err = New([]string{"-h"})
-	if err != nil || cmd == nil {
+	if err := run("-h"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 
-	cmd, err = New([]string{"help", "cmd"})
-	if err != nil || cmd == nil {
+	if err := run("help", "cmd"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 
-	cmd, err = New([]string{"cmd", "--help"})
-	if err != nil || cmd == nil {
+	if err := run("cmd", "--help"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 
-	cmd, err = New([]string{"cmd", "-h"})
-	if err != nil || cmd == nil {
+	if err := run("cmd", "-h"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 
-	cmd, err = New([]string{"help", "eval"})
-	if err != nil || cmd == nil {
+	if err := run("help", "eval"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 
-	cmd, err = New([]string{"eval", "--help"})
-	if err != nil || cmd == nil {
+	if err := run("eval", "--help"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
 }

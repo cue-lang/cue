@@ -16,9 +16,9 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
+	"github.com/spf13/pflag"
 )
 
 // TODO: generate long description from documentation.
@@ -133,18 +133,46 @@ the second to standard output (i.e. it echos it again).
 Run "cue help commands" for more details on tasks and commands.
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			w := cmd.Stderr()
+			// The behavior when there's no known subcommand is different
+			// depending on whether we ran via `cue cmd` or the `cue` shortcut.
+			isRootCmd := cmd.Command == cmd.root
+
+			// TODO(mvdan): test running `cue` and `cue cmd` via testscript as well
 			if len(args) == 0 {
+				// `cue` should print the top-level help like `cue -h`,
+				// but `cue cmd` should explain that a custom command is required.
+				if isRootCmd {
+					return pflag.ErrHelp
+				}
+				w := cmd.OutOrStderr()
 				fmt.Fprintln(w, "cmd must be run as one of its subcommands")
-			} else {
-				const msg = `cmd must be run as one of its subcommands: unknown subcommand %q
-Ensure commands are defined in a "_tool.cue" file.
-`
-				fmt.Fprintf(w, msg, args[0])
+				fmt.Fprintln(w, "Run 'cue help cmd' for known subcommands.")
+				return ErrPrintedError
 			}
-			fmt.Fprintln(w, "Run 'cue help cmd' for known subcommands.")
-			os.Exit(1) // TODO: get rid of this
-			return nil
+			tools, err := buildTools(cmd, args[1:])
+			if err != nil && !isRootCmd {
+				// `cue cmd` fails immediately if there is no CUE package,
+				// but `cue` does not in order to always show a useful error in `cue typo`.
+				return err
+			}
+			sub, err := customCommand(cmd, commandSection, args[0], tools)
+			if err != nil {
+				w := cmd.OutOrStderr()
+				if isRootCmd {
+					fmt.Fprintf(w, "unknown 'cue' subcommand: %q\n\n", args[0])
+					fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
+					fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")
+					fmt.Fprintln(w, "Run 'cue help' to see the built-in 'cue' commands.")
+				} else {
+					fmt.Fprintf(w, "unknown 'cue cmd' subcommand: %q\n\n", args[0])
+					fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
+					fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")
+				}
+				return ErrPrintedError
+			}
+			// Presumably the *cobra.Command argument should be cmd.Command,
+			// as that is the one which will have the right settings applied.
+			return sub.RunE(cmd.Command, args[1:])
 		}),
 	}
 

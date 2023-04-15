@@ -16,6 +16,23 @@
       "message": "Would be good to document how to trigger a dummy dispatch then.",
       "revId": "08dbe37e1eb526905d84a0305fe37c5aa03f637b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a940f63_01b1ad72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-04-15T14:11:11Z",
+      "side": 1,
+      "message": "This CL is currently broken. Needs to be fixed up with respect to dispatch only triggering when there really is dummy data. ",
+      "revId": "08dbe37e1eb526905d84a0305fe37c5aa03f637b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

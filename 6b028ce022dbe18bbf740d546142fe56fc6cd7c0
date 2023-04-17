@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0cbf84c_b143558f",
+        "filename": "cmd/cue/cmd/cmd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-17T20:22:17Z",
+      "side": 1,
+      "message": "Done. I did not do this initially because the lines aren\u0027t actually the same. But with a variable, they can be. The resulting code is just as many lines, but at least the text isn\u0027t repeated as much.",
+      "parentUuid": "b37430db_ec93603e",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4eb163d1_543700ab",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-04-17T12:05:03Z",
       "side": 1,
       "message": "Maybe document what it does as well as saying when it\u0027s used?",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "602a9d59_3491e220",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-17T20:22:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4eb163d1_543700ab",
       "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -101,6 +137,24 @@
       "side": 1,
       "message": "Forgot to mention another reason why the current New API is bad - handling any flags or arguments at that point is too early and broken, because the user hasn\u0027t had a chance to call `cmd.SetOutput` to decide where help/usage text should be printed, among others. This is what caused https://github.com/cue-lang/cue/issues/1694.",
       "parentUuid": "69ae7336_96d66711",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf044f31_8bf249bd",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-17T20:22:17Z",
+      "side": 1,
+      "message": "I\u0027ve fixed this by not changing the declarations at all. Now, New takes the arguments like it used to (for cobra, this is not such a weird thing, given how SetArgs is separate from Execute), and New always returns a nil error.\n\nSo I think the change is now safe to do. The API remains a bit wonky, but I think you\u0027re right that breaking it is not necessary. Plus, we\u0027re most likely the only user, so making it nice is not a priority.",
+      "parentUuid": "f88d1d8c_90b63e83",
       "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

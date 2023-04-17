@@ -85,6 +85,24 @@
       "parentUuid": "923cc0b7_7bb43531",
       "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f88d1d8c_90b63e83",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-17T13:59:02Z",
+      "side": 1,
+      "message": "Forgot to mention another reason why the current New API is bad - handling any flags or arguments at that point is too early and broken, because the user hasn\u0027t had a chance to call `cmd.SetOutput` to decide where help/usage text should be printed, among others. This is what caused https://github.com/cue-lang/cue/issues/1694.",
+      "parentUuid": "69ae7336_96d66711",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

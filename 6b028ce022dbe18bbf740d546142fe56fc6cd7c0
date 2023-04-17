@@ -67,6 +67,24 @@
       "message": "I know this isn\u0027t really _intended_ to be a public API, but it is actually public in practice, and it\u0027s possible that this signature change might break some users. I think we should either somehow preserve the old API or get explicit signoff that it\u0027s OK to make this change.",
       "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69ae7336_96d66711",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-17T12:29:45Z",
+      "side": 1,
+      "message": "That\u0027s a good callout. I did think about this while doing the refactor, and did intentionally change the API, but I didn\u0027t mention it in the commit message.\n\nThe old API was used like:\n\n```\n// New builds the root command, may print help text, and may load \"*_tools.go\" files.\nc, err :\u003d cmd.New(args)\nif err !\u003d nil { handle(err) }\n\n// Run reuses the args from earlier to run a subcommand like \"eval\".\nerr \u003d c.Run(ctx)\nif err !\u003d nil { handle(err) }\n```\n\nThis was awkward for multiple reasons:\n\n* `New` did too much work; when given `[]string{\"cmd\", \"foo\"}` as arguments, it could spend multiple seconds loading a CUE package before the actual `Run`.\n\n* There were two returned errors, when the user only really wants one. Moreover, it wasn\u0027t clear how the errors were different - it was an arbitrary separation.\n\n* There was no way to simply obtain the root cobra command without the complications above. Given that the root command is pretty declarative, this was unfortunate.\n\nThe new API is a lot nicer:\n\n```\n// New only builds the root command, and does no other work.\nc :\u003d cmd.New()\n\n// Run takes args directly. The error may be from extra setup work like loading \"*_tools.go\" files,\n// or from running a subcommand like \"eval\".\nif err :\u003d c.Run(ctx, args); err !\u003d nil { handle(err) }\n```\n\nPlus, it can be chained as well, like `err :\u003d cmd.New().Run(ctx, args)`.\n\nIt is a breaking change in a public package, but I reckon that it\u0027s OK because:\n\n* The `cmd` package already exposes internal details that will break from time to time already; note how cobra leaks via embedding into Command.\n\n* The `cmd` package only has one public user, and it\u0027s a fork (https://pkg.go.dev/cuelang.org/go/cmd/cue/cmd?tab\u003dimportedby); there are likely very few users.\n\n* I can\u0027t think of an alternative other than \"stick with the old API\", meaning we\u0027d keep the awkwardness and confusion, or \"add new APIs and deprecate the old ones\", which isn\u0027t much better. \n\n* The cmd API is already worse than `os/exec` for other reasons, like not taking `Dir` or `Env`, so I don\u0027t think the `cmd` package is terribly useful as-is beyond for testing.\n\nHappy to hold until Marcel or Paul have taken a look. I\u0027d definitely break in this case.",
+      "parentUuid": "923cc0b7_7bb43531",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

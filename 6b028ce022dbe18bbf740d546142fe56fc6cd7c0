@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45b00360_e1131791",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-17T12:05:03Z",
+      "side": 1,
+      "message": "I like this change quite a bit, but I\u0027m a bit concerned about the technical API-breaking change. If we can avoid that, that would be nice.",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b37430db_ec93603e",
+        "filename": "cmd/cue/cmd/cmd.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-17T12:05:03Z",
+      "side": 1,
+      "message": "Maybe factor these first two commands out of the if, because it looks like they\u0027re the same in both cases?",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4eb163d1_543700ab",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-17T12:05:03Z",
+      "side": 1,
+      "message": "Maybe document what it does as well as saying when it\u0027s used?",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "923cc0b7_7bb43531",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-17T12:05:03Z",
+      "side": 1,
+      "message": "I know this isn\u0027t really _intended_ to be a public API, but it is actually public in practice, and it\u0027s possible that this signature change might break some users. I think we should either somehow preserve the old API or get explicit signoff that it\u0027s OK to make this change.",
+      "revId": "6b028ce022dbe18bbf740d546142fe56fc6cd7c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

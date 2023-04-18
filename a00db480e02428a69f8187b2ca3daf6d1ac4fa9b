@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf77f1e8_1f0ddb42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-18T08:41:37Z",
+      "side": 1,
+      "message": "LGTM, thanks!",
+      "revId": "a00db480e02428a69f8187b2ca3daf6d1ac4fa9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e04ecd59_c48e23c8",
+        "filename": "cmd/cue/cmd/root_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-04-18T08:41:37Z",
+      "side": 1,
+      "message": "Much cleaner to do this every time, thanks. Could actually be a table-driven test, but not worth doing that now.",
+      "revId": "a00db480e02428a69f8187b2ca3daf6d1ac4fa9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

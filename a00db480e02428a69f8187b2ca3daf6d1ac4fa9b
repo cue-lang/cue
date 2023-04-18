@@ -33,6 +33,24 @@
       "message": "Much cleaner to do this every time, thanks. Could actually be a table-driven test, but not worth doing that now.",
       "revId": "a00db480e02428a69f8187b2ca3daf6d1ac4fa9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8eb8775b_b74eceb8",
+        "filename": "cmd/cue/cmd/root_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-18T08:46:18Z",
+      "side": 1,
+      "message": "It should honestly be a testscript txtar file :) we already have help.txtar, so a future CL can consolidate these into that file.",
+      "parentUuid": "e04ecd59_c48e23c8",
+      "revId": "a00db480e02428a69f8187b2ca3daf6d1ac4fa9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

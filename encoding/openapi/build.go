@@ -45,6 +45,7 @@ type buildContext struct {
 	descFunc      func(v cue.Value) string
 	fieldFilter   *regexp.Regexp
 	evalDepth     int // detect cycles when resolving references
+	maxCycleDepth int
 
 	schemas *OrderedMap
 
@@ -101,16 +102,17 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 	}
 
 	c := &buildContext{
-		inst:         val,
-		instExt:      val,
-		refPrefix:    "components/schemas",
-		expandRefs:   g.ExpandReferences,
-		structural:   g.ExpandReferences,
-		nameFunc:     g.NameFunc,
-		descFunc:     g.DescriptionFunc,
-		schemas:      &OrderedMap{},
-		externalRefs: map[string]*externalType{},
-		fieldFilter:  fieldFilter,
+		inst:          val,
+		instExt:       val,
+		refPrefix:     "components/schemas",
+		expandRefs:    g.ExpandReferences,
+		structural:    g.ExpandReferences,
+		nameFunc:      g.NameFunc,
+		descFunc:      g.DescriptionFunc,
+		schemas:       &OrderedMap{},
+		externalRefs:  map[string]*externalType{},
+		fieldFilter:   fieldFilter,
+		maxCycleDepth: g.MaxCycleDepth,
 	}
 	if g.ReferenceFunc != nil {
 		if !isInstance {
@@ -216,12 +218,12 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 	return (*ast.StructLit)(c.schemas), c.errs
 }
 
-func (c *buildContext) build(name cue.Selector, v cue.Value) *ast.StructLit {
-	return newCoreBuilder(c).schema(nil, name, v)
+func (b *buildContext) build(name cue.Selector, v cue.Value) *ast.StructLit {
+	return newCoreBuilder(b).schema(nil, name, v)
 }
 
 // isInternal reports whether or not to include this type.
-func (c *buildContext) isInternal(sel cue.Selector) bool {
+func (b *buildContext) isInternal(sel cue.Selector) bool {
 	// TODO: allow a regexp filter in Config. If we have closed structs and
 	// definitions, this will likely be unnecessary.
 	return sel.Type().LabelType() == cue.DefinitionLabel &&
@@ -766,7 +768,7 @@ func (b *builder) object(v cue.Value) {
 			return
 		}
 
-	case cue.NoOp:
+	case cue.NoOp, cue.SelectorOp:
 		// TODO: extract format from specific type.
 
 	default:

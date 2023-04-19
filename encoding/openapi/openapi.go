@@ -81,6 +81,12 @@ type Config struct {
 	// OpenAPI Schema. It is an error for an CUE value to refer to itself
 	// if this option is used.
 	ExpandReferences bool
+
+	// MaxCycleDepth is a value that adds a maximum of iterations to stop evaluating
+	// structure cycles. The current behaviour does not have any stop condition, and it could
+	// generate infinite loops working with recursive values.
+	// The value should be big enough to fix the desire use case, but it must be used carefully.
+	MaxCycleDepth int
 }
 
 type Generator = Config

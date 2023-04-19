@@ -26,16 +26,23 @@ import (
 func (b *builder) pushNode(v cue.Value) {
 	_, n := internalvalue.ToInternal(v)
 	b.ctx.cycleNodes = append(b.ctx.cycleNodes, n)
+	b.ctx.evalDepth++
 }
 
 func (b *builder) popNode() {
 	b.ctx.cycleNodes = b.ctx.cycleNodes[:len(b.ctx.cycleNodes)-1]
+	b.ctx.evalDepth--
 }
 
 func (b *builder) checkCycle(v cue.Value) bool {
 	if !b.ctx.expandRefs {
 		return true
 	}
+
+	if b.ctx.maxCycleDepth > 0 && b.ctx.evalDepth > b.ctx.maxCycleDepth {
+		return false
+	}
+
 	r, n := internalvalue.ToInternal(v)
 	ctx := eval.NewContext(r, n)
 

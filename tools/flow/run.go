@@ -206,13 +206,29 @@ func (c *Controller) updateTaskResults(t *Task) bool {
 
 	expr := t.update
 	for i := len(t.labels) - 1; i >= 0; i-- {
-		expr = &adt.StructLit{
-			Decls: []adt.Decl{
-				&adt.Field{
-					Label: t.labels[i],
-					Value: expr,
+		label := t.labels[i]
+		switch label.Typ() {
+		case adt.StringLabel, adt.HiddenLabel:
+			expr = &adt.StructLit{
+				Decls: []adt.Decl{
+					&adt.Field{
+						Label: t.labels[i],
+						Value: expr,
+					},
 				},
-			},
+			}
+		case adt.IntLabel:
+			i := label.Index()
+			list := &adt.ListLit{}
+			any := &adt.Top{}
+			// TODO(perf): make this a constant thing. This will be possible with the query extension.
+			for k := 0; k < i; k++ {
+				list.Elems = append(list.Elems, any)
+			}
+			list.Elems = append(list.Elems, expr, &adt.Ellipsis{})
+			expr = list
+		default:
+			panic(fmt.Errorf("unexpected label type %v", label.Typ()))
 		}
 	}
 

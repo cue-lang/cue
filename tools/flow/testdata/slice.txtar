@@ -1,0 +1,117 @@
+-- in.cue --
+root: [
+	{
+		$id: "valToOut"
+		val: "foo"
+		out: string
+	},
+	{
+		$id:    "valToOut"
+		$after: root[0]
+		val:    "bar"
+		out:    string
+	},
+	{
+		$id: "valToOut"
+		out: root[0].out + root[1].out
+	},
+]
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root[0] [Ready]")
+  t1("root[1] [Waiting]")
+  t1-->t0
+  t2("root[2] [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t1 --
+graph TD
+  t0("root[0] [Terminated]")
+  t1("root[1] [Ready]")
+  t1-->t0
+  t2("root[2] [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t1/value --
+{
+	$id: "valToOut"
+	val: "foo"
+	out: "foo"
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  17
+Reused: 12
+Allocs: 5
+Retain: 0
+
+Unifications: 17
+Conjuncts:    30
+Disjuncts:    17
+-- out/run/t2 --
+graph TD
+  t0("root[0] [Terminated]")
+  t1("root[1] [Terminated]")
+  t1-->t0
+  t2("root[2] [Ready]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t2/value --
+{
+	$id: "valToOut"
+	$after: {
+		$id: "valToOut"
+		val: "foo"
+		out: "foo"
+	}
+	val: "bar"
+	out: "bar"
+}
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  17
+Reused: 17
+Allocs: 0
+Retain: 0
+
+Unifications: 17
+Conjuncts:    33
+Disjuncts:    17
+-- out/run/t3 --
+graph TD
+  t0("root[0] [Terminated]")
+  t1("root[1] [Terminated]")
+  t1-->t0
+  t2("root[2] [Terminated]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t3/value --
+{
+	$id: "valToOut"
+	out: "foobar"
+}
+-- out/run/t3/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  34
+Reused: 29
+Allocs: 5
+Retain: 0
+
+Unifications: 34
+Conjuncts:    63
+Disjuncts:    34

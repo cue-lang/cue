@@ -77,6 +77,10 @@ func (c *Controller) findRootTasks(v cue.Value) {
 	for iter, _ := v.Fields(opts...); iter.Next(); {
 		c.findRootTasks(iter.Value())
 	}
+	for iter, _ := v.List(); iter.Next(); {
+		c.findRootTasks(iter.Value())
+	}
+
 }
 
 // This file contains the functionality to locate and record the tasks of

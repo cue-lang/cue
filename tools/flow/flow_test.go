@@ -44,7 +44,7 @@ func TestFlow(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		v := cuecontext.New().BuildInstance(t.Instance())
 		if err := v.Err(); err != nil {
-			t.Fatal(err)
+			t.Fatal(errors.Details(err, nil))
 		}
 
 		seqNum = 0
@@ -166,7 +166,7 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 				return nil
 			}), nil
 		}
-		if err != nil && v.Lookup("$id").Exists() {
+		if err != nil && v.LookupPath(cue.MakePath(cue.Str("$id"))).Exists() {
 			return nil, err
 		}
 

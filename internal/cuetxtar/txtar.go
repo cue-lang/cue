@@ -251,9 +251,9 @@ func (t *Test) Instances(args ...string) []*build.Instance {
 	for _, i := range a {
 		if i.Err != nil {
 			if t.hasGold {
-				t.Fatal("Parse error: ", i.Err)
+				t.Fatal("Parse error: ", errors.Details(i.Err, nil))
 			}
-			t.Skip("Parse error: ", i.Err)
+			t.Skip("Parse error: ", errors.Details(i.Err, nil))
 		}
 	}
 	return a

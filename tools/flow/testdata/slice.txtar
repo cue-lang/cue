@@ -1,4 +1,8 @@
+#FindHiddenTasks: true
 -- in.cue --
+
+// TODO test when root has the list embedded and
+// some hidden task fields too. See https://github.com/cue-lang/cue/issues/2366.
 root: [
 	{
 		$id: "valToOut"
@@ -16,6 +20,7 @@ root: [
 		out: root[0].out + root[1].out
 	},
 ]
+
 -- out/run/errors --
 -- out/run/t0 --
 graph TD

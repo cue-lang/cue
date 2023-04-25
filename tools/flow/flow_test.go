@@ -42,7 +42,6 @@ func TestFlow(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-
 		v := cuecontext.New().BuildInstance(t.Instance())
 		if err := v.Err(); err != nil {
 			t.Fatal(errors.Details(err, nil))
@@ -168,8 +167,7 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 			}), nil
 		}
 		if err != nil && v.LookupPath(cue.MakePath(cue.Str("$id"))).Exists() {
-
-			return nil, fmt.Errorf("exists in %v!: %v", v, err)
+			return nil, err
 		}
 
 	case "valToOut":

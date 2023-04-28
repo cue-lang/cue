@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "720ffaf3_92d38fcb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-04-28T09:21:42Z",
+      "side": 1,
+      "message": "Not sure if you forgot to submit this one, Roger, since you did submit the other CL in the chain.",
+      "revId": "f80c58aad61be887de6fb90215d24bd69d1c0f5b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "I know we\u0027ve discussed this before, but I\u0027m not that keen on the redundancy involved with this, and I think it would be good to be able to identify wasm assets without scanning the entire source code.\n\nHow about something like this instead?\n\n\t@extern(foo, kind\u003d\"wasm\", filename\u003d\"foo.wasm\", abi\u003dc)\n\t@extern(bar, kind\u003d\"wasm\", filename\u003d\"bar.wasm\", abi\u003dc)\n\tpackage p\n\n\tadd: _ @extern(foo, sig\u003d\"func(int64, int64): int64\")\n\tmul: _ @extern(foo, sig\u003d\"func(float64, float64): float64\")\n\tnot: _ @extern(foo, abi\u003dc, sig\u003d\"func(bool): bool\")\n\tisPrime: _ @extern(bar, name\u003dis_prime, sig\u003d\"func(uint64): bool\")\n\nThat is, the package-level @extern attribute introduces a new identifier, usable inside other @extern attributes in that file, that identifies a Wasm asset and its attributes. The other @extern attributes reference the package-level attribute and specify the actual func signature.\n\nThis way, we can find out what wasm files are in use by just scanning the header.\nWe can also make it an error if there are no uses of the wasm identifier, thus removing false positives (same kind of idea as import directives).",
       "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c4328b1_1c6781b0",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T15:12:34Z",
+      "side": 1,
+      "message": "I don\u0027t have any strong opinions one way or the other, but this would be quite the change from what we have now.",
+      "parentUuid": "0fbe00f9_ec770a57",
+      "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

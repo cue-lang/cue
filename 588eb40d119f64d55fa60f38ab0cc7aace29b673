@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d47b716_bd0e81b9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-03T14:56:14Z",
+      "side": 1,
+      "message": "You said you discussed this with Marcel offline, so SGTM.\n\nThe new package name works well with e.g. `pkg.Register`, less so with e.g. `pkg.Package` or `pkg.List`, especially since that last one has zero to do with packages. I wonder if we could come up with a better name given that we\u0027re already here. `./internal` already exists, so we can\u0027t simply make it sit there.",
+      "revId": "588eb40d119f64d55fa60f38ab0cc7aace29b673",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

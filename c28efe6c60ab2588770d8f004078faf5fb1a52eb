@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19e66404_edae339a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "I moved it into `cue/interpreter/wasm`.\n\nWe can\u0027t move it into `internal/wasm` because it needs to be accessible by our users.",
+      "parentUuid": "08936011_ab0ca39b",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff60cb8b_6ea07683",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-03-27T14:06:07Z",
       "side": 1,
       "message": "What happens if they don\u0027t?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6837b37_3d3d1fa3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Hell breaks loose. I\u0027ll be explaining in the docs what happens (next commit in the chain), I think for a commit message this is enough.",
+      "parentUuid": "ff60cb8b_6ea07683",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c15b13d4_d03418b7",
+        "filename": "cue/load/import.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db5aff5d_9c066b09",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "44d750e0_4bfa33bb",
@@ -105,6 +159,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1639bb9b_aa680231",
+        "filename": "cue/wasm/abi.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "The simple answer is that this makes it very convenient. The user specifies a string, and in the end, we use a string (the same string) to pass back to the CUE runtime as an identifier.\n\nWe could go through an intermediary integer layer, but it feels like busy work. Convert the string from the user to an int just to convert the int back to string to pass to CUE.\n\nIn any case this code will all go away once I add new ABIs. I have a much better design.",
+      "parentUuid": "44d750e0_4bfa33bb",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e479e180_48f86666",
         "filename": "cue/wasm/abi.go",
         "patchSetId": 4
@@ -116,6 +188,24 @@
       "writtenOn": "2023-03-27T14:06:07Z",
       "side": 1,
       "message": "Perhaps document why the fields are exported here?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f963be6_128ee8d9",
+        "filename": "cue/wasm/abi.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Good catch, they don\u0027t need to be, fixed.\n\n(They used to be exported because I was using CUE itself to do validation.)",
+      "parentUuid": "e479e180_48f86666",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -155,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbe76360_136b10d8",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "690499b8_61d4f262",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "473fd79c_3f65d833",
@@ -168,6 +276,24 @@
       "writtenOn": "2023-03-27T08:17:11Z",
       "side": 1,
       "message": "Personally, I would put the public interface in the file with the same name as the package. That is the first place I would look for it, at least.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ed82ccf_68f88e08",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "473fd79c_3f65d833",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -189,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b34f8ff3_b10ea1c5",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f37d2c8f_a74497a0",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f00abe82_f897461d",
@@ -202,6 +346,24 @@
       "writtenOn": "2023-03-27T14:06:07Z",
       "side": 1,
       "message": "In general, a doc comment can avoid describing the error path because\nthat can be taken as a given (see any number of examples in the standard library for precedent). In general I find the description a bit hard to take in, and it doesn\u0027t actually say how `funcName` is used.\n\nHow about something like this instead?\n\n\n    Compile searches for a Wasm function described by the given `@extern` attribute and returns it as an [adt.Builtin] with the given function name.\n\n?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a4a6048_d90cc142",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f00abe82_f897461d",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -225,6 +387,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9cbc439a_6c811437",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "I agree, it\u0027s really unfortunate, but it\u0027s the best we can do with this interface. While we know where the error happens inside the attribute, at this point in code we do not have access to the position of the attribute itself.\n\nI think that we should make the ExternInterpreter interface richer, so we do not lose position information.\n\nIn a different CL though.",
+      "parentUuid": "b8bed04b_10d90933",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0be910c1_870423df",
         "filename": "cue/wasm/interpreter.go",
         "patchSetId": 4
@@ -236,6 +416,24 @@
       "writtenOn": "2023-03-27T14:06:07Z",
       "side": 1,
       "message": "Again, no need to describe the error path.",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "817e31bd_dd894701",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0be910c1_870423df",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -259,6 +457,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a23df9b3_6db2e087",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Unfortunately we can\u0027t (see explanation of why in a previous message).\n\nWhile the ast.Expr does have a position, it\u0027s not the position we want. It\u0027s the position *within* the value of the attribute, but we don\u0027t have the position of the attribute itself.",
+      "parentUuid": "b8abff9f_d75f6611",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f76bd1ef_f32bb475",
         "filename": "cue/wasm/interpreter.go",
         "patchSetId": 4
@@ -270,6 +486,24 @@
       "writtenOn": "2023-03-27T14:06:07Z",
       "side": 1,
       "message": "A more informative error might be more appropriate here, assuming it\u0027s something that can ever happen in practice. If not, maybe comment to that effect?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00ed77f0_0fbac9c2",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Added a TODO to revisit this once we get position information.",
+      "parentUuid": "f76bd1ef_f32bb475",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -291,6 +525,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d38e8a57_af9a0edd",
+        "filename": "cue/wasm/testdata/eval.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee1db216_07345b2e",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "607a06aa_68ee683e",
@@ -304,6 +556,24 @@
       "writtenOn": "2023-03-27T08:17:11Z",
       "side": 1,
       "message": "Why not use txtar files instead of directories?",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56415ae3_2c264136",
+        "filename": "cue/wasm/testdata/morewasm/bar.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-03T14:40:29Z",
+      "side": 1,
+      "message": "txtar files can\u0027t contain binary data. Not without an additional layer of encoding, anyway.",
+      "parentUuid": "607a06aa_68ee683e",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

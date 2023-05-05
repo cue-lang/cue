@@ -2,7 +2,20 @@
 
 name: Dispatch trybot
 "on":
-  repository_dispatch: {}
+  workflow_dispatch:
+    inputs:
+      CL:
+        description: Legacy field from repository_dispatch
+        type: string
+      patchset:
+        description: Legacy field from repository_dispatch
+        type: string
+      targetBranch:
+        description: Legacy field from repository_dispatch
+        type: string
+      ref:
+        description: Legacy field from repository_dispatch
+        type: string
   push:
     branches:
       - ci/test
@@ -12,7 +25,6 @@ jobs:
     defaults:
       run:
         shell: bash
-    if: ${{ github.ref == 'refs/heads/ci/test' || github.event.client_payload.type == 'trybot' }}
     steps:
       - name: Write netrc file for cueckoo Gerrithub
         run: |-
@@ -28,10 +40,10 @@ jobs:
         run: |-
           cat <<EOD >> $GITHUB_OUTPUT
           value<<DOE
-          null
+          {"CL":"553527","patchset":"2","targetBranch":"master","ref":"refs/changes/27/553527/2"}
           DOE
           EOD
-      - if: github.event.client_payload.type != 'trybot'
+      - if: inputs.type != 'trybot'
         name: Trigger TryBot (fake data)
         run: |-
           mkdir tmpgit
@@ -81,8 +93,8 @@ jobs:
           	echo "Giving up"
           	exit 1
           fi
-      - if: github.event.client_payload.type == 'trybot'
-        name: Trigger TryBot (repository_dispatch payload)
+      - if: inputs.type == 'trybot'
+        name: Trigger TryBot (workflow_dispatch payload)
         run: |-
           mkdir tmpgit
           cd tmpgit
@@ -92,15 +104,15 @@ jobs:
           git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
           git remote add origin  https://review.gerrithub.io/a/cue-lang/cue
 
-          git fetch origin ${{ github.event.client_payload.ref }}
-          git checkout -b local_${{ github.event.client_payload.targetBranch }} FETCH_HEAD
+          git fetch origin ${{ inputs.ref }}
+          git checkout -b local_${{ inputs.targetBranch }} FETCH_HEAD
 
           # Error if we already have dispatchTrailer according to git log logic.
           # See earlier check for GitHub expression logic check.
           x="$(git log -1 --pretty='%(trailers:key=Dispatch-Trailer,valueonly)')"
           if [[ "$x" != "" ]]
           then
-          	 echo "Ref ${{ github.event.client_payload.ref }} already has a Dispatch-Trailer"
+          	 echo "Ref ${{ inputs.ref }} already has a Dispatch-Trailer"
           	 exit 1
           fi
 
@@ -112,7 +124,7 @@ jobs:
           # Use bash heredoc so that JSON's use of double quotes does
           # not get interpreted as shell.
           trailer="$(cat <<EOD | jq -r -c '{type} + .'
-          ${{ toJSON(github.event.client_payload) }}
+          ${{ toJSON(inputs) }}
           EOD
           )"
           git log -1 --format=%B | git interpret-trailers --trailer "Dispatch-Trailer: $trailer" | git commit --amend -F -
@@ -121,7 +133,7 @@ jobs:
           success=false
           for try in {1..20}; do
           	echo "Push to trybot try $try"
-          	if git push -f https://github.com/cue-lang/cue-trybot local_${{ github.event.client_payload.targetBranch }}:${{ github.event.client_payload.targetBranch }}; then
+          	if git push -f https://github.com/cue-lang/cue-trybot local_${{ inputs.targetBranch }}:${{ inputs.targetBranch }}; then
           		success=true
           		break
           	fi

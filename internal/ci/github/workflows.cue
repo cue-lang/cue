@@ -47,5 +47,7 @@ workflows: close({
 })
 
 dummyDispatch: _repo.#dispatch & {
-	type: _repo.trybot.key
+	CL:           "CL"
+	patchset:     "patchSet"
+	targetBranch: "master"
 }

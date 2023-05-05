@@ -46,6 +46,4 @@ workflows: close({
 	trybot_dispatch: #dummyDispatch: dummyDispatch
 })
 
-dummyDispatch: _repo.#dispatch & {
-	type: _repo.trybot.key
-}
+dummyDispatch: _repo.#dispatch

@@ -20,9 +20,8 @@ trybotWorkflows: {
 }
 
 #dispatch: {
-	type:         string
-	CL:           int
-	patchset:     int
+	CL:           string
+	patchset:     string
 	targetBranch: *defaultBranch | string
 
 	let p = strings.Split("\(CL)", "")
@@ -32,9 +31,28 @@ trybotWorkflows: {
 
 trybotDispatchWorkflow: bashWorkflow & {
 	#dummyDispatch?: #dispatch
-	name:            "Dispatch \(trybot.key)"
+	name:            "Dispatch \(trybot.key) for ${{inputs.ref}}"
 	on: {
-		repository_dispatch: {}
+		workflow_dispatch: {
+			inputs: {
+				CL: {
+					description: "Legacy field from repository_dispatch"
+					type:        "string"
+				}
+				patchset: {
+					description: "Legacy field from repository_dispatch"
+					type:        "string"
+				}
+				targetBranch: {
+					description: "Legacy field from repository_dispatch"
+					type:        "string"
+				}
+				ref: {
+					description: "Legacy field from repository_dispatch"
+					type:        "string"
+				}
+			}
+		}
 		push: {
 			// To enable testing of the dispatch itself
 			branches: [testDefaultBranch]
@@ -45,10 +63,6 @@ trybotDispatchWorkflow: bashWorkflow & {
 		(trybot.key): {
 			"runs-on": linuxMachine
 
-			// We set the "on" conditions above, but this would otherwise mean we
-			// run for all dispatch events.
-			if: "${{ github.ref == 'refs/heads/\(testDefaultBranch)' || github.event.client_payload.type == '\(trybot.key)' }}"
-
 			// See the comment below about the need for cases
 			let cases = [
 				{
@@ -58,8 +72,8 @@ trybotDispatchWorkflow: bashWorkflow & {
 				},
 				{
 					condition:  "=="
-					expr:       "github.event.client_payload"
-					nameSuffix: "repository_dispatch payload"
+					expr:       "inputs"
+					nameSuffix: "workflow_dispatch payload"
 				},
 			]
 
@@ -90,14 +104,14 @@ trybotDispatchWorkflow: bashWorkflow & {
 				// runtime expressions
 				//
 				// Hence we have to create two steps, one to trigger if the
-				// repository_dispatch payload is set, and one if not (i.e. we use
+				// workflow_dispatch payload is set, and one if not (i.e. we use
 				// the fake payload).
 				for v in cases {
 					let localBranchExpr = "local_${{ \(v.expr).targetBranch }}"
 					let targetBranchExpr = "${{ \(v.expr).targetBranch }}"
 					json.#step & {
 						name: "Trigger \(trybot.name) (\(v.nameSuffix))"
-						if:   "github.event.client_payload.type \(v.condition) '\(trybot.key)'"
+						if:   "inputs.type \(v.condition) '\(trybot.key)'"
 						run:  """
 						mkdir tmpgit
 						cd tmpgit

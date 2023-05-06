@@ -17,7 +17,7 @@ is a predeclared value of `>=0 & <=255`.
 Note that as it is already defined to be an `IP`, the length of the list
 is already fixed at `4` and we do not have to specify a value for all elements.
 Also note that instead of writing `...uint8`, we could have written `...`
-as the type constraint is already already implied by `IP`.
+as the type constraint is already implied by `IP`.
 
 The output contains a valid private IP address (`myIP`)
 and an invalid one (`yourIP`).

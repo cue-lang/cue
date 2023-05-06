@@ -3,15 +3,14 @@ package load
 import (
 	_ "embed"
 	"io"
-	"strings"
-
 	"path/filepath"
+	"strings"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load/internal/mvs"
 	"cuelang.org/go/cue/token"
-	"github.com/rogpeppe/go-internal/semver"
 	"golang.org/x/mod/module"
+	"golang.org/x/mod/semver"
 )
 
 //go:embed moduleschema.cue

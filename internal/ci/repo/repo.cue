@@ -11,8 +11,9 @@ base
 
 githubRepositoryPath: "cue-lang/cue"
 
-unityRepositoryPath: "cue-unity/unity"
-unityRepositoryURL:  "https://github.com/" + unityRepositoryPath
+unityRepositoryPath:   "cue-unity/unity"
+unityRepositoryURL:    "https://github.com/" + unityRepositoryPath
+unityNewRepositoryURL: unityRepositoryURL + "-private"
 
 cuelangRepositoryPath: "cue-lang/cuelang.org"
 
@@ -55,4 +56,5 @@ zeroReleaseTagSuffix: "-0.dev"
 // zeroReleaseTagSuffix.
 zeroReleaseTagPattern: "*" + zeroReleaseTagSuffix
 
-codeReview: "cue-unity": unityRepositoryURL
+codeReview: "cue-unity":     unityRepositoryURL
+codeReview: "cue-unity-new": unityNewRepositoryURL

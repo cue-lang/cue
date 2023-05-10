@@ -12,9 +12,10 @@ import (
 // file that drives golang.org/x/review/git-codereview. This config
 // file is also used by github.com/cue-sh/tools/cmd/cueckoo.
 #codeReview: {
-	gerrit?:      string
-	github?:      string
-	"cue-unity"?: string
+	gerrit?:          string
+	github?:          string
+	"cue-unity"?:     string
+	"cue-unity-new"?: string
 }
 
 // #toCodeReviewCfg converts a #codeReview instance to

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9b4da80e_36ec1159",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-10T20:51:55Z",
+      "side": 1,
+      "message": "Some of the failures were correct; I forgot that codereview.cfg is code generated. PTAL again.",
+      "revId": "925e99bf887df7e0c61c9f92e6c53007c010c747",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fecfcfca_202f19c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-10T14:59:01Z",
+      "side": 1,
+      "message": "Interesting that the gerrithub people made a commit to this branch, presumably when updating to gerrit v3.7.",
+      "revId": "0d3c0c0cdbddb9f339ad1d612c4b31365ab73dfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

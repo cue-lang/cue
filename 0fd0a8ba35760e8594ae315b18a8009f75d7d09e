@@ -34,6 +34,24 @@
       "parentUuid": "0fbe00f9_ec770a57",
       "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01239702_dd5288aa",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-11T10:09:16Z",
+      "side": 1,
+      "message": "After chatting about this with Marcel, let\u0027s go with the current design for now. Wasm is an experimental feature and we have the freedom to change the interface if we see a need or think of a better option.\n\nThat said, there are a few thing I don\u0027t like about your counter-proposal. It introduces what essentially amounts to an identifier in the package-level extern declaration (`foo` and `bar` above). Also, it doesn\u0027t really solve the redundancy, because you still have to repeat this identifier for every function import. Is `foo` really that much better than `\"foo.wasm\"` in every function import?\n\nMarcel also said that `kind\u003d\"wasm\"` makes it look optional, where it is not, and that the type of external interpreter is the fundamental object specified in the package-level declaration, so perhaps it should be something like this instead:\n\n    @extern(\"wasm\", ref\u003dfoo, filename\u003d\"foo.wasm\", abi\u003dc)\n    @extern(\"wasm\", ref\u003dbar, filename\u003d\"bar.wasm\", abi\u003dc)\n    package p\n    \n    add: _ @extern(foo, sig\u003d\"func(int64, int64): int64\")\n    mul: _ @extern(foo, sig\u003d\"func(float64, float64): float64\")\n    not: _ @extern(foo, abi\u003dc, sig\u003d\"func(bool): bool\")\n    isPrime: _ @extern(bar, name\u003dis_prime, sig\u003d\"func(uint64): bool\")\n\nNevertheless, in the interest of progress let\u0027s go with the current design for now.",
+      "parentUuid": "8c4328b1_1c6781b0",
+      "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

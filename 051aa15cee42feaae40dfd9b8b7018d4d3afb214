@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "937f0ff2_27cdd1cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-05-12T12:30:54Z",
+      "side": 1,
+      "message": "LGTM with one reservation about the sig syntax.",
+      "revId": "051aa15cee42feaae40dfd9b8b7018d4d3afb214",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f20d6147_c6e7d6a8",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-05-12T12:30:54Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem quite right. I don\u0027t _think_ you want to have `func(1, 2): 3` as a valid signature. How about just making identifiers exactly the same as CUE identifiers?",
+      "revId": "051aa15cee42feaae40dfd9b8b7018d4d3afb214",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

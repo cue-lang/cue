@@ -70,6 +70,24 @@
       "parentUuid": "01239702_dd5288aa",
       "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5bb65795_2f6683cf",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-12T13:00:33Z",
+      "side": 1,
+      "message": "\u003e is it actually possible to have two different ABIs in play in a single wasm file?\n\nYes, in fact, I expect this to be pretty common.\n\nAs for your blob-based example, I\u0027m thinking that if the blob is like a zip, then there are still files (with filenames) inside. In that case the filename could refer to the \"file\" inside the archive rather than to files on disk, so the name could still be useful, I think.\n\nAlso, I expect these CUE files containing references to concrete Wasm modules to be generated in the future by some tooling layer rather than being written by hand. What I am thinking of is the user simply writing they Go/Rust, and then run `go generate` or `cargo build` which would run our tool that will produce all these files. I do not expect the user to have to write these files by hand in the long run.",
+      "parentUuid": "6f35896c_638f406d",
+      "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

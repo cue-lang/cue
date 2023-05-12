@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e0c5e65_e83f4b73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-05-12T12:41:50Z",
+      "side": 1,
+      "message": "LGTM with one minor gripe about that unhelpful error, message and a suggestion for adding a TODO.",
+      "revId": "042df874d65ac85e9d30bf1130bddcf4c4c88fb6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

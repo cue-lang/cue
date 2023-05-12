@@ -405,6 +405,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "709a2e67_a7c53d41",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-05-12T12:41:50Z",
+      "side": 1,
+      "message": "We should probably maintain position information inside internal.Attr. As you say, we can do it later. Maybe add a TODO for now so we can easily remember later?",
+      "parentUuid": "9cbc439a_6c811437",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0be910c1_870423df",
         "filename": "cue/wasm/interpreter.go",
         "patchSetId": 4
@@ -504,6 +522,24 @@
       "side": 1,
       "message": "Added a TODO to revisit this once we get position information.",
       "parentUuid": "f76bd1ef_f32bb475",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a4ba4ea_a312a5aa",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-05-12T12:41:50Z",
+      "side": 1,
+      "message": "Not just position information but also a bare \"not an identifier\" is unhelpful particularly in the absence of position info. Perhaps include information about the node type too?",
+      "parentUuid": "00ed77f0_0fbac9c2",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

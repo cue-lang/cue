@@ -1,0 +1,259 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57421442_59675db0",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "Does Go doc use this markup notation nowadays?",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1e79ebcb_26e834c9",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "Maybe:\n\"To utilize Wasm modules, CUE files need to declare their intent by specifying a package attribute in the following manner:\"\n\nor\n\n\"To utilize Wasm modules, CUE files need to declare their intent by specifying a package attribute:\"",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f04a979_84858139",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "As a matter of style, I would keep a different newline to avoid the suggestion that this needs to be attached to the package.",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3f9a7d6_e4f6718c",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "s/can be then/can then be/\n\nOr otherwise:\n\n\"After declaring the intent to use Wasm modules, individual functions can be imported from them by utilizing a field attribute:\"",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04c1a0ae_47ec8d98",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "s/of Wasm/of the Wasm/",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3717683f_7fe6d8ff",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "Declare ABI on first usage.\n\ns/ABI/Abstract Binary Interface (ABI)/",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07ee6489_7c955732",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "s/Sig/sig/\n(Go style indicates preserving capitalizations of identifiers over strict adherence to English rules.)",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32db5930_60076a07",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "s/(more about that in a later section)/(see below)/",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d93cec2_5e0bda63",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "I tend to separate new sections with two newlines.",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95016eae_b5d940ce",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "Maybe:\n\nCUE executes Wasm code within a secure sandbox, which restricts access to external resources. Therefore, any Wasm code intended for execution in CUE must be self-contained and cannot have external dependencies.\n\nIn general, please try to avoid the use of parenthesis.",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b840c070_96829f56",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "Wasm code must always terminate and return a result.",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "683c7a21_2fcd0c4b",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "and will cause CUE evaluation to be undefined.\n\nOr something like that.",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9a14cf5_18a7a992",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "I prefer Oxford commas, so s/ and/, and/",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e80a6e2_1a0c4af0",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "s/, etc././\n\nYou already said \"such as\".",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee7f66d6_a51dd2ef",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "How does this render in Go doc?",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -88,6 +88,24 @@
       "parentUuid": "6f35896c_638f406d",
       "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27dff534_dc6acda7",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T14:54:39Z",
+      "side": 1,
+      "message": "I agree we can keep it as is. We can find a shorthand down the line if needed. Especially since it may be variable per in-file extern, the current format seemingly has to be supported anyway.",
+      "parentUuid": "5bb65795_2f6683cf",
+      "revId": "0fd0a8ba35760e8594ae315b18a8009f75d7d09e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

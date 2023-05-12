@@ -421,6 +421,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ac25a6a_c57ff094",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-12T13:16:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "709a2e67_a7c53d41",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0be910c1_870423df",
@@ -540,6 +558,24 @@
       "side": 1,
       "message": "Not just position information but also a bare \"not an identifier\" is unhelpful particularly in the absence of position info. Perhaps include information about the node type too?",
       "parentUuid": "00ed77f0_0fbac9c2",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6b0da61_fb710918",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-12T13:16:23Z",
+      "side": 1,
+      "message": "Done, error now reads:\n\n    can\u0027t load from external module: invalid function signature: expected identifier, found *ast.ListLit:\n        ./wrongsig/foo.cue:5:8",
+      "parentUuid": "1a4ba4ea_a312a5aa",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

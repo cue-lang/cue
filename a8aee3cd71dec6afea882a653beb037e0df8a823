@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ed97cf0d_9ef8620f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T15:10:09Z",
+      "side": 1,
+      "message": "LGTM, plus Roger\u0027s comments.",
+      "revId": "a8aee3cd71dec6afea882a653beb037e0df8a823",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfb43571_bf8b893f",
+        "filename": "cue/interpreter/wasm/abi.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T15:10:09Z",
+      "side": 1,
+      "message": "Why is this file named abi.go? Seems like type.go is more appropriate.",
+      "revId": "a8aee3cd71dec6afea882a653beb037e0df8a823",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fc19784_1a5ef461",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T15:10:09Z",
+      "side": 1,
+      "message": "Maybe a short doc comment to explain why you are using TestMain.",
+      "revId": "a8aee3cd71dec6afea882a653beb037e0df8a823",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "325d9328_65e80d5d",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-12T15:10:09Z",
+      "side": 1,
+      "message": "Maybe briefly describe what each of these files do?",
+      "revId": "a8aee3cd71dec6afea882a653beb037e0df8a823",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

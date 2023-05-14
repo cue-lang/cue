@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fc64840_1bd5a24a",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Yes: https://tip.golang.org/doc/comment#headings",
+      "parentUuid": "57421442_59675db0",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1e79ebcb_26e834c9",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-05-12T14:54:39Z",
       "side": 1,
       "message": "Maybe:\n\"To utilize Wasm modules, CUE files need to declare their intent by specifying a package attribute in the following manner:\"\n\nor\n\n\"To utilize Wasm modules, CUE files need to declare their intent by specifying a package attribute:\"",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "649803d0_bbb6fb8d",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e79ebcb_26e834c9",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "972b1ffc_e19c618a",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Gofmt doesn\u0027t allow newlines like that in code blocks. It removes leading whitespace, thereby rendering as two code blocks.",
+      "parentUuid": "2f04a979_84858139",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e3f9a7d6_e4f6718c",
         "filename": "cue/interpreter/wasm/doc.go",
         "patchSetId": 4
@@ -65,6 +119,24 @@
       "writtenOn": "2023-05-12T14:54:39Z",
       "side": 1,
       "message": "s/can be then/can then be/\n\nOr otherwise:\n\n\"After declaring the intent to use Wasm modules, individual functions can be imported from them by utilizing a field attribute:\"",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c4efea7_5d1079c1",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e3f9a7d6_e4f6718c",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e6234cf_0c6e0890",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "04c1a0ae_47ec8d98",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3717683f_7fe6d8ff",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-05-12T14:54:39Z",
       "side": 1,
       "message": "Declare ABI on first usage.\n\ns/ABI/Abstract Binary Interface (ABI)/",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bc9e6e6_9f57a333",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done (but lowercase).",
+      "parentUuid": "3717683f_7fe6d8ff",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c6b5434_273b03ec",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "I remember Rob disagreeing with this, but I changed it to be unambiguous.",
+      "parentUuid": "07ee6489_7c955732",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80823372_1324a0e2",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32db5930_60076a07",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d93cec2_5e0bda63",
@@ -150,6 +294,24 @@
       "writtenOn": "2023-05-12T14:54:39Z",
       "side": 1,
       "message": "I tend to separate new sections with two newlines.",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb2fa3b2_f0e4e106",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "`gofmt` now remove extra newlines between sections.",
+      "parentUuid": "8d93cec2_5e0bda63",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +333,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "213066ed_78f799a9",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done (with tweaks).",
+      "parentUuid": "95016eae_b5d940ce",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b840c070_96829f56",
@@ -184,6 +364,24 @@
       "writtenOn": "2023-05-12T14:54:39Z",
       "side": 1,
       "message": "Wasm code must always terminate and return a result.",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a39b52d0_a44b45a0",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b840c070_96829f56",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -205,6 +403,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4851877_c7e09ae1",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "683c7a21_2fcd0c4b",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9a14cf5_18a7a992",
@@ -218,6 +434,24 @@
       "writtenOn": "2023-05-12T14:54:39Z",
       "side": 1,
       "message": "I prefer Oxford commas, so s/ and/, and/",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95b7715f_236c54e9",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9a14cf5_18a7a992",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -239,6 +473,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f3f45f9_d8610bb5",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e80a6e2_1a0c4af0",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee7f66d6_a51dd2ef",
@@ -252,6 +504,24 @@
       "writtenOn": "2023-05-12T14:54:39Z",
       "side": 1,
       "message": "How does this render in Go doc?",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "38b00227_c70f275b",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:11Z",
+      "side": 1,
+      "message": "They render inline, where they are used, not at the end of the document. See for example: https://pkg.go.dev/encoding/json@go1.20.4.\n\nIt\u0027s all documented at: https://tip.golang.org/doc/comment#links\n\nIt\u0027s very unfortunate that since the demise of godoc we can\u0027t preview any of it.",
+      "parentUuid": "ee7f66d6_a51dd2ef",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

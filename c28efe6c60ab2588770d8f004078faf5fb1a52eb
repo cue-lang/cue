@@ -105,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21dc8379_d932a1c3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:35Z",
+      "side": 1,
+      "message": "\u003e Do you expect the binaries to change often?\n\nI expect them to change relatively rarely.",
+      "parentUuid": "cacd82e9_2dfc02c6",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db5aff5d_9c066b09",
@@ -171,6 +189,24 @@
       "side": 1,
       "message": "The simple answer is that this makes it very convenient. The user specifies a string, and in the end, we use a string (the same string) to pass back to the CUE runtime as an identifier.\n\nWe could go through an intermediary integer layer, but it feels like busy work. Convert the string from the user to an int just to convert the int back to string to pass to CUE.\n\nIn any case this code will all go away once I add new ABIs. I have a much better design.",
       "parentUuid": "44d750e0_4bfa33bb",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d000ead2_e1bf35d7",
+        "filename": "cue/wasm/abi.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1639bb9b_aa680231",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -505,6 +541,24 @@
       "side": 1,
       "message": "Unfortunately we can\u0027t (see explanation of why in a previous message).\n\nWhile the ast.Expr does have a position, it\u0027s not the position we want. It\u0027s the position *within* the value of the attribute, but we don\u0027t have the position of the attribute itself.",
       "parentUuid": "b8abff9f_d75f6611",
+      "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce490f4c_146b7f24",
+        "filename": "cue/wasm/interpreter.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-05-14T12:29:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a23df9b3_6db2e087",
       "revId": "c28efe6c60ab2588770d8f004078faf5fb1a52eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

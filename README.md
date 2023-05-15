@@ -18,6 +18,8 @@
 [![Go 1.20+](https://img.shields.io/badge/go-1.20-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 
+DO NOT MERGE; testing CI
+
 # The CUE Data Constraint Language
 
 _Configure, Unify, Execute_

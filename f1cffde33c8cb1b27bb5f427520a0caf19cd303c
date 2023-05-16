@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ca756f0_5bd7ab3d",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-16T23:33:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "972b1ffc_e19c618a",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e3f9a7d6_e4f6718c",
@@ -522,6 +540,24 @@
       "side": 1,
       "message": "They render inline, where they are used, not at the end of the document. See for example: https://pkg.go.dev/encoding/json@go1.20.4.\n\nIt\u0027s all documented at: https://tip.golang.org/doc/comment#links\n\nIt\u0027s very unfortunate that since the demise of godoc we can\u0027t preview any of it.",
       "parentUuid": "ee7f66d6_a51dd2ef",
+      "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c2e003f_4d430bf0",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-05-16T23:33:33Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "38b00227_c70f275b",
       "revId": "f1cffde33c8cb1b27bb5f427520a0caf19cd303c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

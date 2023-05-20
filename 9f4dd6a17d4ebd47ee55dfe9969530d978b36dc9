@@ -16,6 +16,23 @@
       "message": "Please take another look. A few changes here since your last review that are worth a look.",
       "revId": "9f4dd6a17d4ebd47ee55dfe9969530d978b36dc9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06bb61fe_16bfdd55",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-20T14:49:37Z",
+      "side": 1,
+      "message": "Still LGTM",
+      "revId": "9f4dd6a17d4ebd47ee55dfe9969530d978b36dc9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

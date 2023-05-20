@@ -192,30 +192,6 @@ func parseJSON(ctx *adt.OpContext, b []byte) adt.Value {
 	return compileExpr(ctx, expr)
 }
 
-func isZero(v reflect.Value) bool {
-	x := v.Interface()
-	if x == nil {
-		return true
-	}
-	switch k := v.Kind(); k {
-	case reflect.Struct, reflect.Array:
-		// we never allow optional values for these types.
-		return false
-
-	case reflect.Chan, reflect.Func, reflect.Interface, reflect.Map,
-		reflect.Slice:
-		// Note that for maps we preserve the distinction between a nil map and
-		// an empty map.
-		return v.IsNil()
-
-	case reflect.String:
-		return v.Len() == 0
-
-	default:
-		return x == reflect.Zero(v.Type()).Interface()
-	}
-}
-
 func GoValueToExpr(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Expr {
 	e := convertRec(ctx, nilIsTop, x)
 	if e == nil {
@@ -438,7 +414,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 				if tag, _ := sf.Tag.Lookup("json"); tag == "-" {
 					continue
 				}
-				if isOmitEmpty(&sf) && isZero(val) {
+				if isOmitEmpty(&sf) && val.IsZero() {
 					continue
 				}
 				sub := convertRec(ctx, nilIsTop, val.Interface())

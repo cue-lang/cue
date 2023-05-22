@@ -35,8 +35,9 @@ workflows: tip_triggers: _repo.bashWorkflow & {
 				}
 			},
 			_repo.repositoryDispatch & {
-				name:                  "Trigger unity build"
-				#githubRepositoryPath: _repo.unityRepositoryPath
+				name:                          "Trigger unity build"
+				#githubRepositoryPath:         _repo.unityRepositoryPath
+				#botGitHubUserTokenSecretsKey: "PORCUEPINE_GITHUB_PAT"
 				#arg: {
 					event_type: "Check against ${GITHUB_SHA}"
 					client_payload: {

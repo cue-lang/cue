@@ -13,7 +13,6 @@
 // limitations under the License.
 
 //go:build !gen
-// +build !gen
 
 package gocode
 

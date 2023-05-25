@@ -569,16 +569,16 @@ func Print(w io.Writer, err error, cfg *Config) {
 // Details is a convenience wrapper for Print to return the error text as a
 // string.
 func Details(err error, cfg *Config) string {
-	w := &bytes.Buffer{}
-	Print(w, err, cfg)
-	return w.String()
+	var b strings.Builder
+	Print(&b, err, cfg)
+	return b.String()
 }
 
 // String generates a short message from a given Error.
 func String(err Error) string {
-	w := &strings.Builder{}
-	writeErr(w, err)
-	return w.String()
+	var b strings.Builder
+	writeErr(&b, err)
+	return b.String()
 }
 
 func writeErr(w io.Writer, err Error) {

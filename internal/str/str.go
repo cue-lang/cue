@@ -16,8 +16,8 @@
 package str // import "cuelang.org/go/internal/str"
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 )
@@ -59,7 +59,7 @@ func ToFold(s string) string {
 	return s
 
 Slow:
-	var buf bytes.Buffer
+	var buf strings.Builder
 	for _, r := range s {
 		// SimpleFold(x) cycles to the next equivalent rune > x
 		// or wraps around to smaller values. Iterate until it wraps,

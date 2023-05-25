@@ -21,7 +21,8 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
-	"github.com/stretchr/testify/assert"
+
+	"github.com/go-quicktest/qt"
 )
 
 func TestSanitize(t *testing.T) {
@@ -444,7 +445,7 @@ c: {
 			}
 
 			got := string(b)
-			assert.Equal(t, got, tc.want)
+			qt.Assert(t, qt.Equals(got, tc.want))
 		})
 	}
 }

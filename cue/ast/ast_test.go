@@ -17,7 +17,7 @@ package ast_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -92,7 +92,7 @@ func TestPackageName(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			assert.Equal(t, f.PackageName(), tc.pkg)
+			qt.Assert(t, qt.Equals(f.PackageName(), tc.pkg))
 		})
 	}
 }

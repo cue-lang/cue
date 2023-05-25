@@ -21,7 +21,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
@@ -119,7 +119,7 @@ func TestExtract(t *testing.T) {
 			out := &bytes.Buffer{}
 			e, err := Extract(tc.name, []byte(tc.in))
 			toString(out, e, err)
-			assert.Equal(t, tc.out, out.String())
+			qt.Assert(t, qt.Equals(out.String(), tc.out))
 
 			out = &bytes.Buffer{}
 			d := NewDecoder(nil, tc.name, strings.NewReader(tc.in))
@@ -133,7 +133,7 @@ func TestExtract(t *testing.T) {
 					break
 				}
 			}
-			assert.Equal(t, tc.out, out.String())
+			qt.Assert(t, qt.Equals(out.String(), tc.out))
 		})
 	}
 }

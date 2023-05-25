@@ -23,8 +23,8 @@ import (
 	"strings"
 	"testing"
 
+	qt "github.com/frankban/quicktest"
 	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
@@ -122,5 +122,5 @@ func TestDecode(t *testing.T) {
 		})
 		return nil
 	})
-	assert.NoError(t, err)
+	qt.Assert(t, err, qt.IsNil)
 }

@@ -18,8 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	qt "github.com/frankban/quicktest"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -323,6 +322,7 @@ a: list6c6973
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
+			c := qt.New(t)
 			f, err := parser.ParseFile(tc.name, tc.in, parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
@@ -331,10 +331,10 @@ a: list6c6973
 			n := astutil.Apply(f, tc.before, tc.after)
 
 			b, err := format.Node(n)
-			require.NoError(t, err)
+			c.Assert(err, qt.IsNil)
 			got := strings.TrimSpace(string(b))
 			want := strings.TrimSpace(tc.out)
-			assert.Equal(t, want, got)
+			c.Assert(want, qt.Equals, got)
 		})
 	}
 }

@@ -21,7 +21,8 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
-	"github.com/stretchr/testify/assert"
+
+	qt "github.com/frankban/quicktest"
 )
 
 func TestSanitize(t *testing.T) {
@@ -433,6 +434,7 @@ c: {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			c := qt.New(t)
 			err := astutil.Sanitize(tc.file)
 			if err != nil {
 				t.Fatal(err)
@@ -444,7 +446,7 @@ c: {
 			}
 
 			got := string(b)
-			assert.Equal(t, got, tc.want)
+			c.Assert(got, qt.Equals, tc.want)
 		})
 	}
 }

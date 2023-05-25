@@ -15,8 +15,8 @@
 package tabwriter
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 	"text/tabwriter"
 
 	"cuelang.org/go/cue"
@@ -25,8 +25,8 @@ import (
 // Write formats text in columns. See golang.org/pkg/text/tabwriter for more
 // info.
 func Write(data cue.Value) (string, error) {
-	buf := &bytes.Buffer{}
-	tw := tabwriter.NewWriter(buf, 0, 4, 1, ' ', 0)
+	var b strings.Builder
+	tw := tabwriter.NewWriter(&b, 0, 4, 1, ' ', 0)
 
 	write := func(v cue.Value) error {
 		b, err := v.Bytes()
@@ -57,5 +57,5 @@ func Write(data cue.Value) (string, error) {
 	}
 
 	err := tw.Flush()
-	return buf.String(), err
+	return b.String(), err
 }

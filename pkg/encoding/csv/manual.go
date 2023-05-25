@@ -15,17 +15,17 @@
 package csv
 
 import (
-	"bytes"
 	"encoding/csv"
 	"io"
+	"strings"
 
 	"cuelang.org/go/cue"
 )
 
 // Encode encode the given list of lists to CSV.
 func Encode(x cue.Value) (string, error) {
-	buf := &bytes.Buffer{}
-	w := csv.NewWriter(buf)
+	var b strings.Builder
+	w := csv.NewWriter(&b)
 	iter, err := x.List()
 	if err != nil {
 		return "", err
@@ -51,7 +51,7 @@ func Encode(x cue.Value) (string, error) {
 		_ = w.Write(a)
 	}
 	w.Flush()
-	return buf.String(), nil
+	return b.String(), nil
 }
 
 // Decode reads in a csv into a list of lists.

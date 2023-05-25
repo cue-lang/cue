@@ -17,8 +17,8 @@
 package astutil
 
 import (
-	"bytes"
 	"fmt"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -447,14 +447,14 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 
 // Debugging support
 func (s *scope) String() string {
-	var buf bytes.Buffer
-	fmt.Fprintf(&buf, "scope %p {", s)
+	var b strings.Builder
+	fmt.Fprintf(&b, "scope %p {", s)
 	if s != nil && len(s.index) > 0 {
-		fmt.Fprintln(&buf)
+		fmt.Fprintln(&b)
 		for name := range s.index {
-			fmt.Fprintf(&buf, "\t%v\n", name)
+			fmt.Fprintf(&b, "\t%v\n", name)
 		}
 	}
-	fmt.Fprintf(&buf, "}\n")
-	return buf.String()
+	fmt.Fprintf(&b, "}\n")
+	return b.String()
 }

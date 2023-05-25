@@ -18,8 +18,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
+	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -331,10 +330,10 @@ a: list6c6973
 			n := astutil.Apply(f, tc.before, tc.after)
 
 			b, err := format.Node(n)
-			require.NoError(t, err)
+			qt.Assert(t, qt.IsNil(err))
 			got := strings.TrimSpace(string(b))
 			want := strings.TrimSpace(tc.out)
-			assert.Equal(t, want, got)
+			qt.Assert(t, qt.Equals(got, want))
 		})
 	}
 }

@@ -15,13 +15,13 @@
 package ast_test
 
 import (
+	"errors"
 	"strings"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 )
@@ -139,14 +139,14 @@ func TestLabelName(t *testing.T) {
 		b, _ := format.Node(tc.in)
 		t.Run(string(b), func(t *testing.T) {
 			if id, ok := tc.in.(*ast.Ident); ok && !strings.HasPrefix(id.Name, "`") {
-				assert.Equal(t, tc.isIdent, ast.IsValidIdent(id.Name))
+				qt.Assert(t, qt.Equals(ast.IsValidIdent(id.Name), tc.isIdent))
 			}
 
 			str, isIdent, err := ast.LabelName(tc.in)
-			assert.Equal(t, tc.out, str, "value")
-			assert.Equal(t, tc.isIdent, isIdent, "isIdent")
-			assert.Equal(t, tc.err, err != nil, "err")
-			assert.Equal(t, tc.expr, errors.Is(err, ast.ErrIsExpression), "expr")
+			qt.Assert(t, qt.Equals(str, tc.out), qt.Commentf("value"))
+			qt.Assert(t, qt.Equals(isIdent, tc.isIdent), qt.Commentf("isIdent"))
+			qt.Assert(t, qt.Equals(err != nil, tc.err), qt.Commentf("err"))
+			qt.Assert(t, qt.Equals(errors.Is(err, ast.ErrIsExpression), tc.expr), qt.Commentf("expr"))
 		})
 	}
 }

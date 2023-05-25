@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3b93b15_979f713d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-05-25T11:57:23Z",
+      "side": 1,
+      "message": "Marking as on hold until a new release of https://github.com/go-quicktest/qt is cut.",
+      "revId": "ff6b6eeda82f8b19bf64dba67a2726c05e7e514f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a158b0f_da9cfbd0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-26T16:16:37Z",
+      "side": 1,
+      "message": "I was keeping the original names where possible to keep diffs small, but I agree anyway, so renamed.",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab56483b_371efee3",
@@ -31,6 +48,24 @@
       "writtenOn": "2023-05-26T09:20:29Z",
       "side": 1,
       "message": "Nit: s/buf/b/g",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2067320_65ba4b08",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-26T16:16:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab56483b_371efee3",
       "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd5a88ee_c40c10ac",
+        "filename": "internal/str/str.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-26T16:16:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "135b8b6a_4fb0fff4",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5b0e2f25_3498ec77",
@@ -65,6 +118,24 @@
       "writtenOn": "2023-05-26T09:20:29Z",
       "side": 1,
       "message": "Nit: s/buf/b/",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50106fed_750a3608",
+        "filename": "pkg/encoding/json/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-26T16:16:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5b0e2f25_3498ec77",
       "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

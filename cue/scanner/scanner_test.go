@@ -16,7 +16,6 @@ package scanner
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -894,7 +893,7 @@ func BenchmarkScan(b *testing.B) {
 func BenchmarkScanFile(b *testing.B) {
 	b.StopTimer()
 	const filename = "go"
-	src, err := ioutil.ReadFile(filename)
+	src, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}

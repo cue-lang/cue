@@ -208,7 +208,7 @@ func (r *importReader) readImport(imports *[]string) {
 	r.readString(imports)
 }
 
-// readComments is like ioutil.ReadAll, except that it only reads the leading
+// readComments is like io.ReadAll, except that it only reads the leading
 // block of comments in the file.
 func readComments(f io.Reader) ([]byte, errors.Error) {
 	r := &importReader{b: bufio.NewReader(f)}
@@ -220,7 +220,7 @@ func readComments(f io.Reader) ([]byte, errors.Error) {
 	return r.buf, r.err
 }
 
-// readImports is like ioutil.ReadAll, except that it expects a CUE file as
+// readImports is like io.ReadAll, except that it expects a CUE file as
 // input and stops reading the input once the imports have completed.
 func readImports(f io.Reader, reportSyntaxError bool, imports *[]string) ([]byte, errors.Error) {
 	r := &importReader{b: bufio.NewReader(f)}

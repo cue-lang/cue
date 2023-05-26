@@ -16,6 +16,7 @@ package benchmarks
 
 import (
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -79,7 +80,7 @@ func Benchmark(b *testing.B) {
 
 			a.Files[statsPos].Data = []byte(ctx.Stats().String() + "\n\n")
 
-			ioutil.WriteFile(name, txtar.Format(a), fi.Mode())
+			os.WriteFile(name, txtar.Format(a), fi.Mode())
 		}
 
 		b.Run(name, func(b *testing.B) {

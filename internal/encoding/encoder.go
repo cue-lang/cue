@@ -19,7 +19,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -311,7 +310,7 @@ func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err er
 	// prevent clobbering the file in case of a crash.
 	b := &bytes.Buffer{}
 	fn := func() error {
-		return ioutil.WriteFile(path, b.Bytes(), 0644)
+		return os.WriteFile(path, b.Bytes(), 0644)
 	}
 	return b, fn, nil
 }

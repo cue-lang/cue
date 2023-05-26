@@ -17,7 +17,7 @@ package openapi_test
 import (
 	"bytes"
 	"encoding/json"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -251,11 +251,11 @@ func TestParseDefinitions(t *testing.T) {
 
 				wantFile := filepath.Join("testdata", tc.out)
 				if cuetest.UpdateGoldenFiles {
-					_ = ioutil.WriteFile(wantFile, out.Bytes(), 0644)
+					_ = os.WriteFile(wantFile, out.Bytes(), 0644)
 					return
 				}
 
-				b, err = ioutil.ReadFile(wantFile)
+				b, err = os.ReadFile(wantFile)
 				if err != nil {
 					t.Fatal(err)
 				}

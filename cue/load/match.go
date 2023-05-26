@@ -15,7 +15,7 @@
 package load
 
 import (
-	"io/ioutil"
+	"io"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -64,7 +64,7 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 	}
 
 	if file.Filename == "-" {
-		b, err2 := ioutil.ReadAll(cfg.stdin())
+		b, err2 := io.ReadAll(cfg.stdin())
 		if err2 != nil {
 			err = errors.Newf(token.NoPos, "read stdin: %v", err)
 			return

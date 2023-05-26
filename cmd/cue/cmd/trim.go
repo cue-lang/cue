@@ -17,7 +17,6 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/spf13/cobra"
@@ -171,7 +170,7 @@ func runTrim(cmd *Command, args []string) error {
 				filename = dst
 			}
 
-			err = ioutil.WriteFile(filename, b, 0644)
+			err = os.WriteFile(filename, b, 0644)
 			if err != nil {
 				return err
 			}

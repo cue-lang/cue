@@ -17,7 +17,7 @@ package openapi_test
 import (
 	"bytes"
 	"io/fs"
-	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
 	"strings"
@@ -110,7 +110,7 @@ func TestDecode(t *testing.T) {
 					if cuetest.UpdateGoldenFiles {
 						a.Files[outIndex].Data = b
 						b = txtar.Format(a)
-						err = ioutil.WriteFile(fullpath, b, 0644)
+						err = os.WriteFile(fullpath, b, 0644)
 						if err != nil {
 							t.Fatal(err)
 						}

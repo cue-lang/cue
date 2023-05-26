@@ -21,7 +21,7 @@ package path
 import (
 	"flag"
 	"fmt"
-	"io/ioutil"
+	"os"
 	goos "os"
 	"os/exec"
 	"reflect"
@@ -69,7 +69,7 @@ func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
 			return
 		}
 		fn, data := Join([]string{dd, cmdfile}, Windows), []byte("@echo "+d+"\r\n")
-		if err := ioutil.WriteFile(fn, data, perm); err != nil {
+		if err := os.WriteFile(fn, data, perm); err != nil {
 			t.Errorf("%d,%d: WriteFile(%#q) failed: %v", ti, i, fn, err)
 			return
 		}

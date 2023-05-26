@@ -4,7 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
+	"os"
 	"strconv"
 	"strings"
 	"testing"
@@ -916,7 +916,7 @@ func TestFiles(t *testing.T) {
 		t.Run(test, func(t *testing.T) {
 			testname := fmt.Sprintf("testdata/%s.test", test)
 			filename := fmt.Sprintf("testdata/%s.out", test)
-			mergeTests, err := ioutil.ReadFile(testname)
+			mergeTests, err := os.ReadFile(testname)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -926,10 +926,10 @@ func TestFiles(t *testing.T) {
 			}
 			got := cueStr(expr)
 			if cuetest.UpdateGoldenFiles {
-				ioutil.WriteFile(filename, []byte(got), 0644)
+				os.WriteFile(filename, []byte(got), 0644)
 				return
 			}
-			b, err := ioutil.ReadFile(filename)
+			b, err := os.ReadFile(filename)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -971,7 +971,7 @@ func TestFuzzCrashers(t *testing.T) {
 //var data []byte
 //func init() {
 //	var err error
-//	data, err = ioutil.ReadFile("/tmp/file.yaml")
+//	data, err = os.ReadFile("/tmp/file.yaml")
 //	if err != nil {
 //		panic(err)
 //	}

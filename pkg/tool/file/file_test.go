@@ -87,7 +87,7 @@ func TestAppend(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b, err := ioutil.ReadFile(name)
+	b, err := os.ReadFile(name)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -116,7 +116,7 @@ func TestCreate(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b, err := ioutil.ReadFile(name)
+	b, err := os.ReadFile(name)
 	if err != nil {
 		t.Fatal(err)
 	}

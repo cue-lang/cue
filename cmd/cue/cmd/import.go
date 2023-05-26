@@ -17,7 +17,6 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -492,7 +491,7 @@ func writeFile(p *buildPlan, f *ast.File, cueFile string) error {
 		return err
 	}
 	_ = os.MkdirAll(filepath.Dir(cueFile), 0755)
-	return ioutil.WriteFile(cueFile, b, 0644)
+	return os.WriteFile(cueFile, b, 0644)
 }
 
 type hoister struct {

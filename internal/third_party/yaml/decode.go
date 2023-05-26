@@ -6,8 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"math"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -73,7 +73,7 @@ func readSource(filename string, src interface{}) ([]byte, error) {
 		}
 		return nil, errors.New("invalid source")
 	}
-	return ioutil.ReadFile(filename)
+	return os.ReadFile(filename)
 }
 
 func newParser(filename string, src interface{}) (*parser, error) {

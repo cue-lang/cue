@@ -21,7 +21,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/url"
 	"os"
 	"strings"
@@ -182,7 +181,7 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 
 	if file, ok := f.Source.(*ast.File); ok {
 		i.file = file
-		i.closer = ioutil.NopCloser(strings.NewReader(""))
+		i.closer = io.NopCloser(strings.NewReader(""))
 		i.validate(file, f)
 		return i
 	}
@@ -250,11 +249,11 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		i.next = d.Decode
 		i.Next()
 	case build.Text:
-		b, err := ioutil.ReadAll(r)
+		b, err := io.ReadAll(r)
 		i.err = err
 		i.expr = ast.NewString(string(b))
 	case build.Binary:
-		b, err := ioutil.ReadAll(r)
+		b, err := io.ReadAll(r)
 		i.err = err
 		s := literal.Bytes.WithTabIndent(1).Quote(string(b))
 		i.expr = ast.NewLit(token.STRING, s)
@@ -265,7 +264,7 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		}
 		i.file, i.err = protobuf.Extract(path, r, paths)
 	case build.TextProto:
-		b, err := ioutil.ReadAll(r)
+		b, err := io.ReadAll(r)
 		i.err = err
 		if err == nil {
 			d := textproto.NewDecoder()
@@ -330,20 +329,20 @@ func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {
 	case nil:
 		// Use the file name.
 	case string:
-		return ioutil.NopCloser(strings.NewReader(s)), nil
+		return io.NopCloser(strings.NewReader(s)), nil
 	case []byte:
-		return ioutil.NopCloser(bytes.NewReader(s)), nil
+		return io.NopCloser(bytes.NewReader(s)), nil
 	case *bytes.Buffer:
 		// is io.Reader, but it needs to be readable repeatedly
 		if s != nil {
-			return ioutil.NopCloser(bytes.NewReader(s.Bytes())), nil
+			return io.NopCloser(bytes.NewReader(s.Bytes())), nil
 		}
 	default:
 		return nil, fmt.Errorf("invalid source type %T", f.Source)
 	}
 	// TODO: should we allow this?
 	if f.Filename == "-" {
-		return ioutil.NopCloser(stdin), nil
+		return io.NopCloser(stdin), nil
 	}
 	return os.Open(f.Filename)
 }

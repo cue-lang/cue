@@ -15,14 +15,14 @@
 package parser
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 var src = readFile("testdata/commas.src")
 
 func readFile(filename string) []byte {
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}

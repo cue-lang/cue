@@ -35,7 +35,6 @@ import (
 	"go/parser"
 	"go/printer"
 	"go/token"
-	"io/ioutil"
 	"log"
 	"math/big"
 	"os"
@@ -181,7 +180,7 @@ func generate(cuePkgPath string) error {
 
 	filename := filepath.Join(pkg.Dir, genFile)
 
-	if err := ioutil.WriteFile(filename, b, 0666); err != nil {
+	if err := os.WriteFile(filename, b, 0666); err != nil {
 		return err
 	}
 	return nil

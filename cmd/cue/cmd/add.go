@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"html/template"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -126,7 +125,7 @@ func doAdd(cmd *Command, args []string) (err error) {
 	}
 
 	// Read text to be appended.
-	text, err := ioutil.ReadAll(cmd.InOrStdin())
+	text, err := io.ReadAll(cmd.InOrStdin())
 	if err != nil {
 		return err
 	}
@@ -204,7 +203,7 @@ func (fo *originalFile) restore() error {
 	if len(fo.contents) == 0 {
 		return os.Remove(fo.filename)
 	}
-	return ioutil.WriteFile(fo.filename, fo.contents, 0644)
+	return os.WriteFile(fo.filename, fo.contents, 0644)
 }
 
 type fileInfo struct {
@@ -271,7 +270,7 @@ func initFile(cmd *Command, file string, getBuild func(path string) *build.Insta
 
 func (fi *fileInfo) appendAndCheck() (fo originalFile, err error) {
 	// Read original file
-	b, err := ioutil.ReadFile(fi.filename)
+	b, err := os.ReadFile(fi.filename)
 	if err == nil {
 		fo.filename = fi.filename
 		fo.contents = b
@@ -289,7 +288,7 @@ func (fi *fileInfo) appendAndCheck() (fo originalFile, err error) {
 		return originalFile{}, err
 	}
 
-	if err = ioutil.WriteFile(fi.filename, b, 0644); err != nil {
+	if err = os.WriteFile(fi.filename, b, 0644); err != nil {
 		// Just in case, attempt to restore original file.
 		_ = fo.restore()
 		return originalFile{}, err

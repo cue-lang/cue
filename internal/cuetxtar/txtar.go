@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -418,7 +417,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 			a.Files = files
 
 			if update {
-				err = ioutil.WriteFile(fullpath, txtar.Format(a), 0644)
+				err = os.WriteFile(fullpath, txtar.Format(a), 0644)
 				if err != nil {
 					t.Fatal(err)
 				}

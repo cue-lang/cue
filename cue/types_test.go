@@ -17,7 +17,7 @@ package cue
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"math"
 	"math/big"
 	"reflect"
@@ -610,7 +610,7 @@ func TestString(t *testing.T) {
 
 			r, err := getInstance(t, tc.value).Value().Reader()
 			checkFatal(t, err, tc.err, "init")
-			b, _ = ioutil.ReadAll(r)
+			b, _ = io.ReadAll(r)
 			if got := string(b); got != tc.str {
 				t.Errorf("Reader: got %q; want %q", got, tc.str)
 			}

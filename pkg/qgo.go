@@ -28,7 +28,6 @@ import (
 	"go/token"
 	"go/types"
 	"io"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -156,7 +155,7 @@ func extract(args []string) {
 			if err != nil {
 				log.Fatal(err)
 			}
-			err = ioutil.WriteFile(lastPkg+".go", b, 0644)
+			err = os.WriteFile(lastPkg+".go", b, 0644)
 			if err != nil {
 				log.Fatal(err)
 			}

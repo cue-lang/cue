@@ -19,7 +19,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
-	"io/ioutil"
+	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -268,7 +268,7 @@ func newTestServerCmd(v cue.Value) (itask.Runner, error) {
 	testOnce.Do(func() {
 		s := httptest.NewServer(http.HandlerFunc(
 			func(w http.ResponseWriter, req *http.Request) {
-				data, _ := ioutil.ReadAll(req.Body)
+				data, _ := io.ReadAll(req.Body)
 				d := map[string]interface{}{
 					"data": string(data),
 					"when": "now",

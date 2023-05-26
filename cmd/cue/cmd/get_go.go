@@ -22,7 +22,6 @@ import (
 	"go/types"
 	"io"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -535,7 +534,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		if err != nil {
 			return err
 		}
-		err = ioutil.WriteFile(filepath.Join(dir, file), b, 0666)
+		err = os.WriteFile(filepath.Join(dir, file), b, 0666)
 		if err != nil {
 			return err
 		}
@@ -589,14 +588,14 @@ func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error 
 				fmt.Fprintln(w, "//cue:generate cue get go", args)
 				fmt.Fprintln(w)
 
-				b, err := ioutil.ReadFile(path)
+				b, err := os.ReadFile(path)
 				if err != nil {
 					return err
 				}
 				w.Write(b)
 
 				dst := filepath.Join(dir, file)
-				if err := ioutil.WriteFile(dst, w.Bytes(), 0666); err != nil {
+				if err := os.WriteFile(dst, w.Bytes(), 0666); err != nil {
 					return err
 				}
 			}

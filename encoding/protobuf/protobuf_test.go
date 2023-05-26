@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"strings"
@@ -58,11 +57,11 @@ func TestExtractDefinitions(t *testing.T) {
 
 			wantFile := filepath.Join("testdata", filepath.Base(file)+".out.cue")
 			if cuetest.UpdateGoldenFiles {
-				_ = ioutil.WriteFile(wantFile, out.Bytes(), 0644)
+				_ = os.WriteFile(wantFile, out.Bytes(), 0644)
 				return
 			}
 
-			b, err := ioutil.ReadFile(wantFile)
+			b, err := os.ReadFile(wantFile)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -104,7 +103,7 @@ func TestBuild(t *testing.T) {
 				t.Fatal(err)
 			}
 			_ = os.MkdirAll(filepath.Dir(f.Filename), 0755)
-			err = ioutil.WriteFile(f.Filename, b, 0644)
+			err = os.WriteFile(f.Filename, b, 0644)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -139,7 +138,7 @@ func TestBuild(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		want, err := ioutil.ReadFile(path)
+		want, err := os.ReadFile(path)
 		if err != nil {
 			t.Fatal(err)
 		}

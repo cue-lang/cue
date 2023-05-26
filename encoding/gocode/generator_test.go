@@ -66,11 +66,11 @@ func TestGenerate(t *testing.T) {
 
 			goFile := filepath.Join("testdata", d.Name(), "cue_gen.go")
 			if cuetest.UpdateGoldenFiles {
-				_ = ioutil.WriteFile(goFile, b, 0644)
+				_ = os.WriteFile(goFile, b, 0644)
 				return
 			}
 
-			want, err := ioutil.ReadFile(goFile)
+			want, err := os.ReadFile(goFile)
 			if err != nil {
 				t.Fatal(err)
 			}

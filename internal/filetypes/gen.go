@@ -17,7 +17,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 
@@ -46,7 +45,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	if err := ioutil.WriteFile("types.go", b, 0644); err != nil {
+	if err := os.WriteFile("types.go", b, 0644); err != nil {
 		log.Fatal(err)
 	}
 }

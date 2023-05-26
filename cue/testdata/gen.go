@@ -21,7 +21,6 @@ import (
 	"go/ast"
 	"go/constant"
 	"go/format"
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -269,7 +268,7 @@ func (e *extractor) extractTest(x *ast.CompositeLit) {
 	name = strings.ReplaceAll(name, " ", "_")
 	name = strings.ReplaceAll(name, ":", "_")
 	filename := filepath.Join(e.dir, name+".txtar")
-	err := ioutil.WriteFile(filename, txtar.Format(e.a), 0644)
+	err := os.WriteFile(filename, txtar.Format(e.a), 0644)
 	if err != nil {
 		e.fatalf("Could not write file: %v", err)
 	}

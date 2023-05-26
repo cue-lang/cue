@@ -3,7 +3,6 @@ package load
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"net/http"
 	"os"
 	"path"
@@ -61,7 +60,7 @@ func (c *registryClient) fetchRawModFile(m module.Version) ([]byte, error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	body, err := ioutil.ReadAll(resp.Body)
+	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("cannot get HTTP response body: %v", err)
 	}
@@ -85,7 +84,7 @@ func (c *registryClient) getModContents(m module.Version) (string, error) {
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != http.StatusOK {
-		body, _ := ioutil.ReadAll(resp.Body)
+		body, _ := io.ReadAll(resp.Body)
 		return "", fmt.Errorf("module.cue HTTP GET request failed: %s", body)
 	}
 	zipfile := filepath.Join(c.cacheDir, m.String()+".zip")

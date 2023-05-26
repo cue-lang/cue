@@ -20,7 +20,6 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -142,7 +141,7 @@ func TestX(t *testing.T) {
 	for _, f := range a.Files {
 		name := filepath.Join(tmpdir, f.Name)
 		check(os.MkdirAll(filepath.Dir(name), 0777))
-		check(ioutil.WriteFile(name, f.Data, 0666))
+		check(os.WriteFile(name, f.Data, 0666))
 	}
 
 	cwd, err := os.Getwd()

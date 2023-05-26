@@ -20,7 +20,6 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"io"
-	"io/ioutil"
 	"net/http"
 
 	"cuelang.org/go/cue"
@@ -130,7 +129,7 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, err
 	}
 	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
+	b, err := io.ReadAll(resp.Body)
 	// parse response body and headers
 	return map[string]interface{}{
 		"response": map[string]interface{}{

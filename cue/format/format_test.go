@@ -19,7 +19,7 @@ package format
 import (
 	"bytes"
 	"fmt"
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 	"time"
@@ -119,7 +119,7 @@ func diff(aname, bname string, a, b []byte) error {
 }
 
 func runcheck(t *testing.T, source, golden string, mode checkMode) {
-	src, err := ioutil.ReadFile(source)
+	src, err := os.ReadFile(source)
 	if err != nil {
 		t.Error(err)
 		return
@@ -135,14 +135,14 @@ func runcheck(t *testing.T, source, golden string, mode checkMode) {
 
 	// update golden files if necessary
 	if cuetest.UpdateGoldenFiles {
-		if err := ioutil.WriteFile(golden, res, 0644); err != nil {
+		if err := os.WriteFile(golden, res, 0644); err != nil {
 			t.Error(err)
 		}
 		return
 	}
 
 	// get golden
-	gld, err := ioutil.ReadFile(golden)
+	gld, err := os.ReadFile(golden)
 	if err != nil {
 		t.Error(err)
 		return

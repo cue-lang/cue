@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b3d2eb25_654169ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-05-26T09:20:29Z",
+      "side": 1,
+      "message": "LGTM with a minor nit on what is probably a style thing, given the switch from a type called Buffer to Builder.",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab56483b_371efee3",
+        "filename": "cue/ast/astutil/resolve.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 450,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-05-26T09:20:29Z",
+      "side": 1,
+      "message": "Nit: s/buf/b/g",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "135b8b6a_4fb0fff4",
+        "filename": "internal/str/str.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-05-26T09:20:29Z",
+      "side": 1,
+      "message": "Nit: s/buf/b/",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b0e2f25_3498ec77",
+        "filename": "pkg/encoding/json/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-05-26T09:20:29Z",
+      "side": 1,
+      "message": "Nit: s/buf/b/",
+      "revId": "52731e945ae0d039fd08f434669c0aabf6a30871",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "Suggestion: let\u0027s use this CL as an opportunity to try and incorporate https://github.com/rsc/rf/blob/main/git-generate/main.go into our CI setup.",
       "revId": "5bbd9a8c32c78079e022df150ae251a9645d2ef7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd628f9a_d15d23a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-05-30T08:48:31Z",
+      "side": 1,
+      "message": "Done. One minor quirk is that it stops the script at Change-Id, whereas our hooks place Signed-Off-By first, so I reordered them.",
+      "parentUuid": "6fad3b6b_d6b14b62",
+      "revId": "5bbd9a8c32c78079e022df150ae251a9645d2ef7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -26,9 +26,8 @@ import (
 )
 
 var idnaProfile = idna.New(
-	idna.ValidateLabels(true),
+	idna.MapForLookup(),
 	idna.VerifyDNSLength(true),
-	idna.StrictDomainName(true),
 )
 
 // SplitHostPort splits a network address of the form "host:port",

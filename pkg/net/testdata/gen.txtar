@@ -27,6 +27,7 @@ t21: net.PathEscape("foo/bar")
 t22: net.PathUnescape("foo%2Fbar")
 t23: net.QueryEscape("f%o")
 t24: net.QueryUnescape("f%25o")
+t25: net.FQDN("https://abcd_ab.com")
 -- out/net --
 Errors:
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
@@ -65,4 +66,5 @@ t21: "foo%2Fbar"
 t22: "foo/bar"
 t23: "f%25o"
 t24: "f%o"
+t25: false
 

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "321e8d9e_5d948111",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "`reduceKeepingFloats`, which consistently applies the new logic, already has this TODO about keeping the expected number of zeros, as we discussed on a call a few months ago:\n\n```\n// TODO: Rather than reducing all trailing zeros,\n// we should keep a number of zeros that makes sense given the operation.\n```\n\nI definitely agree that would be better - I just want to make the samllest refactor possible with this switch to v3. Unless you think that the changes as they are here cause any regressions :) The behavior definitely changes, but I don\u0027t _think_ it regresses. At worst, it swaps one inconsistent behavior with an arbitrary one.",
+      "parentUuid": "2f9d6767_77ae6124",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8f2a5ba7_8a729c06",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -31,6 +49,24 @@
       "writtenOn": "2022-11-07T10:28:11Z",
       "side": 1,
       "message": "Since we are getting close now, I would move internal.Context as suggested. Could be a followup CL.\n\nThis allows us to move more easily to a precision of 34 digits, commensurate to the decimal128 standard.",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28f3dce5_96a2ecef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "8f2a5ba7_8a729c06",
       "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -89,6 +125,42 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2adcee37_55c1a9c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "Agreed; will do the swap to 34 digits as a follow-up CL in the same chain.",
+      "parentUuid": "2048afc8_cd594b08",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20e0693d_a9339db6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "Correct:\n\n```\n$ cat /tmp/f.cue\nn1: 2.0 * 3\nn2: 2.00 * 3\nn3: 2.000 * 3\n$ cue-master export --out\u003dcue /tmp/f.cue\nn1: 6.0\nn2: 6.00\nn3: 6.000\n$ cue-cl export --out\u003dcue /tmp/f.cue\nn1: 6.0\nn2: 6.00\nn3: 6.000\n```\n\nI don\u0027t think any tests currently cover this. The closest I could find is `cue/testdata/basicrewrite/002_arithmetic.txtar`, which has some arithmetic operations with decimal points. Where do you think new test cases would fit?",
+      "parentUuid": "f69815c9_1e47bb5a",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0484f71e_890bd5dc",
         "filename": "cue/literal/num.go",
         "patchSetId": 2
@@ -121,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "48c3bdb4_0f8ea24c",
+        "filename": "cue/literal/num.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "./internal depends on ./cue/literal, so the latter can\u0027t depend on the former.\n\nI didn\u0027t consider moving Context to ./cue/literal because then we expose it as public API :) \n\n./internal/decimal seems fine. I can do that as a follow-up CL, but before we swap the precision, since it should be easier to review.",
+      "parentUuid": "cc594f91_64efe1f1",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "abb96023_18d54b79",
@@ -140,6 +230,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f2ea6d87_c9e47e2e",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "Not sure I follow; `mant` here is a `*big.Int`, not an apd type, so there isn\u0027t a `SetMathBigInt` method. I assume changing the signature to use apd rather than math/big would be a breaking change, and not really part of the v2-to-v3 refactor.",
+      "parentUuid": "abb96023_18d54b79",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dcca9b7f_f804746d",
         "filename": "cue/types.go",
         "patchSetId": 2
@@ -151,6 +259,24 @@
       "writtenOn": "2022-11-07T10:28:11Z",
       "side": 1,
       "message": "ditto",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67351c03_caa65081",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "replied in the original comment",
+      "parentUuid": "dcca9b7f_f804746d",
       "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -190,6 +316,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c74038c_1f888ced",
+        "filename": "internal/internal.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "85ffae99_ebf93f66",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d257969f_06c6ddad",
@@ -203,6 +347,24 @@
       "writtenOn": "2022-11-07T10:28:11Z",
       "side": 1,
       "message": "I wonder if this is actually a bug (also in the old code)?\n\nTo be sure, i would just use d.MathBigInt()?",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56e49051_9e1f38c0",
+        "filename": "pkg/math/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-01T15:06:50Z",
+      "side": 1,
+      "message": "I agree this looks buggy, I\u0027ve added a TODO since we can\u0027t simply call d.MathBigInt - that method does not exist. We could multiply Coeff by Exponent, and I think that\u0027s the proper fix, but this CL is big and tricky enough as it is, so I feel more comfortable doing that separately.",
+      "parentUuid": "d257969f_06c6ddad",
       "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

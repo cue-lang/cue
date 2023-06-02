@@ -16,6 +16,24 @@
       "message": "Note that the precision is still not conform decimal128, but that could be done in a followup CL.\n\nWould be nice to see the impact of the two in isolation and the two together with a simple benchmark perhaps (at least one some operation, like 1/3, to trigger filling up all digits).",
       "revId": "3eb207e2beebede202c85b673646da2aa97b6f41",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc35caf5_4a9f712a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-02T15:58:31Z",
+      "side": 1,
+      "message": "I\u0027ve started the chain of changes. There\u0027s a new base commit which introduces a benchmark, then this commit has the benchmark comparison, then a third commit bumps the precision and compares the benchmark numbers against the first two.\n\nOverall there\u0027s little change. I think this is because we convert to math/big ints quite often, so the apd/v3 benefit of avoiding allocations by not using math/big directly is less effective. We could likely do better via follow-up changes if we wanted to.\n\nOverall I\u0027m not too worried about a performance benefit, as long as we don\u0027t regress noticeably. I just want to move on from apd/v2 as it\u0027s effectively dead :)",
+      "parentUuid": "603a1be0_82d08c1b",
+      "revId": "3eb207e2beebede202c85b673646da2aa97b6f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

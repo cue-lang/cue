@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fcdcd7a4_97900c3c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-02T15:58:31Z",
+      "side": 1,
+      "message": "Are you happy with me marking this as done, or do you want me to rephrase this part of the commit message?",
+      "parentUuid": "321e8d9e_5d948111",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8f2a5ba7_8a729c06",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2

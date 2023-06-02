@@ -1,0 +1,28 @@
+# TODO: "go generate" in ./cue/testdata appears broken as of 2023-06.
+-- stats.txt --
+Leaks:  0
+Freed:  11
+Reused: 8
+Allocs: 3
+Retain: 0
+
+Unifications: 11
+Conjuncts:    11
+Disjuncts:    11
+
+-- in.cue --
+out: [
+  123.45 + 987.65,
+  123.45 - 987.65,
+  123.45 * 987.65,
+  123.45 / 987.65,
+
+  // whole integers
+  2 + 3,
+  7 - 1,
+  5 * 10,
+  20 / 4,
+
+  1 / 3, // fill all digits
+]
+-- out/compile --

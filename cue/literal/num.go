@@ -25,7 +25,7 @@ var baseContext apd.Context
 
 func init() {
 	baseContext = apd.BaseContext
-	baseContext.Precision = 24
+	baseContext.Precision = 34
 }
 
 // NumInfo contains information about a parsed numbers.

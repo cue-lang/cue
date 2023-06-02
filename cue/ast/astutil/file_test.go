@@ -40,7 +40,7 @@ func TestToFile(t *testing.T) {
 	}{{
 		desc: "add import",
 		expr: ast.NewBinExpr(token.ADD, ast.NewLit(token.INT, "1"), pi),
-		want: "4.14159265358979323846264",
+		want: "4.141592653589793238462643383279503",
 	}, {
 		desc: "resolve unresolved within struct",
 		expr: ast.NewStruct(

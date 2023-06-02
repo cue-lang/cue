@@ -139,8 +139,8 @@ Result:
   i1: (int){ 1 }
   i2: (int){ 2 }
   sum: (int){ 1 }
-  div1: (float){ 4.00000000000000000000000 }
-  div2: (float){ 4.00000000000000000000000 }
+  div1: (float){ 4.000000000000000000000000000000000 }
+  div2: (float){ 4.000000000000000000000000000000000 }
   div3: (float){ 1.0 }
   divZero: (_|_){
     // [eval] divZero: failed arithmetic: division by zero:
@@ -151,7 +151,7 @@ Result:
     //     ./in.cue:9:10
   }
   b: (bool){ true }
-  add: (float){ 5.00000000000000000000000 }
+  add: (float){ 5.000000000000000000000000000000000 }
   idiv00: (_|_){
     // [eval] idiv00: division by zero:
     //     ./in.cue:13:9
@@ -170,7 +170,7 @@ Result:
   }
   v1: (float){ 5.0E+11 }
   v2: (bool){ true }
-  v3: (float){ 0.666666666666666666666667 }
+  v3: (float){ 0.6666666666666666666666666666666667 }
   v5: (int){ 0 }
   e0: (_|_){
     // [eval] e0: invalid operands 2 and "a" to '+' (type int and string):

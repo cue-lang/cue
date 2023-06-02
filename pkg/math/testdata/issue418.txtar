@@ -14,7 +14,7 @@ b: {
 }
 -- out/math --
 Errors:
-b.y: conflicting values int and 3.47970044315009900124277 (mismatched types int and float):
+b.y: conflicting values int and 3.479700443150099001242770375542286 (mismatched types int and float):
     ./in.cue:11:5
     ./in.cue:12:5
 
@@ -25,6 +25,6 @@ a: {
 }
 b: {
 	x: 32.45
-	y: _|_ // b.y: conflicting values int and 3.47970044315009900124277 (mismatched types int and float)
+	y: _|_ // b.y: conflicting values int and 3.479700443150099001242770375542286 (mismatched types int and float)
 }
 

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "603a1be0_82d08c1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-02T15:02:40Z",
+      "side": 1,
+      "message": "Note that the precision is still not conform decimal128, but that could be done in a followup CL.\n\nWould be nice to see the impact of the two in isolation and the two together with a simple benchmark perhaps (at least one some operation, like 1/3, to trigger filling up all digits).",
+      "revId": "3eb207e2beebede202c85b673646da2aa97b6f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

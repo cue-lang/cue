@@ -246,6 +246,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7478f618_70031088",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 348,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-02T15:02:40Z",
+      "side": 1,
+      "message": "Ah, never mind.",
+      "parentUuid": "f2ea6d87_c9e47e2e",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dcca9b7f_f804746d",
@@ -277,6 +295,24 @@
       "side": 1,
       "message": "replied in the original comment",
       "parentUuid": "dcca9b7f_f804746d",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8660fa13_fd00ab83",
+        "filename": "cue/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 428,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-02T15:02:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "67351c03_caa65081",
       "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

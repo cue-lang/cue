@@ -95,7 +95,7 @@ var ErrIncomplete = errors.New("incomplete value")
 var MakeInstance func(value interface{}) (instance interface{})
 
 // BaseContext is used as CUE's default context for arbitrary-precision decimals.
-var BaseContext = Context{*apd.BaseContext.WithPrecision(24)}
+var BaseContext = Context{*apd.BaseContext.WithPrecision(34)}
 
 // APIVersionSupported is the back version until which deprecated features
 // are still supported.

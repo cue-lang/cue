@@ -15,7 +15,7 @@
 package benchmarks
 
 import (
-	"io/ioutil"
+	"os"
 	"path/filepath"
 	"testing"
 
@@ -28,14 +28,14 @@ import (
 )
 
 func Benchmark(b *testing.B) {
-	files, err := ioutil.ReadDir(".")
+	entries, err := os.ReadDir(".")
 	if err != nil {
 		b.Fatal(err)
 	}
 
-	for _, fi := range files {
-		name := fi.Name()
-		if fi.IsDir() || filepath.Ext(name) != ".txtar" {
+	for _, entry := range entries {
+		name := entry.Name()
+		if entry.IsDir() || filepath.Ext(name) != ".txtar" {
 			continue
 		}
 
@@ -79,10 +79,15 @@ func Benchmark(b *testing.B) {
 
 			a.Files[statsPos].Data = []byte(ctx.Stats().String() + "\n\n")
 
-			ioutil.WriteFile(name, txtar.Format(a), fi.Mode())
+			info, err := entry.Info()
+			if err != nil {
+				b.Fatal(err)
+			}
+			os.WriteFile(name, txtar.Format(a), info.Mode())
 		}
 
 		b.Run(name, func(b *testing.B) {
+			b.ReportAllocs()
 			for i := 0; i < b.N; i++ {
 				inst := cue.Build(cuetxtar.Load(a, b.TempDir()))[0]
 				if inst.Err != nil {

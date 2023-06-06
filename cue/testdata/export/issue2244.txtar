@@ -1,0 +1,91 @@
+-- in.cue --
+package x
+
+import (
+	"strings"
+)
+
+_#matchPattern: {
+	#pattern: string
+	[
+		// can't remove this builtin call
+		if strings.HasSuffix(#pattern, "*") {
+
+			// this let is required _within_ the if block
+			// i.e. it can't be "inlined" with the if that
+			// currently contains it
+			let prefix = strings.TrimSuffix(#pattern, "*")
+
+			prefix
+		},
+		"'\(#pattern)'",
+	][0]
+}
+
+_#isReleaseTag: _#matchPattern & {#pattern: "refs/tags/v*", _}
+
+#step: {
+	if: number | string
+}
+
+m: #step & {
+	if: _#isReleaseTag
+}
+-- out/eval/stats --
+Leaks:  11
+Freed:  18
+Reused: 14
+Allocs: 15
+Retain: 15
+
+Unifications: 25
+Conjuncts:    64
+Disjuncts:    33
+-- out/eval --
+(struct){
+  _#matchPattern(:x): (_|_){
+    // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
+    //     ./in.cue:11:6
+    //     ./in.cue:8:12
+    #pattern: (string){ string }
+  }
+  _#isReleaseTag(:x): (string){
+    "refs/tags/v"
+    #pattern: (string){ "refs/tags/v*" }
+    let prefix#1 = (string){ "refs/tags/v" }
+  }
+  #step: (#struct){
+    if: ((string|number)){ |((number){ number }, (string){ string }) }
+  }
+  m: (#struct){
+    if: (string){
+      "refs/tags/v"
+      #pattern: (string){ "refs/tags/v*" }
+      let prefix#1 = (string){ "refs/tags/v" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  _#matchPattern: {
+    #pattern: string
+    [
+      if 〈import;strings〉.HasSuffix(〈1;#pattern〉, "*") {
+        let prefix#1 = 〈import;strings〉.TrimSuffix(〈2;#pattern〉, "*")
+        〈0;let prefix#1〉
+      },
+      "'\(〈1;#pattern〉)'",
+    ][0]
+  }
+  _#isReleaseTag: (〈0;_#matchPattern〉 & {
+    #pattern: "refs/tags/v*"
+    _
+  })
+  #step: {
+    if: (number|string)
+  }
+  m: (〈0;#step〉 & {
+    if: 〈1;_#isReleaseTag〉
+  })
+}

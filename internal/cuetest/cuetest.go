@@ -26,8 +26,6 @@ import (
 )
 
 const (
-	envLong = "CUE_LONG"
-
 	envUpdate = "CUE_UPDATE"
 
 	// envNonIssues can be set to a regular expression which indicates what
@@ -54,11 +52,6 @@ var (
 	}
 )
 
-// Long determines whether long tests should be run.
-// It is controlled by setting CUE_LONG to a non-empty string like "true".
-// Note that it is not the equivalent of not supplying -short.
-var Long = os.Getenv(envLong) != ""
-
 // UpdateGoldenFiles determines whether testscript scripts should update txtar
 // archives in the event of cmp failures.
 // It is controlled by setting CUE_UPDATE to a non-empty string like "true".
@@ -72,8 +65,6 @@ var FormatTxtar = os.Getenv(envFormatTxtar) != ""
 
 // Condition adds support for CUE-specific testscript conditions within
 // testscript scripts. Supported conditions include:
-//
-// [long] - evaluates to true when the long build tag is specified
 //
 // [golang.org/issue/N] - evaluates to true unless CUE_NON_ISSUES
 // is set to a regexp that matches the condition, i.e. golang.org/issue/N
@@ -89,10 +80,6 @@ func Condition(cond string) (bool, error) {
 	}
 	if isIssue {
 		return !nonIssue, nil
-	}
-	switch cond {
-	case "long":
-		return Long, nil
 	}
 	return false, fmt.Errorf("unknown condition %v", cond)
 }

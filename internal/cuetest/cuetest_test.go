@@ -14,11 +14,6 @@ func TestCondition(t *testing.T) {
 	}{
 		// issue cases covered by TestCheckIssueCondition
 		{
-			name: "long",
-			con:  "long",
-			want: Long, // not really testing much here
-		},
-		{
 			name: "bad condition",
 			env:  ".",
 			con:  "golang.org/Issue/1234", // note typo Issue

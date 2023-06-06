@@ -40,10 +40,12 @@ import (
 
 var (
 	cleanup = flag.Bool("cleanup", true, "clean up generated files")
+
+	testLong = os.Getenv("CUE_LONG") != ""
 )
 
 func TestTutorial(t *testing.T) {
-	if !cuetest.Long {
+	if !testLong {
 		t.Skipf("the kubernetes tutorial can easily take half a minute")
 	}
 
@@ -272,7 +274,7 @@ func isCUE(filename string) bool {
 }
 
 func TestEval(t *testing.T) {
-	if !cuetest.Long {
+	if !testLong {
 		t.Skipf("the kubernetes tutorial can easily take half a minute")
 	}
 

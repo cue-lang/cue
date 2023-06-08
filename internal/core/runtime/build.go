@@ -57,15 +57,6 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 
 	errs = b.Err
 
-	// Build transitive dependencies.
-	for _, file := range b.Files {
-		file.VisitImports(func(d *ast.ImportDecl) {
-			for _, s := range d.Specs {
-				errs = errors.Append(errs, x.buildSpec(cfg, b, s))
-			}
-		})
-	}
-
 	err := x.ResolveFiles(b)
 	errs = errors.Append(errs, err)
 
@@ -88,6 +79,15 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	}
 
 	x.AddInst(b.ImportPath, v, b)
+
+	// Build transitive dependencies.
+	for _, file := range b.Files {
+		file.VisitImports(func(d *ast.ImportDecl) {
+			for _, s := range d.Specs {
+				errs = errors.Append(errs, x.buildSpec(cfg, b, s))
+			}
+		})
+	}
 
 	return v, errs
 }

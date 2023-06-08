@@ -1,0 +1,42 @@
+-- in.cue --
+package cycle
+
+import "mod.test/cycle/foo"
+
+Foo: foo.#Foo
+-- cue.mod/module.cue --
+module: "mod.test"
+-- cycle/foo/foo.cue --
+package foo
+
+import "mod.test/cycle/bar"
+
+#Foo1: 1
+#Foo2: bar.#Bar1 + 2
+#Foo:  bar.#Bar2 + 4
+-- cycle/bar/bar.cue --
+package bar
+
+import "mod.test/cycle/foo"
+
+#Bar1: foo.#Foo1 + 8
+#Bar2: foo.#Foo2 + 16
+-- out/eval/stats --
+Leaks:  6
+Freed:  3
+Reused: 0
+Allocs: 9
+Retain: 8
+
+Unifications: 9
+Conjuncts:    9
+Disjuncts:    9
+-- out/eval --
+(struct){
+  Foo: (int){ 31 }
+}
+-- out/compile --
+--- in.cue
+{
+  Foo: 〈import;"mod.test/cycle/foo"〉.#Foo
+}

@@ -66,6 +66,9 @@ func (inst *Instance) Complete() error {
 	if err != nil {
 		inst.ReportError(err)
 	}
+	for _, imp := range inst.Imports {
+		_ = imp.Complete()
+	}
 	if inst.Err != nil {
 		inst.Incomplete = true
 		return inst.Err

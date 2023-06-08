@@ -103,18 +103,26 @@ files:
 imports:
     mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
 	}, {
-		// TODO:
-		// - path incorrect, should be mod.test/test/other:main.
 		cfg:  dirCfg,
 		args: args("./other/..."),
 		want: `
 err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
-path:   ""
+path:   mod.test/test/other:main
 module: mod.test/test
 root:   $CWD/testdata/testmod
-dir:    ""
-display:""`,
+dir:    $CWD/testdata/testmod/other
+display:./other
+files:
+    $CWD/testdata/testmod/other/main.cue
+
+path:   mod.test/test/other/file
+module: mod.test/test
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/other/file
+display:./other/file
+files:
+    $CWD/testdata/testmod/other/file/file.cue`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./anon"),
@@ -329,6 +337,22 @@ module: mod.test/test
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tagsbad
 display:./tagsbad`,
+	}, {
+		cfg: &Config{
+			Dir: testdataDir,
+		},
+		args: args("./cycle"),
+		want: `
+path:   mod.test/test/cycle
+module: mod.test/test
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/cycle
+display:./cycle
+files:
+    $CWD/testdata/testmod/cycle/cycle.cue
+imports:
+    mod.test/cycle/foo: $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/foo/foo.cue
+    mod.test/cycle/bar: $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/bar/bar.cue`,
 	}}
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {

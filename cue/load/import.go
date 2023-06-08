@@ -195,7 +195,6 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		}
 
 		l.addFiles(cfg.ModuleRoot, p)
-		_ = p.Complete()
 	}
 	sort.Slice(all, func(i, j int) bool {
 		return all[i].Dir < all[j].Dir

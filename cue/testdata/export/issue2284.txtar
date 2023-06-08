@@ -1,0 +1,34 @@
+-- cue.mod/module.cue --
+module: "mod.test"
+
+-- a/a.cue --
+package a
+
+some_field: "some value"
+
+-- a.cue --
+package a
+
+import "mod.test/a"
+
+some_other_field: a.some_field
+
+-- out/compile --
+--- a.cue
+{
+  some_other_field: 〈import;"mod.test/a"〉.some_field
+}
+-- out/eval/stats --
+Leaks:  2
+Freed:  2
+Reused: 0
+Allocs: 4
+Retain: 2
+
+Unifications: 4
+Conjuncts:    5
+Disjuncts:    3
+-- out/eval --
+(struct){
+  some_other_field: (string){ "some value" }
+}

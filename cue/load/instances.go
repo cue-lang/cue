@@ -101,6 +101,10 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	for _, p := range a {
+		_ = p.Complete()
+	}
+
+	for _, p := range a {
 		tags, err := findTags(p)
 		if err != nil {
 			p.ReportError(err)

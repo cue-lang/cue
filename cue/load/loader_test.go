@@ -330,6 +330,23 @@ module: mod.test/test
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tagsbad
 display:./tagsbad`,
+	}, {
+		cfg: &Config{
+			Dir: testdataDir,
+		},
+		args: args("./cycle"),
+		want: `
+err:    import failed: import failed: import failed: package import cycle not allowed:
+    $CWD/testdata/testmod/cycle/cycle.cue:3:8
+    $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/bar/bar.cue:3:8
+    $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/foo/foo.cue:3:8
+path:   mod.test/test/cycle
+module: mod.test/test
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/cycle
+display:./cycle
+files:
+    $CWD/testdata/testmod/cycle/cycle.cue`,
 	}}
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {

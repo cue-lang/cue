@@ -51,6 +51,19 @@ import (
 //	_       anonymous files (which may be marked with _)
 //	*       all packages
 func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
+	retErr := func(errs errors.Error) []*build.Instance {
+		// XXX: move this loop to ReportError
+		for _, err := range errors.Errors(errs) {
+			p.ReportError(err)
+		}
+		return []*build.Instance{p}
+	}
+
+	for _, item := range l.stk {
+		if item == p.ImportPath {
+			return retErr(&PackageError{Message: errors.NewMessagef("package import cycle not allowed")})
+		}
+	}
 	l.stk.Push(p.ImportPath)
 	defer l.stk.Pop()
 
@@ -58,14 +71,6 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	ctxt := &cfg.fileSystem
 
 	if p.Err != nil {
-		return []*build.Instance{p}
-	}
-
-	retErr := func(errs errors.Error) []*build.Instance {
-		// XXX: move this loop to ReportError
-		for _, err := range errors.Errors(errs) {
-			p.ReportError(err)
-		}
 		return []*build.Instance{p}
 	}
 

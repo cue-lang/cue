@@ -87,6 +87,24 @@
       "parentUuid": "5929d8fb_532cc100",
       "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b8fd852_a08004d4",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-12T15:45:24Z",
+      "side": 1,
+      "message": "Resolved in a call :) there was just a bit of a misunderstanding as to what CUE_TEST_MEMSTATS did. it only exists for the tests (see `inTest`) and it is an input file.",
+      "parentUuid": "8ec5f3c2_87fd99c0",
+      "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

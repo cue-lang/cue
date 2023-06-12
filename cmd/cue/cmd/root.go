@@ -16,8 +16,10 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/spf13/cobra"
 
@@ -25,6 +27,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/interpreter/wasm"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -62,6 +65,19 @@ func statsEncoder(cmd *Command) *encoding.Encoder {
 	return statsEnc
 }
 
+// Stats expands [stats.Counts] with counters obtained from other sources,
+// such as the Go runtime. The stats are grouped by category to clarify their source.
+type Stats struct {
+	// CUE groups stats obtained from the CUE evaluator.
+	CUE stats.Counts
+
+	// Go groups stats obtained from the Go runtime.
+	Go struct {
+		AllocBytes   uint64
+		AllocObjects uint64
+	}
+}
+
 func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c.Command = cmd
@@ -71,7 +87,29 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		err := f(c, args)
 
 		if statsEnc != nil {
-			statsEnc.Encode(c.ctx.Encode(adt.TotalStats()))
+			var stats Stats
+			stats.CUE = adt.TotalStats()
+
+			// Fill in the runtime stats, which are cumulative counters.
+			// Since in practice the number of allocations isn't fully deterministic,
+			// due to the inherent behavior of memory pools like sync.Pool,
+			// we support supplying MemStats as a JSON file in the tests.
+			var m runtime.MemStats
+			if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" && inTest {
+				bs, err := os.ReadFile(name)
+				if err != nil {
+					return err
+				}
+				if err := json.Unmarshal(bs, &m); err != nil {
+					return err
+				}
+			} else {
+				runtime.ReadMemStats(&m)
+			}
+			stats.Go.AllocBytes = m.TotalAlloc
+			stats.Go.AllocObjects = m.Mallocs
+
+			statsEnc.Encode(c.ctx.Encode(stats))
 			statsEnc.Close()
 		}
 		return err
@@ -177,6 +215,8 @@ func MainTest() int {
 	// Setting inTest causes filenames printed in error messages
 	// to be normalized so the output looks the same on Unix
 	// as Windows.
+	// TODO: replace with testing.Testing once we can require Go 1.21 or later,
+	// per the accepted proposal at https://go.dev/issue/52600.
 	inTest = true
 	return Main()
 }

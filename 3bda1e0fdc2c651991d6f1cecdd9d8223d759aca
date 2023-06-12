@@ -16,6 +16,24 @@
       "message": "FYI Marcel, as discussed.\n\nAn alternative would be to declare these two fields in the cmd package rather than the adt package. That would be a bit cleaner, since the adt package does not use the fields at all, but also more verbose and perhaps confusing due to the duplication:\n\n```\npackage cmd\n\ntype Stats struct {\n    ADT adt.Stats\n    \n    Runtime struct {\n        AllocBytes uint64\n        AllocObjects uint64\n    }\n}\n```\n\nor, if we wanted to keep the stats format flat, we could consider embedding, though then it\u0027s not clear what stats are coming from where:\n\n```\npackage cmd\n\ntype Stats struct {\n    adt.Stats\n    \n    AllocBytes uint64\n    AllocObjects uint64\n}\n```",
       "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55996ac6_b98241a2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-12T13:35:51Z",
+      "side": 1,
+      "message": "not meant to be resolved.",
+      "parentUuid": "ddce02f1_962099a6",
+      "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

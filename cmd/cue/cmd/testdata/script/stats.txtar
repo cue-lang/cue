@@ -1,3 +1,5 @@
+env CUE_TEST_MEMSTATS=memstats.json
+
 env CUE_STATS_FILE=stats.json
 exec cue eval x.cue
 cmp stats.json out/stats.json
@@ -24,6 +26,11 @@ cmp stderr out/stderr
 a: 1
 b: 2
 c: a | b
+-- memstats.json --
+{
+    "TotalAlloc": 300456,
+    "Mallocs": 100123
+}
 -- overwrite_stats.json --
 contents overwritten
 -- out/stats.json --
@@ -34,7 +41,9 @@ contents overwritten
     "Freed": 6,
     "Reused": 2,
     "Allocs": 4,
-    "Retained": 0
+    "Retained": 0,
+    "AllocBytes": 300456,
+    "AllocObjects": 100123
 }
 -- out/stats.cue --
 Unifications: 4
@@ -44,6 +53,8 @@ Freed:        6
 Reused:       2
 Allocs:       4
 Retained:     0
+AllocBytes:   300456
+AllocObjects: 100123
 -- out/stats.yaml --
 Unifications: 4
 Disjuncts: 6
@@ -52,6 +63,8 @@ Freed: 6
 Reused: 2
 Allocs: 4
 Retained: 0
+AllocBytes: 300456
+AllocObjects: 100123
 -- out/stderr --
 {
     "Unifications": 4,
@@ -60,5 +73,7 @@ Retained: 0
     "Freed": 6,
     "Reused": 2,
     "Allocs": 4,
-    "Retained": 0
+    "Retained": 0,
+    "AllocBytes": 300456,
+    "AllocObjects": 100123
 }

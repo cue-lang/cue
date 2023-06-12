@@ -61,6 +61,13 @@ type Counts struct {
 	Reused   int64 // Number of times a buffer is reused instead of allocated.
 	Allocs   int64 // Total number of allocated buffer objects.
 	Retained int64 // Number of times a buffer is retained upon finalization.
+
+	// Stats obtained from the Go runtime.
+	// These are obtained via cumulative counters in the cmd package,
+	// so they aren't used by methods like Add or Since.
+
+	AllocBytes   uint64
+	AllocObjects uint64
 }
 
 // TODO: None of the methods below protect against overflows or underflows.
@@ -110,7 +117,10 @@ Retain: {{.Retained}}
 
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
-Disjuncts:    {{.Disjuncts}}`))
+Disjuncts:    {{.Disjuncts}}
+
+AllocBytes:   {{.AllocBytes}}
+AllocObjects: {{.AllocObjects}}`))
 
 func (s Counts) String() string {
 	buf := &strings.Builder{}

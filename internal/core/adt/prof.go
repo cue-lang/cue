@@ -28,16 +28,14 @@ var (
 	countsMu sync.Mutex
 )
 
-// AddStats adds the stats of the given OpContext to the global
-// counters.
+// AddStats adds the stats of the given OpContext to the global counters.
 func AddStats(ctx *OpContext) {
 	countsMu.Lock()
 	counts.Add(ctx.stats)
 	countsMu.Unlock()
 }
 
-// TotalStats returns the aggregate counts of all operations
-// calling AddStats.
+// TotalStats returns the aggregate counts of all operations calling AddStats.
 func TotalStats() stats.Counts {
 	countsMu.Lock()
 	// Shallow copy suffices as it only contains counter fields.

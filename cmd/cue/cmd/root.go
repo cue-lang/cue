@@ -16,8 +16,10 @@ package cmd
 
 import (
 	"context"
+	"encoding/json"
 	"io"
 	"os"
+	"runtime"
 
 	"github.com/spf13/cobra"
 
@@ -71,7 +73,28 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		err := f(c, args)
 
 		if statsEnc != nil {
-			statsEnc.Encode(c.ctx.Encode(adt.TotalStats()))
+			stats := adt.TotalStats()
+
+			// Fill in the runtime stats, since they are cumulative counters.
+			// Since in practice the number of allocations isn't fully deterministic,
+			// due to the inherent behavior of memory pools like sync.Pool,
+			// we support supplying MemStats as a JSON file in the tests.
+			var m runtime.MemStats
+			if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" && inTest {
+				bs, err := os.ReadFile(name)
+				if err != nil {
+					return err
+				}
+				if err := json.Unmarshal(bs, &m); err != nil {
+					return err
+				}
+			} else {
+				runtime.ReadMemStats(&m)
+			}
+			stats.AllocBytes = m.TotalAlloc
+			stats.AllocObjects = m.Mallocs
+
+			statsEnc.Encode(c.ctx.Encode(stats))
 			statsEnc.Close()
 		}
 		return err
@@ -177,6 +200,8 @@ func MainTest() int {
 	// Setting inTest causes filenames printed in error messages
 	// to be normalized so the output looks the same on Unix
 	// as Windows.
+	// TODO: replace with testing.Testing once we can require Go 1.21 or later,
+	// per the accepted proposal at https://go.dev/issue/52600.
 	inTest = true
 	return Main()
 }

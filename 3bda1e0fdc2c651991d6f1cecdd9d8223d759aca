@@ -34,6 +34,24 @@
       "parentUuid": "ddce02f1_962099a6",
       "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f2525188_4aaa064c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-12T13:39:01Z",
+      "side": 1,
+      "message": "The fact that CI correctly points out that I would need to use CUE_UPDATE for ~340 txtar files, just to add the two new fieds set to 0, makes me think that indeed I shouldn\u0027t add the fields to the adt package. I personally lean towards the first alternative above, then.",
+      "parentUuid": "55996ac6_b98241a2",
+      "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

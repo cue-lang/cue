@@ -69,6 +69,24 @@
       "message": "If this is not stable, this file is presumably going to change \"at random\". \n\nWhy not simply do a number of comparisons again `\\d+` or similar, but not \"commit\" the file to the txtar? \n\nAnd then leave some other processing analysing the stats against `master` to handle the variance?",
       "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ec5f3c2_87fd99c0",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-12T15:15:07Z",
+      "side": 1,
+      "message": "I\u0027m not sure if we\u0027re talking about the same thing here. This file is an _input_, not an _output_ we compare against.\n\nI could have gone with a regexp approach, but I felt that this gave me more confidence. All I\u0027m really doing is replacing the call to `runtime.ReadMemStats` - the rest of the code and test is untouched, and covers all the other behavior.",
+      "parentUuid": "5929d8fb_532cc100",
+      "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

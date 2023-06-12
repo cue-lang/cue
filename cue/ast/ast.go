@@ -132,10 +132,6 @@ type clause struct{}
 
 func (clause) clauseNode() {}
 
-func (x *ForClause) clauseNode() {}
-func (x *IfClause) clauseNode()  {}
-func (x *Alias) clauseNode()     {}
-
 // Comments
 
 type comments struct {
@@ -347,6 +343,7 @@ type Alias struct {
 	Expr  Expr      // An Ident or SelectorExpr
 
 	comments
+	clause
 	decl
 	expr
 	label

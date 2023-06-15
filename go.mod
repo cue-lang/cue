@@ -3,6 +3,7 @@ module cuelang.org/go
 go 1.19
 
 require (
+	github.com/bmatcuk/doublestar/v4 v4.2.0
 	github.com/cockroachdb/apd/v2 v2.0.2
 	github.com/emicklei/proto v1.10.0
 	github.com/go-quicktest/qt v1.100.0

@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc5ac563_ec40dca8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-15T12:54:27Z",
+      "side": 1,
+      "message": "We\u0027ve agreed to merge this in a call. I\u0027ll file a separate issue for improving our behavior with remaining precision after each operation.",
+      "parentUuid": "fcdcd7a4_97900c3c",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f2a5ba7_8a729c06",

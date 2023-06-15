@@ -1,0 +1,60 @@
+# Regression test for two vet issues relating trailing input,
+# https://cuelang.org/issue/2179 and https://cuelang.org/issue/2439.
+
+# First, sanity check that other commands spot the trailing invalid syntax.
+! exec cue eval   data-trailing-garbage.json
+stderr 'invalid JSON'
+! exec cue def    data-trailing-garbage.json
+stderr 'invalid JSON'
+! exec cue export data-trailing-garbage.json
+stderr 'invalid JSON'
+! exec cue eval   data-trailing-garbage.jsonl
+stderr 'invalid JSON'
+
+# Then, check that vet does too.
+! exec cue vet schema.cue data-trailing-garbage.json
+stderr 'invalid JSON'
+! exec cue vet schema.cue data-trailing-garbage.jsonl
+stderr 'invalid JSON'
+
+# Check that even the last value is validated as well.
+! exec cue vet schema.cue data-trailing-mismatch.json
+stderr 'foo: conflicting values "789" and int'
+! exec cue vet schema.cue data-trailing-mismatch.jsonl
+stderr 'foo: conflicting values "789" and int'
+
+-- schema.cue --
+foo: int
+-- data-trailing-garbage.json --
+{
+	"foo": 123
+}
+hi there
+-- data-trailing-mismatch.json --
+{
+	"foo": 123
+}
+{
+	"foo": 456
+}
+{
+	"foo": "789"
+}
+-- data-trailing-garbage.jsonl --
+{
+	"foo": 123
+}
+{
+	"foo": 456
+}
+hi there
+-- data-trailing-mismatch.jsonl --
+{
+	"foo": 123
+}
+{
+	"foo": 456
+}
+{
+	"foo": "789"
+}

@@ -107,6 +107,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 		if err := d.Err(); err != nil {
 			return err
 		}
+		d.Close()
 
 		if b.perFile {
 			for i, obj := range objs {

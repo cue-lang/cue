@@ -197,6 +197,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7da8745a_874e6736",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-15T12:55:07Z",
+      "side": 1,
+      "message": "Will follow up in a separate CL.",
+      "parentUuid": "20e0693d_a9339db6",
+      "revId": "0816f14e216a66c3e51677e85516801c69fe845f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0484f71e_890bd5dc",
         "filename": "cue/literal/num.go",
         "patchSetId": 2

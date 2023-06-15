@@ -265,6 +265,9 @@ func (i *streamingIterator) scan() bool {
 	// advance to next value
 	if i.dec != nil && !i.dec.Done() {
 		i.dec.Next()
+		if i.e = i.dec.Err(); i.e != nil {
+			return false
+		}
 	}
 
 	// advance to next stream if necessary
@@ -429,12 +432,6 @@ func (d *decoderInfo) dec(b *buildPlan) *encoding.Decoder {
 	return d.d
 }
 
-func (d *decoderInfo) close() {
-	if d.d != nil {
-		d.d.Close()
-	}
-}
-
 // getDecoders takes the orphaned files of the given instance and splits them in
 // schemas and values, saving the build.File and encoding.Decoder in the
 // returned slices. It is up to the caller to Close any of the decoders that are
@@ -514,9 +511,6 @@ func (p *buildPlan) importFiles(b *build.Instance) error {
 	// TODO: assume textproto is imported at top-level or just ignore them.
 
 	schemas, values, err := p.getDecoders(b)
-	for _, d := range append(schemas, values...) {
-		defer d.close()
-	}
 	if err != nil {
 		return err
 	}
@@ -569,9 +563,6 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 
 	if b := p.orphanInstance; b != nil {
 		schemas, values, err := p.getDecoders(b)
-		for _, d := range append(schemas, values...) {
-			defer d.close()
-		}
 		if err != nil {
 			return nil, err
 		}
@@ -590,6 +581,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			if err := d.Err(); err != nil {
 				return nil, err
 			}
+			d.Close()
 		}
 
 		if len(p.insts) > 1 && p.schema != nil {

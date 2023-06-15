@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c9650ace_e28317cf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-15T11:46:41Z",
+      "side": 1,
+      "message": "```\npackage cmd\n\ntype Stats struct {\n    CUE stats.Stats\n\n    Go struct {\n        AllocBytes uint64\n        AllocObjects uint64\n    }\n}\n```",
+      "parentUuid": "f2525188_4aaa064c",
+      "revId": "3bda1e0fdc2c651991d6f1cecdd9d8223d759aca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5929d8fb_532cc100",
         "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
         "patchSetId": 1

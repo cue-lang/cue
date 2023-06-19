@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cf311227_0ad13362",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-19T08:13:41Z",
+      "side": 1,
+      "message": "Here is said commit - it wasn\u0027t a CL nor does it have a Change-Id, so I cannot easily link to it:\n\nhttps://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+/3645ed62f96c282eddaceb1d1a4e0df1f68638b4%5E%21/",
+      "revId": "f6e5f02c9acb971a2779c9c50c06f44cd30883e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,23 @@
       "message": "Marcel is closer to the code, my head is in alpha.cuelang.org things!",
       "revId": "162755bdee3e12da6e758047be2895ed51a3cc9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "322d43cc_e8138458",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-20T10:20:56Z",
+      "side": 1,
+      "message": "I do not remember why the call to close was delayed. But this looks good.",
+      "revId": "162755bdee3e12da6e758047be2895ed51a3cc9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

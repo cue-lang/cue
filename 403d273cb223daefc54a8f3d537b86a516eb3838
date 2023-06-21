@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bdce9aa_04ac8ee6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-21T16:17:03Z",
+      "side": 1,
+      "message": "Such a simple fix, but as always, I wonder how you got there :) I did investigate the stack trace and read the code a few weeks ago, but I couldn\u0027t easily find where the cycle was meant to be detected or stopped.",
+      "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e6cc14b_39e56be5",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_cycle.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-21T16:17:03Z",
+      "side": 1,
+      "message": "is this meant to be kept commented out? perhaps just delete it if not helpful.",
+      "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fc5be4d4_9e7ecb51",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-21T16:17:03Z",
+      "side": 1,
+      "message": "how come this file is changing?",
+      "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

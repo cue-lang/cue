@@ -1,0 +1,64 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+import (
+	"strings"
+	"tool/cli"
+)
+
+#Input: INPUT={
+	kind: string
+	outKey: string | *"default"
+	if kind != "foo" {
+		outKey: INPUT.kind
+	}
+}
+inputs: f: #Input & { kind: "foo" }
+inputs: b: #Input & { kind: "bar" }
+
+outputs: [string]: string
+for _, input in inputs {
+	outputs: "\(input.outKey)": input.kind
+}
+
+root: print: cli.Print & {
+	text: strings.Join([ for key, val in outputs { "key=\(key) val=\(val)" } ], "\n")
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.print [Ready]")
+
+-- out/run/t1 --
+graph TD
+  t0("root.print [Terminated]")
+
+-- out/run/t1/value --
+{
+	$id:    "tool/cli.Print"
+	stdout: "foo"
+	text: """
+		key=default val=foo
+		key=bar val=bar
+		"""
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  30
+Reused: 20
+Allocs: 10
+Retain: 27
+
+Unifications: 22
+Conjuncts:    56
+Disjuncts:    52
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  30
+Reused: 20
+Allocs: 10
+Retain: 27
+
+Unifications: 22
+Conjuncts:    56
+Disjuncts:    52

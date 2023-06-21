@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f3378e1_e3ed0b76",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-21T16:17:50Z",
+      "side": 1,
+      "message": "Lacks a test? :) Otherwise SGTM.",
+      "revId": "42c4c9a8d56f0491631a04ae52348e68ebca21d9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

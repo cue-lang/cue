@@ -245,6 +245,9 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 		// value may reference the result value of a task, or even create
 		// new tasks based on the result of another task.
 		if d.Import() == nil {
+			if c.nodes[d.Node] == cycleMarker {
+				return nil
+			}
 			c.nodes[d.Node] = cycleMarker
 			c.markTaskDependencies(t, d.Node)
 			c.nodes[d.Node] = nil

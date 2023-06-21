@@ -1,0 +1,133 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+package kubecluster
+
+import (
+	"list"
+	"strings"
+	"tool/file"
+)
+
+#Cluster: {
+	clusterName: string
+
+	dnsPrefix: *"kube-\(clusterName)" | string
+	if strings.HasPrefix(clusterName, "foo_") {
+		dnsPrefix: "foo-kube-" + strings.TrimPrefix(clusterName, "foo_")
+	}
+}
+
+clusters: [CLUSTER=string]: #Cluster & {
+	clusterName: CLUSTER
+}
+
+dnsRecords: [string]: string
+
+for clusterName, cluster in clusters {
+	dnsRecords: "\(cluster.dnsPrefix)-monitoring-proxy": "127.0.0.1"
+}
+
+clusters: vagrant: {
+
+}
+
+#Cluster: CLUSTER={
+	foobar: CLUSTER.clusterName
+}
+
+root: build: {
+	$short: "exportiert gesamte Konfiguration nach ./output/"
+
+	task: mkdir: {
+		output: file.MkdirAll & {path: "output"}
+	}
+
+	task: "output/dns-records.zone": file.Create & {
+		$after:   task.mkdir.output
+		filename: "output/dns-records.zone"
+		let lines = list.SortStrings([
+			for name, addr in dnsRecords {
+				"\(name) A \(addr)"
+			},
+		])
+		contents: strings.Join(lines, "\n") + "\n"
+	}
+
+}
+
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.build.task.mkdir.output [Ready]")
+  t1("root.build.task.#quot;output/dns-records.zone#quot; [Waiting]")
+  t1-->t0
+
+-- out/run/t1 --
+graph TD
+  t0("root.build.task.mkdir.output [Terminated]")
+  t1("root.build.task.#quot;output/dns-records.zone#quot; [Ready]")
+  t1-->t0
+
+-- out/run/t1/value --
+{
+	$id:           "tool/file.Mkdir"
+	path:          "output"
+	createParents: true
+	stdout:        "foo"
+	permissions:   493
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  56
+Reused: 47
+Allocs: 9
+Retain: 16
+
+Unifications: 40
+Conjuncts:    98
+Disjuncts:    71
+-- out/run/t2 --
+graph TD
+  t0("root.build.task.mkdir.output [Terminated]")
+  t1("root.build.task.#quot;output/dns-records.zone#quot; [Terminated]")
+  t1-->t0
+
+-- out/run/t2/value --
+{
+	$id: "tool/file.Create"
+	$after: {
+		$id:           "tool/file.Mkdir"
+		path:          "output"
+		createParents: true
+		stdout:        "foo"
+		permissions:   493
+	}
+	filename:    "output/dns-records.zone"
+	permissions: 438
+	contents: """
+		kube-vagrant-monitoring-proxy A 127.0.0.1
+
+		"""
+	stdout: "foo"
+}
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  57
+Reused: 57
+Allocs: 0
+Retain: 16
+
+Unifications: 41
+Conjuncts:    104
+Disjuncts:    72
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  113
+Reused: 104
+Allocs: 9
+Retain: 32
+
+Unifications: 81
+Conjuncts:    202
+Disjuncts:    143

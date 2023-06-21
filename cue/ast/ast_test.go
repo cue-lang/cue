@@ -20,7 +20,12 @@ import (
 	"github.com/go-quicktest/qt"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/tdtest"
 )
 
 func TestCommentText(t *testing.T) {
@@ -95,4 +100,55 @@ func TestPackageName(t *testing.T) {
 			qt.Assert(t, qt.Equals(f.PackageName(), tc.pkg))
 		})
 	}
+}
+
+func TestNewStruct(t *testing.T) {
+	type testCase struct {
+		input []any
+		want  string
+	}
+	testCases := []testCase{{
+		input: []any{
+			internal.NewComment(true, "foo"),
+			&ast.Ellipsis{},
+		},
+		want: `{
+	// foo
+
+	...
+}`}, {
+		input: []any{
+			&ast.LetClause{Ident: ast.NewIdent("foo"), Expr: ast.NewIdent("bar")},
+			ast.Label(ast.NewString("bar")), ast.NewString("baz"),
+			&ast.Field{
+				Label: ast.NewString("a"),
+				Value: ast.NewString("b"),
+			},
+		},
+		want: `{
+	let foo = bar
+	"bar": "baz"
+	"a":   "b"
+}`}, {
+		input: []any{
+			ast.NewIdent("opt"), token.OPTION, ast.NewString("foo"),
+			ast.NewIdent("req"), token.NOT, ast.NewString("bar"),
+		},
+		want: `{
+	opt?: "foo"
+	req!: "bar"
+}`}, {
+		input: []any{ast.Embed(ast.NewBool(true))},
+		want: `{
+	true
+}`}}
+	// TODO(tdtest): use cuetest.Run when supported.
+	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+		s := ast.NewStruct(tc.input...)
+		b, err := format.Node(s)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Equal(string(b), tc.want)
+	})
 }

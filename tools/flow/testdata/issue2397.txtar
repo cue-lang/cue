@@ -1,0 +1,55 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+package test
+
+import "tool/cli"
+
+obj: {
+	request: int & <=limit
+	limit: int & <=100
+
+	request: 10
+	limit: request
+}
+
+root: print: cli.Print & {
+	text: "\(obj.request) \(obj.limit)"
+}
+
+
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.print [Ready]")
+
+-- out/run/t1 --
+graph TD
+  t0("root.print [Terminated]")
+
+-- out/run/t1/value --
+{
+	$id:    "tool/cli.Print"
+	stdout: "foo"
+	text:   "10 10"
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  11
+Reused: 5
+Allocs: 6
+Retain: 1
+
+Unifications: 9
+Conjuncts:    25
+Disjuncts:    12
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  11
+Reused: 5
+Allocs: 6
+Retain: 1
+
+Unifications: 9
+Conjuncts:    25
+Disjuncts:    12

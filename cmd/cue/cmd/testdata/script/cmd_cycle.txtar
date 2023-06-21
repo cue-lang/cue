@@ -1,0 +1,119 @@
+# Issue #2416
+
+exec cue cmd kube issue2397_tool.cue issue2397.cue
+cmp stdout stdout2397.golden
+
+# cycle on complete error
+! exec cue cmd build issue2416a_tool.cue
+cmp stderr stderr2416.golden
+
+# cycle on incomplete error
+exec cue cmd print issue2416b_tool.cue
+cmp stdout stdout2416.golden
+
+-- issue2397.cue --
+package test
+
+#obj: {
+        requests?: {
+                memory?: int & <=limits.memory
+        }
+        limits?: {
+                memory?: int & <=100Gi
+        }
+}
+
+// Stack overflow, but only in `cue cmd`.
+obj: #obj & {
+        requests: memory: 1Gi
+		// The problem in the original bug report was with this reference.
+        limits: memory:   requests.memory
+}
+
+-- issue2397_tool.cue --
+package test
+
+import (
+        "encoding/yaml"
+        "tool/cli"
+)
+
+command: kube: {
+        task: print: cli.Print & {
+                text: yaml.Marshal(obj)
+        }
+}
+
+
+-- issue2416a_tool.cue --
+package kubecluster
+
+#Cluster: {}
+
+m: x: #Cluster
+m: x: X={
+	foobar: X.name
+	name: "x"
+	foo: string
+}
+
+dnsRecords: _
+
+for _, X in m {
+	dnsRecords: "\(m.x.foo)": "127.0.0.1"
+}
+
+command: build: {
+	$id: "tool/file.Create"
+	filename: "output/dns-records.zone"
+	permissions: int | *0o666
+	let lines = [
+		for name, addr in dnsRecords {
+			"\(name) A \(addr)"
+		},
+	]
+	contents: lines[0]
+}
+
+-- issue2416b_tool.cue --
+package p
+
+import (
+	"strings"
+	"tool/cli"
+)
+
+#Input: INPUT={
+	kind: string
+	outKey: string | *"default"
+	if kind != "foo" {
+		outKey: INPUT.kind
+	}
+}
+inputs: f: #Input & { kind: "foo" }
+inputs: b: #Input & { kind: "bar" }
+
+outputs: [string]: string
+for _, input in inputs {
+	outputs: "\(input.outKey)": input.kind
+}
+
+command: print: cli.Print & {
+	text: strings.Join([ for key, val in outputs { "key=\(key) val=\(val)" } ], "\n")
+}
+
+-- stdout2397.golden --
+requests:
+  memory: 1073741824
+limits:
+  memory: 1073741824
+
+-- stderr2416.golden --
+command.build.contents: invalid bytes argument: invalid interpolation: non-concrete value string (type string):
+    ./issue2416a_tool.cue:18:10
+    ./issue2416a_tool.cue:9:7
+    ./issue2416a_tool.cue:15:14
+    ./issue2416a_tool.cue:27:2
+-- stdout2416.golden --
+key=default val=foo
+key=bar val=bar

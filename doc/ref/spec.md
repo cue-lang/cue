@@ -1992,7 +1992,6 @@ PrimaryExpr =
 	Operand |
 	PrimaryExpr Selector |
 	PrimaryExpr Index |
-	PrimaryExpr Slice |
 	PrimaryExpr Arguments .
 
 Selector       = "." (identifier | simple_string_lit) .
@@ -2009,6 +2008,7 @@ Filter         = "[" [ "?" ] AliasExpr "]" .
 
 TODO: maybe reintroduce slices, as they are useful in queries, probably this
 time with Python semantics.
+	PrimaryExpr Slice |
 Slice          = "[" [ Expression ] ":" [ Expression ] [ ":" [Expression] ] "]" .
 
 Argument       = Expression | ( identifier ":" Expression ).
@@ -2149,27 +2149,14 @@ for `a` of struct type:
 
 
 ```
-[ 1, 2 ][1]     // 2
-[ 1, 2 ][2]     // _|_
-[ 1, 2, ...][2] // _|_
-```
+a: [ 1, 2 ][1]     // 2
+b: [ 1, 2 ][2]     // _|_
+c: [ 1, 2, ...][2] // _|_
 
-<!-- TODO: Marcel says this is no longer how CUE works -->
-
-Both the operand and index value may be a value-default pair.
-```
-va[vi]              =>  va[vi]
-va[(vi, di)]        =>  (va[vi], va[di])
-(va, da)[vi]        =>  (va[vi], da[vi])
-(va, da)[(vi, di)]  =>  (va[vi], da[di])
-```
-
-```
-Fields                  Result
-x: [1, 2] | *[3, 4]     ([1,2]|[3,4], [3,4])
-i: int | *1             (int, 1)
-
-v: x[i]                 (x[i], 4)
+// Defaults are selected for both operand and index:
+x: [1, 2] | *[3, 4]
+y: int | *1
+z: x[y]  // 4
 ```
 
 ### Operators
@@ -2198,12 +2185,10 @@ other operand is not, the constant is [converted] to the type of the other
 operand.
 -->
 
-Operands of unary and binary expressions may be associated with a default using
-the following
-
-<!-- TODO: the following... what? only examples follow. -->
-
 <!--
+Operands of unary and binary expressions may be associated with a default using
+the following:
+
 ```
 O1: op (v1, d1)          => (op v1, op d1)
 
@@ -2212,7 +2197,6 @@ and because v => (v, v)
 O3: v1       op (v2, d2) => (v1 op v2, v1 op d2)
 O4: (v1, d1) op v2       => (v1 op v2, d1 op v2)
 ```
--->
 
 ```
 Field               Resulting Value-Default pair
@@ -2222,6 +2206,7 @@ b: -a               (-a, -1)
 c: a + 2            (a+2, 3)
 d: a + a            (a+a, 2)
 ```
+-->
 
 #### Operator precedence
 
@@ -2664,10 +2649,9 @@ a result of type int.
 ```
 Argument type    Result
 
-string            string length in bytes
-bytes             length of byte sequence
-list              list length, smallest length for an open list
-struct            number of distinct data fields, excluding optional
+bytes            length of byte sequence
+list             list length, smallest length for an open list
+struct           number of distinct data fields, excluding field constraints
 ```
 <!-- TODO: consider not supporting len, but instead rely on more
 precisely named builtin functions:
@@ -2681,7 +2665,7 @@ precisely named builtin functions:
 Expression           Result
 len("Hellø")         6
 len([1, 2, 3])       3
-len([1, 2, ...])     >=2
+len([1, 2, ...])     2
 ```
 
 

@@ -1053,7 +1053,7 @@ Embedding       = Comprehension | AliasExpr .
 Field           = Label ":" { Label ":" } AliasExpr { attribute } .
 Label           = [ identifier "=" ] LabelExpr .
 LabelExpr       = LabelName [ "?" | "!" ] | "[" AliasExpr "]" .
-LabelName       = identifier | simple_string_lit  .
+LabelName       = identifier | simple_string_lit | "(" AliasExpr ")" .
 
 attribute       = "@" identifier "(" attr_tokens ")" .
 attr_tokens     = { attr_token |
@@ -1156,6 +1156,25 @@ h: b & { foo?: number }                _|_
 i: c & { foo: string }                 { foo: *"baz" | string }
 ```
 -->
+
+
+#### Dynamic fields
+
+A _dynamic field_ is a field whose label is determined by
+an expression wrapped in parentheses.
+A dynamic field may be marked as optional or required.
+
+```
+Expression                             Result
+a:   "foo                              a:   "foo"
+b:   "bar"                             b:   "bar"
+(a): "baz"                             bar: "baz"
+
+(a+b): "qux"                           foobar: "qux"
+
+(a)?: string                           foo?: string
+(b)!: string                           bar!: string
+```
 
 
 #### Pattern and default constraints
@@ -1575,17 +1594,29 @@ In front of a Label (`X=label: value`):
 
 - binds the identifier to the same value as `label` would be bound
   to if it were a valid identifier.
-- for optional fields (`foo?: bar` and `[foo]: bar`),
-  the bound identifier is only visible within the field value (`bar`).
+
+In front of a dynamic field (`X=(label): value`):
+
+- binds the identifier to the same value as `label` if it were a valid
+  static identifier.
+
+In front of a dynamic field expression (`(X=expr): value`):
+
+- binds the identifier to the concrete label resulting from evaluating `expr`.
+
+In front of a pattern constraint (`X=[expr]: value`):
+
+- binds the identifier to the same field as the matched by the pattern
+  within the instance of the field value (`value`).
+
+In front of a pattern constraint expression (`[X=expr]: value`):
+
+- binds the identifier to the concrete label that matches `expr`
+  within the instances of the field value (`value`).
 
 Before a value (`foo: X=x`)
 
 - binds the identifier to the value it precedes within the scope of that value.
-
-Inside a bracketed label (`[X=expr]: value`):
-
-- binds the identifier to the concrete label that matches `expr`
-  within the instances of the field value (`value`).
 
 Before a list element (`[ X=value, X+1 ]`) (Not yet implemented)
 

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "010ebcd4_4d12ccd3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T15:22:54Z",
+      "side": 1,
+      "message": "I reckon this is done elsewhere, but this is a nice place to add it. Done.",
+      "parentUuid": "d080abf3_3c7da689",
+      "revId": "21d7ef2bf743e1c43817c8d845ce3588d3782160",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2159cf5_00e6582b",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-22T14:44:02Z",
       "side": 1,
       "message": "FYI: a few lines here mix spaces and tabs for indentation, e.g. 21, 23, 25, 27. easy to see with gerrit\u0027s diff viewer.",
+      "revId": "21d7ef2bf743e1c43817c8d845ce3588d3782160",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c4f6655_3d9ff8f6",
+        "filename": "cue/testdata/comprehensions/fields.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T15:22:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2159cf5_00e6582b",
       "revId": "21d7ef2bf743e1c43817c8d845ce3588d3782160",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

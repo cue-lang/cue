@@ -1366,10 +1366,6 @@ func (v Value) structValData(ctx *adt.OpContext) (structValue, *adt.Bottom) {
 	})
 }
 
-func (v Value) structValFull(ctx *adt.OpContext) (structValue, *adt.Bottom) {
-	return v.structValOpts(ctx, options{allowScalar: true})
-}
-
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err *adt.Bottom) {
 	v, _ = v.Default()
@@ -1379,10 +1375,8 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 	switch b, ok := v.v.BaseValue.(*adt.Bottom); {
 	case ok && b.IsIncomplete() && !o.concrete && !o.final:
 
-	// TODO:
-	// case o.allowScalar, !o.omitHidden, !o.omitDefinitions:
-	// Allow scalar values if hidden or definition fields are requested?
-	case o.allowScalar:
+	// Allow scalar values if hidden or definition fields are requested.
+	case !o.omitHidden, !o.omitDefinitions:
 	default:
 		obj, err = v.getStruct()
 		if err != nil {
@@ -2062,7 +2056,6 @@ type options struct {
 	ignoreClosedness  bool // used for comparing APIs
 	docs              bool
 	disallowCycles    bool // implied by concrete
-	allowScalar       bool
 }
 
 // An Option defines modes of evaluation.

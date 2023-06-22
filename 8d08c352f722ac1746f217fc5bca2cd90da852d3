@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3dde13c_0b7fd571",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T07:35:31Z",
+      "side": 1,
+      "message": "perhaps clarify that a dynamic field uses parentheses, for example:\n\n    A _dynamic field_ is a field whose label is determined by an expression wrapped in parentheses.\n\nOtherwise, as a user skimming the spec, I might not realise which of the examples below are actually dynamic fields.",
+      "revId": "8d08c352f722ac1746f217fc5bca2cd90da852d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fffa950e_af2c7784",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1602,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T07:35:31Z",
+      "side": 1,
+      "message": "like the case below, I wonder if \"dynamic field expression\" might be more consistent, given the use of \"expr\" on the right.",
+      "revId": "8d08c352f722ac1746f217fc5bca2cd90da852d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "006ed7a2_00cf2989",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1611,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T07:35:31Z",
+      "side": 1,
+      "message": "perhaps \"pattern constraint expression\" to avoid confusion with the repetition, and more consistent with the \"expr\" on the right?",
+      "revId": "8d08c352f722ac1746f217fc5bca2cd90da852d3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

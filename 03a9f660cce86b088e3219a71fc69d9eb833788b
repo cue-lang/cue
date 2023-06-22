@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbb4e57e_8da1a976",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T07:54:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b960c03f_02389942",
+      "revId": "03a9f660cce86b088e3219a71fc69d9eb833788b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66ef95d6_f3560804",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fec4f84_9cae72ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T07:54:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "66ef95d6_f3560804",
+      "revId": "03a9f660cce86b088e3219a71fc69d9eb833788b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70639ae5_23694a58",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-06-21T16:22:08Z",
       "side": 1,
       "message": "FYI: this TODO was mine, because I thought the sentence above was unfinished.\n\nPerhaps add a colon at the end, to clarify that you mean the following code:\n\n    ... using the following:",
+      "revId": "03a9f660cce86b088e3219a71fc69d9eb833788b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9932c12_2048a72a",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2192,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T07:54:08Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70639ae5_23694a58",
       "revId": "03a9f660cce86b088e3219a71fc69d9eb833788b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

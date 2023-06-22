@@ -1,0 +1,12 @@
+#Issue #2336
+
+exec cue export x.cue
+cmp stdout stdout.golden
+
+-- x.cue --
+#Person: {
+	name!: string
+	age?:  int
+}
+-- stdout.golden --
+{}

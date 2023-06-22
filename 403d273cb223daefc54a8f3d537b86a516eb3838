@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60343d18_5208c25b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T09:59:44Z",
+      "side": 1,
+      "message": "The OpContext has a Logf method that indents based on the path that is being evaluated. That is quite useful. If there is some cycle, that only works well with a source-level debugger.\n\nVarious packages have a TestX method where it is easy to past in some code and have some basic infrastructure in place. The one I use the most is internal/core/adt/eval_test.go. But in this case I used the one in flow_test.go and script_test.go.\n\nFor cycles, it is very much a matter of looking at the trace, spotting the cycle, and reasoning through why it happens. Not to say that it is easy to figure out why it happens.",
+      "parentUuid": "42c51b5d_e8cc9ac8",
+      "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8e6cc14b_39e56be5",

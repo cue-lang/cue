@@ -313,7 +313,9 @@ Disjuncts:    205
         //     ./mutual.cue:9:10
         foo: (string){ "" }
       }
-      a: (struct){
+      a: (_|_){
+        // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
+        //     ./mutual.cue:9:10
         bar*: (_|_){
           // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
           //     ./mutual.cue:9:10

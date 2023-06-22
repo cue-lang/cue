@@ -242,6 +242,10 @@ func (c *OpContext) unify(v *Vertex, state vertexStatus) {
 		// have been considered.
 		// TODO: is checkClosed really still necessary here?
 		if v.status == conjuncts && (n.hasErr() || !n.checkClosed(state)) {
+			if err := n.getErr(); err != nil {
+				b, _ := v.BaseValue.(*Bottom)
+				v.BaseValue = CombineErrors(nil, b, err)
+			}
 			break
 		}
 

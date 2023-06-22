@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fbcc6a1_b696842e",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 2667,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-06-22T10:20:37Z",
+      "side": 0,
+      "message": "tbh I don\u0027t really see why we shouldn\u0027t support len(string). We could define it as `len(s)` to be the same as `len(\u0027\\(s)\u0027)`.",
+      "revId": "b22ec6a02e7c92fb125af262b1be4aa89790ad17",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "56f686f3_5ee3754f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-06-22T10:20:37Z",
+      "side": 1,
+      "message": "spurious",
+      "revId": "e46324ef052b90aaf605aebea608fa147b2bf8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de1faf32_52d3b382",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-06-22T10:20:37Z",
+      "side": 1,
+      "message": "LGTM modulo a few thoughts/suggestions.",
+      "revId": "e46324ef052b90aaf605aebea608fa147b2bf8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6869916c_89a41dc0",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 2654,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-06-22T10:20:37Z",
+      "side": 1,
+      "message": "\"data field\" isn\u0027t defined anywhere in the spec AFAICS. Is a private field a data field? What about a definition with a concrete value? Perhaps something to address in a future update.",
+      "revId": "e46324ef052b90aaf605aebea608fa147b2bf8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

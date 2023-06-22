@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "689af51e_88c2942f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-06-22T10:13:36Z",
+      "side": 1,
+      "message": "LGTM with one thought.",
+      "revId": "3a635fc7a746cef0abd6250de13f07092eee5518",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b1660a5_3d0163fe",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 1598,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-06-22T10:13:36Z",
+      "side": 1,
+      "message": "I wonder if it might be good to be a bit more explicit about scope in this section. For example I _think_ that \"within the instance of the field value\" denotes a different scope of the alias from the others but it\u0027s a bit ambiguous.",
+      "revId": "3a635fc7a746cef0abd6250de13f07092eee5518",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

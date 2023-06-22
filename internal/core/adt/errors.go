@@ -226,6 +226,20 @@ func NewRequiredNotPresentError(ctx *OpContext, v *Vertex) *Bottom {
 	return b
 }
 
+func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Vertex) *Bottom {
+	err := ctx.Newf("missing required field in for comprehension: %v", v.Label)
+	err.AddPosition(x.Src)
+	for _, c := range v.Conjuncts {
+		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
+			err.AddPosition(c.x)
+		}
+	}
+	return &Bottom{
+		Code: IncompleteError,
+		Err:  err,
+	}
+}
+
 // A ValueError is returned as a result of evaluating a value.
 type ValueError struct {
 	r      Runtime

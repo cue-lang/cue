@@ -803,6 +803,18 @@ func TestFields(t *testing.T) {
 	}, {
 		value: `{a!: 1, b?: 2, c: 3}`,
 		err:   "a: field is required but not present",
+	}, {
+		opts:  []Option{Hidden(true)},
+		value: `1, _a: 2`,
+		res:   `{_a:2,}`,
+	}, {
+		opts:  []Option{Definitions(true)},
+		value: `1, #a: 2`,
+		res:   `{#a:2,}`,
+	}, {
+		opts:  []Option{Optional(true)},
+		value: `1, a?: 2`,
+		err:   "cannot use value 1 (type int) as struct",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -830,14 +842,14 @@ func TestFields(t *testing.T) {
 				want, err := iter.Value().MarshalJSON()
 				checkFatal(t, err, tc.err, "Obj.At2")
 
-				got, err := obj.Lookup(iter.Label()).MarshalJSON()
+				got, err := obj.LookupPath(MakePath(iter.Selector())).MarshalJSON()
 				checkFatal(t, err, tc.err, "Obj.At2")
 
 				if !bytes.Equal(got, want) {
 					t.Errorf("Lookup: got %q; want %q", got, want)
 				}
 			}
-			v := obj.Lookup("non-existing")
+			v := obj.LookupPath(MakePath(Str("non-existing")))
 			checkErr(t, v.Err(), "not found", "non-existing")
 		})
 	}

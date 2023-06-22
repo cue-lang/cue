@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d080abf3_3c7da689",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T14:44:02Z",
+      "side": 1,
+      "message": "Do we want to test to also ensure that optional fields are _not_ iterated over?",
+      "revId": "21d7ef2bf743e1c43817c8d845ce3588d3782160",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2159cf5_00e6582b",
+        "filename": "cue/testdata/comprehensions/fields.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 28,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T14:44:02Z",
+      "side": 1,
+      "message": "FYI: a few lines here mix spaces and tabs for indentation, e.g. 21, 23, 25, 27. easy to see with gerrit\u0027s diff viewer.",
+      "revId": "21d7ef2bf743e1c43817c8d845ce3588d3782160",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1863,8 +1863,19 @@ func (x *ForClause) yield(s *compState) {
 	}
 	n.LockArcs = true
 	for _, a := range n.Arcs {
-		if !a.Label.IsRegular() || !a.IsDefined(c) {
+		if !a.Label.IsRegular() {
 			continue
+		}
+		if !a.isDefined() {
+			a.Finalize(c)
+			switch a.ArcType {
+			case ArcMember:
+			case ArcRequired:
+				c.AddBottom(newRequiredFieldInComprehensionError(c, x, a))
+				continue
+			default:
+				continue
+			}
 		}
 
 		c.unify(a, partial)

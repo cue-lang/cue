@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d9d5114_a3795ca2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T13:12:02Z",
+      "side": 1,
+      "message": "Nice catch in PS2 :) I wonder if you should do those with an `// XXX` to make sure they don\u0027t make it to master.",
+      "revId": "aa3d23c3f4e6df9f7bf3d7ba64181c70dab38cb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

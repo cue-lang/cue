@@ -357,15 +357,15 @@ large: {
 	}
 }
 -- out/eval/stats --
-Leaks:  7
-Freed:  108
-Reused: 97
-Allocs: 18
-Retain: 311
+Leaks:  10
+Freed:  105
+Reused: 95
+Allocs: 20
+Retain: 302
 
 Unifications: 115
-Conjuncts:    238
-Disjuncts:    230
+Conjuncts:    229
+Disjuncts:    215
 -- out/eval --
 (struct){
   minimal: (struct){
@@ -374,7 +374,9 @@ Disjuncts:    230
       //     ./in.cue:18:6
       port: (string){ "" }
     }
-    b: (struct){
+    b: (_|_){
+      // [cycle] minimal.b: cycle with field a.port:
+      //     ./in.cue:18:6
       port*: (_|_){
         // [cycle] minimal.b: cycle with field a.port:
         //     ./in.cue:18:6
@@ -515,7 +517,9 @@ Disjuncts:    230
     }
     p2: (struct){
       X: (string){ "user@mod.test" }
-      Y: (struct){
+      Y: (_|_){
+        // [cycle] large.p2.Y: undefined field: port:
+        //     ./in.cue:267:10
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
         port*: (_|_){
@@ -523,9 +527,18 @@ Disjuncts:    230
           //     ./in.cue:267:10
         }
       }
-      #X: (#struct){
+      #X: (_|_){
+        // [cycle] large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:243:7
+        // large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:246:7
+        // large.p2.Y: undefined field: port:
+        //     ./in.cue:267:10
         userinfo: (string){ "user@" }
-        port: (string){ "" }
+        port: (_|_){
+          // [cycle] large.p2.Y: undefined field: port:
+          //     ./in.cue:267:10
+        }
         host: (string){ "mod.test" }
       }
       #Y: (#struct){
@@ -536,12 +549,23 @@ Disjuncts:    230
     }
     p3: (struct){
       X: (string){ "user@mod.test" }
-      #X: (#struct){
+      #X: (_|_){
+        // [cycle] large.p3.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:279:7
+        // large.p3.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:282:7
+        // large.p3.Y: undefined field: port:
+        //     ./in.cue:308:10
         userinfo: (string){ "user@" }
-        port: (string){ "" }
+        port: (_|_){
+          // [cycle] large.p3.Y: undefined field: port:
+          //     ./in.cue:308:10
+        }
         host: (string){ "mod.test" }
       }
-      Y: (struct){
+      Y: (_|_){
+        // [cycle] large.p3.Y: undefined field: port:
+        //     ./in.cue:308:10
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
         port*: (_|_){
@@ -557,9 +581,18 @@ Disjuncts:    230
     }
     p4: (struct){
       X: (string){ "user@mod.test" }
-      #X: (#struct){
+      #X: (_|_){
+        // [cycle] large.p4.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:320:7
+        // large.p4.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:323:7
+        // large.p4.Y: undefined field: port:
+        //     ./in.cue:351:10
         userinfo: (string){ "user@" }
-        port: (string){ "" }
+        port: (_|_){
+          // [cycle] large.p4.Y: undefined field: port:
+          //     ./in.cue:351:10
+        }
         host: (string){ "mod.test" }
       }
       #Y: (#struct){
@@ -567,7 +600,9 @@ Disjuncts:    230
         port: (string){ "" }
         userinfo: (string){ "user" }
       }
-      Y: (struct){
+      Y: (_|_){
+        // [cycle] large.p4.Y: undefined field: port:
+        //     ./in.cue:351:10
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
         port*: (_|_){

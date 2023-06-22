@@ -12,6 +12,35 @@ dynamic: {
 	}
 }
 
+ignoreOptional: {
+	#x: {
+		a?: string
+		b?: string
+		c:  string
+	}
+
+	y: {
+		for k,v in #x {
+			(k): "exists"
+		}
+	}
+}
+
+missingRequiredError:  {
+	// Issue #2369
+	#x: {
+		a!: string
+		b?: string
+		c:  string
+	}
+
+	y: {
+		for k,v in #x {
+			(k): "exists"
+		}
+	}
+}
+
 issue560: {
 	#User: {
 		tags_str: string
@@ -30,27 +59,50 @@ issue560: {
 }
 -- out/eval/stats --
 Leaks:  1
-Freed:  19
-Reused: 13
+Freed:  32
+Reused: 26
 Allocs: 7
 Retain: 2
 
-Unifications: 20
-Conjuncts:    26
-Disjuncts:    20
+Unifications: 33
+Conjuncts:    41
+Disjuncts:    33
 -- out/eval --
 (struct){
   dynamic: (struct){
     foo: (int){ 1 }
     foobar: (int){ 2 }
   }
+  ignoreOptional: (struct){
+    #x: (#struct){
+      a?: (string){ string }
+      b?: (string){ string }
+      c: (string){ string }
+    }
+    y: (struct){
+      c: (string){ "exists" }
+    }
+  }
+  missingRequiredError: (struct){
+    #x: (#struct){
+      a!: (string){ string }
+      b?: (string){ string }
+      c: (string){ string }
+    }
+    y: (_|_){
+      // [incomplete] missingRequiredError.y: missing required field in for comprehension: a:
+      //     ./in.cue:33:3
+      //     ./in.cue:27:3
+      //     ./in.cue:33:14
+    }
+  }
   issue560: (struct){
     #User: (#struct){
       tags_str: (string){ string }
       tags_map: (_|_){
         // [incomplete] issue560.#User.tags_map: error in call to strings.Split: non-concrete value string:
-        //     ./in.cue:14:16
-        //     ./in.cue:12:13
+        //     ./in.cue:43:16
+        //     ./in.cue:41:13
         "{a}": (string){ string }
       }
     }
@@ -73,6 +125,30 @@ Disjuncts:    20
     ] {
       〈1;s〉: 1
       "\(〈1;s〉)bar": 2
+    }
+  }
+  ignoreOptional: {
+    #x: {
+      a?: string
+      b?: string
+      c: string
+    }
+    y: {
+      for k, v in 〈1;#x〉 {
+        〈1;k〉: "exists"
+      }
+    }
+  }
+  missingRequiredError: {
+    #x: {
+      a!: string
+      b?: string
+      c: string
+    }
+    y: {
+      for k, v in 〈1;#x〉 {
+        〈1;k〉: "exists"
+      }
     }
   }
   issue560: {

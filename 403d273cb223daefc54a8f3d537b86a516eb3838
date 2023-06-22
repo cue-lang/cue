@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9341af87_44a23708",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T07:47:01Z",
+      "side": 1,
+      "message": "It was a long road! One issue was that a Vertex could retain its arcs even when it was erroneous. This caused the dynamic evaluation in dep to descend recursively. However, keeping arcs is fine for incomplete errors, so I had to special case that. One of your reducers actually triggered the bug for incomplete errors as well. This meant the fix was not workable and it was back to the drawing board.\n\nMy conclusion was then that there must be some other mechanism to break cycles. When investigating where this could be, I noticed that there was already some cycle handling code and that it still was not triggered. That fixed it. It now looks that it is actually tools/flow that was traversing a graph cyclicly, not dep.\n\nSo note that I went from the evaluator has a representation bug, to dep isn\u0027t handling cycles correctly, to tools/flow isn\u0027t handling cycles correctly.\n\nAnyway, moral of the story is that I do not generally magically find these fixes. :)",
+      "parentUuid": "6bdce9aa_04ac8ee6",
+      "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8e6cc14b_39e56be5",
         "filename": "cmd/cue/cmd/testdata/script/cmd_cycle.txtar",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-21T16:17:03Z",
       "side": 1,
       "message": "is this meant to be kept commented out? perhaps just delete it if not helpful.",
+      "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33f454e8_56d83b33",
+        "filename": "cmd/cue/cmd/testdata/script/cmd_cycle.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T07:47:01Z",
+      "side": 1,
+      "message": "This came from the original bug report. I kept it as it may be useful to understand under which conditions the bug was triggered, if it ever were to regress.\n\nRemoved it in favor of a comment, as this block is still documented in the original issue.",
+      "parentUuid": "8e6cc14b_39e56be5",
       "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2023-06-21T16:17:03Z",
       "side": 1,
       "message": "how come this file is changing?",
+      "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d16bfef1_b2943248",
+        "filename": "tools/flow/testdata/template.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T07:47:01Z",
+      "side": 1,
+      "message": "The change triggers a different order of evaluation, which causes fields to be ordered differently.\n\nClearly, we need to establish a more defined and stable field ordering, but that is a concern for elsewhere.",
+      "parentUuid": "fc5be4d4_9e7ecb51",
       "revId": "403d273cb223daefc54a8f3d537b86a516eb3838",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

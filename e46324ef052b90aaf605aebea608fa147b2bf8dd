@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1fc8ec63_819649c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T10:27:21Z",
+      "side": 1,
+      "message": "Submitted, so I think we have to live with the typo :)",
+      "parentUuid": "56f686f3_5ee3754f",
+      "revId": "e46324ef052b90aaf605aebea608fa147b2bf8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "de1faf32_52d3b382",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -48,6 +66,24 @@
       "writtenOn": "2023-06-22T10:20:37Z",
       "side": 1,
       "message": "\"data field\" isn\u0027t defined anywhere in the spec AFAICS. Is a private field a data field? What about a definition with a concrete value? Perhaps something to address in a future update.",
+      "revId": "e46324ef052b90aaf605aebea608fa147b2bf8dd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02fe2c83_86f5ea29",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 3
+      },
+      "lineNbr": 2654,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-22T10:27:21Z",
+      "side": 1,
+      "message": "Since this CL is submitted, and it didn\u0027t touch this part of the text, file a separate CL or spec issue as a reminder?",
+      "parentUuid": "6869916c_89a41dc0",
       "revId": "e46324ef052b90aaf605aebea608fa147b2bf8dd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

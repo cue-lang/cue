@@ -3,6 +3,11 @@
 exec cue export x.cue
 cmp stdout stdout.golden
 
+#Issue #2307
+
+! exec cue export y.cue
+cmp stderr stderr.golden
+
 -- x.cue --
 #Person: {
 	name!: string
@@ -10,3 +15,18 @@ cmp stdout stdout.golden
 }
 -- stdout.golden --
 {}
+-- y.cue --
+a: x!: 5
+a: x?: int // do not include this position
+
+#Def: {
+	x!: int
+}
+
+b: #Def
+-- stderr.golden --
+a.x: field is required but not present:
+    ./y.cue:1:4
+b.x: field is required but not present:
+    ./y.cue:5:2
+    ./y.cue:8:4

@@ -208,9 +208,19 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 
 func NewRequiredNotPresentError(ctx *OpContext, v *Vertex) *Bottom {
 	saved := ctx.PushArc(v)
+	err := ctx.Newf("field is required but not present")
+	for _, c := range v.Conjuncts {
+		if f, ok := c.x.(*Field); ok && f.ArcType == ArcRequired {
+			err.AddPosition(c.x)
+		}
+		if c.CloseInfo.closeInfo != nil {
+			err.AddPosition(c.CloseInfo.location)
+		}
+	}
+
 	b := &Bottom{
 		Code: IncompleteError,
-		Err:  ctx.Newf("field is required but not present"),
+		Err:  err,
 	}
 	ctx.PopArc(saved)
 	return b

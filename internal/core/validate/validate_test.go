@@ -194,7 +194,7 @@ y: conflicting values 4 and 2:
 				height: 1.80
 			}
 			`,
-		out: "incomplete\nPerson.name: field is required but not present",
+		out: "incomplete\nPerson.name: field is required but not present:\n    test:3:5",
 	}, {
 		name: "allow required fields in definitions",
 		cfg:  &Config{Concrete: true},

@@ -16,6 +16,24 @@
       "message": "Do you mean that lines 779-808 do not affect the case where f.IsHidden()\u003d\u003dtrue? I would say that, then, because \"always passes\" doesn\u0027t really make sense to me.",
       "revId": "c8bcd245db319df98181e444191b091da928f066",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b57ba08_89dfd158",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-22T11:35:41Z",
+      "side": 1,
+      "message": "What it means is that Accept should always return true for a hidden field.",
+      "parentUuid": "abfe30eb_5833add2",
+      "revId": "c8bcd245db319df98181e444191b091da928f066",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

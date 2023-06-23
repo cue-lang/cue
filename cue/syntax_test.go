@@ -198,6 +198,23 @@ func TestSyntax(t *testing.T) {
 	}
 }
 		`,
+	}, {
+		name: "issue2339",
+		in: `
+s: string
+if true {
+	out: "\(s)": 3
+}
+	`,
+		options: o(cue.ResolveReferences(true)),
+		out: `
+{
+	s: string
+	out: {
+		"\(s)": 3
+	}
+}
+	`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

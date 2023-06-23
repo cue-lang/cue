@@ -104,6 +104,7 @@ type cacheKey struct {
 func (e *Environment) up(count int32) *Environment {
 	for ; count > 0; count-- {
 		e = e.Up
+		Assertf(e.Vertex != nil, "Environment.up encountered a nil vertex")
 	}
 	return e
 }

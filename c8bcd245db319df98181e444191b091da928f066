@@ -34,6 +34,24 @@
       "parentUuid": "abfe30eb_5833add2",
       "revId": "c8bcd245db319df98181e444191b091da928f066",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b28a030_910d37ac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-23T10:34:23Z",
+      "side": 1,
+      "message": "Gotcha. Perhaps tweak the wording a bit, but in any case it\u0027s just a nit.",
+      "parentUuid": "2b57ba08_89dfd158",
+      "revId": "c8bcd245db319df98181e444191b091da928f066",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

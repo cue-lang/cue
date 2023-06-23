@@ -101,9 +101,10 @@ type cacheKey struct {
 	Arc  *Vertex
 }
 
-func (e *Environment) up(count int32) *Environment {
+func (e *Environment) up(ctx *OpContext, count int32) *Environment {
 	for ; count > 0; count-- {
 		e = e.Up
+		ctx.Assertf(ctx.Pos(), e.Vertex != nil, "Environment.up encountered a nil vertex")
 	}
 	return e
 }

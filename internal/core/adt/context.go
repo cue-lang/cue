@@ -315,18 +315,18 @@ func spawn(env *Environment, node *Vertex) *Environment {
 }
 
 func (c *OpContext) Env(upCount int32) *Environment {
-	return c.e.up(upCount)
+	return c.e.up(c, upCount)
 }
 
 func (c *OpContext) relNode(upCount int32) *Vertex {
-	e := c.e.up(upCount)
+	e := c.e.up(c, upCount)
 	c.unify(e.Vertex, partial)
 	return e.Vertex
 }
 
 func (c *OpContext) relLabel(upCount int32) Feature {
 	// locate current label.
-	e := c.e.up(upCount)
+	e := c.e.up(c, upCount)
 	return e.DynamicLabel
 }
 

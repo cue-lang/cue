@@ -39,6 +39,24 @@
       "message": "I think it would be good to include Paul\u0027s test case, just to make sure our regression test suite is solid.",
       "revId": "5ecdaba04b6c26198e22603e4bdb57d096fac5e8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7b2ce07_91b2553f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-23T13:15:25Z",
+      "side": 1,
+      "message": "Intriguing. I thought I did. Done.",
+      "parentUuid": "88e73530_07a9f2e6",
+      "revId": "5ecdaba04b6c26198e22603e4bdb57d096fac5e8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

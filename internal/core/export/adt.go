@@ -278,6 +278,13 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 				panic("unreachable")
 			}
 		}
+
+		// If this is an "unwrapped" comprehension, we need to also
+		// account for the curly braces of the original comprehension.
+		if x.Nest() > 0 {
+			env = &adt.Environment{Up: env, Vertex: empty}
+		}
+
 		return e.adt(env, adt.ToExpr(x.Value))
 
 	default:

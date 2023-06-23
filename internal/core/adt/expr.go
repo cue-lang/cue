@@ -788,7 +788,7 @@ func (x *DynamicReference) Source() ast.Node {
 }
 
 func (x *DynamicReference) EvaluateLabel(ctx *OpContext, env *Environment) Feature {
-	env = env.up(x.UpCount)
+	env = env.up(ctx, x.UpCount)
 	frame := ctx.PushState(env, x.Src)
 	v := ctx.value(x.Label, partial)
 	ctx.PopState(frame)

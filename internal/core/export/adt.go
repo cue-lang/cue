@@ -278,7 +278,15 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 				panic("unreachable")
 			}
 		}
-		return e.adt(env, adt.ToExpr(x.Value))
+		switch v := x.Value.(type) {
+		case *adt.Field:
+			env = &adt.Environment{Up: env, Vertex: empty}
+			return e.adt(env, v.Value)
+		case *adt.StructLit:
+			return e.adt(env, v)
+		default:
+			panic("unreachable")
+		}
 
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))

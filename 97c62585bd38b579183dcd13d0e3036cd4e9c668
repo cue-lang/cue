@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c01ee7f_3393d9c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-26T12:10:56Z",
+      "side": 1,
+      "message": "PTAL",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3a6e1ec_967f2e5c",
@@ -37,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "573ea0b5_a5d32810",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-26T12:10:56Z",
+      "side": 1,
+      "message": "I briefly considered it, but note that Assertf only panics if debugging is turned on. I think we want this panic to be on by default, not the opposite. If a user has code that runs into this situation, we want them to report it as a bug, which would almost certainly not happen if they have to set CUE_DEBUG\u003d1 to see it.\n\nDo we have anything like that? If not, I lean towards always panicking over almost never panicking.",
+      "parentUuid": "b3a6e1ec_967f2e5c",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08e38b77_605940f0",
         "filename": "internal/core/export/adt.go",
         "patchSetId": 1
@@ -48,6 +83,24 @@
       "writtenOn": "2023-06-26T10:19:09Z",
       "side": 1,
       "message": "Maybe copying the code at line 672 would work too?\n\n\t// If this is an \"unwrapped\" comprehension, we need to also\n\t// account for the curly braces of the original comprehension.\n\tif comp.Nest() \u003e 0 {\n\t\tenv \u003d \u0026adt.Environment{Up: env, Vertex: empty}\n\t}\n\nEither way, it seems that these two points of code need to do the same thing.",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b2f8c18_85a18f12",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-26T12:10:56Z",
+      "side": 1,
+      "message": "Good point, done!",
+      "parentUuid": "08e38b77_605940f0",
       "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

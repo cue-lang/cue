@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f38c245d_d84231e0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-26T15:22:07Z",
+      "side": 1,
+      "message": "FYI Paul, Marcel mentioned that he used to turn on CUE_DEBUG for pre-releases, turning it off before the final release. It would help spot any potential bugs via the assertions while users tested the pre-releases.\n\nThat was a manual step that we\u0027ve been forgetting for a long time :) Hence my attempt at some automatic detection.\n\nAn alternative would be to always have assertions on by default. I feel like we should consider that separately, since turning on assertions by default in a stable release could lead to lots of user breakage.",
+      "revId": "b7bb9ed77718c97a8a6b9f3d5b54150aa9d47791",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

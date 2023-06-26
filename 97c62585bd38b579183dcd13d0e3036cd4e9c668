@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c7e579f_b419152c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-26T10:19:09Z",
+      "side": 1,
+      "message": "Nice!\n\nCouple of comments.",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3a6e1ec_967f2e5c",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-26T10:19:09Z",
+      "side": 1,
+      "message": "Perhaps use OpContext.Assertf?",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08e38b77_605940f0",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-26T10:19:09Z",
+      "side": 1,
+      "message": "Maybe copying the code at line 672 would work too?\n\n\t// If this is an \"unwrapped\" comprehension, we need to also\n\t// account for the curly braces of the original comprehension.\n\tif comp.Nest() \u003e 0 {\n\t\tenv \u003d \u0026adt.Environment{Up: env, Vertex: empty}\n\t}\n\nEither way, it seems that these two points of code need to do the same thing.",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"runtime/debug"
 	"sort"
 	"strings"
 
@@ -32,10 +33,48 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+func findModule(info *debug.BuildInfo, modulePath string) *debug.Module {
+	if info.Main.Path == modulePath {
+		return &info.Main
+	}
+	for _, dep := range info.Deps {
+		if dep.Path == modulePath {
+			return dep
+		}
+	}
+	return nil
+}
+
 // Debug sets whether extra aggressive checking should be done.
-// This should typically default to true for pre-releases and default to
-// false otherwise.
-var Debug bool = os.Getenv("CUE_DEBUG") != "0"
+var Debug = func() bool {
+	// If the user set it explicitly via an env var, obey them.
+	// "0" turns it off, other values like "1" or "true" turn it on.
+	if s := os.Getenv("CUE_DEBUG"); s != "" {
+		return s != "0"
+	}
+	// If the build information tells us this is an alpha or beta release,
+	// default to the setting being on. Otherwise, it's off.
+	// Note that this isn't a perfect mechanism; a local build of an alpha release
+	// may leave the version as "(devel)", particularly if no git info is available.
+	// We're fine with only enabling the setting when we're sure of the version.
+	//
+	// TODO(mvdan): we should probably set CUE_DEBUG=1 in CI to run "go test ./..."
+	// otherwise we might not notice any failing asserts when we want to do an alpha or beta.
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return false // no build info available
+	}
+	// Note that CUE might be used via cmd/cue, being the main module,
+	// or as a Go library, being somewhere in Deps.
+	mod := findModule(info, "cuelang.org/go")
+	if mod == nil {
+		return false // module not found?
+	}
+	if mod.Replace != nil {
+		mod = mod.Replace // the module is being replaced
+	}
+	return strings.Contains(mod.Version, "alpha.") || strings.Contains(mod.Version, "beta.")
+}()
 
 // Verbosity sets the log level. There are currently only two levels:
 //

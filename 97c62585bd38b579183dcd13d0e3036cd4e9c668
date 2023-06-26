@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d6027b1b_0e43ac27",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-26T14:19:05Z",
+      "side": 1,
+      "message": "Should be okay in the alpha phase.\n\nI turning assertion checking in general on by default for alphas, actually.",
+      "parentUuid": "573ea0b5_a5d32810",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "08e38b77_605940f0",
         "filename": "internal/core/export/adt.go",
         "patchSetId": 1

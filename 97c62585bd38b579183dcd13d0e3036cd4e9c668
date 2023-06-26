@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2224278_259b29d2",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-26T14:48:23Z",
+      "side": 1,
+      "message": "Per our chat, turning this into an Assertf, and we can turn on CUE_DEBUG for the alphas in a separate CL.",
+      "parentUuid": "d6027b1b_0e43ac27",
+      "revId": "97c62585bd38b579183dcd13d0e3036cd4e9c668",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08e38b77_605940f0",

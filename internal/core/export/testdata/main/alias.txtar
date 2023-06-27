@@ -45,6 +45,12 @@ issue1308: {
 	let _xA = 1
 	sub: [{_A: _xA}]
 }
+
+// TODO: these could be merged into a single struct.
+issue2374: {
+	r=[string]: {z: 1, b: r | null}
+	a: {r: 0}
+}
 -- y.cue --
 fieldAlias: cross: {
 	baz: 3
@@ -127,6 +133,17 @@ issue1308: {
 		_A: _xA
 	}]
 }
+
+// TODO: these could be merged into a single struct.
+issue2374: {
+	r_1=[string]: {
+		z: 1
+		b: r_1 | null
+	}
+	a: {
+		r: 0
+	}
+}
 -- out/doc --
 []
 [fieldAlias]
@@ -175,6 +192,13 @@ was known to compile and is known to be correct.
 [issue1308 sub]
 [issue1308 sub 0]
 [issue1308 sub 0 _A]
+[issue2374]
+- TODO: these could be merged into a single struct.
+
+[issue2374 a]
+[issue2374 a r]
+[issue2374 a z]
+[issue2374 a b]
 -- out/value --
 == Simplified
 {
@@ -229,6 +253,15 @@ was known to compile and is known to be correct.
 	}
 	issue1308: {
 		sub: [{}]
+	}
+
+	// TODO: these could be merged into a single struct.
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
 	}
 }
 == Raw
@@ -290,6 +323,15 @@ was known to compile and is known to be correct.
 			_A: 1
 		}]
 	}
+
+	// TODO: these could be merged into a single struct.
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
+	}
 }
 == Final
 {
@@ -333,6 +375,13 @@ was known to compile and is known to be correct.
 	}
 	issue1308: {
 		sub: [{}]
+	}
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
 	}
 }
 == All
@@ -394,6 +443,15 @@ was known to compile and is known to be correct.
 			_A: 1
 		}]
 	}
+
+	// TODO: these could be merged into a single struct.
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
+	}
 }
 == Eval
 {
@@ -440,5 +498,12 @@ was known to compile and is known to be correct.
 	}
 	issue1308: {
 		sub: [{}]
+	}
+	issue2374: {
+		a: {
+			r: 0
+			z: 1
+			b: null
+		}
 	}
 }

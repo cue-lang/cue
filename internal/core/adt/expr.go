@@ -759,7 +759,7 @@ func (x *LabelReference) evaluate(ctx *OpContext, state vertexStatus) Value {
 	return label.ToValue(ctx)
 }
 
-// A DynamicReference is like a LabelReference, but with a computed label.
+// A DynamicReference is like a FieldReference, but with a computed label.
 //
 // Example: an X referring to
 //

@@ -34,7 +34,7 @@ fixing a bug, or considering a new feature.
 * Code contributions, the main focus of this guide. The CUE project is a little
   different from that used by other open source projects so we cover this
 process in more detail below.
-* Contributing thoughts and use cases use cases to proposals. CUE can be and is
+* Contributing thoughts and use cases to proposals. CUE can be and is
   being used in many varied different ways. Sharing experience reports helps
 to shape proposals and designs.
 * Creating content. Whether it be writing blog posts, live streaming,

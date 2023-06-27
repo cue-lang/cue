@@ -146,11 +146,22 @@ func TestAttributeErr(t *testing.T) {
 	}
 }
 
+func TestAttributeName(t *testing.T) {
+	const config = `
+	a: 0 @foo(a,b,c=1) @bar()
+	`
+	v := getInstance(t, config).Value().Lookup("a")
+	a := v.Attribute("foo")
+	if got, want := a.Name(), "foo"; got != want {
+		t.Errorf("got %v; want %v", got, want)
+	}
+}
+
 func TestAttributeString(t *testing.T) {
 	const config = `
 	a: {
 		a: 0 @foo(a,b,c=1)
-		b: 1 @bar(a,b,c,d=1) @foo(a,,d=1)
+		b: 1 @bar(a,b,c,d=1) @foo(a,,d=1,e="x y","f g")
 	}
 	`
 	testCases := []struct {
@@ -175,13 +186,18 @@ func TestAttributeString(t *testing.T) {
 		pos:  3,
 		str:  "d=1",
 	}, {
+		path: "b",
+		attr: "foo",
+		pos:  3,
+		str:  `e=x y`,
+	}, {
 		path: "e",
 		attr: "bar",
 		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
 		path: "b",
 		attr: "foo",
-		pos:  4,
+		pos:  5,
 		err:  errors.New("field does not exist"),
 	}}
 	for _, tc := range testCases {
@@ -194,6 +210,70 @@ func TestAttributeString(t *testing.T) {
 			}
 			if got != tc.str {
 				t.Errorf("str: got %v; want %v", got, tc.str)
+			}
+		})
+	}
+}
+
+func TestAttributeArg(t *testing.T) {
+	const config = `
+	a: 1 @foo(a,,d=1,e="x y","f g", with spaces ,  s=  spaces in value  )
+	`
+	testCases := []struct {
+		pos int
+		key string
+		val string
+		raw string
+	}{{
+		pos: 0,
+		key: "a",
+		val: "",
+		raw: "a",
+	}, {
+		pos: 1,
+		key: "",
+		val: "",
+		raw: "",
+	}, {
+		pos: 2,
+		key: "d",
+		val: "1",
+		raw: "d=1",
+	}, {
+		pos: 3,
+		key: "e",
+		val: "x y",
+		raw: "e=x y",
+	}, {
+		pos: 4,
+		key: "f g",
+		val: "",
+		raw: "f g",
+	}, {
+		pos: 5,
+		key: "with spaces",
+		val: "",
+		raw: "with spaces",
+	}, {
+		pos: 6,
+		key: "s",
+		val: "spaces in value",
+		raw: "s=  spaces in value",
+	}}
+	for _, tc := range testCases {
+		t.Run(fmt.Sprintf("%d", tc.pos), func(t *testing.T) {
+			v := getInstance(t, config).Value().Lookup("a")
+			a := v.Attribute("foo")
+			key, val := a.Arg(tc.pos)
+			raw := a.RawArg(tc.pos)
+			if got, want := key, tc.key; got != want {
+				t.Errorf("unexpected key; got %q want %q", got, want)
+			}
+			if got, want := val, tc.val; got != want {
+				t.Errorf("unexpected value; got %q want %q", got, want)
+			}
+			if got, want := raw, tc.raw; got != want {
+				t.Errorf("unexpected raw value; got %q want %q", got, want)
 			}
 		})
 	}

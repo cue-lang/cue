@@ -22,6 +22,16 @@ d: bar: {}
 e: [X=string]: [Y=string]: X + Y
 e: foo: bar:               _
 
+patternField: t1: {
+	r=[string]: {b: r | null}
+	a: {r: 0}
+}
+
+patternField: t2: {
+	a: {r: 0}
+	x=[string]: {z: 1, b: x.z}
+}
+
 // Field aliases
 
 bar: 3
@@ -84,14 +94,14 @@ underscore: e: {
 // c2: c1 & { x: _ }
 -- out/eval/stats --
 Leaks:  0
-Freed:  46
-Reused: 41
-Allocs: 5
+Freed:  58
+Reused: 52
+Allocs: 6
 Retain: 3
 
-Unifications: 46
-Conjuncts:    87
-Disjuncts:    49
+Unifications: 56
+Conjuncts:    103
+Disjuncts:    61
 -- out/eval --
 (struct){
   a: (struct){
@@ -111,6 +121,21 @@ Disjuncts:    49
   e: (struct){
     foo: (struct){
       bar: (string){ "foobar" }
+    }
+  }
+  patternField: (struct){
+    t1: (struct){
+      a: (struct){
+        r: (int){ 0 }
+        b: (null){ null }
+      }
+    }
+    t2: (struct){
+      a: (struct){
+        r: (int){ 0 }
+        z: (int){ 1 }
+        b: (int){ 1 }
+      }
     }
   }
   bar: (int){ 3 }
@@ -214,6 +239,27 @@ Disjuncts:    49
   e: {
     foo: {
       bar: _
+    }
+  }
+  patternField: {
+    t1: {
+      [string]: {
+        b: (〈1;(〈0;-〉)〉|null)
+      }
+      a: {
+        r: 0
+      }
+    }
+  }
+  patternField: {
+    t2: {
+      a: {
+        r: 0
+      }
+      [string]: {
+        z: 1
+        b: 〈1;(〈0;-〉)〉.z
+      }
     }
   }
   bar: 3

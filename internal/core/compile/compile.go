@@ -415,6 +415,11 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		switch f := n.Node.(type) {
 		case *ast.Field:
 			_ = c.lookupAlias(k, f.Label.(*ast.Alias).Ident) // mark as used
+			// The expression of field Label is always done in the same
+			// Environment as pointed to by the UpCount of the DynamicReference
+			// and the evaluation of a DynamicReference assumes this.
+			// We therefore set the UpCount of the LabelReference to 0.
+			label.UpCount = 0
 			return &adt.DynamicReference{
 				Src:     n,
 				UpCount: upCount,

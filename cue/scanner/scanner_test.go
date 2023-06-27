@@ -233,9 +233,6 @@ func checkPosScan(t *testing.T, lit string, p token.Pos, expected token.Position
 
 // Verify that calling Scan() provides the correct results.
 func TestScan(t *testing.T) {
-	whitespace_linecount := newlineCount(whitespace)
-
-	// error handler
 	eh := func(_ token.Pos, msg string, args []interface{}) {
 		t.Errorf("error handler called (msg = %s)", fmt.Sprintf(msg, args...))
 	}
@@ -244,6 +241,42 @@ func TestScan(t *testing.T) {
 	var s Scanner
 	s.Init(token.NewFile("", 1, len(source)), source, eh, ScanComments|dontInsertCommas)
 
+	testScan(t, func(int) (token.Pos, token.Token, string) {
+		return s.Scan()
+	})
+
+	if s.ErrorCount != 0 {
+		t.Errorf("found %d errors", s.ErrorCount)
+	}
+}
+
+func TestScanAtOffset(t *testing.T) {
+	eh := func(_ token.Pos, msg string, args []interface{}) {
+		t.Errorf("error handler called (msg = %s)", fmt.Sprintf(msg, args...))
+	}
+	file := token.NewFile("", 1, len(source))
+	// scan through the source once to prime the File.
+	var s Scanner
+	s.Init(file, source, eh, ScanComments|dontInsertCommas)
+	for {
+		_, tok, _ := s.Scan()
+		if tok == token.EOF {
+			break
+		}
+	}
+	testScan(t, func(offset int) (token.Pos, token.Token, string) {
+		var s Scanner
+		s.InitAtOffset(file, source[offset:], offset, eh, ScanComments|dontInsertCommas)
+		pos, tok, lit := s.Scan()
+		if s.ErrorCount != 0 {
+			t.Errorf("found %d errors", s.ErrorCount)
+		}
+		return pos, tok, lit
+	})
+}
+
+func testScan(t *testing.T, scan func(offset int) (token.Pos, token.Token, string)) {
+	whitespace_linecount := newlineCount(whitespace)
 	// set up expected position
 	epos := token.Position{
 		Filename: "",
@@ -254,7 +287,7 @@ func TestScan(t *testing.T) {
 
 	index := 0
 	for {
-		pos, tok, lit := s.Scan()
+		pos, tok, lit := scan(epos.Offset)
 
 		// check position
 		if tok == token.EOF {
@@ -317,11 +350,6 @@ func TestScan(t *testing.T) {
 		// update position
 		epos.Offset += len(e.lit) + len(whitespace)
 		epos.Line += newlineCount(e.lit) + whitespace_linecount
-
-	}
-
-	if s.ErrorCount != 0 {
-		t.Errorf("found %d errors", s.ErrorCount)
 	}
 }
 

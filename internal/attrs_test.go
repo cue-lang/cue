@@ -35,67 +35,70 @@ func TestAttributeBody(t *testing.T) {
 		out: keyVals{{}},
 	}, {
 		in:  "bb",
-		out: keyVals{{"bb", "", "bb"}},
+		out: keyVals{{"", "bb", "bb"}},
 	}, {
 		in:  "a,",
-		out: keyVals{{"a", "", "a"}, {}},
+		out: keyVals{{"", "a", "a"}, {"", ""}},
 	}, {
 		in:  `"a",`,
-		out: keyVals{{"a", "", `a`}, {}},
+		out: keyVals{{"", "a", `"a"`}, {"", ""}},
 	}, {
 		in:  "a,b",
-		out: keyVals{{"a", "", "a"}, {"b", "", "b"}},
+		out: keyVals{{"", "a", "a"}, {"", "b", "b"}},
 	}, {
 		in:  `foo,"bar",#"baz"#`,
-		out: keyVals{{"foo", "", "foo"}, {"bar", "", `bar`}, {"baz", "", `baz`}},
+		out: keyVals{{"", "foo", "foo"}, {"", "bar", `"bar"`}, {"", "baz", `#"baz"#`}},
 	}, {
 		in:  `foo,bar,baz`,
-		out: keyVals{{"foo", "", "foo"}, {"bar", "", "bar"}, {"baz", "", "baz"}},
+		out: keyVals{{"", "foo", "foo"}, {"", "bar", "bar"}, {"", "baz", "baz"}},
 	}, {
 		in:  `1,map[int]string`,
-		out: keyVals{{"1", "", "1"}, {"map[int]string", "", "map[int]string"}},
+		out: keyVals{{"", "1", "1"}, {"", "map[int]string", "map[int]string"}},
 	}, {
 		in:  `bar=str`,
 		out: keyVals{{"bar", "str", "bar=str"}},
 	}, {
 		in:  `bar="str"`,
-		out: keyVals{{"bar", "str", `bar=str`}},
+		out: keyVals{{"bar", "str", `bar="str"`}},
 	}, {
 		in:  `foo.bar="str"`,
-		out: keyVals{{"foo.bar", "str", `foo.bar=str`}},
+		out: keyVals{{"foo.bar", "str", `foo.bar="str"`}},
 	}, {
 		in:  `bar=,baz=`,
 		out: keyVals{{"bar", "", "bar="}, {"baz", "", "baz="}},
 	}, {
 		in:  `foo=1,bar="str",baz=free form`,
-		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar=str`}, {"baz", "free form", "baz=free form"}},
+		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar="str"`}, {"baz", "free form", "baz=free form"}},
 	}, {
 		in:  `foo=1,bar="str",baz=free form  `,
-		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar=str`}, {"baz", "free form", "baz=free form"}},
+		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar="str"`}, {"baz", "free form", "baz=free form  "}},
 	}, {
 		in:  `foo=1,bar="str"  ,baz="free form  "`,
-		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar=str`}, {"baz", "free form", `baz=free form  `}},
+		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar="str"  `}, {"baz", "free form  ", `baz="free form  "`}},
 	}, {
 		in: `"""
 		"""`,
-		out: keyVals{{"", "", ""}},
+		out: keyVals{{"", "", `"""
+		"""`}},
 	}, {
 		in: `#'''
 			\#x20
 			'''#`,
-		out: keyVals{{" ", "", " "}},
+		out: keyVals{{"", " ", `#'''
+			\#x20
+			'''#`}},
 	}, {
 		in:  "'' ,b",
-		out: keyVals{{"", "", ""}, {"b", "", "b"}},
+		out: keyVals{{"", "", "'' "}, {"", "b", "b"}},
 	}, {
 		in:  "' ,b",
-		err: "attribute string not terminated",
+		err: "error scanning attribute text",
 	}, {
 		in:  `"\ "`,
-		err: "invalid attribute string",
+		err: "error scanning attribute text",
 	}, {
 		in:  `# `,
-		err: "invalid attribute string",
+		out: keyVals{{"", "#", "# "}},
 	}}
 	for i, tc := range testdata {
 		t.Run(fmt.Sprintf("%d-%s", i, tc.in), func(t *testing.T) {

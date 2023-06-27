@@ -60,7 +60,7 @@ let _schema_1 = schema
   })
   {
     ["foo"]: {
-      b: (〈1;(〈1;-〉)〉|null)
+      b: (〈1;(〈0;-〉)〉|null)
     }
   }
   {

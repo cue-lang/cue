@@ -970,28 +970,28 @@ Result:
   dynamicPatternEmbed: {
     ok1: {
       [string]: (string|{
-        〈1;(〈1;-〉)〉
+        〈1;(〈0;-〉)〉
       })
     }
   }
   dynamicPatternEmbed: {
     ok2: {
       [string]: ({
-        〈1;(〈1;-〉)〉
+        〈1;(〈0;-〉)〉
       }|string)
     }
   }
   dynamicPatternList: {
     ok1: {
       [string]: (string|[
-        〈1;(〈1;-〉)〉,
+        〈1;(〈0;-〉)〉,
       ])
     }
   }
   dynamicPatternList: {
     ok2: {
       [string]: ([
-        〈1;(〈1;-〉)〉,
+        〈1;(〈0;-〉)〉,
       ]|string)
     }
   }

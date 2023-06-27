@@ -415,6 +415,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		switch f := n.Node.(type) {
 		case *ast.Field:
 			_ = c.lookupAlias(k, f.Label.(*ast.Alias).Ident) // mark as used
+			label.UpCount = 0
 			return &adt.DynamicReference{
 				Src:     n,
 				UpCount: upCount,

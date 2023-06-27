@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "027cd13c_66a4073a",
+        "filename": "internal/core/compile/compile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 418,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-27T18:31:51Z",
+      "side": 1,
+      "message": "I would document the need for this line briefly.",
+      "revId": "4c9cf1eefea17218c1d0c8a7bbcc1767893b9325",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

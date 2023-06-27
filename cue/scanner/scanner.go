@@ -39,11 +39,12 @@ type ErrorHandler func(pos token.Pos, msg string, args []interface{})
 // structure but must be initialized via Init before use.
 type Scanner struct {
 	// immutable state
-	file *token.File  // source file handle
-	dir  string       // directory portion of file.Name()
-	src  []byte       // source
-	errh ErrorHandler // error reporting; or nil
-	mode Mode         // scanning mode
+	file      *token.File  // source file handle
+	dir       string       // directory portion of file.Name()
+	src       []byte       // source
+	srcOffset int          // offset of start of src.
+	errh      ErrorHandler // error reporting; or nil
+	mode      Mode         // scanning mode
 
 	// scanning state
 	ch              rune // current character
@@ -71,19 +72,19 @@ const bom = 0xFEFF // byte order mark, only permitted as very first character
 // Read the next Unicode char into s.ch.
 // s.ch < 0 means end-of-file.
 func (s *Scanner) next() {
-	if s.rdOffset < len(s.src) {
+	if s.rdOffset < len(s.src)+s.srcOffset {
 		s.offset = s.rdOffset
 		if s.ch == '\n' {
 			s.lineOffset = s.offset
 			s.file.AddLine(s.offset)
 		}
-		r, w := rune(s.src[s.rdOffset]), 1
+		r, w := rune(s.src[s.rdOffset-s.srcOffset]), 1
 		switch {
 		case r == 0:
 			s.errf(s.offset, "illegal character NUL")
 		case r >= utf8.RuneSelf:
 			// not ASCII
-			r, w = utf8.DecodeRune(s.src[s.rdOffset:])
+			r, w = utf8.DecodeRune(s.src[s.rdOffset-s.srcOffset:])
 			if r == utf8.RuneError && w == 1 {
 				s.errf(s.offset, "illegal UTF-8 encoding")
 			} else if r == bom && s.offset > 0 {
@@ -93,7 +94,7 @@ func (s *Scanner) next() {
 		s.rdOffset += w
 		s.ch = r
 	} else {
-		s.offset = len(s.src)
+		s.offset = len(s.src) + s.srcOffset
 		if s.ch == '\n' {
 			s.lineOffset = s.offset
 			s.file.AddLine(s.offset)
@@ -111,6 +112,32 @@ const (
 	ScanComments     Mode = 1 << iota // return comments as COMMENT tokens
 	dontInsertCommas                  // do not automatically insert commas - for testing only
 )
+const DontInsertCommas = dontInsertCommas // do not automatically insert commas - for testing only
+
+// InitAtOffset is like Init except that src is taken to start at the given offset within the file.
+// The file should already have been initialized with the full source; if it isn't
+// then positional information will not be accurate.
+func (s *Scanner) InitAtOffset(file *token.File, src []byte, srcOffset int, eh ErrorHandler, mode Mode) {
+	// Explicitly initialize all fields since a scanner may be reused.
+	s.file = file
+	s.dir, _ = filepath.Split(file.Name())
+	s.src = src
+	s.errh = eh
+	s.mode = mode
+
+	s.ch = ' '
+	s.srcOffset = srcOffset
+	s.offset = srcOffset
+	s.rdOffset = srcOffset
+	s.lineOffset = srcOffset
+	s.insertEOL = false
+	s.ErrorCount = 0
+
+	s.next()
+	if s.ch == bom {
+		s.next() // ignore BOM at file beginning
+	}
+}
 
 // Init prepares the scanner s to tokenize the text src by setting the
 // scanner at the beginning of src. The scanner uses the file set file
@@ -127,27 +154,10 @@ const (
 // Note that Init may call err if there is an error in the first character
 // of the file.
 func (s *Scanner) Init(file *token.File, src []byte, eh ErrorHandler, mode Mode) {
-	// Explicitly initialize all fields since a scanner may be reused.
 	if file.Size() != len(src) {
 		panic(fmt.Sprintf("file size (%d) does not match src len (%d)", file.Size(), len(src)))
 	}
-	s.file = file
-	s.dir, _ = filepath.Split(file.Name())
-	s.src = src
-	s.errh = eh
-	s.mode = mode
-
-	s.ch = ' '
-	s.offset = 0
-	s.rdOffset = 0
-	s.lineOffset = 0
-	s.insertEOL = false
-	s.ErrorCount = 0
-
-	s.next()
-	if s.ch == bom {
-		s.next() // ignore BOM at file beginning
-	}
+	s.InitAtOffset(file, src, 0, eh, mode)
 }
 
 func (s *Scanner) errf(offs int, msg string, args ...interface{}) {
@@ -196,7 +206,7 @@ func (s *Scanner) scanComment() string {
 		}
 		if offs == s.lineOffset {
 			// comment starts at the beginning of the current line
-			s.interpretLineComment(s.src[offs:s.offset])
+			s.interpretLineComment(s.src[offs-s.srcOffset : s.offset-s.srcOffset])
 		}
 		goto exit
 	}
@@ -204,7 +214,7 @@ func (s *Scanner) scanComment() string {
 	s.errf(offs, "comment not terminated")
 
 exit:
-	lit := s.src[offs:s.offset]
+	lit := s.src[offs-s.srcOffset : s.offset-s.srcOffset]
 	if hasCR {
 		// TODO: preserve /r/n
 		lit = stripCR(lit)
@@ -231,13 +241,21 @@ func (s *Scanner) scanFieldIdentifier() string {
 		s.next()
 		// TODO: remove this block to allow #<num>
 		if isDigit(s.ch) {
-			return string(s.src[offs:s.offset])
+			return s.str(offs, s.offset)
 		}
 	}
 	for isLetter(s.ch) || isDigit(s.ch) || s.ch == '_' || s.ch == '$' {
 		s.next()
 	}
-	return string(s.src[offs:s.offset])
+	return s.str(offs, s.offset)
+}
+
+func (s *Scanner) str(o0, o1 int) string {
+	return string(s.bytes(o0, o1))
+}
+
+func (s *Scanner) bytes(o0, o1 int) []byte {
+	return s.src[o0-s.srcOffset : o1-s.srcOffset]
 }
 
 func (s *Scanner) scanIdentifier() string {
@@ -245,7 +263,7 @@ func (s *Scanner) scanIdentifier() string {
 	for isLetter(s.ch) || isDigit(s.ch) || s.ch == '_' || s.ch == '$' {
 		s.next()
 	}
-	return string(s.src[offs:s.offset])
+	return s.str(offs, s.offset)
 }
 
 func isExtendedIdent(r rune) bool {
@@ -278,6 +296,11 @@ func (s *Scanner) scanMantissa(base int) {
 	if last == '_' {
 		s.errf(s.offset-1, "illegal '_' in number")
 	}
+}
+
+// Offset returns the current position in the source text.
+func (s *Scanner) Offset() int {
+	return s.offset
 }
 
 func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
@@ -348,7 +371,7 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 
 fraction:
 	if s.ch == '.' {
-		if p := s.offset + 1; p < len(s.src) && s.src[p] == '.' {
+		if p := s.offset + 1 - s.srcOffset; p < len(s.src) && s.src[p] == '.' {
 			// interpret dot as part of a range.
 			goto exit
 		}
@@ -378,7 +401,7 @@ exponent:
 	}
 
 exit:
-	return tok, string(s.src[offs:s.offset])
+	return tok, s.str(offs, s.offset)
 }
 
 // scanEscape parses an escape sequence where rune is the accepted
@@ -462,7 +485,7 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 		ch := s.ch
 		if (quote.numChar != 3 && ch == '\n') || ch < 0 {
 			s.errf(offs, "string literal not terminated")
-			lit := s.src[offs:s.offset]
+			lit := s.bytes(offs, s.offset)
 			if hasCR {
 				lit = stripCR(lit)
 			}
@@ -486,7 +509,7 @@ func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 			}
 		}
 	}
-	lit := s.src[offs : s.offset+extra]
+	lit := s.bytes(offs, s.offset+extra)
 	if hasCR {
 		lit = stripCR(lit)
 	}
@@ -558,7 +581,7 @@ func (s *Scanner) scanAttribute() (tok token.Token, lit string) {
 	} else {
 		s.errf(s.offset, "invalid attribute: expected '('")
 	}
-	return token.ATTRIBUTE, string(s.src[offs:s.offset])
+	return token.ATTRIBUTE, s.str(offs, s.offset)
 }
 
 func (s *Scanner) scanAttributeTokens(close token.Token) {
@@ -794,7 +817,7 @@ scanAgain:
 				// e.g. ##""##
 				if n := s.scanHashes(quote.numHash); n == quote.numHash {
 					// It's the empty string.
-					tok, lit = token.STRING, string(s.src[offs:s.offset])
+					tok, lit = token.STRING, s.str(offs, s.offset)
 				} else {
 					tok, lit = s.scanString(offs, quote)
 				}
@@ -814,8 +837,8 @@ scanAgain:
 					fallthrough
 				default:
 					s.errf(offs, "expected newline after multiline quote %s",
-						s.src[offs:s.offset])
-					tok, lit = token.STRING, string(s.src[offs:s.offset])
+						s.bytes(offs, s.offset))
+					tok, lit = token.STRING, s.str(offs, s.offset)
 				}
 			}
 		case '@':

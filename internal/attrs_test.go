@@ -20,88 +20,94 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/token"
+	"github.com/google/go-cmp/cmp"
 )
+
+type keyVals [][3]string
 
 func TestAttributeBody(t *testing.T) {
 	testdata := []struct {
-		in, out string
-		err     string
+		in  string
+		out keyVals
+		err string
 	}{{
 		in:  "",
-		out: "[{ 0}]",
+		out: keyVals{{}},
 	}, {
 		in:  "bb",
-		out: "[{bb 0}]",
+		out: keyVals{{"bb", "", "bb"}},
 	}, {
 		in:  "a,",
-		out: "[{a 0} { 0}]",
+		out: keyVals{{"a", "", "a"}, {}},
 	}, {
 		in:  `"a",`,
-		out: "[{a 0} { 0}]",
+		out: keyVals{{"a", "", `a`}, {}},
 	}, {
 		in:  "a,b",
-		out: "[{a 0} {b 0}]",
+		out: keyVals{{"a", "", "a"}, {"b", "", "b"}},
 	}, {
 		in:  `foo,"bar",#"baz"#`,
-		out: "[{foo 0} {bar 0} {baz 0}]",
+		out: keyVals{{"foo", "", "foo"}, {"bar", "", `bar`}, {"baz", "", `baz`}},
 	}, {
 		in:  `foo,bar,baz`,
-		out: "[{foo 0} {bar 0} {baz 0}]",
+		out: keyVals{{"foo", "", "foo"}, {"bar", "", "bar"}, {"baz", "", "baz"}},
 	}, {
 		in:  `1,map[int]string`,
-		out: "[{1 0} {map[int]string 0}]",
-	}, {
-		in:  `1,map[int]string`,
-		out: "[{1 0} {map[int]string 0}]",
+		out: keyVals{{"1", "", "1"}, {"map[int]string", "", "map[int]string"}},
 	}, {
 		in:  `bar=str`,
-		out: "[{bar=str 3}]",
+		out: keyVals{{"bar", "str", "bar=str"}},
 	}, {
 		in:  `bar="str"`,
-		out: "[{bar=str 3}]",
+		out: keyVals{{"bar", "str", `bar=str`}},
 	}, {
 		in:  `foo.bar="str"`,
-		out: "[{foo.bar=str 7}]",
+		out: keyVals{{"foo.bar", "str", `foo.bar=str`}},
 	}, {
 		in:  `bar=,baz=`,
-		out: "[{bar= 3} {baz= 3}]",
+		out: keyVals{{"bar", "", "bar="}, {"baz", "", "baz="}},
 	}, {
 		in:  `foo=1,bar="str",baz=free form`,
-		out: "[{foo=1 3} {bar=str 3} {baz=free form 3}]",
+		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar=str`}, {"baz", "free form", "baz=free form"}},
 	}, {
 		in:  `foo=1,bar="str",baz=free form  `,
-		out: "[{foo=1 3} {bar=str 3} {baz=free form 3}]",
+		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar=str`}, {"baz", "free form", "baz=free form"}},
 	}, {
 		in:  `foo=1,bar="str"  ,baz="free form  "`,
-		out: "[{foo=1 3} {bar=str 3} {baz=free form   3}]",
+		out: keyVals{{"foo", "1", "foo=1"}, {"bar", "str", `bar=str`}, {"baz", "free form", `baz=free form  `}},
 	}, {
 		in: `"""
 		"""`,
-		out: "[{ 0}]",
+		out: keyVals{{"", "", ""}},
 	}, {
 		in: `#'''
 			\#x20
 			'''#`,
-		out: "[{  0}]",
+		out: keyVals{{" ", "", " "}},
 	}, {
 		in:  "'' ,b",
-		out: "[{ 0} {b 0}]",
+		out: keyVals{{"", "", ""}, {"b", "", "b"}},
 	}, {
 		in:  "' ,b",
-		err: "not terminated",
+		err: "attribute string not terminated",
 	}, {
 		in:  `"\ "`,
-		err: "invalid attribute",
+		err: "invalid attribute string",
 	}, {
 		in:  `# `,
-		err: "invalid attribute",
+		err: "invalid attribute string",
 	}}
-	for _, tc := range testdata {
-		t.Run(tc.in, func(t *testing.T) {
-			pa := ParseAttrBody(token.NoPos, tc.in)
+	for i, tc := range testdata {
+		t.Run(fmt.Sprintf("%d-%s", i, tc.in), func(t *testing.T) {
+			f := token.NewFile("test", -1, len(tc.in))
+			pos := f.Pos(0, token.NoRelPos)
+			pa := ParseAttrBody(pos, tc.in)
 			err := pa.Err
 
 			if tc.err != "" {
+				if err == nil {
+					t.Fatalf("unexpected success when error was expected (%#v)", pa.Fields)
+				}
 				if !strings.Contains(err.Error(), tc.err) {
 					t.Errorf("error was %v; want %v", err, tc.err)
 				}
@@ -110,9 +116,12 @@ func TestAttributeBody(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-
-			if got := fmt.Sprint(pa.Fields); got != tc.out {
-				t.Errorf("got %v; want %v", got, tc.out)
+			var kvs keyVals
+			for _, kv := range pa.Fields {
+				kvs = append(kvs, [3]string{kv.Key(), kv.Value(), kv.Text()})
+			}
+			if diff := cmp.Diff(tc.out, kvs); diff != "" {
+				t.Errorf("unexpected result; diff (-want +got)\n%s", diff)
 			}
 		})
 	}

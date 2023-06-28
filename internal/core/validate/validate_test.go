@@ -186,7 +186,7 @@ y: conflicting values 4 and 2:
 		out: "incomplete\nx.a: incomplete value 1 | 2",
 	}, {
 		name: "required field not present",
-		cfg:  &Config{Concrete: true},
+		cfg:  &Config{Final: true},
 		in: `
 			Person: {
 				name!:  string

@@ -12,7 +12,6 @@ validate: t1: schema: {b: string}
 validate: t2: schema: {a: <3}
 
 // Issue #2395
-// TODO: fix this test.
 validate: enforceRequired: {
 	str: "{}"
 	schema: {x!: int}
@@ -110,13 +109,12 @@ validate: {
 	}
 
 	// Issue #2395
-	// TODO: fix this test.
 	enforceRequired: {
 		str: "{}"
 		schema: {
 			x!: int
 		}
-		result: true
+		result: json.Validate(str, schema)
 	}
 }
 valid: {

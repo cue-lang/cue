@@ -6,10 +6,30 @@ exec cue vet -c=false in.cue
 cmp stdout expect-stdout2
 cmp stderr expect-stderr2
 
+! exec cue vet data.json in.cue
+cmp stdout expect-stdout3
+cmp stderr expect-stderr3
+
+! exec cue vet data.yaml in.cue
+cmp stdout expect-stdout4
+cmp stderr expect-stderr4
+
 -- in.cue --
 x!: string
+-- data.json --
+{}
+-- data.yaml --
+y: 1
 -- expect-stdout1 --
 -- expect-stderr1 --
 some instances are incomplete; use the -c flag to show errors or suppress this message
 -- expect-stdout2 --
 -- expect-stderr2 --
+-- expect-stdout3 --
+-- expect-stderr3 --
+x: field is required but not present:
+    ./in.cue:1:1
+-- expect-stdout4 --
+-- expect-stderr4 --
+x: field is required but not present:
+    ./in.cue:1:1

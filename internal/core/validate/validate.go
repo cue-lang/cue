@@ -23,6 +23,9 @@ type Config struct {
 	// Concrete, if true, requires that all values be concrete.
 	Concrete bool
 
+	// Final, if true, checks that there are no required fields left.
+	Final bool
+
 	// DisallowCycles indicates that there may not be cycles.
 	DisallowCycles bool
 
@@ -98,7 +101,7 @@ func (v *validator) validate(x *adt.Vertex) {
 	}
 
 	for _, a := range x.Arcs {
-		if a.ArcType == adt.ArcRequired && v.Concrete && v.inDefinition == 0 {
+		if a.ArcType == adt.ArcRequired && v.Final && v.inDefinition == 0 {
 			v.add(adt.NewRequiredNotPresentError(v.ctx, a))
 			continue
 		}

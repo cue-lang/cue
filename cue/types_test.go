@@ -2193,6 +2193,59 @@ func TestUnify(t *testing.T) {
 	})
 }
 
+func TestUnifyAccept(t *testing.T) {
+	type testCase struct {
+		value string
+		want  string
+	}
+	testCases := []testCase{{
+		value: `#A: 4, #B: 4, #T: int`,
+		want:  `4`,
+	}, {
+		value: `#A: string, #B: "foo", #T: string`,
+		want:  `"foo"`,
+	}, {
+		value: `#A: {a: "foo"}, #B: {b: 4}, #T: {a: string, b: int}`,
+		want:  `{"a":"foo","b":4}`,
+	}, {
+		value: `#A: [string,  4], #B: ["foo", 4], #T: [string, int, ...]`,
+		want:  `["foo",4]`,
+	}, {
+		value: `#A: {a: string, b: 1, _#hidden: int}, #B: {a: "foo"}, #T: {...}`,
+		want:  `{"a":"foo","b":1}`,
+	}, {
+		// Issue #2325: let should not result in a closedness error.
+		value: `#T: {
+			...
+		}
+		#A: {}
+		#B: {
+			let foobar = {}
+			 _fb: foobar
+		}`,
+		want: `{}`,
+	}, {
+		value: `
+		#A: #A: "foo"
+		#B: {b:1}
+		#T: {...}
+		`,
+		want: `{"b":1}`,
+	}}
+	// TODO(tdtest): use cuetest.Run when supported.
+	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+		v := getInstance(t.T, tc.value).Value()
+		x := v.LookupPath(ParsePath("#A"))
+		y := v.LookupPath(ParsePath("#B"))
+		a := v.LookupPath(ParsePath("#T"))
+		b, err := x.UnifyAccept(y, a).MarshalJSON()
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Equal(string(b), tc.want)
+	})
+}
+
 func TestEquals(t *testing.T) {
 	testCases := []struct {
 		a, b string

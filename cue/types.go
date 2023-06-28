@@ -1890,8 +1890,11 @@ func (v Value) Unify(w Value) Value {
 	return makeValue(v.idx, n, v.parent_)
 }
 
-// UnifyAccept is as v.Unify(w), but will disregard any field that is allowed
-// in the Value accept.
+// UnifyAccept is as v.Unify(w), but will disregard the closedness rules for
+// v and w, and will, instead, only allow fields that are present in accept.
+//
+// UnifyAccept is used to piecemeal unify individual conjuncts obtained from
+// accept without violating closedness rules.
 func (v Value) UnifyAccept(w Value, accept Value) Value {
 	if v.v == nil {
 		return w

@@ -93,9 +93,10 @@ workflows: release: _repo.bashWorkflow & {
 				}
 			},
 			_repo.repositoryDispatch & {
-				name:                  "Trigger unity build"
-				if:                    _repo.isReleaseTag
-				#githubRepositoryPath: _repo.unityRepositoryPath
+				name:                          "Trigger unity build"
+				if:                            _repo.isReleaseTag
+				#githubRepositoryPath:         _repo.unityRepositoryPath
+				#botGitHubUserTokenSecretsKey: "PORCUEPINE_GITHUB_PAT"
 				#arg: {
 					event_type: "Check against CUE \(_cueVersionRef)"
 					client_payload: {

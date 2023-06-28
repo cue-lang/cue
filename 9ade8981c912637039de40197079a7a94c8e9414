@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eea1789b_d20cc85f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-28T15:52:36Z",
+      "side": 1,
+      "message": "The test changes look like an improvement!\n\nWe\u0027ve looked at the Unity change together: just like the test cases here, it looks like a `cue eval` output now correctly contains an alias that was being dropped earlier. So this breakage looks intentional and good.\n\nMarcel, let\u0027s sync to get this submitted and Unity fixed up right after. Probably first thing on Friday, since I\u0027m mostly out tomorrow.",
+      "revId": "9ade8981c912637039de40197079a7a94c8e9414",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7b32546_136e2b53",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-28T15:52:36Z",
+      "side": 1,
+      "message": "nit: you could consider `fixedField` for the sake of avoiding \"get\" func prefixes.",
+      "revId": "9ade8981c912637039de40197079a7a94c8e9414",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

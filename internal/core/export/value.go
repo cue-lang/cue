@@ -56,7 +56,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	}()
 
 	for _, c := range n.Conjuncts {
-		e.markLets(c.Expr().Source())
+		e.markLets(c.Expr().Source(), s)
 	}
 
 	switch x := n.BaseValue.(type) {

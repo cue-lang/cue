@@ -2211,13 +2211,15 @@ func (o *options) updateOptions(opts []Option) {
 // exists.
 //
 // Note that by default not all errors are reported, unless options like
-// Concrete are used.
+// Concrete are used. The Final option can be used to check for missing
+// required fields.
 func (v Value) Validate(opts ...Option) error {
 	o := options{}
 	o.updateOptions(opts)
 
 	cfg := &validate.Config{
 		Concrete:       o.concrete,
+		Final:          o.final,
 		DisallowCycles: o.disallowCycles,
 		AllErrors:      true,
 	}

@@ -52,7 +52,7 @@ func Validate(b []byte, v cue.Value) error {
 	if v.Err() != nil {
 		return v.Err()
 	}
-	return nil
+	return v.Validate(cue.Final())
 }
 
 // Extract parses JSON-encoded data to a CUE expression, using path for

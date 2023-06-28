@@ -50,9 +50,9 @@ a: B=b: {
 	X=(z): 4
 	Y="y": "foo"
 	enclosed: {
-		x: string
-		y: enclosed.x
-		z: x
+		V=x: string
+		y:   enclosed.x
+		z:   V
 
 		// Comment.
 		labelX: X

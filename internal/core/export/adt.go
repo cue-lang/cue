@@ -303,6 +303,18 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 
 	switch x := r.(type) {
 	case *adt.FieldReference:
+		// Special case when the original CUE already had an alias.
+		if x.Src != nil {
+			if f, ok := x.Src.Node.(*ast.Field); ok {
+				if entry, ok := e.fieldAlias[f]; ok {
+					ident := ast.NewIdent(aliasFromLabel(f))
+					ident.Node = entry.field
+					ident.Scope = entry.scope
+					return ident
+				}
+			}
+		}
+
 		ident, _ := e.newIdentForField(x.Src, x.Label, x.UpCount)
 
 		// Use low-level lookup to bypass structural cycle detection. This is
@@ -443,9 +455,8 @@ func (e *exporter) decl(env *adt.Environment, d adt.Decl) ast.Decl {
 
 	case *adt.Field:
 		e.setDocs(x)
-		f := &ast.Field{
-			Label: e.stringLabel(x.Label),
-		}
+		f := e.getFixedField(x)
+
 		internal.SetConstraint(f, x.ArcType.Token())
 		e.setField(x.Label, f)
 

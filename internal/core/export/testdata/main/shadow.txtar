@@ -62,6 +62,89 @@ shadowAlias: t2: {
 	}
 	y: "outer"
 }
+
+shadowField: t1: {
+	z: {
+		A=b: 0
+		d: {
+			b: 1
+			c: A
+		}
+	}
+}
+
+shadowField: t2: {
+	z: {
+		A=b: 0
+		d: {
+			b: 1
+			c: A
+		}
+	}
+	z: d: { A: 1 }
+}
+
+shadowField: t4: {
+	merge: {
+		z: {
+			A=b: 0
+			d: {
+				b: 1
+				c: A
+			}
+		}
+	}
+
+	merge: {
+		z: {
+			A=b: 0
+			d: {
+				b: 1
+				c: A
+			}
+		}
+		z: d: { A: 1 }
+	}
+}
+
+shadowField: t5: {
+	merge: {
+		A=b: 0
+		d: {
+			b: 1
+			c: A
+		}
+	}
+	merge: {
+		b: 0
+		d: b: 1
+	}
+}
+
+// TODO: could be simplified to:
+// 		A=b: 0
+//  	c:   A
+// or even
+// 		b: 0
+//  	c: b
+shadowField: t6: {
+	x: {
+		A=b: 0
+		c: A
+	}
+	x: b: 0
+}
+
+shadowField: issue2378: {
+	a: {
+		A=b: 0
+		d: {
+			b: 1
+			c: A & a.z
+		}
+	}
+}
+
 -- out/definition --
 shadowRef: {
 	t1: {
@@ -86,33 +169,33 @@ shadowRef: {
 		}
 	}
 	t4: {
-		x_8=x: {
-			x: x_8 | null
+		X=x: {
+			x: X | null
 			y: x
 		}
 	}
 	t5: {
-		x_E=x: {
-			x: x_E | null
+		X=x: {
+			x: X | null
 		}
 	}
 	e1: {
-		x_B=x: {
-			x: x_B
+		x_8=x: {
+			x: x_8
 		}
 	}
 }
 shadowAlias: {
 	t1: {
-		y_B=y: "outer"
+		y: "outer"
 		a: {
 			key:     "y"
 			X=(key): "inner"
 			refs: {
-				y:     1
-				outer: y_B
+				Z="y": 1
+				outer: y
 				mid:   X
-				inner: y
+				inner: Z
 			}
 		}
 	}
@@ -121,13 +204,94 @@ shadowAlias: {
 			key:       "y"
 			X_1=(key): "inner"
 			refs: {
-				y:     1
-				outer: y_6
+				Z="y": 1
+				outer: y
 				mid:   X_1
-				inner: y
+				inner: Z
 			}
 		}
-		y_6=y: "outer"
+		y: "outer"
+	}
+}
+shadowField: {
+	t1: {
+		z: {
+			A=b: 0
+			d: {
+				b: 1
+				c: A
+			}
+		}
+	}
+	t2: {
+		z: {
+			{
+				A=b: 0
+				d: {
+					b: 1
+					c: A
+				}
+			}
+			d: {
+				A: 1
+			}
+		}
+	}
+	t4: {
+		merge: {
+			z: {
+				{
+					A=b: 0
+					d: {
+						b: 1
+						c: A
+					}
+				}
+				{
+					A=b: 0
+					d: {
+						b: 1
+						c: A
+					}
+				}
+				d: {
+					A: 1
+				}
+			}
+		}
+	}
+	t5: {
+		merge: {
+			{
+				A=b: 0
+				d: {
+					b: 1
+					c: A
+				}
+			}
+			b: 0
+			d: {
+				b: 1
+			}
+		}
+	}
+	t6: {
+		x: {
+			{
+				A=b: 0
+				c:   A
+			}
+			b: 0
+		}
+	}
+	issue2378: {
+		a: {
+			A=b: 0
+			d: {
+				b: 1
+				c: A & a.z
+			}
+		}
 	}
 }
 -- out/doc --
@@ -176,6 +340,51 @@ shadowAlias: {
 [shadowAlias t2 a refs inner]
 [shadowAlias t2 a y]
 [shadowAlias t2 y]
+[shadowField]
+[shadowField t1]
+[shadowField t1 z]
+[shadowField t1 z b]
+[shadowField t1 z d]
+[shadowField t1 z d b]
+[shadowField t1 z d c]
+[shadowField t2]
+[shadowField t2 z]
+[shadowField t2 z b]
+[shadowField t2 z d]
+[shadowField t2 z d b]
+[shadowField t2 z d c]
+[shadowField t2 z d A]
+[shadowField t4]
+[shadowField t4 merge]
+[shadowField t4 merge z]
+[shadowField t4 merge z b]
+[shadowField t4 merge z d]
+[shadowField t4 merge z d b]
+[shadowField t4 merge z d c]
+[shadowField t4 merge z d A]
+[shadowField t5]
+[shadowField t5 merge]
+[shadowField t5 merge b]
+[shadowField t5 merge d]
+[shadowField t5 merge d b]
+[shadowField t5 merge d c]
+[shadowField t6]
+- TODO: could be simplified to:
+		A=b: 0
+ 	c:   A
+or even
+		b: 0
+ 	c: b
+
+[shadowField t6 x]
+[shadowField t6 x b]
+[shadowField t6 x c]
+[shadowField issue2378]
+[shadowField issue2378 a]
+[shadowField issue2378 a b]
+[shadowField issue2378 a d]
+[shadowField issue2378 a d b]
+[shadowField issue2378 a d c]
 -- out/value --
 == Simplified
 _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
@@ -250,6 +459,70 @@ _|_ // shadowRef.e1.x.x: structural cycle (and 1 more errors)
 				}
 			}
 			y: "outer"
+		}
+	}
+	shadowField: {
+		t1: {
+			z: {
+				b: 0
+				d: {
+					b: 1
+					c: 0
+				}
+			}
+		}
+		t2: {
+			z: {
+				b: 0
+				d: {
+					b: 1
+					A: 1
+					c: 0
+				}
+			}
+		}
+		t4: {
+			merge: {
+				z: {
+					b: 0
+					d: {
+						b: 1
+						A: 1
+						c: 0
+					}
+				}
+			}
+		}
+		t5: {
+			merge: {
+				b: 0
+				d: {
+					b: 1
+					c: 0
+				}
+			}
+		}
+
+		// TODO: could be simplified to:
+		// 		A=b: 0
+		//  	c:   A
+		// or even
+		// 		b: 0
+		//  	c: b
+		t6: {
+			x: {
+				b: 0
+				c: 0
+			}
+		}
+		issue2378: {
+			a: {
+				b: 0
+				d: {
+					b: 1
+					c: A & a.z
+				}
+			}
 		}
 	}
 }

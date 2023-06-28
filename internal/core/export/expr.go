@@ -133,7 +133,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 				e.valueAlias[a] = valueAlias
 			}
 		}
-		x.markLets(c.c.Expr().Source())
+		x.markLets(c.c.Expr().Source(), s)
 	}
 
 	defer filterUnusedLets(s)

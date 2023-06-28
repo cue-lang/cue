@@ -11,6 +11,13 @@ validate: [string]: {
 validate: t1: schema: {b: string}
 validate: t2: schema: {a: <3}
 
+// Issue #2395
+// TODO: fix this test.
+validate: enforceRequired: {
+	str: "{}"
+	schema: {x!: int}
+}
+
 valid: [string]: {
 	string // input
 	#result: json.Valid(string)
@@ -100,6 +107,16 @@ validate: {
 			a: <3
 		}
 		result: _|_ // validate.t2.result: error in call to encoding/json.Validate: validate.t2.schema.a: invalid value 10 (out of bound <3)
+	}
+
+	// Issue #2395
+	// TODO: fix this test.
+	enforceRequired: {
+		str: "{}"
+		schema: {
+			x!: int
+		}
+		result: true
 	}
 }
 valid: {

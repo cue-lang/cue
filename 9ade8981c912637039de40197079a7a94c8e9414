@@ -33,6 +33,24 @@
       "message": "nit: you could consider `fixedField` for the sake of avoiding \"get\" func prefixes.",
       "revId": "9ade8981c912637039de40197079a7a94c8e9414",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5304d2c4_316ac1cf",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-28T16:22:40Z",
+      "side": 1,
+      "message": "A bunch of the functions in this file that do more than just retrieving something follow the \u003cverb\u003e\u003cthing\u003e pattern, including \"get\" for the verb, so I\u0027ll leave it for now.",
+      "parentUuid": "d7b32546_136e2b53",
+      "revId": "9ade8981c912637039de40197079a7a94c8e9414",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

@@ -3,7 +3,7 @@
 a: {
 	command: alias: {
 		// TODO: fix inner referene.
-		val: (instance & {enabled: true}).value
+		val: (instance & outer & {enabled: true}).value
 		echo: cmd: val
 	}
 
@@ -20,8 +20,12 @@ a: {
 
 	instance: #combined & {enabled: true}
 }
+
+outer: k: l: int
+
 -- out/dependencies/field --
 -- out/dependencies/all --
+outer
 -- out/dependencies/dynamic --
 value
 a.command.alias.val

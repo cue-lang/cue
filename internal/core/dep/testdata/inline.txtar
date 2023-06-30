@@ -1,0 +1,49 @@
+-- in.cue --
+
+a: b: {
+	c: [int, int]
+	d: [c][0]
+	e: {out: c}.out
+	f: {out: q}.out
+	g: {out: q}.out
+
+	h1: {out: r: s: string}.out
+	h2: {out: {out: r: c}.out}.out.r[0]
+	h3: {out: {out: r: q}.out}.out.r.x
+
+	// TODO: filter these dependencies?
+	i: h1.r
+	j: h1.r.s
+
+	k: r.k
+	l: r.k.l
+}
+
+q: {
+	x: [...int]
+}
+
+r: {out: k: l: string}.out
+-- out/dependencies/field --
+-- out/dependencies/all --
+[0]
+out
+out
+out
+out
+out.r
+out.r.x
+r.k
+r.k.l
+-- out/dependencies/dynamic --
+a.b[0]
+a.b.out
+a.b.out
+a.b.out
+a.b.out
+a.b.out.r[0]
+a.b.out.r.x
+a.b.h1.r
+a.b.h1.r.s
+r.k
+r.k.l

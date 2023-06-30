@@ -256,9 +256,14 @@ func (p *pivotter) makeParentPath(d *depData) {
 		return
 	}
 
-	str := f.IdentString(p.x.ctx)
-	str = strings.TrimLeft(str, "_#")
-	str = strings.ToUpper(str)
+	var str string
+	if f.IsInt() {
+		str = fmt.Sprintf("Index%d", f.Index())
+	} else {
+		str = f.IdentString(p.x.ctx)
+		str = strings.TrimLeft(str, "_#")
+		str = strings.ToUpper(str)
+	}
 	uf, _ := p.x.uniqueFeature(str)
 
 	d.path = []adt.Feature{uf}

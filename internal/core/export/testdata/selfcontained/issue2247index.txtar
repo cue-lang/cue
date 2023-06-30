@@ -1,0 +1,24 @@
+#Issue: 2247
+#path: root
+-- x.cue --
+root: {
+	b: a[0]
+	c: a[0]
+
+	Index0: int
+}
+
+a: [{
+	s: t: string
+}]
+-- out/default --
+b:      Index0_1
+c:      Index0_1
+Index0: int
+
+//cue:path: a.0
+let Index0_1 = {
+	s: {
+		t: string
+	}
+}

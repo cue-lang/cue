@@ -1,0 +1,70 @@
+#inlineImports: true
+-- cue.mod/module.cue --
+module: "example.com"
+-- x.cue --
+import "example.com/t"
+
+f: t.p
+-- t/t.cue --
+package t
+
+p: {
+	c: [int]
+	d: [c][0]
+	e: {out: c}.out
+	f: {out: q}.out
+	g: {out: q}.out
+
+	h: {out: r: s: string}.out
+	i: h.r
+	j: h.r.s
+
+	k: r.k
+	l: r.k.l
+}
+
+q: {
+	x: [...int]
+}
+
+r: {out: k: l: string}.out
+
+-- out/default --
+import "example.com/t"
+
+f: t.p
+-- out/expand_imports --
+f: {
+	c: [int]
+	d: [c][0]
+	e: {
+		out: c
+	}.out
+	f: {
+		out: Q
+	}.out
+	g: {
+		out: Q
+	}.out
+	h: {
+		out: {
+			r: {
+				s: string
+			}
+		}
+	}.out
+	i: h.r
+	j: h.r.s
+	k: K
+	l: K.l
+}
+
+//cue:path: q
+let Q = {
+	x: [...int]
+}
+
+//cue:path: r.k
+let K = {
+	l: string
+}

@@ -230,7 +230,7 @@ func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
 //   - as regular nodes are traversed recursively they are marked with a cycle
 //     marker to detect cycles, ensuring a finite traversal as well.
 func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
-	dep.VisitFields(c.opCtx, n, func(d dep.Dependency) error {
+	dep.VisitFields(c.opCtx, nil, n, func(d dep.Dependency) error {
 		depTask := c.findImpliedTask(d)
 		if depTask != nil {
 			if depTask != cycleMarker {

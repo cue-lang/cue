@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "33f08f0d_c2706ca7",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-30T12:03:40Z",
+      "side": 1,
+      "message": "Maybe eventually. Although it is not really a language concept per se, more an interpretation of a CUE result.",
+      "parentUuid": "c9bed347_e7bd2ea3",
+      "revId": "fc6fca1580dac28ad89c8b01e6e80b1cf98c7380",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "7003d67a_c677333f",
         "filename": "pkg/encoding/json/testdata/gen.txtar",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2023-06-30T09:51:54Z",
       "side": 1,
       "message": "should this not be `false`? `str` can\u0027t be made any more concrete, and I don\u0027t think `schema` can either, so I don\u0027t see how we can\u0027t resolve the result to `false`.",
+      "revId": "fc6fca1580dac28ad89c8b01e6e80b1cf98c7380",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "759f1c8a_a764349c",
+        "filename": "pkg/encoding/json/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-30T12:03:40Z",
+      "side": 1,
+      "message": "Interesting observation.\n\nThis could also be written as:\n```\ndata:   {}\nresult: json.Validate(json.Encode(data), schema)\n```\n\nCurrently the builtin does not have enough information to know the difference, so it returns an \"incomplete\" error.\n\nIn the future I think we should have a strict separation between functions and validators. In that case it is clear that this will not return a boolean anyway.\n\nRight now there is not much we can do, though, because builtins do not know whether a given concrete value is a literal or something intermittent.",
+      "parentUuid": "7003d67a_c677333f",
       "revId": "fc6fca1580dac28ad89c8b01e6e80b1cf98c7380",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

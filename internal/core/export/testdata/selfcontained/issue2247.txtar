@@ -59,12 +59,12 @@ f: {
 	l: K.l
 }
 
-//cue:path: q
+//cue:path: "example.com/t".q
 let Q = {
 	x: [...int]
 }
 
-//cue:path: r.k
+//cue:path: "example.com/t".r.k
 let K = {
 	l: string
 }

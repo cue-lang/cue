@@ -118,7 +118,7 @@ func (v *depData) node() *adt.Vertex {
 }
 
 func (p *pivotter) linkDependencies(v *adt.Vertex) {
-	p.markDeps(v)
+	p.markDeps(v, nil)
 
 	// Explicitly add the root of the configuration.
 	p.markIncluded(v)
@@ -150,10 +150,10 @@ func getParent(d *depData) *depData {
 	return d
 }
 
-func (p *pivotter) markDeps(v *adt.Vertex) {
+func (p *pivotter) markDeps(v *adt.Vertex, pkg *adt.ImportReference) {
 	// TODO: sweep all child nodes and mark as no need for recursive checks.
 
-	dep.VisitAll(p.x.ctx, v, func(d dep.Dependency) error {
+	dep.VisitAll(p.x.ctx, pkg, v, func(d dep.Dependency) error {
 		node := d.Node
 
 		switch {
@@ -202,7 +202,7 @@ func (p *pivotter) markDeps(v *adt.Vertex) {
 		p.refMap[d.Reference] = ref
 
 		if !ok {
-			p.markDeps(node)
+			p.markDeps(node, d.Import())
 		}
 
 		return nil

@@ -3,6 +3,8 @@ Test comprehensions that are defined above the reference root.
 Because the references are not at addressable locations, the printed
 references are bogus. However, this simply tests they are found, reported,
 and do not cause a crash.
+
+TODO: filter bogus references.
 -- in.cue --
 for key, value in { test: 1 } {
 	("a"): b: k1: key

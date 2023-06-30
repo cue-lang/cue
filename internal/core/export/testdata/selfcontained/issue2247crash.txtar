@@ -4,7 +4,4 @@ a: _
 b: [a][0]
 -- out/default --
 a: _
-b: X
-
-//cue:path: 0
-let X = a
+b: [a][0]

@@ -23,19 +23,15 @@ q: {
 r: {out: k: l: string}.out
 -- out/dependencies/field --
 -- out/dependencies/all --
-[0]
-out
-out
-out
-out
+q
+q
 r.k
 r.k.l
 -- out/dependencies/dynamic --
-a.b[0]
-a.b.out
-a.b.out
-a.b.out
-a.b.out
+a.b.c
+a.b.c
+q
+q
 a.b.h.r
 a.b.h.r.s
 r.k

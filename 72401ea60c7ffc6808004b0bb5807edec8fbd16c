@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b8fc533_cdc34958",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-30T09:42:06Z",
+      "side": 1,
+      "message": "I like it. The CUE is longer, but it\u0027s more structured and has more of a pattern to it.\n\nI had already thought that the old form wasn\u0027t particularly nice; global numbering and mixing different APIs didn\u0027t feel right. An alternative would be to split up the file into more files, but that also has its drawbacks, so I like this better.\n\nDid you forget to run the trybots on this chain, btw?",
+      "revId": "72401ea60c7ffc6808004b0bb5807edec8fbd16c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

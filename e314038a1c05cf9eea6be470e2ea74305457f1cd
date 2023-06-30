@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b095c8c5_8d1bf9d6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-30T11:55:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14c34bb5_28045ec2",
+      "revId": "e314038a1c05cf9eea6be470e2ea74305457f1cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ec3d48f4_b9aa24d8",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -87,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "674f7a0b_62de0f25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-30T11:55:19Z",
+      "side": 1,
+      "message": "Changed from Fixed to Issue to allow this not to hold up this CL.",
+      "parentUuid": "56900a34_1967a1c4",
+      "revId": "e314038a1c05cf9eea6be470e2ea74305457f1cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "effbe071_aa3ffeed",
@@ -118,6 +154,24 @@
       "side": 1,
       "message": "My feedback was going to be to use the same names as the parameters on the method itself.",
       "parentUuid": "effbe071_aa3ffeed",
+      "revId": "e314038a1c05cf9eea6be470e2ea74305457f1cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08df3d49_e903e4e2",
+        "filename": "cue/types_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2240,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-06-30T11:55:19Z",
+      "side": 1,
+      "message": "Naming them #v, #w, and #accept, as Paul suggested.\n\n(The parameters need to be definitions, though.)",
+      "parentUuid": "5e56f05a_cb8ca8d4",
       "revId": "e314038a1c05cf9eea6be470e2ea74305457f1cd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

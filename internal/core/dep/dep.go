@@ -29,14 +29,15 @@ type Dependency struct {
 	// Reference is the expression that referenced the node.
 	Reference adt.Resolver
 
+	pkg *adt.ImportReference
+
 	top bool
 }
 
 // Import returns the import reference or nil if the reference was within
 // the same package as the visited Vertex.
 func (d *Dependency) Import() *adt.ImportReference {
-	x, _ := d.Reference.(adt.Expr)
-	return importRef(x)
+	return d.pkg
 }
 
 // IsRoot reports whether the dependency is referenced by the root of the
@@ -67,28 +68,31 @@ type VisitFunc func(Dependency) error
 
 // Visit calls f for all vertices referenced by the conjuncts of n without
 // descending into the elements of list or fields of structs. Only references
-// that do not refer to the conjuncts of n itself are reported.
-func Visit(c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
-	return visit(c, n, f, false, true)
+// that do not refer to the conjuncts of n itself are reported. pkg
+// indicates the current package, which is used for reporting purposes.
+func Visit(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc) error {
+	return visit(c, pkg, n, f, false, true)
 }
 
 // VisitAll calls f for all vertices referenced by the conjuncts of n including
 // those of descendant fields and elements. Only references that do not refer to
-// the conjuncts of n itself are reported.
-func VisitAll(c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
-	return visit(c, n, f, true, true)
+// the conjuncts of n itself are reported. pkg indicates the current
+// package, which is used for reporting purposes.
+func VisitAll(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc) error {
+	return visit(c, pkg, n, f, true, true)
 }
 
 // VisitFields calls f for n and all its descendent arcs that have a conjunct
 // that originates from a conjunct in n. Only the conjuncts of n that ended up
 // as a conjunct in an actual field are visited and they are visited for each
-// field in which the occurs.
-func VisitFields(c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
+// field in which the occurs. pkg indicates the current package, which is
+// used for reporting purposes.
+func VisitFields(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc) error {
 	m := marked{}
 
 	m.markExpr(n)
 
-	dynamic(c, n, f, m, true)
+	dynamic(c, pkg, n, f, m, true)
 	return nil
 }
 
@@ -100,7 +104,7 @@ func init() {
 	empty.ForceDone()
 }
 
-func visit(c *adt.OpContext, n *adt.Vertex, f VisitFunc, all, top bool) (err error) {
+func visit(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc, all, top bool) (err error) {
 	if c == nil {
 		panic("nil context")
 	}
@@ -108,6 +112,7 @@ func visit(c *adt.OpContext, n *adt.Vertex, f VisitFunc, all, top bool) (err err
 		ctxt:  c,
 		visit: f,
 		node:  n,
+		pkg:   pkg,
 		all:   all,
 		top:   top,
 	}
@@ -136,6 +141,7 @@ type visitor struct {
 	visit VisitFunc
 	node  *adt.Vertex
 	err   error
+	pkg   *adt.ImportReference
 	all   bool
 	top   bool
 }
@@ -263,9 +269,15 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 		}
 
 		if ref != c.node && ref != empty {
+			pkg := importRef(r.(adt.Expr))
+			if pkg == nil {
+				pkg = c.pkg
+			}
+
 			d := Dependency{
 				Node:      ref,
 				Reference: r,
+				pkg:       pkg,
 				top:       c.top,
 			}
 			if err := c.visit(d); err != nil {

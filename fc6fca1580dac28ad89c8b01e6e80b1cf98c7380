@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9bed347_e7bd2ea3",
+        "filename": "internal/core/validate/validate.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-30T09:51:54Z",
+      "side": 1,
+      "message": "Interesting that `Final` is a concept already present in the rest of our Go API, but unlike `Concrete`, it\u0027s not defined in the CUE spec. Should it?",
+      "revId": "fc6fca1580dac28ad89c8b01e6e80b1cf98c7380",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7003d67a_c677333f",
+        "filename": "pkg/encoding/json/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-06-30T09:51:54Z",
+      "side": 1,
+      "message": "should this not be `false`? `str` can\u0027t be made any more concrete, and I don\u0027t think `schema` can either, so I don\u0027t see how we can\u0027t resolve the result to `false`.",
+      "revId": "fc6fca1580dac28ad89c8b01e6e80b1cf98c7380",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

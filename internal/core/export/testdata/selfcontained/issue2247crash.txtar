@@ -4,7 +4,4 @@ a: _
 b: [a][0]
 -- out/default --
 a: _
-b: Index0
-
-//cue:path: 0
-let Index0 = a
+b: [a][0]

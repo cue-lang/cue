@@ -27,7 +27,8 @@ outer: k: l: int
 -- out/dependencies/all --
 outer
 -- out/dependencies/dynamic --
-value
+a.instance
+outer
 a.command.alias.val
 a.#base
 a.#combined

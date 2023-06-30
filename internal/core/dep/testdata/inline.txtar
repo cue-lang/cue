@@ -9,6 +9,8 @@ a: b: {
 
 	h1: {out: r: s: string}.out
 	h2: {out: {out: r: c}.out}.out.r[0]
+	// TODO: Should this reference be q or q.x?
+	// q is an approximation, but q.x is more precise, it seems.
 	h3: {out: {out: r: q}.out}.out.r.x
 
 	// TODO: filter these dependencies?
@@ -26,23 +28,18 @@ q: {
 r: {out: k: l: string}.out
 -- out/dependencies/field --
 -- out/dependencies/all --
-[0]
-out
-out
-out
-out
-out.r
-out.r.x
+q
+q
+q
 r.k
 r.k.l
 -- out/dependencies/dynamic --
-a.b[0]
-a.b.out
-a.b.out
-a.b.out
-a.b.out
-a.b.out.r[0]
-a.b.out.r.x
+a.b.c
+a.b.c
+q
+q
+a.b.c
+q
 a.b.h1.r
 a.b.h1.r.s
 r.k

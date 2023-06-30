@@ -218,7 +218,40 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	// Note: it is okay to pass an empty CloseInfo{} here as we assume that
 	// all nodes are finalized already and we need neither closedness nor cycle
 	// checks.
-	if ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r); ref != nil {
+	ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r)
+
+	// If a vertex is dynamic, for instance the result of {foo: 1}.foo,
+	// then it means there is no valid path the the returned value and
+	// it is pointless to mark dependencies. Instead, we mark dependencies
+	// for the LHS of selector or index references.
+	var expr adt.Expr
+	if ref != nil && isDynamic(ref) {
+		switch x := r.(type) {
+		case *adt.SelectorExpr:
+			expr = x.X
+		case *adt.IndexExpr:
+			expr = x.X
+		}
+	}
+	// TODO: consider the case where an inlined composite literal does not
+	// resolve, but has references.
+	if expr != nil {
+		// Within a dynamic struct, we always process all references,
+		// As these references will otherwise not be visited as part of
+		// a normal traversal as they have not path from the root to reach them.
+		saved := c.all
+		c.all = true
+		c.markExpr(env, expr)
+		c.all = saved
+		return
+	}
+
+	// if expr := isInline(r); expr != nil {
+	// 	c.markExpr(env, expr)
+	// 	return
+	// }
+
+	if ref != nil {
 		// If ref is within a let, we only care about dependencies referred to
 		// by internal expressions. The let expression itself is not considered
 		// a dependency and is considered part of the referring expression.
@@ -271,6 +304,17 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 func hasLetParent(v *adt.Vertex) bool {
 	for ; v != nil; v = v.Parent {
 		if v.Label.IsLet() {
+			return true
+		}
+	}
+	return false
+}
+
+// TODO(perf): make this available as a property of vertices to avoid doing
+// these dynamic lookups.
+func isDynamic(v *adt.Vertex) bool {
+	for ; v != nil; v = v.Parent {
+		if v.IsDynamic {
 			return true
 		}
 	}

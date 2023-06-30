@@ -46,7 +46,7 @@ func TestVisit(t *testing.T) {
 		testCases := []struct {
 			name string
 			root string
-			fn   func(*adt.OpContext, *adt.Vertex, dep.VisitFunc) error
+			fn   func(*adt.OpContext, *adt.ImportReference, *adt.Vertex, dep.VisitFunc) error
 		}{{
 			name: "field",
 			root: "a.b",
@@ -68,7 +68,7 @@ func TestVisit(t *testing.T) {
 			w := t.Writer(tc.name)
 
 			t.Run(tc.name, func(sub *testing.T) {
-				tc.fn(ctxt, n, func(d dep.Dependency) error {
+				tc.fn(ctxt, nil, n, func(d dep.Dependency) error {
 					str := value.Make(ctxt, d.Node).Path().String()
 					if i := d.Import(); i != nil {
 						path := i.ImportPath.StringValue(ctxt)
@@ -110,7 +110,7 @@ func TestX(t *testing.T) {
 
 	deps := []string{}
 
-	_ = dep.VisitFields(ctxt, n, func(d dep.Dependency) error {
+	_ = dep.VisitFields(ctxt, nil, n, func(d dep.Dependency) error {
 		str := value.Make(ctxt, d.Node).Path().String()
 		if i := d.Import(); i != nil {
 			path := i.ImportPath.StringValue(ctxt)

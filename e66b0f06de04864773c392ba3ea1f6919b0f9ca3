@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "25f1c162_2d74da44",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T19:14:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "59bb14ec_5ad11b46",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d95dd653_3e3a3e29",
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f57eabf0_bf1ff5e3",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T19:14:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fcd759c5_2399369e",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4c463b72_599d0ba6",
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f02fe40_4bcf55c9",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T19:14:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4c463b72_599d0ba6",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "335dc3d7_f45ccd0c",
@@ -99,6 +153,24 @@
       "writtenOn": "2023-07-03T16:29:32Z",
       "side": 1,
       "message": "I wish there was a way to annotate _which_ parts of this aren\u0027t correct.\nMaybe another dummy file just above with some commentary?",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74c94793_b395cb64",
+        "filename": "internal/core/export/testdata/selfcontained/issue2247.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T19:14:57Z",
+      "side": 1,
+      "message": "Using a naming convention of some sort would be the easiest, I reckon.",
+      "parentUuid": "335dc3d7_f45ccd0c",
       "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

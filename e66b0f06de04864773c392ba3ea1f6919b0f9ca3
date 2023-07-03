@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57ed774e_b3af59f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:29:32Z",
+      "side": 1,
+      "message": "LGTM module a couple of typos and a couple of comment suggestions, thanks.",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59bb14ec_5ad11b46",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 224,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:29:32Z",
+      "side": 1,
+      "message": "s/the the/to the/",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d95dd653_3e3a3e29",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:29:32Z",
+      "side": 1,
+      "message": "I\u0027m wondering about cases like:\n```\nx: {\n   foo: ref1\n   bar: ref2\n}.bar\n```\nDo we actually need to process `ref1` there? I\u0027m not sure. Maybe worth adding a TODO or a remark about that kind of case?",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fcd759c5_2399369e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:29:32Z",
+      "side": 1,
+      "message": "s/not path/no path/",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c463b72_599d0ba6",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:29:32Z",
+      "side": 1,
+      "message": "_dynamic_ lookups, lol 😊",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "335dc3d7_f45ccd0c",
+        "filename": "internal/core/export/testdata/selfcontained/issue2247.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:29:32Z",
+      "side": 1,
+      "message": "I wish there was a way to annotate _which_ parts of this aren\u0027t correct.\nMaybe another dummy file just above with some commentary?",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

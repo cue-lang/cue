@@ -115,7 +115,7 @@ earlyChecks: json.#step & {
 		# TODO: Our --max-count here is just 1, because we've made mistakes very
 		# recently. Increase it to 5 or 10 soon, to also cover CL chains.
 		for commit in $(git rev-list --max-count=1 HEAD); do
-			if ! git rev-list --format=%B --max-count=1 $commit | grep -q '^Signed-off-by:'; then
+			if [ "$(git log -1 --pretty='%(trailers:key=Signed-off-by)' | sed '/^$/d' | wc -l)" -eq 0 ]; then
 				echo -e "\nRecent commit is lacking Signed-off-by:\n"
 				git show --quiet $commit
 				exit 1

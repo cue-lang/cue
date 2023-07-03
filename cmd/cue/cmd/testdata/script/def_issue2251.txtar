@@ -1,0 +1,33 @@
+# See also issue304.txtar
+
+exec cue def 1.cue --outfile 2.cue
+exec cue def 2.cue --outfile 3.cue
+exec cue def 3.cue
+cmp stdout golden1.output
+
+-- 1.cue --
+import "example.com/repro/foo"
+
+foo.#Foo
+
+a: "A"
+
+-- foo/foo.cue --
+package foo
+
+#Foo: {
+	a: string
+}
+
+Foo: {
+	a: string
+}
+
+-- cue.mod/module.cue --
+module: "example.com/repro"
+
+-- golden1.output --
+import "example.com/repro/foo"
+
+foo.#Foo
+a: "A"

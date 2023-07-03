@@ -117,8 +117,24 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, 
 
 	expr := e.expr(nil, v)
 
-	if isDef {
+	switch isDef {
+	case true:
 		e.inDefinition--
+
+		// This eliminates the need to wrap in _#def in the most common cases,
+		// while ensuring only one level of _#def wrapping is ever used.
+		if st, ok := expr.(*ast.StructLit); ok {
+			for _, elem := range st.Elts {
+				if d, ok := elem.(*ast.EmbedDecl); ok {
+					if isDefinitionReference(d.Expr) {
+						return e.finalize(v, expr)
+					}
+				}
+			}
+		}
+
+		// TODO: embed an empty definition instead once we verify that this
+		// preserves semantics.
 		if v.Kind() == adt.StructKind {
 			expr = ast.NewStruct(
 				ast.Embed(ast.NewIdent("_#def")),
@@ -128,6 +144,23 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (f *ast.File, 
 	}
 
 	return e.finalize(v, expr)
+}
+
+func isDefinitionReference(x ast.Expr) bool {
+	switch x := x.(type) {
+	case *ast.Ident:
+		if internal.IsDef(x.Name) {
+			return true
+		}
+	case *ast.SelectorExpr:
+		if internal.IsDefinition(x.Sel) {
+			return true
+		}
+		return isDefinitionReference(x.X)
+	case *ast.IndexExpr:
+		return isDefinitionReference(x.X)
+	}
+	return false
 }
 
 // Expr exports the given unevaluated expression (schema mode).

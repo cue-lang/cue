@@ -25,17 +25,5 @@ module: "example.com/repro"
 -- golden1.output --
 import "example.com/repro/foo"
 
-_#def
-_#def: {
-	_#def
-	foo.#Foo
-	foo.#Foo
-	_#def: {
-		_#def
-		_#def: {
-			foo.#Foo
-			a: "A"
-		}
-	}
-	a: "A"
-}
+foo.#Foo
+a: "A"

@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -135,4 +136,18 @@ bar: [
 	if err == nil {
 		t.Fatalf("BuildInstances() = %#v, wanted error", vs)
 	}
+}
+
+func TestContextCheck(t *testing.T) {
+	defer func() {
+		str, _ := recover().(string)
+		if !strings.Contains(str, "use cuecontext.New") {
+			t.Errorf("unexpected panic string: %v", str)
+		}
+	}()
+
+	var c cue.Context
+	c.CompileString("1")
+
+	t.Error("did not panic")
 }

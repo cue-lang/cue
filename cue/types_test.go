@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/tdtest"
 )
@@ -3226,7 +3227,7 @@ a: x: y: z: "x"`,
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			var c Context
-			c.runtime().Init()
+			(*runtime.Runtime)(&c).Init()
 			v := c.CompileString(tc.value)
 			v = v.LookupPath(ParsePath("a"))
 			pos := v.Pos().String()

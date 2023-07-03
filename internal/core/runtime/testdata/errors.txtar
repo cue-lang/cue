@@ -97,9 +97,7 @@ duplicate extern attributes:
     ./duplicate.cue:11:3
 interpreter name must be non-empty:
     ./empty_extern.cue:1:1
-invalid attribute: expected comma:
-    ./invalid_field_attr.cue:8:8
-invalid attribute: expected comma:
+no interpreter defined for "\"test\" foo":
     ./invalid_file_attr.cue:1:1
 extern attribute must appear before package clause:
     ./late_extern.cue:3:1

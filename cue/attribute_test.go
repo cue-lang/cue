@@ -189,7 +189,7 @@ func TestAttributeString(t *testing.T) {
 		path: "b",
 		attr: "foo",
 		pos:  3,
-		str:  `e=x y`,
+		str:  `e="x y"`,
 	}, {
 		path: "e",
 		attr: "bar",
@@ -243,22 +243,22 @@ func TestAttributeArg(t *testing.T) {
 		pos: 3,
 		key: "e",
 		val: "x y",
-		raw: "e=x y",
+		raw: `e="x y"`,
 	}, {
 		pos: 4,
 		key: "f g",
 		val: "",
-		raw: "f g",
+		raw: `"f g"`,
 	}, {
 		pos: 5,
 		key: "with spaces",
 		val: "",
-		raw: "with spaces",
+		raw: " with spaces ",
 	}, {
 		pos: 6,
 		key: "s",
 		val: "spaces in value",
-		raw: "s=  spaces in value",
+		raw: "  s=  spaces in value  ",
 	}}
 	for _, tc := range testCases {
 		t.Run(fmt.Sprintf("%d", tc.pos), func(t *testing.T) {

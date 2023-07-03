@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "604ba7a0_1bc1fe0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:47:17Z",
+      "side": 1,
+      "message": "LGTM module a couple of comment suggestions, thanks!",
+      "revId": "5c7cb98c8770b9e765b5030c19a87354f6000089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8726e1a9_561ff14f",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:47:17Z",
+      "side": 1,
+      "message": "By \"the current package\" do you mean the package within which n is contained? If so, perhaps document accordingly, as the notion of \"current\" package seems ill-defined to me. Also, perhaps clarify if it\u0027s OK for pkg to be nil (from the tests it looks like that is alright) ?",
+      "revId": "5c7cb98c8770b9e765b5030c19a87354f6000089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "337ff081_0994369e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:47:17Z",
+      "side": 1,
+      "message": "Maybe add a comment saying why we\u0027re sure that the Resolver is an Expr here?",
+      "revId": "5c7cb98c8770b9e765b5030c19a87354f6000089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

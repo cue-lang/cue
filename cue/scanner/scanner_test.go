@@ -242,7 +242,7 @@ func TestScan(t *testing.T) {
 
 	// verify scan
 	var s Scanner
-	s.Init(token.NewFile("", 1, len(source)), source, eh, ScanComments|dontInsertCommas)
+	s.Init(token.NewFile("", 1, len(source)), source, eh, ScanComments|DontInsertCommas)
 
 	// set up expected position
 	epos := token.Position{
@@ -559,7 +559,7 @@ func TestLineComments(t *testing.T) {
 	// verify scan
 	var S Scanner
 	f := token.NewFile(filepath.Join("dir", "TestLineComments"), 1, len(src))
-	S.Init(f, []byte(src), nil, dontInsertCommas)
+	S.Init(f, []byte(src), nil, DontInsertCommas)
 	for _, s := range segs {
 		p, _, lit := S.Scan()
 		pos := f.Position(p)
@@ -583,7 +583,7 @@ func TestInit(t *testing.T) {
 	// 1st init
 	src1 := "false true { }"
 	f1 := token.NewFile("src1", 1, len(src1))
-	s.Init(f1, []byte(src1), nil, dontInsertCommas)
+	s.Init(f1, []byte(src1), nil, DontInsertCommas)
 	if f1.Size() != len(src1) {
 		t.Errorf("bad file size: got %d, expected %d", f1.Size(), len(src1))
 	}
@@ -597,7 +597,7 @@ func TestInit(t *testing.T) {
 	// 2nd init
 	src2 := "null true { ]"
 	f2 := token.NewFile("src2", 1, len(src2))
-	s.Init(f2, []byte(src2), nil, dontInsertCommas)
+	s.Init(f2, []byte(src2), nil, DontInsertCommas)
 	if f2.Size() != len(src2) {
 		t.Errorf("bad file size: got %d, expected %d", f2.Size(), len(src2))
 	}
@@ -674,7 +674,7 @@ func TestStdErrorHander(t *testing.T) {
 	}
 
 	var s Scanner
-	s.Init(token.NewFile("File1", 1, len(src)), []byte(src), eh, dontInsertCommas)
+	s.Init(token.NewFile("File1", 1, len(src)), []byte(src), eh, DontInsertCommas)
 	for {
 		if _, tok, _ := s.Scan(); tok == token.EOF {
 			break
@@ -713,7 +713,7 @@ func checkError(t *testing.T, src string, tok token.Token, pos int, lit, err str
 		h.msg = fmt.Sprintf(msg, args...)
 		h.pos = pos
 	}
-	s.Init(token.NewFile("", 1, len(src)), []byte(src), eh, ScanComments|dontInsertCommas)
+	s.Init(token.NewFile("", 1, len(src)), []byte(src), eh, ScanComments|DontInsertCommas)
 	_, tok0, lit0 := s.Scan()
 	if tok0 != tok {
 		t.Errorf("%q: got %s, expected %s", src, tok0, tok)

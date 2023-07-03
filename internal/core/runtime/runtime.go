@@ -46,6 +46,11 @@ func New() *Runtime {
 	return r
 }
 
+// IsInitialized reports whether the runtime has been initialized.
+func (r *Runtime) IsInitialized() bool {
+	return r.index != nil
+}
+
 func (r *Runtime) Init() {
 	if r.index != nil {
 		return

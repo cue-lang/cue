@@ -43,6 +43,10 @@ type Context runtime.Runtime
 
 func (c *Context) runtime() *runtime.Runtime {
 	rt := (*runtime.Runtime)(c)
+	if !rt.IsInitialized() {
+		panic("cue: uninitialized Context: use cuecontext.New instead of zero value")
+	}
+
 	return rt
 }
 

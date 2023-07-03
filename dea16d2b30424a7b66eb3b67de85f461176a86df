@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3d47975_f20c04fe",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T11:00:13Z",
+      "side": 1,
+      "message": "Maybe introduce a Config to avoid having more Init methods?\n\nLike (* Scanner) InitString(s string, c *Config)\n\nOr alternatively add the offset in the error handler?",
+      "revId": "dea16d2b30424a7b66eb3b67de85f461176a86df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -280,6 +280,9 @@ func (d *decoder) interfaceValue(v Value) (x interface{}) {
 		for list.Next() {
 			a = append(a, d.interfaceValue(list.Value()))
 		}
+		if a == nil {
+			a = []interface{}{}
+		}
 		x = a
 
 	case StructKind:

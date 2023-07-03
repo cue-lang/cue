@@ -231,6 +231,10 @@ func TestDecode(t *testing.T) {
 				`,
 		dst: &S{},
 		err: "Decode: x: cannot use value 1 (type int) as (string|bytes)",
+	}, {
+		value: `[]`,
+		dst:   new(interface{}),
+		want:  []interface{}{},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3991a58f_95fb18ab",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T12:55:00Z",
+      "side": 1,
+      "message": "`{a: k, #def).b` here b may not exist in the composite literal.",
+      "revId": "63a6ee999d00118d9787aca54753b7b8e1d29a3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

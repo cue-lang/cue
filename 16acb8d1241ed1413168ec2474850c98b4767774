@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aeb33e20_93a2b1f4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T17:01:10Z",
+      "side": 1,
+      "message": "LGTM but I\u0027d like to see a test case.",
+      "revId": "16acb8d1241ed1413168ec2474850c98b4767774",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

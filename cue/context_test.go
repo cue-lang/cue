@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/cuetxtar"
+	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
 
@@ -135,4 +136,11 @@ bar: [
 	if err == nil {
 		t.Fatalf("BuildInstances() = %#v, wanted error", vs)
 	}
+}
+
+func TestContextCheck(t *testing.T) {
+	qt.Assert(t, qt.PanicMatches(func() {
+		var c cue.Context
+		c.CompileString("1")
+	}, `.*use cuecontext\.New.*`))
 }

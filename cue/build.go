@@ -83,10 +83,11 @@ func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	v := (*Context)(r).BuildExpr(expr)
+	runtime := r.runtime()
+	v := (*Context)(runtime).BuildExpr(expr)
 	err = v.Err()
 	inst := &Instance{
-		index: r.runtime(),
+		index: runtime,
 		root:  v.v,
 		inst: &build.Instance{
 			Files: []*ast.File{f},

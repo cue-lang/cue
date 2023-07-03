@@ -18,10 +18,10 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
-	"unicode"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
+	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
 )
 
@@ -61,24 +61,21 @@ func NewNonExisting(key string) Attr {
 }
 
 type KeyValue struct {
-	data  string
-	equal int // index of equal sign or 0 if non-existing
+	key   string
+	value string
+	text  string
 }
 
-func (kv *KeyValue) Text() string { return kv.data }
-func (kv *KeyValue) Key() string {
-	if kv.equal == 0 {
-		return kv.data
-	}
-	s := kv.data[:kv.equal]
-	s = strings.TrimSpace(s)
-	return s
+func (kv *KeyValue) Text() string {
+	return kv.text
 }
+
+func (kv *KeyValue) Key() string {
+	return kv.key
+}
+
 func (kv *KeyValue) Value() string {
-	if kv.equal == 0 {
-		return ""
-	}
-	return strings.TrimSpace(kv.data[kv.equal+1:])
+	return kv.value
 }
 
 func (a *Attr) hasPos(p int) error {
@@ -97,7 +94,12 @@ func (a *Attr) String(pos int) (string, error) {
 	if err := a.hasPos(pos); err != nil {
 		return "", err
 	}
-	return a.Fields[pos].Text(), nil
+	f := a.Fields[pos]
+	if f.key != "" {
+		// When there's a key, we return the entire value.
+		return f.Text(), nil
+	}
+	return a.Fields[pos].Value(), nil
 }
 
 // Int reports the integer at the given position or an error if the attribute is
@@ -120,7 +122,7 @@ func (a *Attr) Flag(pos int, key string) (bool, error) {
 		return false, err
 	}
 	for _, kv := range a.Fields[pos:] {
-		if kv.Text() == key {
+		if kv.Key() == "" && kv.Value() == key {
 			return true, nil
 		}
 	}
@@ -143,110 +145,133 @@ func (a *Attr) Lookup(pos int, key string) (val string, found bool, err error) {
 }
 
 func ParseAttrBody(pos token.Pos, s string) (a Attr) {
+	// Create temporary token.File so that scanner has something
+	// to work with.
+	// TODO it's probably possible to do this without allocations.
+	tmpFile := token.NewFile("", 0, len(s))
+	if len(s) > 0 {
+		tmpFile.AddLine(len(s) - 1)
+	}
 	a.Body = s
-	i := 0
+	var scan scanner.Scanner
+	scan.Init(tmpFile, []byte(s), nil, scanner.DontInsertCommas)
 	for {
-		i += skipSpace(s[i:])
-		// always scan at least one, possibly empty element.
-		n, err := scanAttributeElem(pos, s[i:], &a)
+		start := scan.Offset()
+		tok, err := scanAttributeTokens(&scan, pos, 1<<token.COMMA|1<<token.BIND|1<<token.EOF)
 		if err != nil {
-			return Attr{Err: err}
+			// Shouldn't happen because bracket nesting should have been checked previously by
+			// the regular CUE parser.
+			a.Err = err
+			return a
 		}
-		if i += n; i >= len(s) {
-			break
+		switch tok {
+		case token.EOF:
+			// Empty field.
+			a.appendField("", s[start:], s[start:])
+			return a
+		case token.COMMA:
+			val := s[start : scan.Offset()-1]
+			a.appendField("", val, val) // All but final comma.
+			continue
 		}
-		i += skipSpace(s[i:])
-		if s[i] != ',' {
-			return Attr{Err: errors.Newf(pos, "invalid attribute: expected comma")}
+		valStart := scan.Offset()
+		key := s[start : valStart-1] // All but =.
+		tok, err = scanAttributeTokens(&scan, pos, 1<<token.COMMA|1<<token.EOF)
+		if err != nil {
+			// Shouldn't happen because bracket nesting should have been checked previously by
+			// the regular CUE parser.
+			a.Err = err
+			return a
 		}
-		i++
+		valEnd := len(s)
+		if tok != token.EOF {
+			valEnd = scan.Offset() - 1 // All but final comma
+		}
+		value := s[valStart:valEnd]
+		text := s[start:valEnd]
+		a.appendField(key, value, text)
+		if tok == token.EOF {
+			return a
+		}
 	}
-	return a
 }
 
-func skipSpace(s string) int {
-	for n, r := range s {
-		if !unicode.IsSpace(r) {
-			return n
-		}
-	}
-	return 0
+func (a *Attr) appendField(k, v, text string) {
+	a.Fields = append(a.Fields, KeyValue{
+		key:   strings.TrimSpace(k),
+		value: maybeUnquote(strings.TrimSpace(v)),
+		text:  text,
+	})
 }
 
-func scanAttributeElem(pos token.Pos, s string, a *Attr) (n int, err errors.Error) {
-	// try CUE string
-	kv := KeyValue{}
-	if n, kv.data, err = scanAttributeString(pos, s); n == 0 {
-		// try key-value pair
-		p := strings.IndexAny(s, ",=") // ) is assumed to be stripped.
-		switch {
-		case p < 0:
-			kv.data = strings.TrimSpace(s)
-			n = len(s)
-
-		default: // ','
-			n = p
-			kv.data = strings.TrimSpace(s[:n])
-
-		case s[p] == '=':
-			kv.equal = p
-			offset := p + 1
-			offset += skipSpace(s[offset:])
-			var str string
-			if p, str, err = scanAttributeString(pos, s[offset:]); p > 0 {
-				n = offset + p
-				kv.data = s[:offset] + str
-			} else {
-				n = len(s)
-				if p = strings.IndexByte(s[offset:], ','); p >= 0 {
-					n = offset + p
-				}
-				kv.data = strings.TrimSpace(s[:n])
-			}
-		}
+func maybeUnquote(s string) string {
+	if !possiblyQuoted(s) {
+		return s
 	}
-	if a != nil {
-		a.Fields = append(a.Fields, kv)
+	s1, err := literal.Unquote(s)
+	if err != nil {
+		return s
 	}
-	return n, err
+	return s1
 }
 
-func scanAttributeString(pos token.Pos, s string) (n int, str string, err errors.Error) {
-	if s == "" || (s[0] != '#' && s[0] != '"' && s[0] != '\'') {
-		return 0, "", nil
+func possiblyQuoted(s string) bool {
+	if len(s) < 2 {
+		return false
 	}
+	if s[0] == '#' && s[len(s)-1] == '#' {
+		return true
+	}
+	if s[0] == '"' && s[len(s)-1] == '"' {
+		return true
+	}
+	if s[0] == '\'' && s[len(s)-1] == '\'' {
+		return true
+	}
+	return false
+}
 
-	nHash := 0
+// scanAttributeTokens reads tokens from s until it encounters
+// a close token from the given bitmask. It returns the actual close token read.
+func scanAttributeTokens(s *scanner.Scanner, startPos token.Pos, close uint64) (token.Token, errors.Error) {
 	for {
-		if nHash < len(s) {
-			if s[nHash] == '#' {
-				nHash++
-				continue
-			}
-			if s[nHash] == '\'' || s[nHash] == '"' {
-				break
-			}
+		pos, tok, _ := s.Scan()
+		if s.ErrorCount > 0 {
+			// Shouldn't happen because the text should have been scanned previously by
+			// the regular CUE parser.
+			return 0, errors.Newf(startPos.Add(pos.Offset()), "error scanning attribute text")
 		}
-		return nHash, s[:nHash], errors.Newf(pos, "invalid attribute string")
+		if tok < 64 && (close&(1<<tok)) != 0 {
+			return tok, nil
+		}
+		var err error
+		switch tok {
+		case token.EOF:
+			err = fmt.Errorf("attribute missing '%s'", tokenMaskStr(close))
+		case token.LPAREN:
+			_, err = scanAttributeTokens(s, startPos, 1<<token.RPAREN)
+		case token.LBRACE:
+			_, err = scanAttributeTokens(s, startPos, 1<<token.RBRACE)
+		case token.LBRACK:
+			_, err = scanAttributeTokens(s, startPos, 1<<token.RBRACK)
+		case token.RPAREN, token.RBRACK, token.RBRACE:
+			err = fmt.Errorf("unexpected '%s'", tok)
+		}
+		if err != nil {
+			return 0, errors.Newf(startPos.Add(pos.Offset()), "%v", err)
+		}
 	}
+}
 
-	// Determine closing quote.
-	nQuote := 1
-	if c := s[nHash]; nHash+6 < len(s) && s[nHash+1] == c && s[nHash+2] == c {
-		nQuote = 3
+func tokenMaskStr(m uint64) string {
+	var buf strings.Builder
+	for t := token.Token(0); t < 64; t++ {
+		if (m & (1 << t)) != 0 {
+			if buf.Len() > 0 {
+				buf.WriteByte('|')
+			}
+			buf.WriteString(t.String())
+		}
 	}
-	close := s[nHash:nHash+nQuote] + s[:nHash]
-
-	// Search for closing quote.
-	index := strings.Index(s[len(close):], close)
-	if index == -1 {
-		return len(s), "", errors.Newf(pos, "attribute string not terminated")
-	}
-
-	index += 2 * len(close)
-	s, err2 := literal.Unquote(s[:index])
-	if err2 != nil {
-		return index, "", errors.Newf(pos, "invalid attribute string: %v", err2)
-	}
-	return index, s, nil
+	return buf.String()
 }

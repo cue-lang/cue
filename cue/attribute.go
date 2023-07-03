@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/export"
 )
@@ -45,7 +44,9 @@ func (v Value) Attribute(key string) Attribute {
 
 func newAttr(k internal.AttrKind, a *ast.Attribute) Attribute {
 	key, body := a.Split()
-	x := internal.ParseAttrBody(token.NoPos, body)
+	// Note: the body is always positioned just after
+	// the opening ( after the key.
+	x := internal.ParseAttrBody(a.Pos().Add(len(key)+1), body)
 	x.Name = key
 	x.Kind = k
 	return Attribute{x}
@@ -109,7 +110,20 @@ const (
 	// TODO: Merge: merge namesake attributes.
 )
 
-// An Attribute contains meta data about a field.
+// An Attribute contains metadata about a field.
+//
+// By convention, an attribute is split into positional arguments
+// according to the rules below. However, these are not mandatory.
+// To access the raw contents of an attribute, use [Attribute.Contents].
+//
+// Arguments are of the form key[=value] where key and value each
+// consist of an arbitrary number of CUE tokens with balanced brackets
+// ((), [], and {}). These are the arguments retrieved by the
+// [Attribute] methods.
+//
+// Leading and trailing white space will be stripped from both key and
+// value. If there is no value and the key consists of exactly one
+// quoted string, it will be unquoted.
 type Attribute struct {
 	attr internal.Attr
 }
@@ -140,9 +154,17 @@ func (a *Attribute) NumArgs() int {
 // Arg reports the contents of the ith comma-separated argument of a.
 //
 // If the argument contains an unescaped equals sign, it returns a key-value
-// pair. Otherwise it returns the contents in value.
+// pair. Otherwise it returns the contents in key.
 func (a *Attribute) Arg(i int) (key, value string) {
+	// TODO: Returning the contents in key for a non-key-value argument
+	// is counter to the original documentation for this method and
+	// counter-intuitive too, but it remains that way to avoid breaking
+	// backward compatibility. In the future it would be nice to
+	// change it to return ("", value) in this case.
 	f := a.attr.Fields[i]
+	if f.Key() == "" {
+		return f.Value(), ""
+	}
 	return f.Key(), f.Value()
 }
 

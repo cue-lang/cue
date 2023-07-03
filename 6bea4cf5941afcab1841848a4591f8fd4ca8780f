@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1abdccb7_7bae2191",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:58:31Z",
+      "side": 1,
+      "message": "LGTM module a couple of minor suggestions, thanks!",
+      "revId": "6bea4cf5941afcab1841848a4591f8fd4ca8780f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6837b48c_8a9e9210",
+        "filename": "cmd/cue/cmd/testdata/script/def_issue2251.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:58:31Z",
+      "side": 1,
+      "message": "It would have been nice to have added this test case before introducing this CL.",
+      "revId": "6bea4cf5941afcab1841848a4591f8fd4ca8780f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76084371_cf9446e0",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-03T16:58:31Z",
+      "side": 1,
+      "message": "or just `return e.finalize(v, expr)` and avoid the switch/outer shenanigans? Or factor the loop logic into a function.",
+      "revId": "6bea4cf5941afcab1841848a4591f8fd4ca8780f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

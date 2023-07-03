@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d34932d4_cb4b2275",
+        "filename": "cue/attribute.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T11:12:44Z",
+      "side": 1,
+      "message": "Please add a TODO that this was a bug for which we changed the API text for backwards compatibility.\n\nIt should probably reverted for a v1 API.",
+      "revId": "66296cb099bae9d84fa21923ddc7b0ea8619768c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9768d483_68a78b57",
+        "filename": "cue/attribute_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-03T11:12:44Z",
+      "side": 1,
+      "message": "Also test that `\"f g\"` in position for becomes \"f g\". Probably in an earlier CL",
+      "revId": "66296cb099bae9d84fa21923ddc7b0ea8619768c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

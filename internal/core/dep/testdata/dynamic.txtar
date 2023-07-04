@@ -23,10 +23,13 @@ a: {
 	c: {}
 }
 -- out/dependencies/field --
-middle
+line  reference    path of resulting vertex
+21:   middle    => middle
 -- out/dependencies/all --
-middle
+line  reference    path of resulting vertex
+21:   middle    => middle
 -- out/dependencies/dynamic --
-middle
-middle.la1
-middle.la2
+line  reference    path of resulting vertex
+21:   middle    => middle
+21:   x         => middle.la1
+21:   x         => middle.la2

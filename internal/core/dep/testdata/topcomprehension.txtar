@@ -22,17 +22,20 @@ a: {
 	b: {}
 }
 -- out/dependencies/field --
+line  reference    path of resulting vertex
 -- out/dependencies/all --
-key
-test
-key
-test
+line  reference    path of resulting vertex
+4:    key       => key
+5:    value     => test
+2:    key       => key
+3:    value     => test
 -- out/dependencies/dynamic --
-key
-test
-key
-a.test
-key
-test
-key
-a.test
+line  reference    path of resulting vertex
+4:    key       => key
+5:    value     => test
+11:   key       => key
+12:   value     => a.test
+2:    key       => key
+3:    value     => test
+9:    key       => key
+10:   value     => a.test

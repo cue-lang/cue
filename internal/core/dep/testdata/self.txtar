@@ -15,10 +15,13 @@ a: b: {
 
 m: 3
 -- out/dependencies/field --
+line  reference    path of resulting vertex
 -- out/dependencies/all --
-m
+line  reference    path of resulting vertex
+5:    m         => m
 -- out/dependencies/dynamic --
-m
-a.b.y
-a.b.x.f
-a.b
+line  reference    path of resulting vertex
+5:    m         => m
+6:    y         => a.b.y
+7:    f         => a.b.x.f
+10:   b         => a.b

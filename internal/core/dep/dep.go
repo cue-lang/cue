@@ -21,6 +21,17 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
+// TODO: for a public API, a better approach seems to be to have a single
+// Visit method, with a configuration to set a bunch of orthogonal options.
+// Here are some examples of the options:
+//   - Dynamic:   evaluate and descend into computed fields.
+//   - Recurse:   evaluate dependencies of subfields as well.
+//   - Inner:     report dependencies within the root being visited.
+//   - NonRooted: report dependencies that do not have a path to the root.
+//
+//   - ContinueOnError:  continue visiting even if there are errors.
+//   [add more as they come up]
+
 // A Dependency is a reference and the node that reference resolves to.
 type Dependency struct {
 	// Node is the referenced node.
@@ -227,72 +238,28 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	// checks.
 	ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r)
 
-	// If a vertex is dynamic, for instance the result of {foo: 1}.foo,
-	// then it means there is no valid path to the returned value and
-	// it is pointless to mark dependencies. Instead, we mark dependencies
-	// for the LHS of selector or index references.
-	var expr adt.Expr
-	if ref != nil && isDynamic(ref) {
-		switch x := r.(type) {
-		case *adt.SelectorExpr:
-			expr = x.X
-		case *adt.IndexExpr:
-			expr = x.X
-		}
-	}
 	// TODO: consider the case where an inlined composite literal does not
 	// resolve, but has references. For instance, {a: k, ref}.b would result
 	// in a failure during evaluation if b is not defined within ref. However,
 	// ref might still specialize to allow b.
-	if expr != nil {
-		// Within a dynamic struct, we always process all references,
-		// As these references will otherwise not be visited as part of
-		// a normal traversal as they have no path from the root to reach them.
-
-		// TODO: this probably processes more references than necessary.
-		// Consider:
-		//	x: {
-		//		foo: ref1
-		//		bar: ref2
-		//	}.bar
-		// In this case ref1 should probably not be processed.
-		saved := c.all
-		c.all = true
-		c.markExpr(env, expr)
-		c.all = saved
-		return
-	}
 
 	if ref != nil {
-		// If ref is within a let, we only care about dependencies referred to
-		// by internal expressions. The let expression itself is not considered
-		// a dependency and is considered part of the referring expression.
-		if hasLetParent(ref) {
-			// It is okay to use the Environment recorded in the arc, as
-			// lets that may vary per Environment already have a separate arc
-			// associated with them (see Vertex.MultiLet).
-			for _, x := range ref.Conjuncts {
-				c.markExpr(x.Env, x.Expr())
-			}
-			return
-		}
+		if ref.Rooted() {
+			c.reportDependency(ref, r)
+		} else { // Lets and dynamically created structs.
+			// Always process all references for non-rooted values, as
+			// these references will otherwise not be visited as part of a
+			// normal traversal.
 
-		if ref != c.node && ref != empty {
-			pkg := importRef(r.(adt.Expr)) // All resolvers are expressions.
-			if pkg == nil {
-				pkg = c.pkg
-			}
+			// It is okay to use the given env for lets, as lets that may vary
+			// per Environment already have a separate arc associated with them
+			// (see Vertex.MultiLet).
 
-			d := Dependency{
-				Node:      ref,
-				Reference: r,
-				pkg:       pkg,
-				top:       c.top,
-			}
-			if err := c.visit(d); err != nil {
-				c.err = err
-				panic(aborted)
-			}
+			saved := *c
+			c.all = true
+			c.top = false
+			c.traverseNotRooted(env, r.(adt.Expr))
+			*c = saved
 		}
 
 		return
@@ -317,6 +284,30 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	}
 }
 
+// reportDependency reports a dependency to the user of this package.
+// v must be the value that is obtained after resolving r.
+func (c *visitor) reportDependency(v *adt.Vertex, r adt.Resolver) {
+	if v == c.node || v == empty {
+		return
+	}
+
+	pkg := importRef(r.(adt.Expr)) // All resolvers are expressions.
+	if pkg == nil {
+		pkg = c.pkg
+	}
+
+	d := Dependency{
+		Node:      v,
+		Reference: r,
+		pkg:       pkg,
+		top:       c.top,
+	}
+	if err := c.visit(d); err != nil {
+		c.err = err
+		panic(aborted)
+	}
+}
+
 // TODO(perf): make this available as a property of vertices to avoid doing
 // work repeatedly.
 func hasLetParent(v *adt.Vertex) bool {
@@ -328,15 +319,117 @@ func hasLetParent(v *adt.Vertex) bool {
 	return false
 }
 
-// TODO(perf): make this available as a property of vertices to avoid doing
-// work repeatedly.
-func isDynamic(v *adt.Vertex) bool {
-	for ; v != nil; v = v.Parent {
-		if v.IsDynamic {
-			return true
+// traverseNotRooted traverses an expression for which there is no path from
+// the root of a tree. Such expressions are typically found within a let or
+// when selecting into a composit literal. In such cases, it is important to
+// find dependencies that will otherwise not be visited. The algorithm passes
+// corrects the found references by further unwinding the path of selectors
+// that led to the non-rooted value.
+func (c *visitor) traverseNotRooted(env *adt.Environment, ref adt.Expr, path ...adt.Resolver) *adt.Vertex {
+	var v *adt.Vertex
+	switch x := ref.(type) {
+	case nil:
+		return nil
+	case *adt.SelectorExpr:
+		v = c.traverseNotRooted(env, x.X, append(path, x)...)
+		if v == nil {
+			return nil
 		}
+		v = v.Lookup(x.Sel)
+		return c.traverseNotRooted(env, v, path...)
+
+	case *adt.IndexExpr:
+		v = c.traverseNotRooted(env, x.X, append(path, x)...)
+		if v == nil {
+			return nil
+		}
+		i, _ := c.ctxt.Evaluate(env, x.Index)
+		i = adt.Unwrap(i)
+		f := adt.LabelFromValue(c.ctxt, x.Index, i)
+		v = v.Lookup(f)
+		return c.traverseNotRooted(env, v, path...)
+
+	case adt.Resolver:
+		v, _ = c.ctxt.Resolve(adt.MakeConjunct(env, ref, adt.CloseInfo{}), x)
+		if v == nil {
+			return nil
+		}
+
+		if !v.Rooted() {
+			if len(path) == 0 {
+				for _, x := range v.Conjuncts {
+					c.markExpr(x.Env, x.Expr())
+				}
+			}
+			if hasLetParent(v) {
+				return v
+			}
+		}
+
+		if len(path) == 0 {
+			c.reportDependency(v, ref.(adt.Resolver))
+		} else {
+			c.markExprPath(env, v, path...)
+		}
+		return v
+
+	default:
+		value, _ := c.ctxt.Evaluate(env, ref)
+		v, _ = value.(*adt.Vertex)
+		if v == nil {
+			return nil
+		}
+		// TODO(perf): one level of  evaluation would suffice.
+		v.Finalize(c.ctxt)
+		for _, x := range v.Conjuncts {
+			expr := x.Expr()
+			if len(path) == 0 {
+				c.markExpr(x.Env, expr)
+				continue
+			}
+			c.markInnerResolvers(x.Env, expr, path...)
+		}
+		return v
 	}
-	return false
+}
+
+// markInnerResolvers marks all references that are inside an non-rooted struct
+// as dependencies. It extends the resolvers with the remaining path if
+// necessary.
+func (c *visitor) markInnerResolvers(env *adt.Environment, expr adt.Expr, path ...adt.Resolver) {
+	switch y := expr.(type) {
+	case adt.Resolver:
+		c.traverseNotRooted(env, expr, path...)
+
+	case *adt.BinaryExpr:
+		c.markInnerResolvers(env, y.X, path...)
+		c.markInnerResolvers(env, y.Y, path...)
+	}
+}
+
+func (c *visitor) feature(env *adt.Environment, r adt.Resolver) adt.Feature {
+	switch x := r.(type) {
+	case *adt.SelectorExpr:
+		return x.Sel
+	case *adt.IndexExpr:
+		v, _ := c.ctxt.Evaluate(env, x.Index)
+		v = adt.Unwrap(v)
+		return adt.LabelFromValue(c.ctxt, x.Index, v)
+	}
+	panic("unreachable")
+}
+
+func (c *visitor) markExprPath(env *adt.Environment, v *adt.Vertex, path ...adt.Resolver) {
+	var r adt.Resolver
+	for _, next := range path {
+		r = next
+		w := v.Lookup(c.feature(env, next))
+		if w == nil {
+			break
+		}
+		v = w
+	}
+	c.reportDependency(v, r)
 }
 
 func (c *visitor) markSubExpr(env *adt.Environment, x adt.Expr) {

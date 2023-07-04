@@ -5,17 +5,16 @@ let X = {c: v}.c.w
 let Y = {c: {out: v}.out}.c.w
 
 a: b: {
-	// TODO: fix these, should be v.w
 	x: X
 	y: Y
 }
 -- out/dependencies/field --
 line  reference    path of resulting vertex
 -- out/dependencies/all --
-line  reference    path of resulting vertex
-3:    v         => v
-4:    v         => v
+line  reference                path of resulting vertex
+3:    {c: v}.c.w            => v.w
+4:    {c: {out: v}.out}.c.w => v.w
 -- out/dependencies/dynamic --
-line  reference    path of resulting vertex
-3:    v         => v
-4:    v         => v
+line  reference                path of resulting vertex
+3:    {c: v}.c.w            => v.w
+4:    {c: {out: v}.out}.c.w => v.w

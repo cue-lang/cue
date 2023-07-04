@@ -147,7 +147,7 @@ func (f Feature) ToValue(ctx *OpContext) Value {
 
 // StringLabel converts s to a string label.
 func (c *OpContext) StringLabel(s string) Feature {
-	return labelFromValue(c, nil, &String{Str: s})
+	return LabelFromValue(c, nil, &String{Str: s})
 }
 
 // MakeStringLabel creates a label for the given string.
@@ -228,7 +228,7 @@ func MakeIntLabel(t FeatureType, i int64) Feature {
 
 const msgGround = "invalid non-ground value %s (must be concrete %s)"
 
-func labelFromValue(c *OpContext, src Expr, v Value) Feature {
+func LabelFromValue(c *OpContext, src Expr, v Value) Feature {
 	v, _ = c.getDefault(v)
 
 	var i int64

@@ -926,7 +926,7 @@ func (c *OpContext) undefinedFieldError(v *Vertex, code ErrorCode) {
 }
 
 func (c *OpContext) Label(src Expr, x Value) Feature {
-	return labelFromValue(c, src, x)
+	return LabelFromValue(c, src, x)
 }
 
 func (c *OpContext) typeError(v Value, k Kind) {

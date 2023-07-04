@@ -29,10 +29,10 @@ line  reference    path of resulting vertex
 line  reference    path of resulting vertex
 4:    outer     => outer
 -- out/dependencies/dynamic --
-line  reference    path of resulting vertex
-4:    instance  => a.instance
-4:    outer     => outer
-5:    val       => a.command.alias.val
-13:   #base     => a.#base
-19:   #combined => a.#combined
-14:   X.enabled => a.instance.enabled
+line  reference                                     path of resulting vertex
+4:    (instance & outer & {enabled: true}).value => a.instance.value
+4:    (instance & outer & {enabled: true}).value => outer
+5:    val                                        => a.command.alias.val
+13:   #base                                      => a.#base
+19:   #combined                                  => a.#combined
+14:   X.enabled                                  => a.instance.enabled

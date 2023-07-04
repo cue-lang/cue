@@ -7,8 +7,10 @@ let X = {c: d: v}
 a: b: X.c
 -- out/dependencies/field --
 line  reference    path of resulting vertex
+3:    v         => v
 -- out/dependencies/all --
 line  reference    path of resulting vertex
 3:    v         => v
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
+3:    v         => v

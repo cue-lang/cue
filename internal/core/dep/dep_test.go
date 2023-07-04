@@ -76,19 +76,19 @@ func TestVisit(t *testing.T) {
 				fmt.Fprintf(tw, "line \vreference\v   path of resulting vertex\n")
 
 				tc.fn(ctxt, nil, n, func(d dep.Dependency) error {
-					var ref string
-					var line int
-					// TODO: remove check at some point.
-					if d.Reference != nil {
-						src := d.Reference.Source()
-						line = src.Pos().Line()
-						b, _ := format.Node(src)
-						ref = string(b)
+					if d.Reference == nil {
+						t.Fatal("no reference")
 					}
+					src := d.Reference.Source()
+					line := src.Pos().Line()
+					b, _ := format.Node(src)
+					ref := string(b)
 					str := value.Make(ctxt, d.Node).Path().String()
 					if i := d.Import(); i != nil {
 						path := i.ImportPath.StringValue(ctxt)
 						str = fmt.Sprintf("%q.%s", path, str)
+					} else if !d.Node.Rooted() {
+						str = "**non-rooted**"
 					}
 					fmt.Fprintf(tw, "%d:\v%s\v=> %s\n", line, ref, str)
 					return nil

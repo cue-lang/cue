@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1fb79335_b797cdb2",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 241,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-04T08:38:10Z",
+      "side": 1,
+      "message": "Marcel, did you see this comment? I assume you did given the TODO below, but just in case, since this comment is unresolved.",
+      "parentUuid": "d95dd653_3e3a3e29",
+      "revId": "e66b0f06de04864773c392ba3ea1f6919b0f9ca3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fcd759c5_2399369e",
         "filename": "internal/core/dep/dep.go",
         "patchSetId": 3

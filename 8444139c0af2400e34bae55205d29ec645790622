@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcecf427_f5aff877",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-04T08:38:10Z",
+      "side": 1,
+      "message": "interesting that the commit message is so narrow, BTW. You\u0027re easily 20 characters under the usual limit, and you can see the blue vertical bar if you open the commit message in the Gerrit diff viewer :)",
+      "revId": "8444139c0af2400e34bae55205d29ec645790622",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

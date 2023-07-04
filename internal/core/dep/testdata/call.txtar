@@ -6,11 +6,14 @@ a: b: json.Marshal({#a: str})
 
 str: "x:y:z"
 -- out/dependencies/field --
-"encoding/json".Marshal
-str
+line  reference       path of resulting vertex
+4:    json.Marshal => "encoding/json".Marshal
+4:    str          => str
 -- out/dependencies/all --
-"encoding/json".Marshal
-str
+line  reference       path of resulting vertex
+4:    json.Marshal => "encoding/json".Marshal
+4:    str          => str
 -- out/dependencies/dynamic --
-"encoding/json".Marshal
-str
+line  reference       path of resulting vertex
+4:    json.Marshal => "encoding/json".Marshal
+4:    str          => str

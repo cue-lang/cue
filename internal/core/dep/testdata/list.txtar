@@ -6,9 +6,12 @@ a: b: [ d, ...e] & [ 1, 2, ...]
 d: int
 e: int
 -- out/dependencies/field --
+line  reference    path of resulting vertex
 -- out/dependencies/all --
-d
-e
+line  reference    path of resulting vertex
+3:    d         => d
+3:    e         => e
 -- out/dependencies/dynamic --
-d
-e
+line  reference    path of resulting vertex
+3:    d         => d
+3:    e         => e

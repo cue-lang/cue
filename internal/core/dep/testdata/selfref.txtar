@@ -25,11 +25,11 @@ outer: k: l: int
 
 -- out/dependencies/field --
 -- out/dependencies/all --
-outer
+4: outer: outer
 -- out/dependencies/dynamic --
-a.instance
-outer
-a.command.alias.val
-a.#base
-a.#combined
-a.instance.enabled
+4:  instance:  a.instance
+4:  outer:     outer
+5:  val:       a.command.alias.val
+13: #base:     a.#base
+19: #combined: a.#combined
+14: X.enabled: a.instance.enabled

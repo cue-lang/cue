@@ -12,17 +12,17 @@ value:   c
 name:    "name"
 c:       "descendants"
 -- out/dependencies/field --
-pattern
-name
+2: pattern: pattern
+3: name:    name
 -- out/dependencies/all --
-pattern
-c
-name
-c
-c
-c
+2: pattern: pattern
+2: c:       c
+3: name:    name
+3: c:       c
+4: c:       c
+5: c:       c
 -- out/dependencies/dynamic --
-pattern
-name
-c
-c
+2: pattern: pattern
+3: name:    name
+4: c:       c
+3: c:       c

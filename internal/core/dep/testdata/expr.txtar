@@ -7,22 +7,22 @@ c: [1, 2]
 d: 2
 e: 3
 -- out/dependencies/field --
-d
-d
-c
-c[0]
-e
+3: d:    d
+3: d:    d
+3: c:    c
+3: c[0]: c[0]
+3: e:    e
 -- out/dependencies/all --
-d
-d
-c
-c[0]
-e
-d
-e
+3: d:    d
+3: d:    d
+3: c:    c
+3: c[0]: c[0]
+3: e:    e
+3: d:    d
+3: e:    e
 -- out/dependencies/dynamic --
-d
-d
-c
-c[0]
-e
+3: d:    d
+3: d:    d
+3: c:    c
+3: c[0]: c[0]
+3: e:    e

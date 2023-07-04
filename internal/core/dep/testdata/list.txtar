@@ -7,8 +7,8 @@ d: int
 e: int
 -- out/dependencies/field --
 -- out/dependencies/all --
-d
-e
+3: d: d
+3: e: e
 -- out/dependencies/dynamic --
-d
-e
+3: d: d
+3: e: e

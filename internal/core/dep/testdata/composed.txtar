@@ -9,6 +9,6 @@ a: b: {$id: "foo"} & {
 }
 -- out/dependencies/field --
 -- out/dependencies/all --
-t1.stdout
+7: t1.stdout: t1.stdout
 -- out/dependencies/dynamic --
-t1.stdout
+7: t1.stdout: t1.stdout

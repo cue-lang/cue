@@ -17,18 +17,18 @@ f: {
     g: 3
 }
 -- out/dependencies/field --
-c
-e
+2: c: c
+5: e: e
 -- out/dependencies/all --
-c
-e
-d
-f.g
+2: c:   c
+5: e:   e
+5: d:   d
+8: f.g: f.g
 -- out/dependencies/dynamic --
-c
-e
-f.g
-c[0]
-d
-c[1]
-d
+2: c:   c
+5: e:   e
+8: f.g: f.g
+5: x:   c[0]
+5: d:   d
+5: x:   c[1]
+5: d:   d

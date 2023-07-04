@@ -5,23 +5,23 @@ c: d: 3
 d: "d"
 e: "e"
 -- out/dependencies/field --
-c.d
-c
-c
-e
-c.d
-c.d
+1: c.d:    c.d
+1: c:      c
+1: c:      c
+1: e:      e
+1: c["d"]: c.d
+1: c[d]:   c.d
 -- out/dependencies/all --
-c.d
-c
-c
-e
-c.d
-c.d
+1: c.d:    c.d
+1: c:      c
+1: c:      c
+1: e:      e
+1: c["d"]: c.d
+1: c[d]:   c.d
 -- out/dependencies/dynamic --
-c.d
-c
-c
-e
-c.d
-c.d
+1: c.d:    c.d
+1: c:      c
+1: c:      c
+1: e:      e
+1: c["d"]: c.d
+1: c[d]:   c.d

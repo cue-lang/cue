@@ -9,11 +9,11 @@ a: b: X
 c: 5
 d: 6
 -- out/dependencies/field --
-c
-d
+2: c: c
+2: d: d
 -- out/dependencies/all --
-c
-d
+2: c: c
+2: d: d
 -- out/dependencies/dynamic --
-c
-d
+2: c: c
+2: d: d

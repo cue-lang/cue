@@ -5,14 +5,13 @@ let X = {c: v}.c.w
 let Y = {c: {out: v}.out}.c.w
 
 a: b: {
-	// TODO: fix these, should be v.w
 	x: X
 	y: Y
 }
 -- out/dependencies/field --
 -- out/dependencies/all --
-3: v: v
-4: v: v
+3: {c: v}.c.w:            v.w
+4: {c: {out: v}.out}.c.w: v.w
 -- out/dependencies/dynamic --
-3: v: v
-4: v: v
+3: {c: v}.c.w:            v.w
+4: {c: {out: v}.out}.c.w: v.w

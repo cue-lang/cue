@@ -6,6 +6,8 @@ let X = {c: d: v}
 
 a: b: X.c
 -- out/dependencies/field --
+3: v: v
 -- out/dependencies/all --
 3: v: v
 -- out/dependencies/dynamic --
+3: v: v

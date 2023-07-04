@@ -27,9 +27,9 @@ outer: k: l: int
 -- out/dependencies/all --
 4: outer: outer
 -- out/dependencies/dynamic --
-4:  instance:  a.instance
-4:  outer:     outer
-5:  val:       a.command.alias.val
-13: #base:     a.#base
-19: #combined: a.#combined
-14: X.enabled: a.instance.enabled
+4:  (instance & outer & {enabled: true}).value: a.instance.value
+4:  (instance & outer & {enabled: true}).value: outer
+5:  val:                                        a.command.alias.val
+13: #base:                                      a.#base
+19: #combined:                                  a.#combined
+14: X.enabled:                                  a.instance.enabled

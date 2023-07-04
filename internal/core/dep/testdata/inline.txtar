@@ -110,59 +110,63 @@ msg: string
 
 -- out/dependencies/field --
 -- out/dependencies/all --
-10: s.k:                      s.k
-13: q:                        q
-14: q:                        q
-15: q:                        q
-18: q:                        q
-20: q:                        q
-21: q:                        q
-22: q:                        q
-28: r.k:                      r.k
-29: r.k.l:                    r.k.l
-34: q:                        q
-35: s:                        s
-40: s:                        s
-45: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
-45: msg:                      msg
-51: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
-51: msg:                      msg
-57: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
-57: msg:                      msg
-63: strings.ToUpper:          "strings".ToUpper
-63: msg:                      msg
-78: #f:                       #f
-93: #g:                       #g
+10:  s.k:                                                  s.k
+13:  q:                                                    q
+14:  q:                                                    q
+15:  {out: q}.out.x:                                       q.x
+18:  q:                                                    q
+20:  {out: r: q}.out.r.x:                                  q.x
+21:  {out: {out: r: q}.out}.out.r.x:                       q.x
+22:  {out: {out: r: q}.out.r}.out.x:                       q.x
+28:  r.k:                                                  r.k
+29:  r.k.l:                                                r.k.l
+34:  q:                                                    q
+40:  s:                                                    s
+39:  other:                                                **non-rooted**
+45:  regexp.FindNamedSubmatch:                             "regexp".FindNamedSubmatch
+45:  msg:                                                  msg
+51:  regexp.FindNamedSubmatch:                             "regexp".FindNamedSubmatch
+51:  msg:                                                  msg
+57:  regexp.FindNamedSubmatch:                             "regexp".FindNamedSubmatch
+57:  msg:                                                  msg
+78:  (#f & {arg: runs.t1.stdout + runs.t2.stdout}).result: #f.result
+106: strings.Join:                                         "strings".Join
+106: strings.Split:                                        "strings".Split
+106: arg:                                                  **non-rooted**
+93:  (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result: #g.result
+108: strings.Join:                                         "strings".Join
+108: strings.Split:                                        "strings".Split
 -- out/dependencies/dynamic --
-8:  c:                        a.b.c
-10: s.k:                      s.k
-12: c:                        a.b.c
-13: q:                        q
-14: q:                        q
-15: q:                        q
-18: q:                        q
-19: c:                        a.b.c
-20: q:                        q
-21: q:                        q
-22: q:                        q
-25: h1.r:                     a.b.h1.r
-26: h1.r.s:                   a.b.h1.r.s
-28: r.k:                      r.k
-29: r.k.l:                    r.k.l
-34: q:                        q
-35: s:                        s
-40: s:                        s
-45: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
-45: msg:                      msg
-51: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
-51: msg:                      msg
-57: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
-57: msg:                      msg
-63: strings.ToUpper:          "strings".ToUpper
-63: msg:                      msg
-78: #f:                       #f
-78: runs.t1.stdout:           a.b.t1.runs.t1.stdout
-78: runs.t2.stdout:           a.b.t1.runs.t2.stdout
-93: #g:                       #g
-93: runs.t1.stdout:           a.b.t2.runs.t1.stdout
-93: runs.t2.stdout:           a.b.t2.runs.t2.stdout
+8:   c:                                                    a.b.c
+10:  s.k:                                                  s.k
+12:  c:                                                    a.b.c
+13:  q:                                                    q
+14:  q:                                                    q
+15:  {out: q}.out.x:                                       q.x
+18:  q:                                                    q
+19:  {out: {out: r: c}.out}.out.r[0]:                      a.b.c[0]
+20:  {out: r: q}.out.r.x:                                  q.x
+21:  {out: {out: r: q}.out}.out.r.x:                       q.x
+22:  {out: {out: r: q}.out.r}.out.x:                       q.x
+25:  h1.r:                                                 a.b.h1.r
+26:  h1.r.s:                                               a.b.h1.r.s
+28:  r.k:                                                  r.k
+29:  r.k.l:                                                r.k.l
+34:  q:                                                    q
+40:  s:                                                    s
+39:  other:                                                **non-rooted**
+45:  regexp.FindNamedSubmatch:                             "regexp".FindNamedSubmatch
+45:  msg:                                                  msg
+51:  regexp.FindNamedSubmatch:                             "regexp".FindNamedSubmatch
+51:  msg:                                                  msg
+57:  regexp.FindNamedSubmatch:                             "regexp".FindNamedSubmatch
+57:  msg:                                                  msg
+78:  (#f & {arg: runs.t1.stdout + runs.t2.stdout}).result: #f.result
+106: strings.Join:                                         "strings".Join
+106: strings.Split:                                        "strings".Split
+78:  runs.t1.stdout:                                       a.b.t1.runs.t1.stdout
+78:  runs.t2.stdout:                                       a.b.t1.runs.t2.stdout
+106: arg:                                                  **non-rooted**
+93:  (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result: #g.result
+108: strings.Join:                                         "strings".Join
+108: strings.Split:                                        "strings".Split

@@ -44,8 +44,10 @@ type Codec struct {
 // It is safe to use the methods of Codec concurrently as long as the given
 // Runtime is not used elsewhere while using Codec. However, only the concurrent
 // use of Decode, Validate, and Complete is efficient.
-func New(r *cue.Runtime, c *Config) *Codec {
-	return &Codec{runtime: value.ConvertToContext(r)}
+//
+// Note: calling this with a *cue.Runtime value is deprecated.
+func New[Ctx cue.Runtime | cue.Context](ctx *Ctx, c *Config) *Codec {
+	return &Codec{runtime: value.ConvertToContext(ctx)}
 }
 
 // ExtractType extracts a CUE value from a Go type.

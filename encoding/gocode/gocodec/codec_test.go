@@ -22,6 +22,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 )
 
 type Sum struct {
@@ -80,8 +81,8 @@ func TestValidate(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			r := &cue.Runtime{}
-			codec := New(r, nil)
+			ctx := cuecontext.New()
+			codec := New(ctx, nil)
 
 			v, err := codec.ExtractType(tc.value)
 			if err != nil {
@@ -89,15 +90,22 @@ func TestValidate(t *testing.T) {
 			}
 
 			if tc.constraints != "" {
-				inst, err := r.Compile(tc.name, tc.constraints)
-				if err != nil {
+				v1 := ctx.CompileString(tc.constraints, cue.Filename(tc.name))
+				if err := v1.Err(); err != nil {
 					t.Fatal(err)
 				}
-				v = v.Unify(inst.Value())
+				v = v.Unify(v1)
 			}
 
 			err = codec.Validate(v, tc.value)
 			checkErr(t, err, tc.err)
+
+			// Smoke test that it seems to work OK with deprecated *cue.Runtime argument
+			r := &cue.Runtime{}
+			codec = New(r, nil)
+			if _, err := codec.ExtractType(tc.value); err != nil {
+				t.Fatal(err)
+			}
 		})
 	}
 }

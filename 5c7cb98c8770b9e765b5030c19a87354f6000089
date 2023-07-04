@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15047fda_3acb8aa1",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-04T18:50:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8726e1a9_561ff14f",
+      "revId": "5c7cb98c8770b9e765b5030c19a87354f6000089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "337ff081_0994369e",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-07-03T16:47:17Z",
       "side": 1,
       "message": "Maybe add a comment saying why we\u0027re sure that the Resolver is an Expr here?",
+      "revId": "5c7cb98c8770b9e765b5030c19a87354f6000089",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "642cd10f_1596fd00",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-04T18:50:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "337ff081_0994369e",
       "revId": "5c7cb98c8770b9e765b5030c19a87354f6000089",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

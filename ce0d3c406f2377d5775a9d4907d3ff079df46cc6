@@ -16,6 +16,24 @@
       "message": "Or, given that we\u0027ve got `qt` as a dependency now:\n\n```\nqt.Assert(t, qt.PanicMatches(func() {\n    var c cue.Context\n    c.CompileString(\"1\")\n}, `.*use cuecontext\\.New.*`))\n```\n\n:shrug:",
       "revId": "ce0d3c406f2377d5775a9d4907d3ff079df46cc6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7b04f4e_2fcc6bab",
+        "filename": "cue/context_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-04T16:47:48Z",
+      "side": 1,
+      "message": "Ah, was thinking of it but couldn\u0027t remember the name. Quickly looked at check.v1, which we depend on, but looked pretty bad.\n\nI assume this fails if it doesn\u0027t panic.",
+      "parentUuid": "0bde13ed_e219c6ac",
+      "revId": "ce0d3c406f2377d5775a9d4907d3ff079df46cc6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

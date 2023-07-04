@@ -138,15 +138,7 @@ an existing set of Kubernetes configurations is available in
 
 ### Contributing
 
-Our canonical Git repository is located at
-https://review.gerrithub.io/q/project:cue-lang%252Fcue.
-
-To contribute, please read the [Contribution Guide](./doc/contribute.md).
-
-To report issues or make a feature request, use the
-[issue tracker](https://cuelang.org/issues).
-
-Changes can be contributed using Gerrit or Github pull requests.
+To contribute, please read the [Contribution Guide](CONTRIBUTING.md).
 
 
 ## Code of Conduct

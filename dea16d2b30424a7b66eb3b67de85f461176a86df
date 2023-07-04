@@ -16,6 +16,24 @@
       "message": "Maybe introduce a Config to avoid having more Init methods?\n\nLike (* Scanner) InitString(s string, c *Config)\n\nOr alternatively add the offset in the error handler?",
       "revId": "dea16d2b30424a7b66eb3b67de85f461176a86df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "407323b3_2f24834f",
+        "filename": "cue/scanner/scanner.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-04T10:01:15Z",
+      "side": 1,
+      "message": "As discussed, it turns out that the new API isn\u0027t actually needed, so we can punt this down the road for now.",
+      "parentUuid": "f3d47975_f20c04fe",
+      "revId": "dea16d2b30424a7b66eb3b67de85f461176a86df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

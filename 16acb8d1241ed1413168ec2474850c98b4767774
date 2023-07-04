@@ -16,6 +16,40 @@
       "message": "LGTM but I\u0027d like to see a test case.",
       "revId": "16acb8d1241ed1413168ec2474850c98b4767774",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eac437dc_3acfe20f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-04T08:39:44Z",
+      "side": 1,
+      "message": "Tend to agree with Roger that a regression test would be good.",
+      "revId": "16acb8d1241ed1413168ec2474850c98b4767774",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "810b58b3_af4bf898",
+        "filename": "cue/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-04T08:39:44Z",
+      "side": 1,
+      "message": "nit: I think `cuecontext.New` is enough to reference the constructor, just like we do in general in godoc comments.",
+      "revId": "16acb8d1241ed1413168ec2474850c98b4767774",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

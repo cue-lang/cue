@@ -999,10 +999,3 @@ chmod +x .git/hooks/prepare-commit-msg
 
 If you already have a `prepare-commit-msg` hook, adapt it accordingly. The `-s`
 flag will now be implied every time a commit is created.
-
-
-## Code of Conduct
-
-Guidelines for participating in CUE community spaces and a reporting process for
-handling issues can be found in the [Code of
-Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).

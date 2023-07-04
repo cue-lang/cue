@@ -136,19 +136,6 @@ an existing set of Kubernetes configurations is available in
 - [`cue` Command line reference](./doc/cmd/cue.md): the `cue` command
 
 
-### Contributing
-
-Our canonical Git repository is located at
-https://review.gerrithub.io/q/project:cue-lang%252Fcue.
-
-To contribute, please read the [Contribution Guide](./doc/contribute.md).
-
-To report issues or make a feature request, use the
-[issue tracker](https://cuelang.org/issues).
-
-Changes can be contributed using Gerrit or Github pull requests.
-
-
 ## Code of Conduct
 
 Guidelines for participating in CUE community spaces and a reporting process for

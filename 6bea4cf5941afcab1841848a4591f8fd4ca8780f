@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ddd6029_0df4901b",
+        "filename": "cmd/cue/cmd/testdata/script/def_issue2251.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-04T14:00:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6837b48c_8a9e9210",
+      "revId": "6bea4cf5941afcab1841848a4591f8fd4ca8780f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "76084371_cf9446e0",
@@ -66,6 +84,24 @@
       "side": 1,
       "message": "I would also prefer the first option that Roger suggests.",
       "parentUuid": "76084371_cf9446e0",
+      "revId": "6bea4cf5941afcab1841848a4591f8fd4ca8780f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36dd657f_6d286625",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-04T14:00:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b0d328f_106b1e7f",
       "revId": "6bea4cf5941afcab1841848a4591f8fd4ca8780f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

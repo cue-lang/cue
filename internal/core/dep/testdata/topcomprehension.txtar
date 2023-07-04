@@ -23,16 +23,16 @@ a: {
 }
 -- out/dependencies/field --
 -- out/dependencies/all --
-4: key:   key
+4: key:   **non-rooted**
 5: value: **non-rooted**
-2: key:   key
+2: key:   **non-rooted**
 3: value: **non-rooted**
 -- out/dependencies/dynamic --
-4:  key:   key
+4:  key:   **non-rooted**
 5:  value: **non-rooted**
-11: key:   key
+11: key:   **non-rooted**
 12: value: **non-rooted**
-2:  key:   key
+2:  key:   **non-rooted**
 3:  value: **non-rooted**
-9:  key:   key
+9:  key:   **non-rooted**
 10: value: **non-rooted**

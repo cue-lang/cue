@@ -191,6 +191,11 @@ func TestAttributeString(t *testing.T) {
 		pos:  3,
 		str:  `e=x y`,
 	}, {
+		path: "b",
+		attr: "foo",
+		pos:  4,
+		str:  `f g`,
+	}, {
 		path: "e",
 		attr: "bar",
 		err:  errors.New(`attribute "bar" does not exist`),

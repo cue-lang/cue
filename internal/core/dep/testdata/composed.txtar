@@ -8,7 +8,10 @@ a: b: {$id: "foo"} & {
 	text: t1.stdout
 }
 -- out/dependencies/field --
+line  reference    path of resulting vertex
 -- out/dependencies/all --
-t1.stdout
+line  reference    path of resulting vertex
+7:    t1.stdout => t1.stdout
 -- out/dependencies/dynamic --
-t1.stdout
+line  reference    path of resulting vertex
+7:    t1.stdout => t1.stdout

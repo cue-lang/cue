@@ -9,11 +9,14 @@ a: b: X
 c: 5
 d: 6
 -- out/dependencies/field --
-c
-d
+line  reference    path of resulting vertex
+2:    c         => c
+2:    d         => d
 -- out/dependencies/all --
-c
-d
+line  reference    path of resulting vertex
+2:    c         => c
+2:    d         => d
 -- out/dependencies/dynamic --
-c
-d
+line  reference    path of resulting vertex
+2:    c         => c
+2:    d         => d

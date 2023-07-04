@@ -1,5 +1,4 @@
 -- in.cue --
-
 a: b: {
 	c: [int, int]
 	d: [c][0]
@@ -27,20 +26,23 @@ q: {
 
 r: {out: k: l: string}.out
 -- out/dependencies/field --
+line  reference    path of resulting vertex
 -- out/dependencies/all --
-q
-q
-q
-r.k
-r.k.l
+line  reference    path of resulting vertex
+5:    q         => q
+6:    q         => q
+12:   q         => q
+18:   r.k       => r.k
+19:   r.k.l     => r.k.l
 -- out/dependencies/dynamic --
-a.b.c
-a.b.c
-q
-q
-a.b.c
-q
-a.b.h1.r
-a.b.h1.r.s
-r.k
-r.k.l
+line  reference    path of resulting vertex
+3:    c         => a.b.c
+4:    c         => a.b.c
+5:    q         => q
+6:    q         => q
+9:    c         => a.b.c
+12:   q         => q
+15:   h1.r      => a.b.h1.r
+16:   h1.r.s    => a.b.h1.r.s
+18:   r.k       => r.k
+19:   r.k.l     => r.k.l

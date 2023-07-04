@@ -18,9 +18,11 @@ import (
 	"fmt"
 	"strings"
 	"testing"
+	"text/tabwriter"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/dep"
@@ -68,13 +70,27 @@ func TestVisit(t *testing.T) {
 			w := t.Writer(tc.name)
 
 			t.Run(tc.name, func(sub *testing.T) {
+				tw := tabwriter.NewWriter(w, 0, 4, 1, ' ', 0)
+				defer tw.Flush()
+
+				fmt.Fprintf(tw, "line \vreference\v   path of resulting vertex\n")
+
 				tc.fn(ctxt, nil, n, func(d dep.Dependency) error {
+					var ref string
+					var line int
+					// TODO: remove check at some point.
+					if d.Reference != nil {
+						src := d.Reference.Source()
+						line = src.Pos().Line()
+						b, _ := format.Node(src)
+						ref = string(b)
+					}
 					str := value.Make(ctxt, d.Node).Path().String()
 					if i := d.Import(); i != nil {
 						path := i.ImportPath.StringValue(ctxt)
 						str = fmt.Sprintf("%q.%s", path, str)
 					}
-					fmt.Fprintln(w, str)
+					fmt.Fprintf(tw, "%d:\v%s\v=> %s\n", line, ref, str)
 					return nil
 				})
 			})

@@ -1,45 +1,168 @@
 -- in.cue --
+import (
+	"regexp"
+	"strings"
+)
+
 a: b: {
 	c: [int, int]
-	d: [c][0]
-	e: {out: c}.out
-	f: {out: q}.out
-	g: {out: q}.out
+	d: [c][0]  // a.b.c (dynamic/inner only)
+
+	e: s.k
+
+	f1: {out: c}.out   // a.b.c (dynamic/inner only)
+	f2: {out: q}.out   // q
+	f3: {out: q}.out   // q
+	f4: {out: q}.out.x // q.x
 
 	h1: {out: r: s: string}.out
-	h2: {out: {out: r: c}.out}.out.r[0]
-	// TODO: Should this reference be q or q.x?
-	// q is an approximation, but q.x is more precise, it seems.
-	h3: {out: {out: r: q}.out}.out.r.x
+	h2: {out: {out: r: q}.out}.out.r    // q
+	h3: {out: {out: r: c}.out}.out.r[0] // a.b.c[0] (dynamic/inner only)
+	h4: {out: r: q}.out.r.x             // q.x
+	h5: {out: {out: r: q}.out}.out.r.x  // q.x
+	h6: {out: {out: r: q}.out.r}.out.x  // q.x
 
-	// TODO: filter these dependencies?
-	i: h1.r
-	j: h1.r.s
+	// Dynamic processing reports dependencies within the root.
+	i: h1.r   // a.b.h1.r
+	j: h1.r.s // a.b.h1.r.s
 
-	k: r.k
-	l: r.k.l
+	k: r.k   // r.k
+	l: r.k.l // r.k.l
+
+	// Do not report dependencies that are not selected and not needed for
+	// evaluating the ultimate value.
+	m1: {
+		out:   q
+		other: s // should not appear in output
+	}.out
+
+	m2: {
+		out:   other
+		other: s // should appear in output
+	}.out
+
+	m3: {
+		// report msg
+		regexp.FindNamedSubmatch(#"Hello (?P<out>\w*)!"#, msg)
+	}.out
+
+	m4: {
+		// Theoretically could not report message, but it is hard to know in
+		// general whether a function will return a result. So report.
+		regexp.FindNamedSubmatch(#"Hello (?P<person>\w*)!"#, msg)
+		out: "foo"
+	}.out
+
+	m5: {
+		// report msg
+		regexp.FindNamedSubmatch(#"Hello (?P<person>\w*)!"#, msg)
+		out:    person
+		person: string
+	}.out
+
+	m6: {
+		person: strings.ToUpper(msg) // do not report msg
+		out:    "foo"
+	}.out
+
+	t1: {
+		runs: t1:  {
+			cmd: ["sh", "-c", "sleep 1; echo t1"]
+			stdout: string
+		}
+		runs: t2:  {
+			cmd: ["sh", "-c", "sleep 1; echo t2"]
+			stdout: string
+		}
+		print:  {
+			// report the references in arg
+			text: (#f & {arg: runs.t1.stdout + runs.t2.stdout}).result
+		}
+	}
+
+	t2: {
+		runs: t1:  {
+			cmd: ["sh", "-c", "sleep 1; echo t1"]
+			stdout: string
+		}
+		runs: t2:  {
+			cmd: ["sh", "-c", "sleep 1; echo t2"]
+			stdout: string
+		}
+		print:  {
+			// do not report the references in arg
+			text: (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result
+		}
+	}
 }
 
-q: {
-	x: [...int]
-}
-
+q: x: y: [...int]
 r: {out: k: l: string}.out
+s: k: l: int
+
+msg: string
+
+#f: {
+	arg: string
+	result: strings.Join(strings.Split(arg, ""), ".")
+}
+#g: result: strings.Join(strings.Split("foo.bar", ""), ".")
+
 -- out/dependencies/field --
 -- out/dependencies/all --
-5:  q:     q
-6:  q:     q
-12: q:     q
-18: r.k:   r.k
-19: r.k.l: r.k.l
+10: s.k:                      s.k
+13: q:                        q
+14: q:                        q
+15: q:                        q
+18: q:                        q
+20: q:                        q
+21: q:                        q
+22: q:                        q
+28: r.k:                      r.k
+29: r.k.l:                    r.k.l
+34: q:                        q
+35: s:                        s
+40: s:                        s
+45: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
+45: msg:                      msg
+51: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
+51: msg:                      msg
+57: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
+57: msg:                      msg
+63: strings.ToUpper:          "strings".ToUpper
+63: msg:                      msg
+78: #f:                       #f
+93: #g:                       #g
 -- out/dependencies/dynamic --
-3:  c:      a.b.c
-4:  c:      a.b.c
-5:  q:      q
-6:  q:      q
-9:  c:      a.b.c
-12: q:      q
-15: h1.r:   a.b.h1.r
-16: h1.r.s: a.b.h1.r.s
-18: r.k:    r.k
-19: r.k.l:  r.k.l
+8:  c:                        a.b.c
+10: s.k:                      s.k
+12: c:                        a.b.c
+13: q:                        q
+14: q:                        q
+15: q:                        q
+18: q:                        q
+19: c:                        a.b.c
+20: q:                        q
+21: q:                        q
+22: q:                        q
+25: h1.r:                     a.b.h1.r
+26: h1.r.s:                   a.b.h1.r.s
+28: r.k:                      r.k
+29: r.k.l:                    r.k.l
+34: q:                        q
+35: s:                        s
+40: s:                        s
+45: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
+45: msg:                      msg
+51: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
+51: msg:                      msg
+57: regexp.FindNamedSubmatch: "regexp".FindNamedSubmatch
+57: msg:                      msg
+63: strings.ToUpper:          "strings".ToUpper
+63: msg:                      msg
+78: #f:                       #f
+78: runs.t1.stdout:           a.b.t1.runs.t1.stdout
+78: runs.t2.stdout:           a.b.t1.runs.t2.stdout
+93: #g:                       #g
+93: runs.t1.stdout:           a.b.t2.runs.t1.stdout
+93: runs.t2.stdout:           a.b.t2.runs.t2.stdout

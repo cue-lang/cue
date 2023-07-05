@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32053678_120171c5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-05T21:10:31Z",
+      "side": 1,
+      "message": "I need to review the algorithm tomorrow, with a fresh mind :)",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e667b610_81fd18e8",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-05T21:10:31Z",
+      "side": 1,
+      "message": "nit: perhaps nonRooted? that\u0027s how I would write it, but I\u0027m not sure I can argue notRooted is incorrect.",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74076e6a_a7e58461",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-05T21:10:31Z",
+      "side": 1,
+      "message": "is this empty line meaning anything in particular?",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25da37bc_6af3dd15",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-05T21:10:31Z",
+      "side": 1,
+      "message": "composite",
+      "range": {
+        "startLine": 324,
+        "startChar": 25,
+        "endLine": 324,
+        "endChar": 33
+      },
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12e0a5ad_7eae43c6",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-05T21:10:31Z",
+      "side": 1,
+      "message": "either \"the algorithm passes correct\" or \"the algorithm pass corrects\"",
+      "range": {
+        "startLine": 325,
+        "startChar": 57,
+        "endLine": 326,
+        "endChar": 11
+      },
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbb5e0ef_ecc0ba06",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-05T21:10:31Z",
+      "side": 1,
+      "message": "a",
+      "range": {
+        "startLine": 396,
+        "startChar": 59,
+        "endLine": 396,
+        "endChar": 61
+      },
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

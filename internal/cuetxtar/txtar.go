@@ -434,7 +434,9 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 				t.Errorf("result for %s differs: (-want +got)\n%s",
 					sub.name,
-					cmp.Diff(string(gold.Data), string(result)))
+					cmp.Diff(string(gold.Data), string(result)),
+				)
+				t.Errorf("actual result: %q", result)
 			}
 
 			// Add remaining unrelated files, ignoring files that were already

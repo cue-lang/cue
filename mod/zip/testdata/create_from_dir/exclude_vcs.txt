@@ -1,6 +1,6 @@
-path=example.com/m
+path=example.com/m@v1
 version=v1.0.0
-hash=h1:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
+hash=h1:js1etTKx6RMP5ZMV2GIUC2hUhREIdF7sb4aiWzQLkOU=
 -- .bzr/exclude --
 exclude
 -- .git/exclude --
@@ -9,3 +9,5 @@ exclude
 exclude
 -- .svn/exclude --
 exclude
+-- cue.mod/module.cue --
+module: "example.com/m"

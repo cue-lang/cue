@@ -1,5 +1,5 @@
-path=example.com/m
+path=example.com/m@v1
 version=v1.0.0
-wantErr=GO.MOD: go.mod files must have lowercase names
--- GO.MOD --
-module example.com/m
+wantErr=create zip: CUE.MOD/MODULE.CUE: cue.mod directories must have lowercase names
+-- CUE.MOD/MODULE.CUE --
+module: "example.com/m"

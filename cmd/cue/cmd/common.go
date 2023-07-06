@@ -63,6 +63,7 @@ var defaultConfig = config{
 			}
 			return parser.ParseFile(name, src, options...)
 		},
+		Registry: getRegistry(),
 	},
 }
 
@@ -825,6 +826,23 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 
 	inst = inst.Build(ti)
 	return inst, inst.Err
+}
+
+func getRegistry() string {
+	if experimentEnabled("modules") {
+		return os.Getenv("CUE_REGISTRY")
+	}
+	return ""
+}
+
+func experimentEnabled(kind string) bool {
+	e := os.Getenv("CUE_EXPERIMENT")
+	for _, name := range strings.Split(e, ",") {
+		if name == kind {
+			return true
+		}
+	}
+	return false
 }
 
 func shortFile(root string, f *build.File) string {

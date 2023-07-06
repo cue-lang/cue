@@ -63,6 +63,7 @@ var defaultConfig = config{
 			}
 			return parser.ParseFile(name, src, options...)
 		},
+		Registry: os.Getenv("CUE_REGISTRY"),
 	},
 }
 

@@ -57,14 +57,7 @@ func TestLoad(t *testing.T) {
 		cfg:  badModCfg,
 		args: args("."),
 		want: `
-err:    module: invalid module.cue file: 2 errors in empty disjunction:
-module: invalid module.cue file: conflicting values 123 and "" (mismatched types int and string):
-    $cueroot/cue/load/moduleschema.cue:4:20
-    $CWD/testdata/badmod/cue.mod/module.cue:2:9
-module: invalid module.cue file: conflicting values 123 and =~"^[^@]+$" (mismatched types int and string):
-    $cueroot/cue/load/moduleschema.cue:4:10
-    $cueroot/cue/load/moduleschema.cue:21:21
-    $CWD/testdata/badmod/cue.mod/module.cue:2:9
+err:    instance: invalid module.cue file: errors in the following field: module
 path:   ""
 module: ""
 root:   ""
@@ -227,14 +220,14 @@ files:
 	}, {
 		// NOTE: dir should probably be set to $CWD/testdata, but either way.
 		cfg:  dirCfg,
-		args: args("non-existing"),
+		args: args("notthere"),
 		want: `
-err:    cannot find package "non-existing"
-path:   non-existing
+err:    cannot find package "notthere"
+path:   notthere
 module: mod.test/test
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/non-existing
-display:non-existing`,
+dir:    $CWD/testdata/testmod/cue.mod/gen/notthere
+display:notthere`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./empty"),

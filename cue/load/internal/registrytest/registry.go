@@ -8,8 +8,8 @@ import (
 	"net/http/httptest"
 	"strings"
 
-	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
+	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"

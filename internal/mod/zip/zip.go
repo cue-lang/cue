@@ -8,7 +8,7 @@
 // to ensure that module zip files can be extracted consistently on supported
 // platforms and file systems.
 //
-// • All file paths within a zip file must be valid (see cuelang.org/go/mod/module.CheckFilePath).
+// • All file paths within a zip file must be valid (see cuelang.org/go/internal/mod/module.CheckFilePath).
 //
 // • No two file paths may be equal under Unicode case-folding (see
 // strings.EqualFold).

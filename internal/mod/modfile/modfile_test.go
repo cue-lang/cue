@@ -10,11 +10,13 @@ import (
 
 var tests = []struct {
 	testName  string
+	parse     func(modfile []byte, filename string) (*File, error)
 	data      string
 	wantError string
 	want      *File
 }{{
 	testName: "NoDeps",
+	parse:    Parse,
 	data: `
 module: "foo.com/bar@v0"
 `,
@@ -23,6 +25,7 @@ module: "foo.com/bar@v0"
 	},
 }, {
 	testName: "WithDeps",
+	parse:    Parse,
 	data: `
 module: "foo.com/bar@v0"
 deps: "example.com@v1": v: "v1.2.3"
@@ -41,44 +44,75 @@ deps: "other.com/something@v0": v: "v0.2.3"
 	},
 }, {
 	testName: "InvalidDepVersion",
+	parse:    Parse,
 	data: `
 module: "foo.com/bar@v1"
 deps: "example.com@v1": v: "1.2.3"
 `,
-	wantError: `invalid module.cue file: cannot make version from module "example.com@v1", version "1.2.3": version "1.2.3" \(of module "example.com@v1"\) is not canonical`,
+	wantError: `invalid module.cue file "module.cue": cannot make version from module "example.com@v1", version "1.2.3": version "1.2.3" \(of module "example.com@v1"\) is not canonical`,
 }, {
 	testName: "NonCanonicalVersion",
+	parse:    Parse,
 	data: `
 module: "foo.com/bar@v1"
 deps: "example.com@v1": v: "v1.2"
 `,
-	wantError: `invalid module.cue file: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`,
+	wantError: `invalid module.cue file "module.cue": cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`,
 }, {
 	testName: "NonCanonicalModule",
+	parse:    Parse,
 	data: `
 module: "foo.com/bar"
 `,
-	wantError: `module path "foo.com/bar" does not contain major version`,
+	wantError: `module path "foo.com/bar" in "module.cue" does not contain major version`,
 }, {
 	testName: "NonCanonicalDep",
+	parse:    Parse,
 	data: `
 module: "foo.com/bar@v1"
 deps: "example.com": v: "v1.2.3"
 `,
-	wantError: `invalid module.cue file: no major version in "example.com"`,
+	wantError: `invalid module.cue file "module.cue": no major version in "example.com"`,
 }, {
 	testName: "MismatchedMajorVersion",
+	parse:    Parse,
 	data: `
 module: "foo.com/bar@v1"
 deps: "example.com@v1": v: "v0.1.2"
 `,
-	wantError: `invalid module.cue file: cannot make version from module "example.com@v1", version "v0.1.2": mismatched major version suffix in "example.com@v1" \(version v0.1.2\)`,
+	wantError: `invalid module.cue file "module.cue": cannot make version from module "example.com@v1", version "v0.1.2": mismatched major version suffix in "example.com@v1" \(version v0.1.2\)`,
+}, {
+	testName: "NonStrictNoMajorVersions",
+	parse:    ParseNonStrict,
+	data: `
+module: "foo.com/bar"
+deps: "example.com": v: "v1.2.3"
+`,
+	want: &File{
+		Module: "foo.com/bar",
+		Deps: map[string]*Dep{
+			"example.com": {
+				Version: "v1.2.3",
+			},
+		},
+	},
+}, {
+	testName: "LegacyWithExtraFields",
+	parse:    ParseLegacy,
+	data: `
+module: "foo.com/bar"
+something: 4
+cue: lang: "xxx"
+`,
+	want: &File{
+		Module: "foo.com/bar",
+	},
 }}
 
 func TestParse(t *testing.T) {
 	for _, test := range tests {
 		t.Run(test.testName, func(t *testing.T) {
-			f, err := Parse([]byte(test.data), "module.cue")
+			f, err := test.parse([]byte(test.data), "module.cue")
 			if test.wantError != "" {
 				qt.Assert(t, qt.ErrorMatches(err, test.wantError))
 				return

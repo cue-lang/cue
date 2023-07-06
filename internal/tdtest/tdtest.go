@@ -25,6 +25,7 @@ package tdtest
 import (
 	"fmt"
 	"go/token"
+	"path/filepath"
 	"reflect"
 	"runtime"
 	"strings"
@@ -110,6 +111,10 @@ func (t *T) getCallInfo() (*info, *callInfo) {
 	if !ok {
 		t.Fatalf("could not update file for test %s", t.Name())
 	}
+	// Note: it seems that sometimes the file returned by Caller
+	// might not be in canonical format (under Windows, it can contain
+	// forward slashes), so clean it.
+	file = filepath.Clean(file)
 	info := t.info(file)
 	return info, info.calls[token.Position{Filename: file, Line: line}]
 }

@@ -16,7 +16,10 @@ func TestModuleFetch(t *testing.T) {
 		Name: "modfetch",
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
-		r := registrytest.New(t.Archive)
+		r, err := registrytest.New(t.Archive)
+		if err != nil {
+			t.Fatal(err)
+		}
 		defer r.Close()
 		t.LoadConfig.Registry = r.URL()
 		ctx := cuecontext.New()

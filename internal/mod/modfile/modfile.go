@@ -97,10 +97,10 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	if strict {
 		_, v, ok := module.SplitPathVersion(mf.Module)
 		if !ok {
-			return nil, fmt.Errorf("module path %q does not contain major version", mf.Module)
+			return nil, fmt.Errorf("module path %q in %q does not contain major version", mf.Module, filename)
 		}
 		if semver.Major(v) != v {
-			return nil, fmt.Errorf("module path %q should contain the major version only", mf.Module)
+			return nil, fmt.Errorf("module path %q in %q should contain the major version only", mf.Module, filename)
 		}
 	}
 	var versions []module.Version
@@ -108,11 +108,11 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	for m, dep := range mf.Deps {
 		v, err := module.NewVersion(m, dep.Version)
 		if err != nil {
-			return nil, fmt.Errorf("invalid module.cue file: cannot make version from module %q, version %q: %v", m, dep.Version, err)
+			return nil, fmt.Errorf("invalid module.cue file %q: cannot make version from module %q, version %q: %v", filename, m, dep.Version, err)
 		}
 		versions = append(versions, v)
 		if strict && v.Path() != m {
-			return nil, fmt.Errorf("invalid module.cue file: no major version in %q", m)
+			return nil, fmt.Errorf("invalid module.cue file %q: no major version in %q", filename, m)
 		}
 	}
 

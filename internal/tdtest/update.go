@@ -20,6 +20,7 @@ import (
 	"go/format"
 	"go/token"
 	"go/types"
+	"log"
 	"os"
 	"reflect"
 	"strconv"
@@ -194,13 +195,16 @@ func (i *info) initFieldRef(c *callInfo, f *ast.File) {
 // findFileAndPackage locates the ast.File and package within the given slice
 // of packages, in which the given file is located.
 func findFileAndPackage(path string, pkgs []*packages.Package) (*ast.File, *packages.Package) {
+	var allFiles []string
 	for _, p := range pkgs {
 		for i, gf := range p.GoFiles {
 			if gf == path {
 				return p.Syntax[i], p
 			}
+			allFiles = append(allFiles, gf)
 		}
 	}
+	log.Printf("cannot find path %q in all go files %q", path, allFiles)
 	return nil, nil
 }
 

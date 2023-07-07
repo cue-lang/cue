@@ -70,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0481b544_d93fec97",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "Changed to nonRooted as my spell checker complains about unrooted (that was my first choice).",
+      "parentUuid": "d8c887e3_69e7557b",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74076e6a_a7e58461",
@@ -104,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4333164e_0d1e277d",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "195c2c42_a64e9397",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25da37bc_6af3dd15",
@@ -117,6 +153,30 @@
       "writtenOn": "2023-07-05T21:10:31Z",
       "side": 1,
       "message": "composite",
+      "range": {
+        "startLine": 324,
+        "startChar": 25,
+        "endLine": 324,
+        "endChar": 33
+      },
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ec50319_f2a5719f",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 324,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "25da37bc_6af3dd15",
       "range": {
         "startLine": 324,
         "startChar": 25,
@@ -150,6 +210,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a13cef2_f3df301a",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "12e0a5ad_7eae43c6",
+      "range": {
+        "startLine": 325,
+        "startChar": 57,
+        "endLine": 326,
+        "endChar": 11
+      },
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6405ce93_a2b0717a",
@@ -167,6 +251,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6abad74e_affde22b",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "no longer relevant.",
+      "parentUuid": "6405ce93_a2b0717a",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2fe28eef_6462fb48",
@@ -180,6 +282,24 @@
       "writtenOn": "2023-07-07T10:32:45Z",
       "side": 1,
       "message": "It seems a bit of a shame that the append here could cause lots of allocations. It might be better to keep the appended-to slice around, either by returning it from `traverseNotRooted` or passing in a reference to it rather than by value.",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "83e04d6f_19818c44",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "Removed in rework. It is now a buffer in the visitor.",
+      "parentUuid": "2fe28eef_6462fb48",
       "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -224,6 +344,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5f25f18_6ea7ff0e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 396,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "No longer applicable.",
+      "parentUuid": "fbb5e0ef_ecc0ba06",
+      "range": {
+        "startLine": 396,
+        "startChar": 59,
+        "endLine": 396,
+        "endChar": 61
+      },
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "05612bdb_9caecfd5",
@@ -255,6 +399,24 @@
       "side": 1,
       "message": "+1",
       "parentUuid": "05612bdb_9caecfd5",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ff3e803_df13877e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9b17d535_653bc59a",
       "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

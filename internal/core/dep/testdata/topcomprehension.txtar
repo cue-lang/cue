@@ -26,16 +26,16 @@ line  reference    path of resulting vertex
 -- out/dependencies/all --
 line  reference    path of resulting vertex
 4:    key       => key
-5:    value     => test
+5:    value     => **non-rooted**
 2:    key       => key
-3:    value     => test
+3:    value     => **non-rooted**
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
 4:    key       => key
-5:    value     => test
+5:    value     => **non-rooted**
 11:   key       => key
-12:   value     => a.test
+12:   value     => **non-rooted**
 2:    key       => key
-3:    value     => test
+3:    value     => **non-rooted**
 9:    key       => key
-10:   value     => a.test
+10:   value     => **non-rooted**

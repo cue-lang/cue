@@ -21,6 +21,67 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
+// Dependencies
+//
+// A dependency is a reference relation from one Vertex to another. A Vertex
+// has multiple Conjuncts, each of which is associated with an expression.
+// Each expression, in turn, may have multiple references, each representing
+// a single dependency.
+//
+// A reference that occurs in a node will point to another node. A reference
+// `x.y` may point to a node `x.y` as well as `x`. By default, only the most
+// precise node is reported, which is `x.y` if it exists, or `x` otherwise.
+// In the latter case, a path is associated with the reference to indicate
+// the specific non-existing path that is needed for that dependency. (TODO)
+//
+// A single reference may point to multiple nodes. For instance,
+// (a & b).z may point to both `a.z` and `b.z`. This has to be taken into
+// account if dep is used for substitutions.
+//
+//
+//   field: Conjunct
+//             |
+//           Expr                       Conjunct Expression
+//             |- Reference             A reference to led to a target
+//             |-    \- Target Node     Pointed to by Reference
+//             |-         \- UsedPath   The sole path used within Node
+
+// TODO: verify that these concepts are correctly reflected in the API:
+// Source:
+//     The CUE value for which dependencies are analyzed.
+//     This may differ per dependency for dynamic and transitive analysis.
+// Target:
+//     The field to which the found reference resolves.
+// Reference:
+//     The reference that resolved to the dependency.
+//     Replacing this reference in the conjuncts of the source vertex with a
+//     link to the target vertex yields the same result if there only a single
+//     dependency matching this reference.
+// Conjunct:
+//     The conjunct in which the Reference was found.
+// Used Path:
+//     The target vertex may be a parent of the actual, more precise,
+//     dependency, if the latter does not yet exist. The target path is the path
+//     from the target vertex to the actual dependency.
+// Trace:
+//     A sequence of dependencies leading to the result in case of transitive
+//     dependencies.
+
+// TODO: for a public API, a better approach seems to be to have a single
+// Visit method, with a configuration to set a bunch of orthogonal options.
+// Here are some examples of the options:
+//   - Dynamic:    evaluate and descend into computed fields.
+//   - Recurse:    evaluate dependencies of subfields as well.
+//   - Inner:      report dependencies within the root being visited.
+//   - RootLess:   report dependencies that do not have a path to the root.
+//   - Transitive: get all dependencies, not just the direct ones.
+//   - Substitute: do not get precise dependencies, but rather keep them
+//         such that each expression needs to be replaced with at most
+//         one dependency. Could be a method on Dependency.
+//   - ContinueOnError:  continue visiting even if there are errors.
+//   [add more as they come up]
+//
+
 // A Dependency is a reference and the node that reference resolves to.
 type Dependency struct {
 	// Node is the referenced node.
@@ -110,12 +171,13 @@ func visit(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFun
 		panic("nil context")
 	}
 	v := visitor{
-		ctxt:  c,
-		visit: f,
-		node:  n,
-		pkg:   pkg,
-		all:   all,
-		top:   top,
+		ctxt:    c,
+		visit:   f,
+		node:    n,
+		pkg:     pkg,
+		recurse: all,
+		all:     all,
+		top:     top,
 	}
 
 	defer func() {
@@ -143,8 +205,23 @@ type visitor struct {
 	node  *adt.Vertex
 	err   error
 	pkg   *adt.ImportReference
-	all   bool
-	top   bool
+
+	// recurse indicates whether, during static analysis, to process references
+	// that will be unified into different fields.
+	recurse bool
+	// all indicates wether to process references that would be unified into
+	// different fields. This similar to recurse, but sometimes gets temporarily
+	// overridden to deal with special cases.
+	all       bool
+	top       bool
+	topRef    adt.Resolver
+	pathStack []refEntry
+	numRefs   int // count of reported dependencies
+}
+
+type refEntry struct {
+	env *adt.Environment
+	ref adt.Resolver
 }
 
 // TODO: factor out the below logic as either a low-level dependency analyzer or
@@ -152,11 +229,17 @@ type visitor struct {
 
 // markExpr visits all nodes in an expression to mark dependencies.
 func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
+	if expr, ok := expr.(adt.Resolver); ok {
+		c.markResolver(env, expr)
+		return
+	}
+
+	saved := c.topRef
+	c.topRef = nil
+	defer func() { c.topRef = saved }()
+
 	switch x := expr.(type) {
 	case nil:
-	case adt.Resolver:
-		c.markResolver(env, x)
-
 	case *adt.BinaryExpr:
 		c.markExpr(env, x.X)
 		c.markExpr(env, x.Y)
@@ -227,74 +310,13 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	// checks.
 	ref, _ := c.ctxt.Resolve(adt.MakeConjunct(env, r, adt.CloseInfo{}), r)
 
-	// If a vertex is dynamic, for instance the result of {foo: 1}.foo,
-	// then it means there is no valid path to the returned value and
-	// it is pointless to mark dependencies. Instead, we mark dependencies
-	// for the LHS of selector or index references.
-	var expr adt.Expr
-	if ref != nil && isDynamic(ref) {
-		switch x := r.(type) {
-		case *adt.SelectorExpr:
-			expr = x.X
-		case *adt.IndexExpr:
-			expr = x.X
-		}
-	}
 	// TODO: consider the case where an inlined composite literal does not
 	// resolve, but has references. For instance, {a: k, ref}.b would result
 	// in a failure during evaluation if b is not defined within ref. However,
 	// ref might still specialize to allow b.
-	if expr != nil {
-		// Within a dynamic struct, we always process all references,
-		// As these references will otherwise not be visited as part of
-		// a normal traversal as they have no path from the root to reach them.
-
-		// TODO: this probably processes more references than necessary.
-		// Consider:
-		//	x: {
-		//		foo: ref1
-		//		bar: ref2
-		//	}.bar
-		// In this case ref1 should probably not be processed.
-		saved := c.all
-		c.all = true
-		c.markExpr(env, expr)
-		c.all = saved
-		return
-	}
 
 	if ref != nil {
-		// If ref is within a let, we only care about dependencies referred to
-		// by internal expressions. The let expression itself is not considered
-		// a dependency and is considered part of the referring expression.
-		if hasLetParent(ref) {
-			// It is okay to use the Environment recorded in the arc, as
-			// lets that may vary per Environment already have a separate arc
-			// associated with them (see Vertex.MultiLet).
-			for _, x := range ref.Conjuncts {
-				c.markExpr(x.Env, x.Expr())
-			}
-			return
-		}
-
-		if ref != c.node && ref != empty {
-			pkg := importRef(r.(adt.Expr)) // All resolvers are expressions.
-			if pkg == nil {
-				pkg = c.pkg
-			}
-
-			d := Dependency{
-				Node:      ref,
-				Reference: r,
-				pkg:       pkg,
-				top:       c.top,
-			}
-			if err := c.visit(d); err != nil {
-				c.err = err
-				panic(aborted)
-			}
-		}
-
+		c.reportDependency(env, r, ref)
 		return
 	}
 
@@ -317,6 +339,89 @@ func (c *visitor) markResolver(env *adt.Environment, r adt.Resolver) {
 	}
 }
 
+// reportDependency reports a dependency from r to v.
+// v must be the value that is obtained after resolving r.
+func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *adt.Vertex) {
+	if v == c.node || v == empty {
+		return
+	}
+
+	reference := ref
+	if c.topRef == nil && len(c.pathStack) == 0 {
+		saved := c.topRef
+		c.topRef = ref
+		defer func() { c.topRef = saved }()
+	}
+
+	// TODO: in "All" mode we still report the latest reference used, instead
+	// of the reference at the start of the traversal, as the self-contained
+	// algorithm (its only user) depends on it.
+	// However, if the stack is non-nil, the reference will not correctly
+	// reflect the substituted value, so we use the top reference instead.
+	if !c.recurse && len(c.pathStack) == 0 && c.topRef != nil {
+		reference = c.topRef
+	}
+
+	if !v.Rooted() {
+		before := c.numRefs
+		c.markInternalResolvers(env, ref, v)
+		// TODO: this logic could probably be simplified if we let clients
+		// explicitly mark whether to visit rootless nodes. Visiting these
+		// may be necessary when substituting values.
+		switch _, ok := ref.(*adt.FieldReference); {
+		case !ok:
+			// Do not report rootless nodes for selectors.
+			return
+		case c.numRefs > before:
+			// For FieldReferences that resolve to something we do not need
+			// to report anything intermediate.
+			return
+		}
+	}
+	if hasLetParent(v) {
+		return
+	}
+
+	// Expand path.
+	altRef := reference
+	for i := len(c.pathStack) - 1; i >= 0; i-- {
+		x := c.pathStack[i]
+		var w *adt.Vertex
+		// TODO: instead of setting the reference, the proper thing to do is
+		// to record a path that still needs to be selected into the recorded
+		// dependency. See the Target Path definition at the top of the file.
+		if f := c.feature(x.env, x.ref); f != 0 {
+			w = v.Lookup(f)
+		}
+		if w == nil {
+			break
+		}
+		altRef = x.ref
+		if i == 0 && c.topRef != nil {
+			altRef = c.topRef
+		}
+		v = w
+	}
+
+	pkg := importRef(ref.(adt.Expr)) // All resolvers are expressions.
+	if pkg == nil {
+		pkg = c.pkg
+	}
+
+	c.numRefs++
+
+	d := Dependency{
+		Node:      v,
+		Reference: altRef,
+		pkg:       pkg,
+		top:       c.top,
+	}
+	if err := c.visit(d); err != nil {
+		c.err = err
+		panic(aborted)
+	}
+}
+
 // TODO(perf): make this available as a property of vertices to avoid doing
 // work repeatedly.
 func hasLetParent(v *adt.Vertex) bool {
@@ -328,15 +433,67 @@ func hasLetParent(v *adt.Vertex) bool {
 	return false
 }
 
-// TODO(perf): make this available as a property of vertices to avoid doing
-// work repeatedly.
-func isDynamic(v *adt.Vertex) bool {
-	for ; v != nil; v = v.Parent {
-		if v.IsDynamic {
-			return true
-		}
+// markConjuncts transitively marks all reference of the current node.
+func (c *visitor) markConjuncts(v *adt.Vertex) {
+	for _, x := range v.Conjuncts {
+		c.markExpr(x.Env, x.Expr())
 	}
-	return false
+}
+
+// markInternalResolvers marks dependencies for rootless nodes. As these
+// nodes may not be visited during normal traversal, we need to be more
+// proactive. For selectors and indices this means we need to evaluate their
+// objects to see exactly what the selector or index refers to.
+func (c *visitor) markInternalResolvers(env *adt.Environment, r adt.Resolver, v *adt.Vertex) {
+	if v.Rooted() {
+		panic("node must not be rooted")
+	}
+
+	c.markConjuncts(v)
+
+	saved := c.all // recursive traversal already done by this function.
+	c.all = false
+
+	switch r := r.(type) {
+	case *adt.SelectorExpr:
+		c.evaluateInner(env, r.X, r)
+	case *adt.IndexExpr:
+		c.evaluateInner(env, r.X, r)
+	}
+
+	c.all = saved
+}
+
+// evaluateInner evaluates the LHS of the given selector or index expression,
+// and marks all its conjuncts. The reference is pushed on a stack to mark
+// the field or index that needs to be selected for any dependencies that are
+// subsequently encountered. This is handled by reportDependency.
+func (c *visitor) evaluateInner(env *adt.Environment, x adt.Expr, r adt.Resolver) {
+	value, _ := c.ctxt.Evaluate(env, x)
+	v, _ := value.(*adt.Vertex)
+	if v == nil {
+		return
+	}
+	// TODO(perf): one level of  evaluation would suffice.
+	v.Finalize(c.ctxt)
+
+	saved := len(c.pathStack)
+	c.pathStack = append(c.pathStack, refEntry{env, r})
+	c.markConjuncts(v)
+	c.pathStack = c.pathStack[:saved]
+}
+
+func (c *visitor) feature(env *adt.Environment, r adt.Resolver) adt.Feature {
+	switch r := r.(type) {
+	case *adt.SelectorExpr:
+		return r.Sel
+	case *adt.IndexExpr:
+		v, _ := c.ctxt.Evaluate(env, r.Index)
+		v = adt.Unwrap(v)
+		return adt.LabelFromValue(c.ctxt, r.Index, v)
+	default:
+		return adt.InvalidLabel
+	}
 }
 
 func (c *visitor) markSubExpr(env *adt.Environment, x adt.Expr) {

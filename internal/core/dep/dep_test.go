@@ -16,6 +16,7 @@ package dep_test
 
 import (
 	"fmt"
+	"io"
 	"strings"
 	"testing"
 	"text/tabwriter"
@@ -30,6 +31,8 @@ import (
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/value"
 )
+
+type visitFunc func(*adt.OpContext, *adt.ImportReference, *adt.Vertex, dep.VisitFunc) error
 
 func TestVisit(t *testing.T) {
 	test := cuetxtar.TxTarTest{
@@ -48,7 +51,7 @@ func TestVisit(t *testing.T) {
 		testCases := []struct {
 			name string
 			root string
-			fn   func(*adt.OpContext, *adt.ImportReference, *adt.Vertex, dep.VisitFunc) error
+			fn   visitFunc
 		}{{
 			name: "field",
 			root: "a.b",
@@ -70,36 +73,48 @@ func TestVisit(t *testing.T) {
 			w := t.Writer(tc.name)
 
 			t.Run(tc.name, func(sub *testing.T) {
-				tw := tabwriter.NewWriter(w, 0, 4, 1, ' ', 0)
-				defer tw.Flush()
-
-				fmt.Fprintf(tw, "line \vreference\v   path of resulting vertex\n")
-
-				tc.fn(ctxt, nil, n, func(d dep.Dependency) error {
-					var ref string
-					var line int
-					// TODO: remove check at some point.
-					if d.Reference != nil {
-						src := d.Reference.Source()
-						line = src.Pos().Line()
-						b, _ := format.Node(src)
-						ref = string(b)
-					}
-					str := value.Make(ctxt, d.Node).Path().String()
-					if i := d.Import(); i != nil {
-						path := i.ImportPath.StringValue(ctxt)
-						str = fmt.Sprintf("%q.%s", path, str)
-					}
-					fmt.Fprintf(tw, "%d:\v%s\v=> %s\n", line, ref, str)
-					return nil
-				})
+				testVisit(sub, w, ctxt, n, tc.fn)
 			})
 		}
 	})
 }
 
+func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, fn visitFunc) {
+	t.Helper()
+
+	tw := tabwriter.NewWriter(w, 0, 4, 1, ' ', 0)
+	defer tw.Flush()
+
+	fmt.Fprintf(tw, "line \vreference\v   path of resulting vertex\n")
+
+	fn(ctxt, nil, v, func(d dep.Dependency) error {
+		if d.Reference == nil {
+			t.Fatal("no reference")
+		}
+
+		src := d.Reference.Source()
+		line := src.Pos().Line()
+		b, _ := format.Node(src)
+		ref := string(b)
+		str := value.Make(ctxt, d.Node).Path().String()
+
+		if i := d.Import(); i != nil {
+			path := i.ImportPath.StringValue(ctxt)
+			str = fmt.Sprintf("%q.%s", path, str)
+		} else if !d.Node.Rooted() {
+			str = "**non-rooted**"
+		}
+
+		fmt.Fprintf(tw, "%d:\v%s\v=> %s\n", line, ref, str)
+
+		return nil
+	})
+}
+
 // DO NOT REMOVE: for Testing purposes.
 func TestX(t *testing.T) {
+	fn := dep.VisitAll
+
 	in := `
 	`
 
@@ -124,17 +139,10 @@ func TestX(t *testing.T) {
 		t.Log(str)
 	}
 
-	deps := []string{}
+	w := &strings.Builder{}
+	fmt.Fprintln(w)
 
-	_ = dep.VisitFields(ctxt, nil, n, func(d dep.Dependency) error {
-		str := value.Make(ctxt, d.Node).Path().String()
-		if i := d.Import(); i != nil {
-			path := i.ImportPath.StringValue(ctxt)
-			str = fmt.Sprintf("%q.%s", path, str)
-		}
-		deps = append(deps, str)
-		return nil
-	})
+	testVisit(t, w, ctxt, n, fn)
 
-	t.Error(deps)
+	t.Error(w.String())
 }

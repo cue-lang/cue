@@ -197,6 +197,8 @@ type Vertex struct {
 	// Used for cycle detection.
 	IsDynamic bool
 
+	nonRooted bool // indicates that there is no path from the root of the tree.
+
 	// hasPendingArc is set if this Vertex has a void arc (e.g. for comprehensions)
 	hasPendingArc bool
 
@@ -271,6 +273,12 @@ func (v *Vertex) IsDefined(c *OpContext) bool {
 	}
 	v.Finalize(c)
 	return v.isDefined()
+}
+
+// Rooted reports whether there is a path from the root of the tree to this
+// Vertex.
+func (v *Vertex) Rooted() bool {
+	return !v.nonRooted && !v.Label.IsLet() && !v.IsDynamic
 }
 
 type ArcType uint8
@@ -883,7 +891,13 @@ func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew 
 				"field %v not allowed by earlier comprehension or reference cycle", f)
 		}
 	}
-	arc = &Vertex{Parent: v, Label: f, ArcType: t}
+	// TODO: consider setting Dynamic here from parent.
+	arc = &Vertex{
+		Parent:    v,
+		Label:     f,
+		ArcType:   t,
+		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
+	}
 	v.Arcs = append(v.Arcs, arc)
 	if t == ArcPending {
 		v.hasPendingArc = true

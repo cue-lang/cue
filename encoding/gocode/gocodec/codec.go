@@ -46,7 +46,7 @@ type Codec struct {
 // use of Decode, Validate, and Complete is efficient.
 //
 // Note: calling this with a *cue.Runtime value is deprecated.
-func New[Ctx cue.Runtime | cue.Context](ctx *Ctx, c *Config) *Codec {
+func New[Ctx *cue.Runtime | *cue.Context](ctx Ctx, c *Config) *Codec {
 	return &Codec{runtime: value.ConvertToContext(ctx)}
 }
 

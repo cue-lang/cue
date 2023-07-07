@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bfef3aa_b0be5d9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-07T12:24:36Z",
+      "side": 1,
+      "message": "Do we want to leave a TODO behind about moving the pointer back if/when the upstream issue is fixed, or are we OK with this?",
+      "revId": "0b9f0910ad816fff7e874ec7f4ed959398d50aff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

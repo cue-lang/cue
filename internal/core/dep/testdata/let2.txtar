@@ -15,6 +15,9 @@ a: b: {
 	x3: X3.w
 
 	// all result in v
+	// TODO: fix this for "All" mode. This can be done by getting rid of the
+	// recurse flag and allowing the API to directly access the expressions
+	// that need to be substituted.
 	y1: Y1
 	y2: Y2
 }
@@ -22,13 +25,15 @@ a: b: {
 line  reference    path of resulting vertex
 -- out/dependencies/all --
 line  reference    path of resulting vertex
-3:    v         => v
-4:    v         => v
+12:   X1        => v.w
+13:   X2        => v.w
+14:   X3.w      => v.w
 7:    v         => v
 8:    v         => v
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
-3:    v         => v
-4:    v         => v
-7:    v         => v
-8:    v         => v
+12:   X1        => v.w
+13:   X2        => v.w
+14:   X3.w      => v.w
+20:   Y1        => v
+21:   Y2        => v

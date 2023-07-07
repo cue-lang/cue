@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f68d3e5_644281b3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-07T12:25:11Z",
+      "side": 1,
+      "message": "also, please use https://go.dev/issue/61164 since it\u0027s shorter and doesn\u0027t tie it to github, in case they move (again).",
+      "revId": "0b9f0910ad816fff7e874ec7f4ed959398d50aff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "0bfef3aa_b0be5d9b",

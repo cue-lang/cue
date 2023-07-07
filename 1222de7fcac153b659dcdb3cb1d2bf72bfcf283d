@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "61d1fd9c_7236761d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-07T10:32:45Z",
+      "side": 1,
+      "message": "LGTM with a few minor comments and suggestions, thanks!",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e667b610_81fd18e8",
@@ -37,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d8c887e3_69e7557b",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-07T10:32:45Z",
+      "side": 1,
+      "message": "I agree \"not rooted\" reads a bit oddly. Another possibility: \"unrooted\" ?",
+      "parentUuid": "e667b610_81fd18e8",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "74076e6a_a7e58461",
         "filename": "internal/core/dep/dep.go",
         "patchSetId": 2
@@ -48,6 +83,23 @@
       "writtenOn": "2023-07-05T21:10:31Z",
       "side": 1,
       "message": "is this empty line meaning anything in particular?",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "195c2c42_a64e9397",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 289,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-07T10:32:45Z",
+      "side": 1,
+      "message": "Maybe reverse the arg order?\n\n// reportDependency reports a dependency from r to v.\n// v must be the value... etc",
       "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -94,6 +146,40 @@
         "endLine": 326,
         "endChar": 11
       },
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6405ce93_a2b0717a",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-07T10:32:45Z",
+      "side": 1,
+      "message": "s/NotRooted/Unrooted/ ?",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fe28eef_6462fb48",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 334,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-07T10:32:45Z",
+      "side": 1,
+      "message": "It seems a bit of a shame that the append here could cause lots of allocations. It might be better to keep the appended-to slice around, either by returning it from `traverseNotRooted` or passing in a reference to it rather than by value.",
       "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -151,6 +237,24 @@
       "writtenOn": "2023-07-07T08:54:03Z",
       "side": 1,
       "message": "nit: I would write all of these type switches as `switch expr :\u003d expr.(type)`. I borrowed this trick from gri, and it helps reduce the number of names in scope. It\u0027s not like the interface value is useful in any way, once you have the concrete type - even in the default case, the \"concrete\" type will be the interface.\n\nyou also gain consistency - note how in the first case you use `expr`, but in the second you use `y`. with the change, you\u0027d use `expr` in both.\n\nthis applies to the other type switches in this change, as well as some of the existing type switches. I\u0027d probably do it for the ones being changed here, and gradually change the others. As long as you agree, of course :)",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b17d535_653bc59a",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-07T10:32:45Z",
+      "side": 1,
+      "message": "+1",
+      "parentUuid": "05612bdb_9caecfd5",
       "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

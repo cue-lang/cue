@@ -51,19 +51,19 @@ func TestVisit(t *testing.T) {
 		testCases := []struct {
 			name string
 			root string
-			fn   visitFunc
+			cfg  *dep.Config
 		}{{
 			name: "field",
 			root: "a.b",
-			fn:   dep.Visit,
+			cfg:  nil,
 		}, {
 			name: "all",
 			root: "a",
-			fn:   dep.VisitAll,
+			cfg:  &dep.Config{Descend: true},
 		}, {
 			name: "dynamic",
 			root: "a",
-			fn:   dep.VisitFields,
+			cfg:  &dep.Config{Dynamic: true},
 		}}
 
 		for _, tc := range testCases {
@@ -73,13 +73,13 @@ func TestVisit(t *testing.T) {
 			w := t.Writer(tc.name)
 
 			t.Run(tc.name, func(sub *testing.T) {
-				testVisit(sub, w, ctxt, n, tc.fn)
+				testVisit(sub, w, ctxt, n, tc.cfg)
 			})
 		}
 	})
 }
 
-func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, fn visitFunc) {
+func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, cfg *dep.Config) {
 	t.Helper()
 
 	tw := tabwriter.NewWriter(w, 0, 4, 1, ' ', 0)
@@ -87,7 +87,7 @@ func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, fn
 
 	fmt.Fprintf(tw, "line \vreference\v   path of resulting vertex\n")
 
-	fn(ctxt, nil, v, func(d dep.Dependency) error {
+	dep.Visit(cfg, ctxt, v, func(d dep.Dependency) error {
 		if d.Reference == nil {
 			t.Fatal("no reference")
 		}
@@ -113,7 +113,10 @@ func testVisit(t *testing.T, w io.Writer, ctxt *adt.OpContext, v *adt.Vertex, fn
 
 // DO NOT REMOVE: for Testing purposes.
 func TestX(t *testing.T) {
-	fn := dep.VisitAll
+	cfg := &dep.Config{
+		Dynamic: true,
+		// Recurse: true,
+	}
 
 	in := `
 	`
@@ -142,7 +145,7 @@ func TestX(t *testing.T) {
 	w := &strings.Builder{}
 	fmt.Fprintln(w)
 
-	testVisit(t, w, ctxt, n, fn)
+	testVisit(t, w, ctxt, n, cfg)
 
 	t.Error(w.String())
 }

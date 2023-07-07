@@ -32,17 +32,11 @@ func ConvertToRuntime(c *cue.Context) *cue.Runtime {
 	return (*cue.Runtime)(c)
 }
 
-func ConvertToContext[Ctx cue.Runtime | cue.Context](ctx *Ctx) *cue.Context {
-	// This should really just be a static type conversion.
-	// See https://github.com/golang/go/issues/61164.
-	switch ctx := any(ctx).(type) {
-	case *cue.Runtime:
+func ConvertToContext[Ctx *cue.Runtime | *cue.Context](ctx Ctx) *cue.Context {
+	if ctx, ok := any(ctx).(*cue.Runtime); ok {
 		(*runtime.Runtime)(ctx).Init()
-		return (*cue.Context)(ctx)
-	case *cue.Context:
-		return ctx
 	}
-	panic("unreachable")
+	return (*cue.Context)(ctx)
 }
 
 func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {

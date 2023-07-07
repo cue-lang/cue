@@ -39,7 +39,7 @@ func (b *builder) checkCycle(v cue.Value) bool {
 	r, n := internalvalue.ToInternal(v)
 	ctx := eval.NewContext(r, n)
 
-	err := dep.Visit(ctx, nil, n, func(d dep.Dependency) error {
+	err := dep.Visit(nil, ctx, n, func(d dep.Dependency) error {
 		for _, m := range b.ctx.cycleNodes {
 			if m == d.Node {
 				var p token.Pos

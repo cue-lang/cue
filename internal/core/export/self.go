@@ -153,7 +153,11 @@ func getParent(d *depData) *depData {
 func (p *pivotter) markDeps(v *adt.Vertex, pkg *adt.ImportReference) {
 	// TODO: sweep all child nodes and mark as no need for recursive checks.
 
-	dep.VisitAll(p.x.ctx, pkg, v, func(d dep.Dependency) error {
+	cfg := &dep.Config{
+		Descend: true,
+		Pkg:     pkg,
+	}
+	dep.Visit(cfg, p.x.ctx, v, func(d dep.Dependency) error {
 		node := d.Node
 
 		switch {

@@ -1905,7 +1905,10 @@ func (x *ForClause) yield(s *compState) {
 		}
 
 		if x.Key != InvalidLabel {
-			v := &Vertex{Label: x.Key}
+			v := &Vertex{
+				Label:     x.Key,
+				IsDynamic: true,
+			}
 			key := a.Label.ToValue(c)
 			v.AddConjunct(MakeRootConjunct(c.Env(0), key))
 			v.SetValue(c, key)

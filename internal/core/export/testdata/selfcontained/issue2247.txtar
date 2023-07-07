@@ -11,6 +11,7 @@ package t
 p: {
 	c: [int]
 	d: [c][0]
+	// TODO: simplify these:
 	e: {out: c}.out
 	f: {out: q}.out
 	g: {out: q}.out
@@ -37,6 +38,7 @@ f: t.p
 f: {
 	c: [int]
 	d: [c][0]
+	// TODO: simplify these:
 	e: {
 		out: c
 	}.out

@@ -27,10 +27,10 @@ import (
 // evaluated Vertex. A more correct and more performant algorithm would be to
 // descend into the conjuncts and evaluate the necessary values, like fields
 // and comprehension sources.
-func dynamic(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc, m marked, top bool) {
+func (v *visitor) dynamic(n *adt.Vertex, top bool) {
 	found := false
 	for _, c := range n.Conjuncts {
-		if m[c.Expr()] {
+		if v.m[c.Expr()] {
 			found = true
 			break
 		}
@@ -40,15 +40,15 @@ func dynamic(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitF
 		return
 	}
 
-	if visit(c, pkg, n, f, false, top) != nil {
+	if v.visit(n, top) != nil {
 		return
 	}
 
 	for _, a := range n.Arcs {
-		if !a.IsDefined(c) || a.Label.IsLet() {
+		if !a.IsDefined(v.ctxt) || a.Label.IsLet() {
 			continue
 		}
-		dynamic(c, pkg, a, f, m, false)
+		v.dynamic(a, false)
 	}
 }
 

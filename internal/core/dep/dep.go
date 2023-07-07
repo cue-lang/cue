@@ -16,8 +16,7 @@
 package dep
 
 import (
-	"errors"
-
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -83,6 +82,34 @@ import (
 //   [add more as they come up]
 //
 
+type Config struct {
+	// Dynamic enables evaluting dependencies Vertex Arcs, recursively
+	Dynamic bool
+
+	// Descend enables recursively descending into fields. This option is
+	// implied by Dynamic.
+	Descend bool
+
+	// Cycles allows a Node to reported more than once. This includes the node
+	// passed to Visit, which is otherwise never reported. This option can be
+	// used to disable cycle checking. TODO: this is not yet implemented.
+	AllowCycles bool
+
+	// NonRooted enables reporting nodes that do not have a path from the root.
+	// This includes variables of comprehensions and fields of composite literal
+	// values that are part of expressions, such as {out: v}.out.
+	NonRooted bool
+
+	// TODO:
+	// ContinueOnError indicates whether to continue finding dependencies
+	// even when there are errors.
+	// ContinueOnError bool
+
+	//  pkg indicates the main package for which the analyzer is configured,
+	// which is used for reporting purposes.
+	Pkg *adt.ImportReference
+}
+
 // A Dependency is a reference and the node that reference resolves to.
 type Dependency struct {
 	// Node is the referenced node.
@@ -109,9 +136,9 @@ func (d *Dependency) IsRoot() bool {
 	return d.top
 }
 
-func (d *Dependency) Path() []adt.Feature {
-	return nil
-}
+// func (d *Dependency) Path() []adt.Feature {
+// 	return nil
+// }
 
 func importRef(r adt.Expr) *adt.ImportReference {
 	switch x := r.(type) {
@@ -128,37 +155,6 @@ func importRef(r adt.Expr) *adt.ImportReference {
 // VisitFunc is used for reporting dependencies.
 type VisitFunc func(Dependency) error
 
-// Visit calls f for all vertices referenced by the conjuncts of n without
-// descending into the elements of list or fields of structs. Only references
-// that do not refer to the conjuncts of n itself are reported. pkg indicates
-// the the package within which n is contained, which is used for reporting
-// purposes. It may be nil, indicating the main package.
-func Visit(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc) error {
-	return visit(c, pkg, n, f, false, true)
-}
-
-// VisitAll calls f for all vertices referenced by the conjuncts of n including
-// those of descendant fields and elements. Only references that do not refer to
-// the conjuncts of n itself are reported. pkg indicates the current
-// package, which is used for reporting purposes.
-func VisitAll(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc) error {
-	return visit(c, pkg, n, f, true, true)
-}
-
-// VisitFields calls f for n and all its descendent arcs that have a conjunct
-// that originates from a conjunct in n. Only the conjuncts of n that ended up
-// as a conjunct in an actual field are visited and they are visited for each
-// field in which the occurs. pkg indicates the current package, which is
-// used for reporting purposes.
-func VisitFields(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc) error {
-	m := marked{}
-
-	m.markExpr(n)
-
-	dynamic(c, pkg, n, f, m, true)
-	return nil
-}
-
 var empty *adt.Vertex
 
 func init() {
@@ -167,21 +163,50 @@ func init() {
 	empty.ForceDone()
 }
 
-func visit(c *adt.OpContext, pkg *adt.ImportReference, n *adt.Vertex, f VisitFunc, all, top bool) (err error) {
+var zeroConfig = &Config{}
+
+// Visit calls f for the dependencies of n as determined by the given
+// configuration.
+func Visit(cfg *Config, c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
+	if cfg == nil {
+		cfg = zeroConfig
+	}
 	if c == nil {
 		panic("nil context")
 	}
 	v := visitor{
 		ctxt:    c,
-		visit:   f,
-		node:    n,
-		pkg:     pkg,
-		recurse: all,
-		all:     all,
-		top:     top,
+		fn:      f,
+		pkg:     cfg.Pkg,
+		recurse: cfg.Descend,
+		all:     cfg.Descend,
+		top:     true,
 	}
 
+	if cfg.Dynamic {
+		v.m = marked{}
+
+		v.m.markExpr(n)
+
+		v.dynamic(n, true)
+	} else {
+		v.visit(n, true)
+	}
+
+	return v.err
+}
+
+func (v *visitor) visit(n *adt.Vertex, top bool) (err error) {
+	savedNode := v.node
+	savedTop := v.top
+
+	v.node = n
+	v.top = top
+
 	defer func() {
+		v.node = savedNode
+		v.top = savedTop
+
 		switch x := recover(); x {
 		case nil:
 		case aborted:
@@ -202,7 +227,7 @@ var aborted = errors.New("aborted")
 
 type visitor struct {
 	ctxt      *adt.OpContext
-	visit     VisitFunc
+	fn        VisitFunc
 	node      *adt.Vertex
 	err       error
 	pkg       *adt.ImportReference
@@ -212,6 +237,8 @@ type visitor struct {
 	topRef    adt.Resolver
 	pathStack []refEntry
 	numRefs   int // count of reported dependencies
+
+	m marked
 }
 
 type refEntry struct {
@@ -411,7 +438,7 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		pkg:       pkg,
 		top:       c.top,
 	}
-	if err := c.visit(d); err != nil {
+	if err := c.fn(d); err != nil {
 		c.err = err
 		panic(aborted)
 	}

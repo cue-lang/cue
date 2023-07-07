@@ -16,6 +16,24 @@
       "message": "Perhaps clarify in the commit message that this is for 2247?",
       "revId": "b698926197002c6360746bb9099df36a6492f893",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "01a67ebd_b9c24029",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-07T17:10:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f128fae0_4aa541b3",
+      "revId": "b698926197002c6360746bb9099df36a6492f893",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

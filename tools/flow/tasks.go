@@ -252,7 +252,7 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 				return nil
 			}
 			c.nodes[d.Node] = cycleMarker
-			c.markTaskDependencies(t, d.Node)
+			d.Recurse()
 			c.nodes[d.Node] = nil
 		}
 		return nil

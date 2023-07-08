@@ -121,6 +121,14 @@ type Dependency struct {
 	pkg *adt.ImportReference
 
 	top bool
+
+	v *visitor
+}
+
+// Recurse visits the dependencies of this dependency, using the same
+// visit function as original.
+func (d *Dependency) Recurse() {
+	d.v.visit(d.Node, false)
 }
 
 // Import returns the import reference or nil if the reference was within
@@ -425,18 +433,21 @@ func (c *visitor) reportDependency(env *adt.Environment, ref adt.Resolver, v *ad
 		v = w
 	}
 
-	pkg := importRef(ref.(adt.Expr)) // All resolvers are expressions.
-	if pkg == nil {
-		pkg = c.pkg
+	savedPkg := c.pkg
+	// All resolvers are expressions.
+	if p := importRef(ref.(adt.Expr)); p != nil {
+		c.pkg = p
 	}
+	defer func() { c.pkg = savedPkg }()
 
 	c.numRefs++
 
 	d := Dependency{
 		Node:      v,
 		Reference: altRef,
-		pkg:       pkg,
+		pkg:       c.pkg,
 		top:       c.top,
+		v:         c,
 	}
 	if err := c.fn(d); err != nil {
 		c.err = err

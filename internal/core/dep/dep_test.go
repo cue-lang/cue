@@ -59,7 +59,7 @@ func TestVisit(t *testing.T) {
 		}, {
 			name: "all",
 			root: "a",
-			cfg:  &dep.Config{Recurse: true},
+			cfg:  &dep.Config{Descend: true},
 		}, {
 			name: "dynamic",
 			root: "a",

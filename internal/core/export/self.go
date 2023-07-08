@@ -206,7 +206,7 @@ func (p *pivotter) markDeps(v *adt.Vertex, pkg *adt.ImportReference) {
 		p.refMap[d.Reference] = ref
 
 		if !ok {
-			p.markDeps(node, d.Import())
+			d.Recurse()
 		}
 
 		return nil

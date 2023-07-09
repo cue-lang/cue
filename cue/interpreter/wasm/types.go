@@ -28,16 +28,16 @@ type typ string
 
 const (
 	_bool    typ = "bool"
-	_int8        = "int8"
-	_int16       = "int16 "
-	_int32       = "int32"
-	_int64       = "int64"
-	_uint8       = "uint8"
-	_uint16      = "uint16"
-	_uint32      = "uint32"
-	_uint64      = "uint64"
-	_float32     = "float32"
-	_float64     = "float64"
+	_int8    typ = "int8"
+	_int16   typ = "int16 "
+	_int32   typ = "int32"
+	_int64   typ = "int64"
+	_uint8   typ = "uint8"
+	_uint16  typ = "uint16"
+	_uint32  typ = "uint32"
+	_uint64  typ = "uint64"
+	_float32 typ = "float32"
+	_float64 typ = "float64"
 )
 
 func (t typ) kind() adt.Kind {

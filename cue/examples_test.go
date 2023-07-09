@@ -16,7 +16,6 @@ package cue_test
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"cuelang.org/go/cue"
@@ -26,7 +25,7 @@ import (
 )
 
 func load(file string) *cue.Instance {
-	dir, _ := ioutil.TempDir("", "*")
+	dir, _ := os.MkdirTemp("", "*")
 	defer os.RemoveAll(dir)
 
 	inst := cue.Build(cuetxtar.Load(txtar.Parse([]byte(file)), dir))[0]

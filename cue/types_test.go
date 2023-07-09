@@ -1384,8 +1384,6 @@ func TestFillPath(t *testing.T) {
 func TestFillPathError(t *testing.T) {
 	r := &Runtime{}
 
-	type key struct{ a int }
-
 	testCases := []struct {
 		in   string
 		x    interface{}

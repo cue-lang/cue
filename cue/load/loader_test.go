@@ -24,7 +24,7 @@ import (
 	"text/template"
 	"unicode"
 
-	"github.com/kylelemons/godebug/diff"
+	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -351,7 +351,7 @@ display:./tagsbad`,
 			want := strings.TrimSpace(tc.want)
 			want = strings.Replace(want, "\t", "    ", -1)
 			if got != want {
-				t.Errorf("\n%s", diff.Diff(want, got))
+				t.Errorf("\n%s", cmp.Diff(want, got))
 				t.Logf("\n%s", got)
 			}
 		})

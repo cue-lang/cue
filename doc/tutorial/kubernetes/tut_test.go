@@ -30,7 +30,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kylelemons/godebug/diff"
+	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue/load"
@@ -259,7 +259,7 @@ func TestTutorial(t *testing.T) {
 		}
 		got, want := string(b1), string(b2)
 		if got != want {
-			t.Log(diff.Diff(got, want))
+			t.Log(cmp.Diff(got, want))
 			return fmt.Errorf("file %q differs", path)
 		}
 		return nil
@@ -403,7 +403,7 @@ func run(t *testing.T, dir, command string, cfg *config) {
 
 	want := strings.TrimSpace(cfg.Golden)
 	if got != want {
-		t.Errorf("files differ:\n%s", diff.Diff(got, want))
+		t.Errorf("files differ:\n%s", cmp.Diff(got, want))
 	}
 }
 

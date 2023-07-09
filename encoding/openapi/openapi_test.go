@@ -22,7 +22,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/kylelemons/godebug/diff"
+	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
@@ -260,7 +260,7 @@ func TestParseDefinitions(t *testing.T) {
 					t.Fatal(err)
 				}
 
-				if d := diff.Diff(string(b), out.String()); d != "" {
+				if d := cmp.Diff(string(b), out.String()); d != "" {
 					t.Errorf("files differ:\n%v", d)
 				}
 			}

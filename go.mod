@@ -10,7 +10,6 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.2.0
 	github.com/kr/pretty v0.3.1
-	github.com/kylelemons/godebug v1.1.0
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230328191034-3462fbc510c0
 	github.com/rogpeppe/go-internal v1.10.0

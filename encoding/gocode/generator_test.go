@@ -22,7 +22,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/kylelemons/godebug/diff"
+	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -75,7 +75,7 @@ func TestGenerate(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if d := diff.Diff(string(want), string(b)); d != "" {
+			if d := cmp.Diff(string(want), string(b)); d != "" {
 				t.Errorf("files differ (-want +got):\n%v", d)
 			}
 		})

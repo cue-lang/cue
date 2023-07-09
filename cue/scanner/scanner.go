@@ -248,10 +248,6 @@ func (s *Scanner) scanIdentifier() string {
 	return string(s.src[offs:s.offset])
 }
 
-func isExtendedIdent(r rune) bool {
-	return strings.IndexRune("-_#$%. ", r) >= 0
-}
-
 func digitVal(ch rune) int {
 	switch {
 	case '0' <= ch && ch <= '9':

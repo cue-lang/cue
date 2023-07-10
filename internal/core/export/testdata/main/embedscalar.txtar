@@ -60,11 +60,11 @@ issue718: {
 [sub b 0]
 [sub b 1]
 [issue718]
-[issue718 #a]
-[issue718 #b]
 [issue718 #fn]
 [issue718 #fn #a]
 [issue718 #fn #b]
+[issue718 #a]
+[issue718 #b]
 -- out/value --
 == Simplified
 {

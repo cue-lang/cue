@@ -285,15 +285,15 @@ issue1116: {
   }
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  114
-Reused: 108
-Allocs: 7
-Retain: 6
+Leaks:  3
+Freed:  112
+Reused: 107
+Allocs: 8
+Retain: 10
 
 Unifications: 115
-Conjuncts:    163
-Disjuncts:    119
+Conjuncts:    169
+Disjuncts:    117
 -- out/eval --
 (struct){
   a1list: (#list){
@@ -470,9 +470,9 @@ Disjuncts:    119
     }
     b: (string){
       "b"
-      let List#11 = (#list){
-        0: (string){ "a" }
-        1: (string){ "b" }
+      let List#11 = (_|_){
+        // [incomplete] issue1116.b.List: cycle error referencing #a:
+        //     ./in.cue:96:14
       }
       #a: (#list){
         0: (string){ "a" }

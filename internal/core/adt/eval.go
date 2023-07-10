@@ -287,7 +287,6 @@ func (c *OpContext) unify(v *Vertex, state vertexStatus) {
 		disState := state
 		if len(n.disjunctions) > 0 && disState != finalized {
 			disState = finalized
-			// disState = state
 		}
 		n.expandDisjuncts(disState, n, maybeDefault, false, true)
 
@@ -983,9 +982,6 @@ type nodeContext struct {
 	vLists []*Vertex
 	exprs  []envExpr
 
-	// inBinExpr means the first part of a binary expression is being processed.
-	inBinExpr int
-
 	checks     []Validator // BuiltinValidator, other bound values.
 	postChecks []envCheck  // Check non-monotonic constraints, among other things.
 
@@ -1475,9 +1471,7 @@ func (n *nodeContext) addExprConjunct(v Conjunct, state vertexStatus) {
 
 	case *BinaryExpr:
 		if x.Op == AndOp {
-			n.inBinExpr++
 			n.addExprConjunct(MakeConjunct(env, x.X, id), state)
-			n.inBinExpr--
 			n.addExprConjunct(MakeConjunct(env, x.Y, id), state)
 			return
 		} else {
@@ -1962,12 +1956,23 @@ func (n *nodeContext) addStruct(
 
 	parent := n.node.AddStruct(s, childEnv, closeInfo)
 	closeInfo.IsClosed = false
+
 	parent.Disable = true // disable until processing is done.
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
-		case *Field, *LetField:
-			// handle in next iteration.
+		case *Field:
+			if x.Label.IsString() && x.ArcType == ArcMember {
+				n.aStruct = s
+				n.aStructID = closeInfo
+			}
+			n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
+
+		case *LetField:
+			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
+			if x.IsMulti {
+				arc.MultiLet = x.IsMulti
+			}
 
 		case *DynamicField:
 			n.aStruct = s
@@ -1980,16 +1985,14 @@ func (n *nodeContext) addStruct(
 		case Expr:
 			// add embedding to optional
 
-			// if f, ok := x.(*FieldReference); ok && f.Src.Name != "#File" {
-			// 	fmt.Println("XXX: field reference", f.Src.Name)
-			// }
-
 			// TODO(perf): only do this if addExprConjunct below will result in
 			// a fieldSet. Otherwise the entry will just be removed next.
 			id := closeInfo.SpawnEmbed(x)
 
 			// push and opo embedding type.
-			n.addExprConjunct(MakeConjunct(childEnv, x, id), partial)
+			c := MakeConjunct(childEnv, x, id)
+
+			n.addExprConjunct(c, partial)
 
 		case *BulkOptionalField, *Ellipsis:
 			// Nothing to do here. Note that the presence of these fields do not
@@ -2008,22 +2011,6 @@ func (n *nodeContext) addStruct(
 
 	parent.Disable = false
 
-	for _, d := range s.Decls {
-		switch x := d.(type) {
-		case *Field:
-			if x.Label.IsString() && x.ArcType == ArcMember {
-				n.aStruct = s
-				n.aStructID = closeInfo
-			}
-			n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
-
-		case *LetField:
-			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
-			if x.IsMulti {
-				arc.MultiLet = x.IsMulti
-			}
-		}
-	}
 }
 
 // TODO(perf): if an arc is the only arc with that label added to a Vertex, and

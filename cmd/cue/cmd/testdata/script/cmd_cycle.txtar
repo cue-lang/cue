@@ -48,9 +48,9 @@ command: kube: {
 -- issue2416a_tool.cue --
 package kubecluster
 
-#Cluster: {}
+Cluster: {}
 
-m: x: #Cluster
+m: x: Cluster
 m: x: X={
 	foobar: X.name
 	name: "x"

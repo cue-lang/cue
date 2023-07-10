@@ -506,8 +506,8 @@ Disjuncts:    215
         // large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
         //     ./in.cue:205:7
         userinfo: (string){ "user@" }
-        port: (string){ "" }
         host: (string){ "mod.test" }
+        port: (string){ "" }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -535,11 +535,11 @@ Disjuncts:    215
         // large.p2.Y: cycle error referencing port:
         //     ./in.cue:267:10
         userinfo: (string){ "user@" }
+        host: (string){ "mod.test" }
         port: (_|_){
           // [cycle] large.p2.Y: cycle error referencing port:
           //     ./in.cue:267:10
         }
-        host: (string){ "mod.test" }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -557,11 +557,11 @@ Disjuncts:    215
         // large.p3.Y: cycle error referencing port:
         //     ./in.cue:308:10
         userinfo: (string){ "user@" }
+        host: (string){ "mod.test" }
         port: (_|_){
           // [cycle] large.p3.Y: cycle error referencing port:
           //     ./in.cue:308:10
         }
-        host: (string){ "mod.test" }
       }
       Y: (_|_){
         // [cycle] large.p3.Y: cycle error referencing port:
@@ -589,11 +589,11 @@ Disjuncts:    215
         // large.p4.Y: cycle error referencing port:
         //     ./in.cue:351:10
         userinfo: (string){ "user@" }
+        host: (string){ "mod.test" }
         port: (_|_){
           // [cycle] large.p4.Y: cycle error referencing port:
           //     ./in.cue:351:10
         }
-        host: (string){ "mod.test" }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }

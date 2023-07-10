@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7e63c180_5b54d473",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T12:21:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f68d3e5_644281b3",
+      "revId": "0b9f0910ad816fff7e874ec7f4ed959398d50aff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0bfef3aa_b0be5d9b",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2023-07-07T12:24:36Z",
       "side": 1,
       "message": "Do we want to leave a TODO behind about moving the pointer back if/when the upstream issue is fixed, or are we OK with this?",
+      "revId": "0b9f0910ad816fff7e874ec7f4ed959398d50aff",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "50d320ae_0e941fab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T12:21:41Z",
+      "side": 1,
+      "message": "I\u0027m fine with this, tbh. It\u0027s almost exactly equivalent.",
+      "parentUuid": "0bfef3aa_b0be5d9b",
       "revId": "0b9f0910ad816fff7e874ec7f4ed959398d50aff",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

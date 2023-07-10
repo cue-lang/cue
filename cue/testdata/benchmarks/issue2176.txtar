@@ -59,15 +59,15 @@ output: {
 	"2": (datastream & {marker: length: 14}).marker.position
 }
 -- out/eval/stats --
-Leaks:  218
+Leaks:  214
 Freed:  5799
 Reused: 5795
-Allocs: 222
-Retain: 1915
+Allocs: 218
+Retain: 1911
 
-Unifications: 6009
-Conjuncts:    14515
-Disjuncts:    6868
+Unifications: 6005
+Conjuncts:    14507
+Disjuncts:    6864
 -- out/eval --
 (struct){
   #Datastream: (#struct){

@@ -83,44 +83,44 @@ Disjuncts:    47
       }
     }
     #A1: (#struct){
-      n: (string){ string }
-      depends_on: (list){
-      }
       x: (int){ int }
       y: (#struct){
         z: (string){ string }
       }
-    }
-    #A2: (#struct){
       n: (string){ string }
       depends_on: (list){
       }
+    }
+    #A2: (#struct){
       i: (string){ string }
+      n: (string){ string }
+      depends_on: (list){
+      }
     }
     s: (struct){
       foo: (#struct){
-        n: (string){ "foo" }
-        depends_on: (list){
-        }
         x: (int){ 10 }
         y: (#struct){
           z: (string){ "z" }
         }
+        n: (string){ "foo" }
+        depends_on: (list){
+        }
       }
       bar: (#struct){
+        i: (string){ "hello bar" }
         n: (string){ "bar" }
         depends_on: (#list){
           0: (#struct){
-            n: (string){ "foo" }
-            depends_on: (list){
-            }
             x: (int){ 10 }
             y: (#struct){
               z: (string){ "z" }
             }
+            n: (string){ "foo" }
+            depends_on: (list){
+            }
           }
         }
-        i: (string){ "hello bar" }
       }
     }
   }

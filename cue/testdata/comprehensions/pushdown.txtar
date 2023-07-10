@@ -742,15 +742,15 @@ unifyDynamicReflectSuccess: {
 }
 
 -- out/eval/stats --
-Leaks:  16
-Freed:  392
-Reused: 385
-Allocs: 23
-Retain: 135
+Leaks:  14
+Freed:  394
+Reused: 387
+Allocs: 21
+Retain: 114
 
 Unifications: 394
-Conjuncts:    635
-Disjuncts:    484
+Conjuncts:    641
+Disjuncts:    474
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:
@@ -766,6 +766,8 @@ embed.fail4.p: field not allowed:
     ./in.cue:71:9
     ./in.cue:72:3
     ./in.cue:74:4
+noStackOverflowStructCycle.#list.tail: structural cycle
+noStackOverflowStructCycle.list.tail: structural cycle
 provideIncompleteSuccess.t2.a.c.d: field not allowed:
     ./in.cue:187:7
     ./in.cue:189:4
@@ -774,10 +776,6 @@ provideIncompleteSuccess.t2.a.c.d: field not allowed:
 fieldMismatch.a: cannot combine regular field "x" with 2:
     ./in.cue:139:7
     ./in.cue:137:3
-noStackOverflowStructCycle.#list.tail: structural cycle:
-    ./in.cue:150:6
-noStackOverflowStructCycle.list.tail: structural cycle:
-    ./in.cue:158:6
 
 Result:
 (_|_){
@@ -785,8 +783,8 @@ Result:
   linkChildren: (struct){
     w: (int){ 1 }
     v: (struct){
-      y: (int){ 1 }
       x: (int){ 1 }
+      y: (int){ 1 }
       z: (int){ 1 }
       rw: (int){ 1 }
       rx: (int){ 1 }
@@ -877,13 +875,13 @@ Result:
       q: (int){ int }
     }
     incomplete7: (struct){
-      q: (int){ int }
       p: (_|_){
         // [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
         //     ./in.cue:93:6
         //     ./in.cue:94:6
         //     ./in.cue:95:3
       }
+      q: (int){ int }
     }
   }
   mixedFieldsSuccess: (struct){
@@ -924,19 +922,15 @@ Result:
   noStackOverflowStructCycle: (_|_){
     // [structural cycle]
     #list: (_|_){
-      // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle:
-      //     ./in.cue:150:6
+      // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
       tail: (_|_){
-        // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle:
-        //     ./in.cue:150:6
+        // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
       }
     }
     list: (_|_){
-      // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle:
-      //     ./in.cue:158:6
+      // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
       tail: (_|_){
-        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle:
-        //     ./in.cue:158:6
+        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
       }
     }
   }
@@ -949,24 +943,25 @@ Result:
         b: (bool){ bool }
       }
       x: (#struct){
-        c: (int){ 4 }
         b: (bool){ true }
+        c: (int){ 4 }
       }
       y: (#struct){
-        c: (int){ 4 }
         b: (bool){ true }
+        c: (int){ 4 }
       }
     }
     t2: (_|_){
       // [eval]
       #a: (#struct){
-        c: (int){ 4 }
         b: (bool){ true }
+        c: (int){ 4 }
       }
       #c: (#struct){
       }
       a: (_|_){
         // [eval]
+        b: (bool){ true }
         c: (_|_){
           // [eval]
           d: (_|_){
@@ -977,7 +972,6 @@ Result:
             //     ./in.cue:195:7
           }
         }
-        b: (bool){ true }
       }
     }
   }
@@ -985,6 +979,7 @@ Result:
     scopes: (struct){
       x: (int){ 1 }
       a: (struct){
+        y: (int){ 2 }
         b: (int){ 1 }
         c: (struct){
           d: (int){ 1 }
@@ -993,7 +988,6 @@ Result:
         f: (struct){
           g: (int){ 2 }
         }
-        y: (int){ 2 }
       }
     }
     drop: (struct){
@@ -1006,10 +1000,10 @@ Result:
   cyclicError: (struct){
     a: (_|_){
       // [cycle] cycle error
-      y: (_|_){
+      x: (_|_){
         // [cycle] cycle error
       }
-      x: (_|_){
+      y: (_|_){
         // [cycle] cycle error
       }
       b: (struct){
@@ -1250,8 +1244,8 @@ Result:
     }
     drop1: (struct){
       t: (struct){
-        x: (int){ int }
         #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
+        x: (int){ int }
       }
       s: (struct){
         #ok: (bool){ false }
@@ -1278,12 +1272,12 @@ Result:
     }
   }
   topElimination: (struct){
+    a: (int){ int }
     x: (_|_){
       // [incomplete] topElimination.x: non-concrete value int in operand to +:
       //     ./in.cue:510:6
       //     ./in.cue:507:5
     }
-    a: (int){ int }
   }
   explicitDefaultError: (_|_){
     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
@@ -1334,12 +1328,12 @@ Result:
     }
   }
   issue1759: (struct){
-    port: (string){ "80" }
     _ports_map: (struct){
       a: (struct){
         port: (string){ "80" }
       }
     }
+    port: (string){ "80" }
   }
   arcAlignment: (struct){
     t1: (struct){

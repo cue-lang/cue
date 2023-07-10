@@ -36,11 +36,11 @@ Leaks:  16
 Freed:  17
 Reused: 13
 Allocs: 20
-Retain: 28
+Retain: 30
 
 Unifications: 24
-Conjuncts:    62
-Disjuncts:    39
+Conjuncts:    58
+Disjuncts:    40
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){

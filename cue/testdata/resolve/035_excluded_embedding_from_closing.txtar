@@ -92,9 +92,6 @@ Result:
 (_|_){
   // [eval]
   #S: (#struct){
-    c: (#struct){
-      d: (int){ int }
-    }
     a: (#struct){
       c: (int){ int }
     }
@@ -104,20 +101,12 @@ Result:
     b: (#struct){
       open: (int){ int }
     }
+    c: (#struct){
+      d: (int){ int }
+    }
   }
   V: (_|_){
     // [eval]
-    c: (_|_){
-      // [eval]
-      d: (int){ int }
-      e: (_|_){
-        // [eval] V.c.e: field not allowed:
-        //     ./in.cue:3:2
-        //     ./in.cue:4:6
-        //     ./in.cue:9:4
-        //     ./in.cue:10:5
-      }
-    }
     a: (#struct){
       c: (int){ int }
     }
@@ -133,6 +122,17 @@ Result:
         //     ./in.cue:7:5
         //     ./in.cue:9:4
         //     ./in.cue:11:5
+      }
+    }
+    c: (_|_){
+      // [eval]
+      d: (int){ int }
+      e: (_|_){
+        // [eval] V.c.e: field not allowed:
+        //     ./in.cue:3:2
+        //     ./in.cue:4:6
+        //     ./in.cue:9:4
+        //     ./in.cue:10:5
       }
     }
   }

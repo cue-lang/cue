@@ -267,11 +267,11 @@ Leaks:  1
 Freed:  150
 Reused: 141
 Allocs: 10
-Retain: 76
+Retain: 70
 
 Unifications: 151
-Conjuncts:    158
-Disjuncts:    205
+Conjuncts:    160
+Disjuncts:    202
 -- out/eval --
 (struct){
   self: (struct){
@@ -400,78 +400,72 @@ Disjuncts:    205
   sameStruct: (struct){
     chainSuccess: (struct){
       a: (struct){
+        raises?: (struct){
+        }
         ret: (struct){
           a: (int){ 1 }
         }
         foo: (struct){
           a: (int){ 1 }
-        }
-        raises?: (struct){
         }
       }
       b: (struct){
-        foo: (struct){
-          a: (int){ 1 }
+        raises?: (struct){
         }
         ret: (struct){
           a: (int){ 1 }
         }
-        raises?: (struct){
+        foo: (struct){
+          a: (int){ 1 }
         }
       }
     }
     cycleFail: (struct){
       t1: (struct){
         p1: (_|_){
-          // [cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: ret changed after evaluation:
-          //     ./mutualsamestruct.cue:30:6
+          // [cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:26:6
+          raises: (struct){
+            a: (int){ 1 }
+          }
+          ret: (struct){
+            a: (int){ 1 }
+          }
+        }
+        p2: (_|_){
+          // [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:37:6
           ret: (struct){
             a: (int){ 1 }
           }
           raises?: (struct){
           }
         }
-        p2: (_|_){
-          // [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: raises changed after evaluation:
-          //     ./mutualsamestruct.cue:41:6
-          raises: (struct){
-            a: (int){ 1 }
-          }
-          ret: (struct){
-            a: (int){ 1 }
-          }
-        }
       }
       t2: (struct){
         p1: (_|_){
-          // [cycle] sameStruct.cycleFail.t2.p1: circular dependency in evaluation of conditionals: ret changed after evaluation:
-          //     ./mutualsamestruct.cue:58:6
-          ret: (struct){
-          }
+          // [cycle] sameStruct.cycleFail.t2.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:54:6
           raises: (struct){
+            a: (int){ 1 }
+          }
+          ret: (struct){
+            a: (int){ 1 }
           }
         }
         p2: (_|_){
-          // [cycle] sameStruct.cycleFail.t2.p2: circular dependency in evaluation of conditionals: raises changed after evaluation:
-          //     ./mutualsamestruct.cue:73:6
-          raises: (struct){
-            a: (int){ 1 }
-          }
+          // [cycle] sameStruct.cycleFail.t2.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:69:6
           ret: (struct){
-            a: (int){ 1 }
+          }
+          raises: (struct){
           }
         }
       }
       t3: (struct){
         p1: (_|_){
-          // [cycle] sameStruct.cycleFail.t3.p1: circular dependency in evaluation of conditionals: ret changed after evaluation:
-          //     ./mutualsamestruct.cue:87:6
-          ret: (_){ _ }
-          raises: (_){ _ }
-        }
-        p2: (_|_){
-          // [cycle] sameStruct.cycleFail.t3.p2: circular dependency in evaluation of conditionals: raises changed after evaluation:
-          //     ./mutualsamestruct.cue:98:6
+          // [cycle] sameStruct.cycleFail.t3.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+          //     ./mutualsamestruct.cue:83:6
           raises: (struct){
             a: (int){ 1 }
           }
@@ -479,20 +473,26 @@ Disjuncts:    205
             a: (int){ 1 }
           }
         }
+        p2: (_|_){
+          // [cycle] sameStruct.cycleFail.t3.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+          //     ./mutualsamestruct.cue:94:6
+          ret: (_){ _ }
+          raises: (_){ _ }
+        }
       }
     }
     defCloseSuccess: (struct){
       #Example: (#struct){
-        ret?: (_){ _ }
         raises?: (#struct){
           runtime?: (string){ string }
         }
+        ret?: (_){ _ }
       }
       expr: (#struct){
-        ret: (int){ 2 }
         raises?: (#struct){
           runtime?: (string){ string }
         }
+        ret: (int){ 2 }
       }
     }
   }
@@ -507,8 +507,8 @@ Disjuncts:    205
     }
     brokenCycleSuccess: (struct){
       #E: (#struct){
-        y: (bool){ true }
         x: (bool){ true }
+        y: (bool){ true }
       }
     }
     doubleAddfail: (_|_){
@@ -522,8 +522,8 @@ Disjuncts:    205
     }
     trippleSuccess: (struct){
       #E: (#struct){
-        y: (bool){ true }
         x: (bool){ true }
+        y: (bool){ true }
       }
       z: (bool){ true }
     }

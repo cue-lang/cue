@@ -102,13 +102,13 @@ clusters: foo: {}
 -- out/eval/stats --
 Leaks:  1
 Freed:  99
-Reused: 74
-Allocs: 26
-Retain: 120
+Reused: 76
+Allocs: 24
+Retain: 80
 
 Unifications: 100
 Conjuncts:    260
-Disjuncts:    190
+Disjuncts:    166
 -- out/eval --
 (struct){
   shorewallParams: (#struct){
@@ -123,27 +123,6 @@ Disjuncts:    190
       //     ./issue2235.cue:14:19
       //     ./issue2235.cue:13:19
       //     ./issue2235.cue:14:33
-    }
-    objects: (#struct){
-      namespaced: (#struct){
-        ingress: (#struct){
-          Service: (#struct){
-            "admin-nginx-ingress-controller": (#struct){
-              spec: (#struct){
-                externalIPs: (#list){
-                  0: (string){ "127.0.0.1" }
-                }
-              }
-              metadata: (#struct){
-                labels: (#struct){
-                  "ingress-class": (string){ "admin" }
-                  stack: (string){ "ingress" }
-                }
-              }
-            }
-          }
-        }
-      }
     }
     globalIngressControllers: (#struct){
       admin: (#struct){
@@ -171,32 +150,32 @@ Disjuncts:    190
         }
       }
     }
-  }
-  clusters: (struct){
-    foo: (#struct){
-      clusterName: (string){ "foo" }
-      shorewallPrefix: (string){ "KUBERNETES_FOO" }
-      objects: (#struct){
-        namespaced: (#struct){
-          ingress: (#struct){
-            Service: (#struct){
-              "admin-nginx-ingress-controller": (#struct){
-                spec: (#struct){
-                  externalIPs: (#list){
-                    0: (string){ "127.0.0.1" }
-                  }
+    objects: (#struct){
+      namespaced: (#struct){
+        ingress: (#struct){
+          Service: (#struct){
+            "admin-nginx-ingress-controller": (#struct){
+              spec: (#struct){
+                externalIPs: (#list){
+                  0: (string){ "127.0.0.1" }
                 }
-                metadata: (#struct){
-                  labels: (#struct){
-                    "ingress-class": (string){ "admin" }
-                    stack: (string){ "ingress" }
-                  }
+              }
+              metadata: (#struct){
+                labels: (#struct){
+                  "ingress-class": (string){ "admin" }
+                  stack: (string){ "ingress" }
                 }
               }
             }
           }
         }
       }
+    }
+  }
+  clusters: (struct){
+    foo: (#struct){
+      clusterName: (string){ "foo" }
+      shorewallPrefix: (string){ "KUBERNETES_FOO" }
       globalIngressControllers: (#struct){
         admin: (#struct){
           class: (string){ "admin" }
@@ -216,6 +195,27 @@ Disjuncts:    190
                         stack: (string){ "ingress" }
                       }
                     }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      objects: (#struct){
+        namespaced: (#struct){
+          ingress: (#struct){
+            Service: (#struct){
+              "admin-nginx-ingress-controller": (#struct){
+                spec: (#struct){
+                  externalIPs: (#list){
+                    0: (string){ "127.0.0.1" }
+                  }
+                }
+                metadata: (#struct){
+                  labels: (#struct){
+                    "ingress-class": (string){ "admin" }
+                    stack: (string){ "ingress" }
                   }
                 }
               }

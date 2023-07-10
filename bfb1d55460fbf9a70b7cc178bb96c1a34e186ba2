@@ -75,6 +75,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b50e72a8_3e34943a",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bcb52613_c4267bea",
+      "range": {
+        "startLine": 26,
+        "startChar": 16,
+        "endLine": 26,
+        "endChar": 27
+      },
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4cd215d_95d85246",
@@ -88,6 +112,24 @@
       "writtenOn": "2023-07-10T09:55:53Z",
       "side": 1,
       "message": "s/to be/to by/ ?",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1904083d_3119c407",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4cd215d_95d85246",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -109,6 +151,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6f3fd8b_6c5a3704",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf100061_d898c9c7",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e35c97c2_88859cb2",
@@ -122,6 +182,24 @@
       "writtenOn": "2023-07-08T16:30:27Z",
       "side": 1,
       "message": "can we document the difference between `recurse` and `all`? they are both initialised the same, but `all` is temporarily disabled at times. they clearly do different things, but it\u0027s not entirely clear just from looking here or the entry func.",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a483de0_0722a218",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e35c97c2_88859cb2",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -143,6 +221,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6391d36b_984c941f",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 349,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "00bb9e28_f321f5fa",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81402caa_2433537f",
@@ -156,6 +252,24 @@
       "writtenOn": "2023-07-10T09:55:53Z",
       "side": 1,
       "message": "How about just adding `Expr` to the `Resolver` interface definition? Then you wouldn\u0027t need the dynamic type conversion. I tried it and everything seemed to be fine. And it would make `Resolver` a little clearer too.",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5baab418_f50033fa",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Could be, but would prefer in a separate CL in that case.",
+      "parentUuid": "81402caa_2433537f",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -183,6 +297,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d753bd0a_f74987fa",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e46077c2_c78dec10",
+      "range": {
+        "startLine": 431,
+        "startChar": 30,
+        "endLine": 431,
+        "endChar": 34
+      },
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5e43280d_900a77a0",
@@ -200,6 +338,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fa81083_8dc0ac4e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5e43280d_900a77a0",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "19428cba_2935acae",
@@ -213,6 +369,24 @@
       "writtenOn": "2023-07-10T09:55:53Z",
       "side": 1,
       "message": "Or maybe `c.pathStack \u003d c.pathStack[:len(saved)]` ?\nThen you won\u0027t be losing the allocation that `append` might be doing.",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6defcced_1e67241c",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "19428cba_2935acae",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -252,6 +426,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f330580_83cafb4f",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "054e50d8_1cd3bd7e",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02873380_1489b841",
@@ -265,6 +457,24 @@
       "writtenOn": "2023-07-08T16:30:27Z",
       "side": 1,
       "message": "can we sort the output by line? 78 and 93 are being moved for apparently no reason. I realise this is currently the visit order, but the test should likely want the deps lists to be sorted in a way that is most useful to the human reader.",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0953c9c_4f7b242a",
+        "filename": "internal/core/dep/testdata/inline.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "I think it is too much code for what it is worth, especially as the visit order is informative, and I have used it to understand the code when debugging.",
+      "parentUuid": "02873380_1489b841",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -286,6 +496,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d196eae_99bb4668",
+        "filename": "internal/core/dep/testdata/inline.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "It is correct. The q appears in the output as a dependency, but the s is not.",
+      "parentUuid": "397dcf6c_1d6f9429",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "72aa6708_083eeed9",
@@ -299,6 +527,24 @@
       "writtenOn": "2023-07-08T16:30:27Z",
       "side": 1,
       "message": "should comments be here?",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26c110e2_dd53e296",
+        "filename": "internal/core/dep/testdata/inline.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Why not? I think it is fine and even useful.",
+      "parentUuid": "72aa6708_083eeed9",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

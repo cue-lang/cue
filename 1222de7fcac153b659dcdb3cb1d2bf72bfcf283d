@@ -123,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8edf4bc_5fb0129e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74076e6a_a7e58461",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "195c2c42_a64e9397",
@@ -335,6 +353,24 @@
       "writtenOn": "2023-07-07T08:54:03Z",
       "side": 1,
       "message": "I think this func could do with a few more comments about what is happening for each type case, in particular the resolver and default ones. For example, why do resolvers which are non-rooted and have an empty path do something special? I can\u0027t really figure it out by just reading the code.",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f984d15e_1d3c112d",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-10T12:23:03Z",
+      "side": 1,
+      "message": "I\u0027m not sure to which function this comment implies.",
+      "parentUuid": "05cfa60b_7fead8f4",
       "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

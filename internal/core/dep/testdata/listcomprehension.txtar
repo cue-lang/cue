@@ -19,3 +19,11 @@ line  reference    path of resulting vertex
 1:    d         => d
 1:    x.a       => c[1].a
 1:    d         => d
+-- out/dependencies/merged --
+line  reference    path of resulting vertex
+1:    c         => c
+1:    d         => d
+1:    x.a       => c[0].a
+1:    d         => d
+1:    x.a       => c[1].a
+1:    d         => d

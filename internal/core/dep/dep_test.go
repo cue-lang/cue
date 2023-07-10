@@ -64,6 +64,10 @@ func TestVisit(t *testing.T) {
 			name: "dynamic",
 			root: "a",
 			cfg:  &dep.Config{Dynamic: true},
+		}, {
+			name: "merged",
+			root: "a",
+			cfg:  &dep.Config{Dynamic: true, ReportMerged: true},
 		}}
 
 		for _, tc := range testCases {

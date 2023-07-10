@@ -176,3 +176,42 @@ line  reference                          path of resulting vertex
 108:  strings.Join                                         => "strings".Join
 108:  strings.Split                                        => "strings".Split
 93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result
+-- out/dependencies/merged --
+line  reference                          path of resulting vertex
+8:    [c][0]                          => a.b.c
+10:   s.k                             => s.k
+12:   {out: c}.out                    => a.b.c
+13:   {out: q}.out                    => q
+14:   {out: q}.out                    => q
+15:   {out: q}.out.x                  => q.x
+18:   {out: {out: r: q}.out}.out.r    => q
+19:   {out: {out: r: c}.out}.out.r[0] => a.b.c[0]
+20:   {out: r: q}.out.r.x             => q.x
+21:   {out: {out: r: q}.out}.out.r.x  => q.x
+22:   {out: {out: r: q}.out.r}.out.x  => q.x
+25:   h1.r                            => a.b.h1.r
+26:   h1.r.s                          => a.b.h1.r.s
+28:   r.k                             => r.k
+29:   r.k.l                           => r.k.l
+33:   {
+      out:   q
+      other: s // should not appear in output
+}.out => q
+38:   {
+      out:   other
+      other: s // should appear in output
+}.out => s
+45:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+45:   msg                                                  => msg
+51:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+51:   msg                                                  => msg
+57:   regexp.FindNamedSubmatch                             => "regexp".FindNamedSubmatch
+57:   msg                                                  => msg
+106:  strings.Join                                         => "strings".Join
+106:  strings.Split                                        => "strings".Split
+78:   runs.t1.stdout                                       => a.b.t1.runs.t1.stdout
+78:   runs.t2.stdout                                       => a.b.t1.runs.t2.stdout
+78:   (#f & {arg: runs.t1.stdout + runs.t2.stdout}).result => #f.result
+108:  strings.Join                                         => "strings".Join
+108:  strings.Split                                        => "strings".Split
+93:   (#g & {arg: runs.t1.stdout + runs.t2.stdout}).result => #g.result

@@ -15,3 +15,6 @@ line  reference    path of resulting vertex
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
 7:    t1.stdout => t1.stdout
+-- out/dependencies/merged --
+line  reference    path of resulting vertex
+7:    t1.stdout => t1.stdout

@@ -33,3 +33,16 @@ line  reference    path of resulting vertex
 21:   middle    => middle
 21:   x         => middle.la1
 21:   x         => middle.la2
+-- out/dependencies/merged --
+line  reference    path of resulting vertex
+21:   middle    => middle
+21:   x         => middle.la1
+6:    a.c       => a.c
+13:   x         => first.out[0]
+14:   x         => first.out[0]
+15:   ignore.x  => ignore.x
+21:   x         => middle.la2
+6:    a.c       => a.c
+13:   x         => first.out[1]
+14:   x         => first.out[1]
+15:   ignore.x  => ignore.x

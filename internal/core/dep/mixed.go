@@ -28,16 +28,18 @@ import (
 // descend into the conjuncts and evaluate the necessary values, like fields
 // and comprehension sources.
 func (v *visitor) dynamic(n *adt.Vertex, top bool) {
-	found := false
-	for _, c := range n.Conjuncts {
-		if v.marked[c.Expr()] {
-			found = true
-			break
+	if v.marked != nil {
+		found := false
+		for _, c := range n.Conjuncts {
+			if v.marked[c.Expr()] {
+				found = true
+				break
+			}
 		}
-	}
 
-	if !found {
-		return
+		if !found {
+			return
+		}
 	}
 
 	if v.visit(n, top) != nil {
@@ -58,6 +60,7 @@ type marked map[adt.Expr]bool
 // some walk functionality.
 
 // markExpr visits all nodes in an expression to mark dependencies.
+// This ensures that only direct dependencies of an indicated root are visited.
 func (m marked) markExpr(x adt.Expr) {
 	m[x] = true
 

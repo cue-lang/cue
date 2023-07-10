@@ -36,3 +36,11 @@ line  reference                                     path of resulting vertex
 13:   #base                                      => a.#base
 19:   #combined                                  => a.#combined
 14:   X.enabled                                  => a.instance.enabled
+-- out/dependencies/merged --
+line  reference                                     path of resulting vertex
+4:    (instance & outer & {enabled: true}).value => a.instance.value
+4:    outer                                      => outer
+5:    val                                        => a.command.alias.val
+13:   #base                                      => a.#base
+19:   #combined                                  => a.#combined
+14:   X.enabled                                  => a.instance.enabled

@@ -39,3 +39,13 @@ line  reference    path of resulting vertex
 3:    value     => **non-rooted**
 9:    key       => **non-rooted**
 10:   value     => **non-rooted**
+-- out/dependencies/merged --
+line  reference    path of resulting vertex
+4:    key       => **non-rooted**
+5:    value     => **non-rooted**
+11:   key       => **non-rooted**
+12:   value     => **non-rooted**
+2:    key       => **non-rooted**
+3:    value     => **non-rooted**
+9:    key       => **non-rooted**
+10:   value     => **non-rooted**

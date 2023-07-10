@@ -89,6 +89,11 @@ type Config struct {
 	// implied by Dynamic.
 	Descend bool
 
+	// ReportMerged enables reporting of dependencies that are merged in during
+	// unification, instead of just direct dependencies. This only applies in
+	// dynamic mode.
+	ReportMerged bool
+
 	// Cycles allows a Node to reported more than once. This includes the node
 	// passed to Visit, which is otherwise never reported. This option can be
 	// used to disable cycle checking. TODO: this is not yet implemented.
@@ -191,10 +196,10 @@ func Visit(cfg *Config, c *adt.OpContext, n *adt.Vertex, f VisitFunc) error {
 	}
 
 	if cfg.Dynamic {
-		v.marked = marked{}
-
-		v.marked.markExpr(n)
-
+		if !cfg.ReportMerged {
+			v.marked = marked{}
+			v.marked.markExpr(n)
+		}
 		v.dynamic(n, true)
 	} else {
 		v.visit(n, true)

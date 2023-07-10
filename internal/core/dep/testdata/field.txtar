@@ -29,3 +29,9 @@ line  reference    path of resulting vertex
 3:    name      => name
 4:    c         => c
 3:    c         => c
+-- out/dependencies/merged --
+line  reference    path of resulting vertex
+2:    pattern   => pattern
+3:    name      => name
+4:    c         => c
+3:    c         => c

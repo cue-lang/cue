@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3939fd90_9acd5d0d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "A quick google persuades me that \"rootless\" is better than either of those two alternatives - sorry for not suggesting it earlier (non-rooted isn\u0027t really a word and \"unrooted\", although valid for this meaning (https://www.merriam-webster.com/dictionary/unrooted), can also mean \"with the roots removed\".\n\nSo I\u0027d suggest using \"rootless\".",
+      "parentUuid": "0481b544_d93fec97",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74076e6a_a7e58461",

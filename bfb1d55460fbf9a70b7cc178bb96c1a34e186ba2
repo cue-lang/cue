@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "636240a4_af2cfb36",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor comments and suggestions, thanks!",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bcb52613_c4267bea",
@@ -54,6 +71,40 @@
         "endLine": 26,
         "endChar": 27
       },
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b4cd215d_95d85246",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "s/to be/to by/ ?",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf100061_d898c9c7",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "This sounds like it might be a TODO?",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -94,6 +145,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "81402caa_2433537f",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "How about just adding `Expr` to the `Resolver` interface definition? Then you wouldn\u0027t need the dynamic type conversion. I tried it and everything seemed to be fine. And it would make `Resolver` a little clearer too.",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e46077c2_c78dec10",
         "filename": "internal/core/dep/dep.go",
         "patchSetId": 4
@@ -117,6 +185,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5e43280d_900a77a0",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "s/such/these/ ?",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19428cba_2935acae",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "Or maybe `c.pathStack \u003d c.pathStack[:len(saved)]` ?\nThen you won\u0027t be losing the allocation that `append` might be doing.",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5eee84f5_53fa0fec",
         "filename": "internal/core/dep/dep.go",
         "patchSetId": 4
@@ -134,6 +236,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "054e50d8_1cd3bd7e",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "Yeah, it could be `adt.InvalidLabel`.",
+      "parentUuid": "5eee84f5_53fa0fec",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "02873380_1489b841",
         "filename": "internal/core/dep/testdata/inline.txtar",
         "patchSetId": 4
@@ -145,6 +265,23 @@
       "writtenOn": "2023-07-08T16:30:27Z",
       "side": 1,
       "message": "can we sort the output by line? 78 and 93 are being moved for apparently no reason. I realise this is currently the visit order, but the test should likely want the deps lists to be sorted in a way that is most useful to the human reader.",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "397dcf6c_1d6f9429",
+        "filename": "internal/core/dep/testdata/inline.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 159,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-10T09:55:53Z",
+      "side": 1,
+      "message": "This seems to be appearing in the output. Presumably that\u0027s OK because it\u0027s on the LHS not the right, but perhaps the comment could use updating?",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

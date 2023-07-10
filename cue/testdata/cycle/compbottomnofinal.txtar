@@ -518,12 +518,12 @@ Disjuncts:    215
     p2: (struct){
       X: (string){ "user@mod.test" }
       Y: (_|_){
-        // [cycle] large.p2.Y: undefined field: port:
+        // [cycle] large.p2.Y: cycle error referencing port:
         //     ./in.cue:267:10
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
         port*: (_|_){
-          // [cycle] large.p2.Y: undefined field: port:
+          // [cycle] large.p2.Y: cycle error referencing port:
           //     ./in.cue:267:10
         }
       }
@@ -532,11 +532,11 @@ Disjuncts:    215
         //     ./in.cue:243:7
         // large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
         //     ./in.cue:246:7
-        // large.p2.Y: undefined field: port:
+        // large.p2.Y: cycle error referencing port:
         //     ./in.cue:267:10
         userinfo: (string){ "user@" }
         port: (_|_){
-          // [cycle] large.p2.Y: undefined field: port:
+          // [cycle] large.p2.Y: cycle error referencing port:
           //     ./in.cue:267:10
         }
         host: (string){ "mod.test" }
@@ -554,22 +554,22 @@ Disjuncts:    215
         //     ./in.cue:279:7
         // large.p3.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
         //     ./in.cue:282:7
-        // large.p3.Y: undefined field: port:
+        // large.p3.Y: cycle error referencing port:
         //     ./in.cue:308:10
         userinfo: (string){ "user@" }
         port: (_|_){
-          // [cycle] large.p3.Y: undefined field: port:
+          // [cycle] large.p3.Y: cycle error referencing port:
           //     ./in.cue:308:10
         }
         host: (string){ "mod.test" }
       }
       Y: (_|_){
-        // [cycle] large.p3.Y: undefined field: port:
+        // [cycle] large.p3.Y: cycle error referencing port:
         //     ./in.cue:308:10
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
         port*: (_|_){
-          // [cycle] large.p3.Y: undefined field: port:
+          // [cycle] large.p3.Y: cycle error referencing port:
           //     ./in.cue:308:10
         }
       }
@@ -586,11 +586,11 @@ Disjuncts:    215
         //     ./in.cue:320:7
         // large.p4.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
         //     ./in.cue:323:7
-        // large.p4.Y: undefined field: port:
+        // large.p4.Y: cycle error referencing port:
         //     ./in.cue:351:10
         userinfo: (string){ "user@" }
         port: (_|_){
-          // [cycle] large.p4.Y: undefined field: port:
+          // [cycle] large.p4.Y: cycle error referencing port:
           //     ./in.cue:351:10
         }
         host: (string){ "mod.test" }
@@ -601,12 +601,12 @@ Disjuncts:    215
         userinfo: (string){ "user" }
       }
       Y: (_|_){
-        // [cycle] large.p4.Y: undefined field: port:
+        // [cycle] large.p4.Y: cycle error referencing port:
         //     ./in.cue:351:10
         userinfo: (string){ "user" }
         host: (string){ "mod.test" }
         port*: (_|_){
-          // [cycle] large.p4.Y: undefined field: port:
+          // [cycle] large.p4.Y: cycle error referencing port:
           //     ./in.cue:351:10
         }
       }

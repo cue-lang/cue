@@ -46,13 +46,13 @@ issue1837: {
 -- out/eval/stats --
 Leaks:  5
 Freed:  27
-Reused: 21
-Allocs: 11
-Retain: 114
+Reused: 22
+Allocs: 10
+Retain: 80
 
 Unifications: 32
-Conjuncts:    167
-Disjuncts:    59
+Conjuncts:    147
+Disjuncts:    37
 -- out/eval --
 (struct){
   s: (string){ string }
@@ -96,31 +96,31 @@ Disjuncts:    59
   }
   issue1837: (struct){
     p1: (struct){
-      message: (string){ "a" }
       context: (struct){
       }
       x: (_|_){
         // [incomplete] issue1837.p1.x: undefined field: b:
         //     ./in.cue:25:14
       }
+      message: (string){ "a" }
     }
     p2: (struct){
-      message: (string){ "a" }
       x: (_|_){
         // [incomplete] issue1837.p2.x: undefined field: b:
         //     ./in.cue:34:14
       }
       context: (struct){
       }
+      message: (string){ "a" }
     }
     p3: (struct){
-      message: (string){ "a" }
       context: (struct){
       }
       x: (_|_){
         // [incomplete] issue1837.p3.x: undefined field: b:
         //     ./in.cue:42:14
       }
+      message: (string){ "a" }
     }
   }
 }

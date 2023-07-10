@@ -109,11 +109,10 @@ limits:
   memory: 1073741824
 
 -- stderr2416.golden --
-command.build.contents: invalid bytes argument: invalid interpolation: non-concrete value string (type string):
-    ./issue2416a_tool.cue:18:10
-    ./issue2416a_tool.cue:9:7
-    ./issue2416a_tool.cue:15:14
-    ./issue2416a_tool.cue:27:2
+unknown 'cue cmd' subcommand: "build"
+
+Ensure custom commands are defined in a "_tool.cue" file.
+Run 'cue help cmd' to list available custom commands.
 -- stdout2416.golden --
 key=default val=foo
 key=bar val=bar

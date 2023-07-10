@@ -15,7 +15,7 @@ stdout 'hello, world'
 -- expect/concrete.json --
 {
     "command": {
-        "hello": {
+        "hello1": {
             "task": {
                 "hello": {
                     "$id": "tool/cli.Print",
@@ -23,7 +23,7 @@ stdout 'hello, world'
                 }
             }
         },
-        "hello1": {
+        "hello": {
             "task": {
                 "hello": {
                     "$id": "tool/cli.Print",

@@ -537,19 +537,20 @@ n2: n1 & {a: n1}
 n3: n1 & {n1}
 n4: n1 & {x: n1 & {y: n1 & {z: int}}}
 -- out/eval/stats --
-Leaks:  16
-Freed:  799
-Reused: 787
-Allocs: 28
-Retain: 65
+Leaks:  15
+Freed:  800
+Reused: 788
+Allocs: 27
+Retain: 61
 
 Unifications: 629
 Conjuncts:    1227
-Disjuncts:    848
+Disjuncts:    847
 -- out/eval --
 Errors:
 a1.f.0: structural cycle
 a3.f.g: structural cycle
+b12b.#list.tail: structural cycle
 b13.root.a.0.0: structural cycle
 b14.root.b.1.1: structural cycle
 b4.cond1.x.y.0: structural cycle
@@ -631,8 +632,6 @@ shortPathFail.elipsis.t2.Foo.ref.ref: structural cycle
 withLetFail.schema.next: structural cycle
 z1.z.f.h: structural cycle
 z1.z.g.h: structural cycle
-b12b.#list.tail: structural cycle:
-    ./in.cue:176:6
 d1.r: structural cycle:
     ./in.cue:299:26
 d3.x.indirect: structural cycle:
@@ -897,12 +896,11 @@ Result:
   }
   b12: (struct){
     #list: (#struct){
-      sum: (int){ int }
       value: (int){ int }
       tail: (null){ null }
+      sum: (int){ int }
     }
     list1: (#struct){
-      sum: (int){ 10 }
       value: (int){ 1 }
       tail: (#struct){
         value: (int){ 2 }
@@ -910,28 +908,26 @@ Result:
           value: (int){ 3 }
           tail: (#struct){
             value: (int){ 4 }
-            sum: (int){ 4 }
             tail: (null){ null }
+            sum: (int){ 4 }
           }
           sum: (int){ 7 }
         }
         sum: (int){ 9 }
       }
+      sum: (int){ 10 }
     }
   }
   b12b: (_|_){
     // [structural cycle]
     #list: (_|_){
-      // [structural cycle] b12b.#list.tail: structural cycle:
-      //     ./in.cue:176:6
+      // [structural cycle] b12b.#list.tail: structural cycle
       tail: (_|_){
-        // [structural cycle] b12b.#list.tail: structural cycle:
-        //     ./in.cue:176:6
+        // [structural cycle] b12b.#list.tail: structural cycle
       }
     }
     list1: (_|_){
-      // [structural cycle] b12b.#list.tail: structural cycle:
-      //     ./in.cue:176:6
+      // [structural cycle] b12b.#list.tail: structural cycle
       tail: (struct){
         tail: (struct){
         }

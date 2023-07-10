@@ -63,13 +63,13 @@ Junk: {
 -- out/eval/stats --
 Leaks:  0
 Freed:  15
-Reused: 6
-Allocs: 9
-Retain: 5
+Reused: 9
+Allocs: 6
+Retain: 1
 
 Unifications: 11
-Conjuncts:    24
-Disjuncts:    18
+Conjuncts:    23
+Disjuncts:    16
 -- out/eval --
 Errors:
 listOfCloseds.0.b: field not allowed:
@@ -84,6 +84,16 @@ listOfCloseds.0.b: field not allowed:
 Result:
 (_|_){
   // [eval]
+  Foo: (struct){
+    listOfCloseds: (list){
+    }
+  }
+  #Closed: (#struct){
+    a: (int){ |(*(int){ 0 }, (int){ int }) }
+  }
+  Junk: (struct){
+    b: (int){ 2 }
+  }
   listOfCloseds: (_|_){
     // [eval]
     0: (_|_){
@@ -100,15 +110,5 @@ Result:
         //     ./in.cue:16:4
       }
     }
-  }
-  Foo: (struct){
-    listOfCloseds: (list){
-    }
-  }
-  #Closed: (#struct){
-    a: (int){ |(*(int){ 0 }, (int){ int }) }
-  }
-  Junk: (struct){
-    b: (int){ 2 }
   }
 }

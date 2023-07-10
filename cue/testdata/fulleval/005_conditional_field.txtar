@@ -59,14 +59,13 @@ Leaks:  0
 Freed:  7
 Reused: 4
 Allocs: 3
-Retain: 1
+Retain: 0
 
 Unifications: 7
 Conjuncts:    8
 Disjuncts:    7
 -- out/eval --
 (struct){
-  a: (string){ "foo" }
   b: (bool){ true }
   c: (struct){
     a: (int){ 3 }
@@ -79,4 +78,5 @@ Disjuncts:    7
       //     ./in.cue:14:5
     }
   }
+  a: (string){ "foo" }
 }

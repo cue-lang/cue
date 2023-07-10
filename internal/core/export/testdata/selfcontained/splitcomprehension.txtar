@@ -23,13 +23,13 @@ a: {
 -- out/default --
 
 {
-	k2: "test"
-} & {
-	v2: 1
-} & {
 	k4: "test"
 } & {
 	v4: 1
+} & {
+	k2: "test"
+} & {
+	v2: 1
 } & {
 	k1: "test"
 	v1: 1

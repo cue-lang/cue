@@ -22,26 +22,15 @@ for _, manifest in manifests {
 -- out/eval/stats --
 Leaks:  0
 Freed:  22
-Reused: 12
-Allocs: 10
-Retain: 9
+Reused: 15
+Allocs: 7
+Retain: 0
 
 Unifications: 22
 Conjuncts:    38
-Disjuncts:    27
+Disjuncts:    22
 -- out/eval --
 (struct){
-  results: (struct){
-    deployment: (struct){
-      #map: (#struct){
-        app01: (#struct){
-          image: (string){ "image01" }
-          name: (string){ "app01" }
-          desc: (string){ string }
-        }
-      }
-    }
-  }
   key: (string){ "app01" }
   manifests: (#list){
     0: (struct){
@@ -61,6 +50,17 @@ Disjuncts:    27
           app01: (#struct){
             image: (string){ "image01" }
           }
+        }
+      }
+    }
+  }
+  results: (struct){
+    deployment: (struct){
+      #map: (#struct){
+        app01: (#struct){
+          image: (string){ "image01" }
+          name: (string){ "app01" }
+          desc: (string){ string }
         }
       }
     }

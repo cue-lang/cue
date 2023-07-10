@@ -31,10 +31,10 @@ line  reference    path of resulting vertex
 3:    value     => test
 -- out/dependencies/dynamic --
 line  reference    path of resulting vertex
-4:    key       => key
-5:    value     => test
 11:   key       => key
 12:   value     => a.test
+4:    key       => key
+5:    value     => test
 2:    key       => key
 3:    value     => test
 9:    key       => key

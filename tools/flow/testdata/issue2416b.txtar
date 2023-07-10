@@ -45,20 +45,20 @@ graph TD
 -- out/run/t1/stats --
 Leaks:  0
 Freed:  30
-Reused: 20
-Allocs: 10
-Retain: 27
+Reused: 24
+Allocs: 6
+Retain: 1
 
 Unifications: 22
 Conjuncts:    56
-Disjuncts:    52
+Disjuncts:    31
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  30
-Reused: 20
-Allocs: 10
-Retain: 27
+Reused: 24
+Allocs: 6
+Retain: 1
 
 Unifications: 22
 Conjuncts:    56
-Disjuncts:    52
+Disjuncts:    31

@@ -124,13 +124,13 @@ foo: {
 -- out/eval/stats --
 Leaks:  4
 Freed:  118
-Reused: 105
-Allocs: 17
-Retain: 19
+Reused: 99
+Allocs: 23
+Retain: 26
 
 Unifications: 112
-Conjuncts:    249
-Disjuncts:    133
+Conjuncts:    245
+Disjuncts:    140
 -- out/eval --
 (struct){
   networkingv1: (struct){
@@ -231,6 +231,83 @@ Disjuncts:    133
     }
   }
   #Flux: (#struct){
+    charts: (#struct){
+      foo: (#struct){
+        global: (#struct){
+          auth0: (#struct){
+            enabled: (bool){ bool }
+          }
+        }
+      }
+    }
+    formatOutput: (#struct){
+      "ns/network": (#struct){
+        spec: (#struct){
+          ingress: (#list){
+            0: (#struct){
+              from: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          egress: (#list){
+            0: (#struct){
+              to: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      foo: (#struct){
+      }
+    }
+    _outputs(:config): (#struct){
+      "ns/network": (#struct){
+        spec: (#struct){
+          ingress: (#list){
+            0: (#struct){
+              from: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          egress: (#list){
+            0: (#struct){
+              to: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      foo: (#struct){
+      }
+    }
     tenant: (#struct){
       id: (string){ string }
     }
@@ -239,92 +316,9 @@ Disjuncts:    133
       //     ./in.cue:41:12
       enabled: (bool){ bool }
     }
-    charts: (#struct){
-      foo: (#struct){
-        global: (#struct){
-          auth0: (#struct){
-            enabled: (_|_){
-              // [incomplete] #Flux.auth0: incomplete bool: bool:
-              //     ./in.cue:41:12
-            }
-          }
-        }
-      }
-    }
     global: (#struct){
       auth0: (#struct){
-        enabled: (_|_){
-          // [incomplete] #Flux.auth0: incomplete bool: bool:
-          //     ./in.cue:41:12
-        }
-      }
-    }
-    _outputs(:config): (#struct){
-      foo: (#struct){
-      }
-      "ns/network": (#struct){
-        spec: (#struct){
-          ingress: (#list){
-            0: (#struct){
-              from: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          egress: (#list){
-            0: (#struct){
-              to: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    formatOutput: (#struct){
-      foo: (#struct){
-      }
-      "ns/network": (#struct){
-        spec: (#struct){
-          ingress: (#list){
-            0: (#struct){
-              from: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-          egress: (#list){
-            0: (#struct){
-              to: (#list){
-                0: (#struct){
-                  namespaceSelector: (#struct){
-                    matchLabels: (#struct){
-                      tenant: (string){ string }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
+        enabled: (bool){ bool }
       }
     }
   }

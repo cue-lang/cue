@@ -451,7 +451,7 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 		for n.maybeSetCache(); n.expandOne(state); n.maybeSetCache() {
 		}
 
-		if !n.addLists() {
+		if !n.addLists(state) {
 			break
 		}
 	}
@@ -2146,7 +2146,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists() (progress bool) {
+func (n *nodeContext) addLists(state vertexStatus) (progress bool) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
 		return false
 	}
@@ -2221,7 +2221,7 @@ outer:
 		for j, elem := range l.list.Elems {
 			switch x := elem.(type) {
 			case *Comprehension:
-				err := c.yield(nil, l.env, x, finalized, func(e *Environment) {
+				err := c.yield(nil, l.env, x, state, func(e *Environment) {
 					label, err := MakeLabel(x.Source(), index, IntLabel)
 					n.addErr(err)
 					index++

@@ -102,33 +102,33 @@ Leaks:  4
 Freed:  64
 Reused: 57
 Allocs: 11
-Retain: 20
+Retain: 19
 
 Unifications: 68
 Conjuncts:    96
-Disjuncts:    82
+Disjuncts:    81
 -- out/eval --
 (struct){
-  A: (struct){
-    X: (struct){
-      run: (string){ "dfoo" }
-      files: (string){ "dfoo" }
-    }
-  }
   a: (struct){
     x: (int){ 10 }
     y: (int){ 100 }
     z: (int){ 50 }
   }
   b: (struct){
+    x: (int){ 10 }
     k: (int){ 20 }
     l: (int){ 40 }
-    x: (int){ 10 }
     z: (int){ 50 }
   }
   c: (struct){
     y: (int){ 110 }
     z: (int){ 60 }
+  }
+  A: (struct){
+    X: (struct){
+      run: (string){ "dfoo" }
+      files: (string){ "dfoo" }
+    }
   }
   matchOrder: (struct){
     a1: (struct){

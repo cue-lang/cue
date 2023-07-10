@@ -96,15 +96,15 @@ embeddedFunctionalExpr: {
 	#fn
 }
 -- out/eval/stats --
-Leaks:  12
+Leaks:  8
 Freed:  53
 Reused: 48
-Allocs: 17
-Retain: 31
+Allocs: 13
+Retain: 23
 
-Unifications: 65
-Conjuncts:    185
-Disjuncts:    77
+Unifications: 61
+Conjuncts:    151
+Disjuncts:    66
 -- out/eval --
 (struct){
   embeddingDirect: (struct){

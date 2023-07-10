@@ -1962,12 +1962,42 @@ func (n *nodeContext) addStruct(
 
 	parent := n.node.AddStruct(s, childEnv, closeInfo)
 	closeInfo.IsClosed = false
+
 	parent.Disable = true // disable until processing is done.
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
-		case *Field, *LetField:
+		case *Field:
 			// handle in next iteration.
+			if x.Label.IsString() && x.ArcType == ArcMember {
+				n.aStruct = s
+				n.aStructID = closeInfo
+			}
+			n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
+
+		case *LetField:
+			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
+			if x.IsMulti {
+				arc.MultiLet = x.IsMulti
+			}
+		}
+	}
+
+	for _, d := range s.Decls {
+		switch x := d.(type) {
+		case *Field:
+		// 	// handle in next iteration.
+		// 	if x.Label.IsString() && x.ArcType == ArcMember {
+		// 		n.aStruct = s
+		// 		n.aStructID = closeInfo
+		// 	}
+		// 	n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
+
+		case *LetField:
+		// 	arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
+		// 	if x.IsMulti {
+		// 		arc.MultiLet = x.IsMulti
+		// 	}
 
 		case *DynamicField:
 			n.aStruct = s
@@ -1988,8 +2018,25 @@ func (n *nodeContext) addStruct(
 			// a fieldSet. Otherwise the entry will just be removed next.
 			id := closeInfo.SpawnEmbed(x)
 
+			// n.exprs = append(n.exprs, envExpr{
+			// 	MakeConjunct(childEnv, x, id), nil,
+			// 	// childEnv, x, id
+			// })
 			// push and opo embedding type.
-			n.addExprConjunct(MakeConjunct(childEnv, x, id), partial)
+			c := MakeConjunct(childEnv, x, id)
+
+			// ctx := n.ctx
+			// s := ctx.PushState(childEnv, x.Source())
+			// val := ctx.evalState(x, partial)
+
+			// if err, _ := val.(*Bottom); err != nil && err.IsIncomplete() {
+			// 	n.exprs = append(n.exprs, envExpr{c, nil})
+			// }
+
+			// _ = ctx.PopState(s)
+
+			n.addExprConjunct(c, partial)
+			// n.addValueConjunct(childEnv, val, id)
 
 		case *BulkOptionalField, *Ellipsis:
 			// Nothing to do here. Note that the presence of these fields do not
@@ -2006,24 +2053,28 @@ func (n *nodeContext) addStruct(
 		n.aStructID = closeInfo
 	}
 
+	// for _, d := range s.Decls {
+	// 	switch x := d.(type) {
+	// 	case *Field:
+	// 	case Expr:
+	// 		// add embedding to optional
+
+	// 		// TODO(perf): only do this if addExprConjunct below will result in
+	// 		// a fieldSet. Otherwise the entry will just be removed next.
+	// 		id := closeInfo.SpawnEmbed(x)
+
+	// 		n.exprs = append(n.exprs, envExpr{
+	// 			MakeConjunct(childEnv, x, id), nil,
+	// 			// childEnv, x, id
+	// 		})
+	// 		// push and opo embedding type.
+	// 		// n.addExprConjunct(MakeConjunct(childEnv, x, id), partial)
+
+	// 	}
+	// }
+
 	parent.Disable = false
 
-	for _, d := range s.Decls {
-		switch x := d.(type) {
-		case *Field:
-			if x.Label.IsString() && x.ArcType == ArcMember {
-				n.aStruct = s
-				n.aStructID = closeInfo
-			}
-			n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
-
-		case *LetField:
-			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
-			if x.IsMulti {
-				arc.MultiLet = x.IsMulti
-			}
-		}
-	}
 }
 
 // TODO(perf): if an arc is the only arc with that label added to a Vertex, and

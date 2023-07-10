@@ -98,17 +98,17 @@ Disjuncts:    15
     }
   }
   #def: (#struct){
+    b: (int){ 2 }
     a: (int){ 1 }
     sub: (#struct){
       f: (int){ 3 }
     }
-    b: (int){ 2 }
   }
   #f: (#struct){
     a: (int){ 10 }
   }
   #e: (#struct){
-    a: (int){ 10 }
     b: (int){ &(<100, int) }
+    a: (int){ 10 }
   }
 }

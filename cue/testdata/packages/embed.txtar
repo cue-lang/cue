@@ -31,17 +31,17 @@ Allocs: 5
 Retain: 4
 
 Unifications: 11
-Conjuncts:    27
+Conjuncts:    25
 Disjuncts:    13
 -- out/eval --
 (struct){
-  foo: (struct){
-    x: (int){ 1 }
-    y: (int){ 2 }
-  }
   z: (int){ 3 }
-  x: (int){ 1 }
+  foo: (struct){
+    y: (int){ 2 }
+    x: (int){ 1 }
+  }
   y: (int){ 2 }
+  x: (int){ 1 }
 }
 -- out/compile --
 --- in.cue

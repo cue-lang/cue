@@ -44,14 +44,14 @@ dynamic: {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  27
-Reused: 21
-Allocs: 6
-Retain: 4
+Freed:  26
+Reused: 22
+Allocs: 4
+Retain: 0
 
-Unifications: 27
-Conjuncts:    41
-Disjuncts:    29
+Unifications: 26
+Conjuncts:    39
+Disjuncts:    26
 -- out/eval --
 Errors:
 a.q.e: field not allowed:
@@ -74,8 +74,8 @@ Result:
   #A: (#struct){
     b: (int){ int }
     q: (#struct){
-      c: (int){ int }
       d: (int){ int }
+      c: (int){ int }
     }
   }
   a: (_|_){
@@ -83,8 +83,8 @@ Result:
     b: (int){ 3 }
     q: (_|_){
       // [eval]
-      c: (int){ 2 }
       d: (int){ int }
+      c: (int){ 2 }
       e: (_|_){
         // [eval] a.q.e: field not allowed:
         //     ./in.cue:1:5
@@ -96,10 +96,10 @@ Result:
     }
   }
   issue852: (_|_){
-    // [eval]
-    b: (struct){
-      Foo: (string){ "foo" }
-    }
+    // [eval] issue852.a.Foo: field not allowed:
+    //     ./in.cue:22:6
+    //     ./in.cue:26:5
+    //     ./in.cue:28:5
     #A: (#struct){
     }
     a: (_|_){

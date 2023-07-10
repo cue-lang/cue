@@ -332,8 +332,8 @@ Disjuncts:    194
       }
       X: (string){ "user@mod.test" }
       #X: (#struct){
-        userinfo: (string){ "user@" }
         host: (string){ "mod.test" }
+        userinfo: (string){ "user@" }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -347,8 +347,8 @@ Disjuncts:    194
         host: (string){ "mod.test" }
       }
       #X: (#struct){
-        userinfo: (string){ "user@" }
         host: (string){ "mod.test" }
+        userinfo: (string){ "user@" }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -358,8 +358,8 @@ Disjuncts:    194
     p3: (struct){
       X: (string){ "user@mod.test" }
       #X: (#struct){
-        userinfo: (string){ "user@" }
         host: (string){ "mod.test" }
+        userinfo: (string){ "user@" }
       }
       Y: (struct){
         userinfo: (string){ "user" }
@@ -373,12 +373,12 @@ Disjuncts:    194
     p4: (struct){
       X: (string){ "user@mod.test" }
       #X: (#struct){
-        userinfo: (string){ "user@" }
         host: (string){ "mod.test" }
+        userinfo: (string){ "user@" }
       }
       Y: (struct){
-        userinfo: (string){ "user" }
         host: (string){ "mod.test" }
+        userinfo: (string){ "user" }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }

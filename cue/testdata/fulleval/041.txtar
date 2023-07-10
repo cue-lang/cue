@@ -37,18 +37,18 @@ s: t & {
 -- out/eval/stats --
 Leaks:  0
 Freed:  11
-Reused: 5
-Allocs: 6
-Retain: 1
+Reused: 6
+Allocs: 5
+Retain: 0
 
 Unifications: 7
-Conjuncts:    12
+Conjuncts:    13
 Disjuncts:    11
 -- out/eval --
 (struct){
   t: (struct){
-    x: (int){ int }
     #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
+    x: (int){ int }
   }
   s: (struct){
     #ok: (bool){ false }

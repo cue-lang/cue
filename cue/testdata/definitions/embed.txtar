@@ -137,11 +137,11 @@ Result:
       y: (int){ int }
     }
     #a: (#struct){
-      x: (int){ int }
-      y: (int){ int }
       b: (#struct){
         c: (int){ int }
       }
+      x: (int){ int }
+      y: (int){ int }
     }
     z: (_|_){
       // [eval]
@@ -160,11 +160,11 @@ Result:
       y: (int){ int }
     }
     a: (#struct){
-      x: (int){ int }
-      y: (int){ int }
       b: (struct){
         c: (int){ int }
       }
+      x: (int){ int }
+      y: (int){ int }
     }
     z: (struct){
       c: (int){ int }
@@ -183,12 +183,12 @@ Result:
       Name: (string){ string }
     }
     #A: (#struct){
-      Name: (string){ string }
       Something: (int){ int }
+      Name: (string){ string }
     }
     #B: (#struct){
-      Name: (string){ string }
       Else: (int){ int }
+      Name: (string){ string }
     }
     x: (#struct){
       Name: (string){ "a" }

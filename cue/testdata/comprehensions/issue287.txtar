@@ -10,18 +10,18 @@ if #E["y"] != _|_ {
 -- out/eval/stats --
 Leaks:  0
 Freed:  5
-Reused: 1
-Allocs: 4
-Retain: 2
+Reused: 2
+Allocs: 3
+Retain: 0
 
 Unifications: 5
-Conjuncts:    7
+Conjuncts:    8
 Disjuncts:    5
 -- out/eval --
 (struct){
   #E: (#struct){
-    y: (bool){ true }
     x: (bool){ true }
+    y: (bool){ true }
   }
   z: (bool){ true }
 }

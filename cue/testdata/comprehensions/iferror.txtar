@@ -151,11 +151,11 @@ Leaks:  0
 Freed:  43
 Reused: 35
 Allocs: 8
-Retain: 22
+Retain: 18
 
 Unifications: 33
-Conjuncts:    67
-Disjuncts:    60
+Conjuncts:    65
+Disjuncts:    57
 -- out/eval --
 Errors:
 issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
@@ -200,8 +200,8 @@ Result:
   }
   useDefault: (struct){
     a: (struct){
-      y: (string){ |(*(string){ "foo" }, (string){ string }) }
       x: (string){ |(*(string){ "foo" }, (string){ string }) }
+      y: (string){ |(*(string){ "foo" }, (string){ string }) }
     }
     issue809: (struct){
       #A: (#struct){
@@ -230,12 +230,12 @@ Result:
       //     ./in.cue:61:8
       // issue1972.err1: invalid list index someCondition (type string):
       //     ./in.cue:65:6
-      patchs: (list){
-      }
-      someCondition: (_){ _ }
       #patchs: (#list){
       }
       #someCondition: (_){ _ }
+      someCondition: (_){ _ }
+      patchs: (list){
+      }
     }
   }
 }

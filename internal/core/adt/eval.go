@@ -1866,6 +1866,9 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 		}
 		n.scalar = x
 		n.scalarID = id
+		if n.node.status >= conjuncts {
+			n.node.BaseValue = x
+		}
 
 	default:
 		panic(fmt.Sprintf("unknown value type %T", x))

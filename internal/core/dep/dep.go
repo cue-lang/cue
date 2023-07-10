@@ -487,9 +487,20 @@ func (c *visitor) markInternalResolvers(env *adt.Environment, r adt.Resolver, v 
 		panic("node must not be rooted")
 	}
 
+	saved := c.all // recursive traversal already done by this function.
+
+	// As let have no path and we otherwise will not process them, we set
+	// processing all to true.
+	if c.marked != nil && hasLetParent(v) {
+		for _, x := range v.Conjuncts {
+			c.marked.markExpr(x.Expr())
+		}
+	}
+
 	c.markConjuncts(v)
 
-	saved := c.all // recursive traversal already done by this function.
+	// evaluateInner will already process all values recursively, so disable
+	// while processing in this case.
 	c.all = false
 
 	switch r := r.(type) {

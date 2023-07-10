@@ -897,10 +897,14 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state vertexStat
 		// TODO(errors): add path reference and make message
 		//       "undefined field %s in %s"
 		var err *ValueError
-		if l.IsInt() {
+		switch {
+		case isCyclePlaceholder(x.BaseValue):
+			err = c.NewPosf(pos, "cycle error referencing %s", label)
+			permanent = false
+		case l.IsInt():
 			err = c.NewPosf(pos, "index out of range [%d] with length %d",
 				l.Index(), len(x.Elems()))
-		} else {
+		default:
 			err = c.NewPosf(pos, "undefined field: %s", label)
 		}
 		c.AddBottom(&Bottom{

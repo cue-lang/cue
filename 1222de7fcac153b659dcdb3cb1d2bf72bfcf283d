@@ -377,6 +377,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c3dc2016_ab034d1d",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T05:44:38Z",
+      "side": 1,
+      "message": "This comment is old, on PS2 - you can see there that it\u0027s on traverseNotRooted. I\u0027m not sure if it still applies after your refactor. The old func didn\u0027t have comments in its body.",
+      "parentUuid": "f984d15e_1d3c112d",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fbb5e0ef_ecc0ba06",
         "filename": "internal/core/dep/dep.go",
         "patchSetId": 2

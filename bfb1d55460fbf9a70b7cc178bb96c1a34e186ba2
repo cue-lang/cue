@@ -479,6 +479,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b1dd0487_8c0a2c2c",
+        "filename": "internal/core/dep/testdata/inline.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T05:44:38Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f0953c9c_4f7b242a",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "397dcf6c_1d6f9429",
@@ -545,6 +563,24 @@
       "side": 1,
       "message": "Why not? I think it is fine and even useful.",
       "parentUuid": "72aa6708_083eeed9",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0617f5c4_40d8393c",
+        "filename": "internal/core/dep/testdata/inline.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T05:44:38Z",
+      "side": 1,
+      "message": "Gotcha; my initial instinct was that it might have been an oversight.",
+      "parentUuid": "26c110e2_dd53e296",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -74,15 +74,13 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 	}
 
 	name := filepath.Base(file.Filename)
-	if !cfg.filesMode && strings.HasPrefix(name, ".") {
-		return false, nil, &excludeError{
-			errors.Newf(token.NoPos, "filename starts with a '.'"),
-		}
-	}
-
-	if strings.HasPrefix(name, "_") {
-		return false, nil, &excludeError{
-			errors.Newf(token.NoPos, "filename starts with a '_"),
+	if !cfg.filesMode {
+		for _, prefix := range []string{".", "_"} {
+			if strings.HasPrefix(name, prefix) {
+				return false, nil, &excludeError{
+					errors.Newf(token.NoPos, "filename starts with a '%s'", prefix),
+				}
+			}
 		}
 	}
 

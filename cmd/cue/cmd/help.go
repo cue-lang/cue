@@ -106,6 +106,9 @@ pkg itself, while foo/.../bar matches all directories named bar
 within foo. In all cases, directories containing cue.mod
 directories are excluded from the result.
 
+Directory and file names that begin with "." or "_" are ignored,
+unless explicitly listed as inputs.
+
 A package may also be specified as a list of .cue files.
 The special symbol '-' denotes stdin or stdout and defaults to
 the cue file type for stdin. For stdout, the default depends on

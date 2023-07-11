@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a2e4567_7c2315e8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T14:11:34Z",
+      "side": 1,
+      "message": "I\u0027m actually struggling to find any docs on these filename prefixes...\n\nThere is one mention of a dot prefix, but that\u0027s about relative packages, not excluding files.\n\nIn any case, in Go the period and underscore filename prefix both ignore files the same way, so this change SGTM in the sense that it makes the two more consistent in cmd/cue.",
+      "revId": "95c8e5cdda3efed80e4840d28684fad4346c6315",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1aa01c4_5bc755c1",
+        "filename": "cue/load/match.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T14:11:34Z",
+      "side": 1,
+      "message": "I\u0027d join this `if` branch with the one above, in line 77, since now the dot and underscore prefixes will be treated the same. The only difference is the prefix to be matched and the error message, but those can be variables in a two-element loop, for instance.\n\nSpeaking of, this second error is wrong, right? The first error says `\u0027.\u0027`, but the second one says `\u0027_`, missing the closing quote. We could avoid that problem by using `%q`.",
+      "revId": "95c8e5cdda3efed80e4840d28684fad4346c6315",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

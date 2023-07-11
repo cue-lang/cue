@@ -78,7 +78,7 @@ func {{if .func}}{{.complete}}{{.cueName}}{{$sig}}
 var loadCode = template.Must(template.New("load").Funcs(template.FuncMap{
 	"normalizeHex": normalizeHex,
 }).Parse(`
-var {{.prefix}}Codec, {{.prefix}}Instance = func() (*gocodec.Codec, *cue.Instance) {
+var {{.prefix}}Codec, {{.prefix}}Instance_, {{.prefix}}Value = func() (*gocodec.Codec, *cue.Instance, cue.Value) {
 	var r *cue.Runtime
 	r = {{if .runtime}}{{.runtime}}{{else}}&cue.Runtime{}{{end}}
 	instances, err := r.Unmarshal({{.prefix}}InstanceData)
@@ -88,13 +88,16 @@ var {{.prefix}}Codec, {{.prefix}}Instance = func() (*gocodec.Codec, *cue.Instanc
 	if len(instances) != 1 {
 		panic("expected encoding of exactly one instance")
 	}
-	return gocodec.New(r, nil), instances[0]
+	return gocodec.New(r, nil), instances[0], instances[0].Value()
 }()
+
+// Deprecated: cue.Instance is deprecated. Use {{.prefix}}Value instead.
+var {{.prefix}}Instance = {{.prefix}}Instance_
 
 // {{.prefix}}Make is called in the init phase to initialize CUE values for
 // validation functions.
 func {{.prefix}}Make(name string, x interface{}) cue.Value {
-	f, err := {{.prefix}}Instance.Value().FieldByName(name, true)
+	f, err := {{.prefix}}Value.FieldByName(name, true)
 	if err != nil {
 		panic(fmt.Errorf("could not find type %q in instance", name))
 	}

@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "400f0142_515b313c",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T05:49:23Z",
+      "side": 1,
+      "message": "I\u0027d use a longer field name - `d.v` tells me little about what the field is elsewhere in the package.",
+      "revId": "8701a007715cf336731667f884eb42d91ea7d025",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bab2bd3_409aae46",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T05:49:23Z",
+      "side": 1,
+      "message": "hmm, a bit confusing :) not sure if we can word it better if \"this\" is also a dependency.",
+      "range": {
+        "startLine": 127,
+        "startChar": 22,
+        "endLine": 127,
+        "endChar": 53
+      },
+      "revId": "8701a007715cf336731667f884eb42d91ea7d025",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c1eff18_018b0809",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 128,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T05:49:23Z",
+      "side": 1,
+      "message": "as the",
+      "range": {
+        "startLine": 128,
+        "startChar": 18,
+        "endLine": 128,
+        "endChar": 20
+      },
+      "revId": "8701a007715cf336731667f884eb42d91ea7d025",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

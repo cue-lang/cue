@@ -141,26 +141,6 @@ func resolveFile(
 			}
 		}
 	}
-
-	k := 0
-	for _, u := range f.Unresolved {
-		if u.Node != nil {
-			continue
-		}
-		if n, ok := allFields[u.Name]; ok {
-			u.Node = n
-			u.Scope = f
-			continue
-		}
-		f.Unresolved[k] = u
-		k++
-	}
-	f.Unresolved = f.Unresolved[:k]
-	// TODO: also need to resolve types.
-	// if len(f.Unresolved) > 0 {
-	// 	n := f.Unresolved[0]
-	// 	return ctx.mkErr(newBase(n), "unresolved reference %s", n.Name)
-	// }
 	return errs
 }
 

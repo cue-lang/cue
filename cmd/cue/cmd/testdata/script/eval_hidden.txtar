@@ -1,9 +1,30 @@
+# File starting with .
 exec cue eval .foo.cue
-cmp stdout expect-stdout
+cmp stdout expect-stdout-dot
 
--- expect-stdout --
-a: 42
+# File starting with _
+exec cue eval _foo.cue
+cmp stdout expect-stdout-underscore
+
+# Ensure package eval excludes both for completeness
+exec cue eval .
+cmp stdout expect-stdout-pkg
+
 -- .foo.cue --
 package foo
 
 a: 42
+-- _foo.cue --
+package foo
+
+b: 42
+-- foo.cue --
+package foo
+
+c: 42
+-- expect-stdout-dot --
+a: 42
+-- expect-stdout-underscore --
+b: 42
+-- expect-stdout-pkg --
+c: 42

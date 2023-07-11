@@ -96,8 +96,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 		}, nil
 	}
 
-	i := cuegenInstance.Value()
-	i, errs := update(nil, i, i, "modes", mode.String())
+	i, errs := update(nil, cuegenValue, cuegenValue, "modes", mode.String())
 	v := i.LookupDef("FileInfo")
 	v = v.Fill(b)
 
@@ -283,7 +282,7 @@ func toFile(i, v cue.Value, filename string) (*build.File, error) {
 }
 
 func parseType(s string, mode Mode) (inst, val cue.Value, err error) {
-	i := cuegenInstance.Value()
+	i := cuegenValue
 	i = i.Unify(i.Lookup("modes", mode.String()))
 	v := i.LookupDef("File")
 

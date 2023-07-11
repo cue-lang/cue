@@ -20,6 +20,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"strings"
+	"sync"
 	"testing"
 	"text/template"
 	"unicode"
@@ -437,5 +438,25 @@ func TestOverlays(t *testing.T) {
 		if got := string(bytes.Map(rmSpace, b)); got != want[i] {
 			t.Errorf("%s: got %s; want %s", inst.Dir, got, want[i])
 		}
+	}
+}
+
+func TestLoadInstancesConcurrent(t *testing.T) {
+	// This test is designed to fail when run with the race detector
+	// if there's an underlying race condition.
+	// See https:/cuelang.org/issue/1746
+	race(func() {
+		Instances([]string{"."}, nil)
+	})
+}
+
+func race(f func()) {
+	var wg sync.WaitGroup
+	for i := 0; i < 2; i++ {
+		wg.Add(1)
+		go func() {
+			f()
+			wg.Done()
+		}()
 	}
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d93ccef5_b5ce0c55",
+        "filename": "internal/core/runtime/resolve.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-11T11:28:07Z",
+      "side": 1,
+      "message": "This also looks like a similar problem. Should we really be doing this?",
+      "revId": "86c26eb726de9f42b9c37784581f5c1e4a8c8d6b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,46 @@
       "message": "FYI Aram for the wasm package change.",
       "revId": "3c75e6d43ba9ab6853bfe3ec73fade15bcfc36bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77faabbc_81e06da8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-07-11T07:58:09Z",
+      "side": 1,
+      "message": "LGTM.",
+      "revId": "3c75e6d43ba9ab6853bfe3ec73fade15bcfc36bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7bac1bc_25b0b8ea",
+        "filename": "cue/interpreter/wasm/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-07-11T07:58:09Z",
+      "side": 1,
+      "message": "I didn\u0027t know Go constants worked like this.",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 25
+      },
+      "revId": "3c75e6d43ba9ab6853bfe3ec73fade15bcfc36bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

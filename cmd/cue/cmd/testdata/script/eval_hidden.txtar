@@ -1,4 +1,10 @@
+# File starting with .
 exec cue eval .foo.cue
+cmp stdout expect-stdout
+
+# File starting with _
+cp .foo.cue _foo.cue
+exec cue eval _foo.cue
 cmp stdout expect-stdout
 
 -- expect-stdout --

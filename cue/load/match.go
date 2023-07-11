@@ -80,7 +80,7 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 		}
 	}
 
-	if strings.HasPrefix(name, "_") {
+	if !cfg.filesMode && strings.HasPrefix(name, "_") {
 		return false, nil, &excludeError{
 			errors.Newf(token.NoPos, "filename starts with a '_"),
 		}

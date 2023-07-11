@@ -56,6 +56,30 @@
       },
       "revId": "3c75e6d43ba9ab6853bfe3ec73fade15bcfc36bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbf084d8_f8878c3d",
+        "filename": "cue/interpreter/wasm/types.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-11T09:05:13Z",
+      "side": 1,
+      "message": "what you did works with iota consts, since the type propagates along with the incrementing iota. without iota, these are just separate const declarations.",
+      "parentUuid": "f7bac1bc_25b0b8ea",
+      "range": {
+        "startLine": 31,
+        "startChar": 0,
+        "endLine": 40,
+        "endChar": 25
+      },
+      "revId": "3c75e6d43ba9ab6853bfe3ec73fade15bcfc36bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

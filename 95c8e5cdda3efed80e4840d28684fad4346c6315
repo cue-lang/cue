@@ -18,6 +18,41 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d2d9bd8_1423d0cc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-11T15:05:17Z",
+      "side": 1,
+      "message": "Hmm, nice catch. I could have sworn that we did have some mention of this. I\u0027ve updated the \"cue help inputs\" docs.",
+      "parentUuid": "4a2e4567_7c2315e8",
+      "revId": "95c8e5cdda3efed80e4840d28684fad4346c6315",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7dcb6621_3c26725e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-11T15:05:17Z",
+      "side": 1,
+      "message": "Thanks for the (holiday) review, @mvdan. PTAL.",
+      "revId": "95c8e5cdda3efed80e4840d28684fad4346c6315",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1aa01c4_5bc755c1",
@@ -31,6 +66,24 @@
       "writtenOn": "2023-07-11T14:11:34Z",
       "side": 1,
       "message": "I\u0027d join this `if` branch with the one above, in line 77, since now the dot and underscore prefixes will be treated the same. The only difference is the prefix to be matched and the error message, but those can be variables in a two-element loop, for instance.\n\nSpeaking of, this second error is wrong, right? The first error says `\u0027.\u0027`, but the second one says `\u0027_`, missing the closing quote. We could avoid that problem by using `%q`.",
+      "revId": "95c8e5cdda3efed80e4840d28684fad4346c6315",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b8f4c30_ed70509a",
+        "filename": "cue/load/match.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-11T15:05:17Z",
+      "side": 1,
+      "message": "Nice catch on the error message.\n\nRefactored per your suggestion.\n\nI didn\u0027t use `%q` however in order to retain the use of single quotes in the error message.",
+      "parentUuid": "b1aa01c4_5bc755c1",
       "revId": "95c8e5cdda3efed80e4840d28684fad4346c6315",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

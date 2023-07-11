@@ -28,6 +28,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/str"
@@ -447,6 +448,19 @@ func TestLoadInstancesConcurrent(t *testing.T) {
 	// See https:/cuelang.org/issue/1746
 	race(func() {
 		Instances([]string{"."}, nil)
+	})
+}
+
+func TestBuildInstanceConcurrentlyWithSharedLoadInstance(t *testing.T) {
+	// This test is designed to fail when run with the race detector
+	// if there's an underlying race condition.
+	// See https:/cuelang.org/issue/1746
+	inst := Instances([]string{"."}, nil)[0]
+	race(func() {
+		err := cuecontext.New().BuildInstance(inst).Err()
+		if err != nil {
+			t.Error(err)
+		}
 	})
 }
 

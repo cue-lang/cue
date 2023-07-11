@@ -600,6 +600,24 @@
       "message": "simplify how? :)",
       "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93e86543_e14b4d98",
+        "filename": "internal/core/export/testdata/selfcontained/issue2247.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-11T16:13:46Z",
+      "side": 1,
+      "message": "{out: c}.out -\u003e c",
+      "parentUuid": "d14db434_93ce120b",
+      "revId": "bfb1d55460fbf9a70b7cc178bb96c1a34e186ba2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

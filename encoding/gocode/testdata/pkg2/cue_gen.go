@@ -24,7 +24,7 @@ func (x PickMe) Validate() error {
 	return cuegenCodec.Validate(cuegenvalPickMe, x)
 }
 
-var cuegenCodec, cuegenInstance = func() (*gocodec.Codec, *cue.Instance) {
+var cuegenCodec, cuegenValue = func() (*gocodec.Codec, cue.Value) {
 	var r *cue.Runtime
 	r = &cue.Runtime{}
 	instances, err := r.Unmarshal(cuegenInstanceData)
@@ -34,13 +34,13 @@ var cuegenCodec, cuegenInstance = func() (*gocodec.Codec, *cue.Instance) {
 	if len(instances) != 1 {
 		panic("expected encoding of exactly one instance")
 	}
-	return gocodec.New(r, nil), instances[0]
+	return gocodec.New(r, nil), instances[0].Value()
 }()
 
 // cuegenMake is called in the init phase to initialize CUE values for
 // validation functions.
 func cuegenMake(name string, x interface{}) cue.Value {
-	f, err := cuegenInstance.Value().FieldByName(name, true)
+	f, err := cuegenValue.FieldByName(name, true)
 	if err != nil {
 		panic(fmt.Errorf("could not find type %q in instance", name))
 	}

@@ -393,6 +393,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb89ba79_36a6a57c",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 394,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-11T16:12:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "c3dc2016_ab034d1d",
+      "revId": "1222de7fcac153b659dcdb3cb1d2bf72bfcf283d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbb5e0ef_ecc0ba06",

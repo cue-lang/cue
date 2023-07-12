@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "023920db_936831b5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-12T21:03:08Z",
+      "side": 1,
+      "message": "What does this patch do for us, exactly?\n\nIf it\u0027s a no-op, why do we want it? Does it help a future change?\n\nOr perhaps it helps us avoid work and help performance?\n\nOr, if it does change behavior in a good way, should we add a new test?",
+      "revId": "34158ae9581281a97964be5fcebc5a36621c9a9c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

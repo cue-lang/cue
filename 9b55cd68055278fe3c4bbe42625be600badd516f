@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ed838252_0dc3c95e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-12T20:54:20Z",
+      "side": 1,
+      "message": "I would personally avoid \"ISTM\" in a commit message :) We have the space to type it out.",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 4
+      },
+      "revId": "9b55cd68055278fe3c4bbe42625be600badd516f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab073d37_dff781da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-12T20:54:20Z",
+      "side": 1,
+      "message": "FYI, multiple of your lines are going over the standard 72 lines, which you can see in the diff view here as a vertical line.",
+      "revId": "9b55cd68055278fe3c4bbe42625be600badd516f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7266f7c_8f4a3326",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-12T20:54:20Z",
+      "side": 1,
+      "message": "this link, and the other one, are missing one slash",
+      "range": {
+        "startLine": 457,
+        "startChar": 14,
+        "endLine": 457,
+        "endChar": 15
+      },
+      "revId": "9b55cd68055278fe3c4bbe42625be600badd516f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

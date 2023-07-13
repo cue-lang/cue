@@ -20,7 +20,6 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
@@ -48,14 +47,6 @@ func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
 // Make wraps cue.MakeValue.
 func Make(ctx *adt.OpContext, v adt.Value) cue.Value {
 	return (*cue.Context)(ctx.Impl().(*runtime.Runtime)).Encode(v)
-}
-
-func MakeError(r *runtime.Runtime, err errors.Error) cue.Value {
-	b := &adt.Bottom{Err: err}
-	node := &adt.Vertex{BaseValue: b}
-	node.ForceDone()
-	node.AddConjunct(adt.MakeRootConjunct(nil, b))
-	return (*cue.Context)(r).Encode(node)
 }
 
 // UnifyBuiltin returns the given Value unified with the given builtin template.

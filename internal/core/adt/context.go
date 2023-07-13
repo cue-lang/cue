@@ -111,14 +111,6 @@ func init() {
 	log.SetFlags(log.Lshortfile)
 }
 
-func Logf(format string, args ...interface{}) {
-	if Verbosity == 0 {
-		return
-	}
-	s := fmt.Sprintf(format, args...)
-	_ = log.Output(2, s)
-}
-
 var pMap = map[*Vertex]int{}
 
 func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a3ab597_24161eb8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-14T08:55:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed838252_0dc3c95e",
+      "range": {
+        "startLine": 14,
+        "startChar": 0,
+        "endLine": 14,
+        "endChar": 4
+      },
+      "revId": "9b55cd68055278fe3c4bbe42625be600badd516f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ab073d37_dff781da",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c89aaf20_44de2aa8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-14T08:55:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ab073d37_dff781da",
+      "revId": "9b55cd68055278fe3c4bbe42625be600badd516f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d7266f7c_8f4a3326",
@@ -54,6 +96,30 @@
       "writtenOn": "2023-07-12T20:54:20Z",
       "side": 1,
       "message": "this link, and the other one, are missing one slash",
+      "range": {
+        "startLine": 457,
+        "startChar": 14,
+        "endLine": 457,
+        "endChar": 15
+      },
+      "revId": "9b55cd68055278fe3c4bbe42625be600badd516f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d192df6_0f44a504",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 457,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-07-14T08:55:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7266f7c_8f4a3326",
       "range": {
         "startLine": 457,
         "startChar": 14,

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34f1fcd5_bcb9687a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-21T07:06:44Z",
+      "side": 1,
+      "message": "On mobile, excuse the brevity :)\n\nUse [[ instead of [?\n\nThe comment still mentions --max-count.\n\nFor brevity, I think you can match spaces with \\s.\n\nAlso, why is the git command printing empty lines you need to remove with git?",
+      "revId": "268acf79e8cf6da8628a68a4b79ef8a7affbee97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

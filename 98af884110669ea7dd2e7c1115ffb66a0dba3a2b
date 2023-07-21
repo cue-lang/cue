@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e95b4eee_2f1449d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-21T12:20:42Z",
+      "side": 1,
+      "message": "PTAL - I simplified (removed) the for loop stuff which is unnecessary so would appreciate your eyes on that.",
+      "revId": "98af884110669ea7dd2e7c1115ffb66a0dba3a2b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

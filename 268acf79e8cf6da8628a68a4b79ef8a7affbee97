@@ -16,6 +16,24 @@
       "message": "On mobile, excuse the brevity :)\n\nUse [[ instead of [?\n\nThe comment still mentions --max-count.\n\nFor brevity, I think you can match spaces with \\s.\n\nAlso, why is the git command printing empty lines you need to remove with git?",
       "revId": "268acf79e8cf6da8628a68a4b79ef8a7affbee97",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bcf0c0dd_2ae8deab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-21T12:20:42Z",
+      "side": 1,
+      "message": "\u003e On mobile, excuse the brevity :)\n\nYou are excused!\n\n\u003e Use [[ instead of [?\n\nDone.\n\n\u003e The comment still mentions --max-count.\n\nYou were looking at a slightly old patch set. I\u0027ve fixed in the latest. PTAL.\n\n\u003e For brevity, I think you can match spaces with \\s.\n\nDone.\n\n\u003e Also, why is the git command printing empty lines you need to remove with git?\n\nI\u0027ve got no idea :) I will add a comment to indicate I have no idea :)",
+      "parentUuid": "34f1fcd5_bcb9687a",
+      "revId": "268acf79e8cf6da8628a68a4b79ef8a7affbee97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

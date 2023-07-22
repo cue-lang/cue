@@ -51,40 +51,6 @@ func VertexFeatures(c *adt.OpContext, v *adt.Vertex) []adt.Feature {
 	return a
 }
 
-// func structFeatures(a []*adt.StructLit) []adt.Feature {
-// 	sets := extractFeatures(a)
-// 	return sortedArcs(sets)
-// }
-
-func (e *exporter) sortedArcs(v *adt.Vertex) (sorted []*adt.Vertex) {
-	if adt.DebugSort > 0 {
-		return v.Arcs
-	}
-
-	a := extractFeatures(v.Structs)
-	if len(a) == 0 {
-		return v.Arcs
-	}
-
-	sorted = make([]*adt.Vertex, len(v.Arcs))
-	copy(sorted, v.Arcs)
-
-	m := sortArcs(a)
-	sort.SliceStable(sorted, func(i, j int) bool {
-		if m[sorted[i].Label] == 0 {
-			return m[sorted[j].Label] != 0
-		}
-		return m[sorted[i].Label] > m[sorted[j].Label]
-	})
-
-	return sorted
-}
-
-// TODO: remove
-func (e *exporter) extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
-	return extractFeatures(in)
-}
-
 func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
 	for _, s := range in {
 		sorted := []adt.Feature{}

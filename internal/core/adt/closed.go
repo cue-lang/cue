@@ -225,7 +225,7 @@ func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 	return c
 }
 
-// isDef reports whether an expressions is a reference that references a
+// IsDef reports whether an expressions is a reference that references a
 // definition anywhere in its selection path.
 //
 // TODO(performance): this should be merged with resolve(). But for now keeping

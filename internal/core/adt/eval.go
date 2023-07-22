@@ -1698,28 +1698,6 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	}
 }
 
-// isDef reports whether an expressions is a reference that references a
-// definition anywhere in its selection path.
-//
-// TODO(performance): this should be merged with resolve(). But for now keeping
-// this code isolated makes it easier to see what it is for.
-func isDef(x Expr) bool {
-	switch r := x.(type) {
-	case *FieldReference:
-		return r.Label.IsDef()
-
-	case *SelectorExpr:
-		if r.Sel.IsDef() {
-			return true
-		}
-		return isDef(r.X)
-
-	case *IndexExpr:
-		return isDef(r.X)
-	}
-	return false
-}
-
 func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) {
 	n.updateCyclicStatus(id)
 

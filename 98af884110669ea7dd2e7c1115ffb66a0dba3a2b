@@ -33,6 +33,24 @@
       "message": "One more bug I spotted: your removing of the loop now breaks the use of $commit as a var in the error message. You can probably just use HEAD. Otherwise SGTM.",
       "revId": "98af884110669ea7dd2e7c1115ffb66a0dba3a2b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc6ba4a1_3d57e574",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-24T04:59:08Z",
+      "side": 1,
+      "message": "Thanks - good spot. Fixed.",
+      "parentUuid": "1c5d42ee_7b647ddd",
+      "revId": "98af884110669ea7dd2e7c1115ffb66a0dba3a2b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

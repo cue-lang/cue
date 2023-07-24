@@ -368,8 +368,13 @@ process:
 - Click "Authorize gerritforge-ltd" on the GitHub auth page.
 - Confirm account profile details and click "Next."
 
-If you want to use SSH for authentication, SSH keys can be [configured in your
-user profile](https://review.gerrithub.io/settings/#SSHKeys).
+If you want to use SSH for authentication *to GerritHub*, SSH keys can be
+[configured in your user
+profile](https://review.gerrithub.io/settings/#SSHKeys).  If you choose to use
+SSH for authentication, you will not be able to use the `git-codereview`
+command that's suggested later in this document, as the command [does not
+support SSH-based
+origins](https://github.com/golang/go/issues/9599#issuecomment-70538097).
 
 For HTTP Credentials, [generate a password via your user
 profile](https://review.gerrithub.io/settings/#HTTPCredentials). Then use an

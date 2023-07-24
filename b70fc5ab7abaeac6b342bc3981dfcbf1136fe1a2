@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4bec35bb_41d14893",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-24T09:57:47Z",
+      "side": 1,
+      "message": "We looked at the Unity failure; some comprehensions on lists are no longer concrete when the lists are not concrete themselves, which is an improvement.",
+      "revId": "b70fc5ab7abaeac6b342bc3981dfcbf1136fe1a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

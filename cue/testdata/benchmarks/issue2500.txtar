@@ -226,14 +226,14 @@ issue: #AppInstanceConfigView & {
 }
 -- out/eval/stats --
 Leaks:  1
-Freed:  273358
-Reused: 76737
-Allocs: 196622
+Freed:  9760
+Reused: 9739
+Allocs: 22
 Retain: 617
 
 Unifications: 493
-Conjuncts:    296180
-Disjuncts:    273499
+Conjuncts:    32582
+Disjuncts:    9901
 -- out/compile --
 --- in.cue
 {
@@ -346,14 +346,9 @@ Disjuncts:    273499
       // #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
       //     ./in.cue:54:5
       dev_env_version: (_|_){
-        // [incomplete] #Context.cluster.dev_env_version: 4 errors in empty disjunction:
-        // #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-        //     ./in.cue:51:5
-        // #Context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+        // [incomplete] #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:51:5
         // #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-        //     ./in.cue:54:5
-        // #Context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
       }
       #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -369,14 +364,9 @@ Disjuncts:    273499
       // #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
       //     ./in.cue:54:5
       dev_env_version: (_|_){
-        // [incomplete] #ContextForCluster.cluster.dev_env_version: 2 errors in empty disjunction:
-        // #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-        //     ./in.cue:51:5
-        // #ContextForCluster.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+        // [incomplete] #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:51:5
         // #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-        //     ./in.cue:54:5
-        // #ContextForCluster.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
       }
       #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -403,14 +393,9 @@ Disjuncts:    273499
         // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
         dev_env_version: (_|_){
-          // [incomplete] #ConfigForCluster.#context.cluster.dev_env_version: 2 errors in empty disjunction:
-          // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:51:5
-          // #ConfigForCluster.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+          // [incomplete] #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:51:5
           // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:54:5
-          // #ConfigForCluster.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
         }
         #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -430,14 +415,9 @@ Disjuncts:    273499
         // #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
         dev_env_version: (_|_){
-          // [incomplete] #ConfigForCluster.context.cluster.dev_env_version: 2 errors in empty disjunction:
-          // #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:51:5
-          // #ConfigForCluster.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+          // [incomplete] #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:51:5
           // #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:54:5
-          // #ConfigForCluster.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
         }
         #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -488,14 +468,9 @@ Disjuncts:    273499
           // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppInstanceConfigView.#config.#context.cluster.dev_env_version: 2 errors in empty disjunction:
-            // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppInstanceConfigView.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppInstanceConfigView.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -515,14 +490,9 @@ Disjuncts:    273499
           // #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppInstanceConfigView.#config.context.cluster.dev_env_version: 2 errors in empty disjunction:
-            // #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppInstanceConfigView.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppInstanceConfigView.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -572,14 +542,9 @@ Disjuncts:    273499
           // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppInstanceConfigView.config.#context.cluster.dev_env_version: 2 errors in empty disjunction:
-            // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppInstanceConfigView.config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppInstanceConfigView.config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -599,14 +564,9 @@ Disjuncts:    273499
           // #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppInstanceConfigView.config.context.cluster.dev_env_version: 2 errors in empty disjunction:
-            // #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppInstanceConfigView.config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppInstanceConfigView.config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -657,14 +617,9 @@ Disjuncts:    273499
             // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
             dev_env_version: (_|_){
-              // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster.dev_env_version: 2 errors in empty disjunction:
-              // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:51:5
-              // #AppInstanceConfigView.foo.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+              // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:51:5
               // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:54:5
-              // #AppInstanceConfigView.foo.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:54:5
             }
             #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -684,14 +639,9 @@ Disjuncts:    273499
             // #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
             dev_env_version: (_|_){
-              // [incomplete] #AppInstanceConfigView.foo.#config.context.cluster.dev_env_version: 2 errors in empty disjunction:
-              // #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:51:5
-              // #AppInstanceConfigView.foo.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+              // [incomplete] #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:51:5
               // #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:54:5
-              // #AppInstanceConfigView.foo.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:54:5
             }
             #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -742,14 +692,9 @@ Disjuncts:    273499
     // #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
     //     ./in.cue:54:5
     dev_env_version: (_|_){
-      // [incomplete] #ClusterInfo.dev_env_version: 4 errors in empty disjunction:
-      // #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
-      //     ./in.cue:51:5
-      // #ClusterInfo.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+      // [incomplete] #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
       //     ./in.cue:51:5
       // #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
-      //     ./in.cue:54:5
-      // #ClusterInfo.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
       //     ./in.cue:54:5
     }
     #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -767,15 +712,9 @@ Disjuncts:    273499
         // #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
         dev_env_version: (_|_){
-          // [incomplete] #ConfigBase.#context.cluster.dev_env_version: 4 errors in empty disjunction::
-          //     ./in.cue:18:20
-          // #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:51:5
-          // #ConfigBase.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+          // [incomplete] #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:51:5
           // #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:54:5
-          // #ConfigBase.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
         }
         #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -791,15 +730,9 @@ Disjuncts:    273499
         // #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
         dev_env_version: (_|_){
-          // [incomplete] #ConfigBase.context.cluster.dev_env_version: 4 errors in empty disjunction::
-          //     ./in.cue:18:20
-          // #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:51:5
-          // #ConfigBase.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+          // [incomplete] #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:51:5
           // #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:54:5
-          // #ConfigBase.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
         }
         #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -823,14 +756,9 @@ Disjuncts:    273499
         // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
         dev_env_version: (_|_){
-          // [incomplete] #AppConfig.#context.cluster.dev_env_version: 2 errors in empty disjunction:
-          // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:51:5
-          // #AppConfig.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+          // [incomplete] #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:51:5
           // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:54:5
-          // #AppConfig.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
         }
         #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -846,14 +774,9 @@ Disjuncts:    273499
         // #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
         //     ./in.cue:54:5
         dev_env_version: (_|_){
-          // [incomplete] #AppConfig.context.cluster.dev_env_version: 2 errors in empty disjunction:
-          // #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:51:5
-          // #AppConfig.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+          // [incomplete] #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:51:5
           // #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-          //     ./in.cue:54:5
-          // #AppConfig.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
         }
         #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -894,14 +817,9 @@ Disjuncts:    273499
           // #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppConfigView.#config.#context.cluster.dev_env_version: 4 errors in empty disjunction:
-            // #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppConfigView.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigView.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -917,14 +835,9 @@ Disjuncts:    273499
           // #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppConfigView.#config.context.cluster.dev_env_version: 4 errors in empty disjunction:
-            // #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppConfigView.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigView.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -944,14 +857,9 @@ Disjuncts:    273499
           // #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppConfigView.config.#context.cluster.dev_env_version: 4 errors in empty disjunction:
-            // #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppConfigView.config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigView.config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -967,14 +875,9 @@ Disjuncts:    273499
           // #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppConfigView.config.context.cluster.dev_env_version: 4 errors in empty disjunction:
-            // #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppConfigView.config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigView.config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -995,14 +898,9 @@ Disjuncts:    273499
             // #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
             dev_env_version: (_|_){
-              // [incomplete] #AppConfigView.foo.#config.#context.cluster.dev_env_version: 2 errors in empty disjunction:
-              // #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:51:5
-              // #AppConfigView.foo.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+              // [incomplete] #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:51:5
               // #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:54:5
-              // #AppConfigView.foo.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:54:5
             }
             #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -1018,14 +916,9 @@ Disjuncts:    273499
             // #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
             dev_env_version: (_|_){
-              // [incomplete] #AppConfigView.foo.#config.context.cluster.dev_env_version: 2 errors in empty disjunction:
-              // #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:51:5
-              // #AppConfigView.foo.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+              // [incomplete] #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:51:5
               // #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-              //     ./in.cue:54:5
-              // #AppConfigView.foo.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
               //     ./in.cue:54:5
             }
             #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -1053,14 +946,8 @@ Disjuncts:    273499
           dev_env_version: (_|_){
             // [incomplete] #AppConfigFoo1.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
-            // #AppConfigFoo1.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
             // #AppConfigFoo1.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
-            // #AppConfigFoo1.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo1.#config.#context.cluster.dev_env_version: 4 errors in empty disjunction::
-            //     ./in.cue:92:7
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
           #name: (string){ string }
@@ -1077,14 +964,8 @@ Disjuncts:    273499
           dev_env_version: (_|_){
             // [incomplete] #AppConfigFoo1.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
-            // #AppConfigFoo1.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
             // #AppConfigFoo1.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
-            // #AppConfigFoo1.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo1.#config.context.cluster.dev_env_version: 4 errors in empty disjunction::
-            //     ./in.cue:92:7
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
           #name: (string){ string }
@@ -1108,14 +989,8 @@ Disjuncts:    273499
           dev_env_version: (_|_){
             // [incomplete] #AppConfigFoo2.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
-            // #AppConfigFoo2.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
             // #AppConfigFoo2.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
-            // #AppConfigFoo2.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo2.#config.#context.cluster.dev_env_version: 4 errors in empty disjunction::
-            //     ./in.cue:92:7
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
           #name: (string){ string }
@@ -1132,14 +1007,8 @@ Disjuncts:    273499
           dev_env_version: (_|_){
             // [incomplete] #AppConfigFoo2.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
-            // #AppConfigFoo2.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
             // #AppConfigFoo2.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
-            // #AppConfigFoo2.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo2.#config.context.cluster.dev_env_version: 4 errors in empty disjunction::
-            //     ./in.cue:92:7
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
           #name: (string){ string }
@@ -1163,14 +1032,8 @@ Disjuncts:    273499
           dev_env_version: (_|_){
             // [incomplete] #AppConfigFoo3.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
-            // #AppConfigFoo3.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
             // #AppConfigFoo3.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
-            // #AppConfigFoo3.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo3.#config.#context.cluster.dev_env_version: 4 errors in empty disjunction::
-            //     ./in.cue:92:7
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
           #name: (string){ string }
@@ -1187,14 +1050,8 @@ Disjuncts:    273499
           dev_env_version: (_|_){
             // [incomplete] #AppConfigFoo3.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
-            // #AppConfigFoo3.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
             // #AppConfigFoo3.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
-            // #AppConfigFoo3.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo3.#config.context.cluster.dev_env_version: 4 errors in empty disjunction::
-            //     ./in.cue:92:7
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
           #name: (string){ string }
@@ -1216,14 +1073,9 @@ Disjuncts:    273499
           // #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppConfigFoo.#config.#context.cluster.dev_env_version: 2 errors in empty disjunction:
-            // #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppConfigFoo.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo.#config.#context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -1239,14 +1091,9 @@ Disjuncts:    273499
           // #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
           //     ./in.cue:54:5
           dev_env_version: (_|_){
-            // [incomplete] #AppConfigFoo.#config.context.cluster.dev_env_version: 2 errors in empty disjunction:
-            // #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:51:5
-            // #AppConfigFoo.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
+            // [incomplete] #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:51:5
             // #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
-            //     ./in.cue:54:5
-            // #AppConfigFoo.#config.context.cluster.dev_env_version: unresolved disjunction "dev" | "stage" | "production" (type string):
             //     ./in.cue:54:5
           }
           #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
@@ -1385,11 +1232,11 @@ Disjuncts:    273499
 }
 -- out/eval/stats --
 Leaks:  1
-Freed:  273358
-Reused: 76737
-Allocs: 196622
+Freed:  9760
+Reused: 9739
+Allocs: 22
 Retain: 617
 
 Unifications: 493
-Conjuncts:    296180
-Disjuncts:    273499
+Conjuncts:    32582
+Disjuncts:    9901

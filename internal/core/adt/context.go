@@ -256,6 +256,9 @@ type OpContext struct {
 	// as an error if this is true.
 	// TODO: strictly separate validators and functions.
 	IsValidator bool
+
+	// Use fail fast mode to incomplete check.
+	IsIncompleteCheck bool
 }
 
 func (c *OpContext) CloseInfo() CloseInfo { return c.ci }
@@ -397,6 +400,22 @@ type frame struct {
 	err *Bottom
 	src ast.Node
 	ci  CloseInfo
+}
+
+type frameIncomplete struct {
+	incompleteCheck bool
+}
+
+func (c *OpContext) PushIncompleteCheck() frameIncomplete {
+	saved := frameIncomplete{
+		incompleteCheck: c.IsIncompleteCheck,
+	}
+	c.IsIncompleteCheck = true
+	return saved
+}
+
+func (c *OpContext) PopIncompleteCheck(s frameIncomplete) {
+	c.IsIncompleteCheck = s.incompleteCheck
 }
 
 func (c *OpContext) PushState(env *Environment, src ast.Node) (saved frame) {

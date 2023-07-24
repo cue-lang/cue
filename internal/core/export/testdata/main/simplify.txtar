@@ -74,7 +74,7 @@ additional: {
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 	additional: {
 		env:   _
-		confs: _|_ // additional.confs: incomplete bool: _ (and 2 more errors)
+		confs: _|_ // additional.confs: incomplete bool: _
 	}
 }
 == All

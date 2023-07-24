@@ -368,8 +368,13 @@ process:
 - Click "Authorize gerritforge-ltd" on the GitHub auth page.
 - Confirm account profile details and click "Next."
 
-If you want to use SSH for authentication, SSH keys can be [configured in your
-user profile](https://review.gerrithub.io/settings/#SSHKeys).
+If you want to use SSH for authentication *to GerritHub*, SSH keys can be
+[configured in your user
+profile](https://review.gerrithub.io/settings/#SSHKeys).  If you choose to use
+SSH for authentication, you will not be able to use the `git-codereview`
+command that's suggested later in this document, as the command [doesn't
+support SSH-based git
+origins](https://github.com/golang/go/issues/9599#issuecomment-70538097).
 
 For HTTP Credentials, [generate a password via your user
 profile](https://review.gerrithub.io/settings/#HTTPCredentials). Then use an
@@ -528,9 +533,9 @@ the commit with `git codereview change`:
 
 
 ```console
-$ git codereview change -s     # amend current commit
+$ git codereview change  # amend current commit (without -s because we already signed-off, above)
 (open $EDITOR)
-$ git codereview mail          # send new changes to Gerrit
+$ git codereview mail    # send new changes to Gerrit
 ```
 
 If you don't need to change the commit description, just save and exit from the

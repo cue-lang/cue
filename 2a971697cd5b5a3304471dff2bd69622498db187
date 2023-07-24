@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db794eed_ba38ee16",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2023-07-24T16:38:57Z",
+      "side": 1,
+      "message": "I discovered that using SSH auth, whilst setting up my client-side GerritHub access, prohibited me from using the `git-codereview` plugin, so I\u0027ve documented it for future users. PTAL.",
+      "revId": "2a971697cd5b5a3304471dff2bd69622498db187",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

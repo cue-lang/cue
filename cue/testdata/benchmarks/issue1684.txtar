@@ -34,14 +34,14 @@ out: #secrets & {
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  995025
-Reused: 994976
-Allocs: 49
+Freed:  1064043
+Reused: 1063992
+Allocs: 51
 Retain: 0
 
-Unifications: 740771
-Conjuncts:    2327328
-Disjuncts:    995025
+Unifications: 791999
+Conjuncts:    2479541
+Disjuncts:    1064043
 -- out/eval --
 (struct){
   #Secret: (#struct){

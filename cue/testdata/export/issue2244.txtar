@@ -32,15 +32,15 @@ m: #step & {
 	if: _#isReleaseTag
 }
 -- out/eval/stats --
-Leaks:  17
+Leaks:  16
 Freed:  17
 Reused: 13
-Allocs: 21
-Retain: 29
+Allocs: 20
+Retain: 28
 
-Unifications: 25
-Conjuncts:    64
-Disjuncts:    40
+Unifications: 24
+Conjuncts:    62
+Disjuncts:    39
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){

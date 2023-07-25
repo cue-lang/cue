@@ -50,7 +50,7 @@ Allocs: 10
 Retain: 27
 
 Unifications: 22
-Conjuncts:    56
+Conjuncts:    54
 Disjuncts:    52
 -- out/run/stats/totals --
 Leaks:  0
@@ -60,5 +60,5 @@ Allocs: 10
 Retain: 27
 
 Unifications: 22
-Conjuncts:    56
+Conjuncts:    54
 Disjuncts:    52

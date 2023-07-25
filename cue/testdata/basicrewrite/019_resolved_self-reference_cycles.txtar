@@ -94,7 +94,7 @@ Allocs: 5
 Retain: 4
 
 Unifications: 18
-Conjuncts:    37
+Conjuncts:    36
 Disjuncts:    21
 -- out/eval --
 (struct){
@@ -105,18 +105,18 @@ Disjuncts:    21
     1: (int){ 100 }
   }
   s1: (struct){
+    a: (int){ 1 }
     c: (int){ 3 }
     b: (int){ 2 }
-    a: (int){ 1 }
   }
   s2: (struct){
+    b: (int){ 2 }
     a: (int){ 1 }
     c: (int){ 3 }
-    b: (int){ 2 }
   }
   s3: (struct){
+    c: (int){ 3 }
     b: (int){ 2 }
     a: (int){ 1 }
-    c: (int){ 3 }
   }
 }

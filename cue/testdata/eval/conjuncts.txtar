@@ -2,7 +2,6 @@
 
 -- in.cue --
 
-// TODO: fix this test
 conjunct: t1: {
 	#early: *"X" | string
 	#early
@@ -20,6 +19,7 @@ conjunct: t2: {
 	string
 }
 
+// TODO: fix this test
 conjunct: t3: conjunct.t1 & conjunct.t2
 
 handleComprehensions: {
@@ -69,17 +69,25 @@ issue2355: {
 }
 
 -- out/eval/stats --
-Leaks:  6
-Freed:  60
-Reused: 53
-Allocs: 13
-Retain: 40
+Leaks:  9
+Freed:  68
+Reused: 59
+Allocs: 18
+Retain: 24
 
-Unifications: 42
-Conjuncts:    157
-Disjuncts:    78
+Unifications: 45
+Conjuncts:    135
+Disjuncts:    86
 -- out/eval --
-(struct){
+Errors:
+issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
+    ./issue2351.cue:2:15
+    ./issue2351.cue:3:2
+    ./issue2351.cue:4:19
+
+Result:
+(_|_){
+  // [eval]
   conjunct: (struct){
     t1: (string){ |(*(string){
         "X"
@@ -88,35 +96,39 @@ Disjuncts:    78
         string
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }) }
-    t2: (_|_){
-      // [incomplete] conjunct.t2: cannot add field #early: was already used:
-      //     ./in.cue:12:2
-      #early: (string){ |(*(string){ "X" }, (string){ string }) }
-    }
+    t2: (string){ |(*(string){
+        "X"
+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
+      }, (string){
+        string
+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
+      }) }
     t3: (_|_){
       // [incomplete] conjunct.t3: 2 errors in empty disjunction:
       // conjunct.t3: cannot add field #early: was already used:
-      //     ./in.cue:12:2
+      //     ./in.cue:6:2
       // conjunct.t3: cannot add field #early: was already used:
-      //     ./in.cue:16:2
+      //     ./in.cue:15:2
       #early: (string){ |(*(string){ "X" }, (string){ string }) }
     }
   }
   handleComprehensions: (struct){
     #sub2: (int){ 2 }
   }
-  issue2351: (struct){
+  issue2351: (_|_){
+    // [eval]
     let: (_|_){
-      // [incomplete] issue2351.let.param: cycle error referencing _param:
-      //     ./issue2351.cue:4:10
+      // [eval] issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):
+      //     ./issue2351.cue:2:15
+      //     ./issue2351.cue:3:2
+      //     ./issue2351.cue:4:19
       let _param#1 = (string){ "foo" }
     }
-    hidden: (_|_){
-      // [incomplete] issue2351.hidden.in2: cycle error referencing _in1:
-      //     ./issue2351.cue:12:8
+    hidden: (#list){
       _in1: (#list){
         0: (string){ "foo" }
       }
+      0: (string){ "foo" }
     }
   }
   issue2355: (struct){
@@ -137,13 +149,10 @@ Disjuncts:    78
       }
     }
     export: (struct){
-      out1: (_|_){
-        // [cycle] invalid interpolation: cycle error:
-        //     ./issue2355.cue:9:14
-      }
       let data#2 = (struct){
         f1: (string){ "foo" }
       }
+      out1: (string){ "foo" }
     }
   }
 }

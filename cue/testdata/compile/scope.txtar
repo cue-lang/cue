@@ -79,14 +79,14 @@ let _schema_1 = schema
 }
 -- out/eval/stats --
 Leaks:  2
-Freed:  50
-Reused: 47
+Freed:  48
+Reused: 45
 Allocs: 5
 Retain: 8
 
-Unifications: 52
-Conjuncts:    107
-Disjuncts:    56
+Unifications: 50
+Conjuncts:    102
+Disjuncts:    54
 -- out/eval --
 Errors:
 schema.next: structural cycle
@@ -94,8 +94,6 @@ schema.next: structural cycle
 Result:
 (_|_){
   // [structural cycle]
-  e: (struct){
-  }
   a: (struct){
     d: (struct){
     }
@@ -109,6 +107,8 @@ Result:
   s: (string){ "foo" }
   c: (string){ "foo" }
   d: (struct){
+  }
+  e: (struct){
   }
   let B#1 = (struct){
     open: (int){ int }

@@ -100,10 +100,10 @@ Leaks:  0
 Freed:  43
 Reused: 38
 Allocs: 5
-Retain: 6
+Retain: 4
 
 Unifications: 43
-Conjuncts:    78
+Conjuncts:    74
 Disjuncts:    43
 -- out/eval --
 (struct){
@@ -135,8 +135,8 @@ Disjuncts:    43
     b: (int){ 20 }
   }
   indirectlyNested: (struct){
-    b: (bool){ true }
     a: (bool){ true }
+    b: (bool){ true }
   }
   directlyNestedEmpty: (struct){
     a: (bool){ true }

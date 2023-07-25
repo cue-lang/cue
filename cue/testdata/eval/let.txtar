@@ -163,11 +163,11 @@ Leaks:  45
 Freed:  161
 Reused: 152
 Allocs: 54
-Retain: 248
+Retain: 230
 
 Unifications: 192
-Conjuncts:    384
-Disjuncts:    247
+Conjuncts:    365
+Disjuncts:    246
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:
@@ -248,6 +248,11 @@ Result:
     }
   }
   referencesForDirectly: (struct){
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
     let Y#1A = (_|_){
       // [eval] referencesForDirectly.Y: conflicting values 12 and 4:
       //     ./incomprehension.cue:15:2
@@ -256,16 +261,16 @@ Result:
       //     ./incomprehension.cue:15:2
       //     ./incomprehension.cue:16:11
     }
-    l: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-    }
     "0": (int){ 4 }
     "1": (int){ 8 }
     "2": (int){ 12 }
   }
   referencesForViaLet: (struct){
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
     let Y#1B = (_|_){
       // [eval] referencesForViaLet.Y: conflicting values 12 and 4:
       //     ./incomprehension.cue:23:2
@@ -276,29 +281,29 @@ Result:
       //     ./incomprehension.cue:23:24
       //     ./incomprehension.cue:24:11
     }
-    l: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-    }
     "0": (int){ 4 }
     "1": (int){ 8 }
     "2": (int){ 12 }
   }
   letClauseReferencesInert: (struct){
-    let Y#1C = (int){ 2 }
     x: (int){ 2 }
     l: (#list){
       0: (int){ 1 }
       1: (int){ 2 }
       2: (int){ 3 }
     }
+    let Y#1C = (int){ 2 }
     "0": (int){ 2 }
     "1": (int){ 2 }
     "2": (int){ 2 }
   }
   indirectReference: (_|_){
     // [eval]
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
     y: (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
       //     ./incomprehension.cue:42:7
@@ -322,11 +327,6 @@ Result:
       //     ./incomprehension.cue:42:13
       //     ./incomprehension.cue:43:2
       //     ./incomprehension.cue:44:6
-    }
-    l: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
     }
     "0": (_|_){
       // [eval] indirectReference.y: conflicting values 2 and 1:
@@ -412,16 +412,16 @@ Result:
     }
   }
   letWithDynamicInComprehension: (struct){
+    _i: (struct){
+      a: (string){ "d" }
+      b: (string){ "e" }
+    }
     let T#23 = (_|_){
       // [eval] letWithDynamicInComprehension.T: conflicting values "e" and "d":
       //     ./issue2166.cue:3:6
       //     ./issue2166.cue:4:6
       //     ./issue2166.cue:7:2
       //     ./issue2166.cue:8:11
-    }
-    _i: (struct){
-      a: (string){ "d" }
-      b: (string){ "e" }
     }
     d: (string){ "1" }
     e: (string){ "1" }

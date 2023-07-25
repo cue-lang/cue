@@ -208,15 +208,15 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/eval/stats --
-Leaks:  123
-Freed:  4431
-Reused: 4412
-Allocs: 142
-Retain: 720
+Leaks:  72
+Freed:  1815
+Reused: 1801
+Allocs: 86
+Retain: 195
 
-Unifications: 1799
-Conjuncts:    7517
-Disjuncts:    5086
+Unifications: 802
+Conjuncts:    3177
+Disjuncts:    1974
 -- out/eval --
 (struct){
   chain: (struct){
@@ -239,13 +239,13 @@ Disjuncts:    5086
     }
     t2: (struct){
       p1: (struct){
+        X: (int){ 1 }
         x: (struct){
           x0: (struct){
           }
           x1: (struct){
           }
         }
-        X: (int){ 1 }
       }
       p2: (struct){
         x: (struct){
@@ -259,17 +259,18 @@ Disjuncts:    5086
     }
     t3: (struct){
       p1: (struct){
+        X: (int){ 1 }
         x: (struct){
           x0: (struct){
           }
         }
-        X: (int){ 1 }
       }
     }
   }
   issue2052: (struct){
     t1: (struct){
       #Depth: (#struct){
+        #maxiter: (int){ 4 }
         #funcs: (#struct){
           "4": (null){ null }
           "0": (#struct){
@@ -293,7 +294,6 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
         }
-        #maxiter: (int){ 4 }
         #in: (_){ _ }
         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
         out: (int){ 1 }
@@ -308,6 +308,7 @@ Disjuncts:    5086
       }
       tree: (string){ "bar" }
       d: (#struct){
+        #maxiter: (int){ 4 }
         #funcs: (#struct){
           "4": (null){ null }
           "0": (#struct){
@@ -331,7 +332,6 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
         }
-        #maxiter: (int){ 4 }
         #in: (string){ "bar" }
         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
         out: (int){ 1 }
@@ -339,6 +339,7 @@ Disjuncts:    5086
     }
     t2: (struct){
       #Depth: (#struct){
+        #maxiter: (int){ 4 }
         #funcs: (#struct){
           "4": (null){ null }
           "0": (#struct){
@@ -362,7 +363,6 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
         }
-        #maxiter: (int){ 4 }
         #in: (_){ _ }
         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
         out: (int){ 1 }
@@ -377,6 +377,7 @@ Disjuncts:    5086
       }
       tree: (string){ "bar" }
       d: (#struct){
+        #maxiter: (int){ 4 }
         #funcs: (#struct){
           "4": (null){ null }
           "0": (#struct){
@@ -400,7 +401,6 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
         }
-        #maxiter: (int){ 4 }
         #in: (string){ "bar" }
         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
         out: (int){ 1 }
@@ -409,17 +409,17 @@ Disjuncts:    5086
     full: (struct){
       #RecurseN: (_){
         _
+        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (_){ _ }
+        }
         #funcs: (#struct){
           "4": (null){ null }
           "0": (_){ _ }
           "1": (_){ _ }
           "2": (_){ _ }
           "3": (_){ _ }
-        }
-        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (_){ _ }
         }
       }
       #DepthF: (#struct){
@@ -431,6 +431,15 @@ Disjuncts:    5086
         }
       }
       #Depth: (#struct){
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
         #funcs: (#struct){
           "11": (null){ null }
           "0": (#struct){
@@ -484,15 +493,6 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
           "10": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-        }
-        #maxiter: (int){ 11 }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){ 1 }
@@ -513,14 +513,21 @@ Disjuncts:    5086
         }
         cow: (string){ "moo" }
       }
-      d: (#struct){
-        #funcs: (#struct){
-          "11": (null){ null }
-          "0": (#struct){
+      d: (_|_){
+        // [incomplete] issue2052.full.d: cannot add field #maxiter: was already used:
+        //     ./issue2052.cue:119:23
+        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){ 1 }
           }
+        }
+        #funcs: (#struct){
+          "4": (null){ null }
+          "0": (_){ _ }
           "1": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
@@ -536,50 +543,6 @@ Disjuncts:    5086
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){ 1 }
           }
-          "4": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-          "5": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-          "6": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-          "7": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-          "8": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-          "9": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-          "10": (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-        }
-        #maxiter: (int){ 11 }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
         }
         #in: (#struct){
           a: (#struct){
@@ -591,30 +554,6 @@ Disjuncts:    5086
             }
           }
           cow: (string){ "moo" }
-        }
-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-        out: (int){
-          5
-          let depths#1 = (#list){
-            0: (int){
-              4
-              let depths#1 = (#list){
-                0: (int){ 1 }
-                1: (int){
-                  3
-                  let depths#1 = (#list){
-                    0: (int){
-                      2
-                      let depths#1 = (#list){
-                        0: (int){ 1 }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            1: (int){ 1 }
-          }
         }
       }
     }

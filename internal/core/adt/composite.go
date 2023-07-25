@@ -482,7 +482,7 @@ func (v *Vertex) updateStatus(s vertexStatus) {
 func (v *Vertex) setParentDone() {
 	v.hasAllConjuncts = true
 	// Could set "Conjuncts" flag of arc at this point.
-	if n := v.state; n != nil && len(n.conjuncts) == 0 {
+	if n := v.state; n != nil && len(n.conjuncts) == n.conjunctsPos {
 		for _, a := range v.Arcs {
 			a.setParentDone()
 		}
@@ -950,10 +950,25 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	return false
 }
 
+func (n *nodeContext) addConjunction(c Conjunct, index int) {
+	// NOTE: This does not split binary expressions for comprehensions.
+	// TODO: split for comprehensions and rewrap?
+	if x, ok := c.Elem().(*BinaryExpr); ok && x.Op == AndOp {
+		c.x = x.X
+		n.conjuncts = append(n.conjuncts, conjunct{C: c, index: index})
+		c.x = x.Y
+		n.conjuncts = append(n.conjuncts, conjunct{C: c, index: index})
+	} else {
+		n.conjuncts = append(n.conjuncts, conjunct{C: c, index: index})
+	}
+}
+
 func (v *Vertex) addConjunctUnchecked(c Conjunct) {
+	index := len(v.Conjuncts)
 	v.Conjuncts = append(v.Conjuncts, c)
 	if n := v.state; n != nil {
-		n.conjuncts = append(n.conjuncts, c)
+		n.addConjunction(c, index)
+
 		// TODO: can we remove notifyConjunct here? This method is only
 		// used if either Unprocessed is 0, in which case there will be no
 		// notification recipients, or for "pushed down" comprehensions,

@@ -125,21 +125,17 @@ z3:  8
   z3: 8
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  40
-Reused: 34
-Allocs: 10
-Retain: 36
+Leaks:  0
+Freed:  44
+Reused: 36
+Allocs: 8
+Retain: 25
 
 Unifications: 27
-Conjuncts:    93
-Disjuncts:    55
+Conjuncts:    82
+Disjuncts:    58
 -- out/eval --
 Errors:
-xe1: 2 errors in empty disjunction:
-xe1: conflicting values 8 and 9:
-    ./in.cue:33:14
-    ./in.cue:38:6
 xe3: conflicting values 7 and 6:
     ./in.cue:35:6
     ./in.cue:35:10
@@ -165,35 +161,15 @@ Result:
   xd3: (int){ 6 }
   xd4: (int){ 9 }
   xd5: (int){ 10 }
-  xe1: (_|_){
-    // [eval] xe1: 2 errors in empty disjunction:
-    // xe1: conflicting values 8 and 9:
-    //     ./in.cue:33:14
-    //     ./in.cue:38:6
-    // xe3: conflicting values 7 and 6:
-    //     ./in.cue:35:6
-    //     ./in.cue:35:10
-  }
-  xe2: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:35:6
-    //     ./in.cue:35:10
-  }
+  xe1: (int){ 9 }
+  xe2: (int){ 8 }
   xe3: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
     //     ./in.cue:35:6
     //     ./in.cue:35:10
   }
-  xe4: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:35:6
-    //     ./in.cue:35:10
-  }
-  xe5: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:35:6
-    //     ./in.cue:35:10
-  }
+  xe4: (int){ 9 }
+  xe5: (int){ 10 }
   z1: (int){ |(*(int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
   z3: (int){ 8 }

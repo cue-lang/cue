@@ -22,7 +22,7 @@ Allocs: 4
 Retain: 3
 
 Unifications: 4
-Conjuncts:    6
+Conjuncts:    5
 Disjuncts:    4
 -- out/eval --
 (string){

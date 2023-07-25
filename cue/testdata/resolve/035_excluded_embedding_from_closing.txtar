@@ -92,11 +92,11 @@ Result:
 (_|_){
   // [eval]
   #S: (#struct){
-    c: (#struct){
-      d: (int){ int }
-    }
     a: (#struct){
       c: (int){ int }
+    }
+    c: (#struct){
+      d: (int){ int }
     }
     let B#1 = (#struct){
       open: (int){ int }
@@ -107,6 +107,9 @@ Result:
   }
   V: (_|_){
     // [eval]
+    a: (#struct){
+      c: (int){ int }
+    }
     c: (_|_){
       // [eval]
       d: (int){ int }
@@ -117,9 +120,6 @@ Result:
         //     ./in.cue:9:4
         //     ./in.cue:10:5
       }
-    }
-    a: (#struct){
-      c: (int){ int }
     }
     let B#1 = (#struct){
       open: (int){ int }

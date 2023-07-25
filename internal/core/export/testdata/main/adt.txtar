@@ -253,7 +253,6 @@ errorListDef: {
 }
 -- out/doc --
 []
-[x]
 [p1]
 [d1]
 [d1 foobar]
@@ -309,6 +308,7 @@ errorListDef: {
 [m1 baz]
 - baz is a required field.
 
+[x]
 [y1]
 [y1 src]
 [y1 src 0]

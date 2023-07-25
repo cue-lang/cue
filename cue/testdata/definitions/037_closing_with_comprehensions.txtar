@@ -107,11 +107,11 @@ Leaks:  10
 Freed:  18
 Reused: 15
 Allocs: 13
-Retain: 16
+Retain: 15
 
 Unifications: 28
 Conjuncts:    43
-Disjuncts:    34
+Disjuncts:    33
 -- out/eval --
 Errors:
 #E.f3: field not allowed:
@@ -129,6 +129,10 @@ a.f3: field not allowed:
 Result:
 (_|_){
   // [eval]
+  #A: (#struct){
+    f1: (int){ int }
+    f2: (int){ int }
+  }
   a: (_|_){
     // [eval]
     f1: (int){ int }
@@ -140,10 +144,6 @@ Result:
       //     ./in.cue:4:5
       //     ./in.cue:4:11
     }
-  }
-  #A: (#struct){
-    f1: (int){ int }
-    f2: (int){ int }
   }
   #B: (#struct){
     f1: (int){ int }

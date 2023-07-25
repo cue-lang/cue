@@ -175,13 +175,13 @@ out: #sub & {#p: _test.s1}
 -- out/eval/stats --
 Leaks:  0
 Freed:  1907
-Reused: 1881
-Allocs: 26
-Retain: 24
+Reused: 1882
+Allocs: 25
+Retain: 14
 
 Unifications: 1541
 Conjuncts:    6931
-Disjuncts:    1931
+Disjuncts:    1921
 -- out/eval --
 (struct){
   #AC: (#struct){
@@ -222,8 +222,6 @@ Disjuncts:    1931
     n: (string){ string }
   }
   #sub: (#struct){
-    dict: (#struct){
-    }
     #p: (#struct){
       k: (string){ "complex" }
       d: (#struct){
@@ -231,6 +229,8 @@ Disjuncts:    1931
         r: (#struct){
         }
       }
+    }
+    dict: (#struct){
     }
   }
   _test: (struct){
@@ -344,114 +344,6 @@ Disjuncts:    1931
     }
   }
   out: (#struct){
-    let subs#1 = (#struct){
-      let subs#1 = (#struct){
-        dict: (#struct){
-          r1: (#struct){
-            a: (#struct){
-              k: (string){ "simple" }
-              d: (#struct){
-                n: (string){ "c1" }
-              }
-            }
-          }
-        }
-        #p: (#struct){
-          k: (string){ "complex" }
-          d: (#struct){
-            n: (string){ "s3" }
-            r: (#struct){
-              r1: (#struct){
-                a: (#struct){
-                  k: (string){ "simple" }
-                  d: (#struct){
-                    n: (string){ "c1" }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-      dict: (#struct){
-        r1: (#struct){
-          a: (#struct){
-            k: (string){ "simple" }
-            d: (#struct){
-              n: (string){ "c1" }
-            }
-          }
-        }
-        r2_r1: (#struct){
-          a: (#struct){
-            k: (string){ "simple" }
-            d: (#struct){
-              n: (string){ "c1" }
-            }
-          }
-        }
-      }
-      #p: (#struct){
-        k: (string){ "complex" }
-        d: (#struct){
-          n: (string){ "s2" }
-          r: (#struct){
-            r1: (#struct){
-              a: (#struct){
-                k: (string){ "simple" }
-                d: (#struct){
-                  n: (string){ "c1" }
-                }
-              }
-            }
-            r2: (#struct){
-              a: (#struct){
-                k: (string){ "complex" }
-                d: (#struct){
-                  n: (string){ "s3" }
-                  r: (#struct){
-                    r1: (#struct){
-                      a: (#struct){
-                        k: (string){ "simple" }
-                        d: (#struct){
-                          n: (string){ "c1" }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-    dict: (#struct){
-      r1: (#struct){
-        a: (#struct){
-          k: (string){ "simple" }
-          d: (#struct){
-            n: (string){ "c1" }
-          }
-        }
-      }
-      r2_r1: (#struct){
-        a: (#struct){
-          k: (string){ "simple" }
-          d: (#struct){
-            n: (string){ "c1" }
-          }
-        }
-      }
-      r2_r2_r1: (#struct){
-        a: (#struct){
-          k: (string){ "simple" }
-          d: (#struct){
-            n: (string){ "c1" }
-          }
-        }
-      }
-    }
     #p: (#struct){
       k: (string){ "complex" }
       d: (#struct){
@@ -498,6 +390,114 @@ Disjuncts:    1931
                     }
                   }
                 }
+              }
+            }
+          }
+        }
+      }
+    }
+    dict: (#struct){
+      r1: (#struct){
+        a: (#struct){
+          k: (string){ "simple" }
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+        }
+      }
+      r2_r1: (#struct){
+        a: (#struct){
+          k: (string){ "simple" }
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+        }
+      }
+      r2_r2_r1: (#struct){
+        a: (#struct){
+          k: (string){ "simple" }
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+        }
+      }
+    }
+    let subs#1 = (#struct){
+      #p: (#struct){
+        k: (string){ "complex" }
+        d: (#struct){
+          n: (string){ "s2" }
+          r: (#struct){
+            r1: (#struct){
+              a: (#struct){
+                k: (string){ "simple" }
+                d: (#struct){
+                  n: (string){ "c1" }
+                }
+              }
+            }
+            r2: (#struct){
+              a: (#struct){
+                k: (string){ "complex" }
+                d: (#struct){
+                  n: (string){ "s3" }
+                  r: (#struct){
+                    r1: (#struct){
+                      a: (#struct){
+                        k: (string){ "simple" }
+                        d: (#struct){
+                          n: (string){ "c1" }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      dict: (#struct){
+        r1: (#struct){
+          a: (#struct){
+            k: (string){ "simple" }
+            d: (#struct){
+              n: (string){ "c1" }
+            }
+          }
+        }
+        r2_r1: (#struct){
+          a: (#struct){
+            k: (string){ "simple" }
+            d: (#struct){
+              n: (string){ "c1" }
+            }
+          }
+        }
+      }
+      let subs#1 = (#struct){
+        #p: (#struct){
+          k: (string){ "complex" }
+          d: (#struct){
+            n: (string){ "s3" }
+            r: (#struct){
+              r1: (#struct){
+                a: (#struct){
+                  k: (string){ "simple" }
+                  d: (#struct){
+                    n: (string){ "c1" }
+                  }
+                }
+              }
+            }
+          }
+        }
+        dict: (#struct){
+          r1: (#struct){
+            a: (#struct){
+              k: (string){ "simple" }
+              d: (#struct){
+                n: (string){ "c1" }
               }
             }
           }

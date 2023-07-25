@@ -3,8 +3,7 @@
 cmp stderr cmd_baddisplay.out
 
 -- cmd_baddisplay.out --
-unknown 'cue cmd' subcommand: "notool"
-
+could not find command "notool"
 Ensure custom commands are defined in a "_tool.cue" file.
 Run 'cue help cmd' to list available custom commands.
 -- task.cue --

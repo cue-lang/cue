@@ -29,6 +29,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
@@ -104,7 +105,10 @@ outer:
 				break outer
 			}
 		}
-		return nil, errors.New("no command %q defined in a *_tool.cue file")
+		if err := v.Err(); err != nil {
+			return nil, err
+		}
+		return nil, errors.Newf(token.NoPos, "could not find command %q", name)
 	}
 
 	docs := o.Doc()

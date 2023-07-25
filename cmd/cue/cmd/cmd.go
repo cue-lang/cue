@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
+	"cuelang.org/go/cue/errors"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 )
@@ -162,7 +164,8 @@ Run "cue help commands" for more details on tasks and commands.
 				if !isRootCmd {
 					cmdline += " cmd"
 				}
-				fmt.Fprintf(w, "unknown '%s' subcommand: %q\n\n", cmdline, args[0])
+				cwd, _ := os.Getwd()
+				fmt.Fprintf(w, errors.Details(err, &errors.Config{Cwd: cwd}))
 				fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
 				fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")
 				if isRootCmd {

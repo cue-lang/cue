@@ -215,8 +215,8 @@ Allocs: 142
 Retain: 720
 
 Unifications: 1799
-Conjuncts:    7517
-Disjuncts:    5086
+Conjuncts:    7505
+Disjuncts:    5087
 -- out/eval --
 (struct){
   chain: (struct){
@@ -331,8 +331,8 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
         }
-        #maxiter: (int){ 4 }
         #in: (string){ "bar" }
+        #maxiter: (int){ 4 }
         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
         out: (int){ 1 }
       }
@@ -400,8 +400,8 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
         }
-        #maxiter: (int){ 4 }
         #in: (string){ "bar" }
+        #maxiter: (int){ 4 }
         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
         out: (int){ 1 }
       }
@@ -432,7 +432,6 @@ Disjuncts:    5086
       }
       #Depth: (#struct){
         #funcs: (#struct){
-          "11": (null){ null }
           "0": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
@@ -488,6 +487,7 @@ Disjuncts:    5086
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
             out: (int){ 1 }
           }
+          "11": (null){ null }
         }
         #maxiter: (int){ 11 }
         #funcFactory: (#struct){
@@ -572,15 +572,6 @@ Disjuncts:    5086
             out: (int){ 1 }
           }
         }
-        #maxiter: (int){ 11 }
-        #funcFactory: (#struct){
-          #next: (_){ _ }
-          #func: (#struct){
-            #in: (_){ _ }
-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
-          }
-        }
         #in: (#struct){
           a: (#struct){
             foo: (string){ "bar" }
@@ -591,6 +582,15 @@ Disjuncts:    5086
             }
           }
           cow: (string){ "moo" }
+        }
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){ 1 }
+          }
         }
         #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
         out: (int){

@@ -103,7 +103,7 @@ Allocs: 9
 Retain: 71
 
 Unifications: 58
-Conjuncts:    427
+Conjuncts:    410
 Disjuncts:    75
 -- out/eval --
 (struct){

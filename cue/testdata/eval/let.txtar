@@ -166,8 +166,8 @@ Allocs: 54
 Retain: 248
 
 Unifications: 192
-Conjuncts:    384
-Disjuncts:    247
+Conjuncts:    367
+Disjuncts:    246
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:

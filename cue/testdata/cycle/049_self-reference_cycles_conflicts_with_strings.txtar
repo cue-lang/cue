@@ -34,7 +34,7 @@ Allocs: 4
 Retain: 1
 
 Unifications: 4
-Conjuncts:    6
+Conjuncts:    5
 Disjuncts:    5
 -- out/eval --
 Errors:

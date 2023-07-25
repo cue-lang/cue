@@ -60,14 +60,14 @@ i: false
   err: (1 & 2)
 }
 -- out/eval/stats --
-Leaks:  1
-Freed:  20
+Leaks:  0
+Freed:  21
 Reused: 16
 Allocs: 5
-Retain: 5
+Retain: 4
 
 Unifications: 21
-Conjuncts:    30
+Conjuncts:    28
 Disjuncts:    21
 -- out/eval --
 Errors:

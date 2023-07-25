@@ -70,24 +70,22 @@ issue2355: {
 
 -- out/eval/stats --
 Leaks:  6
-Freed:  60
-Reused: 53
+Freed:  52
+Reused: 45
 Allocs: 13
 Retain: 40
 
 Unifications: 42
-Conjuncts:    157
-Disjuncts:    78
+Conjuncts:    146
+Disjuncts:    70
 -- out/eval --
 (struct){
   conjunct: (struct){
-    t1: (string){ |(*(string){
-        "X"
-        #early: (string){ |(*(string){ "X" }, (string){ string }) }
-      }, (string){
-        string
-        #early: (string){ |(*(string){ "X" }, (string){ string }) }
-      }) }
+    t1: (_|_){
+      // [incomplete] conjunct.t1: cannot add field #early: was already used:
+      //     ./in.cue:4:2
+      #early: (string){ |(*(string){ "X" }, (string){ string }) }
+    }
     t2: (_|_){
       // [incomplete] conjunct.t2: cannot add field #early: was already used:
       //     ./in.cue:12:2
@@ -96,9 +94,9 @@ Disjuncts:    78
     t3: (_|_){
       // [incomplete] conjunct.t3: 2 errors in empty disjunction:
       // conjunct.t3: cannot add field #early: was already used:
-      //     ./in.cue:12:2
+      //     ./in.cue:4:2
       // conjunct.t3: cannot add field #early: was already used:
-      //     ./in.cue:16:2
+      //     ./in.cue:7:2
       #early: (string){ |(*(string){ "X" }, (string){ string }) }
     }
   }

@@ -311,7 +311,7 @@ Allocs: 60
 Retain: 198
 
 Unifications: 828
-Conjuncts:    2522
+Conjuncts:    2511
 Disjuncts:    1443
 -- out/eval --
 Errors:
@@ -408,8 +408,8 @@ Result:
       code: (int){ 101 }
     }
     Y: (struct){
-      code: (int){ 101 }
       message: (string){ "test" }
+      code: (int){ 101 }
     }
   }
   selfReferential: (_|_){

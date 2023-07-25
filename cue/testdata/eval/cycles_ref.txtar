@@ -15,15 +15,15 @@ Allocs: 5
 Retain: 3
 
 Unifications: 12
-Conjuncts:    25
+Conjuncts:    24
 Disjuncts:    15
 -- out/eval --
 (struct){
   a: (int){ 200 }
   b: (int){ 100 }
   c: (struct){
-    a: (int){ 1 }
     b: (int){ 2 }
+    a: (int){ 1 }
   }
   d: (struct){
     a: (int){ 1 }

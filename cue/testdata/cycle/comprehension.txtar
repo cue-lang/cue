@@ -308,11 +308,11 @@ Leaks:  48
 Freed:  1268
 Reused: 1256
 Allocs: 60
-Retain: 198
+Retain: 189
 
 Unifications: 828
-Conjuncts:    2522
-Disjuncts:    1443
+Conjuncts:    2512
+Disjuncts:    1437
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
@@ -408,13 +408,16 @@ Result:
       code: (int){ 101 }
     }
     Y: (struct){
-      code: (int){ 101 }
       message: (string){ "test" }
+      code: (int){ 101 }
     }
   }
   selfReferential: (_|_){
     // [eval]
     T1: (struct){
+      S: (struct){
+        d: (string){ "bar" }
+      }
       T: (struct){
         e: (struct){
           S: (struct){
@@ -422,9 +425,6 @@ Result:
             d: (string){ "bar" }
           }
         }
-      }
-      S: (struct){
-        d: (string){ "bar" }
       }
     }
     list: (struct){
@@ -647,6 +647,9 @@ Result:
   siblingInsertion: (struct){
     t1: (struct){
       p1: (struct){
+        D: (struct){
+          logging: (_){ _ }
+        }
         deployment: (struct){
           logging: (struct){
             env2: (struct){
@@ -656,12 +659,12 @@ Result:
               ENV: (string){ "True" }
             }
           }
-        }
-        D: (struct){
-          logging: (_){ _ }
         }
       }
       p2: (struct){
+        D: (struct){
+          logging: (_){ _ }
+        }
         deployment: (struct){
           logging: (struct){
             env2: (struct){
@@ -671,14 +674,14 @@ Result:
               ENV: (string){ "True" }
             }
           }
-        }
-        D: (struct){
-          logging: (_){ _ }
         }
       }
     }
     t2: (struct){
       p1: (struct){
+        D: (struct){
+          logging: (_){ _ }
+        }
         deployment: (struct){
           logging: (struct){
             env2: (struct){
@@ -688,12 +691,12 @@ Result:
               ENV: (string){ "True" }
             }
           }
-        }
-        D: (struct){
-          logging: (_){ _ }
         }
       }
       p2: (struct){
+        D: (struct){
+          logging: (_){ _ }
+        }
         deployment: (struct){
           logging: (struct){
             env2: (struct){
@@ -703,9 +706,6 @@ Result:
               ENV: (string){ "True" }
             }
           }
-        }
-        D: (struct){
-          logging: (_){ _ }
         }
       }
     }

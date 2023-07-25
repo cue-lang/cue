@@ -124,13 +124,13 @@ foo: {
 -- out/eval/stats --
 Leaks:  4
 Freed:  118
-Reused: 105
-Allocs: 17
-Retain: 19
+Reused: 103
+Allocs: 19
+Retain: 14
 
 Unifications: 112
 Conjuncts:    249
-Disjuncts:    133
+Disjuncts:    128
 -- out/eval --
 (struct){
   networkingv1: (struct){
@@ -259,7 +259,7 @@ Disjuncts:    133
         }
       }
     }
-    _outputs(:config): (#struct){
+    formatOutput: (#struct){
       foo: (#struct){
       }
       "ns/network": (#struct){
@@ -293,7 +293,7 @@ Disjuncts:    133
         }
       }
     }
-    formatOutput: (#struct){
+    _outputs(:config): (#struct){
       foo: (#struct){
       }
       "ns/network": (#struct){

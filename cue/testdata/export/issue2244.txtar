@@ -32,14 +32,14 @@ m: #step & {
 	if: _#isReleaseTag
 }
 -- out/eval/stats --
-Leaks:  17
+Leaks:  16
 Freed:  17
 Reused: 13
-Allocs: 21
-Retain: 29
+Allocs: 20
+Retain: 30
 
-Unifications: 25
-Conjuncts:    64
+Unifications: 24
+Conjuncts:    58
 Disjuncts:    40
 -- out/eval --
 (struct){

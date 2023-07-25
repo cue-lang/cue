@@ -227,7 +227,13 @@ func (c *OpContext) unify(v *Vertex, state vertexStatus) {
 			n.addBottom(c.errs)
 		}
 
-		n.conjuncts = v.Conjuncts
+		// NOTE: safeguard against accidentally entering the 'unprocessed' state
+		// twice.
+		n.conjuncts = n.conjuncts[:0]
+
+		for i, c := range v.Conjuncts {
+			n.addConjunction(c, i)
+		}
 		if n.insertConjuncts(state) {
 			n.maybeSetCache()
 			v.updateStatus(partial)
@@ -366,30 +372,39 @@ func (c *OpContext) unify(v *Vertex, state vertexStatus) {
 func (n *nodeContext) insertConjuncts(state vertexStatus) bool {
 	// Exit early if we have a concrete value and only need partial results.
 	if state == partial {
-		for n.conjunctsPos < len(n.conjuncts) {
-			c := n.conjuncts[n.conjunctsPos]
-			n.conjunctsPos++
-			if v, ok := c.Elem().(Value); ok && IsConcrete(v) {
-				n.addValueConjunct(c.Env, v, c.CloseInfo)
+		for n.conjunctsPartialPos < len(n.conjuncts) {
+			c := &n.conjuncts[n.conjunctsPartialPos]
+			n.conjunctsPartialPos++
+			if c.done {
+				continue
+			}
+			if v, ok := c.C.Elem().(Value); ok && IsConcrete(v) {
+				c.done = true
+				n.addValueConjunct(c.C.Env, v, c.C.CloseInfo)
 			}
 		}
 		if n.scalar != nil && n.node.isDefined() {
 			return true
 		}
 	}
-	for len(n.conjuncts) > 0 {
+	for n.conjunctsPos < len(n.conjuncts) {
 		nInfos := len(n.node.Structs)
-		p := &n.conjuncts[0]
-		n.conjuncts = n.conjuncts[1:]
+		p := &n.conjuncts[n.conjunctsPos]
+		n.conjunctsPos++
+		if p.done {
+			continue
+		}
+
 		// Initially request a Partial state to allow cyclic references to
 		// resolve more naturally first. This results in better error messages
 		// and less operations.
-		n.addExprConjunct(*p, partial)
+		n.addExprConjunct(p.C, partial)
+		p.done = true
 
 		// Record the OptionalTypes for all structs that were inferred by this
 		// Conjunct. This information can be used by algorithms such as trim.
 		for i := nInfos; i < len(n.node.Structs); i++ {
-			p.CloseInfo.FieldTypes |= n.node.Structs[i].types
+			n.node.Conjuncts[p.index].CloseInfo.FieldTypes |= n.node.Structs[i].types
 		}
 	}
 	return false
@@ -956,7 +971,7 @@ type nodeContext struct {
 
 	// Conjuncts holds a reference to the Vertex Arcs that still need
 	// processing. It does NOT need to be copied.
-	conjuncts       []Conjunct
+	conjuncts       []conjunct
 	cyclicConjuncts []cyclicConjunct
 
 	dynamicFields      []envDynamic
@@ -992,6 +1007,16 @@ type nodeContext struct {
 	result Vertex
 }
 
+type conjunct struct {
+	C Conjunct
+
+	// done marks that this conjunct has been inserted. This prevents a
+	// conjunct from being processed more than once, for instance, when
+	// insertConjuncts is called more than once for the same node.
+	done  bool
+	index int // index of the original conjunct in Vertex.Conjuncts
+}
+
 type nodeContextState struct {
 	// State info
 
@@ -1025,6 +1050,9 @@ type nodeContextState struct {
 	// to process. This is used to avoids processing a conjunct twice in some
 	// cases where there is an evaluation cycle.
 	conjunctsPos int
+	// conjunctsPartialPos is like conjunctsPos, but for the 'partial' phase
+	// of processing where conjuncts are only processed as concrete scalars.
+	conjunctsPartialPos int
 }
 
 // Logf substitutes args in format. Arguments of type Feature, Value, and Expr
@@ -1095,6 +1123,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 				kind: TopKind,
 			},
 			arcMap:             n.arcMap[:0],
+			conjuncts:          n.conjuncts[:0],
 			cyclicConjuncts:    n.cyclicConjuncts[:0],
 			notify:             n.notify[:0],
 			checks:             n.checks[:0],
@@ -1934,12 +1963,23 @@ func (n *nodeContext) addStruct(
 
 	parent := n.node.AddStruct(s, childEnv, closeInfo)
 	closeInfo.IsClosed = false
+
 	parent.Disable = true // disable until processing is done.
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
-		case *Field, *LetField:
-			// handle in next iteration.
+		case *Field:
+			if x.Label.IsString() && x.ArcType == ArcMember {
+				n.aStruct = s
+				n.aStructID = closeInfo
+			}
+			n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
+
+		case *LetField:
+			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
+			if x.IsMulti {
+				arc.MultiLet = x.IsMulti
+			}
 
 		case *DynamicField:
 			n.aStruct = s
@@ -1956,8 +1996,8 @@ func (n *nodeContext) addStruct(
 			// a fieldSet. Otherwise the entry will just be removed next.
 			id := closeInfo.SpawnEmbed(x)
 
-			// push and opo embedding type.
-			n.addExprConjunct(MakeConjunct(childEnv, x, id), partial)
+			c := MakeConjunct(childEnv, x, id)
+			n.addExprConjunct(c, partial)
 
 		case *BulkOptionalField, *Ellipsis:
 			// Nothing to do here. Note that the presence of these fields do not
@@ -1976,22 +2016,6 @@ func (n *nodeContext) addStruct(
 
 	parent.Disable = false
 
-	for _, d := range s.Decls {
-		switch x := d.(type) {
-		case *Field:
-			if x.Label.IsString() && x.ArcType == ArcMember {
-				n.aStruct = s
-				n.aStructID = closeInfo
-			}
-			n.insertField(x.Label, x.ArcType, MakeConjunct(childEnv, x, closeInfo))
-
-		case *LetField:
-			arc := n.insertField(x.Label, ArcMember, MakeConjunct(childEnv, x, closeInfo))
-			if x.IsMulti {
-				arc.MultiLet = x.IsMulti
-			}
-		}
-	}
 }
 
 // TODO(perf): if an arc is the only arc with that label added to a Vertex, and
@@ -2020,7 +2044,7 @@ func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 	case arc.state != nil:
 		arc.state.addConjunctDynamic(x)
 
-	case arc.IsUnprocessed():
+	case arc.IsUnprocessed() || arc.status != finalized:
 		arc.addConjunctUnchecked(x)
 
 	default:

@@ -492,11 +492,11 @@ Leaks:  4
 Freed:  2339
 Reused: 2323
 Allocs: 20
-Retain: 119
+Retain: 115
 
 Unifications: 1260
 Conjuncts:    3417
-Disjuncts:    2458
+Disjuncts:    2454
 -- out/eval --
 Errors:
 issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
@@ -999,10 +999,6 @@ Result:
       t2: (_|_){
         // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
         //     ./issue2209full.cue:24:17
-        BAZ: (_|_){
-          // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
-          //     ./issue2209full.cue:24:17
-        }
         #SpecFoo: (#struct){
           foo: (#struct){
           }
@@ -1022,6 +1018,10 @@ Result:
               x: (int){ 1 }
             }
           }) }
+        BAZ: (_|_){
+          // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+          //     ./issue2209full.cue:24:17
+        }
         b2: (int){ int }
       }
       t3: (_|_){

@@ -16,6 +16,23 @@
       "message": "I discovered that using SSH auth, whilst setting up my client-side GerritHub access, prohibited me from using the `git-codereview` plugin, so I\u0027ve documented it for future users. PTAL.",
       "revId": "2a971697cd5b5a3304471dff2bd69622498db187",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f28bbb16_3e171e8f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-25T09:30:28Z",
+      "side": 1,
+      "message": "cc Aram",
+      "revId": "2a971697cd5b5a3304471dff2bd69622498db187",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "96d150c1_060bbff9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-26T05:18:55Z",
+      "side": 1,
+      "message": "Not sure I agree with this change. The additional mention of the CoC in the contributing guide is a useful repetition to my mind. Similarly, the link to the contributing guide from the README is not unuseful (although it could be made shorter)",
+      "revId": "7912f67c6cab811c46d39c9362b0a231c299ece7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

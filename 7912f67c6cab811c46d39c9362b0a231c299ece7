@@ -16,6 +16,24 @@
       "message": "Not sure I agree with this change. The additional mention of the CoC in the contributing guide is a useful repetition to my mind. Similarly, the link to the contributing guide from the README is not unuseful (although it could be made shorter)",
       "revId": "7912f67c6cab811c46d39c9362b0a231c299ece7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9eb8b494_92031c63",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T07:24:05Z",
+      "side": 1,
+      "message": "I tend to disagree about the repetition given how lengthy the documents are at the moment - hoping that new contributors will read a thousand-line markdown file is a bit naive, so I was trying my best to cut down on it :) Undone in any case.\n\nThe link from the README to CONTRIBUTING is re-added but as a single line.",
+      "parentUuid": "96d150c1_060bbff9",
+      "revId": "7912f67c6cab811c46d39c9362b0a231c299ece7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

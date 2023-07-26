@@ -1,0 +1,169 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bb0d295_b34ea8b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "nit: twice?",
+      "range": {
+        "startLine": 25,
+        "startChar": 32,
+        "endLine": 25,
+        "endChar": 38
+      },
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "11f4d8d1_989042cd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "Nice to finally fix those two issues!",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "353e4ab6_1ab6f45e",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 960,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "I\u0027d personally avoid reusing `c` for the two appends - it is technically OK since `Conjunct` is simply a struct type, so you\u0027re not mutating the first appended value when preparing for the second append. But I had to manually check that to convince myself :)\n\nI would have perhaps written it like this to be more obviously safe:\n\n```\nc1 :\u003d c\nc1.x \u003d x.X\nn.conjuncts \u003d append(n.conjuncts, conjunct{C: c1, index: index})\nc2 :\u003d c\nc2.x \u003d x.X\nn.conjuncts \u003d append(n.conjuncts, conjunct{C: c2, index: index})\n```\n\nI don\u0027t have a strong opinion though. If you don\u0027t like my alternative, just keep yours.",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e236d74b_3cc015c0",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "unprocessed conjuncts? if you meant a variable or field named \"unprocessed\", I can\u0027t see it nearby.",
+      "range": {
+        "startLine": 230,
+        "startChar": 51,
+        "endLine": 230,
+        "endChar": 62
+      },
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1b3dddf_08d68afd",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "does this deserve a TODO? perhaps something like:\n\n    // TODO: for v0.7, use: ...\n\notherwise I would default to assuming it was old code that is now unused and can be deleted, which is probably not the case here.",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1dc0618_634f3852",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1011,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "I\u0027d document why we need this field",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9595bd3_c8d4ae5b",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "I\u0027d document this, like you had already done for conjunctPos. You could always be brief, like this best guess of mine:\n\n    conjunctsPartialPos is like conjunctsPos, but used while adding partial conjuncts.",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cad2bdff_4696960a",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1992,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "is \"opo\" a typo for \"pop\" here?",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "07407591_678fc5eb",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1995,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T10:51:19Z",
+      "side": 1,
+      "message": "out of curiosity, isn\u0027t this change a no-op? perhaps it was needed for something else before, but not anymore?",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

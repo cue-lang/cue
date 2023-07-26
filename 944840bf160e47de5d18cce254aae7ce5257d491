@@ -60,6 +60,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "17dbe709_b8bd217b",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 960,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-26T15:39:16Z",
+      "side": 1,
+      "message": "Would you not still need to do the same verification when you do `c1 :\u003d c`, as you would still need to verify that `c` is not a pointer?",
+      "parentUuid": "353e4ab6_1ab6f45e",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e236d74b_3cc015c0",
         "filename": "internal/core/adt/eval.go",
         "patchSetId": 7
@@ -162,6 +180,24 @@
       "writtenOn": "2023-07-26T10:51:19Z",
       "side": 1,
       "message": "out of curiosity, isn\u0027t this change a no-op? perhaps it was needed for something else before, but not anymore?",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8af2453_6ff73aab",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1995,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-26T15:39:16Z",
+      "side": 1,
+      "message": "Correct. It is an artifact of making and reverting a whole bunch of changes. However, it also makes source-level debugging a bit easier.",
+      "parentUuid": "07407591_678fc5eb",
       "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

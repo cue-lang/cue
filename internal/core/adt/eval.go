@@ -489,8 +489,12 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 		n.injectSelfComprehensions(state)
 	}
 
-	for n.expandOne(state) {
-	}
+	func() {
+		stack := n.ctx.PushIncompleteCheck()
+		defer n.ctx.PopIncompleteCheck(stack)
+		for n.expandOne(state) {
+		}
+	}()
 
 	switch err := n.getErr(); {
 	case err != nil:

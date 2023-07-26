@@ -1,0 +1,1242 @@
+-- in.cue --
+package issue
+
+#Context: {
+	cluster: #ClusterInfo
+}
+
+#ContextForCluster: #Context & {
+	#env:     string
+	#cluster: string
+	let env = #env
+	let name = #cluster
+	cluster: #ClusterInfo & {
+		#env:  env
+		#name: name
+	}
+}
+
+#ConfigForCluster: #AppConfig & {
+	#env:     string
+	#cluster: string
+
+	let env = #env
+	let cluster = #cluster
+	#context: #ContextForCluster & {
+		#env:     env
+		#cluster: cluster
+	}
+}
+
+#AppInstanceConfigView: #AppConfigView & {
+	#env:     string
+	#cluster: string
+
+	let env = #env
+	let cluster = #cluster
+
+	#config: #ConfigForCluster & {
+		#env:     env
+		#cluster: cluster
+	}
+}
+
+#ClusterInfo: {
+	#env:  "dev" | "stage" | "production"
+	#name: string
+
+	dev_env_version: number | *0
+	env:             #env
+	name:            #name
+
+	if #env == "production" {
+		dev_env_version: 0
+	}
+	if #env != "production" {
+		dev_env_version: 42
+	}
+}
+
+#ConfigBase: {
+	#env:     string
+	#cluster: string
+	#context: #Context
+
+	context: #context
+	...
+}
+
+#AppConfig: #ConfigBase
+#AppConfig: {
+	#context: #Context
+
+	application: {
+		env:     #context.cluster.env
+		cluster: #context.cluster.name
+	}
+	context: #context
+	db:      string
+
+	if #context.cluster.env == "production" {
+		db: "app"
+	}
+	if #context.cluster.env == "dev" {
+		let _context = #context
+		db: "app_\(_context.cluster.env)"
+	}
+}
+
+#AppConfigView: {
+	#config: #ConfigBase
+
+	let config = #config
+	foo: #AppConfigFoo & {
+		#config: config
+	}
+}
+
+#AppConfigFoo1: {
+	#config: #ConfigBase
+	foo1:    1
+	...
+}
+
+#AppConfigFoo2: {
+	#config: #ConfigBase
+	foo2:    2
+	...
+}
+
+#AppConfigFoo3: {
+	#config: #ConfigBase
+	foo3:    3
+	...
+}
+
+#AppConfigFoo: #AppConfigFoo1
+#AppConfigFoo: #AppConfigFoo2
+#AppConfigFoo: #AppConfigFoo3
+
+issue: #AppInstanceConfigView & {
+	#env:     "production"
+	#cluster: ""
+}
+-- out/compile --
+--- in.cue
+{
+  #Context: {
+    cluster: 〈1;#ClusterInfo〉
+  }
+  #ContextForCluster: (〈0;#Context〉 & {
+    #env: string
+    #cluster: string
+    let env#1 = 〈0;#env〉
+    let name#2 = 〈0;#cluster〉
+    cluster: (〈1;#ClusterInfo〉 & {
+      #env: 〈1;let env#1〉
+      #name: 〈1;let name#2〉
+    })
+  })
+  #ConfigForCluster: (〈0;#AppConfig〉 & {
+    #env: string
+    #cluster: string
+    let env#3 = 〈0;#env〉
+    let cluster#4 = 〈0;#cluster〉
+    #context: (〈1;#ContextForCluster〉 & {
+      #env: 〈1;let env#3〉
+      #cluster: 〈1;let cluster#4〉
+    })
+  })
+  #AppInstanceConfigView: (〈0;#AppConfigView〉 & {
+    #env: string
+    #cluster: string
+    let env#5 = 〈0;#env〉
+    let cluster#6 = 〈0;#cluster〉
+    #config: (〈1;#ConfigForCluster〉 & {
+      #env: 〈1;let env#5〉
+      #cluster: 〈1;let cluster#6〉
+    })
+  })
+  #ClusterInfo: {
+    #env: ("dev"|"stage"|"production")
+    #name: string
+    dev_env_version: (number|*0)
+    env: 〈0;#env〉
+    name: 〈0;#name〉
+    if (〈0;#env〉 == "production") {
+      dev_env_version: 0
+    }
+    if (〈0;#env〉 != "production") {
+      dev_env_version: 42
+    }
+  }
+  #ConfigBase: {
+    #env: string
+    #cluster: string
+    #context: 〈1;#Context〉
+    context: 〈0;#context〉
+    ...
+  }
+  #AppConfig: 〈0;#ConfigBase〉
+  #AppConfig: {
+    #context: 〈1;#Context〉
+    application: {
+      env: 〈1;#context〉.cluster.env
+      cluster: 〈1;#context〉.cluster.name
+    }
+    context: 〈0;#context〉
+    db: string
+    if (〈0;#context〉.cluster.env == "production") {
+      db: "app"
+    }
+    if (〈0;#context〉.cluster.env == "dev") {
+      let _context#7 = 〈1;#context〉
+      db: "app_\(〈0;let _context#7〉.cluster.env)"
+    }
+  }
+  #AppConfigView: {
+    #config: 〈1;#ConfigBase〉
+    let config#8 = 〈0;#config〉
+    foo: (〈1;#AppConfigFoo〉 & {
+      #config: 〈1;let config#8〉
+    })
+  }
+  #AppConfigFoo1: {
+    #config: 〈1;#ConfigBase〉
+    foo1: 1
+    ...
+  }
+  #AppConfigFoo2: {
+    #config: 〈1;#ConfigBase〉
+    foo2: 2
+    ...
+  }
+  #AppConfigFoo3: {
+    #config: 〈1;#ConfigBase〉
+    foo3: 3
+    ...
+  }
+  #AppConfigFoo: 〈0;#AppConfigFoo1〉
+  #AppConfigFoo: 〈0;#AppConfigFoo2〉
+  #AppConfigFoo: 〈0;#AppConfigFoo3〉
+  issue: (〈0;#AppInstanceConfigView〉 & {
+    #env: "production"
+    #cluster: ""
+  })
+}
+-- out/eval/stats --
+Leaks:  1
+Freed:  9760
+Reused: 9739
+Allocs: 22
+Retain: 617
+
+Unifications: 493
+Conjuncts:    32582
+Disjuncts:    9901
+-- out/compile --
+--- in.cue
+{
+  #Context: {
+    cluster: 〈1;#ClusterInfo〉
+  }
+  #ContextForCluster: (〈0;#Context〉 & {
+    #env: string
+    #cluster: string
+    let env#1 = 〈0;#env〉
+    let name#2 = 〈0;#cluster〉
+    cluster: (〈1;#ClusterInfo〉 & {
+      #env: 〈1;let env#1〉
+      #name: 〈1;let name#2〉
+    })
+  })
+  #ConfigForCluster: (〈0;#AppConfig〉 & {
+    #env: string
+    #cluster: string
+    let env#3 = 〈0;#env〉
+    let cluster#4 = 〈0;#cluster〉
+    #context: (〈1;#ContextForCluster〉 & {
+      #env: 〈1;let env#3〉
+      #cluster: 〈1;let cluster#4〉
+    })
+  })
+  #AppInstanceConfigView: (〈0;#AppConfigView〉 & {
+    #env: string
+    #cluster: string
+    let env#5 = 〈0;#env〉
+    let cluster#6 = 〈0;#cluster〉
+    #config: (〈1;#ConfigForCluster〉 & {
+      #env: 〈1;let env#5〉
+      #cluster: 〈1;let cluster#6〉
+    })
+  })
+  #ClusterInfo: {
+    #env: ("dev"|"stage"|"production")
+    #name: string
+    dev_env_version: (number|*0)
+    env: 〈0;#env〉
+    name: 〈0;#name〉
+    if (〈0;#env〉 == "production") {
+      dev_env_version: 0
+    }
+    if (〈0;#env〉 != "production") {
+      dev_env_version: 42
+    }
+  }
+  #ConfigBase: {
+    #env: string
+    #cluster: string
+    #context: 〈1;#Context〉
+    context: 〈0;#context〉
+    ...
+  }
+  #AppConfig: 〈0;#ConfigBase〉
+  #AppConfig: {
+    #context: 〈1;#Context〉
+    application: {
+      env: 〈1;#context〉.cluster.env
+      cluster: 〈1;#context〉.cluster.name
+    }
+    context: 〈0;#context〉
+    db: string
+    if (〈0;#context〉.cluster.env == "production") {
+      db: "app"
+    }
+    if (〈0;#context〉.cluster.env == "dev") {
+      let _context#7 = 〈1;#context〉
+      db: "app_\(〈0;let _context#7〉.cluster.env)"
+    }
+  }
+  #AppConfigView: {
+    #config: 〈1;#ConfigBase〉
+    let config#8 = 〈0;#config〉
+    foo: (〈1;#AppConfigFoo〉 & {
+      #config: 〈1;let config#8〉
+    })
+  }
+  #AppConfigFoo1: {
+    #config: 〈1;#ConfigBase〉
+    foo1: 1
+    ...
+  }
+  #AppConfigFoo2: {
+    #config: 〈1;#ConfigBase〉
+    foo2: 2
+    ...
+  }
+  #AppConfigFoo3: {
+    #config: 〈1;#ConfigBase〉
+    foo3: 3
+    ...
+  }
+  #AppConfigFoo: 〈0;#AppConfigFoo1〉
+  #AppConfigFoo: 〈0;#AppConfigFoo2〉
+  #AppConfigFoo: 〈0;#AppConfigFoo3〉
+  issue: (〈0;#AppInstanceConfigView〉 & {
+    #env: "production"
+    #cluster: ""
+  })
+}
+-- out/eval --
+(struct){
+  #Context: (#struct){
+    cluster: (_|_){
+      // [incomplete] #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:51:5
+      // #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:54:5
+      dev_env_version: (_|_){
+        // [incomplete] #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #Context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+      #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+      #name: (string){ string }
+      env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+      name: (string){ string }
+    }
+  }
+  #ContextForCluster: (#struct){
+    cluster: (_|_){
+      // [incomplete] #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:51:5
+      // #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:54:5
+      dev_env_version: (_|_){
+        // [incomplete] #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #ContextForCluster.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+      #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+      #name: (string){ string }
+      env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+      name: (string){ string }
+    }
+    #env: (string){ string }
+    #cluster: (string){ string }
+    let env#1 = (string){ string }
+    let name#2 = (string){ string }
+  }
+  #ConfigForCluster: (_|_){
+    // [incomplete] #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+    //     ./in.cue:51:5
+    // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+    //     ./in.cue:54:5
+    #env: (string){ string }
+    #cluster: (string){ string }
+    #context: (#struct){
+      cluster: (_|_){
+        // [incomplete] #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+        dev_env_version: (_|_){
+          // [incomplete] #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        #name: (string){ string }
+        env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        name: (string){ string }
+      }
+      #env: (string){ string }
+      #cluster: (string){ string }
+      let env#1 = (string){ string }
+      let name#2 = (string){ string }
+    }
+    context: (#struct){
+      cluster: (_|_){
+        // [incomplete] #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+        dev_env_version: (_|_){
+          // [incomplete] #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #ConfigForCluster.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        #name: (string){ string }
+        env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        name: (string){ string }
+      }
+      #env: (string){ string }
+      #cluster: (string){ string }
+      let env#1multi = 〈0;#env〉
+      let name#2multi = 〈0;#cluster〉
+    }
+    db: (_|_){
+      // [incomplete] #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:51:5
+      // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:54:5
+    }
+    application: (#struct){
+      env: (_|_){
+        // [incomplete] #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+      cluster: (_|_){
+        // [incomplete] #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #ConfigForCluster.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+    }
+    let env#3 = (string){ string }
+    let cluster#4 = (string){ string }
+  }
+  #AppInstanceConfigView: (#struct){
+    #config: (_|_){
+      // [incomplete] #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:51:5
+      // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:54:5
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+        #env: (string){ string }
+        #cluster: (string){ string }
+        let env#1 = (string){ string }
+        let name#2 = (string){ string }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+        #env: (string){ string }
+        #cluster: (string){ string }
+        let env#1multi = 〈0;#env〉
+        let name#2multi = 〈0;#cluster〉
+      }
+      db: (_|_){
+        // [incomplete] #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+      application: (#struct){
+        env: (_|_){
+          // [incomplete] #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        cluster: (_|_){
+          // [incomplete] #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+      }
+      let env#3 = (string){ string }
+      let cluster#4 = (string){ string }
+    }
+    let config#8 = (_|_){
+      // [incomplete] #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:51:5
+      // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:54:5
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+        #env: (string){ string }
+        #cluster: (string){ string }
+        let env#1 = (string){ string }
+        let name#2 = (string){ string }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+        #env: (string){ string }
+        #cluster: (string){ string }
+        let env#1multi = 〈0;#env〉
+        let name#2multi = 〈0;#cluster〉
+      }
+      db: (_|_){
+        // [incomplete] #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+      application: (#struct){
+        env: (_|_){
+          // [incomplete] #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        cluster: (_|_){
+          // [incomplete] #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+      }
+      let env#3 = (string){ string }
+      let cluster#4 = (string){ string }
+    }
+    foo: (#struct){
+      #config: (_|_){
+        // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+        #env: (string){ string }
+        #cluster: (string){ string }
+        #context: (#struct){
+          cluster: (_|_){
+            // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+            dev_env_version: (_|_){
+              // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:51:5
+              // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:54:5
+            }
+            #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            #name: (string){ string }
+            env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            name: (string){ string }
+          }
+          #env: (string){ string }
+          #cluster: (string){ string }
+          let env#1 = (string){ string }
+          let name#2 = (string){ string }
+        }
+        context: (#struct){
+          cluster: (_|_){
+            // [incomplete] #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+            dev_env_version: (_|_){
+              // [incomplete] #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:51:5
+              // #AppInstanceConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:54:5
+            }
+            #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            #name: (string){ string }
+            env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            name: (string){ string }
+          }
+          #env: (string){ string }
+          #cluster: (string){ string }
+          let env#1multi = 〈0;#env〉
+          let name#2multi = 〈0;#cluster〉
+        }
+        db: (_|_){
+          // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        application: (#struct){
+          env: (_|_){
+            // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          cluster: (_|_){
+            // [incomplete] #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppInstanceConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+        }
+        let env#3 = (string){ string }
+        let cluster#4 = (string){ string }
+      }
+      foo1: (int){ 1 }
+      foo2: (int){ 2 }
+      foo3: (int){ 3 }
+    }
+    #env: (string){ string }
+    #cluster: (string){ string }
+    let env#5 = (string){ string }
+    let cluster#6 = (string){ string }
+  }
+  #ClusterInfo: (_|_){
+    // [incomplete] #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
+    //     ./in.cue:51:5
+    // #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
+    //     ./in.cue:54:5
+    dev_env_version: (_|_){
+      // [incomplete] #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:51:5
+      // #ClusterInfo: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:54:5
+    }
+    #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+    #name: (string){ string }
+    env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+    name: (string){ string }
+  }
+  #ConfigBase: (#struct){
+    #env: (string){ string }
+    #cluster: (string){ string }
+    #context: (#struct){
+      cluster: (_|_){
+        // [incomplete] #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+        dev_env_version: (_|_){
+          // [incomplete] #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #ConfigBase.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        #name: (string){ string }
+        env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        name: (string){ string }
+      }
+    }
+    context: (#struct){
+      cluster: (_|_){
+        // [incomplete] #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+        dev_env_version: (_|_){
+          // [incomplete] #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #ConfigBase.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        #name: (string){ string }
+        env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        name: (string){ string }
+      }
+    }
+  }
+  #AppConfig: (_|_){
+    // [incomplete] #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+    //     ./in.cue:51:5
+    // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+    //     ./in.cue:54:5
+    #env: (string){ string }
+    #cluster: (string){ string }
+    #context: (#struct){
+      cluster: (_|_){
+        // [incomplete] #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+        dev_env_version: (_|_){
+          // [incomplete] #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        #name: (string){ string }
+        env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        name: (string){ string }
+      }
+    }
+    context: (#struct){
+      cluster: (_|_){
+        // [incomplete] #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+        dev_env_version: (_|_){
+          // [incomplete] #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfig.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+        }
+        #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        #name: (string){ string }
+        env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+        name: (string){ string }
+      }
+    }
+    db: (_|_){
+      // [incomplete] #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:51:5
+      // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+      //     ./in.cue:54:5
+    }
+    application: (#struct){
+      env: (_|_){
+        // [incomplete] #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+      cluster: (_|_){
+        // [incomplete] #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:51:5
+        // #AppConfig.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+        //     ./in.cue:54:5
+      }
+    }
+  }
+  #AppConfigView: (#struct){
+    #config: (#struct){
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigView.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigView.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+    }
+    let config#8 = (#struct){
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigView.config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigView.config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+    }
+    foo: (#struct){
+      #config: (#struct){
+        #env: (string){ string }
+        #cluster: (string){ string }
+        #context: (#struct){
+          cluster: (_|_){
+            // [incomplete] #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+            dev_env_version: (_|_){
+              // [incomplete] #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:51:5
+              // #AppConfigView.foo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:54:5
+            }
+            #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            #name: (string){ string }
+            env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            name: (string){ string }
+          }
+        }
+        context: (#struct){
+          cluster: (_|_){
+            // [incomplete] #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+            dev_env_version: (_|_){
+              // [incomplete] #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:51:5
+              // #AppConfigView.foo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+              //     ./in.cue:54:5
+            }
+            #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            #name: (string){ string }
+            env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+            name: (string){ string }
+          }
+        }
+      }
+      foo1: (int){ 1 }
+      foo2: (int){ 2 }
+      foo3: (int){ 3 }
+    }
+  }
+  #AppConfigFoo1: (#struct){
+    #config: (#struct){
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo1.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo1.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo1.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo1.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo1.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo1.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo1.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo1.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+    }
+    foo1: (int){ 1 }
+  }
+  #AppConfigFoo2: (#struct){
+    #config: (#struct){
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo2.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo2.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo2.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo2.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo2.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo2.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo2.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo2.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+    }
+    foo2: (int){ 2 }
+  }
+  #AppConfigFoo3: (#struct){
+    #config: (#struct){
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo3.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo3.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo3.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo3.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo3.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo3.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo3.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo3.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+    }
+    foo3: (int){ 3 }
+  }
+  #AppConfigFoo: (#struct){
+    #config: (#struct){
+      #env: (string){ string }
+      #cluster: (string){ string }
+      #context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo.#config.#context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+      context: (#struct){
+        cluster: (_|_){
+          // [incomplete] #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:51:5
+          // #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+          //     ./in.cue:54:5
+          dev_env_version: (_|_){
+            // [incomplete] #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:51:5
+            // #AppConfigFoo.#config.context.cluster: unresolved disjunction "dev" | "stage" | "production" (type string):
+            //     ./in.cue:54:5
+          }
+          #env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          #name: (string){ string }
+          env: (string){ |((string){ "dev" }, (string){ "stage" }, (string){ "production" }) }
+          name: (string){ string }
+        }
+      }
+    }
+    foo1: (int){ 1 }
+    foo2: (int){ 2 }
+    foo3: (int){ 3 }
+  }
+  issue: (#struct){
+    #config: (#struct){
+      #env: (string){ "production" }
+      #cluster: (string){ "" }
+      #context: (#struct){
+        cluster: (#struct){
+          dev_env_version: (int){ 0 }
+          #env: (string){ "production" }
+          #name: (string){ "" }
+          env: (string){ "production" }
+          name: (string){ "" }
+        }
+        #env: (string){ "production" }
+        #cluster: (string){ "" }
+        let env#1 = (string){ "production" }
+        let name#2 = (string){ "" }
+      }
+      context: (#struct){
+        cluster: (#struct){
+          dev_env_version: (int){ 0 }
+          #env: (string){ "production" }
+          #name: (string){ "" }
+          env: (string){ "production" }
+          name: (string){ "" }
+        }
+        #env: (string){ "production" }
+        #cluster: (string){ "" }
+        let env#1multi = 〈0;#env〉
+        let name#2multi = 〈0;#cluster〉
+      }
+      db: (string){ "app" }
+      application: (#struct){
+        env: (string){ "production" }
+        cluster: (string){ "" }
+      }
+      let env#3 = (string){ "production" }
+      let cluster#4 = (string){ "" }
+    }
+    let config#8 = (#struct){
+      #env: (string){ "production" }
+      #cluster: (string){ "" }
+      #context: (#struct){
+        cluster: (#struct){
+          dev_env_version: (int){ 0 }
+          #env: (string){ "production" }
+          #name: (string){ "" }
+          env: (string){ "production" }
+          name: (string){ "" }
+        }
+        #env: (string){ "production" }
+        #cluster: (string){ "" }
+        let env#1 = (string){ "production" }
+        let name#2 = (string){ "" }
+      }
+      context: (#struct){
+        cluster: (#struct){
+          dev_env_version: (int){ 0 }
+          #env: (string){ "production" }
+          #name: (string){ "" }
+          env: (string){ "production" }
+          name: (string){ "" }
+        }
+        #env: (string){ "production" }
+        #cluster: (string){ "" }
+        let env#1multi = 〈0;#env〉
+        let name#2multi = 〈0;#cluster〉
+      }
+      db: (string){ "app" }
+      application: (#struct){
+        env: (string){ "production" }
+        cluster: (string){ "" }
+      }
+      let env#3 = (string){ "production" }
+      let cluster#4 = (string){ "" }
+    }
+    foo: (#struct){
+      #config: (#struct){
+        #env: (string){ "production" }
+        #cluster: (string){ "" }
+        #context: (#struct){
+          cluster: (#struct){
+            dev_env_version: (int){ 0 }
+            #env: (string){ "production" }
+            #name: (string){ "" }
+            env: (string){ "production" }
+            name: (string){ "" }
+          }
+          #env: (string){ "production" }
+          #cluster: (string){ "" }
+          let env#1 = (string){ "production" }
+          let name#2 = (string){ "" }
+        }
+        context: (#struct){
+          cluster: (#struct){
+            dev_env_version: (int){ 0 }
+            #env: (string){ "production" }
+            #name: (string){ "" }
+            env: (string){ "production" }
+            name: (string){ "" }
+          }
+          #env: (string){ "production" }
+          #cluster: (string){ "" }
+          let env#1multi = 〈0;#env〉
+          let name#2multi = 〈0;#cluster〉
+        }
+        db: (string){ "app" }
+        application: (#struct){
+          env: (string){ "production" }
+          cluster: (string){ "" }
+        }
+        let env#3 = (string){ "production" }
+        let cluster#4 = (string){ "" }
+      }
+      foo1: (int){ 1 }
+      foo2: (int){ 2 }
+      foo3: (int){ 3 }
+    }
+    #env: (string){ "production" }
+    #cluster: (string){ "" }
+    let env#5 = (string){ "production" }
+    let cluster#6 = (string){ "" }
+  }
+}
+-- out/eval/stats --
+Leaks:  1
+Freed:  9760
+Reused: 9739
+Allocs: 22
+Retain: 617
+
+Unifications: 493
+Conjuncts:    32582
+Disjuncts:    9901

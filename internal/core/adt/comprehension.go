@@ -339,6 +339,11 @@ func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
 			d.err = err
 			workRemaining = true
 
+			if n.ctx.IsIncompleteCheck && err.IsIncomplete() {
+				n.addBottom(err)
+				break
+			}
+
 			continue
 
 			// TODO: add this when it can be done without breaking other

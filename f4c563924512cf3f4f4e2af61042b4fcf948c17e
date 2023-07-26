@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a69755a_006df85b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T07:13:14Z",
+      "side": 1,
+      "message": "Late to this, but FYI one could still use both SSH and git-codereview with git\u0027s insteadOf, something like:\n\ngit config --global url.ssh://git@github.com/.insteadOf https://github.com/\n\nI believe this is what Roger uses, for example.\n\nPersonally I think using HTTPS is easiest, although we shouldn\u0027t really say \"you cannot use SSH with git-codereview\" either :)",
+      "revId": "f4c563924512cf3f4f4e2af61042b4fcf948c17e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

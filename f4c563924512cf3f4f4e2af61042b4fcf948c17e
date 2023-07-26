@@ -34,6 +34,24 @@
       "parentUuid": "5a69755a_006df85b",
       "revId": "f4c563924512cf3f4f4e2af61042b4fcf948c17e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0167f47_28378242",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2023-07-26T11:52:34Z",
+      "side": 1,
+      "message": "@Paul @Daniel I\u0027d be interested to see a /working/ setup, with a single Gerrit SSH origin, using insteadOf to allow git-codereview to work!\n\nI couldn\u0027t get this working with /any/ combination of protocol, username, port or host placed inside git config\u0027s `url`\u0027s `insteadOf` setting, or the url selector. This is where I ended up, and it still didn\u0027t work:\n\n```\n[url \"https://jpluscplusm@review.gerrithub.io/a\"]\n  insteadOf \u003d ssh://jpluscplusm@review.gerrithub.io:29418\n```\n\nDigging into the code I see this, at https://cs.opensource.google/go/x/review/+/master:git-codereview/api.go;l\u003d62 ...\n\n```\noriginUrl :\u003d trim(cmdOutput(\"git\", \"config\", \"remote.origin.url\"))\n```\n\nMy reading is that git-codereview compares the  the remote\u0027s configured URL which, in the case of an SSH origin, is `ssh://...`. Critically, AFAICT, the command `git config remote.origin.url` doesn\u0027t return the \"munged-through-url.insteadOf\" value.\n\nI can\u0027t see how to make this work, especially in a way which invalidates the currently documented \"don\u0027t use SSH with GerritHub\" guidance - so if anyone has a known-good setup with a single Gerrit SSH origin that they could share, I\u0027ll happily document it!",
+      "parentUuid": "5dc956f8_75a250f0",
+      "revId": "f4c563924512cf3f4f4e2af61042b4fcf948c17e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -52,6 +52,24 @@
       "parentUuid": "9eb8b494_92031c63",
       "revId": "7912f67c6cab811c46d39c9362b0a231c299ece7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "475800ec_19d1012e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-26T08:23:20Z",
+      "side": 1,
+      "message": "Gotcha. Are you happy with the patch as it is now, then?",
+      "parentUuid": "49570261_4beda122",
+      "revId": "7912f67c6cab811c46d39c9362b0a231c299ece7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

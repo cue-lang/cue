@@ -1,0 +1,51 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+package p
+
+import (
+	"tool/cli"
+	"encoding/json"
+)
+
+input: [name=string]: {
+	{#in: name, #out: #in}.#out
+}
+root: foo: {
+	cli.Print & {text: json.Marshal(input)}
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.foo [Ready]")
+
+-- out/run/t1 --
+graph TD
+  t0("root.foo [Terminated]")
+
+-- out/run/t1/value --
+{
+	$id:    "tool/cli.Print"
+	stdout: "foo"
+	text:   "{}"
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  15
+Reused: 12
+Allocs: 3
+Retain: 5
+
+Unifications: 13
+Conjuncts:    24
+Disjuncts:    20
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  21
+Reused: 15
+Allocs: 6
+Retain: 10
+
+Unifications: 19
+Conjuncts:    32
+Disjuncts:    31

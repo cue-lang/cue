@@ -189,7 +189,8 @@ func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
 	// Note: this call is cheap if n is already Finalized.
 	n.Finalize(c.opCtx)
 
-	for ; n != nil; n = n.Parent {
+	// internal/core/dep may sometimes use "empty" vertices with nil BaseValues.
+	for ; n != nil && n.BaseValue != nil; n = n.Parent {
 		if c.cfg.IgnoreConcrete && n.IsConcrete() {
 			if k := n.BaseValue.Kind(); k != adt.StructKind && k != adt.ListKind {
 				return nil

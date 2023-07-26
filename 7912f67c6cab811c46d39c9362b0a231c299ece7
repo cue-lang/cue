@@ -34,6 +34,24 @@
       "parentUuid": "96d150c1_060bbff9",
       "revId": "7912f67c6cab811c46d39c9362b0a231c299ece7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "49570261_4beda122",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-07-26T07:33:39Z",
+      "side": 1,
+      "message": "\u003e I tend to disagree about the repetition given how lengthy the documents are at the moment - hoping that new contributors will read a thousand-line markdown file is a bit naive, so I was trying my best to cut down on it :) Undone in any case.\n\nMy thinking is not that people will read the entire thing, but see the contents/search the file for details of code of conduct. At least that\u0027s how I tend to do things: I think of a thing, search for it, and hope to find a link to that thing from a place where it would make sense for there to be a link.",
+      "parentUuid": "9eb8b494_92031c63",
+      "revId": "7912f67c6cab811c46d39c9362b0a231c299ece7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

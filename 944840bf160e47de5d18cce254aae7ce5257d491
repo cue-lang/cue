@@ -99,6 +99,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65944592_119e6bd9",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-26T15:53:56Z",
+      "side": 1,
+      "message": "Unprocessed is a const for a state. Clarified.",
+      "parentUuid": "e236d74b_3cc015c0",
+      "range": {
+        "startLine": 230,
+        "startChar": 51,
+        "endLine": 230,
+        "endChar": 62
+      },
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1b3dddf_08d68afd",
@@ -112,6 +136,24 @@
       "writtenOn": "2023-07-26T10:51:19Z",
       "side": 1,
       "message": "does this deserve a TODO? perhaps something like:\n\n    // TODO: for v0.7, use: ...\n\notherwise I would default to assuming it was old code that is now unused and can be deleted, which is probably not the case here.",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc74bed2_d6612f30",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 269,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-26T15:53:56Z",
+      "side": 1,
+      "message": "Removed",
+      "parentUuid": "d1b3dddf_08d68afd",
       "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -133,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2e343b7_08cbf7c3",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1011,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-26T15:53:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1dc0618_634f3852",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9595bd3_c8d4ae5b",
@@ -150,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f61ffec9_dfe9e2e6",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1048,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-26T15:53:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a9595bd3_c8d4ae5b",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cad2bdff_4696960a",
@@ -163,6 +241,24 @@
       "writtenOn": "2023-07-26T10:51:19Z",
       "side": 1,
       "message": "is \"opo\" a typo for \"pop\" here?",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e441ceea_b4bf2ebc",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1992,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-26T15:53:56Z",
+      "side": 1,
+      "message": "Removed as it seems to be a remnant.",
+      "parentUuid": "cad2bdff_4696960a",
       "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

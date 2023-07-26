@@ -52,6 +52,24 @@
       "parentUuid": "5dc956f8_75a250f0",
       "revId": "f4c563924512cf3f4f4e2af61042b4fcf948c17e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6456506_9ff72a71",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2023-07-26T13:37:51Z",
+      "side": 1,
+      "message": "\u003e I couldn\u0027t get this working with /any/ combination of protocol, username, port or host placed inside git config\u0027s url\u0027s insteadOf setting, or the url selector.\n\nSame. I couldn\u0027t get this to work with SSH at all.",
+      "parentUuid": "f0167f47_28378242",
+      "revId": "f4c563924512cf3f4f4e2af61042b4fcf948c17e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

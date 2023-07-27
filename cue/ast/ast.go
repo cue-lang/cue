@@ -394,7 +394,8 @@ type BottomLit struct {
 	expr
 }
 
-// An Ident node represents an left-hand side identifier.
+// An Ident node represents an left-hand side identifier,
+// including the underscore "_" identifier to represent top.
 type Ident struct {
 	NamePos token.Pos // identifier position
 

@@ -34,6 +34,7 @@ func isDigit(ch rune) bool {
 }
 
 // IsValidIdent reports whether str is a valid identifier.
+// Note that the underscore "_" string is considered valid, for top.
 func IsValidIdent(ident string) bool {
 	if ident == "" {
 		return false

@@ -76,6 +76,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c221f611_2718ca4d",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 960,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-27T09:19:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "17dbe709_b8bd217b",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e236d74b_3cc015c0",
@@ -294,6 +312,24 @@
       "side": 1,
       "message": "Correct. It is an artifact of making and reverting a whole bunch of changes. However, it also makes source-level debugging a bit easier.",
       "parentUuid": "07407591_678fc5eb",
+      "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c64456e5_8de36865",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1995,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-27T09:19:02Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b8af2453_6ff73aab",
       "revId": "944840bf160e47de5d18cce254aae7ce5257d491",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

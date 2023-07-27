@@ -127,7 +127,15 @@ type Dependency struct {
 // Recurse visits the dependencies of d.Node, using the same visit function as
 // the original.
 func (d *Dependency) Recurse() {
+	savedAll := d.visitor.all
+	savedTop := d.visitor.top
+	d.visitor.all = d.visitor.recurse
+	d.visitor.top = true
+
 	d.visitor.visit(d.Node, false)
+
+	d.visitor.all = savedAll
+	d.visitor.top = savedTop
 }
 
 // Import returns the import reference or nil if the reference was within

@@ -34,6 +34,24 @@
       "parentUuid": "5d9d5114_a3795ca2",
       "revId": "aa3d23c3f4e6df9f7bf3d7ba64181c70dab38cb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0171b222_273fe766",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-27T22:45:05Z",
+      "side": 1,
+      "message": "We don\u0027t enforce XXX on Gerrit yet, but we plan to: https://github.com/cue-lang/cue/issues/1959",
+      "parentUuid": "6f25ac2b_994fa947",
+      "revId": "aa3d23c3f4e6df9f7bf3d7ba64181c70dab38cb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

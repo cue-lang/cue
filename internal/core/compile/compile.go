@@ -189,6 +189,9 @@ func (c *compiler) insertAlias(id *ast.Ident, a aliasEntry) *adt.Bottom {
 			"alias %q already declared; previous declaration at %s",
 			id.Name, e.source.Pos())
 	}
+	if id.Name == "_" {
+		return c.errf(id, "cannot use _ as alias or let clause")
+	}
 
 	m[id.Name] = a
 	return nil

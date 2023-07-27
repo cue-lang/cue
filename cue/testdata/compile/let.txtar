@@ -56,9 +56,15 @@ issue767: {
 		out: _#volmnts
 	}
 }
+
+disallowTopAsLet: {
+	let _ = 1
+}
 -- out/compile --
 b.let[]: cyclic references in let clause or alias:
     ./in.cue:10:10
+disallowTopAsLet: cannot use _ as alias or let clause:
+    ./in.cue:60:6
 --- in.cue
 {
   a: {
@@ -125,7 +131,12 @@ b.let[]: cyclic references in let clause or alias:
       out: 〈0;let _#volmnts#E〉
     }
   }
+  disallowTopAsLet: {
+    let _ = 1
+  }
 }
 -- out/eval --
 b.let[]: cyclic references in let clause or alias:
     ./in.cue:10:10
+disallowTopAsLet: cannot use _ as alias or let clause:
+    ./in.cue:60:6

@@ -10,7 +10,13 @@ dynamic: t2: {
 	X=(a): 1
 	a: "name"
 }
+
+disallowTopAsAlias: {
+	_=X: 1
+}
 -- out/compile --
+disallowTopAsAlias: cannot use _ as alias or let clause:
+    ./in.cue:14:2
 --- in.cue
 {
   dynamic: {
@@ -27,6 +33,9 @@ dynamic: t2: {
       a: "name"
     }
   }
+  disallowTopAsAlias: {
+    X: 1
+  }
 }
 -- out/eval/stats --
 Leaks:  0
@@ -39,17 +48,5 @@ Unifications: 10
 Conjuncts:    11
 Disjuncts:    10
 -- out/eval --
-(struct){
-  dynamic: (struct){
-    t1: (struct){
-      x: (int){ 1 }
-      a: (string){ "name" }
-      name: (int){ 1 }
-    }
-    t2: (struct){
-      x: (int){ 1 }
-      a: (string){ "name" }
-      name: (int){ 1 }
-    }
-  }
-}
+disallowTopAsAlias: cannot use _ as alias or let clause:
+    ./in.cue:14:2

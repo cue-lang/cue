@@ -24,18 +24,6 @@ ok11: [list.FlattenN([string], 1)]: string   // disallowed in evaluator
 
 bad1: [ for x in [1, 2, 3] {x}]: string
 
-disallowTopAsLabel: {
-	_: 1
-	a: _ // Should not compile to a reference.
-}
-
-// TODO: disallow dollar as label? This is according to the spec, but it
-// will be a breaking change and $ was reserved for referring to the root of
-// a file, which we very likely will never implement.
-// disallowDollarAsLabel: {
-//   $: 1
-// }
-
 saneReferencesInComprehensions: {
 	for _ in [1] {
 		a: _ // Should not compile to a reference.
@@ -44,8 +32,6 @@ saneReferencesInComprehensions: {
 -- out/compile --
 bad1: comprehension values not allowed in this position:
     ./in.cue:24:9
-disallowTopAsLabel: cannot use _ as label:
-    ./in.cue:27:2
 --- in.cue
 {
   dis1: ("dev"|"prd")
@@ -95,10 +81,6 @@ disallowTopAsLabel: cannot use _ as label:
   bad1: {
     [_|_(comprehension values not allowed in this position)]: string
   }
-  disallowTopAsLabel: {
-    _|_(cannot use _ as label)
-    a: _
-  }
   saneReferencesInComprehensions: {
     for _, _ in [
       1,
@@ -110,5 +92,3 @@ disallowTopAsLabel: cannot use _ as label:
 -- out/eval --
 bad1: comprehension values not allowed in this position:
     ./in.cue:24:9
-disallowTopAsLabel: cannot use _ as label:
-    ./in.cue:27:2

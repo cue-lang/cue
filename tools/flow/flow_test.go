@@ -105,7 +105,7 @@ func TestFlow(t *testing.T) {
 var zeroStats stats.Counts
 
 const diffMsg = `
-stats: task totals differens from controller:
+stats: task totals different from controller:
 task totals:
 %v
 

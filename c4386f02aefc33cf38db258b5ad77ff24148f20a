@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68890317_336ad20d",
+        "filename": "cue/testdata/compile/alias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-07-27T17:36:08Z",
+      "side": 1,
+      "message": "Put test be in a different file so that it does not erase the other test results?",
+      "revId": "c4386f02aefc33cf38db258b5ad77ff24148f20a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -75,11 +75,11 @@ Leaks:  3
 Freed:  23
 Reused: 17
 Allocs: 9
-Retain: 57
+Retain: 58
 
 Unifications: 26
-Conjuncts:    48
-Disjuncts:    55
+Conjuncts:    50
+Disjuncts:    56
 -- out/eval --
 Errors:
 out: cannot combine regular field "val" with "b":
@@ -93,9 +93,9 @@ Result:
     //     ./in.cue:33:2
     val: (string){ "b" }
   }
-  multiLets: (_|_){
-    // [cycle] multiLets: circular dependency in evaluation of conditionals: val changed after evaluation:
-    //     ./in.cue:23:7
+  multiLets: (string){
+    "b"
+    let val#1multi = 〈2;k〉
   }
   keys: (#list){
     0: (string){ "a" }
@@ -106,9 +106,8 @@ Result:
     c: (string){ "foo" }
   }
   full: (struct){
-    out: (_|_){
-      // [cycle] full.out: circular dependency in evaluation of conditionals: (val & string) changed after evaluation:
-      //     ./in.cue:54:25
+    out: (struct){
+      let val#2multi = 〈4;values〉[〈2;k〉]
       role: (string){ "member" }
     }
     #github_team_membership: (#struct){

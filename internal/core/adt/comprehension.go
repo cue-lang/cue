@@ -203,7 +203,8 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
+				n.node.state.insertFieldUnchecked(f.Label, ArcMember, conjunct)
+
 				fields = append(fields, f)
 
 			default:

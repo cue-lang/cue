@@ -102,13 +102,13 @@ clusters: foo: {}
 -- out/eval/stats --
 Leaks:  1
 Freed:  99
-Reused: 76
-Allocs: 24
-Retain: 80
+Reused: 80
+Allocs: 20
+Retain: 64
 
 Unifications: 100
 Conjuncts:    260
-Disjuncts:    166
+Disjuncts:    151
 -- out/eval --
 (struct){
   shorewallParams: (#struct){

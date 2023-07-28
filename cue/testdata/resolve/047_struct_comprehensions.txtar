@@ -80,9 +80,9 @@ reg: 4
 -- out/eval/stats --
 Leaks:  2
 Freed:  12
-Reused: 6
-Allocs: 8
-Retain: 3
+Reused: 7
+Allocs: 7
+Retain: 2
 
 Unifications: 10
 Conjuncts:    19

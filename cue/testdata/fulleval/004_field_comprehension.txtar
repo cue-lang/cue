@@ -92,12 +92,12 @@ c:
 -- out/eval/stats --
 Leaks:  0
 Freed:  12
-Reused: 4
-Allocs: 8
-Retain: 16
+Reused: 5
+Allocs: 7
+Retain: 12
 
 Unifications: 12
-Conjuncts:    16
+Conjuncts:    17
 Disjuncts:    16
 -- out/eval --
 (struct){

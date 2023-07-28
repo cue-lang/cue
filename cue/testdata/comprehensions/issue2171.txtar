@@ -25,11 +25,11 @@ Leaks:  0
 Freed:  3
 Reused: 0
 Allocs: 3
-Retain: 2
+Retain: 0
 
 Unifications: 3
 Conjuncts:    5
-Disjuncts:    5
+Disjuncts:    3
 -- out/eval --
 (struct){
   do: (struct){

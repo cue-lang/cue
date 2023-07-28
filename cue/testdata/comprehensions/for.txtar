@@ -13,13 +13,13 @@ comprehensionBinds: {
 	b: {for _, _ in [1] {a: _}}
 }
 -- out/eval/stats --
-Leaks:  4
+Leaks:  2
 Freed:  16
 Reused: 12
-Allocs: 8
-Retain: 11
+Allocs: 6
+Retain: 7
 
-Unifications: 20
+Unifications: 18
 Conjuncts:    18
 Disjuncts:    21
 -- out/eval --

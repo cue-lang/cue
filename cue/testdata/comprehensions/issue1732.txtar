@@ -122,15 +122,15 @@ foo: {
 	}
 }
 -- out/eval/stats --
-Leaks:  4
+Leaks:  3
 Freed:  118
 Reused: 103
-Allocs: 19
-Retain: 14
+Allocs: 18
+Retain: 10
 
-Unifications: 112
+Unifications: 111
 Conjuncts:    249
-Disjuncts:    128
+Disjuncts:    126
 -- out/eval --
 (struct){
   networkingv1: (struct){

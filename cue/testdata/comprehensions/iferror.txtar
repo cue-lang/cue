@@ -151,10 +151,10 @@ Leaks:  0
 Freed:  43
 Reused: 35
 Allocs: 8
-Retain: 18
+Retain: 14
 
 Unifications: 33
-Conjuncts:    65
+Conjuncts:    66
 Disjuncts:    57
 -- out/eval --
 Errors:

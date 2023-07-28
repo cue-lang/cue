@@ -107,11 +107,11 @@ Leaks:  10
 Freed:  18
 Reused: 15
 Allocs: 13
-Retain: 15
+Retain: 10
 
 Unifications: 28
 Conjuncts:    43
-Disjuncts:    33
+Disjuncts:    28
 -- out/eval --
 Errors:
 #E.f3: field not allowed:

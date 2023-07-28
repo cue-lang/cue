@@ -121,11 +121,11 @@ Leaks:  15
 Freed:  26
 Reused: 23
 Allocs: 18
-Retain: 42
+Retain: 20
 
 Unifications: 41
 Conjuncts:    75
-Disjuncts:    67
+Disjuncts:    45
 -- out/eval --
 Errors:
 e0: incompatible list lengths (1 and 2)

@@ -40,15 +40,15 @@ p2: {
 }
 
 -- out/eval/stats --
-Leaks:  37
-Freed:  152
-Reused: 145
-Allocs: 44
-Retain: 77
+Leaks:  18
+Freed:  171
+Reused: 163
+Allocs: 26
+Retain: 18
 
 Unifications: 173
 Conjuncts:    557
-Disjuncts:    206
+Disjuncts:    189
 -- out/eval --
 (struct){
   p1: (struct){

@@ -61,13 +61,13 @@ nested: {
 		(3 | 4 | *( 5 | 6 | *7)) & ( 3 | 4 | ( *7 | 8 )))
 }
 -- out/eval/stats --
-Leaks:  2
+Leaks:  1
 Freed:  416
 Reused: 381
-Allocs: 37
-Retain: 2
+Allocs: 36
+Retain: 1
 
-Unifications: 258
+Unifications: 257
 Conjuncts:    478
 Disjuncts:    417
 -- out/eval --

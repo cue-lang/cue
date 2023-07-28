@@ -28,6 +28,8 @@ linuxMachine:   "ubuntu-22.04"
 macosMachine:   "macos-11"
 windowsMachine: "windows-2022"
 
+previousStableGo: "1.19.x"
+
 // Use the latest Go version for extra checks,
 // such as running tests with the data race detector.
 latestStableGo: "1.20.x"
@@ -35,7 +37,7 @@ latestStableGo: "1.20.x"
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.20.5"
+pinnedReleaseGo: "1.20.6"
 
 goreleaserVersion: "v1.18.2"
 

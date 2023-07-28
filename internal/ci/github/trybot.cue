@@ -90,7 +90,7 @@ workflows: trybot: _repo.bashWorkflow & {
 	_testStrategy: {
 		"fail-fast": false
 		matrix: {
-			"go-version": ["1.19.x", _repo.latestStableGo]
+			"go-version": [_repo.previousStableGo, _repo.latestStableGo]
 			runner: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
 		}
 	}

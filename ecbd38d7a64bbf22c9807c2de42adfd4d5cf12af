@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcfa9092_615d305b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-28T13:48:50Z",
+      "side": 1,
+      "message": "I think I agree with using a separate module. go-git as a dependency will never be a thing in the main module, and this little tool doesn\u0027t have a reason to be part of the main module either.\n\nI would perhaps be a bit more nitpicky about the var names if this were part of the main module, but since it\u0027s not, I think it\u0027s okay to not pay too much attention :) The \"try\" approach also seems fine in that case.",
+      "revId": "ecbd38d7a64bbf22c9807c2de42adfd4d5cf12af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75b89fb5_dcdc806f",
+        "filename": "internal/cuegit/cuegit.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-28T13:48:50Z",
+      "side": 1,
+      "message": "perhaps clarify that this command works on staged changes, not unstaged ones. the rest of the code mentions this, but not the docs.",
+      "revId": "ecbd38d7a64bbf22c9807c2de42adfd4d5cf12af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "294f4d69_0d0eeabb",
+        "filename": "internal/cuegit/cuegit.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-28T13:48:50Z",
+      "side": 1,
+      "message": "are we sure that file paths in the git worktree can\u0027t use backslashes on windows? because if so, you might need path/filepath.Ext.",
+      "revId": "ecbd38d7a64bbf22c9807c2de42adfd4d5cf12af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

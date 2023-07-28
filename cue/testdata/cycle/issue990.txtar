@@ -232,6 +232,7 @@ Disjuncts:    1919
     }
     dict: (#struct){
     }
+    let subs#1 = (_){ _ }
   }
   _test: (struct){
     c1: (#struct){
@@ -502,6 +503,7 @@ Disjuncts:    1919
             }
           }
         }
+        let subs#1 = (_){ _ }
       }
     }
   }

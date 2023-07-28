@@ -208,14 +208,14 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/eval/stats --
-Leaks:  72
+Leaks:  70
 Freed:  1815
 Reused: 1801
-Allocs: 86
-Retain: 195
+Allocs: 84
+Retain: 185
 
-Unifications: 802
-Conjuncts:    3177
+Unifications: 800
+Conjuncts:    3175
 Disjuncts:    1974
 -- out/eval --
 (struct){

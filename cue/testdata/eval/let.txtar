@@ -159,14 +159,14 @@ keepDescending: t2: {
 }
 
 -- out/eval/stats --
-Leaks:  45
+Leaks:  43
 Freed:  161
 Reused: 152
-Allocs: 54
-Retain: 230
+Allocs: 52
+Retain: 202
 
-Unifications: 192
-Conjuncts:    365
+Unifications: 190
+Conjuncts:    377
 Disjuncts:    246
 -- out/eval --
 Errors:

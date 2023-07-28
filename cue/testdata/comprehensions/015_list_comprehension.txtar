@@ -83,12 +83,12 @@ d:
 -- out/eval/stats --
 Leaks:  0
 Freed:  19
-Reused: 11
-Allocs: 8
-Retain: 14
+Reused: 12
+Allocs: 7
+Retain: 10
 
 Unifications: 19
-Conjuncts:    35
+Conjuncts:    36
 Disjuncts:    23
 -- out/eval --
 (struct){

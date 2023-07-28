@@ -303,16 +303,22 @@ selfReferential: fail: {
 	}
 }
 
--- out/eval/stats --
-Leaks:  48
-Freed:  1268
-Reused: 1256
-Allocs: 60
-Retain: 189
+// avoid infinite recursion
+issue2367: {
+	a: _
+	for x in [a] {a: x}
+}
 
-Unifications: 828
-Conjuncts:    2512
-Disjuncts:    1437
+-- out/eval/stats --
+Leaks:  50
+Freed:  1270
+Reused: 1260
+Allocs: 60
+Retain: 145
+
+Unifications: 832
+Conjuncts:    2525
+Disjuncts:    1404
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
@@ -709,6 +715,9 @@ Result:
         }
       }
     }
+  }
+  issue2367: (struct){
+    a: (_){ _ }
   }
 }
 -- out/compile --
@@ -1192,6 +1201,14 @@ Result:
       a: {}
       b: (〈0;a〉.x != "")
       if 〈0;b〉 {}
+    }
+  }
+  issue2367: {
+    a: _
+    for _, x in [
+      〈1;a〉,
+    ] {
+      a: 〈1;x〉
     }
   }
 }

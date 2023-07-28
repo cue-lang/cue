@@ -1878,7 +1878,6 @@ func (x *ForClause) yield(s *compState) {
 			}
 		}
 
-		c.unify(a, partial)
 		if !a.definitelyExists() {
 			continue
 		}

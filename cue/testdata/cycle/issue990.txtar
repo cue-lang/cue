@@ -177,11 +177,11 @@ Leaks:  0
 Freed:  1907
 Reused: 1882
 Allocs: 25
-Retain: 14
+Retain: 12
 
 Unifications: 1541
 Conjuncts:    6931
-Disjuncts:    1921
+Disjuncts:    1919
 -- out/eval --
 (struct){
   #AC: (#struct){

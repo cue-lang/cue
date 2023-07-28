@@ -31,13 +31,13 @@ a: 2
   }
 }
 -- out/eval/stats --
-Leaks:  2
+Leaks:  1
 Freed:  8
 Reused: 3
-Allocs: 7
-Retain: 2
+Allocs: 6
+Retain: 1
 
-Unifications: 6
+Unifications: 5
 Conjuncts:    12
 Disjuncts:    9
 -- out/eval --

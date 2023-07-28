@@ -138,13 +138,13 @@ service:
 -- out/eval/stats --
 Leaks:  0
 Freed:  51
-Reused: 41
-Allocs: 10
-Retain: 7
+Reused: 43
+Allocs: 8
+Retain: 4
 
 Unifications: 27
 Conjuncts:    70
-Disjuncts:    58
+Disjuncts:    55
 -- out/eval --
 (struct){
   result: (#list){

@@ -44,18 +44,18 @@ conflictRangingOverSelf: {
 	}
 }
 -- out/eval/stats --
-Leaks:  4
-Freed:  27
-Reused: 23
-Allocs: 8
-Retain: 6
+Leaks:  1
+Freed:  28
+Reused: 22
+Allocs: 7
+Retain: 1
 
-Unifications: 21
+Unifications: 19
 Conjuncts:    40
-Disjuncts:    30
+Disjuncts:    29
 -- out/eval --
 Errors:
-conflictRangingOverSelf.x: conflicting values int and "age" (mismatched types int and string):
+conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
     ./in.cue:36:9
     ./in.cue:40:3
     ./in.cue:41:9
@@ -102,7 +102,7 @@ Result:
       // [eval]
       name: (string){ "name" }
       age: (_|_){
-        // [eval] conflictRangingOverSelf.x: conflicting values int and "age" (mismatched types int and string):
+        // [eval] conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):
         //     ./in.cue:36:9
         //     ./in.cue:40:3
         //     ./in.cue:41:9

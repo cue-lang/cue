@@ -81,10 +81,16 @@ Unifications: 26
 Conjuncts:    48
 Disjuncts:    55
 -- out/eval --
-(struct){
+Errors:
+out: cannot combine regular field "val" with "b":
+    ./in.cue:33:2
+
+Result:
+(_|_){
+  // [eval]
   out: (_|_){
-    // [cycle] out: circular dependency in evaluation of conditionals: val changed after evaluation:
-    //     ./in.cue:8:7
+    // [eval] out: cannot combine regular field "val" with "b":
+    //     ./in.cue:33:2
     val: (string){ "b" }
   }
   multiLets: (_|_){

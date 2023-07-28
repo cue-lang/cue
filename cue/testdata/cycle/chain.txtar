@@ -427,7 +427,10 @@ Disjuncts:    1974
         #func: (#struct){
           #in: (_){ _ }
           #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-          out: (int){ 1 }
+          out: (int){
+            1
+            let depths#1 = (_){ _ }
+          }
         }
       }
       #Depth: (#struct){
@@ -437,7 +440,10 @@ Disjuncts:    1974
           #func: (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
         }
         #funcs: (#struct){
@@ -445,62 +451,98 @@ Disjuncts:    1974
           "0": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "1": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "2": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "3": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "4": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "5": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "6": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "7": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "8": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "9": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "10": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
         }
         #in: (_){ _ }
         #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-        out: (int){ 1 }
+        out: (int){
+          1
+          let depths#1 = (_){ _ }
+        }
       }
       tree: (struct){
         a: (struct){
@@ -522,7 +564,10 @@ Disjuncts:    1974
           #func: (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
         }
         #funcs: (#struct){
@@ -531,17 +576,26 @@ Disjuncts:    1974
           "1": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "2": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
           "3": (#struct){
             #in: (_){ _ }
             #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-            out: (int){ 1 }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
         }
         #in: (#struct){

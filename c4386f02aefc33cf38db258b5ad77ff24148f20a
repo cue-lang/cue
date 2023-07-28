@@ -16,6 +16,24 @@
       "message": "Put test be in a different file so that it does not erase the other test results?",
       "revId": "c4386f02aefc33cf38db258b5ad77ff24148f20a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe1b0918_2683a7eb",
+        "filename": "cue/testdata/compile/alias.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-28T09:39:38Z",
+      "side": 1,
+      "message": "Done, PTAL. I thought the same, but I was following what was done for disallowTopAsLabel. I\u0027ve moved all of them under a new `err_top.txtar` file.",
+      "parentUuid": "68890317_336ad20d",
+      "revId": "c4386f02aefc33cf38db258b5ad77ff24148f20a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

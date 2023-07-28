@@ -814,10 +814,12 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 			k++
 
 			switch {
-			case !wasVoid, !a.Label.IsString():
+			case a.ArcType > ArcRequired, !a.Label.IsString():
 			case n.kind&StructKind == 0:
-				n.reportFieldMismatch(pos(a.Value()), nil, a.Label, n.node.Value())
-
+				if !n.node.IsErr() {
+					n.reportFieldMismatch(pos(a.Value()), nil, a.Label, n.node.Value())
+				}
+			case !wasVoid:
 			case n.kind == TopKind:
 				// Theoretically it may be possible that a "void" arc references
 				// this top value where it really should have been a struct. One

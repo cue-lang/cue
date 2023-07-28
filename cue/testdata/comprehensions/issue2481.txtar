@@ -1,0 +1,169 @@
+
+-- in.cue --
+// Mixing struct fields and embedded scalars should error. Using comprehensions
+// this follows a different path which may miss the error.
+// TODO: fix
+out: {
+	for k in keys {
+		if values[k] != _|_  {
+			val: k
+			if val != _|_ {
+				k
+			}
+		}
+	}
+}
+
+// multiple lets are mapped to the same location and will conflict. This is
+// fine, though, as lets do not represent a single data field. This should
+// therefore not error.
+// TODO: fix
+multiLets: {
+	for k in keys {
+		if values[k] != _|_  {
+			let val = k
+			if val != _|_ {
+				k
+			}
+		}
+	}
+}
+
+keys: [
+	// order matters
+	"a",
+	"b",
+]
+
+values: {
+	// order does not matter
+	"b": "member"
+	"c": "foo"
+}
+
+full: {
+	out: {
+
+		// changing this to a list of the keys "fixes" things, i.e. this comprehension is required
+		for k, _ in #github_team_membership {
+	
+			// Remove this comprehension to trigger a different type of cycle error
+			if ( values[k] != _|_ ) {
+	
+				// This let is also required
+				let val = values[k]
+	
+				if val != null && ((val & string) != _|_) {
+					(k): val
+				}
+			}
+		}
+	}
+
+	#github_team_membership: {
+		team_id: string
+		role:    string
+	}
+	
+	values: {
+		"role":     "member"
+		"username": "foo"
+	}
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  23
+Reused: 17
+Allocs: 9
+Retain: 57
+
+Unifications: 26
+Conjuncts:    48
+Disjuncts:    55
+-- out/eval --
+(struct){
+  out: (_|_){
+    // [cycle] out: circular dependency in evaluation of conditionals: val changed after evaluation:
+    //     ./in.cue:8:7
+    val: (string){ "b" }
+  }
+  multiLets: (_|_){
+    // [cycle] multiLets: circular dependency in evaluation of conditionals: val changed after evaluation:
+    //     ./in.cue:23:7
+  }
+  keys: (#list){
+    0: (string){ "a" }
+    1: (string){ "b" }
+  }
+  values: (struct){
+    b: (string){ "member" }
+    c: (string){ "foo" }
+  }
+  full: (struct){
+    out: (_|_){
+      // [cycle] full.out: circular dependency in evaluation of conditionals: (val & string) changed after evaluation:
+      //     ./in.cue:54:25
+      role: (string){ "member" }
+    }
+    #github_team_membership: (#struct){
+      team_id: (string){ string }
+      role: (string){ string }
+    }
+    values: (struct){
+      role: (string){ "member" }
+      username: (string){ "foo" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  out: {
+    for _, k in 〈1;keys〉 {
+      if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
+        val: 〈2;k〉
+        if (〈0;val〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈3;k〉
+        }
+      }
+    }
+  }
+  multiLets: {
+    for _, k in 〈1;keys〉 {
+      if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
+        let val#1multi = 〈2;k〉
+        if (〈0;let val#1〉 != _|_(explicit error (_|_ literal) in source)) {
+          〈3;k〉
+        }
+      }
+    }
+  }
+  keys: [
+    "a",
+    "b",
+  ]
+  values: {
+    b: "member"
+    c: "foo"
+  }
+  full: {
+    out: {
+      for k, _ in 〈1;#github_team_membership〉 {
+        if (〈3;values〉[〈1;k〉] != _|_(explicit error (_|_ literal) in source)) {
+          let val#2multi = 〈4;values〉[〈2;k〉]
+          if ((〈0;let val#2〉 != null) && ((〈0;let val#2〉 & string) != _|_(explicit error (_|_ literal) in source))) {
+            〈3;k〉: 〈1;let val#2〉
+          }
+        }
+      }
+    }
+    #github_team_membership: {
+      team_id: string
+      role: string
+    }
+    values: {
+      role: "member"
+      username: "foo"
+    }
+  }
+}

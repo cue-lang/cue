@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c839783e_bc405b39",
+        "filename": "cue/testdata/comprehensions/issue2481.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-31T10:34:32Z",
+      "side": 1,
+      "message": "FYI, trailing whitespace",
+      "revId": "8b9f58561dde15d61f83c210e4ed501e00f93f51",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

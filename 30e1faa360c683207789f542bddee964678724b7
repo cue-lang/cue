@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "430bb686_0cdf915a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-07-31T12:10:34Z",
+      "side": 1,
+      "message": "can you expand on this? without any context this is confusing, since 2218 was closed months ago. do you mean that the bug had re-appeared and you fixed it once again? if so, perhaps clarify what the testdata change for it is.",
+      "revId": "30e1faa360c683207789f542bddee964678724b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

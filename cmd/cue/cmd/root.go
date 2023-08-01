@@ -191,6 +191,9 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	subCommands = append(subCommands, newHelpTopics(c)...)
 
 	addGlobalFlags(cmd.PersistentFlags())
+	// We add the injection flags to the root command for the sake of the short form "cue -t foo=bar mycmd".
+	// Note that they are not persistent, so that they aren't inherited by sub-commands like "cue fmt".
+	addInjectionFlags(cmd.Flags(), false, true)
 
 	for _, sub := range subCommands {
 		cmd.AddCommand(sub)

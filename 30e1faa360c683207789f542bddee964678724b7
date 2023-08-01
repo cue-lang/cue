@@ -52,6 +52,24 @@
       "parentUuid": "dcc30dd6_f2f96f52",
       "revId": "30e1faa360c683207789f542bddee964678724b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2849c1d_c493ccf7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-01T09:31:41Z",
+      "side": 1,
+      "message": "clearer this way :) SGTM",
+      "parentUuid": "73e9fe93_59a4919b",
+      "revId": "30e1faa360c683207789f542bddee964678724b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -742,15 +742,15 @@ unifyDynamicReflectSuccess: {
 }
 
 -- out/eval/stats --
-Leaks:  14
+Leaks:  15
 Freed:  394
-Reused: 387
+Reused: 388
 Allocs: 21
-Retain: 107
+Retain: 108
 
-Unifications: 394
-Conjuncts:    638
-Disjuncts:    471
+Unifications: 395
+Conjuncts:    640
+Disjuncts:    472
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:
@@ -1344,7 +1344,7 @@ Result:
       y: (int){ 1 }
     }
     a: (struct){
-      let x#1 = (int){ 1 }
+      let x#1multi = 〈1;v〉
     }
   }
   nestedWithEmbeddingOK: (struct){

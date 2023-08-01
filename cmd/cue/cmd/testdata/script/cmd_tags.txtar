@@ -1,6 +1,19 @@
 exec cue cmd -t prod -t name=bar tag tags.cue tags_tool.cue
 cmp stdout expect-stdout
 
+# Same as before, but now with the short form.
+# See https://cuelang.org/issue/2510.
+exec cue -t prod -t name=bar tag tags.cue tags_tool.cue
+cmp stdout expect-stdout
+
+# Verify that the new global -t flag added as a fix for issue 2510 above
+# only works with the commands we expect it to.
+exec cue eval -t name=bar tags.cue
+stdout 'name: *"bar"'
+exec cue -t name=bar eval tags.cue
+stdout 'name: *"bar"'
+! exec cue fmt -t name=bar tags.cue
+
 -- expect-stdout --
 prod: bar
 -- tags.cue --

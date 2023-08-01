@@ -181,7 +181,7 @@ Run "cue help commands" for more details on tasks and commands.
 
 	cmd.Flags().SetInterspersed(false)
 
-	addInjectionFlags(cmd.Flags(), true)
+	addInjectionFlags(cmd.Flags(), true, false)
 
 	return cmd
 }

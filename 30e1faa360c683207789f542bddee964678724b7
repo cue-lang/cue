@@ -34,6 +34,24 @@
       "parentUuid": "430bb686_0cdf915a",
       "revId": "30e1faa360c683207789f542bddee964678724b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73e9fe93_59a4919b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-01T09:29:40Z",
+      "side": 1,
+      "message": "Removed comment and addressed in separate CL.",
+      "parentUuid": "dcc30dd6_f2f96f52",
+      "revId": "30e1faa360c683207789f542bddee964678724b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cc7ab1c_942f1b75",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-01T13:33:35Z",
+      "side": 1,
+      "message": "Merging since we want this in for the RC and you appear offline :)",
+      "revId": "912bc6bfc7233c2f7c03bca985b0edd4ce340c97",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

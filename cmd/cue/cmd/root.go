@@ -191,6 +191,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	subCommands = append(subCommands, newHelpTopics(c)...)
 
 	addGlobalFlags(cmd.PersistentFlags())
+	addInjectionFlags(cmd.Flags(), false, true)
 
 	for _, sub := range subCommands {
 		cmd.AddCommand(sub)

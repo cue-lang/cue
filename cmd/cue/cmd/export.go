@@ -94,7 +94,7 @@ yaml    output as YAML
 
 	addOutFlags(cmd.Flags(), true)
 	addOrphanFlags(cmd.Flags())
-	addInjectionFlags(cmd.Flags(), false)
+	addInjectionFlags(cmd.Flags(), false, false)
 
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "export this expression only")

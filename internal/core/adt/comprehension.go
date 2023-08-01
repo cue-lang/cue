@@ -203,7 +203,8 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcMember, conjunct)
+				arc := n.node.state.insertFieldUnchecked(f.Label, ArcMember, conjunct)
+				arc.MultiLet = f.IsMulti
 
 				fields = append(fields, f)
 

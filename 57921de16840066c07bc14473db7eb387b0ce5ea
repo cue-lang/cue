@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a948a1b2_dc7ca5e5",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-02T14:28:17Z",
+      "side": 1,
+      "message": "setTags already has a TODO explaining this; I\u0027ve expanded the comment there with more context. I don\u0027t think duplicating this in both call sites is worthwhile.",
+      "parentUuid": "b3435c79_90a92468",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26f9ff0c_f8e8be09",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-08-02T13:56:27Z",
       "side": 1,
       "message": "likewise",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c33cc92_1079f72d",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-02T14:28:17Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "26f9ff0c_f8e8be09",
       "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ec00ede_754feb31",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-02T14:28:17Z",
+      "side": 1,
+      "message": "I thought exactly the same, and in general I agree, but in this case this is double-flag shenanigans is a hack that we will remove sooner than later - undoing this second boolean parameter. so I\u0027d rather not add extra noise when we\u0027ll most likely go back to a single boolean.\n\nSee: https://github.com/cue-lang/cue/issues/2519",
+      "parentUuid": "7ba93c6c_c05f421d",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9dfaa59f_cf2d57c0",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-08-02T13:56:27Z",
       "side": 1,
       "message": "Maybe mention why we need to add the injection flags here?",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "34fec746_7df09522",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-02T14:28:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dfaa59f_cf2d57c0",
       "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

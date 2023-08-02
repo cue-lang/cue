@@ -34,6 +34,24 @@
       "parentUuid": "6a37c0c1_315dfabc",
       "revId": "c1529c0835b1a1075100e1bf4c1b77860d07fb64",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce9bfa0f_1da4e0eb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-02T13:40:25Z",
+      "side": 1,
+      "message": "Fixed now. After wrestling with the cobra API for a while, I found how to register these top-level flags in a way that they aren\u0027t inherited by all sub-commands.",
+      "parentUuid": "5f75f6af_b3895f6c",
+      "revId": "c1529c0835b1a1075100e1bf4c1b77860d07fb64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "I\u0027ll leave this to Rog to review (given he reviewed the previous CL) but one thing I\u0027m not clear on is whether it makes sense to have -t be a global flag. Whilst hidden, it\u0027s no longer an error to use -t with fmt, for example:\n\n```\nexec cue eval -t asdf\u003dasdf x.cue\ncmp stdout eval.golden\n\n! exec cue fmt -t asdf\u003dasdf x.cue\n\n-- x.cue --\nx: string @tag(asdf)\n-- eval.golden --\nx: \"asdf\"\n```",
       "revId": "c1529c0835b1a1075100e1bf4c1b77860d07fb64",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f75f6af_b3895f6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-02T10:11:01Z",
+      "side": 1,
+      "message": "It\u0027s a bit awkward for sure, though the previous code and its slowness was even more awkward for sure.\n\nI\u0027ll look at whether we can easily plug this gap.",
+      "parentUuid": "6a37c0c1_315dfabc",
+      "revId": "c1529c0835b1a1075100e1bf4c1b77860d07fb64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

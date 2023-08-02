@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8bef1791_de733a7e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-02T13:56:27Z",
+      "side": 1,
+      "message": "LGTM modulo a few minor suggestions, thanks!",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3435c79_90a92468",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 403,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-02T13:56:27Z",
+      "side": 1,
+      "message": "A comment explaining why we need to pass parent flags too might be useful for future reference.",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26f9ff0c_f8e8be09",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 775,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-02T13:56:27Z",
+      "side": 1,
+      "message": "likewise",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ba93c6c_c05f421d",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-02T13:56:27Z",
+      "side": 1,
+      "message": "minor nit: the multiple bools don\u0027t make it easy to see what\u0027s going on at the call site. maybe consider something like:\n```\ntype injectFlagsOpts int\nconst (\n    injectAuto injectFlagsOpts \u003d 1\u003c\u003ciota\n    injectHidden\n)\n```\n?",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dfaa59f_cf2d57c0",
+        "filename": "cmd/cue/cmd/root.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-02T13:56:27Z",
+      "side": 1,
+      "message": "Maybe mention why we need to add the injection flags here?",
+      "revId": "57921de16840066c07bc14473db7eb387b0ce5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

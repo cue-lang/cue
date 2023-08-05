@@ -77,7 +77,7 @@ func getLang() language.Tag {
 	if loc == "" {
 		loc = os.Getenv("LANG")
 	}
-	loc = strings.Split(loc, ".")[0]
+	loc, _, _ = strings.Cut(loc, ".")
 	return language.Make(loc)
 }
 

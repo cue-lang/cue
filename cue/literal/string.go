@@ -154,7 +154,6 @@ func (q QuoteInfo) Unquote(s string) (string, error) {
 		}
 	}
 
-	var runeTmp [utf8.UTFMax]byte
 	buf := make([]byte, 0, 3*len(s)/2) // Try to avoid more allocations.
 	stripNL := false
 	wasEscapedNewline := false
@@ -220,11 +219,10 @@ func (q QuoteInfo) Unquote(s string) (string, error) {
 		}
 		stripNL = false
 		wasEscapedNewline = false
-		if c < utf8.RuneSelf || !multibyte {
+		if !multibyte {
 			buf = append(buf, byte(c))
 		} else {
-			n := utf8.EncodeRune(runeTmp[:], c)
-			buf = append(buf, runeTmp[:n]...)
+			buf = utf8.AppendRune(buf, c)
 		}
 	}
 	// allow unmatched quotes if already checked.

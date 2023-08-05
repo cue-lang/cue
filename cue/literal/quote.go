@@ -223,7 +223,6 @@ func (f Form) appendEscaped(buf []byte, s string) []byte {
 }
 
 func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
-	var runeTmp [utf8.UTFMax]byte
 	if (!f.multiline && r == rune(f.quote)) || r == '\\' { // always backslashed
 		buf = f.appendEscape(buf)
 		buf = append(buf, byte(r))
@@ -235,8 +234,7 @@ func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
 			return buf
 		}
 	} else if strconv.IsPrint(r) || f.graphicOnly && isInGraphicList(r) {
-		n := utf8.EncodeRune(runeTmp[:], r)
-		buf = append(buf, runeTmp[:n]...)
+		buf = utf8.AppendRune(buf, r)
 		return buf
 	}
 	buf = f.appendEscape(buf)

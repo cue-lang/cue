@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9b796ec_33a3855e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-05T23:21:39Z",
+      "side": 1,
+      "message": "OK, now I see why we didn\u0027t reuse identifiers: toValue is a fairly simple AST to constant value converter, and it doesn\u0027t handle references.\n\nThis can be fixed via go/types, but not urgent. The other two CLs can be merged first, as those _are_ pretty urgent to fix the constant.",
+      "revId": "3c0b2520986bb4bd1429fdb23889f0f0b2cef614",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

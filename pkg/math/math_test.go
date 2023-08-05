@@ -15,11 +15,46 @@
 package math_test
 
 import (
+	"fmt"
 	"testing"
 
 	"cuelang.org/go/pkg/internal/builtintest"
+	"cuelang.org/go/pkg/math"
 )
 
 func TestBuiltin(t *testing.T) {
 	builtintest.Run("math", t)
+}
+
+func Example_constants() {
+	show := func(name string, value any) {
+		fmt.Printf("% 7s: %v\n", name, value)
+	}
+
+	show("E", math.E)
+	show("Pi", math.Pi)
+	show("Phi", math.Phi)
+
+	show("Sqrt2", math.Sqrt2)
+	show("SqrtE", math.SqrtE)
+	show("SqrtPi", math.SqrtPi)
+	show("SqrtPhi", math.SqrtPhi)
+
+	show("Ln2", math.Ln2)
+	show("Log2E", math.Log2E)
+	show("Ln10", math.Ln10)
+	show("Log10E", math.Log10E)
+
+	// Output:
+	//       E: 2.718281828459045
+	//      Pi: 3.141592653589793
+	//     Phi: 1.618033988749895
+	//   Sqrt2: 1.4142135623730951
+	//   SqrtE: 1.6487212707001282
+	//  SqrtPi: 1.772453850905516
+	// SqrtPhi: 1.272019649514069
+	//     Ln2: 0.6931471805599453
+	//   Log2E: 1
+	//    Ln10: 2.302585092994046
+	//  Log10E: 0
 }

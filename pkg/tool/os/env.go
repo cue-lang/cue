@@ -98,11 +98,7 @@ func (c *environCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	update := map[string]interface{}{}
 
 	for _, kv := range os.Environ() {
-		a := strings.SplitN(kv, "=", 2)
-
-		name := a[0]
-		str := a[1]
-
+		name, str, _ := strings.Cut(kv, "=")
 		if v := ctx.Obj.Lookup(name); v.Exists() {
 			update[name], err = fromString(name, str, v)
 			if err != nil {

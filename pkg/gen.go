@@ -29,7 +29,6 @@ import (
 	"flag"
 	"fmt"
 	"go/ast"
-	gobuild "go/build"
 	"go/constant"
 	"go/format"
 	"go/parser"
@@ -43,6 +42,8 @@ import (
 	"strings"
 	"text/template"
 
+	"golang.org/x/tools/go/packages"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -55,8 +56,6 @@ const genFile = "pkg.go"
 
 //go:embed packages.txt
 var packagesStr string
-
-var packages = strings.Fields(packagesStr)
 
 type headerParams struct {
 	GoPkg  string
@@ -89,12 +88,15 @@ var _ = adt.TopKind // in case the adt package isn't used
 {{end}}
 `))
 
+const pkgParent = "cuelang.org/go/pkg"
+
 func main() {
 	flag.Parse()
 	log.SetFlags(log.Lshortfile)
 	log.SetOutput(os.Stdout)
 
-	for _, pkg := range packages {
+	var packagesList []string
+	for _, pkg := range strings.Fields(packagesStr) {
 		if pkg == "path" {
 			// TODO remove this special case. Currently the path
 			// pkg.go file cannot be generated automatically but that
@@ -102,6 +104,19 @@ func main() {
 			// to builtin functions.
 			continue
 		}
+		packagesList = append(packagesList, path.Join(pkgParent, pkg))
+	}
+
+	cfg := &packages.Config{Mode: packages.NeedName | packages.NeedFiles}
+	pkgs, err := packages.Load(cfg, packagesList...)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "load: %v\n", err)
+		os.Exit(1)
+	}
+	if packages.PrintErrors(pkgs) > 0 {
+		os.Exit(1)
+	}
+	for _, pkg := range pkgs {
 		if err := generate(pkg); err != nil {
 			log.Fatalf("%s: %v", pkg, err)
 		}
@@ -116,23 +131,23 @@ type generator struct {
 	first      bool
 }
 
-func generate(cuePkgPath string) error {
-	goPkgPath := path.Join("cuelang.org/go/pkg", cuePkgPath)
-	pkg, err := gobuild.Import(goPkgPath, "", 0)
-	if err != nil {
-		return err
-	}
-
+func generate(pkg *packages.Package) error {
+	// go/packages supports multiple build system, including some which don't keep
+	// a Go package entirely within a single directory.
+	// However, we know for certain that CUE uses modules, so it is the case here.
+	// We can figure out the directory from the first Go file.
+	pkgDir := filepath.Dir(pkg.GoFiles[0])
+	cuePkg := strings.TrimPrefix(pkg.PkgPath, pkgParent+"/")
 	g := generator{
-		dir:        pkg.Dir,
-		cuePkgPath: cuePkgPath,
+		dir:        pkgDir,
+		cuePkgPath: cuePkg,
 		w:          &bytes.Buffer{},
 		fset:       token.NewFileSet(),
 	}
 
 	params := headerParams{
 		GoPkg:  pkg.Name,
-		CUEPkg: cuePkgPath,
+		CUEPkg: cuePkg,
 	}
 	// As a special case, the "tool" package cannot be imported from CUE.
 	skipRegister := params.CUEPkg == "tool"
@@ -140,8 +155,8 @@ func generate(cuePkgPath string) error {
 		params.CUEPkg = ""
 	}
 
-	if doc, err := os.ReadFile(filepath.Join(pkg.Dir, "doc.txt")); err == nil {
-		defs, err := os.ReadFile(filepath.Join(pkg.Dir, pkg.Name+".cue"))
+	if doc, err := os.ReadFile(filepath.Join(pkgDir, "doc.txt")); err == nil {
+		defs, err := os.ReadFile(filepath.Join(pkgDir, pkg.Name+".cue"))
 		if err != nil {
 			return err
 		}
@@ -164,7 +179,9 @@ func generate(cuePkgPath string) error {
 			if filename == genFile {
 				continue
 			}
-			g.processGo(filepath.Join(pkg.Dir, filename))
+			if err := g.processGo(filename); err != nil {
+				return err
+			}
 		}
 		fmt.Fprintf(g.w, "},\n")
 		if err := g.processCUE(); err != nil {
@@ -178,7 +195,7 @@ func generate(cuePkgPath string) error {
 		b = g.w.Bytes() // write the unformatted source
 	}
 
-	filename := filepath.Join(pkg.Dir, genFile)
+	filename := filepath.Join(pkgDir, genFile)
 
 	if err := os.WriteFile(filename, b, 0666); err != nil {
 		return err

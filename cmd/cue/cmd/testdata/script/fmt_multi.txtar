@@ -1,6 +1,6 @@
 exec cue fmt .
 cmp x.cue out/x.cue
-cmp x.cue out/star-cue
+cmp star.cue out/star-cue
 cmp y.cue out/y-cue
 cmp yb.cue out/yb-cue
 -- x.cue --
@@ -45,11 +45,7 @@ package x
 a:  1
 bb: 2
 -- out/star-cue --
-// header
-
-package x
-
-// file comment
+package _
 
 a:  1
 bb: 2

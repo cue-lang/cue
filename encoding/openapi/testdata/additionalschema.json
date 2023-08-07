@@ -1,0 +1,38 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "HTTPRouteDestination": {
+            "type": "object",
+            "required": [
+               "headers"
+            ],
+            "properties": {
+               "headers": {
+                  "$ref": "#/components/schemas/Headers"
+               }
+            }
+         },
+         "Headers": {
+            "type": "object",
+            "required": [
+               "request"
+            ],
+            "properties": {
+               "request": {
+                  "$ref": "#/components/schemas/Headers.HeaderOperations"
+               }
+            }
+         },
+         "Headers.HeaderOperations": {
+            "type": "object",
+            "minItems": 1
+         }
+      }
+   }
+}

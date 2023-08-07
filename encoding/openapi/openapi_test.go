@@ -22,6 +22,10 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cuetest"
+
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/cue"
@@ -30,7 +34,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/openapi"
-	"cuelang.org/go/internal/cuetest"
 )
 
 func TestParseDefinitions(t *testing.T) {
@@ -172,6 +175,38 @@ func TestParseDefinitions(t *testing.T) {
 			},
 			DescriptionFunc: func(v cue.Value) string {
 				return "Randomly picked description from a set of size one."
+			},
+		},
+	}, {
+		in:           "additionalschema.cue",
+		out:          "additionalschema.json",
+		variant:      "+AdditionalSchemasFunc",
+		instanceOnly: true,
+		config: &openapi.Config{
+			Info: info,
+			AdditionalSchemasFunc: func(v cue.Value) []openapi.SchemaConstraint {
+				for _, d := range v.Doc() {
+					if strings.Contains(d.Text(), "validateme") {
+						return []openapi.SchemaConstraint{{
+							Key:       "minItems",
+							Attribute: &ast.BasicLit{Kind: token.INT, ValuePos: token.NoPos, Value: "1"},
+						}}
+					}
+				}
+				return nil
+			},
+			DescriptionFunc: func(v cue.Value) string {
+				doc := []string{}
+				for _, d := range v.Doc() {
+					if strings.Contains(d.Text(), "validateme") {
+						continue
+					}
+					doc = append(doc, d.Text())
+				}
+				return strings.TrimSpace(strings.Join(doc, "\n\n"))
+			},
+			ReferenceFunc: func(p *cue.Instance, path []string) string {
+				return strings.Join(path, ".")
 			},
 		},
 	}, {

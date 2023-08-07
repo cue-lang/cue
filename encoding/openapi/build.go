@@ -43,6 +43,7 @@ type buildContext struct {
 	exclusiveBool bool
 	nameFunc      func(inst cue.Value, path cue.Path) string
 	descFunc      func(v cue.Value) string
+	schemasFunc   func(v cue.Value) []SchemaConstraint
 	fieldFilter   *regexp.Regexp
 
 	schemas *OrderedMap
@@ -107,6 +108,7 @@ func schemas(g *Generator, inst cue.InstanceOrValue) (schemas *ast.StructLit, er
 		structural:   g.ExpandReferences,
 		nameFunc:     g.NameFunc,
 		descFunc:     g.DescriptionFunc,
+		schemasFunc:  g.AdditionalSchemasFunc,
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 		fieldFilter:  fieldFilter,
@@ -303,6 +305,11 @@ func (b *builder) fillSchema(v cue.Value) *ast.StructLit {
 		}
 	}
 
+	if b.ctx.schemasFunc != nil {
+		for _, attr := range b.ctx.schemasFunc(v) {
+			b.setSingle(attr.Key, attr.Attribute, true)
+		}
+	}
 	schema := b.finish()
 	s := (*ast.StructLit)(schema)
 

@@ -1,23 +1,44 @@
 -- want --
 valid:
+valid.cue
+other/valid.cue
+cue.mod/module.cue
+cue.mod/pkg_other/x
+cue.mod/pkg/x
+cue.mod/usr/x
+cue.mod/gen/x
+GO.MOD
+vendor/x/y
 valid.go
 
 omitted:
-vendor/x/y: file is in vendor directory
-sub/go.mod: file is in another module
+sub1/cue.mod/module.cue: file is in another module
+sub1/something.cue: file is in another module
+sub2/CUE.MOD/module.cue: file is in another module
 .hg_archival.txt: file is inserted by 'hg archive' and is always omitted
 
 invalid:
+cue.mod/Module.cue: cue.mod/module.cue files must have lowercase names
 not/../clean: file path is not clean
-GO.MOD: go.mod files must have lowercase names
+CUE.MOD/module.cue: cue.mod directories must have lowercase names
 invalid.go': malformed file path "invalid.go'": invalid char '\''
 valid.go: multiple entries for file "valid.go"
--- valid.go --
+-- valid.cue --
+-- other/valid.cue --
+-- cue.mod/module.cue --
+-- cue.mod/Module.cue --
+-- cue.mod/pkg_other/x --
+-- cue.mod/pkg/x --
+-- cue.mod/usr/x --
+-- cue.mod/gen/x --
 -- not/../clean --
 -- GO.MOD --
+-- CUE.MOD/module.cue --
 -- invalid.go' --
 -- vendor/x/y --
--- sub/go.mod --
+-- sub1/cue.mod/module.cue --
+-- sub1/something.cue --
+-- sub2/CUE.MOD/module.cue --
 -- .hg_archival.txt --
 -- valid.go --
 duplicate

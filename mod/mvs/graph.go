@@ -7,7 +7,7 @@ package mvs
 import (
 	"fmt"
 
-	"cuelang.org/go/cue/load/internal/slices"
+	"cuelang.org/go/mod/mvs/internal/slices"
 
 	"golang.org/x/mod/module"
 )

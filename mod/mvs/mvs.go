@@ -4,6 +4,9 @@
 
 // Package mvs implements Minimal Version Selection.
 // See https://research.swtch.com/vgo-mvs.
+//
+// THIS IS AN EXPERIMENTAL API. DO NOT IMPORT: THE
+// API MAY CHANGE WITHOUT WARNING.
 package mvs
 
 import (
@@ -12,7 +15,7 @@ import (
 	"sort"
 	"sync"
 
-	"cuelang.org/go/cue/load/internal/par"
+	"cuelang.org/go/mod/mvs/internal/par"
 
 	"golang.org/x/mod/module"
 )

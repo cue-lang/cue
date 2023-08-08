@@ -50,6 +50,42 @@
       "message": "Is the empty string default of `\"\"` expected by both curl /and/ the GitHub API? I /suspect/ `\"{}\"` might be what\u0027s needed.",
       "revId": "deb39d199d55e8d0de2a19e5a614d73fbe321edc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d574841d_f5831c14",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-08-08T09:36:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78c99a65_58c6410b",
+      "revId": "deb39d199d55e8d0de2a19e5a614d73fbe321edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eadcbd60_20e99abe",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-08-08T09:36:17Z",
+      "side": 1,
+      "message": "Done. Needed to fix up a broken escape in any case. And we were missing the `ref` param.",
+      "parentUuid": "995eb66f_23210480",
+      "revId": "deb39d199d55e8d0de2a19e5a614d73fbe321edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

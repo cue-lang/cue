@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/load/internal/mvs"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/mod/mvs"
 	"golang.org/x/mod/module"
 	"golang.org/x/mod/semver"
 )

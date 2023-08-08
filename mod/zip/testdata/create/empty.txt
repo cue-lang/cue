@@ -1,3 +1,4 @@
-path=example.com/empty
+path=example.com/empty@v1
 version=v1.0.0
 hash=h1:47DEQpj8HBSa+/TImW+5JCeuQeRkm5NMpJWZG3hSuFU=
+wantErr=no cue.mod/module.cue file found

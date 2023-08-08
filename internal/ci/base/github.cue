@@ -312,6 +312,20 @@ repositoryDispatch: json.#step & {
 			"""#
 }
 
+workflowDispatch: json.#step & {
+	#githubRepositoryPath:         *githubRepositoryPath | string
+	#botGitHubUserTokenSecretsKey: *botGitHubUserTokenSecretsKey | string
+	#workflowID:                   string
+	#arg:                          _
+
+	_curlGitHubAPI: curlGitHubAPI & {#tokenSecretsKey: #botGitHubUserTokenSecretsKey, _}
+
+	name: string
+	run:  #"""
+			\#(_curlGitHubAPI) -f --request POST --data-binary \#(*strconv.Quote(encjson.Marshal(#arg)) | "") https://api.github.com/repos/\#(#githubRepositoryPath)/actions/workflows/\(#workflowID)/dispatches
+			"""#
+}
+
 // dispatchTrailer is the trailer that we use to pass information in a commit
 // when triggering workflow events in other GitHub repos.
 //

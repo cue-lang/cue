@@ -1,153 +1,123 @@
-//go:build ignore
-
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package module
 
-import "testing"
+import (
+	"testing"
 
-var escapeTests = []struct {
-	path string
-	esc  string // empty means same as path
+	"github.com/go-quicktest/qt"
+)
+
+var checkTests = []struct {
+	path    string
+	version string
+	ok      bool
 }{
-	{path: "ascii.com/abcdefghijklmnopqrstuvwxyz.-/~_0123456789"},
-	{path: "github.com/GoogleCloudPlatform/omega", esc: "github.com/!google!cloud!platform/omega"},
+	{"rsc.io/quote@v0", "0.1.0", false},
+	{"rsc io/quote", "v1.0.0", false},
+
+	{"github.com/go-yaml/yaml@v0", "v0.8.0", true},
+	{"github.com/go-yaml/yaml@v1", "v1.0.0", true},
+	{"github.com/go-yaml/yaml", "v2.0.0", false},
+	{"github.com/go-yaml/yaml@v1", "v2.1.5", false},
+	{"github.com/go-yaml/yaml@v3.0", "v3.0.0", false},
+
+	{"github.com/go-yaml/yaml@v2", "v1.0.0", false},
+	{"github.com/go-yaml/yaml@v2", "v2.0.0", true},
+	{"github.com/go-yaml/yaml@v2", "v2.1.5", true},
+	{"github.com/go-yaml/yaml@v2", "v3.0.0", false},
+
+	{"rsc.io/quote", "v17.0.0", false},
 }
 
-func TestEscapePath(t *testing.T) {
-	// Check invalid paths.
-	for _, tt := range checkPathTests {
-		if !tt.ok {
-			_, err := EscapePath(tt.path)
-			if err == nil {
-				t.Errorf("EscapePath(%q): succeeded, want error (invalid path)", tt.path)
+func TestCheck(t *testing.T) {
+	for _, tt := range checkTests {
+		err := Check(tt.path, tt.version)
+		if tt.ok && err != nil {
+			t.Errorf("Check(%q, %q) = %v, wanted nil error", tt.path, tt.version, err)
+		} else if !tt.ok && err == nil {
+			t.Errorf("Check(%q, %q) succeeded, wanted error", tt.path, tt.version)
+		}
+	}
+}
+
+var newVersionTests = []struct {
+	path, vers   string
+	wantError    string
+	wantPath     string
+	wantBasePath string
+}{{
+	path:         "github.com/foo/bar@v0",
+	vers:         "v0.1.2",
+	wantPath:     "github.com/foo/bar@v0",
+	wantBasePath: "github.com/foo/bar",
+}, {
+	path:         "github.com/foo/bar",
+	vers:         "v3.1.2",
+	wantPath:     "github.com/foo/bar@v3",
+	wantBasePath: "github.com/foo/bar",
+}, {
+	path:         "github.com/foo/bar@v1",
+	vers:         "",
+	wantPath:     "github.com/foo/bar@v1",
+	wantBasePath: "github.com/foo/bar",
+}, {
+	path:      "github.com/foo/bar@v1",
+	vers:      "v3.1.2",
+	wantError: `mismatched major version suffix in "github.com/foo/bar@v1" \(version v3\.1\.2\)`,
+}, {
+	path:      "github.com/foo/bar@v1",
+	vers:      "v3.1",
+	wantError: `version "v3.1" \(of module "github.com/foo/bar@v1"\) is not canonical`,
+}, {
+	path:      "github.com/foo/bar@v1",
+	vers:      "v3.10.4+build",
+	wantError: `version "v3.10.4\+build" \(of module "github.com/foo/bar@v1"\) is not canonical`,
+}, {
+	path:      "something/bad@v1",
+	vers:      "v1.2.3",
+	wantError: `malformed module path "something/bad@v1": missing dot in first path element`,
+}, {
+	path:      "foo.com/bar",
+	vers:      "",
+	wantError: `path "foo.com/bar" has no major version`,
+}}
+
+func TestNewVersion(t *testing.T) {
+	for _, test := range newVersionTests {
+		t.Run(test.path+"@"+test.vers, func(t *testing.T) {
+			v, err := NewVersion(test.path, test.vers)
+			if test.wantError != "" {
+				qt.Assert(t, qt.ErrorMatches(err, test.wantError))
+				return
 			}
-		}
-	}
-
-	// Check encodings.
-	for _, tt := range escapeTests {
-		esc, err := EscapePath(tt.path)
-		if err != nil {
-			t.Errorf("EscapePath(%q): unexpected error: %v", tt.path, err)
-			continue
-		}
-		want := tt.esc
-		if want == "" {
-			want = tt.path
-		}
-		if esc != want {
-			t.Errorf("EscapePath(%q) = %q, want %q", tt.path, esc, want)
-		}
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(v.Path(), test.wantPath))
+			qt.Assert(t, qt.Equals(v.BasePath(), test.wantBasePath))
+			qt.Assert(t, qt.Equals(v.Version(), test.vers))
+		})
 	}
 }
 
-var badUnescape = []string{
-	"github.com/GoogleCloudPlatform/omega",
-	"github.com/!google!cloud!platform!/omega",
-	"github.com/!0google!cloud!platform/omega",
-	"github.com/!_google!cloud!platform/omega",
-	"github.com/!!google!cloud!platform/omega",
-	"",
-}
+var parseVersionTests = []struct {
+	s         string
+	wantError string
+}{{
+	s: "github.com/foo/bar@v0.1.2",
+}}
 
-func TestUnescapePath(t *testing.T) {
-	// Check invalid decodings.
-	for _, bad := range badUnescape {
-		_, err := UnescapePath(bad)
-		if err == nil {
-			t.Errorf("UnescapePath(%q): succeeded, want error (invalid decoding)", bad)
-		}
-	}
-
-	// Check invalid paths (or maybe decodings).
-	for _, tt := range checkPathTests {
-		if !tt.ok {
-			path, err := UnescapePath(tt.path)
-			if err == nil {
-				t.Errorf("UnescapePath(%q) = %q, want error (invalid path)", tt.path, path)
+func TestParseVersion(t *testing.T) {
+	for _, test := range parseVersionTests {
+		t.Run(test.s, func(t *testing.T) {
+			v, err := ParseVersion(test.s)
+			if test.wantError != "" {
+				qt.Assert(t, qt.ErrorMatches(err, test.wantError))
+				return
 			}
-		}
-	}
-
-	// Check encodings.
-	for _, tt := range escapeTests {
-		esc := tt.esc
-		if esc == "" {
-			esc = tt.path
-		}
-		path, err := UnescapePath(esc)
-		if err != nil {
-			t.Errorf("UnescapePath(%q): unexpected error: %v", esc, err)
-			continue
-		}
-		if path != tt.path {
-			t.Errorf("UnescapePath(%q) = %q, want %q", esc, path, tt.path)
-		}
-	}
-}
-
-func TestMatchPathMajor(t *testing.T) {
-	for _, test := range []struct {
-		v, pathMajor string
-		want         bool
-	}{
-		{"v0.0.0", "", true},
-		{"v0.0.0", "/v2", false},
-		{"v0.0.0", ".v0", true},
-		{"v0.0.0-20190510104115-cbcb75029529", ".v1", true},
-		{"v1.0.0", "/v2", false},
-		{"v1.0.0", ".v1", true},
-		{"v1.0.0", ".v1-unstable", true},
-		{"v2.0.0+incompatible", "", true},
-		{"v2.0.0", "", false},
-		{"v2.0.0", "/v2", true},
-		{"v2.0.0", ".v2", true},
-	} {
-		if got := MatchPathMajor(test.v, test.pathMajor); got != test.want {
-			t.Errorf("MatchPathMajor(%q, %q) = %v, want %v", test.v, test.pathMajor, got, test.want)
-		}
-	}
-}
-
-func TestMatchPrefixPatterns(t *testing.T) {
-	for _, test := range []struct {
-		globs, target string
-		want          bool
-	}{
-		{"", "rsc.io/quote", false},
-		{"/", "rsc.io/quote", false},
-		{"*/quote", "rsc.io/quote", true},
-		{"*/quo", "rsc.io/quote", false},
-		{"*/quo??", "rsc.io/quote", true},
-		{"*/quo*", "rsc.io/quote", true},
-		{"*quo*", "rsc.io/quote", false},
-		{"rsc.io", "rsc.io/quote", true},
-		{"*.io", "rsc.io/quote", true},
-		{"rsc.io/", "rsc.io/quote", true},
-		{"rsc", "rsc.io/quote", false},
-		{"rsc*", "rsc.io/quote", true},
-
-		{"rsc.io", "rsc.io/quote/v3", true},
-		{"*/quote", "rsc.io/quote/v3", true},
-		{"*/quote/", "rsc.io/quote/v3", true},
-		{"*/quote/*", "rsc.io/quote/v3", true},
-		{"*/quote/*/", "rsc.io/quote/v3", true},
-		{"*/v3", "rsc.io/quote/v3", false},
-		{"*/*/v3", "rsc.io/quote/v3", true},
-		{"*/*/*", "rsc.io/quote/v3", true},
-		{"*/*/*/", "rsc.io/quote/v3", true},
-		{"*/*/*", "rsc.io/quote", false},
-		{"*/*/*/", "rsc.io/quote", false},
-
-		{"*/*/*,,", "rsc.io/quote", false},
-		{"*/*/*,,*/quote", "rsc.io/quote", true},
-		{",,*/quote", "rsc.io/quote", true},
-	} {
-		if got := MatchPrefixPatterns(test.globs, test.target); got != test.want {
-			t.Errorf("MatchPrefixPatterns(%q, %q) = %t, want %t", test.globs, test.target, got, test.want)
-		}
+			qt.Assert(t, qt.IsNil(err))
+			qt.Assert(t, qt.Equals(v.String(), test.s))
+		})
 	}
 }

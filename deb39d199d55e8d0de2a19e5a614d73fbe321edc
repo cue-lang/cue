@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f299727_0afe518a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2023-08-08T09:05:30Z",
+      "side": 1,
+      "message": "I\u0027m unable to CR+2 this CL.",
+      "revId": "deb39d199d55e8d0de2a19e5a614d73fbe321edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78c99a65_58c6410b",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2023-08-08T09:05:30Z",
+      "side": 1,
+      "message": "I\u0027d prefer the `--fail` long opt over `-f`.",
+      "revId": "deb39d199d55e8d0de2a19e5a614d73fbe321edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "995eb66f_23210480",
+        "filename": "internal/ci/base/github.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2023-08-08T09:05:30Z",
+      "side": 1,
+      "message": "Is the empty string default of `\"\"` expected by both curl /and/ the GitHub API? I /suspect/ `\"{}\"` might be what\u0027s needed.",
+      "revId": "deb39d199d55e8d0de2a19e5a614d73fbe321edc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

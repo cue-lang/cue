@@ -1,0 +1,81 @@
+#IgnoreConcrete: true
+#InferTasks: true
+-- in.cue --
+package x
+
+root: {
+	prepare: {
+		$id: "prepare"
+	}
+	env2: {
+		input: prepare.stdout
+	}
+	run: {
+		$id: "run"
+		env: env2
+	}
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.prepare [Ready]")
+  t1("root.run [Ready]")
+
+-- out/run/t1 --
+graph TD
+  t0("root.prepare [Running]")
+  t1("root.run [Terminated]")
+
+-- out/run/t1/value --
+{
+	$id:    "run"
+	stdout: "foo"
+	env: {
+		input: PREPARE.stdout
+	}
+
+	//cue:path: root.prepare
+	let PREPARE = {
+		$id: "prepare"
+	}
+}
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  11
+Reused: 6
+Allocs: 5
+Retain: 0
+
+Unifications: 11
+Conjuncts:    15
+Disjuncts:    11
+-- out/run/t2 --
+graph TD
+  t0("root.prepare [Terminated]")
+  t1("root.run [Terminated]")
+
+-- out/run/t2/value --
+{
+	$id:    "prepare"
+	stdout: "foo"
+}
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  12
+Reused: 12
+Allocs: 0
+Retain: 0
+
+Unifications: 12
+Conjuncts:    21
+Disjuncts:    12
+-- out/run/stats/totals --
+Leaks:  0
+Freed:  23
+Reused: 18
+Allocs: 5
+Retain: 0
+
+Unifications: 23
+Conjuncts:    36
+Disjuncts:    23

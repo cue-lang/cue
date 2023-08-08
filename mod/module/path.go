@@ -1,14 +1,9 @@
-//go:build ignore
-
-// Copyright 2018 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package module
 
 import (
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"unicode"
 	"unicode/utf8"
@@ -16,11 +11,18 @@ import (
 	"golang.org/x/mod/semver"
 )
 
+// The following regular expressions come from https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests
+// and ensure that we can store modules inside OCI registries.
+var (
+	basePathPat = regexp.MustCompile(`^[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*(/[a-z0-9]+((\.|_|__|-+)[a-z0-9]+)*)*$`)
+	tagPat      = regexp.MustCompile(`^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$`)
+)
+
 // Check checks that a given module path, version pair is valid.
 // In addition to the path being a valid module path
 // and the version being a valid semantic version,
 // the two must correspond.
-// For example, the path "yaml/v2" only corresponds to
+// For example, the path "foo.com/bar@v2" only corresponds to
 // semantic versions beginning with "v2.".
 func Check(path, version string) error {
 	if err := CheckPath(path); err != nil {
@@ -49,19 +51,18 @@ func firstPathOK(r rune) bool {
 }
 
 // modPathOK reports whether r can appear in a module path element.
-// Paths can be ASCII letters, ASCII digits, and limited ASCII punctuation: - . _ and ~.
+// Paths can be lower case ASCII letters, ASCII digits, and limited ASCII punctuation: - . _ and ~.
 //
 // This matches what "go get" has historically recognized in import paths,
 // and avoids confusing sequences like '%20' or '+' that would change meaning
 // if used in a URL.
 //
 // TODO(rsc): We would like to allow Unicode letters, but that requires additional
-// care in the safe encoding (see "escaped paths" above).
+// care when encoding for storage on a filesystem.
 func modPathOK(r rune) bool {
 	if r < utf8.RuneSelf {
-		return r == '-' || r == '.' || r == '_' || r == '~' ||
+		return r == '-' || r == '.' || r == '_' ||
 			'0' <= r && r <= '9' ||
-			'A' <= r && r <= 'Z' ||
 			'a' <= r && r <= 'z'
 	}
 	return false
@@ -75,7 +76,10 @@ func modPathOK(r rune) bool {
 // otherwise-unambiguous on the command line and historically used for some
 // binary names (such as '++' as a suffix for compiler binaries and wrappers).
 func importPathOK(r rune) bool {
-	return modPathOK(r) || r == '+'
+	return modPathOK(r) ||
+		r == '+' ||
+		r == '~' ||
+		'A' <= r && r <= 'Z'
 }
 
 // fileNameOK reports whether r can appear in a file name.
@@ -86,7 +90,7 @@ func importPathOK(r rune) bool {
 func fileNameOK(r rune) bool {
 	if r < utf8.RuneSelf {
 		// Entire set of ASCII punctuation, from which we remove characters:
-		//     ! " # $ % & ' ( ) * + , - . / : ; < = > ? @ [ \ ] ^ _ ` { | } ~
+		//     ! " # $ % & ' ( ) * + , - . / : ; < = > ? [ \ ] ^ _ ` { | } ~
 		// We disallow some shell special characters: " ' * < > ? ` |
 		// (Note that some of those are disallowed by the Windows file system as well.)
 		// We also disallow path separators / : and \ (fileNameOK is only called on path element characters).
@@ -105,46 +109,62 @@ func fileNameOK(r rune) bool {
 // CheckPath checks that a module path is valid.
 // A valid module path is a valid import path, as checked by CheckImportPath,
 // with three additional constraints.
+//
 // First, the leading path element (up to the first slash, if any),
 // by convention a domain name, must contain only lower-case ASCII letters,
 // ASCII digits, dots (U+002E), and dashes (U+002D);
 // it must contain at least one dot and cannot start with a dash.
-// Second, for a final path element of the form /vN, where N looks numeric
-// (ASCII digits and dots) must not begin with a leading zero, must not be /v1,
-// and must not contain any dots. For paths beginning with "gopkg.in/",
-// this second requirement is replaced by a requirement that the path
-// follow the gopkg.in server's conventions.
+//
+// Second, there must be a final major version of the form
+// @vN where N looks numeric
+// (ASCII digits) and must not begin with a leading zero.
+//
 // Third, no path element may begin with a dot.
-func CheckPath(path string) (err error) {
+//
+// TODO we probably need function to check module paths that
+// may not contain a major version.
+func CheckPath(mpath string) (err error) {
 	defer func() {
 		if err != nil {
-			err = &InvalidPathError{Kind: "module", Path: path, Err: err}
+			err = &InvalidPathError{Kind: "module", Path: mpath, Err: err}
 		}
 	}()
 
-	if err := checkPath(path, modulePath); err != nil {
+	basePath, vers, ok := SplitPathVersion(mpath)
+	if !ok {
+		return fmt.Errorf("no major version found in module path")
+	}
+	if semver.Major(vers) != vers {
+		return fmt.Errorf("path can contain major version only")
+	}
+
+	if err := checkPath(basePath, modulePath); err != nil {
 		return err
 	}
-	i := strings.Index(path, "/")
+	i := strings.Index(basePath, "/")
 	if i < 0 {
-		i = len(path)
+		i = len(basePath)
 	}
 	if i == 0 {
 		return fmt.Errorf("leading slash")
 	}
-	if !strings.Contains(path[:i], ".") {
+	if !strings.Contains(basePath[:i], ".") {
 		return fmt.Errorf("missing dot in first path element")
 	}
-	if path[0] == '-' {
+	if basePath[0] == '-' {
 		return fmt.Errorf("leading dash in first path element")
 	}
-	for _, r := range path[:i] {
+	for _, r := range basePath[:i] {
 		if !firstPathOK(r) {
 			return fmt.Errorf("invalid char %q in first path element", r)
 		}
 	}
-	if _, _, ok := SplitPathVersion(path); !ok {
-		return fmt.Errorf("invalid version")
+	// Sanity check agreement with OCI specs.
+	if !basePathPat.MatchString(basePath) {
+		return fmt.Errorf("non-conforming path %q", basePath)
+	}
+	if !tagPat.MatchString(vers) {
+		return fmt.Errorf("non-conforming version %q", vers)
 	}
 	return nil
 }
@@ -152,23 +172,32 @@ func CheckPath(path string) (err error) {
 // CheckImportPath checks that an import path is valid.
 //
 // A valid import path consists of one or more valid path elements
-// separated by slashes (U+002F). (It must not begin with nor end in a slash.)
+// separated by slashes (U+002F), optionally followed by
+// an @vN (major version) qualifier.
+// The path part must not begin with nor end in a slash.
 //
 // A valid path element is a non-empty string made up of
-// ASCII letters, ASCII digits, and limited ASCII punctuation: - . _ and ~.
-// It must not end with a dot (U+002E), nor contain two dots in a row.
+// lower case ASCII letters, ASCII digits, and limited ASCII punctuation: - . and _
+// Punctuation characters may not be adjacent and must be between non-punctuation
+// characters.
 //
 // The element prefix up to the first dot must not be a reserved file name
-// on Windows, regardless of case (CON, com1, NuL, and so on). The element
-// must not have a suffix of a tilde followed by one or more ASCII digits
-// (to exclude paths elements that look like Windows short-names).
-//
-// CheckImportPath may be less restrictive in the future, but see the
-// top-level package documentation for additional information about
-// subtleties of Unicode.
-func CheckImportPath(path string) error {
+// on Windows, regardless of case (CON, com1, NuL, and so on).
+func CheckImportPath(path0 string) error {
+	path := path0
+	basePath, vers, ok := SplitPathVersion(path)
+	if ok {
+		if semver.Major(vers) != vers {
+			return &InvalidPathError{
+				Kind: "import",
+				Path: path,
+				Err:  fmt.Errorf("import paths can only contain a major version specifier"),
+			}
+		}
+		path = basePath
+	}
 	if err := checkPath(path, importPath); err != nil {
-		return &InvalidPathError{Kind: "import", Path: path, Err: err}
+		return &InvalidPathError{Kind: "import", Path: path0, Err: err}
 	}
 	return nil
 }
@@ -251,7 +280,6 @@ func checkElem(elem string, kind pathKind) error {
 			return fmt.Errorf("invalid char %q", r)
 		}
 	}
-
 	// Windows disallows a bunch of path elements, sadly.
 	// See https://docs.microsoft.com/en-us/windows/desktop/fileio/naming-a-file
 	short := elem
@@ -335,55 +363,47 @@ var badWindowsNames = []string{
 	"LPT9",
 }
 
-// SplitPathVersion returns prefix and major version such that prefix+pathMajor == path
-// and version is either empty or "/vN" for N >= 2.
-// As a special case, gopkg.in paths are recognized directly;
-// they require ".vN" instead of "/vN", and for all N, not just N >= 2.
-// SplitPathVersion returns with ok = false when presented with
-// a path whose last path element does not satisfy the constraints
-// applied by CheckPath, such as "example.com/pkg/v1" or "example.com/pkg/v1.2".
+// SplitPathVersion returns a prefix and version suffix such
+// that prefix+"@"+version == path.
+// SplitPathVersion returns with ok=false when presented
+// with a path with an invalid version suffix.
+//
+// For example, SplitPathVersion("foo.com/bar@v0.1") returns
+// ("foo.com/bar", "v0.1", true).
 func SplitPathVersion(path string) (prefix, pathMajor string, ok bool) {
-	if strings.HasPrefix(path, "gopkg.in/") {
-		return splitGopkgIn(path)
+	i := strings.LastIndex(path, "@")
+	split := i
+	if i <= 0 || i+2 >= len(path) {
+		return "", "", false
 	}
-
-	i := len(path)
-	dot := false
-	for i > 0 && ('0' <= path[i-1] && path[i-1] <= '9' || path[i-1] == '.') {
-		if path[i-1] == '.' {
-			dot = true
-		}
-		i--
+	if strings.Contains(path[:i], "@") {
+		return "", "", false
 	}
-	if i <= 1 || i == len(path) || path[i-1] != 'v' || path[i-2] != '/' {
-		return path, "", true
+	if path[i+1] != 'v' {
+		return "", "", false
 	}
-	prefix, pathMajor = path[:i-2], path[i-2:]
-	if dot || len(pathMajor) <= 2 || pathMajor[2] == '0' || pathMajor == "/v1" {
-		return path, "", false
+	if !semver.IsValid(path[i+1:]) {
+		return "", "", false
 	}
-	return prefix, pathMajor, true
+	return path[:split], path[split+1:], true
 }
 
-// splitGopkgIn is like SplitPathVersion but only for gopkg.in paths.
-func splitGopkgIn(path string) (prefix, pathMajor string, ok bool) {
-	if !strings.HasPrefix(path, "gopkg.in/") {
-		return path, "", false
+// MatchPathMajor reports whether the semantic version v
+// matches the path major version pathMajor.
+//
+// MatchPathMajor returns true if and only if CheckPathMajor returns nil.
+func MatchPathMajor(v, pathMajor string) bool {
+	return CheckPathMajor(v, pathMajor) == nil
+}
+
+// CheckPathMajor returns a non-nil error if the semantic version v
+// does not match the path major version pathMajor.
+func CheckPathMajor(v, pathMajor string) error {
+	if m := semver.Major(v); m != pathMajor {
+		return &InvalidVersionError{
+			Version: v,
+			Err:     fmt.Errorf("should be %s, not %s", pathMajor, m),
+		}
 	}
-	i := len(path)
-	if strings.HasSuffix(path, "-unstable") {
-		i -= len("-unstable")
-	}
-	for i > 0 && ('0' <= path[i-1] && path[i-1] <= '9') {
-		i--
-	}
-	if i <= 1 || path[i-1] != 'v' || path[i-2] != '.' {
-		// All gopkg.in paths must end in vN for some N.
-		return path, "", false
-	}
-	prefix, pathMajor = path[:i-2], path[i-2:]
-	if len(pathMajor) <= 2 || pathMajor[2] == '0' && pathMajor != ".v0" {
-		return path, "", false
-	}
-	return prefix, pathMajor, true
+	return nil
 }

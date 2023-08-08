@@ -6,11 +6,12 @@ import (
 	"path/filepath"
 	"strings"
 
+	"golang.org/x/mod/module"
+	"golang.org/x/mod/semver"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load/internal/mvs"
 	"cuelang.org/go/cue/token"
-	"golang.org/x/mod/module"
-	"golang.org/x/mod/semver"
 )
 
 //go:embed moduleschema.cue

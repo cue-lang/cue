@@ -19,25 +19,19 @@ root: {
 -- out/run/t0 --
 graph TD
   t0("root.prepare [Ready]")
-  t1("root.run [Ready]")
+  t1("root.run [Waiting]")
+  t1-->t0
 
 -- out/run/t1 --
 graph TD
-  t0("root.prepare [Running]")
-  t1("root.run [Terminated]")
+  t0("root.prepare [Terminated]")
+  t1("root.run [Ready]")
+  t1-->t0
 
 -- out/run/t1/value --
 {
-	$id:    "run"
+	$id:    "prepare"
 	stdout: "foo"
-	env: {
-		input: PREPARE.stdout
-	}
-
-	//cue:path: root.prepare
-	let PREPARE = {
-		$id: "prepare"
-	}
 }
 -- out/run/t1/stats --
 Leaks:  0
@@ -47,17 +41,21 @@ Allocs: 5
 Retain: 0
 
 Unifications: 11
-Conjuncts:    15
+Conjuncts:    17
 Disjuncts:    11
 -- out/run/t2 --
 graph TD
   t0("root.prepare [Terminated]")
   t1("root.run [Terminated]")
+  t1-->t0
 
 -- out/run/t2/value --
 {
-	$id:    "prepare"
+	$id:    "run"
 	stdout: "foo"
+	env: {
+		input: "foo"
+	}
 }
 -- out/run/t2/stats --
 Leaks:  0
@@ -77,5 +75,5 @@ Allocs: 5
 Retain: 0
 
 Unifications: 23
-Conjuncts:    36
+Conjuncts:    38
 Disjuncts:    23

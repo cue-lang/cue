@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f7001e6_223c2ddc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-09T09:11:32Z",
+      "side": 1,
+      "message": "to be less generic, how about\n\ninternal/core/dep: avoid Values without an Environment to fix panic",
+      "revId": "46d4164c03fce0652a431ea59a6ccbdcaaa52bd3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "886558a0_32180e96",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-09T09:11:32Z",
+      "side": 1,
+      "message": "Squashing the two CLs SGTM, similar case as the one I had with the flaky test.",
+      "revId": "46d4164c03fce0652a431ea59a6ccbdcaaa52bd3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -20,7 +20,6 @@ import (
 	"log"
 	"os"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/gocode"
 )
@@ -31,11 +30,11 @@ func main() {
 		log.Fatal(err)
 	}
 
-	inst := cue.Build(load.Instances([]string{"types.cue"}, &load.Config{
+	inst := load.Instances([]string{"types.cue"}, &load.Config{
 		Dir:        cwd,
 		ModuleRoot: cwd,
 		Module:     "cuelang.org/go/cue/build",
-	}))[0]
+	})[0]
 	if inst.Err != nil {
 		log.Fatal(inst.Err)
 	}

@@ -93,23 +93,20 @@ const defaultPrefix = "cuegen"
 // Currently not supported:
 //   - option to generate Go structs (or automatically generate if undefined)
 //   - for type option to refer to types outside the package.
-func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err error) {
+func Generate(pkgPath string, inst cue.InstanceOrValue, c *Config) (b []byte, err error) {
 	// TODO: if inst is nil, the instance is loaded from CUE files in the same
 	// package directory with the same package name.
-	if err = inst.Value().Validate(); err != nil {
-		return nil, err
-	}
 	if c == nil {
 		c = &Config{}
 	}
-	g := &generator{
-		Config: *c,
 
+	g := &generator{
+		Config:  *c,
 		typeMap: map[string]types.Type{},
 	}
 
-	pkgName := inst.PkgName
-
+	val := inst.Value()
+	pkgName := inst.Value().BuildInstance().PkgName
 	if pkgPath != "" {
 		loadCfg := &packages.Config{
 			Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedImports | packages.NeedTypes | packages.NeedTypesSizes | packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedDeps,
@@ -149,15 +146,15 @@ func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err erro
 		"pkgName": pkgName,
 	})
 
-	iter, err := inst.Value().Fields(cue.Definitions(true))
+	iter, err := val.Fields(cue.Definitions(true))
 	g.addErr(err)
 
 	for iter.Next() {
 		g.decl(iter.Label(), iter.Value())
 	}
 
-	r := value.ConvertToRuntime(inst.Value().Context())
-	b, err = r.Marshal(inst)
+	r := value.ConvertToRuntime(val.Context())
+	b, err = r.Marshal(&val)
 	g.addErr(err)
 
 	g.exec(loadCode, map[string]string{

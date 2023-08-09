@@ -24,7 +24,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cuetest"
@@ -49,17 +49,19 @@ func TestGenerate(t *testing.T) {
 		t.Run(d.Name(), func(t *testing.T) {
 			dir := filepath.Join(cwd, "testdata")
 			pkg := "." + string(filepath.Separator) + d.Name()
-			inst := cue.Build(load.Instances([]string{pkg}, &load.Config{
+
+			inst := load.Instances([]string{pkg}, &load.Config{
 				Dir:        dir,
 				ModuleRoot: dir,
 				Module:     "cuelang.org/go/encoding/gocode/testdata",
-			}))[0]
+			})[0]
 			if err := inst.Err; err != nil {
 				t.Fatal(err)
 			}
+			val := cuecontext.New().BuildInstance(inst)
 
 			goPkg := "./testdata/" + d.Name()
-			b, err := Generate(goPkg, inst, nil)
+			b, err := Generate(goPkg, val, nil)
 			if err != nil {
 				t.Fatal(errStr(err))
 			}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b5b42f1_cc0fdefd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-09T08:32:49Z",
+      "side": 1,
+      "message": "As agreed with Marcel in chat, I\u0027ve joined the two CLs into this one, since the test was flaky without the fix due to a race between two tasks. He already approved all the changes, so I\u0027ll be merging on green.",
+      "revId": "2ecaa769918be6dafa5074fde7913e1807c59cfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

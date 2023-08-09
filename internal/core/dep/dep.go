@@ -486,7 +486,9 @@ func hasLetParent(v *adt.Vertex) bool {
 // markConjuncts transitively marks all reference of the current node.
 func (c *visitor) markConjuncts(v *adt.Vertex) {
 	for _, x := range v.Conjuncts {
-		c.markExpr(x.Env, x.Expr())
+		// Use Elem instead of Expr to preserve the Comprehension to, in turn,
+		// ensure an Environment is inserted for the Value clause.
+		c.markExpr(x.Env, x.Elem())
 	}
 }
 

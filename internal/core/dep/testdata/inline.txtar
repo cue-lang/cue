@@ -108,6 +108,13 @@ msg: string
 }
 #g: result: strings.Join(strings.Split("foo.bar", ""), ".")
 
+a: issue2512: (extIf & {}).env
+extIf: {
+	if true {
+		env: msg
+	}
+}
+
 -- out/dependencies/field --
 line  reference    path of resulting vertex
 -- out/dependencies/all --

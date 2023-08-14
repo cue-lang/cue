@@ -17,9 +17,12 @@
 package gocode
 
 import (
+	"bytes"
+	"regexp"
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/encoding/gocode/testdata/pkg1"
 	"cuelang.org/go/encoding/gocode/testdata/pkg2"
 )
@@ -106,4 +109,14 @@ O.P: invalid value 4 (out of bound >5):
 			}
 		})
 	}
+}
+
+func errStr(err error) string {
+	if err == nil {
+		return "nil"
+	}
+	buf := &bytes.Buffer{}
+	errors.Print(buf, err, nil)
+	r := regexp.MustCompile(`.cue:\d+:\d+`)
+	return r.ReplaceAllString(buf.String(), ".cue:x:x")
 }

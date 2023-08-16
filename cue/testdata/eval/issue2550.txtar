@@ -1,0 +1,40 @@
+-- in.cue --
+foo: string
+bar: close({})
+
+if bar.missing == "x" {
+	let _bar = bar
+	foo: _bar
+}
+-- out/compile --
+--- in.cue
+{
+  foo: string
+  bar: close({})
+  if (〈0;bar〉.missing == "x") {
+    let _bar#1 = 〈1;bar〉
+    foo: 〈0;let _bar#1〉
+  }
+}
+-- out/eval/stats --
+Leaks:  1
+Freed:  4
+Reused: 1
+Allocs: 4
+Retain: 5
+
+Unifications: 5
+Conjuncts:    5
+Disjuncts:    9
+-- out/eval --
+(_|_){
+  // [incomplete] undefined field: missing:
+  //     ./in.cue:4:8
+  foo: (_|_){
+    // [incomplete] undefined field: missing:
+    //     ./in.cue:4:8
+  }
+  bar: (#struct){
+  }
+  let _bar#1 = (_){ _ }
+}

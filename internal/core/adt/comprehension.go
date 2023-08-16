@@ -397,10 +397,10 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			}
 
 			// continue to collect other errors.
-			d.node.state.addBottom(err)
 			d.done = true
 			d.inserted = true
 			if d.node != nil {
+				d.node.state.addBottom(err)
 				ctx.PopArc(d.node)
 			}
 			return nil

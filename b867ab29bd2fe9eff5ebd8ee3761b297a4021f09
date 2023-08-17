@@ -16,6 +16,24 @@
       "message": "I feel like I\u0027m missing the motivation for this change... either in the commit message or elsewhere?",
       "revId": "b867ab29bd2fe9eff5ebd8ee3761b297a4021f09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5f024df_05d69759",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-08-17T06:05:25Z",
+      "side": 1,
+      "message": "Ah, I found it in the next CL in the chain. Perhaps mention https://cuelang.org/cl/557322 in the commit message?",
+      "parentUuid": "f324739e_7e5da83e",
+      "revId": "b867ab29bd2fe9eff5ebd8ee3761b297a4021f09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "Nit (for later): standardise on `out/x-cue` or `out/x.cue`. For my OCD at least.",
       "revId": "c3667c468861f6078afe74703befc0242eb58a1e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3f0cdad_22a9cd0b",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_multi.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-17T07:46:55Z",
+      "side": 1,
+      "message": "ack :)",
+      "parentUuid": "b29abb03_372936e0",
+      "revId": "c3667c468861f6078afe74703befc0242eb58a1e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

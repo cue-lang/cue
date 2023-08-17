@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d144e14b_e04983ec",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-08-17T05:59:31Z",
+      "side": 1,
+      "message": "I would explicitly mention the CL to be precise.",
+      "revId": "000a7f6e7d4a1d4b8bff9c66590407752a23a4c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0e85ccd_80a2ddf0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-08-17T05:59:31Z",
+      "side": 1,
+      "message": "LGTM with a couple of nits.\n\nAlso need to bump https://github.com/cue-lang/cue/blob/99e8578ac45e5e7e6ebf25794303bc916744c0d3/README.md#L19",
+      "revId": "000a7f6e7d4a1d4b8bff9c66590407752a23a4c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

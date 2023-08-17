@@ -70,7 +70,7 @@ func incompleteError(v Value) errors.Error {
 
 func (d *decoder) clear(x reflect.Value) {
 	if x.CanSet() {
-		x.Set(reflect.Zero(x.Type()))
+		x.SetZero()
 	}
 }
 
@@ -373,11 +373,10 @@ func (d *decoder) convertMap(x reflect.Value, v Value) {
 			}
 		}
 
-		elemType := t.Elem()
 		if !mapElem.IsValid() {
-			mapElem = reflect.New(elemType).Elem()
+			mapElem = reflect.New(t.Elem()).Elem()
 		} else {
-			mapElem.Set(reflect.Zero(elemType))
+			mapElem.SetZero()
 		}
 		d.decode(mapElem, iter.Value(), false)
 

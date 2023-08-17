@@ -1332,7 +1332,7 @@ func (v Value) Bytes() ([]byte, error) {
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
 	case *adt.Bytes:
-		return append([]byte(nil), x.B...), nil
+		return bytes.Clone(x.B), nil
 	case *adt.String:
 		return []byte(x.Str), nil
 	}

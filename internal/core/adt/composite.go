@@ -999,7 +999,8 @@ func (n *nodeContext) addConjunctDynamic(c Conjunct) {
 }
 
 func (n *nodeContext) notifyConjunct(c Conjunct) {
-	for _, arc := range n.notify {
+	for _, rec := range n.notify {
+		arc := rec.v
 		if !arc.hasConjunct(c) {
 			if arc.state == nil {
 				// TODO: continuing here is likely to result in a faulty

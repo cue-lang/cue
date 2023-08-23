@@ -138,7 +138,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state vertexStatus) Value {
 		// relax this again once we have proper tests to prevent regressions of
 		// that issue.
 		if !v.state.done() || v.state.errs != nil {
-			v.state.addNotify(c.vertex)
+			v.state.addNotify(c.vertex, nil)
 		}
 	}
 
@@ -444,7 +444,8 @@ func (n *nodeContext) doNotify() {
 	if n.errs == nil || len(n.notify) == 0 {
 		return
 	}
-	for _, v := range n.notify {
+	for _, rec := range n.notify {
+		v := rec.v
 		if v.state == nil {
 			if b, ok := v.BaseValue.(*Bottom); ok {
 				v.BaseValue = CombineErrors(nil, b, n.errs)
@@ -971,9 +972,7 @@ type nodeContext struct {
 
 	arcMap []arcKey // not copied for cloning
 
-	// notify is used to communicate errors in cyclic dependencies.
-	// TODO: also use this to communicate increasingly more concrete values.
-	notify []*Vertex
+	notify []receiver
 
 	// Conjuncts holds a reference to the Vertex Arcs that still need
 	// processing. It does NOT need to be copied.
@@ -1061,6 +1060,12 @@ type nodeContextState struct {
 	conjunctsPartialPos int
 }
 
+// A receiver receives notifications.
+type receiver struct {
+	v  *Vertex
+	cc *closeContext
+}
+
 // Logf substitutes args in format. Arguments of type Feature, Value, and Expr
 // are printed in human-friendly formats. The printed string is prefixed and
 // indented with the path associated with the current nodeContext.
@@ -1079,9 +1084,9 @@ type defaultInfo struct {
 	origMode defaultMode
 }
 
-func (n *nodeContext) addNotify(v *Vertex) {
+func (n *nodeContext) addNotify(v *Vertex, cc *closeContext) {
 	if v != nil && !n.node.hasAllConjuncts {
-		n.notify = append(n.notify, v)
+		n.notify = append(n.notify, receiver{v, nil})
 	}
 }
 
@@ -1692,7 +1697,7 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 	}
 
 	if arc.state != nil {
-		arc.state.addNotify(n.node)
+		arc.state.addNotify(n.node, nil)
 	}
 
 	for _, c := range arc.Conjuncts {

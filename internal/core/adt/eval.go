@@ -669,10 +669,10 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		// }
 		// n := d.node.getNodeContext(ctx)
 		// n.addBottom(err)
-		if final && c.node != nil && c.node.status != finalized {
-			n := c.node.getNodeContext(n.ctx, 0)
+		if final && c.vertex != nil && c.vertex.status != finalized {
+			n := c.vertex.getNodeContext(n.ctx, 0)
 			n.addBottom(err)
-			c.node = nil
+			c.vertex = nil
 		}
 	}
 	for _, c := range n.selfComprehensions {
@@ -698,10 +698,10 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		// }
 		// n := d.node.getNodeContext(ctx)
 		// n.addBottom(err)
-		if c.node != nil && c.node.status != finalized {
-			n := c.node.getNodeContext(n.ctx, 0)
+		if c.vertex != nil && c.vertex.status != finalized {
+			n := c.vertex.getNodeContext(n.ctx, 0)
 			n.addBottom(err)
-			c.node = nil
+			c.vertex = nil
 		}
 	}
 	for _, x := range n.exprs {

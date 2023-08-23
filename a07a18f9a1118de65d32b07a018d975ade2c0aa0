@@ -26,6 +26,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9e181fbc_b68d9149",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "\"As it increases data structure size, it may affect performance.\" ?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e96e1576_c7eeffef",
         "filename": "/COMMIT_MSG",
         "patchSetId": 1
@@ -58,6 +75,57 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65e4ef63_385667e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "I\u0027ve had an initial look through, but had to stop before I properly got to the end or understood better what exactly what\u0027s going on. Hopefully these remarks are useful and the updated comments will help further understanding later 😊",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8512cbb6_bbf2cb7c",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/IsEmbed/FromEmbed/",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9684888c_569435d1",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "Maybe clearer (assuming I\u0027ve understood the meaning correctly) as:\n\"This flag is sticky: it will be set for conjuncts created from ...\"\nSame below.\n\n(leave as is if \"stickiness\" is independent of the other property).",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e7ea89bd_17c55e58",
@@ -77,6 +145,23 @@
         "endLine": 124,
         "endChar": 11
       },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc809948_e48ac3a0",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/IsEmbed/FromEmbed/",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -123,6 +208,142 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a8466eae_d5795487",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/represet/represent/",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6603f6d3_f0c0fca6",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/compared on/compared for/\n?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aac8a1e4_03b5dfee",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/set/field set/ ?\nor leave out the \"the\" before \"CloseInfo\".",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8734c6ba_5e54ad2f",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/Elipsis/Ellipsis/\n\nIt would be nice to say what the offset is.\nMaybe:\n\n// insertListEllipsis inserts the given list ellipsis as\n// a pattern constraint on n, applying it to all elements\n// at indexes \u003e\u003d offset.\n\n?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "182f5a6d_a701d9b1",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "matchPattern reports whether f matches pattern, that is,\nwhether f converted to a CUE value unifies successfully with\npattern.\n\n?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84416db4_0ae1c010",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/insert/inserts/",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42fb73c3_2792afd3",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/from/of/",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2eab1ce7_ee8697e8",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "Could make this int to avoid the need for explicit int64 type conversions when calling?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "410ab130_baa18999",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 1
@@ -140,6 +361,23 @@
         "endLine": 17,
         "endChar": 17
       },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23933cc9_35ed2cc4",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/keep/holds/ ?",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -186,6 +424,23 @@
         "endLine": 26,
         "endChar": 49
       },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f002bc3_0330cd33",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/is in/is available/\n?",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -261,6 +516,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae7ff377_18bd5300",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "FWIW I saw FromEmbed and FromDef but I didn\u0027t see an equivalent for references. Is that still something to be added?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d034a10d_2bea563d",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 1
@@ -278,6 +550,23 @@
         "endLine": 59,
         "endChar": 53
       },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb20d4d1_e3a2cb56",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "\"Such conjuncts\" doesn\u0027t seem specific enough, because you\u0027ve only said that conjuncts have some flags, which includes all conjuncts.\n\nDo you mean that conjuncts are grouped by the combined values of the above flags?\nSo (for example), all conjuncts which have \"FromEmbed: true, FromDef: false, FromRef: true\" would group together?",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -330,6 +619,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fc8061a3_8f8a4121",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "marked how? Are \"Dynamic\" and \"inline\" alternatives or synonyms? If the latter, then maybe lose the \"or \".",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a807f960_70fb515e",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 1
@@ -353,6 +659,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "782755be_f5f953b5",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "Conjuncts",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1af1c3f4_fca0be75",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 1
@@ -370,6 +693,23 @@
         "endLine": 102,
         "endChar": 9
       },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6c6dd24_376973c9",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/Gets/gets/ ?",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -416,6 +756,227 @@
         "endLine": 135,
         "endChar": 6
       },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b91ce1b_b97f1efb",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "This doesn\u0027t appear to be used.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f8d4fea_f14d9890",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "doc comment?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf855f9b_f9dcd34c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "Maybe nicer to phrase this as a comment inside the body of the if statement, so it\u0027s clear how the \"do not carry over closedness info\" statement applies.\n\nThat said, it would also be nice to have a general positive comment about what we\u0027re actually doing here.\n\nParticularly as the condition seems about closedness itself as well as whether it\u0027s an embedding.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b007e872_b63fa52b",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/closeContext/nodeContext/\n?\n\nin general, the alternation of method definitions between closeContext and nodeContext is a little confusing (i didn\u0027t notice it for a while).",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d684c5a6_596fbe76",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "Maybe a doc comment briefly describing how insertArc1 and insertArc2 differ from insertArc?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1d6fa27_a95e0d2e",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "return v, false\n?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4a9fd7c_c5a486b4",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "if a.Label !\u003d f {\n    continue\n}\n\n?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df3c187b_d820239b",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "add a TODO for the `// false?` question?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74b43574_581ceb47",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "s/need/needs/\n\nAlso, I don\u0027t see any logic below that seems like it might be related to closing, but I\u0027m guessing that\u0027s the Equal test somehow. Maybe add a comment just before the return to that effect?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32c0c08e_b69ae50b",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "doc comment?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "747f189b_cabde983",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "doc comment",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03867d07_f920f731",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "I don\u0027t see why `+2` here. Either we\u0027ve got +n (if typeof(b) \u003d\u003d *Conjunction) or +1 otherwise.\n\nIf you care about allocations, you could do something like this, perhaps:\n\n```\nfunc mergeConjunctions(a, b Value) Value {\n\tif a \u003d\u003d nil {\n\t\treturn b\n\t}\n\tif b \u003d\u003d nil {\n\t\treturn a\n\t}\n\tca, _ :\u003d a.(*Conjunction)\n\tcb, _ :\u003d b.(*Conjunction)\n\tn :\u003d 2\n\tif ca !\u003d nil {\n\t\tn +\u003d len(ca.Values)-1\n\t}\n\tif cb !\u003d nil {\n\t\tn +\u003d len(cb.Values)-1\n\t}\n\tvs :\u003d make([]Value, 0, n)\n\tif ca !\u003d nil {\n\t\tvs \u003d append(vs, ca.Values...)\n\t} else {\n\t\tvs \u003d append(vs, a)\n\t}\n\tif cb !\u003d nil {\n\t\tvs \u003d append(vs, cb.Values...)\n\t} else {\n\t\tvs \u003d append(vs, b)\n\t}\n\t// TODO: potentially order conjuncts to make match more likely.\n\treturn \u0026Conjunction{Values: vs}\n}\n```",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24b46b56_d0de61aa",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-08-23T17:43:39Z",
+      "side": 1,
+      "message": "The func signature doesn\u0027t seem to indicate that it creates anything. Perhaps adjust the comment to make it clear what it does to c ?",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

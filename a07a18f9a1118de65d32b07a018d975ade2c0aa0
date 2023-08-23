@@ -1,0 +1,440 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87938dc8_2a1aa859",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "is the uppecase N here on purpose?",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 10
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e96e1576_c7eeffef",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "this sentence reads a bit weird, how about:\n\nAs this change increases the size of some data structures,\nit may lead to a small performance hit.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6384c09_9289cd7e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "Just a first pass, I haven\u0027t looked at the implementation yet.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7ea89bd_17c55e58",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "FromDef",
+      "range": {
+        "startLine": 124,
+        "startChar": 4,
+        "endLine": 124,
+        "endChar": 11
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7b050db_a07e8829",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "its",
+      "range": {
+        "startLine": 26,
+        "startChar": 36,
+        "endLine": 26,
+        "endChar": 40
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb1ba653_0aba8733",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "nit: since godoc now has support for links to Go names like [foo] or [pkg.Bar], I would be careful with inline CUE expressions like these, since they might result in broken or confusing links.\n\ngodoc doesn\u0027t support inline code sections, but it does support code blocks per https://tip.golang.org/doc/comment#code, like:\n\n```\n// A PatternConstraint represents a single\n//\n//   [pattern]: T\n```",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "410ab130_baa18999",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "keeps the",
+      "range": {
+        "startLine": 17,
+        "startChar": 13,
+        "endLine": 17,
+        "endChar": 17
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8f04de4_a0135581",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "failing",
+      "range": {
+        "startLine": 25,
+        "startChar": 73,
+        "endLine": 25,
+        "endChar": 77
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c45b09e_e1551708",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "how about making it clearer, like:\n\n\u003e we have enough data to tell for certain.",
+      "range": {
+        "startLine": 26,
+        "startChar": 32,
+        "endLine": 26,
+        "endChar": 49
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d339e968_94699718",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "what do you mean by this? easy to duplicate?",
+      "range": {
+        "startLine": 31,
+        "startChar": 14,
+        "endLine": 31,
+        "endChar": 22
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dbe0a79_b61ccda0",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "nit: I\u0027d use oxford commas throughout, for the sake of clarity",
+      "range": {
+        "startLine": 41,
+        "startChar": 38,
+        "endLine": 41,
+        "endChar": 74
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb94262a_42bf6430",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "\u003e helps filter disjuncts\n\nor, alternatively, although it is longer:\n\n\u003e helps with the filtering of disjuncts",
+      "range": {
+        "startLine": 43,
+        "startChar": 18,
+        "endLine": 43,
+        "endChar": 50
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d034a10d_2bea563d",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "this is explained in the next paragraph; I would probably delete it entirely, since on its own it means nothing, and the next paragraph explains the grouping already.",
+      "range": {
+        "startLine": 59,
+        "startChar": 3,
+        "endLine": 59,
+        "endChar": 53
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbb11ac7_5d97e887",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "are \"group\" and \"grouping\" the same concept in this godoc? it\u0027s not entirely clear to me. if they are separate, I wonder if more distinct terms would be more intuitive.",
+      "range": {
+        "startLine": 62,
+        "startChar": 48,
+        "endLine": 62,
+        "endChar": 56
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "629e0b3d_a618614a",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "reflect",
+      "range": {
+        "startLine": 64,
+        "startChar": 22,
+        "endLine": 64,
+        "endChar": 32
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a807f960_70fb515e",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "Conjuncts",
+      "range": {
+        "startLine": 93,
+        "startChar": 3,
+        "endLine": 93,
+        "endChar": 12
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1af1c3f4_fca0be75",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "as in, uniquely identify? I\u0027d just say that",
+      "range": {
+        "startLine": 102,
+        "startChar": 3,
+        "endLine": 102,
+        "endChar": 9
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "103ca462_a0df4dde",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "presumably this should be spaces?",
+      "range": {
+        "startLine": 127,
+        "startChar": 2,
+        "endLine": 127,
+        "endChar": 6
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81b72fe8_e34a68c4",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "ditto",
+      "range": {
+        "startLine": 135,
+        "startChar": 2,
+        "endLine": 135,
+        "endChar": 6
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b32bb64e_aeef55d5",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-23T16:17:32Z",
+      "side": 1,
+      "message": "this looks to me like it belongs in a different CL, as it modifies existing logic rather than adding the new algorithm in isolation.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

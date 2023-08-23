@@ -217,6 +217,8 @@ type OpContext struct {
 
 	Version EvaluatorVersion
 
+	taskContext
+
 	nest int
 
 	stats        stats.Counts

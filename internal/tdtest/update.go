@@ -204,10 +204,7 @@ func findFileAndPackage(path string, pkgs []*packages.Package) (*ast.File, *pack
 	return nil, nil
 }
 
-const (
-	typeT       = "*cuelang.org/go/internal/tdtest.T"
-	tdtestParen = `("cuelang.org/go/internal/tdtest")`
-)
+const typeT = "*cuelang.org/go/internal/tdtest.T"
 
 // findCalls finds all call expressions within a given block for functions
 // or methods defined within the tdtest package.
@@ -229,10 +226,19 @@ func (i *info) findCalls(block *ast.BlockStmt, names ...string) []*callInfo {
 		info := i.testPkg.TypesInfo
 		for _, name := range names {
 			if sel.Sel.Name == name {
-				if info.TypeOf(sel.X).String() == typeT {
-				} else if ident, ok := sel.X.(*ast.Ident); !ok {
-					return true // Run method.
-				} else if id, ok := info.Uses[ident].(*types.PkgName); ok && strings.Contains(id.String(), tdtestParen) {
+				receiver := info.TypeOf(sel.X).String()
+				if receiver == typeT {
+					// Method.
+				} else if len(c.Args) == 3 {
+					// Run function.
+					fn := c.Args[2].(*ast.FuncLit)
+					if len(fn.Type.Params.List) != 2 {
+						return true
+					}
+					argType := info.TypeOf(fn.Type.Params.List[0].Type).String()
+					if argType != typeT {
+						return true
+					}
 				} else {
 					return true
 				}

@@ -40,9 +40,6 @@ import (
 // - make name field explicit, i.e. Name("name"), field tag, or tdtest.Name type.
 // - allow "skip" field. Again either SkipName("skip"), tag, or Skip type.
 // - allow for tdtest:"noupdate" field tag.
-// - should we derive names from field names? This would require always
-//   loading the packages data upon error. Could be an option to disable, or
-//   implicitly it would only be loaded if there is an error without message.
 // - Option: allow ignore field that lists a set of fields to not be tested
 //   for that particular test case: ignore: tdtest.Ignore("want1", "want2")
 //
@@ -165,6 +162,7 @@ func (t *T) Select(tests ...any) {
 				return
 			}
 		case string:
+			n = strings.ReplaceAll(n, " ", "_")
 			if n == parts[len(parts)-1] {
 				return
 			}

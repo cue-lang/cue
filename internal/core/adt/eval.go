@@ -960,6 +960,10 @@ type nodeContext struct {
 
 	nodeContextState
 
+	// rootCloseContext should not be cloned as clones need to get their own
+	// copies of this and is thus, for safety, not included in nodeContextState.
+	rootCloseContext *closeContext
+
 	// Below are slices that need to be managed when cloning and reclaiming
 	// nodeContexts for reuse. We want to ensure that, instead of setting
 	// slices to nil, we truncate the existing buffers so that they do not

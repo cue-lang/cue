@@ -72,8 +72,8 @@ package adt
 
 // envComprehension caches the result of a single comprehension.
 type envComprehension struct {
-	comp *Comprehension
-	node *Vertex // The Vertex from which the comprehension originates.
+	comp   *Comprehension
+	vertex *Vertex // The Vertex from which the comprehension originates.
 
 	// runtime-related fields
 
@@ -141,8 +141,8 @@ func (n *nodeContext) insertComprehension(
 	ec := c.comp
 	if ec == nil {
 		ec = &envComprehension{
-			comp: c,
-			node: n.node,
+			comp:   c,
+			vertex: n.node,
 
 			err:  nil,   // shut up linter
 			envs: nil,   // shut up linter
@@ -391,7 +391,7 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			envs = append(envs, env)
 		}
 
-		if err := ctx.yield(d.node, d.env, d.comp, state, f); err != nil {
+		if err := ctx.yield(d.vertex, d.env, d.comp, state, f); err != nil {
 			if err.IsIncomplete() {
 				return err
 			}
@@ -399,9 +399,9 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 			// continue to collect other errors.
 			d.done = true
 			d.inserted = true
-			if d.node != nil {
-				d.node.state.addBottom(err)
-				ctx.PopArc(d.node)
+			if d.vertex != nil {
+				d.vertex.state.addBottom(err)
+				ctx.PopArc(d.vertex)
 			}
 			return nil
 		}

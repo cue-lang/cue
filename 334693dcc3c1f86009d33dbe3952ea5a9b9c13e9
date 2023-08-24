@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc4947a5_8a9531db",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T17:26:05Z",
+      "side": 1,
+      "message": "FYI, an alternative route would be to lean into io/fs, where you can write an \"overlay fs\" abstraction. However, io/fs exposes read-only methods, so that\u0027s a bummer since we also want \"update golden files\" to work.",
+      "revId": "334693dcc3c1f86009d33dbe3952ea5a9b9c13e9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f4a7dd5_b3a46d22",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T17:26:05Z",
+      "side": 1,
+      "message": "AlphaVersion, to be consistent with DefaultVersion?\n\nI would also document what is included in it - e.g. for now it would be just the new closedness implementation.\n\nI also wonder whether we should properly version these at all, for example, we could call \"v0.7 plus new closedness implementation\" something like V07NewClosedness, so that later alpha/experimental evaluator versions aren\u0027t confused with this one. Depends on how we want to expose these to the user, particularly keeping in mind future CUE versions and other experimental features we\u0027d want to expose behind an option.",
+      "revId": "334693dcc3c1f86009d33dbe3952ea5a9b9c13e9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

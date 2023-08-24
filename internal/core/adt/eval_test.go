@@ -24,6 +24,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
@@ -51,7 +52,7 @@ func TestEval(t *testing.T) {
 	}
 
 	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc)
+		runEvalTest(tc, adt.DefaultVersion)
 	})
 }
 
@@ -63,7 +64,29 @@ var needFix = map[string]string{
 	"DIR/NAME": "reason",
 }
 
-func runEvalTest(t *cuetxtar.Test) {
+var todoAlpha = map[string]string{
+	"DIR/NAME": "reason",
+}
+
+func TestEvalAlpha(t *testing.T) {
+	test := cuetxtar.TxTarTest{
+		Root:     "../../../cue/testdata",
+		Name:     "evalalpha",
+		Fallback: "eval", // Allow eval golden files to pass these tests.
+		Skip:     alwaysSkip,
+		ToDo:     todoAlpha,
+	}
+
+	if *todo {
+		test.ToDo = nil
+	}
+
+	test.Run(t, func(t *cuetxtar.Test) {
+		runEvalTest(t, adt.VAlpha)
+	})
+}
+
+func runEvalTest(t *cuetxtar.Test, version adt.EvaluatorVersion) {
 	a := t.Instance()
 	r := runtime.New()
 
@@ -75,6 +98,7 @@ func runEvalTest(t *cuetxtar.Test) {
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)
+	ctx.Version = version
 	v.Finalize(ctx)
 
 	stats := ctx.Stats()
@@ -103,8 +127,11 @@ func runEvalTest(t *cuetxtar.Test) {
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
-	verbosity := 0
-	verbosity = 1 // uncomment to turn logging off.
+	var verbosity int
+	verbosity = 1 // comment to turn logging off.
+
+	var version adt.EvaluatorVersion
+	version = adt.VAlpha // comment to use default implementation.
 
 	in := `
 -- cue.mod/module.cue --
@@ -136,11 +163,15 @@ module: "mod.test"
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)
+	ctx.Version = version
 	v.Finalize(ctx)
 	adt.Verbosity = 0
 
-	// b := validate.Validate(ctx, v, &validate.Config{Concrete: true})
-	// t.Log(errors.Details(b.Err, nil))
+	if b := validate.Validate(ctx, v, &validate.Config{
+		AllErrors: true,
+	}); b != nil {
+		t.Log(errors.Details(b.Err, nil))
+	}
 
 	t.Error(debug.NodeString(r, v, nil))
 

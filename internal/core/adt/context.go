@@ -197,6 +197,14 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
+type EvaluatorVersion int
+
+const (
+	DefaultVersion EvaluatorVersion = iota
+
+	VAlpha
+)
+
 // An OpContext implements CUE's unification operation. It only
 // operates on values that are created with the Runtime with which an OpContext
 // is associated. An OpContext is not goroutine safe and only one goroutine may
@@ -204,6 +212,8 @@ func New(v *Vertex, cfg *Config) *OpContext {
 type OpContext struct {
 	Runtime
 	Format func(Node) string
+
+	Version EvaluatorVersion
 
 	nest int
 

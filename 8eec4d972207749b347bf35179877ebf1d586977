@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc4c6337_9b242ded",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T13:48:12Z",
+      "side": 1,
+      "message": "Thanks for clarifying my questions. I reviewed the high-level docs first, then the tests, and now the rest :)",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

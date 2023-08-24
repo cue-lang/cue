@@ -88,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "79eb0811_608eb22c",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T13:48:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a41d6c83_af9dc4df",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "465ff134_0efb5092",
@@ -119,6 +137,24 @@
       "side": 1,
       "message": "The output reflects the representation. It could be, indeed, that grouping nodes are collapsed. But for now this is not implemented. There are actually all kinds of possible optimizations here, but I think it is best to do those when the port is more mature.",
       "parentUuid": "465ff134_0efb5092",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d276a48f_94d8b230",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T13:48:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a2e67f4b_3f02e5ce",
       "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -158,6 +194,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2542a50_751d3814",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T13:48:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "416284e6_14d0353b",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "caf42f6e_ca9a04b3",
@@ -193,6 +247,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd820fa7_b2cc8a02",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T13:48:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "dc12f79c_0f4b0f15",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "887e5deb_72a056be",
@@ -224,6 +296,24 @@
       "side": 1,
       "message": "I don\u0027t think these are all that useful outside of the tests. It is also nice to be able to change them locally without having to worry about breaking stuff elsewhere.",
       "parentUuid": "887e5deb_72a056be",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f91e6385_5fa74688",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T13:48:12Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "ba46fda1_b4384fae",
       "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88981b5d_1012c974",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87938dc8_2a1aa859",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 10
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9e181fbc_b68d9149",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "518aea8c_6d501fa2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Took Daniels rewrite, which amounts to about the same change.",
+      "parentUuid": "9e181fbc_b68d9149",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e96e1576_c7eeffef",
@@ -54,6 +96,24 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "this sentence reads a bit weird, how about:\n\nAs this change increases the size of some data structures,\nit may lead to a small performance hit.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa3452d5_3d1611b2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e96e1576_c7eeffef",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -109,6 +169,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d6cf94b_1d2a3ca7",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8512cbb6_bbf2cb7c",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9684888c_569435d1",
@@ -122,6 +200,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "Maybe clearer (assuming I\u0027ve understood the meaning correctly) as:\n\"This flag is sticky: it will be set for conjuncts created from ...\"\nSame below.\n\n(leave as is if \"stickiness\" is independent of the other property).",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16396105_13a54daa",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9684888c_569435d1",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -166,6 +262,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "151419f7_ebd753d1",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7ea89bd_17c55e58",
+      "range": {
+        "startLine": 124,
+        "startChar": 4,
+        "endLine": 124,
+        "endChar": 11
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7c65f70_5103a26e",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bc809948_e48ac3a0",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7b050db_a07e8829",
@@ -179,6 +317,30 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "its",
+      "range": {
+        "startLine": 26,
+        "startChar": 36,
+        "endLine": 26,
+        "endChar": 40
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "433b641d_d6f40f94",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7b050db_a07e8829",
       "range": {
         "startLine": 26,
         "startChar": 36,
@@ -206,6 +368,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e6b88dc_32b250f0",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb1ba653_0aba8733",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a8466eae_d5795487",
@@ -219,6 +399,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "s/represet/represent/",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43179b65_0dffdd83",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a8466eae_d5795487",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -240,6 +438,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45f48f03_35e7003c",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6603f6d3_f0c0fca6",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aac8a1e4_03b5dfee",
@@ -257,6 +473,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8ffc16b_d03f0a68",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "reworded. \"set\" was correct.",
+      "parentUuid": "aac8a1e4_03b5dfee",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8734c6ba_5e54ad2f",
@@ -270,6 +504,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "s/Elipsis/Ellipsis/\n\nIt would be nice to say what the offset is.\nMaybe:\n\n// insertListEllipsis inserts the given list ellipsis as\n// a pattern constraint on n, applying it to all elements\n// at indexes \u003e\u003d offset.\n\n?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f622e10_a852a65b",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8734c6ba_5e54ad2f",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -293,6 +545,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "db0ede66_4aee3655",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Yes. Features are just a different representation of concrete scalars that can be used as field values, including list indexes.",
+      "parentUuid": "182f5a6d_a701d9b1",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "84416db4_0ae1c010",
         "filename": "internal/core/adt/export_test.go",
         "patchSetId": 1
@@ -304,6 +574,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "s/insert/inserts/",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf23bcb0_adf5fdab",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84416db4_0ae1c010",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -325,6 +613,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "052df1a3_c8966f05",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42fb73c3_2792afd3",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2eab1ce7_ee8697e8",
@@ -338,6 +644,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "Could make this int to avoid the need for explicit int64 type conversions when calling?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ad13b56_1c8086c9",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2eab1ce7_ee8697e8",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -382,6 +706,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "36dbdd89_31abaf5b",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "23933cc9_35ed2cc4",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8adaf3d2_923a6959",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "410ab130_baa18999",
+      "range": {
+        "startLine": 17,
+        "startChar": 13,
+        "endLine": 17,
+        "endChar": 17
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8f04de4_a0135581",
@@ -395,6 +761,30 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "failing",
+      "range": {
+        "startLine": 25,
+        "startChar": 73,
+        "endLine": 25,
+        "endChar": 77
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "548e0abd_274ae25b",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d8f04de4_a0135581",
       "range": {
         "startLine": 25,
         "startChar": 73,
@@ -445,6 +835,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bcc94d3_33429641",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "rephrased according to mvdan\u0027s suggestion.",
+      "parentUuid": "4f002bc3_0330cd33",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "166f085a_65366d5d",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c45b09e_e1551708",
+      "range": {
+        "startLine": 26,
+        "startChar": 32,
+        "endLine": 26,
+        "endChar": 49
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d339e968_94699718",
@@ -458,6 +890,30 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "what do you mean by this? easy to duplicate?",
+      "range": {
+        "startLine": 31,
+        "startChar": 14,
+        "endLine": 31,
+        "endChar": 22
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5bfbe90a_96e177e9",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "rephrased.",
+      "parentUuid": "d339e968_94699718",
       "range": {
         "startLine": 31,
         "startChar": 14,
@@ -491,6 +947,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e924634_2207b8ab",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 41,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dbe0a79_b61ccda0",
+      "range": {
+        "startLine": 41,
+        "startChar": 38,
+        "endLine": 41,
+        "endChar": 74
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb94262a_42bf6430",
@@ -514,6 +994,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "86b1b42e_22ffd479",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb94262a_42bf6430",
+      "range": {
+        "startLine": 43,
+        "startChar": 18,
+        "endLine": 43,
+        "endChar": 50
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ae7ff377_18bd5300",
@@ -527,6 +1031,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "FWIW I saw FromEmbed and FromDef but I didn\u0027t see an equivalent for references. Is that still something to be added?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d20577a7_5eafb45c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Yes, that is why it is marked optional. As for now it is unimplemented.\n\nChanged to optional and unimplemented.",
+      "parentUuid": "ae7ff377_18bd5300",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -571,6 +1093,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5c8d378_50d44dfa",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d034a10d_2bea563d",
+      "range": {
+        "startLine": 59,
+        "startChar": 3,
+        "endLine": 59,
+        "endChar": 53
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44f377c8_f1ee6532",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Rephrased.\n\nBasically, all conjuncts from the same origin are grouped. So two conjuncts originating from two different embeddings are not grouped.",
+      "parentUuid": "fb20d4d1_e3a2cb56",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbb11ac7_5d97e887",
@@ -584,6 +1148,30 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "are \"group\" and \"grouping\" the same concept in this godoc? it\u0027s not entirely clear to me. if they are separate, I wonder if more distinct terms would be more intuitive.",
+      "range": {
+        "startLine": 62,
+        "startChar": 48,
+        "endLine": 62,
+        "endChar": 56
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe46d354_269ff46a",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Removed the word altogether.",
+      "parentUuid": "bbb11ac7_5d97e887",
       "range": {
         "startLine": 62,
         "startChar": 48,
@@ -617,6 +1205,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89fdd235_d10869be",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "629e0b3d_a618614a",
+      "range": {
+        "startLine": 64,
+        "startChar": 22,
+        "endLine": 64,
+        "endChar": 32
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fc8061a3_8f8a4121",
@@ -630,6 +1242,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "marked how? Are \"Dynamic\" and \"inline\" alternatives or synonyms? If the latter, then maybe lose the \"or \".",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a032289_e9fd4b7f",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "synonyms. Removed.",
+      "parentUuid": "fc8061a3_8f8a4121",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -674,6 +1304,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fb0fef9_c29219ef",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a807f960_70fb515e",
+      "range": {
+        "startLine": 93,
+        "startChar": 3,
+        "endLine": 93,
+        "endChar": 12
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6374c6a0_a5de7f72",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "782755be_f5f953b5",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1af1c3f4_fca0be75",
@@ -687,6 +1359,30 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "as in, uniquely identify? I\u0027d just say that",
+      "range": {
+        "startLine": 102,
+        "startChar": 3,
+        "endLine": 102,
+        "endChar": 9
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcd27b4f_13e8e3ec",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1af1c3f4_fca0be75",
       "range": {
         "startLine": 102,
         "startChar": 3,
@@ -714,6 +1410,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "214bb2cd_1cf7f1fc",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6c6dd24_376973c9",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "103ca462_a0df4dde",
@@ -727,6 +1441,30 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "presumably this should be spaces?",
+      "range": {
+        "startLine": 127,
+        "startChar": 2,
+        "endLine": 127,
+        "endChar": 6
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d89fa52_4ff90b7c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "103ca462_a0df4dde",
       "range": {
         "startLine": 127,
         "startChar": 2,
@@ -760,6 +1498,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "358dcba1_79064d92",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81b72fe8_e34a68c4",
+      "range": {
+        "startLine": 135,
+        "startChar": 2,
+        "endLine": 135,
+        "endChar": 6
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8b91ce1b_b97f1efb",
@@ -773,6 +1535,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "This doesn\u0027t appear to be used.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9c8673d_3ac18bf1",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "8b91ce1b_b97f1efb",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -794,6 +1574,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "72861a76_1a05c952",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0f8d4fea_f14d9890",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf855f9b_f9dcd34c",
@@ -807,6 +1605,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "Maybe nicer to phrase this as a comment inside the body of the if statement, so it\u0027s clear how the \"do not carry over closedness info\" statement applies.\n\nThat said, it would also be nice to have a general positive comment about what we\u0027re actually doing here.\n\nParticularly as the condition seems about closedness itself as well as whether it\u0027s an embedding.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6613d0ee_a591dfd2",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf855f9b_f9dcd34c",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -828,6 +1644,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77066262_7415def1",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done: the comment was really for insertArc1.",
+      "parentUuid": "b007e872_b63fa52b",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d684c5a6_596fbe76",
@@ -841,6 +1675,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "Maybe a doc comment briefly describing how insertArc1 and insertArc2 differ from insertArc?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58f2910d_75ab8712",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 309,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d684c5a6_596fbe76",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -862,6 +1714,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1d40faa_d107976e",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 318,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1d6fa27_a95e0d2e",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4a9fd7c_c5a486b4",
@@ -875,6 +1745,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "if a.Label !\u003d f {\n    continue\n}\n\n?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "951c8de8_6fcb1598",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 345,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4a9fd7c_c5a486b4",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -896,6 +1784,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d645fd8_2063302c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 390,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "df3c187b_d820239b",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74b43574_581ceb47",
@@ -909,6 +1815,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "s/need/needs/\n\nAlso, I don\u0027t see any logic below that seems like it might be related to closing, but I\u0027m guessing that\u0027s the Equal test somehow. Maybe add a comment just before the return to that effect?",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a510494d_7961a670",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 400,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done and added comment.",
+      "parentUuid": "74b43574_581ceb47",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -930,6 +1854,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16f96759_226a3933",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done. Also renamed.",
+      "parentUuid": "32c0c08e_b69ae50b",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "747f189b_cabde983",
@@ -943,6 +1885,24 @@
       "writtenOn": "2023-08-23T17:43:39Z",
       "side": 1,
       "message": "doc comment",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a644a393_c8b5abef",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 444,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "747f189b_cabde983",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -964,6 +1924,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ae9f62a_d2ca0142",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 466,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "03867d07_f920f731",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "24b46b56_d0de61aa",
@@ -981,6 +1959,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64574297_7db50904",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24b46b56_d0de61aa",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b32bb64e_aeef55d5",
@@ -994,6 +1990,24 @@
       "writtenOn": "2023-08-23T16:17:32Z",
       "side": 1,
       "message": "this looks to me like it belongs in a different CL, as it modifies existing logic rather than adding the new algorithm in isolation.",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "083afffb_60c6a7c6",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T08:49:29Z",
+      "side": 1,
+      "message": "I thought so to when cleaning up the rebase, and I moved it to a separate CL initially. But it is actually needed to make the test pass: the \"simulated evaluator\" (FieldTester) defined in export_test.go, relies on it.",
+      "parentUuid": "b32bb64e_aeef55d5",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

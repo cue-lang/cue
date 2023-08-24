@@ -16,6 +16,24 @@
       "message": "Upstream\u0027s logic is at https://cs.opensource.google/go/go/+/refs/tags/go1.21.0:src/testing/match.go;l\u003d284-319 if you want to expand yours or even copy theirs. I think this small change is fine for our needs, just FYI.",
       "revId": "4944dfbf324de8a4cd09e52063ad9bf832413072",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f63514fb_710d429a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T07:01:10Z",
+      "side": 1,
+      "message": "That is what I figured, indeed.",
+      "parentUuid": "521f3548_3103d549",
+      "revId": "4944dfbf324de8a4cd09e52063ad9bf832413072",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

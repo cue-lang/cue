@@ -49,6 +49,12 @@ type TxTarTest struct {
 	// TODO: by default derive from the current base directory name.
 	Name string
 
+	// Fallback allows the golden tests named by Fallback to pass tests in
+	// case the golden file corresponding to Name does not exist.
+	// The feature can be used to have two implementations of the same
+	// functionality share the same test sets.
+	Fallback string
+
 	// Skip is a map of tests to skip; the key is the test name; the value is the
 	// skip message.
 	Skip map[string]string
@@ -92,6 +98,7 @@ type Test struct {
 	*testing.T
 
 	prefix   string
+	fallback string
 	buf      *bytes.Buffer // the default buffer
 	outFiles []file
 
@@ -109,14 +116,15 @@ type Test struct {
 func (t *Test) Write(b []byte) (n int, err error) {
 	if t.buf == nil {
 		t.buf = &bytes.Buffer{}
-		t.outFiles = append(t.outFiles, file{t.prefix, t.buf})
+		t.outFiles = append(t.outFiles, file{t.prefix, t.fallback, t.buf})
 	}
 	return t.buf.Write(b)
 }
 
 type file struct {
-	name string
-	buf  *bytes.Buffer
+	name     string
+	fallback string
+	buf      *bytes.Buffer
 }
 
 // HasTag reports whether the tag with the given key is defined
@@ -201,10 +209,13 @@ func (t *Test) WriteFile(f *ast.File) {
 // in the txtar file. If name is empty, data will be written to the test
 // output and checked against "out/\(testName)".
 func (t *Test) Writer(name string) io.Writer {
+	var fallback string
 	switch name {
 	case "":
 		name = t.prefix
+		fallback = t.fallback
 	default:
+		fallback = path.Join(t.fallback, name)
 		name = path.Join(t.prefix, name)
 	}
 
@@ -215,7 +226,7 @@ func (t *Test) Writer(name string) io.Writer {
 	}
 
 	w := &bytes.Buffer{}
-	t.outFiles = append(t.outFiles, file{name, w})
+	t.outFiles = append(t.outFiles, file{name, fallback, w})
 
 	if name == t.prefix {
 		t.buf = w
@@ -326,6 +337,11 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				prefix:     path.Join("out", x.Name),
 				LoadConfig: x.LoadConfig,
 			}
+			if x.Fallback != "" {
+				tc.fallback = path.Join("out", x.Fallback)
+			} else {
+				tc.fallback = tc.prefix
+			}
 
 			if tc.HasTag("skip") {
 				t.Skip()
@@ -341,12 +357,13 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 			update := false
 
 			for i, f := range a.Files {
-
-				if strings.HasPrefix(f.Name, tc.prefix) && (f.Name == tc.prefix || f.Name[len(tc.prefix)] == '/') {
+				hasPrefix := func(s string) bool {
 					// It's either "\(tc.prefix)" or "\(tc.prefix)/..." but not some other name
 					// that happens to start with tc.prefix.
-					tc.hasGold = true
+					return strings.HasPrefix(f.Name, s) && (f.Name == s || f.Name[len(s)] == '/')
 				}
+
+				tc.hasGold = hasPrefix(tc.prefix) || hasPrefix(tc.fallback)
 
 				// Format CUE files as required
 				if tc.HasTag("noformat") || !strings.HasSuffix(f.Name, ".cue") {
@@ -377,6 +394,10 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					k = i
 					break
 				}
+				if i, ok := index[sub.fallback]; ok {
+					k = i
+					break
+				}
 			}
 
 			files := a.Files[:k:k]
@@ -392,6 +413,15 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					delete(index, sub.name)
 
 					if bytes.Equal(gold.Data, result) {
+						continue
+					}
+				} else if i, ok := index[sub.fallback]; ok {
+					gold.Data = a.Files[i].Data
+
+					// Use the golden file of the fallback set if it matches.
+					if bytes.Equal(gold.Data, result) {
+						gold.Name = sub.fallback
+						delete(index, sub.fallback)
 						continue
 					}
 				}

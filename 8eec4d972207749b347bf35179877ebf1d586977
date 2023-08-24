@@ -16,6 +16,722 @@
       "message": "Thanks for clarifying my questions. I reviewed the high-level docs first, then the tests, and now the rest :)",
       "revId": "8eec4d972207749b347bf35179877ebf1d586977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "193bcc4f_864866ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I _think_ I understand what\u0027s going on after a couple of hours of reviews, and hopefully the comments are useful. I\u0027ll leave it here for now with a LGTM. Up to you whether you want to wait for Roger or Aram to be back next week before you merge :)\n\nI imagine that merging is okay, with the idea that they can catch up on the reviews after it\u0027s hit master, and you can continue with your work on top without being blocked.",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27a42ed2_978aa9cf",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "not a big fan of this name for a field used in other files, since it\u0027s too short - how about closeCtx? I imagine the name being slightly longer isn\u0027t a huge deal since we will remove closeInfo and embed closeContext in the not-so-distant future, when the old implementation is removed.",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f45b8ef_99ea899c",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "meaning that we should remove it at some point, hence a TODO, or that it\u0027s old behavior that we must keep around for a long time?",
+      "range": {
+        "startLine": 149,
+        "startChar": 2,
+        "endLine": 149,
+        "endChar": 24
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ea73077_b4358583",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "surely you mean \"slow\" here? otherwise this TODO doesn\u0027t make sense to me.",
+      "range": {
+        "startLine": 216,
+        "startChar": 70,
+        "endLine": 216,
+        "endChar": 74
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a540cd9_31d678f3",
+        "filename": "internal/core/adt/constraints_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I would assume this to be a no-op if I saw it, to be honest, since you\u0027re seemingly getting an error value and throwing it away.",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "af056d6e_d7faf3af",
+        "filename": "internal/core/adt/constraints_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "this puzzled me for longer than I\u0027d like to admit, as I was reading it like `_ | _` - top or top, which should match. I guess yet another reason to drop this token :)",
+      "range": {
+        "startLine": 77,
+        "startChar": 11,
+        "endLine": 77,
+        "endChar": 14
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "880cffb6_3ac8d5d0",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 964,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I understood what you mean here after three reads, but the wording is a bit confusing :)",
+      "range": {
+        "startLine": 963,
+        "startChar": 42,
+        "endLine": 964,
+        "endChar": 30
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32e74276_cbc27c27",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "nit: I\u0027d always write type switches like `switch a :\u003d a.(type)` unless there\u0027s a very good reason to use a different name. it\u0027s also nicer as it prevents using the interface value by mistake, since it\u0027s shadowed.",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fe54461_600b2255",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "verified against, maybe? I feel like one word is missing here.",
+      "range": {
+        "startLine": 156,
+        "startChar": 67,
+        "endLine": 156,
+        "endChar": 75
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ab763d3_3c42701d",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "maintains, or holds",
+      "range": {
+        "startLine": 162,
+        "startChar": 9,
+        "endLine": 162,
+        "endChar": 23
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e6cfbff7_7757813c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "remove \"the\"?",
+      "range": {
+        "startLine": 184,
+        "startChar": 41,
+        "endLine": 184,
+        "endChar": 44
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae565296_cfeb098f",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "did you mean `parent.src` here?",
+      "range": {
+        "startLine": 192,
+        "startChar": 39,
+        "endLine": 192,
+        "endChar": 50
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57de2241_83fc7430",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "Out of curiosity, why is this type Value and not type Expr? Or, if it needs to be Value with the extra methods (Concreteness and Kind), why is the field named Expr and documented as \"contains the Expr\"?",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a25b4758_7fa08e4d",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I\u0027m slightly confused; closeNodeType is not a bitset, since closeDef and closeEmbed are of value `iota` rather than something like `1 \u003c\u003c iota`.\n\nIf they were indeed bitsets, and you could have both set at the same time, then the type should be updated and we should probably write\n\n```\nc.cc.isDef \u003d t\u0026closeDef !\u003d 0\nc.cc.isEmbed \u003d t\u0026closeEmbed !\u003d 0\n```\n\nIf it\u0027s not meant as a bitset, then I think we should write\n\n```\nswitch t {\ncase closeDef:\n    c.cc.isDef \u003d true\ncase closeEmbed:\n    c.cc.isEmbed \u003d true\n}\n```",
+      "range": {
+        "startLine": 218,
+        "startChar": 1,
+        "endLine": 223,
+        "endChar": 2
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "841c8f6f_0de3a343",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I fail to parse this sentence, is a word missing perhaps? like:\n\n\u003e used by insertArc when inserting ...",
+      "range": {
+        "startLine": 321,
+        "startChar": 2,
+        "endLine": 323,
+        "endChar": 41
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de8c34be_856569d8",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "it seems to me like this check is redundant with the call sites in insertArc, since they pass c, and it already checked that c.CloseInfo.cc is not nil.",
+      "range": {
+        "startLine": 326,
+        "startChar": 1,
+        "endLine": 328,
+        "endChar": 2
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55783172_3c98721b",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "nit: \"called from\", since you say \"is used to\" right after, to avoid confusion.",
+      "range": {
+        "startLine": 354,
+        "startChar": 28,
+        "endLine": 354,
+        "endChar": 35
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cfe913bb_f6821362",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I think this word is unnecessary?",
+      "range": {
+        "startLine": 355,
+        "startChar": 31,
+        "endLine": 355,
+        "endChar": 33
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cebba188_56498fa1",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "`check` is only set in this `true` argument here, so it\u0027s never false - is that what the TODO here is about? do we expect to have a mix of true and false `check` values soon?",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f574520_f440cf89",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I imagine that if `cc.isTotal` is true you don\u0027t need to do anything besides return early, i.e.\n\n```\nif cc.isTotal {\n    return\n}\nif isTotal(pattern) {\n    cc.isTotal \u003d true\n    cc.Patterns \u003d cc.Patterns[:0]\n    return\n}\n```\n\nprobably not any noticeable difference perf wise, but it confused me for a second why Patterns could be non-empty once isTotal is already true.",
+      "range": {
+        "startLine": 417,
+        "startChar": 1,
+        "endLine": 421,
+        "endChar": 2
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "920a0837_a137d365",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "did you mean \"then\"? but perhaps \"first\" would be better, since you do that before closing dst with the patterns.",
+      "range": {
+        "startLine": 448,
+        "startChar": 6,
+        "endLine": 448,
+        "endChar": 9
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9e6bc2b_b21e5cc9",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I would name the disallowedField Go field something else, like `notAllowedErrorEmitted`, to clarify that the meaning is that _we already reported the error_, not that the field is never allowed. In the latter case, I would expect us to _always_ report an error, unless I remembered the docs elsewhere in the codebase explaining that the purpose is to not show duplicate errors.",
+      "range": {
+        "startLine": 457,
+        "startChar": 4,
+        "endLine": 458,
+        "endChar": 10
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "121ca46c_e9790bc6",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "this seems like a fairly worrying TODO :)",
+      "range": {
+        "startLine": 469,
+        "startChar": 4,
+        "endLine": 469,
+        "endChar": 62
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a4f2448_e3f78204",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "a",
+      "range": {
+        "startLine": 475,
+        "startChar": 27,
+        "endLine": 475,
+        "endChar": 29
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57f582d6_222e8754",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "is it possible for ca or cb to be non-nil but with an empty Values slice? because if it\u0027s possible, it does make your length estimation slightly off, although it\u0027s not a big deal.",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3115c1d0_59d5d982",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "matching?",
+      "range": {
+        "startLine": 519,
+        "startChar": 46,
+        "endLine": 519,
+        "endChar": 51
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "44a14d59_b4233a6c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "updates",
+      "range": {
+        "startLine": 523,
+        "startChar": 19,
+        "endLine": 523,
+        "endChar": 25
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8e547c0_49d12272",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I would remove the two commas here - otherwise there are too many pauses in this sentence.",
+      "range": {
+        "startLine": 524,
+        "startChar": 36,
+        "endLine": 525,
+        "endChar": 22
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb7c2c86_e7062755",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "closed?",
+      "range": {
+        "startLine": 547,
+        "startChar": 14,
+        "endLine": 547,
+        "endChar": 19
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd429918_c2137d83",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "matching?",
+      "range": {
+        "startLine": 564,
+        "startChar": 47,
+        "endLine": 564,
+        "endChar": 52
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "faf753ee_e380e396",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "I struggle to understand why `[d]{notShared}` is duplicated here... I read your comment above but it\u0027s still not clicking.",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f491d0a0_a29dddbc",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "is it expected that b and c don\u0027t have their contents sorted or normalized, which would make them equal?",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "878730ea_249b1d04",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "in what cases could deduplication be a bad idea? could we not always do it?",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c885ae2_8ba0b6f3",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T14:51:22Z",
+      "side": 1,
+      "message": "earlier there were cases which also unified into errors on the value side - does this test/code only find some types of errors, like \"field not allowed\"?",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

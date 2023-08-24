@@ -16,6 +16,24 @@
       "message": "FYI this would be nicer if we avoided go/ast matching altogether, like what I did in https://review.gerrithub.io/c/cue-lang/cue/+/557328. But this is a good incremental change nonetheless.",
       "revId": "d52a0a60314242175bf50e464500b44690c2bd0d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f40c655_b335d1a8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T07:03:02Z",
+      "side": 1,
+      "message": "Would be nice at some point indeed.",
+      "parentUuid": "6920c157_04243783",
+      "revId": "d52a0a60314242175bf50e464500b44690c2bd0d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

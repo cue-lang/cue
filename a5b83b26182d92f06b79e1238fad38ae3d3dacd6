@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3a8c2527_80d0ea27",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T12:56:46Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "c2392026_6ab5049d",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3ccdba46_355c0f06",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-08-24T10:53:36Z",
       "side": 1,
       "message": "what are your thoughts on naming sub-tests like `DoubleNested` instead of `double nested`? I tend to prefer avoiding spaces since they\u0027ll get replaced in the CLI, so the same CamelCasing that top-level test names use can be more consistent in this way.",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a41d6c83_af9dc4df",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T12:56:46Z",
+      "side": 1,
+      "message": "I understand your reasoning. I still prefer this, though. Sometimes the names become quite large descriptions and then camelcase reads a bit odd.",
+      "parentUuid": "3ccdba46_355c0f06",
       "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +107,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a2e67f4b_3f02e5ce",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T12:56:46Z",
+      "side": 1,
+      "message": "The output reflects the representation. It could be, indeed, that grouping nodes are collapsed. But for now this is not implemented. There are actually all kinds of possible optimizations here, but I think it is best to do those when the port is more mature.",
+      "parentUuid": "465ff134_0efb5092",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b449cebf_b78e4534",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 2
@@ -82,6 +136,24 @@
       "writtenOn": "2023-08-24T10:53:36Z",
       "side": 1,
       "message": "is it by design that the arc \"a\" also contains the value \"string\", even though it\u0027s technically redundant with the pattern below? I can see how this can help with the algorithm, although it could blow things up a bit in terms of repetition, e.g. if you have ten pattern constraints and a thousand fields (arcs) matching them.",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "416284e6_14d0353b",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T12:56:46Z",
+      "side": 1,
+      "message": "Yep. The conjuncts of all patterns that match a field are \"collated\" with the respective arcs (a Vertex). That is what is reflected here. I guess theoretically this could be done lazily, but that is not how this works at the moment. Might be interesting to investigate at some point.",
+      "parentUuid": "b449cebf_b78e4534",
       "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +177,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dc12f79c_0f4b0f15",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T12:56:46Z",
+      "side": 1,
+      "message": "Correct. So indeed evaluation of field \"m\" will lead to an error. That is not reflected here, as this code reflects a \"collation\" stage, if you will, and does not handle evaluation.",
+      "parentUuid": "caf42f6e_ca9a04b3",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "887e5deb_72a056be",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 2
@@ -122,6 +212,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ba46fda1_b4384fae",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T12:56:46Z",
+      "side": 1,
+      "message": "I don\u0027t think these are all that useful outside of the tests. It is also nice to be able to change them locally without having to worry about breaking stuff elsewhere.",
+      "parentUuid": "887e5deb_72a056be",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0fb59c7d_a4b6f6dc",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 2
@@ -133,6 +241,24 @@
       "writtenOn": "2023-08-24T10:53:36Z",
       "side": 1,
       "message": "FieldTester is passed around in these helpers, but you really only need the runtime/context. Pass that around instead?",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "422aec16_88bc9d6f",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-24T12:56:46Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "0fb59c7d_a4b6f6dc",
       "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

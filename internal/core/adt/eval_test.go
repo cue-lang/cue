@@ -37,6 +37,7 @@ var (
 	todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
 )
 
+// TestEval tests the default implementation of the evaluator.
 func TestEval(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root: "../../../cue/testdata",
@@ -49,42 +50,8 @@ func TestEval(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	test.Run(t, func(t *cuetxtar.Test) {
-		a := t.Instance()
-		r := runtime.New()
-
-		v, err := r.Build(nil, a)
-		if err != nil {
-			t.WriteErrors(err)
-			return
-		}
-
-		e := eval.New(r)
-		ctx := e.NewContext(v)
-		v.Finalize(ctx)
-
-		stats := ctx.Stats()
-		w := t.Writer("stats")
-		fmt.Fprintln(w, stats)
-		// if n := stats.Leaks(); n > 0 {
-		// 	t.Skipf("%d leaks reported", n)
-		// }
-
-		if b := validate.Validate(ctx, v, &validate.Config{
-			AllErrors: true,
-		}); b != nil {
-			fmt.Fprintln(t, "Errors:")
-			t.WriteErrors(b.Err)
-			fmt.Fprintln(t, "")
-			fmt.Fprintln(t, "Result:")
-		}
-
-		if v == nil {
-			return
-		}
-
-		debug.WriteNode(t, r, v, &debug.Config{Cwd: t.Dir})
-		fmt.Fprintln(t)
+	test.Run(t, func(tc *cuetxtar.Test) {
+		runEvalTest(tc)
 	})
 }
 
@@ -94,6 +61,44 @@ var alwaysSkip = map[string]string{
 
 var needFix = map[string]string{
 	"DIR/NAME": "reason",
+}
+
+func runEvalTest(t *cuetxtar.Test) {
+	a := t.Instance()
+	r := runtime.New()
+
+	v, err := r.Build(nil, a)
+	if err != nil {
+		t.WriteErrors(err)
+		return
+	}
+
+	e := eval.New(r)
+	ctx := e.NewContext(v)
+	v.Finalize(ctx)
+
+	stats := ctx.Stats()
+	w := t.Writer("stats")
+	fmt.Fprintln(w, stats)
+	// if n := stats.Leaks(); n > 0 {
+	// 	t.Skipf("%d leaks reported", n)
+	// }
+
+	if b := validate.Validate(ctx, v, &validate.Config{
+		AllErrors: true,
+	}); b != nil {
+		fmt.Fprintln(t, "Errors:")
+		t.WriteErrors(b.Err)
+		fmt.Fprintln(t, "")
+		fmt.Fprintln(t, "Result:")
+	}
+
+	if v == nil {
+		return
+	}
+
+	debug.WriteNode(t, r, v, &debug.Config{Cwd: t.Dir})
+	fmt.Fprintln(t)
 }
 
 // TestX is for debugging. Do not delete.

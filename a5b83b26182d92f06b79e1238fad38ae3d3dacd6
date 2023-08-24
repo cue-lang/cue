@@ -1,0 +1,140 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af9d705b_3df608da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "still not done...",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2392026_6ab5049d",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "should this func check for an error?",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ccdba46_355c0f06",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "what are your thoughts on naming sub-tests like `DoubleNested` instead of `double nested`? I tend to prefer avoiding spaces since they\u0027ll get replaced in the CLI, so the same CamelCasing that top-level test names use can be more consistent in this way.",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "465ff134_0efb5092",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "could the `[e]{ [d]{` instead be `[ed]{`? reading the implementation I think the answer is yes, so I wonder if this is just a quirk of how the EmbedDef test helper works, or if we do want to always keep these From booleans at separate levels when set.",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b449cebf_b78e4534",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "is it by design that the arc \"a\" also contains the value \"string\", even though it\u0027s technically redundant with the pattern below? I can see how this can help with the algorithm, although it could blow things up a bit in terms of repetition, e.g. if you have ten pattern constraints and a thousand fields (arcs) matching them.",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "caf42f6e_ca9a04b3",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "to double check, does this mean `[string]: 1 \u0026 2`, i.e. an error, or something else like `[string]: {\"1\": _, \"2\": _}`?",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "887e5deb_72a056be",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 515,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "part of me wonders if these printers belong in a test file, unless they\u0027re really only useful for testing the adt package itself, and nothing else like human debugging or testing other packages.",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fb59c7d_a4b6f6dc",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 571,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "FieldTester is passed around in these helpers, but you really only need the runtime/context. Pass that around instead?",
+      "revId": "a5b83b26182d92f06b79e1238fad38ae3d3dacd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

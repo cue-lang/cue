@@ -924,6 +924,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d6e2f59_dd8a5960",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5bfbe90a_96e177e9",
+      "range": {
+        "startLine": 31,
+        "startChar": 14,
+        "endLine": 31,
+        "endChar": 22
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9dbe0a79_b61ccda0",
@@ -1172,6 +1196,30 @@
       "side": 1,
       "message": "Removed the word altogether.",
       "parentUuid": "bbb11ac7_5d97e887",
+      "range": {
+        "startLine": 62,
+        "startChar": 48,
+        "endLine": 62,
+        "endChar": 56
+      },
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "237e8b14_8b7d5c84",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "Ack; easier to understand now.",
+      "parentUuid": "fe46d354_269ff46a",
       "range": {
         "startLine": 62,
         "startChar": 48,
@@ -2008,6 +2056,24 @@
       "side": 1,
       "message": "I thought so to when cleaning up the rebase, and I moved it to a separate CL initially. But it is actually needed to make the test pass: the \"simulated evaluator\" (FieldTester) defined in export_test.go, relies on it.",
       "parentUuid": "b32bb64e_aeef55d5",
+      "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33a5fe1d_c0deea7e",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 331,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-24T10:53:36Z",
+      "side": 1,
+      "message": "Ah I see. Perhaps call this out in the commit message.",
+      "parentUuid": "083afffb_60c6a7c6",
       "revId": "a07a18f9a1118de65d32b07a018d975ade2c0aa0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

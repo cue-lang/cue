@@ -33,6 +33,24 @@
       "message": "AlphaVersion, to be consistent with DefaultVersion?\n\nI would also document what is included in it - e.g. for now it would be just the new closedness implementation.\n\nI also wonder whether we should properly version these at all, for example, we could call \"v0.7 plus new closedness implementation\" something like V07NewClosedness, so that later alpha/experimental evaluator versions aren\u0027t confused with this one. Depends on how we want to expose these to the user, particularly keeping in mind future CUE versions and other experimental features we\u0027d want to expose behind an option.",
       "revId": "334693dcc3c1f86009d33dbe3952ea5a9b9c13e9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bbd1f7f_15755def",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:11:13Z",
+      "side": 1,
+      "message": "My idea was that we would eventually have V0_6, etc. and even make this a regular mechanism of the evaluator to support different semantics for different versions.\n\nMaybe this is getting ahead of ourselves, but in such a case starting with V seemed nice. But that still does not mean we cannot use your name, of course.\n\nCome to think of it, VAlpha is a bit too generous. I think \"Dev\" is a better name. So maybe DevVersion.\n\nBut indeed, I can imagine we go in that direction. That is why I did VAlpha for now. I don\u0027t think I will get as fine grained as new closedness and all. Just having the development version seems enough.",
+      "parentUuid": "1f4a7dd5_b3a46d22",
+      "revId": "334693dcc3c1f86009d33dbe3952ea5a9b9c13e9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

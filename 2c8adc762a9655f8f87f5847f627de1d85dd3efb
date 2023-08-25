@@ -16,6 +16,24 @@
       "message": "did you mean to delete the entire godoc?",
       "revId": "2c8adc762a9655f8f87f5847f627de1d85dd3efb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e77da1c4_c75ac40d",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 974,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:15:05Z",
+      "side": 0,
+      "message": "Nope! Fixed.",
+      "parentUuid": "cf17b0a2_6f63758d",
+      "revId": "2c8adc762a9655f8f87f5847f627de1d85dd3efb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

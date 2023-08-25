@@ -16,6 +16,24 @@
       "message": "shouldn\u0027t `cc` be passed instead of `nil`?",
       "revId": "8d953649193c18b7c292166c26a3861f17c2ee88",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0c5bc21_882daff6",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1089,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:15:05Z",
+      "side": 1,
+      "message": "Good catch. Must have slipped in when moving back and forth on whether changing the signature of addNotify now or later.\n\nFixed.",
+      "parentUuid": "986b5410_1cc8fb56",
+      "revId": "8d953649193c18b7c292166c26a3861f17c2ee88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

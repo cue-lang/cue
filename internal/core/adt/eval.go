@@ -671,8 +671,7 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		// n := d.node.getNodeContext(ctx)
 		// n.addBottom(err)
 		if final && c.vertex != nil && c.vertex.status != finalized {
-			n := c.vertex.getNodeContext(n.ctx, 0)
-			n.addBottom(err)
+			c.vertex.state.addBottom(err)
 			c.vertex = nil
 		}
 	}
@@ -700,8 +699,7 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		// n := d.node.getNodeContext(ctx)
 		// n.addBottom(err)
 		if c.vertex != nil && c.vertex.status != finalized {
-			n := c.vertex.getNodeContext(n.ctx, 0)
-			n.addBottom(err)
+			c.vertex.state.addBottom(err)
 			c.vertex = nil
 		}
 	}

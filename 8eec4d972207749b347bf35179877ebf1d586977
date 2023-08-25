@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "671f450a_a5e1234d",
+        "filename": "internal/core/adt/closed.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Added a TODO to not interfere with rebase for now.",
+      "parentUuid": "27a42ed2_978aa9cf",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f45b8ef_99ea899c",
@@ -65,6 +83,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "meaning that we should remove it at some point, hence a TODO, or that it\u0027s old behavior that we must keep around for a long time?",
+      "range": {
+        "startLine": 149,
+        "startChar": 2,
+        "endLine": 149,
+        "endChar": 24
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d9ed8d8_395004ed",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Not sure what I meant, other than that this is clearly a copy paste of the code in optional.go. I updated to what I _think_ I meant.",
+      "parentUuid": "5f45b8ef_99ea899c",
       "range": {
         "startLine": 149,
         "startChar": 2,
@@ -98,6 +140,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "258a3f01_a432e53b",
+        "filename": "internal/core/adt/constraints.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "indeed. Good catch.",
+      "parentUuid": "3ea73077_b4358583",
+      "range": {
+        "startLine": 216,
+        "startChar": 70,
+        "endLine": 216,
+        "endChar": 74
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2a540cd9_31d678f3",
@@ -117,6 +183,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "aaa4d78e_92a61ab6",
+        "filename": "internal/core/adt/constraints_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "That is why the comment is there. Err() also resets the recorded errors in the context. This is done to avoid them carrying over to the next run, which reuses ctx.\n\nErr should probably be renamed GetAndClearErr() or something.",
+      "parentUuid": "2a540cd9_31d678f3",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "af056d6e_d7faf3af",
         "filename": "internal/core/adt/constraints_test.go",
         "patchSetId": 4
@@ -128,6 +212,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "this puzzled me for longer than I\u0027d like to admit, as I was reading it like `_ | _` - top or top, which should match. I guess yet another reason to drop this token :)",
+      "range": {
+        "startLine": 77,
+        "startChar": 11,
+        "endLine": 77,
+        "endChar": 14
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4b9bab2_e481598d",
+        "filename": "internal/core/adt/constraints_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Yep. 😊",
+      "parentUuid": "af056d6e_d7faf3af",
       "range": {
         "startLine": 77,
         "startChar": 11,
@@ -161,6 +269,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15569888_9b96d945",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 964,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "rephrased.",
+      "parentUuid": "880cffb6_3ac8d5d0",
+      "range": {
+        "startLine": 963,
+        "startChar": 42,
+        "endLine": 964,
+        "endChar": 30
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32e74276_cbc27c27",
@@ -178,6 +310,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ccb34f9_6f53726b",
+        "filename": "internal/core/adt/export_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "32e74276_cbc27c27",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9fe54461_600b2255",
@@ -191,6 +341,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "verified against, maybe? I feel like one word is missing here.",
+      "range": {
+        "startLine": 156,
+        "startChar": 67,
+        "endLine": 156,
+        "endChar": 75
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cf23df7_4ebc3a4c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fe54461_600b2255",
       "range": {
         "startLine": 156,
         "startChar": 67,
@@ -224,6 +398,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "74594e41_5487d0ad",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5ab763d3_3c42701d",
+      "range": {
+        "startLine": 162,
+        "startChar": 9,
+        "endLine": 162,
+        "endChar": 23
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e6cfbff7_7757813c",
@@ -237,6 +435,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "remove \"the\"?",
+      "range": {
+        "startLine": 184,
+        "startChar": 41,
+        "endLine": 184,
+        "endChar": 44
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "29dcccdd_939c57dd",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 184,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e6cfbff7_7757813c",
       "range": {
         "startLine": 184,
         "startChar": 41,
@@ -270,6 +492,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6bdf080_134ee2d1",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done. Seems like it.",
+      "parentUuid": "ae565296_cfeb098f",
+      "range": {
+        "startLine": 192,
+        "startChar": 39,
+        "endLine": 192,
+        "endChar": 50
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57de2241_83fc7430",
@@ -289,6 +535,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "cd433fbe_c2e81aa8",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "This is a result of type being values in CUE. For usage purposes, it really is an expression. In CUE terms, where Value means a fully evaluated CUE expression, it really is a Value: it is guaranteed that all references, etc. have been eliminated and no more resolution is needed to be able to unify it against a scalar value.",
+      "parentUuid": "57de2241_83fc7430",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a25b4758_7fa08e4d",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 4
@@ -300,6 +564,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "I\u0027m slightly confused; closeNodeType is not a bitset, since closeDef and closeEmbed are of value `iota` rather than something like `1 \u003c\u003c iota`.\n\nIf they were indeed bitsets, and you could have both set at the same time, then the type should be updated and we should probably write\n\n```\nc.cc.isDef \u003d t\u0026closeDef !\u003d 0\nc.cc.isEmbed \u003d t\u0026closeEmbed !\u003d 0\n```\n\nIf it\u0027s not meant as a bitset, then I think we should write\n\n```\nswitch t {\ncase closeDef:\n    c.cc.isDef \u003d true\ncase closeEmbed:\n    c.cc.isEmbed \u003d true\n}\n```",
+      "range": {
+        "startLine": 218,
+        "startChar": 1,
+        "endLine": 223,
+        "endChar": 2
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9f6826b_bb4fcfa5",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Good catch. It is a bitset later in the rebase.\n\nNot sure if it should be, by hindsight, so I\u0027ve fix this here, rather than making it a bitset now.",
+      "parentUuid": "a25b4758_7fa08e4d",
       "range": {
         "startLine": 218,
         "startChar": 1,
@@ -333,6 +621,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69a15341_10006f9e",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 323,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "841c8f6f_0de3a343",
+      "range": {
+        "startLine": 321,
+        "startChar": 2,
+        "endLine": 323,
+        "endChar": 41
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de8c34be_856569d8",
@@ -356,6 +668,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd8989ba_5bf50a09",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "removed.",
+      "parentUuid": "de8c34be_856569d8",
+      "range": {
+        "startLine": 326,
+        "startChar": 1,
+        "endLine": 328,
+        "endChar": 2
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55783172_3c98721b",
@@ -369,6 +705,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "nit: \"called from\", since you say \"is used to\" right after, to avoid confusion.",
+      "range": {
+        "startLine": 354,
+        "startChar": 28,
+        "endLine": 354,
+        "endChar": 35
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd8b48b9_399b1c0d",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 354,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55783172_3c98721b",
       "range": {
         "startLine": 354,
         "startChar": 28,
@@ -404,6 +764,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6fe33fd0_cfe8f5bb",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "reworded a bit.",
+      "parentUuid": "cfe913bb_f6821362",
+      "range": {
+        "startLine": 355,
+        "startChar": 31,
+        "endLine": 355,
+        "endChar": 33
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "cebba188_56498fa1",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 4
@@ -421,6 +805,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b1a9c410_19f26a30",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "The new implementation uses it with both values, but it is not checked in yet.\n\nThe TODO is merely questioning which value we should use here.",
+      "parentUuid": "cebba188_56498fa1",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3f574520_f440cf89",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 4
@@ -432,6 +834,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "I imagine that if `cc.isTotal` is true you don\u0027t need to do anything besides return early, i.e.\n\n```\nif cc.isTotal {\n    return\n}\nif isTotal(pattern) {\n    cc.isTotal \u003d true\n    cc.Patterns \u003d cc.Patterns[:0]\n    return\n}\n```\n\nprobably not any noticeable difference perf wise, but it confused me for a second why Patterns could be non-empty once isTotal is already true.",
+      "range": {
+        "startLine": 417,
+        "startChar": 1,
+        "endLine": 421,
+        "endChar": 2
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8da95310_ecd17b5a",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 421,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3f574520_f440cf89",
       "range": {
         "startLine": 417,
         "startChar": 1,
@@ -465,6 +891,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be4c5824_c15e4555",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 448,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "920a0837_a137d365",
+      "range": {
+        "startLine": 448,
+        "startChar": 6,
+        "endLine": 448,
+        "endChar": 9
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b9e6bc2b_b21e5cc9",
@@ -478,6 +928,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "I would name the disallowedField Go field something else, like `notAllowedErrorEmitted`, to clarify that the meaning is that _we already reported the error_, not that the field is never allowed. In the latter case, I would expect us to _always_ report an error, unless I remembered the docs elsewhere in the codebase explaining that the purpose is to not show duplicate errors.",
+      "range": {
+        "startLine": 457,
+        "startChar": 4,
+        "endLine": 458,
+        "endChar": 10
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0101f35_386b741a",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Added a comment. Keeping the name to not mess with rebase too much.",
+      "parentUuid": "b9e6bc2b_b21e5cc9",
       "range": {
         "startLine": 457,
         "startChar": 4,
@@ -511,6 +985,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6b5b31e_2153b47c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 469,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "I forgot why this works. I removed the TODO and added a comment for my own sanity at least. 😊 Also added a if statement to make it clearer when this is necessary.",
+      "parentUuid": "121ca46c_e9790bc6",
+      "range": {
+        "startLine": 469,
+        "startChar": 4,
+        "endLine": 469,
+        "endChar": 62
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6a4f2448_e3f78204",
@@ -524,6 +1022,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "a",
+      "range": {
+        "startLine": 475,
+        "startChar": 27,
+        "endLine": 475,
+        "endChar": 29
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd702a8b_d994f3d6",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 475,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a4f2448_e3f78204",
       "range": {
         "startLine": 475,
         "startChar": 27,
@@ -553,6 +1075,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6e127cac_b1711513",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "The Conjunction should always have 2 values, or at a minimum 1, at least.",
+      "parentUuid": "57f582d6_222e8754",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3115c1d0_59d5d982",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 4
@@ -564,6 +1104,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "matching?",
+      "range": {
+        "startLine": 519,
+        "startChar": 46,
+        "endLine": 519,
+        "endChar": 51
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a656bb7_4a3f81f2",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 519,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3115c1d0_59d5d982",
       "range": {
         "startLine": 519,
         "startChar": 46,
@@ -597,6 +1161,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0540cbfe_53efc6a1",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 523,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44a14d59_b4233a6c",
+      "range": {
+        "startLine": 523,
+        "startChar": 19,
+        "endLine": 523,
+        "endChar": 25
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e8e547c0_49d12272",
@@ -610,6 +1198,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "I would remove the two commas here - otherwise there are too many pauses in this sentence.",
+      "range": {
+        "startLine": 524,
+        "startChar": 36,
+        "endLine": 525,
+        "endChar": 22
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5da2f3cf_826bcb09",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 525,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e8e547c0_49d12272",
       "range": {
         "startLine": 524,
         "startChar": 36,
@@ -643,6 +1255,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c205f19_f05f1637",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb7c2c86_e7062755",
+      "range": {
+        "startLine": 547,
+        "startChar": 14,
+        "endLine": 547,
+        "endChar": 19
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd429918_c2137d83",
@@ -656,6 +1292,30 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "matching?",
+      "range": {
+        "startLine": 564,
+        "startChar": 47,
+        "endLine": 564,
+        "endChar": 52
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d086f31f_f20dffd0",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 564,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd429918_c2137d83",
       "range": {
         "startLine": 564,
         "startChar": 47,
@@ -685,6 +1345,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9a39353f_350a9713",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Added a comment. Theoretically it could be shared, in this case. There is no mechanism to catch this, though, as conjunctions are only disambiguated based on pointer identity.\n\nAlso, this would work in the real evaluator as there we are dealing with references to definitions. With the simulator, though, every Def is really a new \"virtual\" type.",
+      "parentUuid": "faf753ee_e380e396",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f491d0a0_a29dddbc",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 4
@@ -696,6 +1374,24 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "is it expected that b and c don\u0027t have their contents sorted or normalized, which would make them equal?",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d674a481_8606742e",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "It is indeed not necessary to sort it. Equality is only checked after evaluation, and not at the conjunct level.",
+      "parentUuid": "f491d0a0_a29dddbc",
       "revId": "8eec4d972207749b347bf35179877ebf1d586977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -719,6 +1415,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "89f60e3a_9e1b3ea1",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Things should not be deduplicated, for instance, if otherwise conjuncts originate from a different closedContext or Environment. Deduplicating when these _are_ equal is critical, though, as it can avoid combinatorial explosion.\n\nAlso note that deduplication is only done at the pointer level. The idea here is that we really only need to dedup if the exact same element from the configuration is unified multiple times with the same closeContext, in which case the pointers will be equal, as this can lead to a combinatorial explosion. In all other cases, it is fine and even desirable to let normal evaluation handle the deduplication, as it will preserve provenance better.\n\nIn the old evaluator we also had to consider the Environment, as that was a proxy for \"closedness grouping\". But in reality the Environment was often different for other reasons. The groupings in the new algorithm should be much more accurate in deduping exactly what can be deduped, making it more efficient.",
+      "parentUuid": "878730ea_249b1d04",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8c885ae2_8ba0b6f3",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 4
@@ -730,6 +1444,24 @@
       "writtenOn": "2023-08-24T14:51:22Z",
       "side": 1,
       "message": "earlier there were cases which also unified into errors on the value side - does this test/code only find some types of errors, like \"field not allowed\"?",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0f1c05c7_0553b91b",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-08-25T11:01:01Z",
+      "side": 1,
+      "message": "Indeed. This code only handles closedness and the collation of conjuncts necessary to do that. It does not evaluate conjuncts and thus will not find unification errors as such.",
+      "parentUuid": "8c885ae2_8ba0b6f3",
       "revId": "8eec4d972207749b347bf35179877ebf1d586977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

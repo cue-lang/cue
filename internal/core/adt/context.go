@@ -806,6 +806,11 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state vertexStat
 	// 	kind = x.BaseValue.Kind()
 	// }
 
+	// Add lists if we have evidence that a list is needed.
+	if n := x.state; n != nil && l.IsInt() {
+		n.addLists(state)
+	}
+
 	switch x.BaseValue.(type) {
 	case *StructMarker:
 		if l.Typ() == IntLabel {
@@ -908,7 +913,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state vertexStat
 
 		// TODO(errors): add path reference and make message
 		//       "undefined field %s in %s"
-		var err *ValueError
+		var err errors.Error
 		switch {
 		case isCyclePlaceholder(x.BaseValue):
 			err = c.NewPosf(pos, "cycle error referencing %s", label)

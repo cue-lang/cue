@@ -928,7 +928,7 @@ func (v *Vertex) Source() ast.Node {
 
 // AddConjunct adds the given Conjuncts to v if it doesn't already exist.
 func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
-	if v.BaseValue != nil {
+	if v.BaseValue != nil && !isCyclePlaceholder(v.BaseValue) {
 		// TODO: investigate why this happens at all. Removing it seems to
 		// change the order of fields in some cases.
 		//

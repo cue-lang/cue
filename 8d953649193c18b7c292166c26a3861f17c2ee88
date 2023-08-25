@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "986b5410_1cc8fb56",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1089,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T09:49:45Z",
+      "side": 1,
+      "message": "shouldn\u0027t `cc` be passed instead of `nil`?",
+      "revId": "8d953649193c18b7c292166c26a3861f17c2ee88",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

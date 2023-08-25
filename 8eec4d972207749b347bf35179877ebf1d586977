@@ -199,6 +199,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "223fc85f_78f59f13",
+        "filename": "internal/core/adt/constraints_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Ah, gotcha. Renaming SGTM, I added an item to my TODO list.",
+      "parentUuid": "aaa4d78e_92a61ab6",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "af056d6e_d7faf3af",
@@ -551,6 +569,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ecfee62_a50a9ba6",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 202,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "cd433fbe_c2e81aa8",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a25b4758_7fa08e4d",
@@ -588,6 +624,30 @@
       "side": 1,
       "message": "Good catch. It is a bitset later in the rebase.\n\nNot sure if it should be, by hindsight, so I\u0027ve fix this here, rather than making it a bitset now.",
       "parentUuid": "a25b4758_7fa08e4d",
+      "range": {
+        "startLine": 218,
+        "startChar": 1,
+        "endLine": 223,
+        "endChar": 2
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7497393d_7516fdc4",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 223,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a9f6826b_bb4fcfa5",
       "range": {
         "startLine": 218,
         "startChar": 1,
@@ -786,6 +846,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "096cc9b1_7f9191a9",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 355,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6fe33fd0_cfe8f5bb",
+      "range": {
+        "startLine": 355,
+        "startChar": 31,
+        "endLine": 355,
+        "endChar": 33
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cebba188_56498fa1",
@@ -817,6 +901,24 @@
       "side": 1,
       "message": "The new implementation uses it with both values, but it is not checked in yet.\n\nThe TODO is merely questioning which value we should use here.",
       "parentUuid": "cebba188_56498fa1",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9e7e6b5_f2ee8d03",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b1a9c410_19f26a30",
       "revId": "8eec4d972207749b347bf35179877ebf1d586977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -962,6 +1064,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "84d81ad0_829bdede",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "ack, added to my TODO list as well",
+      "parentUuid": "f0101f35_386b741a",
+      "range": {
+        "startLine": 457,
+        "startChar": 4,
+        "endLine": 458,
+        "endChar": 10
+      },
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "121ca46c_e9790bc6",
@@ -1087,6 +1213,24 @@
       "side": 1,
       "message": "The Conjunction should always have 2 values, or at a minimum 1, at least.",
       "parentUuid": "57f582d6_222e8754",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bea304f_b70764a0",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 507,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "6e127cac_b1711513",
       "revId": "8eec4d972207749b347bf35179877ebf1d586977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -1361,6 +1505,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ce14a1b_6f666464",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 253,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9a39353f_350a9713",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f491d0a0_a29dddbc",
@@ -1392,6 +1554,24 @@
       "side": 1,
       "message": "It is indeed not necessary to sort it. Equality is only checked after evaluation, and not at the conjunct level.",
       "parentUuid": "f491d0a0_a29dddbc",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c044ef93_f39f4280",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 292,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d674a481_8606742e",
       "revId": "8eec4d972207749b347bf35179877ebf1d586977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -1431,6 +1611,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "91b0583d_7d8806f7",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 442,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Ack, thanks for the context!",
+      "parentUuid": "89f60e3a_9e1b3ea1",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8c885ae2_8ba0b6f3",
@@ -1462,6 +1660,24 @@
       "side": 1,
       "message": "Indeed. This code only handles closedness and the collation of conjuncts necessary to do that. It does not evaluate conjuncts and thus will not find unification errors as such.",
       "parentUuid": "8c885ae2_8ba0b6f3",
+      "revId": "8eec4d972207749b347bf35179877ebf1d586977",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d49e93d_954d1a16",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 462,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-08-25T11:20:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "0f1c05c7_0553b91b",
       "revId": "8eec4d972207749b347bf35179877ebf1d586977",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

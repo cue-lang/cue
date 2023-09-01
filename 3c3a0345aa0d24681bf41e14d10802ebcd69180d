@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "017ae190_f3fb064d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2023-09-01T16:25:59Z",
+      "side": 1,
+      "message": "This prepares for a CL /after/ https://github.com/cue-lang/cuelang.org/pull/413 to shunt the issue-owning repo from `docs-and-content` to `cue`.\n\nThe form/text is probably not 100% correct, but I figured I\u0027d get an early version of the template out there for completeness, reviewable in the context of #413.",
+      "revId": "3c3a0345aa0d24681bf41e14d10802ebcd69180d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

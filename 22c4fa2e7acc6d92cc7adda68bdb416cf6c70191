@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a571532_add9065f",
+        "filename": "pkg/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-04T08:54:15Z",
+      "side": 1,
+      "message": "Perhaps add a comment saying why we need to do this rather than just use `ExactString` ?",
+      "revId": "22c4fa2e7acc6d92cc7adda68bdb416cf6c70191",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

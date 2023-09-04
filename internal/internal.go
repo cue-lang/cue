@@ -264,9 +264,8 @@ func NewAttr(name, str string) *ast.Attribute {
 	buf.WriteByte('@')
 	buf.WriteString(name)
 	buf.WriteByte('(')
-	fmt.Fprintf(buf, str)
+	buf.WriteString(str)
 	buf.WriteByte(')')
-
 	return &ast.Attribute{Text: buf.String()}
 }
 

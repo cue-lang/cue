@@ -165,8 +165,7 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 				t.Fill(map[string]string{"stdout": "foo"})
 				return nil
 			}), nil
-		}
-		if err != nil && v.LookupPath(cue.MakePath(cue.Str("$id"))).Exists() {
+		} else if v.LookupPath(cue.MakePath(cue.Str("$id"))).Exists() {
 			return nil, err
 		}
 

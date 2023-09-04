@@ -1237,9 +1237,6 @@ func (b *builder) finish() *ast.StructLit {
 
 	default:
 		exprs := []ast.Expr{}
-		if t != nil {
-			exprs = append(exprs, (*ast.StructLit)(t))
-		}
 		for _, s := range b.allOf {
 			exprs = append(exprs, s)
 		}

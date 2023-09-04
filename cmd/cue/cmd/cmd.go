@@ -165,7 +165,7 @@ Run "cue help commands" for more details on tasks and commands.
 					cmdline += " cmd"
 				}
 				cwd, _ := os.Getwd()
-				fmt.Fprintf(w, errors.Details(err, &errors.Config{Cwd: cwd}))
+				fmt.Fprint(w, errors.Details(err, &errors.Config{Cwd: cwd}))
 				fmt.Fprintln(w, `Ensure custom commands are defined in a "_tool.cue" file.`)
 				fmt.Fprintln(w, "Run 'cue help cmd' to list available custom commands.")
 				if isRootCmd {

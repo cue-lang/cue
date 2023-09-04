@@ -16,6 +16,24 @@
       "message": "Perhaps add a comment saying why we need to do this rather than just use `ExactString` ?",
       "revId": "22c4fa2e7acc6d92cc7adda68bdb416cf6c70191",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2bb7991a_24bf0c7d",
+        "filename": "pkg/gen.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-04T10:14:43Z",
+      "side": 1,
+      "message": "I would if I knew - I have absolutely no idea. I haven\u0027t touched any code I didn\u0027t need to as part of this go/types refactor.",
+      "parentUuid": "7a571532_add9065f",
+      "revId": "22c4fa2e7acc6d92cc7adda68bdb416cf6c70191",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

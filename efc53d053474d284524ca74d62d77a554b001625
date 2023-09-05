@@ -16,6 +16,24 @@
       "message": "Or lose the else?",
       "revId": "efc53d053474d284524ca74d62d77a554b001625",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4e441a9_1419b542",
+        "filename": "tools/flow/flow_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-05T10:58:33Z",
+      "side": 1,
+      "message": "I considered it too, but it feels fine either way, and there\u0027s a bit more symmetry this way even if the \"else\" is unnecessary.",
+      "parentUuid": "924efff0_24a03c01",
+      "revId": "efc53d053474d284524ca74d62d77a554b001625",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

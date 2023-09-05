@@ -3,9 +3,38 @@
 #name: resolved self-reference cycles
 #evalPartial
 -- in.cue --
-a: b - 100
-b: a + 100
-b: 200
+math: p1: {
+	a: b - 100
+	b: a + 100
+	b: 200
+}
+math: p2: {
+	a: b - 100
+	b: 200
+	b: a + 100
+}
+math: p3: {
+	b: a + 100
+	a: b - 100
+	b: 200
+}
+math: p4: {
+	b: a + 100
+	b: 200
+	a: b - 100
+}
+math: p5: {
+	b: 200
+	b: a + 100
+	a: b - 100
+}
+math: p6: {
+	b: 200
+	a: b - 100
+	b: a + 100
+}
+
+a: 100
 
 c: [c[1], a]
 
@@ -69,9 +98,49 @@ s3:
 -- out/compile --
 --- in.cue
 {
-  a: (〈0;b〉 - 100)
-  b: (〈0;a〉 + 100)
-  b: 200
+  math: {
+    p1: {
+      a: (〈0;b〉 - 100)
+      b: (〈0;a〉 + 100)
+      b: 200
+    }
+  }
+  math: {
+    p2: {
+      a: (〈0;b〉 - 100)
+      b: 200
+      b: (〈0;a〉 + 100)
+    }
+  }
+  math: {
+    p3: {
+      b: (〈0;a〉 + 100)
+      a: (〈0;b〉 - 100)
+      b: 200
+    }
+  }
+  math: {
+    p4: {
+      b: (〈0;a〉 + 100)
+      b: 200
+      a: (〈0;b〉 - 100)
+    }
+  }
+  math: {
+    p5: {
+      b: 200
+      b: (〈0;a〉 + 100)
+      a: (〈0;b〉 - 100)
+    }
+  }
+  math: {
+    p6: {
+      b: 200
+      a: (〈0;b〉 - 100)
+      b: (〈0;a〉 + 100)
+    }
+  }
+  a: 100
   c: [
     〈1;c〉[1],
     〈1;a〉,
@@ -88,18 +157,43 @@ s3:
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  18
-Reused: 13
+Freed:  36
+Reused: 31
 Allocs: 5
-Retain: 4
+Retain: 9
 
-Unifications: 18
-Conjuncts:    36
-Disjuncts:    21
+Unifications: 36
+Conjuncts:    61
+Disjuncts:    43
 -- out/eval --
 (struct){
+  math: (struct){
+    p1: (struct){
+      a: (int){ 100 }
+      b: (int){ 200 }
+    }
+    p2: (struct){
+      a: (int){ 100 }
+      b: (int){ 200 }
+    }
+    p3: (struct){
+      b: (int){ 200 }
+      a: (int){ 100 }
+    }
+    p4: (struct){
+      b: (int){ 200 }
+      a: (int){ 100 }
+    }
+    p5: (struct){
+      b: (int){ 200 }
+      a: (int){ 100 }
+    }
+    p6: (struct){
+      b: (int){ 200 }
+      a: (int){ 100 }
+    }
+  }
   a: (int){ 100 }
-  b: (int){ 200 }
   c: (#list){
     0: (int){ 100 }
     1: (int){ 100 }

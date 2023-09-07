@@ -1,0 +1,117 @@
+-- in.cue --
+import "strings"
+
+#Foo: {
+	#a: string
+	#b: string
+	foo: strings.HasPrefix("\(#a)", #b)
+}
+
+foo: {
+	let env_context = #Foo & {
+		#a: "hello"
+		#b: "world"
+	}
+
+	e1: env_context
+	e2: env_context
+	e3: env_context
+	e4: env_context
+	e5: env_context
+	e6: env_context
+	e7: env_context
+	e8: env_context
+}
+-- out/compile --
+--- in.cue
+{
+  #Foo: {
+    #a: string
+    #b: string
+    foo: 〈import;strings〉.HasPrefix("\(〈0;#a〉)", 〈0;#b〉)
+  }
+  foo: {
+    let env_context#1 = (〈1;#Foo〉 & {
+      #a: "hello"
+      #b: "world"
+    })
+    e1: 〈0;let env_context#1〉
+    e2: 〈0;let env_context#1〉
+    e3: 〈0;let env_context#1〉
+    e4: 〈0;let env_context#1〉
+    e5: 〈0;let env_context#1〉
+    e6: 〈0;let env_context#1〉
+    e7: 〈0;let env_context#1〉
+    e8: 〈0;let env_context#1〉
+  }
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  42
+Reused: 38
+Allocs: 4
+Retain: 0
+
+Unifications: 42
+Conjuncts:    90
+Disjuncts:    42
+Builtins:     9
+-- out/eval --
+(struct){
+  #Foo: (#struct){
+    #a: (string){ string }
+    #b: (string){ string }
+    foo: (_|_){
+      // [incomplete] #Foo.foo: invalid interpolation: non-concrete value string (type string):
+      //     ./in.cue:6:25
+      //     ./in.cue:4:6
+    }
+  }
+  foo: (struct){
+    let env_context#1 = (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e1: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e2: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e3: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e4: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e5: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e6: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e7: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+    e8: (#struct){
+      #a: (string){ "hello" }
+      #b: (string){ "world" }
+      foo: (bool){ false }
+    }
+  }
+}

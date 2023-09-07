@@ -50,6 +50,60 @@
       "message": "Per conversation with Marcel, we should make this internal for now, and very clearly mark all packages as experimental. The commit message should also make clear this is experimental.",
       "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "067928be_d191ea22",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:18:07Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "c7b5f711_ded6d966",
+      "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14a8ca52_a77c5720",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:18:07Z",
+      "side": 1,
+      "message": "We still have to parse it into a Go struct and verify it against the correct schema. Best not to duplicate that logic IMHO.",
+      "parentUuid": "76ca8123_d2233321",
+      "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc2df9be_fee397ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:18:07Z",
+      "side": 1,
+      "message": "done",
+      "parentUuid": "dc2fc232_5bbfbb59",
+      "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

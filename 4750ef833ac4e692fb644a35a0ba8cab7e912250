@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "76ca8123_d2233321",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-07T06:55:44Z",
+      "side": 1,
+      "message": "FYI: surprised that we need the modfile package at all, since our \"mod file\" is in CUE.",
+      "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

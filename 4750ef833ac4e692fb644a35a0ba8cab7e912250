@@ -16,6 +16,23 @@
       "message": "FYI: surprised that we need the modfile package at all, since our \"mod file\" is in CUE.",
       "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7b5f711_ded6d966",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-07T06:56:48Z",
+      "side": 1,
+      "message": "Also, shouldn\u0027t all this be internal? Otherwise we are blocked on doing a release until you are set on all this API being practically frozen.",
+      "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

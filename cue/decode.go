@@ -317,7 +317,7 @@ func (d *decoder) convertMap(x reflect.Value, v Value) {
 		reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64,
 		reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 	default:
-		if !reflect.PtrTo(t.Key()).Implements(textUnmarshalerType) {
+		if !reflect.PointerTo(t.Key()).Implements(textUnmarshalerType) {
 			d.addErr(errors.Newf(v.Pos(), "unsupported key type %v", t.Key()))
 			return
 		}
@@ -336,21 +336,17 @@ func (d *decoder) convertMap(x reflect.Value, v Value) {
 
 		var kv reflect.Value
 		kt := t.Key()
-		switch {
-		case reflect.PtrTo(kt).Implements(textUnmarshalerType):
+		if reflect.PointerTo(kt).Implements(textUnmarshalerType) {
 			kv = reflect.New(kt)
 			err := kv.Interface().(encoding.TextUnmarshaler).UnmarshalText([]byte(key))
 			d.addErr(err)
 			kv = kv.Elem()
-
-		case kt.Kind() == reflect.String:
-			kv = reflect.ValueOf(key).Convert(kt)
-
-		default:
+		} else {
 			switch kt.Kind() {
+			case reflect.String:
+				kv = reflect.ValueOf(key).Convert(kt)
 			case reflect.Int, reflect.Int8, reflect.Int16, reflect.Int32, reflect.Int64:
-				s := string(key)
-				n, err := strconv.ParseInt(s, 10, 64)
+				n, err := strconv.ParseInt(key, 10, 64)
 				d.addErr(err)
 				if reflect.Zero(kt).OverflowInt(n) {
 					d.addErr(errors.Newf(v.Pos(), "key integer %d overflows %s", n, kt))
@@ -359,8 +355,7 @@ func (d *decoder) convertMap(x reflect.Value, v Value) {
 				kv = reflect.ValueOf(n).Convert(kt)
 
 			case reflect.Uint, reflect.Uint8, reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
-				s := string(key)
-				n, err := strconv.ParseUint(s, 10, 64)
+				n, err := strconv.ParseUint(key, 10, 64)
 				d.addErr(err)
 				if reflect.Zero(kt).OverflowUint(n) {
 					d.addErr(errors.Newf(v.Pos(), "key integer %d overflows %s", n, kt))
@@ -488,10 +483,6 @@ type goField struct {
 
 // byIndex sorts goField by index sequence.
 type byIndex []goField
-
-func (x byIndex) Len() int { return len(x) }
-
-func (x byIndex) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
 
 func (x byIndex) Less(i, j int) bool {
 	for k, xik := range x[i].index {
@@ -662,7 +653,7 @@ func typeFields(t reflect.Type) structFields {
 	}
 
 	fields = out
-	sort.Sort(byIndex(fields))
+	sort.Slice(fields, byIndex(fields).Less)
 
 	nameIndex := make(map[string]int, len(fields))
 	for i, field := range fields {

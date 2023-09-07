@@ -16,6 +16,23 @@
       "message": "Modulo my concern about this being a public package, like I said in the parent CL.",
       "revId": "6f475aa0171c6de1d00f3531c86ffc6c007d854b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3dfdb01_6bf940bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-07T09:06:58Z",
+      "side": 1,
+      "message": "Per conversation with Marcel, we should make this internal for now, and very clearly mark all packages as experimental. The commit message should also make clear this is experimental.",
+      "revId": "6f475aa0171c6de1d00f3531c86ffc6c007d854b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

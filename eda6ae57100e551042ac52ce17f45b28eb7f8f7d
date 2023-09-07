@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3608b73f_ed06bc97",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-07T11:16:44Z",
+      "side": 1,
+      "message": "not to nitpick, but the commit messages should now say \"internal/mod\" and so on. same for the other CLs.",
+      "revId": "eda6ae57100e551042ac52ce17f45b28eb7f8f7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -551,23 +551,45 @@ func (v *Vertex) ToDataSingle() *Vertex {
 	return &w
 }
 
+type toDataOption struct {
+	copyAllLabels bool
+}
+
+type ToDataOption func(option *toDataOption)
+
+func ToDataOnlyRegular(onlyRegular bool) ToDataOption {
+	return func(option *toDataOption) {
+		option.copyAllLabels = !onlyRegular
+	}
+}
+
 // ToDataAll returns a new v where v and all its descendents contain only
 // the regular fields.
-func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
+func (v *Vertex) ToDataAll(ctx *OpContext, options ...ToDataOption) *Vertex {
+	var opt toDataOption
+	for _, option := range options {
+		if option != nil {
+			option(&opt)
+		}
+	}
+	return v.toDataAllWithOptions(ctx, &opt)
+}
+
+func (v *Vertex) toDataAllWithOptions(ctx *OpContext, opt *toDataOption) *Vertex {
 	arcs := make([]*Vertex, 0, len(v.Arcs))
 	for _, a := range v.Arcs {
 		if !a.IsDefined(ctx) {
 			continue
 		}
-		if a.Label.IsRegular() {
-			arcs = append(arcs, a.ToDataAll(ctx))
+		if a.Label.IsRegular() || opt.copyAllLabels {
+			arcs = append(arcs, a.toDataAllWithOptions(ctx, opt))
 		}
 	}
 	w := *v
 	w.state = nil
 	w.status = finalized
 
-	w.BaseValue = toDataAll(ctx, w.BaseValue)
+	w.BaseValue = toDataAll(ctx, w.BaseValue, opt)
 	w.Arcs = arcs
 	w.isData = true
 	w.Conjuncts = make([]Conjunct, len(v.Conjuncts))
@@ -579,19 +601,19 @@ func (v *Vertex) ToDataAll(ctx *OpContext) *Vertex {
 	copy(w.Conjuncts, v.Conjuncts)
 	for i, c := range w.Conjuncts {
 		if v, _ := c.x.(Value); v != nil {
-			w.Conjuncts[i].x = toDataAll(ctx, v).(Value)
+			w.Conjuncts[i].x = toDataAll(ctx, v, opt).(Value)
 		}
 	}
 	return &w
 }
 
-func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
+func toDataAll(ctx *OpContext, v BaseValue, opt *toDataOption) BaseValue {
 	switch x := v.(type) {
 	default:
 		return x
 
 	case *Vertex:
-		return x.ToDataAll(ctx)
+		return x.toDataAllWithOptions(ctx, opt)
 
 	// The following cases are always erroneous, but we handle them anyway
 	// to avoid issues with the closedness algorithm down the line.
@@ -601,7 +623,7 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 		for i, v := range x.Values {
 			switch x := v.(type) {
 			case *Vertex:
-				d.Values[i] = x.ToDataAll(ctx)
+				d.Values[i] = x.toDataAllWithOptions(ctx, opt)
 			default:
 				d.Values[i] = x
 			}
@@ -613,7 +635,7 @@ func toDataAll(ctx *OpContext, v BaseValue) BaseValue {
 		c.Values = make([]Value, len(x.Values))
 		for i, v := range x.Values {
 			// This case is okay because the source is of type Value.
-			c.Values[i] = toDataAll(ctx, v).(Value)
+			c.Values[i] = toDataAll(ctx, v, opt).(Value)
 		}
 		return &c
 	}

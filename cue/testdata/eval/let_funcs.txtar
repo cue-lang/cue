@@ -53,9 +53,9 @@ Allocs: 4
 Retain: 0
 
 Unifications: 42
-Conjuncts:    90
+Conjuncts:    58
 Disjuncts:    42
-Builtins:     9
+Builtins:     1
 -- out/eval --
 (struct){
   #Foo: (#struct){

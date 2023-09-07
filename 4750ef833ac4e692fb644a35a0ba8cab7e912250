@@ -33,6 +33,23 @@
       "message": "Also, shouldn\u0027t all this be internal? Otherwise we are blocked on doing a release until you are set on all this API being practically frozen.",
       "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc2fc232_5bbfbb59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-07T09:06:49Z",
+      "side": 1,
+      "message": "Per conversation with Marcel, we should make this internal for now, and very clearly mark all packages as experimental. The commit message should also make clear this is experimental.",
+      "revId": "4750ef833ac4e692fb644a35a0ba8cab7e912250",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

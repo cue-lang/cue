@@ -26,10 +26,10 @@ import (
 
 	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
+	"cuelang.org/go/internal/mod/semver"
 	digest "github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
-	"golang.org/x/mod/semver"
 
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/module"

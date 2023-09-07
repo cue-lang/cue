@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"sync"
 
-	"golang.org/x/mod/semver"
+	"cuelang.org/go/internal/mod/semver"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"

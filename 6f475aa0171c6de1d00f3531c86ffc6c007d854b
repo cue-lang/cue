@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc7c301b_045640d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-07T06:57:12Z",
+      "side": 1,
+      "message": "Modulo my concern about this being a public package, like I said in the parent CL.",
+      "revId": "6f475aa0171c6de1d00f3531c86ffc6c007d854b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

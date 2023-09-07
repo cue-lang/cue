@@ -8,7 +8,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"golang.org/x/mod/semver"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 // The following regular expressions come from https://github.com/opencontainers/distribution-spec/blob/main/spec.md#pulling-manifests

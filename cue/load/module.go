@@ -12,7 +12,7 @@ import (
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/mvs"
-	"golang.org/x/mod/semver"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 // loadModule loads the module file, resolves and downloads module

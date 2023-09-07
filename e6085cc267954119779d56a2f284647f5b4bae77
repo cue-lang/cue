@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "be112fd3_80c4593c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 19
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:47:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b6270c97_94298302",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "f3ab1e3c_9da1350c",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 19
@@ -70,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ce289f2_a789bc70",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:47:39Z",
+      "side": 1,
+      "message": "We already depend on x/mod for another reason, so we won\u0027t remove the dependency entirely, but it does seem reasonable that the CUE module stuff avoids depending on x/mod, so I\u0027ve added a CL in the chain that makes that change.",
+      "parentUuid": "e0d778df_efe4dcbf",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a2b5da5_b0228a12",
@@ -83,6 +119,24 @@
       "writtenOn": "2023-09-07T07:18:38Z",
       "side": 1,
       "message": "add a TODO to use https://pkg.go.dev/slices#Clip soon",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65a220dd_98ba0b12",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:47:39Z",
+      "side": 1,
+      "message": "There are bound to be lots of other cases in the code where the slices package could be of use. I\u0027d prefer to go through and fix them all rather than adding TODOs in some places and not others.",
+      "parentUuid": "5a2b5da5_b0228a12",
       "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -104,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7728c1c6_6f404eaa",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 19
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:47:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "417331fa_af1cbbf9",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "592b3228_b16d633e",
@@ -117,6 +189,24 @@
       "writtenOn": "2023-09-07T07:18:38Z",
       "side": 1,
       "message": "explain why, or include a URL to a page with more details?\n\nalso, nit: oxford comma :)",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c773e3d3_6578cb38",
+        "filename": "mod/zip/zip.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-07T14:47:39Z",
+      "side": 1,
+      "message": "I\u0027m not sure it\u0027s good to make the error message super long, and there\u0027s no explanation doc yet. I\u0027ve hopefully made the message a bit more self-explanatory and added a TODO to link.",
+      "parentUuid": "592b3228_b16d633e",
       "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

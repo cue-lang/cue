@@ -1,3 +1,4 @@
+wantErr=no cue.mod/module.cue file found
 -- want --
 valid:
 

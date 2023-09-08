@@ -1,9 +1,11 @@
-path=example.com/m
+path=example.com/m@v1
 version=v1.0.0
-hash=h1:xctQQey8/y7IcBjFZDP/onWLSXhlqcsC3i1fgSdpMHk=
+hash=h1:kfXam9weeIGbXPqzuILvA7E/rit+44dEMb1xuXLpJwE=
 -- a.go --
 package a
--- b/GO.MOD --
+-- cue.mod/module.cue --
+module: "example.com/m"
+-- b/CUE.MOD/foo --
 MODULE EXAMPLE.COM/M/B
 -- b/b.go --
 package b

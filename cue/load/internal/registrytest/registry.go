@@ -2,22 +2,22 @@ package registrytest
 
 import (
 	"bytes"
+	"context"
 	"fmt"
 	"io"
-	"net/http"
 	"net/http/httptest"
-	"os"
-	"path"
 	"strings"
-	"time"
 
-	"golang.org/x/mod/module"
-	"golang.org/x/mod/semver"
-	"golang.org/x/mod/zip"
+	"cuelabs.dev/go/oci/ociregistry/ocimem"
+	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/mod/modfile"
+	"cuelang.org/go/internal/mod/modregistry"
+	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/internal/mod/zip"
 )
 
 // New starts a registry instance that serves modules found inside the
@@ -29,16 +29,71 @@ import (
 // contain a cue.mod/module.cue file holding the module info.
 //
 // The Registry should be closed after use.
-func New(ar *txtar.Archive) *Registry {
-	h, err := newHandler(ar)
+func New(ar *txtar.Archive) (*Registry, error) {
+	srv := httptest.NewServer(ociserver.New(ocimem.New(), nil))
+	client, err := modregistry.NewClient(srv.URL, "cue/")
 	if err != nil {
-		panic(err)
+		return nil, fmt.Errorf("cannot make client: %v", err)
 	}
-	srv := httptest.NewServer(h)
+	mods, err := getModules(ar)
+	if err != nil {
+		return nil, fmt.Errorf("invalid modules: %v", err)
+	}
+	if err := pushContent(client, mods); err != nil {
+		return nil, fmt.Errorf("cannot push modules: %v", err)
+	}
 	return &Registry{
 		srv: srv,
-	}
+	}, nil
 }
+
+func pushContent(client *modregistry.Client, mods map[module.Version]*moduleContent) error {
+	pushed := make(map[module.Version]bool)
+	for v := range mods {
+		err := visitDepthFirst(mods, v, func(v module.Version, m *moduleContent) error {
+			if pushed[v] {
+				return nil
+			}
+			var zipContent bytes.Buffer
+			if err := m.writeZip(&zipContent); err != nil {
+				return err
+			}
+			if err := client.PutModule(context.Background(), v, bytes.NewReader(zipContent.Bytes()), int64(zipContent.Len())); err != nil {
+				return err
+			}
+			pushed[v] = true
+			return nil
+		})
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func visitDepthFirst(mods map[module.Version]*moduleContent, v module.Version, f func(module.Version, *moduleContent) error) error {
+	m := mods[v]
+	if m == nil {
+		return fmt.Errorf("no module found for version %v", v)
+	}
+	for _, depv := range m.modFile.Versions() {
+		if err := visitDepthFirst(mods, depv, f); err != nil {
+			return err
+		}
+	}
+	return f(v, m)
+}
+
+//
+//func putModule(t *testing.T, c *Client, mv module.Version, content *txtar.Archive) []byte {
+//	var zipContent bytes.Buffer
+//	err := modzip.Create[txtar.File](&zipContent, mv, content.Files, txtarFileIO{})
+//	qt.Assert(t, qt.IsNil(err))
+//	zipData := zipContent.Bytes()
+//	err = c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
+//	qt.Assert(t, qt.IsNil(err))
+//	return zipData
+//}
 
 type Registry struct {
 	srv *httptest.Server
@@ -57,7 +112,7 @@ type handler struct {
 	modules []*moduleContent
 }
 
-func newHandler(ar *txtar.Archive) (*handler, error) {
+func getModules(ar *txtar.Archive) (map[module.Version]*moduleContent, error) {
 	ctx := cuecontext.New()
 	modules := make(map[string]*moduleContent)
 	for _, f := range ar.Files {
@@ -67,7 +122,7 @@ func newHandler(ar *txtar.Archive) (*handler, error) {
 		}
 		modver, rest, ok := strings.Cut(path, "/")
 		if !ok {
-			return nil, fmt.Errorf("cannot have regular file inside _registry")
+			return nil, fmt.Errorf("_registry should only contain directories, but found regular file %q", path)
 		}
 		content := modules[modver]
 		if content == nil {
@@ -80,252 +135,59 @@ func newHandler(ar *txtar.Archive) (*handler, error) {
 		})
 	}
 	for modver, content := range modules {
-		if err := content.initVersion(ctx, modver); err != nil {
-			return nil, fmt.Errorf("cannot determine version for module in %q: %v", modver, err)
+		if err := content.init(ctx, modver); err != nil {
+			return nil, fmt.Errorf("cannot initialize module %q: %v", modver, err)
 		}
 	}
-	mods := make([]*moduleContent, 0, len(modules))
+	byVer := map[module.Version]*moduleContent{}
 	for _, m := range modules {
-		mods = append(mods, m)
+		byVer[m.version] = m
 	}
-	return &handler{
-		modules: mods,
-	}, nil
-}
-
-var modulePath = cue.MakePath(cue.Str("module"))
-
-func modulePathFromModFile(ctx *cue.Context, data []byte) (string, error) {
-	v := ctx.CompileBytes(data)
-	if err := v.Err(); err != nil {
-		return "", fmt.Errorf("invalid module.cue syntax: %v", err)
-	}
-	v = v.LookupPath(modulePath)
-	s, err := v.String()
-	if err != nil {
-		return "", fmt.Errorf("cannot get module value from module.cue file: %v", err)
-	}
-	if s == "" {
-		return "", fmt.Errorf("empty module directive")
-	}
-	// TODO check for valid module path?
-	return s, nil
-}
-
-func (r *handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	mreq, err := parseReq(req.URL.Path)
-	if err != nil {
-		http.Error(w, fmt.Sprintf("cannot parse request %q: %v", req.URL.Path, err), http.StatusBadRequest)
-		return
-	}
-	switch mreq.kind {
-	case reqMod:
-		data, err := r.getMod(mreq)
-		if err != nil {
-			http.Error(w, fmt.Sprintf("cannot get module: %v", err), http.StatusNotFound)
-			return
-		}
-		// TODO content type
-		w.Write(data)
-	case reqZip:
-		data, err := r.getZip(mreq)
-		if err != nil {
-			// TODO this can fail for non-NotFound reasons too.
-			http.Error(w, fmt.Sprintf("cannot get module contents: %v", err), http.StatusNotFound)
-			return
-		}
-		// TODO content type
-		w.Header().Set("Content-Type", "application/zip")
-		w.Write(data)
-	default:
-		http.Error(w, "not implemented yet", http.StatusInternalServerError)
-	}
-}
-
-func (r *handler) getMod(req *request) ([]byte, error) {
-	for _, m := range r.modules {
-		if m.version == req.version {
-			return m.getMod(), nil
-		}
-	}
-	return nil, fmt.Errorf("no module found for %v", req.version)
-}
-
-func (r *handler) getZip(req *request) ([]byte, error) {
-	for _, m := range r.modules {
-		if m.version == req.version {
-			// TODO write this to somewhere else temporary before
-			// writing to HTTP response.
-			var buf bytes.Buffer
-			if err := m.writeZip(&buf); err != nil {
-				return nil, err
-			}
-			return buf.Bytes(), nil
-		}
-	}
-	return nil, fmt.Errorf("no module found for %v", req.version)
+	return byVer, nil
 }
 
 type moduleContent struct {
 	version module.Version
 	files   []txtar.File
+	modFile *modfile.File
 }
 
 func (c *moduleContent) writeZip(w io.Writer) error {
-	files := make([]zip.File, len(c.files))
-	for i := range c.files {
-		files[i] = zipFile{&c.files[i]}
-	}
-	return zip.Create(w, c.version, files)
+	return zip.Create[txtar.File](w, c.version, c.files, txtarFileIO{})
 }
 
-type zipFile struct {
-	f *txtar.File
-}
-
-// Path implements zip.File.Path.
-func (f zipFile) Path() string {
-	return f.f.Name
-}
-
-// Lstat implements zip.File.Lstat.
-func (f zipFile) Lstat() (os.FileInfo, error) {
-	return f, nil
-}
-
-func (f zipFile) Open() (io.ReadCloser, error) {
-	return io.NopCloser(bytes.NewReader(f.f.Data)), nil
-}
-
-// Name implements fs.FileInfo.Name.
-func (f zipFile) Name() string {
-	return path.Base(f.f.Name)
-}
-
-// Mode implements fs.FileInfo.Mode.
-func (f zipFile) Mode() os.FileMode {
-	return 0
-}
-
-// Size implements fs.FileInfo.Size.
-func (f zipFile) Size() int64 {
-	return int64(len(f.f.Data))
-}
-
-func (f zipFile) IsDir() bool {
-	return false
-}
-func (f zipFile) ModTime() time.Time {
-	return time.Time{}
-}
-func (f zipFile) Sys() any {
-	return nil
-}
-
-func (c *moduleContent) getMod() []byte {
-	for _, f := range c.files {
-		if f.Name == "cue.mod/module.cue" {
-			return f.Data
-		}
-	}
-	panic(fmt.Errorf("no module.cue file found in %v", c.version))
-}
-
-func (c *moduleContent) initVersion(ctx *cue.Context, versDir string) error {
+func (c *moduleContent) init(ctx *cue.Context, versDir string) error {
+	found := false
 	for _, f := range c.files {
 		if f.Name != "cue.mod/module.cue" {
 			continue
 		}
-		mod, err := modulePathFromModFile(ctx, f.Data)
+		modf, err := modfile.Parse(f.Data, f.Name)
 		if err != nil {
-			return fmt.Errorf("invalid module file in %q: %v", path.Join(versDir, f.Name), err)
+			return err
 		}
-		if c.version.Path != "" {
+		if found {
 			return fmt.Errorf("multiple module.cue files")
 		}
-		c.version.Path = mod
-		mod = strings.ReplaceAll(mod, "/", "_") + "_"
+		modp, _, ok := module.SplitPathVersion(modf.Module)
+		if !ok {
+			return fmt.Errorf("module %q does not contain major version", modf.Module)
+		}
+		mod := strings.ReplaceAll(modp, "/", "_") + "_"
 		vers := strings.TrimPrefix(versDir, mod)
 		if len(vers) == len(versDir) {
-			return fmt.Errorf("module path %q in module.cue does not match directory %q", c.version.Path, versDir)
+			return fmt.Errorf("module path %q in module.cue does not match directory %q", modf.Module, versDir)
 		}
-		if !semver.IsValid(vers) {
-			return fmt.Errorf("module version %q is not valid", vers)
+		v, err := module.NewVersion(modf.Module, vers)
+		if err != nil {
+			return fmt.Errorf("cannot make module version: %v", err)
 		}
-		c.version.Version = vers
+		c.version = v
+		c.modFile = modf
+		found = true
 	}
-	if c.version.Path == "" {
+	if !found {
 		return fmt.Errorf("no module.cue file found in %q", versDir)
 	}
 	return nil
-}
-
-type reqKind int
-
-const (
-	reqInvalid reqKind = iota
-	reqLatest
-	reqList
-	reqMod
-	reqZip
-	reqInfo
-)
-
-type request struct {
-	version module.Version
-	kind    reqKind
-}
-
-func parseReq(urlPath string) (*request, error) {
-	urlPath = strings.TrimPrefix(urlPath, "/")
-	i := strings.LastIndex(urlPath, "/@")
-	if i == -1 {
-		return nil, fmt.Errorf("no @ found in path")
-	}
-	if i == 0 {
-		return nil, fmt.Errorf("empty module name in path")
-	}
-	var req request
-	mod, rest := urlPath[:i], urlPath[i+1:]
-	req.version.Path = mod
-	qual, rest, ok := strings.Cut(rest, "/")
-	if qual == "@latest" {
-		if ok {
-			return nil, fmt.Errorf("invalid @latest request")
-		}
-		// $base/$module/@latest
-		req.kind = reqLatest
-		return &req, nil
-	}
-	if qual != "@v" {
-		return nil, fmt.Errorf("invalid @ in request")
-	}
-	if !ok {
-		return nil, fmt.Errorf("no qualifier after @")
-	}
-	if rest == "list" {
-		// $base/$module/@v/list
-		req.kind = reqList
-		return &req, nil
-	}
-	i = strings.LastIndex(rest, ".")
-	if i == -1 {
-		return nil, fmt.Errorf("no . found after @")
-	}
-	vers, rest := rest[:i], rest[i+1:]
-	if len(vers) == 0 {
-		return nil, fmt.Errorf("empty version string")
-	}
-	req.version.Version = vers
-	switch rest {
-	case "info":
-		req.kind = reqInfo
-	case "mod":
-		req.kind = reqMod
-	case "zip":
-		req.kind = reqZip
-	default:
-		return nil, fmt.Errorf("unknown request kind %q", rest)
-	}
-	return &req, nil
 }

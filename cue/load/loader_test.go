@@ -45,7 +45,6 @@ func TestLoad(t *testing.T) {
 	badModCfg := &Config{
 		Dir: testMod("badmod"),
 	}
-
 	type loadTest struct {
 		cfg  *Config
 		args []string
@@ -56,13 +55,7 @@ func TestLoad(t *testing.T) {
 	testCases := []loadTest{{
 		cfg:  badModCfg,
 		args: args("."),
-		want: `err:    module: invalid module.cue file: 2 errors in empty disjunction:
-module: invalid module.cue file: conflicting values 123 and "" (mismatched types int and string):
-    $cueroot/cue/load/moduleschema.cue:4:20
-    $CWD/testdata/badmod/cue.mod/module.cue:2:9
-module: invalid module.cue file: conflicting values 123 and =~"^[^@]+$" (mismatched types int and string):
-    $cueroot/cue/load/moduleschema.cue:4:10
-    $cueroot/cue/load/moduleschema.cue:21:21
+		want: `err:    module: cannot use value 123 (type int) as string:
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
 path:   ""
 module: ""
@@ -83,8 +76,7 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
-	}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		// Even though the directory is called testdata, the last path in
 		// the module is test. So "package test" is correctly the default
 		// package of this directory.
@@ -98,8 +90,7 @@ display:.
 files:
     $CWD/testdata/testmod/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
-	}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		// TODO:
 		// - path incorrect, should be mod.test/test/other:main.
 		cfg:  dirCfg,
@@ -110,8 +101,7 @@ path:   ""
 module: mod.test/test
 root:   $CWD/testdata/testmod
 dir:    ""
-display:""`,
-	}, {
+display:""`}, {
 		cfg:  dirCfg,
 		args: args("./anon"),
 		want: `err:    build constraints exclude all CUE files in ./anon:
@@ -120,8 +110,7 @@ path:   mod.test/test/anon
 module: mod.test/test
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/anon
-display:./anon`,
-	}, {
+display:./anon`}, {
 		// TODO:
 		// - paths are incorrect, should be mod.test/test/other:main.
 		cfg:  dirCfg,
@@ -134,8 +123,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/other
 display:./other
 files:
-    $CWD/testdata/testmod/other/main.cue`,
-	}, {
+    $CWD/testdata/testmod/other/main.cue`}, {
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
@@ -149,8 +137,7 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
-	}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
@@ -164,8 +151,7 @@ files:
     $CWD/testdata/testmod/test.cue
     $CWD/testdata/testmod/hello/test.cue
 imports:
-    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`,
-	}, {
+    mod.test/test/sub: $CWD/testdata/testmod/sub/sub.cue`}, {
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
@@ -178,8 +164,7 @@ path:   mod.test/test/hello:nonexist
 module: mod.test/test
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
-display:mod.test/test/hello:nonexist`,
-	}, {
+display:mod.test/test/hello:nonexist`}, {
 		cfg:  dirCfg,
 		args: args("./anon.cue", "./other/anon.cue"),
 		want: `path:   ""
@@ -189,8 +174,7 @@ dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
     $CWD/testdata/testmod/anon.cue
-    $CWD/testdata/testmod/other/anon.cue`,
-	}, {
+    $CWD/testdata/testmod/other/anon.cue`}, {
 		cfg: dirCfg,
 		// Absolute file is normalized.
 		args: args(filepath.Join(testMod("testmod"), "anon.cue")),
@@ -200,8 +184,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
-    $CWD/testdata/testmod/anon.cue`,
-	}, {
+    $CWD/testdata/testmod/anon.cue`}, {
 		cfg:  dirCfg,
 		args: args("-"),
 		want: `path:   ""
@@ -210,12 +193,11 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
-    -`,
-	}, {
+    -`}, {
 		// NOTE: dir should probably be set to $CWD/testdata, but either way.
 		cfg:  dirCfg,
 		args: args("non-existing"),
-		want: `err:    cannot find package "non-existing"
+		want: `err:    implied package identifier "non-existing" from import path "non-existing" is not valid
 path:   non-existing
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -242,8 +224,7 @@ files:
     $CWD/testdata/testmod/imports/imports.cue
 imports:
     mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
-    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`,
-	}, {
+    mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}, {
 		cfg:  dirCfg,
 		args: args("./toolonly"),
 		want: `path:   mod.test/test/toolonly:foo
@@ -252,8 +233,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
 display:./toolonly
 files:
-    $CWD/testdata/testmod/toolonly/foo_tool.cue`,
-	}, {
+    $CWD/testdata/testmod/toolonly/foo_tool.cue`}, {
 		cfg: &Config{
 			Dir: testdataDir,
 		},
@@ -266,8 +246,7 @@ path:   mod.test/test/toolonly:foo
 module: mod.test/test
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/toolonly
-display:./toolonly`,
-	}, {
+display:./toolonly`}, {
 		cfg: &Config{
 			Dir:  testdataDir,
 			Tags: []string{"prod"},
@@ -279,8 +258,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tags
 display:./tags
 files:
-    $CWD/testdata/testmod/tags/prod.cue`,
-	}, {
+    $CWD/testdata/testmod/tags/prod.cue`}, {
 		cfg: &Config{
 			Dir:  testdataDir,
 			Tags: []string{"prod", "foo=bar"},
@@ -292,8 +270,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tags
 display:./tags
 files:
-    $CWD/testdata/testmod/tags/prod.cue`,
-	}, {
+    $CWD/testdata/testmod/tags/prod.cue`}, {
 		cfg: &Config{
 			Dir:  testdataDir,
 			Tags: []string{"prod"},
@@ -308,8 +285,7 @@ path:   mod.test/test/tagsbad
 module: mod.test/test
 root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/tagsbad
-display:./tagsbad`,
-	}, {
+display:./tagsbad`}, {
 		cfg: &Config{
 			Dir: testdataDir,
 		},
@@ -324,8 +300,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/cycle
 display:./cycle
 files:
-    $CWD/testdata/testmod/cycle/cycle.cue`,
-	}}
+    $CWD/testdata/testmod/cycle/cycle.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
 		pkgs := Instances(tc.args, tc.cfg)
 

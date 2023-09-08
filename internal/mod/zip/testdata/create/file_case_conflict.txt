@@ -1,4 +1,4 @@
-path=example.com/m
+path=example.com/m@v1
 version=v1.0.0
 wantErr=case-insensitive file name collision: "m.go" and "M.GO"
 -- m.go --

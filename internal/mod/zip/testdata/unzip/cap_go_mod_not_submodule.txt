@@ -1,9 +1,11 @@
-path=example.com/m
+path=example.com/m@v1
 version=v1.0.0
-wantErr=go.mod file not in module root directory
--- example.com/m@v1.0.0/a.go --
+wantErr=cue.mod not in module root directory
+-- example.com/m@v1.0.0/cue.mod/module.cue --
+module: "example.com/m"
+-- example.com/m@v1.0.0/a.cue --
 package a
--- example.com/m@v1.0.0/b/GO.MOD --
-MODULE EXAMPLE.COM/M/B
+-- example.com/m@v1.0.0/b/CUE.MOD/MODULE.CUE --
+MODULE: "EXAMPLE.COM/M/B"
 -- example.com/m@v1.0.0/b/b.go --
 package b

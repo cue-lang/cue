@@ -1,5 +1,5 @@
-path=example.com/m
+path=example.com/m@v1
 version=v1.0.0
-wantErr=malformed file path "bad.go'": invalid char '\''
--- example.com/m@v1.0.0/bad.go' --
+wantErr=malformed file path "bad.cue'": invalid char '\''
+-- bad.cue' --
 package bad

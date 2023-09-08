@@ -1,7 +1,7 @@
-path=example.com/m
+path=example.com/m@v1
 version=v1.0.0
 wantErr=entry "a.go" is both a file and a directory
--- example.com/m@v1.0.0/a.go --
+-- a.go --
 package a
--- example.com/m@v1.0.0/a.go/b.go --
+-- a.go/b.go --
 package b

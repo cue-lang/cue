@@ -1,5 +1,3 @@
-//go:build ignore
-
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -16,88 +14,16 @@
 // There are no restrictions imposed directly by use of this structure,
 // but additional checking functions, most notably Check, verify that
 // a particular path, version pair is valid.
-//
-// # Escaped Paths
-//
-// Module paths appear as substrings of file system paths
-// (in the download cache) and of web server URLs in the proxy protocol.
-// In general we cannot rely on file systems to be case-sensitive,
-// nor can we rely on web servers, since they read from file systems.
-// That is, we cannot rely on the file system to keep rsc.io/QUOTE
-// and rsc.io/quote separate. Windows and macOS don't.
-// Instead, we must never require two different casings of a file path.
-// Because we want the download cache to match the proxy protocol,
-// and because we want the proxy protocol to be possible to serve
-// from a tree of static files (which might be stored on a case-insensitive
-// file system), the proxy protocol must never require two different casings
-// of a URL path either.
-//
-// One possibility would be to make the escaped form be the lowercase
-// hexadecimal encoding of the actual path bytes. This would avoid ever
-// needing different casings of a file path, but it would be fairly illegible
-// to most programmers when those paths appeared in the file system
-// (including in file paths in compiler errors and stack traces)
-// in web server logs, and so on. Instead, we want a safe escaped form that
-// leaves most paths unaltered.
-//
-// The safe escaped form is to replace every uppercase letter
-// with an exclamation mark followed by the letter's lowercase equivalent.
-//
-// For example,
-//
-//	github.com/Azure/azure-sdk-for-go ->  github.com/!azure/azure-sdk-for-go.
-//	github.com/GoogleCloudPlatform/cloudsql-proxy -> github.com/!google!cloud!platform/cloudsql-proxy
-//	github.com/Sirupsen/logrus -> github.com/!sirupsen/logrus.
-//
-// Import paths that avoid upper-case letters are left unchanged.
-// Note that because import paths are ASCII-only and avoid various
-// problematic punctuation (like : < and >), the escaped form is also ASCII-only
-// and avoids the same problematic punctuation.
-//
-// Import paths have never allowed exclamation marks, so there is no
-// need to define how to escape a literal !.
-//
-// # Unicode Restrictions
-//
-// Today, paths are disallowed from using Unicode.
-//
-// Although paths are currently disallowed from using Unicode,
-// we would like at some point to allow Unicode letters as well, to assume that
-// file systems and URLs are Unicode-safe (storing UTF-8), and apply
-// the !-for-uppercase convention for escaping them in the file system.
-// But there are at least two subtle considerations.
-//
-// First, note that not all case-fold equivalent distinct runes
-// form an upper/lower pair.
-// For example, U+004B ('K'), U+006B ('k'), and U+212A ('K' for Kelvin)
-// are three distinct runes that case-fold to each other.
-// When we do add Unicode letters, we must not assume that upper/lower
-// are the only case-equivalent pairs.
-// Perhaps the Kelvin symbol would be disallowed entirely, for example.
-// Or perhaps it would escape as "!!k", or perhaps as "(212A)".
-//
-// Second, it would be nice to allow Unicode marks as well as letters,
-// but marks include combining marks, and then we must deal not
-// only with case folding but also normalization: both U+00E9 ('é')
-// and U+0065 U+0301 ('e' followed by combining acute accent)
-// look the same on the page and are treated by some file systems
-// as the same path. If we do allow Unicode marks in paths, there
-// must be some kind of normalization to allow only one canonical
-// encoding of any character used in an import path.
 package module
 
 // IMPORTANT NOTE
 //
-// This file essentially defines the set of valid import paths for the go command.
+// This file essentially defines the set of valid import paths for the cue command.
 // There are many subtle considerations, including Unicode ambiguity,
 // security, network, and file system representations.
-//
-// This file also defines the set of valid module path and version combinations,
-// another topic with many subtle considerations.
-//
-// Changes to the semantics in this file require approval from rsc.
 
 import (
+	"fmt"
 	"sort"
 	"strings"
 
@@ -106,56 +32,133 @@ import (
 
 // A Version (for clients, a module.Version) is defined by a module path and version pair.
 // These are stored in their plain (unescaped) form.
+// This type is comparable.
 type Version struct {
-	// Path is a module path, like "golang.org/x/text" or "rsc.io/quote/v2".
-	Path string
-
-	// Version is usually a semantic version in canonical form.
-	// There are three exceptions to this general rule.
-	// First, the top-level target of a build has no specific version
-	// and uses Version = "".
-	// Second, during MVS calculations the version "none" is used
-	// to represent the decision to take no version of a given module.
-	// Third, filesystem paths found in "replace" directives are
-	// represented by a path with an empty version.
-	Version string `json:",omitempty"`
+	path    string
+	version string
 }
 
-// String returns a representation of the Version suitable for logging
+// Path returns the module path part of the Version,
+// which always includes the major version suffix
+// unless a module path, like "github.com/foo/bar@v0".
+// Note that in general the path should include the major version suffix
+// even though it's implied from the version. The Canonical
+// method can be used to add the major version suffix if not present.
+// The BasePath method can be used to obtain the path without
+// the suffix.
+func (m Version) Path() string {
+	return m.path
+}
+
+func (m Version) BasePath() string {
+	basePath, _, ok := SplitPathVersion(m.path)
+	if !ok {
+		panic(fmt.Errorf("broken invariant: failed to split version in %q", m.path))
+	}
+	return basePath
+}
+
+func (m Version) Version() string {
+	return m.version
+}
+
+// String returns the string form of the Version:
 // (Path@Version, or just Path if Version is empty).
 func (m Version) String() string {
-	if m.Version == "" {
-		return m.Path
+	if m.version == "" {
+		return m.path
 	}
-	return m.Path + "@" + m.Version
+	return m.BasePath() + "@" + m.version
 }
 
-// CanonicalVersion returns the canonical form of the version string v.
-// It is the same as semver.Canonical(v) except that it preserves the special build suffix "+incompatible".
-func CanonicalVersion(v string) string {
-	cv := semver.Canonical(v)
-	if semver.Build(v) == "+incompatible" {
-		cv += "+incompatible"
+func MustParseVersion(s string) Version {
+	v, err := ParseVersion(s)
+	if err != nil {
+		panic(err)
 	}
-	return cv
+	return v
+}
+
+// ParseVersion parses a $module@$version
+// string into a Version.
+// The version must be canonical (i.e. it can't be
+// just a major version).
+func ParseVersion(s string) (Version, error) {
+	basePath, vers, ok := SplitPathVersion(s)
+	if !ok {
+		return Version{}, fmt.Errorf("invalid module path@version %q", s)
+	}
+	if semver.Canonical(vers) != vers {
+		return Version{}, fmt.Errorf("module version in %q is not canonical", s)
+	}
+	return Version{basePath + "@" + semver.Major(vers), vers}, nil
+}
+
+func MustNewVersion(path string, vers string) Version {
+	v, err := NewVersion(path, vers)
+	if err != nil {
+		panic(err)
+	}
+	return v
+}
+
+// NewVersion forms a Version from the given path and version.
+// The version must be canonical or empty.
+// If the path doesn't have a major version suffix, one will be added
+// if the version isn't empty; if the version is empty, it's an error.
+func NewVersion(path string, vers string) (Version, error) {
+	if vers != "" && vers != "none" {
+		if semver.Canonical(vers) != vers {
+			return Version{}, fmt.Errorf("version %q (of module %q) is not canonical", vers, path)
+		}
+		maj := semver.Major(vers)
+		_, vmaj, ok := SplitPathVersion(path)
+		if ok && maj != vmaj {
+			return Version{}, fmt.Errorf("mismatched major version suffix in %q (version %v)", path, vers)
+		}
+		if !ok {
+			fullPath := path + "@" + maj
+			if _, _, ok := SplitPathVersion(fullPath); !ok {
+				return Version{}, fmt.Errorf("cannot form version path from %q, version %v", path, vers)
+			}
+			path = fullPath
+		}
+	} else {
+		if _, _, ok := SplitPathVersion(path); !ok {
+			return Version{}, fmt.Errorf("path %q has no major version", path)
+		}
+	}
+	if vers == "" {
+		if err := CheckPath(path); err != nil {
+			return Version{}, err
+		}
+	} else {
+		if err := Check(path, vers); err != nil {
+			return Version{}, err
+		}
+	}
+	return Version{
+		path:    path,
+		version: vers,
+	}, nil
 }
 
 // Sort sorts the list by Path, breaking ties by comparing Version fields.
 // The Version fields are interpreted as semantic versions (using semver.Compare)
 // optionally followed by a tie-breaking suffix introduced by a slash character,
-// like in "v0.0.1/go.mod".
+// like in "v0.0.1/module.cue".
 func Sort(list []Version) {
 	sort.Slice(list, func(i, j int) bool {
 		mi := list[i]
 		mj := list[j]
-		if mi.Path != mj.Path {
-			return mi.Path < mj.Path
+		if mi.path != mj.path {
+			return mi.path < mj.path
 		}
 		// To help go.sum formatting, allow version/file.
 		// Compare semver prefix by semver rules,
 		// file by string order.
-		vi := mi.Version
-		vj := mj.Version
+		vi := mi.version
+		vj := mj.version
 		var fi, fj string
 		if k := strings.Index(vi, "/"); k >= 0 {
 			vi, fi = vi[:k], vi[k:]

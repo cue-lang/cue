@@ -16,6 +16,24 @@
       "message": "What version did you use as the source?",
       "revId": "d26fbb5fbbac90b9d603bc4413d005625ebeacec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a096f87_8000ce59",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T10:46:23Z",
+      "side": 1,
+      "message": "Same as the rest of x/mod: v0.6.0. I\u0027ve updated the commit message to be explicit about that.",
+      "parentUuid": "fe6face1_f5df2f2b",
+      "revId": "d26fbb5fbbac90b9d603bc4413d005625ebeacec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

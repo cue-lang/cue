@@ -1,5 +1,3 @@
-//go:build ignore
-
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -11,8 +9,6 @@ import (
 	"reflect"
 	"strings"
 	"testing"
-
-	"golang.org/x/mod/module"
 )
 
 var tests = `
@@ -459,17 +455,17 @@ func Test(t *testing.T) {
 			})
 		}
 	}
-	m := func(s string) module.Version {
-		return module.Version{Path: s[:1], Version: s[1:]}
+	m := func(s string) version {
+		return version{s[:1], s[1:]}
 	}
-	ms := func(list []string) []module.Version {
-		var mlist []module.Version
+	ms := func(list []string) []version {
+		var mlist []version
 		for _, s := range list {
 			mlist = append(mlist, m(s))
 		}
 		return mlist
 	}
-	checkList := func(t *testing.T, desc string, list []module.Version, err error, val string) {
+	checkList := func(t *testing.T, desc string, list []version, err error, val string) {
 		if err != nil {
 			t.Fatalf("%s: %v", desc, err)
 		}
@@ -509,7 +505,7 @@ func Test(t *testing.T) {
 				t.Fatalf("build takes one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := BuildList([]module.Version{m(kf[1])}, reqs)
+				list, err := BuildList[version]([]version{m(kf[1])}, reqs)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -518,7 +514,7 @@ func Test(t *testing.T) {
 				t.Fatalf("upgrade* takes one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := UpgradeAll(m(kf[1]), reqs)
+				list, err := UpgradeAll[version](m(kf[1]), reqs)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -527,7 +523,7 @@ func Test(t *testing.T) {
 				t.Fatalf("upgrade takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Upgrade(m(kf[1]), reqs, ms(kf[2:])...)
+				list, err := Upgrade[version](m(kf[1]), reqs, ms(kf[2:])...)
 				if err == nil {
 					// Copy the reqs map, but substitute the upgraded requirements in
 					// place of the target's original requirements.
@@ -537,7 +533,7 @@ func Test(t *testing.T) {
 					}
 					upReqs[m(kf[1])] = list
 
-					list, err = Req(m(kf[1]), nil, upReqs)
+					list, err = Req[version](m(kf[1]), nil, upReqs)
 				}
 				checkList(t, key, list, err, val)
 			})
@@ -547,7 +543,7 @@ func Test(t *testing.T) {
 				t.Fatalf("upgrade takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Upgrade(m(kf[1]), reqs, ms(kf[2:])...)
+				list, err := Upgrade[version](m(kf[1]), reqs, ms(kf[2:])...)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -556,7 +552,7 @@ func Test(t *testing.T) {
 				t.Fatalf("downgrade takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Downgrade(m(kf[1]), reqs, ms(kf[1:])...)
+				list, err := Downgrade[version](m(kf[1]), reqs, ms(kf[1:])...)
 				checkList(t, key, list, err, val)
 			})
 			continue
@@ -565,17 +561,17 @@ func Test(t *testing.T) {
 				t.Fatalf("req takes at least one argument: %q", line)
 			}
 			fns = append(fns, func(t *testing.T) {
-				list, err := Req(m(kf[1]), kf[2:], reqs)
+				list, err := Req[version](m(kf[1]), kf[2:], reqs)
 				checkList(t, key, list, err, val)
 			})
 			continue
 		}
 		if len(kf) == 1 && 'A' <= key[0] && key[0] <= 'Z' {
-			var rs []module.Version
+			var rs []version
 			for _, f := range strings.Fields(val) {
 				r := m(f)
 				if reqs[r] == nil {
-					reqs[r] = []module.Version{}
+					reqs[r] = []version{}
 				}
 				rs = append(rs, r)
 			}
@@ -587,7 +583,19 @@ func Test(t *testing.T) {
 	flush()
 }
 
-type reqsMap map[module.Version][]module.Version
+type reqsMap map[version][]version
+
+func (r reqsMap) Path(v version) string {
+	return v.path
+}
+
+func (r reqsMap) Version(v version) string {
+	return v.version
+}
+
+func (r reqsMap) New(p, v string) (version, error) {
+	return version{p, v}, nil
+}
 
 func (r reqsMap) Max(v1, v2 string) string {
 	if v1 == "none" || v2 == "" {
@@ -602,36 +610,41 @@ func (r reqsMap) Max(v1, v2 string) string {
 	return v1
 }
 
-func (r reqsMap) Upgrade(m module.Version) (module.Version, error) {
-	u := module.Version{Version: "none"}
+func (r reqsMap) Upgrade(m version) (version, error) {
+	u := version{"", "none"}
 	for k := range r {
-		if k.Path == m.Path && r.Max(u.Version, k.Version) == k.Version && !strings.HasSuffix(k.Version, ".hidden") {
+		if k.path == m.path && r.Max(u.version, k.version) == k.version && !strings.HasSuffix(k.version, ".hidden") {
 			u = k
 		}
 	}
-	if u.Path == "" {
-		return module.Version{}, fmt.Errorf("missing module: %v", module.Version{Path: m.Path})
+	if u.path == "" {
+		return version{}, fmt.Errorf("missing module: %v", m.path)
 	}
 	return u, nil
 }
 
-func (r reqsMap) Previous(m module.Version) (module.Version, error) {
-	var p module.Version
+func (r reqsMap) Previous(m version) (version, error) {
+	var p version
 	for k := range r {
-		if k.Path == m.Path && p.Version < k.Version && k.Version < m.Version && !strings.HasSuffix(k.Version, ".hidden") {
+		if k.path == m.path && p.version < k.version && k.version < m.version && !strings.HasSuffix(k.version, ".hidden") {
 			p = k
 		}
 	}
-	if p.Path == "" {
-		return module.Version{Path: m.Path, Version: "none"}, nil
+	if p.path == "" {
+		return version{m.path, "none"}, nil
 	}
 	return p, nil
 }
 
-func (r reqsMap) Required(m module.Version) ([]module.Version, error) {
+func (r reqsMap) Required(m version) ([]version, error) {
 	rr, ok := r[m]
 	if !ok {
 		return nil, fmt.Errorf("missing module: %v", m)
 	}
 	return rr, nil
+}
+
+type version struct {
+	path    string
+	version string
 }

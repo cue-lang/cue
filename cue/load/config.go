@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/mod/modfile"
 )
 
 const (
@@ -139,7 +140,7 @@ type Config struct {
 	// if no module file was present. If non-nil, then
 	// after calling Config.complete, modFile.Module will be
 	// equal to Module.
-	modFile *modFile
+	modFile *modfile.File
 
 	// Package defines the name of the package to be loaded. If this is not set,
 	// the package must be uniquely defined from its context. Special values:
@@ -364,6 +365,7 @@ func (c Config) complete() (cfg *Config, err error) {
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
 	}
+	//c.Registry = "registry.cue.works"
 	if c.Registry != "" {
 		u, err := url.Parse(c.Registry)
 		if err != nil {

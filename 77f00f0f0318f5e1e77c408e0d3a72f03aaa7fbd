@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78e23c77_1fa9bdff",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 22
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T12:48:05Z",
+      "side": 1,
+      "message": "OK, I found the reason: the additional work is from parsing the module.cue schema file. I\u0027ve now changed the modfile logic so that it only parses that schema file once on demand, so the stats in this CL now remain the same.",
+      "parentUuid": "40bf1068_2d986292",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a2e0d484_1e37dc58",

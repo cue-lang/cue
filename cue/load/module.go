@@ -1,49 +1,19 @@
 package load
 
 import (
-	_ "embed"
+	"context"
+	"fmt"
 	"io"
 	"path/filepath"
 	"strings"
 
-	"golang.org/x/mod/module"
-	"golang.org/x/mod/semver"
-
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/load/internal/mvs"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/mod/modfile"
+	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/internal/mod/mvs"
+	"golang.org/x/mod/semver"
 )
-
-//go:embed moduleschema.cue
-var moduleSchema []byte
-
-type modFile struct {
-	Module string `json:"module"`
-	Deps   map[string]*modDep
-}
-
-// versions returns all the modules that are dependended on by
-// the module file.
-func (mf *modFile) versions() []module.Version {
-	if len(mf.Deps) == 0 {
-		// It's important to return nil here because otherwise the
-		// "mistake: chose versions" panic in mvs will trigger
-		// on an empty version list.
-		return nil
-	}
-	vs := make([]module.Version, 0, len(mf.Deps))
-	for m, dep := range mf.Deps {
-		vs = append(vs, module.Version{
-			Path:    m,
-			Version: dep.Version,
-		})
-	}
-	return vs
-}
-
-type modDep struct {
-	Version string `json:"v"`
-}
 
 // loadModule loads the module file, resolves and downloads module
 // dependencies. It sets c.Module if it's empty or checks it for
@@ -69,7 +39,11 @@ func (c *Config) loadModule() error {
 	if err != nil {
 		return err
 	}
-	mf, err := parseModuleFile(data, mod)
+	parseModFile := modfile.ParseNonStrict
+	if c.Registry == "" {
+		parseModFile = modfile.ParseLegacy
+	}
+	mf, err := parseModFile(data, mod)
 	if err != nil {
 		return err
 	}
@@ -87,26 +61,53 @@ func (c *Config) loadModule() error {
 }
 
 type dependencies struct {
-	versions []module.Version
+	mainModule *modfile.File
+	versions   []module.Version
 }
 
 // lookup returns the module corresponding to the given import path, and the relative path
 // of the package beneath that.
 //
 // It assumes that modules are not nested.
-func (deps *dependencies) lookup(pkgPath importPath) (v module.Version, subPath string, ok bool) {
+func (deps *dependencies) lookup(pkgPath importPath) (v module.Version, subPath string, err error) {
+	type answer struct {
+		v       module.Version
+		subPath string
+	}
+	var possible []answer
 	for _, dep := range deps.versions {
-		if subPath, ok := isParent(importPath(dep.Path), pkgPath); ok {
-			return dep, subPath, true
+		if subPath, ok := isParent(dep, pkgPath); ok {
+			possible = append(possible, answer{dep, subPath})
 		}
 	}
-	return module.Version{}, "", false
+	switch len(possible) {
+	case 0:
+		return module.Version{}, "", fmt.Errorf("no dependency found for import path %q", pkgPath)
+	case 1:
+		return possible[0].v, possible[0].subPath, nil
+	}
+	var found *answer
+	for i, a := range possible {
+		dep, ok := deps.mainModule.Deps[a.v.Path()]
+		if ok && dep.Default {
+			if found != nil {
+				// More than one default.
+				// TODO this should be impossible and checked by modfile.
+				return module.Version{}, "", fmt.Errorf("more than one default module for import path %q", pkgPath)
+			}
+			found = &possible[i]
+		}
+	}
+	if found == nil {
+		return module.Version{}, "", fmt.Errorf("no default module found for import path %q", pkgPath)
+	}
+	return found.v, found.subPath, nil
 }
 
 // resolveDependencies resolves all the versions of all the modules in the given module file,
 // using regClient to fetch dependency information.
-func resolveDependencies(mainModFile *modFile, regClient *registryClient) (*dependencies, error) {
-	vs, err := mvs.BuildList(mainModFile.versions(), &mvsReqs{
+func resolveDependencies(mainModFile *modfile.File, regClient *registryClient) (*dependencies, error) {
+	vs, err := mvs.BuildList[module.Version](mainModFile.DepVersions(), &mvsReqs{
 		mainModule: mainModFile,
 		regClient:  regClient,
 	})
@@ -114,27 +115,29 @@ func resolveDependencies(mainModFile *modFile, regClient *registryClient) (*depe
 		return nil, err
 	}
 	return &dependencies{
-		versions: vs,
+		mainModule: mainModFile,
+		versions:   vs,
 	}, nil
 }
 
 // mvsReqs implements mvs.Reqs by fetching information using
 // regClient.
 type mvsReqs struct {
-	mainModule *modFile
+	module.Versions
+	mainModule *modfile.File
 	regClient  *registryClient
 }
 
 // Required implements mvs.Reqs.Required.
 func (reqs *mvsReqs) Required(m module.Version) (vs []module.Version, err error) {
-	if m.Path == reqs.mainModule.Module {
-		return reqs.mainModule.versions(), nil
+	if m.Path() == reqs.mainModule.Module {
+		return reqs.mainModule.DepVersions(), nil
 	}
-	mf, err := reqs.regClient.fetchModFile(m)
+	mf, err := reqs.regClient.fetchModFile(context.TODO(), m)
 	if err != nil {
 		return nil, err
 	}
-	return mf.versions(), nil
+	return mf.DepVersions(), nil
 }
 
 // Required implements mvs.Reqs.Max.
@@ -164,17 +167,28 @@ func cmpVersion(v1, v2 string) int {
 	return semver.Compare(v1, v2)
 }
 
-// isParent reports whether the module modPath contains the package with the given
+// isParent reports whether the module modv contains the package with the given
 // path, and if so, returns its relative path within that module.
-func isParent(modPath, pkgPath importPath) (subPath string, ok bool) {
-	if !strings.HasPrefix(string(pkgPath), string(modPath)) {
+func isParent(modv module.Version, pkgPath importPath) (subPath string, ok bool) {
+	modBase := modv.BasePath()
+	pkgBase, pkgMajor, pkgHasVersion := module.SplitPathVersion(string(pkgPath))
+	if !pkgHasVersion {
+		pkgBase = string(pkgPath)
+	}
+
+	if !strings.HasPrefix(pkgBase, modBase) {
 		return "", false
 	}
-	if len(pkgPath) == len(modPath) {
-		return ".", true
-	}
-	if pkgPath[len(modPath)] != '/' {
+	if len(pkgBase) == len(modBase) {
+		subPath = "."
+	} else if pkgBase[len(modBase)] != '/' {
 		return "", false
+	} else {
+		subPath = pkgBase[len(modBase)+1:]
 	}
-	return string(pkgPath[len(modPath)+1:]), true
+	// It's potentially a match, but we need to check the major version too.
+	if !pkgHasVersion || semver.Major(modv.Version()) == pkgMajor {
+		return subPath, true
+	}
+	return "", false
 }

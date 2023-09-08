@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "24b11bcb_f49b6f1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T09:25:52Z",
+      "side": 1,
+      "message": "Per our exchange offline, I would split this into separate CLs. There is a lot of mechanical stuff that unrelated to the introduction of the new package that can go into separate CLs.",
+      "revId": "f0b22dc6adc0d05fea15e90d22c1f4466a2b37f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cfff58ce_fc99d3ea",

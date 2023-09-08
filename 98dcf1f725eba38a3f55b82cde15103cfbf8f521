@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85b609a0_184e9a22",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T09:23:18Z",
+      "side": 1,
+      "message": "Nit: should be on a clear line just before the trailers.",
+      "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e50f8b27_07be6586",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T09:23:18Z",
+      "side": 1,
+      "message": "Why v0.6.0?\n\nhttps://pkg.go.dev/golang.org/x/mod?tab\u003dversions\n\nv0.12.0 is the current latest.",
+      "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3691fd7_75556d72",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T09:23:18Z",
+      "side": 1,
+      "message": "Per my comment, not clear why we are not using the latest version of golang.org/x/mod here.",
+      "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

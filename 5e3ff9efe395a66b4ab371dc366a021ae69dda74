@@ -16,6 +16,24 @@
       "message": "A brief explanation on why we need to do this will help the reader like me :)",
       "revId": "5e3ff9efe395a66b4ab371dc366a021ae69dda74",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9b258b9_8ccc5bb0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 16
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T11:45:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "149a9fb7_e7ea8017",
+      "revId": "5e3ff9efe395a66b4ab371dc366a021ae69dda74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

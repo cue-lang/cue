@@ -50,6 +50,10 @@ func (m Version) Path() string {
 	return m.path
 }
 
+func (m Version) Equal(m1 Version) bool {
+	return m.path == m1.path && m.version == m1.version
+}
+
 func (m Version) BasePath() string {
 	basePath, _, ok := SplitPathVersion(m.path)
 	if !ok {

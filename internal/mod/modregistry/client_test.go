@@ -79,7 +79,13 @@ deps: "example.com@v1": v: "v1.2.3"
 deps: "other.com/something@v0": v: "v0.2.3"
 
 -- x.cue --
-x: 42
+package bar
+
+import (
+	a "example.com"
+	"other.com/something"
+)
+x: a.foo + something.bar
 `
 	ctx := context.Background()
 	mv := module.MustParseVersion("foo.com/bar@v0.5.100")

@@ -15,6 +15,7 @@
 package load
 
 import (
+	"fmt"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -37,7 +38,10 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 	// all the way to the root of the git repository, causing Go's test caching
 	// to never kick in, as the .git directory almost always changes.
 	// Moreover, it's extra work that isn't useful to the tests.
-	c, _ := (&Config{ModuleRoot: cwd, Dir: cwd}).complete()
+	c, err := (&Config{ModuleRoot: cwd, Dir: cwd}).complete()
+	if err != nil {
+		return nil, fmt.Errorf("unexpected error on Config.complete: %v", err)
+	}
 	l := loader{cfg: c}
 	inst := l.newRelInstance(token.NoPos, pkg, c.Package)
 	p := l.importPkg(token.NoPos, inst)[0]
@@ -45,7 +49,12 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 }
 
 func TestEmptyImport(t *testing.T) {
-	c, _ := (&Config{}).complete()
+	c, err := (&Config{
+		ModuleRoot: ".",
+	}).complete()
+	if err != nil {
+		t.Fatal(err)
+	}
 	l := loader{cfg: c}
 	inst := l.newInstance(token.NoPos, "")
 	p := l.importPkg(token.NoPos, inst)[0]

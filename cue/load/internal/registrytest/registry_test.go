@@ -1,17 +1,18 @@
 package registrytest
 
 import (
+	"context"
 	"fmt"
-	"io"
-	"net/http"
 	"os"
 	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 
 	"golang.org/x/tools/txtar"
+
+	"cuelang.org/go/internal/mod/modregistry"
+	"cuelang.org/go/internal/mod/module"
 )
 
 func TestRegistry(t *testing.T) {
@@ -31,7 +32,10 @@ func TestRegistry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Run(strings.TrimSuffix(name, ".txtar"), func(t *testing.T) {
-			r := New(ar)
+			r, err := New(ar)
+			if err != nil {
+				t.Fatal(err)
+			}
 			defer r.Close()
 			runTest(t, r.URL(), string(ar.Comment), ar)
 		})
@@ -39,8 +43,11 @@ func TestRegistry(t *testing.T) {
 }
 
 func runTest(t *testing.T, registry string, script string, ar *txtar.Archive) {
-	var resp *http.Response
-	var respBody []byte
+	ctx := context.Background()
+	client, err := modregistry.NewClient(registry, "")
+	if err != nil {
+		t.Fatal(err)
+	}
 	for _, line := range strings.Split(script, "\n") {
 		if line == "" || line[0] == '#' {
 			continue
@@ -50,37 +57,28 @@ func runTest(t *testing.T, registry string, script string, ar *txtar.Archive) {
 			t.Fatalf("invalid line %q", line)
 		}
 		switch args[0] {
-		case "GET":
-			if len(args) != 2 {
-				t.Fatalf("usage: GET $url")
-			}
-			resp1, err := http.Get(registry + "/" + args[1])
-			if err != nil {
-				t.Fatalf("GET failed: %v", err)
-			}
-			respBody, _ = io.ReadAll(resp1.Body)
-			resp1.Body.Close()
-			resp = resp1
-		case "body":
+		case "modfile":
 			if len(args) != 3 {
-				t.Fatalf("usage: body code file")
+				t.Fatalf("usage: getmod $version $wantFile")
 			}
-			wantCode, err := strconv.Atoi(args[1])
+			mv, err := module.ParseVersion(args[1])
 			if err != nil {
-				t.Fatalf("invalid code %q", args[1])
+				t.Fatalf("invalid version %q in getmod", args[1])
 			}
-			wantBody, err := getFile(ar, args[2])
+			m, err := client.GetModule(ctx, mv)
+			if err != nil {
+				t.Fatal(err)
+			}
+			gotData, err := m.ModuleFile(ctx)
+			if err != nil {
+				t.Fatal(err)
+			}
+			wantData, err := getFile(ar, args[2])
 			if err != nil {
 				t.Fatalf("cannot open file for body comparison: %v", err)
 			}
-			if resp == nil {
-				t.Fatalf("no previous GET request to check body against")
-			}
-			if resp.StatusCode != wantCode {
-				t.Errorf("unexpected GET response code; got %v want %v", wantCode, resp.StatusCode)
-			}
-			if string(respBody) != string(wantBody) {
-				t.Errorf("unexpected GET response\ngot %q\nwant %q", respBody, wantBody)
+			if string(gotData) != string(wantData) {
+				t.Errorf("unexpected GET response\ngot %q\nwant %q", gotData, wantData)
 			}
 		default:
 			t.Fatalf("unknown command %q", line)

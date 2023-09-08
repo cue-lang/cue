@@ -1,4 +1,4 @@
-package ociregistry
+package modregistry
 
 import (
 	"archive/zip"

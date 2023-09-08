@@ -1,6 +1,6 @@
-! exec cue eval non-existing .
+! exec cue eval nonexisting .
 ! stdout .
 cmp stderr expect-stderr
 
 -- expect-stderr --
-cannot find package "non-existing"
+cannot find package "nonexisting"

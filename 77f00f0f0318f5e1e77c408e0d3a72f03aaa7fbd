@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bff444b_1f70539b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T09:35:02Z",
+      "side": 1,
+      "message": "I think this commit message would benefit from a summary of the actual changes being made in this CL. It helps with the review, but also subsequent readers of the commit do not then need to trawl the code.",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2a70f64_fd0bc082",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 22
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T09:35:02Z",
+      "side": 1,
+      "message": "Why are we seeing changes here?",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2e0d484_1e37dc58",
+        "filename": "cue/load/internal/mvs/mvs_test.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T09:35:02Z",
+      "side": 1,
+      "message": "Belongs in another CL?",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -20,6 +20,7 @@ package load
 //    - go/build
 
 import (
+	"fmt"
 	"os"
 
 	"cuelang.org/go/cue/ast"
@@ -56,12 +57,16 @@ func Instances(args []string, c *Config) []*build.Instance {
 		if err != nil {
 			return []*build.Instance{c.newErrInstance(err)}
 		}
-		regClient = newRegistryClient(c.Registry, tmpDir)
+		regClient, err = newRegistryClient(c.Registry, tmpDir)
+		if err != nil {
+			return []*build.Instance{c.newErrInstance(fmt.Errorf("cannot make registry client: %v", err))}
+		}
 		deps1, err := resolveDependencies(c.modFile, regClient)
 		if err != nil {
 			return []*build.Instance{c.newErrInstance(err)}
 		}
 		deps = deps1
+
 	}
 	tg := newTagger(c)
 	l := newLoader(c, tg, deps, regClient)

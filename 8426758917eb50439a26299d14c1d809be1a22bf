@@ -16,6 +16,24 @@
       "message": "Again, would be nice to have some level detail here on the changes in the CL. Otherwise every reader has the job of lifting that from the code changes.",
       "revId": "8426758917eb50439a26299d14c1d809be1a22bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d14288d_e59eb3ac",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T22:54:35Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9111a953_565e8be7",
+      "revId": "8426758917eb50439a26299d14c1d809be1a22bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

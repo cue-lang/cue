@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9111a953_565e8be7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-08T15:13:17Z",
+      "side": 1,
+      "message": "Again, would be nice to have some level detail here on the changes in the CL. Otherwise every reader has the job of lifting that from the code changes.",
+      "revId": "8426758917eb50439a26299d14c1d809be1a22bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,10 +1,9 @@
 -- out/modfetch/error --
-instance: example.com@v0.0.1: module.cue HTTP GET request failed: cannot get module: no module found for example.com@v0.0.1
-
+instance: example.com@v0.0.1: module example.com@v0.0.1: error response: 404 Not Found: repository name not known to registry
 -- cue.mod/module.cue --
-module: "main.org"
+module: "main.org@v0"
 
-deps: "example.com": v: "v0.0.1"
+deps: "example.com@v0": v: "v0.0.1"
 
 -- main.cue --
 package main

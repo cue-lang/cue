@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "40bf1068_2d986292",
+        "filename": "cmd/cue/cmd/testdata/script/stats.txtar",
+        "patchSetId": 22
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T11:05:54Z",
+      "side": 1,
+      "message": "good question. i\u0027ll look into it.",
+      "parentUuid": "e2a70f64_fd0bc082",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a2e0d484_1e37dc58",
         "filename": "cue/load/internal/mvs/mvs_test.go",
         "patchSetId": 22
@@ -48,6 +66,24 @@
       "writtenOn": "2023-09-08T09:35:02Z",
       "side": 1,
       "message": "Belongs in another CL?",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9734bf57_007926b4",
+        "filename": "cue/load/internal/mvs/mvs_test.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T11:05:54Z",
+      "side": 1,
+      "message": "From my p.o.v. this change belongs in this CL: we can\u0027t remove the package before changing cue/load to use the mvs package in its new position; we could remove it after, but it seems to me like it\u0027s nicer to remove it as soon as it\u0027s unused. YMMV - let me know what you\u0027d prefer.",
+      "parentUuid": "a2e0d484_1e37dc58",
       "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

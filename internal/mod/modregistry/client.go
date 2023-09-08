@@ -22,8 +22,6 @@ import (
 	"errors"
 	"fmt"
 	"io"
-	"io/ioutil"
-	"sort"
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -140,17 +138,13 @@ func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt,
 	if err != nil {
 		return fmt.Errorf("module zip file check failed: %v", err)
 	}
-	modFileContent, deps, err := c.checkModFile(ctx, m, modf)
+	modFileContent, err := c.checkModFile(ctx, m, modf)
 	if err != nil {
 		return fmt.Errorf("module.cue file check failed: %v", err)
 	}
 	selfDigest, err := digest.FromReader(io.NewSectionReader(r, 0, size))
 	if err != nil {
 		return fmt.Errorf("cannot read module zip file: %v", err)
-	}
-
-	if err := c.uploadDeps(ctx, m, deps); err != nil {
-		return fmt.Errorf("cannot upload dependencies: %v", err)
 	}
 	// Upload the actual module's content
 	// TODO should we use a custom media type for this?
@@ -169,8 +163,8 @@ func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt,
 		},
 		MediaType: ocispec.MediaTypeImageManifest,
 		Config:    configDesc,
-		// One for self, one for module file + 1 for each dependency.
-		Layers: make([]ocispec.Descriptor, 2+len(deps)),
+		// One for self, one for module file.
+		Layers: make([]ocispec.Descriptor, 2),
 	}
 	manifest.Layers[0] = selfDesc
 
@@ -178,33 +172,11 @@ func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt,
 	manifest.Layers[1].MediaType = moduleFileMediaType
 	manifest.Layers[1].Size = int64(len(modFileContent))
 
-	//log.Printf("push layer 0 %s@%s %s", repoName, manifest.Layers[0].Digest, manifest.Layers[0].MediaType)
 	if err := c.registry.Push(ctx, repoName, manifest.Layers[0], io.NewSectionReader(r, 0, size)); err != nil {
 		return fmt.Errorf("cannot push module contents: %v", err)
 	}
-	//log.Printf("push layer 1 %s@%s %s", repoName, manifest.Layers[1].Digest, manifest.Layers[1].MediaType)
 	if err := c.registry.Push(ctx, repoName, manifest.Layers[1], bytes.NewReader(modFileContent)); err != nil {
 		return fmt.Errorf("cannot push cue.mod/module.cue contents: %v", err)
-	}
-
-	depVersions := mapKeys(deps)
-	// Create the layers in predictable order.
-	sort.Slice(depVersions, func(i, j int) bool {
-		v1, v2 := depVersions[i], depVersions[j]
-		if v1.Path() == v2.Path() {
-			// This can't happen currently but probably could in the future
-			// when we keep one version for main module and a different
-			// for when used as dependency.
-			return semver.Compare(v1.Version(), v2.Version()) < 0
-		}
-		return v1.Path() < v2.Path()
-	})
-	for i, v := range depVersions {
-		layer := &manifest.Layers[i+2]
-		*layer = deps[v].manifest.Layers[0]
-		layer.Annotations = map[string]string{
-			"works.cue.module": v.String(),
-		}
 	}
 	manifestData, err := json.Marshal(manifest)
 	if err != nil {
@@ -216,65 +188,42 @@ func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt,
 	return nil
 }
 
-func (c *Client) uploadDeps(ctx context.Context, dst module.Version, deps map[module.Version]*Module) error {
-	// Since we've verified that all the dependencies exist, we can just
-	// mount them directly from where they were originally.
-
-	dstRepo := c.repoName(dst.Path())
-	// TODO do this concurrently
-	for src, m := range deps {
-		//log.Printf("mount %v@%v %v", m.repo, m.manifest.Layers[0].Digest, m.repo)
-		if err := c.registry.Mount(ctx, m.repo, dstRepo, m.manifest.Layers[0]); err != nil {
-			return fmt.Errorf("failed to make %v available as dependency in %v: %v", src, dst.Path(), err)
-		}
-	}
-	return nil
-}
-
-func (c *Client) checkModFile(ctx context.Context, m module.Version, f *zip.File) ([]byte, map[module.Version]*Module, error) {
+func (c *Client) checkModFile(ctx context.Context, m module.Version, f *zip.File) ([]byte, error) {
 	r, err := f.Open()
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	defer r.Close()
 	// TODO check max size?
 	data, err := io.ReadAll(r)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	mf, err := modfile.Parse(data, f.Name)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 	if mf.Module != m.Path() {
-		return nil, nil, fmt.Errorf("module path %q found in %s does not match module path being published %q", mf.Module, f.Name, m.Path())
+		return nil, fmt.Errorf("module path %q found in %s does not match module path being published %q", mf.Module, f.Name, m.Path())
 	}
 	_, major, ok := module.SplitPathVersion(mf.Module)
 	if !ok {
-		return nil, nil, fmt.Errorf("invalid module path %q", mf.Module)
+		return nil, fmt.Errorf("invalid module path %q", mf.Module)
 	}
 	wantMajor := semver.Major(m.Version())
 	if major != wantMajor {
 		// This can't actually happen because the zip checker checks the major version
 		// that's being published to, so the above path check also implicitly checks that.
-		return nil, nil, fmt.Errorf("major version %q found in %s does not match version being published %q", major, f.Name, m.Version())
+		return nil, fmt.Errorf("major version %q found in %s does not match version being published %q", major, f.Name, m.Version())
 	}
-	deps := make(map[module.Version]*Module)
+	// Check that all dependency versions look valid.
 	for modPath, dep := range mf.Deps {
-		depv, err := module.NewVersion(modPath, dep.Version)
+		_, err := module.NewVersion(modPath, dep.Version)
 		if err != nil {
-			return nil, nil, fmt.Errorf("invalid dependency: %v @ %v", modPath, dep.Version)
+			return nil, fmt.Errorf("invalid dependency: %v @ %v", modPath, dep.Version)
 		}
-		dm, err := c.GetModule(ctx, depv)
-		if err != nil {
-			// TODO try getting all modules so we get told about all missing dependencies rather than just one?
-			return nil, nil, fmt.Errorf("cannot get module %v: %v", depv, err)
-		}
-		deps[depv] = dm
 	}
-	// TODO run MVS on the module file and check that
-	// the versions in the module dependencies reflect the final versions.
-	return data, deps, nil
+	return data, nil
 }
 
 // Module represents a CUE module instance.
@@ -295,44 +244,6 @@ func (m *Module) ModuleFile(ctx context.Context) ([]byte, error) {
 // error has been checked.
 func (m *Module) GetZip(ctx context.Context) (io.ReadCloser, error) {
 	return m.client.registry.Fetch(ctx, m.repo, m.manifest.Layers[0])
-}
-
-// Dependencies returns all the module's dependencies available inside the module.
-func (m *Module) Dependencies(ctx context.Context) (map[module.Version]Dependency, error) {
-	deps := make(map[module.Version]Dependency)
-	for _, desc := range m.manifest.Layers[2:] {
-		mname, ok := desc.Annotations[moduleAnnotation]
-		if !ok {
-			return nil, fmt.Errorf("no %s annotation found for blob", moduleAnnotation)
-		}
-		mv, err := module.ParseVersion(mname)
-		if err != nil {
-			return nil, fmt.Errorf("bad module name %q found in module config", mname)
-		}
-		deps[mv] = Dependency{
-			client:  m.client,
-			version: mv,
-			desc:    desc,
-		}
-	}
-	return deps, nil
-}
-
-// Dependency represents a module depended on by another module.
-type Dependency struct {
-	client  *Client
-	version module.Version
-	desc    ocispec.Descriptor
-}
-
-// Version returns the version of the dependency.
-func (d Dependency) Version() module.Version {
-	return d.version
-}
-
-// GetZip returns a reader for the dependency's archive.
-func (d Dependency) GetZip() (io.ReadCloser, error) {
-	panic("unimplemented")
 }
 
 type fetchFunc = func(ctx context.Context, repoName string, desc ocispec.Descriptor) (io.ReadCloser, error)
@@ -357,7 +268,7 @@ func fetchBytes(ctx context.Context, fetch fetchFunc, repoName string, desc ocis
 		return nil, fmt.Errorf("cannot fetch content: %v", err)
 	}
 	defer r.Close()
-	data, err := ioutil.ReadAll(r)
+	data, err := io.ReadAll(r)
 	if err != nil {
 		return nil, fmt.Errorf("cannot read content: %v", err)
 	}
@@ -379,14 +290,6 @@ func isModuleFile(desc ocispec.Descriptor) bool {
 // TODO this is a guess. There's probably a more correct way to do it.
 func isJSON(mediaType string) bool {
 	return strings.HasSuffix(mediaType, "+json") || strings.HasSuffix(mediaType, "/json")
-}
-
-func mapKeys[K comparable, V any](m map[K]V) []K {
-	ks := make([]K, 0, len(m))
-	for k := range m {
-		ks = append(ks, k)
-	}
-	return ks
 }
 
 // scratchConfig returns a dummy configuration consisting only of the

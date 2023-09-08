@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "de4fdf8c_47aadf7d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T11:01:04Z",
+      "side": 1,
+      "message": "Done (in all CLs in the chain).",
+      "parentUuid": "85b609a0_184e9a22",
+      "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e50f8b27_07be6586",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e03c16b_5936f2e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T11:01:04Z",
+      "side": 1,
+      "message": "replied elsewhere.",
+      "parentUuid": "e50f8b27_07be6586",
+      "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "d3691fd7_75556d72",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-09-08T09:23:18Z",
       "side": 1,
       "message": "Per my comment, not clear why we are not using the latest version of golang.org/x/mod here.",
+      "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "203c993c_d6133610",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-08T11:01:04Z",
+      "side": 1,
+      "message": "I think it was because I started by using the version of x/mod depended on by the version of Go before work files were added. I just looked at the relevant changes from v0.6.0 to v0.12.0 and there are none that look like we need them: they\u0027re all just about updating doc comments. Here\u0027s the relevant diff, with unused packages and test files removed for clarity: https://gist.github.com/rogpeppe/f2280f0badf17b149630028f2350c612. Note that `CreateFromVCS` is removed from our fork.",
+      "parentUuid": "d3691fd7_75556d72",
       "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

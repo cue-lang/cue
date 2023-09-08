@@ -77,15 +77,36 @@ x: 42
 func TestPutWithDependencies(t *testing.T) {
 	const testMod = `
 -- cue.mod/module.cue --
-module: "example.com/module@v1"
-
 module: "foo.com/bar@v0"
 deps: "example.com@v1": v: "v1.2.3"
 deps: "other.com/something@v0": v: "v0.2.3"
 
 -- x.cue --
-x: 42
+package bar
+
+import (
+	a "example.com"
+	"other.com/something"
+)
+x: a.foo + something.bar
 `
+	ctx := context.Background()
+	mv := module.MustParseVersion("foo.com/bar@v0.9.8")
+	c := newTestClient(t)
+	zipData := putModule(t, c, mv, testMod)
+
+	m, err := c.GetModule(ctx, mv)
+	qt.Assert(t, qt.IsNil(err))
+
+	r, err := m.GetZip(ctx)
+	qt.Assert(t, qt.IsNil(err))
+	data, err := io.ReadAll(r)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(data, zipData))
+
+	tags, err := c.ModuleVersions(ctx, mv.Path())
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(tags, []string{"v0.9.8"}))
 }
 
 var checkModuleTests = []struct {

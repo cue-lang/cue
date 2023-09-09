@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8537ffbe_b9f58331",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T07:06:08Z",
+      "side": 1,
+      "message": "This is misleading as a name; it\u0027s a typo that\u0027s the cause of the problem here.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "031030c7_0f2c5409",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T07:06:08Z",
+      "side": 1,
+      "message": "\"canonical\" is a bit of a technical term. \"version is not well formed\" might be more friendly? Without losing any precision?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dea9ce8b_c8a94652",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T07:06:08Z",
+      "side": 1,
+      "message": "This comment appears to be redundant, given the code that follows is not commented.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

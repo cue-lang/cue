@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c50198e_1243145a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 13
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:28:29Z",
+      "side": 1,
+      "message": "I think I must have missed where this happens? In any case, worth pointing to the CL here.",
+      "revId": "8af9889299769f1a0438d159ef3abd2e106ed4ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

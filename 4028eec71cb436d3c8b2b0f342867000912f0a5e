@@ -1,0 +1,276 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6affcc17_edcadd43",
+        "filename": "internal/mod/module/versions.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Why is `\"\"` a maximum? \n\nWorth documenting unless this is covered elsewhere?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98e02632_c079e03b",
+        "filename": "internal/mod/mvs/errors.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Did you mean to leave this comment code lying around?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f638d88_1ca4723b",
+        "filename": "internal/mod/mvs/graph.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "nit: doc comment. With so many mentions of \"version\" in this space, a subtly named `Versions` definitely needs a comment.",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbf7860b_07bb669c",
+        "filename": "internal/mod/mvs/graph.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "When can this happen?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5adef4f6_029c0ab9",
+        "filename": "internal/mod/mvs/internal/par/atomic_go1.18.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "This file can be removed:\n\nhttps://github.com/cue-lang/cue/discussions/1937",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbe59a88_7754c269",
+        "filename": "internal/mod/mvs/internal/par/atomic_go1.19.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Ditto re supported Go versions.",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa2e8d5e_16f56fef",
+        "filename": "internal/mod/mvs/internal/par/queue.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Change doesn\u0027t belong in this CL?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "85ccddf0_a4d7ace7",
+        "filename": "internal/mod/mvs/internal/par/queue_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Change doesn\u0027t belong in this CL?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec14b2b2_b4a4eb72",
+        "filename": "internal/mod/mvs/internal/par/work.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Change doesn\u0027t belong in this CL?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "708bba21_682cb9ac",
+        "filename": "internal/mod/mvs/internal/par/work_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Change doesn\u0027t belong in this CL?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66192ef5_4f7f65c6",
+        "filename": "internal/mod/mvs/internal/slices/slices.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Change doesn\u0027t belong in this CL?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57219aca_7276cd52",
+        "filename": "internal/mod/mvs/mvs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Change doesn\u0027t belong in this CL?",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6611bc3_84c4358e",
+        "filename": "internal/mod/mvs/mvs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 252,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "It doesn\u0027t feel like we should be in a situation where we ever panic, correct?\n\nIf so, I would document this panic just being there as a \"should never happen\" scenario.\n\nOr we have some means of creating versions knowing that we only have valid inputs.",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1141ae5_fa7bac89",
+        "filename": "internal/mod/mvs/mvs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Ditto re panic",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62487100_b2cf7836",
+        "filename": "internal/mod/mvs/mvs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 432,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Ditto re panic",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d5e81b4_22da43f3",
+        "filename": "internal/mod/mvs/mvs.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T04:39:50Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "4028eec71cb436d3c8b2b0f342867000912f0a5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

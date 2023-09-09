@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60b356cd_4ca7f779",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T03:35:59Z",
+      "side": 1,
+      "message": "As mvdan has mentioned before, commit messages should wrap at 72 chars. We have editor settings turned on to enforce this/make the formatting automatic. \n\nYou can see below in Gerrit how it formats as one long line if this doesn\u0027t happen.",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c49bdf4_8af8c1bb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T03:35:59Z",
+      "side": 1,
+      "message": "We should start an FAQ/something somewhere where details like this are captured. In a markdown file in this repo for now so that a) we \"force\" ourselves to do it, but also b) the semantics are captured along with actual changes.\n\nWill form the basis of release notes, an actual FAQ etc.\n\nPerhaps a simple markdown file in internal/mod?",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3136fcd5_24000b34",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T03:35:59Z",
+      "side": 1,
+      "message": "With some straightforward suggestions.",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b14687e0_8d2f3069",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T03:35:59Z",
+      "side": 1,
+      "message": "Why is such a function not CheckImportPath?",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78e94641_77ce7efe",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-09T03:35:59Z",
+      "side": 1,
+      "message": "nit: you refer to \"version\" here but the return variable is named \"pathMajor\".",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,23 @@
       "message": "Marking this comment as done, because it is.",
       "revId": "baeada98a95182657a130779abb4c0622e5ed75b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cefb360_778087bb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T13:08:42Z",
+      "side": 1,
+      "message": "On the basis this is used by `./internal/mod/...` and `cue/load`, the source of main changes in this CL, this CL feels like it belongs earlier in the chain?",
+      "revId": "baeada98a95182657a130779abb4c0622e5ed75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

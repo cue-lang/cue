@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40be05ca_4305058b",
+        "filename": "go.mod",
+        "patchSetId": 34
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Please explain these dependencies in the commit message, along with some notes about how/why they are \"good\" to add as dependencies to CUE, size, quality of maintainership etc.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bcdf84fe_4f57b6f7",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Does the client assume the server is append-only, or that server contents can be mutated?",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "daacddb9_65dc2dfb",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Missing copyright header.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41481157_0628b249",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Incorrect package name given last element of directory path.\n\nAlso, I\u0027m entirely clear on the package name `modregistry`. It implies to me more of a server implementation rather than a client? A package comment might make this more clear.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95dc6ba8_5df6dd68",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Per previous discussions, this will prevent people from doing a \"naked\" store. \n\nCan we not implement this concept of a default in a better way?",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d26f008a_dd7725ba",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Is there not a named type we want to use here to make documentation of `m` easier? In any case the variable name could do with tweaking to make consistent with the docs. Perhaps `module.Path`?",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f26a36d_5a0e033c",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "This comment appears to be lost.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76f9436d_736a12f8",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Do we really want to be enforcing this, day 1? \n\nIt feels like there are a number of edge cases that make this fragile, not least if people have the ability to say where modules come from (the routing config file).",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84402b59_c9a1ef2a",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "I\u0027m not clear that this can be correct in general, because a dependency may not be available via the same registry. Per our routing configuration conversation.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a0e8b13_56f70475",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Doc comment.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b6dac7b_6c14d395",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Are we guaranteed that dependencies will come from the same registry?",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7c41664_c96c3805",
+        "filename": "internal/mod/modregistry/client_test.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Missing copyright header.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a12fe76f_ee073272",
+        "filename": "internal/mod/modregistry/registry.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T08:02:59Z",
+      "side": 1,
+      "message": "Missing copyright header.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

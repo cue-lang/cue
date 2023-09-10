@@ -1,0 +1,225 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa74a24d_265d69ff",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Does this change require that an import path contain the version number? \n\nIf so, we should probably call that out in the proposed markdown FAQ file, but also in the commit message. Otherwise there\u0027s a lot to keep in mind on \"where we are\" with respect to implementation at any point in time.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf282e5c_98f5e403",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Per previous comments on formatting in commit message.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c61af6c_5c61b20e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "This change seems to conflate a number of unrelated changes. I\u0027d suggest we split them out so that it\u0027s quicker and easier to review the actual changes.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10c40c56_d62f4dfb",
+        "filename": "cue/load/config.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Left over debugging line?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "20bab837_c41bf816",
+        "filename": "cue/load/import.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Is this condition `i \u003e\u003d 0` not guaranteed to be the case?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32b784f8_d9c30f8b",
+        "filename": "cue/load/import.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Just to confirm, we are going to do this based on the environment variable enabling modules... as well as some other condition, correct?\n\nDo we have that CL in the stack?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c90c9ab4_d850f026",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Panic or `t.Fatal`?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "febdf537_9561671e",
+        "filename": "cue/load/internal/mvs/errors.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Does this package removal belong in another CL?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcc20adc_2148e549",
+        "filename": "cue/load/internal/par/atomic_go1.18.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Does this package removal belong in another CL?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98ecd27b_2d0bfcfb",
+        "filename": "cue/load/internal/registrytest/fileio.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Do the registrytest changes belong in another CL?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "96e3a4e0_8b138714",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "This comment is, I believe, out of date now.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31b052eb_ba13b40e",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Feels like this should be in another CL so as to separate out the changes related to the tdtest change and the OCI modules change.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf1f1f97_47a8ac96",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T12:54:18Z",
+      "side": 1,
+      "message": "Per comment in a previous CL, this change doesn\u0027t seem to belong here.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a33cad76_e4e39dfd",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:56:25Z",
+      "side": 1,
+      "message": "Missing copyright header.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a66d7b89_1741e381",
         "filename": "internal/mod/modfile/modfile.go",
         "patchSetId": 7
@@ -14,6 +31,23 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "I\u0027m not clear whether this is something we should/shouldn\u0027t do, so flagging for Marcel to take a look.\n\nOne thing I think we should do regardless is give the user the ability to render the schema of a module file (with line numbers).",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5be8e9e4_90b7bcec",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:56:25Z",
+      "side": 1,
+      "message": "Missing copyright.",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -65,6 +99,23 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "Just noting that from my perspective we should, in time, make this publicly available somewhere.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "195e59c8_00871d3b",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:56:25Z",
+      "side": 1,
+      "message": "Missing copyright header.",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

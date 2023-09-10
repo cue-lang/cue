@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2042d272_f5018d9d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T13:07:50Z",
+      "side": 1,
+      "message": "I\u0027m assuming the `cmd/cue` tests for modules will follow this CL, which will also serve as a test for this new env var?",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57db4a8b_6543e673",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T13:07:50Z",
+      "side": 1,
+      "message": "Nit: per earlier CL reviews, commit message formatting.",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "708aef10_de219e53",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T13:07:50Z",
+      "side": 1,
+      "message": "Are we going to default this to the central registry?\n\nAgain, I would document FAQs etc in the earlier proposed markdown file.\n\nI would also suggest we create a CL earlier in the chain that allows us to document via `cue help environment`, at which point we also add this new env var.",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d245041c_64946f87",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 838,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T13:07:50Z",
+      "side": 1,
+      "message": "I would split this out into a separate CL. The commit message says nothing about also introducing the `CUE_EXPERIMENT` variable.",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

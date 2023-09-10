@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a66d7b89_1741e381",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "I\u0027m not clear whether this is something we should/shouldn\u0027t do, so flagging for Marcel to take a look.\n\nOne thing I think we should do regardless is give the user the ability to render the schema of a module file (with line numbers).",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8537ffbe_b9f58331",
         "filename": "internal/mod/modfile/modfile_test.go",
         "patchSetId": 7
@@ -31,6 +48,244 @@
       "writtenOn": "2023-09-09T07:06:08Z",
       "side": 1,
       "message": "\"canonical\" is a bit of a technical term. \"version is not well formed\" might be more friendly? Without losing any precision?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3cd80f5_255cdd64",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "Just noting that from my perspective we should, in time, make this publicly available somewhere.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f43e5a6d_77125756",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "Outdated comment.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78efef2b_ae8b40b7",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "Why `v` instead of `version`?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8114eefd_8f98a614",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "What is \"This\" a reference to here?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "017dfb87_a6b9d85c",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "What is \"here\" a reference to? \n\nIs the term \"reported here\" significant? What does \"reported\" mean?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6919c5f0_f690ca22",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "This comment doesn\u0027t appear to make sense to me, given the comment above about \"cannot be overridden on the command line\". Is this the max allowed scope?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ae20012_2986ecf8",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "I think some CUE/explanation is required to explain the relationship between `allow`, `default` and whatever is allowed to be set on the command line.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddc33b93_4b76aac6",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "Why not `module` instead of `m`, `version` instead of `v`?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a80e019b_765df16e",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "Is this a day-1 thing?\n\nWhat about Windows paths in this situation?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa62f35b_5360e3ce",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "This feels worthwhile doing today, so that people can tell pre publish that there is a problem.\n\nAlso we should add an FAQ to that FAQ markdown file that explains what people should do in case they already have a GitHub repo/module etc that violates the naming conventions.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1739c378_17c92613",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "Why embed this? Why not expose `#ModuleFile` as a definition? \n\nNot least because it exposes us to potential errors because the closedness of `_#ModuleFile` is relaxed during embedding. \n\nBut also because when we make these definitions non-internal, documentation etc becomes simpler.\n\nMake the package value the \"value\" here seems unnecessary.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "002ff178_d3c553f6",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "Please document that these came from semver.org (which is where I suspect they came from)",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8477b98d_4ebd4561",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "I don\u0027t understand this comment.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83a1f466_285bddbd",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-10T05:44:45Z",
+      "side": 1,
+      "message": "This comment appears to be out of date, as does the field name.",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

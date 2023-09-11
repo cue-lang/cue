@@ -16,6 +16,24 @@
       "message": "Just to confirm, we plan to add the ability to set this label into `cueckoo runtrybot` however?",
       "revId": "412e45cb742b205d26a59b1557093bf8501b0595",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56ca8477_10c49a57",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-11T13:15:56Z",
+      "side": 1,
+      "message": "Yep. Can\u0027t test out that stuff before I declare the label however, which is why this comes first.",
+      "parentUuid": "c1302c47_5d6c559d",
+      "revId": "412e45cb742b205d26a59b1557093bf8501b0595",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

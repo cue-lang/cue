@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3e97388_08095c6a",
+        "filename": "internal/mod/zip/testdata/create/invalid_utf8_mod_path.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "Because the argument to Create is a Version, and it\u0027s no longer possible to create a Version with a malformed module path because the fields are unexported and it\u0027s guarded by a factory function.",
+      "parentUuid": "bdeb62d8_d472930e",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "219c8e18_40ce00e7",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-09T05:37:03Z",
       "side": 1,
       "message": "Why is this not a valid test for us?",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05a36e61_9917a14a",
+        "filename": "internal/mod/zip/testdata/unzip/bad_mod_path.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "same reason as the other one: we can\u0027t make a Version with an invalid module path.",
+      "parentUuid": "219c8e18_40ce00e7",
       "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f8edbb56_cd805237",
+        "filename": "internal/mod/zip/testdata/unzip/bad_mod_path_version_suffix.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "709fd703_3f9e6814",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d46e7d9_66710854",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-09-09T05:37:03Z",
       "side": 1,
       "message": "Why is this not a valid test for us?",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06460199_73c6389d",
+        "filename": "internal/mod/zip/testdata/unzip/bad_version.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "6d46e7d9_66710854",
       "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c52148e5_b8b1780d",
+        "filename": "internal/mod/zip/testdata/unzip/invalid_utf8_mod_path.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "c81c9000_2bc00e0a",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2aaa158_15e6afd3",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-09-09T05:37:03Z",
       "side": 1,
       "message": "Why is this not a valid test for us?",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df9d92ec_a9b108e9",
+        "filename": "internal/mod/zip/testdata/unzip/prefix_only.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "c2aaa158_15e6afd3",
       "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9f30191_39994b8f",
+        "filename": "internal/mod/zip/vendor_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "not currently, but I think it probably will be, so we\u0027re future-proofing against that possibility by omitting the `cue.mod/vendor` directory from modules. I\u0027ve just added a comment in the code to that effect. Maybe that\u0027s a bad idea though? WDYT",
+      "parentUuid": "87777bcb_0bdbe9ea",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd9cabd7_9510bf1b",
@@ -137,6 +263,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6767fd61_23e4e58c",
+        "filename": "internal/mod/zip/zip_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "I think it\u0027s worth leaving in. It\u0027s nice to display the full file name in question so it\u0027s easy to jump to if/when a test fails.",
+      "parentUuid": "dd9cabd7_9510bf1b",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14f2f578_1d79ad22",
@@ -150,6 +294,24 @@
       "writtenOn": "2023-09-09T05:37:03Z",
       "side": 1,
       "message": "Left of debug logging?",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "73ed01e5_f63d05c3",
+        "filename": "internal/mod/zip/zip_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 481,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "ditto",
+      "parentUuid": "14f2f578_1d79ad22",
       "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

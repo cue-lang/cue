@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4be825b8_ad2b3744",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T15:54:39Z",
+      "side": 1,
+      "message": "PTAL. I haven\u0027t made any changes, but feel free to disagree with the assessments I made in my replies below.",
+      "revId": "9b2ff403d30ac7af2ff9d9b8c615f36a1fc801e6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

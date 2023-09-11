@@ -103,7 +103,7 @@ func MustNewVersion(path string, vers string) Version {
 }
 
 // NewVersion forms a Version from the given path and version.
-// The version must be canonical or empty.
+// The version must be canonical, empty or "none".
 // If the path doesn't have a major version suffix, one will be added
 // if the version isn't empty; if the version is empty, it's an error.
 func NewVersion(path string, vers string) (Version, error) {

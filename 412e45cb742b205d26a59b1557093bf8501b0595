@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1302c47_5d6c559d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-11T09:00:15Z",
+      "side": 1,
+      "message": "Just to confirm, we plan to add the ability to set this label into `cueckoo runtrybot` however?",
+      "revId": "412e45cb742b205d26a59b1557093bf8501b0595",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

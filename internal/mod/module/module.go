@@ -108,6 +108,9 @@ func MustNewVersion(path string, vers string) Version {
 // if the version isn't empty; if the version is empty, it's an error.
 func NewVersion(path string, vers string) (Version, error) {
 	if vers != "" && vers != "none" {
+		if !semver.IsValid(vers) {
+			return Version{}, fmt.Errorf("version %q (of module %q) is not well formed", vers, path)
+		}
 		if semver.Canonical(vers) != vers {
 			return Version{}, fmt.Errorf("version %q (of module %q) is not canonical", vers, path)
 		}

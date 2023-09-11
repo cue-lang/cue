@@ -1,5 +1,3 @@
-//go:build ignore
-
 // Copyright 2020 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -8,22 +6,35 @@ package mvs
 
 import (
 	"fmt"
+	"sort"
 
-	"cuelang.org/go/mod/mvs/internal/slices"
-
-	"golang.org/x/mod/module"
+	"cuelang.org/go/internal/mod/mvs/internal/slices"
 )
+
+// Versions is an interface that should be provided by implementations
+// to define the mvs algorithm in terms of their own version type V, where
+// a version type holds a (module path, module version) pair.
+type Versions[V any] interface {
+	// New creates a new instance of V holding the
+	// given module path and version.
+	New(path, version string) (V, error)
+	// Path returns the path part of V.
+	Path(v V) string
+	// Version returns the version part of V.
+	Version(v V) string
+}
 
 // Graph implements an incremental version of the MVS algorithm, with the
 // requirements pushed by the caller instead of pulled by the MVS traversal.
-type Graph struct {
+type Graph[V comparable] struct {
+	v     Versions[V]
 	cmp   func(v1, v2 string) int
-	roots []module.Version
+	roots []V
 
-	required map[module.Version][]module.Version
+	required map[V][]V
 
-	isRoot   map[module.Version]bool // contains true for roots and false for reachable non-roots
-	selected map[string]string       // path → version
+	isRoot   map[V]bool        // contains true for roots and false for reachable non-roots
+	selected map[string]string // path → version
 }
 
 // NewGraph returns an incremental MVS graph containing only a set of root
@@ -31,19 +42,20 @@ type Graph struct {
 //
 // The caller must ensure that the root slice is not modified while the Graph
 // may be in use.
-func NewGraph(cmp func(v1, v2 string) int, roots []module.Version) *Graph {
-	g := &Graph{
+func NewGraph[V comparable](v Versions[V], cmp func(string, string) int, roots []V) *Graph[V] {
+	g := &Graph[V]{
+		v:        v,
 		cmp:      cmp,
 		roots:    slices.Clip(roots),
-		required: make(map[module.Version][]module.Version),
-		isRoot:   make(map[module.Version]bool),
+		required: make(map[V][]V),
+		isRoot:   make(map[V]bool),
 		selected: make(map[string]string),
 	}
 
 	for _, m := range roots {
 		g.isRoot[m] = true
-		if g.cmp(g.Selected(m.Path), m.Version) < 0 {
-			g.selected[m.Path] = m.Version
+		if g.cmp(g.Selected(g.v.Path(m)), g.v.Version(m)) < 0 {
+			g.selected[g.v.Path(m)] = g.v.Version(m)
 		}
 	}
 
@@ -58,7 +70,7 @@ func NewGraph(cmp func(v1, v2 string) int, roots []module.Version) *Graph {
 //
 // If any of the modules in reqs has the same path as g's target,
 // the target must have higher precedence than the version in req.
-func (g *Graph) Require(m module.Version, reqs []module.Version) {
+func (g *Graph[V]) Require(m V, reqs []V) {
 	// To help catch disconnected-graph bugs, enforce that all required versions
 	// are actually reachable from the roots (and therefore should affect the
 	// selected versions of the modules they name).
@@ -81,8 +93,8 @@ func (g *Graph) Require(m module.Version, reqs []module.Version) {
 			g.isRoot[dep] = false
 		}
 
-		if g.cmp(g.Selected(dep.Path), dep.Version) < 0 {
-			g.selected[dep.Path] = dep.Version
+		if g.cmp(g.Selected(g.v.Path(dep)), g.v.Version(dep)) < 0 {
+			g.selected[g.v.Path(dep)] = g.v.Version(dep)
 		}
 	}
 }
@@ -93,7 +105,7 @@ func (g *Graph) Require(m module.Version, reqs []module.Version) {
 //
 // The caller must not modify the returned slice, but may safely append to it
 // and may rely on it not to be modified.
-func (g *Graph) RequiredBy(m module.Version) (reqs []module.Version, ok bool) {
+func (g *Graph[V]) RequiredBy(m V) (reqs []V, ok bool) {
 	reqs, ok = g.required[m]
 	return reqs, ok
 }
@@ -101,7 +113,7 @@ func (g *Graph) RequiredBy(m module.Version) (reqs []module.Version, ok bool) {
 // Selected returns the selected version of the given module path.
 //
 // If no version is selected, Selected returns version "none".
-func (g *Graph) Selected(path string) (version string) {
+func (g *Graph[V]) Selected(path string) (version string) {
 	v, ok := g.selected[path]
 	if !ok {
 		return "none"
@@ -114,12 +126,12 @@ func (g *Graph) Selected(path string) (version string) {
 //
 // The order of the remaining elements in the list is deterministic
 // but arbitrary.
-func (g *Graph) BuildList() []module.Version {
+func (g *Graph[V]) BuildList() []V {
 	seenRoot := make(map[string]bool, len(g.roots))
 
-	var list []module.Version
+	var list []V
 	for _, r := range g.roots {
-		if seenRoot[r.Path] {
+		if seenRoot[g.v.Path(r)] {
 			// Multiple copies of the same root, with the same or different versions,
 			// are a bit of a degenerate case: we will take the transitive
 			// requirements of both roots into account, but only the higher one can
@@ -129,31 +141,51 @@ func (g *Graph) BuildList() []module.Version {
 			continue
 		}
 
-		if v := g.Selected(r.Path); v != "none" {
-			list = append(list, module.Version{Path: r.Path, Version: v})
+		if v := g.Selected(g.v.Path(r)); v != "none" {
+			list = append(list, g.newVersion(g.v.Path(r), v))
 		}
-		seenRoot[r.Path] = true
+		seenRoot[g.v.Path(r)] = true
 	}
 	uniqueRoots := list
 
 	for path, version := range g.selected {
 		if !seenRoot[path] {
-			list = append(list, module.Version{Path: path, Version: version})
+			list = append(list, g.newVersion(path, version))
 		}
 	}
-	module.Sort(list[len(uniqueRoots):])
-
+	g.sortVersions(list[len(uniqueRoots):])
 	return list
+}
+
+func (g *Graph[V]) sortVersions(vs []V) {
+	sort.Slice(vs, func(i, j int) bool {
+		v0, v1 := vs[i], vs[j]
+		if p0, p1 := g.v.Path(v0), g.v.Path(v1); p0 != p1 {
+			return p0 < p1
+		}
+		return g.cmp(g.v.Version(v0), g.v.Version(v1)) < 0
+	})
+}
+
+func (g *Graph[V]) newVersion(path string, vers string) V {
+	v, err := g.v.New(path, vers)
+	if err != nil {
+		// Note: can't happen because all paths and versions passed to
+		// g.newVersion have already come from valid paths and versions
+		// returned from a Versions implementation.
+		panic(err)
+	}
+	return v
 }
 
 // WalkBreadthFirst invokes f once, in breadth-first order, for each module
 // version other than "none" that appears in the graph, regardless of whether
 // that version is selected.
-func (g *Graph) WalkBreadthFirst(f func(m module.Version)) {
-	var queue []module.Version
-	enqueued := make(map[module.Version]bool)
+func (g *Graph[V]) WalkBreadthFirst(f func(m V)) {
+	var queue []V
+	enqueued := make(map[V]bool)
 	for _, m := range g.roots {
-		if m.Version != "none" {
+		if g.v.Version(m) != "none" {
 			queue = append(queue, m)
 			enqueued[m] = true
 		}
@@ -167,7 +199,7 @@ func (g *Graph) WalkBreadthFirst(f func(m module.Version)) {
 
 		reqs, _ := g.RequiredBy(m)
 		for _, r := range reqs {
-			if !enqueued[r] && r.Version != "none" {
+			if !enqueued[r] && g.v.Version(r) != "none" {
 				queue = append(queue, r)
 				enqueued[r] = true
 			}
@@ -178,14 +210,14 @@ func (g *Graph) WalkBreadthFirst(f func(m module.Version)) {
 // FindPath reports a shortest requirement path starting at one of the roots of
 // the graph and ending at a module version m for which f(m) returns true, or
 // nil if no such path exists.
-func (g *Graph) FindPath(f func(module.Version) bool) []module.Version {
+func (g *Graph[V]) FindPath(f func(V) bool) []V {
 	// firstRequires[a] = b means that in a breadth-first traversal of the
 	// requirement graph, the module version a was first required by b.
-	firstRequires := make(map[module.Version]module.Version)
+	firstRequires := make(map[V]V)
 
 	queue := g.roots
 	for _, m := range g.roots {
-		firstRequires[m] = module.Version{}
+		firstRequires[m] = *new(V)
 	}
 
 	for len(queue) > 0 {
@@ -195,10 +227,10 @@ func (g *Graph) FindPath(f func(module.Version) bool) []module.Version {
 		if f(m) {
 			// Construct the path reversed (because we're starting from the far
 			// endpoint), then reverse it.
-			path := []module.Version{m}
+			path := []V{m}
 			for {
 				m = firstRequires[m]
-				if m.Path == "" {
+				if g.v.Path(m) == "" {
 					break
 				}
 				path = append(path, m)

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "21abeb53_0543645b",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a33cad76_e4e39dfd",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a66d7b89_1741e381",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "I\u0027m not clear whether this is something we should/shouldn\u0027t do, so flagging for Marcel to take a look.\n\nOne thing I think we should do regardless is give the user the ability to render the schema of a module file (with line numbers).",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b28d744_886af032",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "I\u0027m not quite sure what you mean here. By \"render\", do you mean \"show\" ?",
+      "parentUuid": "a66d7b89_1741e381",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09c68d1b_726c1b5d",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5be8e9e4_90b7bcec",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8537ffbe_b9f58331",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d936433_f53e7635",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8537ffbe_b9f58331",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "031030c7_0f2c5409",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-09-09T07:06:08Z",
       "side": 1,
       "message": "\"canonical\" is a bit of a technical term. \"version is not well formed\" might be more friendly? Without losing any precision?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f59bb026_64dd0cae",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "For this particular example, \"is not well formed\" is definitely a more appropriate error message. But for a version like \"v0.2\", it is actually a well formed version, just not canonical, so I think this message would be better for that. I\u0027ve added another CL just before this in the chain to improve that.",
+      "parentUuid": "031030c7_0f2c5409",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "37265b24_ea8e76d2",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "195e59c8_00871d3b",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f43e5a6d_77125756",
@@ -133,6 +241,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "Outdated comment.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbb04752_e5eaca02",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f43e5a6d_77125756",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -156,6 +282,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8da26a56_73069abf",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "My reasoning is that it\u0027s ubiquitous enough (and repeated enough) that the full \"version\" string would be overly noisy in actual module files (every single dependency will repeat the \"version: \" string). And \"v\" is the same as the prefix that versions themselves have, so shouldn\u0027t be too unexpected. Go, after all, doesn\u0027t have any key at all for the version of a module.\n\nWe have mentioned this format a few times (for example: https://github.com/cue-lang/proposal/blob/main/designs/2330-modules-v2.md) with no particular pushback on this aspect, but we can change it if you\u0027d prefer it more explicit.",
+      "parentUuid": "78efef2b_ae8b40b7",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8114eefd_8f98a614",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -167,6 +311,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "What is \"This\" a reference to here?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b497f754_ab77f802",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "We\u0027ve already gone through multiple reviews of this document in this CL: https://review.gerrithub.io/c/cue-lang/proposal/+/552362/1\nDo we want to do more rounds now, or shall we just move forward with what we agreed there for now, perhaps adding a TODO about ambiguous language?",
+      "parentUuid": "8114eefd_8f98a614",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -241,6 +403,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "46198fec_7f4be1f4",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Similar reasoning to that in `deps`. Happy to go with longer keys if that\u0027s our consensus.",
+      "parentUuid": "ddc33b93_4b76aac6",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a80e019b_765df16e",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -252,6 +432,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "Is this a day-1 thing?\n\nWhat about Windows paths in this situation?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ada7638_5a2a7ad5",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Yes, it\u0027s a day-1 thing - I\u0027m not sure replacements are on the cards even for MVP-1. Perhaps I should just make this `string` for now.",
+      "parentUuid": "a80e019b_765df16e",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -275,6 +473,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "975cfa08_2347d82a",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "I\u0027m inclined to let this through for scrappy-1. We\u0027ve got a TODO in place.",
+      "parentUuid": "aa62f35b_5360e3ce",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1739c378_17c92613",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -292,6 +508,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fe679036_675c6675",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "It\u0027s a matter of taste. I don\u0027t necessarily have strong feelings on the matter but @mpvl might have some views. I\u0027ve made it this way to try to go with the spirit of some of his suggestions in the past, particularly in the design of the `cueconfig` package, where it was deemed more intuitive to define the config at the top level than to have a convention for a field to look up. The idea is that the entire file is the schema for the module data, which arguably makes it clearer what it\u0027s about - we can just unify the whole thing without any need to choose a definition.\n\nHappy to go either way: this is just internal detail for now (I\u0027m not too concerned about the potential errors because of embedding as they\u0027re all confined to this one short file).",
+      "parentUuid": "1739c378_17c92613",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "002ff178_d3c553f6",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -303,6 +537,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "Please document that these came from semver.org (which is where I suspect they came from)",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aba9ac8b_f9556206",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "002ff178_d3c553f6",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -326,6 +578,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f32fa97b_274bd326",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Adjusted the comment to hopefully make it clearer.",
+      "parentUuid": "8477b98d_4ebd4561",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "83a1f466_285bddbd",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -337,6 +607,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "This comment appears to be out of date, as does the field name.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8555b63_b07f73b0",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "83a1f466_285bddbd",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -354,6 +642,24 @@
       "writtenOn": "2023-09-09T07:06:08Z",
       "side": 1,
       "message": "This comment appears to be redundant, given the code that follows is not commented.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "356053b7_be5aede0",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-11T17:33:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dea9ce8b_c8a94652",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

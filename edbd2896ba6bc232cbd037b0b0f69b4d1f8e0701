@@ -33,6 +33,24 @@
       "message": "I\u0027d suggest \"cue.works Approvers\" - because it\u0027s more company thing to be able to trigger this, rather that any approvers of a CUE CL (although there is clearly overlap)",
       "revId": "edbd2896ba6bc232cbd037b0b0f69b4d1f8e0701",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9192bda7_9ce0a02d",
+        "filename": "project.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-11T14:23:58Z",
+      "side": 1,
+      "message": "As discussed, this is fine as is.",
+      "parentUuid": "9b1318e6_a19e32cb",
+      "revId": "edbd2896ba6bc232cbd037b0b0f69b4d1f8e0701",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

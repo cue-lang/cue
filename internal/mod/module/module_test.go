@@ -83,6 +83,10 @@ var newVersionTests = []struct {
 	path:      "foo.com/bar",
 	vers:      "",
 	wantError: `path "foo.com/bar" has no major version`,
+}, {
+	path:      "x.com",
+	vers:      "bad",
+	wantError: `version "bad" \(of module "x.com"\) is not well formed`,
 }}
 
 func TestNewVersion(t *testing.T) {

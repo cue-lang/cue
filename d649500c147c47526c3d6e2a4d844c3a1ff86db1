@@ -16,6 +16,24 @@
       "message": "Can we make this an authenticated endpoint?\n\nThe config is non-public.",
       "revId": "d649500c147c47526c3d6e2a4d844c3a1ff86db1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c399ab81_0c1bd3b5",
+        "filename": "webhooks.config",
+        "patchSetId": 1
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-11T14:08:57Z",
+      "side": 1,
+      "message": "Thanks for the suggestion; done",
+      "parentUuid": "e407a8b4_232a2554",
+      "revId": "d649500c147c47526c3d6e2a4d844c3a1ff86db1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1481,6 +1481,7 @@ func (x *CallExpr) evaluate(c *OpContext, state vertexStatus) Value {
 	if b.IsValidator(len(args)) {
 		return &BuiltinValidator{x, b, args}
 	}
+	c.stats.Builtins++
 	result := b.call(c, pos(x), false, args)
 	if result == nil {
 		return nil

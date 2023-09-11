@@ -51,6 +51,10 @@ type Counts struct {
 	// algorithmic behavior.
 	Conjuncts int64
 
+	// Builtins indicates the number of total builtin functions executed (like
+	// `strings.ToLower`).
+	Builtins int64
+
 	// Buffer counters
 	//
 	// Each unification and disjunct operation is associated with an object
@@ -71,6 +75,7 @@ func (c *Counts) Add(other Counts) {
 	c.Unifications += other.Unifications
 	c.Conjuncts += other.Conjuncts
 	c.Disjuncts += other.Disjuncts
+	c.Builtins += other.Builtins
 
 	c.Freed += other.Freed
 	c.Retained += other.Retained
@@ -82,6 +87,7 @@ func (c Counts) Since(start Counts) Counts {
 	c.Unifications -= start.Unifications
 	c.Conjuncts -= start.Conjuncts
 	c.Disjuncts -= start.Disjuncts
+	c.Builtins -= start.Builtins
 
 	c.Freed -= start.Freed
 	c.Retained -= start.Retained
@@ -110,7 +116,8 @@ Retain: {{.Retained}}
 
 Unifications: {{.Unifications}}
 Conjuncts:    {{.Conjuncts}}
-Disjuncts:    {{.Disjuncts}}`))
+Disjuncts:    {{.Disjuncts}}
+Builtins:     {{.Builtins}}`))
 
 func (s Counts) String() string {
 	buf := &strings.Builder{}

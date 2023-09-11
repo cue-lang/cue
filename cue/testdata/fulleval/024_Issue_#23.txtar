@@ -36,6 +36,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    15
 Disjuncts:    11
+Builtins:     0
 -- out/eval --
 Errors:
 y: 2 errors in empty disjunction:

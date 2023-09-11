@@ -96,6 +96,7 @@ Retain: 4
 Unifications: 18
 Conjuncts:    36
 Disjuncts:    21
+Builtins:     0
 -- out/eval --
 (struct){
   a: (int){ 100 }

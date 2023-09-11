@@ -42,6 +42,7 @@ Retain: 0
 Unifications: 791999
 Conjuncts:    2479541
 Disjuncts:    1064043
+Builtins:     0
 -- out/eval --
 (struct){
   #Secret: (#struct){

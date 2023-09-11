@@ -16,6 +16,7 @@ Retain: 5
 Unifications: 8
 Conjuncts:    14
 Disjuncts:    8
+Builtins:     5
 -- out/eval --
 Errors:
 explicit error (_|_ literal) in source:

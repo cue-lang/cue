@@ -41,6 +41,7 @@ Retain: 30
 Unifications: 24
 Conjuncts:    58
 Disjuncts:    40
+Builtins:     16
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){

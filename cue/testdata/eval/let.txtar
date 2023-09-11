@@ -168,6 +168,7 @@ Retain: 188
 Unifications: 196
 Conjuncts:    373
 Disjuncts:    248
+Builtins:     2
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:

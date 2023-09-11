@@ -89,6 +89,7 @@ Retain: 1
 Unifications: 18
 Conjuncts:    150
 Disjuncts:    135
+Builtins:     0
 -- out/eval --
 (struct){
   o1: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }

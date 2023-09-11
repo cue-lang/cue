@@ -49,6 +49,7 @@ Retain: 0
 Unifications: 11
 Conjuncts:    11
 Disjuncts:    11
+Builtins:     0
 -- out/eval --
 (struct){
   out: (#list){

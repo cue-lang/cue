@@ -91,6 +91,7 @@ Retain: 0
 Unifications: 11
 Conjuncts:    31
 Disjuncts:    23
+Builtins:     0
 -- out/eval --
 (struct){
   service: (struct){

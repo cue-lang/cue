@@ -497,6 +497,7 @@ Retain: 115
 Unifications: 1260
 Conjuncts:    3417
 Disjuncts:    2454
+Builtins:     0
 -- out/eval --
 Errors:
 issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:

@@ -48,6 +48,7 @@ Retain: 0
 Unifications: 29
 Conjuncts:    29
 Disjuncts:    29
+Builtins:     28
 -- out/eval --
 Errors:
 quoDivByZero: division by zero:

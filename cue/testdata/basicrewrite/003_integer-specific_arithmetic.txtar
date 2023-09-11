@@ -95,6 +95,7 @@ Retain: 0
 Unifications: 25
 Conjuncts:    25
 Disjuncts:    25
+Builtins:     0
 -- out/eval --
 Errors:
 qe1: invalid operands 2.0 and 1 to 'quo' (type float and int):

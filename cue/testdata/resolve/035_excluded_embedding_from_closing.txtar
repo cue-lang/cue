@@ -75,6 +75,7 @@ Retain: 0
 Unifications: 21
 Conjuncts:    29
 Disjuncts:    21
+Builtins:     0
 -- out/eval --
 Errors:
 V.b.extra: field not allowed:

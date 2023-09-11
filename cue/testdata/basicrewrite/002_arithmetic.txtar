@@ -103,6 +103,7 @@ Retain: 0
 Unifications: 24
 Conjuncts:    26
 Disjuncts:    24
+Builtins:     0
 -- out/eval --
 Errors:
 divZero: failed arithmetic: division by zero:

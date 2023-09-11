@@ -55,6 +55,7 @@ Retain: 0
 Unifications: 6
 Conjuncts:    11
 Disjuncts:    11
+Builtins:     0
 -- out/eval --
 (struct){
   a: ((bool|int|string)){ |(*(int){ 5 }, (string){ "a" }, (bool){ true }) }

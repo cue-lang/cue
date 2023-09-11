@@ -56,6 +56,7 @@ Retain: 0
 Unifications: 17
 Conjuncts:    30
 Disjuncts:    17
+Builtins:     0
 -- out/run/t2 --
 graph TD
   t0("root[0] [Terminated]")
@@ -86,6 +87,7 @@ Retain: 0
 Unifications: 17
 Conjuncts:    33
 Disjuncts:    17
+Builtins:     0
 -- out/run/t3 --
 graph TD
   t0("root[0] [Terminated]")
@@ -110,6 +112,7 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+Builtins:     0
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  34
@@ -120,3 +123,4 @@ Retain: 0
 Unifications: 34
 Conjuncts:    63
 Disjuncts:    34
+Builtins:     0

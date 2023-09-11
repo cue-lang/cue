@@ -2025,6 +2025,7 @@ Retain: 0
 Unifications: 1001
 Conjuncts:    500501
 Disjuncts:    1001
+Builtins:     0
 -- out/eval --
 (struct){
   f1: (string){ string }

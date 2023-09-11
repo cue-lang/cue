@@ -39,6 +39,7 @@ contents overwritten
         "Unifications": 4,
         "Disjuncts": 6,
         "Conjuncts": 8,
+        "Builtins": 0,
         "Freed": 6,
         "Reused": 2,
         "Allocs": 4,
@@ -54,6 +55,7 @@ CUE: {
 	Unifications: 4
 	Disjuncts:    6
 	Conjuncts:    8
+	Builtins:     0
 	Freed:        6
 	Reused:       2
 	Allocs:       4
@@ -68,6 +70,7 @@ CUE:
   Unifications: 4
   Disjuncts: 6
   Conjuncts: 8
+  Builtins: 0
   Freed: 6
   Reused: 2
   Allocs: 4
@@ -81,6 +84,7 @@ Go:
         "Unifications": 4,
         "Disjuncts": 6,
         "Conjuncts": 8,
+        "Builtins": 0,
         "Freed": 6,
         "Reused": 2,
         "Allocs": 4,

@@ -27,6 +27,7 @@ Retain: 0
 Unifications: 18
 Conjuncts:    26
 Disjuncts:    18
+Builtins:     4
 -- out/eval --
 (struct){
   DeleteThis: (#list){

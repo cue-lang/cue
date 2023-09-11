@@ -26,6 +26,7 @@ Retain: 5
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    9
+Builtins:     1
 -- out/eval --
 (_|_){
   // [incomplete] undefined field: missing:

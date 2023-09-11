@@ -41,6 +41,17 @@ graph TD
 	val: "foo"
 	out: "foo"
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  17
+Reused: 12
+Allocs: 5
+Retain: 0
+
+Unifications: 17
+Conjuncts:    28
+Disjuncts:    17
+Builtins:     0
 -- out/run/t2 --
 graph TD
   t0("root.a [Terminated]")
@@ -61,6 +72,17 @@ graph TD
 	val: "bar"
 	out: "bar"
 }
+-- out/run/t2/stats --
+Leaks:  0
+Freed:  17
+Reused: 17
+Allocs: 0
+Retain: 0
+
+Unifications: 17
+Conjuncts:    28
+Disjuncts:    17
+Builtins:     0
 -- out/run/t3 --
 graph TD
   t0("root.a [Terminated]")
@@ -75,26 +97,6 @@ graph TD
 	$id: "valToOut"
 	out: "foobar"
 }
--- out/run/t1/stats --
-Leaks:  0
-Freed:  17
-Reused: 12
-Allocs: 5
-Retain: 0
-
-Unifications: 17
-Conjuncts:    28
-Disjuncts:    17
--- out/run/t2/stats --
-Leaks:  0
-Freed:  17
-Reused: 17
-Allocs: 0
-Retain: 0
-
-Unifications: 17
-Conjuncts:    28
-Disjuncts:    17
 -- out/run/t3/stats --
 Leaks:  0
 Freed:  0
@@ -105,6 +107,7 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+Builtins:     0
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  34
@@ -115,3 +118,4 @@ Retain: 0
 Unifications: 34
 Conjuncts:    56
 Disjuncts:    34
+Builtins:     0

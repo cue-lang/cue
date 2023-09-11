@@ -68,6 +68,7 @@ Retain: 17
 Unifications: 27
 Conjuncts:    35
 Disjuncts:    25
+Builtins:     0
 -- out/eval --
 Errors:
 e: invalid struct selector 4 (type int):

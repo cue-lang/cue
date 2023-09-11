@@ -751,6 +751,7 @@ Retain: 108
 Unifications: 395
 Conjuncts:    640
 Disjuncts:    472
+Builtins:     2
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:

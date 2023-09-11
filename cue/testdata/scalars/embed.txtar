@@ -160,6 +160,7 @@ Retain: 57
 Unifications: 128
 Conjuncts:    297
 Disjuncts:    164
+Builtins:     1
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):

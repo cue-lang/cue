@@ -35,6 +35,7 @@ Retain: 0
 Unifications: 4
 Conjuncts:    7
 Disjuncts:    4
+Builtins:     0
 -- out/eval --
 Errors:
 e: conflicting values false and true:

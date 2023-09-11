@@ -72,6 +72,7 @@ Retain: 1
 Unifications: 53
 Conjuncts:    90
 Disjuncts:    54
+Builtins:     0
 -- out/eval --
 Errors:
 simplifyExpr.e2: cannot use null for bound >:

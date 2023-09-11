@@ -28,6 +28,7 @@ Retain: 0
 Unifications: 11
 Conjuncts:    17
 Disjuncts:    11
+Builtins:     0
 -- out/eval --
 Errors:
 x1.Age: field not allowed:

@@ -89,6 +89,7 @@ Retain: 0
 Unifications: 15
 Conjuncts:    26
 Disjuncts:    15
+Builtins:     0
 -- out/eval --
 (struct){
   #emb: (#struct){

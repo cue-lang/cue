@@ -59,6 +59,7 @@ Retain: 0
 Unifications: 40
 Conjuncts:    99
 Disjuncts:    70
+Builtins:     8
 -- out/eval --
 (struct){
   issue700: (struct){

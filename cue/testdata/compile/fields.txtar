@@ -21,6 +21,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    5
 Disjuncts:    5
+Builtins:     0
 -- out/eval --
 (struct){
   #dev: (int){ int }

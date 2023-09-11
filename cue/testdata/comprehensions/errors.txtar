@@ -53,6 +53,7 @@ Retain: 1
 Unifications: 19
 Conjuncts:    40
 Disjuncts:    29
+Builtins:     0
 -- out/eval --
 Errors:
 conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched types int and string):

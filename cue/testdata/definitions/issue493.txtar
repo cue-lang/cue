@@ -20,6 +20,7 @@ Retain: 0
 Unifications: 20
 Conjuncts:    38
 Disjuncts:    24
+Builtins:     0
 -- out/eval --
 (struct){
   #Artifact: (#struct){

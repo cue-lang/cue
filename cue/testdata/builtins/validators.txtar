@@ -124,6 +124,7 @@ Retain: 0
 Unifications: 50
 Conjuncts:    91
 Disjuncts:    52
+Builtins:     2
 -- out/eval --
 Errors:
 callOfCallToValidator.e: cannot call previously called validator b:

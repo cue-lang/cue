@@ -73,6 +73,7 @@ Retain: 123
 Unifications: 107
 Conjuncts:    295
 Disjuncts:    240
+Builtins:     0
 -- out/eval --
 Errors:
 #Configure.service.description.role: undefined field: role:

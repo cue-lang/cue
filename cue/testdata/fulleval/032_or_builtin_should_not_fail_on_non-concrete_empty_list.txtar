@@ -51,6 +51,7 @@ Retain: 6
 Unifications: 15
 Conjuncts:    32
 Disjuncts:    17
+Builtins:     6
 -- out/eval --
 (struct){
   #Workflow: (#struct){

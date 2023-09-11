@@ -1,5 +1,3 @@
-//go:build ignore
-
 // Copyright 2018 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -11,6 +9,7 @@ import (
 	"errors"
 	"math/rand"
 	"sync"
+	"sync/atomic"
 )
 
 // Work manages a set of work items to be executed in parallel, at most once each.
@@ -141,7 +140,7 @@ type Cache[K comparable, V any] struct {
 }
 
 type cacheEntry[V any] struct {
-	done   atomicBool
+	done   atomic.Bool
 	mu     sync.Mutex
 	result V
 }

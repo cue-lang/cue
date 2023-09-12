@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d22b7c61_d205dd43",
+        "filename": "internal/mod/zip/testdata/create/invalid_utf8_mod_path.txt",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "f3e97388_08095c6a",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "219c8e18_40ce00e7",
@@ -248,6 +266,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "450def09_5a2f8eb1",
+        "filename": "internal/mod/zip/vendor_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "We should definitely add this to the list of things to document if we are going to do that. And clear also in that same documentation that the top-level `vendor` is _not_ special (unlike Go, for those who might be confused by the change).",
+      "parentUuid": "b9f30191_39994b8f",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dd9cabd7_9510bf1b",
         "filename": "internal/mod/zip/zip_test.go",
         "patchSetId": 5
@@ -277,6 +313,24 @@
       "side": 1,
       "message": "I think it\u0027s worth leaving in. It\u0027s nice to display the full file name in question so it\u0027s easy to jump to if/when a test fails.",
       "parentUuid": "dd9cabd7_9510bf1b",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b649d35b_36daf7d0",
+        "filename": "internal/mod/zip/zip_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "6767fd61_23e4e58c",
       "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

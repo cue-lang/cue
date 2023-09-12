@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79e7ea41_4b6cc80e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "Nit: formatting of commit message.\n\nIs there a tool or mode of acme you can use to help with this?",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c1aee1a_1347d954",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "With only some small suggestions.",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e70eb2d_c20d6edf",
+        "filename": "internal/mod/zip/testdata/check_files/empty.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "Why is this needed?",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "047feb4a_b86fd7e4",
+        "filename": "internal/mod/zip/zip.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "Is this an error, or should we just ignore these files?\n\nFeels like we should add a reminder to document this.",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1931d895_671309cf",
+        "filename": "internal/mod/zip/zip.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 601,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:22:44Z",
+      "side": 1,
+      "message": "Again, per my earlier suggestion, we should add a reminder to the docs file we discussion with this detail.",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

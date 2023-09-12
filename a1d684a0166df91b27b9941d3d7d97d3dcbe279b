@@ -3,6 +3,57 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ae7261b6_ab9fe6c4",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "This returns the errors in a non-reproducible order.",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77693989_a885f2c9",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "Misspelled",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bd275504_e540b09d",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 14
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "Also see comment below.\n\nJust a brainstorm: since the package is already called modfile, this name could potentially be smaller, such as #File.\n\nBut I don\u0027t feel strongly about this and am happy to leave it as such. I\u0027m inclined to leave it, but just wanted to point it out.",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "63553f06_40962c90",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 14
@@ -14,6 +65,23 @@
       "writtenOn": "2023-09-12T09:04:23Z",
       "side": 1,
       "message": "This still isn\u0027t clear to me FWIW.",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71e6b094_a9327f93",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 14
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I would replace 1\u00262 with a top-level #unimplemented. That makes it 1) easier to swap out a value later, and 2) allow the #unimplemented to be defined with the fields above like so:\n\n   foo: #unimplemented\n   foo: def",
       "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "17ad9eda_fdb3bde2",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "Actually, this is not the first case. It happens elsewhere.\n\nI agree with Paul. Firstly, this is quite a decision on how to handle errors and it seems to be moving it in a less principled, wrong direction. I think it is better to come up with a consistent way of referring to internal schemas.\n\nAlso note that the errors package allows extracting data from errors. This approach discards that ability.\n\nI would just return errors as is. We can address this later and independently.",
+      "parentUuid": "c22c0fed_6efba066",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5be8e9e4_90b7bcec",
         "filename": "internal/mod/modfile/modfile_test.go",
         "patchSetId": 7
@@ -336,6 +354,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "d4e2b202_625d8502",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I agree with using `v` for that same reason.",
+      "parentUuid": "8da26a56_73069abf",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8114eefd_8f98a614",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -371,6 +407,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ad173563_c1d7b7b7",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "It could be that this was just overlooked before. It is a small change to make.\n\nAlso, what is clear to one reviewer may not be clear to another. It is good to converge on language that is understandable to all. So even if it was clear to a previous reviewer, if it is not to another, we should fix that.",
+      "parentUuid": "b497f754_ab77f802",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "017dfb87_a6b9d85c",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -399,6 +453,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "This comment doesn\u0027t appear to make sense to me, given the comment above about \"cannot be overridden on the command line\". Is this the max allowed scope?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4fe0ce8f_8cde2266",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I believe this is what \"here\" and \"this\" refers to. So what is specified in this section cannot be overridden later.",
+      "parentUuid": "6919c5f0_f690ca22",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -457,6 +529,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b4912577_754a6376",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I agree. I you write out the paths, it looks quite verbose to write out version.\n\nIn this case writing module might not be as bad. But using `m` here is consistent with using `v`. So I think `m` is fine.",
+      "parentUuid": "46198fec_7f4be1f4",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a80e019b_765df16e",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -492,6 +582,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5bcc2c8a_6393d973",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I would not use a value that becomes more strict later.\n\nI think it is fine to leave this feature in, and mark it with a TODO. \nFor now it can be just Linux paths, where we can relax the path once we support this feature to also allow Windows.\n\nIOW, either remove it, or leave it as is with a TODO once we decide not to include this initially before a release. I\u0027m fine with either.",
+      "parentUuid": "8ada7638_5a2a7ad5",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "aa62f35b_5360e3ce",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -521,6 +629,24 @@
       "side": 1,
       "message": "I\u0027m inclined to let this through for scrappy-1. We\u0027ve got a TODO in place.",
       "parentUuid": "aa62f35b_5360e3ce",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4a8f1de_737d633c",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I agree we can leave this out for scrappy 1. But we should do it before the first release. Maybe use TODO(x), with some string for x that indicates it should be done before the first module release.",
+      "parentUuid": "975cfa08_2347d82a",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -573,6 +699,24 @@
       "writtenOn": "2023-09-12T09:02:47Z",
       "side": 1,
       "message": "I\u0027m happy to not make these changes or postpone them until later. Will let Marcel decide.",
+      "parentUuid": "fe679036_675c6675",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fcf1337_aaf536a4",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I personally always distinguish between package that define a \"namespace\" of configuration and packages that provide definitions, but are not themselves meant to be data per se.  So primarily data vs primarily schema packages.\n\nFor the latter, I would not use the embedding trick but rather let the user refer to the schema directly.\n\nThis also allows us to later define templates, pre-defined defaults, etc within the same package. In fact, one of the style guide rules I have alluded to with the new required field approach, is to define \"pure\" schemas as definitions with a name starting with #, where derivatives would use this schema and add refinements.\n\nIn this case, a file could include\n\n```\n#ModuleFile: {... }\n\nModuleFile: #ModuleFile \u0026 { // add some default values, etc. }\n\n// just some silly example to make a point:\nEnforceLinuxPaths: #ModuleFile \u0026 {}\n```\n\nIOW, I strongly suggest NOT embedding _#ModuleFile.",
       "parentUuid": "fe679036_675c6675",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
@@ -644,6 +788,24 @@
       "side": 1,
       "message": "Adjusted the comment to hopefully make it clearer.",
       "parentUuid": "8477b98d_4ebd4561",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c3304a5_f38fb2aa",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-12T09:25:47Z",
+      "side": 1,
+      "message": "I don\u0027t really understand it still either. Even after reading the new comment.",
+      "parentUuid": "f32fa97b_274bd326",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

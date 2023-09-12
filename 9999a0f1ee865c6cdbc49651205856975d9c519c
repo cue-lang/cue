@@ -16,6 +16,24 @@
       "message": "Test needed for this?",
       "revId": "9999a0f1ee865c6cdbc49651205856975d9c519c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b83849a0_6e132ae4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T16:51:59Z",
+      "side": 1,
+      "message": "Given that it\u0027s test code itself, it\u0027s hard to reproduce, and there\u0027s a failure if it doesn\u0027t work, I think we\u0027re probably OK.",
+      "parentUuid": "99d66008_cb8487da",
+      "revId": "9999a0f1ee865c6cdbc49651205856975d9c519c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

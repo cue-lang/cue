@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63553f06_40962c90",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 14
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T09:04:23Z",
+      "side": 1,
+      "message": "This still isn\u0027t clear to me FWIW.",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

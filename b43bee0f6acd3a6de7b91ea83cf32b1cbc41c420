@@ -302,6 +302,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "44f5daf7_df67ed03",
+        "filename": "internal/mod/zip/vendor_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T09:08:23Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2f52869d_b4d2bedd",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "dd9cabd7_9510bf1b",
         "filename": "internal/mod/zip/zip_test.go",
         "patchSetId": 5

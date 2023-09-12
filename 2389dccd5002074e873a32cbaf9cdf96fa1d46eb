@@ -16,6 +16,24 @@
       "message": "I think the unresolved comment is now resolved?",
       "revId": "2389dccd5002074e873a32cbaf9cdf96fa1d46eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd068e80_78b29304",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T11:58:55Z",
+      "side": 1,
+      "message": "Yes, I forgot to mark it as resolved, sorry.",
+      "parentUuid": "5b63b590_81888df2",
+      "revId": "2389dccd5002074e873a32cbaf9cdf96fa1d46eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

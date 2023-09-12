@@ -16,6 +16,74 @@
       "message": "PTAL",
       "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d7d9e83b_7cab4521",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:10:04Z",
+      "side": 1,
+      "message": "Couple of nit suggestions, and one question regarding the docs which still isn\u0027t clear to me.",
+      "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9da5e3ab_e348684f",
+        "filename": "internal/mod/module/versions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:10:04Z",
+      "side": 1,
+      "message": "Nit: odd formatting.",
+      "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5686d86e_b5cde9c4",
+        "filename": "internal/mod/module/versions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:10:04Z",
+      "side": 1,
+      "message": "I\u0027m not seeing any detail on this case of `\"\"`. I\u0027m seeing notes about `\"none\"`, but not `\"\"`. Am I missing something?",
+      "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dc33751_fd2007e1",
+        "filename": "internal/mod/mvs/graph.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T05:10:04Z",
+      "side": 1,
+      "message": "nit: s/is a interface/is an interface/",
+      "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

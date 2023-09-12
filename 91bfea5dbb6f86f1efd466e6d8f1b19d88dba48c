@@ -16,6 +16,24 @@
       "message": "Nit on commit message formatting.",
       "revId": "91bfea5dbb6f86f1efd466e6d8f1b19d88dba48c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6b882a7_e676542a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:34:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "aa572db6_532912c7",
+      "revId": "91bfea5dbb6f86f1efd466e6d8f1b19d88dba48c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

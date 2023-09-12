@@ -562,6 +562,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "5ff3455c_32ecc9b5",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T09:02:47Z",
+      "side": 1,
+      "message": "I\u0027m happy to not make these changes or postpone them until later. Will let Marcel decide.",
+      "parentUuid": "fe679036_675c6675",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "002ff178_d3c553f6",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7

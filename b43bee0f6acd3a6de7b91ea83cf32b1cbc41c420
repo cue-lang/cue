@@ -318,6 +318,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9715cd82_b3151c3a",
+        "filename": "internal/mod/zip/vendor_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T10:34:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "44f5daf7_df67ed03",
+      "revId": "b43bee0f6acd3a6de7b91ea83cf32b1cbc41c420",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dd9cabd7_9510bf1b",

@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f65f46e_a1489299",
+        "filename": "internal/mod/zip/testdata/check_files/empty.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T10:34:36Z",
+      "side": 1,
+      "message": "In Go, there were existing published modules from before modules existed that were grandfathered in. Those modules didn\u0027t have `go.mod` files, hence no error when a `go.mod` is not present.\n\nIn our case, there are no published modules that currently exist in the ecosystem (and we already have a module.cue file convention), therefore I think it\u0027s OK to require a module.cue file.",
+      "parentUuid": "f28a1b7f_1f23df6a",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "047feb4a_b86fd7e4",
@@ -155,6 +173,24 @@
       "side": 1,
       "message": "This means there is a fairly hard cut off for users of a module. Not saying this is a bad thing, but again something for us to clearly document.",
       "parentUuid": "90a702f3_48641104",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84469df9_3734b04b",
+        "filename": "internal/mod/zip/zip.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 298,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T10:34:36Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "13e569f6_8759bbcf",
       "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

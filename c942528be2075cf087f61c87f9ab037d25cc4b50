@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ec96423_18023ebb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:01:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "60b356cd_4ca7f779",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3c49bdf4_8af8c1bb",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-09T03:35:59Z",
       "side": 1,
       "message": "We should start an FAQ/something somewhere where details like this are captured. In a markdown file in this repo for now so that a) we \"force\" ourselves to do it, but also b) the semantics are captured along with actual changes.\n\nWill form the basis of release notes, an actual FAQ etc.\n\nPerhaps a simple markdown file in internal/mod?",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38bb700a_d413adf5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:01:11Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "3c49bdf4_8af8c1bb",
       "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e84eb49_919fac71",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:01:11Z",
+      "side": 1,
+      "message": "Because import paths can also be stdlib import paths (i.e. not start with a hostname), which is a superset of versionless module paths.",
+      "parentUuid": "b14687e0_8d2f3069",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "78e94641_77ce7efe",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-09-09T03:35:59Z",
       "side": 1,
       "message": "nit: you refer to \"version\" here but the return variable is named \"pathMajor\".",
+      "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08704301_3511ec1a",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:01:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78e94641_77ce7efe",
       "revId": "c942528be2075cf087f61c87f9ab037d25cc4b50",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

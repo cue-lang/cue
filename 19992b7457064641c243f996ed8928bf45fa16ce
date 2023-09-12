@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c650d287_7be36bcc",
+        "filename": "go.mod",
+        "patchSetId": 34
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40be05ca_4305058b",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bcdf84fe_4f57b6f7",
@@ -69,6 +87,60 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c4b7fb2_8b45393a",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "daacddb9_65dc2dfb",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae52afce_724e9e01",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Neither. It\u0027s agnostic in that respect. The server gets to make that decision.",
+      "parentUuid": "bcdf84fe_4f57b6f7",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "849f7ae9_fc9134d5",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41481157_0628b249",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95dc6ba8_5df6dd68",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-09-10T08:02:59Z",
       "side": 1,
       "message": "Per previous discussions, this will prevent people from doing a \"naked\" store. \n\nCan we not implement this concept of a default in a better way?",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eebf51e0_151e3f6d",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "I removed the defaulting behaviour.",
+      "parentUuid": "95dc6ba8_5df6dd68",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77d1f288_aabdc4b5",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "I\u0027m not that keen on making types that aren\u0027t generally used in a fully consistent way. Module paths are often created directly from (parts of) other strings and vice versa; making a named type would give the illusion of type safety without actually providing much actual safety IMHO, and it also makes it more awkward to use by virtue of requiring type conversions. All the Go code for dealing with module paths just uses `string` and I\u0027m inclined to do the same.\n\nThat said, if we feel it\u0027s worth doing, we can still do it in the future, but let\u0027s leave it for now, as it would require changing large amounts of code throughout the internal/mod/... packages.",
+      "parentUuid": "d26f008a_dd7725ba",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f26a36d_5a0e033c",
@@ -116,6 +224,24 @@
       "writtenOn": "2023-09-10T08:02:59Z",
       "side": 1,
       "message": "This comment appears to be lost.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e8d4183_9faf16c5",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "3f26a36d_5a0e033c",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +263,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "40cf6ea6_fad2a97b",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "For uploads to the central registry, I\u0027m fairly sure we do, although I\u0027m interested to hear about other edge cases you\u0027re thinking of.\n\nMy take is that the least we can do is ensure that all modules in the registry are possible to use without additional registries. If that\u0027s not the case, we can\u0027t do any backward compatibility checks or check that the code that\u0027s uploaded is valid. If someone really wishes to upload modules to the store that have dependencies that are intended to be fulfilled by privately provided modules, they should at least provide \"dummy\" versions of those modules in the public store.\n\nHowever, for uploads to private registries, I agree that we\u0027ll want the ability to upload a module where the dependencies come from some other registry or registries, which isn\u0027t catered for in this API.\n\nFor now, I think it\u0027s OK to go with what we\u0027ve got here (this code will be used by the github app uploader), while leaving a TODO to make the module checking dependent on an OCI registry client implementation value that\u0027s passed in, rather than directly on a single host URL.",
+      "parentUuid": "76f9436d_736a12f8",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84402b59_c9a1ef2a",
@@ -150,6 +294,24 @@
       "writtenOn": "2023-09-10T08:02:59Z",
       "side": 1,
       "message": "I\u0027m not clear that this can be correct in general, because a dependency may not be available via the same registry. Per our routing configuration conversation.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d39e2669_b3a78669",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "When we change the code to be able to resolve dependencies from other places too, I think this will just fall out naturally.",
+      "parentUuid": "84402b59_c9a1ef2a",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +333,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8175371c_6c71b79c",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a0e8b13_56f70475",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9b6dac7b_6c14d395",
@@ -184,6 +364,24 @@
       "writtenOn": "2023-09-10T08:02:59Z",
       "side": 1,
       "message": "Are we guaranteed that dependencies will come from the same registry?",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "915756da_1dafc6af",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "From the p.o.v. of this code, I believe so, yes. Where a single \"registry\" can actually be defined as a composition of actual registries composed together outwith this package.",
+      "parentUuid": "9b6dac7b_6c14d395",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -205,6 +403,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "085f932f_25f6f95a",
+        "filename": "internal/mod/modregistry/client_test.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d7c41664_c96c3805",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a12fe76f_ee073272",
@@ -218,6 +434,24 @@
       "writtenOn": "2023-09-10T08:02:59Z",
       "side": 1,
       "message": "Missing copyright header.",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26c53b29_8391864c",
+        "filename": "internal/mod/modregistry/registry.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T17:51:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a12fe76f_ee073272",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

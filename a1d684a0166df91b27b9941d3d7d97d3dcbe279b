@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "04ae019f_41d9715c",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 193,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "removed",
+      "parentUuid": "ae7261b6_ab9fe6c4",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77693989_a885f2c9",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-12T09:25:47Z",
       "side": 1,
       "message": "Misspelled",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23fd0ac4_03138f32",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 14
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77693989_a885f2c9",
       "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d4d0a8b_f6f5f68c",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 14
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "I\u0027ll leave it for now.",
+      "parentUuid": "bd275504_e540b09d",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "63553f06_40962c90",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38b1d33d_55477b89",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 14
+      },
+      "lineNbr": 116,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Adjusted comment again.",
+      "parentUuid": "63553f06_40962c90",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "71e6b094_a9327f93",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-09-12T09:25:47Z",
       "side": 1,
       "message": "I would replace 1\u00262 with a top-level #unimplemented. That makes it 1) easier to swap out a value later, and 2) allow the #unimplemented to be defined with the fields above like so:\n\n   foo: #unimplemented\n   foo: def",
+      "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2af1c9b2_79b6ae7d",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 14
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71e6b094_a9327f93",
       "revId": "a1d684a0166df91b27b9941d3d7d97d3dcbe279b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

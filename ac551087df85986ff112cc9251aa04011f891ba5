@@ -33,6 +33,24 @@
       "message": "What\u0027s the thinking in documenting the fields above, only to mark them in error down here? \n\nWe should at least document above that these fields should not be used for now (because they are unimplemented) otherwise it will be a bit of a surprise for someone reading this file.",
       "revId": "ac551087df85986ff112cc9251aa04011f891ba5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0aa9cc66_e4bf1545",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 13
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "I\u0027ve added \"TODO implement this\" comments to all the unimplemented fields.",
+      "parentUuid": "b1a7dbf1_bb8c23a4",
+      "revId": "ac551087df85986ff112cc9251aa04011f891ba5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -107,6 +107,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5599ba0_7b11b235",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17ad9eda_fdb3bde2",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5be8e9e4_90b7bcec",
@@ -226,6 +244,24 @@
       "side": 1,
       "message": "Ok, so we need to make sure we have a TODO for documenting what \"canonical\" means, how its distinguished from \"well formed\" etc.",
       "parentUuid": "f59bb026_64dd0cae",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ffa2a51_b813d7c7",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "89008c03_aeac5b87",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -370,6 +406,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3dee01b_b008c744",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d4e2b202_625d8502",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8114eefd_8f98a614",
@@ -425,6 +479,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "74910453_1aff5e86",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Hopefully clearer now.",
+      "parentUuid": "ad173563_c1d7b7b7",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "017dfb87_a6b9d85c",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7
@@ -471,6 +543,24 @@
       "side": 1,
       "message": "I believe this is what \"here\" and \"this\" refers to. So what is specified in this section cannot be overridden later.",
       "parentUuid": "6919c5f0_f690ca22",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45101953_f2589193",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "I tend to agree with Paul here. If the restriction cannot be overridden on the command line, than how can this be the \"default\" restriction rather than the exact restriction that applies? I\u0027m guessing that we\u0027ve got an implicit \"public is wider than private\" relationship here, and that it\u0027s OK to override public with private but not vice versa. Given that none of this is implemented yet, perhaps we should just reserve the field and add a TODO?",
+      "parentUuid": "4fe0ce8f_8cde2266",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -545,6 +635,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3596277_8c733fc4",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b4912577_754a6376",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a80e019b_765df16e",
@@ -598,6 +706,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3961f22f_d38dfd73",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Given that, unlike in Go, there\u0027s no ambiguity about what defines a local path replacement, I think I\u0027d suggest just going with `string` for now. The Go-level logic can error if the path doesn\u0027t exist.",
+      "parentUuid": "5bcc2c8a_6393d973",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "aa62f35b_5360e3ce",
@@ -647,6 +773,24 @@
       "side": 1,
       "message": "I agree we can leave this out for scrappy 1. But we should do it before the first release. Maybe use TODO(x), with some string for x that indicates it should be done before the first module release.",
       "parentUuid": "975cfa08_2347d82a",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48cc3f98_20a0f580",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "Given that it\u0027s checked by the modules loading code itself (with an arguably clearer error message when it fails), I\u0027m not sure it actually _needs_ to be done before the first module release.",
+      "parentUuid": "d4a8f1de_737d633c",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -806,6 +950,24 @@
       "side": 1,
       "message": "I don\u0027t really understand it still either. Even after reading the new comment.",
       "parentUuid": "f32fa97b_274bd326",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ca149a0_b1a83320",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T14:52:17Z",
+      "side": 1,
+      "message": "I\u0027ve adjusted the comment again, hopefully better this time.",
+      "parentUuid": "4c3304a5_f38fb2aa",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

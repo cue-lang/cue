@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c22c0fed_6efba066",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T08:25:50Z",
+      "side": 1,
+      "message": "This is the first time (to my knowledge) that we are surfacing a CUE evaluation error, where the \"data\" has come from the user, but the schema is embedded within `cmd/cue`. As such the user cannot see the schema against which we are validating their data. We are \"fixing\" that here by translating the error messages into a format that user will likely understand more, understand more than references in an error stack to a file they do not know exists. An alternative would be to render the CUE errors exactly as we get them back (which is good dog-fooding in any case), with an appropriate \"fake\" filepath for the schema, and then tell the user that `cue help modfile` (or some command) will show them a line-numbered version of the schema.\n\nSo yes, by \"render\" I mean \"show\".",
+      "parentUuid": "0b28d744_886af032",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5be8e9e4_90b7bcec",
         "filename": "internal/mod/modfile/modfile_test.go",
         "patchSetId": 7
@@ -172,6 +190,24 @@
       "side": 1,
       "message": "For this particular example, \"is not well formed\" is definitely a more appropriate error message. But for a version like \"v0.2\", it is actually a well formed version, just not canonical, so I think this message would be better for that. I\u0027ve added another CL just before this in the chain to improve that.",
       "parentUuid": "031030c7_0f2c5409",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89008c03_aeac5b87",
+        "filename": "internal/mod/modfile/modfile_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T08:25:50Z",
+      "side": 1,
+      "message": "Ok, so we need to make sure we have a TODO for documenting what \"canonical\" means, how its distinguished from \"well formed\" etc.",
+      "parentUuid": "f59bb026_64dd0cae",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac95e3b9_0368118f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 13
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T08:25:50Z",
+      "side": 1,
+      "message": "Will chat through a few of the points shortly. Adding Marcel to also take a look",
+      "revId": "ac551087df85986ff112cc9251aa04011f891ba5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b1a7dbf1_bb8c23a4",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 13
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-12T08:25:50Z",
+      "side": 1,
+      "message": "What\u0027s the thinking in documenting the fields above, only to mark them in error down here? \n\nWe should at least document above that these fields should not be used for now (because they are unimplemented) otherwise it will be a bit of a surprise for someone reading this file.",
+      "revId": "ac551087df85986ff112cc9251aa04011f891ba5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9443900c_c3a24717",
+        "filename": "internal/mod/module/versions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T08:04:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9da5e3ab_e348684f",
+      "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5686d86e_b5cde9c4",
@@ -69,6 +87,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c877808f_6d9a4566",
+        "filename": "internal/mod/module/versions.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T08:04:05Z",
+      "side": 1,
+      "message": "The comment phrasing on Reqs comes from the original Go docs FWIW. \"the target passed as the first argument to MVS functions\" is sometimes the empty string. That\u0027s why I added the qualification above, but I\u0027ve now adjusted that to be more explicit and talk about the target.",
+      "parentUuid": "5686d86e_b5cde9c4",
+      "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9dc33751_fd2007e1",
@@ -82,6 +118,24 @@
       "writtenOn": "2023-09-12T05:10:04Z",
       "side": 1,
       "message": "nit: s/is a interface/is an interface/",
+      "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4d31559_2aeeaeee",
+        "filename": "internal/mod/mvs/graph.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T08:04:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9dc33751_fd2007e1",
       "revId": "75ea1e84d5cd7d884a883afb83c72102182eb636",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -565,6 +565,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b5c328b_acfee291",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T16:00:09Z",
+      "side": 1,
+      "message": "Given that it\u0027s not implemented for now, so this discussion isn\u0027t crucial to the initial implementation, I\u0027ve just removed these problematic comments and just left it marked as unimplemented for now with a TODO. That should hopefully be enough to proceed.",
+      "parentUuid": "45101953_f2589193",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ae20012_2986ecf8",
@@ -578,6 +596,24 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "I think some CUE/explanation is required to explain the relationship between `allow`, `default` and whatever is allowed to be set on the command line.",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b47bd5e_abac24aa",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T16:00:09Z",
+      "side": 1,
+      "message": "as above",
+      "parentUuid": "7ae20012_2986ecf8",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -862,6 +898,24 @@
       "side": 1,
       "message": "I personally always distinguish between package that define a \"namespace\" of configuration and packages that provide definitions, but are not themselves meant to be data per se.  So primarily data vs primarily schema packages.\n\nFor the latter, I would not use the embedding trick but rather let the user refer to the schema directly.\n\nThis also allows us to later define templates, pre-defined defaults, etc within the same package. In fact, one of the style guide rules I have alluded to with the new required field approach, is to define \"pure\" schemas as definitions with a name starting with #, where derivatives would use this schema and add refinements.\n\nIn this case, a file could include\n\n```\n#ModuleFile: {... }\n\nModuleFile: #ModuleFile \u0026 { // add some default values, etc. }\n\n// just some silly example to make a point:\nEnforceLinuxPaths: #ModuleFile \u0026 {}\n```\n\nIOW, I strongly suggest NOT embedding _#ModuleFile.",
       "parentUuid": "fe679036_675c6675",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6af9bc96_3677a5bc",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-12T16:00:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fcf1337_aaf536a4",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

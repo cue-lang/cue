@@ -35,16 +35,14 @@ import (
 func (v Value) Decode(x interface{}) error {
 	var d decoder
 	w := reflect.ValueOf(x)
-	switch {
-	case !reflect.Indirect(w).CanSet():
-		d.addErr(errors.Newf(v.Pos(), "cannot decode into unsettable value"))
-
-	default:
-		if w.Kind() == reflect.Ptr {
-			w = w.Elem()
-		}
-		d.decode(w, v, false)
+	if w.Kind() == reflect.Ptr {
+		w = w.Elem()
 	}
+	if !w.CanSet() {
+		d.addErr(errors.Newf(v.Pos(), "cannot decode into unsettable value"))
+		return d.errs
+	}
+	d.decode(w, v, false)
 	return d.errs
 }
 

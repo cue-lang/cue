@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/interpreter/wasm"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 )
@@ -83,6 +84,10 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		c.Command = cmd
 
 		statsEnc := statsEncoder(c)
+
+		if err := cueexperiment.Init(); err != nil {
+			return err
+		}
 
 		err := f(c, args)
 

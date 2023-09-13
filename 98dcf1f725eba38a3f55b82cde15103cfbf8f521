@@ -122,6 +122,24 @@
       "parentUuid": "d3691fd7_75556d72",
       "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6603880_f5c6c855",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:22:08Z",
+      "side": 1,
+      "message": "This would have been good to capture in the commit message in some form, rather than relying on the Gerrit history for that detail.",
+      "parentUuid": "203c993c_d6133610",
+      "revId": "98dcf1f725eba38a3f55b82cde15103cfbf8f521",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

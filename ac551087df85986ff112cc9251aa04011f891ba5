@@ -51,6 +51,24 @@
       "parentUuid": "b1a7dbf1_bb8c23a4",
       "revId": "ac551087df85986ff112cc9251aa04011f891ba5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb75457e_363924fc",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 13
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "I\u0027ve replied at the new location of this embedded struct to clarify the point if it wasn\u0027t clear before.",
+      "parentUuid": "0aa9cc66_e4bf1545",
+      "revId": "ac551087df85986ff112cc9251aa04011f891ba5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

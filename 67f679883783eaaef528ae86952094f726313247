@@ -424,6 +424,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ec02b84_e45bd63b",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "Sounds good.",
+      "parentUuid": "d3dee01b_b008c744",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8114eefd_8f98a614",
@@ -495,6 +513,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3576b015_28c32577",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "Made clearer by removing that line, yes :)",
+      "parentUuid": "74910453_1aff5e86",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "017dfb87_a6b9d85c",
@@ -508,6 +544,42 @@
       "writtenOn": "2023-09-10T05:44:45Z",
       "side": 1,
       "message": "What is \"here\" a reference to? \n\nIs the term \"reported here\" significant? What does \"reported\" mean?",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6608914c_50026eff",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "I think this is now addressed?",
+      "parentUuid": "017dfb87_a6b9d85c",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31d1ae88_7bfe7176",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "This has been resolved, correct?",
+      "parentUuid": "017dfb87_a6b9d85c",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -689,6 +761,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "30e7f4c8_f29475c1",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "Sounds good.",
+      "parentUuid": "e3596277_8c733fc4",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a80e019b_765df16e",
@@ -827,6 +917,24 @@
       "side": 1,
       "message": "Given that it\u0027s checked by the modules loading code itself (with an arguably clearer error message when it fails), I\u0027m not sure it actually _needs_ to be done before the first module release.",
       "parentUuid": "d4a8f1de_737d633c",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b09c8e94_5a6a40d4",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "Indeed. The reasoning behind this is the very spirit of shifting left with CUE. Putting constraints in CUE that people can use independent of the loading file logic.",
+      "parentUuid": "48cc3f98_20a0f580",
       "revId": "67f679883783eaaef528ae86952094f726313247",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

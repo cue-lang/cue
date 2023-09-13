@@ -16,6 +16,57 @@
       "message": "PTAL",
       "revId": "53ec1127a1f69773b675d2d7c5a1fdbdc40c58db",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cb25b66_aafb98d2",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "Nice. This is a good approach.",
+      "revId": "53ec1127a1f69773b675d2d7c5a1fdbdc40c58db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "841d01aa_64d1a597",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "Needs a doc comment, and I\u0027m also not clear on the naming. This method is `(*modfile.File).Versions()`. Which sort of suggests at first (and to me subsequent) reading that this gives me versions of a module file? I\u0027m not clear what that would even be. Instead, this method is actually returning the versions of dependencies. That should probably be clearer in the naming?",
+      "revId": "53ec1127a1f69773b675d2d7c5a1fdbdc40c58db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce9f0618_8a5a436e",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:51:00Z",
+      "side": 1,
+      "message": "Per my earlier comments. Every field in this embedded struct, is declared and indeed documented below. So I\u0027m unclear why you even need this embedded version, save for adding the constraint `unimplemented`. Because you could simply add `\u0026 unimplemented` to each declaration below, a conjunction element that would be removed at the same time the comment `TODO implement` would be removed?",
+      "revId": "53ec1127a1f69773b675d2d7c5a1fdbdc40c58db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

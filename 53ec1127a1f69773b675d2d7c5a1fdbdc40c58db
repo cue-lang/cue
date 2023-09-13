@@ -69,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e07b1f6_3adecf1a",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T08:12:10Z",
+      "side": 1,
+      "message": "I\u0027ve renamed it to DepVersions, which is hopefully clearer.",
+      "parentUuid": "841d01aa_64d1a597",
+      "revId": "53ec1127a1f69773b675d2d7c5a1fdbdc40c58db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce9f0618_8a5a436e",
@@ -82,6 +100,24 @@
       "writtenOn": "2023-09-13T04:51:00Z",
       "side": 1,
       "message": "Per my earlier comments. Every field in this embedded struct, is declared and indeed documented below. So I\u0027m unclear why you even need this embedded version, save for adding the constraint `unimplemented`. Because you could simply add `\u0026 unimplemented` to each declaration below, a conjunction element that would be removed at the same time the comment `TODO implement` would be removed?",
+      "revId": "53ec1127a1f69773b675d2d7c5a1fdbdc40c58db",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88dd872d_531edb93",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 18
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T08:12:10Z",
+      "side": 1,
+      "message": "The idea is that the rest of the schema (modulo TODO comments) is just as it will be when the fields are actually implemented. This is an adjunct that makes it easy to see in one place what\u0027s still to do. I wouldn\u0027t publish the schema like this, but I _think_ it makes for a reasonable WIP. Given that there\u0027s no technical difference, I think I\u0027ll leave it as is for now. It\u0027s easy to change in the future.",
+      "parentUuid": "ce9f0618_8a5a436e",
       "revId": "53ec1127a1f69773b675d2d7c5a1fdbdc40c58db",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

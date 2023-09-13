@@ -320,6 +320,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "31350456_86e43914",
+        "filename": "internal/mod/modfile/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T08:29:54Z",
+      "side": 1,
+      "message": "I don\u0027t think this actually got done.\n\nPlease can we do this in a follow-up CL?",
+      "parentUuid": "37265b24_ea8e76d2",
+      "revId": "67f679883783eaaef528ae86952094f726313247",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f43e5a6d_77125756",
         "filename": "internal/mod/modfile/schema.cue",
         "patchSetId": 7

@@ -124,6 +124,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdeaa695_19d86459",
+        "filename": "internal/mod/zip/testdata/check_files/empty.txt",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T04:25:33Z",
+      "side": 1,
+      "message": "Makes sense, thanks.",
+      "parentUuid": "1f65f46e_a1489299",
+      "revId": "d083c6451444b925eb22a5eea0168e272c9e94a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "047feb4a_b86fd7e4",

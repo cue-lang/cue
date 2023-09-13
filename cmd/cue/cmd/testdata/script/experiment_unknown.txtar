@@ -1,0 +1,3 @@
+env CUE_EXPERIMENT=xxx
+! exec cue eval something
+stderr 'unknown CUE_EXPERIMENT xxx'

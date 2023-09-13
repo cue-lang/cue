@@ -335,6 +335,24 @@
       "parentUuid": "592b3228_b16d633e",
       "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f9426fb_3b357a86",
+        "filename": "mod/zip/zip.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:00:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c773e3d3_6578cb38",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

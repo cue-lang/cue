@@ -160,6 +160,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3967d823_5db3e85e",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T09:57:50Z",
+      "side": 1,
+      "message": "Yes, in https://review.gerrithub.io/c/cue-lang/cue/+/1168634/",
+      "parentUuid": "0d3af79e_c8e97017",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5a2b5da5_b0228a12",
@@ -227,6 +245,24 @@
       "side": 1,
       "message": "Is this resolved?",
       "parentUuid": "961a617d_449c3235",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ea05f9c_65c92489",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T09:57:50Z",
+      "side": 1,
+      "message": "I\u0027d say so, yes.",
+      "parentUuid": "7f819c71_a53abd8f",
       "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

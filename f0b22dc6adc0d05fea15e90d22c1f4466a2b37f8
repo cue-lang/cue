@@ -69,6 +69,24 @@
       "parentUuid": "cfff58ce_fc99d3ea",
       "revId": "f0b22dc6adc0d05fea15e90d22c1f4466a2b37f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab63bb82_6bf839b2",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T09:57:50Z",
+      "side": 1,
+      "message": "The suggestion was a good one, but the modfile changes are no longer in this CL so it can\u0027t be addressed here.",
+      "parentUuid": "a9fd1d03_80c17355",
+      "revId": "f0b22dc6adc0d05fea15e90d22c1f4466a2b37f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

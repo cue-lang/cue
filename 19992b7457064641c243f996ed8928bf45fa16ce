@@ -159,6 +159,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "33971cc7_f421db09",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T09:57:50Z",
+      "side": 1,
+      "message": "Yes, that would potentially invalidate client-side caching, but this client doesn\u0027t do any caching (and I\u0027m not sure it should) so I don\u0027t think it matters for this package and CL.",
+      "parentUuid": "744645de_ab2d4301",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95dc6ba8_5df6dd68",
@@ -331,6 +349,24 @@
       "side": 1,
       "message": "But this code is not aware of whether it is downloading from/uploading to the central registry or not. A day-1 requirement is that people can have private modules in a private registry (with appropriate routing configuration for that module path (or paths)). Unless I\u0027m missing something, this places a requirement on every dependency of that private module being accessible on that private registry. Which is not guaranteed to be the case, in the (common) case that the user wants public dependencies to be resolved from the central registry.",
       "parentUuid": "40cf6ea6_fad2a97b",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dc18478_1e201730",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T09:57:50Z",
+      "side": 1,
+      "message": "I\u0027ve added a point in today\u0027s meeting notes to discuss this point in the future. As discussed, we\u0027ll carry on with this behaviour for now.",
+      "parentUuid": "c14f5163_f48c5cf6",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

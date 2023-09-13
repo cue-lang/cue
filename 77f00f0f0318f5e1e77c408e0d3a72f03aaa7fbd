@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "76bd42be_190bf046",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 22
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bff444b_1f70539b",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2a70f64_fd0bc082",
@@ -123,6 +141,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "193cab10_9fb5c83a",
+        "filename": "cue/load/internal/par/work_test.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "18ac2a0a_8779e160",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5616f5dc_320b6515",
@@ -136,6 +172,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Belongs in another CL?",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51d7642c_eff1b3d7",
+        "filename": "cue/load/internal/slices/slices.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "I don\u0027t think so, as discussed elsewhere.",
+      "parentUuid": "5616f5dc_320b6515",
       "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -157,6 +211,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbb62bae_c5f847b3",
+        "filename": "internal/mod/modregistry/registry.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cfe0fb75_aab2e9ff",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bd26580_c942adaf",
@@ -170,6 +242,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Belongs in another CL?",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef872c34_44e272a4",
+        "filename": "internal/mod/zip/zip.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "3bd26580_c942adaf",
       "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -191,6 +281,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70fb799e_95fe1583",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 117,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87b04034_bc2a82b7",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b3888491_14f113fa",
@@ -204,6 +312,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Belongs in another CL?",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "258e1d2d_05312f5a",
+        "filename": "internal/tdtest/update.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Actually it\u0027s just a debugging remnant that I forgot to remove. Removed now.",
+      "parentUuid": "b3888491_14f113fa",
       "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

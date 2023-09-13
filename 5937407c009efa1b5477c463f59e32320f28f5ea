@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dfbefcfc_7afbdd8f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "No, version numbers are not required in import paths. When omitted, version numbers are inferred from the dependencies in module.cue.",
+      "parentUuid": "aa74a24d_265d69ff",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf282e5c_98f5e403",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Per previous comments on formatting in commit message.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bd2eec7_82300f77",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf282e5c_98f5e403",
       "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "44a9de9e_74eb082a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "I _think_ this is resolved now. The package removals and the registrytest changes seem like they\u0027re appropriate in this CL, as discussed in other comments.",
+      "parentUuid": "1c61af6c_5c61b20e",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "10c40c56_d62f4dfb",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Left over debugging line?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1804fcc1_6b40d6ed",
+        "filename": "cue/load/config.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10c40c56_d62f4dfb",
       "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "299971d2_9ba12fe7",
+        "filename": "cue/load/import.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 362,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Yes, good catch. That actually illuminates a (minor) bug. If we import `foo.com@v1`, then `name` will be `foo.com@v1` not `foo.com`, so the error message will say `implied package identifier \"foo.com@v1\" is not valid` rather than the more correct `implied package identifier \"foo.com\" is not valid`.\n\nSo we should do this a little differently.\n\nI\u0027ve changed the code accordingly.",
+      "parentUuid": "20bab837_c41bf816",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "32b784f8_d9c30f8b",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Just to confirm, we are going to do this based on the environment variable enabling modules... as well as some other condition, correct?\n\nDo we have that CL in the stack?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1204e500_740c9033",
+        "filename": "cue/load/import.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 391,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "We are for now, but in the future, I think we probably aren\u0027t going to require CUE_EXPERIMENT to be set, so this TODO is still relevant I think.\n\nThe relevant CL is next in the stack: https://review.gerrithub.io/c/cue-lang/cue/+/1168510",
+      "parentUuid": "32b784f8_d9c30f8b",
       "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f84e2839_4c3034d8",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "No access to testing.T here, so I think panic is reasonable.",
+      "parentUuid": "c90c9ab4_d850f026",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "febdf537_9561671e",
@@ -133,6 +259,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Does this package removal belong in another CL?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc659108_3894e9c8",
+        "filename": "cue/load/internal/mvs/errors.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "As discussed, I think removing the package when it becomes unused is reasonable.",
+      "parentUuid": "febdf537_9561671e",
       "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +298,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8411e97a_1cdaa854",
+        "filename": "cue/load/internal/par/atomic_go1.18.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "dcc20adc_2148e549",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "98ecd27b_2d0bfcfb",
@@ -167,6 +329,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Do the registrytest changes belong in another CL?",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "da7c50c1_33b9076a",
+        "filename": "cue/load/internal/registrytest/fileio.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "We can\u0027t do these changes before changing cue/load, because that would be changing cue/load to use OCI registries. We can\u0027t do those changes after changing cue/load because then cue/load wouldn\u0027t be using OCI registries.\n\nSo unless we duplicate the package, and then remove it later, I don\u0027t think we can do it in another CL.",
+      "parentUuid": "98ecd27b_2d0bfcfb",
       "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +368,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab78bc77_36825ec6",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "96e3a4e0_8b138714",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31b052eb_ba13b40e",
@@ -205,6 +403,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbe3179d_ebc63a4a",
+        "filename": "cue/load/loader_test.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 303,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done. There\u0027s now another CL before this that does that.",
+      "parentUuid": "31b052eb_ba13b40e",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf1f1f97_47a8ac96",
@@ -218,6 +434,24 @@
       "writtenOn": "2023-09-10T12:54:18Z",
       "side": 1,
       "message": "Per comment in a previous CL, this change doesn\u0027t seem to belong here.",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a3c12129_bb85d724",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-13T10:11:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bf1f1f97_47a8ac96",
       "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

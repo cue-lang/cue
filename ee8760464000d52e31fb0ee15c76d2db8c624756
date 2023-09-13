@@ -1,6 +1,40 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c35a42a_6bf078f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 45
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Nit: the backticks are not necessary, because commit messages are only ever (at least in my experience) rendered as fixed-width plain text. As such they just make commit messages harder to write (and read).",
+      "revId": "ee8760464000d52e31fb0ee15c76d2db8c624756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3beca36a_356b4b2f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 45
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Nit: line wrapping.",
+      "revId": "ee8760464000d52e31fb0ee15c76d2db8c624756",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "51e1876e_3e60f3af",

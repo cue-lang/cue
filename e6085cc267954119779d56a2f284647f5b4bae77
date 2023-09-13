@@ -144,6 +144,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0d3af79e_c8e97017",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Is this resolved?",
+      "parentUuid": "a83df612_80d4c7f5",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5a2b5da5_b0228a12",
         "filename": "mod/modfile/modfile.go",
         "patchSetId": 19
@@ -191,6 +209,24 @@
       "side": 1,
       "message": "I suspect there are lots of potential candidates for use of the slices package",
       "parentUuid": "5a2b5da5_b0228a12",
+      "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f819c71_a53abd8f",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Is this resolved?",
+      "parentUuid": "961a617d_449c3235",
       "revId": "e6085cc267954119779d56a2f284647f5b4bae77",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

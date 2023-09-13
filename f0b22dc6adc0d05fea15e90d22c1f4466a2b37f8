@@ -51,6 +51,24 @@
       "message": "I don\u0027t think you mean to be using `%q` here.",
       "revId": "f0b22dc6adc0d05fea15e90d22c1f4466a2b37f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a9fd1d03_80c17355",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Is this resolved?",
+      "parentUuid": "cfff58ce_fc99d3ea",
+      "revId": "f0b22dc6adc0d05fea15e90d22c1f4466a2b37f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

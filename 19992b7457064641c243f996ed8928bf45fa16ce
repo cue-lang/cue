@@ -143,6 +143,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "744645de_ab2d4301",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Except that any client side caching would be rendered invalid if the server could mutate, no? i.e. we would always have to fetch. \n\nAssuming that is the case, one thing at least we should do is start to flesh out our FAQ in this area. Marking as unresolved so this jumps to your attention.",
+      "parentUuid": "ae52afce_724e9e01",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "95dc6ba8_5df6dd68",
         "filename": "internal/mod/modregistry/client.go",
         "patchSetId": 34
@@ -207,6 +225,24 @@
       "side": 1,
       "message": "I\u0027m not that keen on making types that aren\u0027t generally used in a fully consistent way. Module paths are often created directly from (parts of) other strings and vice versa; making a named type would give the illusion of type safety without actually providing much actual safety IMHO, and it also makes it more awkward to use by virtue of requiring type conversions. All the Go code for dealing with module paths just uses `string` and I\u0027m inclined to do the same.\n\nThat said, if we feel it\u0027s worth doing, we can still do it in the future, but let\u0027s leave it for now, as it would require changing large amounts of code throughout the internal/mod/... packages.",
       "parentUuid": "d26f008a_dd7725ba",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fb1d0c7_e19aa9c7",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Sounds good.",
+      "parentUuid": "77d1f288_aabdc4b5",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -283,6 +319,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c14f5163_f48c5cf6",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "But this code is not aware of whether it is downloading from/uploading to the central registry or not. A day-1 requirement is that people can have private modules in a private registry (with appropriate routing configuration for that module path (or paths)). Unless I\u0027m missing something, this places a requirement on every dependency of that private module being accessible on that private registry. Which is not guaranteed to be the case, in the (common) case that the user wants public dependencies to be resolved from the central registry.",
+      "parentUuid": "40cf6ea6_fad2a97b",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "84402b59_c9a1ef2a",
         "filename": "internal/mod/modregistry/client.go",
         "patchSetId": 34
@@ -312,6 +366,24 @@
       "side": 1,
       "message": "When we change the code to be able to resolve dependencies from other places too, I think this will just fall out naturally.",
       "parentUuid": "84402b59_c9a1ef2a",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee8f76e9_eeec631c",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 270,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Ok.",
+      "parentUuid": "d39e2669_b3a78669",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -382,6 +454,24 @@
       "side": 1,
       "message": "From the p.o.v. of this code, I believe so, yes. Where a single \"registry\" can actually be defined as a composition of actual registries composed together outwith this package.",
       "parentUuid": "9b6dac7b_6c14d395",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1072f114_464b9ab9",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-13T05:08:39Z",
+      "side": 1,
+      "message": "Ah good point.",
+      "parentUuid": "915756da_1dafc6af",
       "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

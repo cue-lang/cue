@@ -30,21 +30,17 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-// Decode initializes x with Value v. If x is a struct, it will validate the
-// constraints specified in the field tags.
+// Decode initializes x with Value v. An error is returned if x is nil or not a pointer.
+//
+// If x is a struct, Decode will validate the constraints specified in the field tags.
 func (v Value) Decode(x interface{}) error {
 	var d decoder
 	w := reflect.ValueOf(x)
-	switch {
-	case !reflect.Indirect(w).CanSet():
+	if w.Kind() != reflect.Pointer || w.IsNil() {
 		d.addErr(errors.Newf(v.Pos(), "cannot decode into unsettable value"))
-
-	default:
-		if w.Kind() == reflect.Ptr {
-			w = w.Elem()
-		}
-		d.decode(w, v, false)
+		return d.errs
 	}
+	d.decode(w.Elem(), v, false)
 	return d.errs
 }
 

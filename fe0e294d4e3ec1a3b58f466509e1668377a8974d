@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf1759fc_e7beb022",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-14T11:32:04Z",
+      "side": 1,
+      "message": "One tiny suggestion to make the comment phrasing slightly clearer.",
+      "revId": "fe0e294d4e3ec1a3b58f466509e1668377a8974d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9942c14_1732497f",
+        "filename": "cue/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-14T11:32:04Z",
+      "side": 1,
+      "message": "Decode initializes the value pointed to by x with Value v.\n\n?",
+      "revId": "fe0e294d4e3ec1a3b58f466509e1668377a8974d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

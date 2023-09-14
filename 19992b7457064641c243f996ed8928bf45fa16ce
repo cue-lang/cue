@@ -177,6 +177,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7df2c8bf_2255fd34",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 34
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-14T04:35:41Z",
+      "side": 1,
+      "message": "Ack.",
+      "parentUuid": "33971cc7_f421db09",
+      "revId": "19992b7457064641c243f996ed8928bf45fa16ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95dc6ba8_5df6dd68",

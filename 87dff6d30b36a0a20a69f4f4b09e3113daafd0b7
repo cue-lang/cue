@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd2e65d3_44b2abba",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-14T11:12:20Z",
+      "side": 1,
+      "message": "+2 to the astutil change.\nI think the cue/decode.go change should probably get its own CL and I\u0027d suggest a slightly different implementation.",
+      "revId": "87dff6d30b36a0a20a69f4f4b09e3113daafd0b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a559bc6_8202b757",
+        "filename": "cue/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-14T11:12:20Z",
+      "side": 1,
+      "message": "I\u0027d suggest doing this in another CL, and maybe slightly more direct code:\n\n```\nfunc (v Value) Decode(x interface{}) error {\n    var d decoder\n    w :\u003d reflect.ValueOf(x)\n    if w.Kind() !\u003d reflect.Pointer || w.IsNil() {\n        d.addErr(errors.Newf(v.Pos(), \"cannot decode into unsettable value\"))\n        return d.errs\n    }\n    d.decode(w.Elem(), v, false)\n    return d.errs\n}\n```",
+      "revId": "87dff6d30b36a0a20a69f4f4b09e3113daafd0b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

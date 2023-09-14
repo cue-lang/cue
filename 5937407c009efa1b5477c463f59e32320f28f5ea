@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bb49a720_98983bf3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-14T04:52:33Z",
+      "side": 1,
+      "message": "Unless I\u0027ve missed the tests (if I have, please ignore and mark this comment as resolved) we don\u0027t appear to have a test for a no-version-number import path in the `cue/load` package?",
+      "parentUuid": "dfbefcfc_7afbdd8f",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "bf282e5c_98f5e403",
         "filename": "/COMMIT_MSG",
         "patchSetId": 31
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "10c40c56_d62f4dfb",
+      "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "595f630b_44259718",
+        "filename": "cue/load/config.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 368,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-14T04:52:33Z",
+      "side": 1,
+      "message": "Not sure this is done?",
+      "parentUuid": "1804fcc1_6b40d6ed",
       "revId": "5937407c009efa1b5477c463f59e32320f28f5ea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

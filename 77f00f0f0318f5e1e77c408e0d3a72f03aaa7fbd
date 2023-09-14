@@ -124,6 +124,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52e8b726_acd24d23",
+        "filename": "cue/load/internal/mvs/mvs_test.go",
+        "patchSetId": 22
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-14T04:52:33Z",
+      "side": 1,
+      "message": "Just as a thought, a brief form of this reasoning would not have been a bad thing to include in the commit message. Saves other reviewers having to either re-ask the question, or discover it from this exchange.",
+      "parentUuid": "9734bf57_007926b4",
+      "revId": "77f00f0f0318f5e1e77c408e0d3a72f03aaa7fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "18ac2a0a_8779e160",

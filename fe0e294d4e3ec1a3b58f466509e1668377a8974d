@@ -33,6 +33,24 @@
       "message": "Decode initializes the value pointed to by x with Value v.\n\n?",
       "revId": "fe0e294d4e3ec1a3b58f466509e1668377a8974d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c68518b_bc638777",
+        "filename": "cue/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-14T11:36:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d9942c14_1732497f",
+      "revId": "fe0e294d4e3ec1a3b58f466509e1668377a8974d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,6 +33,23 @@
       "message": "Leaving for Marcel to review.",
       "revId": "b595c496ac70df6eaed661fb744a180edb13a5e3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "51b8672c_c660014d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 48
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-15T09:10:18Z",
+      "side": 1,
+      "message": "Per discussions, we\u0027re going to remove the \"bundling\" of dependencies in this change and that\u0027s being worked on in this CL.",
+      "revId": "b595c496ac70df6eaed661fb744a180edb13a5e3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

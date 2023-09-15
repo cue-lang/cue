@@ -18,11 +18,11 @@ import (
 	"flag"
 	"fmt"
 	"strings"
+	"sync"
 	"testing"
 
-	"golang.org/x/tools/txtar"
-
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
+	"golang.org/x/tools/txtar"
 )
 
 var (
@@ -127,8 +128,8 @@ func runEvalTest(t *cuetxtar.Test, version adt.EvaluatorVersion) {
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
-	var verbosity int
-	verbosity = 1 // comment to turn logging off.
+	verbosity := 0
+	// verbosity = 1 // comment to turn logging off.
 
 	var version adt.EvaluatorVersion
 	version = adt.DevVersion // comment to use default implementation.
@@ -138,6 +139,20 @@ func TestX(t *testing.T) {
 module: "mod.test"
 
 -- in.cue --
+package foo
+
+import "mod.test/pkg/bar"
+
+bar.foo
+-- pkg/bar/bar1.cue --
+package bar
+
+foo: #foo
+foo: string
+-- pkg/bar/bar2.cue --
+package bar
+
+#foo: "foo"
 	`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
@@ -149,6 +164,23 @@ module: "mod.test"
 	if instance.Err != nil {
 		t.Fatal(instance.Err)
 	}
+
+	var wg sync.WaitGroup
+	start := make(chan bool)
+	for i := 0; i < 100; i++ {
+		wg.Add(1)
+		go func(instance *build.Instance) {
+			defer wg.Done()
+			_ = <-start
+
+			_, err := runtime.New().Build(nil, instance)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}(instance)
+	}
+	close(start)
+	wg.Wait()
 
 	r := runtime.New()
 
@@ -173,9 +205,9 @@ module: "mod.test"
 		t.Log(errors.Details(b.Err, nil))
 	}
 
-	t.Error(debug.NodeString(r, v, nil))
+	//t.Error(debug.NodeString(r, v, nil))
 
-	t.Log(ctx.Stats())
+	//t.Log(ctx.Stats())
 }
 
 func BenchmarkUnifyAPI(b *testing.B) {

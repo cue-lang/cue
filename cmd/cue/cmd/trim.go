@@ -92,7 +92,7 @@ removal.
 }
 
 func runTrim(cmd *Command, args []string) error {
-	binst := loadFromArgs(cmd, args, nil)
+	binst := loadFromArgs(args, nil)
 	if binst == nil {
 		return nil
 	}

@@ -34,7 +34,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			plan, err := newBuildPlan(cmd, args, &config{loadCfg: &load.Config{
+			plan, err := newBuildPlan(cmd, &config{loadCfg: &load.Config{
 				Tests:       true,
 				Tools:       true,
 				AllCUEFiles: true,
@@ -42,7 +42,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 			}})
 			exitOnErr(cmd, err, true)
 
-			builds := loadFromArgs(cmd, args, plan.cfg.loadCfg)
+			builds := loadFromArgs(args, plan.cfg.loadCfg)
 			if builds == nil {
 				exitOnErr(cmd, errors.Newf(token.NoPos, "invalid args"), true)
 			}

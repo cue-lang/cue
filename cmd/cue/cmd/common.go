@@ -68,10 +68,6 @@ var defaultConfig = config{
 
 var inTest = false
 
-func exitIfErr(cmd *Command, inst *cue.Instance, err error, fatal bool) {
-	exitOnErr(cmd, err, fatal)
-}
-
 func getLang() language.Tag {
 	loc := os.Getenv("LC_ALL")
 	if loc == "" {
@@ -108,7 +104,7 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 	}
 }
 
-func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instance {
+func loadFromArgs(args []string, cfg *load.Config) []*build.Instance {
 	binst := load.Instances(args, cfg)
 	if len(binst) == 0 {
 		return nil
@@ -376,7 +372,7 @@ type config struct {
 	loadCfg *load.Config
 }
 
-func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
+func newBuildPlan(cmd *Command, cfg *config) (p *buildPlan, err error) {
 	if cfg == nil {
 		cfg = &defaultConfig
 	}
@@ -400,9 +396,7 @@ func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err e
 	}
 	cfg.reFile = re
 
-	if err := setTags(cfg.loadCfg, cmd.Flags(), cmd.Parent().Flags()); err != nil {
-		return nil, err
-	}
+	setTags(cfg.loadCfg, cmd.Flags(), cmd.Parent().Flags())
 
 	return p, nil
 }
@@ -411,7 +405,7 @@ func (p *buildPlan) matchFile(file string) bool {
 	return p.cfg.reFile.MatchString(file)
 }
 
-func setTags(cfg *load.Config, flags ...*pflag.FlagSet) error {
+func setTags(cfg *load.Config, flags ...*pflag.FlagSet) {
 	// setTags usually receives a subcommmand's flags, plus the parent (root) command's flags,
 	// so that we can support "cue cmd -t foo=bar mycmd" as well as the short form "cue -t foo=bar mycmd".
 	// TODO: once we remove "cue cmd" short-hand support, go back to a single FlagSet parameter.
@@ -422,7 +416,6 @@ func setTags(cfg *load.Config, flags ...*pflag.FlagSet) error {
 			cfg.TagVars = load.DefaultTagVars()
 		}
 	}
-	return nil
 }
 
 type decoderInfo struct {
@@ -523,14 +516,14 @@ func (p *buildPlan) importFiles(b *build.Instance) error {
 }
 
 func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
-	p, err = newBuildPlan(cmd, args, cfg)
+	p, err = newBuildPlan(cmd, cfg)
 	if err != nil {
 		return nil, err
 	}
 
 	adt.DebugSort, _ = strconv.Atoi(os.Getenv("CUE_DEBUG_SORT_ARCS"))
 
-	builds := loadFromArgs(cmd, args, cfg.loadCfg)
+	builds := loadFromArgs(args, cfg.loadCfg)
 	if builds == nil {
 		return nil, errors.Newf(token.NoPos, "invalid args")
 	}
@@ -727,7 +720,7 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
 	instances, err := cmd.ctx.BuildInstances(binst)
-	exitIfErr(cmd, nil, err, true)
+	exitOnErr(cmd, err, true)
 
 	insts := make([]*instance, len(instances))
 	for i, v := range instances {
@@ -747,12 +740,12 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitIfErr(cmd, nil, inst.Validate(), !flagIgnore.Bool(cmd))
+		exitOnErr(cmd, inst.Validate(), !flagIgnore.Bool(cmd))
 	}
 	return insts
 }
 
-func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance, error) {
+func buildToolInstances(binst []*build.Instance) ([]*cue.Instance, error) {
 	instances := cue.Build(binst)
 	for _, inst := range instances {
 		if inst.Err != nil {
@@ -774,11 +767,9 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 		Tools: true,
 	}
 	f := cmd.cmd.Flags()
-	if err := setTags(cfg, f, cmd.cmd.Parent().Flags()); err != nil {
-		return nil, err
-	}
+	setTags(cfg, f, cmd.cmd.Parent().Flags())
 
-	binst := loadFromArgs(cmd, args, cfg)
+	binst := loadFromArgs(args, cfg)
 	if len(binst) == 0 {
 		return nil, nil
 	}
@@ -801,7 +792,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 		inst.Files = inst.Files[:k]
 	}
 
-	insts, err := buildToolInstances(cmd, binst)
+	insts, err := buildToolInstances(binst)
 	if err != nil {
 		return nil, err
 	}

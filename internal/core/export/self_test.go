@@ -16,8 +16,6 @@ package export_test
 
 import (
 	"bytes"
-	"io/ioutil"
-	"log"
 	"strings"
 	"testing"
 
@@ -116,12 +114,7 @@ func patch(t *testing.T, r *cue.Context, orig *txtar.Archive, f *ast.File) cue.V
 		Data: b,
 	})
 
-	dir, err := ioutil.TempDir("", "test")
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	instance := cuetxtar.Load(&a, dir)[0]
+	instance := cuetxtar.Load(&a, t.TempDir())[0]
 	if instance.Err != nil {
 		t.Fatal(instance.Err)
 	}
@@ -156,13 +149,8 @@ module: "mod.test/a"
 		t.Skip()
 	}
 
-	dir, err := ioutil.TempDir("", "test")
-	if err != nil {
-		log.Fatal(err)
-	}
-
 	a := txtar.Parse([]byte(in))
-	instance := cuetxtar.Load(a, dir)[0]
+	instance := cuetxtar.Load(a, t.TempDir())[0]
 	if instance.Err != nil {
 		t.Fatal(instance.Err)
 	}

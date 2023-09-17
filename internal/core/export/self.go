@@ -110,7 +110,6 @@ func (d *depData) usageCount() int {
 
 type refData struct {
 	dst *depData
-	ref ast.Expr
 }
 
 func (v *depData) node() *adt.Vertex {

@@ -284,8 +284,6 @@ type exporter struct {
 	letAlias   map[*ast.LetClause]*ast.LetClause
 	references map[*adt.Vertex]*referenceInfo
 
-	usedHidden map[string]bool
-
 	pivotter *pivotter
 }
 
@@ -785,20 +783,4 @@ func (e *exporter) setDocs(x adt.Node) {
 	f := e.stack[len(e.stack)-1]
 	f.docSources = []adt.Conjunct{adt.MakeRootConjunct(nil, x)}
 	e.stack[len(e.stack)-1] = f
-}
-
-// func (e *Exporter) promise(upCount int32, f completeFunc) {
-// 	e.todo = append(e.todo, f)
-// }
-
-func (e *exporter) errf(format string, args ...interface{}) *ast.BottomLit {
-	err := &exporterError{}
-	e.errs = errors.Append(e.errs, err)
-	return &ast.BottomLit{}
-}
-
-type errTODO errors.Error
-
-type exporterError struct {
-	errTODO
 }

@@ -367,7 +367,7 @@ func extract(cmd *Command, args []string) error {
 	// command specifies a Go package(s) that belong to the main module
 	// and where for some reason the
 	// determine module root:
-	binst := loadFromArgs(cmd, []string{"."}, nil)[0]
+	binst := loadFromArgs([]string{"."}, nil)[0]
 
 	// TODO: require explicitly set root.
 	root := binst.Root

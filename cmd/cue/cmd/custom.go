@@ -154,7 +154,7 @@ func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 	c := flow.New(cfg, root, newTaskFunc(cmd))
 
 	err := c.Run(context.Background())
-	exitIfErr(cmd, root, err, true)
+	exitOnErr(cmd, err, true)
 
 	return err
 }

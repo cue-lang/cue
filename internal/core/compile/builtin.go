@@ -192,6 +192,32 @@ var remBuiltin = &adt.Builtin{
 	},
 }
 
+var isConcreteBuiltin = &adt.Builtin{
+	Name:        "isconcrete",
+	Params:      []adt.Param{{Value: &adt.BasicType{K: adt.BottomKind}}},
+	Result:      adt.BoolKind,
+	AllowErrors: true,
+	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+		switch x := args[0].(type) {
+		case *adt.Bottom:
+			if x.IsIncomplete() && x.Permanent {
+				_ = c.Err()
+				return &adt.Bool{B: false}
+			}
+			return x
+		default:
+			concrete := adt.IsConcrete(x)
+			if e := c.Err(); e != nil {
+				if e.IsIncomplete() && e.Permanent {
+					return &adt.Bool{B: false}
+				}
+				return e
+			}
+			return &adt.Bool{B: concrete}
+		}
+	},
+}
+
 type intFunc func(c *adt.OpContext, x, y *adt.Num) adt.Value
 
 func intDivOp(c *adt.OpContext, fn intFunc, name string, args []adt.Value) adt.Value {

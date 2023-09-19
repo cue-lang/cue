@@ -1,0 +1,120 @@
+-- in.cue --
+a: {}
+b: int
+
+c: exists(a)   // true
+d: exists(b)   // true
+e: exists(a.b) // false (b could still be defined)
+f: exists(b.c) // fatal error (b.c can never be satisfied)
+
+opt?: int
+ref_opt: exists(opt)  // false considered to be non-existing.
+
+req!: int
+ref_req: exists(req)  // false
+
+foo: {
+    a?: string
+    b?: string
+    a: "test"
+}
+
+foo_a: exists(foo.a) // true
+foo_b: exists(foo.b) // false(foo.b could still be defined)
+foo_c: exists(foo.c) // false(foo.c could still be defined)
+foo_a_x: exists(foo.a.x) // fatal error (foo.a.x can never be satisfied)
+foo_b_x: exists(foo.b.x) // fatal error (foo.b.x can never be satisfied)
+foo_c_x: exists(foo.c.x)
+foo_e: exists({a: 1, a: 2}.a) // fatal error (conflict values)
+
+-- out/compile --
+--- in.cue
+{
+  a: {}
+  b: int
+  c: exists(〈0;a〉)
+  d: exists(〈0;b〉)
+  e: exists(〈0;a〉.b)
+  f: exists(〈0;b〉.c)
+  opt?: int
+  ref_opt: exists(〈0;opt〉)
+  req!: int
+  ref_req: exists(〈0;req〉)
+  foo: {
+    a?: string
+    b?: string
+    a: "test"
+  }
+  foo_a: exists(〈0;foo〉.a)
+  foo_b: exists(〈0;foo〉.b)
+  foo_c: exists(〈0;foo〉.c)
+  foo_a_x: exists(〈0;foo〉.a.x)
+  foo_b_x: exists(〈0;foo〉.b.x)
+  foo_c_x: exists(〈0;foo〉.c.x)
+  foo_e: exists({
+    a: 1
+    a: 2
+  }.a)
+}
+-- out/eval/stats --
+Leaks:  2
+Freed:  21
+Reused: 19
+Allocs: 4
+Retain: 2
+
+Unifications: 23
+Conjuncts:    31
+Disjuncts:    22
+-- out/eval --
+Errors:
+a: conflicting values 2 and 1:
+    ./in.cue:27:19
+    ./in.cue:27:25
+f: invalid operand b (found int, want list or struct):
+    ./in.cue:7:11
+foo_a_x: invalid operand foo.a (found string, want list or struct):
+    ./in.cue:24:17
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+  }
+  b: (int){ int }
+  c: (bool){ true }
+  d: (bool){ true }
+  e: (bool){ false }
+  f: (_|_){
+    // [eval] f: invalid operand b (found int, want list or struct):
+    //     ./in.cue:7:11
+  }
+  opt?: (int){ int }
+  ref_opt: (bool){ false }
+  req!: (int){ int }
+  ref_req: (bool){ false }
+  foo: (struct){
+    a: (string){ "test" }
+    b?: (string){ string }
+  }
+  foo_a: (bool){ true }
+  foo_b: (bool){ false }
+  foo_c: (bool){ false }
+  foo_a_x: (_|_){
+    // [eval] foo_a_x: invalid operand foo.a (found string, want list or struct):
+    //     ./in.cue:24:17
+  }
+  foo_b_x: (_|_){
+    // [incomplete] foo_b_x: cannot reference optional field: b:
+    //     ./in.cue:25:21
+  }
+  foo_c_x: (_|_){
+    // [incomplete] foo_c_x: undefined field: c:
+    //     ./in.cue:26:21
+  }
+  foo_e: (_|_){
+    // [eval] a: conflicting values 2 and 1:
+    //     ./in.cue:27:19
+    //     ./in.cue:27:25
+  }
+}

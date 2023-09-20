@@ -115,7 +115,6 @@ func runExport(cmd *Command, args []string) error {
 
 	enc, err := encoding.NewEncoder(b.outFile, b.encConfig)
 	exitOnErr(cmd, err, true)
-	defer enc.Close()
 
 	iter := b.instances()
 	defer iter.close()
@@ -125,5 +124,9 @@ func runExport(cmd *Command, args []string) error {
 		exitOnErr(cmd, err, true)
 	}
 	exitOnErr(cmd, iter.err(), true)
+
+	err = enc.Close()
+	exitOnErr(cmd, err, true)
+
 	return nil
 }

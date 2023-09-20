@@ -12,6 +12,30 @@ stderr 'error writing "test.yml": file already exists'
 exec cue export --force -o test.yml file.cue
 cmp test.yml test.yml.golden
 
+# With or without --force, we should fail to output to a file inside a missing directory.
+# TODO: these should not succeed; the following commit fixes the bug.
+exec cue export -o /definitely/does/not/exist/test.yml file.cue
+exec cue export --force -o /definitely/does/not/exist/test.yml file.cue
+
+# Two concurrent exports to the same new file without --force;
+# only one should succeed. We use a relatively slow bit of CUE
+# to make it likely that both export operations begin before either
+# has finished and created the resulting output file.
+# Since it's a coin toss which command wins the race,
+# we allow both to fail but expect the joint stderr to contain exactly one error.
+# TODO: this is currently racy; the following commit fixes the bug.
+# exec cue_exitzero export -o conflict.yml slow.cue &
+# exec cue_exitzero export -o conflict.yml slow.cue &
+# wait
+# stderr -count=1 'error writing "conflict.yml": file already exists'
+# exists conflict.yml
+
+# Now with --force; the two commands should always succeed.
+exec cue export --force -o conflict_force.yml slow.cue &
+exec cue export --force -o conflict_force.yml slow.cue &
+wait
+exists conflict_force.yml
+
 -- file.cue --
 package hello
 
@@ -19,3 +43,9 @@ package hello
 message: "Hello \(#who)!"
 -- test.yml.golden --
 message: Hello World!
+-- slow.cue --
+package hello
+
+import "list"
+
+out: list.Repeat(["x"], 2000)

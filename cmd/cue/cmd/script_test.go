@@ -177,6 +177,13 @@ func TestX(t *testing.T) {
 func TestMain(m *testing.M) {
 	os.Exit(testscript.RunMain(m, map[string]func() int{
 		"cue": MainTest,
+		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
+		// or we have some other way to use "exec" without caring about success,
+		// this is an easy way for us to mimic `? exec cue`.
+		"cue_exitzero": func() int {
+			MainTest()
+			return 0
+		},
 		"cue_stdinpipe": func() int {
 			cwd, _ := os.Getwd()
 			if err := mainTestStdinPipe(); err != nil {

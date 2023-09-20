@@ -19,6 +19,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/fs"
 	"os"
 	"path/filepath"
 
@@ -300,17 +301,27 @@ func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err er
 		}
 		return cfg.Stdout, nil, nil
 	}
-	if !cfg.Force {
-		if _, err := os.Stat(path); err == nil {
-			return nil, nil, errors.Wrapf(os.ErrExist, token.NoPos,
-				"error writing %q", path)
-		}
-	}
-	// Delay opening the file until we can write it to completion. This will
-	// prevent clobbering the file in case of a crash.
+	// Delay opening the file until we can write it to completion.
+	// This prevents clobbering the file in case of a crash.
 	b := &bytes.Buffer{}
 	fn := func() error {
-		return os.WriteFile(path, b.Bytes(), 0644)
+		mode := os.O_WRONLY | os.O_CREATE | os.O_EXCL
+		if cfg.Force {
+			// Swap O_EXCL for O_TRUNC to allow replacing an entire existing file.
+			mode = os.O_WRONLY | os.O_CREATE | os.O_TRUNC
+		}
+		f, err := os.OpenFile(path, mode, 0o644)
+		if err != nil {
+			if errors.Is(err, fs.ErrExist) {
+				return errors.Wrapf(fs.ErrExist, token.NoPos, "error writing %q", path)
+			}
+			return err
+		}
+		_, err = f.Write(b.Bytes())
+		if err1 := f.Close(); err1 != nil && err == nil {
+			err = err1
+		}
+		return err
 	}
 	return b, fn, nil
 }

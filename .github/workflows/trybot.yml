@@ -180,6 +180,8 @@ jobs:
       - if: (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')
         name: Test with -race
         run: go test -race ./...
+        env:
+          GORACE: atexit_sleep_ms=10
       - if: (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')
         name: Check
         run: go vet ./...

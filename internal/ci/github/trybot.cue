@@ -128,6 +128,7 @@ workflows: trybot: _repo.bashWorkflow & {
 
 	_goTestRace: json.#step & {
 		name: "Test with -race"
+		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
 		run:  "go test -race ./..."
 	}
 }

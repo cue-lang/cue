@@ -16,6 +16,24 @@
       "message": "What happens if this becomes faster?",
       "revId": "fedb28af7a23760f7eee18d48aebbc24b2dd3157",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f4651ef_fd360312",
+        "filename": "cmd/cue/cmd/testdata/script/export_force.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-25T11:04:12Z",
+      "side": 1,
+      "message": "This minor slowness just makes the data race more likely to show up and fail the test. I would have used time.Sleep if we had it, but we of course don\u0027t :)\n\nIf/when this evaluation gets faster, that\u0027s completely fine - all I want is for the evaluation to do a little bit of work so that there\u0027s some time between the start and end of the command.",
+      "parentUuid": "3a97c95b_fd51c78d",
+      "revId": "fedb28af7a23760f7eee18d48aebbc24b2dd3157",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

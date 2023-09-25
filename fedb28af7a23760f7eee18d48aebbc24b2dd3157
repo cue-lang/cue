@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a97c95b_fd51c78d",
+        "filename": "cmd/cue/cmd/testdata/script/export_force.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-09-25T10:55:06Z",
+      "side": 1,
+      "message": "What happens if this becomes faster?",
+      "revId": "fedb28af7a23760f7eee18d48aebbc24b2dd3157",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -6,8 +6,8 @@ import (
 
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/load/internal/registrytest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/registrytest"
 )
 
 func TestModuleFetch(t *testing.T) {

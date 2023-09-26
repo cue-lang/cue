@@ -3,8 +3,10 @@ package registrytest
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http/httptest"
 	"strings"
 
@@ -28,13 +30,13 @@ import (
 // contain a cue.mod/module.cue file holding the module info.
 //
 // The Registry should be closed after use.
-func New(ar *txtar.Archive) (*Registry, error) {
+func New(fsys fs.FS) (*Registry, error) {
 	srv := httptest.NewServer(ociserver.New(ocimem.New(), nil))
 	client, err := modregistry.NewClient(srv.URL, "cue/")
 	if err != nil {
 		return nil, fmt.Errorf("cannot make client: %v", err)
 	}
-	mods, err := getModules(ar)
+	mods, err := getModules(fsys)
 	if err != nil {
 		return nil, fmt.Errorf("invalid modules: %v", err)
 	}
@@ -100,27 +102,41 @@ type handler struct {
 	modules []*moduleContent
 }
 
-func getModules(ar *txtar.Archive) (map[module.Version]*moduleContent, error) {
+func getModules(fsys fs.FS) (map[module.Version]*moduleContent, error) {
 	ctx := cuecontext.New()
 	modules := make(map[string]*moduleContent)
-	for _, f := range ar.Files {
-		path := strings.TrimPrefix(f.Name, "_registry/")
-		if len(path) == len(f.Name) {
-			continue
+	if err := fs.WalkDir(fsys, "_registry", func(path string, d fs.DirEntry, err error) error {
+		if err != nil {
+			// If a filesystem has no _registry directory at all,
+			// return zero modules without an error.
+			if path == "_registry" && errors.Is(err, fs.ErrNotExist) {
+				return fs.SkipAll
+			}
+			return err
 		}
-		modver, rest, ok := strings.Cut(path, "/")
+		if d.IsDir() {
+			return nil // we're only interested in regular files, not their parent directories
+		}
+		modver, rest, ok := strings.Cut(strings.TrimPrefix(path, "_registry/"), "/")
 		if !ok {
-			return nil, fmt.Errorf("_registry should only contain directories, but found regular file %q", path)
+			return fmt.Errorf("_registry should only contain directories, but found regular file %q", path)
 		}
 		content := modules[modver]
 		if content == nil {
 			content = &moduleContent{}
 			modules[modver] = content
 		}
+		data, err := fs.ReadFile(fsys, path)
+		if err != nil {
+			return err
+		}
 		content.files = append(content.files, txtar.File{
 			Name: rest,
-			Data: f.Data,
+			Data: data,
 		})
+		return nil
+	}); err != nil {
+		return nil, err
 	}
 	for modver, content := range modules {
 		if err := content.init(ctx, modver); err != nil {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8814e5b_696365c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 51
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:56:32Z",
+      "side": 1,
+      "message": "As discussed, I\u0027m not sure it\u0027s too important to add this test right now, as it would be very weird if an import were to succeed when there is no registry configured, as how could it know the temporary host name of the test registry server?",
+      "parentUuid": "34a05ad2_f7f9c597",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "be86d666_e93ab771",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-26T10:18:26Z",
       "side": 1,
       "message": "return the error?",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f93ac1b7_4eaf555f",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:56:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "be86d666_e93ab771",
       "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2175eb1c_7dcebe0e",
+        "filename": "cue/load/internal/registrytest/fileio.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:56:32Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "fa395bc2_a902e14b",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3628b4a_82f89d50",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-09-26T10:18:26Z",
       "side": 1,
       "message": "nit carried from the previous CL, in case the rebase loses it: s/fake/txtar/",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3204d725_a67ee693",
+        "filename": "cue/load/internal/registrytest/fileio.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:56:32Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3628b4a_82f89d50",
       "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c6f6fd4_bf290f94",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:56:32Z",
+      "side": 1,
+      "message": "Not really worth it, I reckon.",
+      "parentUuid": "b22c36fa_91543953",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b77f0d82_e571a518",
@@ -99,6 +189,24 @@
       "writtenOn": "2023-09-26T10:18:26Z",
       "side": 1,
       "message": "nit: keep third party imports separate",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80c17b0d_2b4840e2",
+        "filename": "cue/load/module.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:56:32Z",
+      "side": 1,
+      "message": "That\u0027ll be fixed in https://review.gerrithub.io/c/cue-lang/cue/+/1168634 so might as well leave it for now to avoid the conflict.",
+      "parentUuid": "b77f0d82_e571a518",
       "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

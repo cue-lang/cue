@@ -12,7 +12,7 @@ require (
 	github.com/kr/pretty v0.3.1
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230328191034-3462fbc510c0
-	github.com/rogpeppe/go-internal v1.11.0
+	github.com/rogpeppe/go-internal v1.11.1-0.20230926105539-32ae33786ecc
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/tetratelabs/wazero v1.0.2

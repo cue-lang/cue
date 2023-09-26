@@ -106,7 +106,6 @@ func TestScript(t *testing.T) {
 				"GOPROXY="+srv.URL,
 				"GONOSUMDB=*", // GOPROXY is a private proxy
 				homeEnvName()+"="+home,
-				"GORACE="+os.Getenv("GORACE"), // TODO(mvdan): testscript should do this by default
 			)
 			return nil
 		},

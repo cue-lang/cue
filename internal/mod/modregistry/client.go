@@ -25,7 +25,6 @@ import (
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry"
-	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelang.org/go/internal/mod/semver"
 	digest "github.com/opencontainers/go-digest"
 	specs "github.com/opencontainers/image-spec/specs-go"
@@ -58,10 +57,9 @@ const (
 // TODO pass in an ociregistry.Interface instead of a URL,
 // thus allowing a locally defined composition of registries
 // rather than always assuming everything is behind a single host.
-func NewClient(registryURL string, prefix string) (*Client, error) {
-	r := ociclient.New(registryURL, nil)
+func NewClient(registry ociregistry.Interface, prefix string) (*Client, error) {
 	return &Client{
-		registry: r,
+		registry: registry,
 		prefix:   prefix,
 	}, nil
 }

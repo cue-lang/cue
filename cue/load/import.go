@@ -389,7 +389,7 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 
 	default:
 		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
-		if l.cfg.Registry != "" {
+		if l.cfg.Registry != nil {
 			var err error
 			absDir, err = l.externalPackageDir(p)
 			if err != nil {

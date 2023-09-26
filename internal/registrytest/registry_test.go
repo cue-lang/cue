@@ -9,6 +9,8 @@ import (
 	"strings"
 	"testing"
 
+	"cuelabs.dev/go/oci/ociregistry"
+	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/internal/mod/modregistry"
@@ -37,12 +39,12 @@ func TestRegistry(t *testing.T) {
 				t.Fatal(err)
 			}
 			defer r.Close()
-			runTest(t, r.URL(), string(ar.Comment), ar)
+			runTest(t, ociclient.New(r.URL(), nil), string(ar.Comment), ar)
 		})
 	}
 }
 
-func runTest(t *testing.T, registry string, script string, ar *txtar.Archive) {
+func runTest(t *testing.T, registry ociregistry.Interface, script string, ar *txtar.Archive) {
 	ctx := context.Background()
 	client, err := modregistry.NewClient(registry, "cue/")
 	if err != nil {

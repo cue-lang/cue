@@ -10,6 +10,7 @@ import (
 	"net/http/httptest"
 	"strings"
 
+	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"golang.org/x/tools/txtar"
@@ -23,7 +24,7 @@ import (
 )
 
 // New starts a registry instance that serves modules found inside the
-// _registry path inside ar. It serves the OCI registry protocol.
+// _registry path inside fsys. It serves the OCI registry protocol.
 //
 // Each module should be inside a directory named path_vers, where
 // slashes in path have been replaced with underscores and should
@@ -32,7 +33,7 @@ import (
 // The Registry should be closed after use.
 func New(fsys fs.FS) (*Registry, error) {
 	srv := httptest.NewServer(ociserver.New(ocimem.New(), nil))
-	client, err := modregistry.NewClient(srv.URL, "cue/")
+	client, err := modregistry.NewClient(ociclient.New(srv.URL, nil), "cue/")
 	if err != nil {
 		return nil, fmt.Errorf("cannot make client: %v", err)
 	}

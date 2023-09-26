@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "34a05ad2_f7f9c597",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 51
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-26T10:25:54Z",
+      "side": 1,
+      "message": "Generally LGTM, but I think we need a test in here that contains a module with a `module.cue` file that declares dependencies, nothing \"vendored\" in the `cue.mod/pkg` directory, with code that relies on the import resolving, but that should _fail_ because we do not specify a registry configuration. I\u0027m not clear we have such a test, and that\u0027s an important test to have to force keep us honest on the setting of `cue/load.Config.Registry` as being the means of enabling modules.",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "be86d666_e93ab771",
         "filename": "cue/load/import_test.go",
         "patchSetId": 51
@@ -14,6 +31,23 @@
       "writtenOn": "2023-09-26T10:18:26Z",
       "side": 1,
       "message": "return the error?",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa395bc2_a902e14b",
+        "filename": "cue/load/internal/registrytest/fileio.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-26T10:25:54Z",
+      "side": 1,
+      "message": "A couple of docs comments on these types will help the reader reviewing this (or reading the code later) without needing to jump to the usage sites.",
       "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

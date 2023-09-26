@@ -51,6 +51,24 @@
       "parentUuid": "df391d8c_18bf16aa",
       "revId": "047bbb26f350bcde2a877e28977c8997ddf4e88e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00fca626_5b4e5da5",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:48:37Z",
+      "side": 1,
+      "message": "What Daniel says. And also the fact that the only reasonable failure mode of `init` is to panic, but we\u0027d like a more genteel failure mode than that. I\u0027ve adjusted the comment accordingly.",
+      "parentUuid": "f1407a86_0ebf4e08",
+      "revId": "047bbb26f350bcde2a877e28977c8997ddf4e88e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

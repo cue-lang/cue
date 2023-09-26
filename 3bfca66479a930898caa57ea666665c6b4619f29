@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be86d666_e93ab771",
+        "filename": "cue/load/import_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-26T10:18:26Z",
+      "side": 1,
+      "message": "return the error?",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3628b4a_82f89d50",
+        "filename": "cue/load/internal/registrytest/fileio.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-26T10:18:26Z",
+      "side": 1,
+      "message": "nit carried from the previous CL, in case the rebase loses it: s/fake/txtar/",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b22c36fa_91543953",
+        "filename": "cue/load/internal/registrytest/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-26T10:18:26Z",
+      "side": 1,
+      "message": "nit: you can make with a size hint here",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b77f0d82_e571a518",
+        "filename": "cue/load/module.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-26T10:18:26Z",
+      "side": 1,
+      "message": "nit: keep third party imports separate",
+      "revId": "3bfca66479a930898caa57ea666665c6b4619f29",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

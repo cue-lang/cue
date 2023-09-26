@@ -16,7 +16,7 @@ func TestModuleFetch(t *testing.T) {
 		Name: "modfetch",
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
-		r, err := registrytest.New(t.Archive)
+		r, err := registrytest.New(registrytest.TxtarFS(t.Archive))
 		if err != nil {
 			t.Fatal(err)
 		}

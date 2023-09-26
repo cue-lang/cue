@@ -32,7 +32,7 @@ func TestRegistry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Run(strings.TrimSuffix(name, ".txtar"), func(t *testing.T) {
-			r, err := New(ar)
+			r, err := New(TxtarFS(ar))
 			if err != nil {
 				t.Fatal(err)
 			}

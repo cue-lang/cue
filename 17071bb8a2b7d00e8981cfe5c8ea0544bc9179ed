@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "628a662b_ed0f006c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T15:15:47Z",
+      "side": 1,
+      "message": "LGTM with one little suggestion, thanks!",
+      "revId": "17071bb8a2b7d00e8981cfe5c8ea0544bc9179ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63c9f6de_e8e9c782",
+        "filename": "internal/mod/modregistry/client_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T15:15:47Z",
+      "side": 1,
+      "message": "This can be a bit simpler now, I think:\n```\nfunc newTestClient(t *testing.T) *Client {\n\tc, err :\u003d NewClient(ocimem.New(), \"\")\n\tqt.Assert(t, qt.IsNil(err))\n\treturn c\n}\n```",
+      "revId": "17071bb8a2b7d00e8981cfe5c8ea0544bc9179ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

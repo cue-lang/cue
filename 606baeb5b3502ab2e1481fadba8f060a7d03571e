@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b4eee420_fe013426",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 51
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:32:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1d0dd18_1c768f0e",
+      "revId": "606baeb5b3502ab2e1481fadba8f060a7d03571e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "deb0742d_69b42ad2",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-26T10:11:07Z",
       "side": 1,
       "message": "Would suggest we add a `TODO` here to indicate that this will likely be made configurable at some point (configuration to come from \"somewhere\")",
+      "revId": "606baeb5b3502ab2e1481fadba8f060a7d03571e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45d4dc26_857233c7",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:32:50Z",
+      "side": 1,
+      "message": "as discussed, it\u0027s probably better to capture this elsewhere, as it\u0027s a much broader design issue than just this piece of the code.",
+      "parentUuid": "deb0742d_69b42ad2",
       "revId": "606baeb5b3502ab2e1481fadba8f060a7d03571e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

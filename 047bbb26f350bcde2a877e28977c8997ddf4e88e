@@ -33,6 +33,24 @@
       "message": "Why not use just a regular `init()` function?",
       "revId": "047bbb26f350bcde2a877e28977c8997ddf4e88e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f1407a86_0ebf4e08",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-26T12:37:23Z",
+      "side": 1,
+      "message": "Different behavior; with `init`, we would start failing on e.g. `GOEXPERIMENT\u003dbad cue help`, since that\u0027s not a CUE command going through `mkRunE`. I lean slightly towards what Roger did here, but I\u0027d document why we\u0027re not using a regular init func as well.",
+      "parentUuid": "df391d8c_18bf16aa",
+      "revId": "047bbb26f350bcde2a877e28977c8997ddf4e88e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

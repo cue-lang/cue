@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1d0dd18_1c768f0e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 51
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-26T10:11:07Z",
+      "side": 1,
+      "message": "Nit: formatting of commit message. Time to get an auto-formatter going :)",
+      "revId": "606baeb5b3502ab2e1481fadba8f060a7d03571e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "deb0742d_69b42ad2",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-26T10:11:07Z",
+      "side": 1,
+      "message": "Would suggest we add a `TODO` here to indicate that this will likely be made configurable at some point (configuration to come from \"somewhere\")",
+      "revId": "606baeb5b3502ab2e1481fadba8f060a7d03571e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

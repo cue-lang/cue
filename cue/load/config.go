@@ -15,13 +15,12 @@
 package load
 
 import (
-	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
+	"cuelabs.dev/go/oci/ociregistry"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -276,9 +275,13 @@ type Config struct {
 	// the corresponding build.File will be associated with the full buffer.
 	Stdin io.Reader
 
-	// Registry holds the URL of the CUE registry. If it has no scheme, https:// is assumed
-	// as a prefix. THIS IS EXPERIMENTAL FOR NOW. DO NOT USE.
-	Registry string
+	// Registry is used to fetch CUE module dependencies.
+	//
+	// When nil, dependencies will be resolved in legacy mode:
+	// reading from cue.mod/pkg, cue.mod/usr, and cue.mod/gen.
+	//
+	// THIS IS EXPERIMENTAL FOR NOW. DO NOT USE.
+	Registry ociregistry.Interface
 
 	fileSystem fileSystem
 }
@@ -364,17 +367,6 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
-	}
-	//c.Registry = "registry.cue.works"
-	if c.Registry != "" {
-		u, err := url.Parse(c.Registry)
-		if err != nil {
-			return nil, fmt.Errorf("invalid registry URL %q: %v", c.Registry, err)
-		}
-		if u.Scheme == "" {
-			u.Scheme = "https"
-			c.Registry = u.String()
-		}
 	}
 	if err := c.loadModule(); err != nil {
 		return nil, err

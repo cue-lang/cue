@@ -28,6 +28,7 @@ import (
 
 	"golang.org/x/tools/txtar"
 
+	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
 
@@ -39,7 +40,7 @@ func newTestClient(t *testing.T) *Client {
 	srv := httptest.NewServer(ociserver.New(ocimem.New(), nil))
 	t.Cleanup(srv.Close)
 
-	c, err := NewClient(srv.URL, "")
+	c, err := NewClient(ociclient.New(srv.URL, nil), "")
 	qt.Assert(t, qt.IsNil(err))
 	return c
 }

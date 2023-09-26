@@ -8,6 +8,7 @@ import (
 	"path"
 	"path/filepath"
 
+	"cuelabs.dev/go/oci/ociregistry"
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/module"
@@ -27,8 +28,8 @@ type registryClient struct {
 // in the given cache directory. It assumes that information
 // in the registry is immutable, so if it's in the cache, a module
 // will not be downloaded again.
-func newRegistryClient(registryHost string, cacheDir string) (*registryClient, error) {
-	client, err := modregistry.NewClient(registryHost, "cue/") // TODO configurable prefix
+func newRegistryClient(registry ociregistry.Interface, cacheDir string) (*registryClient, error) {
+	client, err := modregistry.NewClient(registry, "cue/") // TODO configurable prefix
 	if err != nil {
 		return nil, err
 	}

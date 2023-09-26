@@ -69,6 +69,24 @@
       "parentUuid": "252deb6f_ae557cc8",
       "revId": "baeada98a95182657a130779abb4c0622e5ed75b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "371bc270_5a48a6cb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 18
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-09-26T12:58:33Z",
+      "side": 1,
+      "message": "As disussed, the result is the same, and doing it this way round avoids a bunch of conflicts, so leaving as is.",
+      "parentUuid": "1fd3634e_227d4c8e",
+      "revId": "baeada98a95182657a130779abb4c0622e5ed75b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

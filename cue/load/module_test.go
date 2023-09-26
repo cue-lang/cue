@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetxtar"
@@ -21,7 +22,7 @@ func TestModuleFetch(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer r.Close()
-		t.LoadConfig.Registry = r.URL()
+		t.LoadConfig.Registry = ociclient.New(r.URL(), nil)
 		ctx := cuecontext.New()
 		insts := t.RawInstances()
 		if len(insts) != 1 {

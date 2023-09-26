@@ -40,7 +40,7 @@ func (c *Config) loadModule() error {
 		return err
 	}
 	parseModFile := modfile.ParseNonStrict
-	if c.Registry == "" {
+	if c.Registry == nil {
 		parseModFile = modfile.ParseLegacy
 	}
 	mf, err := parseModFile(data, mod)

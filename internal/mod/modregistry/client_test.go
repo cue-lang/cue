@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"net/http/httptest"
 	"os"
 	"path"
 	"testing"
@@ -29,17 +28,13 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
-	"cuelabs.dev/go/oci/ociregistry/ociserver"
 
 	"cuelang.org/go/internal/mod/module"
 	modzip "cuelang.org/go/internal/mod/zip"
 )
 
 func newTestClient(t *testing.T) *Client {
-	srv := httptest.NewServer(ociserver.New(ocimem.New(), nil))
-	t.Cleanup(srv.Close)
-
-	c, err := NewClient(srv.URL, "")
+	c, err := NewClient(ocimem.New(), "")
 	qt.Assert(t, qt.IsNil(err))
 	return c
 }

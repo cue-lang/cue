@@ -51,7 +51,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	// TODO use predictable location
 	var deps *dependencies
 	var regClient *registryClient
-	if c.Registry != "" {
+	if c.Registry != nil {
 		// TODO use configured cache directory.
 		tmpDir, err := os.MkdirTemp("", "cue-load-")
 		if err != nil {

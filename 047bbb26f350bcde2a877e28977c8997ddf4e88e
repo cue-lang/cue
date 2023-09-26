@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4347eb2d_1a26d3bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-26T10:28:17Z",
+      "side": 1,
+      "message": "Will leave @mvdan to review.",
+      "revId": "047bbb26f350bcde2a877e28977c8997ddf4e88e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df391d8c_18bf16aa",
+        "filename": "internal/cueexperiment/exp.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-09-26T10:28:17Z",
+      "side": 1,
+      "message": "Why not use just a regular `init()` function?",
+      "revId": "047bbb26f350bcde2a877e28977c8997ddf4e88e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

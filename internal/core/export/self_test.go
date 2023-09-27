@@ -168,6 +168,7 @@ module: "mod.test/a"
 	self.InlineImports = true
 
 	adt.Verbosity = 1
+	t.Cleanup(func() { adt.Verbosity = 0 })
 
 	file, errs := self.Def(tValue.R, "", tValue.V)
 	if errs != nil {

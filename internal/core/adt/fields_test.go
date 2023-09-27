@@ -42,8 +42,6 @@ import (
 // package adt. The code in export_test.go provides access to the
 // low-level functionality that this test needs.
 func TestCloseContext(t *testing.T) {
-	adt.Verbosity = 1
-
 	r := runtime.New()
 	ctx := eval.NewContext(r, nil)
 

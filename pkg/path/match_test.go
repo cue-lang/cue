@@ -96,7 +96,7 @@ func errp(e error) string {
 }
 
 func TestMatch(t *testing.T) {
-	for _, os := range []OS{Unix, Windows, Plan9} {
+	testEachOS(t, []OS{Unix, Windows, Plan9}, func(t *testing.T, os OS) {
 		for _, tt := range matchTests {
 			pattern := tt.pattern
 			s := tt.s
@@ -114,5 +114,5 @@ func TestMatch(t *testing.T) {
 					pattern, s, os, ok, errp(err), tt.match, errp(tt.err))
 			}
 		}
-	}
+	})
 }

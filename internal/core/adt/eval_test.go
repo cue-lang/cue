@@ -160,6 +160,7 @@ module: "mod.test"
 	// t.Error(debug.NodeString(r, v, nil))
 	// eval.Debug = true
 	adt.Verbosity = verbosity
+	t.Cleanup(func() { adt.Verbosity = 0 })
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)
@@ -193,8 +194,6 @@ func BenchmarkUnifyAPI(b *testing.B) {
 }
 
 func TestIssue2293(t *testing.T) {
-	adt.Verbosity = 1
-
 	ctx := cuecontext.New()
 	c := `a: {}, a`
 	v1 := ctx.CompileString(c)

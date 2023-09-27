@@ -19,10 +19,19 @@
 package path
 
 import (
+	"fmt"
 	"reflect"
 	"runtime"
 	"testing"
 )
+
+func testEachOS(t *testing.T, list []OS, fn func(t *testing.T, os OS)) {
+	for _, os := range list {
+		t.Run(fmt.Sprintf("OS=%s", os), func(t *testing.T) {
+			fn(t, os)
+		})
+	}
+}
 
 type PathTest struct {
 	path, result string
@@ -101,8 +110,8 @@ var wincleantests = []PathTest{
 }
 
 func TestClean(t *testing.T) {
-	tests := cleantests
-	for _, os := range []OS{Unix, Windows, Plan9} {
+	testEachOS(t, []OS{Unix, Windows, Plan9}, func(t *testing.T, os OS) {
+		tests := append([]PathTest{}, cleantests...) // TODO: replace with slices.Clone
 		if os == Windows {
 			for i := range tests {
 				tests[i].result = FromSlash(tests[i].result, os)
@@ -132,7 +141,7 @@ func TestClean(t *testing.T) {
 				t.Errorf("Clean(%q): %v allocs, want zero", test.result, allocs)
 			}
 		}
-	}
+	})
 }
 
 func TestFromAndToSlash(t *testing.T) {
@@ -185,7 +194,7 @@ var winsplitlisttests = []SplitListTest{
 }
 
 func TestSplitList(t *testing.T) {
-	for _, os := range []OS{Unix, Windows, Plan9} {
+	testEachOS(t, []OS{Unix, Windows, Plan9}, func(t *testing.T, os OS) {
 		sep := getOS(os).ListSeparator
 
 		tests := []SplitListTest{
@@ -201,7 +210,7 @@ func TestSplitList(t *testing.T) {
 				t.Errorf("SplitList(%#q, %q) = %#q, want %#q", test.list, os, l, test.result)
 			}
 		}
-	}
+	})
 }
 
 type SplitTest struct {
@@ -230,13 +239,12 @@ var winsplittests = []SplitTest{
 }
 
 func TestSplit(t *testing.T) {
-	for _, os := range []OS{Windows, Unix} {
-		var splittests []SplitTest
-		splittests = unixsplittests
+	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
+		tests := unixsplittests
 		if os == Windows {
-			splittests = append(splittests, winsplittests...)
+			tests = append(tests, winsplittests...)
 		}
-		for _, test := range splittests {
+		for _, test := range tests {
 			pair := Split(test.path, os)
 			d, f := pair[0], pair[1]
 			if d != test.dir || f != test.file {
@@ -244,7 +252,7 @@ func TestSplit(t *testing.T) {
 					test.path, os, d, f, test.dir, test.file)
 			}
 		}
-	}
+	})
 }
 
 type JoinTest struct {
@@ -308,17 +316,18 @@ var winjointests = []JoinTest{
 }
 
 func TestJoin(t *testing.T) {
-	for _, os := range []OS{Unix, Windows} {
+	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
+		tests := jointests
 		if os == Windows {
-			jointests = append(jointests, winjointests...)
+			tests = append(tests, winjointests...)
 		}
-		for _, test := range jointests {
+		for _, test := range tests {
 			expected := FromSlash(test.path, os)
 			if p := Join(test.elem, os); p != expected {
 				t.Errorf("join(%q, %q) = %q, want %q", test.elem, os, p, expected)
 			}
 		}
-	}
+	})
 }
 
 type ExtTest struct {
@@ -334,13 +343,13 @@ var exttests = []ExtTest{
 }
 
 func TestExt(t *testing.T) {
-	for _, os := range []OS{Unix, Windows} {
+	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
 		for _, test := range exttests {
 			if x := Ext(test.path, os); x != test.ext {
 				t.Errorf("Ext(%q, %q) = %q, want %q", test.path, os, x, test.ext)
 			}
 		}
-	}
+	})
 }
 
 var basetests = []PathTest{
@@ -370,7 +379,7 @@ var winbasetests = []PathTest{
 
 func TestBase(t *testing.T) {
 	tests := basetests
-	for _, os := range []OS{Unix, Windows} {
+	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
 		if os == Windows {
 			// make unix tests work on windows
 			for i := range tests {
@@ -384,7 +393,7 @@ func TestBase(t *testing.T) {
 				t.Errorf("Base(%q, %q) = %q, want %q", test.path, os, s, test.result)
 			}
 		}
-	}
+	})
 }
 
 var dirtests = []PathTest{
@@ -415,7 +424,7 @@ var windirtests = []PathTest{
 }
 
 func TestDir(t *testing.T) {
-	for _, os := range []OS{Unix, Windows} {
+	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
 		tests := dirtests
 		if os == Windows {
 			// make unix tests work on windows
@@ -430,7 +439,7 @@ func TestDir(t *testing.T) {
 				t.Errorf("Dir(%q, %q) = %q, want %q", test.path, os, s, test.result)
 			}
 		}
-	}
+	})
 }
 
 type IsAbsTest struct {
@@ -465,7 +474,7 @@ var winisabstests = []IsAbsTest{
 }
 
 func TestIsAbs(t *testing.T) {
-	for _, os := range []OS{Unix, Windows} {
+	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
 		var tests []IsAbsTest
 		if os == Windows {
 			tests = append(tests, winisabstests...)
@@ -491,7 +500,7 @@ func TestIsAbs(t *testing.T) {
 				t.Errorf("IsAbs(%q, %q) = %v, want %v", test.path, os, r, test.isAbs)
 			}
 		}
-	}
+	})
 }
 
 type RelTests struct {
@@ -552,7 +561,7 @@ var winreltests = []RelTests{
 }
 
 func TestRel(t *testing.T) {
-	for _, os := range []OS{Unix, Windows} {
+	testEachOS(t, []OS{Unix, Windows}, func(t *testing.T, os OS) {
 		tests := append([]RelTests{}, reltests...)
 		if os == Windows {
 			for i := range tests {
@@ -575,7 +584,7 @@ func TestRel(t *testing.T) {
 				t.Errorf("Rel(%q, %q, %q)=%q, want %q", test.root, test.path, os, got, test.want)
 			}
 		}
-	}
+	})
 }
 
 type VolumeNameTest struct {
@@ -609,14 +618,10 @@ var volumenametests = []VolumeNameTest{
 }
 
 func TestVolumeName(t *testing.T) {
-	for _, os := range []OS{Unix, Windows} {
-		if os != Windows {
-			return
-		}
-		for _, v := range volumenametests {
-			if vol := VolumeName(v.path, os); vol != v.vol {
-				t.Errorf("VolumeName(%q, %q)=%q, want %q", v.path, os, vol, v.vol)
-			}
+	os := Windows
+	for _, v := range volumenametests {
+		if vol := VolumeName(v.path, os); vol != v.vol {
+			t.Errorf("VolumeName(%q, %q)=%q, want %q", v.path, os, vol, v.vol)
 		}
 	}
 }

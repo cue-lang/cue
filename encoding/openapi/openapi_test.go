@@ -22,18 +22,16 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/cuetest"
-
-	"github.com/google/go-cmp/cmp"
-
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/openapi"
+	"cuelang.org/go/internal/cuetest"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestParseDefinitions(t *testing.T) {
@@ -184,13 +182,12 @@ func TestParseDefinitions(t *testing.T) {
 		instanceOnly: true,
 		config: &openapi.Config{
 			Info: info,
-			AdditionalSchemasFunc: func(v cue.Value) []openapi.SchemaConstraint {
+			AdditionalSchemasFunc: func(v cue.Value) map[string]ast.Expr {
 				for _, d := range v.Doc() {
 					if strings.Contains(d.Text(), "validateme") {
-						return []openapi.SchemaConstraint{{
-							Key:       "minItems",
-							Attribute: &ast.BasicLit{Kind: token.INT, ValuePos: token.NoPos, Value: "1"},
-						}}
+						return map[string]ast.Expr{
+							"minItems": &ast.BasicLit{Kind: token.INT, ValuePos: token.NoPos, Value: "1"},
+						}
 					}
 				}
 				return nil
@@ -281,12 +278,12 @@ func TestParseDefinitions(t *testing.T) {
 					walk(all)
 				}
 
-				var out = &bytes.Buffer{}
+				out := &bytes.Buffer{}
 				_ = json.Indent(out, b, "", "   ")
 
 				wantFile := filepath.Join("testdata", tc.out)
 				if cuetest.UpdateGoldenFiles {
-					_ = os.WriteFile(wantFile, out.Bytes(), 0644)
+					_ = os.WriteFile(wantFile, out.Bytes(), 0o644)
 					return
 				}
 
@@ -378,7 +375,7 @@ func TestX(t *testing.T) {
 		t.Fatal(errors.Details(err, nil))
 	}
 
-	var out = &bytes.Buffer{}
+	out := &bytes.Buffer{}
 	_ = json.Indent(out, b, "", "   ")
 	t.Error(out.String())
 }

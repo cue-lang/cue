@@ -15,7 +15,6 @@
 package openapi
 
 import (
-	internaljson "cuelang.org/go/internal/encoding/json"
 	"fmt"
 	"strings"
 
@@ -24,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	cuejson "cuelang.org/go/encoding/json"
+	internaljson "cuelang.org/go/internal/encoding/json"
 )
 
 // A Config defines options for converting CUE to and from OpenAPI.
@@ -63,7 +63,7 @@ type Config struct {
 	DescriptionFunc func(v cue.Value) string
 
 	// AdditionalSchemasFunc allows adding additional schema constraints for a certain field.
-	AdditionalSchemasFunc func(v cue.Value) []SchemaConstraint
+	AdditionalSchemasFunc func(v cue.Value) map[string]ast.Expr
 
 	// SelfContained causes all non-expanded external references to be included
 	// in this document.
@@ -84,13 +84,6 @@ type Config struct {
 	// OpenAPI Schema. It is an error for an CUE value to refer to itself
 	// if this option is used.
 	ExpandReferences bool
-}
-
-// SchemaConstraint defines a single entry into a schema.
-// An example would be `SchemaConstraint{Key: "minItems", Attribute: 1}`
-type SchemaConstraint struct {
-	Key       string
-	Attribute ast.Expr
 }
 
 type Generator = Config
@@ -147,7 +140,6 @@ func toCUE(name string, x interface{}) (v ast.Expr, err error) {
 			"openapi: could not encode %s", name)
 	}
 	return v, nil
-
 }
 
 func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *ast.StructLit, err error) {

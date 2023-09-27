@@ -43,7 +43,7 @@ type buildContext struct {
 	exclusiveBool bool
 	nameFunc      func(inst cue.Value, path cue.Path) string
 	descFunc      func(v cue.Value) string
-	schemasFunc   func(v cue.Value) []SchemaConstraint
+	schemasFunc   func(v cue.Value) map[string]ast.Expr
 	fieldFilter   *regexp.Regexp
 
 	schemas *OrderedMap
@@ -306,8 +306,8 @@ func (b *builder) fillSchema(v cue.Value) *ast.StructLit {
 	}
 
 	if b.ctx.schemasFunc != nil {
-		for _, attr := range b.ctx.schemasFunc(v) {
-			b.setSingle(attr.Key, attr.Attribute, true)
+		for k, v := range b.ctx.schemasFunc(v) {
+			b.setSingle(k, v, true)
 		}
 	}
 	schema := b.finish()
@@ -837,7 +837,6 @@ func (b *builder) object(v cue.Value) {
 //     schema: an array instance is valid if at least one element matches
 //     this schema.
 func (b *builder) array(v cue.Value) {
-
 	switch op, a := v.Expr(); op {
 	case cue.CallOp:
 		name := fmt.Sprint(a[0])

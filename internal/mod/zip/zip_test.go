@@ -20,6 +20,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/mod/module"
 	modzip "cuelang.org/go/internal/mod/zip"
 	"golang.org/x/mod/sumdb/dirhash"
@@ -719,7 +720,7 @@ var sizeLimitTests = [...]sizeLimitTest{
 var sizeLimitVersion = module.MustNewVersion("example.com/large@v1", "v1.0.0")
 
 func TestCreateSizeLimits(t *testing.T) {
-	if testing.Short() {
+	if testing.Short() || cuetest.Race {
 		t.Skip("creating large files takes time")
 	}
 	t.Parallel()
@@ -781,7 +782,7 @@ func TestCreateSizeLimits(t *testing.T) {
 }
 
 func TestUnzipSizeLimits(t *testing.T) {
-	if testing.Short() {
+	if testing.Short() || cuetest.Race {
 		t.Skip("creating large files takes time")
 	}
 	t.Parallel()
@@ -848,7 +849,7 @@ func TestUnzipSizeLimits(t *testing.T) {
 }
 
 func TestUnzipSizeLimitsSpecial(t *testing.T) {
-	if testing.Short() {
+	if testing.Short() || cuetest.Race {
 		t.Skip("skipping test; creating large files takes time")
 	}
 

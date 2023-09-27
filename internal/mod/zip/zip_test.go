@@ -401,7 +401,7 @@ func TestCreate(t *testing.T) {
 			t.Logf("test file: %s", testPath)
 
 			// Write zip to temporary file.
-			tmpZipFile := tempFile(t, "TestCreate-*.zip")
+			tmpZipFile := tempFile(t, "tmp.zip")
 			m := module.MustNewVersion(test.path, test.version)
 			files := make([]fakeFile, len(test.archive.Files))
 			for i, tf := range test.archive.Files {
@@ -442,6 +442,7 @@ func assertNoExcludedFiles(t *testing.T, zf string) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer z.Close()
 	for _, f := range z.File {
 		if shouldExclude(f) {
 			t.Errorf("file %s should have been excluded but was not", f.Name)
@@ -493,7 +494,7 @@ func TestCreateFromDir(t *testing.T) {
 			}
 
 			// Create zip from the directory.
-			tmpZipFile := tempFile(t, "TestCreateFromDir-*.zip")
+			tmpZipFile := tempFile(t, "tmp.zip")
 			m := module.MustNewVersion(test.path, test.version)
 			if err := modzip.CreateFromDir(tmpZipFile, m, tmpDir); err != nil {
 				if test.wantErr == "" {
@@ -576,7 +577,7 @@ func TestCreateFromDirSpecial(t *testing.T) {
 			tmpDir := t.TempDir()
 			dir := test.setup(t, tmpDir)
 
-			tmpZipFile := tempFile(t, "TestCreateFromDir-*.zip")
+			tmpZipFile := tempFile(t, "tmp.zip")
 			m := module.MustNewVersion("example.com/m@v1", "v1.0.0")
 
 			if err := modzip.CreateFromDir(tmpZipFile, m, dir); err != nil {
@@ -789,7 +790,7 @@ func TestUnzipSizeLimits(t *testing.T) {
 		test := test
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
-			tmpZipFile := tempFile(t, "TestUnzipSizeLimits-*.zip")
+			tmpZipFile := tempFile(t, "tmp.zip")
 
 			zw := zip.NewWriter(tmpZipFile)
 			for _, tf := range test.files {
@@ -935,7 +936,7 @@ func TestUnzipSizeLimitsSpecial(t *testing.T) {
 		t.Run(test.desc, func(t *testing.T) {
 			t.Parallel()
 
-			tmpZipFile := tempFile(t, "TestUnzipSizeLimits-*.zip")
+			tmpZipFile := tempFile(t, "tmp.zip")
 			test.writeZip(t, tmpZipFile)
 			if err := tmpZipFile.Close(); err != nil {
 				t.Fatal(err)
@@ -963,14 +964,11 @@ func mustWriteFile(name string, content string) {
 	}
 }
 
-func tempFile(t *testing.T, tmpl string) *os.File {
-	f, err := os.CreateTemp("", tmpl)
+func tempFile(t *testing.T, name string) *os.File {
+	f, err := os.Create(filepath.Join(t.TempDir(), name))
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Cleanup(func() {
-		f.Close()
-		os.Remove(f.Name())
-	})
+	t.Cleanup(func() { f.Close() })
 	return f
 }

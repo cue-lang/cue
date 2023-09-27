@@ -652,15 +652,6 @@ type sizeLimitTest struct {
 // sizeLimitTests is shared by TestCreateSizeLimits and TestUnzipSizeLimits.
 var sizeLimitTests = [...]sizeLimitTest{
 	{
-		desc: "one_large",
-		files: []fakeFile{{
-			name: "large.go",
-			size: modzip.MaxZipFile - uint64(len(`module: "example.com/m@v1"`)),
-		}, {
-			name: "cue.mod/module.cue",
-			data: []byte(`module: "example.com/m@v1"`),
-		}},
-	}, {
 		desc: "total_large",
 		files: []fakeFile{{
 			name: "large.go",

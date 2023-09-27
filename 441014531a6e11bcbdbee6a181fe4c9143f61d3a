@@ -16,6 +16,24 @@
       "message": "RaceEnabled ?",
       "revId": "441014531a6e11bcbdbee6a181fe4c9143f61d3a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6038b85f_b9288aac",
+        "filename": "internal/cuetest/norace.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-09-27T11:06:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c23335c3_78186251",
+      "revId": "441014531a6e11bcbdbee6a181fe4c9143f61d3a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

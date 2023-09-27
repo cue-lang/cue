@@ -249,7 +249,7 @@ func TestCheckFiles(t *testing.T) {
 			}
 
 			// Check the files.
-			cf, err := modzip.CheckFiles[fakeFile](files, fakeFileIO{})
+			cf, _ := modzip.CheckFiles[fakeFile](files, fakeFileIO{})
 			got := formatCheckedFiles(cf)
 			if diff := cmp.Diff(test.want, got); diff != "" {
 				t.Errorf("unexpected result; (-want +got):\n%s", diff)
@@ -299,7 +299,7 @@ func TestCheckDir(t *testing.T) {
 			}
 
 			// Check the directory.
-			cf, err := modzip.CheckDir(tmpDir)
+			cf, _ := modzip.CheckDir(tmpDir)
 			rep := strings.NewReplacer(tmpDir, "$work", `'\''`, `'\''`, string(os.PathSeparator), "/")
 			got := rep.Replace(formatCheckedFiles(cf))
 			if diff := cmp.Diff(test.want, got); diff != "" {

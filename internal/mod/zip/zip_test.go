@@ -202,6 +202,7 @@ func formatCheckedFiles(cf modzip.CheckedFiles) string {
 }
 
 func TestCheckFilesWithDirWithTrailingSlash(t *testing.T) {
+	t.Parallel()
 	// When checking a zip file,
 	files := []fakeFile{{
 		name:  "cue.mod/",
@@ -221,6 +222,7 @@ func TestCheckFilesWithDirWithTrailingSlash(t *testing.T) {
 // focuses on how multiple errors and omissions are reported, rather than trying
 // to cover every case.
 func TestCheckFiles(t *testing.T) {
+	t.Parallel()
 	testPaths, err := filepath.Glob(filepath.FromSlash("testdata/check_files/*.txt"))
 	if err != nil {
 		t.Fatal(err)
@@ -274,6 +276,7 @@ func TestCheckFiles(t *testing.T) {
 // test focuses on how multiple errors and omissions are reported, rather than
 // trying to cover every case.
 func TestCheckDir(t *testing.T) {
+	t.Parallel()
 	testPaths, err := filepath.Glob(filepath.FromSlash("testdata/check_dir/*.txt"))
 	if err != nil {
 		t.Fatal(err)
@@ -324,6 +327,7 @@ func TestCheckDir(t *testing.T) {
 // covered by TestUnzip, so this test focuses on how multiple errors are
 // reported, rather than trying to cover every case.
 func TestCheckZip(t *testing.T) {
+	t.Parallel()
 	testPaths, err := filepath.Glob(filepath.FromSlash("testdata/check_zip/*.txt"))
 	if err != nil {
 		t.Fatal(err)
@@ -373,6 +377,7 @@ func TestCheckZip(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
+	t.Parallel()
 	testDir := filepath.FromSlash("testdata/create")
 	testInfos, err := os.ReadDir(testDir)
 	if err != nil {
@@ -458,6 +463,7 @@ func shouldExclude(f *zip.File) bool {
 }
 
 func TestCreateFromDir(t *testing.T) {
+	t.Parallel()
 	testDir := filepath.FromSlash("testdata/create_from_dir")
 	testInfos, err := os.ReadDir(testDir)
 	if err != nil {
@@ -513,6 +519,7 @@ func TestCreateFromDir(t *testing.T) {
 }
 
 func TestCreateFromDirSpecial(t *testing.T) {
+	t.Parallel()
 	for _, test := range []struct {
 		desc     string
 		setup    func(t *testing.T, tmpDir string) string
@@ -589,6 +596,7 @@ func TestCreateFromDirSpecial(t *testing.T) {
 }
 
 func TestUnzip(t *testing.T) {
+	t.Parallel()
 	testDir := filepath.FromSlash("testdata/unzip")
 	testInfos, err := os.ReadDir(testDir)
 	if err != nil {
@@ -714,6 +722,7 @@ func TestCreateSizeLimits(t *testing.T) {
 	if testing.Short() {
 		t.Skip("creating large files takes time")
 	}
+	t.Parallel()
 	tests := append(sizeLimitTests[:], sizeLimitTest{
 		// negative file size may happen when size is represented as uint64
 		// but is cast to int64, as is the case in zip files.
@@ -775,6 +784,7 @@ func TestUnzipSizeLimits(t *testing.T) {
 	if testing.Short() {
 		t.Skip("creating large files takes time")
 	}
+	t.Parallel()
 	for _, test := range sizeLimitTests {
 		test := test
 		t.Run(test.desc, func(t *testing.T) {
@@ -842,6 +852,7 @@ func TestUnzipSizeLimitsSpecial(t *testing.T) {
 		t.Skip("skipping test; creating large files takes time")
 	}
 
+	t.Parallel()
 	for _, test := range []struct {
 		desc     string
 		wantErr  string

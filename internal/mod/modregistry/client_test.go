@@ -34,7 +34,7 @@ import (
 )
 
 func newTestClient(t *testing.T) *Client {
-	c, err := NewClient(ocimem.New(), "")
+	c, err := NewClient(ocimem.New())
 	qt.Assert(t, qt.IsNil(err))
 	return c
 }

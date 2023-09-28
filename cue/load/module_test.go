@@ -22,7 +22,13 @@ func TestModuleFetch(t *testing.T) {
 			t.Fatal(err)
 		}
 		defer r.Close()
-		t.LoadConfig.Registry = ociclient.New(r.URL(), nil)
+		reg, err := ociclient.New(r.Host(), &ociclient.Options{
+			Insecure: true,
+		})
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.LoadConfig.Registry = reg
 		ctx := cuecontext.New()
 		insts := t.RawInstances()
 		if len(insts) != 1 {

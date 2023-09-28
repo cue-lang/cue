@@ -39,14 +39,17 @@ func TestRegistry(t *testing.T) {
 				t.Fatal(err)
 			}
 			defer r.Close()
-			runTest(t, ociclient.New(r.URL(), nil), string(ar.Comment), ar)
+			client, err := ociclient.New(r.Host(), &ociclient.Options{
+				Insecure: true,
+			})
+			runTest(t, client, string(ar.Comment), ar)
 		})
 	}
 }
 
 func runTest(t *testing.T, registry ociregistry.Interface, script string, ar *txtar.Archive) {
 	ctx := context.Background()
-	client, err := modregistry.NewClient(registry, "cue/")
+	client, err := modregistry.NewClient(registry)
 	if err != nil {
 		t.Fatal(err)
 	}

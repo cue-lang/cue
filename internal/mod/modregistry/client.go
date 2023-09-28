@@ -41,7 +41,6 @@ var ErrNotFound = fmt.Errorf("module not found")
 // provides a store for CUE modules.
 type Client struct {
 	registry ociregistry.Interface
-	prefix   string
 }
 
 const (
@@ -51,16 +50,10 @@ const (
 )
 
 // NewClient returns a new client that talks to the registry at the given
-// hostname. All repositories created or accessed in the registry
-// will have the given prefix.
-//
-// TODO pass in an ociregistry.Interface instead of a URL,
-// thus allowing a locally defined composition of registries
-// rather than always assuming everything is behind a single host.
-func NewClient(registry ociregistry.Interface, prefix string) (*Client, error) {
+// hostname.
+func NewClient(registry ociregistry.Interface) (*Client, error) {
 	return &Client{
 		registry: registry,
-		prefix:   prefix,
 	}, nil
 }
 
@@ -100,7 +93,7 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 
 func (c *Client) repoName(modPath string) string {
 	path, _, _ := module.SplitPathVersion(modPath)
-	return c.prefix + path
+	return path
 }
 
 // ModuleVersions returns all the versions for the module with the given path.

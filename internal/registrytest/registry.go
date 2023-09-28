@@ -8,9 +8,9 @@ import (
 	"io"
 	"io/fs"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 
-	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"golang.org/x/tools/txtar"
@@ -32,8 +32,8 @@ import (
 //
 // The Registry should be closed after use.
 func New(fsys fs.FS) (*Registry, error) {
-	srv := httptest.NewServer(ociserver.New(ocimem.New(), nil))
-	client, err := modregistry.NewClient(ociclient.New(srv.URL, nil), "cue/")
+	r := ocimem.New()
+	client, err := modregistry.NewClient(r)
 	if err != nil {
 		return nil, fmt.Errorf("cannot make client: %v", err)
 	}
@@ -44,8 +44,14 @@ func New(fsys fs.FS) (*Registry, error) {
 	if err := pushContent(client, mods); err != nil {
 		return nil, fmt.Errorf("cannot push modules: %v", err)
 	}
+	srv := httptest.NewServer(ociserver.New(r, nil))
+	u, err := url.Parse(srv.URL)
+	if err != nil {
+		return nil, err
+	}
 	return &Registry{
-		srv: srv,
+		srv:  srv,
+		host: u.Host,
 	}, nil
 }
 
@@ -87,16 +93,20 @@ func visitDepthFirst(mods map[module.Version]*moduleContent, v module.Version, f
 }
 
 type Registry struct {
-	srv *httptest.Server
+	srv  *httptest.Server
+	host string
 }
 
 func (r *Registry) Close() {
 	r.srv.Close()
 }
 
-// URL returns the base URL for the registry.
-func (r *Registry) URL() string {
-	return r.srv.URL
+// Host returns the hostname for the registry server;
+// for example localhost:13455.
+//
+// The connection can be assumed to be insecure.
+func (r *Registry) Host() string {
+	return r.host
 }
 
 type handler struct {

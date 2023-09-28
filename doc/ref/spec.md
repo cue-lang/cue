@@ -1166,9 +1166,9 @@ A dynamic field may be marked as optional or required.
 
 ```
 Expression                             Result
-a:   "foo                              a:   "foo"
+a:   "foo"                             a:   "foo"
 b:   "bar"                             b:   "bar"
-(a): "baz"                             bar: "baz"
+(a): "baz"                             foo: "baz"
 
 (a+b): "qux"                           foobar: "qux"
 

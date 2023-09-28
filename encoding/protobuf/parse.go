@@ -796,7 +796,10 @@ func (p *optionParser) parse(options []*proto.Option) {
 			if !p.required {
 				constraint.Optional = token.NoSpace.Pos()
 			}
-
+		case "(google.api.field_behavior)":
+			if o.Constant.Source == "REQUIRED" {
+				p.required = true
+			}
 		default:
 			// TODO: dropping comments. Maybe add dummy tag?
 

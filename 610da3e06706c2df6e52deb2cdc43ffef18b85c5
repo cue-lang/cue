@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1433ddaf_5daf094f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-02T09:29:17Z",
+      "side": 1,
+      "message": "FYI I used https://review.gerrithub.io/admin/repos/cue-lang/cue,access to make this change - using the web UI is a bit clumsy, but I\u0027m sure I am using the right config key, and it lets me search for groups as well. https://gerrit-review.googlesource.com/Documentation/access-control.html#category_toggle_work_in_progress_state did not actually contain toggleWipState, so I didn\u0027t even know how to enable this :) \n\nThe \"auto editor\" did drop some unnecessary quotes, which is mildly annoying, but I guess OK.",
+      "revId": "610da3e06706c2df6e52deb2cdc43ffef18b85c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

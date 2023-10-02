@@ -16,6 +16,24 @@
       "message": "Roger mentioned last week that this isn\u0027t meant to be reviewed/merged, and that instead he\u0027ll repurpose this CL for a different change.\n\nNoting this here for our records. For the sake of clarity, I think it would be good to mark CLs as either \"work in progress\" or abandoned entirely, to make sure others aren\u0027t confused. It seems like I can abandon Roger\u0027s CL but not mark it as WIP, which is... interesting :)",
       "revId": "baa1e089cb0df5fa4154ee2d863da9978b25b666",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4f660e75_6adddca6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 47
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-02T09:39:41Z",
+      "side": 1,
+      "message": "Now we _can_ set WIP status just like Abandoned :)",
+      "parentUuid": "b580d007_5bc58e94",
+      "revId": "baa1e089cb0df5fa4154ee2d863da9978b25b666",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

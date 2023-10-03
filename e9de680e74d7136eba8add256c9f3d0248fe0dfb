@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bacc3550_b00e246b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-03T14:30:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2042d272_f5018d9d",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "57db4a8b_6543e673",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-09-10T13:07:50Z",
       "side": 1,
       "message": "Nit: per earlier CL reviews, commit message formatting.",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c53428cc_94f9c958",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 31
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-03T14:30:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "57db4a8b_6543e673",
       "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b47bee4_0f396b60",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 833,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-03T14:30:18Z",
+      "side": 1,
+      "message": "Done. Added a TODO for `cue help environment`.",
+      "parentUuid": "708aef10_de219e53",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d245041c_64946f87",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-09-10T13:07:50Z",
       "side": 1,
       "message": "I would split this out into a separate CL. The commit message says nothing about also introducing the `CUE_EXPERIMENT` variable.",
+      "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca033d56_8a4e99b7",
+        "filename": "cmd/cue/cmd/common.go",
+        "patchSetId": 31
+      },
+      "lineNbr": 838,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-03T14:30:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d245041c_64946f87",
       "revId": "e9de680e74d7136eba8add256c9f3d0248fe0dfb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

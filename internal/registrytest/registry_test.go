@@ -11,6 +11,7 @@ import (
 
 	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
+	"cuelabs.dev/go/oci/ociregistry/ocifilter"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/internal/mod/modregistry"
@@ -34,7 +35,7 @@ func TestRegistry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Run(strings.TrimSuffix(name, ".txtar"), func(t *testing.T) {
-			r, err := New(TxtarFS(ar))
+			r, err := New(TxtarFS(ar), "someprefix/other")
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -42,7 +43,7 @@ func TestRegistry(t *testing.T) {
 			client, err := ociclient.New(r.Host(), &ociclient.Options{
 				Insecure: true,
 			})
-			runTest(t, client, string(ar.Comment), ar)
+			runTest(t, ocifilter.Sub(client, "someprefix/other"), string(ar.Comment), ar)
 		})
 	}
 }

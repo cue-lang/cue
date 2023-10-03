@@ -65,7 +65,7 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 	modDesc, err := c.registry.ResolveTag(ctx, repoName, m.Version())
 	if err != nil {
 		if errors.Is(err, ociregistry.ErrManifestUnknown) {
-			return nil, fmt.Errorf("module %q: %w", m, ErrNotFound)
+			return nil, fmt.Errorf("module %v: %w", m, ErrNotFound)
 		}
 		return nil, fmt.Errorf("module %v: %v", m, err)
 	}

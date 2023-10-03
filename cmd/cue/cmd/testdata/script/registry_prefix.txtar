@@ -1,0 +1,23 @@
+exec cue export .
+cmp stdout expect-stdout
+
+-- expect-stdout --
+"ok"
+-- main.cue --
+package main
+import "example.com/e"
+
+e.foo
+
+-- cue.mod/module.cue --
+module: "test.org"
+deps: "example.com/e": v: "v0.0.1"
+-- _registry_prefix --
+somewhere/other
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+package e
+
+foo: "ok"

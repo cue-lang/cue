@@ -43,27 +43,34 @@ import (
 
 var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
 
-var defaultConfig = config{
-	loadCfg: &load.Config{
-		ParseFile: func(name string, src interface{}) (*ast.File, error) {
-			version := internal.APIVersionSupported
-			if requestedVersion != "" {
-				switch {
-				case strings.HasPrefix(requestedVersion, "v0.1"):
-					version = -1000 + 100
+func defaultConfig() (*config, error) {
+	reg, err := getRegistry()
+	if err != nil {
+		return nil, err
+	}
+	return &config{
+		loadCfg: &load.Config{
+			ParseFile: func(name string, src interface{}) (*ast.File, error) {
+				version := internal.APIVersionSupported
+				if requestedVersion != "" {
+					switch {
+					case strings.HasPrefix(requestedVersion, "v0.1"):
+						version = -1000 + 100
+					}
 				}
-			}
-			options := []parser.Option{
-				parser.FromVersion(version),
-				parser.ParseComments,
-			}
-			// TODO: consolidate all options into a single CUE_DEBUG variable.
-			if os.Getenv("CUE_DEBUG_PARSER_TRACE") != "" {
-				options = append(options, parser.Trace)
-			}
-			return parser.ParseFile(name, src, options...)
+				options := []parser.Option{
+					parser.FromVersion(version),
+					parser.ParseComments,
+				}
+				// TODO: consolidate all options into a single CUE_DEBUG variable.
+				if os.Getenv("CUE_DEBUG_PARSER_TRACE") != "" {
+					options = append(options, parser.Trace)
+				}
+				return parser.ParseFile(name, src, options...)
+			},
+			Registry: reg,
 		},
-	},
+	}, nil
 }
 
 var inTest = false
@@ -373,11 +380,19 @@ type config struct {
 }
 
 func newBuildPlan(cmd *Command, cfg *config) (p *buildPlan, err error) {
+	var defCfg *config
+	if cfg == nil || cfg.loadCfg == nil {
+		var err error
+		defCfg, err = defaultConfig()
+		if err != nil {
+			return nil, err
+		}
+	}
 	if cfg == nil {
-		cfg = &defaultConfig
+		cfg = defCfg
 	}
 	if cfg.loadCfg == nil {
-		cfg.loadCfg = defaultConfig.loadCfg
+		cfg.loadCfg = defCfg.loadCfg
 	}
 	cfg.loadCfg.Stdin = cmd.InOrStdin()
 

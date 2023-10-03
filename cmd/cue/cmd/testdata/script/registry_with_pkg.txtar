@@ -1,0 +1,38 @@
+# When CUE_REGISTRY is correctly set, packages in the
+# pkg directory are ignored.
+exec cue export .
+cmp stdout expect-stdout
+
+-- expect-stdout --
+"registry source"
+-- main.cue --
+package main
+import "example.com/e"
+
+e.foo
+
+-- cue.mod/module.cue --
+module: "test.org"
+deps: "example.com/e": v: "v0.0.1"
+
+-- cue.mod/pkg/example.com/e/cue.mod/module.cue --
+module: "example.com/e"
+
+-- cue.mod/pkg/example.com/e/main.cue --
+package e
+foo: "cue.mod/pkg source"
+
+-- cue.mod/pkg/example.com/e/cue.mod/module.cue --
+module: "example.com/e"
+
+-- cue.mod/pkg/example.com/e/main.cue --
+package e
+foo: "cue.mod/pkg source"
+
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+package e
+
+foo: "registry source"

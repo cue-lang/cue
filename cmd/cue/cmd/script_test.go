@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/registrytest"
 )
 
 const (
@@ -107,6 +108,29 @@ func TestScript(t *testing.T) {
 				"GONOSUMDB=*", // GOPROXY is a private proxy
 				homeEnvName()+"="+home,
 			)
+			if info, err := os.Stat(filepath.Join(e.WorkDir, "_registry")); err == nil && info.IsDir() {
+				prefix := ""
+				if data, err := os.ReadFile(filepath.Join(e.WorkDir, "_registry_prefix")); err == nil {
+					prefix = strings.TrimSpace(string(data))
+				}
+				// There's a _registry directory. Start a fake registry server to serve
+				// the modules in it.
+				reg, err := registrytest.New(os.DirFS(e.WorkDir), prefix)
+				if err != nil {
+					return fmt.Errorf("cannot start test registry server: %v", err)
+				}
+				if prefix != "" {
+					prefix = "/" + prefix
+				}
+				e.Vars = append(e.Vars,
+					"CUE_REGISTRY="+reg.Host()+prefix+"+insecure",
+					// This enables some tests to construct their own malformed
+					// CUE_REGISTRY values that still refer to the test registry.
+					"DEBUG_REGISTRY_HOST="+reg.Host(),
+					"CUE_EXPERIMENT=modules",
+				)
+				e.Defer(reg.Close)
+			}
 			return nil
 		},
 		Condition: cuetest.Condition,

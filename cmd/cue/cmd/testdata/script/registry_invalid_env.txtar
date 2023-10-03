@@ -1,0 +1,16 @@
+env CUE_EXPERIMENT=modules
+env CUE_REGISTRY=malformed!registry@url
+! exec cue eval .
+cmp stderr expect-stderr
+
+-- expect-stderr --
+$CUE_REGISTRY "malformed!registry@url" is not a valid host name
+-- main.cue --
+package main
+import "example.com/e"
+
+e.foo
+
+-- cue.mod/module.cue --
+module: "test.org"
+deps: "example.com/e": v: "v0.0.1"

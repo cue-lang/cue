@@ -1398,7 +1398,7 @@ func isFinalError(n *Vertex) bool {
 // change after the fact.
 // expectError indicates whether the value should evaluate to an error or not.
 func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectError bool) {
-	if n := env.Vertex.getNodeContext(c, 0); n != nil {
+	if n := env.Vertex.state; n != nil {
 		n.postChecks = append(n.postChecks, envCheck{
 			env:         env,
 			expr:        x,

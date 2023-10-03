@@ -62,6 +62,8 @@ type set[TC any] struct {
 }
 
 // Run runs the given function for each (selected) element in the table.
+// TC must be a struct type. If that has a string field named "name",
+// that value will be used to name the associated subtest.
 func Run[TC any](t *testing.T, table []TC, fn func(t *T, tc *TC)) {
 	s := &set[TC]{
 		t:             t,

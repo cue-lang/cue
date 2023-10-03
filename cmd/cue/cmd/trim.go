@@ -124,7 +124,11 @@ func runTrim(cmd *Command, args []string) error {
 
 	}
 
-	cfg := *defaultConfig.loadCfg
+	defCfg, err := defaultConfig()
+	if err != nil {
+		return err
+	}
+	cfg := *defCfg.loadCfg
 	cfg.Overlay = overlay
 	tinsts := buildInstances(cmd, load.Instances(args, &cfg), false)
 	if len(tinsts) != len(binst) {

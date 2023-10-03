@@ -63,7 +63,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		}
 		deps1, err := resolveDependencies(c.modFile, regClient)
 		if err != nil {
-			return []*build.Instance{c.newErrInstance(err)}
+			return []*build.Instance{c.newErrInstance(fmt.Errorf("cannot resolve dependencies: %v", err))}
 		}
 		deps = deps1
 

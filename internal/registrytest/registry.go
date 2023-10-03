@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"strings"
 
+	"cuelabs.dev/go/oci/ociregistry/ocifilter"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"golang.org/x/tools/txtar"
@@ -25,18 +26,21 @@ import (
 
 // New starts a registry instance that serves modules found inside the
 // _registry path inside fsys. It serves the OCI registry protocol.
+// If prefix is non-empty, all module paths will be prefixed by that,
+// separated by a slash (/).
 //
 // Each module should be inside a directory named path_vers, where
 // slashes in path have been replaced with underscores and should
 // contain a cue.mod/module.cue file holding the module info.
 //
 // The Registry should be closed after use.
-func New(fsys fs.FS) (*Registry, error) {
+func New(fsys fs.FS, prefix string) (*Registry, error) {
 	r := ocimem.New()
-	client, err := modregistry.NewClient(r)
+	client, err := modregistry.NewClient(ocifilter.Sub(r, prefix))
 	if err != nil {
 		return nil, fmt.Errorf("cannot make client: %v", err)
 	}
+
 	mods, err := getModules(fsys)
 	if err != nil {
 		return nil, fmt.Errorf("invalid modules: %v", err)

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b7b14ee_990ca372",
+        "filename": "internal/tdtest/tdtest.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:37:07Z",
+      "side": 1,
+      "message": "each subtest?",
+      "range": {
+        "startLine": 66,
+        "startChar": 35,
+        "endLine": 66,
+        "endChar": 43
+      },
+      "revId": "2f479d1d35892fe1836e114c56e289e141842802",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

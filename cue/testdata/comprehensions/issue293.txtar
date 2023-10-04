@@ -42,6 +42,9 @@ Conjuncts:    33
 Disjuncts:    20
 -- out/eval --
 Errors:
+#V1.x.f2: field not allowed:
+    ./variant1.cue:2:11
+    ./variant1.cue:3:5
 z.x.f2: field not allowed:
     ./in.cue:2:2
     ./in.cue:5:12
@@ -76,10 +79,16 @@ Result:
   #C: (#struct){
     p: (_){ _ }
   }
-  #V1: (#struct){
-    x: (#struct){
+  #V1: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval]
       f1: (int){ int }
-      f2: (int){ 2 }
+      f2: (_|_){
+        // [eval] #V1.x.f2: field not allowed:
+        //     ./variant1.cue:2:11
+        //     ./variant1.cue:3:5
+      }
     }
   }
 }

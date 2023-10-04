@@ -148,7 +148,6 @@ Guidelines for participating in CUE community spaces and a reporting process for
 handling issues can be found in the [Code of
 Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
 
-
 ## Contact
 
 You can get in touch with the cuelang community in the following ways:

@@ -86,7 +86,7 @@ var closeBuiltin = &adt.Builtin{
 		if !ok {
 			return c.NewErrf("struct argument must be concrete")
 		}
-		if m, ok := s.BaseValue.(*adt.StructMarker); ok && m.NeedClose || s.Closed {
+		if m, ok := s.BaseValue.(*adt.StructMarker); ok && m.NeedClose {
 			return s
 		}
 		v := s.Clone()

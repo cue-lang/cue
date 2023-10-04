@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "aaf94bf4_9f884f03",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 51
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6011888c_37c211c3",
+      "range": {
+        "startLine": 14,
+        "startChar": 64,
+        "endLine": 14,
+        "endChar": 68
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb94cf6d_644c2166",
@@ -37,6 +61,24 @@
       "writtenOn": "2023-10-04T07:59:18Z",
       "side": 1,
       "message": "remind the reader how that\u0027s done, perhaps? I certainly don\u0027t remember :) A number of people might see this CL/commit and want to try it out.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a384fd76_369b046b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 51
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bb94cf6d_644c2166",
       "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2f0caa6_0a6b3706",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b004a3d1_677b7df9",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0b40e5eb_b1660c73",
@@ -71,6 +131,24 @@
       "writtenOn": "2023-10-04T07:59:18Z",
       "side": 1,
       "message": "we\u0027re allowing anything through here, such as spaces or any special characters, which seems like a footgun. would it not be better to append `/dummy` so we can pass the string to `ociref.Parse`, assuming that Parse does some validation, and then set `r.Repository` to the empty string?",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6534cfee_d941ab08",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "I started to do this, but it became awkward because the error messages turn out nasty (particularly when the string looks like `foo@something`), so I landed https://review.gerrithub.io/c/cue-labs/oci/+/1170299 instead so we can check host name validity directly.",
+      "parentUuid": "0b40e5eb_b1660c73",
       "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -98,6 +176,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a448c15a_bfd6c548",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f7fcdade_90b6a5b6",
+      "range": {
+        "startLine": 60,
+        "startChar": 63,
+        "endLine": 60,
+        "endChar": 73
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4548322c_69c1f6cc",
@@ -111,6 +213,24 @@
       "writtenOn": "2023-10-04T07:59:18Z",
       "side": 1,
       "message": "I wish we had ErrorContains - that is often what I want instead of regular expressions in cases like this, since it saves needing so many backslashes, and still doesn\u0027t require me to include the entire error string.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e70bcb59_7897cd16",
+        "filename": "cmd/cue/cmd/registry_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "I\u0027m actually not that keen on just checking that errors contain a string, because then it\u0027s not that clear what the actual error message looks like: for example, it\u0027s really easy just to check for some string in the middle of the message, but the whole message contains unpleasant-looking duplication or grammatical errors.\n\nLooking at the qt docs, they really should make it clear that the pattern is treated as anchored, so `qt.ErrorMatches(err, \"foo\")` is matching against `^(foo)$` not just `foo`. Created https://github.com/go-quicktest/qt/pull/16 for that.\n\nIn cases like this where we don\u0027t want to use the pattern-matching behaviour, we could always use `regexp.QuoteMeta`.\n\nFWIW if we do want it, it\u0027s pretty trivial to write one\u0027s own `ErrorContains` function:\n\n```\nfunc ErrorContains(err error, s string) qt.Checker {\n\treturn qt.ErrorMatches(err, \".*\" + regexp.QuoteMeta(s) + \".*\")\n}\n```",
+      "parentUuid": "4548322c_69c1f6cc",
       "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -138,6 +258,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffb90222_7ceb7d54",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Yeah, we could easily change that in the future.",
+      "parentUuid": "0e15c586_a42d4dd1",
+      "range": {
+        "startLine": 118,
+        "startChar": 16,
+        "endLine": 118,
+        "endChar": 52
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "67b1efc5_8028af85",
@@ -151,6 +295,24 @@
       "writtenOn": "2023-10-04T07:59:18Z",
       "side": 1,
       "message": "why not include that in each testscript directly?\n\nalso, do our APIs require the prefix to come with or without a slash? if they require no slash, then what you do here is correct - perhaps I missed that.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e68c0d55_98ce6665",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Our APIs do indeed omit the slash (repository names likewise don\u0027t have a leading slash), so I think it\u0027s OK.",
+      "parentUuid": "67b1efc5_8028af85",
       "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -172,6 +334,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a97f3522_dc5d12e6",
+        "filename": "cmd/cue/cmd/testdata/script/registry_experiment_not_set.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "64aba943_b6ec90ec",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2b897da_0858b031",
@@ -185,6 +365,24 @@
       "writtenOn": "2023-10-04T07:59:18Z",
       "side": 1,
       "message": "redundant given the Setup func?",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23be66f5_1f2d8db2",
+        "filename": "cmd/cue/cmd/testdata/script/registry_invalid_env.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Not redundant because we\u0027ve got no _registrytest directory (and there\u0027s no need for it because we don\u0027t actually want it to talk to a registry).",
+      "parentUuid": "e2b897da_0858b031",
       "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -230,6 +428,54 @@
         "startChar": 10,
         "endLine": 5,
         "endChar": 59
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "364fa91c_884d31b2",
+        "filename": "cmd/cue/cmd/testdata/script/registry_module_not_found.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "No, but the fix isn\u0027t immediately obvious (it\u0027s possible that there are other error paths where the first or second occurrence of the module path is _not_ redundant), so I\u0027ll leave it for now in the interests of progress, as it\u0027s not crucial.",
+      "parentUuid": "41f3e06d_029c9fef",
+      "range": {
+        "startLine": 5,
+        "startChar": 10,
+        "endLine": 5,
+        "endChar": 59
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c5a7216_0bba2b4f",
+        "filename": "cmd/cue/cmd/testdata/script/registry_module_not_found.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-04T13:16:19Z",
+      "side": 1,
+      "message": "Yeah, this error isn\u0027t ideal, but fixing it involves a number of changes at different abstraction levels, so I\u0027ll leave it for now with a TODO to fix it.",
+      "parentUuid": "01dbe34b_a42ce427",
+      "range": {
+        "startLine": 5,
+        "startChar": 61,
+        "endLine": 5,
+        "endChar": 75
       },
       "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"

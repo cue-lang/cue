@@ -1,0 +1,238 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6011888c_37c211c3",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 51
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "perhaps say \"the heuristic\" to clarify what you mean",
+      "range": {
+        "startLine": 14,
+        "startChar": 64,
+        "endLine": 14,
+        "endChar": 68
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb94cf6d_644c2166",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 51
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "remind the reader how that\u0027s done, perhaps? I certainly don\u0027t remember :) A number of people might see this CL/commit and want to try it out.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b004a3d1_677b7df9",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "nit: should we error or at least print a warning if the user set CUE_REGISTRY but not the CUE_EXPERIMENT flag? they might be holding it wrong by accident, and get confused why modules aren\u0027t working.\n\nbut perhaps they would soon later get a \"modules are not enabled\" error anyway? if that\u0027s the case then this code is OK, if not then I think we should either error or warn.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0b40e5eb_b1660c73",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "we\u0027re allowing anything through here, such as spaces or any special characters, which seems like a footgun. would it not be better to append `/dummy` so we can pass the string to `ociref.Parse`, assuming that Parse does some validation, and then set `r.Repository` to the empty string?",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7fcdade_90b6a5b6",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "\"an associated\"?\n\nalso, assuming that Parse already provides the input string as part of its error, I think you should also show the value of CUE_REGISTRY here. for example, getting this error in CI would be a pain unless CI itself also shows you the entire environment somewhere - otherwise you can\u0027t even tell what the value was.",
+      "range": {
+        "startLine": 60,
+        "startChar": 63,
+        "endLine": 60,
+        "endChar": 73
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4548322c_69c1f6cc",
+        "filename": "cmd/cue/cmd/registry_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "I wish we had ErrorContains - that is often what I want instead of regular expressions in cases like this, since it saves needing so many backslashes, and still doesn\u0027t require me to include the entire error string.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e15c586_a42d4dd1",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "looking at this now, interesting that we give registrytest.New an FS for the _parent directory_ rather than the registry directory itself. odd API, methinks.",
+      "range": {
+        "startLine": 118,
+        "startChar": 16,
+        "endLine": 118,
+        "endChar": 52
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67b1efc5_8028af85",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 51
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "why not include that in each testscript directly?\n\nalso, do our APIs require the prefix to come with or without a slash? if they require no slash, then what you do here is correct - perhaps I missed that.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64aba943_b6ec90ec",
+        "filename": "cmd/cue/cmd/testdata/script/registry_experiment_not_set.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "how about making the strings \"cue.mod/pkg source\" and \"registry source\" to clarify what each of them refers to?\n\nand I\u0027d also test the opposite case - what is the behavior when the experiment is enabled, and the same package is available in both pkg and the registry? you can do it in this test too.",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2b897da_0858b031",
+        "filename": "cmd/cue/cmd/testdata/script/registry_invalid_env.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "redundant given the Setup func?",
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01dbe34b_a42ce427",
+        "filename": "cmd/cue/cmd/testdata/script/registry_module_not_found.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "personally I find this section of the error redundant.",
+      "range": {
+        "startLine": 5,
+        "startChar": 61,
+        "endLine": 5,
+        "endChar": 75
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "41f3e06d_029c9fef",
+        "filename": "cmd/cue/cmd/testdata/script/registry_module_not_found.txtar",
+        "patchSetId": 51
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-04T07:59:18Z",
+      "side": 1,
+      "message": "do we duplicate module@version on purpose?",
+      "range": {
+        "startLine": 5,
+        "startChar": 10,
+        "endLine": 5,
+        "endChar": 59
+      },
+      "revId": "7460f07bd67e420042fb9809c49b56526cc120eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

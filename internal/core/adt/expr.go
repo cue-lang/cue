@@ -367,7 +367,7 @@ func (x *Bytes) Kind() Kind       { return BytesKind }
 // vertices.
 
 type ListMarker struct {
-	Src    ast.Node
+	Src    ast.Expr
 	IsOpen bool
 }
 

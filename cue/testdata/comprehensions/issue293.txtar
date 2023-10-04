@@ -24,16 +24,22 @@ t: #C
 	}
 }
 t: p: "foo"
--- out/eval/stats --
-Leaks:  2
-Freed:  12
-Reused: 8
-Allocs: 6
-Retain: 3
 
-Unifications: 14
-Conjuncts:    25
-Disjuncts:    15
+-- variant1.cue --
+#V1: {
+	x: close({ f1: int })
+	x: f2: 2 // TODO: fail
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  16
+Reused: 12
+Allocs: 7
+Retain: 4
+
+Unifications: 19
+Conjuncts:    33
+Disjuncts:    20
 -- out/eval --
 Errors:
 z.x.f2: field not allowed:
@@ -70,6 +76,12 @@ Result:
   #C: (#struct){
     p: (_){ _ }
   }
+  #V1: (#struct){
+    x: (#struct){
+      f1: (int){ int }
+      f2: (int){ 2 }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -96,5 +108,16 @@ Result:
   }
   t: {
     p: "foo"
+  }
+}
+--- variant1.cue
+{
+  #V1: {
+    x: close({
+      f1: int
+    })
+    x: {
+      f2: 2
+    }
   }
 }

@@ -3,7 +3,7 @@ s: string
 
 e1:  s + s
 e2:  >"bar" & s // okay
-e3:  >s & "foo" // okay
+e3:  >s & "foo" // not okay
 e3b: >s
 
 e4: >e1 & s
@@ -44,15 +44,15 @@ issue1837: {
 	}
 }
 -- out/eval/stats --
-Leaks:  5
-Freed:  27
-Reused: 21
-Allocs: 11
-Retain: 101
+Leaks:  0
+Freed:  32
+Reused: 26
+Allocs: 6
+Retain: 96
 
 Unifications: 32
-Conjuncts:    159
-Disjuncts:    50
+Conjuncts:    172
+Disjuncts:    45
 -- out/eval --
 (struct){
   s: (string){ string }
@@ -62,8 +62,14 @@ Disjuncts:    50
     //     ./in.cue:1:4
   }
   e2: (string){ >"bar" }
-  e3: (string){ "foo" }
-  e3b: (string){ string }
+  e3: (_|_){
+    // [incomplete] e3: non-concrete value s for bound >:
+    //     ./in.cue:5:7
+  }
+  e3b: (_|_){
+    // [incomplete] e3b: non-concrete value s for bound >:
+    //     ./in.cue:6:7
+  }
   e4: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
     //     ./in.cue:3:6
@@ -90,9 +96,8 @@ Disjuncts:    50
   }
   a: (int){ int }
   okay: (_|_){
-    // [incomplete] okay: non-concrete value >10 & int in operand to +:
-    //     ./in.cue:18:7
-    //     ./in.cue:18:8
+    // [incomplete] non-concrete value a for bound <:
+    //     ./in.cue:18:15
   }
   issue1837: (struct){
     p1: (struct){

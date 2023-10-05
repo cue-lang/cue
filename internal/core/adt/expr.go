@@ -548,7 +548,11 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state vertexStatus) Value {
 	case *BasicType:
 		switch x.Op {
 		case LessEqualOp, LessThanOp, GreaterEqualOp, GreaterThanOp:
-			return y
+			// TODO: this does not seem correct and results in some weird
+			// behavior for bounds.
+			ctx.addErrf(IncompleteError, token.NoPos,
+				"non-concrete value %s for bound %s", x.Expr, x.Op)
+			return nil
 		}
 	}
 	if v.Concreteness() > Concrete {

@@ -38,7 +38,20 @@
 //		}
 //	}
 //
-//	//  TODO: support serving once we have the cue serve command.
+//	Serve: {
+//		$id: "tool/http.Serve"
+//		listenAddr!: string
+//		request!: #Request
+//		response!: _
+//	}
+//
+//	#Request: {
+//		query!: [string]: [... string]
+//		header!: [string]: [... string]
+//		body!: _
+//	}
+//
+//	//  TODO: XXXX support serving once we have the cue serve command.
 //	// Serve: {
 //	//  port: int
 //	//
@@ -105,6 +118,21 @@ var p = &pkg.Package{
 				[string]: string | [...string]
 			}
 		}
+	}
+	Serve: {
+		$id:         "tool/http.Serve"
+		listenAddr!: string
+		request!:    #Request
+		response!:   _
+	}
+	#Request: {
+		query!: {
+			[string]: [...string]
+		}
+		header!: {
+			[string]: [...string]
+		}
+		body!: _
 	}
 }`,
 }

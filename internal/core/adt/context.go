@@ -527,7 +527,6 @@ func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 // concrete returns the concrete value of x after evaluating it.
 // msg is used to mention the context in which an error occurred, if any.
 func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
-
 	w, complete := c.Evaluate(env, x)
 
 	w, ok := c.getDefault(w)
@@ -1167,7 +1166,6 @@ func (c *OpContext) ToBytes(v Value) []byte {
 // ToString returns the string value of a scalar value.
 func (c *OpContext) ToString(v Value) string {
 	return c.toStringValue(v, StringKind|NumKind|BytesKind|BoolKind, nil)
-
 }
 
 func (c *OpContext) stringValue(v Value, as interface{}) string {

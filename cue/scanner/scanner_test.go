@@ -841,7 +841,7 @@ func TestScanErrors(t *testing.T) {
 
 // Verify that no comments show up as literal values when skipping comments.
 func TestNoLiteralComments(t *testing.T) {
-	var src = `
+	src := `
 		a: {
 			A: 1 // foo
 		}

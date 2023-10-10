@@ -98,7 +98,7 @@ func ParseVersion(s string) (Version, error) {
 	return Version{basePath + "@" + semver.Major(vers), vers}, nil
 }
 
-func MustNewVersion(path string, vers string) Version {
+func MustNewVersion(path, vers string) Version {
 	v, err := NewVersion(path, vers)
 	if err != nil {
 		panic(err)
@@ -110,7 +110,7 @@ func MustNewVersion(path string, vers string) Version {
 // The version must be canonical, empty or "none".
 // If the path doesn't have a major version suffix, one will be added
 // if the version isn't empty; if the version is empty, it's an error.
-func NewVersion(path string, vers string) (Version, error) {
+func NewVersion(path, vers string) (Version, error) {
 	if vers != "" && vers != "none" {
 		if !semver.IsValid(vers) {
 			return Version{}, fmt.Errorf("version %q (of module %q) is not well formed", vers, path)

@@ -84,7 +84,7 @@ func updateGoldenFiles(t *testing.T) {
 	var buf bytes.Buffer
 	fmt.Fprintln(&buf, "-- in.cue --")
 	fmt.Fprintf(&buf, "%s", fInputs)
-	if err := os.WriteFile("testdata/gen.txtar", buf.Bytes(), 0666); err != nil {
+	if err := os.WriteFile("testdata/gen.txtar", buf.Bytes(), 0o666); err != nil {
 		t.Fatal(err)
 	}
 }

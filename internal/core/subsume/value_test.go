@@ -428,7 +428,6 @@ func TestValues(t *testing.T) {
 		r := runtime.New()
 
 		t.Run(strconv.Itoa(i)+"/"+key, func(t *testing.T) {
-
 			file, err := parser.ParseFile("subsume", tc.in)
 			if err != nil {
 				t.Fatal(err)

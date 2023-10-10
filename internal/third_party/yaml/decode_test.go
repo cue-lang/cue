@@ -28,43 +28,56 @@ var unmarshalTests = []struct {
 	{
 		"{}",
 		"",
-	}, {
+	},
+	{
 		"v: hi",
 		`v: "hi"`,
-	}, {
+	},
+	{
 		"v: hi",
 		`v: "hi"`,
-	}, {
+	},
+	{
 		"v: true",
 		"v: true",
-	}, {
+	},
+	{
 		"v: 10",
 		"v: 10",
-	}, {
+	},
+	{
 		"v: 0b10",
 		"v: 0b10",
-	}, {
+	},
+	{
 		"v: 0xA",
 		"v: 0xA",
-	}, {
+	},
+	{
 		"v: 4294967296",
 		"v: 4294967296",
-	}, {
+	},
+	{
 		"v: 0.1",
 		"v: 0.1",
-	}, {
+	},
+	{
 		"v: .1",
 		"v: 0.1",
-	}, {
+	},
+	{
 		"v: .Inf",
 		"v: +Inf",
-	}, {
+	},
+	{
 		"v: -.Inf",
 		"v: -Inf",
-	}, {
+	},
+	{
 		"v: -10",
 		"v: -10",
-	}, {
+	},
+	{
 		"v: -.1",
 		"v: -0.1",
 	},
@@ -79,16 +92,20 @@ var unmarshalTests = []struct {
 	{
 		"canonical: 6.8523e+5",
 		"canonical: 6.8523e+5",
-	}, {
+	},
+	{
 		"expo: 685.230_15e+03",
 		"expo: 685.230_15e+03",
-	}, {
+	},
+	{
 		"fixed: 685_230.15",
 		"fixed: 685_230.15",
-	}, {
+	},
+	{
 		"neginf: -.inf",
 		"neginf: -Inf",
-	}, {
+	},
+	{
 		"fixed: 685_230.15",
 		"fixed: 685_230.15",
 	},
@@ -99,19 +116,24 @@ var unmarshalTests = []struct {
 	{
 		"canonical: y",
 		`canonical: "y"`,
-	}, {
+	},
+	{
 		"answer: n",
 		`answer: "n"`,
-	}, {
+	},
+	{
 		"answer: NO",
 		`answer: "NO"`,
-	}, {
+	},
+	{
 		"logical: True",
 		"logical: true",
-	}, {
+	},
+	{
 		"option: on",
 		`option: "on"`,
-	}, {
+	},
+	{
 		"answer: off",
 		`answer: "off"`,
 	},
@@ -119,25 +141,32 @@ var unmarshalTests = []struct {
 	{
 		"canonical: 685230",
 		"canonical: 685230",
-	}, {
+	},
+	{
 		"decimal: +685_230",
 		"decimal: +685_230",
-	}, {
+	},
+	{
 		"octal: 02472256",
 		"octal: 0o2472256",
-	}, {
+	},
+	{
 		"hexa: 0x_0A_74_AE",
 		"hexa: 0x_0A_74_AE",
-	}, {
+	},
+	{
 		"bin: 0b1010_0111_0100_1010_1110",
 		"bin: 0b1010_0111_0100_1010_1110",
-	}, {
+	},
+	{
 		"bin: -0b101010",
 		"bin: -0b101010",
-	}, {
+	},
+	{
 		"bin: -0b1000000000000000000000000000000000000000000000000000000000000000",
 		"bin: -0b1000000000000000000000000000000000000000000000000000000000000000",
-	}, {
+	},
+	{
 		"decimal: +685_230",
 		"decimal: +685_230",
 	},
@@ -148,25 +177,32 @@ var unmarshalTests = []struct {
 	{
 		"empty:",
 		"empty: null",
-	}, {
+	},
+	{
 		"canonical: ~",
 		"canonical: null",
-	}, {
+	},
+	{
 		"english: null",
 		"english: null",
-	}, {
+	},
+	{
 		"_foo: 1",
 		`"_foo": 1`,
-	}, {
+	},
+	{
 		`"#foo": 1`,
 		`"#foo": 1`,
-	}, {
+	},
+	{
 		"_#foo: 1",
 		`"_#foo": 1`,
-	}, {
+	},
+	{
 		"~: null key",
 		`"null": "null key"`,
-	}, {
+	},
+	{
 		`empty:
 apple: "newline"`,
 		`empty: null
@@ -177,10 +213,12 @@ apple: "newline"`,
 	{
 		"seq: [A,B]",
 		`seq: ["A", "B"]`,
-	}, {
+	},
+	{
 		"seq: [A,B,C,]",
 		`seq: ["A", "B", "C"]`,
-	}, {
+	},
+	{
 		"seq: [A,1,C]",
 		`seq: ["A", 1, "C"]`,
 	},
@@ -191,14 +229,16 @@ apple: "newline"`,
 	"A",
 	"B",
 ]`,
-	}, {
+	},
+	{
 		"seq:\n - A\n - B\n - C",
 		`seq: [
 	"A",
 	"B",
 	"C",
 ]`,
-	}, {
+	},
+	{
 		"seq:\n - A\n - 1\n - C",
 		`seq: [
 	"A",
@@ -242,25 +282,32 @@ apple: "newline"`,
 	{
 		"hello: world",
 		`hello: "world"`,
-	}, {
+	},
+	{
 		"a:",
 		"a: null",
-	}, {
+	},
+	{
 		"a: 1",
 		"a: 1",
-	}, {
+	},
+	{
 		"a: 1.0",
 		"a: 1.0",
-	}, {
+	},
+	{
 		"a: [1, 2]",
 		"a: [1, 2]",
-	}, {
+	},
+	{
 		"a: y",
 		`a: "y"`,
-	}, {
+	},
+	{
 		"{ a: 1, b: {c: 1} }",
 		`a: 1, b: {c: 1}`,
-	}, {
+	},
+	{
 		`
 True: 1
 Null: 1
@@ -275,13 +322,16 @@ Null: 1
 	{
 		"v: 42",
 		"v: 42",
-	}, {
+	},
+	{
 		"v: -42",
 		"v: -42",
-	}, {
+	},
+	{
 		"v: 4294967296",
 		"v: 4294967296",
-	}, {
+	},
+	{
 		"v: -4294967296",
 		"v: -4294967296",
 	},
@@ -382,7 +432,8 @@ Null: 1
 	{
 		"v: 4294967297",
 		"v: 4294967297",
-	}, {
+	},
+	{
 		"v: 128",
 		"v: 128",
 	},
@@ -391,7 +442,8 @@ Null: 1
 	{
 		"'1': '\"2\"'",
 		`"1": "\"2\""`,
-	}, {
+	},
+	{
 		"v:\n- A\n- 'B\n\n  C'\n",
 		`v: [
 	"A",
@@ -400,7 +452,8 @@ Null: 1
 		C
 		""",
 ]`,
-	}, {
+	},
+	{
 		`"\0"`,
 		`"\u0000"`,
 	},
@@ -409,16 +462,20 @@ Null: 1
 	{
 		"v: !!float '1.1'",
 		"v: 1.1",
-	}, {
+	},
+	{
 		"v: !!float 0",
 		"v: float & 0", // Should this be 0.0?
-	}, {
+	},
+	{
 		"v: !!float -1",
 		"v: float & -1", // Should this be -1.0?
-	}, {
+	},
+	{
 		"v: !!null ''",
 		"v: null",
-	}, {
+	},
+	{
 		"%TAG !y! tag:yaml.org,2002:\n---\nv: !y!int '1'",
 		"v: 1",
 	},
@@ -437,13 +494,15 @@ Null: 1
 b: 2
 c: 1
 d: 2`,
-	}, {
+	},
+	{
 		"a: &a {c: 1}\nb: *a",
 		`a: {c: 1}
 b: {
 	c: 1
 }`,
-	}, {
+	},
+	{
 		"a: &a [1, 2]\nb: *a",
 		"a: [1, 2]\nb: [1, 2]", // TODO: a: [1, 2], b: a
 	},
@@ -451,7 +510,8 @@ b: {
 	{
 		"foo: ''",
 		`foo: ""`,
-	}, {
+	},
+	{
 		"foo: null",
 		"foo: null",
 	},
@@ -524,10 +584,12 @@ b: {
 	{
 		"a: !!binary gIGC\n",
 		`a: '\x80\x81\x82'`,
-	}, {
+	},
+	{
 		"a: !!binary |\n  " + strings.Repeat("kJCQ", 17) + "kJ\n  CQ\n",
 		"a: '" + strings.Repeat(`\x90`, 54) + "'",
-	}, {
+	},
+	{
 		"a: !!binary |\n  " + strings.Repeat("A", 70) + "\n  ==\n",
 		"a: '" + strings.Repeat(`\x00`, 52) + "'",
 	},
@@ -678,7 +740,8 @@ a:
 	{
 		"a: 123456e1\n",
 		`a: 123456e1`,
-	}, {
+	},
+	{
 		"a: 123456E1\n",
 		`a: 123456e1`,
 	},
@@ -926,7 +989,7 @@ func TestFiles(t *testing.T) {
 			}
 			got := cueStr(expr)
 			if cuetest.UpdateGoldenFiles {
-				os.WriteFile(filename, []byte(got), 0644)
+				os.WriteFile(filename, []byte(got), 0o644)
 				return
 			}
 			b, err := os.ReadFile(filename)

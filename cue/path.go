@@ -353,7 +353,8 @@ func toSelectors(expr ast.Expr) []Selector {
 		if b, ok := x.Index.(*ast.BasicLit); !ok {
 			sel = Selector{pathError{
 				errors.Newf(token.NoPos, "non-constant expression %s",
-					astinternal.DebugStr(x.Index))}}
+					astinternal.DebugStr(x.Index)),
+			}}
 		} else {
 			sel = basicLitSelector(b)
 		}
@@ -411,7 +412,8 @@ func basicLitSelector(b *ast.BasicLit) Selector {
 		info, _, _, _ := literal.ParseQuotes(b.Value, b.Value)
 		if !info.IsDouble() {
 			return Selector{pathError{
-				errors.Newf(token.NoPos, "invalid string index %s", b.Value)}}
+				errors.Newf(token.NoPos, "invalid string index %s", b.Value),
+			}}
 		}
 		s, _ := literal.Unquote(b.Value)
 		return Selector{stringSelector(s)}
@@ -430,8 +432,9 @@ func Label(label ast.Label) Selector {
 		switch s := x.Name; {
 		case strings.HasPrefix(s, "_"):
 			// TODO: extract package from a bound identifier.
-			return Selector{pathError{errors.Newf(token.NoPos,
-				"invalid path: hidden label %s not allowed", s),
+			return Selector{pathError{
+				errors.Newf(token.NoPos,
+					"invalid path: hidden label %s not allowed", s),
 			}}
 		case strings.HasPrefix(s, "#"):
 			return Selector{definitionSelector(x.Name)}

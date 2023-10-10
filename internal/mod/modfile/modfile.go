@@ -62,7 +62,7 @@ func moduleSchema() cue.Value {
 		ctx := cuecontext.New()
 		schemav := ctx.CompileBytes(moduleSchemaData, cue.Filename("cuelang.org/go/internal/mod/modfile/schema.cue"))
 		schemav = lookup(schemav, cue.Def("#File"))
-		//schemav = schemav.Unify(lookup(schemav, cue.Hid("#Strict", "_")))
+		// schemav = schemav.Unify(lookup(schemav, cue.Hid("#Strict", "_")))
 		if err := schemav.Validate(); err != nil {
 			panic(fmt.Errorf("internal error: invalid CUE module.cue schema: %v", errors.Details(err, nil)))
 		}

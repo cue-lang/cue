@@ -133,7 +133,7 @@ func TestTutorial(t *testing.T) {
 					r, err = os.OpenFile(
 						strings.TrimSpace(redirect[2:]),
 						os.O_APPEND|os.O_CREATE|os.O_WRONLY,
-						0666)
+						0o666)
 				} else { // strings.HasPrefix(redirect, ">")
 					// Create new file with input
 					r, err = os.Create(strings.TrimSpace(redirect[1:]))
@@ -182,7 +182,7 @@ func TestTutorial(t *testing.T) {
 					t.Fatal(err)
 				}
 				b = re.ReplaceAll(b, repl)
-				err = os.WriteFile(file, b, 0644)
+				err = os.WriteFile(file, b, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -190,7 +190,7 @@ func TestTutorial(t *testing.T) {
 			case strings.HasPrefix(cmd, "touch "):
 				logf(t, "$ %s", cmd)
 				file := strings.TrimSpace(cmd[len("touch "):])
-				err := os.WriteFile(file, []byte(""), 0644)
+				err := os.WriteFile(file, []byte(""), 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -227,7 +227,7 @@ func TestTutorial(t *testing.T) {
 		err = filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
 			if isCUE(path) {
 				dst := path[len(dir)+1:]
-				err := os.MkdirAll(filepath.Dir(dst), 0755)
+				err := os.MkdirAll(filepath.Dir(dst), 0o755)
 				if err != nil {
 					return err
 				}
@@ -297,7 +297,7 @@ func TestEval(t *testing.T) {
 			testfile := filepath.Join("testdata", dir+".out")
 
 			if cuetest.UpdateGoldenFiles {
-				err := os.WriteFile(testfile, got, 0644)
+				err := os.WriteFile(testfile, got, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}

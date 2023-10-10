@@ -66,6 +66,5 @@ func TestEncode(t *testing.T) {
 			return
 		}
 		_, _ = t.Write(b)
-
 	})
 }

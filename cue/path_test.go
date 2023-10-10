@@ -45,7 +45,6 @@ func TestPaths(t *testing.T) {
 		out:  "int",
 		str:  "list.[_]",
 	}, {
-
 		path: MakePath(Def("#Foo"), Str("a"), Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",

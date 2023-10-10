@@ -447,8 +447,7 @@ func isLocalImport(path string) bool {
 func warnUnmatched(matches []*match) {
 	for _, m := range matches {
 		if len(m.Pkgs) == 0 {
-			m.Err =
-				errors.Newf(token.NoPos, "cue: %q matched no packages\n", m.Pattern)
+			m.Err = errors.Newf(token.NoPos, "cue: %q matched no packages\n", m.Pattern)
 		}
 	}
 }

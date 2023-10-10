@@ -344,7 +344,7 @@ func isJSON(mediaType string) bool {
 // scratchConfig returns a dummy configuration consisting only of the
 // two-byte configuration {}.
 // https://github.com/opencontainers/image-spec/blob/main/manifest.md#example-of-a-scratch-config-or-layer-descriptor
-func (c *Client) scratchConfig(ctx context.Context, repoName string, mediaType string) (ocispec.Descriptor, error) {
+func (c *Client) scratchConfig(ctx context.Context, repoName, mediaType string) (ocispec.Descriptor, error) {
 	// TODO check if it exists already to avoid push?
 	content := []byte("{}")
 	desc := ocispec.Descriptor{

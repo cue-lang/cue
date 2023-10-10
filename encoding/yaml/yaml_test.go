@@ -241,7 +241,6 @@ func TestYAMLValues(t *testing.T) {
 			if got := strings.TrimSpace(string(b)); got != tc.yaml {
 				t.Errorf("Encode:\ngot  %q\nwant %q", got, tc.yaml)
 			}
-
 		})
 	}
 }

@@ -870,6 +870,7 @@ func NewImport(name *Ident, importPath string) *ImportSpec {
 // Pos and End implementations for spec nodes.
 
 func (s *ImportSpec) Pos() token.Pos { return getPos(s) }
+
 func (s *ImportSpec) pos() *token.Pos {
 	if s.Name != nil {
 		return s.Name.pos()

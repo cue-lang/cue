@@ -61,7 +61,8 @@ func incompleteError(v Value) errors.Error {
 		err: &adt.Bottom{
 			Code: adt.IncompleteError,
 			Err: errors.Newf(v.Pos(),
-				"cannot convert non-concrete value %v", v)},
+				"cannot convert non-concrete value %v", v),
+		},
 	}
 }
 

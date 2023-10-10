@@ -114,7 +114,6 @@ func (s *boundSimplifier) expr(ctx *adt.OpContext) (e ast.Expr) {
 		}
 		if sign := s.minNum.X.Sign(); sign == -1 {
 			e = ast.NewIdent("int")
-
 		} else {
 			e = ast.NewIdent("uint")
 			if sign == 0 && s.min.Op == adt.GreaterEqualOp {
@@ -178,8 +177,10 @@ var intRanges = []builtinRange{
 	{"int16", makeDec("-32768"), makeDec("32767")},
 	{"int32", makeDec("-2147483648"), makeDec("2147483647")},
 	{"int64", makeDec("-9223372036854775808"), makeDec("9223372036854775807")},
-	{"int128", makeDec("-170141183460469231731687303715884105728"),
-		makeDec("170141183460469231731687303715884105727")},
+	{
+		"int128", makeDec("-170141183460469231731687303715884105728"),
+		makeDec("170141183460469231731687303715884105727"),
+	},
 
 	{"uint8", makeDec("0"), makeDec("255")},
 	{"uint16", makeDec("0"), makeDec("65535")},
@@ -192,14 +193,18 @@ var intRanges = []builtinRange{
 
 var floatRanges = []builtinRange{
 	// 2**127 * (2**24 - 1) / 2**23
-	{"float32",
+	{
+		"float32",
 		makeDec("-3.40282346638528859811704183484516925440e+38"),
-		makeDec("3.40282346638528859811704183484516925440e+38")},
+		makeDec("3.40282346638528859811704183484516925440e+38"),
+	},
 
 	// 2**1023 * (2**53 - 1) / 2**52
-	{"float64",
+	{
+		"float64",
 		makeDec("-1.797693134862315708145274237317043567981e+308"),
-		makeDec("1.797693134862315708145274237317043567981e+308")},
+		makeDec("1.797693134862315708145274237317043567981e+308"),
+	},
 }
 
 func wrapBin(a, b ast.Expr, op adt.Op) ast.Expr {

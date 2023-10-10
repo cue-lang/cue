@@ -164,7 +164,6 @@ loop:
 			if kind != "" {
 				return "", pos, nil, errors.Newf(a.Pos(),
 					"only one file-level extern attribute allowed per file")
-
 			}
 			kind = k
 		}
@@ -278,7 +277,6 @@ func (d *externDecorator) markExternFieldAttr(kind string, decls []ast.Decl) (er
 		}
 
 		return true
-
 	}, func(n ast.Node) {
 		switch n.(type) {
 		case *ast.Field:

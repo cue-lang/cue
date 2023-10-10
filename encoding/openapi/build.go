@@ -830,7 +830,6 @@ func (b *builder) object(v cue.Value) {
 //     schema: an array instance is valid if at least one element matches
 //     this schema.
 func (b *builder) array(v cue.Value) {
-
 	switch op, a := v.Expr(); op {
 	case cue.CallOp:
 		name := fmt.Sprint(a[0])
@@ -1265,7 +1264,7 @@ func (b *builder) addConjunct(f func(*builder)) {
 	b.add((*ast.StructLit)(c.finish()))
 }
 
-func (b *builder) addRef(v cue.Value, inst cue.Value, ref cue.Path) {
+func (b *builder) addRef(v, inst cue.Value, ref cue.Path) {
 	name := b.ctx.makeRef(inst, ref)
 	b.addConjunct(func(b *builder) {
 		b.allOf = append(b.allOf, ast.NewStruct(

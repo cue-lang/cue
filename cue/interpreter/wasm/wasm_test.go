@@ -95,17 +95,17 @@ func copyWasmFiles(t *testing.T, dstDir, srcDir string) {
 
 func copyFile(t *testing.T, dst, src string) {
 	buf := must(os.ReadFile(src))(t)
-	err := os.WriteFile(dst, buf, 0664)
+	err := os.WriteFile(dst, buf, 0o664)
 	if err != nil {
 		t.Fatal(err)
 	}
 }
 
-func check(t *testing.T, dir string, got string) {
+func check(t *testing.T, dir, got string) {
 	golden := filepath.Join("testdata", dir) + ".golden"
 
 	if cuetest.UpdateGoldenFiles {
-		os.WriteFile(golden, []byte(got), 0644)
+		os.WriteFile(golden, []byte(got), 0o644)
 	}
 
 	want := string(must(os.ReadFile(golden))(t))

@@ -36,8 +36,7 @@ import (
 // There are currently no options.
 type Option func(*options)
 
-type options struct {
-}
+type options struct{}
 
 // NewDecoder returns a new Decoder
 func NewDecoder(option ...Option) *Decoder {
@@ -325,7 +324,6 @@ func (d *decoder) decodeMsg(m *mapping, n []*pbast.Node) ast.Expr {
 				label = ast.NewIdent(s)
 			} else {
 				label = ast.NewString(s)
-
 			}
 			// TODO: convert line number information. However, position
 			// information in textpbfmt packages is too wonky to be useful

@@ -35,10 +35,12 @@ type match struct {
 
 var errExclude = errors.New("file rejected")
 
-type cueError = errors.Error
-type excludeError struct {
-	cueError
-}
+type (
+	cueError     = errors.Error
+	excludeError struct {
+		cueError
+	}
+)
 
 func (e excludeError) Is(err error) bool { return err == errExclude }
 

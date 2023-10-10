@@ -215,7 +215,7 @@ func Parse(layout, value string) (string, error) {
 // It is valid to pass nsec outside the range [0, 999999999].
 // Not all sec values have a corresponding time value. One such
 // value is 1<<63-1 (the largest int64 value).
-func Unix(sec int64, nsec int64) string {
+func Unix(sec, nsec int64) string {
 	t := time.Unix(sec, nsec)
 	return t.UTC().Format(time.RFC3339Nano)
 }

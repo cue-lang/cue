@@ -91,10 +91,10 @@ func extractTxtarToTempDir(t testing.TB, arc *txtar.Archive) (dir string, err er
 	dir = t.TempDir()
 	for _, f := range arc.Files {
 		filePath := filepath.Join(dir, f.Name)
-		if err := os.MkdirAll(filepath.Dir(filePath), 0777); err != nil {
+		if err := os.MkdirAll(filepath.Dir(filePath), 0o777); err != nil {
 			return "", err
 		}
-		if err := os.WriteFile(filePath, f.Data, 0666); err != nil {
+		if err := os.WriteFile(filePath, f.Data, 0o666); err != nil {
 			return "", err
 		}
 	}
@@ -165,6 +165,7 @@ func (fi fakeFileInfo) Size() int64 {
 	}
 	return int64(fi.f.size)
 }
+
 func (fi fakeFileInfo) Mode() os.FileMode {
 	if fi.f.isDir {
 		return os.ModeDir | 0o755
@@ -530,7 +531,7 @@ func TestCreateFromDirSpecial(t *testing.T) {
 		{
 			desc: "ignore_empty_dir",
 			setup: func(t *testing.T, tmpDir string) string {
-				if err := os.Mkdir(filepath.Join(tmpDir, "empty"), 0777); err != nil {
+				if err := os.Mkdir(filepath.Join(tmpDir, "empty"), 0o777); err != nil {
 					t.Fatal(err)
 				}
 				mustWriteFile(
@@ -562,7 +563,7 @@ func TestCreateFromDirSpecial(t *testing.T) {
 			desc: "dir_is_vendor",
 			setup: func(t *testing.T, tmpDir string) string {
 				vendorDir := filepath.Join(tmpDir, "vendor")
-				if err := os.Mkdir(vendorDir, 0777); err != nil {
+				if err := os.Mkdir(vendorDir, 0o777); err != nil {
 					t.Fatal(err)
 				}
 				mustWriteFile(
@@ -956,7 +957,7 @@ func TestUnzipSizeLimitsSpecial(t *testing.T) {
 	}
 }
 
-func mustWriteFile(name string, content string) {
+func mustWriteFile(name, content string) {
 	if err := os.MkdirAll(filepath.Dir(name), 0o777); err != nil {
 		panic(err)
 	}

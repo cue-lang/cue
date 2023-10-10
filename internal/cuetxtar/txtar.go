@@ -449,7 +449,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 			a.Files = files
 
 			if update {
-				err = os.WriteFile(fullpath, txtar.Format(a), 0644)
+				err = os.WriteFile(fullpath, txtar.Format(a), 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}

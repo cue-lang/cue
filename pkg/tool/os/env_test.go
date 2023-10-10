@@ -31,7 +31,6 @@ import (
 )
 
 func TestGetenv(t *testing.T) {
-
 	for _, p := range [][2]string{
 		{"CUEOSTESTMOOD", "yippie"},
 		{"CUEOSTESTTRUE", "True"},
@@ -91,7 +90,7 @@ func TestGetenv(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		var opts = []cmp.Option{
+		opts := []cmp.Option{
 			cmpopts.IgnoreFields(ast.BinaryExpr{}, "OpPos"),
 			cmpopts.IgnoreFields(ast.BasicLit{}, "ValuePos"),
 			cmpopts.IgnoreUnexported(ast.BasicLit{}, ast.BinaryExpr{}),

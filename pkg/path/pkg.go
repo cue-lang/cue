@@ -41,7 +41,8 @@ var (
 		Values: append([]adt.Value{
 			newStr("windows"),
 			newStr("unix"),
-			newStr("plan9")}, unixOS...),
+			newStr("plan9"),
+		}, unixOS...),
 	}
 
 	allOS = append([]adt.Value{

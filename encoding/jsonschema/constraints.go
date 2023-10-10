@@ -149,7 +149,8 @@ var constraints = []*constraint{
 		// TODO: handle the case where this is always defined and we don't want
 		// to include the default value.
 		obj.Elts = append(obj.Elts, &ast.Attribute{
-			Text: fmt.Sprintf("@jsonschema(id=%q)", u)})
+			Text: fmt.Sprintf("@jsonschema(id=%q)", u),
+		})
 	}),
 
 	// Generic constraint
@@ -697,7 +698,6 @@ var constraints = []*constraint{
 		list := s.addImport(n, "list")
 		x := ast.NewCall(ast.NewSel(list, "MaxItems"), clearPos(s.uint(n)))
 		s.add(n, arrayType, x)
-
 	}),
 
 	p1("uniqueItems", func(n cue.Value, s *state) {

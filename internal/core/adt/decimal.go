@@ -61,7 +61,6 @@ func numOp(c *OpContext, fn numFunc, x, y *Num) Value {
 	var d apd.Decimal
 
 	cond, err := fn(&d, &x.X, &y.X)
-
 	if err != nil {
 		return c.NewErrf("failed arithmetic: %v", err)
 	}

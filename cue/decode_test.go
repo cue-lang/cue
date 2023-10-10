@@ -49,7 +49,6 @@ func TestDecode(t *testing.T) {
 		dst:   &[]int{1},
 		want:  []int(nil),
 	}, {
-
 		value: `1`,
 		err:   "cannot decode into unsettable value",
 	}, {
@@ -122,8 +121,10 @@ func TestDecode(t *testing.T) {
 		// allocate map
 		value: `{a:1,m:{a: 3}}`,
 		dst:   &fields{},
-		want: fields{A: 1,
-			M: map[string]interface{}{"a": int(3)}},
+		want: fields{
+			A: 1,
+			M: map[string]interface{}{"a": int(3)},
+		},
 	}, {
 		// indirect int
 		value: `{p: 1}`,
@@ -187,7 +188,8 @@ func TestDecode(t *testing.T) {
 		dst:   &map[string]interface{}{},
 		want: map[string]interface{}{
 			"a": 1, "b": 2, "c": true,
-			"d": map[string]interface{}{"e": 2}},
+			"d": map[string]interface{}{"e": 2},
+		},
 	}, {
 		value: `{a: b: *2 | int}`,
 		dst:   &map[string]interface{}{},

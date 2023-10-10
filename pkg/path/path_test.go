@@ -148,7 +148,7 @@ func TestFromAndToSlash(t *testing.T) {
 	for _, o := range []OS{Unix, Windows, Plan9} {
 		sep := getOS(o).Separator
 
-		var slashtests = []PathTest{
+		slashtests := []PathTest{
 			{"", ""},
 			{"/", string(sep)},
 			{"/a/b", string([]byte{sep, 'a', sep, 'b'})},

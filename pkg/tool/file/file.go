@@ -41,13 +41,15 @@ func newMkdirCmd(v cue.Value) (task.Runner, error)     { return &cmdMkdir{}, nil
 func newMkdirTempCmd(v cue.Value) (task.Runner, error) { return &cmdMkdirTemp{}, nil }
 func newRemoveAllCmd(v cue.Value) (task.Runner, error) { return &cmdRemoveAll{}, nil }
 
-type cmdRead struct{}
-type cmdAppend struct{}
-type cmdCreate struct{}
-type cmdGlob struct{}
-type cmdMkdir struct{}
-type cmdMkdirTemp struct{}
-type cmdRemoveAll struct{}
+type (
+	cmdRead      struct{}
+	cmdAppend    struct{}
+	cmdCreate    struct{}
+	cmdGlob      struct{}
+	cmdMkdir     struct{}
+	cmdMkdirTemp struct{}
+	cmdRemoveAll struct{}
+)
 
 func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
 	filename := ctx.String("filename")

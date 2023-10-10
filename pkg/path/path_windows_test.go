@@ -40,11 +40,11 @@ func TestWinSplitListTestsAreValid(t *testing.T) {
 }
 
 func testWinSplitListTestIsValid(t *testing.T, ti int, tt SplitListTest,
-	comspec string) {
-
+	comspec string,
+) {
 	const (
 		cmdfile = `printdir.cmd`
-		perm    = 0700
+		perm    = 0o700
 	)
 
 	tmp := t.TempDir()

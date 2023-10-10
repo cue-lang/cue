@@ -106,7 +106,6 @@ func (e *exporter) expr(env *adt.Environment, v adt.Elem) (result ast.Expr) {
 // unified. All other conjuncts are added verbatim.
 
 func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct, orig ...adt.Conjunct) (expr ast.Expr) {
-
 	e := conjuncts{
 		exporter: x,
 		values:   &adt.Vertex{},

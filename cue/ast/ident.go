@@ -188,7 +188,6 @@ func LabelName(l Label) (name string, isIdent bool, err error) {
 		isIdent = false
 	}
 	return name, isIdent, err
-
 }
 
 // ErrIsExpression reports whether a label is an expression.

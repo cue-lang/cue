@@ -152,7 +152,6 @@ func (p RelPos) Pos() Pos {
 // HasRelPos repors whether p has a relative position.
 func (p Pos) HasRelPos() bool {
 	return p.offset&relMask != 0
-
 }
 
 func (p Pos) Before(q Pos) bool {

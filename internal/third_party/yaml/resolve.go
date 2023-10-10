@@ -14,8 +14,10 @@ type resolveMapItem struct {
 	tag   string
 }
 
-var resolveTable = make([]byte, 256)
-var resolveMap = make(map[string]resolveMapItem)
+var (
+	resolveTable = make([]byte, 256)
+	resolveMap   = make(map[string]resolveMapItem)
+)
 
 func init() {
 	t := resolveTable
@@ -29,7 +31,7 @@ func init() {
 	}
 	t[int('.')] = '.' // Float (potentially in map)
 
-	var resolveMapList = []struct {
+	resolveMapList := []struct {
 		v   interface{}
 		tag string
 		l   []string

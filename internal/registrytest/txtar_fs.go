@@ -114,7 +114,7 @@ type openFile struct {
 func newOpenFile(f txtar.File) *openFile {
 	var o openFile
 	o.Reader.Reset(f.Data)
-	o.fi = fileInfo{f, 0444}
+	o.fi = fileInfo{f, 0o444}
 	return &o
 }
 
@@ -130,11 +130,11 @@ type fileInfo struct {
 }
 
 func newFileInfo(f txtar.File) fileInfo {
-	return fileInfo{f, 0444}
+	return fileInfo{f, 0o444}
 }
 
 func newDirInfo(name string) fileInfo {
-	return fileInfo{txtar.File{Name: name}, fs.ModeDir | 0555}
+	return fileInfo{txtar.File{Name: name}, fs.ModeDir | 0o555}
 }
 
 func (f fileInfo) Name() string               { return path.Base(f.f.Name) }

@@ -203,7 +203,7 @@ func (fo *originalFile) restore() error {
 	if len(fo.contents) == 0 {
 		return os.Remove(fo.filename)
 	}
-	return os.WriteFile(fo.filename, fo.contents, 0644)
+	return os.WriteFile(fo.filename, fo.contents, 0o644)
 }
 
 type fileInfo struct {
@@ -288,7 +288,7 @@ func (fi *fileInfo) appendAndCheck() (fo originalFile, err error) {
 		return originalFile{}, err
 	}
 
-	if err = os.WriteFile(fi.filename, b, 0644); err != nil {
+	if err = os.WriteFile(fi.filename, b, 0o644); err != nil {
 		// Just in case, attempt to restore original file.
 		_ = fo.restore()
 		return originalFile{}, err

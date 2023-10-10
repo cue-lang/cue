@@ -135,7 +135,7 @@ func runcheck(t *testing.T, source, golden string, mode checkMode) {
 
 	// update golden files if necessary
 	if cuetest.UpdateGoldenFiles {
-		if err := os.WriteFile(golden, res, 0644); err != nil {
+		if err := os.WriteFile(golden, res, 0o644); err != nil {
 			t.Error(err)
 		}
 		return
@@ -210,7 +210,7 @@ func TestFiles(t *testing.T) {
 			t.Parallel()
 			check(t, source, golden, mode)
 			// TODO(gri) check that golden is idempotent
-			//check(t, golden, golden, e.mode)
+			// check(t, golden, golden, e.mode)
 		})
 	}
 }
@@ -278,7 +278,6 @@ func TestNodes(t *testing.T) {
 			}
 		})
 	}
-
 }
 
 // Verify that the printer doesn't crash if the AST contains BadXXX nodes.
@@ -294,6 +293,7 @@ func TestBadNodes(t *testing.T) {
 		t.Errorf("got %q, expected %q", string(b), res)
 	}
 }
+
 func TestPackage(t *testing.T) {
 	f := &ast.File{
 		Decls: []ast.Decl{

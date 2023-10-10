@@ -995,7 +995,6 @@ func (n *nodeContext) addConjunctDynamic(c Conjunct) {
 	n.node.Conjuncts = append(n.node.Conjuncts, c)
 	n.addExprConjunct(c, partial)
 	n.notifyConjunct(c)
-
 }
 
 func (n *nodeContext) notifyConjunct(c Conjunct) {

@@ -32,8 +32,10 @@ func TestQuote(t *testing.T) {
 		{form: String, in: "\x00", out: `"\u0000"`},
 		{form: String, in: "abc\xffdef", out: `"abc�def"`, lossy: true},
 		{form: Bytes, in: "abc\xffdef", out: `'abc\xffdef'`},
-		{form: String.WithASCIIOnly(),
-			in: "abc\xffdef", out: `"abc\ufffddef"`, lossy: true},
+		{
+			form: String.WithASCIIOnly(),
+			in:   "abc\xffdef", out: `"abc\ufffddef"`, lossy: true,
+		},
 		{form: String, in: "\a\b\f\r\n\t\v", out: `"\a\b\f\r\n\t\v"`},
 		{form: String, in: "\"", out: `"\""`},
 		{form: String, in: "\\", out: `"\\"`},

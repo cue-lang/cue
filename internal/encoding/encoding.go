@@ -61,8 +61,10 @@ type Decoder struct {
 	err            error
 }
 
-type interpretFunc func(*cue.Instance) (file *ast.File, id string, err error)
-type rewriteFunc func(*ast.File) (file *ast.File, err error)
+type (
+	interpretFunc func(*cue.Instance) (file *ast.File, id string, err error)
+	rewriteFunc   func(*ast.File) (file *ast.File, err error)
+)
 
 // ID returns a canonical identifier for the decoded object or "" if no such
 // identifier could be found.

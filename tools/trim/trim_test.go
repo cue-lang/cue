@@ -282,7 +282,6 @@ func TestData(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-
 		a := t.Instance()
 		val := cuecontext.New().BuildInstance(a)
 		// Note: don't check val.Err because there are deliberate

@@ -177,8 +177,8 @@ func (s *subsumer) structural(a, b adt.Conjunct) bool {
 
 func (s *subsumer) structLit(
 	ea *adt.Environment, sa *adt.StructLit,
-	eb *adt.Environment, sb *adt.StructLit) bool {
-
+	eb *adt.Environment, sb *adt.StructLit,
+) bool {
 	// Create index of instance fields.
 	ca := newCollatedDecls()
 	ca.collate(ea, sa)
@@ -213,11 +213,9 @@ func (s *subsumer) structLit(
 		// 		return false
 		// 	}
 		// }
-
 	}
 
 	return false
-
 }
 
 // collatedDecls is used to compute the structural subsumption of two

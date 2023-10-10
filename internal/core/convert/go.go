@@ -93,7 +93,7 @@ func parseTag(ctx *adt.OpContext, obj *ast.StructLit, field, tag string) ast.Exp
 }
 
 // splitTag splits a cue tag into cue and options.
-func splitTag(tag string) (cue string, options string) {
+func splitTag(tag string) (cue, options string) {
 	q := strings.LastIndexByte(tag, '"')
 	if c := strings.IndexByte(tag[q+1:], ','); c >= 0 {
 		return tag[:q+1+c], tag[q+1+c+1:]

@@ -564,7 +564,6 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 				if a.Label.Typ() == StringLabel && a.IsDefined(ctx) {
 					n.addErr(ctx.Newf("list may not have regular fields"))
 					// TODO(errors): add positions for list and arc definitions.
-
 				}
 			}
 
@@ -1228,8 +1227,8 @@ func (c *OpContext) freeNodeContext(n *nodeContext) {
 func (n *nodeContext) reportConflict(
 	v1, v2 Node,
 	k1, k2 Kind,
-	ids ...CloseInfo) {
-
+	ids ...CloseInfo,
+) {
 	ctx := n.ctx
 
 	var err *ValueError
@@ -1257,8 +1256,8 @@ func (n *nodeContext) reportFieldMismatch(
 	s *StructLit,
 	f Feature,
 	scalar Expr,
-	id ...CloseInfo) {
-
+	id ...CloseInfo,
+) {
 	ctx := n.ctx
 
 	if f == InvalidLabel {
@@ -1293,8 +1292,7 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 	kind := n.kind & k
 
 	switch {
-	case n.kind == BottomKind,
-		k == BottomKind:
+	case n.kind == BottomKind, k == BottomKind:
 		return false
 
 	case kind != BottomKind:
@@ -1933,8 +1931,8 @@ func valueError(v Value) *ValueError {
 func (n *nodeContext) addStruct(
 	env *Environment,
 	s *StructLit,
-	closeInfo CloseInfo) {
-
+	closeInfo CloseInfo,
+) {
 	n.updateCyclicStatus(closeInfo)
 
 	// NOTE: This is a crucial point in the code:
@@ -2007,7 +2005,6 @@ func (n *nodeContext) addStruct(
 	}
 
 	parent.Disable = false
-
 }
 
 // TODO(perf): if an arc is the only arc with that label added to a Vertex, and

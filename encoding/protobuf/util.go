@@ -40,9 +40,7 @@ type protoError struct {
 	error
 }
 
-var (
-	newSection = token.NewSection.Pos()
-)
+var newSection = token.NewSection.Pos()
 
 func addComments(f ast.Node, i int, doc, inline *proto.Comment) bool {
 	cg := comment(doc, true)

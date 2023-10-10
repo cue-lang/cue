@@ -26,14 +26,13 @@ import (
 
 func ExampleExtract() {
 	cwd, _ := os.Getwd()
-	var paths = []string{}
+	paths := []string{}
 	paths = append(paths, cwd)
 	paths = append(paths, filepath.Join(cwd, "testdata"))
 
 	f, err := protobuf.Extract("examples/basic/basic.proto", nil, &protobuf.Config{
 		Paths: paths,
 	})
-
 	if err != nil {
 		log.Fatal(err, "")
 	}

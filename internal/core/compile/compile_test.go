@@ -28,9 +28,7 @@ import (
 	"cuelang.org/go/internal/cuetxtar"
 )
 
-var (
-	todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
-)
+var todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
 
 func TestCompile(t *testing.T) {
 	test := cuetxtar.TxTarTest{

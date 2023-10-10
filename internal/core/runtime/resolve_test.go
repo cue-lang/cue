@@ -54,7 +54,6 @@ func TestPartiallyResolved(t *testing.T) {
 			PkgName:    "foo",
 		}},
 	}, map[string]ast.Node{})
-
 	if err != nil {
 		t.Errorf("exected no error, found %v", err)
 	}

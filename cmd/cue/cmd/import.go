@@ -490,8 +490,8 @@ func writeFile(p *buildPlan, f *ast.File, cueFile string) error {
 		_, err := p.cmd.OutOrStdout().Write(b)
 		return err
 	}
-	_ = os.MkdirAll(filepath.Dir(cueFile), 0755)
-	return os.WriteFile(cueFile, b, 0644)
+	_ = os.MkdirAll(filepath.Dir(cueFile), 0o755)
+	return os.WriteFile(cueFile, b, 0o644)
 }
 
 type hoister struct {
@@ -521,7 +521,6 @@ func (h *hoister) hoist(f *ast.File) {
 			return false
 		}
 		return true
-
 	}, func(c astutil.Cursor) bool {
 		switch f := c.Node().(type) {
 		case *ast.Field:

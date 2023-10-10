@@ -461,7 +461,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 	}
 
-	if err := os.MkdirAll(dir, 0777); err != nil {
+	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return err
 	}
 
@@ -534,7 +534,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		if err != nil {
 			return err
 		}
-		err = os.WriteFile(filepath.Join(dir, file), b, 0666)
+		err = os.WriteFile(filepath.Join(dir, file), b, 0o666)
 		if err != nil {
 			return err
 		}
@@ -595,7 +595,7 @@ func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error 
 				w.Write(b)
 
 				dst := filepath.Join(dir, file)
-				if err := os.WriteFile(dst, w.Bytes(), 0666); err != nil {
+				if err := os.WriteFile(dst, w.Bytes(), 0o666); err != nil {
 					return err
 				}
 			}
@@ -1342,7 +1342,7 @@ func hasFlag(tag, key, flag string, offset int) bool {
 	return false
 }
 
-func getName(name string, tag string) string {
+func getName(name, tag string) string {
 	tags := reflect.StructTag(tag)
 	for _, s := range []string{"json", "yaml"} {
 		if tag, ok := tags.Lookup(s); ok {

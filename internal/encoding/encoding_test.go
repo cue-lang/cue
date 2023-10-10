@@ -29,24 +29,26 @@ func TestValidate(t *testing.T) {
 		in     string
 		err    string
 		compat bool
-	}{{
-		form: "data",
-		in: `
+	}{
+		{
+			form: "data",
+			in: `
 		// Foo
 		a: 2
 		"b-b": 3
 		s: -2
 		a: +2
 		`,
-	}, {
-		form: "graph",
-		in: `
+		},
+		{
+			form: "graph",
+			in: `
 		let X = 3
 		a: X
 		"b-b": 3
 		s: a
 		`,
-	},
+		},
 
 		{form: "data", err: "imports", in: `import "foo" `},
 		{form: "data", err: "references", in: `a: a`},

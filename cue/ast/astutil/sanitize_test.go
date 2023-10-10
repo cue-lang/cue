@@ -42,7 +42,8 @@ func TestSanitize(t *testing.T) {
 						ast.NewIdent("list"), ast.NewCall(
 							ast.NewSel(&ast.Ident{Name: "list", Node: spec},
 								"Min")),
-					)},
+					),
+				},
 			}}
 		}(),
 		want: `import (

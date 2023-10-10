@@ -116,7 +116,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 		return fmt.Errorf("cue.mod directory already exists")
 	}
 
-	err = os.Mkdir(mod, 0755)
+	err = os.Mkdir(mod, 0o755)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
@@ -130,10 +130,10 @@ func runModInit(cmd *Command, args []string) (err error) {
 	// Set module even if it is empty, making it easier for users to fill it in.
 	_, err = fmt.Fprintf(f, "module: %q\n", module)
 
-	if err = os.Mkdir(filepath.Join(mod, "usr"), 0755); err != nil {
+	if err = os.Mkdir(filepath.Join(mod, "usr"), 0o755); err != nil {
 		return err
 	}
-	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0755); err != nil {
+	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0o755); err != nil {
 		return err
 	}
 
@@ -148,7 +148,7 @@ func backport(mod, cwd string) error {
 		return err
 	}
 
-	err = os.Mkdir(filepath.Join(cwd, "cue.mod"), 0755)
+	err = os.Mkdir(filepath.Join(cwd, "cue.mod"), 0o755)
 	if err != nil {
 		os.Rename(tmp, mod)
 		return err
@@ -164,10 +164,10 @@ func backport(mod, cwd string) error {
 		return err
 	}
 
-	if err = os.Mkdir(filepath.Join(mod, "usr"), 0755); err != nil {
+	if err = os.Mkdir(filepath.Join(mod, "usr"), 0o755); err != nil {
 		return err
 	}
-	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0755); err != nil {
+	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0o755); err != nil {
 		return err
 	}
 

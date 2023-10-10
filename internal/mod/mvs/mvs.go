@@ -115,7 +115,6 @@ func buildList[V comparable](targets []V, reqs Reqs[V], upgrade func(V) (V, erro
 		work.Add(target)
 	}
 	work.Do(10, func(m V) {
-
 		var required []V
 		var err error
 		if reqs.Version(m) != "none" {

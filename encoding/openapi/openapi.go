@@ -137,7 +137,6 @@ func toCUE(name string, x interface{}) (v ast.Expr, err error) {
 			"openapi: could not encode %s", name)
 	}
 	return v, nil
-
 }
 
 func (c *Config) compose(inst cue.InstanceOrValue, schemas *ast.StructLit) (x *ast.StructLit, err error) {

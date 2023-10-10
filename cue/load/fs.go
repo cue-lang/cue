@@ -39,7 +39,7 @@ type overlayFile struct {
 
 func (f *overlayFile) Name() string       { return f.basename }
 func (f *overlayFile) Size() int64        { return int64(len(f.contents)) }
-func (f *overlayFile) Mode() os.FileMode  { return 0644 }
+func (f *overlayFile) Mode() os.FileMode  { return 0o644 }
 func (f *overlayFile) ModTime() time.Time { return f.modtime }
 func (f *overlayFile) IsDir() bool        { return f.isDir }
 func (f *overlayFile) Sys() interface{}   { return nil }
@@ -257,7 +257,6 @@ func (fs *fileSystem) walk(root string, f walkFunc) error {
 		return nil
 	}
 	return err
-
 }
 
 func (fs *fileSystem) walkRec(path string, entry iofs.DirEntry, f walkFunc) errors.Error {

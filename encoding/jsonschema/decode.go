@@ -121,7 +121,8 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		if len(tags) > 0 {
 			body := strings.Join(tags, ",")
 			a = append(a, &ast.Attribute{
-				Text: fmt.Sprintf("@jsonschema(%s)", body)})
+				Text: fmt.Sprintf("@jsonschema(%s)", body),
+			})
 		}
 
 		if state.deprecated {

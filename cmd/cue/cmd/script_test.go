@@ -99,7 +99,7 @@ func TestScript(t *testing.T) {
 			// Set up a home dir within work dir with a . prefix so that the
 			// Go/CUE pattern ./... does not descend into it.
 			home := filepath.Join(e.WorkDir, homeDirName)
-			if err := os.Mkdir(home, 0777); err != nil {
+			if err := os.Mkdir(home, 0o777); err != nil {
 				return err
 			}
 
@@ -164,8 +164,8 @@ func TestX(t *testing.T) {
 
 	for _, f := range a.Files {
 		name := filepath.Join(tmpdir, f.Name)
-		check(os.MkdirAll(filepath.Dir(name), 0777))
-		check(os.WriteFile(name, f.Data, 0666))
+		check(os.MkdirAll(filepath.Dir(name), 0o777))
+		check(os.WriteFile(name, f.Data, 0o666))
 	}
 
 	cwd, err := os.Getwd()

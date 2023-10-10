@@ -131,6 +131,7 @@ func (e *encoder) ws(pos token.Pos, default_ token.RelPos) {
 		e.indent()
 	}
 }
+
 func (e *encoder) encode(n ast.Node) error {
 	if e.tab == nil {
 		e.tab = []byte("    ")

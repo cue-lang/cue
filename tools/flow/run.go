@@ -158,7 +158,6 @@ func (c *Controller) markReady(t *Task) {
 // updateValue recomputes the workflow configuration if it is out of date. It
 // reports whether the values were updated.
 func (c *Controller) updateValue() bool {
-
 	if c.valueSeqNum == c.conjunctSeq {
 		return false
 	}

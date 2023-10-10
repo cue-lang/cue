@@ -167,7 +167,7 @@ func (g *Graph[V]) sortVersions(vs []V) {
 	})
 }
 
-func (g *Graph[V]) newVersion(path string, vers string) V {
+func (g *Graph[V]) newVersion(path, vers string) V {
 	v, err := g.v.New(path, vers)
 	if err != nil {
 		// Note: can't happen because all paths and versions passed to

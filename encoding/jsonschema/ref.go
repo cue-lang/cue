@@ -297,7 +297,6 @@ func (s *state) newSel(e ast.Expr, v cue.Value, a []string) ast.Expr {
 func newSel(e ast.Expr, label label) ast.Expr {
 	if label.isDef {
 		return ast.NewSel(e, label.name)
-
 	}
 	if ast.IsValidIdent(label.name) && !internal.IsDefOrHidden(label.name) {
 		return ast.NewSel(e, label.name)

@@ -34,9 +34,7 @@ import (
 	_ "cuelang.org/go/pkg"
 )
 
-var (
-	todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
-)
+var todo = flag.Bool("todo", false, "run tests marked with #todo-compile")
 
 // TestEval tests the default implementation of the evaluator.
 func TestEval(t *testing.T) {

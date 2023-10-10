@@ -80,7 +80,6 @@ func (c *Context) Bytes(field string) []byte {
 }
 
 func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interface{}) {
-
 	err := &taskError{
 		task:    c.Obj,
 		v:       v,

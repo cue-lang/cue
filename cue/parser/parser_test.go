@@ -24,7 +24,6 @@ import (
 
 func TestParse(t *testing.T) {
 	testCases := []struct{ desc, in, out string }{{
-
 		"ellipsis in structs",
 		`#Def: {
 			b: "2"
@@ -42,7 +41,6 @@ func TestParse(t *testing.T) {
 		`,
 		`#Def: {b: "2", ...}, ..., #Def2: {..., b: "2"}, #Def3: {..., _}, ...`,
 	}, {
-
 		"empty file", "", "",
 	}, {
 		"empty struct", "{}", "{}",
@@ -698,20 +696,32 @@ bar: 2
 
 func TestStrict(t *testing.T) {
 	testCases := []struct{ desc, in string }{
-		{"block comments",
-			`a: 1 /* a */`},
-		{"space separator",
-			`a b c: 2`},
-		{"reserved identifiers",
-			`__foo: 3`},
-		{"old-style alias 1",
-			`X=3`},
-		{"old-style alias 2",
-			`X={}`},
+		{
+			"block comments",
+			`a: 1 /* a */`,
+		},
+		{
+			"space separator",
+			`a b c: 2`,
+		},
+		{
+			"reserved identifiers",
+			`__foo: 3`,
+		},
+		{
+			"old-style alias 1",
+			`X=3`,
+		},
+		{
+			"old-style alias 2",
+			`X={}`,
+		},
 
 		// Not yet supported
-		{"additional typed not yet supported",
-			`{...int}`},
+		{
+			"additional typed not yet supported",
+			`{...int}`,
+		},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -786,7 +796,7 @@ func TestParseExpr(t *testing.T) {
 }
 
 func TestImports(t *testing.T) {
-	var imports = map[string]bool{
+	imports := map[string]bool{
 		`"a"`:        true,
 		`"a/b"`:      true,
 		`"a.b"`:      true,

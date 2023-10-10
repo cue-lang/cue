@@ -247,7 +247,6 @@ func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 
 	c.initTasks()
 	return c
-
 }
 
 // Run runs the tasks of a workflow until completion.
@@ -448,7 +447,6 @@ func (t *Task) addDep(path string, dep *Task) {
 	}
 	if !found {
 		t.pathDeps[path] = append(a, dep)
-
 	}
 
 	if !t.deps[dep] {

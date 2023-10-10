@@ -246,12 +246,12 @@ func TestParseDefinitions(t *testing.T) {
 					walk(all)
 				}
 
-				var out = &bytes.Buffer{}
+				out := &bytes.Buffer{}
 				_ = json.Indent(out, b, "", "   ")
 
 				wantFile := filepath.Join("testdata", tc.out)
 				if cuetest.UpdateGoldenFiles {
-					_ = os.WriteFile(wantFile, out.Bytes(), 0644)
+					_ = os.WriteFile(wantFile, out.Bytes(), 0o644)
 					return
 				}
 
@@ -343,7 +343,7 @@ func TestX(t *testing.T) {
 		t.Fatal(errors.Details(err, nil))
 	}
 
-	var out = &bytes.Buffer{}
+	out := &bytes.Buffer{}
 	_ = json.Indent(out, b, "", "   ")
 	t.Error(out.String())
 }

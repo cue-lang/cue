@@ -197,7 +197,6 @@ func fromGoValue(x interface{}, nilIsNull bool) (v cue.Value, err error) {
 	// v = instance.Eval(expr)
 	// mutex.Unlock()
 	// return v, nil
-
 }
 
 func fromGoType(x interface{}) cue.Value {

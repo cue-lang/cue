@@ -98,5 +98,4 @@ func TestCheckIssueCondition(t *testing.T) {
 			}
 		})
 	}
-
 }

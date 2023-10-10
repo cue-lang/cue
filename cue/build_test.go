@@ -90,25 +90,30 @@ func TestBuild(t *testing.T) {
 		insts(&bimport{"", files(`test: "ok"`)}),
 		`{test:"ok"}`,
 	}, {
-		insts(&bimport{"",
+		insts(&bimport{
+			"",
 			files(
 				`package test
 
 				import "math"
 
-				"Pi: \(math.Pi)!"`)}),
+				"Pi: \(math.Pi)!"`),
+		}),
 		`"Pi: 3.14159265358979323846264338327950288419716939937510582097494459!"`,
 	}, {
-		insts(&bimport{"",
+		insts(&bimport{
+			"",
 			files(
 				`package test
 
 				import math2 "math"
 
-				"Pi: \(math2.Pi)!"`)}),
+				"Pi: \(math2.Pi)!"`),
+		}),
 		`"Pi: 3.14159265358979323846264338327950288419716939937510582097494459!"`,
 	}, {
-		insts(pkg1, &bimport{"",
+		insts(pkg1, &bimport{
+			"",
 			files(
 				`package test
 
@@ -118,7 +123,8 @@ func TestBuild(t *testing.T) {
 		}),
 		`"Hello World!"`,
 	}, {
-		insts(pkg1, &bimport{"",
+		insts(pkg1, &bimport{
+			"",
 			files(
 				`package test
 
@@ -128,7 +134,8 @@ func TestBuild(t *testing.T) {
 		}),
 		`"Hello World!"`,
 	}, {
-		insts(pkg1, &bimport{"",
+		insts(pkg1, &bimport{
+			"",
 			files(
 				`package test
 
@@ -139,7 +146,8 @@ func TestBuild(t *testing.T) {
 		}),
 		`"Hello World!"`,
 	}, {
-		insts(pkg1, pkg2, &bimport{"",
+		insts(pkg1, pkg2, &bimport{
+			"",
 			files(
 				`package test
 
@@ -151,7 +159,8 @@ func TestBuild(t *testing.T) {
 		}),
 		`imported and not used: "pkg1" as bar (and 1 more errors)`,
 	}, {
-		insts(pkg2, &bimport{"",
+		insts(pkg2, &bimport{
+			"",
 			files(
 				`package test
 
@@ -162,7 +171,8 @@ func TestBuild(t *testing.T) {
 		`imported and not used: "mod.test/foo/pkg2:pkg" (and 1 more errors)`,
 		// `file0.cue:5:14: unresolved reference pkg2`,
 	}, {
-		insts(pkg2, &bimport{"",
+		insts(pkg2, &bimport{
+			"",
 			files(
 				`package test
 
@@ -172,7 +182,8 @@ func TestBuild(t *testing.T) {
 		}),
 		`"Hello 12!"`,
 	}, {
-		insts(pkg3, &bimport{"",
+		insts(pkg3, &bimport{
+			"",
 			files(
 				`package test
 
@@ -182,7 +193,8 @@ func TestBuild(t *testing.T) {
 		}),
 		`"Hello 2!"`,
 	}, {
-		insts(pkg3, &bimport{"",
+		insts(pkg3, &bimport{
+			"",
 			files(
 				`package test
 

@@ -362,13 +362,17 @@ func (t *T) updateField(info *info, ci *callInfo, newValue any) {
 		}
 	case reflect.Int, reflect.Int64, reflect.Int32, reflect.Int8:
 		i := x.Int()
-		value = &ast.BasicLit{Kind: token.INT,
-			Value: strconv.FormatInt(i, 10)}
+		value = &ast.BasicLit{
+			Kind:  token.INT,
+			Value: strconv.FormatInt(i, 10),
+		}
 		isZero = i == 0
 	case reflect.Uint, reflect.Uint64, reflect.Uint32, reflect.Uint8:
 		i := x.Uint()
-		value = &ast.BasicLit{Kind: token.INT,
-			Value: strconv.FormatUint(i, 10)}
+		value = &ast.BasicLit{
+			Kind:  token.INT,
+			Value: strconv.FormatUint(i, 10),
+		}
 		isZero = i == 0
 	}
 

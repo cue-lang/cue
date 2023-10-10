@@ -184,27 +184,32 @@ func TestStructural(t *testing.T) {
 		104: {subsumes: true, in: `a: !bool, b: !bool`},
 
 		// Call
-		113: {subsumes: true, in: `
+		113: {
+			subsumes: true, in: `
 			a: fn()
 			b: fn()
 			fn: _`,
 		},
-		114: {subsumes: false, in: `
+		114: {
+			subsumes: false, in: `
 			a: fn(),
 			b: fn(1)
 			fn: _`,
 		},
-		115: {subsumes: true, in: `
+		115: {
+			subsumes: true, in: `
 			a: fn(2)
 			b: fn(2)
 			fn: _`,
 		},
-		116: {subsumes: true, in: `
+		116: {
+			subsumes: true, in: `
 			a: fn(number)
 			b: fn(2)
 			fn: _`,
 		},
-		117: {subsumes: false, in: `
+		117: {
+			subsumes: false, in: `
 			a: fn(2)
 			b: fn(number)
 			fn: _`,
@@ -459,7 +464,6 @@ func TestStructural(t *testing.T) {
 		r := runtime.New()
 
 		t.Run(strconv.Itoa(i)+"/"+key, func(t *testing.T) {
-
 			file, err := parser.ParseFile("subsume", tc.in)
 			if err != nil {
 				t.Fatal(err)

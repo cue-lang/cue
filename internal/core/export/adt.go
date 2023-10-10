@@ -421,7 +421,8 @@ func (e *exporter) resolve(env *adt.Environment, r adt.Resolver) ast.Expr {
 func (e *exporter) newIdentForField(
 	orig *ast.Ident,
 	label adt.Feature,
-	upCount int32) (ident *ast.Ident, ok bool) {
+	upCount int32,
+) (ident *ast.Ident, ok bool) {
 	f := e.frame(upCount)
 	entry := f.fields[label]
 
@@ -614,7 +615,6 @@ func aliasFromLabel(src *ast.Field) string {
 }
 
 func (e *exporter) elem(env *adt.Environment, d adt.Elem) ast.Expr {
-
 	switch x := d.(type) {
 	case adt.Expr:
 		return e.expr(env, x)

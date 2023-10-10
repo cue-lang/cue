@@ -141,7 +141,7 @@ func TestDecode(t *testing.T) {
 
 			if updated {
 				b := txtar.Format(a)
-				err = os.WriteFile(fullpath, b, 0644)
+				err = os.WriteFile(fullpath, b, 0o644)
 				if err != nil {
 					t.Fatal(err)
 				}

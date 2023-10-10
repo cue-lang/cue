@@ -94,7 +94,8 @@ func TestSyntax(t *testing.T) {
 	let T = {
 		name: string
 	}
-}`}, {
+}`,
+	}, {
 		// Structural errors (and worse) are reported as is.
 		name: "structural error",
 		in: `

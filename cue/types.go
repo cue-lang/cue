@@ -1259,7 +1259,6 @@ func (v Value) Len() Value {
 	}
 	const msg = "len not supported for type %v"
 	return remakeValue(v, nil, mkErr(v.idx, v.v, msg, v.Kind()))
-
 }
 
 // Elem returns the value of undefined element types of lists and structs.
@@ -1895,7 +1894,7 @@ func (v Value) Unify(w Value) Value {
 //
 // UnifyAccept is used to piecemeal unify individual conjuncts obtained from
 // accept without violating closedness rules.
-func (v Value) UnifyAccept(w Value, accept Value) Value {
+func (v Value) UnifyAccept(w, accept Value) Value {
 	if v.v == nil {
 		return w
 	}
@@ -2302,7 +2301,6 @@ func (v Value) Expr() (Op, []Value) {
 
 	if v.v.IsData() {
 		expr = v.v.Value()
-
 	} else {
 		switch len(v.v.Conjuncts) {
 		case 0:

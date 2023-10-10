@@ -110,7 +110,7 @@ func TestDecode(t *testing.T) {
 					if cuetest.UpdateGoldenFiles {
 						a.Files[outIndex].Data = b
 						b = txtar.Format(a)
-						err = os.WriteFile(fullpath, b, 0644)
+						err = os.WriteFile(fullpath, b, 0o644)
 						if err != nil {
 							t.Fatal(err)
 						}

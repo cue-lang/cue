@@ -29,8 +29,7 @@ import (
 )
 
 // Config has no options yet, but is defined for future extensibility.
-type Config struct {
-}
+type Config struct{}
 
 // A Codec decodes and encodes CUE from and to Go values and validates and
 // completes Go values based on CUE templates.

@@ -157,7 +157,6 @@ const (
 // representing the fragments of erroneous source code). Multiple errors
 // are returned via a ErrorList which is sorted by file position.
 func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
-
 	// get source
 	text, err := source.Read(filename, src)
 	if err != nil {

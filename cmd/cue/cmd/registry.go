@@ -90,9 +90,7 @@ func isInsecureHost(hostPort string) bool {
 		host = hostPort
 	}
 	switch host {
-	case "localhost",
-		"127.0.0.1",
-		"::1":
+	case "localhost", "127.0.0.1", "::1":
 		return true
 	}
 	// TODO other clients have logic for RFC1918 too, amongst other

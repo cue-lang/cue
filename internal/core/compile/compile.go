@@ -895,7 +895,8 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		ret := &adt.SelectorExpr{
 			Src: n,
 			X:   c.expr(n.X),
-			Sel: c.label(n.Sel)}
+			Sel: c.label(n.Sel),
+		}
 		c.inSelector--
 		return ret
 

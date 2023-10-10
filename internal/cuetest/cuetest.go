@@ -39,18 +39,16 @@ const (
 	envFormatTxtar = "CUE_FORMAT_TXTAR"
 )
 
-var (
-	// issuesConditions is a set of regular expressions that defines the set of
-	// conditions that can be used to declare links to issues in various issue
-	// trackers. e.g. in testscript condition form
-	//
-	//     [golang.org/issues/1234]
-	//     [github.com/govim/govim/issues/4321]
-	issuesConditions = []*regexp.Regexp{
-		regexp.MustCompile(`^golang\.org/issues?/\d+$`),
-		regexp.MustCompile(`^cuelang\.org/issues?/\d+$`),
-	}
-)
+// issuesConditions is a set of regular expressions that defines the set of
+// conditions that can be used to declare links to issues in various issue
+// trackers. e.g. in testscript condition form
+//
+//     [golang.org/issues/1234]
+//     [github.com/govim/govim/issues/4321]
+var issuesConditions = []*regexp.Regexp{
+	regexp.MustCompile(`^golang\.org/issues?/\d+$`),
+	regexp.MustCompile(`^cuelang\.org/issues?/\d+$`),
+}
 
 // UpdateGoldenFiles determines whether testscript scripts should update txtar
 // archives in the event of cmp failures.
@@ -118,7 +116,7 @@ func IssueSkip(t *testing.T, s string) {
 // CUE_NON_ISSUES for a match, in which case nonIssue is true (a value of true
 // indicates roughly that we don't believe issue s is an issue any more). In
 // case of any errors err is set.
-func checkIssueCondition(s string) (isIssue bool, nonIssue bool, err error) {
+func checkIssueCondition(s string) (isIssue, nonIssue bool, err error) {
 	var r *regexp.Regexp
 	if v := os.Getenv(envNonIssues); v != "" {
 		r, err = regexp.Compile(v)

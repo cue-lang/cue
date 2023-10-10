@@ -98,7 +98,6 @@ type envDisjunct struct {
 }
 
 func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, cloneID CloseInfo) {
-
 	// TODO: precompute
 	numDefaults := 0
 	for _, v := range x.Values {
@@ -115,15 +114,14 @@ func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, clone
 func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
 	n.disjunctions = append(n.disjunctions,
 		envDisjunct{env, cloneID, nil, x, x.HasDefaults, false, false})
-
 }
 
 func (n *nodeContext) expandDisjuncts(
 	state vertexStatus,
 	parent *nodeContext,
 	parentMode defaultMode, // default mode of this disjunct
-	recursive, last bool) {
-
+	recursive, last bool,
+) {
 	n.ctx.stats.Disjuncts++
 
 	// refNode is used to collect cyclicReferences for all disjuncts to be
@@ -583,7 +581,6 @@ func selectErrors(a []*Bottom) (errs errors.Error) {
 	if len(a) <= 2 {
 		for _, b := range a {
 			errs = errors.Append(errs, b.Err)
-
 		}
 		return errs
 	}

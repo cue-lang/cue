@@ -943,7 +943,7 @@ func TestFieldType(t *testing.T) {
 }
 
 func TestLookup(t *testing.T) {
-	var runtime = new(Runtime)
+	runtime := new(Runtime)
 	inst, err := runtime.Compile("x.cue", `
 #V: {
 	x: int
@@ -1129,7 +1129,6 @@ func TestFill2(t *testing.T) {
 		b: int
 	}
 	`)
-
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -3255,7 +3254,6 @@ func TestPathCorrection(t *testing.T) {
 		},
 		want: "a",
 	}, {
-
 		// TODO: embedding: have field operators.
 		input: `
 			a: {
@@ -3270,7 +3268,6 @@ func TestPathCorrection(t *testing.T) {
 		},
 		want: "a.c",
 	}, {
-
 		// TODO: implement proper Elem()
 		input: `
 			a: b: [...T]
@@ -3358,7 +3355,6 @@ func TestPathCorrection(t *testing.T) {
 			return v
 		},
 	}, {
-
 		input: `
 		package foo
 
@@ -3379,7 +3375,6 @@ func TestPathCorrection(t *testing.T) {
 			return v
 		},
 	}, {
-
 		// TODO: record additionalItems in list
 		input: `
 			package foo
@@ -3472,7 +3467,6 @@ func TestPathCorrection(t *testing.T) {
 			if gotPath != tc.want {
 				t.Errorf("got path %s; want %s", gotPath, tc.want)
 			}
-
 		})
 	}
 }
@@ -3705,7 +3699,7 @@ func TestExpr(t *testing.T) {
 		input: `v: and([])`,
 		want:  `_`,
 	}, {
-		//Issue #1245
+		// Issue #1245
 		input: `
 				x: *4 | int
 				v: x | *7

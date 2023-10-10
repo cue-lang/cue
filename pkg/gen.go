@@ -190,7 +190,7 @@ func generate(pkg *packages.Package) error {
 
 	filename := filepath.Join(pkgDir, genFile)
 
-	if err := os.WriteFile(filename, b, 0666); err != nil {
+	if err := os.WriteFile(filename, b, 0o666); err != nil {
 		return err
 	}
 	return nil
@@ -438,7 +438,7 @@ var errNoCUEFiles = errors.New("no CUE files in directory")
 // library, we don't want that cyclic dependency.
 // It only has to deal with the fairly limited subset of CUE packages that are
 // present inside pkg/....
-func loadCUEPackage(ctx *cue.Context, dir string, pkgPath string) (cue.Value, error) {
+func loadCUEPackage(ctx *cue.Context, dir, pkgPath string) (cue.Value, error) {
 	inst := &build.Instance{
 		PkgName:     path.Base(pkgPath),
 		Dir:         dir,

@@ -32,7 +32,6 @@ type validator interface {
 }
 
 func TestPackages(t *testing.T) {
-
 	testCases := []struct {
 		name  string
 		value validator

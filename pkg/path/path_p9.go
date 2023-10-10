@@ -20,8 +20,10 @@ package path
 
 import "strings"
 
-const plan9Separator = '/'
-const plan9ListSeparator = '\000'
+const (
+	plan9Separator     = '/'
+	plan9ListSeparator = '\000'
+)
 
 type plan9Info struct{}
 

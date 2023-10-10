@@ -101,7 +101,6 @@ func TestAttributes(t *testing.T) {
 			if got != tc.out {
 				t.Errorf("got %v; want %v", got, tc.out)
 			}
-
 		})
 	}
 }

@@ -57,81 +57,111 @@ func TestConvert(t *testing.T) {
 	testCases := []struct {
 		goVal interface{}
 		want  string
-	}{{
-		nil, "(_){ _ }",
-	}, {
-		true, "(bool){ true }",
-	}, {
-		false, "(bool){ false }",
-	}, {
-		errors.New("oh noes"), "(_|_){\n  // [eval] oh noes\n}",
-	}, {
-		"foo", `(string){ "foo" }`,
-	}, {
-		"\x80", `(string){ "�" }`,
-	}, {
-		3, "(int){ 3 }",
-	}, {
-		uint(3), "(int){ 3 }",
-	}, {
-		uint8(3), "(int){ 3 }",
-	}, {
-		uint16(3), "(int){ 3 }",
-	}, {
-		uint32(3), "(int){ 3 }",
-	}, {
-		uint64(3), "(int){ 3 }",
-	}, {
-		int8(-3), "(int){ -3 }",
-	}, {
-		int16(-3), "(int){ -3 }",
-	}, {
-		int32(-3), "(int){ -3 }",
-	}, {
-		int64(-3), "(int){ -3 }",
-	}, {
-		float64(3), "(float){ 3 }",
-	}, {
-		float64(3.1), "(float){ 3.1 }",
-	}, {
-		float32(3.1), "(float){ 3.1 }",
-	}, {
-		uintptr(3), "(int){ 3 }",
-	}, {
-		&i34, "(int){ 34 }",
-	}, {
-		&f37, "(float){ 37 }",
-	}, {
-		&d35, "(int){ 35 }",
-	}, {
-		&n36, "(int){ -36 }",
-	}, {
-		[]int{1, 2, 3, 4}, `(#list){
+	}{
+		{
+			nil, "(_){ _ }",
+		},
+		{
+			true, "(bool){ true }",
+		},
+		{
+			false, "(bool){ false }",
+		},
+		{
+			errors.New("oh noes"), "(_|_){\n  // [eval] oh noes\n}",
+		},
+		{
+			"foo", `(string){ "foo" }`,
+		},
+		{
+			"\x80", `(string){ "�" }`,
+		},
+		{
+			3, "(int){ 3 }",
+		},
+		{
+			uint(3), "(int){ 3 }",
+		},
+		{
+			uint8(3), "(int){ 3 }",
+		},
+		{
+			uint16(3), "(int){ 3 }",
+		},
+		{
+			uint32(3), "(int){ 3 }",
+		},
+		{
+			uint64(3), "(int){ 3 }",
+		},
+		{
+			int8(-3), "(int){ -3 }",
+		},
+		{
+			int16(-3), "(int){ -3 }",
+		},
+		{
+			int32(-3), "(int){ -3 }",
+		},
+		{
+			int64(-3), "(int){ -3 }",
+		},
+		{
+			float64(3), "(float){ 3 }",
+		},
+		{
+			float64(3.1), "(float){ 3.1 }",
+		},
+		{
+			float32(3.1), "(float){ 3.1 }",
+		},
+		{
+			uintptr(3), "(int){ 3 }",
+		},
+		{
+			&i34, "(int){ 34 }",
+		},
+		{
+			&f37, "(float){ 37 }",
+		},
+		{
+			&d35, "(int){ 35 }",
+		},
+		{
+			&n36, "(int){ -36 }",
+		},
+		{
+			[]int{1, 2, 3, 4}, `(#list){
   0: (int){ 1 }
   1: (int){ 2 }
   2: (int){ 3 }
   3: (int){ 4 }
 }`,
-	}, {
-		struct {
-			A int
-			B *int
-		}{3, nil},
-		"(struct){\n  A: (int){ 3 }\n}",
-	}, {
-		[]interface{}{}, "(#list){\n}",
-	}, {
-		[]interface{}{nil}, "(#list){\n  0: (_){ _ }\n}",
-	}, {
-		map[string]interface{}{"a": 1, "x": nil}, `(struct){
+		},
+		{
+			struct {
+				A int
+				B *int
+			}{3, nil},
+			"(struct){\n  A: (int){ 3 }\n}",
+		},
+		{
+			[]interface{}{}, "(#list){\n}",
+		},
+		{
+			[]interface{}{nil}, "(#list){\n  0: (_){ _ }\n}",
+		},
+		{
+			map[string]interface{}{"a": 1, "x": nil}, `(struct){
   a: (int){ 1 }
   x: (_){ _ }
 }`,
-	}, {
-		map[string][]int{
-			"a": {1},
-			"b": {3, 4},
-		}, `(struct){
+		},
+		{
+			map[string][]int{
+				"a": {1},
+				"b": {3, 4},
+			}, `(struct){
   a: (#list){
     0: (int){ 1 }
   }
@@ -140,94 +170,119 @@ func TestConvert(t *testing.T) {
     1: (int){ 4 }
   }
 }`,
-	}, {
-		map[bool]int{}, "(_|_){\n  // [eval] unsupported Go type for map key (bool)\n}",
-	}, {
-		map[struct{}]int{{}: 2}, "(_|_){\n  // [eval] unsupported Go type for map key (struct {})\n}",
-	}, {
-		map[int]int{1: 2}, `(struct){
+		},
+		{
+			map[bool]int{}, "(_|_){\n  // [eval] unsupported Go type for map key (bool)\n}",
+		},
+		{
+			map[struct{}]int{{}: 2}, "(_|_){\n  // [eval] unsupported Go type for map key (struct {})\n}",
+		},
+		{
+			map[int]int{1: 2}, `(struct){
   "1": (int){ 2 }
 }`,
-	}, {
-		struct {
-			a int
-			b int
-		}{3, 4},
-		"(struct){\n}",
-	}, {
-		struct {
-			A int
-			B int `json:"-"`
-			C int `json:",omitempty"`
-		}{3, 4, 0},
-		`(struct){
+		},
+		{
+			struct {
+				a int
+				b int
+			}{3, 4},
+			"(struct){\n}",
+		},
+		{
+			struct {
+				A int
+				B int `json:"-"`
+				C int `json:",omitempty"`
+			}{3, 4, 0},
+			`(struct){
   A: (int){ 3 }
 }`,
-	}, {
-		struct {
-			A int
-			B int
-		}{3, 4},
-		`(struct){
+		},
+		{
+			struct {
+				A int
+				B int
+			}{3, 4},
+			`(struct){
   A: (int){ 3 }
   B: (int){ 4 }
 }`,
-	}, {
-		struct {
-			A int `json:"a"`
-			B int `yaml:"b"`
-		}{3, 4},
-		`(struct){
+		},
+		{
+			struct {
+				A int `json:"a"`
+				B int `yaml:"b"`
+			}{3, 4},
+			`(struct){
   a: (int){ 3 }
   b: (int){ 4 }
 }`,
-	}, {
-		struct {
-			A int `json:"" yaml:"" protobuf:"aa"`
-			B int `yaml:"cc" json:"bb" protobuf:"aa"`
-		}{3, 4},
-		`(struct){
+		},
+		{
+			struct {
+				A int `json:"" yaml:"" protobuf:"aa"`
+				B int `yaml:"cc" json:"bb" protobuf:"aa"`
+			}{3, 4},
+			`(struct){
   aa: (int){ 3 }
   bb: (int){ 4 }
 }`,
-	}, {
-		&struct{ A int }{3}, `(struct){
+		},
+		{
+			&struct{ A int }{3}, `(struct){
   A: (int){ 3 }
 }`,
-	}, {
-		(*struct{ A int })(nil), "(_){ _ }",
-	}, {
-		reflect.ValueOf(3), "(int){ 3 }",
-	}, {
-		time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC), `(string){ "2019-04-01T00:00:00Z" }`,
-	}, {
-		func() interface{} {
-			type T struct {
-				B int
-			}
-			type S struct {
-				A string
-				T
-			}
-			return S{}
-		}(),
-		`(struct){
+		},
+		{
+			(*struct{ A int })(nil), "(_){ _ }",
+		},
+		{
+			reflect.ValueOf(3), "(int){ 3 }",
+		},
+		{
+			time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC), `(string){ "2019-04-01T00:00:00Z" }`,
+		},
+		{
+			func() interface{} {
+				type T struct {
+					B int
+				}
+				type S struct {
+					A string
+					T
+				}
+				return S{}
+			}(),
+			`(struct){
   A: (string){ "" }
   B: (int){ 0 }
 }`,
-	},
-		{map[key]string{{a: 1}: "foo"},
-			"(_|_){\n  // [eval] unsupported Go type for map key (convert_test.key)\n}"},
-		{map[*textMarshaller]string{{b: "bar"}: "foo"},
-			"(struct){\n  \"&{bar}\": (string){ \"foo\" }\n}"},
-		{map[int]string{1: "foo"},
-			"(struct){\n  \"1\": (string){ \"foo\" }\n}"},
-		{map[string]encoding.TextMarshaler{"foo": nil},
-			"(struct){\n  foo: (_){ _ }\n}"},
-		{make(chan int),
-			"(_|_){\n  // [eval] unsupported Go type (chan int)\n}"},
-		{[]interface{}{func() {}},
-			"(_|_){\n  // [eval] unsupported Go type (func())\n}"},
+		},
+		{
+			map[key]string{{a: 1}: "foo"},
+			"(_|_){\n  // [eval] unsupported Go type for map key (convert_test.key)\n}",
+		},
+		{
+			map[*textMarshaller]string{{b: "bar"}: "foo"},
+			"(struct){\n  \"&{bar}\": (string){ \"foo\" }\n}",
+		},
+		{
+			map[int]string{1: "foo"},
+			"(struct){\n  \"1\": (string){ \"foo\" }\n}",
+		},
+		{
+			map[string]encoding.TextMarshaler{"foo": nil},
+			"(struct){\n  foo: (_){ _ }\n}",
+		},
+		{
+			make(chan int),
+			"(_|_){\n  // [eval] unsupported Go type (chan int)\n}",
+		},
+		{
+			[]interface{}{func() {}},
+			"(_|_){\n  // [eval] unsupported Go type (func())\n}",
+		},
 		{stringType("\x80"), `(string){ "�" }`},
 	}
 	r := runtime.New()

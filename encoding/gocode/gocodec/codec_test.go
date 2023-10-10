@@ -37,6 +37,7 @@ func checkErr(t *testing.T, got error, want string) {
 		t.Errorf("error: got %v; want %v", got, want)
 	}
 }
+
 func TestValidate(t *testing.T) {
 	fail := "some error"
 	testCases := []struct {

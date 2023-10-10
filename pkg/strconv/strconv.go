@@ -93,7 +93,7 @@ func ParseFloat(s string, bitSize int) (float64, error) {
 const IntSize = 64
 
 // ParseUint is like ParseInt but for unsigned numbers.
-func ParseUint(s string, base int, bitSize int) (uint64, error) {
+func ParseUint(s string, base, bitSize int) (uint64, error) {
 	return strconv.ParseUint(s, base, bitSize)
 }
 
@@ -117,7 +117,7 @@ func ParseUint(s string, base int, bitSize int) (uint64, error) {
 // signed integer of the given size, err.Err = ErrRange and the
 // returned value is the maximum magnitude integer of the
 // appropriate bitSize and sign.
-func ParseInt(s string, base int, bitSize int) (i int64, err error) {
+func ParseInt(s string, base, bitSize int) (i int64, err error) {
 	return strconv.ParseInt(s, base, bitSize)
 }
 

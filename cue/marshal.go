@@ -217,5 +217,4 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 	}
 
 	return buf.Bytes(), nil
-
 }

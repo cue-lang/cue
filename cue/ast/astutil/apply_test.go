@@ -132,7 +132,8 @@ everywhere: new
 				}
 			}
 			return true
-		}}, {
+		},
+	}, {
 		name: "templates",
 		in: `
 				foo: {

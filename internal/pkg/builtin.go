@@ -180,7 +180,6 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 		panic(err)
 	}
 	return c.Expr()
-
 }
 
 func (x *Builtin) name(ctx *adt.OpContext) string {

@@ -355,7 +355,8 @@ func (n *nodeContext) insertArc1(f Feature, mode ArcType, c Conjunct, check bool
 //
 // If check is true it will not add c if it was already added.
 func (cc *closeContext) insertArc(
-	n *nodeContext, f Feature, mode ArcType, c Conjunct, check bool) (v *Vertex, isNew bool) {
+	n *nodeContext, f Feature, mode ArcType, c Conjunct, check bool,
+) (v *Vertex, isNew bool) {
 	c.CloseInfo.cc = nil
 
 	for _, a := range cc.Arcs {

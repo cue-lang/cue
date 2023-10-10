@@ -43,9 +43,11 @@ func TestUnquote(t *testing.T) {
 		{`"""` + "\n\raaa\n\rbbb\n\r" + `"""`, "aaa\nbbb", nil},
 		{`'\a\b\f\n\r\t\v\'\\\/'`, "\a\b\f\n\r\t\v'\\/", nil},
 		{`"\a\b\f\n\r\t\v\"\\\/"`, "\a\b\f\n\r\t\v\"\\/", nil},
-		{`#"The sequence "\U0001F604" renders as \#U0001F604."#`,
+		{
+			`#"The sequence "\U0001F604" renders as \#U0001F604."#`,
 			`The sequence "\U0001F604" renders as 😄.`,
-			nil},
+			nil,
+		},
 		{`"  \U00010FfF"`, "  \U00010fff", nil},
 		{`"\u0061 "`, "a ", nil},
 		{`'\x61\x55'`, "\x61\x55", nil},

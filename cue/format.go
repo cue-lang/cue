@@ -136,7 +136,6 @@ func (v Value) Format(state fmt.State, verb rune) {
 }
 
 func formatCUE(state fmt.State, v Value, showDocs, showAll bool) {
-
 	pkgPath := v.instance().ID()
 
 	p := *export.Simplified

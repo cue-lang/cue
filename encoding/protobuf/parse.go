@@ -381,7 +381,8 @@ func (p *protoConverter) stringLit(pos scanner.Position, s string) *ast.BasicLit
 	return &ast.BasicLit{
 		ValuePos: p.toCUEPos(pos),
 		Kind:     token.STRING,
-		Value:    literal.String.Quote(s)}
+		Value:    literal.String.Quote(s),
+	}
 }
 
 func (p *protoConverter) ident(pos scanner.Position, name string) *ast.Ident {
@@ -576,7 +577,6 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 // Enums are always defined at the top level. The name of a nested enum
 // will be prefixed with the name of its parent and an underscore.
 func (p *protoConverter) enum(x *proto.Enum) {
-
 	if len(x.Elements) == 0 {
 		failf(x.Position, "empty enum")
 	}
@@ -732,7 +732,6 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 			newStruct()
 			p.messageField(s, 1, v)
 		}
-
 	}
 }
 
@@ -773,7 +772,6 @@ type optionParser struct {
 }
 
 func (p *optionParser) parse(options []*proto.Option) {
-
 	// TODO: handle options
 	// - translate options to tags
 	// - interpret CUE options.

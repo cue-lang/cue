@@ -55,7 +55,8 @@ func TestMarshalling(t *testing.T) {
 		import "strings"
 
 		a: strings.TrimSpace("  Hello world!  ")
-		`}}
+		`,
+	}}
 	for _, tc := range testCases {
 		t.Run(tc.filename, func(t *testing.T) {
 			r := &Runtime{}
@@ -124,16 +125,19 @@ func TestMarshalMultiPackage(t *testing.T) {
 		insts(&instanceData{true, "", files(`test: "ok"`)}),
 		`{test: "ok"}`,
 	}, {
-		insts(&instanceData{true, "",
+		insts(&instanceData{
+			true, "",
 			files(
 				`package test
 
 		import math2 "math"
 
-		"Pi: \(math2.Pi)!"`)}),
+		"Pi: \(math2.Pi)!"`),
+		}),
 		`"Pi: 3.14159265358979323846264338327950288419716939937510582097494459!"`,
 	}, {
-		insts(pkg1, &instanceData{true, "",
+		insts(pkg1, &instanceData{
+			true, "",
 			files(
 				`package test
 
@@ -143,7 +147,8 @@ func TestMarshalMultiPackage(t *testing.T) {
 		}),
 		`"Hello World!"`,
 	}, {
-		insts(pkg1, &instanceData{true, "",
+		insts(pkg1, &instanceData{
+			true, "",
 			files(
 				`package test
 
@@ -154,7 +159,8 @@ func TestMarshalMultiPackage(t *testing.T) {
 		}),
 		`"Hello World!"`,
 	}, {
-		insts(pkg2, &instanceData{true, "",
+		insts(pkg2, &instanceData{
+			true, "",
 			files(
 				`package test
 

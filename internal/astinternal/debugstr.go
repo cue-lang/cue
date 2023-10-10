@@ -196,7 +196,7 @@ func DebugStr(x interface{}) (out string) {
 			str += "l"
 		}
 		str += strconv.Itoa(int(v.Position))
-		var a = []string{}
+		a := []string{}
 		for _, c := range v.List {
 			a = append(a, c.Text)
 		}

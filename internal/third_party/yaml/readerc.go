@@ -5,7 +5,7 @@ import (
 )
 
 // Set the reader error and return 0.
-func yaml_parser_set_reader_error(parser *yaml_parser_t, problem string, offset int, value int) bool {
+func yaml_parser_set_reader_error(parser *yaml_parser_t, problem string, offset, value int) bool {
 	parser.error = yaml_READER_ERROR
 	parser.problem = problem
 	parser.problem_offset = offset
@@ -104,7 +104,7 @@ func yaml_parser_update_buffer(parser *yaml_parser_t, length int) bool {
 		// given length in the buffer. Not doing that means every single
 		// check that calls this function to make sure the buffer has a
 		// given length is Go) panicking; or C) accessing invalid memory.
-		//return true
+		// return true
 	}
 
 	// Return if the buffer contains enough characters.

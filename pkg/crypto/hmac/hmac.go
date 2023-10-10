@@ -44,7 +44,7 @@ const (
 //
 // Supported hash functions: "MD5", "SHA1", "SHA224", "SHA256", "SHA384", "SHA512", "SHA512_224",
 // and "SHA512_256".
-func Sign(hashName string, key []byte, data []byte) ([]byte, error) {
+func Sign(hashName string, key, data []byte) ([]byte, error) {
 	hash, err := hashFromName(hashName)
 	if err != nil {
 		return nil, err

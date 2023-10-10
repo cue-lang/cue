@@ -644,7 +644,7 @@ func Unzip(dir string, m module.Version, zipFile string) (err error) {
 	}
 
 	// Unzip, enforcing sizes declared in the zip file.
-	if err := os.MkdirAll(dir, 0777); err != nil {
+	if err := os.MkdirAll(dir, 0o777); err != nil {
 		return err
 	}
 	for _, zf := range z.File {
@@ -653,10 +653,10 @@ func Unzip(dir string, m module.Version, zipFile string) (err error) {
 			continue
 		}
 		dst := filepath.Join(dir, name)
-		if err := os.MkdirAll(filepath.Dir(dst), 0777); err != nil {
+		if err := os.MkdirAll(filepath.Dir(dst), 0o777); err != nil {
 			return err
 		}
-		w, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0444)
+		w, err := os.OpenFile(dst, os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0o444)
 		if err != nil {
 			return err
 		}
@@ -873,9 +873,11 @@ type ZipFileIO struct {
 func (fio ZipFileIO) Path(f *zip.File) string {
 	return strings.TrimPrefix(f.Name, fio.StripPrefix)
 }
+
 func (ZipFileIO) Lstat(f *zip.File) (os.FileInfo, error) {
 	return f.FileInfo(), nil
 }
+
 func (ZipFileIO) Open(f *zip.File) (io.ReadCloser, error) {
 	return f.Open()
 }

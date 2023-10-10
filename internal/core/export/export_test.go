@@ -352,7 +352,6 @@ func TestFromAPI(t *testing.T) {
 
 			r, x := value.ToInternal(v)
 			file, err := export.Def(r, "foo", x)
-
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -361,7 +360,6 @@ func TestFromAPI(t *testing.T) {
 			if got != tc.out {
 				t.Errorf("got:  %s\nwant: %s", got, tc.out)
 			}
-
 		})
 	}
 }

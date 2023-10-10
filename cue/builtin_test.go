@@ -25,12 +25,14 @@ import (
 
 func TestBuiltins(t *testing.T) {
 	test := func(pkg, expr string) []*bimport {
-		return []*bimport{{"",
+		return []*bimport{{
+			"",
 			[]string{fmt.Sprintf("import %q\n(%s)", pkg, expr)},
 		}}
 	}
 	testExpr := func(expr string) []*bimport {
-		return []*bimport{{"",
+		return []*bimport{{
+			"",
 			[]string{fmt.Sprintf("(%s)", expr)},
 		}}
 	}
@@ -140,7 +142,8 @@ func TestSingleBuiltin(t *testing.T) {
 	t.Skip("error message")
 
 	test := func(pkg, expr string) []*bimport {
-		return []*bimport{{"",
+		return []*bimport{{
+			"",
 			[]string{fmt.Sprintf("import %q\n(%s)", pkg, expr)},
 		}}
 	}

@@ -85,18 +85,18 @@ Go structs are converted to cue structs adhering to the following conventions:
 	- embedded structs marked with a json inline tag unify with struct
 	  definition. For instance, the Go struct
 
-	    struct MyStruct {
-			Common  ` + "json:\",inline\"" + `
-			Field string
+		 struct MyStruct {
+			Common ` + "`json:\",inline\"`" + `
+			Field  string
 		 }
 
 	  translates to the CUE struct
 
 		 #MyStruct: Common & {
-			 Field: string
+			Field: string
 		 }
 
-	- a type that implements MarshalJSON, UnmarshalJSON, MarshalYAML, or
+	- a type that implements MarshalJSON and UnmarshalJSON or MarshalYAML and
 	  UnmarshalYAML is translated to top (_) to indicate it may be any
 	  value. For some Go core types for which the implementation of these
 	  methods is known, like time.Time, the type may be more specific.
@@ -309,31 +309,21 @@ func typeSignature(name string, params, results []types.Type) *types.Signature {
 	)
 }
 
-// TODO(mvdan): Shouldn't we only consider a Go type "top" if it implements both
-// marshal/unmarhal methods of JSON or YAML?
-
 // Note that we record these interfaces without names, so they will show up in
 // the logs like "interface{MarshalJSON() ([]uint8, error)}" rather than
 // encoding/json.Marshaler. We could construct named types if need be.
-
 var toTop = []*types.Interface{
-	// json.Marshaler: interface { MarshalJSON() ([]byte, error) }
 	types.NewInterfaceType([]*types.Func{
+		// json.Marshaler: interface { MarshalJSON() ([]byte, error) }
 		typeMethod("MarshalJSON", nil, []types.Type{typeBytes, typeError}),
-	}, nil).Complete(),
-
-	// json.Unmarshaler: interface { UnmarshalJSON([]byte) error }
-	types.NewInterfaceType([]*types.Func{
+		// json.Unmarshaler: interface { UnmarshalJSON([]byte) error }
 		typeMethod("UnmarshalJSON", []types.Type{typeBytes}, []types.Type{typeError}),
 	}, nil).Complete(),
 
-	// yaml.Marshaler: interface { MarshalYAML() (interface{}, error) }
 	types.NewInterfaceType([]*types.Func{
+		// yaml.Marshaler: interface { MarshalYAML() (interface{}, error) }
 		typeMethod("MarshalYAML", nil, []types.Type{typeAny, typeError}),
-	}, nil).Complete(),
-
-	// yaml.Unmarshaler: interface { UnmarshalYAML(func(interface{}) error) error }
-	types.NewInterfaceType([]*types.Func{
+		// yaml.Unmarshaler: interface { UnmarshalYAML(func(interface{}) error) error }
 		typeMethod("UnmarshalYAML", []types.Type{
 			typeSignature("", []types.Type{typeAny}, []types.Type{typeError}),
 		}, []types.Type{typeError}),

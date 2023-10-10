@@ -886,7 +886,7 @@ We create the tool file to do just that.
 $ cat <<EOF > kube_tool.cue
 package kube
 
-objects: [ for v in objectSets for x in v {x}]
+objects: [for v in objectSets for x in v {x}]
 
 objectSets: [
 	service,
@@ -1202,7 +1202,7 @@ The next step is to pull common fields, such as `image` to the top level.
 Arguments can be specified as a map.
 ```
     arg: [string]: string
-    args: [ for k, v in arg { "-\(k)=\(v)" } ] | [...string]
+    args: [for k, v in arg { "-\(k)=\(v)" } ] | [...string]
 ```
 
 If order matters, users could explicitly specify the list as well.
@@ -1307,7 +1307,7 @@ kubernetes: services: {
             metadata: labels: x.label
             spec: selector:   x.label
 
-            spec: ports: [ for p in x.port { p } ]
+            spec: ports: [for p in x.port { p } ]
         }
     }
 }

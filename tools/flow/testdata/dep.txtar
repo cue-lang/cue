@@ -52,7 +52,7 @@ root: {
 	}
 
 	incompleteList: {
-		x: [ for x in [1] {incompleteComprehensionSource.x}]
+		x: [for x in [1] {incompleteComprehensionSource.x}]
 	}
 
 	incompleteGeneratedStruct: {

@@ -142,10 +142,10 @@ package expressions
 	e: [...int]
 	e: [...int]
 	e: [...int | float]
-	e: [ for x in someObject if x > 9 {
+	e: [for x in someObject if x > 9 {
 		x
 	}]
-	e: [ for x in someObject if x > 9 {x}]
+	e: [for x in someObject if x > 9 {x}]
 	e: [
 		for x in someObject
 		if x > 9 {x}]
@@ -235,4 +235,16 @@ package expressions
 
 	"contains		tabs": 123
 	@jsonschema(foo="contains		tabs")
+
+	g: [1, 2, 3]
+	g: [1, 2, 3]
+	g: [1, 2, 3]
+	g: [1, 2, 3]
+	g: [1, 2, 3]
+	g: [1, 2, 3]
+	g: [1, 2, 3]
+	g: [1, 2, 3]
+	g: [if true {1}, 2, 3]
+	h: [1]
+	i: [{}]
 }

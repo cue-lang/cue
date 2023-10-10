@@ -5,7 +5,7 @@ package expressions
     aaa: 22 // comment
 
     "": 3
-    
+
     b: 3
 
     c: b: a:  4
@@ -171,7 +171,7 @@ package expressions
             "\(k)":v
         }
     }
-    
+
     e: { for k, v in someObject if k > "a" {"\(k)":v} }
     e: { for k, v in someObject if k > "a" {
         "\(k)":v }}
@@ -232,4 +232,16 @@ package expressions
 
     "contains		tabs": 123
     @jsonschema(foo="contains		tabs")
+
+    g: [ 1, 2, 3]
+    g: [ 1, 2, 3,]
+    g: [ 1, 2, 3, ]
+    g: [ 1, 2, 3 ]
+    g: [1, 2, 3,]
+    g: [ 1, 2, 3, ]
+    g: [    1, 2, 3,]
+    g: [     1, 2, 3,]
+    g: [ if true { 1 }, 2, 3]
+    h: [ 1]
+    i: [ {}]
 }

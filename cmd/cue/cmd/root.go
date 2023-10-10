@@ -140,7 +140,7 @@ Commands are defined in CUE as follows:
 	command: deploy: {
 		exec.Run
 		cmd:   "kubectl"
-		args:  [ "-f", "deploy" ]
+		args:  ["-f", "deploy"]
 		in:    json.Encode(userValue) // encode the emitted configuration.
 	}
 

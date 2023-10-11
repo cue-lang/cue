@@ -32,7 +32,7 @@
 -- out.cue --
 // Main schema
 intString?: null | bool | int | string | [...]
-object?:    {
+object?: {
 	...
 } | *{
 	foo: "bar"

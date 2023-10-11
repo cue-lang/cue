@@ -1,5 +1,7 @@
 package expressions
 
+import "list"
+
 {
 	a:   1  // comment
 	aaa: 22 // comment
@@ -235,4 +237,20 @@ package expressions
 
 	"contains		tabs": 123
 	@jsonschema(foo="contains		tabs")
+
+	j: cueckoo: _ | [
+		1,
+
+		2,
+	]
+	k: cueckoo: *[
+		1,
+
+		2,
+	]
+	l: cueckoo: list.Concat([
+		1,
+
+		2,
+	])
 }

@@ -56,8 +56,8 @@ var p = &pkg.Package{
 	Native: []*pkg.Builtin{},
 	CUE: `{
 	Run: {
-		$id:  *"tool/exec.Run" | "exec"
-		cmd:  string | [string, ...string]
+		$id: *"tool/exec.Run" | "exec"
+		cmd: string | [string, ...string]
 		dir?: string
 		env: {
 			[string]: string | [...=~"="]

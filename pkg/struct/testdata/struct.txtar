@@ -36,7 +36,7 @@ import "struct"
 
 minFields: {
 	incomplete1: {} & struct.MinFields(1)
-	fail1:       _|_ // minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
+	fail1: _|_ // minFields.fail1: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1)
 	ok1: {
 		a: 1
 	}

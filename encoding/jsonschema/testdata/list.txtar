@@ -40,6 +40,6 @@ import "list"
 
 foo?: [...string]
 tuple?: [string, int, 2]
-has?:  list.Contains(3)
+has?: list.Contains(3)
 size?: list.UniqueItems() & list.MaxItems(9) & [_, _, _, ...]
 additional?: [int, int, ...string]

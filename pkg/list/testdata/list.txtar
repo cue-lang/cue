@@ -168,7 +168,7 @@ unique: {
 // Issue #2099
 minItems: {
 	incomplete1: [...] & list.MinItems(1)
-	fail1:       _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1) (and 1 more errors)
+	fail1: _|_ // minItems.fail1: invalid value [] (does not satisfy list.MinItems(1)): len(list) < MinItems(1) (0 < 1) (and 1 more errors)
 	ok1: [0, ...]
 	ok2: [0]
 }

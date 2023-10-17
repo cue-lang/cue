@@ -104,6 +104,40 @@ func fileNameOK(r rune) bool {
 	return unicode.IsLetter(r)
 }
 
+// CheckPathWithoutVersion is like CheckPath except that
+// it expects a module path without a major version.
+func CheckPathWithoutVersion(basePath string) (err error) {
+	if _, _, ok := SplitPathVersion(basePath); ok {
+		return fmt.Errorf("module path inappropriately contains major version")
+	}
+	if err := checkPath(basePath, modulePath); err != nil {
+		return err
+	}
+	i := strings.Index(basePath, "/")
+	if i < 0 {
+		i = len(basePath)
+	}
+	if i == 0 {
+		return fmt.Errorf("leading slash")
+	}
+	if !strings.Contains(basePath[:i], ".") {
+		return fmt.Errorf("missing dot in first path element")
+	}
+	if basePath[0] == '-' {
+		return fmt.Errorf("leading dash in first path element")
+	}
+	for _, r := range basePath[:i] {
+		if !firstPathOK(r) {
+			return fmt.Errorf("invalid char %q in first path element", r)
+		}
+	}
+	// Sanity check agreement with OCI specs.
+	if !basePathPat.MatchString(basePath) {
+		return fmt.Errorf("non-conforming path %q", basePath)
+	}
+	return nil
+}
+
 // CheckPath checks that a module path is valid.
 // A valid module path is a valid import path, as checked by CheckImportPath,
 // with three additional constraints.
@@ -135,31 +169,8 @@ func CheckPath(mpath string) (err error) {
 	if semver.Major(vers) != vers {
 		return fmt.Errorf("path can contain major version only")
 	}
-
-	if err := checkPath(basePath, modulePath); err != nil {
+	if err := CheckPathWithoutVersion(basePath); err != nil {
 		return err
-	}
-	i := strings.Index(basePath, "/")
-	if i < 0 {
-		i = len(basePath)
-	}
-	if i == 0 {
-		return fmt.Errorf("leading slash")
-	}
-	if !strings.Contains(basePath[:i], ".") {
-		return fmt.Errorf("missing dot in first path element")
-	}
-	if basePath[0] == '-' {
-		return fmt.Errorf("leading dash in first path element")
-	}
-	for _, r := range basePath[:i] {
-		if !firstPathOK(r) {
-			return fmt.Errorf("invalid char %q in first path element", r)
-		}
-	}
-	// Sanity check agreement with OCI specs.
-	if !basePathPat.MatchString(basePath) {
-		return fmt.Errorf("non-conforming path %q", basePath)
 	}
 	if !tagPat.MatchString(vers) {
 		return fmt.Errorf("non-conforming version %q", vers)

@@ -43,6 +43,32 @@ func TestCheck(t *testing.T) {
 	}
 }
 
+var checkPathWithoutVersionTests = []struct {
+	path    string
+	wantErr string
+}{{
+	path:    "rsc io/quote",
+	wantErr: `invalid char ' '`,
+}, {
+	path:    "foo.com@v0",
+	wantErr: `module path inappropriately contains major version`,
+}, {
+	path: "foo.com/bar/baz",
+}}
+
+func TestCheckPathWithoutVersion(t *testing.T) {
+	for _, test := range checkPathWithoutVersionTests {
+		t.Run(test.path, func(t *testing.T) {
+			err := CheckPathWithoutVersion(test.path)
+			if test.wantErr != "" {
+				qt.Assert(t, qt.ErrorMatches(err, test.wantErr))
+				return
+			}
+			qt.Assert(t, qt.IsNil(err))
+		})
+	}
+}
+
 var newVersionTests = []struct {
 	path, vers   string
 	wantError    string

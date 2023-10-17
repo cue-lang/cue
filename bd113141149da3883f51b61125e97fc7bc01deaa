@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b52a7fc4_143ec7ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "PTAL",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b4a2d3c9_7c5267ec",
@@ -18,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb069fc8_8f4cf942",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b4a2d3c9_7c5267ec",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdb0a934_3bd6d154",
@@ -31,6 +66,30 @@
       "writtenOn": "2023-10-17T15:40:59Z",
       "side": 1,
       "message": "may? can?\n\n(this is simply about resolving, not necessarily fetching)",
+      "range": {
+        "startLine": 24,
+        "startChar": 45,
+        "endLine": 24,
+        "endChar": 49
+      },
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d63373f2_ec43dcc9",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "I\u0027ve gone with \"should\".",
+      "parentUuid": "cdb0a934_3bd6d154",
       "range": {
         "startLine": 24,
         "startChar": 45,
@@ -64,6 +123,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65ee4159_30fda6aa",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "I don\u0027t see any particular reason to require it to be at the end.",
+      "parentUuid": "886083c1_144ae6ba",
+      "range": {
+        "startLine": 27,
+        "startChar": 36,
+        "endLine": 27,
+        "endChar": 53
+      },
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "caa4fa54_83569504",
@@ -77,6 +160,30 @@
       "writtenOn": "2023-10-17T15:40:59Z",
       "side": 1,
       "message": "where is this link? was this a sort of TODO?",
+      "range": {
+        "startLine": 43,
+        "startChar": 51,
+        "endLine": 43,
+        "endChar": 69
+      },
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7868cc90_39b6417e",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "caa4fa54_83569504",
       "range": {
         "startLine": 43,
         "startChar": 51,
@@ -104,6 +211,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e431aee_35ebb46d",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a23d8da7_2e2be58c",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "765b269c_a1d2393c",
@@ -117,6 +242,24 @@
       "writtenOn": "2023-10-17T15:40:59Z",
       "side": 1,
       "message": "do you need these three lines? you will skip the for loop below, and error with `no default catch-all registry provided`, which is perfectly fine. both are the same error case IMO, so there doesn\u0027t seem to be a need to handle it in two places. performance shouldn\u0027t matter at all for the case where s is empty, since you\u0027ll do basically no extra work.",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d029144f_31404635",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "We don\u0027t skip the for loop below in that case because `strings.Split` always returns at least one element, so this is worth doing for the better error message I think.",
+      "parentUuid": "765b269c_a1d2393c",
       "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -138,6 +281,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35042892_045069ef",
+        "filename": "internal/mod/modresolve/resolve_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6bb2b07c_4749ddb0",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "13495264_97dbe68f",
@@ -151,6 +312,24 @@
       "writtenOn": "2023-10-17T15:40:59Z",
       "side": 1,
       "message": "can we use hostnames that don\u0027t relate to us, perhaps? e.g. assuming we decided to keep the proxy under cue.works, having tests that point to cuelabs.dev would be rather unnecessary",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "93ebed14_632162e8",
+        "filename": "internal/mod/modresolve/resolve_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "13495264_97dbe68f",
       "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -172,6 +351,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a2e852c_d066a572",
+        "filename": "internal/mod/modresolve/resolve_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 22,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1334596f_05f6fab9",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "74ad3caa_69dbae57",
@@ -185,6 +382,24 @@
       "writtenOn": "2023-10-17T15:40:59Z",
       "side": 1,
       "message": "what does looking up an empty string mean? as far as I can tell this is not documented anywhere, and I find it somewhat confusing\n\nEdit: now having read the implementation, I now see that it\u0027s to look up the catch-all or fallback. I\u0027d personally do that via a separate method to be clearer, like Fallback or CatchAll.",
+      "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab5aa6ce_ad53c66b",
+        "filename": "internal/mod/modresolve/resolve_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-17T16:38:42Z",
+      "side": 1,
+      "message": "As discussed, the empty string isn\u0027t really special here - it\u0027s just an invalid path that results in the default location being returned.",
+      "parentUuid": "74ad3caa_69dbae57",
       "revId": "bd113141149da3883f51b61125e97fc7bc01deaa",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -108,14 +108,15 @@ func TestScript(t *testing.T) {
 				"GONOSUMDB=*", // GOPROXY is a private proxy
 				homeEnvName()+"="+home,
 			)
-			if info, err := os.Stat(filepath.Join(e.WorkDir, "_registry")); err == nil && info.IsDir() {
+			registryDir := filepath.Join(e.WorkDir, "_registry")
+			if info, err := os.Stat(registryDir); err == nil && info.IsDir() {
+				// There's a _registry directory. Start a fake registry server to serve
+				// the modules in it.
 				prefix := ""
 				if data, err := os.ReadFile(filepath.Join(e.WorkDir, "_registry_prefix")); err == nil {
 					prefix = strings.TrimSpace(string(data))
 				}
-				// There's a _registry directory. Start a fake registry server to serve
-				// the modules in it.
-				reg, err := registrytest.New(os.DirFS(e.WorkDir), prefix)
+				reg, err := registrytest.New(os.DirFS(registryDir), prefix)
 				if err != nil {
 					return fmt.Errorf("cannot start test registry server: %v", err)
 				}

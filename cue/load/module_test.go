@@ -2,6 +2,7 @@ package load_test
 
 import (
 	"fmt"
+	"io/fs"
 	"testing"
 
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
@@ -17,7 +18,11 @@ func TestModuleFetch(t *testing.T) {
 		Name: "modfetch",
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
-		r, err := registrytest.New(registrytest.TxtarFS(t.Archive), "")
+		rfs, err := fs.Sub(registrytest.TxtarFS(t.Archive), "_registry")
+		if err != nil {
+			t.Fatal(err)
+		}
+		r, err := registrytest.New(rfs, "")
 		if err != nil {
 			t.Fatal(err)
 		}

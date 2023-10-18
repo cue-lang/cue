@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "53041498_72d0c799",
+        "filename": "internal/mod/modmux/mux.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-18T16:07:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e820563f_1f45a760",
+      "revId": "1d88040aa08f7da15006a36afb2cf0979c9ac895",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b4f8f1b_377fcf72",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-10-18T15:47:07Z",
       "side": 1,
       "message": "document why this isn\u0027t path.Join - it surprised me",
+      "revId": "1d88040aa08f7da15006a36afb2cf0979c9ac895",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a128101f_cd74ea81",
+        "filename": "internal/mod/modmux/mux.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-10-18T16:07:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b4f8f1b_377fcf72",
       "revId": "1d88040aa08f7da15006a36afb2cf0979c9ac895",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

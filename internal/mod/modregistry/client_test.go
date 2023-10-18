@@ -34,9 +34,7 @@ import (
 )
 
 func newTestClient(t *testing.T) *Client {
-	c, err := NewClient(ocimem.New())
-	qt.Assert(t, qt.IsNil(err))
-	return c
+	return NewClient(ocimem.New())
 }
 
 func TestPutGetModule(t *testing.T) {

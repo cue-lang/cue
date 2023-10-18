@@ -29,12 +29,8 @@ type registryClient struct {
 // in the registry is immutable, so if it's in the cache, a module
 // will not be downloaded again.
 func newRegistryClient(registry ociregistry.Interface, cacheDir string) (*registryClient, error) {
-	client, err := modregistry.NewClient(registry)
-	if err != nil {
-		return nil, err
-	}
 	return &registryClient{
-		client:   client,
+		client:   modregistry.NewClient(registry),
 		cacheDir: cacheDir,
 	}, nil
 }

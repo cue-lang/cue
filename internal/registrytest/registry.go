@@ -36,10 +36,7 @@ import (
 // The Registry should be closed after use.
 func New(fsys fs.FS, prefix string) (*Registry, error) {
 	r := ocimem.New()
-	client, err := modregistry.NewClient(ocifilter.Sub(r, prefix))
-	if err != nil {
-		return nil, fmt.Errorf("cannot make client: %v", err)
-	}
+	client := modregistry.NewClient(ocifilter.Sub(r, prefix))
 
 	mods, err := getModules(fsys)
 	if err != nil {

@@ -50,10 +50,7 @@ func TestRegistry(t *testing.T) {
 
 func runTest(t *testing.T, registry ociregistry.Interface, script string, ar *txtar.Archive) {
 	ctx := context.Background()
-	client, err := modregistry.NewClient(registry)
-	if err != nil {
-		t.Fatal(err)
-	}
+	client := modregistry.NewClient(registry)
 	for _, line := range strings.Split(script, "\n") {
 		if line == "" || line[0] == '#' {
 			continue

@@ -51,10 +51,10 @@ const (
 
 // NewClient returns a new client that talks to the registry at the given
 // hostname.
-func NewClient(registry ociregistry.Interface) (*Client, error) {
+func NewClient(registry ociregistry.Interface) *Client {
 	return &Client{
 		registry: registry,
-	}, nil
+	}
 }
 
 // GetModule returns the module instance for the given version.

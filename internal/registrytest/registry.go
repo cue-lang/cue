@@ -117,11 +117,11 @@ type handler struct {
 func getModules(fsys fs.FS) (map[module.Version]*moduleContent, error) {
 	ctx := cuecontext.New()
 	modules := make(map[string]*moduleContent)
-	if err := fs.WalkDir(fsys, "_registry", func(path string, d fs.DirEntry, err error) error {
+	if err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
-			// If a filesystem has no _registry directory at all,
+			// If a filesystem has no entries at all,
 			// return zero modules without an error.
-			if path == "_registry" && errors.Is(err, fs.ErrNotExist) {
+			if path == "." && errors.Is(err, fs.ErrNotExist) {
 				return fs.SkipAll
 			}
 			return err

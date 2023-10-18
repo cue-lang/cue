@@ -108,12 +108,25 @@ func TestScript(t *testing.T) {
 				"GONOSUMDB=*", // GOPROXY is a private proxy
 				homeEnvName()+"="+home,
 			)
-			registryDir := filepath.Join(e.WorkDir, "_registry")
-			if info, err := os.Stat(registryDir); err == nil && info.IsDir() {
+			entries, err := os.ReadDir(e.WorkDir)
+			if err != nil {
+				return fmt.Errorf("cannot read workdir: %v", err)
+			}
+			hasRegistry := false
+			for _, entry := range entries {
+				if !entry.IsDir() {
+					continue
+				}
+				regID, ok := strings.CutPrefix(entry.Name(), "_registry")
+				if !ok {
+					continue
+				}
 				// There's a _registry directory. Start a fake registry server to serve
 				// the modules in it.
+				hasRegistry = true
+				registryDir := filepath.Join(e.WorkDir, entry.Name())
 				prefix := ""
-				if data, err := os.ReadFile(filepath.Join(e.WorkDir, "_registry_prefix")); err == nil {
+				if data, err := os.ReadFile(filepath.Join(e.WorkDir, "_registry"+regID+"_prefix")); err == nil {
 					prefix = strings.TrimSpace(string(data))
 				}
 				reg, err := registrytest.New(os.DirFS(registryDir), prefix)
@@ -124,13 +137,17 @@ func TestScript(t *testing.T) {
 					prefix = "/" + prefix
 				}
 				e.Vars = append(e.Vars,
-					"CUE_REGISTRY="+reg.Host()+prefix+"+insecure",
+					"CUE_REGISTRY"+regID+"="+reg.Host()+prefix+"+insecure",
 					// This enables some tests to construct their own malformed
 					// CUE_REGISTRY values that still refer to the test registry.
-					"DEBUG_REGISTRY_HOST="+reg.Host(),
-					"CUE_EXPERIMENT=modules",
+					"DEBUG_REGISTRY"+regID+"_HOST="+reg.Host(),
 				)
 				e.Defer(reg.Close)
+			}
+			if hasRegistry {
+				e.Vars = append(e.Vars,
+					"CUE_EXPERIMENT=modules",
+				)
 			}
 			return nil
 		},

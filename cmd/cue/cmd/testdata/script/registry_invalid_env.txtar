@@ -4,7 +4,7 @@ env CUE_REGISTRY=malformed!registry@url
 cmp stderr expect-stderr
 
 -- expect-stderr --
-$CUE_REGISTRY "malformed!registry@url" is not a valid host name
+bad value for $CUE_REGISTRY: invalid registry "malformed!registry@url": invalid host name "malformed!registry@url" in registry
 -- main.cue --
 package main
 import "example.com/e"

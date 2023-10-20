@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f782fce3_f59bbe81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-20T09:39:54Z",
+      "side": 1,
+      "message": "The Unity failure is expected; a lot of the projects in Unity test that their CUE doesn\u0027t change behavior by using `cue eval ./...` and tracking the output to not change. Most `cue/format` changes affecting how we format CUE will result in failures with that kind of mechanism.\n\nI\u0027ve made a note to improve that mechanism; in the meantime, we can merge this CL and I\u0027ll manually fix up Unity. I already verified that the changes are all whitespace.",
+      "revId": "d98bcc629d0d6abf2f1849806ce5a98fd31c5fb9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

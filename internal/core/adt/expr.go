@@ -1184,6 +1184,79 @@ func (x *Interpolation) evaluate(c *OpContext, state combinedFlags) Value {
 	return &String{x.Src, buf.String(), nil}
 }
 
+type TaggedInterpolation struct {
+	Src           *ast.TaggedInterpolation
+	Tag           Expr // The tag function to call.
+	Interpolation *Interpolation
+}
+
+func (x *TaggedInterpolation) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+
+func (x *TaggedInterpolation) evaluate(c *OpContext, state combinedFlags) Value {
+	fun := c.value(x.Tag, require(partial, scalarKnown))
+	var b *Builtin
+	switch f := fun.(type) {
+	case *Builtin:
+		b = f
+
+	case *BuiltinValidator:
+		c.AddErrf("cannot use validator as tag in tagged interpolation")
+		return nil
+
+	default:
+		c.AddErrf("cannot use non-function %s (type %s) for tagged interpolation", x.Tag, kind(fun))
+		return nil
+	}
+
+	parts := x.Interpolation.Parts
+	strings := &ListLit{
+		Elems: make([]Elem, 0, len(parts)/2),
+	}
+	// The constant strings are in the even indexes.
+	for i := 0; i < len(parts); i += 2 {
+		strings.Elems = append(strings.Elems, c.value(parts[i], require(finalized, scalarKnown)))
+	}
+	values := &ListLit{
+		Elems: make([]Elem, 0, len(parts)/2),
+	}
+	runMode := state.runMode()
+	cond := state.conditions() | allAncestorsProcessed | concreteKnown
+	argState := combineMode(cond, runMode).withVertexStatus(state.vertexStatus())
+	// The values are in the odd indexes.
+	for i := 1; i < len(parts); i += 2 {
+		saved := c.errs
+		// TODO should we use "finalized" rather than "partial" here?
+		expr := c.value(parts[i], argState)
+		switch expr := expr.(type) {
+		case nil:
+			if c.errs == nil {
+				// There SHOULD be an error in the context. If not, we generate one.
+				c.Assertf(pos(x.Tag), c.HasErr(), "argument %d to interpolation tag %s is incomplete", i, x.Tag)
+			}
+		case *Bottom:
+			// TODO(errors): consider adding an argument index for this errors.
+			c.errs = CombineErrors(parts[i].Source(), c.errs, expr)
+		default:
+			values.Elems = append(values.Elems, expr)
+		}
+		c.errs = CombineErrors(parts[i].Source(), saved, c.errs)
+	}
+	if c.HasErr() {
+		return nil
+	}
+	args := []Value{c.value(strings, require(partial, concreteKnown)), c.value(values, require(partial, concreteKnown))}
+	result := b.call(c, pos(x), false, args)
+	if result == nil {
+		return nil
+	}
+	return c.evalState(result, state.withVertexStatus(partial))
+}
+
 // UnaryExpr is a unary expression.
 //
 //	Op X

@@ -112,6 +112,9 @@ func (w *Visitor) node(n adt.Node) {
 		for _, x := range x.Parts {
 			w.node(x)
 		}
+	case *adt.TaggedInterpolation:
+		w.node(x.Tag)
+		w.node(x.Interpolation)
 
 	case *adt.BoundExpr:
 		w.node(x.Expr)

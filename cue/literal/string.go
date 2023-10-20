@@ -71,7 +71,7 @@ func (q QuoteInfo) Whitespace() string {
 }
 
 // ParseQuotes checks if the opening quotes in start matches the ending quotes
-// in end and reports its type as q or an error if they do not matching or are
+// in end and reports its type as q or an error if they do not match or are
 // invalid. nStart indicates the number of bytes used for the opening quote.
 func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 	for i, c := range start {

@@ -26,7 +26,9 @@ import (
 	_ "cuelang.org/go/pkg/encoding/hex"
 	_ "cuelang.org/go/pkg/encoding/json"
 	_ "cuelang.org/go/pkg/encoding/yaml"
+	_ "cuelang.org/go/pkg/gosource"
 	_ "cuelang.org/go/pkg/html"
+	_ "cuelang.org/go/pkg/sh"
 
 	_ "cuelang.org/go/pkg/list"
 	_ "cuelang.org/go/pkg/math"

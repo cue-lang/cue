@@ -4,9 +4,11 @@ encoding/base64
 encoding/yaml
 encoding/hex
 encoding/csv
+gosource
 uuid
 time
 list
+sh
 strings
 path
 math/bits

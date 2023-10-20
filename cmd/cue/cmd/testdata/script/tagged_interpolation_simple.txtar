@@ -1,0 +1,21 @@
+# This test demonstrates a simple use of a tagged interpolation
+# to quote a shell string properly.
+
+exec cue export x.cue
+cmp stdout want-stdout
+
+-- want-stdout --
+{
+    "filename": "hell 'o.cue \" $foo",
+    "script": "# single quotes\nls -l 'foo hell '\"'\"'o.cue \" $foo'\n# double quotes\nls -l \"foo $HOME hell 'o.cue \\\" \\$foo\""
+}
+-- x.cue --
+import "sh"
+
+filename: "hell 'o.cue \" $foo"
+script: sh.Format """
+	# single quotes
+	ls -l 'foo \(filename)'
+	# double quotes
+	ls -l "foo $HOME \(filename)"
+	"""

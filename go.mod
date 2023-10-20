@@ -24,6 +24,7 @@ require (
 	golang.org/x/text v0.13.0
 	golang.org/x/tools v0.13.0
 	gopkg.in/yaml.v3 v3.0.1
+	mvdan.cc/sh/v3 v3.7.0
 )
 
 require (

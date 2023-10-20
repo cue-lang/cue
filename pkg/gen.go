@@ -21,7 +21,7 @@
 // Be sure to also update an entry in pkg/pkg.go, if so desired.
 package main
 
-// TODO generate ../register.go too.
+// TODO generate register.go too.
 
 import (
 	"bytes"

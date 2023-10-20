@@ -69,6 +69,11 @@ func DebugStr(x interface{}) (out string) {
 			out += DebugStr(e)
 		}
 		return out
+	case *ast.TaggedInterpolation:
+		out += DebugStr(v.Tag)
+		out += " "
+		out += DebugStr(v.Str)
+		return out
 
 	case *ast.EmbedDecl:
 		out += DebugStr(v.Expr)

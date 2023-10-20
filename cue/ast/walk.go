@@ -83,6 +83,10 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 	case *Interpolation:
 		walkList(n.Elts, before, after)
 
+	case *TaggedInterpolation:
+		Walk(n.Tag, before, after)
+		Walk(n.Str, before, after)
+
 	case *ListLit:
 		walkList(n.Elts, before, after)
 

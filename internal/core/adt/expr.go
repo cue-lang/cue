@@ -1145,6 +1145,70 @@ func (x *Interpolation) evaluate(c *OpContext, state Flags) Value {
 	return &String{x.Src, buf.String()}
 }
 
+type TaggedInterpolation struct {
+	Src           *ast.TaggedInterpolation
+	Tag           Expr // The tag function to call.
+	Interpolation *Interpolation
+}
+
+func (x *TaggedInterpolation) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+
+func (x *TaggedInterpolation) evaluate(c *OpContext, state Flags) Value {
+	parts := x.Interpolation.Parts
+	strings := &ListLit{
+		Elems: make([]Elem, 0, len(parts)/2),
+	}
+	// The constant strings are in the even indexes.
+	for i := 0; i < len(parts); i += 2 {
+		strings.Elems = append(strings.Elems, c.value(parts[i], Flags{
+			status:    finalized,
+			condition: scalarKnown,
+			mode:      yield,
+		}))
+	}
+	values := &ListLit{
+		Elems: make([]Elem, 0, len(parts)/2),
+	}
+	argState := Flags{
+		status:    state.status,
+		condition: state.condition | allAncestorsProcessed | concreteKnown,
+		mode:      state.mode,
+		concrete:  true,
+	}
+	// The values are in the odd indexes.
+	for i := 1; i < len(parts); i += 2 {
+		saved := c.errs
+		// TODO should we use "finalized" rather than "partial" here?
+		expr := c.value(parts[i], argState)
+		switch expr := expr.(type) {
+		case nil:
+			if c.errs == nil {
+				// There SHOULD be an error in the context. If not, we generate one.
+				c.Assertf(Pos(x.Tag), c.HasErr(), "argument %d to interpolation tag %s is incomplete", i, x.Tag)
+			}
+		case *Bottom:
+			// TODO(errors): consider adding an argument index for this errors.
+			c.errs = CombineErrors(parts[i].Source(), c.errs, expr)
+		default:
+			values.Elems = append(values.Elems, expr)
+		}
+		c.errs = CombineErrors(parts[i].Source(), saved, c.errs)
+	}
+	if c.HasErr() {
+		return nil
+	}
+	call := &CallExpr{
+		Fun:  x.Tag,
+		Args: []Expr{strings, values},
+	}
+	return call.evaluate(c, state)
+}
+
 // UnaryExpr is a unary expression.
 //
 //	Op X

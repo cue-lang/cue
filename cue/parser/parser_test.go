@@ -463,6 +463,14 @@ cannot import package as definition identifier`,
 			 '''`,
 		`a: "foo \(ident)", b: "bar \(bar)  $$$ ", c: "nest \({a: "\(nest) "}.a) \(5)", ` + "m1: \"\"\"\n\t\t\t multi \\(bar)\n\t\t\t \"\"\", m2: '''\n\t\t\t \\(bar) multi\n\t\t\t '''",
 	}, {
+		"tagged interpolation basic string",
+		`a: foo "something"`,
+		`a: foo "something"`,
+	}, {
+		"tagged interpolation",
+		`a: something "foo \(ident)"`,
+		`a: something "foo \(ident)"`,
+	}, {
 		"file comments",
 		`// foo
 

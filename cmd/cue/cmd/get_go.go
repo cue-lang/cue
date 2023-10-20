@@ -1023,7 +1023,8 @@ func (e *extractor) makeField(name string, kind fieldKind, expr types.Type, doc 
 }
 
 func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
-	if x, ok := expr.(*types.Named); ok {
+	switch x := expr.(type) {
+	case *types.Named:
 		obj := x.Obj()
 		if obj.Pkg() == nil {
 			return e.ident("_", false)
@@ -1076,10 +1077,52 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			result = cueast.NewSel(p, "#"+obj.Name())
 			e.usedPkg(pkg.Path())
 		}
-		return
-	}
 
-	switch x := expr.(type) {
+		// TODO(uhthomas): Fields with type parameters should not be
+		// top.
+		//
+		// For example:
+		//
+		// 	type A[T any] struct {
+		// 		SomeField T
+		// 	}
+		//
+		// 	type B A[string]
+		//
+		// Should become:
+		//
+		// 	#A: SomeField: _
+		//
+		// 	#B: #A & {
+		// 		_#T: string
+		// 		SomeField: _#T
+		// 	}
+		//
+		// Or maybe:
+		//
+		// 	#A: {
+		// 		#T: _
+		// 		SomeField: #T
+		// 	}
+		//
+		// 	#B: #A & {
+		// 		#T: string
+		// 	}
+		//
+		// The values of x.TypeParams() and x.TypeArgs() may be helpful.
+
+		// params := x.TypeParams()
+		// args := x.TypeArgs()
+		// if params.Len() > 0 {
+		// 	var fields []any
+		// 	for i := 0; i < params.Len(); i++ {
+		// 		name := params.At(i).Obj().Name()
+		// 		fields = append(fields, e.ident(name, true), e.makeType(args.At(i)))
+		// 	}
+		// 	return cueast.NewBinExpr(cuetoken.AND, result, cueast.NewStruct(fields...))
+		// }
+
+		return result
 	case *types.Pointer:
 		return &cueast.BinaryExpr{
 			X:  cueast.NewNull(),
@@ -1148,8 +1191,38 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			return e.ident(t, false)
 		}
 
+	case *types.Union:
+		var exprs []cueast.Expr
+		for i := 0; i < x.Len(); i++ {
+			exprs = append(exprs, e.makeType(x.Term(i).Type()))
+		}
+		return cueast.NewBinExpr(cuetoken.OR, exprs...)
+
 	case *types.Interface:
-		return e.ident("_", false)
+		// TODO(uhthomas): Should interfaces with methods (IsMethodSet)
+		// be set to top?
+		if !x.IsComparable() {
+			return e.ident("_", false)
+		}
+
+		// TODO(uhthomas): Simplify expressions.
+		//
+		// For example:
+		//
+		// 	int | (int | string)
+		//
+		// Should really become:
+		//
+		// 	int | string
+		//
+		var exprs []cueast.Expr
+		for i := 0; i < x.NumEmbeddeds(); i++ {
+			exprs = append(exprs, e.makeType(x.EmbeddedType(i)))
+		}
+		return cueast.NewBinExpr(cuetoken.OR, exprs...)
+
+	case *types.TypeParam:
+		return e.makeType(x.Constraint())
 
 	default:
 		// record error

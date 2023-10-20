@@ -1,0 +1,77 @@
+# This tagged interpolations example demonstrates multiple levels
+# of quoting involving different languages.
+#
+# If run as a tool, it runs an ssh command that creates and runs a custom Go
+# program on the remote host that prints a message that comes
+# from the current configuration.
+#
+# The layers involved, from innermost to outermost are:
+#
+# - The Go program containing a string constant holding the message.
+# - A shell script containing the Go program as a string to write to a file.
+# - A string containing the remote shell script, as an argument to ssh
+# - A shell script that runs locally and calls ssh
+
+exec cue eval tool.cue
+cmp stdout want-stdout
+-- tool.cue --
+package demo
+
+import (
+	go "gosource"
+	"sh"
+	"tool/exec"
+)
+
+// msg holds the message to be printed.
+// Note that it contains both double and single quotes,
+// so needs special quoting in both a Go and shell context.
+msg: #"A message containing a "payload" that isn't trivial to quote"#
+remoteHost: "localhost"
+remoteHome: "/home/myself"
+
+demoCommand: exec.Run & {
+	cmd:   ["bash", "-c", sh.Format """
+		echo running ssh
+		ssh \(remoteHost) \(sh.Format """
+			bash -c \(sh.Format """
+				set -e
+				dir=$(mktemp -d)
+				cd "$dir"
+				echo -n \(go.Format #"""
+					package main
+
+					import "fmt"
+					func main() {
+						fmt.Printf("%s\n", \#(msg))
+					}
+					"""#) > main.go
+				export GOROOT=\(remoteHome)/go
+				export PATH=$PATH:$GOROOT/bin
+				echo 'module test' > go.mod
+				go mod tidy
+				go run .
+				""")
+			""")
+		""",
+	]
+}
+
+
+-- want-stdout --
+msg:        "A message containing a \"payload\" that isn't trivial to quote"
+remoteHost: "localhost"
+remoteHome: "/home/myself"
+demoCommand: {
+    $id: "tool/exec.Run"
+    cmd: ["bash", "-c", """
+        echo running ssh
+        ssh localhost "bash -c \\$'set -e\\\\ndir=\\$(mktemp -d)\\\\ncd \\"\\$dir\\"\\\\necho -n \\$\\\\'package main\\\\\\\\n\\\\\\\\nimport \\"fmt\\"\\\\\\\\n\\\\\\\\nfunc main() {\\\\\\\\n\\\\\\\\tfmt.Printf(\\"%s\\\\\\\\\\\\\\\\n\\", \\"A message containing a \\\\\\\\\\\\\\\\\\"payload\\\\\\\\\\\\\\\\\\" that isn\\\\\\\\\\\\'t trivial to quote\\")\\\\\\\\n}\\\\\\\\n\\\\' > main.go\\\\nexport GOROOT=/home/myself/go\\\\nexport PATH=\\$PATH:\\$GOROOT/bin\\\\necho \\\\'module test\\\\' > go.mod\\\\ngo mod tidy\\\\ngo run .'"
+        """]
+    env: {} | []
+    stdout:      null
+    stderr:      null
+    stdin:       null
+    success:     bool
+    mustSucceed: true
+}

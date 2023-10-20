@@ -544,6 +544,11 @@ func (w *printer) node(n adt.Node) {
 	case *adt.Interpolation:
 		w.interpolation(x)
 
+	case *adt.TaggedInterpolation:
+		w.node(x.Tag)
+		w.string(" ")
+		w.interpolation(x.Interpolation)
+
 	case *adt.UnaryExpr:
 		w.string(x.Op.String())
 		w.node(x.X)

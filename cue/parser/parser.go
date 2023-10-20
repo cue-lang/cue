@@ -1401,6 +1401,23 @@ func (p *parser) parsePrimaryExprTail(operand ast.Expr) ast.Expr {
 L:
 	for {
 		switch p.tok {
+		case token.STRING:
+			x = &ast.TaggedInterpolation{
+				Tag: x,
+				Str: &ast.Interpolation{
+					Elts: []ast.Expr{&ast.BasicLit{
+						ValuePos: p.pos,
+						Kind:     token.STRING,
+						Value:    p.lit,
+					}},
+				},
+			}
+			p.next()
+		case token.INTERPOLATION:
+			x = &ast.TaggedInterpolation{
+				Tag: x,
+				Str: p.parseInterpolation(),
+			}
 		case token.PERIOD:
 			c := p.openComments()
 			c.pos = 1
@@ -1516,9 +1533,15 @@ func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
 	}
 }
 
-func (p *parser) parseInterpolation() (expr ast.Expr) {
+func (p *parser) parseInterpolation() (expr *ast.Interpolation) {
 	c := p.openComments()
-	defer func() { c.closeNode(p, expr) }()
+	defer func() {
+		var e ast.Expr
+		if e != nil {
+			e = expr
+		}
+		c.closeNode(p, e)
+	}()
 
 	p.openList()
 	defer p.closeList()

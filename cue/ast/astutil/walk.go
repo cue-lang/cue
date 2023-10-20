@@ -102,6 +102,9 @@ func walk(v visitor, node ast.Node) {
 		for _, e := range n.Elts {
 			walk(v, e)
 		}
+	case *ast.TaggedInterpolation:
+		walk(v, n.Tag)
+		walk(v, n.Str)
 
 	case *ast.ListLit:
 		walkExprList(v, n.Elts)

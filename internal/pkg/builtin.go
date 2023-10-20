@@ -133,9 +133,9 @@ func ToBuiltin(b *Builtin) *adt.Builtin {
 		}
 		defer func() {
 			var errVal interface{} = c.Err
-			if err := recover(); err != nil {
-				errVal = err
-			}
+			//if err := recover(); err != nil {
+			//	errVal = err
+			//}
 			ret = processErr(c, errVal, ret)
 		}()
 		b.Func(c)

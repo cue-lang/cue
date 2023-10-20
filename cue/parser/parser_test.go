@@ -1046,6 +1046,16 @@ expected ')' for string interpolation, found ','`,
 expected ')' for string interpolation, found ','`,
 		},
 		{
+			desc: "tagged interpolation basic string",
+			in:   `a: foo "something"`,
+			out:  `a: foo "something"`,
+		},
+		{
+			desc: "tagged interpolation",
+			in:   `a: something "foo \(ident)"`,
+			out:  `a: something "foo \(ident)"`,
+		},
+		{
 			desc: "file comments",
 			in: `// foo
 

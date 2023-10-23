@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7ef600b_7ab43adb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-23T20:42:09Z",
+      "side": 1,
+      "message": "I should have linked to https://github.com/cue-lang/cue/blob/master/CONTRIBUTING.md#good-commit-messages. The two guidelines are extremely similar, which is why I got confused :)",
+      "parentUuid": "ee9e88a0_492bbc21",
+      "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "5c472243_5f83abe2",
@@ -141,6 +159,30 @@
       "side": 1,
       "message": "Not easily - they don\u0027t implement a common interface and it would be more effort than it\u0027s worth IMO. It\u0027s not the worst thing in the world to have some duplication, especially if it\u0027s only twice.",
       "parentUuid": "6a90ebff_2a4d97e1",
+      "range": {
+        "startLine": 1193,
+        "startChar": 1,
+        "endLine": 1197,
+        "endChar": 49
+      },
+      "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c469a3f1_b71d4e14",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-23T20:42:09Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b3eb4fb9_8ca70c14",
       "range": {
         "startLine": 1193,
         "startChar": 1,

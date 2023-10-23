@@ -153,8 +153,8 @@ Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
 You can get in touch with the cuelang community in the following ways:
 
 - Ask questions via [GitHub Discussions](https://github.com/cue-lang/cue/discussions)
-- Chat with us on our
-  [Slack workspace](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE).
+- Chat with us on our [Slack workspace](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE).
+- Subscribe to our [Community Calendar](https://cuelang.org/s/community-calendar) for community calls, demos, office hours, etc
 
 ---
 

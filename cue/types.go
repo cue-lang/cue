@@ -1055,7 +1055,7 @@ func (v Value) Doc() []*ast.CommentGroup {
 // split values may fail if actually unified.
 // Source returns a non-nil value.
 //
-// Deprecated: use Expr.
+// Deprecated: use [Value.Expr].
 func (v hiddenValue) Split() []Value {
 	if v.v == nil {
 		return nil
@@ -1947,7 +1947,7 @@ func (v Value) instance() *Instance {
 // a reference. If a reference contains index selection (foo[bar]), it will
 // only return a reference if the index resolves to a concrete value.
 //
-// Deprecated: use ReferencePath
+// Deprecated: use [Value.ReferencePath]
 func (v hiddenValue) Reference() (inst *Instance, path []string) {
 	root, p := v.ReferencePath()
 	if !root.Exists() {

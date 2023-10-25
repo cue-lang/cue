@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 )
 
-// An InstanceOrValue is implemented by Value and *Instance.
+// An InstanceOrValue is implemented by [Value] and *[Instance].
 //
 // This is a placeholder type that is used to allow Instance-based APIs to
 // transition to Value-based APIs. The goals is to get rid of the Instance
@@ -38,11 +38,15 @@ type InstanceOrValue interface {
 func (Value) internal()     {}
 func (*Instance) internal() {}
 
-// Value implements value.Instance.
+// Value implements [InstanceOrValue].
 func (v hiddenValue) Value() Value { return v }
 
 // An Instance defines a single configuration based on a collection of
 // underlying CUE files.
+//
+// Use of this type is being phased out in favor of [Value].
+// Any APIs currently taking an Instance should use [InstanceOrValue]
+// to transition to the new type without breaking users.
 type Instance struct {
 	index *runtime.Runtime
 

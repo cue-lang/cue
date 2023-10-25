@@ -102,8 +102,8 @@ func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
 // provided as a string, byte slice, or io.Reader. The name is used as the file
 // name in position information. The source may import builtin packages.
 //
-// Deprecated: use CompileString or CompileBytes.  The use of Instance is being
-// phased out.
+// Deprecated: use [Context.CompileString] or [Context.CompileBytes].
+// The use of [Instance] is being phased out.
 func (r *hiddenRuntime) Parse(name string, source interface{}) (*Instance, error) {
 	return r.Compile(name, source)
 }
@@ -111,15 +111,13 @@ func (r *hiddenRuntime) Parse(name string, source interface{}) (*Instance, error
 // Build creates an Instance from the given build.Instance. A returned Instance
 // may be incomplete, in which case its Err field is set.
 //
-// Deprecated: use Context.BuildInstance. The use of Instance is being phased
-// out.
+// Deprecated: use [Context.BuildInstance]. The use of [Instance] is being phased out.
 func (r *hiddenRuntime) Build(p *build.Instance) (*Instance, error) {
 	v, _ := r.runtime().Build(nil, p)
 	return r.complete(p, v)
 }
 
-// Deprecated: use cuecontext.Context.BuildInstances. The use of Instance is
-// being phased out.
+// Deprecated: [Context.BuildInstances]. The use of [Instance] is being phased out.
 func Build(instances []*build.Instance) []*Instance {
 	if len(instances) == 0 {
 		panic("cue: list of instances must not be empty")

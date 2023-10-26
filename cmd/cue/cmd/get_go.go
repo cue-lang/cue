@@ -1144,9 +1144,10 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			return e.ident("uint64", false)
 		case types.Byte:
 			return e.ident("uint8", false)
-		default:
-			return e.ident(x.String(), false)
+		case types.Complex64, types.Complex128:
+			return e.ident("_", false)
 		}
+		return e.ident(x.String(), false)
 
 	case *types.Interface:
 		return e.ident("_", false)

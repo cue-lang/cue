@@ -16,7 +16,7 @@ import (
 	"tool/cli"
 )
 
-objects: [ for x in map {x}]
+objects: [for x in map {x}]
 
 command: dump: {
 	cli.Print & {
@@ -28,3 +28,4 @@ command: dump: {
 -- expect-stdout --
 spec: {}
 
+-- ignore --

@@ -17,7 +17,7 @@
       "additionalProperties": true
     },
     "obj2": {
-      "type": [ "object", "null" ],
+      "type": ["object", "null"],
       "additionalProperties": true
     }
   }

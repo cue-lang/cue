@@ -61,7 +61,7 @@ foo: int
 bar: 3
 -- sort/print.cue --
 files: {}
-flat: [ for k, _ in files {k} ]
+flat: [for k, _ in files {k}]
 -- sort/root_1.cue --
 files: root_1: 0
 -- sort/root_2/child_1.cue --

@@ -8,16 +8,16 @@ p1: {
 	#A: {
 		x?: int
 		y?: int
-	
+
 		let list = [x, y]
-		all:  [ for v in list if v != _|_ {v}]
-	
+		all:  [for v in list if v != _|_ {v}]
+
 		*{
 			x?: _|_
 			y:  1
 		} | _
 	}
-	
+
 	a: #A & { x: 3 }
 	b: #A & a
 }
@@ -25,16 +25,16 @@ p2: {
 	#A: {
 		x?: int
 		y?: int
-	
+
 		let list = [x, y]
-		all:  [ for v in list if v != _|_ {v}]
+		all:  [for v in list if v != _|_ {v}]
 
 		_ | *{
 			x?: _|_
 			y:  1
 		}
 	}
-	
+
 	a: #A & { x: 3, y: 2 }
 	b: #A & a
 }

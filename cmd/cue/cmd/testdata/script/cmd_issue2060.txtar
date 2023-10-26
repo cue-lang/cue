@@ -118,9 +118,9 @@ buildSource: {
 			Bindings: [
 				for _, strokeDef in strokeDefs {
 					let bindingMap = strokeDef.Bindings["\(PlatformName)"]
-					let bindingIds = [ for k, v in bindingMap {name: k, idx: v}]
+					let bindingIds = [for k, v in bindingMap {name: k, idx: v}]
 					let bindingIdsSorted = list.Sort(bindingIds, {x: {}, y: {}, less: x.idx < y.idx})
-					let bindingKeys = [ for _, kv in bindingIdsSorted {kv.name}]
+					let bindingKeys = [for _, kv in bindingIdsSorted {kv.name}]
 					let bindingText = strings.Join(bindingKeys, "+")
 					"DefText":  "\(strokeDef.DefText)"
 					"BindText": bindingText

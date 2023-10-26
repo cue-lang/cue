@@ -10,11 +10,11 @@
     "person": {
       "description": "A person is a human being.",
       "type": "object",
-      "required": [ "name" ],
+      "required": ["name"],
       "properties": {
         "name": {
           "type": "string",
-          "examples": [ "foo" ]
+          "examples": ["foo"]
         },
         "address": {
             "description": "where does this person live?",

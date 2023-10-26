@@ -55,7 +55,7 @@
       "additionalProperties": { "type": "string" }
     },
     "multi": {
-      "type": [ "object", "number" ],
+      "type": ["object", "number"],
       "properties": {
         "foo": { "type": "number" },
         "bar": { "type": "number" }

@@ -6,7 +6,7 @@
   "properties": {
     "intString": {
       "description": "an integer or string.",
-      "type": [ "string", "integer", "boolean", "array", "null" ]
+      "type": ["string", "integer", "boolean", "array", "null"]
     },
     "object": {
         "type": "object",

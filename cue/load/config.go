@@ -159,7 +159,7 @@ type Config struct {
 	//
 	// Each string is of the form
 	//
-	//     key [ "=" value ]
+	//     key ["=" value ]
 	//
 	// where key is a valid CUE identifier and value valid CUE scalar.
 	//

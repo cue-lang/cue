@@ -16,7 +16,7 @@ root: {
 	// Run this after all generated tasks (so far)
 	b: {
 		$id: "list"
-		$after: [ for x in middle {x}]
+		$after: [for x in middle {x}]
 		out: [...int]
 	}
 	after: {

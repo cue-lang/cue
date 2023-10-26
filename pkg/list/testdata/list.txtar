@@ -179,3 +179,4 @@ maxItems: {
 	fail1: _|_ // maxItems.fail1: invalid value [0,1] (does not satisfy list.MaxItems(1)): len(list) > MaxItems(1) (2 > 1) (and 1 more errors)
 }
 
+-- ignore --

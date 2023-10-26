@@ -43,7 +43,7 @@ func TestEnv(t *testing.T) {
 	}, {
 		val: `
 		cmd: "echo"
-		env: [ "WHO=World", "WHAT=Hello", "WHEN=Now!" ]
+		env: ["WHO=World", "WHAT=Hello", "WHEN=Now!"]
 		`,
 		env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},
 	}}

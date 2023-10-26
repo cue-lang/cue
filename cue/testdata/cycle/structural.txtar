@@ -189,7 +189,7 @@ b12b: {
 }
 
 // Issue #587
-b13: root: a: [ for x in root {x}]
+b13: root: a: [for x in root {x}]
 
 // Issue #587
 // TODO: this should probably be okay if we allow shallow evaluation of
@@ -202,7 +202,7 @@ b14: {
 			"\(x)": {}
 		}
 
-		b: [ for x in root {x}]
+		b: [for x in root {x}]
 	}
 }
 

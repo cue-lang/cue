@@ -659,7 +659,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		f.print(ws, x.Rbrace, token.RBRACE)
 
 	case *ast.ListLit:
-		f.print(x.Lbrack, token.LBRACK, indent)
+		f.print(x.Lbrack, token.LBRACK, noblank, indent)
 		f.walkListElems(x.Elts)
 		f.print(trailcomma, noblank)
 		f.visitComments(f.current.pos)

@@ -100,7 +100,7 @@ issue2052: t1: {
 			out: {
 				if (#in & #basic) != _|_ {1}
 				if (#in & #basic) == _|_ {
-					list.Max([ for k, v in #in {(#next & {#in: v}).out}]) + 1
+					list.Max([for k, v in #in {(#next & {#in: v}).out}]) + 1
 				}
 			}
 		}
@@ -139,7 +139,7 @@ issue2052: t2: {
 			out: {
 				if (#in & #basic) != _|_ {1}
 				if (#in & #basic) == _|_ {
-					list.Max([ for k, v in #in {(#next & {#in: v}).out}]) + 1
+					list.Max([for k, v in #in {(#next & {#in: v}).out}]) + 1
 				}
 			}
 		}
@@ -188,7 +188,7 @@ issue2052: full: {
 				// if we are not a basic type, then we are 1 + the max of children
 				if (#in & #basic) == _|_ {
 					// this is our "recursion" for each child
-					let depths = [ for k, v in #in {(#next & {#in: v}).out}]
+					let depths = [for k, v in #in {(#next & {#in: v}).out}]
 					list.Max(depths) + 1
 				}
 			}

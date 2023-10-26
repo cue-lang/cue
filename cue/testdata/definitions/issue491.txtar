@@ -29,7 +29,7 @@ y: #Repo & {
 
 z: #PrestepNewUser & {
 	Args: {
-		Repos: [ {
+		Repos: [{
 			Var: "REPO1"
 		}]
 	}

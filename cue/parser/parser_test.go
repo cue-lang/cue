@@ -310,7 +310,7 @@ func TestParse(t *testing.T) {
 		"list comprehensions",
 		`{
 				y: [1,2,3]
-				b: [ for x in y if x == 1 { x } ],
+				b: [for x in y if x == 1 { x }],
 			}`,
 		`{y: [1, 2, 3], b: [for x in y if x==1 {x}]}`,
 	}, {

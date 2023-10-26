@@ -28,7 +28,7 @@ issue1828: {
 	volumes: L3
 
 	let L3 = {
-		for v2 in [ for v1 in L2 {} ] {}
+		for v2 in [for v1 in L2 {}] {}
 	}
 
 	let L2 = L1

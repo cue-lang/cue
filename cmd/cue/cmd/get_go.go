@@ -1139,13 +1139,13 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 
 	case *types.Basic:
-		switch t := x.String(); t {
-		case "uintptr":
+		switch x.Kind() {
+		case types.Uintptr, types.UnsafePointer:
 			return e.ident("uint64", false)
-		case "byte":
+		case types.Byte:
 			return e.ident("uint8", false)
 		default:
-			return e.ident(t, false)
+			return e.ident(x.String(), false)
 		}
 
 	case *types.Interface:

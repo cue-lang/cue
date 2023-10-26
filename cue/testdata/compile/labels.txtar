@@ -22,7 +22,7 @@ ok9: [name=dis2]:                   string
 ok10: [{foo:                        "bar"}]: string // disallowed in evaluator
 ok11: [list.FlattenN([string], 1)]: string   // disallowed in evaluator
 
-bad1: [ for x in [1, 2, 3] {x}]: string
+bad1: [for x in [1, 2, 3] {x}]: string
 
 saneReferencesInComprehensions: {
 	for _ in [1] {
@@ -31,7 +31,7 @@ saneReferencesInComprehensions: {
 }
 -- out/compile --
 bad1: comprehension values not allowed in this position:
-    ./in.cue:24:9
+    ./in.cue:24:8
 --- in.cue
 {
   dis1: ("dev"|"prd")
@@ -91,4 +91,4 @@ bad1: comprehension values not allowed in this position:
 }
 -- out/eval --
 bad1: comprehension values not allowed in this position:
-    ./in.cue:24:9
+    ./in.cue:24:8

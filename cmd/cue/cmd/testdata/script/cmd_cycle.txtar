@@ -99,7 +99,7 @@ for _, input in inputs {
 }
 
 command: print: cli.Print & {
-	text: strings.Join([ for key, val in outputs { "key=\(key) val=\(val)" } ], "\n")
+	text: strings.Join([for key, val in outputs { "key=\(key) val=\(val)" }], "\n")
 }
 
 -- stdout2397.golden --

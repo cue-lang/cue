@@ -170,7 +170,7 @@ f4: {} # line 4
 				a: 1
 				b: 3
 			}
-			c: [1, [ for x in m {x}]]
+			c: [1, [for x in m {x}]]
 			`,
 		out: "yaml: unsupported node for x in m {x} (*ast.Comprehension)",
 	}, {

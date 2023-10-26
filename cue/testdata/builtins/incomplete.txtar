@@ -14,7 +14,7 @@ list1: {
 
 	// This evaluates to a list with an incomplete element.
 	Top: [
-		[ for _, F in _Sub {F}],
+		[for _, F in _Sub {F}],
 	]
 
 	_Sub: a.b

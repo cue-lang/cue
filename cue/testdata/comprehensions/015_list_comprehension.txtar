@@ -3,15 +3,15 @@
 #name: list comprehension
 #evalFull
 -- in.cue --
-a: [ for k, v in b if k < "d" if v > b.a {k}]
+a: [for k, v in b if k < "d" if v > b.a {k}]
 b: {
 	a: 1
 	b: 2
 	c: 3
 	d: 4
 }
-c: [ for _, x in b for _, y in b if x < y {x}]
-d: [ for x, _ in a {x}]
+c: [for _, x in b for _, y in b if x < y {x}]
+d: [for x, _ in a {x}]
 -- out/def --
 a: ["b", "c"]
 b: {

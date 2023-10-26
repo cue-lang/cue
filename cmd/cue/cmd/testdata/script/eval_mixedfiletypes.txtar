@@ -40,7 +40,7 @@ checks: {
 	}
 
 	hasManager: {
-		ok: len([ for m in team if list.Contains(m, "EM") {m}]) >= 1
+		ok: len([for m in team if list.Contains(m, "EM") {m}]) >= 1
 	}
 }
 -- y.cue --

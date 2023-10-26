@@ -55,7 +55,7 @@ command: gen: {
 		for _workflowName, _workflow in github.workflows {
 			let _filename = _workflowName + repo.workflowFileExtension
 			"generate \(_filename)": file.Create & {
-				$after: [ for v in remove {v}]
+				$after: [for v in remove {v}]
 				filename: path.Join([_dir, _filename], _goos)
 				let donotedit = repo.doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}
 				contents: "# \(donotedit)\n\n\(yaml.Marshal(_workflow))"

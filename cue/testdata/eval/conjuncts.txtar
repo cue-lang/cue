@@ -34,7 +34,7 @@ issue2351: let: {
 	let _param = "foo"
 	({
 		param: _param & [{}]
-		gen: [ for p in param {p}]
+		gen: [for p in param {p}]
 	}).gen
 }
 
@@ -42,7 +42,7 @@ issue2351: hidden: {
 	_in1: ["foo"]
 	{
 		in2: _in1
-		out: [ for x in in2 {x}]
+		out: [for x in in2 {x}]
 	}.out
 }
 

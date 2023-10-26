@@ -19,7 +19,7 @@ middle: {
 }
 
 a: {
-	b: [ for x in middle {x}]
+	b: [for x in middle {x}]
 	c: {}
 }
 -- out/dependencies/field --

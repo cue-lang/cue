@@ -1,7 +1,7 @@
 -- in.cue --
 a: [{a: 1}, {b: 2 & 3}]
 
-b: [ for x in a {x}]
+b: [for x in a {x}]
 -- out/eval/stats --
 Leaks:  0
 Freed:  7

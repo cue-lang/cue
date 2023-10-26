@@ -3,7 +3,7 @@
 #name: struct comprehension with template
 #evalFull
 -- in.cue --
-result: [ for _, v in service {v}]
+result: [for _, v in service {v}]
 
 service: [Name=string]: {
 	name: *Name | string

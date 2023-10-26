@@ -4,7 +4,7 @@
 #evalFull
 -- in.cue --
 #Foo: {
-	let X = or([ for k, _ in {} {k}])
+	let X = or([for k, _ in {} {k}])
 	connection: [X]: X
 }
 #A: {
@@ -21,11 +21,11 @@ b: #B & {foo: "key"}
 -- out/def --
 #Foo: {
 	connection: {
-		[or([ for k, _ in {
+		[or([for k, _ in {
 				...
-		} { k } ])]: or([ for k, _ in {
+		} { k }])]: or([for k, _ in {
 			...
-		} { k } ])
+		} { k }])
 	}
 }
 #A: {

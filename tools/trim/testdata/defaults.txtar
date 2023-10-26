@@ -59,7 +59,7 @@ issue781: {
 // was first used to select the default.
 dontEraseDefaultSelection: {
 	rule: _#Rule & {
-		verbs: [ "c"]
+		verbs: ["c"]
 	}
 	_#Rule: {
 		verbs: *["a", "b"] | ["c"]
@@ -127,7 +127,7 @@ issue781: {
 // was first used to select the default.
 dontEraseDefaultSelection: {
 	rule: _#Rule & {
-		verbs: [ "c"]
+		verbs: ["c"]
 	}
 	_#Rule: {
 		verbs: *["a", "b"] | ["c"]

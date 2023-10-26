@@ -22,7 +22,7 @@ for _, input in inputs {
 }
 
 root: print: cli.Print & {
-	text: strings.Join([ for key, val in outputs { "key=\(key) val=\(val)" } ], "\n")
+	text: strings.Join([for key, val in outputs { "key=\(key) val=\(val)" }], "\n")
 }
 -- out/run/errors --
 -- out/run/t0 --

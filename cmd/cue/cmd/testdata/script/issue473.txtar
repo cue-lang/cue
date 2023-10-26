@@ -10,7 +10,7 @@ package x
 
         Steps: [string]: #Step
 
-        #TerminalName: or([ for k, _ in Terminals {k}])
+        #TerminalName: or([for k, _ in Terminals {k}])
 
         #Step: {
                 Terminal: #TerminalName

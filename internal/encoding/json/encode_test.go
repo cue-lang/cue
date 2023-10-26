@@ -154,7 +154,7 @@ f4: {
 				a: 1
 				b: 3
 			}
-			c: [1, [ for x in m { x } ]]
+			c: [1, [for x in m { x }]]
 			`,
 		out: "json: unsupported node for x in m {x} (*ast.Comprehension)",
 	}, {

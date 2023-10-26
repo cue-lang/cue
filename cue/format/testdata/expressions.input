@@ -142,10 +142,10 @@ import "list"
     e: [...int]
     e: [...int,]
     e: [...int | float]
-    e: [ for x in someObject if x > 9 {
+    e: [for x in someObject if x > 9 {
         x
     }]
-    e: [ for x in someObject if x > 9 {x}]
+    e: [for x in someObject if x > 9 {x}]
     e: [
     for x in someObject
     if x > 9 {x}]
@@ -250,4 +250,20 @@ import "list"
 
         2,
     ])
+
+    m: [1, 2, 3]
+    m: [1, 2, 3,]
+    m: [ 1, 2, 3, ]
+    m: [    1, 2, 3,]
+    m: [     1, 2, 3,]
+    m: [ 1, 2, 3]
+    m: [ 1, 2, 3,]
+    m: [ 1, 2, 3, ]
+    m: [ 1, 2, 3 ]
+    m: [ if true { 1 }, 2, 3]
+    n: [ 1]
+    o: [{}]
+    o: [ {}]
+    o: [{} ]
+    o: [ {} ]
 }

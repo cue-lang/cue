@@ -278,7 +278,7 @@ setupGoActionsCaches: {
 // but array literals are not yet supported in expressions.
 isProtectedBranch: {
 	#trailers: [...string]
-	"((" + strings.Join([ for branch in protectedBranchPatterns {
+	"((" + strings.Join([for branch in protectedBranchPatterns {
 		(_matchPattern & {variable: "github.ref", pattern: "refs/heads/\(branch)"}).expr
 	}], " || ") + ") && (! \(containsDispatchTrailer)))"
 }

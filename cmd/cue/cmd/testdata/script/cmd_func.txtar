@@ -8,7 +8,7 @@ import "encoding/json"
 
 x: y: 2
 
-objects: [ for v in [ json.Marshal(x) ] {v} ]
+objects: [for v in [json.Marshal(x)] {v}]
 
 -- k_tool.cue --
 package kube

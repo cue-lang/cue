@@ -15,15 +15,15 @@ a3: b: c: 100*A3[0] + A3[0]
 
 a4list: [{4}]
 let A4 = a4list
-a4: [ for x in A4 {v: 404}]
+a4: [for x in A4 {v: 404}]
 
 a5list: [{5}]
 let A5 = a5list
-a5: b: [ for x in A5 {v: 505}]
+a5: b: [for x in A5 {v: 505}]
 
 a6list: [{6}]
 let A6 = a6list
-a6: b: c: [ for x in A6 {v: 606}]
+a6: b: c: [for x in A6 {v: 606}]
 
 a7list: [{7}]
 let A7 = a7list

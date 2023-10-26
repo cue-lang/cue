@@ -58,7 +58,7 @@ disjunctionCycle: {
 
 forCycle: {
 	#A: a: #B // TODO(errors): Correct error position.
-	#B: or([ for x in #A { b: x } ])
+	#B: or([for x in #A { b: x }])
 }
 
 letCycleWithAnd: {

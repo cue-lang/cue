@@ -1,5 +1,5 @@
 -- in.cue --
-a: b: [ for x in c if x.a > 0 {x.a + d}]
+a: b: [for x in c if x.a > 0 {x.a + d}]
 
 c: [{a: 1}, {a: 3}]
 d: 2

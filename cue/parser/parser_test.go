@@ -300,7 +300,7 @@ func TestParse(t *testing.T) {
 		"list types",
 		`{
 			a: 4*[int]
-			b: <=5*[ {a: 5} ]
+			b: <=5*[{a: 5}]
 			c1: [...int]
 			c2: [...]
 			c3: [1, 2, ...int,]
@@ -310,7 +310,7 @@ func TestParse(t *testing.T) {
 		"list comprehensions",
 		`{
 				y: [1,2,3]
-				b: [ for x in y if x == 1 { x } ],
+				b: [for x in y if x == 1 { x }],
 			}`,
 		`{y: [1, 2, 3], b: [for x in y if x==1 {x}]}`,
 	}, {

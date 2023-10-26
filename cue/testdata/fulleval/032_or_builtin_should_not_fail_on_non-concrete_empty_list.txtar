@@ -8,7 +8,7 @@
 		[jobID=string]: {
 		}
 	}
-	#JobID: or([ for k, _ in jobs {k}])
+	#JobID: or([for k, _ in jobs {k}])
 }
 
 foo: #Workflow & {
@@ -20,7 +20,7 @@ foo: #Workflow & {
 	jobs: {
 		[jobID=string]: {}
 	}
-	#JobID: or([ for k, _ in jobs { k } ])
+	#JobID: or([for k, _ in jobs { k }])
 }
 foo: #Workflow & {
 	jobs: {

@@ -21,7 +21,7 @@ import (
 // the key: value
 toCodeReviewCfg: {
 	#input: #codeReview
-	let parts = [ for k, v in #input {k + ": " + v}]
+	let parts = [for k, v in #input {k + ": " + v}]
 
 	// Per https://pkg.go.dev/golang.org/x/review/git-codereview#hdr-Configuration
 	strings.Join(parts, "\n")

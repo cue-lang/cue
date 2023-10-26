@@ -3,7 +3,7 @@ cond: bool
 src: {}
 top: _
 a: [ if cond {}]
-b: [ for x in src.foo {}]
+b: [for x in src.foo {}]
 c: {for x in top {}}
 -- out/eval/stats --
 Leaks:  0
@@ -27,7 +27,7 @@ Disjuncts:    7
   }
   b: (_|_){
     // [incomplete] b: undefined field: foo:
-    //     ./in.cue:5:19
+    //     ./in.cue:5:18
   }
   c: (_|_){
     // [incomplete] c: cannot range over top (incomplete type _):

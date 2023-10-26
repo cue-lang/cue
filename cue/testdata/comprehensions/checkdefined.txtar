@@ -17,31 +17,31 @@ okc1: { if xc.undefined != _|_ {a: 1} }
 oko1: { if xo.undefined != _|_ {a: 1} }
 
 okc2: {
-	if ({} & {s: [ for y in xc.undefined {}]}) != _|_ {a: 1}
+	if ({} & {s: [for y in xc.undefined {}]}) != _|_ {a: 1}
 }
 
 oko2: {
-	if ({} & {s: [ for y in xo.undefined {}]}) != _|_ {a: 1}
+	if ({} & {s: [for y in xo.undefined {}]}) != _|_ {a: 1}
 }
 
 okc3: {
-	if ({s: [ for y in xc.undefined {}]}) != _|_ {a: 1}
+	if ({s: [for y in xc.undefined {}]}) != _|_ {a: 1}
 }
 
 oko3: {
-	if ({s: [ for y in xo.undefined {}]}) != _|_ {a: 1}
+	if ({s: [for y in xo.undefined {}]}) != _|_ {a: 1}
 }
 
 issue1969: okc: {
 	let X = xc.undefined
-	let Y = {} & {s: [ for y in list.Range(0, X, 1) {}]}
+	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
 	if Y != _|_ {Y}
 }
 
 issue1969: oko: {
 	let X = xo.undefined
-	let Y = {} & {s: [ for y in list.Range(0, X, 1) {}]}
+	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
 
 	if Y != _|_ {Y}
 }

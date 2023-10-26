@@ -8,10 +8,10 @@ description = ""
 -- text.md --
 <!-- jba: the terms here are confusing. "Null coalescing" is actually not
   that, but then there is something called "actual null coalescing."
-  
+
   Just say that because _|_ | X evaluates to X, you can use disjunction
   to represent fallback values.
-  
+
   And then you can use that to effectively type-check with a default value.
 -->
 
@@ -28,7 +28,7 @@ In that case the default will be used if either the lookup fails or
 the result is not of the desired type.
 
 -- coalesce.cue --
-list: [ "Cat", "Mouse", "Dog" ]
+list: ["Cat", "Mouse", "Dog"]
 
 a: *list[0] | "None"
 b: *list[5] | "None"

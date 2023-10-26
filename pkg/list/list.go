@@ -149,7 +149,7 @@ func Repeat(x []cue.Value, count int) ([]cue.Value, error) {
 //
 // Concat([a, b, c]) is equivalent to
 //
-//	[ for x in a {x}, for x in b {x}, for x in c {x} ]
+//	[for x in a {x}, for x in b {x}, for x in c {x}]
 func Concat(a []cue.Value) ([]cue.Value, error) {
 	var res []cue.Value
 	for _, e := range a {

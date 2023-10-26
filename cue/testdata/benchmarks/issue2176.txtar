@@ -37,7 +37,7 @@ import (
 					}
 				}
 			}
-			[ for i, _ in unique_combinations {i}][0]
+			[for i, _ in unique_combinations {i}][0]
 		}
 	}
 }

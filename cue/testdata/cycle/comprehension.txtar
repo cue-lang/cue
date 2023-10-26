@@ -4,11 +4,11 @@
 A: {
 	a: {
 		parent: ""
-		children: [ for k, v in A if v.parent == k {k}]
+		children: [for k, v in A if v.parent == k {k}]
 	}
 	b: {
 		parent: "a"
-		children: [ for k, v in A if v.parent == k {k}]
+		children: [for k, v in A if v.parent == k {k}]
 	}
 }
 
@@ -17,7 +17,7 @@ A: {
 B: {
 	a: {
 		parent: ""
-		children: [ for k, v in B for _, w in v.children {k}]
+		children: [for k, v in B for _, w in v.children {k}]
 	}
 }
 
@@ -131,13 +131,13 @@ selfReferential: acrossOr: t1: p1: {
 		retry: #Output
 	}
 
-	#Output: or([ for name, config in #AllOutputs {
+	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
 }
 
 selfReferential: acrossOr: t1: p2: {
-	#Output: or([ for name, config in #AllOutputs {
+	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
 
@@ -151,7 +151,7 @@ selfReferential: acrossOr: t1: p2: {
 }
 
 selfReferential: acrossOr: t1: p3: {
-	#Output: or([ for name, config in #AllOutputs {
+	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
 
@@ -165,7 +165,7 @@ selfReferential: acrossOr: t1: p3: {
 }
 
 selfReferential: acrossOr: t2: p1: {
-	d: or([ for x, y in #A { y } ])
+	d: or([for x, y in #A { y }])
 	o: d & { b: 2 }
 	#A: {
 		d1: int
@@ -176,7 +176,7 @@ selfReferential: acrossOr: t2: p1: {
 
 selfReferential: acrossOr: t2: p2: {
 	o: d & { b: 2 }
-	d: or([ for x, y in #A { y } ])
+	d: or([for x, y in #A { y }])
 	#A: {
 		d1: int
 		d2: string
@@ -191,7 +191,7 @@ selfReferential: acrossOr: t2: p3: {
 		d2: string
 		d3: b: d
 	}
-	d: or([ for x, y in #A { y } ])
+	d: or([for x, y in #A { y }])
 }
 
 issue1881: p1: {
@@ -203,7 +203,7 @@ issue1881: p1: {
 		retry: output: #Output
 	}
 
-	#Output: or([ for name, config in #AllOutputs {
+	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
 }
@@ -214,10 +214,10 @@ issue1881: p2: {
 		resource: string
 		retry: output: #Output
 	}
-	
+
 	o: #Output & { retry: output: reject: "ok" }
 
-	#Output: or([ for name, config in #AllOutputs {
+	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
 }
@@ -229,7 +229,7 @@ issue1881: p3: {
 		retry: output: #Output
 	}
 
-	#Output: or([ for name, config in #AllOutputs {
+	#Output: or([for name, config in #AllOutputs {
 		(name): config
 	}])
 

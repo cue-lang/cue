@@ -2,7 +2,7 @@ This test tests a case where a child node needs to be evaluated
 before evaluating a parent has completed.
 
 -- in.cue --
-a: [ for c in foo.bar.baz {
+a: [for c in foo.bar.baz {
 	c
 }]
 

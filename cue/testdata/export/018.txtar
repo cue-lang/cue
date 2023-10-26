@@ -2,7 +2,7 @@
 #
 raw: true
 -- in.cue --
-{a: [1, 2], b: [ for k, v in a {v}]}
+{a: [1, 2], b: [for k, v in a {v}]}
 -- out/def --
 a: [1, 2]
 b: [1, 2]

@@ -1,7 +1,7 @@
 // Issue-specific tests. Essence tested in evaluate.txtar (LetCycle*).
 -- issue1960.cue --
 t1: {
-	z: blah: s: [ for z in z {}]
+	z: blah: s: [for z in z {}]
 	z: hello: {
 		for x in p {}
 		let q = z.blah
@@ -11,7 +11,7 @@ t1: {
 }
 
 t2: {
-	z: blah: s: [ for z in z {}]
+	z: blah: s: [for z in z {}]
 	z: hello: {
 		for x in p {}
 		let q = z.blah
@@ -34,19 +34,19 @@ t3: {
 			}
 		}
 	}
-	
+
 	#i: {
 		#z
 		t: "i"
 		r: e: {}
 	}
-	
+
 	#c: {
 		#z
 		t: "c"
 		n: string
 	}
-	
+
 	z: [N= =~"^b"]: #i & {
 		s: [
 			for n, z in z
@@ -54,7 +54,7 @@ t3: {
 			if z.n == N {n},
 		]
 	}
-	
+
 	z: [N= =~"^h"]: #c & {
 		n: string
 		// Causes a structural cycle on its own, but not when referenced below.

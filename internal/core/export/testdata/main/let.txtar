@@ -17,7 +17,7 @@ x: "foo"
 let Y = x
 y: Y
 -- issue593.cue --
-cfgs: [ for crd in ["one", "two"] {
+cfgs: [for crd in ["one", "two"] {
 	metadata: {
 		name: crd
 	}
@@ -137,7 +137,7 @@ let X = 1 + 1
 let Y = x
 let Y_1 = x
 {
-	cfgs: [ for crd in ["one", "two"] {
+	cfgs: [for crd in ["one", "two"] {
 		metadata: {
 			name: crd
 		}

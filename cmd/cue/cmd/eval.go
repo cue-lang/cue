@@ -42,7 +42,7 @@ configuration file, instead of the entire configuration file itself.
 Examples:
 
   $ cat <<EOF > foo.cue
-  a: [ "a", "b", "c" ]
+  a: ["a", "b", "c"]
   EOF
 
   $ cue eval foo.cue -e a[0] -e a[2]

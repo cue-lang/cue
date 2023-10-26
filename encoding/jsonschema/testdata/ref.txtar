@@ -19,7 +19,7 @@
       "type": "integer"
     },
     "string-int": {
-      "type": [ "integer", "string" ]
+      "type": ["integer", "string"]
     },
     "person": {
       "type": "object",

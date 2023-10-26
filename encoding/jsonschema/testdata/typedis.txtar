@@ -5,7 +5,7 @@
 
   "properties": {
     "intOrString1": {
-      "type": [ "string", "integer" ]
+      "type": ["string", "integer"]
     },
     "intOrString2": {
       "oneOf": [

@@ -382,7 +382,7 @@ issue2246: simplified: {
 	#FormFoo: fooID: string
 	#FormBar: barID: string
 	#Form: { #FormFoo | #FormBar }
-	
+
 	data: {fooID: "123"}
 	out1: #Form & data
 	out2: #Form & out1
@@ -391,9 +391,9 @@ issue2246: full: {
 	data: forms: [{
 		fooID: "00-0000001"
 	}]
-	
+
 	form1040: (#compute & {in: data}).out
-	
+
 	#K1: {
 		#_base: common: 3
 		#FormFoo: {
@@ -408,16 +408,16 @@ issue2246: full: {
 			#FormFoo | #FormBar
 		}
 	}
-	
+
 	#Input: {
 		forms: [...#K1.#Form]
 	}
-	
+
 	#summarizeReturn: {
 		in:  #Input
-		out: [ for k in in.forms { k.common } ]
+		out: [for k in in.forms { k.common }]
 	}
-	
+
 	#compute: {
 		in:  #Input
 		out: (#summarizeReturn & {"in": in}).out

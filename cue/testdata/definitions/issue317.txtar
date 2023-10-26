@@ -25,7 +25,7 @@ s: #T & {
 #Deployment: {
 	#Containers: [Name=string]: #Container
 
-	containers: [ for c in #Containers {c}] // Problem is here.
+	containers: [for c in #Containers {c}] // Problem is here.
 }
 Something: {
 	#Deployment
@@ -150,7 +150,7 @@ s: #T & {
 #Deployment: {
 	#Containers: [Name=string]: #Container
 
-	containers: [ for c in #Containers {c}] // Problem is here.
+	containers: [for c in #Containers {c}] // Problem is here.
 }
 Something: {
 	#Deployment

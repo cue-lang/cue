@@ -12,8 +12,11 @@ cmp ./pkg3/pkg3_go_gen.cue ./pkg3/pkg3_go_gen.cue.golden
 cmp ./pkg1/file1_go_gen.cue ./pkg1/file1_go_gen.cue.golden
 cmp ./pkg1/alias_go_gen.cue ./pkg1/alias_go_gen.cue.golden
 cmp ./pkg2/pkg2_go_gen.cue ./pkg2/pkg2_go_gen.cue.golden
+<<<<<<< HEAD
 cmp ./pkg4/pkg4_go_gen.cue ./pkg4/pkg4_go_gen.cue.golden
 cmp ./pkg_generics/pkg_generics_go_gen.cue ./pkg_generics/pkg_generics_go_gen.cue.golden
+=======
+>>>>>>> 5e42c260 (cmd/cue: ignore complex types in get go)
 
 # Verify dependencies did not change
 cmp go.mod go.mod.golden
@@ -44,6 +47,7 @@ import (
 	"encoding"
 	"encoding/json"
 	"time"
+	"unsafe"
 
 	p2 "mod.test/pkg2"
 )
@@ -66,6 +70,11 @@ type Foozer struct {
 	exclude int
 
 	Ptr uintptr
+
+	UnsafePointer unsafe.Pointer
+
+	Complex64     complex64
+	Complex128    complex128
 
 	Byte byte
 
@@ -248,14 +257,17 @@ import (
 	String: string
 
 	#Inline
-	NoInline:    #NoInline
-	CustomJSON:  #CustomJSON
-	CustomYAML?: null | #CustomYAML @go(,*CustomYAML)
-	AnyJSON:     _                  @go(,json.Marshaler)
-	AnyText:     string             @go(,encoding.TextMarshaler)
-	bar?:        int & >10          @go(Bar)
-	Ptr:         uint64             @go(,uintptr)
-	Byte:        uint8              @go(,byte)
+	NoInline:      #NoInline
+	CustomJSON:    #CustomJSON
+	CustomYAML?:   null | #CustomYAML @go(,*CustomYAML)
+	AnyJSON:       _                  @go(,json.Marshaler)
+	AnyText:       string             @go(,encoding.TextMarshaler)
+	bar?:          int & >10          @go(Bar)
+	Ptr:           uint64             @go(,uintptr)
+	UnsafePointer: uint64             @go(,unsafe.Pointer)
+	Complex64:     _                  @go(,complex64)
+	Complex128:    _                  @go(,complex128)
+	Byte:          uint8              @go(,byte)
 
 	// Time is mapped to CUE's internal type.
 	Time:    time.Time

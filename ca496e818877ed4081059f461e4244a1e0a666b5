@@ -56,6 +56,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2a582de7_5023c895",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-26T20:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e7ef600b_7ab43adb",
+      "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5c472243_5f83abe2",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -105,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "afc7b79e_6c3b1a19",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-26T20:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "47302dea_eefefac6",
+      "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb34db36_ea854015",
@@ -118,6 +154,24 @@
       "writtenOn": "2023-10-22T11:04:51Z",
       "side": 1,
       "message": "another way to phrase this is that, if a type B instantiates a generic type A, then B should be converted in its instantiated form, with all the type parameters fully expanded.\n\ngo/types already handles type instantiation for you; search for \"instantiat\", \"instantiated\", or \"instantiating\" in https://pkg.go.dev/go/types and you\u0027ll see some pointers like Info.Instances, Named.Origin, and so on.\n\ndefinitely fine to do this in a follow-up CL, just giving pointers.",
+      "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18ee79e8_df61ef4b",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1082,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-26T20:08:13Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "fb34db36_ea854015",
       "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -228,6 +282,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5afa47a7_e9d112e3",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1201,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-26T20:08:13Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f93d84c_94150e2a",
+      "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "91bc3e2c_176311ba",
@@ -259,6 +331,24 @@
       "side": 1,
       "message": "I think that makes sense really, `cue fmt -s` or `cue trim` would be better places to simplify expressions. I know statticheck can do something similar, so may be worth looking there.\n\nhttps://staticcheck.io/docs/checks#S1",
       "parentUuid": "91bc3e2c_176311ba",
+      "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "daaf658e_2438d011",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1202,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-26T20:08:13Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7dfb8996_dd5a438c",
       "revId": "ca496e818877ed4081059f461e4244a1e0a666b5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

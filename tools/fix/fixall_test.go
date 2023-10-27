@@ -38,7 +38,7 @@ func TestInstances(t *testing.T) {
 			for _, f := range b.Files {
 				b, _ := format.Node(f)
 				fmt.Fprintln(t, "---", t.Rel(f.Filename))
-				fmt.Fprintln(t, string(b))
+				fmt.Fprint(t, string(b))
 			}
 		}
 	})

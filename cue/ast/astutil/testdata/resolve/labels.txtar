@@ -32,4 +32,3 @@ for _ in [1] {a: _}
 34[_]:      Scope: 0[<nil>]       Node: 0[]
 37[a]:      Scope: 0[<nil>]       Node: 0[]
 38[_]:      Scope: 0[<nil>]       Node: 0[]
-

@@ -8,4 +8,3 @@ b: X={
 8[c]:  Scope: 0[<nil>]      Node: 0[]
 9[X]:  Scope: 2[*ast.Field] Node: 4[X={c: X.a}]
 10[a]: Scope: 0[<nil>]      Node: 0[]
-

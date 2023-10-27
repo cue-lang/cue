@@ -502,4 +502,3 @@ Volume: {
 		"//host/share/foo/../bar":                    "//host/share"
 	}
 }
-

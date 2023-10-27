@@ -60,4 +60,3 @@ t14: "hello"
 t15: "hello"
 t16: _|_ // t16: invalid value "hello" (does not satisfy strings.MaxRunes(3))
 t17: _|_ // t17: invalid value "hello" (does not satisfy strings.MinRunes(10))
-

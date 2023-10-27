@@ -10,4 +10,3 @@ issues1025: {
 	p: *"hello" | string
 	q: "hello"
 }
-

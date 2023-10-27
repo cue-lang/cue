@@ -37,4 +37,3 @@ FormatDuration: [{
 	arg: 600000000
 	out: "600ms"
 }]
-

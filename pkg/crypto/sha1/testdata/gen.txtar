@@ -6,4 +6,3 @@ import "crypto/sha1"
 t1: len(sha1.Sum("hash me"))
 -- out/sha1 --
 t1: 20
-

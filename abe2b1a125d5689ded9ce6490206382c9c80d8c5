@@ -33,6 +33,24 @@
       "message": "use `go 1.21` here; otherwise CI correctly spots that this breaks the tests on Go 1.20, since the patch version suffix support was only added in Go 1.21.",
       "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "82ac4dd4_eaf85bf6",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T17:21:58Z",
+      "side": 1,
+      "message": "Should we just update to Go 1.21?",
+      "parentUuid": "a51d0c83_9616a933",
+      "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

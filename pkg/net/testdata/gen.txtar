@@ -65,4 +65,3 @@ t21: "foo%2Fbar"
 t22: "foo/bar"
 t23: "f%25o"
 t24: "f%o"
-

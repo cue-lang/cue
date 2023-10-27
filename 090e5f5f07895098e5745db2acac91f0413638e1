@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0c94117_037e5abf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T19:30:59Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "053962aa_d813ce1c",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0202bbe3_b1652bb2",
@@ -31,6 +49,30 @@
       "writtenOn": "2023-10-27T08:01:13Z",
       "side": 1,
       "message": "to be a bit more specific about the edge case, how about:\n\n\u003e but can be introduced by cue/format when a list begins with a comprehension",
+      "range": {
+        "startLine": 9,
+        "startChar": 49,
+        "endLine": 10,
+        "endChar": 33
+      },
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6bc48868_59eed78b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T19:30:59Z",
+      "side": 1,
+      "message": "I don\u0027t think that comment is accurate. This happens with lists without comprehensions also.",
+      "parentUuid": "0202bbe3_b1652bb2",
       "range": {
         "startLine": 9,
         "startChar": 49,
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b11e5220_396a437c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T19:30:59Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "2b866c81_06a44462",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "54aa1459_af5eeba5",
@@ -71,6 +131,24 @@
       "writtenOn": "2023-10-27T08:01:13Z",
       "side": 1,
       "message": "indent this diff chunk with one tab or four spaces - it will render the same in markdown, but look nicer in plaintext like \"git log\".",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99d0273b_c2ce1558",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T19:30:59Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "54aa1459_af5eeba5",
       "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +183,24 @@
       "writtenOn": "2023-10-27T08:01:13Z",
       "side": 1,
       "message": "Talking on Slack about this - I\u0027d rather make the tests more robust and not require a trailing empty line than add this workaround.",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8cce56ac_c1d8bedd",
+        "filename": "pkg/list/testdata/list.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T19:30:59Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7049e69e_1ddd6ab7",
       "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

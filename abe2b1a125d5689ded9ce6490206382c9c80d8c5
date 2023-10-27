@@ -16,6 +16,23 @@
       "message": "Thanks! Merging on green.",
       "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a51d0c83_9616a933",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T16:21:26Z",
+      "side": 1,
+      "message": "use `go 1.21` here; otherwise CI correctly spots that this breaks the tests on Go 1.20, since the patch version suffix support was only added in Go 1.21.",
+      "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

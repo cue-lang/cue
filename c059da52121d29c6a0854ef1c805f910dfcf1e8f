@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0938a7d5_f7079b46",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T07:34:08Z",
+      "side": 1,
+      "message": "Nice to have you on Gerrit :) SGTM",
+      "revId": "c059da52121d29c6a0854ef1c805f910dfcf1e8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

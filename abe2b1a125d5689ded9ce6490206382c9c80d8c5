@@ -51,6 +51,24 @@
       "parentUuid": "a51d0c83_9616a933",
       "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24516037_2cbad3b6",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T17:40:03Z",
+      "side": 1,
+      "message": "It\u0027s too early for that, I\u0027m afraid. CUE is pretty often used as a Go library, and upstream Go supports Go 1.20 and 1.21 as of today, so we support those two today as well. We can drop 1.20 once 1.22 comes out in February.\n\nReplacing `1.21.3` with `1.21` here shouldn\u0027t have any downsides that I know of, anyway :)",
+      "parentUuid": "82ac4dd4_eaf85bf6",
+      "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

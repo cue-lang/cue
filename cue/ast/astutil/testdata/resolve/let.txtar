@@ -9,4 +9,3 @@ a: X
 7[int]: Scope: 0[<nil>]     Node: 0[]
 9[a]:   Scope: 0[<nil>]     Node: 0[]
 10[X]:  Scope: 1[*ast.File] Node: 5[let X=int]
-

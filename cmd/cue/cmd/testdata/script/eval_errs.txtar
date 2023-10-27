@@ -25,4 +25,3 @@ x: {q: a, q: b}
 
 foo: {a: int} | {b: string}
 bar: foo & {a: "str", b: 2}
-

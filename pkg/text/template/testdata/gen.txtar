@@ -6,4 +6,3 @@ import "text/template"
 t1: template.Execute("{{.}}-{{.}}", "foo")
 -- out/template --
 t1: "foo-foo"
-

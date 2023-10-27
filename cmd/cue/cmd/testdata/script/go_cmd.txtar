@@ -3,4 +3,3 @@
 
 go version
 stdout '^go version'
-

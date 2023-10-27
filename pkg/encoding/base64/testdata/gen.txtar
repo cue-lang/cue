@@ -19,4 +19,3 @@ t1: "Zm9v"
 t2: 'foo'
 t3: _|_ // t3: error in call to encoding/base64.Decode: illegal base64 data at input byte 0
 t4: _|_ // t4: error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null
-

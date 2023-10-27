@@ -68,6 +68,6 @@ func Run(name string, t *testing.T) {
 			t.Fatal(err)
 		}
 
-		fmt.Fprintln(t, string(b))
+		fmt.Fprint(t, string(b))
 	})
 }

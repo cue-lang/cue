@@ -31,4 +31,3 @@ t4: _|_ // t4: invalid value {a:1} (does not satisfy struct.MaxFields(0)): len(f
 t5: {
 	a: 1
 }
-

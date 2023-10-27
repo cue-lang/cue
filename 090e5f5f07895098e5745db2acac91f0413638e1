@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "053962aa_d813ce1c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T08:01:13Z",
+      "side": 1,
+      "message": "\u003e cue/format: be consistent with whitespace in lists\n\nSince the fix is in cue/format, not cmd/cue. And also to clarify that I don\u0027t think we ever intended to insert these spaces, nor did we always insert them, we were just being inconsistent due to a bug.",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0202bbe3_b1652bb2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T08:01:13Z",
+      "side": 1,
+      "message": "to be a bit more specific about the edge case, how about:\n\n\u003e but can be introduced by cue/format when a list begins with a comprehension",
+      "range": {
+        "startLine": 9,
+        "startChar": 49,
+        "endLine": 10,
+        "endChar": 33
+      },
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b866c81_06a44462",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T08:01:13Z",
+      "side": 1,
+      "message": "please stick to 76 columns :)",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "54aa1459_af5eeba5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T08:01:13Z",
+      "side": 1,
+      "message": "indent this diff chunk with one tab or four spaces - it will render the same in markdown, but look nicer in plaintext like \"git log\".",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d283177_7f763fc9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T08:01:13Z",
+      "side": 1,
+      "message": "SGTM modulo a few nits and the input about `-- ignore --` :)",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7049e69e_1ddd6ab7",
+        "filename": "pkg/list/testdata/list.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-27T08:01:13Z",
+      "side": 1,
+      "message": "Talking on Slack about this - I\u0027d rather make the tests more robust and not require a trailing empty line than add this workaround.",
+      "revId": "090e5f5f07895098e5745db2acac91f0413638e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

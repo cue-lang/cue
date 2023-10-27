@@ -69,6 +69,24 @@
       "parentUuid": "82ac4dd4_eaf85bf6",
       "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13abcecf_c3840316",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T19:31:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "24516037_2cbad3b6",
+      "revId": "abe2b1a125d5689ded9ce6490206382c9c80d8c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

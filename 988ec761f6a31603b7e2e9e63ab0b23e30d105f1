@@ -33,6 +33,24 @@
       "message": "I now realize that we should have probably added the unsafe.Pointer test case next to this line, because of how similarly uintptr and unsafe.Pointer get treated by our code.\n\nIn the same way, I think you could add the complex fields somewhere in this struct, since it already contains lots of type edge cases, and not need to add an extra pair of files below.",
       "revId": "988ec761f6a31603b7e2e9e63ab0b23e30d105f1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efb90af3_421965f4",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 67,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-27T19:26:24Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "26017634_6c91f1e8",
+      "revId": "988ec761f6a31603b7e2e9e63ab0b23e30d105f1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

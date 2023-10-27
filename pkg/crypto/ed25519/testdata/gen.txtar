@@ -17,4 +17,3 @@ t0: true
 t1: false
 t2: false
 t3: _|_ // t3: error in call to crypto/ed25519.Valid: ed25519: publicKey must be 32 bytes
-

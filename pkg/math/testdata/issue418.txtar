@@ -27,4 +27,3 @@ b: {
 	x: 32.45
 	y: _|_ // b.y: conflicting values int and 3.479700443150099001242770375542286 (mismatched types int and float)
 }
-

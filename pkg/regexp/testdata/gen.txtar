@@ -70,4 +70,3 @@ t13: _|_ // t13: invalid value "invalid)" (does not satisfy regexp.Valid): t13: 
 t14: "a-l-o-at a-o-o-t -r-o-m"
 t15: "a-${A}-${B}-at a-${A}-${B}-t -${A}-${B}-m"
 t16: "a-$1-$2-at a-$1-$2-t -$1-$2-m"
-

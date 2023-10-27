@@ -65,7 +65,7 @@ func TestResolve(t *testing.T) {
 			}, nil)
 			w.Flush()
 
-			fmt.Fprintln(b)
+			fmt.Fprint(b)
 		}
 	})
 }

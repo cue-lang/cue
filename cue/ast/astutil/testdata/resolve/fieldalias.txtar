@@ -10,7 +10,6 @@ c:   X
 9[a]:   Scope: 1[*ast.File] Node: 6[int]
 11[c]:  Scope: 0[<nil>]     Node: 0[]
 12[X]:  Scope: 1[*ast.File] Node: 2[X=a: int]
-
 -- dynamic.cue --
 X=("foo"): int
 Y="\(X)":  string
@@ -26,4 +25,3 @@ b:         Y
 13[X]:      Scope: 1[*ast.File] Node: 2[X=("foo"): int]
 15[b]:      Scope: 0[<nil>]     Node: 0[]
 16[Y]:      Scope: 1[*ast.File] Node: 6[Y="\(X)": string]
-

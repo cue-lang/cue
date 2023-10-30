@@ -21,6 +21,8 @@
 package strconv
 
 import (
+	"errors"
+	"fmt"
 	"math/big"
 	"strconv"
 )
@@ -93,8 +95,22 @@ func ParseFloat(s string, bitSize int) (float64, error) {
 const IntSize = 64
 
 // ParseUint is like ParseInt but for unsigned numbers.
-func ParseUint(s string, base int, bitSize int) (uint64, error) {
-	return strconv.ParseUint(s, base, bitSize)
+func ParseUint(s string, base int, bitSize int) (*big.Int, error) {
+	if bitSize != 0 {
+		i, err := strconv.ParseUint(s, base, bitSize)
+		if err != nil {
+			return nil, err
+		}
+		return new(big.Int).SetUint64(i), nil
+	}
+	i, err := ParseInt(s, base, 0)
+	if err != nil {
+		return nil, err
+	}
+	if i.Sign() == -1 {
+		return nil, fmt.Errorf("cannot parse negative number %q as unsigned integer", s)
+	}
+	return i, nil
 }
 
 // ParseInt interprets a string s in the given base (0, 2 to 36) and
@@ -117,13 +133,24 @@ func ParseUint(s string, base int, bitSize int) (uint64, error) {
 // signed integer of the given size, err.Err = ErrRange and the
 // returned value is the maximum magnitude integer of the
 // appropriate bitSize and sign.
-func ParseInt(s string, base int, bitSize int) (i int64, err error) {
-	return strconv.ParseInt(s, base, bitSize)
+func ParseInt(s string, base int, bitSize int) (*big.Int, error) {
+	if bitSize == 0 {
+		i, ok := new(big.Int).SetString(s, base)
+		if !ok {
+			return nil, errors.New("invalid syntax")
+		}
+		return i, nil
+	}
+	i, err := strconv.ParseInt(s, base, bitSize)
+	if err != nil {
+		return nil, err
+	}
+	return new(big.Int).SetInt64(i), nil
 }
 
 // Atoi is equivalent to ParseInt(s, 10, 0), converted to type int.
-func Atoi(s string) (int, error) {
-	return strconv.Atoi(s)
+func Atoi(s string) (*big.Int, error) {
+	return ParseInt(s, 10, 0)
 }
 
 // FormatFloat converts the floating-point number f to a string,

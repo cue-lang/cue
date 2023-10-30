@@ -1,0 +1,50 @@
+create-github-repo
+env VERSION=v0.0.1
+env MODVER=${MODULE}@v0
+
+cd publish
+
+# TODO: replace by "cue mod init" once it's available.
+# cue mod init ${MODVER}
+env-fill cue.mod/module.cue
+
+exec git init --initial-branch main
+exec git config user.name 'modules_e2e'
+exec git config user.email 'modules_e2e@bot'
+exec git remote add origin https://${GITHUB_TOKEN}@${MODULE}
+
+exec git add foo.cue cue.mod
+exec git commit -m 'first commit'
+exec git tag cue-${VERSION}
+
+exec git push origin main cue-${VERSION}
+# TODO: could we replace this with a retry loop of e.g. "cue mod download"?
+cue-mod-wait
+
+cd ../depend
+
+env-fill cue.mod/module.cue out_foo.cue
+exec cue export
+cmp stdout export.golden
+
+-- publish/cue.mod/module.cue --
+module: "${MODVER}"
+-- publish/foo.cue --
+package publish
+
+foo: "foo value"
+
+-- depend/cue.mod/module.cue --
+module: "depend.localhost"
+
+deps: "${MODVER}": v: "${VERSION}"
+-- depend/out_foo.cue --
+package depend
+
+import mt "${MODVER}:publish"
+
+out: mt.foo
+-- depend/export.golden --
+{
+    "out": "foo value"
+}

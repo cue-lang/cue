@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "147ddafe_e26fba91",
+        "filename": "cmd/cue/cmd/modules_e2e/cleanup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b483f4f0_658a65db",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc02ced8_0352b083",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-10-31T13:39:03Z",
       "side": 1,
       "message": "Doesn\u0027t calling this once only mean that if there are more than 100 repos, we\u0027ll miss some? Perhaps better to follow the example in the docs? https://pkg.go.dev/github.com/google/go-github/v56/github#hdr-Pagination",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af302610_4e23999d",
+        "filename": "cmd/cue/cmd/modules_e2e/cleanup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Yes, but I figured that 100 was probably enough for now. Pagination isn\u0027t easy because we are deleting as we go along, so we should in theory never move to page 2. Added a loop because it\u0027s little effort.",
+      "parentUuid": "bc02ced8_0352b083",
       "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3833ffd2_469c1099",
+        "filename": "cmd/cue/cmd/modules_e2e/cleanup.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "We do want to fail when we can\u0027t delete a repo though. This is a one-off or cron program where a failure should result in an exit code of 1, not an error log and an exit code of 0. This could easily happen if the token permissions aren\u0027t right, for example. I lean towards treating errors as fatal, unless you feel strongly about this.",
+      "parentUuid": "af7b87f4_c3a01365",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2717e0d1_937d5f98",
@@ -82,6 +136,24 @@
       "writtenOn": "2023-10-31T13:39:03Z",
       "side": 1,
       "message": "Maybe include a comment saying why this is in its own module?\nAlso, I _think_ it would probably be better to have this whole thing inside an internal directory so it\u0027s clearly not public.",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "435eb1a2_d1a079bc",
+        "filename": "cmd/cue/cmd/modules_e2e/go.mod",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Internal or not doesn\u0027t actually make a difference to Go as discussed on Slack, but it is a signal to humans, so sure. We agreed on internal/e2e, because in the near future we might also want the e2e tests to cover cue/load.",
+      "parentUuid": "2717e0d1_937d5f98",
       "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c3ce74b_0dfbe724",
+        "filename": "cmd/cue/cmd/modules_e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1a819d9d_c2d3f889",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4e454d45_c060a30d",
@@ -116,6 +206,24 @@
       "writtenOn": "2023-10-31T13:39:03Z",
       "side": 1,
       "message": "Fail if there are any arguments supplied?",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cd231e9_40f29502",
+        "filename": "cmd/cue/cmd/modules_e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "I was avoiding dealing with unlikely edge cases on purpose to cut corners :) Done.",
+      "parentUuid": "4e454d45_c060a30d",
       "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "acb355f7_fee42be2",
+        "filename": "cmd/cue/cmd/modules_e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6697959c_0f79a7d8",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3249262_d9c15aad",
@@ -150,6 +276,24 @@
       "writtenOn": "2023-10-31T13:39:03Z",
       "side": 1,
       "message": "// env-fill rewrites its argument files to replace any environment variable\n// references with their values, using the same algorithm as cmpenv.\n\n?",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71a7e1a9_e3f69608",
+        "filename": "cmd/cue/cmd/modules_e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 148,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3249262_d9c15aad",
       "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -171,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b1b7076_f317f751",
+        "filename": "cmd/cue/cmd/modules_e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9ca9e7e_d0cf197c",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93503a4a_e0253a17",
@@ -188,6 +350,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0bfb859_c4ce69ab",
+        "filename": "cmd/cue/cmd/modules_e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "Oops, good point about the fallback case.\n\nI was keeping this simple with a sleep on purpose, partially because I worried that very fast requests at the start could result in some sort of rate limit issue. But sure, why not. I can always tweak this otherwise.",
+      "parentUuid": "93503a4a_e0253a17",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "30611d80_9fec0c5b",
@@ -201,6 +381,24 @@
       "writtenOn": "2023-10-31T13:39:03Z",
       "side": 1,
       "message": "If we set an appropriate var (say $MODVER ?) we wouldn\u0027t have to include the @v0 suffix on every reference.",
+      "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b9cecb8f_187751c1",
+        "filename": "cmd/cue/cmd/modules_e2e/testdata/script/basic.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T19:49:54Z",
+      "side": 1,
+      "message": "done; this is more verbose but at least less prone to human error.",
+      "parentUuid": "30611d80_9fec0c5b",
       "revId": "641be181ef544da1e6555f5773a1eaba715a97e1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

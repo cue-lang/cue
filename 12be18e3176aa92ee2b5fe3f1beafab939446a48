@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "250f6c36_73d0cad0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T13:44:19Z",
+      "side": 1,
+      "message": "I would rather say \"unnecessary\" :) It\u0027s not incorrect per se, just confusing/verbose.",
+      "range": {
+        "startLine": 10,
+        "startChar": 40,
+        "endLine": 10,
+        "endChar": 49
+      },
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9618e2d3_8430c072",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T13:44:19Z",
+      "side": 1,
+      "message": "Thanks! Just two nits on the commit message.",
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6eddc814_a328a8e4",
+        "filename": "pkg/path/testdata/join.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T13:44:19Z",
+      "side": 1,
+      "message": "mention in the commit message that you\u0027re also removing trailing whitespace from txtar files - otherwise it seems like this is part of the same newline change, which I assume it isn\u0027t.",
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -50,6 +50,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "7eecb6fe_52c2a8e1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T14:56:28Z",
+      "side": 1,
+      "message": "Sure.",
+      "parentUuid": "35d21f8f_72ef209c",
+      "range": {
+        "startLine": 10,
+        "startChar": 40,
+        "endLine": 10,
+        "endChar": 49
+      },
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9618e2d3_8430c072",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -96,6 +120,24 @@
       "side": 1,
       "message": "It is part of the same change - the trailing newline would be interpreted as two new lines, rather than one which is now expected.",
       "parentUuid": "6eddc814_a328a8e4",
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "32b285d6_4b5b5550",
+        "filename": "pkg/path/testdata/join.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-10-31T14:56:28Z",
+      "side": 1,
+      "message": "Are we talking about the same here? I\u0027m pointing at the removal of a trailing space in this copyright header. You didn\u0027t change the number of newlines in this chunk of code, as far as I can tell. The removed newline at the end of the file is fine, that\u0027s entirely separate from what I can tell.",
+      "parentUuid": "05d4ee42_78edadb8",
       "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

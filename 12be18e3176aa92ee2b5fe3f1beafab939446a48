@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "35d21f8f_72ef209c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-31T13:48:53Z",
+      "side": 1,
+      "message": "I would say the term \u0027incorrect\u0027 makes sense in this context as the underlying commands did not return two new lines. The test incorrectly printed this additional newline character and therefore the tests were incorrectly checking for this behaviour.",
+      "parentUuid": "250f6c36_73d0cad0",
+      "range": {
+        "startLine": 10,
+        "startChar": 40,
+        "endLine": 10,
+        "endChar": 49
+      },
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9618e2d3_8430c072",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -54,6 +78,24 @@
       "writtenOn": "2023-10-31T13:44:19Z",
       "side": 1,
       "message": "mention in the commit message that you\u0027re also removing trailing whitespace from txtar files - otherwise it seems like this is part of the same newline change, which I assume it isn\u0027t.",
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05d4ee42_78edadb8",
+        "filename": "pkg/path/testdata/join.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-10-31T13:48:53Z",
+      "side": 1,
+      "message": "It is part of the same change - the trailing newline would be interpreted as two new lines, rather than one which is now expected.",
+      "parentUuid": "6eddc814_a328a8e4",
       "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

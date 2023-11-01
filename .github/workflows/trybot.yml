@@ -183,6 +183,13 @@ jobs:
         env:
           GORACE: atexit_sleep_ms=10
       - if: (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')
+        name: End-to-end test
+        run: |-
+          cd internal/e2e
+          go test
+        env:
+          GITHUB_TOKEN: ${{ secrets.E2E_GITHUB_TOKEN }}
+      - if: (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')
         name: Check
         run: go vet ./...
       - name: Check that git is clean at the end of the job

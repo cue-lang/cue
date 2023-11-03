@@ -3,10 +3,12 @@ package registrytest
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
 	"io/fs"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
@@ -24,6 +26,13 @@ import (
 	"cuelang.org/go/internal/mod/zip"
 )
 
+// AuthConfig specifies authorization requirements for the server.
+// Currently it only supports basic auth.
+type AuthConfig struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
 // New starts a registry instance that serves modules found inside fsys.
 // It serves the OCI registry protocol.
 // If prefix is non-empty, all module paths will be prefixed by that,
@@ -33,19 +42,33 @@ import (
 // slashes in path have been replaced with underscores and should
 // contain a cue.mod/module.cue file holding the module info.
 //
+// If there's a file named auth.json in the root directory,
+// it will cause access to the server to be gated by the
+// specified authorization. See the AuthConfig type for
+// details.
+//
 // The Registry should be closed after use.
 func New(fsys fs.FS, prefix string) (*Registry, error) {
 	r := ocimem.New()
 	client := modregistry.NewClient(ocifilter.Sub(r, prefix))
 
-	mods, err := getModules(fsys)
+	mods, authConfigData, err := getModules(fsys)
 	if err != nil {
 		return nil, fmt.Errorf("invalid modules: %v", err)
 	}
+
 	if err := pushContent(client, mods); err != nil {
 		return nil, fmt.Errorf("cannot push modules: %v", err)
 	}
-	srv := httptest.NewServer(ociserver.New(r, nil))
+	var handler http.Handler = ociserver.New(r, nil)
+	if authConfigData != nil {
+		var cfg AuthConfig
+		if err := json.Unmarshal(authConfigData, &cfg); err != nil {
+			return nil, fmt.Errorf("invalid auth.json: %v", err)
+		}
+		handler = authMiddleware(handler, &cfg)
+	}
+	srv := httptest.NewServer(handler)
 	u, err := url.Parse(srv.URL)
 	if err != nil {
 		return nil, err
@@ -54,6 +77,25 @@ func New(fsys fs.FS, prefix string) (*Registry, error) {
 		srv:  srv,
 		host: u.Host,
 	}, nil
+}
+
+func authMiddleware(handler http.Handler, cfg *AuthConfig) http.Handler {
+	if cfg.Username == "" {
+		return handler
+	}
+	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		if req.Header.Get("Authorization") == "" {
+			w.Header().Set("Www-Authenticate", "Basic service=registry")
+			http.Error(w, "no credentials", http.StatusUnauthorized)
+			return
+		}
+		username, password, ok := req.BasicAuth()
+		if !ok || username != cfg.Username || password != cfg.Password {
+			http.Error(w, "invalid credentials", http.StatusUnauthorized)
+			return
+		}
+		handler.ServeHTTP(w, req)
+	})
 }
 
 func pushContent(client *modregistry.Client, mods map[module.Version]*moduleContent) error {
@@ -114,7 +156,8 @@ type handler struct {
 	modules []*moduleContent
 }
 
-func getModules(fsys fs.FS) (map[module.Version]*moduleContent, error) {
+func getModules(fsys fs.FS) (map[module.Version]*moduleContent, []byte, error) {
+	var authConfig []byte
 	ctx := cuecontext.New()
 	modules := make(map[string]*moduleContent)
 	if err := fs.WalkDir(fsys, ".", func(path string, d fs.DirEntry, err error) error {
@@ -128,6 +171,13 @@ func getModules(fsys fs.FS) (map[module.Version]*moduleContent, error) {
 		}
 		if d.IsDir() {
 			return nil // we're only interested in regular files, not their parent directories
+		}
+		if path == "auth.json" {
+			authConfig, err = fs.ReadFile(fsys, path)
+			if err != nil {
+				return err
+			}
+			return nil
 		}
 		modver, rest, ok := strings.Cut(path, "/")
 		if !ok {
@@ -148,18 +198,18 @@ func getModules(fsys fs.FS) (map[module.Version]*moduleContent, error) {
 		})
 		return nil
 	}); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	for modver, content := range modules {
 		if err := content.init(ctx, modver); err != nil {
-			return nil, fmt.Errorf("cannot initialize module %q: %v", modver, err)
+			return nil, nil, fmt.Errorf("cannot initialize module %q: %v", modver, err)
 		}
 	}
 	byVer := map[module.Version]*moduleContent{}
 	for _, m := range modules {
 		byVer[m.version] = m
 	}
-	return byVer, nil
+	return byVer, authConfig, nil
 }
 
 type moduleContent struct {

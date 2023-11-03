@@ -116,12 +116,20 @@ func (r *registry) PushBlob(ctx context.Context, repo string, desc ociregistry.D
 	return cr.PushBlob(ctx, repo, desc, rd)
 }
 
-func (r *registry) PushBlobChunked(ctx context.Context, repo string, id string, chunkSize int) (ociregistry.BlobWriter, error) {
+func (r *registry) PushBlobChunked(ctx context.Context, repo string, chunkSize int) (ociregistry.BlobWriter, error) {
 	cr, repo, err := r.resolve(repo)
 	if err != nil {
 		return nil, err
 	}
-	return cr.PushBlobChunked(ctx, repo, id, chunkSize)
+	return cr.PushBlobChunked(ctx, repo, chunkSize)
+}
+
+func (r *registry) PushBlobChunkedResume(ctx context.Context, repo, id string, offset int64, chunkSize int) (ociregistry.BlobWriter, error) {
+	cr, repo, err := r.resolve(repo)
+	if err != nil {
+		return nil, err
+	}
+	return cr.PushBlobChunkedResume(ctx, repo, id, offset, chunkSize)
 }
 
 func (r *registry) MountBlob(ctx context.Context, fromRepo, toRepo string, digest ociregistry.Digest) (ociregistry.Descriptor, error) {

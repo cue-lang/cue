@@ -95,6 +95,21 @@ func TestScript(t *testing.T) {
 		Dir:                 filepath.Join("testdata", "script"),
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
 		RequireExplicitExec: true,
+		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){
+			// env-fill rewrites its argument files to replace any environment variable
+			// references with their values, using the same algorithm as cmpenv.
+			"env-fill": func(ts *testscript.TestScript, neg bool, args []string) {
+				if neg || len(args) == 0 {
+					ts.Fatalf("usage: env-fill args...")
+				}
+				for _, arg := range args {
+					path := ts.MkAbs(arg)
+					data := ts.ReadFile(path)
+					data = tsExpand(ts, data)
+					ts.Check(os.WriteFile(path, []byte(data), 0o666))
+				}
+			},
+		},
 		Setup: func(e *testscript.Env) error {
 			// Set up a home dir within work dir with a . prefix so that the
 			// Go/CUE pattern ./... does not descend into it.
@@ -246,6 +261,12 @@ func TestMain(m *testing.M) {
 			return 0
 		},
 	}))
+}
+
+func tsExpand(ts *testscript.TestScript, s string) string {
+	return os.Expand(s, func(key string) string {
+		return ts.Getenv(key)
+	})
 }
 
 // homeEnvName extracts the logic from os.UserHomeDir to get the

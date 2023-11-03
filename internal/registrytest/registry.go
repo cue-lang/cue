@@ -24,8 +24,8 @@ import (
 	"cuelang.org/go/internal/mod/zip"
 )
 
-// New starts a registry instance that serves modules found inside the
-// _registry path inside fsys. It serves the OCI registry protocol.
+// New starts a registry instance that serves modules found inside fsys.
+// It serves the OCI registry protocol.
 // If prefix is non-empty, all module paths will be prefixed by that,
 // separated by a slash (/).
 //
@@ -129,9 +129,9 @@ func getModules(fsys fs.FS) (map[module.Version]*moduleContent, error) {
 		if d.IsDir() {
 			return nil // we're only interested in regular files, not their parent directories
 		}
-		modver, rest, ok := strings.Cut(strings.TrimPrefix(path, "_registry/"), "/")
+		modver, rest, ok := strings.Cut(path, "/")
 		if !ok {
-			return fmt.Errorf("_registry should only contain directories, but found regular file %q", path)
+			return fmt.Errorf("registry should only contain directories, but found regular file %q", path)
 		}
 		content := modules[modver]
 		if content == nil {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f001e1ea_49d8b63f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-03T10:09:33Z",
+      "side": 1,
+      "message": "I tested via the ci/test branch on the cue repo to see that this works; doing one final test here: https://github.com/cue-lang/cue/actions/runs/6743801826/job/18332422534",
+      "revId": "6a382f8e1e27dab070adb317d6a08e17195b632d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

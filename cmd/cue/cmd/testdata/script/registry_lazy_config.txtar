@@ -1,0 +1,48 @@
+# Test that a bad docker config file isn't a problem until we actually
+# need to talk to a registry.
+
+# Initially the code doesn't use any modules, so there should
+# be no need to use a registry.
+env DOCKER_CONFIG=$WORK/dockerconfig
+exec cue export .
+cmp stdout expect-stdout
+
+# The new code uses modules, so we should get a warning
+# when the config file is read.
+cp OTHER/main.cue main.cue
+cp OTHER/cue.mod/module.cue cue.mod/module.cue
+! exec cue export .
+stderr 'instance: cannot resolve dependencies: example.com/e@v0.0.1: module example.com/e@v0.0.1: cannot make client: cannot load OCI auth configuration: invalid config file ".*config.json": decode failed: .*'
+
+-- dockerconfig/config.json --
+should be JSON but isn't
+-- expect-stdout --
+"ok"
+-- main.cue --
+package main
+"ok"
+
+-- cue.mod/module.cue --
+module: "test.org"
+
+-- OTHER/main.cue --
+package main
+import "example.com/e"
+e.foo
+
+-- OTHER/cue.mod/module.cue --
+module: "test.org"
+deps: "example.com/e": v: "v0.0.1"
+
+-- _registry/auth.json --
+{"username": "someone", "password": "something"}
+-- _registry_prefix --
+somewhere/other
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+package e
+
+foo: "ok"
+

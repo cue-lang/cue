@@ -118,14 +118,17 @@ workflows: trybot: _repo.bashWorkflow & {
 	_e2eTest: json.#step & {
 		name: "End-to-end test"
 		// The end-to-end tests require a github token secret and are a bit slow,
-		// so we only run them on pushes to protected branches and on one environment.
-		if: "\(_repo.isProtectedBranch) && \(_isLatestLinux)"
+		// so we only run them on pushes to protected branches and on one
+		// environment in the source repo.
+		if: "github.repository == '\(_repo.githubRepositoryPath)' && \(_repo.isProtectedBranch) && \(_isLatestLinux)"
+
 		// The secret is the fine-grained access token "cue-lang/cue ci e2e for modules-testing"
 		// owned by the porcuepine bot account with read+write access to repo administration and code
 		// on the entire cue-labs-modules-testing org. Note that porcuepine is also an org admin,
 		// since otherwise the repo admin access to create and delete repos does not work.
 		env: GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
-		run:  """
+
+		run: """
 			cd internal/e2e
 			go test
 			"""
@@ -146,6 +149,6 @@ workflows: trybot: _repo.bashWorkflow & {
 	_goTestRace: json.#step & {
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
-		run:  "go test -race ./..."
+		run: "go test -race ./..."
 	}
 }

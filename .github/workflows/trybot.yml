@@ -183,7 +183,7 @@ jobs:
         env:
           GORACE: atexit_sleep_ms=10
       - if: |-
-          ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')
         name: End-to-end test
         run: |-

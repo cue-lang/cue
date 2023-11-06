@@ -16,6 +16,23 @@
       "message": "This leaves room for other commands too: gofmt, go mod verify, staticcheck, etc.",
       "revId": "16b6e7d43dfdc06940e326e3c065539f93861a35",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55ee973b_fbd4ad08",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-06T16:59:31Z",
+      "side": 1,
+      "message": "Or:\n```\ngo -C $module go vet ./...\ngo -C $module mod tidy\n```\ni guess, saving a few lines and some indentation.",
+      "revId": "16b6e7d43dfdc06940e326e3c065539f93861a35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

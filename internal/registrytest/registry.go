@@ -23,7 +23,7 @@ import (
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/module"
-	"cuelang.org/go/internal/mod/zip"
+	"cuelang.org/go/internal/mod/modzip"
 )
 
 // AuthConfig specifies authorization requirements for the server.
@@ -219,7 +219,7 @@ type moduleContent struct {
 }
 
 func (c *moduleContent) writeZip(w io.Writer) error {
-	return zip.Create[txtar.File](w, c.version, c.files, txtarFileIO{})
+	return modzip.Create[txtar.File](w, c.version, c.files, txtarFileIO{})
 }
 
 func (c *moduleContent) init(ctx *cue.Context, versDir string) error {

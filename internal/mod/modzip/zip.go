@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package zip provides functions for creating and extracting module zip files.
+// Package modzip provides functions for creating and extracting module zip files.
 //
 // Module zip files have several restrictions listed below. These are necessary
 // to ensure that module zip files can be extracted consistently on supported
@@ -35,7 +35,7 @@
 //
 // Note that this package does not provide hashing functionality. See
 // golang.org/x/mod/sumdb/dirhash.
-package zip
+package modzip
 
 import (
 	"archive/zip"

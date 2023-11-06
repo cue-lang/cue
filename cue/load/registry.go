@@ -12,7 +12,7 @@ import (
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/module"
-	"cuelang.org/go/internal/mod/zip"
+	"cuelang.org/go/internal/mod/modzip"
 )
 
 // registryClient implements the protocol for talking to
@@ -88,7 +88,7 @@ func (c *registryClient) getModContents(ctx context.Context, mv module.Version) 
 	if _, err := io.Copy(f, r); err != nil {
 		return "", fmt.Errorf("cannot copy data to zip file %q: %v", zipfile, err)
 	}
-	if err := zip.Unzip(modPath, mv, zipfile); err != nil {
+	if err := modzip.Unzip(modPath, mv, zipfile); err != nil {
 		return "", fmt.Errorf("cannot unzip %v: %v", mv, err)
 	}
 	return modPath, nil

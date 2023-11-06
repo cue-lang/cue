@@ -30,7 +30,7 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 
 	"cuelang.org/go/internal/mod/module"
-	modzip "cuelang.org/go/internal/mod/zip"
+	"cuelang.org/go/internal/mod/modzip"
 )
 
 func newTestClient(t *testing.T) *Client {

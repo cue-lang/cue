@@ -16,6 +16,40 @@
       "message": "nit: in this commit message I\u0027d also summarize that you\u0027re adding test scripts for three different scenarios.",
       "revId": "6743546fac0a7d16c6da2ccbdc671e6d42e52dba",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b14cdc1c_44bbcedf",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-11-06T10:27:16Z",
+      "side": 1,
+      "message": "Please add a comment that explains what this test is doing.",
+      "revId": "6743546fac0a7d16c6da2ccbdc671e6d42e52dba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7832ebce_1ac14929",
+        "filename": "cmd/cue/cmd/testdata/script/registry_mux_auth.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-11-06T10:27:16Z",
+      "side": 1,
+      "message": "Please add a comment that explains what this test is doing.",
+      "revId": "6743546fac0a7d16c6da2ccbdc671e6d42e52dba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

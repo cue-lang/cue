@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b565af9_b8e587d5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-06T13:31:26Z",
+      "side": 1,
+      "message": "personally I\u0027m a fan of this, e.g. the new `net/netip` instead of `net/ip`, or `net/http/httptest` rather than `net/http/test`.\n\nFYI an alternative would be to keep the directory as `mod/zip` but name the package like `package modzip`. not perfect since there is a naming inconsistency, but it\u0027s a middle ground that avoids the longer path while also avoiding taking up the name \"zip\". I\u0027ve seen it with SDK packages, e.g. `api/foo/v1` accompanied by `package foov1`.\n\nI\u0027d still go with what you did here, but just sharing another option.",
+      "revId": "24eacffe78e8dcc11c3a356b88c3aabba895b626",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "00fe3044_6a374d83",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-06T16:53:59Z",
+      "side": 1,
+      "message": "This leaves room for other commands too: gofmt, go mod verify, staticcheck, etc.",
+      "revId": "16b6e7d43dfdc06940e326e3c065539f93861a35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -32,7 +32,7 @@ import (
 
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/module"
-	modzip "cuelang.org/go/internal/mod/zip"
+	"cuelang.org/go/internal/mod/modzip"
 )
 
 var ErrNotFound = fmt.Errorf("module not found")

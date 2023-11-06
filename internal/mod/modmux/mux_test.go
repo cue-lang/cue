@@ -21,7 +21,7 @@ import (
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modresolve"
 	"cuelang.org/go/internal/mod/module"
-	modzip "cuelang.org/go/internal/mod/zip"
+	"cuelang.org/go/internal/mod/modzip"
 	"cuelang.org/go/internal/registrytest"
 )
 

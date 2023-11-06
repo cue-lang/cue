@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package zip_test
+package modzip_test
 
 import (
 	"archive/zip"
@@ -22,7 +22,7 @@ import (
 
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/mod/module"
-	modzip "cuelang.org/go/internal/mod/zip"
+	"cuelang.org/go/internal/mod/modzip"
 	"golang.org/x/mod/sumdb/dirhash"
 	"golang.org/x/tools/txtar"
 )

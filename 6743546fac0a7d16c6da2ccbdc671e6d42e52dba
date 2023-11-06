@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "535e0e36_7b75ce7e",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-06T12:45:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b14cdc1c_44bbcedf",
+      "revId": "6743546fac0a7d16c6da2ccbdc671e6d42e52dba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7832ebce_1ac14929",
@@ -66,6 +84,24 @@
       "writtenOn": "2023-11-06T10:27:16Z",
       "side": 1,
       "message": "Please add a comment that explains what this test is doing.",
+      "revId": "6743546fac0a7d16c6da2ccbdc671e6d42e52dba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ded21b3_85987dbd",
+        "filename": "cmd/cue/cmd/testdata/script/registry_mux_auth.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-06T12:45:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7832ebce_1ac14929",
       "revId": "6743546fac0a7d16c6da2ccbdc671e6d42e52dba",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -143,7 +143,17 @@ workflows: trybot: _repo.bashWorkflow & {
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
 		name: "Check"
-		run:  "go vet ./..."
+		run:  """
+			for module in . internal/e2e; do
+				(
+					cd $module
+					go vet ./...
+					go mod tidy
+					go mod tidy failure
+					echo more commands
+				)
+			done
+			"""
 	}
 
 	_goTestRace: json.#step & {

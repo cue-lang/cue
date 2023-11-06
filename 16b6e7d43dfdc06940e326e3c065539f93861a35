@@ -33,6 +33,24 @@
       "message": "Or:\n```\ngo -C $module go vet ./...\ngo -C $module mod tidy\n```\ni guess, saving a few lines and some indentation.",
       "revId": "16b6e7d43dfdc06940e326e3c065539f93861a35",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3741c00b_667d8637",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-06T17:02:46Z",
+      "side": 1,
+      "message": "In this particular instance with two cmd/go commands yes, that could work - but in general that approach won\u0027t work, e.g. gofmt and staticcheck don\u0027t take a -C flag.",
+      "parentUuid": "55ee973b_fbd4ad08",
+      "revId": "16b6e7d43dfdc06940e326e3c065539f93861a35",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

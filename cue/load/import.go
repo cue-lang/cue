@@ -394,7 +394,7 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 			absDir, err = l.externalPackageDir(p)
 			if err != nil {
 				// TODO why can't we use %w ?
-				return "", name, errors.Newf(token.NoPos, "cannot get directory for external module %q (registry %q): %v", p, l.cfg.Registry, err)
+				return "", name, errors.Newf(token.NoPos, "cannot get directory for external module %q: %v", p, l.cfg.Registry, err)
 			}
 		} else {
 			absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), sub)

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99db2a21_3edb4afd",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-06T11:22:43Z",
+      "side": 1,
+      "message": "Yeah, I wondered about this. Technically it _might_ be OK to use a bad config file because it falls back to unauthenticated access which can succeed if no auth is required (that\u0027s why I left it as a warning) but I think it\u0027s fine to be a hard error too. Done.",
+      "parentUuid": "68f88250_1fd2281b",
+      "revId": "bd07176c0742c3b01386231df374b72f764ea1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "43c97eab_d7c0fd41",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6628ced3_3f3c262e",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-06T11:22:43Z",
+      "side": 1,
+      "message": "That\u0027s what I started doing, but the cmd/cue testscript code already sets up a home directory for some reason and tbh all we\u0027re doing here is checking that the (already well tested) ociauth code is hooked up, so if DOCKER_CONFIG works, I have good confidence that the rest of that code works too. So I think it\u0027s OK to leave it.",
+      "parentUuid": "43c97eab_d7c0fd41",
+      "revId": "bd07176c0742c3b01386231df374b72f764ea1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "36e16759_088b5d0e",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-11-06T10:03:40Z",
       "side": 1,
       "message": "no need to split this line at all IMHO",
+      "revId": "bd07176c0742c3b01386231df374b72f764ea1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75f928b4_bc01cba9",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-06T11:22:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36e16759_088b5d0e",
       "revId": "bd07176c0742c3b01386231df374b72f764ea1d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

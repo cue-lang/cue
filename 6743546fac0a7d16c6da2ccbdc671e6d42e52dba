@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "48423a95_004ca3da",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-06T10:03:40Z",
+      "side": 1,
+      "message": "nit: in this commit message I\u0027d also summarize that you\u0027re adding test scripts for three different scenarios.",
+      "revId": "6743546fac0a7d16c6da2ccbdc671e6d42e52dba",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68f88250_1fd2281b",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-06T10:03:40Z",
+      "side": 1,
+      "message": "if the user _is_ doing something that requires a registry, an oci auth config load should be a fatal error and not a warning, though?\n\nin fact, registry_lazy_config further down shows that a bad config doesn\u0027t lead to a warning when cmd/cue doesn\u0027t need a registry, so IMO this warning below should always be a hard error.\n\nunless we want to make it a warning for the sake of falling back to some other default. which could be an okay approach, but then this comment isn\u0027t accurate, I think.",
+      "revId": "bd07176c0742c3b01386231df374b72f764ea1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "43c97eab_d7c0fd41",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-06T10:03:40Z",
+      "side": 1,
+      "message": "wouldn\u0027t this be a more realistic scenario if you set HOME but not DOCKER_CONFIG? I think having DOCKER_CONFIG set will be rare\n\nif you are keeping DOCKER_CONFIG, use it in place of `dockerconfig` elsewhere, though",
+      "revId": "bd07176c0742c3b01386231df374b72f764ea1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36e16759_088b5d0e",
+        "filename": "cmd/cue/cmd/testdata/script/registry_auth.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-06T10:03:40Z",
+      "side": 1,
+      "message": "no need to split this line at all IMHO",
+      "revId": "bd07176c0742c3b01386231df374b72f764ea1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

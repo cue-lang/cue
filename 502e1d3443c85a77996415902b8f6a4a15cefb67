@@ -16,6 +16,24 @@
       "message": "can we keep just the first third of this error and use an ellipsis? this is absolutely enormous for a commit message :) \n\nalso, I would indent with four spaces and drop the triple backquotes - the same result when rendered in markdown, but nicer in plaintext and you save two lines.",
       "revId": "502e1d3443c85a77996415902b8f6a4a15cefb67",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c73569a_cc17227b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-06T15:38:42Z",
+      "side": 1,
+      "message": "Done. Well, almost done, as I kept the triple-quotes, as that allows me to submit a line that\u0027s longer than 72 characters, which I think is justified in this case.",
+      "parentUuid": "f46eb249_92b7e030",
+      "revId": "502e1d3443c85a77996415902b8f6a4a15cefb67",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

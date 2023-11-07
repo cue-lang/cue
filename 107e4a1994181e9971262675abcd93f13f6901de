@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5aa1b34f_8de1aceb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-07T12:14:17Z",
+      "side": 1,
+      "message": "Ack; I slightly misread",
+      "parentUuid": "75fa3d2a_9b01a43c",
+      "revId": "107e4a1994181e9971262675abcd93f13f6901de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fb4dedc8_beea209b",

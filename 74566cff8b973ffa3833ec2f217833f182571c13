@@ -16,6 +16,24 @@
       "message": "May be the Monday morning, but I\u0027m not sure what this means.",
       "revId": "74566cff8b973ffa3833ec2f217833f182571c13",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "920c1e0e_ae2a11b8",
+        "filename": "encoding/openapi/openapi.go",
+        "patchSetId": 19
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-07T16:49:08Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "29812981_6169e41e",
+      "revId": "74566cff8b973ffa3833ec2f217833f182571c13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -116,7 +116,7 @@ type Test struct {
 func (t *Test) Write(b []byte) (n int, err error) {
 	if t.buf == nil {
 		t.buf = &bytes.Buffer{}
-		t.outFiles = append(t.outFiles, file{t.prefix, t.fallback, t.buf})
+		t.outFiles = append(t.outFiles, file{t.prefix, t.fallback, t.buf, false})
 	}
 	return t.buf.Write(b)
 }
@@ -125,6 +125,7 @@ type file struct {
 	name     string
 	fallback string
 	buf      *bytes.Buffer
+	diff     bool // true if this contains a diff between fallback and main
 }
 
 // HasTag reports whether the tag with the given key is defined
@@ -226,7 +227,7 @@ func (t *Test) Writer(name string) io.Writer {
 	}
 
 	w := &bytes.Buffer{}
-	t.outFiles = append(t.outFiles, file{name, fallback, w})
+	t.outFiles = append(t.outFiles, file{name, fallback, w, false})
 
 	if name == t.prefix {
 		t.buf = w
@@ -386,6 +387,33 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				index[f.Name] = i
 			}
 
+			// Add diff files between fallback and main file. These are added
+			// as regular output files so that they can be updated as well.
+			for _, sub := range tc.outFiles {
+				if sub.fallback == sub.name {
+					continue
+				}
+				if j, ok := index[sub.fallback]; ok {
+					fallback := a.Files[j].Data
+
+					result := sub.buf.Bytes()
+					if len(result) == 0 || len(fallback) == 0 {
+						continue
+					}
+
+					diff := cmp.Diff(string(result), string(fallback))
+					if len(diff) == 0 {
+						continue
+					}
+
+					tc.outFiles = append(tc.outFiles, file{
+						name: "diff/-" + sub.name + "<==>+" + sub.fallback,
+						buf:  bytes.NewBufferString(diff),
+						diff: true,
+					})
+				}
+			}
+
 			// Insert results of this test at first location of any existing
 			// test or at end of list otherwise.
 			k := len(a.Files)
@@ -429,6 +457,12 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				if cuetest.UpdateGoldenFiles {
 					update = true
 					gold.Data = result
+					continue
+				}
+
+				// Skip the test if just the diff differs.
+				// TODO: also fail once diffs are fully in use.
+				if sub.diff {
 					continue
 				}
 

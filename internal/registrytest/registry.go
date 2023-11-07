@@ -60,13 +60,13 @@ func New(fsys fs.FS, prefix string) (*Registry, error) {
 	if err := pushContent(client, mods); err != nil {
 		return nil, fmt.Errorf("cannot push modules: %v", err)
 	}
-	var handler http.Handler = ociserver.New(r, nil)
+	var handler http.Handler = ociserver.New(ocifilter.ReadOnly(r), nil)
 	if authConfigData != nil {
 		var cfg AuthConfig
 		if err := json.Unmarshal(authConfigData, &cfg); err != nil {
 			return nil, fmt.Errorf("invalid auth.json: %v", err)
 		}
-		handler = authMiddleware(handler, &cfg)
+		handler = AuthHandler(handler, &cfg)
 	}
 	srv := httptest.NewServer(handler)
 	u, err := url.Parse(srv.URL)
@@ -79,8 +79,12 @@ func New(fsys fs.FS, prefix string) (*Registry, error) {
 	}, nil
 }
 
-func authMiddleware(handler http.Handler, cfg *AuthConfig) http.Handler {
-	if cfg.Username == "" {
+// AuthHandler wraps the given handler with logic that checks
+// that the incoming requests fulfil the auth requirements defined
+// in cfg. If cfg is nil or there are no auth requirements, it returns handler
+// unchanged.
+func AuthHandler(handler http.Handler, cfg *AuthConfig) http.Handler {
+	if cfg == nil || cfg.Username == "" {
 		return handler
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {

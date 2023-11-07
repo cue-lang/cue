@@ -73,8 +73,8 @@ langugage: version: "v0.4.3"
 module: "foo.com/bar@v0"
 `,
 	wantError: `langugage: field not allowed:
-    cuelang.org/go/internal/mod/modfile/schema.cue:14:8
-    cuelang.org/go/internal/mod/modfile/schema.cue:16:2
+    cuelang.org/go/internal/mod/modfile/schema.cue:28:8
+    cuelang.org/go/internal/mod/modfile/schema.cue:30:2
     module.cue:2:1`,
 }, {
 	testName: "InvalidLanguageVersion",

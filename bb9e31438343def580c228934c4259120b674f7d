@@ -22,6 +22,30 @@
       },
       "revId": "bb9e31438343def580c228934c4259120b674f7d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "19929303_644ece82",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-07T10:17:49Z",
+      "side": 1,
+      "message": "Ha, I blame fmt(1) for that.\nDone.",
+      "parentUuid": "d7e0db14_070ce5fc",
+      "range": {
+        "startLine": 58,
+        "startChar": 33,
+        "endLine": 58,
+        "endChar": 35
+      },
+      "revId": "bb9e31438343def580c228934c4259120b674f7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -25,7 +25,7 @@ func getRegistry() (ociregistry.Interface, error) {
 	}
 	resolver, err := modresolve.ParseCUERegistry(env, "registry.cuelabs.dev")
 	if err != nil {
-		return nil, fmt.Errorf("bad value for $CUE_REGISTRY: %v", err)
+		return nil, fmt.Errorf("bad value %q for $CUE_REGISTRY: %v", env, err)
 	}
 	// If the user isn't doing anything that requires a registry, we
 	// shouldn't complain about reading a bad configuration file,

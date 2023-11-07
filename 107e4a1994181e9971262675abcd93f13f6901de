@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7f423935_4fb2e9f9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-07T10:13:26Z",
+      "side": 1,
+      "message": "I\u0027d make a note that we haven\u0027t even decided on the name or semantics; e.g. this might later be called publish.",
+      "revId": "107e4a1994181e9971262675abcd93f13f6901de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fb4dedc8_beea209b",
+        "filename": "cmd/cue/cmd/modupload.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-07T10:13:26Z",
+      "side": 1,
+      "message": "nit: new file, so 2023",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "107e4a1994181e9971262675abcd93f13f6901de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d35554c_424c5b8d",
+        "filename": "cmd/cue/cmd/modupload.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-07T10:13:26Z",
+      "side": 1,
+      "message": "nit: drop this word?",
+      "range": {
+        "startLine": 38,
+        "startChar": 47,
+        "endLine": 38,
+        "endChar": 51
+      },
+      "revId": "107e4a1994181e9971262675abcd93f13f6901de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

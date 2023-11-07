@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7e0db14_070ce5fc",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-07T10:13:26Z",
+      "side": 1,
+      "message": "as far as I know, we don\u0027t use double spaces after periods consistently, so I wouldn\u0027t add them here.",
+      "range": {
+        "startLine": 58,
+        "startChar": 33,
+        "endLine": 58,
+        "endChar": 35
+      },
+      "revId": "bb9e31438343def580c228934c4259120b674f7d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

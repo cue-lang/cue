@@ -1,0 +1,49 @@
+# Check that we can use the cue mod upload command to upload to a registry
+# that's protected by authorization.
+
+memregistry -auth=foo:bar MEMREGISTRY
+env CUE_EXPERIMENT=modules
+env CUE_REGISTRY=$MEMREGISTRY+insecure
+env DOCKER_CONFIG=$WORK/dockerconfig
+env-fill $DOCKER_CONFIG/config.json
+
+cd example
+exec cue mod upload v0.0.1
+cmp stdout ../expect-upload-stdout
+cd ../main
+exec cue eval .
+cmp stdout ../expect-eval-stdout
+
+-- dockerconfig/config.json --
+{
+	"auths": {
+		"${MEMREGISTRY}": {
+			"username": "foo",
+			"password": "bar"
+		}
+	}
+}
+
+-- expect-upload-stdout --
+uploaded example.com@v0.0.1
+-- expect-eval-stdout --
+main:             "main"
+"example.com@v0": "v0.0.1"
+-- main/cue.mod/module.cue --
+module: "main.org"
+deps: "example.com@v0": v: "v0.0.1"
+
+-- main/main.cue --
+package main
+import "example.com@v0:main"
+
+main
+"main": "main"
+
+-- example/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- example/top.cue --
+package main
+
+"example.com@v0": "v0.0.1"

@@ -20,6 +20,8 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
+	"net/http/httptest"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -28,6 +30,8 @@ import (
 	"testing"
 	"time"
 
+	"cuelabs.dev/go/oci/ociregistry/ocimem"
+	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
@@ -108,6 +112,40 @@ func TestScript(t *testing.T) {
 					data = tsExpand(ts, data)
 					ts.Check(os.WriteFile(path, []byte(data), 0o666))
 				}
+			},
+			// memregistry starts an in-memory OCI server and sets the argument
+			// environment variable name to its hostname.
+			"memregistry": func(ts *testscript.TestScript, neg bool, args []string) {
+				usage := func() {
+					ts.Fatalf("usage: memregistry [-auth=username:password] <envvar-name>")
+				}
+				if neg {
+					usage()
+				}
+				var auth *registrytest.AuthConfig
+				if len(args) > 0 && strings.HasPrefix(args[0], "-") {
+					userPass, ok := strings.CutPrefix(args[0], "-auth=")
+					if !ok {
+						usage()
+					}
+					user, pass, ok := strings.Cut(userPass, ":")
+					if !ok {
+						usage()
+					}
+					auth = &registrytest.AuthConfig{
+						Username: user,
+						Password: pass,
+					}
+					args = args[1:]
+				}
+				if len(args) != 1 {
+					usage()
+				}
+
+				srv := httptest.NewServer(registrytest.AuthHandler(ociserver.New(ocimem.New(), nil), auth))
+				u, _ := url.Parse(srv.URL)
+				ts.Setenv(args[0], u.Host)
+				ts.Defer(srv.Close)
 			},
 		},
 		Setup: func(e *testscript.Env) error {

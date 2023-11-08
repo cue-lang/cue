@@ -24,9 +24,10 @@ protectedBranchPatterns: [defaultBranch, releaseBranchPattern]
 botGitHubUser:      "cueckoo"
 botGitHubUserEmail: "cueckoo@gmail.com"
 
-linuxMachine:   "ubuntu-22.04"
-macosMachine:   "macos-11"
-windowsMachine: "windows-2022"
+linuxMachine:     "ubuntu-22.04"
+namespaceMachine: "nscloud-ubuntu-22.04-amd64-4x16"
+macosMachine:     "macos-11"
+windowsMachine:   "windows-2022"
 
 previousStableGo: "1.21.x"
 

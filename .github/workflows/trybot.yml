@@ -20,7 +20,7 @@ jobs:
           - 1.21.x
           - 1.22.x
         runner:
-          - ubuntu-22.04
+          - nscloud-ubuntu-22.04-amd64-4x16
           - macos-11
           - windows-2022
     runs-on: ${{ matrix.runner }}

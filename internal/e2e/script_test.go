@@ -76,10 +76,6 @@ var (
 	// This is necessary since we will create a new repository per test,
 	// and there's no way to easily install the app on each repo via the API.
 	githubOrg = envOr("GITHUB_ORG", "cue-labs-modules-testing")
-	// githubToken should have read and write access to repository
-	// administration and contents within githubOrg,
-	// to be able to create repositories under the org and git push to them.
-	githubToken = envMust("GITHUB_TOKEN")
 	// githubKeep leaves the newly created repo around when set to true.
 	githubKeep = envOr("GITHUB_KEEP", "false")
 )
@@ -92,7 +88,6 @@ func TestScript(t *testing.T) {
 			env.Setenv("CUE_EXPERIMENT", "modules")
 			env.Setenv("CUE_REGISTRY", "registry.cue.works")
 			env.Setenv("CUE_CACHED_GOBIN", os.Getenv("CUE_CACHED_GOBIN"))
-			env.Setenv("GITHUB_TOKEN", githubToken) // needed for "git push"
 			return nil
 		},
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){
@@ -102,6 +97,13 @@ func TestScript(t *testing.T) {
 				if neg || len(args) > 0 {
 					ts.Fatalf("usage: create-github-repo")
 				}
+
+				// githubToken should have read and write access to repository
+				// administration and contents within githubOrg,
+				// to be able to create repositories under the org and git push to them.
+				// Not a global, since
+				githubToken := envMust(t, "GITHUB_TOKEN")
+
 				// TODO: name the repo after ts.Name once the API lands
 				// TODO: add a short random suffix to prevent time collisions
 				repoName := time.Now().UTC().Format("2006-01-02.15-04-05")
@@ -127,6 +129,7 @@ func TestScript(t *testing.T) {
 				})
 
 				ts.Setenv("MODULE", fmt.Sprintf("github.com/%s/%s", githubOrg, repoName))
+				ts.Setenv("GITHUB_TOKEN", githubToken) // needed for "git push"
 			},
 			// env-fill rewrites its argument files to replace any environment variable
 			// references with their values, using the same algorithm as cmpenv.
@@ -174,11 +177,12 @@ func envOr(name, fallback string) string {
 	return fallback
 }
 
-func envMust(name string) string {
+func envMust(t *testing.T, name string) string {
 	if s := os.Getenv(name); s != "" {
 		return s
 	}
-	panic(fmt.Sprintf("%s must be set", name))
+	t.Fatalf("%s must be set", name)
+	return ""
 }
 
 func tsExpand(ts *testscript.TestScript, s string) string {

@@ -9,7 +9,7 @@ env MODVER=${MODULE}@v0
 
 cd publish
 
-# TODO: replace by "cue mod init" once it's available.
+# TODO: replace by "cue mod init" once it supports versioned module names.
 # cue mod init ${MODVER}
 env-fill cue.mod/module.cue
 

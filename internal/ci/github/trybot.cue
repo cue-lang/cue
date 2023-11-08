@@ -75,7 +75,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				_goTestRace & {
 					if: _isLatestLinux
 				},
-				_e2eTest,
+				for v in _e2eTestSteps {v},
 				_goCheck,
 				_repo.checkGitClean,
 			]
@@ -115,24 +115,39 @@ workflows: trybot: _repo.bashWorkflow & {
 		run:  "go test ./..."
 	}
 
-	_e2eTest: json.#step & {
-		name: "End-to-end test"
+	_e2eTestSteps: [... json.#step & {
 		// The end-to-end tests require a github token secret and are a bit slow,
 		// so we only run them on pushes to protected branches and on one
 		// environment in the source repo.
 		if: "github.repository == '\(_repo.githubRepositoryPath)' && \(_repo.isProtectedBranch) && \(_isLatestLinux)"
-
-		// The secret is the fine-grained access token "cue-lang/cue ci e2e for modules-testing"
-		// owned by the porcuepine bot account with read+write access to repo administration and code
-		// on the entire cue-labs-modules-testing org. Note that porcuepine is also an org admin,
-		// since otherwise the repo admin access to create and delete repos does not work.
-		env: GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
-
-		run: """
-			cd internal/e2e
-			go test
-			"""
-	}
+	}] & [
+		// Two setup steps per the upstream docs:
+		// https://github.com/google-github-actions/setup-gcloud#service-account-key-json
+		{
+			name: "gcloud auth for end-to-end tests"
+			id: "auth"
+			uses: "google-github-actions/auth@v1"
+			// E2E_GCLOUD_KEY is a key for the service account cue-e2e-ci,
+			// which has the Artifact Registry Repository Administrator role.
+			with: credentials_json: "${{ secrets.E2E_GCLOUD_KEY }}"
+		},
+		{
+			name: "gcloud setup for end-to-end tests"
+			uses: "google-github-actions/setup-gcloud@v1"
+		},
+		{
+			name: "End-to-end test"
+			// The secret is the fine-grained access token "cue-lang/cue ci e2e for modules-testing"
+			// owned by the porcuepine bot account with read+write access to repo administration and code
+			// on the entire cue-labs-modules-testing org. Note that porcuepine is also an org admin,
+			// since otherwise the repo admin access to create and delete repos does not work.
+			env: GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
+			run: """
+				cd internal/e2e
+				go test
+				"""
+		},
+	]
 
 	_goCheck: json.#step & {
 		// These checks can vary between platforms, as different code can be built

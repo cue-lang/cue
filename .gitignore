@@ -10,3 +10,9 @@ cmd/cue/cue
 # We use test module paths like mod.test or externalmod.test.
 # Don't exclude those as if they were test binaries.
 !**/*mod.test
+
+# Ignore generated credentials from google-github-actions/auth,
+# a GitHub Actions step used in CI for the tests in internal/e2e.
+# Note that CI requires a clean git repo when it finishes,
+# so we don't want it to think the credentials file is untracked.
+gha-creds-*.json

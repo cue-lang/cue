@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5303e93_5e5966f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-08T16:58:23Z",
+      "side": 1,
+      "message": "LGTM with a few minor thoughts/suggestions, thanks.",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d9d1473_c9ba74c1",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-08T16:58:23Z",
+      "side": 1,
+      "message": "nit: helper functions at the end?",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "deaac662_72b64d6b",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-08T16:58:23Z",
+      "side": 1,
+      "message": "The other commands have comments explaining what they do, but this one doesn\u0027t - I\u0027d find one useful to help me understand what belongs here and what might not.",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "28149a2a_1e6d7826",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-08T16:58:23Z",
+      "side": 1,
+      "message": "gcloud-auth-docker",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1c0f18a_ac73ffb6",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-08T16:58:23Z",
+      "side": 1,
+      "message": "This doesn\u0027t seem to relate to the `gcloud-auth-docker` command really. Might it be best from a separation-of-concerns/test-readability standpoint to move it into a different command?",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c6d0ae63_e3733cfd",
+        "filename": "internal/e2e/testdata/script/gcloud_upload.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-08T16:58:23Z",
+      "side": 1,
+      "message": "`cue mod init` exists - it just doesn\u0027t support versioned module names.\nPerhaps: \"once it support versioned module names\" ? (and we should\nraise an issue about that if one doesn\u0027t exist already)",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

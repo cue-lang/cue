@@ -16,6 +16,74 @@
       "message": "Noticed the AUTHORS file lists Google LLC as the only author. Should this be changed to the CUE foundation? \n\nIf the file should be deleted I can remove the AUTHORS reference as well",
       "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56d43277_1b8b129c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-08T09:38:00Z",
+      "side": 1,
+      "message": "Thanks! The first two changes SGTM",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2f1fbe52_02425023",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-08T09:38:00Z",
+      "side": 1,
+      "message": "nit: can you make the whole sentence the link, so that it\u0027s easier to click? e.g:\n\n```\n[Install `git-codereview`](#step-3-install-the-git-codereview-command)\n```",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "559df6cc_e6775d26",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-08T09:38:00Z",
+      "side": 1,
+      "message": "How about we replace this last sentence instead? Reading this entire paragraph, I\u0027m a bit confused by how we give the user two very different examples. The correct form for a subrepository is _not_ `Fixes #159.` :)",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66e418f3_cae06062",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-08T09:38:00Z",
+      "side": 1,
+      "message": "You\u0027re right that this bit of docs is incorrect, well spotted.\n\nCould you please raise an issue about it instead? For example, with a title like \"CONTRIBUTING.md is unclear on the AUTHORS and CONTRIBUTORS files\", and then we\u0027ll agree on what the project should be doing with these files and properly document and implement it.\n\nUntil then, I\u0027d undo this change, because I\u0027m not 100% sure it\u0027s right. For example, we simply don\u0027t generate author lists from the commit logs periodically, at least not right now.",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

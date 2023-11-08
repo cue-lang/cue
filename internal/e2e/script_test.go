@@ -15,12 +15,14 @@
 package e2e_test
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -78,7 +80,22 @@ var (
 	githubOrg = envOr("GITHUB_ORG", "cue-labs-modules-testing")
 	// githubKeep leaves the newly created repo around when set to true.
 	githubKeep = envOr("GITHUB_KEEP", "false")
+
+	// gcloudRegistry is an existing Google Cloud Artifact Registry repository
+	// to upload module versions to via "cue mod upload",
+	// and authenticated via gcloud's configuration in the host environment.
+	gcloudRegistry = envOr("GCLOUD_REGISTRY", "europe-west1-docker.pkg.dev/project-unity-377819/modules-e2e-registry")
 )
+
+// testModuleName creates a unique string without any slashes
+// which can be used as the base name for a module path to publish,
+// so that test runs don't conflict with one another
+// and can be easily attributed to a point in time.
+func testModuleName(ts *testscript.TestScript) string {
+	// TODO: name the repo after ts.Name once the API lands
+	// TODO: add a short random suffix to prevent time collisions
+	return time.Now().UTC().Format("2006-01-02.15-04-05")
+}
 
 func TestScript(t *testing.T) {
 	p := testscript.Params{
@@ -104,9 +121,7 @@ func TestScript(t *testing.T) {
 				// Not a global, since
 				githubToken := envMust(t, "GITHUB_TOKEN")
 
-				// TODO: name the repo after ts.Name once the API lands
-				// TODO: add a short random suffix to prevent time collisions
-				repoName := time.Now().UTC().Format("2006-01-02.15-04-05")
+				repoName := testModuleName(ts)
 				client := github.NewClient(nil).WithAuthToken(githubToken)
 				ctx := context.TODO()
 
@@ -164,6 +179,27 @@ func TestScript(t *testing.T) {
 					}
 				}
 				ts.Fatalf("timed out waiting for module")
+			},
+			"gcloud-auth-docker": func(ts *testscript.TestScript, neg bool, args []string) {
+				if neg || len(args) > 0 {
+					ts.Fatalf("usage: gcloud-auth")
+				}
+				// The test script needs to be able to run gcloud as a docker credential helper.
+				// gcloud will be accessible via $PATH without issue, but it needs to use its host config,
+				// so we pass it along as $CLOUDSDK_CONFIG to not share the host's entire $HOME.
+				//
+				// We assume that the host already has gcloud authorized to upload OCI artifacts,
+				// via either a user account (gcloud auth login) or a service account key (gcloud auth activate-service-account).
+				gcloudConfigPath, err := exec.Command("gcloud", "info", "--format=value(config.paths.global_config_dir)").Output()
+				ts.Check(err)
+				ts.Setenv("CLOUDSDK_CONFIG", string(bytes.TrimSpace(gcloudConfigPath)))
+
+				ts.Setenv("MODULE", "domain.test/"+testModuleName(ts))
+
+				ts.Setenv("CUE_REGISTRY", gcloudRegistry)
+				// TODO: reuse internal/mod/modresolve.parseRegistry, returning a Location with Host.
+				gcloudRegistryHost, _, _ := strings.Cut(gcloudRegistry, "/")
+				ts.Setenv("CUE_REGISTRY_HOST", gcloudRegistryHost)
 			},
 		},
 	}

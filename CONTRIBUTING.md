@@ -322,7 +322,7 @@ follow:
 - **Step 0**: Review the guidelines on [Good Commit Messages](#good-commit-messages), [The Review Process](#the-review-process) and [Miscellaneous Topics](#miscellaneous-topics)
 - **Step 1**: Decide which email address you want to use for contributions.
 - **Step 2**: Set up a [GerritHub](http://gerrithub.io/) account.
-- **Step 3**: Install `git-codereview`
+- **Step 3**: [Install](#step-3-install-the-git-codereview-command) `git-codereview`
 - **Step 4**: Clone the CUE repository locally.
 
 
@@ -630,8 +630,9 @@ applied.
 
 If you are sending a change against a subrepository, you must use the
 fully-qualified syntax supported by GitHub to make sure the change is linked to
-the issue in the main repository, not the subrepository.  All issues are tracked
-in the main repository's issue tracker.  The correct form is "Fixes #159".
+the issue in the main repository, not the subrepository (eg. `cue-lang/cue#999`).
+All issues are tracked in the main repository's issue tracker.
+The correct form is "Fixes #159".
 
 
 
@@ -755,10 +756,9 @@ issue/edit/code review/submit process itself.
 Files in the CUE repository don't list author names, both to avoid clutter and
 to avoid having to keep the lists up to date.  Instead, your name will appear in
 the [change log](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+log)
-and in the [`CONTRIBUTORS`](../CONTRIBUTORS) file and perhaps the
-[`AUTHORS`](../AUTHORS) file.  These files are automatically generated from the
-commit logs periodically.  The [`AUTHORS`](../AUTHORS) file defines who
-&ldquo;The CUE Authors&rdquo;&mdash;the copyright holders&mdash;are.
+and perhaps the [`AUTHORS`](../AUTHORS) file.  These files are automatically
+generated from the commit logs periodically.  The [`AUTHORS`](../AUTHORS) file
+defines who &ldquo;The CUE Authors&rdquo;&mdash;the copyright holders&mdash;are.
 
 
 New files that you contribute should use the standard copyright header:

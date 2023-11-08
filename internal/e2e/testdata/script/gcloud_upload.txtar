@@ -1,0 +1,50 @@
+# Publish a version for a simple CUE module via "cue mod upload"
+# to an off-the-shelf OCI registry which requires authentication.
+# Then fetch that module as a dependency via cmd/cue.
+
+skip 'TODO(mvdan): set up a service account key on GitHub Actions'
+
+gcloud-auth-docker # sets: MODULE, CUE_REGISTRY, CUE_REGISTRY_HOST, CLOUDSDK_CONFIG
+env DOCKER_CONFIG=$WORK/docker-config
+env-fill docker-config/config.json
+
+env VERSION=v0.0.1
+env MODVER=${MODULE}@v0
+
+cd publish
+
+# TODO: replace by "cue mod init" once it supports versioned module names.
+# cue mod init ${MODVER}
+env-fill cue.mod/module.cue
+
+exec cue mod upload ${VERSION}
+
+cd ../depend
+
+env-fill cue.mod/module.cue out_foo.cue
+exec cue export
+cmp stdout export.golden
+
+-- docker-config/config.json --
+{"credHelpers": {"${CUE_REGISTRY_HOST}": "gcloud"}}
+-- publish/cue.mod/module.cue --
+module: "${MODVER}"
+-- publish/foo.cue --
+package publish
+
+foo: "foo value"
+
+-- depend/cue.mod/module.cue --
+module: "depend.localhost"
+
+deps: "${MODVER}": v: "${VERSION}"
+-- depend/out_foo.cue --
+package depend
+
+import mt "${MODVER}:publish"
+
+out: mt.foo
+-- depend/export.golden --
+{
+    "out": "foo value"
+}

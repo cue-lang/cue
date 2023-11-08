@@ -1,3 +1,8 @@
+# Create a public GitHub repository in an org with the GitHub App
+# "CUE Module Publisher" installed for all repositories.
+# Push a git tag with a simple CUE module, wait for the app to publish the version,
+# and then fetch the module as a dependency via cmd/cue.
+
 create-github-repo
 env VERSION=v0.0.1
 env MODVER=${MODULE}@v0

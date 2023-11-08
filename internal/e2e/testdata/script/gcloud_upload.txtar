@@ -2,8 +2,6 @@
 # to an off-the-shelf OCI registry which requires authentication.
 # Then fetch that module as a dependency via cmd/cue.
 
-skip 'TODO(mvdan): set up a service account key on GitHub Actions'
-
 gcloud-auth-docker # sets: MODULE, CUE_REGISTRY, CUE_REGISTRY_HOST, CLOUDSDK_CONFIG
 env DOCKER_CONFIG=$WORK/docker-config
 env-fill docker-config/config.json

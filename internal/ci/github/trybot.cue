@@ -92,7 +92,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		"fail-fast": false
 		matrix: {
 			"go-version": [_repo.previousStableGo, _repo.latestStableGo]
-			runner: [_repo.linuxMachine, _repo.macosMachine, _repo.windowsMachine]
+			runner: [_repo.namespaceMachine, _repo.macosMachine, _repo.windowsMachine]
 		}
 	}
 
@@ -145,7 +145,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
 		name: "Check"
-		run:  """
+		run: """
 			for module in . internal/e2e; do
 				(
 					cd $module

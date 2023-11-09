@@ -140,6 +140,24 @@
       "parentUuid": "05d4ee42_78edadb8",
       "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c9a8b0be_f6dd59ee",
+        "filename": "pkg/path/testdata/join.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T21:32:37Z",
+      "side": 1,
+      "message": "You\u0027ve undone this; thanks!",
+      "parentUuid": "32b285d6_4b5b5550",
+      "revId": "12be18e3176aa92ee2b5fe3f1beafab939446a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -97,6 +97,30 @@ type Foozer struct {
 	Embed struct{ CustomJSON }
 
 	Unsupported map[int]string
+
+	ShouldBeOptionalOmitEmpty string `json:"shouldBeOptionalOmitEmpty,omitempty"`
+
+	// +optional
+	ShouldBeOptionalComment string `json:"shouldBeOptionalComment"`
+
+	// Something before
+	//
+	// +optional
+	//
+	// Something after
+	ShouldBeOptionalComment2 string `json:"shouldBeOptionalComment2"`
+
+	// +optional=
+	ShouldBeOptionalCommentTag string `json:"shouldBeOptionalCommentTag"`
+
+	// +optional=some-value
+	ShouldBeOptionalCommentTag2 string `json:"shouldBeOptionalCommentTag2"`
+
+	// some-prefix+optional
+	ShouldNotBeOptionalPrefix string `json:"shouldNotBeOptionalPrefix"`
+
+	// +optional-some-suffix
+	ShouldNotBeOptionalSuffix string `json:"shouldNotBeOptionalSuffix"`
 }
 
 type Identifier string
@@ -284,6 +308,29 @@ import (
 	Embed: {
 		CustomJSON: #CustomJSON
 	} @go(,struct{CustomJSON})
+	shouldBeOptionalOmitEmpty?: string @go(ShouldBeOptionalOmitEmpty)
+
+	// +optional
+	shouldBeOptionalComment?: string @go(ShouldBeOptionalComment)
+
+	// Something before
+	//
+	// +optional
+	//
+	// Something after
+	shouldBeOptionalComment2?: string @go(ShouldBeOptionalComment2)
+
+	// +optional=
+	shouldBeOptionalCommentTag?: string @go(ShouldBeOptionalCommentTag)
+
+	// +optional=some-value
+	shouldBeOptionalCommentTag2: string @go(ShouldBeOptionalCommentTag2)
+
+	// some-prefix+optional
+	shouldNotBeOptionalPrefix: string @go(ShouldNotBeOptionalPrefix)
+
+	// +optional-some-suffix
+	shouldNotBeOptionalSuffix: string @go(ShouldNotBeOptionalSuffix)
 }
 
 #Identifier: string // #enumIdentifier

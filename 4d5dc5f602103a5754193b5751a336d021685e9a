@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69bc5506_a1e5ea0a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T10:43:43Z",
+      "side": 1,
+      "message": "Forgot to reply to this comment; we agreed we\u0027d consider what to do with AUTHORS via a newly filed issue.",
+      "parentUuid": "f6207a96_b36322e2",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f1fbe52_02425023",

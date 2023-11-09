@@ -1291,9 +1291,10 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		if name == "-" {
 			continue
 		}
+
 		// TODO: check referrers
 		kind := regular
-		if e.isOptional(tag) {
+		if e.isOptional(docs[i], tag) {
 			kind = optional
 		}
 		if _, ok := f.Type().(*types.Pointer); ok {
@@ -1394,7 +1395,15 @@ func (e *extractor) isInline(tag string) bool {
 		hasFlag(tag, "yaml", "inline", 1)
 }
 
-func (e *extractor) isOptional(tag string) bool {
+func (e *extractor) isOptional(docs *ast.CommentGroup, tag string) bool {
+	for _, line := range strings.Split(docs.Text(), "\n") {
+		s, _ := strings.CutSuffix(strings.TrimSpace(line), "=")
+		if s == "+optional" {
+			fmt.Println("optional", docs.Text())
+			return true
+		}
+	}
+
 	// TODO: also when the type is a list or other kind of pointer.
 	return hasFlag(tag, "json", "omitempty", 1) ||
 		hasFlag(tag, "yaml", "omitempty", 1)

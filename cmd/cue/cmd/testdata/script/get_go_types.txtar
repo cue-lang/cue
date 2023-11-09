@@ -97,6 +97,35 @@ type Foozer struct {
 	Embed struct{ CustomJSON }
 
 	Unsupported map[int]string
+
+	OptionalOmitEmptyJSON string `json:"optionalOmitEmptyJSON,omitempty"`
+
+	OptionalOmitEmptyYAML string `yaml:"optionalOmitEmptyYAML,omitempty"`
+
+	// +optional
+	OptionalComment string `json:"optionalComment"`
+
+	//+optional
+	OptionalCommentNoSpace string `json:"optionalCommentNoSpace"`
+
+	// Something before
+	//
+	// +optional
+	//
+	// Something after
+	OptionalCommentExtra string `json:"optionalCommentExtra"`
+
+	// +optional=
+	OptionalCommentTag string `json:"optionalCommentTag"`
+
+	// +optional=some-value
+	OptionalCommentTagValue string `json:"optionalCommentTagValue"`
+
+	// some-prefix+optional
+	RequiredCommentPrefix string `json:"requiredCommentPrefix"`
+
+	// +optional-some-suffix
+	RequiredCommentSuffix string `json:"requiredCommentSuffix"`
 }
 
 type Identifier string
@@ -284,6 +313,33 @@ import (
 	Embed: {
 		CustomJSON: #CustomJSON
 	} @go(,struct{CustomJSON})
+	optionalOmitEmptyJSON?: string @go(OptionalOmitEmptyJSON)
+	optionalOmitEmptyYAML?: string @go(OptionalOmitEmptyYAML)
+
+	// +optional
+	optionalComment?: string @go(OptionalComment)
+
+	//+optional
+	optionalCommentNoSpace?: string @go(OptionalCommentNoSpace)
+
+	// Something before
+	//
+	// +optional
+	//
+	// Something after
+	optionalCommentExtra?: string @go(OptionalCommentExtra)
+
+	// +optional=
+	optionalCommentTag?: string @go(OptionalCommentTag)
+
+	// +optional=some-value
+	optionalCommentTagValue?: string @go(OptionalCommentTagValue)
+
+	// some-prefix+optional
+	requiredCommentPrefix: string @go(RequiredCommentPrefix)
+
+	// +optional-some-suffix
+	requiredCommentSuffix: string @go(RequiredCommentSuffix)
 }
 
 #Identifier: string // #enumIdentifier

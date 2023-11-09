@@ -1291,15 +1291,18 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		if name == "-" {
 			continue
 		}
+
+		doc := docs[i]
+
 		// TODO: check referrers
 		kind := regular
-		if e.isOptional(tag) {
+		if e.isOptional(doc, tag) {
 			kind = optional
 		}
 		if _, ok := f.Type().(*types.Pointer); ok {
 			kind = optional
 		}
-		field, cueType := e.makeField(name, kind, f.Type(), docs[i], count > 0)
+		field, cueType := e.makeField(name, kind, f.Type(), doc, count > 0)
 		add(field)
 
 		if s := reflect.StructTag(tag).Get("cue"); s != "" {
@@ -1394,7 +1397,14 @@ func (e *extractor) isInline(tag string) bool {
 		hasFlag(tag, "yaml", "inline", 1)
 }
 
-func (e *extractor) isOptional(tag string) bool {
+func (e *extractor) isOptional(doc *ast.CommentGroup, tag string) bool {
+	for _, line := range strings.Split(doc.Text(), "\n") {
+		before, _, _ := strings.Cut(strings.TrimSpace(line), "=")
+		if before == "+optional" {
+			return true
+		}
+	}
+
 	// TODO: also when the type is a list or other kind of pointer.
 	return hasFlag(tag, "json", "omitempty", 1) ||
 		hasFlag(tag, "yaml", "omitempty", 1)

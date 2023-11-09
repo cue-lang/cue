@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "71b128b1_aea1cdcd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1020380
+      },
+      "writtenOn": "2023-11-09T19:29:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f6207a96_b36322e2",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2f1fbe52_02425023",
@@ -83,6 +101,24 @@
       "writtenOn": "2023-11-09T09:34:19Z",
       "side": 1,
       "message": "You\u0027ve done this.",
+      "parentUuid": "2f1fbe52_02425023",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bd9dce8_197fcb84",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 325,
+      "author": {
+        "id": 1020380
+      },
+      "writtenOn": "2023-11-09T19:29:23Z",
+      "side": 1,
+      "message": "Done",
       "parentUuid": "2f1fbe52_02425023",
       "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
@@ -123,6 +159,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "56704340_2903e30b",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 635,
+      "author": {
+        "id": 1020380
+      },
+      "writtenOn": "2023-11-09T19:29:23Z",
+      "side": 1,
+      "message": "Reflowed paragraph to make the intent clear",
+      "parentUuid": "559df6cc_e6775d26",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66e418f3_cae06062",
@@ -153,6 +207,24 @@
       "writtenOn": "2023-11-09T09:34:19Z",
       "side": 1,
       "message": "You removed this; let me know if/when you file an issue, otherwise I\u0027ll do it.",
+      "parentUuid": "66e418f3_cae06062",
+      "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc76eb99_35b48309",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 761,
+      "author": {
+        "id": 1020380
+      },
+      "writtenOn": "2023-11-09T19:29:23Z",
+      "side": 1,
+      "message": "Undid this change and will raise issue",
       "parentUuid": "66e418f3_cae06062",
       "revId": "4d5dc5f602103a5754193b5751a336d021685e9a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"

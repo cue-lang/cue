@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5c1c65a2_3b99ff37",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 94,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T09:55:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9d9d1473_c9ba74c1",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "deaac662_72b64d6b",
@@ -48,6 +66,24 @@
       "writtenOn": "2023-11-08T16:58:23Z",
       "side": 1,
       "message": "The other commands have comments explaining what they do, but this one doesn\u0027t - I\u0027d find one useful to help me understand what belongs here and what might not.",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ab96c5a_f4b50fb4",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T09:55:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "deaac662_72b64d6b",
       "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2285545_8330bd56",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T09:55:11Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "28149a2a_1e6d7826",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1c0f18a_ac73ffb6",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdfc7789_23b7ec8e",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T09:55:11Z",
+      "side": 1,
+      "message": "note that `create-github-repo` sets $MODULE as well. in that case it must, because it is creating the github repository, whereas in this case we simply come up with a new name to push to.\n\nI don\u0027t agree with a different command because it would only be called following gcloud-auth-docker, so it\u0027s more code and documentation for no benefit. if we set $MODULE like this in multiple other places, then yes, factoring out into a separate command would make sense - but that\u0027s not the case now, at least not yet.",
+      "parentUuid": "c1c0f18a_ac73ffb6",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c6d0ae63_e3733cfd",
@@ -99,6 +171,24 @@
       "writtenOn": "2023-11-08T16:58:23Z",
       "side": 1,
       "message": "`cue mod init` exists - it just doesn\u0027t support versioned module names.\nPerhaps: \"once it support versioned module names\" ? (and we should\nraise an issue about that if one doesn\u0027t exist already)",
+      "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cce934c2_58c2bf20",
+        "filename": "internal/e2e/testdata/script/gcloud_upload.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T09:55:11Z",
+      "side": 1,
+      "message": "I\u0027d forgotten we already had an ancient version of it; tweaked the TODOs and filed https://github.com/cue-lang/cue/issues/2681.",
+      "parentUuid": "c6d0ae63_e3733cfd",
       "revId": "6a517fc0e91c07a98391bd1374752b0d0e3b2bc7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

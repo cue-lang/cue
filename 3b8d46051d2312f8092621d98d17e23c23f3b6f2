@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "13988b98_50cad1ae",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T10:41:53Z",
+      "side": 1,
+      "message": "PTAL, passed here as a slightly earlier version: https://github.com/cue-lang/cue/actions/runs/6801596726/job/18492813406",
+      "revId": "3b8d46051d2312f8092621d98d17e23c23f3b6f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

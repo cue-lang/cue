@@ -50,6 +50,24 @@
       "message": "Tiny suggestion: I think you can save a level of indentation by doing:\n\n```\n_e2eTestSteps: [... json.#step \u0026 {\n}] \u0026 ...\n```",
       "revId": "3b8d46051d2312f8092621d98d17e23c23f3b6f2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "370d681e_cadce025",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-09T15:43:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e779a473_1a012be5",
+      "revId": "3b8d46051d2312f8092621d98d17e23c23f3b6f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

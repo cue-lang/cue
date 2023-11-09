@@ -22,6 +22,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -101,8 +102,8 @@ func TestScript(t *testing.T) {
 			// create-github-repo creates a unique repository under githubOrg
 			// and sets $MODULE to its resulting module path.
 			"create-github-repo": func(ts *testscript.TestScript, neg bool, args []string) {
-				if neg || len(args) > 0 {
-					ts.Fatalf("usage: create-github-repo")
+				if neg {
+					ts.Fatalf("usage: create-github-repo [field=value...]")
 				}
 
 				// githubToken should have read and write access to repository
@@ -117,6 +118,20 @@ func TestScript(t *testing.T) {
 
 				repo := &github.Repository{
 					Name: github.String(repoName),
+				}
+				for _, arg := range args {
+					field, value, ok := strings.Cut(arg, "=")
+					if !ok {
+						ts.Fatalf("invalid field=value arg: %q", arg)
+					}
+					switch field {
+					case "private":
+						b, err := strconv.ParseBool(value)
+						ts.Check(err)
+						repo.Private = addr(b)
+					default:
+						ts.Fatalf("unsupported field: %q", field)
+					}
 				}
 				_, _, err := client.Repositories.Create(ctx, githubOrg, repo)
 				ts.Check(err)
@@ -133,8 +148,10 @@ func TestScript(t *testing.T) {
 					ts.Check(err)
 				})
 
-				ts.Setenv("MODULE", fmt.Sprintf("github.com/%s/%s", githubOrg, repoName))
+				module := fmt.Sprintf("github.com/%s/%s", githubOrg, repoName)
+				ts.Setenv("MODULE", module)
 				ts.Setenv("GITHUB_TOKEN", githubToken) // needed for "git push"
+				ts.Logf("created github repo: https://%s", module)
 			},
 			// env-fill rewrites its argument files to replace any environment variable
 			// references with their values, using the same algorithm as cmpenv.
@@ -152,23 +169,34 @@ func TestScript(t *testing.T) {
 			// cue-mod-wait waits for a CUE module to exist in a registry for up to 20s.
 			// Since this is easily done via an HTTP HEAD request, an OCI client isn't necessary.
 			"cue-mod-wait": func(ts *testscript.TestScript, neg bool, args []string) {
-				if neg || len(args) > 0 {
-					ts.Fatalf("usage: cue-mod-wait")
+				if len(args) > 1 {
+					ts.Fatalf("usage: [!] cue-mod-wait [timeout]")
 				}
 				manifest := tsExpand(ts, "https://${CUE_REGISTRY}/v2/${MODULE}/manifests/${VERSION}")
+				timeout := 20 * time.Second
+				if len(args) > 0 {
+					var err error
+					timeout, err = time.ParseDuration(args[0])
+					ts.Check(err)
+				}
 				retries := retry.Strategy{
 					Delay:       10 * time.Millisecond,
 					MaxDelay:    time.Second,
-					MaxDuration: 20 * time.Second,
+					MaxDuration: timeout,
 				}
 				for it := retries.Start(); it.Next(nil); {
 					resp, err := http.Head(manifest)
 					ts.Check(err)
 					if resp.StatusCode == http.StatusOK {
+						if neg {
+							ts.Fatalf("%s was unexpectedly published", manifest)
+						}
 						return
 					}
 				}
-				ts.Fatalf("timed out waiting for module")
+				if !neg {
+					ts.Fatalf("timed out waiting for %s", manifest)
+				}
 			},
 			// gcloud-auth-docker configures gcloud so that it uses the host's existing configuration,
 			// and sets CUE_REGISTRY and CUE_REGISTRY_HOST according to gcloudRegistry.
@@ -199,6 +227,8 @@ func TestScript(t *testing.T) {
 	}
 	testscript.Run(t, p)
 }
+
+func addr[T any](t T) *T { return &t }
 
 func envOr(name, fallback string) string {
 	if s := os.Getenv(name); s != "" {

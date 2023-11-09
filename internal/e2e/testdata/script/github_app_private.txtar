@@ -1,0 +1,57 @@
+# Create a private GitHub repository in an org with the GitHub App
+# "CUE Module Publisher" installed for all repositories.
+# Push a git tag with a simple CUE module, and check that the app
+# does not publish a version that is publicly accessible.
+
+create-github-repo private=true
+env VERSION=v0.0.1
+env MODVER=${MODULE}@v0
+
+cd publish
+
+# TODO: replace by "cue mod init" once it supports versioned module names.
+# cue mod init ${MODVER}
+env-fill cue.mod/module.cue
+
+exec git init --initial-branch main
+exec git config user.name 'modules_e2e'
+exec git config user.email 'modules_e2e@bot'
+exec git remote add origin https://${GITHUB_TOKEN}@${MODULE}
+
+exec git add foo.cue cue.mod
+exec git commit -m 'first commit'
+exec git tag cue-${VERSION}
+
+exec git push origin main cue-${VERSION}
+
+# The app publishing method gives no feedback right now,
+# so we instead check that the module version isn't published on the registry within a timeout.
+# From previous test runs, it takes between 5 and 8 seconds between pushing a git tag
+# on a public repo and the module version being published on the registry,
+# so 20 seconds is likely more than enough here to ensure it won't be published.
+! cue-mod-wait 20s
+
+cd ../depend
+
+# Double check that cmd/cue cannot download the dependency either.
+env-fill cue.mod/module.cue out_foo.cue
+! exec cue export
+stderr 'cannot resolve dependencies'
+
+-- publish/cue.mod/module.cue --
+module: "${MODVER}"
+-- publish/foo.cue --
+package publish
+
+foo: "foo value"
+
+-- depend/cue.mod/module.cue --
+module: "depend.localhost"
+
+deps: "${MODVER}": v: "${VERSION}"
+-- depend/out_foo.cue --
+package depend
+
+import mt "${MODVER}:publish"
+
+out: mt.foo

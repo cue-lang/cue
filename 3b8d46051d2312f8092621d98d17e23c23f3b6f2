@@ -16,6 +16,40 @@
       "message": "PTAL, passed here as a slightly earlier version: https://github.com/cue-lang/cue/actions/runs/6801596726/job/18492813406",
       "revId": "3b8d46051d2312f8092621d98d17e23c23f3b6f2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "26218579_555f3927",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-09T14:08:44Z",
+      "side": 1,
+      "message": "LGTM, thanks!",
+      "revId": "3b8d46051d2312f8092621d98d17e23c23f3b6f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e779a473_1a012be5",
+        "filename": "internal/ci/github/trybot.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-09T14:08:44Z",
+      "side": 1,
+      "message": "Tiny suggestion: I think you can save a level of indentation by doing:\n\n```\n_e2eTestSteps: [... json.#step \u0026 {\n}] \u0026 ...\n```",
+      "revId": "3b8d46051d2312f8092621d98d17e23c23f3b6f2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

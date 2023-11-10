@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cf8fe15_b82370b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-10T10:44:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0ece4ed8_c9ac0049",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95107976_fe1f1aba",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-11-10T10:33:53Z",
       "side": 1,
       "message": "`doc.Text()` renders the entire godoc block as a single string, and then you split it again - better to loop over CommentGroup.List, and for each Comment, check if Text is `// +optional` after you\u0027ve cut `\u003d`.\n\nThis should end up as the same result, but not require the Text and Split dance.",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "212be3bd_3b4d2089",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-10T10:44:57Z",
+      "side": 1,
+      "message": "Good observation, thanks. I am not sure how I missed the list of comments. The only caveat is that \"/*\" style comments will not match this. Not sure if it\u0027s worth worrying about.",
+      "parentUuid": "95107976_fe1f1aba",
       "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd6ce96f_e6ad318b",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-10T10:44:57Z",
+      "side": 1,
+      "message": "I don\u0027t think so. I am basing this off the original implementation which does not make any checks for a `+required` tag at all.\n\nhttps://github.com/kubernetes/kube-openapi/blob/2dd684a91f00351087fe2f4ed5408d4d2f3775ab/pkg/generators/openapi.go#L31",
+      "parentUuid": "93962cbf_030b4336",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a92d9ed9_3b52dcbb",
@@ -65,6 +119,24 @@
       "writtenOn": "2023-11-10T10:33:53Z",
       "side": 1,
       "message": "nit: replace `ShouldBeOptional` and `ShouldNotBeOptional` with `Optional` and `Required`, for the sake of avoiding very long names.",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf07b335_18409477",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-10T10:44:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a92d9ed9_3b52dcbb",
       "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

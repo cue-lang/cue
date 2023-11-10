@@ -250,6 +250,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "52aadb54_4524b241",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T11:39:47Z",
+      "side": 1,
+      "message": "yep agreed :) dealing with under-specified and wonky external standards is always tricky, thanks for bearing with me.",
+      "parentUuid": "2d0c3bd3_221e178d",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a92d9ed9_3b52dcbb",

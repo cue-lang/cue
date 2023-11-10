@@ -15,7 +15,7 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc4
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230328191034-3462fbc510c0
-	github.com/rogpeppe/go-internal v1.11.1-0.20230926105539-32ae33786ecc
+	github.com/rogpeppe/go-internal v1.11.1-0.20231026093722-fa6a31e0812c
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/pflag v1.0.5
 	github.com/tetratelabs/wazero v1.0.2

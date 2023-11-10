@@ -232,6 +232,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d0c3bd3_221e178d",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-10T11:36:38Z",
+      "side": 1,
+      "message": "I appreciate your understanding, thank you. I also want to be clear that I absolutely agree with you. If I were to have written this from scratch then it would be sensible to explicitly only allow directives in the form `// +key` or `// +key\u003dvalue`. It would make things a lot nicer, and a lot less confusing.",
+      "parentUuid": "f5682233_9d37c179",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a92d9ed9_3b52dcbb",
@@ -281,6 +299,24 @@
       "side": 1,
       "message": "Hm, did you actually do this? I don\u0027t see it in the last patchset",
       "parentUuid": "bf07b335_18409477",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "16900966_9ac06e55",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-10T11:36:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "682bd112_0e372ff0",
       "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

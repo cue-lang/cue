@@ -1,0 +1,18 @@
+exec cue import x.yaml
+cmp x.cue expect.cue
+
+-- x.yaml --
+# Importing YAML with multi-byte characters as CUE resulted in bad formatting
+# since the YAML decoder would count columns by characters and we count by bytes.
+x1:
+  # ああああああああああああああああああ
+  description: ああ
+  type: string
+-- expect.cue --
+// Importing YAML with multi-byte characters as CUE resulted in bad formatting
+// since the YAML decoder would count columns by characters and we count by bytes.
+x1: {
+	// ああああああああああああああああああ
+	description: "ああ"
+	type:        "string"
+}

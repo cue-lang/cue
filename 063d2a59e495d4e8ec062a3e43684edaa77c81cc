@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ece4ed8_c9ac0049",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T10:33:53Z",
+      "side": 1,
+      "message": "add an empty line after this, since \"fixes\" is not a git trailer. the format should also be like `Fixes #2679.` for consistency with other commits.",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95107976_fe1f1aba",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T10:33:53Z",
+      "side": 1,
+      "message": "`doc.Text()` renders the entire godoc block as a single string, and then you split it again - better to loop over CommentGroup.List, and for each Comment, check if Text is `// +optional` after you\u0027ve cut `\u003d`.\n\nThis should end up as the same result, but not require the Text and Split dance.",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "93962cbf_030b4336",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T10:33:53Z",
+      "side": 1,
+      "message": "do we want to look for `+required` to directly `return false`, e.g. even when the type is a pointer? the upstream docs briefly mention that comment directive, and if we follow `+optional`, I think we should follow both. Otherwise it could be a bit confusing for the end user.",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a92d9ed9_3b52dcbb",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T10:33:53Z",
+      "side": 1,
+      "message": "nit: replace `ShouldBeOptional` and `ShouldNotBeOptional` with `Optional` and `Required`, for the sake of avoiding very long names.",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

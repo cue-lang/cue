@@ -681,7 +681,7 @@ func yaml_parser_parse_indentless_sequence_entry(parser *yaml_parser_t, event *y
 	*event = yaml_event_t{
 		typ:        yaml_SEQUENCE_END_EVENT,
 		start_mark: token.start_mark,
-		end_mark:   token.start_mark, // [Go] Shouldn't this be token.end_mark?
+		end_mark:   token.end_mark,
 	}
 	return true
 }
@@ -907,7 +907,7 @@ func yaml_parser_parse_flow_sequence_entry_mapping_end(parser *yaml_parser_t, ev
 	*event = yaml_event_t{
 		typ:        yaml_MAPPING_END_EVENT,
 		start_mark: token.start_mark,
-		end_mark:   token.start_mark, // [Go] Shouldn't this be end_mark?
+		end_mark:   token.end_mark,
 	}
 	return true
 }

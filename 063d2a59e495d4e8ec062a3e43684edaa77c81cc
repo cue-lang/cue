@@ -216,6 +216,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f5682233_9d37c179",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T11:16:42Z",
+      "side": 1,
+      "message": "`//+optional` is a good point if it actually shows up in some examples in the wild. Please add it as a test case so that we don\u0027t break it in the future.\n\nThen I\u0027m fine with keeping the logic as is. To be clear, performance wasn\u0027t my concern here - it was more about keeping the logic as straightforward as possible, and following the docs. Go\u0027s directives, for example, don\u0027t allow `//      go:build foo` or `/*go:build foo*/` and I think that helps keep everything nicely predictable.",
+      "parentUuid": "5a75c233_df0136a5",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a92d9ed9_3b52dcbb",
         "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
         "patchSetId": 8
@@ -245,6 +263,24 @@
       "side": 1,
       "message": "Done",
       "parentUuid": "a92d9ed9_3b52dcbb",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "682bd112_0e372ff0",
+        "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 125,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T11:16:42Z",
+      "side": 1,
+      "message": "Hm, did you actually do this? I don\u0027t see it in the last patchset",
+      "parentUuid": "bf07b335_18409477",
       "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

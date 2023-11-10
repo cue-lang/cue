@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c20bd8d0_4401cb1c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T13:40:04Z",
+      "side": 1,
+      "message": "Note that I could shorten the test name, e.g. from \"github_app_public\" to \"public\", but I think keeping the entire testscript name is good for the sake of easily and quickly knowing which testdata file one should look at. I don\u0027t think short names here are that important.",
+      "revId": "0fe4f9d506e0c8f531e9da12a3aa8f9cb8dd925f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

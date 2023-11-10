@@ -73,10 +73,10 @@ age: twenty
 
 -- expect-stderr2 --
 age: conflicting values "twenty" and int (mismatched types string and int):
-    ./data.yaml:1:7
+    ./data.yaml:1:6
     ./schema.json:18:7
 -- expect-stderr3 --
 age: conflicting values "twenty" and int (mismatched types string and int):
-    ./data.yaml:1:7
+    ./data.yaml:1:6
     ./schema.json:18:7
 -- cue.mod --

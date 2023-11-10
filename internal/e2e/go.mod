@@ -5,7 +5,7 @@ go 1.20
 require (
 	cuelang.org/go v0.0.0-00010101000000-000000000000
 	github.com/google/go-github/v56 v56.0.0
-	github.com/rogpeppe/go-internal v1.11.1-0.20230926105539-32ae33786ecc
+	github.com/rogpeppe/go-internal v1.11.1-0.20231026093722-fa6a31e0812c
 	github.com/rogpeppe/retry v0.1.0
 )
 

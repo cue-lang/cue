@@ -17,6 +17,7 @@ package e2e_test
 import (
 	"bytes"
 	"context"
+	cryptorand "crypto/rand"
 	"fmt"
 	"net/http"
 	"os"
@@ -252,11 +253,17 @@ func tsExpand(ts *testscript.TestScript, s string) string {
 }
 
 // testModuleName creates a unique string without any slashes
-// which can be used as the base name for a module path to publish,
-// so that test runs don't conflict with one another
-// and can be easily attributed to a point in time.
+// which can be used as the base name for a module path to publish.
+//
+// It has three components:
+// "e2e" with the test name as a prefix, to spot which test created it,
+// a timestamp in seconds, to get an idea of when the test was run,
+// and a short random suffix to avoid timing collisions between machines.
 func testModuleName(ts *testscript.TestScript) string {
-	// TODO: name the repo after ts.Name once the API lands
-	// TODO: add a short random suffix to prevent time collisions
-	return time.Now().UTC().Format("2006-01-02.15-04-05")
+	var randomTrailer [3]byte
+	if _, err := cryptorand.Read(randomTrailer[:]); err != nil {
+		panic(err) // should typically not happen
+	}
+	return fmt.Sprintf("e2e-%s-%s-%x", ts.Name(),
+		time.Now().UTC().Format("2006.01.02-15.04.05"), randomTrailer)
 }

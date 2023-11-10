@@ -180,6 +180,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4c861835_d44be0e9",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T11:02:05Z",
+      "side": 1,
+      "message": "I wasn\u0027t able to find any mention of funky whitespace in their documentation or examples, and comment directives need to be very obvious and simple to parse, so I\u0027m inclined to keep it as simple as possible unless we find an actual example in practice that the simple logic doesn\u0027t support.\n\nI think not supporting `/* +optional */` nor `//                 +optional` is a feature, not a bug :) We only need to emulate the Kubernetes behavior that is documented and widely used - we don\u0027t need a one-to-one copy of the funky stuff their code actually does.",
+      "parentUuid": "7aed816a_75b90b9b",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "a92d9ed9_3b52dcbb",
         "filename": "cmd/cue/cmd/testdata/script/get_go_types.txtar",
         "patchSetId": 8

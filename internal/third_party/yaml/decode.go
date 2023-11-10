@@ -236,6 +236,8 @@ func (p *parser) sequence() *node {
 	}
 	if len(n.children) > 0 {
 		n.endPos = n.children[len(n.children)-1].endPos
+	} else {
+		n.endPos = p.event.start_mark
 	}
 	p.expect(yaml_SEQUENCE_END_EVENT)
 	return n
@@ -362,7 +364,7 @@ func (d *decoder) attachLineComment(m yaml_mark_t, pos int8, expr ast.Node) {
 }
 
 func (d *decoder) pos(m yaml_mark_t) token.Pos {
-	pos := d.p.info.Pos(m.index+1, token.NoRelPos)
+	pos := d.absPos(m)
 
 	if d.forceNewline {
 		d.forceNewline = false
@@ -390,7 +392,7 @@ func (d *decoder) pos(m yaml_mark_t) token.Pos {
 }
 
 func (d *decoder) absPos(m yaml_mark_t) token.Pos {
-	return d.p.info.Pos(m.index+1, token.NoRelPos)
+	return d.p.info.Pos(m.index, token.NoRelPos)
 }
 
 func (d *decoder) start(n *node) token.Pos {

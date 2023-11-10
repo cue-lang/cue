@@ -616,14 +616,14 @@ markup language.
 
 ### Referencing issues
 
-The special notation "Fixes #12345" associates the change with issue 12345 in
+The special notation `Fixes #12345` associates the change with issue 12345 in
 the [CUE issue tracker](https://cuelang.org/issue/12345) When this change is
 eventually applied, the issue tracker will automatically mark the issue as
 fixed.
 
 
 If the change is a partial step towards the resolution of the issue, uses the
-notation "Updates #12345".  This will leave a comment in the issue linking back
+notation `Updates #12345`.  This will leave a comment in the issue linking back
 to the change in Gerrit, but it will not close the issue when the change is
 applied.
 
@@ -631,7 +631,7 @@ applied.
 All issues are tracked in the main repository's issue tracker.
 If you are sending a change against a subrepository, you must use the
 fully-qualified syntax supported by GitHub to make sure the change is linked to
-the issue in the main repository, not the subrepository (eg. "Fixes cue-lang/cue#999").
+the issue in the main repository, not the subrepository (eg. `Fixes cue-lang/cue#999`).
 
 
 

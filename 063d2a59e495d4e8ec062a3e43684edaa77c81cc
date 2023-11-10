@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e4947866_3b1a8fe7",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-10T10:49:32Z",
+      "side": 1,
+      "message": "Hmm, the other problem with using `doc.Lines` is that it preserves all of the syntax like `//`. I think it may be worth sticking with the original implementation to avoid stripping that and handling comment edge cases?",
+      "parentUuid": "212be3bd_3b4d2089",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "93962cbf_030b4336",
         "filename": "cmd/cue/cmd/get_go.go",
         "patchSetId": 8

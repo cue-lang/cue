@@ -8,14 +8,14 @@ cmp stderr expect-stderr2
 translations.hello.lang: incomplete value string:
     ./vet.cue:3:31
 translations.hello.lang: conflicting values false and string (mismatched types bool and string):
-    ./data.yaml:13:11
+    ./data.yaml:13:12
     ./vet.cue:3:25
     ./vet.cue:3:31
 -- expect-stderr2 --
 translations.hello.lang: incomplete value string:
     ./vet.cue:3:31
 translations.hello.lang: conflicting values false and string (mismatched types bool and string):
-    ./data.yaml:13:11
+    ./data.yaml:13:12
     ./vet.cue:3:25
     ./vet.cue:3:31
 -- vet.cue --

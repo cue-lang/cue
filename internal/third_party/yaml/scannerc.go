@@ -528,7 +528,7 @@ func read(parser *yaml_parser_t, s []byte) []byte {
 		s = append(s, parser.buffer[parser.buffer_pos:parser.buffer_pos+w]...)
 		parser.buffer_pos += w
 	}
-	parser.mark.index++
+	parser.mark.index += w
 	parser.mark.column++
 	parser.unread--
 	return s

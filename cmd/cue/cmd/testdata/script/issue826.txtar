@@ -1,0 +1,14 @@
+exec cue import x.yaml
+cmp x.cue expect.cue
+
+-- x.yaml --
+x1:
+  # ああああああああああああああああああ
+  description: ああ
+  type: string
+-- expect.cue --
+x1: {
+	// ああああああああああああああああああ
+	description: "ああ"
+	type:        "string"
+}

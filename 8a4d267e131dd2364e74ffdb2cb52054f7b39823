@@ -16,6 +16,23 @@
       "message": "See the rendering on GitHub on this branch:\n\nhttps://github.com/cedricgc/cue-fork/blob/8a4d267e131dd2364e74ffdb2cb52054f7b39823/CONTRIBUTING.md#referencing-issues",
       "revId": "8a4d267e131dd2364e74ffdb2cb52054f7b39823",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f65a95e6_e0e192c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T16:41:00Z",
+      "side": 1,
+      "message": "Thanks!",
+      "revId": "8a4d267e131dd2364e74ffdb2cb52054f7b39823",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

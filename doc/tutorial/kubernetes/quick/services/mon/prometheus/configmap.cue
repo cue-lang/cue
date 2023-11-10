@@ -51,15 +51,11 @@ configMap: prometheus: {
 		"prometheus.yml": yaml656e63.Marshal(_cue_prometheus_yml)
 		let _cue_prometheus_yml = {
 			global: scrape_interval: "15s"
-			rule_files: [
-				"/etc/prometheus/alert.rules",
-			]
+			rule_files: ["/etc/prometheus/alert.rules"]
 			alerting: alertmanagers: [{
 				scheme: "http"
 				static_configs: [{
-					targets: [
-						"alertmanager:9093",
-					]
+					targets: ["alertmanager:9093"]
 				}]
 			}]
 			scrape_configs: [{

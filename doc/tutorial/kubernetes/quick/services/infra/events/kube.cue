@@ -15,9 +15,7 @@ deployment: events: spec: {
 				labelSelector: matchExpressions: [{
 					key:      "app"
 					operator: "In"
-					values: [
-						"events",
-					]
+					values: ["events"]
 				}]
 				topologyKey: "kubernetes.io/hostname"
 			}]

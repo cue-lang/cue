@@ -20,9 +20,7 @@ statefulSet: etcd: spec: {
 				labelSelector: matchExpressions: [{
 					key:      "app"
 					operator: "In"
-					values: [
-						"etcd",
-					]
+					values: ["etcd"]
 				}]
 				topologyKey: "kubernetes.io/hostname"
 			}]

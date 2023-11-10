@@ -89,6 +89,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6df2d6c_05fd4eeb",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1402,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T10:53:46Z",
+      "side": 1,
+      "message": "All upstream examples use `//`, and `/*` comments are rare and add more edge cases, so I\u0027m inclined to only support `//`.\n\nI do think you should stick to CommentGroup.Lines. I left a comment in the other thread, which I wrote as of patchset 10. There aren\u0027t any edge cases you need to worry about - you just literally need\n\n```\nfor _, comment :\u003d range doc {\n  before, _, _ :\u003d strings.Cut(comment.Text, \"\u003d\")\n  if before \u003d\u003d \"// +optional\" {\n```",
+      "parentUuid": "212be3bd_3b4d2089",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "93962cbf_030b4336",
@@ -120,6 +138,24 @@
       "side": 1,
       "message": "I don\u0027t think so. I am basing this off the original implementation which does not make any checks for a `+required` tag at all.\n\nhttps://github.com/kubernetes/kube-openapi/blob/2dd684a91f00351087fe2f4ed5408d4d2f3775ab/pkg/generators/openapi.go#L31",
       "parentUuid": "93962cbf_030b4336",
+      "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa7b3a3f_724e3fe0",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1404,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-10T10:53:46Z",
+      "side": 1,
+      "message": "OK - can we add a note about it then, for future reference at least?\n\nFor example, I might write:\n\n```\n// Support the \"// +optional\" directives documented by the Kubernetes API conventions:\n// https://github.com/kubernetes/community/blob/HEAD/contributors/devel/sig-architecture/api-conventions.md#optional-vs-required\n//\n// Note that the docs also show \"// +required\", but the rules and code seem to ignore it.\n```\n\nAlso, now that you use `Comment.Text` directly, I think you need `before \u003d\u003d \"// +optional`.\n\nAnd another one: I thikn you should drop TrimSpace. I don\u0027t think you should be allowing `//      +optional\\n` or `// +optional                \\n` (explicit newlines for clarity).",
+      "parentUuid": "bd6ce96f_e6ad318b",
       "revId": "063d2a59e495d4e8ec062a3e43684edaa77c81cc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

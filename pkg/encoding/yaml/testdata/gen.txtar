@@ -32,14 +32,14 @@ Errors:
 t1: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
     ./in.cue:3:5
     ./in.cue:3:49
-    yaml.Validate:3:5
+    yaml.Validate:3:4
 t3: error in call to encoding/yaml.Validate: incomplete value int:
     ./in.cue:5:5
     ./in.cue:5:56
 t4: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3):
     ./in.cue:6:5
     ./in.cue:6:49
-    yaml.ValidatePartial:3:5
+    yaml.ValidatePartial:3:4
 
 Result:
 t1: _|_ // t1: error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3)

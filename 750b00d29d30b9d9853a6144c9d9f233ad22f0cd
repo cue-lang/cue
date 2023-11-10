@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f61227fa_6ca18603",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-10T11:17:38Z",
+      "side": 1,
+      "message": "I\u0027m abandoning this for now, after filing https://github.com/cue-lang/cue/issues/2687 as a placeholder.",
+      "revId": "750b00d29d30b9d9853a6144c9d9f233ad22f0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "177fdac6_e2fce178",

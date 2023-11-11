@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0823e45c_72c11a58",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-11T17:22:23Z",
+      "side": 1,
+      "message": "Making more changes to third_party/yaml is not ideal, but I\u0027m not entirely opposed to it if it is the simplest solution. As long as we have a regression test, we can be sure we don\u0027t reintroduce the bug in the future.\n\nThat said, this doesn\u0027t seem like an entirely right fix; see the comments below. Is it possible that you also need to tweak how the yaml decoder positions advance line numbers?",
+      "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c1d4bf1_d30b6c90",
+        "filename": "cmd/cue/cmd/testdata/script/issue826.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-11T17:22:23Z",
+      "side": 1,
+      "message": "add a brief comment at the top of this testscript to summarize why we added this test, like:\n\n```\n# Importing YAML with multi-byte characters as CUE resulted in bad formatting\n# since the YAML decoder would count columns by characters and we count by bytes.\n```\n\nparticularly important since we\u0027ll want to either update or replace third_party/yaml at some point, so any changes made there like your fix will need to be retraced - so looking at this test and seeing a reminder will help.",
+      "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bfd8a3d_c214eb74",
+        "filename": "cmd/cue/cmd/testdata/script/vet_expr.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-11T17:22:23Z",
+      "side": 1,
+      "message": "this also seems like a bug; the `skip` field begins at the start of a line, so `1` was right.",
+      "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7281ca93_c9df842d",
+        "filename": "cmd/cue/cmd/testdata/script/vet_file.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-11T17:22:23Z",
+      "side": 1,
+      "message": "this seems like a regression. the position of `false` in the line `lang: false` is line 13, byte (column) offset 11.",
+      "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

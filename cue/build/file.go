@@ -66,10 +66,11 @@ const (
 	// the info.title and info.version fields.
 	//
 	// In all other cases, the underlying data is interpreted as is.
-	Auto         Interpretation = "auto"
-	JSONSchema   Interpretation = "jsonschema"
-	OpenAPI      Interpretation = "openapi"
-	ProtobufJSON Interpretation = "pb"
+	Auto                     Interpretation = "auto"
+	JSONSchema               Interpretation = "jsonschema"
+	OpenAPI                  Interpretation = "openapi"
+	ProtobufJSON             Interpretation = "pb"
+	CustomResourceDefinition Interpretation = "crd"
 )
 
 // A Form specifies the form in which a program should be represented.

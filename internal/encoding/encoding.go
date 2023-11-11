@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/crd"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/openapi"
@@ -224,6 +225,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	case build.ProtobufJSON:
 		i.interpretation = build.ProtobufJSON
 		i.rewriteFunc = protobufJSONFunc(cfg, f)
+	case build.CustomResourceDefinition:
+		i.interpretation = build.CustomResourceDefinition
+		i.rewriteFunc = customResourceDefinitionFunc(cfg, f)
 	default:
 		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}
@@ -321,6 +325,16 @@ func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
 				"no schema specified for protobuf interpretation.")
 		}
 		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
+	}
+}
+
+func customResourceDefinitionFunc(c *Config, f *build.File) interpretFunc {
+	cfg := &crd.Config{PkgName: c.PkgName}
+	return func(i *cue.Instance) (file *ast.File, id string, err error) {
+		file, err = crd.Extract(i, cfg)
+		// TODO: simplify currently erases file line info. Reintroduce after fix.
+		// file, err = simplify(file, err)
+		return file, "", err
 	}
 }
 

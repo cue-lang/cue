@@ -198,8 +198,11 @@ func (sel Selector) PkgPath() string {
 }
 
 // Index returns the index of the selector. It panics
-// unless sel.Type is SelIndex.
+// unless sel.Type is IndexLabel.
 func (sel Selector) Index() int {
+	// Note that lists will eventually have constraint types too,
+	// and in that case sel.sel would be of type constraintSelector,
+	// causing the type assertion below to fail.
 	s, ok := sel.sel.(indexSelector)
 	if !ok {
 		panic("Index called on non-index selector")

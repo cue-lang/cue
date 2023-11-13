@@ -727,7 +727,11 @@ func TestList(t *testing.T) {
 			checkFatal(t, err, tc.err, "init")
 
 			buf := []byte{'['}
-			for l.Next() {
+			for wantIdx := 0; l.Next(); wantIdx++ {
+				// Ensure that we can get each index as well.
+				if got := l.Selector().Index(); got != wantIdx {
+					t.Errorf("Index got %v; want %v", got, wantIdx)
+				}
 				b, err := l.Value().MarshalJSON()
 				checkFatal(t, err, tc.err, "list.Value")
 				buf = append(buf, b...)

@@ -198,7 +198,7 @@ func (sel Selector) PkgPath() string {
 }
 
 // Index returns the index of the selector. It panics
-// unless sel.Type is SelIndex.
+// unless sel.Type is IndexLabel.
 func (sel Selector) Index() int {
 	s, ok := sel.sel.(indexSelector)
 	if !ok {

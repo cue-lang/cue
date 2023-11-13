@@ -8,11 +8,13 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/yaml"
 	"github.com/getkin/kin-openapi/openapi3"
+	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 )
 
 // Decoder generates CUE definitions from Kubernetes CRDs using the OpenAPI v3 spec.
@@ -98,8 +100,9 @@ func (imp *Decoder) fromYAML(b []byte) ([]*IntermediateCRD, error) {
 // having been converted from OpenAPI to CUE.
 type IntermediateCRD struct {
 	// The original unmodified CRD YAML, after conversion to a cue.Value.
-	Original cue.Value
-	Props    struct {
+	Original      cue.Value
+	Props         *v1.CustomResourceDefinition
+	internalProps struct {
 		Spec struct {
 			Group string `json:"group"`
 			Names struct {
@@ -131,7 +134,13 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 		Schemas: make([]VersionedSchema, 0),
 	}
 
-	err := crd.Decode(&cc.Props)
+	var err error
+	cc.Props, err = UnmarshalOne(crd)
+	if err != nil {
+		return nil, fmt.Errorf("error decoding crd props into Go struct: %w", err)
+	}
+
+	err = crd.Decode(&cc.internalProps)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding crd props into Go struct: %w", err)
 	}
@@ -245,11 +254,19 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 			return nil
 		}
 
+		extensions, err := exts(ctx, defpath, *cc.Props.Spec.Versions[0].Schema.OpenAPIV3Schema)
+		if err != nil {
+			return nil, err
+		}
+
 		// Have to prepend with the defpath where the CUE CRD representation
 		// lives because the astutil walker to remove ellipses operates over the
 		// whole file, and therefore will be looking for full paths, extending
 		// all the way to the file root
 		err = walkfn(defpath.Selectors(), rootosch)
+		if err != nil {
+			return nil, err
+		}
 
 		// First pass of astutil.Apply to remove ellipses for fields not marked with x-kubernetes-embedded-resource: true
 		// Note that this implementation is only correct for CUE inputs that do not contain references.
@@ -389,4 +406,49 @@ func parentPath(c astutil.Cursor) (cue.Selector, astutil.Cursor) {
 	}
 
 	return cue.Selector{}, nil
+}
+
+// exts preserves k8s OpenAPI extensions as attributes
+func exts(ctx *cue.Context, path cue.Path, props v1.JSONSchemaProps) (cue.Value, error) {
+	extensions := cue.Value{}
+
+	if props.XPreserveUnknownFields != nil {
+		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-preserve-unknown-fields"=%t)`, *props.XPreserveUnknownFields)))
+	}
+
+	if props.XEmbeddedResource {
+		extensions = extensions.FillPath(path, ctx.CompileString(`@k8s("x-kubernetes-embedded-resource"=true)`))
+	}
+
+	if props.XIntOrString {
+		extensions = extensions.FillPath(path, ctx.CompileString(`@k8s("x-kubernetes-int-or-string"=true)`))
+	}
+
+	if len(props.XListMapKeys) > 0 {
+		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-list-map-keys"=["%s"])`, strings.Join(props.XListMapKeys, `", "`))))
+	}
+
+	if props.XListType != nil {
+		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-list-type"="%s")`, *props.XListType)))
+	}
+
+	if props.XMapType != nil {
+		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-map-type"="%s")`, *props.XMapType)))
+	}
+
+	if len(props.XValidations) > 0 {
+		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-validations"="%s")`, cuecontext.New().Encode(props.XValidations))))
+	}
+
+	for name, subProp := range props.Properties {
+		subExtensions, err := exts(ctx, cue.MakePath(cue.Str(name)), subProp)
+		if err != nil {
+			return extensions, err
+		}
+
+		// Merge subextensions at this level
+		extensions = extensions.FillPath(path, subExtensions)
+	}
+
+	return extensions, nil
 }

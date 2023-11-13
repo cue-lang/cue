@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "946bacdf_f9b9c3c9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-11-13T14:37:19Z",
+      "side": 1,
+      "message": "Note that lists will eventually have constraint types too. If you can think of strategic places to put a comment to remind us of that I would add them now.",
+      "revId": "3e2d5a903587c13b3a3714df55243ca6c817ae18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

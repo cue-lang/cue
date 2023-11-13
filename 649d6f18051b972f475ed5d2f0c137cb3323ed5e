@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d601bc2_7dcd56b3",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 931,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-11-13T11:00:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "596983bd_58332cba",
+      "revId": "649d6f18051b972f475ed5d2f0c137cb3323ed5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "66d59992_6564b740",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-08-25T13:37:37Z",
       "side": 1,
       "message": "it\u0027s not clear why this is a noop change; explain why in the commit message?",
+      "revId": "649d6f18051b972f475ed5d2f0c137cb3323ed5e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffafd69c_ab60b12d",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 812,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-11-13T11:00:01Z",
+      "side": 1,
+      "message": "I actually removed this, as this is not correct.",
+      "parentUuid": "66d59992_6564b740",
       "revId": "649d6f18051b972f475ed5d2f0c137cb3323ed5e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

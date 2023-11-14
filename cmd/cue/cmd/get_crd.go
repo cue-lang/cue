@@ -15,8 +15,12 @@
 package cmd
 
 import (
-	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/load"
+	"os"
+	"path/filepath"
+	"strings"
+
+	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/encoding/crd"
 	"github.com/spf13/cobra"
 )
 
@@ -50,23 +54,33 @@ CustomResourceDefinitions are converted to cue structs adhering to the following
 	- The @x-kubernetes-validation attribute is added if the field utilizes the "x-kubernetes-validation" extension.
 `,
 
-		RunE: mkRunE(c, extract),
+		RunE: mkRunE(c, runGetCRD),
 	}
 
 	return cmd
 }
 
 func runGetCRD(cmd *Command, args []string) error {
-	c := &config{
-		fileFilter:     `\.(json|yaml|yml|jsonl|ldjson)$`,
-		interpretation: build.CustomResourceDefinition,
-		encoding:       "yaml",
-		loadCfg:        &load.Config{DataFiles: true},
-	}
+	decoder := crd.NewDecoder(cuecontext.New(), "cue get crd "+strings.Join(args, " "))
 
-	p, err := newBuildPlan(cmd, c)
+	data, err := os.ReadFile(args[0])
 	if err != nil {
 		return err
+	}
+
+	defs, err := decoder.Generate(data)
+	if err != nil {
+		return err
+	}
+
+	for path, crd := range defs {
+		if err = os.MkdirAll(path, 0644); err != nil {
+			return err
+		}
+
+		if err = os.WriteFile(filepath.Join(path, "types_gen.cue"), crd, 0644); err != nil {
+			return err
+		}
 	}
 
 	return nil

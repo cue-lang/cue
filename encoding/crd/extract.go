@@ -212,6 +212,9 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 					}
 				`, cc.Props.Spec.Group, ver, kname, nsConstraint)))
 
+		// Add x-kubernetes-* OpenAPI extensions as attributes
+		sch = sch.FillPath(defpath, exts(ctx, defpath, *cc.Props.Spec.Versions[i].Schema.OpenAPIV3Schema))
+
 		// now, go back to an AST because it's easier to manipulate references there
 		var schast *ast.File
 		switch x := sch.Syntax(cue.All(), cue.Docs(true)).(type) {
@@ -252,11 +255,6 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 			}
 
 			return nil
-		}
-
-		extensions, err := exts(ctx, defpath, *cc.Props.Spec.Versions[0].Schema.OpenAPIV3Schema)
-		if err != nil {
-			return nil, err
 		}
 
 		// Have to prepend with the defpath where the CUE CRD representation
@@ -409,7 +407,7 @@ func parentPath(c astutil.Cursor) (cue.Selector, astutil.Cursor) {
 }
 
 // exts preserves k8s OpenAPI extensions as attributes
-func exts(ctx *cue.Context, path cue.Path, props v1.JSONSchemaProps) (cue.Value, error) {
+func exts(ctx *cue.Context, path cue.Path, props v1.JSONSchemaProps) cue.Value {
 	extensions := cue.Value{}
 
 	if props.XPreserveUnknownFields != nil {
@@ -441,14 +439,9 @@ func exts(ctx *cue.Context, path cue.Path, props v1.JSONSchemaProps) (cue.Value,
 	}
 
 	for name, subProp := range props.Properties {
-		subExtensions, err := exts(ctx, cue.MakePath(cue.Str(name)), subProp)
-		if err != nil {
-			return extensions, err
-		}
-
-		// Merge subextensions at this level
-		extensions = extensions.FillPath(path, subExtensions)
+		// Recursively add subextensions for each property
+		extensions = extensions.FillPath(path, exts(ctx, cue.MakePath(cue.Str(name)), subProp))
 	}
 
-	return extensions, nil
+	return extensions
 }

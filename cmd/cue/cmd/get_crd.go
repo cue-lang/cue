@@ -68,7 +68,7 @@ func runGetCRD(cmd *Command, args []string) error {
 		return err
 	}
 
-	crds, err := decoder.Generate(data)
+	crds, err := decoder.Decode(data)
 	if err != nil {
 		return err
 	}

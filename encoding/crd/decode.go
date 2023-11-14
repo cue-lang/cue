@@ -30,10 +30,10 @@ func NewDecoder(ctx *cue.Context, header string) *Decoder {
 	}
 }
 
-// Generate takes a multi-doc YAML containing Kubernetes CRDs and returns the CUE definitions
+// Decode takes a multi-doc YAML containing Kubernetes CRDs and returns the CUE definitions
 // generated from the OpenAPI spec. The resulting key value pairs, contain a unique identifier
 // in the format `<group>/<kind>/<version>` and the contents of the CUE definition.
-func (imp *Decoder) Generate(crdData []byte) (map[string][]byte, error) {
+func (imp *Decoder) Decode(crdData []byte) (map[string][]byte, error) {
 	result := make(map[string][]byte)
 
 	crds, err := imp.fromYAML(crdData)

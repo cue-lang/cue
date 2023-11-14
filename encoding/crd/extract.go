@@ -99,20 +99,10 @@ func (imp *Decoder) fromYAML(b []byte) ([]*IntermediateCRD, error) {
 // having been converted from OpenAPI to CUE.
 type IntermediateCRD struct {
 	// The original unmodified CRD YAML, after conversion to a cue.Value.
-	Original      cue.Value
-	Props         *v1.CustomResourceDefinition
-	internalProps struct {
-		Spec struct {
-			Group string `json:"group"`
-			Names struct {
-				Kind     string `json:"kind"`
-				ListKind string `json:"listKind"`
-				Plural   string `json:"plural"`
-				Singular string `json:"singular"`
-			} `json:"names"`
-			Scope string `json:"scope"`
-		} `json:"spec"`
-	}
+	Original cue.Value
+
+	// Object form of CRD, decoded by k8s decoder
+	Props *v1.CustomResourceDefinition
 
 	// All the schemas in the original CRD, converted to CUE representation.
 	Schemas []VersionedSchema
@@ -139,10 +129,6 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 		return nil, fmt.Errorf("error decoding crd props into Go struct: %w", err)
 	}
 
-	err = crd.Decode(&cc.internalProps)
-	if err != nil {
-		return nil, fmt.Errorf("error decoding crd props into Go struct: %w", err)
-	}
 	// shorthand
 	kname := cc.Props.Spec.Names.Kind
 
@@ -258,6 +244,11 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 		// It is safe to use in this context because CRDs already have that invariant.
 		var stack []ast.Node
 		var pathstack []cue.Selector
+
+		ast.Walk(schast, func(n ast.Node) bool {
+			fmt.Printf("n: %v\n", n)
+			return true
+		}, nil)
 
 		astutil.Apply(schast, func(c astutil.Cursor) bool {
 			// Skip the root
@@ -415,78 +406,7 @@ const (
 	XListType              XExtensionAttr = "listType"
 	XMapType               XExtensionAttr = "mapType"
 	XValidations           XExtensionAttr = "validations"
-	// XPreserveUnknownFields XExtensionAttr = "x-kubernetes-preserve-unknown-fields"
-	// XEmbeddedResource      XExtensionAttr = "x-kubernetes-embedded-resource"
-	// XIntOrString           XExtensionAttr = "x-kubernetes-int-or-string"
-	// XListMapKeys           XExtensionAttr = "x-kubernetes-list-map-keys"
-	// XListType              XExtensionAttr = "x-kubernetes-list-type"
-	// XMapType               XExtensionAttr = "x-kubernetes-map-type"
-	// XValidations           XExtensionAttr = "x-kubernetes-validations"
 )
-
-// exts preserves k8s OpenAPI extensions as attributes
-func exts(path []cue.Selector, prop v1.JSONSchemaProps) map[string]map[XExtensionAttr]any {
-	extensions := map[string]map[XExtensionAttr]any{}
-
-	pathKey := cue.MakePath(path...).String()
-
-	addExt := func(name XExtensionAttr, value any) {
-		if extensions[pathKey] == nil {
-			extensions[pathKey] = map[XExtensionAttr]any{}
-		}
-
-		extensions[pathKey][name] = value
-	}
-
-	if prop.XPreserveUnknownFields != nil {
-		addExt(XPreserveUnknownFields, *prop.XPreserveUnknownFields)
-		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-preserve-unknown-fields"=%t)`, *prop.XPreserveUnknownFields)
-	}
-
-	if prop.XEmbeddedResource {
-		addExt(XEmbeddedResource, prop.XEmbeddedResource)
-		// extensions[pathKey] = `@crd("x-kubernetes-embedded-resource"=true)`
-	}
-
-	if prop.XIntOrString {
-		addExt(XIntOrString, prop.XIntOrString)
-		// extensions[pathKey] = `@crd("x-kubernetes-int-or-string"=true)`
-	}
-
-	if len(prop.XListMapKeys) > 0 {
-		addExt(XListMapKeys, fmt.Sprintf(`@crd("x-kubernetes-list-map-keys"=["%s"])`, strings.Join(prop.XListMapKeys, `", "`)))
-		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-list-map-keys"=["%s"])`, strings.Join(prop.XListMapKeys, `", "`))
-	}
-
-	if prop.XListType != nil {
-		addExt(XListType, *prop.XListType)
-		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-list-type"="%s")`, *prop.XListType)
-	}
-
-	if prop.XMapType != nil {
-		addExt(XMapType, *prop.XMapType)
-		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-map-type"="%s")`, *prop.XMapType)
-	}
-
-	if len(prop.XValidations) > 0 {
-		vals, err := json.Marshal(prop.XValidations)
-		if err != nil {
-			panic(err)
-		}
-		addExt(XValidations, string(vals))
-		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-validations"="%s")`, string(vals))
-	}
-
-	for name, nextProp := range prop.Properties {
-		// Recursively add subextensions for each property\
-		subExts := exts(append(path, cue.Str(name)), nextProp)
-		for key, val := range subExts {
-			extensions[key] = val
-		}
-	}
-
-	return extensions
-}
 
 // Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
 func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) map[string]ast.Attribute {

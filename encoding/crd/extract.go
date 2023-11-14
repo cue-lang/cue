@@ -473,7 +473,7 @@ func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) []struc
 			attr: &ast.Attribute{Text: attrText},
 		})
 
-		fmt.Println(cue.MakePath(path...).String() + ": " + attrText)
+		// fmt.Println(cue.MakePath(path...).String() + ": " + attrText)
 	}
 
 	for nextPath := range prop.Properties {

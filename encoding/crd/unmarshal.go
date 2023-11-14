@@ -5,7 +5,6 @@ import (
 	"os"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/encoding/yaml"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 	"k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/scheme"
@@ -20,7 +19,7 @@ var (
 
 // Unmarshals a YAML file containing one or more CustomResourceDefinitions
 // into a list of CRD objects
-func UnmarshalFile(filename string) ([]*v1.CustomResourceDefinition, error) {
+func UnmarshalFile(ctx *cue.Context, filename string) ([]*v1.CustomResourceDefinition, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -31,7 +30,7 @@ func UnmarshalFile(filename string) ([]*v1.CustomResourceDefinition, error) {
 	if err != nil {
 		return nil, fmt.Errorf("input is not valid yaml: %w", err)
 	}
-	crdv := cuecontext.New().BuildFile(yf)
+	crdv := ctx.BuildFile(yf)
 
 	return Unmarshal(crdv)
 }

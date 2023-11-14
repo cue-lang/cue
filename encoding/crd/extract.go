@@ -1,6 +1,7 @@
 package crd
 
 import (
+	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -8,12 +9,10 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/yaml"
-	"github.com/getkin/kin-openapi/openapi3"
 	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 )
 
@@ -212,9 +211,6 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 					}
 				`, cc.Props.Spec.Group, ver, kname, nsConstraint)))
 
-		// Add x-kubernetes-* OpenAPI extensions as attributes
-		sch = sch.FillPath(defpath, exts(ctx, defpath, *cc.Props.Spec.Versions[i].Schema.OpenAPIV3Schema))
-
 		// now, go back to an AST because it's easier to manipulate references there
 		var schast *ast.File
 		switch x := sch.Syntax(cue.All(), cue.Docs(true)).(type) {
@@ -226,30 +222,21 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 			panic("unreachable")
 		}
 
+		// rootosch is a shortcut to this version's schema
+		rootosch := *cc.Props.Spec.Versions[i-1].Schema.OpenAPIV3Schema
+
+		// construct a map of all paths using x-kubernetes-* OpenAPI extensions
+		extAttrs := xKubernetesAttributes(defpath.Selectors(), rootosch)
+
 		// construct a map of all the paths that have x-kubernetes-embedded-resource: true defined
-		yodoc, err := yaml.Encode(doc)
-		if err != nil {
-			return nil, fmt.Errorf("error encoding intermediate openapi doc to yaml bytes: %w", err)
-		}
-		odoc, err := openapi3.NewLoader().LoadFromData(yodoc)
-		if err != nil {
-			return nil, fmt.Errorf("could not load openapi3 document for version %s: %w", ver, err)
-		}
-
 		preserve := make(map[string]bool)
-		var rootosch *openapi3.Schema
-		if rref, has := odoc.Components.Schemas[kname]; !has {
-			return nil, fmt.Errorf("could not find root schema for version %s at expected path components.schemas.%s", ver, kname)
-		} else {
-			rootosch = rref.Value
-		}
-
-		var walkfn func(path []cue.Selector, sch *openapi3.Schema) error
-		walkfn = func(path []cue.Selector, sch *openapi3.Schema) error {
-			_, has := sch.Extensions["x-kubernetes-preserve-unknown-fields"]
-			preserve[cue.MakePath(path...).String()] = has
-			for name, prop := range sch.Properties {
-				if err := walkfn(append(path, cue.Str(name)), prop.Value); err != nil {
+		var walkfn func(path []cue.Selector, sch v1.JSONSchemaProps) error
+		walkfn = func(path []cue.Selector, sch v1.JSONSchemaProps) error {
+			if sch.XPreserveUnknownFields != nil {
+				preserve[cue.MakePath(path...).String()] = *sch.XPreserveUnknownFields
+			}
+			for name, nextProp := range sch.Properties {
+				if err := walkfn(append(path, cue.Str(name)), nextProp); err != nil {
 					return err
 				}
 			}
@@ -271,6 +258,7 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 		// It is safe to use in this context because CRDs already have that invariant.
 		var stack []ast.Node
 		var pathstack []cue.Selector
+
 		astutil.Apply(schast, func(c astutil.Cursor) bool {
 			// Skip the root
 			if c.Parent() == nil {
@@ -292,7 +280,9 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 				}
 				stack = append(stack[:i], pc.Node())
 				pathstack = append(pathstack[:i], psel)
-				if !preserve[cue.MakePath(pathstack...).String()] {
+				pathKey := cue.MakePath(pathstack...).String()
+
+				if !preserve[pathKey] {
 					newlist := make([]ast.Decl, 0, len(x.Elts))
 					for _, elt := range x.Elts {
 						if _, is := elt.(*ast.Ellipsis); !is {
@@ -301,6 +291,15 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 					}
 					x.Elts = newlist
 				}
+
+				if attr, ok := extAttrs[pathKey]; ok {
+					x.Elts = append(x.Elts, &attr)
+				}
+				// TODO: how do I get the path for this case?
+				// case *ast.Field:
+				// 	if attr, ok := extAttrs[pathKey]; ok {
+				// 		x.Attrs = append(x.Attrs, &attr)
+				// 	}
 			}
 			return true
 		}, nil)
@@ -406,41 +405,141 @@ func parentPath(c astutil.Cursor) (cue.Selector, astutil.Cursor) {
 	return cue.Selector{}, nil
 }
 
+type XExtensionAttr string
+
+const (
+	XPreserveUnknownFields XExtensionAttr = "preserveUnknownFields"
+	XEmbeddedResource      XExtensionAttr = "embeddedResource"
+	XIntOrString           XExtensionAttr = "intOrString"
+	XListMapKeys           XExtensionAttr = "listMapKeys"
+	XListType              XExtensionAttr = "listType"
+	XMapType               XExtensionAttr = "mapType"
+	XValidations           XExtensionAttr = "validations"
+	// XPreserveUnknownFields XExtensionAttr = "x-kubernetes-preserve-unknown-fields"
+	// XEmbeddedResource      XExtensionAttr = "x-kubernetes-embedded-resource"
+	// XIntOrString           XExtensionAttr = "x-kubernetes-int-or-string"
+	// XListMapKeys           XExtensionAttr = "x-kubernetes-list-map-keys"
+	// XListType              XExtensionAttr = "x-kubernetes-list-type"
+	// XMapType               XExtensionAttr = "x-kubernetes-map-type"
+	// XValidations           XExtensionAttr = "x-kubernetes-validations"
+)
+
 // exts preserves k8s OpenAPI extensions as attributes
-func exts(ctx *cue.Context, path cue.Path, props v1.JSONSchemaProps) cue.Value {
-	extensions := cue.Value{}
+func exts(path []cue.Selector, prop v1.JSONSchemaProps) map[string]map[XExtensionAttr]any {
+	extensions := map[string]map[XExtensionAttr]any{}
 
-	if props.XPreserveUnknownFields != nil {
-		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-preserve-unknown-fields"=%t)`, *props.XPreserveUnknownFields)))
+	pathKey := cue.MakePath(path...).String()
+
+	addExt := func(name XExtensionAttr, value any) {
+		if extensions[pathKey] == nil {
+			extensions[pathKey] = map[XExtensionAttr]any{}
+		}
+
+		extensions[pathKey][name] = value
 	}
 
-	if props.XEmbeddedResource {
-		extensions = extensions.FillPath(path, ctx.CompileString(`@k8s("x-kubernetes-embedded-resource"=true)`))
+	if prop.XPreserveUnknownFields != nil {
+		addExt(XPreserveUnknownFields, *prop.XPreserveUnknownFields)
+		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-preserve-unknown-fields"=%t)`, *prop.XPreserveUnknownFields)
 	}
 
-	if props.XIntOrString {
-		extensions = extensions.FillPath(path, ctx.CompileString(`@k8s("x-kubernetes-int-or-string"=true)`))
+	if prop.XEmbeddedResource {
+		addExt(XEmbeddedResource, prop.XEmbeddedResource)
+		// extensions[pathKey] = `@crd("x-kubernetes-embedded-resource"=true)`
 	}
 
-	if len(props.XListMapKeys) > 0 {
-		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-list-map-keys"=["%s"])`, strings.Join(props.XListMapKeys, `", "`))))
+	if prop.XIntOrString {
+		addExt(XIntOrString, prop.XIntOrString)
+		// extensions[pathKey] = `@crd("x-kubernetes-int-or-string"=true)`
 	}
 
-	if props.XListType != nil {
-		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-list-type"="%s")`, *props.XListType)))
+	if len(prop.XListMapKeys) > 0 {
+		addExt(XListMapKeys, fmt.Sprintf(`@crd("x-kubernetes-list-map-keys"=["%s"])`, strings.Join(prop.XListMapKeys, `", "`)))
+		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-list-map-keys"=["%s"])`, strings.Join(prop.XListMapKeys, `", "`))
 	}
 
-	if props.XMapType != nil {
-		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-map-type"="%s")`, *props.XMapType)))
+	if prop.XListType != nil {
+		addExt(XListType, *prop.XListType)
+		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-list-type"="%s")`, *prop.XListType)
 	}
 
-	if len(props.XValidations) > 0 {
-		extensions = extensions.FillPath(path, ctx.CompileString(fmt.Sprintf(`@k8s("x-kubernetes-validations"="%s")`, cuecontext.New().Encode(props.XValidations))))
+	if prop.XMapType != nil {
+		addExt(XMapType, *prop.XMapType)
+		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-map-type"="%s")`, *prop.XMapType)
 	}
 
-	for name, subProp := range props.Properties {
-		// Recursively add subextensions for each property
-		extensions = extensions.FillPath(path, exts(ctx, cue.MakePath(cue.Str(name)), subProp))
+	if len(prop.XValidations) > 0 {
+		vals, err := json.Marshal(prop.XValidations)
+		if err != nil {
+			panic(err)
+		}
+		addExt(XValidations, string(vals))
+		// extensions[pathKey] = fmt.Sprintf(`@crd("x-kubernetes-validations"="%s")`, string(vals))
+	}
+
+	for name, nextProp := range prop.Properties {
+		// Recursively add subextensions for each property\
+		subExts := exts(append(path, cue.Str(name)), nextProp)
+		for key, val := range subExts {
+			extensions[key] = val
+		}
+	}
+
+	return extensions
+}
+
+// Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
+func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) map[string]ast.Attribute {
+	extensions := map[string]ast.Attribute{}
+
+	pathKey := cue.MakePath(path...).String()
+
+	attrBody := []string{}
+	addAttr := func(key XExtensionAttr, val string) {
+		attrBody = append(attrBody, fmt.Sprintf("%s=%s", key, val))
+	}
+
+	if prop.XPreserveUnknownFields != nil {
+		addAttr(XPreserveUnknownFields, fmt.Sprintf("%t", *prop.XPreserveUnknownFields))
+	}
+
+	if prop.XEmbeddedResource {
+		addAttr(XEmbeddedResource, fmt.Sprintf("%t", *prop.XPreserveUnknownFields))
+	}
+
+	if prop.XIntOrString {
+		addAttr(XIntOrString, fmt.Sprintf("%t", *prop.XPreserveUnknownFields))
+	}
+
+	if len(prop.XListMapKeys) > 0 {
+		addAttr(XListMapKeys, fmt.Sprintf(`["%s"])`, strings.Join(prop.XListMapKeys, `", "`)))
+	}
+
+	if prop.XListType != nil {
+		addAttr(XListType, fmt.Sprintf("%q", *prop.XListType))
+	}
+
+	if prop.XMapType != nil {
+		addAttr(XMapType, fmt.Sprintf("%q", *prop.XMapType))
+	}
+
+	if len(prop.XValidations) > 0 {
+		vals, err := json.Marshal(prop.XValidations)
+		if err != nil {
+			panic(err)
+		}
+		addAttr(XValidations, `"`+string(vals)+`"`)
+	}
+
+	attrText := fmt.Sprintf("@%s(%s)", "xKubernetes", strings.Join(attrBody, ", "))
+	extensions[pathKey] = ast.Attribute{Text: attrText}
+
+	for name, nextProp := range prop.Properties {
+		// Recursively add subextensions for each property\
+		subExts := xKubernetesAttributes(append(path, cue.Str(name)), nextProp)
+		for key, val := range subExts {
+			extensions[key] = val
+		}
 	}
 
 	return extensions

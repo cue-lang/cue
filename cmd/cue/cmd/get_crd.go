@@ -16,10 +16,10 @@ package cmd
 
 import (
 	"os"
-	"path/filepath"
+	"path"
+	"sort"
 	"strings"
 
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/encoding/crd"
 	"github.com/spf13/cobra"
 )
@@ -61,24 +61,32 @@ CustomResourceDefinitions are converted to cue structs adhering to the following
 }
 
 func runGetCRD(cmd *Command, args []string) error {
-	decoder := crd.NewDecoder(cuecontext.New(), "cue get crd "+strings.Join(args, " "))
+	decoder := crd.NewDecoder(cmd.ctx, "// cue get crd "+strings.Join(args, " "))
 
 	data, err := os.ReadFile(args[0])
 	if err != nil {
 		return err
 	}
 
-	defs, err := decoder.Generate(data)
+	crds, err := decoder.Generate(data)
 	if err != nil {
 		return err
 	}
 
-	for path, crd := range defs {
-		if err = os.MkdirAll(path, 0644); err != nil {
+	// Sort the resulting definitions based on file names.
+	keys := make([]string, 0, len(crds))
+	for k := range crds {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+
+	for _, k := range keys {
+		dstDir := path.Join("cue.mod", "gen", k)
+		if err := os.MkdirAll(dstDir, os.ModePerm); err != nil {
 			return err
 		}
 
-		if err = os.WriteFile(filepath.Join(path, "types_gen.cue"), crd, 0644); err != nil {
+		if err := os.WriteFile(path.Join(dstDir, "types_gen.cue"), crds[k], 0644); err != nil {
 			return err
 		}
 	}

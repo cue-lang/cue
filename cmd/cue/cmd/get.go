@@ -47,6 +47,6 @@ per language and are documented in the respective subcommands.
 			return nil
 		}),
 	}
-	cmd.AddCommand(newGoCmd(c))
+	cmd.AddCommand(newGoCmd(c), newCrdCmd(c))
 	return cmd
 }

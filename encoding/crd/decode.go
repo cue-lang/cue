@@ -477,9 +477,24 @@ func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) []struc
 	}
 
 	for nextPath := range prop.Properties {
-		// Recursively add subextensions for each property\
+		// Recursively add subextensions for each property
 		subExts := xKubernetesAttributes(append(path, cue.Str(nextPath)), prop.Properties[nextPath])
 		extensions = append(extensions, subExts...)
+	}
+
+	// TODO: array does not work right, see https://github.com/istio/istio/blob/0d5f530188dfe571bf0d8f515618ba99a0dc3e6c/manifests/charts/base/crds/crd-all.gen.yaml#L188
+	if prop.Type == "array" {
+		if len(prop.Items.JSONSchemas) > 0 {
+			for _, nextProp := range prop.Items.JSONSchemas {
+				// Recursively add subextensions for each property
+				subExts := xKubernetesAttributes(append(path, cue.AnyIndex), nextProp)
+				extensions = append(extensions, subExts...)
+			}
+		} else {
+			// Recursively add subextensions for each property
+			subExts := xKubernetesAttributes(append(path, cue.AnyIndex), *prop.Items.Schema)
+			extensions = append(extensions, subExts...)
+		}
 	}
 
 	return extensions

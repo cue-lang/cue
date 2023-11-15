@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df5f205_44d40b9c",
+        "filename": "cmd/cue/cmd/testdata/script/issue826.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-15T17:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0c1d4bf1_d30b6c90",
+      "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bfd8a3d_c214eb74",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d3d475c_f5237a0c",
+        "filename": "cmd/cue/cmd/testdata/script/vet_expr.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-15T17:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3bfd8a3d_c214eb74",
+      "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7281ca93_c9df842d",
@@ -65,6 +101,24 @@
       "writtenOn": "2023-11-11T17:22:23Z",
       "side": 1,
       "message": "this seems like a regression. the position of `false` in the line `lang: false` is line 13, byte (column) offset 11.",
+      "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0e1b395_c495c540",
+        "filename": "cmd/cue/cmd/testdata/script/vet_file.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-15T17:40:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7281ca93_c9df842d",
       "revId": "76e7fa4b43758af36dc5de69827389c8bfab714e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

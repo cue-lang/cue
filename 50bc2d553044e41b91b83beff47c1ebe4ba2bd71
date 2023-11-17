@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "220a64b3_216bd691",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-17T17:19:25Z",
+      "side": 1,
+      "message": "You improved many positions and fixed a bug, and only seem to have regressed in one test. Overall that\u0027s good, although I\u0027d still prefer to not introduce any regressions. That said, the regression is in the YAML package itself, so I\u0027d be fine with leaving a TODO comment on the test case - supposedly it\u0027s not causing a direct bug in CUE.\n\nBy the way, I dug up where that `index + 1` logic comes from - turns out it\u0027s from Marcel\u0027s changes to the yaml library in 2019: https://review.gerrithub.io/c/cue-lang/cue/+/1172017\n\nSo I think our patching of the yaml library is a lot more extensive than I thought. It\u0027s entirely possible that he made a mistake here, and now the fact that positions are confusing and off-by-one in some cases make a lot more sense :) \n\nIf you have thoughts about how to undo the regression, we can look into it. If not, then please add a TODO that we \"broke\" that test on purpose while fixing that CUE bug, and I\u0027m fine with approving and merging.",
+      "revId": "50bc2d553044e41b91b83beff47c1ebe4ba2bd71",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "376277dc_13342d2b",
+        "filename": "internal/third_party/yaml/decode_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-17T17:19:25Z",
+      "side": 1,
+      "message": "I _think_ this is a regression, both because you joined the two list delimiters when they weren\u0027t before (I don\u0027t see a strong reason to do so), and because now we\u0027re leaving an empty line where there wasn\u0027t one before.",
+      "revId": "50bc2d553044e41b91b83beff47c1ebe4ba2bd71",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4570020_28c69da3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-11-17T12:27:56Z",
+      "side": 1,
+      "message": "LGTM but I think Marcel should probably sign off on whether the wording is appropriate.",
+      "revId": "2e8f29e82ed9349190c9e65f626c13721105f116",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

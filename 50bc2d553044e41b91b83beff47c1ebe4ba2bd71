@@ -51,6 +51,24 @@
       "message": "I _think_ this is a regression, both because you joined the two list delimiters when they weren\u0027t before (I don\u0027t see a strong reason to do so), and because now we\u0027re leaving an empty line where there wasn\u0027t one before.",
       "revId": "50bc2d553044e41b91b83beff47c1ebe4ba2bd71",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e988069_f84a98c3",
+        "filename": "internal/third_party/yaml/decode_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 553,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-17T20:26:07Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "376277dc_13342d2b",
+      "revId": "50bc2d553044e41b91b83beff47c1ebe4ba2bd71",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

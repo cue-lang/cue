@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1fef9e8_c9d56b08",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-17T20:26:07Z",
+      "side": 1,
+      "message": "I\u0027ve added the TODO comment as suggested. I don\u0027t see an obvious way to fix this regression at current, but I will think.",
+      "revId": "2f1f6c7bfdcb9fea6762836dfffaaabbdaa8ce4d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

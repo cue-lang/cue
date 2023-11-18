@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1da26a3f_544fe2ee",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021466
+      },
+      "writtenOn": "2023-11-18T15:21:59Z",
+      "side": 1,
+      "message": "I\u0027v actually resolved the regression and so have removed the TODO comment. Essentially position information for sequence end tokens was incorrect. For example, the regression showed the sequence end token was on the same line as the start token (which it isn\u0027t): `sequence start: 2:3, sequence end: 2:4`. The change fixes this incorrect position, and now shows the sequence end at the beginning of the next line: `sequence start: 2:3, sequence end: 3:1`.",
+      "revId": "143523666155036f74ad96fccedf04b1dd9cb246",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

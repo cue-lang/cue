@@ -514,85 +514,12 @@ func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) []struc
 	return extensions
 }
 
-// TODO: use internal.Attr if it can support writing attributes
-type attr struct {
-	name   string
-	fields []keyval
-}
-
-func (a attr) String() string {
-	fields := []string{}
-	for _, f := range a.fields {
-		fields = append(fields, f.String())
-	}
-	return fmt.Sprintf("@%s(%s)", a.name, strings.Join(fields, ", "))
-}
-
-func addAttr(field ast.Label, a attr) *ast.Field {
-	return &ast.Field{
-		Label: field,
-		Value: ast.NewIdent("_"),
-		Attrs: []*ast.Attribute{
-			{Text: a.String()},
-		},
-	}
-}
-
-type keyval struct {
-	key string
-	val string
-}
-
-func (kv keyval) String() string {
-	if kv.val != "" {
-		return kv.key + "=" + kv.val
-	}
-	return kv.key
-}
-
 // Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
 func mapAttributes(val cue.Value, prop v1.JSONSchemaProps) cue.Value {
-	a := attr{
-		name:   "crd",
-		fields: []keyval{},
-	}
-
-	attrBody := make([]string, 0)
-	appendField := func(key XExtensionAttr, val string) {
-		a.fields = append(a.fields, keyval{key: string(key), val: val})
-		attrBody = append(attrBody, fmt.Sprintf("%s=%s", key, val))
-	}
-
-	if prop.XPreserveUnknownFields != nil {
-		appendField(XPreserveUnknownFields, fmt.Sprintf("%t", *prop.XPreserveUnknownFields))
-	}
-
-	if prop.XEmbeddedResource {
-		appendField(XEmbeddedResource, fmt.Sprintf("%t", prop.XEmbeddedResource))
-	}
-
-	if prop.XIntOrString {
-		appendField(XIntOrString, fmt.Sprintf("%t", prop.XIntOrString))
-	}
-
-	if len(prop.XListMapKeys) > 0 {
-		appendField(XListMapKeys, fmt.Sprint(val.Context().Encode(prop.XListMapKeys)))
-	}
-
-	if prop.XListType != nil {
-		appendField(XListType, fmt.Sprintf("%q", *prop.XListType))
-	}
-
-	if prop.XMapType != nil {
-		appendField(XMapType, fmt.Sprintf("%q", *prop.XMapType))
-	}
-
-	if len(prop.XValidations) > 0 {
-		appendField(XValidations, fmt.Sprint(val.Context().Encode(prop.XValidations)))
-	}
-
-	if len(a.fields) > 0 {
-		attr := &ast.Attribute{Text: a.String()}
+	attr := xk8sattr(*val.Context(), prop)
+	if attr != nil {
+		_, p := val.ReferencePath()
+		fmt.Println(p.String() + ": " + attr.Text)
 		node := val.Source()
 		switch x := node.(type) {
 		case *ast.StructLit:
@@ -633,11 +560,13 @@ func mapAttributes(val cue.Value, prop v1.JSONSchemaProps) cue.Value {
 				val = val.FillPath(nextVal.Path(), mapAttributes(nextVal, prop.Items.JSONSchemas[i]))
 			}
 		} else {
-			if val.Allows(cue.AnyIndex) {
-				anyIndex := cue.MakePath(cue.AnyIndex)
-				nextVal := mapAttributes(val.LookupPath(anyIndex), *prop.Items.Schema)
-				val = val.FillPath(anyIndex, nextVal)
-			}
+			// if val.Allows(cue.AnyIndex) {
+			anyIndex := cue.MakePath(cue.AnyIndex)
+			nextVal := mapAttributes(val.LookupPath(anyIndex), *prop.Items.Schema)
+			val = val.FillPath(anyIndex, nextVal)
+			// } else {
+			// 	fmt.Println("here")
+			// }
 
 			// Add attribute to the pattern constraint
 			// // Recursively add subextensions for each property
@@ -647,4 +576,77 @@ func mapAttributes(val cue.Value, prop v1.JSONSchemaProps) cue.Value {
 	}
 
 	return val
+}
+
+// TODO: use internal.Attr if it can support writing attributes
+type attr struct {
+	name   string
+	fields []keyval
+}
+
+func (a attr) String() string {
+	fields := []string{}
+	for _, f := range a.fields {
+		fields = append(fields, f.String())
+	}
+	return fmt.Sprintf("@%s(%s)", a.name, strings.Join(fields, ", "))
+}
+
+type keyval struct {
+	key string
+	val string
+}
+
+func (kv keyval) String() string {
+	if kv.val != "" {
+		return kv.key + "=" + kv.val
+	}
+	return kv.key
+}
+
+func xk8sattr(ctx cue.Context, prop v1.JSONSchemaProps) *ast.Attribute {
+	a := attr{
+		name:   "crd",
+		fields: []keyval{},
+	}
+
+	attrBody := make([]string, 0)
+	appendField := func(key XExtensionAttr, val string) {
+		a.fields = append(a.fields, keyval{key: string(key), val: val})
+		attrBody = append(attrBody, fmt.Sprintf("%s=%s", key, val))
+	}
+
+	if prop.XPreserveUnknownFields != nil {
+		appendField(XPreserveUnknownFields, fmt.Sprintf("%t", *prop.XPreserveUnknownFields))
+	}
+
+	if prop.XEmbeddedResource {
+		appendField(XEmbeddedResource, fmt.Sprintf("%t", prop.XEmbeddedResource))
+	}
+
+	if prop.XIntOrString {
+		appendField(XIntOrString, fmt.Sprintf("%t", prop.XIntOrString))
+	}
+
+	if len(prop.XListMapKeys) > 0 {
+		appendField(XListMapKeys, fmt.Sprint(ctx.Encode(prop.XListMapKeys)))
+	}
+
+	if prop.XListType != nil {
+		appendField(XListType, fmt.Sprintf("%q", *prop.XListType))
+	}
+
+	if prop.XMapType != nil {
+		appendField(XMapType, fmt.Sprintf("%q", *prop.XMapType))
+	}
+
+	if len(prop.XValidations) > 0 {
+		appendField(XValidations, fmt.Sprint(ctx.Encode(prop.XValidations)))
+	}
+
+	if len(a.fields) > 0 {
+		return &ast.Attribute{Text: a.String()}
+	}
+
+	return nil
 }

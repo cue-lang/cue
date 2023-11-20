@@ -44,7 +44,7 @@ func (i *interpreter) Kind() string {
 
 // NewCompiler returns a Wasm compiler that services the specified
 // build.Instance.
-func (i *interpreter) NewCompiler(b *build.Instance) (coreruntime.Compiler, errors.Error) {
+func (i *interpreter) NewCompiler(b *build.Instance, _ *coreruntime.Runtime) (coreruntime.Compiler, errors.Error) {
 	return &compiler{
 		b:         b,
 		instances: make(map[string]*instance),
@@ -64,7 +64,7 @@ type compiler struct {
 // Compile searches for a Wasm function described by the given `@extern`
 // attribute and returns it as an [adt.Builtin] with the given function
 // name.
-func (c *compiler) Compile(funcName string, a *internal.Attr) (*adt.Builtin, errors.Error) {
+func (c *compiler) Compile(funcName string, _ adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
 	file, err := fileName(a)
 	if err != nil {
 		return nil, errors.Promote(err, "invalid attribute")

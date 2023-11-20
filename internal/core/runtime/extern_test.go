@@ -19,6 +19,7 @@ import (
 	"strconv"
 	"testing"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -27,6 +28,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/value"
 )
 
 func Test(t *testing.T) {
@@ -56,17 +58,19 @@ type interpreterFake struct {
 
 func (i *interpreterFake) Kind() string { return "test" }
 
-func (i *interpreterFake) NewCompiler(b *build.Instance) (runtime.Compiler, errors.Error) {
+func (i *interpreterFake) NewCompiler(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
 	switch b.PkgName {
 	case "failinit":
 		return nil, errors.Newf(token.NoPos, "TEST: fail initialization")
 	case "nullinit":
 		return nil, nil
+	case "scopetest":
+		return newCompilerFake(b, r)
 	}
 	return i, nil
 }
 
-func (i *interpreterFake) Compile(funcName string, a *internal.Attr) (*adt.Builtin, errors.Error) {
+func (i *interpreterFake) Compile(funcName string, _ adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
 	if ok, _ := a.Flag(1, "fail"); ok {
 		return nil, errors.Newf(token.NoPos, "TEST: fail compilation")
 	}
@@ -93,4 +97,36 @@ func (i *interpreterFake) Compile(funcName string, a *internal.Attr) (*adt.Built
 		Params: []adt.Param{{Value: &adt.BasicType{K: adt.IntKind}}},
 		Result: adt.IntKind,
 	}, nil
+}
+
+type compilerFake struct {
+	runtime *runtime.Runtime
+	b       *build.Instance
+}
+
+func newCompilerFake(b *build.Instance, r *runtime.Runtime) (runtime.Compiler, errors.Error) {
+	return &compilerFake{
+		runtime: r,
+		b:       b,
+	}, nil
+}
+
+func (c *compilerFake) Compile(name string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
+	typStr, err := a.String(0)
+	if err != nil {
+		return nil, errors.Promote(err, "test")
+	}
+
+	call := &adt.CallExpr{Fun: &adt.Builtin{
+		Result: adt.TopKind,
+		Func: func(opctx *adt.OpContext, args []adt.Value) adt.Expr {
+			cuectx := (*cue.Context)(c.runtime)
+			scope := value.Make(opctx, scope)
+
+			typ := cuectx.CompileString(typStr, cue.Scope(scope))
+			_, ityp := value.ToInternal(typ)
+			return ityp
+		},
+	}}
+	return call, nil
 }

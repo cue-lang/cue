@@ -16,6 +16,24 @@
       "message": "Just thinking out loud, it is not correct for this to be a regular field. However, further nothing that this CL is not the place to address that, it is instead covered by the change which will adapt imported CUE to use required fields.",
       "revId": "0b305e8a22d62aaf9e1d6deed290b3107699699f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6810828d_af596e5f",
+        "filename": "encoding/protobuf/testdata/gateway.proto.out.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 208,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-20T13:15:10Z",
+      "side": 1,
+      "message": "Yep, we have the same issue in multiple decoders and importers, e.g. https://github.com/cue-lang/cue/issues/2678. I had the same thought as you :)",
+      "parentUuid": "bd789c0c_e49d1970",
+      "revId": "0b305e8a22d62aaf9e1d6deed290b3107699699f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

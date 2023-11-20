@@ -56,6 +56,7 @@ Retain: 0
 Unifications: 12
 Conjuncts:    35
 Disjuncts:    12
+Builtins:     0
 -- out/eval --
 Errors:
 c4: conflicting values 1.2 and int (mismatched types float and int):

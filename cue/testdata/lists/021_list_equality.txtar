@@ -492,6 +492,7 @@ Retain: 96
 Unifications: 234
 Conjuncts:    234
 Disjuncts:    330
+Builtins:     0
 -- out/eval --
 (struct){
   eq0: (bool){ true }

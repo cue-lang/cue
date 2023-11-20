@@ -29,6 +29,7 @@ Retain: 22
 Unifications: 50
 Conjuncts:    66
 Disjuncts:    46
+Builtins:     8
 -- out/eval --
 (struct){
   a: (string){ "est" }

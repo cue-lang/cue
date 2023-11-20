@@ -105,6 +105,7 @@ Retain: 23
 Unifications: 61
 Conjuncts:    151
 Disjuncts:    66
+Builtins:     0
 -- out/eval --
 (struct){
   embeddingDirect: (struct){

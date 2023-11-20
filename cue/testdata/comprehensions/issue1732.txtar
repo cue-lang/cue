@@ -131,6 +131,7 @@ Retain: 10
 Unifications: 111
 Conjuncts:    249
 Disjuncts:    126
+Builtins:     0
 -- out/eval --
 (struct){
   networkingv1: (struct){

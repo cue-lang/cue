@@ -32,6 +32,17 @@ graph TD
 	text:  "v"
 	value: "v"
 }
+-- out/run/t1/stats --
+Leaks:  0
+Freed:  0
+Reused: 0
+Allocs: 0
+Retain: 0
+
+Unifications: 0
+Conjuncts:    0
+Disjuncts:    0
+Builtins:     0
 -- out/run/t2 --
 graph TD
   t0("root.t1 [Terminated]")
@@ -44,16 +55,6 @@ graph TD
 	text:  "v"
 	value: "v"
 }
--- out/run/t1/stats --
-Leaks:  0
-Freed:  0
-Reused: 0
-Allocs: 0
-Retain: 0
-
-Unifications: 0
-Conjuncts:    0
-Disjuncts:    0
 -- out/run/t2/stats --
 Leaks:  0
 Freed:  0
@@ -64,6 +65,7 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+Builtins:     0
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  0
@@ -74,3 +76,4 @@ Retain: 0
 Unifications: 0
 Conjuncts:    0
 Disjuncts:    0
+Builtins:     0

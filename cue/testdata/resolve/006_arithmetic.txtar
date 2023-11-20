@@ -38,6 +38,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    8
 Disjuncts:    7
+Builtins:     0
 -- out/eval --
 Errors:
 e2: conflicting values int and 2.0 (mismatched types int and float):

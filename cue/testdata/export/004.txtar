@@ -32,6 +32,7 @@ Retain: 0
 Unifications: 5
 Conjuncts:    6
 Disjuncts:    5
+Builtins:     0
 -- out/eval --
 (struct){
   $type: (int){ 3 }

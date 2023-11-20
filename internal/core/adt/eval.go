@@ -1571,6 +1571,15 @@ func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
 		}
 		v.CloseInfo = ci
 
+		if _, ok := x.(*LetReference); ok {
+			if arc.status == finalized {
+				if b, ok := arc.BaseValue.(*Bottom); !ok || !b.IsIncomplete() {
+					n.addExprConjunct(MakeRootConjunct(nil, arc.ToDataAll(n.ctx, ToDataOnlyRegular(false))), arc.status)
+					return
+				}
+			}
+		}
+
 		n.addVertexConjuncts(v, arc, false)
 
 	case Evaluator:

@@ -56,6 +56,7 @@ Retain: 0
 Unifications: 25
 Conjuncts:    65
 Disjuncts:    42
+Builtins:     0
 -- out/run/t2 --
 graph TD
   t0("root.get [Terminated]")
@@ -98,6 +99,7 @@ Retain: 0
 Unifications: 25
 Conjuncts:    69
 Disjuncts:    42
+Builtins:     0
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  84
@@ -108,6 +110,7 @@ Retain: 0
 Unifications: 50
 Conjuncts:    134
 Disjuncts:    84
+Builtins:     0
 -- out/run/t3 --
 graph TD
   t0("root.get [Terminated]")

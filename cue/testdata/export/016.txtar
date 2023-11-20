@@ -61,6 +61,7 @@ Retain: 0
 Unifications: 14
 Conjuncts:    24
 Disjuncts:    14
+Builtins:     0
 -- out/eval --
 (struct){
   u16: (int){ &(>=0, <=65535, int) }

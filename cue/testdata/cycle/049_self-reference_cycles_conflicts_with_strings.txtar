@@ -36,6 +36,7 @@ Retain: 1
 Unifications: 4
 Conjuncts:    5
 Disjuncts:    5
+Builtins:     0
 -- out/eval --
 Errors:
 a.x: conflicting values "hey!?" and "hey":

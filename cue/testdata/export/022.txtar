@@ -93,6 +93,7 @@ Retain: 0
 Unifications: 10
 Conjuncts:    22
 Disjuncts:    14
+Builtins:     0
 -- out/eval --
 (struct){
   job: (struct){

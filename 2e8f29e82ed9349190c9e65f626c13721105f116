@@ -16,6 +16,23 @@
       "message": "LGTM but I think Marcel should probably sign off on whether the wording is appropriate.",
       "revId": "2e8f29e82ed9349190c9e65f626c13721105f116",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a70c971d_b9e11361",
+        "filename": "cue/cue.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-11-20T08:10:17Z",
+      "side": 1,
+      "message": "I would also add that the intention is to change this in the future.",
+      "revId": "2e8f29e82ed9349190c9e65f626c13721105f116",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

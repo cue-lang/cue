@@ -189,20 +189,6 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 		// first, extract and get the schema handle itself
 		extracted := ctx.BuildFile(of)
 
-		// Add attributes for k8s oapi extensions
-		// construct a map of all paths using x-kubernetes-* OpenAPI extensions
-		// TODO: what is the list type?
-		for _, extAttr := range xKubernetesAttributes(defpath.Selectors(), rootosch) {
-			extendedVal := extracted.LookupPath(cue.MakePath(extAttr.path...))
-			node := extendedVal.Source()
-			switch x := node.(type) {
-			case *ast.StructLit:
-				x.Elts = append(x.Elts, extAttr.attr)
-			case *ast.Field:
-				x.Attrs = append(x.Attrs, extAttr.attr)
-			}
-		}
-
 		// then unify with our desired base constraints
 		nsConstraint := "!"
 		if cc.Props.Spec.Scope != "Namespaced" {
@@ -222,9 +208,27 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 					}
 				`, cc.Props.Spec.Group, ver, kname, nsConstraint)))
 
-		// for path, attr := range extAttrs {
-		// 	cue.MakePath(cue)
-		// 	sch.LookupPath(cue.MakePath(cue.Str(path)))
+		// Add attributes for k8s oapi extensions
+		// construct a map of all paths using x-kubernetes-* OpenAPI extensions
+		// TODO: what is the list type?
+		sch = mapAttributes(sch, rootosch)
+		// for _, extAttr := range xKubernetesAttributes(defpath.Selectors(), rootosch) {
+		// 	attrPath := cue.MakePath(extAttr.path...)
+		// 	sch = sch.FillPath(attrPath, extAttr.attr)
+		// 	// extendedVal := sch.LookupPath(attrPath)
+		// 	// switch x := extendedVal.Source().(type) {
+		// 	// case *ast.StructLit:
+		// 	// 	x.Elts = append(x.Elts, extAttr.attr)
+		// 	// case *ast.Field:
+		// 	// 	x.Attrs = append(x.Attrs, extAttr.attr)
+		// 	// case *ast.File:
+		// 	// 	x.Decls = append(x.Decls, extAttr.attr)
+		// 	// default:
+		// 	// 	fmt.Println(attrPath)
+		// 	// 	fmt.Printf("extendedVal: %v\n\n", extendedVal)
+		// 	// 	// fmt.Println(reflect.TypeOf(node))
+		// 	// 	// fmt.Printf("node: %v\n", node)
+		// 	// }
 		// }
 
 		// now, go back to an AST because it's easier to manipulate references there
@@ -301,15 +305,6 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 					}
 					x.Elts = newlist
 				}
-
-				// if attr, ok := extAttrs[pathKey]; ok {
-				// 	x.Elts = append(x.Elts, &attr)
-				// }
-				// TODO: how do I get the path for this case?
-				// case *ast.Field:
-				// 	if attr, ok := extAttrs[pathKey]; ok {
-				// 		x.Attrs = append(x.Attrs, &attr)
-				// 	}
 			}
 			return true
 		}, nil)
@@ -499,19 +494,157 @@ func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) []struc
 	}
 
 	// TODO: array does not work right, see https://github.com/istio/istio/blob/0d5f530188dfe571bf0d8f515618ba99a0dc3e6c/manifests/charts/base/crds/crd-all.gen.yaml#L188
-	if prop.Type == "array" {
-		if len(prop.Items.JSONSchemas) > 0 {
-			for _, nextProp := range prop.Items.JSONSchemas {
-				// Recursively add subextensions for each property
-				subExts := xKubernetesAttributes(append(path, cue.AnyIndex), nextProp)
-				extensions = append(extensions, subExts...)
-			}
-		} else {
-			// Recursively add subextensions for each property
-			subExts := xKubernetesAttributes(append(path, cue.AnyIndex), *prop.Items.Schema)
-			extensions = append(extensions, subExts...)
+	// if prop.Type == "array" {
+	// 	if len(prop.Items.JSONSchemas) > 0 {
+	// 		for i, _ := n.List(); i.Next(); {
+	// 			a = append(a, i.Value())
+	// 		}
+	// 		// Iterate each schema in list and add attribute for that list index
+	// 		// for i, nextProp := range prop.Items.JSONSchemas {
+	// 		// 	// Add attribute to the item at index i
+	// 		// }
+	// 	} else {
+	// 		// Add attribute to the pattern constraint
+	// 		// // Recursively add subextensions for each property
+	// 		// subExts := xKubernetesAttributes(append(path, cue.AnyIndex), *prop.Items.Schema)
+	// 		// extensions = append(extensions, subExts...)
+	// 	}
+	// }
+
+	return extensions
+}
+
+// TODO: use internal.Attr if it can support writing attributes
+type attr struct {
+	name   string
+	fields []keyval
+}
+
+func (a attr) String() string {
+	fields := []string{}
+	for _, f := range a.fields {
+		fields = append(fields, f.String())
+	}
+	return fmt.Sprintf("@%s(%s)", a.name, strings.Join(fields, ", "))
+}
+
+func addAttr(field ast.Label, a attr) *ast.Field {
+	return &ast.Field{
+		Label: field,
+		Value: ast.NewIdent("_"),
+		Attrs: []*ast.Attribute{
+			{Text: a.String()},
+		},
+	}
+}
+
+type keyval struct {
+	key string
+	val string
+}
+
+func (kv keyval) String() string {
+	if kv.val != "" {
+		return kv.key + "=" + kv.val
+	}
+	return kv.key
+}
+
+// Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
+func mapAttributes(val cue.Value, prop v1.JSONSchemaProps) cue.Value {
+	a := attr{
+		name:   "crd",
+		fields: []keyval{},
+	}
+
+	attrBody := make([]string, 0)
+	appendField := func(key XExtensionAttr, val string) {
+		a.fields = append(a.fields, keyval{key: string(key), val: val})
+		attrBody = append(attrBody, fmt.Sprintf("%s=%s", key, val))
+	}
+
+	if prop.XPreserveUnknownFields != nil {
+		appendField(XPreserveUnknownFields, fmt.Sprintf("%t", *prop.XPreserveUnknownFields))
+	}
+
+	if prop.XEmbeddedResource {
+		appendField(XEmbeddedResource, fmt.Sprintf("%t", prop.XEmbeddedResource))
+	}
+
+	if prop.XIntOrString {
+		appendField(XIntOrString, fmt.Sprintf("%t", prop.XIntOrString))
+	}
+
+	if len(prop.XListMapKeys) > 0 {
+		appendField(XListMapKeys, fmt.Sprint(val.Context().Encode(prop.XListMapKeys)))
+	}
+
+	if prop.XListType != nil {
+		appendField(XListType, fmt.Sprintf("%q", *prop.XListType))
+	}
+
+	if prop.XMapType != nil {
+		appendField(XMapType, fmt.Sprintf("%q", *prop.XMapType))
+	}
+
+	if len(prop.XValidations) > 0 {
+		appendField(XValidations, fmt.Sprint(val.Context().Encode(prop.XValidations)))
+	}
+
+	if len(a.fields) > 0 {
+		attr := &ast.Attribute{Text: a.String()}
+		node := val.Source()
+		switch x := node.(type) {
+		case *ast.StructLit:
+			x.Elts = append(x.Elts, attr)
+		case *ast.Field:
+			x.Attrs = append(x.Attrs, attr)
+		case *ast.File:
+			x.Decls = append(x.Decls, attr)
+		default:
+			// fmt.Println(attrPath)
+			// fmt.Printf("extendedVal: %v\n\n", extendedVal)
+			// fmt.Println(reflect.TypeOf(node))
+			// fmt.Printf("node: %v\n", node)
 		}
 	}
 
-	return extensions
+	for name := range prop.Properties {
+		// Recursively add subextensions for each property
+		nextPath := cue.MakePath(cue.Str(name))
+		nextVal := mapAttributes(val.LookupPath(nextPath), prop.Properties[name])
+		val = val.FillPath(nextPath, nextVal)
+	}
+
+	// TODO: array does not work right, see https://github.com/istio/istio/blob/0d5f530188dfe571bf0d8f515618ba99a0dc3e6c/manifests/charts/base/crds/crd-all.gen.yaml#L188
+	if prop.Type == "array" {
+		if len(prop.Items.JSONSchemas) > 0 {
+			iter, err := val.List()
+			if err != nil {
+				fmt.Println(err)
+			}
+			// Iterate each schema in list and add attribute for that list index
+			for i := range prop.Items.JSONSchemas {
+				// Add attribute to the item at index i
+				if !iter.Next() {
+					break
+				}
+				nextVal := iter.Value()
+				val = val.FillPath(nextVal.Path(), mapAttributes(nextVal, prop.Items.JSONSchemas[i]))
+			}
+		} else {
+			if val.Allows(cue.AnyIndex) {
+				anyIndex := cue.MakePath(cue.AnyIndex)
+				nextVal := mapAttributes(val.LookupPath(anyIndex), *prop.Items.Schema)
+				val = val.FillPath(anyIndex, nextVal)
+			}
+
+			// Add attribute to the pattern constraint
+			// // Recursively add subextensions for each property
+			// subExts := xKubernetesAttributes(append(path, cue.AnyIndex), *prop.Items.Schema)
+			// extensions = append(extensions, subExts...)
+		}
+	}
+
+	return val
 }

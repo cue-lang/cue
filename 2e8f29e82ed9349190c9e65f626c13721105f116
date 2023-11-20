@@ -33,6 +33,24 @@
       "message": "I would also add that the intention is to change this in the future.",
       "revId": "2e8f29e82ed9349190c9e65f626c13721105f116",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc41d4da_53ebd5a1",
+        "filename": "cue/cue.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-20T13:28:40Z",
+      "side": 1,
+      "message": "Very good point, otherwise it sounds like it\u0027s deliberate and there aren\u0027t any plans to change it.",
+      "parentUuid": "a70c971d_b9e11361",
+      "revId": "2e8f29e82ed9349190c9e65f626c13721105f116",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

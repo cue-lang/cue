@@ -17,8 +17,8 @@
 package stats
 
 import (
-	"html/template"
 	"strings"
+	"text/template"
 )
 
 // Counts holds counters for key events during a CUE evaluation.

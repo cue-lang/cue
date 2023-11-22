@@ -19,7 +19,7 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/encoding/crd/k8s/apiextensions"
+	apiextensions "cuelang.org/go/encoding/crd/k8s/apiextensions/v1"
 	"cuelang.org/go/encoding/yaml"
 	goyaml "gopkg.in/yaml.v3"
 )

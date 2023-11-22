@@ -29,7 +29,7 @@ import (
 // +protobuf.as=Timestamp
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 type Time struct {
-	time.Time `protobuf:"-"`
+	time.Time `json:",inline" protobuf:"-"`
 }
 
 // DeepCopyInto creates a deep-copy of the Time value.  The underlying time.Time

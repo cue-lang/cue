@@ -25,7 +25,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/encoding/crd/k8s/apiextensions"
+	apiextensions "cuelang.org/go/encoding/crd/k8s/apiextensions/v1"
 	"cuelang.org/go/encoding/openapi"
 )
 

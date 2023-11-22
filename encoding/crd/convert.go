@@ -16,7 +16,6 @@ limitations under the License.
 package crd
 
 import (
-	"encoding/json"
 	"fmt"
 	"path"
 	"strings"
@@ -28,30 +27,29 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/crd/k8s/apiextensions"
 	"cuelang.org/go/encoding/openapi"
-	"cuelang.org/go/encoding/yaml"
 )
 
-// Decoder generates CUE definitions from Kubernetes CRDs using the OpenAPI v3 spec.
-type Decoder struct {
+// Extractor generates CUE definitions from Kubernetes CRDs using the OpenAPI v3 spec.
+type Extractor struct {
 	ctx    *cue.Context
 	header string
 }
 
-// NewDecoder creates an Importer for the given CUE context.
-func NewDecoder(ctx *cue.Context, header string) *Decoder {
-	return &Decoder{
+// NewExtractor creates an Importer for the given CUE context.
+func NewExtractor(ctx *cue.Context, header string) *Extractor {
+	return &Extractor{
 		ctx:    ctx,
 		header: header,
 	}
 }
 
-// Decode takes a multi-doc YAML containing Kubernetes CRDs and returns the CUE definitions
+// Instances takes a multi-doc YAML containing Kubernetes CRDs and returns the CUE definitions
 // generated from the OpenAPI spec. The resulting key value pairs, contain a unique identifier
 // in the format `<group>/<kind>/<version>` and the contents of the CUE definition.
-func (imp *Decoder) Decode(crdData []byte) (map[string][]byte, error) {
+func (b *Extractor) Instances(crdData []byte) (map[string][]byte, error) {
 	result := make(map[string][]byte)
 
-	crds, err := imp.fromYAML(crdData)
+	crds, err := b.fromYAML(crdData)
 	if err != nil {
 		return result, err
 	}
@@ -63,7 +61,7 @@ func (imp *Decoder) Decode(crdData []byte) (map[string][]byte, error) {
 				return result, err
 			}
 			name := path.Join(crd.Props.Spec.Group, crd.Props.Spec.Names.Singular, crdVersion.Version)
-			result[name] = []byte(fmt.Sprintf("%s\n\npackage %s\n\n%s", imp.header, crdVersion.Version, string(def)))
+			result[name] = []byte(fmt.Sprintf("%s\n\npackage %s\n\n%s", b.header, crdVersion.Version, string(def)))
 		}
 	}
 
@@ -75,26 +73,11 @@ func (imp *Decoder) Decode(crdData []byte) (map[string][]byte, error) {
 //
 // This function preserves the ordering of schemas declared in the input YAML in
 // the resulting [IntermediateCRD.Schemas] field.
-func (imp *Decoder) fromYAML(b []byte) ([]*IntermediateCRD, error) {
-
+func (b *Extractor) fromYAML(data []byte) ([]*IntermediateCRD, error) {
 	// The filename provided here is only used in error messages
-	yf, err := yaml.Extract("crd.yaml", b)
+	all, err := splitFile(b.ctx, "crd.yaml", data)
 	if err != nil {
-		return nil, fmt.Errorf("input is not valid yaml: %w", err)
-	}
-	crdv := imp.ctx.BuildFile(yf)
-
-	var all []cue.Value
-	switch crdv.IncompleteKind() {
-	case cue.StructKind:
-		all = append(all, crdv)
-	case cue.ListKind:
-		iter, _ := crdv.List()
-		for iter.Next() {
-			all = append(all, iter.Value())
-		}
-	default:
-		return nil, fmt.Errorf("input does not appear to be one or multiple CRDs: %s", crdv)
+		return nil, err
 	}
 
 	ret := make([]*IntermediateCRD, 0, len(all))
@@ -139,7 +122,7 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 	}
 
 	var err error
-	cc.Props, err = UnmarshalOne(crd)
+	cc.Props, err = parseCRD(crd)
 	if err != nil {
 		return nil, fmt.Errorf("error decoding crd props into Go struct: %w", err)
 	}
@@ -422,97 +405,6 @@ const (
 	XMapType               XExtensionAttr = "mapType"
 	XValidations           XExtensionAttr = "validations"
 )
-
-// Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
-func xKubernetesAttributes(path []cue.Selector, prop apiextensions.JSONSchemaProps) []struct {
-	path []cue.Selector
-	attr *ast.Attribute
-} {
-	extensions := []struct {
-		path []cue.Selector
-		attr *ast.Attribute
-	}{}
-
-	// attrFields := []string{}
-
-	attrBody := make([]string, 0)
-	addAttr := func(key XExtensionAttr, val string) {
-		attrBody = append(attrBody, fmt.Sprintf("%s=%s", key, val))
-	}
-
-	if prop.XPreserveUnknownFields != nil {
-		// attrFields = append(attrFields, fmt.Sprintf("%s=%t", XPreserveUnknownFields, *prop.XPreserveUnknownFields))
-		addAttr(XPreserveUnknownFields, fmt.Sprintf("%t", *prop.XPreserveUnknownFields))
-	}
-
-	if prop.XEmbeddedResource {
-		// attrFields = append(attrFields, fmt.Sprintf("%s=%t", XEmbeddedResource, *prop.XPreserveUnknownFields))
-		addAttr(XEmbeddedResource, fmt.Sprintf("%t", prop.XEmbeddedResource))
-	}
-
-	if prop.XIntOrString {
-		addAttr(XIntOrString, fmt.Sprintf("%t", prop.XIntOrString))
-	}
-
-	if len(prop.XListMapKeys) > 0 {
-		addAttr(XListMapKeys, fmt.Sprintf(`'["%s"]'`, strings.Join(prop.XListMapKeys, `", "`)))
-	}
-
-	if prop.XListType != nil {
-		addAttr(XListType, fmt.Sprintf("%q", *prop.XListType))
-	}
-
-	if prop.XMapType != nil {
-		addAttr(XMapType, fmt.Sprintf("%q", *prop.XMapType))
-	}
-
-	if len(prop.XValidations) > 0 {
-		vals, err := json.Marshal(prop.XValidations)
-		if err != nil {
-			panic(err)
-		}
-		addAttr(XValidations, "\"\"\"\n"+string(vals)+"\n\"\"\"")
-	}
-
-	if len(attrBody) > 0 {
-		attrText := fmt.Sprintf("@%s(%s)", "crd", strings.Join(attrBody, ", "))
-		extensions = append(extensions, struct {
-			path []cue.Selector
-			attr *ast.Attribute
-		}{
-			path: path,
-			attr: &ast.Attribute{Text: attrText},
-		})
-
-		// fmt.Println(cue.MakePath(path...).String() + ": " + attrText)
-	}
-
-	for nextPath := range prop.Properties {
-		// Recursively add subextensions for each property
-		subExts := xKubernetesAttributes(append(path, cue.Str(nextPath)), prop.Properties[nextPath])
-		extensions = append(extensions, subExts...)
-	}
-
-	// TODO: array does not work right, see https://github.com/istio/istio/blob/0d5f530188dfe571bf0d8f515618ba99a0dc3e6c/manifests/charts/base/crds/crd-all.gen.yaml#L188
-	// if prop.Type == "array" {
-	// 	if len(prop.Items.JSONSchemas) > 0 {
-	// 		for i, _ := n.List(); i.Next(); {
-	// 			a = append(a, i.Value())
-	// 		}
-	// 		// Iterate each schema in list and add attribute for that list index
-	// 		// for i, nextProp := range prop.Items.JSONSchemas {
-	// 		// 	// Add attribute to the item at index i
-	// 		// }
-	// 	} else {
-	// 		// Add attribute to the pattern constraint
-	// 		// // Recursively add subextensions for each property
-	// 		// subExts := xKubernetesAttributes(append(path, cue.AnyIndex), *prop.Items.Schema)
-	// 		// extensions = append(extensions, subExts...)
-	// 	}
-	// }
-
-	return extensions
-}
 
 // Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
 func mapAttributes(val cue.Value, prop apiextensions.JSONSchemaProps) cue.Value {

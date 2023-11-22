@@ -61,14 +61,14 @@ CustomResourceDefinitions are converted to cue structs adhering to the following
 }
 
 func runGetCRD(cmd *Command, args []string) error {
-	decoder := crd.NewDecoder(cmd.ctx, "// cue get crd "+strings.Join(args, " "))
+	decoder := crd.NewExtractor(cmd.ctx, "// cue get crd "+strings.Join(args, " "))
 
 	data, err := os.ReadFile(args[0])
 	if err != nil {
 		return err
 	}
 
-	crds, err := decoder.Decode(data)
+	crds, err := decoder.Instances(data)
 	if err != nil {
 		return err
 	}

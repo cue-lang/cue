@@ -26,9 +26,9 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/crd/k8s/apiextensions"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/yaml"
-	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
 )
 
 // Decoder generates CUE definitions from Kubernetes CRDs using the OpenAPI v3 spec.
@@ -117,7 +117,7 @@ type IntermediateCRD struct {
 	Original cue.Value
 
 	// Object form of CRD, decoded by k8s decoder
-	Props *v1.CustomResourceDefinition
+	Props *apiextensions.CustomResourceDefinition
 
 	// All the schemas in the original CRD, converted to CUE representation.
 	Schemas []VersionedSchema
@@ -244,8 +244,8 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 
 		// construct a map of all the paths that have x-kubernetes-embedded-resource: true defined
 		preserve := make(map[string]bool)
-		var walkfn func(path []cue.Selector, sch v1.JSONSchemaProps) error
-		walkfn = func(path []cue.Selector, sch v1.JSONSchemaProps) error {
+		var walkfn func(path []cue.Selector, sch apiextensions.JSONSchemaProps) error
+		walkfn = func(path []cue.Selector, sch apiextensions.JSONSchemaProps) error {
 			if sch.XPreserveUnknownFields != nil {
 				preserve[cue.MakePath(path...).String()] = *sch.XPreserveUnknownFields
 			}
@@ -424,7 +424,7 @@ const (
 )
 
 // Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
-func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) []struct {
+func xKubernetesAttributes(path []cue.Selector, prop apiextensions.JSONSchemaProps) []struct {
 	path []cue.Selector
 	attr *ast.Attribute
 } {
@@ -515,7 +515,7 @@ func xKubernetesAttributes(path []cue.Selector, prop v1.JSONSchemaProps) []struc
 }
 
 // Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
-func mapAttributes(val cue.Value, prop v1.JSONSchemaProps) cue.Value {
+func mapAttributes(val cue.Value, prop apiextensions.JSONSchemaProps) cue.Value {
 	attr := xk8sattr(*val.Context(), prop)
 	if attr != nil {
 		_, p := val.ReferencePath()
@@ -562,7 +562,10 @@ func mapAttributes(val cue.Value, prop v1.JSONSchemaProps) cue.Value {
 		} else {
 			// if val.Allows(cue.AnyIndex) {
 			anyIndex := cue.MakePath(cue.AnyIndex)
-			nextVal := mapAttributes(val.LookupPath(anyIndex), *prop.Items.Schema)
+			val.LookupPath(cue.MakePath(cue.AnyIndex))
+			nextVal := val.LookupPath(anyIndex)
+			fmt.Println(nextVal)
+			nextVal = mapAttributes(nextVal, *prop.Items.Schema)
 			val = val.FillPath(anyIndex, nextVal)
 			// } else {
 			// 	fmt.Println("here")
@@ -604,7 +607,7 @@ func (kv keyval) String() string {
 	return kv.key
 }
 
-func xk8sattr(ctx cue.Context, prop v1.JSONSchemaProps) *ast.Attribute {
+func xk8sattr(ctx cue.Context, prop apiextensions.JSONSchemaProps) *ast.Attribute {
 	a := attr{
 		name:   "crd",
 		fields: []keyval{},

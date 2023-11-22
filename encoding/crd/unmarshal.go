@@ -20,16 +20,14 @@ import (
 	"os"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/encoding/crd/k8s/apiextensions"
 	"cuelang.org/go/encoding/yaml"
-	v1 "k8s.io/apiextensions-apiserver/pkg/apis/apiextensions/v1"
-	"k8s.io/apiextensions-apiserver/pkg/client/clientset/clientset/scheme"
-	"k8s.io/apimachinery/pkg/runtime"
-	"k8s.io/apimachinery/pkg/runtime/serializer"
+	goyaml "gopkg.in/yaml.v3"
 )
 
 // Unmarshals a YAML file containing one or more CustomResourceDefinitions
 // into a list of CRD objects
-func UnmarshalFile(ctx *cue.Context, filename string) ([]*v1.CustomResourceDefinition, error) {
+func UnmarshalFile(ctx *cue.Context, filename string) ([]*apiextensions.CustomResourceDefinition, error) {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
@@ -45,7 +43,7 @@ func UnmarshalFile(ctx *cue.Context, filename string) ([]*v1.CustomResourceDefin
 	return Unmarshal(crdv)
 }
 
-func Unmarshal(crdv cue.Value) ([]*v1.CustomResourceDefinition, error) {
+func Unmarshal(crdv cue.Value) ([]*apiextensions.CustomResourceDefinition, error) {
 	var all []cue.Value
 	switch crdv.IncompleteKind() {
 	case cue.StructKind:
@@ -60,7 +58,7 @@ func Unmarshal(crdv cue.Value) ([]*v1.CustomResourceDefinition, error) {
 	}
 
 	// Make return value list
-	ret := make([]*v1.CustomResourceDefinition, 0, len(all))
+	ret := make([]*apiextensions.CustomResourceDefinition, 0, len(all))
 
 	// Iterate over each CRD
 	for _, cueval := range all {
@@ -77,7 +75,7 @@ func Unmarshal(crdv cue.Value) ([]*v1.CustomResourceDefinition, error) {
 
 // Unmarshals YAML data for a single containing one or more CustomResourceDefinitions
 // into a list of CRD objects
-func UnmarshalOne(val cue.Value) (*v1.CustomResourceDefinition, error) {
+func UnmarshalOne(val cue.Value) (*apiextensions.CustomResourceDefinition, error) {
 	// Encode the CUE value as YAML bytes
 	d, err := yaml.Encode(val)
 	if err != nil {
@@ -85,8 +83,9 @@ func UnmarshalOne(val cue.Value) (*v1.CustomResourceDefinition, error) {
 	}
 
 	// Decode into a v1.CustomResourceDefinition
-	obj := &v1.CustomResourceDefinition{}
-	if err = runtime.DecodeInto(serializer.NewCodecFactory(scheme.Scheme).UniversalDecoder(), d, obj); err != nil {
+	obj := &apiextensions.CustomResourceDefinition{}
+	err = goyaml.Unmarshal(d, obj)
+	if err != nil {
 		return nil, err
 	}
 

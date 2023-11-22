@@ -65,6 +65,10 @@ func (b *Extractor) Instances(crdData []byte) (map[string][]byte, error) {
 		}
 	}
 
+	for name := range result {
+		fmt.Println(name)
+	}
+
 	return result, nil
 }
 
@@ -118,7 +122,8 @@ type VersionedSchema struct {
 
 func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 	cc := &IntermediateCRD{
-		Schemas: make([]VersionedSchema, 0),
+		Original: crd,
+		Schemas:  make([]VersionedSchema, 0),
 	}
 
 	var err error

@@ -193,26 +193,7 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 
 		// Add attributes for k8s oapi extensions
 		// construct a map of all paths using x-kubernetes-* OpenAPI extensions
-		// TODO: what is the list type?
 		sch = mapAttributes(sch, rootosch)
-		// for _, extAttr := range xKubernetesAttributes(defpath.Selectors(), rootosch) {
-		// 	attrPath := cue.MakePath(extAttr.path...)
-		// 	sch = sch.FillPath(attrPath, extAttr.attr)
-		// 	// extendedVal := sch.LookupPath(attrPath)
-		// 	// switch x := extendedVal.Source().(type) {
-		// 	// case *ast.StructLit:
-		// 	// 	x.Elts = append(x.Elts, extAttr.attr)
-		// 	// case *ast.Field:
-		// 	// 	x.Attrs = append(x.Attrs, extAttr.attr)
-		// 	// case *ast.File:
-		// 	// 	x.Decls = append(x.Decls, extAttr.attr)
-		// 	// default:
-		// 	// 	fmt.Println(attrPath)
-		// 	// 	fmt.Printf("extendedVal: %v\n\n", extendedVal)
-		// 	// 	// fmt.Println(reflect.TypeOf(node))
-		// 	// 	// fmt.Printf("node: %v\n", node)
-		// 	// }
-		// }
 
 		// now, go back to an AST because it's easier to manipulate references there
 		var schast *ast.File

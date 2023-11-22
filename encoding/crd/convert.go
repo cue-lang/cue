@@ -65,9 +65,9 @@ func (b *Extractor) Instances(crdData []byte) (map[string][]byte, error) {
 		}
 	}
 
-	for name := range result {
-		fmt.Println(name)
-	}
+	// for name := range result {
+	// 	fmt.Println(name)
+	// }
 
 	return result, nil
 }
@@ -198,7 +198,7 @@ func convertCRD(crd cue.Value) (*IntermediateCRD, error) {
 
 		// Add attributes for k8s oapi extensions
 		// construct a map of all paths using x-kubernetes-* OpenAPI extensions
-		sch = mapAttributes(sch, rootosch)
+		sch = mapAttributes(sch.LookupPath(defpath), rootosch)
 
 		// now, go back to an AST because it's easier to manipulate references there
 		var schast *ast.File
@@ -394,10 +394,9 @@ const (
 
 // Preserves Kubernetes OpenAPI extensions in an attribute for each field utilizing them
 func mapAttributes(val cue.Value, prop apiextensions.JSONSchemaProps) cue.Value {
-	attr := xk8sattr(*val.Context(), prop)
+	attr := extensionAttribute(val.Context(), prop)
+	// val = val.FillPath(val.Path(), ast.NewLit(token.ATTRIBUTE, attr.Text))
 	if attr != nil {
-		_, p := val.ReferencePath()
-		fmt.Println(p.String() + ": " + attr.Text)
 		node := val.Source()
 		switch x := node.(type) {
 		case *ast.StructLit:
@@ -417,8 +416,12 @@ func mapAttributes(val cue.Value, prop apiextensions.JSONSchemaProps) cue.Value 
 	for name := range prop.Properties {
 		// Recursively add subextensions for each property
 		nextPath := cue.MakePath(cue.Str(name))
-		nextVal := mapAttributes(val.LookupPath(nextPath), prop.Properties[name])
-		val = val.FillPath(nextPath, nextVal)
+		nextVal := val.LookupPath(nextPath)
+		if nextVal.Kind() == cue.BottomKind {
+			continue
+		}
+		val = val.FillPath(nextPath, mapAttributes(nextVal, prop.Properties[name]))
+		// val = val.Unify(nextVal)
 	}
 
 	// TODO: array does not work right, see https://github.com/istio/istio/blob/0d5f530188dfe571bf0d8f515618ba99a0dc3e6c/manifests/charts/base/crds/crd-all.gen.yaml#L188
@@ -438,21 +441,11 @@ func mapAttributes(val cue.Value, prop apiextensions.JSONSchemaProps) cue.Value 
 				val = val.FillPath(nextVal.Path(), mapAttributes(nextVal, prop.Items.JSONSchemas[i]))
 			}
 		} else {
-			// if val.Allows(cue.AnyIndex) {
 			anyIndex := cue.MakePath(cue.AnyIndex)
-			val.LookupPath(cue.MakePath(cue.AnyIndex))
 			nextVal := val.LookupPath(anyIndex)
-			fmt.Println(nextVal)
-			nextVal = mapAttributes(nextVal, *prop.Items.Schema)
-			val = val.FillPath(anyIndex, nextVal)
-			// } else {
-			// 	fmt.Println("here")
-			// }
-
-			// Add attribute to the pattern constraint
-			// // Recursively add subextensions for each property
-			// subExts := xKubernetesAttributes(append(path, cue.AnyIndex), *prop.Items.Schema)
-			// extensions = append(extensions, subExts...)
+			if nextVal.Kind() != cue.BottomKind {
+				val = val.FillPath(anyIndex, mapAttributes(nextVal, *prop.Items.Schema))
+			}
 		}
 	}
 
@@ -485,7 +478,7 @@ func (kv keyval) String() string {
 	return kv.key
 }
 
-func xk8sattr(ctx cue.Context, prop apiextensions.JSONSchemaProps) *ast.Attribute {
+func extensionAttribute(ctx *cue.Context, prop apiextensions.JSONSchemaProps) *ast.Attribute {
 	a := attr{
 		name:   "crd",
 		fields: []keyval{},

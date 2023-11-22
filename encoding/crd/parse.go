@@ -21,7 +21,7 @@ import (
 	"cuelang.org/go/cue"
 	apiextensions "cuelang.org/go/encoding/crd/k8s/apiextensions/v1"
 	"cuelang.org/go/encoding/yaml"
-	goyaml "gopkg.in/yaml.v3"
+	kyaml "sigs.k8s.io/yaml"
 )
 
 // Splits a YAML file containing one or more YAML documents into its elements
@@ -108,7 +108,7 @@ func parseCRD(val cue.Value) (*apiextensions.CustomResourceDefinition, error) {
 
 	// Decode into a v1.CustomResourceDefinition
 	obj := &apiextensions.CustomResourceDefinition{}
-	err = goyaml.Unmarshal(d, obj)
+	err = kyaml.Unmarshal(d, obj)
 	if err != nil {
 		return nil, err
 	}

@@ -1,5 +1,3 @@
-//go:build ignore
-
 // Copyright 2018 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package load
+package cueimports
 
 import (
 	"io"
@@ -23,8 +21,6 @@ import (
 
 	"cuelang.org/go/cue/errors"
 )
-
-const quote = "`"
 
 type readTest struct {
 	// Test input contains ℙ where readImports should stop.
@@ -38,15 +34,15 @@ var readImportsTests = []readTest{
 		"",
 	},
 	{
-		`package p; import "x"`,
+		`package p, import "x"`,
 		"",
 	},
 	{
-		`package p; import . "x"`,
+		`package p, import . "x"`,
 		"",
 	},
 	{
-		`package p; import "x";ℙvar x = 1`,
+		`package p, import "x",ℙvar x = 1`,
 		"",
 	},
 	{
@@ -62,15 +58,12 @@ var readImportsTests = []readTest{
 			"x"
 			_ "x"
 			a "x" // comment
-			` + quote + `x` + quote + `
-			_ ` + quote + `x` + quote + `
-			a ` + quote + `x` + quote + `
 		)
 		import (
 		)
 		import ()
 		import()import()import()
-		import();import();import()
+		import(),import(),import()
 
 		ℙvar x = 1
 		`,
@@ -116,97 +109,80 @@ func testRead(t *testing.T, tests []readTest, read func(io.Reader) ([]byte, erro
 
 func TestReadImports(t *testing.T) {
 	testRead(t, readImportsTests, func(r io.Reader) ([]byte, errors.Error) {
-		return readImports(r, true, nil)
+		return Read(r)
 	})
 }
 
 var readFailuresTests = []readTest{
 	{
 		`package`,
-		"syntax error",
+		"",
 	},
 	{
 		"package p\n\x00\nimport `math`\n",
 		"unexpected NUL in input",
 	},
 	{
-		`package p; import`,
-		"syntax error",
+		`package p, import`,
+		"",
 	},
 	{
-		`package p; import "`,
-		"syntax error",
+		`package p, import "`,
+		"",
 	},
 	{
-		"package p; import ` \n\n",
-		"syntax error",
+		"package p, import ` \n\n",
+		"",
 	},
 	{
-		`package p; import "x`,
-		"syntax error",
+		`package p, import "x`,
+		"",
 	},
 	{
-		`package p; import _`,
-		"syntax error",
+		`package p, import _`,
+		"",
 	},
 	{
-		`package p; import _ "`,
-		"syntax error",
+		`package p, import _ "`,
+		"",
 	},
 	{
-		`package p; import _ "x`,
-		"syntax error",
+		`package p, import _ "x`,
+		"",
 	},
 	{
-		`package p; import .`,
-		"syntax error",
+		`package p, import .`,
+		"",
 	},
 	{
-		`package p; import . "`,
-		"syntax error",
+		`package p, import . "`,
+		"",
 	},
 	{
-		`package p; import . "x`,
-		"syntax error",
+		`package p, import . "x`,
+		"",
 	},
 	{
-		`package p; import (`,
-		"syntax error",
+		`package p, import (`,
+		"",
 	},
 	{
-		`package p; import ("`,
-		"syntax error",
+		`package p, import ("`,
+		"",
 	},
 	{
-		`package p; import ("x`,
-		"syntax error",
+		`package p, import ("x`,
+		"",
 	},
 	{
-		`package p; import ("x"`,
-		"syntax error",
+		`package p, import ("x"`,
+		"",
 	},
 }
 
 func TestReadFailures(t *testing.T) {
 	// Errors should be reported (true arg to readImports).
 	testRead(t, readFailuresTests, func(r io.Reader) ([]byte, errors.Error) {
-		return readImports(r, true, nil)
-	})
-}
-
-func TestReadFailuresIgnored(t *testing.T) {
-	// Syntax errors should not be reported (false arg to readImports).
-	// Instead, entire file should be the output and no error.
-	// Convert tests not to return syntax errors.
-	tests := make([]readTest, len(readFailuresTests))
-	copy(tests, readFailuresTests)
-	for i := range tests {
-		tt := &tests[i]
-		if !strings.Contains(tt.err, "NUL") {
-			tt.err = ""
-		}
-	}
-	testRead(t, tests, func(r io.Reader) ([]byte, errors.Error) {
-		return readImports(r, false, nil)
+		return Read(r)
 	})
 }

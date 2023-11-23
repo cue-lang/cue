@@ -1,6 +1,4 @@
-//go:build ignore
-
-// Copyright 2018 The CUE Authors
+// Copyright 2023 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package load
+// Package cueimports provides support for reading the import
+// section of a CUE file without needing to read the rest of it.
+package cueimports
 
 import (
 	"bufio"
@@ -76,7 +76,7 @@ func (r *importReader) readByte() byte {
 func (r *importReader) peekByte(skipSpace bool) byte {
 	if r.err != nil {
 		if r.nerr++; r.nerr > 10000 {
-			panic("go/build: import reader looping")
+			panic("import reader looping")
 		}
 		return 0
 	}
@@ -90,10 +90,10 @@ func (r *importReader) peekByte(skipSpace bool) byte {
 	}
 	for r.err == nil && !r.eof {
 		if skipSpace {
-			// For the purposes of this reader, semicolons are never necessary to
+			// For the purposes of this reader, commas are never necessary to
 			// understand the input and are treated as spaces.
 			switch c {
-			case ' ', '\f', '\t', '\r', '\n', ';':
+			case ' ', '\f', '\t', '\r', '\n', ',':
 				c = r.readByte()
 				continue
 
@@ -102,14 +102,6 @@ func (r *importReader) peekByte(skipSpace bool) byte {
 				if c == '/' {
 					for c != '\n' && r.err == nil && !r.eof {
 						c = r.readByte()
-					}
-				} else if c == '*' {
-					var c1 byte
-					for (c != '*' || c1 != '/') && r.err == nil {
-						if r.eof {
-							r.syntaxError()
-						}
-						c, c1 = c1, r.readByte()
 					}
 				} else {
 					r.syntaxError()
@@ -161,29 +153,15 @@ func (r *importReader) readIdent() {
 
 // readString reads a quoted string literal from the input.
 // If an identifier is not present, readString records a syntax error.
-func (r *importReader) readString(save *[]string) {
+func (r *importReader) readString() {
 	switch r.nextByte(true) {
-	case '`':
-		start := len(r.buf) - 1
-		for r.err == nil {
-			if r.nextByte(false) == '`' {
-				if save != nil {
-					*save = append(*save, string(r.buf[start:]))
-				}
-				break
-			}
-			if r.eof {
-				r.syntaxError()
-			}
-		}
 	case '"':
-		start := len(r.buf) - 1
+		// Note: although the syntax in the specification only allows
+		// a simple string literal here, the cue/parser package also
+		// allows #"..."# and """ literals, so there's some impedance-mismatch here.
 		for r.err == nil {
 			c := r.nextByte(false)
 			if c == '"' {
-				if save != nil {
-					*save = append(*save, string(r.buf[start:]))
-				}
 				break
 			}
 			if r.eof || c == '\n' {
@@ -200,19 +178,29 @@ func (r *importReader) readString(save *[]string) {
 
 // readImport reads an import clause - optional identifier followed by quoted string -
 // from the input.
-func (r *importReader) readImport(imports *[]string) {
+func (r *importReader) readImport() {
 	c := r.peekByte(true)
-	if c == '.' {
-		r.peek = 0
-	} else if isIdent(c) {
+	if isIdent(c) {
 		r.readIdent()
 	}
-	r.readString(imports)
+	r.readString()
 }
 
-// readImports is like io.ReadAll, except that it expects a CUE file as
+// readComments is like io.ReadAll, except that it only reads the leading
+// block of comments in the file.
+func readComments(f io.Reader) ([]byte, errors.Error) {
+	r := &importReader{b: bufio.NewReader(f)}
+	r.peekByte(true)
+	if r.err == nil && !r.eof {
+		// Didn't reach EOF, so must have found a non-space byte. Remove it.
+		r.buf = r.buf[:len(r.buf)-1]
+	}
+	return r.buf, r.err
+}
+
+// Read is like io.ReadAll, except that it expects a CUE file as
 // input and stops reading the input once the imports have completed.
-func readImports(f io.Reader, reportSyntaxError bool, imports *[]string) ([]byte, errors.Error) {
+func Read(f io.Reader) ([]byte, errors.Error) {
 	r := &importReader{b: bufio.NewReader(f)}
 
 	r.readKeyword("package")
@@ -222,11 +210,11 @@ func readImports(f io.Reader, reportSyntaxError bool, imports *[]string) ([]byte
 		if r.peekByte(true) == '(' {
 			r.nextByte(false)
 			for r.peekByte(true) != ')' && r.err == nil {
-				r.readImport(imports)
+				r.readImport()
 			}
 			r.nextByte(false)
 		} else {
-			r.readImport(imports)
+			r.readImport()
 		}
 	}
 
@@ -237,8 +225,8 @@ func readImports(f io.Reader, reportSyntaxError bool, imports *[]string) ([]byte
 	}
 
 	// If we stopped for a syntax error, consume the whole file so that
-	// we are sure we don't change the errors that go/parser returns.
-	if r.err == errSyntax && !reportSyntaxError {
+	// we are sure we don't change the errors that the cue/parser returns.
+	if r.err == errSyntax {
 		r.err = nil
 		for r.err == nil && !r.eof {
 			r.readByte()

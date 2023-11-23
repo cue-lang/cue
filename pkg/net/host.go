@@ -56,7 +56,7 @@ func JoinHostPort(host, port cue.Value) (string, error) {
 	switch host.Kind() {
 	case cue.ListKind:
 		ipdata := netGetIP(host)
-		if len(ipdata) != 4 && len(ipdata) != 16 {
+		if !ipdata.IsValid() {
 			err = fmt.Errorf("invalid host %s", host)
 		}
 		hostStr = ipdata.String()

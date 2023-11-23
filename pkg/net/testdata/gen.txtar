@@ -37,7 +37,7 @@ t7: error in call to net.JoinHostPort: invalid host [192, 30, 4]:
 t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
     ./in.cue:15:6
     ./in.cue:15:19
-t20: error in call to net.IPCIDR: invalid CIDR address: 172.16.12.3:
+t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/':
     ./in.cue:22:6
 
 Result:
@@ -60,7 +60,7 @@ t16: [127, 0, 0, 1]
 t17: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 127, 0, 0, 1]
 t18: true
 t19: true
-t20: _|_ // t20: error in call to net.IPCIDR: invalid CIDR address: 172.16.12.3
+t20: _|_ // t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/'
 t21: "foo%2Fbar"
 t22: "foo/bar"
 t23: "f%25o"

@@ -1,0 +1,4 @@
+-- want --
+x.cue: error: expected label or ':', found 'IDENT' contents
+-- x.cue --
+bogus contents

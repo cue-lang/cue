@@ -1,0 +1,43 @@
+-- want --
+x.cue "dep1" "dep2" "dep3"
+y/y1.cue
+y/y2.cue
+y/z1.cue
+y/z2.cue
+-- cue.mod/module.cue --
+module: "example.com"
+
+-- x.cue --
+package example
+
+import (
+	"dep1"
+	"dep2"
+)
+import "dep3"
+
+x: true
+-- y/y1.cue --
+package y
+
+
+-- y/y2.cue --
+package y
+
+-- y/z1.cue --
+package z
+
+-- y/z2.cue --
+package z
+
+-- _omitted1/foo.cue --
+not even looked at
+
+-- .omitted2/foo.cue --
+not looked at either
+
+-- z/cue.mod/module.cue --
+module "other.com"
+
+-- z/z.cue --
+package z

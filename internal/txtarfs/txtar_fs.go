@@ -6,7 +6,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package registrytest
+package txtarfs
 
 import (
 	"bytes"
@@ -21,7 +21,7 @@ import (
 )
 
 // TxtarFS returns an fs.FS which reads from a txtar.Archive.
-func TxtarFS(ar *txtar.Archive) fs.FS {
+func FS(ar *txtar.Archive) fs.FS {
 	return archiveFS{ar}
 }
 

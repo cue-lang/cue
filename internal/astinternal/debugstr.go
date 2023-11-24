@@ -288,5 +288,9 @@ const sep = ", "
 
 // DebugStrToStdErr prints DebugStr for `f`
 func DebugStrToStdErr(msg string, f *ast.File) {
-	fmt.Fprintf(os.Stderr, "file: %s %s DebugStr:%s\n", filepath.Base(f.Filename), msg, DebugStr(f))
+	dbgStr := DebugStr(f)
+	if len(dbgStr) > 120 {
+		dbgStr = dbgStr[:120] + "..."
+	}
+	fmt.Fprintf(os.Stderr, "file: %s %s DebugStr:%s\n", filepath.Base(f.Filename), msg, dbgStr)
 }

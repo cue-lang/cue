@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"os"
+
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/cue/ast"
@@ -23,6 +25,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/tools/fix"
 )
@@ -77,6 +80,9 @@ func newFmtCmd(c *Command) *cobra.Command {
 						}
 
 						files = append(files, f)
+						if os.Getenv("CUE_DEBUG_AST_FILE") != "" {
+							astinternal.DebugStrToStdErr("decoded ast.File", f)
+						}
 					}
 					// Do not defer this Close call, as we are looping over builds,
 					// and otherwise we would hold all of their files open at once.

@@ -16,6 +16,8 @@ package astinternal
 
 import (
 	"fmt"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 
@@ -283,3 +285,8 @@ func DebugStr(x interface{}) (out string) {
 }
 
 const sep = ", "
+
+// DebugStrToStdErr prints DebugStr for `f`
+func DebugStrToStdErr(msg string, f *ast.File) {
+	fmt.Fprintf(os.Stderr, "file: %s %s DebugStr:%s\n", filepath.Base(f.Filename), msg, DebugStr(f))
+}

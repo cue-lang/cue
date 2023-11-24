@@ -232,7 +232,11 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	switch f.Encoding {
 	case build.CUE:
 		if cfg.ParseFile == nil {
-			i.file, i.err = parser.ParseFile(path, r, parser.ParseComments)
+			if os.Getenv("CUE_DEBUG_PARSER_TRACE") != "" {
+				i.file, i.err = parser.ParseFile(path, r, parser.ParseComments, parser.Trace)
+			} else {
+				i.file, i.err = parser.ParseFile(path, r, parser.ParseComments)
+			}
 		} else {
 			i.file, i.err = cfg.ParseFile(path, r)
 		}

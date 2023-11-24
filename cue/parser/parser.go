@@ -16,6 +16,7 @@ package parser
 
 import (
 	"fmt"
+	"os"
 	"strings"
 	"unicode"
 
@@ -1732,5 +1733,10 @@ func (p *parser) parseFile() *ast.File {
 		Decls:   decls,
 	}
 	c.closeNode(p, f)
+
+	if os.Getenv("CUE_DEBUG_AST_FILE") != "" {
+		astinternal.DebugStrToStdErr("parser.go#1738 parseFile f:", f) // completed
+	}
+
 	return f
 }

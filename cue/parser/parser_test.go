@@ -696,6 +696,137 @@ bar: 2
 	}
 }
 
+// TestParseFmtIssues demonstrates several open issues where `cue fmt` misplaces comments.
+func TestParseFmtIssues(t *testing.T) {
+	testCases := []struct{ desc, in, out, outComments string }{{
+		`-- 720.f.cue -- comment ends up in import block`,
+		`
+		import "encoding/base64"
+
+		// comment
+
+		#A: {}`,
+		`import "encoding/base64", #A: {}`,
+		`import <[2// comment] "encoding/base64">, #A: {}`,
+	}, {
+		`-- 720.p.cue -- doc comment is correct`,
+		`
+		import "encoding/base64"
+
+		// comment
+		#A: {}`,
+		`import "encoding/base64", #A: {}`,
+		`import "encoding/base64", <[d0// comment] #A: {}>`,
+	}, {
+		`-- 2274.f.cue -- misplaces comma to the comment line end`,
+		`
+		#Number: two: 2
+
+		aList: [
+		1,
+		#Number.two,
+		// comment
+
+		3,
+		]
+		`,
+		`#Number: {two: 2}, aList: [1, #Number.two, 3]`,
+		`#Number: {two: 2}, aList: [1, <[3// comment] #Number.two>, 3]`,
+	}, {
+		`-- 2274.p.cue -- doc comment is correct`,
+		`
+		#Number: two: 2
+
+		aList: [
+		1,
+		#Number.two,
+		// comment
+		3,
+		]
+		`,
+		`#Number: {two: 2}, aList: [1, #Number.two, 3]`,
+		`#Number: {two: 2}, aList: [1, #Number.two, <[d0// comment] 3>]`,
+	}, {
+		`-- 2423.f.cue -- comment line misplaced`,
+		`
+		#X: {a?: int}
+
+		foo: #X & {
+		// comment
+		}
+		`,
+		`#X: {a?: int}, foo: #X&{}`,
+		`#X: {a?: int}, foo: <[d1// comment] #X&{}>`,
+	}, {
+		`-- 2423.p.cue -- comment line placed correctly`,
+		`
+		#X: {a?: int}
+
+		foo: #X & {
+		// comment
+		a: 5
+		}
+		`,
+		`#X: {a?: int}, foo: #X&{a: 5}`,
+		`#X: {a?: int}, foo: #X&{<[d0// comment] a: 5>}`,
+	}, {
+		`-- 2567a.f.cue -- comment line misplaced, inside brackets`,
+		`
+		foo: [
+			bar["baz"], // inline comment
+		]
+		bar: baz: 43
+		`,
+		`foo: [bar["baz"]], bar: {baz: 43}`,
+		`foo: [<[l3// inline comment] bar["baz"]>], bar: {baz: 43}`,
+	}, {
+		`-- 2567b.f.cue -- comment line misplaced, inside brackets`,
+		`
+		[
+			if true // inline comment
+			{}]
+		`,
+		`[if true {}]`,
+		`[<[l2// inline comment] if true {}>]`,
+	}, {
+		``,
+		`
+		`,
+		``,
+		``,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			mode := []Option{AllErrors}
+			// parse w/o coments
+			{
+				f, err := ParseFile("input", tc.in, mode...)
+				got := debugStr(f)
+				if err != nil {
+					got += "\n" + err.Error()
+				}
+				if got != tc.out {
+					t.Errorf("\ngot  %q;\nwant %q", got, tc.out)
+				}
+			}
+			// parse w/ comments
+			{
+				if strings.Contains(tc.desc, "comment") {
+					mode = append(mode, ParseComments)
+				}
+				f, err := ParseFile("input", tc.in, mode...)
+				got := debugStr(f)
+				if err != nil {
+					got += "\n" + err.Error()
+				}
+				if got != tc.outComments {
+					t.Errorf("\ngot  %q;\nwant %q", got, tc.outComments)
+				}
+			}
+		})
+	}
+}
+
 func TestStrict(t *testing.T) {
 	testCases := []struct{ desc, in string }{
 		{"block comments",

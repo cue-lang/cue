@@ -16,6 +16,7 @@ import (
 
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/internal/txtarfs"
 )
 
 func TestRegistry(t *testing.T) {
@@ -35,7 +36,7 @@ func TestRegistry(t *testing.T) {
 			t.Fatal(err)
 		}
 		t.Run(strings.TrimSuffix(name, ".txtar"), func(t *testing.T) {
-			r, err := New(TxtarFS(ar), "someprefix/other")
+			r, err := New(txtarfs.FS(ar), "someprefix/other")
 			if err != nil {
 				t.Fatal(err)
 			}

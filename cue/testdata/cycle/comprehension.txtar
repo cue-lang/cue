@@ -319,6 +319,7 @@ Retain: 145
 Unifications: 832
 Conjuncts:    2525
 Disjuncts:    1404
+Builtins:     48
 -- out/eval --
 Errors:
 selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle

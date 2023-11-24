@@ -142,6 +142,7 @@ Retain: 0
 Unifications: 36
 Conjuncts:    120
 Disjuncts:    36
+Builtins:     0
 -- out/eval --
 Errors:
 b14: incompatible bounds >=6 and <=5:

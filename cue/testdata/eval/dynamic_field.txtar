@@ -80,6 +80,7 @@ Retain: 11
 Unifications: 61
 Conjuncts:    77
 Disjuncts:    66
+Builtins:     0
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:

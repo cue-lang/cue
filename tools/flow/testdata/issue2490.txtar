@@ -39,6 +39,7 @@ Retain: 0
 Unifications: 7
 Conjuncts:    16
 Disjuncts:    9
+Builtins:     1
 -- out/run/stats/totals --
 Leaks:  0
 Freed:  9
@@ -49,3 +50,4 @@ Retain: 0
 Unifications: 7
 Conjuncts:    16
 Disjuncts:    9
+Builtins:     1

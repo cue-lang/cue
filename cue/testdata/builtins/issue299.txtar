@@ -14,6 +14,7 @@ Retain: 0
 Unifications: 2
 Conjuncts:    5
 Disjuncts:    3
+Builtins:     0
 -- out/eval --
 Errors:
 x: invalid value ["x","x"] (does not satisfy list.UniqueItems):

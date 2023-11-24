@@ -17,6 +17,7 @@ Retain: 2
 Unifications: 10
 Conjuncts:    14
 Disjuncts:    10
+Builtins:     2
 -- out/eval --
 Errors:
 B.c: field not allowed:

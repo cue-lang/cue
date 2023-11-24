@@ -28,6 +28,7 @@ Retain: 0
 Unifications: 11
 Conjuncts:    12
 Disjuncts:    11
+Builtins:     0
 -- out/eval --
 (struct){
   bool1: (string){ "1+1=2:  true" }

@@ -13,6 +13,7 @@ Retain: 2
 Unifications: 6
 Conjuncts:    13
 Disjuncts:    6
+Builtins:     2
 -- out/eval --
 Errors:
 embed.#x: conflicting values 2 and 1:

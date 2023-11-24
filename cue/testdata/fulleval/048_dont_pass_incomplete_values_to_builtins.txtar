@@ -24,6 +24,7 @@ Retain: 0
 Unifications: 3
 Conjuncts:    7
 Disjuncts:    3
+Builtins:     5
 -- out/eval --
 (struct){
   input: (string){ string }

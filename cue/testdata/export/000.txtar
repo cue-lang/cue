@@ -27,5 +27,6 @@ Retain: 0
 Unifications: 1
 Conjuncts:    2
 Disjuncts:    1
+Builtins:     0
 -- out/eval --
 (string){ "hello" }

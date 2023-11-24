@@ -78,6 +78,7 @@ Retain: 22
 Unifications: 45
 Conjuncts:    135
 Disjuncts:    86
+Builtins:     0
 -- out/eval --
 Errors:
 issue2351.let.param: conflicting values "foo" and [{}] (mismatched types string and list):

@@ -142,6 +142,7 @@ Retain: 0
 Unifications: 147
 Conjuncts:    564
 Disjuncts:    304
+Builtins:     0
 -- out/eval --
 Errors:
 f: 2 errors in empty disjunction:

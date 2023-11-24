@@ -41,6 +41,7 @@ Retain: 0
 Unifications: 28
 Conjuncts:    56
 Disjuncts:    40
+Builtins:     0
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:

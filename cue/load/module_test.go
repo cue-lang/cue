@@ -10,6 +10,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/registrytest"
+	"cuelang.org/go/internal/txtarfs"
 )
 
 func TestModuleFetch(t *testing.T) {
@@ -18,7 +19,7 @@ func TestModuleFetch(t *testing.T) {
 		Name: "modfetch",
 	}
 	test.Run(t, func(t *cuetxtar.Test) {
-		rfs, err := fs.Sub(registrytest.TxtarFS(t.Archive), "_registry")
+		rfs, err := fs.Sub(txtarfs.FS(t.Archive), "_registry")
 		if err != nil {
 			t.Fatal(err)
 		}

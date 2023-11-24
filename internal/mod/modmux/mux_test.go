@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/modzip"
 	"cuelang.org/go/internal/registrytest"
+	"cuelang.org/go/internal/txtarfs"
 )
 
 const contents = `
@@ -56,7 +57,7 @@ package x
 `
 
 func TestMux(t *testing.T) {
-	rfs := registrytest.TxtarFS(txtar.Parse([]byte(contents)))
+	rfs := txtarfs.FS(txtar.Parse([]byte(contents)))
 	const numRegistries = 2
 	registries := make([]*registrytest.Registry, numRegistries)
 	for i := 0; i < numRegistries; i++ {
@@ -94,7 +95,7 @@ func TestMux(t *testing.T) {
 	// Verify that we can put a module too.
 	var zbuf bytes.Buffer
 	zw := zip.NewWriter(&zbuf)
-	zipAddFS(zw, registrytest.TxtarFS(txtar.Parse([]byte(`
+	zipAddFS(zw, txtarfs.FS(txtar.Parse([]byte(`
 -- cue.mod/module.cue --
 module: "other.com/a/b@v1"
 -- x.cue --

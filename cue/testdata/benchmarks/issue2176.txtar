@@ -68,6 +68,7 @@ Retain: 1359
 Unifications: 4161
 Conjuncts:    9489
 Disjuncts:    4804
+Builtins:     573
 -- out/eval --
 (struct){
   #Datastream: (#struct){

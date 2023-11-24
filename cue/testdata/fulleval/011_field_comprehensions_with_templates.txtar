@@ -87,6 +87,7 @@ Retain: 0
 Unifications: 8
 Conjuncts:    12
 Disjuncts:    8
+Builtins:     0
 -- out/eval --
 (struct){
   num: (int){ 1 }

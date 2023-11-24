@@ -30,6 +30,7 @@ Retain: 0
 Unifications: 3
 Conjuncts:    5
 Disjuncts:    3
+Builtins:     0
 -- out/eval --
 (struct){
   do: (struct){

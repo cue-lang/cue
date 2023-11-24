@@ -19,6 +19,7 @@ Retain: 0
 Unifications: 10
 Conjuncts:    23
 Disjuncts:    10
+Builtins:     0
 -- out/eval --
 (struct){
   #TopLevel: (#struct){

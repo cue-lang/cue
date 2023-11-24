@@ -33,6 +33,7 @@ Retain: 0
 Unifications: 43
 Conjuncts:    83
 Disjuncts:    45
+Builtins:     7
 -- out/eval --
 Errors:
 f.ben: incompatible list lengths (1 and 2)

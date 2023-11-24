@@ -30,6 +30,7 @@ Retain: 2
 Unifications: 3
 Conjuncts:    8
 Disjuncts:    5
+Builtins:     1
 -- out/eval --
 (struct){ |(*(#struct){
   }, (struct){

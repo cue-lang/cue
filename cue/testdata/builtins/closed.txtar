@@ -51,6 +51,7 @@ Retain: 40
 Unifications: 185
 Conjuncts:    365
 Disjuncts:    190
+Builtins:     19
 -- out/eval --
 Errors:
 b.x: field not allowed:

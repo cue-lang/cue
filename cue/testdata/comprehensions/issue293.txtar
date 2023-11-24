@@ -34,6 +34,7 @@ Retain: 3
 Unifications: 14
 Conjuncts:    25
 Disjuncts:    15
+Builtins:     2
 -- out/eval --
 Errors:
 z.x.f2: field not allowed:

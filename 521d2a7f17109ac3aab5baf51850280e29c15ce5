@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba0ff747_2da46577",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-27T21:59:39Z",
+      "side": 1,
+      "message": "nit: note that you\u0027re over slightly in both of these lines.",
+      "revId": "521d2a7f17109ac3aab5baf51850280e29c15ce5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11508e8a_bf03106c",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-11-27T21:59:39Z",
+      "side": 1,
+      "message": "perhaps call this `yieldFile` to clarify what it does.",
+      "range": {
+        "startLine": 77,
+        "startChar": 5,
+        "endLine": 77,
+        "endChar": 16
+      },
+      "revId": "521d2a7f17109ac3aab5baf51850280e29c15ce5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

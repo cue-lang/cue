@@ -16,6 +16,24 @@
       "message": "I\u0027d expand the commit message slightly to explain if we think this might cause regressions for any users - I assume not, because a unary operator with a basic type doesn\u0027t sound useful, but it would still be nice to explain that.",
       "revId": "7833949ef350fbacd9cf079953454e43af591f9f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d415836_7af8a1fb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-11-29T14:15:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "806781af_f6bb790d",
+      "revId": "7833949ef350fbacd9cf079953454e43af591f9f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

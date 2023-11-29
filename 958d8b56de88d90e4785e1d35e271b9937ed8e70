@@ -22,6 +22,30 @@
       },
       "revId": "958d8b56de88d90e4785e1d35e271b9937ed8e70",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c3a0dc3d_f7c1aa88",
+        "filename": "cue/testdata/comprehensions/issue293.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2023-11-29T14:22:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9a82164_79a2da07",
+      "range": {
+        "startLine": 31,
+        "startChar": 9,
+        "endLine": 31,
+        "endChar": 23
+      },
+      "revId": "958d8b56de88d90e4785e1d35e271b9937ed8e70",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

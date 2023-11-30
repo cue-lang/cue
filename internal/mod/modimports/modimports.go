@@ -2,8 +2,11 @@ package modimports
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"path"
+	"sort"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -22,6 +25,58 @@ type ModuleFile struct {
 	// Syntax includes only the portion of the file up to and including
 	// the imports. It will be nil if there was an error reading the file.
 	Syntax *ast.File
+}
+
+// AllImports returns a sorted list of all the package paths
+// imported by the module files produced by modFilesIter.
+func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, retErr error) {
+	pkgPaths := make(map[string]bool)
+	modFilesIter(func(mf ModuleFile, err error) bool {
+		if err != nil {
+			retErr = fmt.Errorf("cannot read %q: %v", mf.FilePath, err)
+			return false
+		}
+		// TODO look at build tags and omit files with "ignore" tags.
+		for _, imp := range mf.Syntax.Imports {
+			pkgPath, err := strconv.Unquote(imp.Path.Value)
+			if err != nil {
+				// TODO location formatting
+				retErr = fmt.Errorf("invalid import path %q in %s", imp.Path.Value, mf.FilePath)
+				return false
+			}
+			pkgPaths[pkgPath] = true
+		}
+		return true
+	})
+	if retErr != nil {
+		return nil, retErr
+	}
+	// TODO use maps.Keys when we can.
+	pkgPathSlice := make([]string, 0, len(pkgPaths))
+	for p := range pkgPaths {
+		pkgPathSlice = append(pkgPathSlice, p)
+	}
+	sort.Strings(pkgPathSlice)
+	return pkgPathSlice, nil
+}
+
+// PackageFiles returns an iterator that produces all the CUE files
+// inside the package at the given location.
+func PackageFiles(fsys fs.FS, dir string) func(func(ModuleFile, error) bool) {
+	return func(yield func(ModuleFile, error) bool) {
+		entries, err := fs.ReadDir(fsys, dir)
+		if err != nil {
+			yield(ModuleFile{
+				FilePath: dir,
+			}, err)
+			return
+		}
+		for _, e := range entries {
+			if !yieldPackageFile(fsys, path.Join(dir, e.Name()), yield) {
+				return
+			}
+		}
+	}
 }
 
 // AllModuleFiles returns an iterator that produces all the CUE files inside the
@@ -63,9 +118,6 @@ func AllModuleFiles(fsys fs.FS, root string) func(func(ModuleFile, error) bool) 
 				}
 				return nil
 			}
-			if !strings.HasSuffix(fpath, ".cue") {
-				return nil
-			}
 			if !yieldPackageFile(fsys, fpath, yield) {
 				return fs.SkipAll
 			}
@@ -74,11 +126,14 @@ func AllModuleFiles(fsys fs.FS, root string) func(func(ModuleFile, error) bool) 
 	}
 }
 
-func yieldPackageFile(fsys fs.FS, path string, yield func(ModuleFile, error) bool) bool {
-	pf := ModuleFile{
-		FilePath: path,
+func yieldPackageFile(fsys fs.FS, fpath string, yield func(ModuleFile, error) bool) bool {
+	if !strings.HasSuffix(fpath, ".cue") {
+		return true
 	}
-	f, err := fsys.Open(path)
+	pf := ModuleFile{
+		FilePath: fpath,
+	}
+	f, err := fsys.Open(fpath)
 	if err != nil {
 		return yield(pf, err)
 	}
@@ -87,7 +142,7 @@ func yieldPackageFile(fsys fs.FS, path string, yield func(ModuleFile, error) boo
 	if err != nil {
 		return yield(pf, err)
 	}
-	syntax, err := parser.ParseFile(path, data, parser.ParseComments)
+	syntax, err := parser.ParseFile(fpath, data, parser.ParseComments)
 	if err != nil {
 		return yield(pf, err)
 	}

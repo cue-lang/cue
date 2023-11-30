@@ -1,14 +1,14 @@
 {
 	add:     add        @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
 	isPrime: is_prime() @extern("bar.wasm", abi=c, name=is_prime, sig="func(uint64): bool")
-	fact:    fact       @extern("bar.wasm", abi=c, sig="func(uint64): uint64")
+	fact:    fact()     @extern("bar.wasm", abi=c, sig="func(uint64): uint64")
 	a0:      -42
 	b1:      true
 	b2:      false
 	c1:      5040
-	neg32:   neg32 @extern("bar.wasm", abi=c, sig="func(int32): int32")
-	mul:     mul   @extern("foo.wasm", abi=c, sig="func(float64, float64): float64")
-	not:     not() @extern("foo.wasm", abi=c, sig="func(bool): bool")
+	neg32:   neg32() @extern("bar.wasm", abi=c, sig="func(int32): int32")
+	mul:     mul     @extern("foo.wasm", abi=c, sig="func(float64, float64): float64")
+	not:     not()   @extern("foo.wasm", abi=c, sig="func(bool): bool")
 	x0:      3
 	x1:      1
 	x2:      101

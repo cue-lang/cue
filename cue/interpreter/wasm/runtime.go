@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"os"
 
-	"cuelang.org/go/internal/pkg"
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
@@ -109,6 +108,8 @@ func (m *module) load() (*instance, error) {
 	inst := instance{
 		module:   m,
 		instance: wInst,
+		alloc:    wInst.ExportedFunction("allocate"),
+		free:     wInst.ExportedFunction("deallocate"),
 	}
 	return &inst, nil
 }
@@ -117,6 +118,14 @@ func (m *module) load() (*instance, error) {
 type instance struct {
 	*module
 	instance api.Module
+
+	// alloc is a guest function that allocates guest memory on
+	// behalf of the host.
+	alloc api.Function
+
+	// free is a guest function that frees guest memory on
+	// behalf of the host.
+	free api.Function
 }
 
 // load attempts to load the named function from the instance, returning
@@ -129,29 +138,48 @@ func (i *instance) load(funcName string) (api.Function, error) {
 	return f, nil
 }
 
-// callCtxFunc returns a function that wraps fn, which is assumed to
-// be of type typ, into a function that knows how to load its arguments
-// from CUE, call fn with the arguments, then pass its result
-// back to CUE.
-func (i *instance) callCtxFunc(fn api.Function, typ fnTyp) func(*pkg.CallCtxt) {
-	return func(c *pkg.CallCtxt) {
-		var args []uint64
-		for k, t := range typ.args {
-			//
-			// TODO: support more than abi=c here.
-			//
-			args = append(args, loadArg(c, k, t))
-		}
-		if c.Do() {
-			results, err := fn.Call(i.ctx, args...)
-			if err != nil {
-				c.Err = err
-				return
-			}
-			//
-			// TODO: support more than abi=c here.
-			//
-			c.Ret = decodeRet(results[0], typ.ret)
-		}
+// Alloc returns a reference to newly allocated guest memory that spans
+// the provided size.
+func (i *instance) Alloc(size uint32) (*memory, error) {
+	res, err := i.alloc.Call(i.ctx, uint64(size))
+	if err != nil {
+		return nil, fmt.Errorf("can't allocate memory: requested %d bytes", size)
 	}
+	return &memory{
+		i:   i,
+		ptr: uint32(res[0]),
+		len: size,
+	}, nil
+}
+
+// Free frees previously allocated guest memory.
+func (i *instance) Free(m *memory) {
+	i.free.Call(i.ctx, uint64(m.ptr), uint64(m.len))
+}
+
+// memory is a read and write reference to guest memory that the host
+// requested.
+type memory struct {
+	i   *instance
+	ptr uint32
+	len uint32
+}
+
+// Bytes return a copy of the contents of the guest memory to the host.
+func (m *memory) Bytes() []byte {
+	bytes, ok := m.i.instance.Memory().Read(m.ptr, m.len)
+	if !ok {
+		panic(fmt.Sprintf("can't read %d bytes from Wasm address %#x", m.len, m.ptr))
+	}
+	return bytes
+}
+
+// Write writes into p guest memory referenced by n.
+// p must fit into m.
+func (m *memory) Write(p []byte) (int, error) {
+	ok := m.i.instance.Memory().Write(m.ptr, p)
+	if !ok {
+		panic(fmt.Sprintf("can't write %d bytes to Wasm address %#x", len(p), m.ptr))
+	}
+	return len(p), nil
 }

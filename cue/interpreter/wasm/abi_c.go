@@ -15,64 +15,145 @@
 package wasm
 
 import (
+	"fmt"
+
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/pkg"
 	"github.com/tetratelabs/wazero/api"
 )
 
-func decodeRet(r uint64, t typ) any {
-	switch t {
-	case _bool:
-		u := api.DecodeU32(r)
-		if u == 1 {
-			return true
-		}
-		return false
-	case _int8, _int16, _int32:
-		return api.DecodeI32(r)
-	case _uint8, _uint16, _uint32:
-		return api.DecodeU32(r)
-	case _int64, _uint64:
-		return r
-	case _float32:
-		return api.DecodeF32(r)
-	case _float64:
-		return api.DecodeF64(r)
+func encBool(b bool) uint64 {
+	if b {
+		return api.EncodeU32(1)
 	}
-	panic("unsupported return type")
+	return api.EncodeU32(0)
 }
 
-// loadArg load the i'th argument (which must be of type t)
-// passed to a function call represented by the call context.
-// It returns the argument as an uint64, so it can be passed
-// directly to Wasm functions.
-func loadArg(c *pkg.CallCtxt, i int, t typ) uint64 {
-	switch t {
-	case _bool:
-		b := c.Bool(i)
-		if b {
-			return api.EncodeU32(1)
-		}
-		return api.EncodeU32(0)
-	case _int8:
-		return api.EncodeI32(int32(c.Int8(i)))
-	case _int16:
-		return api.EncodeI32(int32(c.Int16(i)))
-	case _int32:
-		return api.EncodeI32(c.Int32(i))
-	case _int64:
-		return api.EncodeI64(c.Int64(i))
-	case _uint8:
-		return api.EncodeU32(uint32(c.Uint8(i)))
-	case _uint16:
-		return api.EncodeU32(uint32(c.Uint16(i)))
-	case _uint32:
-		return api.EncodeU32(c.Uint32(i))
-	case _uint64:
-		return c.Uint64(i)
-	case _float32:
-		return api.EncodeF32(float32(c.Float64(i)))
-	case _float64:
-		return api.EncodeF64(c.Float64(i))
+// encNumber returns the Wasm/System V ABI representation of the number
+// wrapped into val, which must conform to the type of typ.
+func encNumber(typ cue.Value, val cue.Value) (r uint64) {
+	ctx := val.Context()
+
+	_int32 := ctx.CompileString("int32")
+	if _int32.Subsume(typ) == nil {
+		i, _ := val.Int64()
+		return api.EncodeI32(int32(i))
 	}
-	panic("unsupported argument type")
+
+	_int64 := ctx.CompileString("int64")
+	if _int64.Subsume(typ) == nil {
+		i, _ := val.Int64()
+		return api.EncodeI64(i)
+	}
+
+	_uint32 := ctx.CompileString("uint32")
+	if _uint32.Subsume(typ) == nil {
+		i, _ := val.Uint64()
+		return api.EncodeU32(uint32(i))
+	}
+
+	_uint64 := ctx.CompileString("uint64")
+	if _uint64.Subsume(typ) == nil {
+		i, _ := val.Uint64()
+		return i
+	}
+
+	_float32 := ctx.CompileString("float32")
+	if _float32.Subsume(typ) == nil {
+		f, _ := val.Float64()
+		return api.EncodeF32(float32(f))
+	}
+
+	_float64 := ctx.CompileString("float64")
+	if _float64.Subsume(typ) == nil {
+		f, _ := val.Float64()
+		return api.EncodeF64(f)
+	}
+
+	panic("encNumber: unsupported argument type")
+}
+
+func decBool(v uint64) bool {
+	u := api.DecodeU32(v)
+	if u == 1 {
+		return true
+	}
+	return false
+}
+
+// decNumber decodes the the Wasm/System V ABI encoding of the
+// val number of type typ into a Go value.
+func decNumber(typ cue.Value, val uint64) (r any) {
+	ctx := typ.Context()
+
+	_int32 := ctx.CompileString("int32")
+	if _int32.Subsume(typ) == nil {
+		return api.DecodeI32(val)
+	}
+
+	_uint32 := ctx.CompileString("uint32")
+	if _uint32.Subsume(typ) == nil {
+		return api.DecodeU32(val)
+	}
+
+	_int64 := ctx.CompileString("int64")
+	if _int64.Subsume(typ) == nil {
+		return int64(val)
+	}
+
+	_uint64 := ctx.CompileString("uint64")
+	if _uint64.Subsume(typ) == nil {
+		return val
+	}
+
+	_float32 := ctx.CompileString("float32")
+	if _float32.Subsume(typ) == nil {
+		return api.DecodeF32(val)
+	}
+
+	_float64 := ctx.CompileString("float64")
+	if _float64.Subsume(typ) == nil {
+		return api.DecodeF64(val)
+	}
+
+	panic(fmt.Sprintf("unsupported argument type %v (kind %v)", typ, typ.IncompleteKind()))
+}
+
+// cABIFunc implements the Wasm/System V ABI translation. The named
+// function, which must be loadable by the instance, and must be of
+// the specified sig type, will be called by the runtime after its
+// arguments will be converted according to the ABI. The result of the
+// call will be then also be converted back into a Go value and handed
+// to the runtime.
+func cABIFunc(i *instance, name string, sig []cue.Value) func(*pkg.CallCtxt) {
+	fn, _ := i.load(name)
+	return func(c *pkg.CallCtxt) {
+		var args []uint64
+		argsTyp, resTyp := splitLast(sig)
+		for k, typ := range argsTyp {
+			switch typ.IncompleteKind() {
+			case cue.BoolKind:
+				args = append(args, encBool(c.Bool(k)))
+			case cue.IntKind, cue.FloatKind, cue.NumberKind:
+				args = append(args, encNumber(typ, c.Value(k)))
+			default:
+				panic(fmt.Sprintf("unsupported argument type %v (kind %v)", typ, typ.IncompleteKind()))
+			}
+		}
+		if c.Do() {
+			res, err := fn.Call(i.ctx, args...)
+			if err != nil {
+				c.Err = err
+				return
+			}
+			switch resTyp.IncompleteKind() {
+			case cue.BoolKind:
+				c.Ret = decBool(res[0])
+			case cue.IntKind, cue.FloatKind, cue.NumberKind:
+				c.Ret = decNumber(resTyp, res[0])
+			default:
+				panic(fmt.Sprintf("unsupported result type %v (kind %v)", resTyp, resTyp.IncompleteKind()))
+			}
+		}
+	}
 }

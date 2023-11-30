@@ -119,6 +119,12 @@ func decNumber(typ cue.Value, val uint64) (r any) {
 	panic(fmt.Sprintf("unsupported argument type %v (kind %v)", typ, typ.IncompleteKind()))
 }
 
+func encBytes(i *instance, b []byte) *memory {
+	m, _ := i.Alloc(uint32(len(b)))
+	m.Write(b)
+	return m
+}
+
 // cABIFunc implements the Wasm/System V ABI translation. The named
 // function, which must be loadable by the instance, and must be of
 // the specified sig type, will be called by the runtime after its
@@ -126,6 +132,24 @@ func decNumber(typ cue.Value, val uint64) (r any) {
 // call will be then also be converted back into a Go value and handed
 // to the runtime.
 func cABIFunc(i *instance, name string, sig []cue.Value) func(*pkg.CallCtxt) {
+	// Compute the layout of all encountered structs (arguments
+	// and result) such that we will have it available at the time
+	// of an actuall call.
+	var argLayouts []*structLayout
+	var retLayout *structLayout
+	argsTyp, resTyp := splitLast(sig)
+	for _, typ := range argsTyp {
+		switch typ.IncompleteKind() {
+		case cue.StructKind:
+			argLayouts = append(argLayouts, structLayoutVal(typ))
+		default:
+			argLayouts = append(argLayouts, nil)
+		}
+	}
+	if resTyp.IncompleteKind() == cue.StructKind {
+		retLayout = structLayoutVal(resTyp)
+	}
+
 	fn, _ := i.load(name)
 	return func(c *pkg.CallCtxt) {
 		var args []uint64
@@ -136,10 +160,25 @@ func cABIFunc(i *instance, name string, sig []cue.Value) func(*pkg.CallCtxt) {
 				args = append(args, encBool(c.Bool(k)))
 			case cue.IntKind, cue.FloatKind, cue.NumberKind:
 				args = append(args, encNumber(typ, c.Value(k)))
+			case cue.StructKind:
+				ms := encode(i, c.Value(k), argLayouts[k])
+				for _, m := range ms {
+					defer i.Free(m)
+				}
+				args = append(args, uint64(ms[0].ptr))
 			default:
 				panic(fmt.Sprintf("unsupported argument type %v (kind %v)", typ, typ.IncompleteKind()))
 			}
 		}
+
+		var retMem *memory
+		if resTyp.IncompleteKind() == cue.StructKind {
+			retMem, _ = i.Alloc(uint32(retLayout.size))
+			// TODO: add support for structs containing pointers.
+			defer i.Free(retMem)
+			args = append(args, uint64(retMem.ptr))
+		}
+
 		if c.Do() {
 			res, err := fn.Call(i.ctx, args...)
 			if err != nil {
@@ -151,6 +190,8 @@ func cABIFunc(i *instance, name string, sig []cue.Value) func(*pkg.CallCtxt) {
 				c.Ret = decBool(res[0])
 			case cue.IntKind, cue.FloatKind, cue.NumberKind:
 				c.Ret = decNumber(resTyp, res[0])
+			case cue.StructKind:
+				c.Ret = decode(retMem.Bytes(), retLayout)
 			default:
 				panic(fmt.Sprintf("unsupported result type %v (kind %v)", resTyp, resTyp.IncompleteKind()))
 			}

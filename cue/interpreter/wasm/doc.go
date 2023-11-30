@@ -43,10 +43,10 @@
 // used by the function (see below) while sig indicates the type
 // signature of the function. The grammar for sig is:
 //
-//	list    := ident [ { "," ident } ]
-//	func    := "func" "(" [ list ] ")" ":" ident
+//	list    := expr [ { "," expr } ]
+//	func    := "func" "(" [ list ] ")" ":" expr
 //
-// Where ident are all valid CUE identifiers.
+// Where expr are all valid CUE identifiers and selectors.
 //
 // The specific ABI used may restrict the allowable signatures further.
 //
@@ -88,11 +88,22 @@
 //
 // # ABI requirements for Wasm modules
 //
-// Currently only the [C ABI] is supported. Furthermore, only scalar
-// data types can be exchanged between CUE and Wasm. That means booleans,
-// sized integers, and sized floats. The sig field in the attribute
-// refers to these data types by their CUE names, such as bool, uint16,
-// float64.
+// Currently only the [System V ABI] (also known as the C ABI) is
+// supported. Furthermore, only scalar data types and structs containing
+// either scalar types or other structs can be exchanged between CUE
+// and Wasm. Scalar means booleans, sized integers, and sized floats.
+// The sig field in the attribute refers to these data types by their
+// CUE names, such as bool, uint16, float64.
+//
+// Additionally the Wasm module must export two functions with the
+// following C type signature:
+//
+//	void*	allocate(int n);
+//	void	deallocate(void *ptr, int n);
+//
+// Allocate returns a Wasm pointer to a buffer of size n. Deallocate
+// takes a Wasm pointer and the size of the buffer it points to and
+// frees it.
 //
 // # How to compile Rust for use in CUE
 //
@@ -116,7 +127,32 @@
 //	    a * b
 //	}
 //
-// [C ABI]: https://github.com/WebAssembly/tool-conventions/blob/main/BasicCABI.md
+// The following Rust functions can be used to implement allocate and
+// deallocate described above:
+//
+//	#[cfg_attr(all(target_arch = "wasm32"), export_name = "allocate")]
+//	#[no_mangle]
+//	pub extern "C" fn _allocate(size: u32) -> *mut u8 {
+//	    allocate(size as usize)
+//	}
+//
+//	fn allocate(size: usize) -> *mut u8 {
+//	    let vec: Vec<MaybeUninit<u8>> = Vec::with_capacity(size);
+//
+//	    Box::into_raw(vec.into_boxed_slice()) as *mut u8
+//	}
+//
+//	#[cfg_attr(all(target_arch = "wasm32"), export_name = "deallocate")]
+//	#[no_mangle]
+//	pub unsafe extern "C" fn _deallocate(ptr: u32, size: u32) {
+//	    deallocate(ptr as *mut u8, size as usize);
+//	}
+//
+//	unsafe fn deallocate(ptr: *mut u8, size: usize) {
+//	    let _ = Vec::from_raw_parts(ptr, 0, size);
+//	}
+//
+// [System V ABI]: https://github.com/WebAssembly/tool-conventions/blob/main/BasicCABI.md
 // [no_std]: https://docs.rust-embedded.org/book/intro/no-std.html
 // [WASI]: https://wasi.dev
 // [cargo target]: https://doc.rust-lang.org/cargo/reference/cargo-targets.html

@@ -171,7 +171,7 @@ func (m *memory) Bytes() []byte {
 	if !ok {
 		panic(fmt.Sprintf("can't read %d bytes from Wasm address %#x", m.len, m.ptr))
 	}
-	return bytes
+	return append([]byte{}, bytes...)
 }
 
 // Write writes into p guest memory referenced by n.
@@ -182,4 +182,10 @@ func (m *memory) Write(p []byte) (int, error) {
 		panic(fmt.Sprintf("can't write %d bytes to Wasm address %#x", len(p), m.ptr))
 	}
 	return len(p), nil
+}
+
+// Args returns a memory in the form of pair of arguments dirrectly
+// passable to Wasm.
+func (m *memory) Args() []uint64 {
+	return []uint64{uint64(m.ptr), uint64(m.len)}
 }

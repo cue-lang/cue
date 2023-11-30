@@ -83,12 +83,12 @@ z:   false
 // ---
 add:     add
 isPrime: is_prime()
-fact:    fact
+fact:    fact()
 a0:      -42
 b1:      true
 b2:      false
 c1:      5040
-neg32:   neg32
+neg32:   neg32()
 mul:     mul
 not:     not()
 x0:      3

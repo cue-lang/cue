@@ -157,6 +157,13 @@ func (i *instance) Free(m *memory) {
 	i.free.Call(i.ctx, uint64(m.ptr), uint64(m.len))
 }
 
+// Free frees several previously allocated guest memories.
+func (i *instance) FreeAll(ms []*memory) {
+	for _, m := range ms {
+		i.free.Call(i.ctx, uint64(m.ptr), uint64(m.len))
+	}
+}
+
 // memory is a read and write reference to guest memory that the host
 // requested.
 type memory struct {
@@ -171,15 +178,25 @@ func (m *memory) Bytes() []byte {
 	if !ok {
 		panic(fmt.Sprintf("can't read %d bytes from Wasm address %#x", m.len, m.ptr))
 	}
-	return bytes
+	return append([]byte{}, bytes...)
 }
 
-// Write writes into p guest memory referenced by n.
-// p must fit into m.
-func (m *memory) Write(p []byte) (int, error) {
-	ok := m.i.instance.Memory().Write(m.ptr, p)
+// WriteAt writes p at the given relative offset within m.
+// It panics if buf doesn't fit into m, or if off is out of bounds.
+func (m *memory) WriteAt(p []byte, off int64) (int, error) {
+	if (off < 0) || (off >= 1<<32-1) {
+		panic(fmt.Sprintf("can't write %d bytes to Wasm address %#x", len(p), m.ptr))
+	}
+
+	ok := m.i.instance.Memory().Write(m.ptr+uint32(off), p)
 	if !ok {
 		panic(fmt.Sprintf("can't write %d bytes to Wasm address %#x", len(p), m.ptr))
 	}
 	return len(p), nil
+}
+
+// Args returns a memory in the form of pair of arguments directly
+// passable to Wasm.
+func (m *memory) Args() []uint64 {
+	return []uint64{uint64(m.ptr), uint64(m.len)}
 }

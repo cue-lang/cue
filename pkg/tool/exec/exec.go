@@ -71,6 +71,16 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		cmd.Stderr = ctx.Stderr
 	}
 
+	// TODO(mvdan): exec.Run declares mustSucceed as a regular field with a default of true.
+	// We should be able to rely on that here, removing the need for Exists and repeating the default.
+	mustSucceed := true
+	if v := ctx.Obj.LookupPath(cue.ParsePath("mustSucceed")); v.Exists() {
+		mustSucceed, err = v.Bool()
+		if err != nil {
+			return nil, errors.Wrapf(err, v.Pos(), "invalid bool value")
+		}
+	}
+
 	update := map[string]interface{}{}
 	if captureOut {
 		var stdout []byte
@@ -80,15 +90,23 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		err = cmd.Run()
 	}
 	update["success"] = err == nil
-	if err != nil {
-		if exit := (*exec.ExitError)(nil); errors.As(err, &exit) && captureErr {
+
+	if err == nil {
+		return update, nil
+	}
+
+	if captureErr {
+		if exit := (*exec.ExitError)(nil); errors.As(err, &exit) {
 			update["stderr"] = string(exit.Stderr)
 		} else {
-			update = nil
+			update["stderr"] = err.Error()
 		}
-		err = fmt.Errorf("command %q failed: %v", doc, err)
 	}
-	return update, err
+	if !mustSucceed {
+		return update, nil
+	}
+
+	return nil, fmt.Errorf("command %q failed: %v", doc, err)
 }
 
 func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {

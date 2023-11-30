@@ -1,0 +1,32 @@
+{
+	magnitude2: magnitude2() @extern("struct.wasm", abi=c, sig="func(#vector2): float64")
+	magnitude3: magnitude3() @extern("struct.wasm", abi=c, sig="func(#vector3): float64")
+	m0:         1.4142135623730951
+	m1:         2.0
+	m2:         798.6121211702211
+	normalize2: normalize2 @extern("struct.wasm", abi=c, sig="func(#vector2): #vector2")
+	n2: {
+		x: 0.7071067811865476
+		y: 0.7071067811865476
+	}
+	n2m:     1.0
+	m3:      1.7320508075688772
+	m4:      2.8284271247461903
+	m5:      6.666666666666667
+	double3: double3 @extern("struct.wasm", abi=c, sig="func(#vector3): #vector3")
+	d4: {
+		x: 0.0
+		y: 4.0
+		z: 4.0
+	}
+	cornucopia: cornucopia() @extern("struct.wasm", abi=c, sig="func(#cornucopia): int64")
+	c0:         42
+	c1:         6
+	c2:         99
+	c3:         -10014990
+	mag:        magnitude_foo() @extern("struct.wasm", abi=c, name=magnitude_foo, sig="func(#foo): float64")
+	mb0:        1.4142135623730951
+	mb1:        5.0
+	mb2:        37.0
+	mb3:        6.472356603278283
+}

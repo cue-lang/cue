@@ -18,11 +18,9 @@ import (
 	"path/filepath"
 	"strings"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -44,9 +42,10 @@ func (i *interpreter) Kind() string {
 
 // NewCompiler returns a Wasm compiler that services the specified
 // build.Instance.
-func (i *interpreter) NewCompiler(b *build.Instance, _ *coreruntime.Runtime) (coreruntime.Compiler, errors.Error) {
+func (i *interpreter) NewCompiler(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Compiler, errors.Error) {
 	return &compiler{
 		b:         b,
+		runtime:   r,
 		instances: make(map[string]*instance),
 	}, nil
 }
@@ -54,7 +53,8 @@ func (i *interpreter) NewCompiler(b *build.Instance, _ *coreruntime.Runtime) (co
 // A compiler is a [coreruntime.Compiler]
 // that provides Wasm functionality to the runtime.
 type compiler struct {
-	b *build.Instance
+	b       *build.Instance
+	runtime *coreruntime.Runtime
 
 	// instances maps absolute file names to compiled Wasm modules
 	// loaded into memory.
@@ -64,7 +64,7 @@ type compiler struct {
 // Compile searches for a Wasm function described by the given `@extern`
 // attribute and returns it as an [adt.Builtin] with the given function
 // name.
-func (c *compiler) Compile(funcName string, _ adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
+func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (adt.Expr, errors.Error) {
 	file, err := fileName(a)
 	if err != nil {
 		return nil, errors.Promote(err, "invalid attribute")
@@ -85,12 +85,11 @@ func (c *compiler) Compile(funcName string, _ adt.Value, a *internal.Attr) (adt.
 		return nil, errors.Newf(token.NoPos, "can't load Wasm module: %v", err)
 	}
 
-	funcType, err := funcType(a)
+	args, err := argList(a)
 	if err != nil {
 		return nil, errors.Newf(token.NoPos, "invalid function signature: %v", err)
 	}
-
-	builtin, err := builtin(funcName, funcType, inst)
+	builtin, err := generateCallThatReturnsBuiltin(funcName, scope, args, inst)
 	if err != nil {
 		return nil, errors.Newf(token.NoPos, "can't instantiate function: %v", err)
 	}
@@ -131,53 +130,4 @@ func fileName(a *internal.Attr) (string, error) {
 		return "", err
 	}
 	return file, nil
-}
-
-// funcType parses the attribute and returns the found function signature
-// as a fnTyp, or an error.
-func funcType(a *internal.Attr) (fnTyp, error) {
-	funcSig, ok, err := a.Lookup(1, "sig")
-	if err != nil {
-		return fnTyp{}, err
-	}
-	if !ok {
-		return fnTyp{}, errors.New(`missing "sig" key`)
-	}
-	return parseFuncSig(funcSig)
-}
-
-// parseFuncSig parses the string and returns the found function
-// signature as a fnTyp, or an error.
-func parseFuncSig(sig string) (fnTyp, error) {
-	expr, err := parser.ParseExpr("", sig, parser.ParseFuncs)
-	if err != nil {
-		return fnTyp{}, err
-	}
-	return toFnTyp(expr)
-}
-
-// toFnTyp convert e, which must be an *ast.Func, to a fnTyp.
-func toFnTyp(e ast.Expr) (fnTyp, error) {
-	f, ok := e.(*ast.Func)
-	if !ok {
-		// TODO: once we have position information, make this
-		// error more user-friendly by returning the position.
-		return fnTyp{}, errors.New("not a function")
-	}
-
-	var args []typ
-	for _, arg := range append(f.Args, f.Ret) {
-		switch v := arg.(type) {
-		case *ast.Ident:
-			args = append(args, typ(v.Name))
-		default:
-			// TODO: once we have position information, make this
-			// error more user-friendly by returning the position.
-			return fnTyp{}, errors.Newf(token.NoPos, "expected identifier, found %T", v)
-		}
-	}
-	return fnTyp{
-		args: args[:len(args)-1],
-		ret:  args[len(args)-1],
-	}, nil
 }

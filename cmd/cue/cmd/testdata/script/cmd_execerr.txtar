@@ -1,0 +1,56 @@
+! exec cue cmd cannotFail
+cmp stderr cannotFail-stderr.golden
+
+exec cue cmd canFail
+cmp stdout canFail-stdout.golden
+
+-- cue.mod/module.cue --
+module: "example.com"
+
+-- cannotFail-stderr.golden --
+task failed: command "false" failed: exit status 1
+-- canFail-stdout.golden --
+errExit:
+success=false
+hasStderr=false
+
+errNotFound:
+success=false
+hasStderr=true
+-- foo_tool.cue --
+package foo
+
+import (
+	"tool/cli"
+	"tool/exec"
+)
+
+command: cannotFail: {
+	one: exec.Run & {
+		cmd: ["false"]
+	}
+}
+
+command: canFail: {
+	errExit: exec.Run & {
+		cmd: ["false"]
+		stderr: string
+		mustSucceed: false
+	}
+	errNotFound: exec.Run & {
+		cmd: ["program-does-not-exist"]
+		stderr: string
+		mustSucceed: false
+	}
+	second: cli.Print & {
+		text: """
+			errExit:
+			success=\(errExit.success)
+			hasStderr=\(errExit.stderr != "")
+
+			errNotFound:
+			success=\(errNotFound.success)
+			hasStderr=\(errNotFound.stderr != "")
+			"""
+	}
+}

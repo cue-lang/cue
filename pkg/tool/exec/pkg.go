@@ -38,6 +38,10 @@
 //		// code or false otherwise. The user can explicitly specify the value
 //		// force a fatal error if the desired success code is not reached.
 //		success: bool
+//
+//		// mustSucceed indicates whether a command must succeed, in which case success==false results in a fatal error.
+//		// This option is enabled by default, but may be disabled to control what is done when a command execution fails.
+//		mustSucceed: bool | *true
 //	}
 package exec
 
@@ -62,10 +66,11 @@ var p = &pkg.Package{
 		env: {
 			[string]: string | [...=~"="]
 		}
-		stdout:  *null | string | bytes
-		stderr:  *null | string | bytes
-		stdin:   *null | string | bytes
-		success: bool
+		stdout:      *null | string | bytes
+		stderr:      *null | string | bytes
+		stdin:       *null | string | bytes
+		success:     bool
+		mustSucceed: bool | *true
 	}
 }`,
 }

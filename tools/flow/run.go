@@ -61,6 +61,7 @@ func (c *Controller) runLoop() {
 
 		// Mark tasks as Ready.
 		for _, t := range c.tasks {
+			t := t
 			switch t.state {
 			case Waiting:
 				waiting = true

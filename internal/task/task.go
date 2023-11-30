@@ -19,18 +19,23 @@ import (
 	"context"
 	"io"
 	"sync"
+	"sync/atomic"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/value"
+	"cuelang.org/go/tools/flow"
 )
 
 // A Context provides context for running a task.
 type Context struct {
 	Context context.Context
 
+	TaskKey func(v cue.Value) (string, error)
+
+	Root   cue.Value
 	Stdin  io.Reader
 	Stdout io.Writer
 	Stderr io.Writer
@@ -88,6 +93,71 @@ func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interfa
 		Message: errors.NewMessagef(format, args...),
 	}
 	c.Err = errors.Append(c.Err, errors.Wrap(err, wrap))
+}
+
+var IsLegacy error = errors.New("legacy task error")
+
+// NewTaskFunc creates a flow.TaskFunc that uses global settings from Context
+// and a taskKey function to determine the kind of task to run.
+func (c Context) TaskFunc(didWork *atomic.Bool) flow.TaskFunc {
+	return func(v cue.Value) (flow.Runner, error) {
+		kind, err := c.TaskKey(v)
+		var isLegacy bool
+		if err == IsLegacy {
+			err = nil
+			isLegacy = true
+		}
+
+		if err != nil || kind == "" {
+			return nil, err
+		}
+
+		didWork.Store(true)
+
+		rf := Lookup(kind)
+		if rf == nil {
+			return nil, errors.Newf(v.Pos(), "runner of kind %q not found", kind)
+		}
+
+		// Verify entry against template.
+		v = value.UnifyBuiltin(v, kind)
+		if err := v.Err(); err != nil {
+			err = v.Validate()
+			return nil, errors.Promote(err, "newTask")
+		}
+
+		runner, err := rf(v)
+		if err != nil {
+			return nil, errors.Promote(err, "errors running task")
+		}
+
+		if !isLegacy {
+			v = cue.Value{}
+		}
+
+		return c.flowFunc(runner, v), nil
+	}
+}
+
+// flowFunc takes a Runner and a schema v, which should only be defined for
+// legacy task ids.
+func (c Context) flowFunc(runner Runner, v cue.Value) flow.RunnerFunc {
+	return func(t *flow.Task) error {
+		// Set task-specific values.
+		c.Context = t.Context()
+		c.Obj = t.Value()
+		if v.Exists() {
+			c.Obj = c.Obj.Unify(v)
+		}
+		value, err := runner.Run(&c)
+		if err != nil {
+			return err
+		}
+		if value != nil {
+			_ = t.Fill(value)
+		}
+		return nil
+	}
 }
 
 // taskError wraps some error values to retain position information about the

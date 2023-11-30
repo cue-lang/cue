@@ -18,7 +18,7 @@ require (
 	github.com/rogpeppe/go-internal v1.12.0
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
-	github.com/tetratelabs/wazero v1.0.2
+	github.com/tetratelabs/wazero v1.5.0
 	golang.org/x/mod v0.14.0
 	golang.org/x/net v0.19.0
 	golang.org/x/oauth2 v0.15.0

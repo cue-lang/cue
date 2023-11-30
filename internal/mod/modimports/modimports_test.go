@@ -40,6 +40,51 @@ func TestAllPackageFiles(t *testing.T) {
 			if diff := cmp.Diff(string(want), out.String()); diff != "" {
 				t.Fatalf("unexpected results (-want +got):\n%s", diff)
 			}
+			wantImports, err := fs.ReadFile(tfs, "want-imports")
+			qt.Assert(t, qt.IsNil(err))
+			out.Reset()
+			imports, err := AllImports(AllModuleFiles(tfs, "."))
+			if err != nil {
+				fmt.Fprintf(&out, "error: %v\n", err)
+			} else {
+				for _, imp := range imports {
+					fmt.Fprintln(&out, imp)
+				}
+			}
+			if diff := cmp.Diff(string(wantImports), out.String()); diff != "" {
+				t.Fatalf("unexpected results for ImportsForModuleFiles (-want +got):\n%s", diff)
+			}
 		})
 	}
+}
+
+func TestPackageFiles(t *testing.T) {
+	dirContents := txtar.Parse([]byte(`
+-- x1.cue --
+package x
+
+import (
+	"foo"
+	"bar.com/baz"
+)
+-- x2.cue --
+package x
+
+import (
+	"something.else"
+)
+-- foo/y.cue --
+import "other"
+-- omitted.go --
+-- omitted --
+-- y.cue --
+package y
+`))
+	tfs := txtarfs.FS(dirContents)
+	imps, err := AllImports(PackageFiles(tfs, "."))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(imps, []string{"bar.com/baz", "foo", "something.else"}))
+	imps, err = AllImports(PackageFiles(tfs, "foo"))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(imps, []string{"other"}))
 }

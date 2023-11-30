@@ -1,4 +1,6 @@
 -- want --
 x.cue: error: expected label or ':', found 'IDENT' contents
+-- want-imports --
+error: cannot read "x.cue": expected label or ':', found 'IDENT' contents
 -- x.cue --
 bogus contents

@@ -1,9 +1,14 @@
 -- want --
 x.cue "dep1" "dep2" "dep3"
-y/y1.cue
+y/y1.cue "dep3" "dep4"
 y/y2.cue
 y/z1.cue
 y/z2.cue
+-- want-imports --
+dep1
+dep2
+dep3
+dep4
 -- cue.mod/module.cue --
 module: "example.com"
 
@@ -19,7 +24,10 @@ import "dep3"
 x: true
 -- y/y1.cue --
 package y
-
+import (
+	"dep3"
+	"dep4"
+)
 
 -- y/y2.cue --
 package y

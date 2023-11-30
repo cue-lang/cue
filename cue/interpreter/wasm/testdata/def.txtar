@@ -1,3 +1,9 @@
+# In the output external functions appear as a function call, like
+# `add()` and `not()`. This is because they are implemented as a
+# higher-order function which returns the actual callable builtin.
+# Since this is `cue def` we don't run the functions, so we see the
+# call to this higher-order construct.
+
 exec cue def ./basic ./morewasm ./noload ./unusedwasm
 cmp stdout eval.out
 
@@ -72,8 +78,8 @@ x2: add(100, 1)
 -- eval.out --
 package p
 
-add: add   @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
-mul: mul   @extern("foo.wasm", abi=c, sig="func(float64, float64): float64")
+add: add() @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
+mul: mul() @extern("foo.wasm", abi=c, sig="func(float64, float64): float64")
 not: not() @extern("foo.wasm", abi=c, sig="func(bool): bool")
 x0:  add(1, 2)
 x1:  add(-1, 2)
@@ -85,16 +91,16 @@ z:   not(true)
 // ---
 package p
 
-add:     add        @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
+add:     add()      @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
 isPrime: is_prime() @extern("bar.wasm", abi=c, name=is_prime, sig="func(uint64): bool")
-fact:    fact       @extern("bar.wasm", abi=c, sig="func(uint64): uint64")
+fact:    fact()     @extern("bar.wasm", abi=c, sig="func(uint64): uint64")
 a0:      neg32(42)
 b1:      isPrime(127)
 b2:      isPrime(128)
 c1:      fact(7)
-neg32:   neg32 @extern("bar.wasm", abi=c, sig="func(int32): int32")
-mul:     mul   @extern("foo.wasm", abi=c, sig="func(float64, float64): float64")
-not:     not() @extern("foo.wasm", abi=c, sig="func(bool): bool")
+neg32:   neg32() @extern("bar.wasm", abi=c, sig="func(int32): int32")
+mul:     mul()   @extern("foo.wasm", abi=c, sig="func(float64, float64): float64")
+not:     not()   @extern("foo.wasm", abi=c, sig="func(bool): bool")
 x0:      add(1, 2)
 x1:      add(-1, 2)
 x2:      add(100, 1)
@@ -110,7 +116,7 @@ x: 42
 // ---
 package p
 
-add: add @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
+add: add() @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
 x0:  add(1, 2)
 x1:  add(-1, 2)
 x2:  add(100, 1)

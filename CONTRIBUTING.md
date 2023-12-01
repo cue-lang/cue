@@ -64,6 +64,11 @@ inherently distributed nature of open-source this coordination is important
 because it very often serves as the main form of communication between
 contributors.
 
+You can also exchange ideas or feedback with other contributors via the
+`#contributing` [Slack channel](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE),
+as well as the contributor office hours calls which we hold via the
+[community calendar](https://cuelang.org/s/community-calendar) once per week.
+
 ### Check the issue tracker
 
 Whether you already know what contribution to make, or you are searching for an

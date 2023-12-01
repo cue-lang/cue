@@ -33,6 +33,24 @@
       "message": "Does this work when the user has specified that the stderr output is `bytes` rather than `string` ? I guess it would have been an existing bug if it didn\u0027t this wouldn\u0027t be the place to fix it, but it would be nice to have a test case.",
       "revId": "e816ace8670cd8b92c26b6358ae60dbfaf356195",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "516cbb29_bd4dfa68",
+        "filename": "pkg/tool/exec/exec.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-01T12:27:19Z",
+      "side": 1,
+      "message": "this is existing code, so I don\u0027t think we should touch it in this CL :) if you can reproduce a bug with that theory, then please do file a new issue and we can fix in a separate CL.\n\nas far as I can tell, we don\u0027t seem to have any tests that capture stdout/stderr as bytes, which arguably is a fault on its own.",
+      "parentUuid": "abf83117_5feb0f13",
+      "revId": "e816ace8670cd8b92c26b6358ae60dbfaf356195",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

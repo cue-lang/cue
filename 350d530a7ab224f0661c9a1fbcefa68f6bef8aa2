@@ -51,6 +51,24 @@
       "parentUuid": "ba52bff9_fd36b25b",
       "revId": "350d530a7ab224f0661c9a1fbcefa68f6bef8aa2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9dace92b_9cd5ccbf",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-01T13:11:59Z",
+      "side": 1,
+      "message": "Ah that\u0027s why it didn\u0027t work :)",
+      "parentUuid": "18b2df94_e0665dd5",
+      "revId": "350d530a7ab224f0661c9a1fbcefa68f6bef8aa2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

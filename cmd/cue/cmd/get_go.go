@@ -549,9 +549,10 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
-			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
-				return err
+			if p, ok := p.Imports[path]; ok {
+				if err := e.extractPkg(root, p); err != nil {
+					return err
+				}
 			}
 		}
 	}

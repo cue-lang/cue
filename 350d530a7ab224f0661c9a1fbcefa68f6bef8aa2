@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "697584ca_f35b639e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-01T13:04:19Z",
+      "side": 1,
+      "message": "With one nit.",
+      "revId": "350d530a7ab224f0661c9a1fbcefa68f6bef8aa2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba52bff9_fd36b25b",
+        "filename": "CONTRIBUTING.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-01T13:04:19Z",
+      "side": 1,
+      "message": "This link doesn\u0027t appear to take me anywhere. Creating a link from the channel in Slack itself I got https://cuelang.slack.com/archives/CMY132JKY",
+      "revId": "350d530a7ab224f0661c9a1fbcefa68f6bef8aa2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

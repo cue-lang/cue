@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc0c7250_4919edb9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-01T12:22:40Z",
+      "side": 1,
+      "message": "LGTM modulo one musing on a possible bug in passing, thanks (and thanks to Nick Figgins for working on it!).",
+      "revId": "e816ace8670cd8b92c26b6358ae60dbfaf356195",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abf83117_5feb0f13",
+        "filename": "pkg/tool/exec/exec.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-01T12:22:40Z",
+      "side": 1,
+      "message": "Does this work when the user has specified that the stderr output is `bytes` rather than `string` ? I guess it would have been an existing bug if it didn\u0027t this wouldn\u0027t be the place to fix it, but it would be nice to have a test case.",
+      "revId": "e816ace8670cd8b92c26b6358ae60dbfaf356195",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -8,6 +8,10 @@ cmp stdout expect-stdout2
 # Issue #369
 exec cue import --with-context -l '"\(path.Ext(filename))": data' ./import3/data.json
 cmpenv import3/data.cue expect3
+
+# Issue #2721
+exec cue import -f --list issue2721/empty.yaml
+cmp issue2721/empty.cue issue2721/empty.cue.golden
 -- expect-stdout1 --
 service: [{
 	kind: "Service"
@@ -50,3 +54,7 @@ deployment: [{
 -- import3/data.json --
 [1]
 -- cue.mod --
+
+-- issue2721/empty.yaml --
+-- issue2721/empty.cue.golden --
+[]

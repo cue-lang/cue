@@ -295,8 +295,10 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 			f.Decls = append(f.Decls, x.Elts...)
 		case *ast.ListLit:
 			f.Decls = append(f.Decls, &ast.EmbedDecl{Expr: x})
+		case nil:
+			f.Decls = append(f.Decls, &ast.ListLit{})
 		default:
-			panic("unreachable")
+			panic(fmt.Sprintf("unexpected type %T", x))
 		}
 	}
 

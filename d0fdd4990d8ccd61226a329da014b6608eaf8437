@@ -16,6 +16,23 @@
       "message": "Sounds reasonable to me, but needs a test :) Please also verify that the test panics without the fix, and does something reasonable with the fix.",
       "revId": "d0fdd4990d8ccd61226a329da014b6608eaf8437",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2db4b6ed_f75ceb25",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-04T08:55:31Z",
+      "side": 1,
+      "message": "Does this also solve https://cuelang.org/issue/2714?",
+      "revId": "d0fdd4990d8ccd61226a329da014b6608eaf8437",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

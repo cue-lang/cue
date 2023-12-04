@@ -111,6 +111,16 @@ func Version(minor, patch int) int {
 	return -1000 + 100*minor + patch
 }
 
+type EvaluatorVersion int
+
+const (
+	DefaultVersion EvaluatorVersion = iota
+
+	// The DevVersion is used for new implementations of the evaluator that
+	// do not cover all features of the CUE language yet.
+	DevVersion
+)
+
 // ListEllipsis reports the list type and remaining elements of a list. If we
 // ever relax the usage of ellipsis, this function will likely change. Using
 // this function will ensure keeping correct behavior or causing a compiler

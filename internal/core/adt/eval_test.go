@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
@@ -52,7 +53,7 @@ func TestEval(t *testing.T) {
 	}
 
 	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc, adt.DefaultVersion)
+		runEvalTest(tc, internal.DefaultVersion)
 	})
 }
 
@@ -82,13 +83,14 @@ func TestEvalAlpha(t *testing.T) {
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
-		runEvalTest(t, adt.DevVersion)
+		runEvalTest(t, internal.DevVersion)
 	})
 }
 
-func runEvalTest(t *cuetxtar.Test, version adt.EvaluatorVersion) {
+func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 	a := t.Instance()
-	r := runtime.New()
+	// TODO: use version once we implement disjunctions.
+	r := runtime.NewVersioned(internal.DefaultVersion)
 
 	v, err := r.Build(nil, a)
 	if err != nil {
@@ -130,8 +132,8 @@ func TestX(t *testing.T) {
 	var verbosity int
 	verbosity = 1 // comment to turn logging off.
 
-	var version adt.EvaluatorVersion
-	version = adt.DevVersion // comment to use default implementation.
+	var version internal.EvaluatorVersion
+	version = internal.DevVersion // comment to use default implementation.
 
 	in := `
 -- cue.mod/module.cue --
@@ -150,7 +152,7 @@ module: "mod.test"
 		t.Fatal(instance.Err)
 	}
 
-	r := runtime.New()
+	r := runtime.NewVersioned(version)
 
 	v, err := r.Build(nil, instance)
 	if err != nil {
@@ -164,7 +166,6 @@ module: "mod.test"
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)
-	ctx.Version = version
 	v.Finalize(ctx)
 	adt.Verbosity = 0
 

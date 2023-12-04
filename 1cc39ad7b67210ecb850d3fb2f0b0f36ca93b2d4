@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b46dd4c_fb26e445",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T23:08:38Z",
+      "side": 1,
+      "message": "is there any sort of standard for naming iterators? mfi at least doesn\u0027t seem like a great name to me, I can\u0027t even figure out what it stands for. naively I would have named it something like filesIter or modFilesIter.",
+      "range": {
+        "startLine": 31,
+        "startChar": 48,
+        "endLine": 31,
+        "endChar": 51
+      },
+      "revId": "1cc39ad7b67210ecb850d3fb2f0b0f36ca93b2d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0ee7c90_b5cc8f84",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T23:08:38Z",
+      "side": 1,
+      "message": "add a TODO to use maps.Keys once that lands in std?",
+      "revId": "1cc39ad7b67210ecb850d3fb2f0b0f36ca93b2d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5fcdbf85_fa07ba08",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T23:08:38Z",
+      "side": 1,
+      "message": "wouldn\u0027t the directory already be included in the error value? do we need it here?",
+      "range": {
+        "startLine": 69,
+        "startChar": 4,
+        "endLine": 69,
+        "endChar": 18
+      },
+      "revId": "1cc39ad7b67210ecb850d3fb2f0b0f36ca93b2d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -549,13 +549,38 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
-			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
+			if err := e.extractPkg(root, findPackage(p, path)); err != nil {
 				return err
 			}
 		}
 	}
 
+	return nil
+}
+
+// findPackage finds the package with the given path first by checking direct
+// imports, and then by recursively searching for canonical import paths. This
+// is required for resolving type aliases across packages, and vendored
+// packages. There has been discussion on the efficiency of this approach, but
+// the code path should be quite rare and could be more efficient than iterating
+// over all packages initially, depending on the dependency graph.
+func findPackage(p *packages.Package, path string) *packages.Package {
+	if pkg, ok := p.Imports[path]; ok {
+		return pkg
+	}
+	for _, pkg := range p.Imports {
+		if pkg.PkgPath == path {
+			return pkg
+		}
+		// TODO: This allows type aliases to be resolved across
+		// packages, but may not be necessary from Go 1.22/1.23 with
+		// the new type alias API in go/types.
+		//
+		// See https://github.com/golang/go/issues/63223
+		if pkg := findPackage(pkg, path); pkg != nil {
+			return pkg
+		}
+	}
 	return nil
 }
 

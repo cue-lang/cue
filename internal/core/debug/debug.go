@@ -510,6 +510,16 @@ func (w *printer) node(n adt.Node) {
 		}
 		w.string(")")
 
+	case *adt.ConjunctGroup:
+		w.string("&[")
+		for i, c := range *x {
+			if i > 0 {
+				w.string(", ")
+			}
+			w.node(c.Expr())
+		}
+		w.string("]")
+
 	case *adt.Disjunction:
 		w.string("|(")
 		for i, c := range x.Values {

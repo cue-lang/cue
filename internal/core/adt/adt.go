@@ -251,6 +251,9 @@ func (x *Ellipsis) expr() Expr {
 	}
 	return x.Value
 }
+func (*ConjunctGroup) declNode() {}
+func (*ConjunctGroup) elemNode() {}
+func (*ConjunctGroup) expr()     {}
 
 var top = &Top{}
 
@@ -338,6 +341,7 @@ func (*Comprehension) elemNode() {}
 
 func (*Vertex) node()            {}
 func (*Conjunction) node()       {}
+func (*ConjunctGroup) node()     {}
 func (*Disjunction) node()       {}
 func (*BoundValue) node()        {}
 func (*Builtin) node()           {}

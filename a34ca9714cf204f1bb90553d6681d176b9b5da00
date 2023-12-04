@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ea9c1b6_b718b655",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T23:00:09Z",
+      "side": 1,
+      "message": "my understanding is that graphOnce is about building graph the first time it\u0027s needed, not about guarding writes - it\u0027s not a mutex, and the only write you ever do is the first and only build.",
+      "revId": "a34ca9714cf204f1bb90553d6681d176b9b5da00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27afef00_5cc6b571",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T23:00:09Z",
+      "side": 1,
+      "message": "does that API exist? if not, should this bit of the godoc be removed?",
+      "range": {
+        "startLine": 140,
+        "startChar": 47,
+        "endLine": 140,
+        "endChar": 63
+      },
+      "revId": "a34ca9714cf204f1bb90553d6681d176b9b5da00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b387a39c_24919471",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T23:00:09Z",
+      "side": 1,
+      "message": "can\u0027t wait for this trick to be forgotten.",
+      "revId": "a34ca9714cf204f1bb90553d6681d176b9b5da00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

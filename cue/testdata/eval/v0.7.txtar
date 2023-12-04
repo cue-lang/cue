@@ -1,0 +1,1108 @@
+# Some new cases specific to v0.7
+
+-- builtins.cue --
+import "strings"
+
+mutualBuiltin: t1: ok: {
+	// Results in incomplete error in v0.6
+	s3: strings.ContainsAny(s4)
+	s4: strings.ContainsAny(s3)
+	s4: "dd"
+}
+
+mutualBuiltin: t2: ok: {
+	s3: strings.ContainsAny(s5, "dd")
+	s5: s6
+	s6: "dd"
+}
+
+-- comprehensions.cue --
+comprehensions: t1: ok: {
+	src: ["foo"]
+	for v in src { "\(v)": v }
+}
+
+-- dynamic.cue --
+dynamic: t1: ok: {
+	[X=string]: {name: X}
+	(x.y): {}
+	x: y: "foo"
+}
+
+dynamic: t2: ok: {
+	foo: #X
+	#X: {
+		a: b: C: 1
+		for _ in a {
+			a: ("b"): D: 2
+		}
+	}
+}
+
+-- definition.cue --
+definition: t0: err: {
+	#D1: env: {}
+	d1: env: c: "C"
+	d1: #D1
+}
+
+definition: t1: err: {
+	a: #A
+	a: c: 1
+	// defining after first reference triggers notification mechanism to kick in.
+	#A: {}
+}
+
+definition: t2: ok: p1: {
+	#A: {
+		...
+		{a: int}
+	}
+	x: #A & { c: int }
+}
+
+definition: t2: ok: p2: {
+	#A: {
+		{a: int}
+		...
+	}
+	x: #A & { c: int }
+}
+
+definition: t2: ok: p3: {
+	x: #A & { c: int }
+	#A: {
+		...
+		{a: int}
+	}
+}
+
+definition: t2: ok: p4: {
+	x: #A & { c: int }
+	#A: {
+		{a: int}
+		...
+	}
+}
+
+-- expr.cue --
+expr: t1: ok: {
+	a: X
+	X: 5.0
+	X: Y / 2
+	Y: a * 2
+}
+
+expr: t2: ok: {
+	A: X + 2
+	X: 5
+	X: A - 2
+}
+
+expr: t3: ok: p1: {
+	a0: X
+	X:  5.0
+	X:  a0 * 1
+}
+
+expr: t3: ok: p2: {
+	b: Y * 1
+	Y: b * 1
+	Y: 5.0
+}
+
+expr: t4: ok: {
+	// -> a0 -> X -> b1 -> b0 -> a1 -> a0
+	a0: X // Need all conjuncts known from X
+	b0: a1
+	a1: a0 + 2
+	b1: b0 - 2
+	a0: X
+	X:  b1
+	X:  5.0
+}
+
+-- in.cue --
+mutual: t0: ok: {
+	c: e & {b: 2}
+	e: {a: 1}
+	e: c
+}
+
+mutual: t1: ok: {
+	a: {
+		b
+		b: {b: f: 1}
+	}
+	a: a.b
+	a: b: {b: f: 1}
+}
+
+mutual: t2: ok: {
+	x: a: a: f: 1
+	x: y.a
+	y: a: a: e: 1
+	y: x.a
+}
+
+mutual: t3: ok: {
+	d: e: f: 1
+	d
+	d: d: e: g: 1
+}
+
+// This test fails for some permutations in v0.6.
+mutual: t4: ok: {
+	p0: {
+		z: x.b
+		x: b: y.c
+		x: b: {d: b: 2}
+		y: c: z.d
+		z: d: {a: 1}
+	}
+
+	p1: {
+		x: b: y.c
+		z: x.b
+		x: b: {d: b: 2}
+		y: c: z.d
+		z: d: {a: 1}
+	}
+
+	p2: {
+		x: b: y.c
+		x: b: {d: b: 2}
+		y: c: z.d
+		z: x.b
+		z: d: {a: 1}
+	}
+
+	p3: {
+		x: b: {d: b: 2}
+		y: c: z.d
+		z: x.b
+		x: b: y.c
+		z: d: {a: 1}
+	}
+
+	p4: {
+		z: x.b
+		x: b: {d: b: 2}
+		y: c: z.d
+		x: b: y.c
+		z: d: {a: 1}
+	}
+
+	p5: {
+		x: b: {d: b: 2}
+		y: c: z.d
+		x: b: y.c
+		z: x.b
+		z: d: {a: 1}
+	}
+
+	check: p1 & p2 & p3 & p4 & p5
+}
+
+-- out/eval/stats --
+Leaks:  0
+Freed:  261
+Reused: 249
+Allocs: 12
+Retain: 166
+
+Unifications: 261
+Conjuncts:    1578
+Disjuncts:    408
+-- out/eval --
+Errors:
+definition.t0.err.d1.env.c: field not allowed:
+    ./definition.cue:2:12
+    ./definition.cue:3:11
+    ./definition.cue:4:6
+definition.t1.err.a.c: field not allowed:
+    ./definition.cue:8:5
+    ./definition.cue:9:5
+    ./definition.cue:11:6
+mutual.t4.ok.p0.z: cannot add to field b
+mutual.t4.ok.p0.z: cannot add to field c
+mutual.t4.ok.p4.z: cannot add to field b
+mutual.t4.ok.p4.z: cannot add to field c
+
+Result:
+(_|_){
+  // [eval]
+  mutualBuiltin: (struct){
+    t1: (struct){
+      ok: (struct){
+        s3: (string){ strings.ContainsAny("dd") }
+        s4: (_|_){
+          // [incomplete] mutualBuiltin.t1.ok.s4: invalid value "dd" (does not satisfy strings.ContainsAny(strings.ContainsAny("dd"))): error in call to strings.ContainsAny: non-concrete value string:
+          //     ./builtins.cue:6:6
+          //     ./builtins.cue:5:6
+          //     ./builtins.cue:7:6
+        }
+      }
+    }
+    t2: (struct){
+      ok: (struct){
+        s3: (bool){ true }
+        s5: (string){ "dd" }
+        s6: (string){ "dd" }
+      }
+    }
+  }
+  comprehensions: (struct){
+    t1: (struct){
+      ok: (struct){
+        src: (#list){
+          0: (string){ "foo" }
+        }
+        foo: (string){ "foo" }
+      }
+    }
+  }
+  definition: (_|_){
+    // [eval]
+    t0: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        #D1: (#struct){
+          env: (#struct){
+          }
+        }
+        d1: (_|_){
+          // [eval]
+          env: (_|_){
+            // [eval]
+            c: (_|_){
+              // [eval] definition.t0.err.d1.env.c: field not allowed:
+              //     ./definition.cue:2:12
+              //     ./definition.cue:3:11
+              //     ./definition.cue:4:6
+            }
+          }
+        }
+      }
+    }
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval]
+          c: (_|_){
+            // [eval] definition.t1.err.a.c: field not allowed:
+            //     ./definition.cue:8:5
+            //     ./definition.cue:9:5
+            //     ./definition.cue:11:6
+          }
+        }
+        #A: (#struct){
+        }
+      }
+    }
+    t2: (struct){
+      ok: (struct){
+        p1: (struct){
+          #A: (#struct){
+            a: (int){ int }
+          }
+          x: (#struct){
+            a: (int){ int }
+            c: (int){ int }
+          }
+        }
+        p2: (struct){
+          #A: (#struct){
+            a: (int){ int }
+          }
+          x: (#struct){
+            a: (int){ int }
+            c: (int){ int }
+          }
+        }
+        p3: (struct){
+          x: (#struct){
+            a: (int){ int }
+            c: (int){ int }
+          }
+          #A: (#struct){
+            a: (int){ int }
+          }
+        }
+        p4: (struct){
+          x: (#struct){
+            a: (int){ int }
+            c: (int){ int }
+          }
+          #A: (#struct){
+            a: (int){ int }
+          }
+        }
+      }
+    }
+  }
+  dynamic: (struct){
+    t1: (struct){
+      ok: (struct){
+        x: (struct){
+          y: (string){ "foo" }
+          name: (string){ "x" }
+        }
+        foo: (struct){
+          name: (string){ "foo" }
+        }
+      }
+    }
+    t2: (struct){
+      ok: (struct){
+        foo: (#struct){
+          a: (#struct){
+            b: (#struct){
+              C: (int){ 1 }
+              D: (int){ 2 }
+            }
+          }
+        }
+        #X: (#struct){
+          a: (#struct){
+            b: (#struct){
+              C: (int){ 1 }
+              D: (int){ 2 }
+            }
+          }
+        }
+      }
+    }
+  }
+  expr: (struct){
+    t1: (struct){
+      ok: (struct){
+        a: (float){ 5.0 }
+        X: (float){ 5.0 }
+        Y: (float){ 10.0 }
+      }
+    }
+    t2: (struct){
+      ok: (struct){
+        A: (int){ 7 }
+        X: (int){ 5 }
+      }
+    }
+    t3: (struct){
+      ok: (struct){
+        p1: (struct){
+          a0: (float){ 5.0 }
+          X: (float){ 5.0 }
+        }
+        p2: (struct){
+          b: (float){ 5.0 }
+          Y: (float){ 5.0 }
+        }
+      }
+    }
+    t4: (struct){
+      ok: (struct){
+        a0: (float){ 5.0 }
+        b0: (float){ 7.0 }
+        a1: (float){ 7.0 }
+        b1: (float){ 5.0 }
+        X: (float){ 5.0 }
+      }
+    }
+  }
+  mutual: (_|_){
+    // [eval]
+    t0: (struct){
+      ok: (struct){
+        c: (struct){
+          b: (int){ 2 }
+          a: (int){ 1 }
+        }
+        e: (struct){
+          a: (int){ 1 }
+          b: (int){ 2 }
+        }
+      }
+    }
+    t1: (struct){
+      ok: (struct){
+        a: (struct){
+          b: (struct){
+            b: (struct){
+              f: (int){ 1 }
+            }
+            f: (int){ 1 }
+          }
+          f: (int){ 1 }
+        }
+      }
+    }
+    t2: (struct){
+      ok: (struct){
+        x: (struct){
+          a: (struct){
+            a: (struct){
+              f: (int){ 1 }
+            }
+            e: (int){ 1 }
+          }
+          f: (int){ 1 }
+        }
+        y: (struct){
+          a: (struct){
+            a: (struct){
+              e: (int){ 1 }
+            }
+            f: (int){ 1 }
+          }
+          e: (int){ 1 }
+        }
+      }
+    }
+    t3: (struct){
+      ok: (struct){
+        d: (struct){
+          e: (struct){
+            f: (int){ 1 }
+            g: (int){ 1 }
+          }
+          d: (struct){
+            e: (struct){
+              g: (int){ 1 }
+            }
+          }
+        }
+        e: (struct){
+          f: (int){ 1 }
+          g: (int){ 1 }
+        }
+      }
+    }
+    t4: (_|_){
+      // [eval]
+      ok: (_|_){
+        // [eval]
+        p0: (_|_){
+          // [eval]
+          z: (_|_){
+            // [eval] mutual.t4.ok.p0.z: cannot add to field b
+            // mutual.t4.ok.p0.z: cannot add to field c
+            d: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }
+          x: (struct){
+            b: (struct){
+              a: (int){ 1 }
+              d: (struct){
+                b: (int){ 2 }
+              }
+            }
+          }
+          y: (struct){
+            c: (struct){
+              a: (int){ 1 }
+            }
+          }
+        }
+        p1: (struct){
+          x: (struct){
+            b: (struct){
+              d: (struct){
+                b: (int){ 2 }
+              }
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+          }
+          z: (struct){
+            d: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }
+          y: (struct){
+            c: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+          }
+        }
+        p2: (struct){
+          x: (struct){
+            b: (struct){
+              d: (struct){
+                b: (int){ 2 }
+              }
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+          }
+          y: (struct){
+            c: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+          }
+          z: (struct){
+            d: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }
+        }
+        p3: (struct){
+          x: (struct){
+            b: (struct){
+              d: (struct){
+                b: (int){ 2 }
+              }
+              b: (int){ 2 }
+              a: (int){ 1 }
+            }
+          }
+          y: (struct){
+            c: (struct){
+              b: (int){ 2 }
+              a: (int){ 1 }
+            }
+          }
+          z: (struct){
+            d: (struct){
+              b: (int){ 2 }
+              a: (int){ 1 }
+            }
+            b: (int){ 2 }
+            a: (int){ 1 }
+          }
+        }
+        p4: (_|_){
+          // [eval]
+          z: (_|_){
+            // [eval] mutual.t4.ok.p4.z: cannot add to field b
+            // mutual.t4.ok.p4.z: cannot add to field c
+            d: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }
+          x: (struct){
+            b: (struct){
+              d: (struct){
+                b: (int){ 2 }
+              }
+              a: (int){ 1 }
+            }
+          }
+          y: (struct){
+            c: (struct){
+              a: (int){ 1 }
+            }
+          }
+        }
+        p5: (struct){
+          x: (struct){
+            b: (struct){
+              d: (struct){
+                b: (int){ 2 }
+              }
+              b: (int){ 2 }
+              a: (int){ 1 }
+            }
+          }
+          y: (struct){
+            c: (struct){
+              b: (int){ 2 }
+              a: (int){ 1 }
+            }
+          }
+          z: (struct){
+            d: (struct){
+              b: (int){ 2 }
+              a: (int){ 1 }
+            }
+            b: (int){ 2 }
+            a: (int){ 1 }
+          }
+        }
+        check: (struct){
+          x: (struct){
+            b: (struct){
+              d: (struct){
+                b: (int){ 2 }
+              }
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+          }
+          z: (struct){
+            d: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }
+          y: (struct){
+            c: (struct){
+              a: (int){ 1 }
+              b: (int){ 2 }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- builtins.cue
+{
+  mutualBuiltin: {
+    t1: {
+      ok: {
+        s3: 〈import;strings〉.ContainsAny(〈0;s4〉)
+        s4: 〈import;strings〉.ContainsAny(〈0;s3〉)
+        s4: "dd"
+      }
+    }
+  }
+  mutualBuiltin: {
+    t2: {
+      ok: {
+        s3: 〈import;strings〉.ContainsAny(〈0;s5〉, "dd")
+        s5: 〈0;s6〉
+        s6: "dd"
+      }
+    }
+  }
+}
+--- comprehensions.cue
+{
+  comprehensions: {
+    t1: {
+      ok: {
+        src: [
+          "foo",
+        ]
+        for _, v in 〈0;src〉 {
+          "\(〈1;v〉)": 〈1;v〉
+        }
+      }
+    }
+  }
+}
+--- definition.cue
+{
+  definition: {
+    t0: {
+      err: {
+        #D1: {
+          env: {}
+        }
+        d1: {
+          env: {
+            c: "C"
+          }
+        }
+        d1: 〈0;#D1〉
+      }
+    }
+  }
+  definition: {
+    t1: {
+      err: {
+        a: 〈0;#A〉
+        a: {
+          c: 1
+        }
+        #A: {}
+      }
+    }
+  }
+  definition: {
+    t2: {
+      ok: {
+        p1: {
+          #A: {
+            ...
+            {
+              a: int
+            }
+          }
+          x: (〈0;#A〉 & {
+            c: int
+          })
+        }
+      }
+    }
+  }
+  definition: {
+    t2: {
+      ok: {
+        p2: {
+          #A: {
+            {
+              a: int
+            }
+            ...
+          }
+          x: (〈0;#A〉 & {
+            c: int
+          })
+        }
+      }
+    }
+  }
+  definition: {
+    t2: {
+      ok: {
+        p3: {
+          x: (〈0;#A〉 & {
+            c: int
+          })
+          #A: {
+            ...
+            {
+              a: int
+            }
+          }
+        }
+      }
+    }
+  }
+  definition: {
+    t2: {
+      ok: {
+        p4: {
+          x: (〈0;#A〉 & {
+            c: int
+          })
+          #A: {
+            {
+              a: int
+            }
+            ...
+          }
+        }
+      }
+    }
+  }
+}
+--- dynamic.cue
+{
+  dynamic: {
+    t1: {
+      ok: {
+        [string]: {
+          name: 〈1;-〉
+        }
+        〈0;x〉.y: {}
+        x: {
+          y: "foo"
+        }
+      }
+    }
+  }
+  dynamic: {
+    t2: {
+      ok: {
+        foo: 〈0;#X〉
+        #X: {
+          a: {
+            b: {
+              C: 1
+            }
+          }
+          for _, _ in 〈0;a〉 {
+            a: {
+              "b": {
+                D: 2
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+--- expr.cue
+{
+  expr: {
+    t1: {
+      ok: {
+        a: 〈0;X〉
+        X: 5.0
+        X: (〈0;Y〉 / 2)
+        Y: (〈0;a〉 * 2)
+      }
+    }
+  }
+  expr: {
+    t2: {
+      ok: {
+        A: (〈0;X〉 + 2)
+        X: 5
+        X: (〈0;A〉 - 2)
+      }
+    }
+  }
+  expr: {
+    t3: {
+      ok: {
+        p1: {
+          a0: 〈0;X〉
+          X: 5.0
+          X: (〈0;a0〉 * 1)
+        }
+      }
+    }
+  }
+  expr: {
+    t3: {
+      ok: {
+        p2: {
+          b: (〈0;Y〉 * 1)
+          Y: (〈0;b〉 * 1)
+          Y: 5.0
+        }
+      }
+    }
+  }
+  expr: {
+    t4: {
+      ok: {
+        a0: 〈0;X〉
+        b0: 〈0;a1〉
+        a1: (〈0;a0〉 + 2)
+        b1: (〈0;b0〉 - 2)
+        a0: 〈0;X〉
+        X: 〈0;b1〉
+        X: 5.0
+      }
+    }
+  }
+}
+--- in.cue
+{
+  mutual: {
+    t0: {
+      ok: {
+        c: (〈0;e〉 & {
+          b: 2
+        })
+        e: {
+          a: 1
+        }
+        e: 〈0;c〉
+      }
+    }
+  }
+  mutual: {
+    t1: {
+      ok: {
+        a: {
+          〈0;b〉
+          b: {
+            b: {
+              f: 1
+            }
+          }
+        }
+        a: 〈0;a〉.b
+        a: {
+          b: {
+            b: {
+              f: 1
+            }
+          }
+        }
+      }
+    }
+  }
+  mutual: {
+    t2: {
+      ok: {
+        x: {
+          a: {
+            a: {
+              f: 1
+            }
+          }
+        }
+        x: 〈0;y〉.a
+        y: {
+          a: {
+            a: {
+              e: 1
+            }
+          }
+        }
+        y: 〈0;x〉.a
+      }
+    }
+  }
+  mutual: {
+    t3: {
+      ok: {
+        d: {
+          e: {
+            f: 1
+          }
+        }
+        〈0;d〉
+        d: {
+          d: {
+            e: {
+              g: 1
+            }
+          }
+        }
+      }
+    }
+  }
+  mutual: {
+    t4: {
+      ok: {
+        p0: {
+          z: 〈0;x〉.b
+          x: {
+            b: 〈1;y〉.c
+          }
+          x: {
+            b: {
+              d: {
+                b: 2
+              }
+            }
+          }
+          y: {
+            c: 〈1;z〉.d
+          }
+          z: {
+            d: {
+              a: 1
+            }
+          }
+        }
+        p1: {
+          x: {
+            b: 〈1;y〉.c
+          }
+          z: 〈0;x〉.b
+          x: {
+            b: {
+              d: {
+                b: 2
+              }
+            }
+          }
+          y: {
+            c: 〈1;z〉.d
+          }
+          z: {
+            d: {
+              a: 1
+            }
+          }
+        }
+        p2: {
+          x: {
+            b: 〈1;y〉.c
+          }
+          x: {
+            b: {
+              d: {
+                b: 2
+              }
+            }
+          }
+          y: {
+            c: 〈1;z〉.d
+          }
+          z: 〈0;x〉.b
+          z: {
+            d: {
+              a: 1
+            }
+          }
+        }
+        p3: {
+          x: {
+            b: {
+              d: {
+                b: 2
+              }
+            }
+          }
+          y: {
+            c: 〈1;z〉.d
+          }
+          z: 〈0;x〉.b
+          x: {
+            b: 〈1;y〉.c
+          }
+          z: {
+            d: {
+              a: 1
+            }
+          }
+        }
+        p4: {
+          z: 〈0;x〉.b
+          x: {
+            b: {
+              d: {
+                b: 2
+              }
+            }
+          }
+          y: {
+            c: 〈1;z〉.d
+          }
+          x: {
+            b: 〈1;y〉.c
+          }
+          z: {
+            d: {
+              a: 1
+            }
+          }
+        }
+        p5: {
+          x: {
+            b: {
+              d: {
+                b: 2
+              }
+            }
+          }
+          y: {
+            c: 〈1;z〉.d
+          }
+          x: {
+            b: 〈1;y〉.c
+          }
+          z: 〈0;x〉.b
+          z: {
+            d: {
+              a: 1
+            }
+          }
+        }
+        check: ((((〈0;p1〉 & 〈0;p2〉) & 〈0;p3〉) & 〈0;p4〉) & 〈0;p5〉)
+      }
+    }
+  }
+}

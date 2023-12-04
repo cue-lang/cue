@@ -33,6 +33,24 @@
       "message": "Does this also solve https://cuelang.org/issue/2714?",
       "revId": "d0fdd4990d8ccd61226a329da014b6608eaf8437",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81b877db_d889fabd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T10:10:32Z",
+      "side": 1,
+      "message": "I don\u0027t think so, given that this code path is only run when using the `--list` flag, but it would be good to double check just in case.",
+      "parentUuid": "2db4b6ed_f75ceb25",
+      "revId": "d0fdd4990d8ccd61226a329da014b6608eaf8437",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

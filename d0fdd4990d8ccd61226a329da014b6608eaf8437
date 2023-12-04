@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db07ef1e_2a0a2ecc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T08:49:50Z",
+      "side": 1,
+      "message": "Sounds reasonable to me, but needs a test :) Please also verify that the test panics without the fix, and does something reasonable with the fix.",
+      "revId": "d0fdd4990d8ccd61226a329da014b6608eaf8437",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

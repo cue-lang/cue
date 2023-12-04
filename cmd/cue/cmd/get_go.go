@@ -549,13 +549,32 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
-			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
+			if err := e.extractPkg(root, findPackage(p, path)); err != nil {
 				return err
 			}
 		}
 	}
 
+	return nil
+}
+
+func findPackage(p *packages.Package, path string) *packages.Package {
+	if pkg, ok := p.Imports[path]; ok {
+		return pkg
+	}
+	for _, pkg := range p.Imports {
+		if pkg.PkgPath == path {
+			return pkg
+		}
+		// TODO: This fixes resolving type aliases, but may not be
+		// necessary from Go 1.22/1.23 with the new type alias API in
+		// go/types.
+		//
+		// See https://github.com/golang/go/issues/63223
+		if pkg := findPackage(pkg, path); pkg != nil {
+			return pkg
+		}
+	}
 	return nil
 }
 

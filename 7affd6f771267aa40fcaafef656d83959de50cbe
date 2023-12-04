@@ -16,6 +16,23 @@
       "message": "I\u0027ve added a test which I\u0027ve confirmed panics without the fix.",
       "revId": "7affd6f771267aa40fcaafef656d83959de50cbe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba2e9375_62a5c4bf",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T13:33:39Z",
+      "side": 1,
+      "message": "Thanks! LGTM. Looks safe enough, and it is a panic fix, so I\u0027ll include this in the imminent v0.7.0-rc.1.",
+      "revId": "7affd6f771267aa40fcaafef656d83959de50cbe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -324,6 +324,22 @@ const (
 	// We could also define types for required fields and potentially lets.
 )
 
+func (a ArcType) String() string {
+	switch a {
+	case ArcMember:
+		return "Member"
+	case ArcOptional:
+		return "Optional"
+	case ArcRequired:
+		return "Required"
+	case ArcPending:
+		return "Pending"
+	case ArcNotPresent:
+		return "NotPresent"
+	}
+	return fmt.Sprintf("ArcType(%d)", a)
+}
+
 // definitelyExists reports whether an arc is a constraint or member arc.
 // TODO: we should check that users of this call ensure there are no
 // ArcPendings.

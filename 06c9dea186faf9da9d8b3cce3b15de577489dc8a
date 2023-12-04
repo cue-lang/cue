@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a0237d49_2fe01bf2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T15:22:35Z",
+      "side": 1,
+      "message": "For the sake of giving a little bit more context, how about:\n\n\u003e Most Go APIs like go/types.Package.Path and go/packages.Package.PkgPath\n\u003e use \"full\" or \"canonical\" package paths, whereas go/packages.Package.Imports\n\u003e uses source import paths as map keys as they appear in the import declarations.\n\u003e\n\u003e We mixed the two, using package paths from go/types to index into the Imports map,\n\u003e resulting in nil packages in the edge cases when the two paths are different.\n\u003e One such instance is vendored packages, whose full path may be \"vendor/foo/bar\"\n\u003e when they are simply imported as \"foo/bar\".",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f04009c_2dd8590e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T15:22:35Z",
+      "side": 1,
+      "message": "when you add a test case, you can simply say that the added test cases panic without the fix, meaning the commit is also self-contained without relying on github comments.",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0b1b0db_242df611",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T15:22:35Z",
+      "side": 1,
+      "message": "add:\n\n\u003e , since an alias can point to a type whose package is only an indirect import.",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f779fc6a_c367654e",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T15:22:35Z",
+      "side": 1,
+      "message": "Here\u0027s an attempt at shortening/simplifying this:\n\n\u003e findPackage locates a package given its full package path.\n\u003e Note that we cannot index into [go/packages.Package.Imports],\n\u003e since its keys are source import paths as they appear in import declarations.\n\n(I omit the bit about performance, see my other comment below)",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b3d8694_c6937573",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-04T15:22:35Z",
+      "side": 1,
+      "message": "note that this is DFS, not BFS, so you *are* recursing in the vast majority of cases. moreover, you might be recursing into the same package multiple times, since you don\u0027t deduplicate. I do think that the performance here will be relatively noticeable.\n\nrather than implement BFS by e.g. looping twice, or keeping track of what packages you\u0027ve already visited, I\u0027d personally go straight for a prebuilt map and solve both issues at once.",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

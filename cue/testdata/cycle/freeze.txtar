@@ -1,0 +1,567 @@
+// This files tests that values are properly "frozen" in case of mutual
+// references. Non-structural cyclic references are okay, as long a property
+// that is dependended upon in the cycle is not changed after the fact,
+// that is, a value may not become more specific after it is used.
+-- in.cue --
+freezing: t1: ok: {
+	#a: x: "a"
+	len(#a) // 1
+}
+
+-- comprehension.cue --
+// This should be an incomplete error, as z is inserted in x, over which the
+// comprehension loops. Adding a field z to x would fix this.s
+// This test would fail in the old evaluator, depending on ordering.
+comprehension: t1: _
+comprehension: t1: ok: p0: {
+	x: y: {}
+	// order of comprehensions matter in old evaluator.
+	for _ in x {
+		if true { x: z: a: {} }
+	}
+	if true {
+		if true { x: z: a: {} }
+	}
+}
+
+comprehension: t1: ok: p1: {
+	for _ in x {
+		if true { x: z: a: {} }
+	}
+	x: y: {}
+	if true {
+		if true { x: z: a: {} }
+	}
+}
+
+comprehension: t1: ok: p2: {
+	for _ in x {
+		if true { x: z: a: {} }
+	}
+	if true {
+		if true { x: z: a: {} }
+	}
+	x: y: {}
+}
+
+comprehension: t1: ok: p3: {
+	x: y: {}
+	if true {
+		if true { x: z: a: {} }
+	}
+	for _ in x {
+		if true { x: z: a: {} }
+	}
+}
+
+comprehension: t1: ok: p4: {
+	if true {
+		if true { x: z: a: {} }
+	}
+	x: y: {}
+	for _ in x {
+		if true { x: z: a: {} }
+	}
+}
+
+comprehension: t1: ok: p5: {
+	if true {
+		if true { x: z: a: {} }
+	}
+	for _ in x {
+		if true { x: z: a: {} }
+	}
+	x: y: {}
+}
+
+
+comprehension: t2: err: {
+	a: {
+		x: 1
+		for k, v in a {
+			(k+"q"): v // This increases the set of fields in a.
+		}
+	}
+}
+
+comprehension: t3: err: {
+	// mutual dependencies not okay in this case, as the set of fields grows.
+	a: x: 1
+	b: y: 1
+	a: {
+		for k, v in b {
+			(k+"q"): v
+		}
+	}
+	b: {
+		for k, v in a {
+			(k): v
+		}
+	}
+}
+
+comprehension: t4: ok: {
+	// It is okay to make x more specific as long as no fields are added.
+	x: y: {}
+	for _ in x {
+		if true { x: y: a: {} }
+	}
+}
+
+comprehension: moreSpecific: ok: {
+	a: {
+		x: int
+		for k, v in a {
+			(k): 1
+		}
+	}
+}
+
+comprehension: moreSpecific: err: {
+	a: {
+		x: {y: 1}
+		// len(v) should free the size of x.
+		for k, v in a if len(v) > 0 {
+			(k): {z: 1}
+		}
+	}
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  67
+Reused: 59
+Allocs: 8
+Retain: 12
+
+Unifications: 67
+Conjuncts:    119
+Disjuncts:    76
+-- out/eval --
+Errors:
+comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle
+comprehension.t1.ok.p0.x: field z not allowed by earlier comprehension or reference cycle
+comprehension.t1.ok.p1.x: field z not allowed by earlier comprehension or reference cycle
+comprehension.t1.ok.p2.x: field z not allowed by earlier comprehension or reference cycle
+comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle
+comprehension.t3.err.b: field x not allowed by earlier comprehension or reference cycle
+comprehension.t3.err.b: field yq not allowed by earlier comprehension or reference cycle
+
+Result:
+(_|_){
+  // [eval]
+  comprehension: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      ok: (_|_){
+        // [eval]
+        p0: (_|_){
+          // [eval]
+          x: (_|_){
+            // [eval] comprehension.t1.ok.p0.x: field z not allowed by earlier comprehension or reference cycle
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p1: (_|_){
+          // [eval]
+          x: (_|_){
+            // [eval] comprehension.t1.ok.p1.x: field z not allowed by earlier comprehension or reference cycle
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p2: (_|_){
+          // [eval]
+          x: (_|_){
+            // [eval] comprehension.t1.ok.p2.x: field z not allowed by earlier comprehension or reference cycle
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p3: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p4: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+        p5: (struct){
+          x: (struct){
+            y: (struct){
+            }
+            z: (struct){
+              a: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle
+          x: (int){ 1 }
+          xq: (int){ 1 }
+        }
+      }
+    }
+    t3: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (struct){
+          x: (int){ 1 }
+          yq: (int){ 1 }
+        }
+        b: (_|_){
+          // [eval] comprehension.t3.err.b: field x not allowed by earlier comprehension or reference cycle
+          // comprehension.t3.err.b: field yq not allowed by earlier comprehension or reference cycle
+          y: (int){ 1 }
+          x: (int){ 1 }
+          yq: (int){ 1 }
+        }
+      }
+    }
+    t4: (struct){
+      ok: (struct){
+        x: (struct){
+          y: (struct){
+            a: (struct){
+            }
+          }
+        }
+      }
+    }
+    moreSpecific: (_|_){
+      // [eval]
+      ok: (struct){
+        a: (struct){
+          x: (int){ 1 }
+        }
+      }
+      err: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle
+          x: (struct){
+            y: (int){ 1 }
+            z: (int){ 1 }
+          }
+        }
+      }
+    }
+  }
+  freezing: (struct){
+    t1: (struct){
+      ok: (int){
+        1
+        #a: (#struct){
+          x: (string){ "a" }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- comprehension.cue
+{
+  comprehension: {
+    t1: _
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p0: {
+          x: {
+            y: {}
+          }
+          for _, _ in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p1: {
+          for _, _ in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p2: {
+          for _, _ in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p3: {
+          x: {
+            y: {}
+          }
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          for _, _ in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p4: {
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+          for _, _ in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t1: {
+      ok: {
+        p5: {
+          if true {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          for _, _ in 〈0;x〉 {
+            if true {
+              x: {
+                z: {
+                  a: {}
+                }
+              }
+            }
+          }
+          x: {
+            y: {}
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t2: {
+      err: {
+        a: {
+          x: 1
+          for k, v in 〈1;a〉 {
+            (〈1;k〉 + "q"): 〈1;v〉
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t3: {
+      err: {
+        a: {
+          x: 1
+        }
+        b: {
+          y: 1
+        }
+        a: {
+          for k, v in 〈1;b〉 {
+            (〈1;k〉 + "q"): 〈1;v〉
+          }
+        }
+        b: {
+          for k, v in 〈1;a〉 {
+            〈1;k〉: 〈1;v〉
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    t4: {
+      ok: {
+        x: {
+          y: {}
+        }
+        for _, _ in 〈0;x〉 {
+          if true {
+            x: {
+              y: {
+                a: {}
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    moreSpecific: {
+      ok: {
+        a: {
+          x: int
+          for k, v in 〈1;a〉 {
+            〈1;k〉: 1
+          }
+        }
+      }
+    }
+  }
+  comprehension: {
+    moreSpecific: {
+      err: {
+        a: {
+          x: {
+            y: 1
+          }
+          for k, v in 〈1;a〉 if (len(〈0;v〉) > 0) {
+            〈1;k〉: {
+              z: 1
+            }
+          }
+        }
+      }
+    }
+  }
+}
+--- in.cue
+{
+  freezing: {
+    t1: {
+      ok: {
+        #a: {
+          x: "a"
+        }
+        len(〈0;#a〉)
+      }
+    }
+  }
+}

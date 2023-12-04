@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // Debug sets whether extra aggressive checking should be done.
@@ -174,6 +175,8 @@ type Runtime interface {
 	// LoadType retrieves a previously stored CUE expression for a given Go
 	// type if available.
 	LoadType(t reflect.Type) (src ast.Expr, expr Expr, ok bool)
+
+	EvaluatorVersion() internal.EvaluatorVersion
 }
 
 type Config struct {
@@ -190,22 +193,13 @@ func New(v *Vertex, cfg *Config) *OpContext {
 		Runtime: cfg.Runtime,
 		Format:  cfg.Format,
 		vertex:  v,
+		Version: cfg.Runtime.EvaluatorVersion(),
 	}
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
 	}
 	return ctx
 }
-
-type EvaluatorVersion int
-
-const (
-	DefaultVersion EvaluatorVersion = iota
-
-	// The DevVersion is used for new implementations of the evaluator that
-	// do not cover all features of the CUE language yet.
-	DevVersion
-)
 
 // An OpContext implements CUE's unification operation. It only
 // operates on values that are created with the Runtime with which an OpContext
@@ -215,7 +209,7 @@ type OpContext struct {
 	Runtime
 	Format func(Node) string
 
-	Version EvaluatorVersion
+	Version internal.EvaluatorVersion // Copied from Runtime
 
 	taskContext
 

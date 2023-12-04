@@ -62,6 +62,11 @@ func (w *Visitor) node(n adt.Node) {
 	// TODO: special-case Vertex?
 	case adt.Value:
 
+	case *adt.ConjunctGroup:
+		for _, x := range *x {
+			w.Elem(x.Elem())
+		}
+
 	case *adt.ListLit:
 		for _, x := range x.Elems {
 			w.node(x)

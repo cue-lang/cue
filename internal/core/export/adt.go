@@ -260,6 +260,14 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 		}
 		return ast.NewBinExpr(token.OR, a...)
 
+	case *adt.ConjunctGroup:
+		a := []ast.Expr{}
+		for _, c := range *x {
+			v := e.expr(env, c.Expr())
+			a = append(a, v)
+		}
+		return ast.NewBinExpr(token.AND, a...)
+
 	case *adt.Comprehension:
 		if !x.DidResolve() {
 			return dummyTop

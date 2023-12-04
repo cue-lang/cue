@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/cuetest"
 	"github.com/google/go-cmp/cmp"
+	"github.com/rogpeppe/go-internal/diff"
 	"golang.org/x/tools/txtar"
 )
 
@@ -401,14 +402,14 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 						continue
 					}
 
-					diff := cmp.Diff(string(result), string(fallback))
+					diff := diff.Diff("old", fallback, "new", result)
 					if len(diff) == 0 {
 						continue
 					}
 
 					tc.outFiles = append(tc.outFiles, file{
 						name: "diff/-" + sub.name + "<==>+" + sub.fallback,
-						buf:  bytes.NewBufferString(diff),
+						buf:  bytes.NewBuffer(diff),
 						diff: true,
 					})
 				}

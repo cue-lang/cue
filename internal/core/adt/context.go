@@ -146,7 +146,7 @@ func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 }
 
 // PathToString creates a pretty-printed path of the given list of features.
-func (c *OpContext) PathToString(r Runtime, path []Feature) string {
+func (c *OpContext) PathToString(path []Feature) string {
 	var b strings.Builder
 	for i, f := range path {
 		if i > 0 {

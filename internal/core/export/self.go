@@ -447,7 +447,7 @@ func (p *pivotter) addExternal(d *depData) {
 
 	ast.SetRelPos(let, token.NewSection)
 
-	path := p.x.ctx.PathToString(p.x.ctx, d.node().Path())
+	path := p.x.ctx.PathToString(d.node().Path())
 	var msg string
 	if d.dstImport == nil {
 		msg = fmt.Sprintf("//cue:path: %s", path)

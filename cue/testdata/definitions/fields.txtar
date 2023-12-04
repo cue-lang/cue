@@ -1,0 +1,1080 @@
+// Tests fields.go
+
+-- in.cue --
+// TODO: reorganize ordered on what is tested by name. E.g.
+// insertion: longPath: ok: p1: {
+//     a: .... @fail()
+// }
+
+ok: t1: {
+	c: #R
+	c: [{b: int}]
+	#R: [...]
+}
+
+ok: t2: {
+	#A: _
+	l: #A
+	l: f: "hi"
+}
+
+ok: t3: {
+	#A: f: {...}
+	#A1: { #A }
+	s: [string]: #A1
+	s: foo: f: d: foo: 1
+}
+
+ok: t4: {
+	#T: { a: b: 1 }
+	W: {
+		{#T}
+		b: c: 2
+	}
+}
+
+ok: t5: {
+	// TODO: this should pass
+	#A: {
+		Common
+		_
+	}
+	Common: { }
+	x: #A
+	x: c: int
+}
+
+ok: t6: {
+	#A: {
+		Common
+		...
+	}
+	Common: { }
+	x: #A
+	x: c: int
+}
+
+ok: t7: {
+	a: {#A, #B}
+	#A: b: f: 1
+	#B: b: g: 1
+}
+
+ok: t8: {
+	// TODO: this should pass
+	foo: #X
+	#X: {
+		a: b: c: C: 1
+		for k, _ in a {
+			// dynamic field causes insertion one level higher. This causes
+			// b to be inserted in a, after it has been referenced.
+			a: (k): c: D: 2
+		}
+	}
+}
+
+ok: t9: {
+	c: #R
+	c: [{b: int}]
+	#R: [...]
+}
+
+ok: t10: {
+	#A: _ // top should allow everything
+	l: #A
+	l: f: "hi"
+}
+
+ok: t11: {
+	// indirections
+	#A: f: {...}
+	#A1: { #A }
+	s: [string]: #A1
+	s: foo: f: d: foo: "bar" // should pass
+}
+
+ok: t12: {
+	// nested embedding
+	#T: { a: b: 1 }
+	W: {
+		{#T}
+		b: c: 2
+	}
+}
+
+ok: t13: {
+	// TODO: this should pass
+
+	// top opens up
+	#A: {
+		Common
+		_
+	}
+	Common: { }
+	x: #A
+	x: c: int
+}
+
+ok: t14: {
+	// ellipsis opens up
+	#A: {
+		Common
+		...
+	}
+	Common: { }
+	x: #A
+	x: c: int
+}
+
+
+err: t1: {
+	#D: _ & {a: 2}
+	a: #D
+	a: disallowed: 1
+}
+
+err: t2: {
+	#S: { { c: d: 1 } }
+	V: #S
+	V: { c: e:  1 }
+}
+
+err: t3: p1: {
+	#D: {}
+	a: #D
+	a: c: "C"
+}
+
+err: t3: p2: {
+	#D: b: {}
+	a: #D
+	a: b: c: "C"
+}
+
+err: t4: {
+	a: #A
+	#A: b: f: 1
+	a: b: h: 1
+}
+
+err: t5: {
+	// TODO: this should fail
+	a: {#A, #B}
+	#A: b: f: 1
+	#B: b: g: 1
+	b: a
+	b: b: h: 1 // only an error here
+}
+
+err: t6: {
+	// TODO: this should fail
+	a: {#A, #B}
+	#A: b: c: d: e: f: 1
+	#B: b: c: d: e: g: 1
+	b: a
+	b: b: c: d: e: h: 1 // only an error here
+}
+
+err: t7: {
+	#D: _ & {a: 2}
+	a: #D
+	a: b: 1 // FAIL
+}
+
+err: t8: {
+	// nested embedding
+	#S: { { c: d: 1 } }
+	V: #S
+	V: { c: e:  1 } // Should fail
+}
+-- diff/explanation --
+ok.t5 and ok.t13 retain semantics of v0.6 for now.
+-- out/eval/stats --
+Leaks:  0
+Freed:  194
+Reused: 184
+Allocs: 10
+Retain: 14
+
+Unifications: 194
+Conjuncts:    353
+Disjuncts:    208
+-- out/eval --
+Errors:
+err.t1.a.disallowed: field not allowed:
+    ./in.cue:128:10
+    ./in.cue:129:5
+    ./in.cue:130:5
+err.t2.V.c.e: field not allowed:
+    ./in.cue:134:8
+    ./in.cue:134:13
+    ./in.cue:135:5
+    ./in.cue:136:10
+err.t3.p1.a.c: field not allowed:
+    ./in.cue:140:6
+    ./in.cue:141:5
+    ./in.cue:142:5
+err.t3.p2.a.b.c: field not allowed:
+    ./in.cue:146:9
+    ./in.cue:147:5
+    ./in.cue:148:8
+err.t4.a.b.h: field not allowed:
+    ./in.cue:152:5
+    ./in.cue:153:9
+    ./in.cue:154:8
+err.t5.b.b.h: field not allowed:
+    ./in.cue:159:6
+    ./in.cue:159:10
+    ./in.cue:160:9
+    ./in.cue:161:9
+    ./in.cue:162:5
+    ./in.cue:163:8
+err.t6.b.b.c.d.e.h: field not allowed:
+    ./in.cue:168:6
+    ./in.cue:168:10
+    ./in.cue:169:18
+    ./in.cue:170:18
+    ./in.cue:171:5
+    ./in.cue:172:17
+err.t7.a.b: field not allowed:
+    ./in.cue:176:10
+    ./in.cue:177:5
+    ./in.cue:178:5
+err.t8.V.c.e: field not allowed:
+    ./in.cue:183:8
+    ./in.cue:183:13
+    ./in.cue:184:5
+    ./in.cue:185:10
+ok.t13.x.c: field not allowed:
+    ./in.cue:106:6
+    ./in.cue:107:3
+    ./in.cue:110:10
+    ./in.cue:111:5
+    ./in.cue:112:5
+ok.t5.x.c: field not allowed:
+    ./in.cue:35:6
+    ./in.cue:36:3
+    ./in.cue:39:10
+    ./in.cue:40:5
+    ./in.cue:41:5
+
+Result:
+(_|_){
+  // [eval]
+  ok: (_|_){
+    // [eval]
+    t1: (struct){
+      c: (#list){
+        0: (struct){
+          b: (int){ int }
+        }
+      }
+      #R: (list){
+      }
+    }
+    t2: (struct){
+      #A: (_){ _ }
+      l: (struct){
+        f: (string){ "hi" }
+      }
+    }
+    t3: (struct){
+      #A: (#struct){
+        f: (#struct){
+        }
+      }
+      #A1: (#struct){
+        f: (#struct){
+        }
+      }
+      s: (struct){
+        foo: (#struct){
+          f: (#struct){
+            d: (struct){
+              foo: (int){ 1 }
+            }
+          }
+        }
+      }
+    }
+    t4: (struct){
+      #T: (#struct){
+        a: (#struct){
+          b: (int){ 1 }
+        }
+      }
+      W: (#struct){
+        a: (#struct){
+          b: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 2 }
+        }
+      }
+    }
+    t5: (_|_){
+      // [eval]
+      #A: (#struct){
+      }
+      Common: (struct){
+      }
+      x: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] ok.t5.x.c: field not allowed:
+          //     ./in.cue:35:6
+          //     ./in.cue:36:3
+          //     ./in.cue:39:10
+          //     ./in.cue:40:5
+          //     ./in.cue:41:5
+        }
+      }
+    }
+    t6: (struct){
+      #A: (#struct){
+      }
+      Common: (struct){
+      }
+      x: (#struct){
+        c: (int){ int }
+      }
+    }
+    t7: (struct){
+      a: (#struct){
+        b: (#struct){
+          f: (int){ 1 }
+          g: (int){ 1 }
+        }
+      }
+      #A: (#struct){
+        b: (#struct){
+          f: (int){ 1 }
+        }
+      }
+      #B: (#struct){
+        b: (#struct){
+          g: (int){ 1 }
+        }
+      }
+    }
+    t8: (struct){
+      foo: (#struct){
+        a: (#struct){
+          b: (#struct){
+            c: (#struct){
+              C: (int){ 1 }
+              D: (int){ 2 }
+            }
+          }
+        }
+      }
+      #X: (#struct){
+        a: (#struct){
+          b: (#struct){
+            c: (#struct){
+              C: (int){ 1 }
+              D: (int){ 2 }
+            }
+          }
+        }
+      }
+    }
+    t9: (struct){
+      c: (#list){
+        0: (struct){
+          b: (int){ int }
+        }
+      }
+      #R: (list){
+      }
+    }
+    t10: (struct){
+      #A: (_){ _ }
+      l: (struct){
+        f: (string){ "hi" }
+      }
+    }
+    t11: (struct){
+      #A: (#struct){
+        f: (#struct){
+        }
+      }
+      #A1: (#struct){
+        f: (#struct){
+        }
+      }
+      s: (struct){
+        foo: (#struct){
+          f: (#struct){
+            d: (struct){
+              foo: (string){ "bar" }
+            }
+          }
+        }
+      }
+    }
+    t12: (struct){
+      #T: (#struct){
+        a: (#struct){
+          b: (int){ 1 }
+        }
+      }
+      W: (#struct){
+        a: (#struct){
+          b: (int){ 1 }
+        }
+        b: (struct){
+          c: (int){ 2 }
+        }
+      }
+    }
+    t13: (_|_){
+      // [eval]
+      #A: (#struct){
+      }
+      Common: (struct){
+      }
+      x: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval] ok.t13.x.c: field not allowed:
+          //     ./in.cue:106:6
+          //     ./in.cue:107:3
+          //     ./in.cue:110:10
+          //     ./in.cue:111:5
+          //     ./in.cue:112:5
+        }
+      }
+    }
+    t14: (struct){
+      #A: (#struct){
+      }
+      Common: (struct){
+      }
+      x: (#struct){
+        c: (int){ int }
+      }
+    }
+  }
+  err: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      #D: (#struct){
+        a: (int){ 2 }
+      }
+      a: (_|_){
+        // [eval]
+        a: (int){ 2 }
+        disallowed: (_|_){
+          // [eval] err.t1.a.disallowed: field not allowed:
+          //     ./in.cue:128:10
+          //     ./in.cue:129:5
+          //     ./in.cue:130:5
+        }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      #S: (#struct){
+        c: (#struct){
+          d: (int){ 1 }
+        }
+      }
+      V: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval]
+          d: (int){ 1 }
+          e: (_|_){
+            // [eval] err.t2.V.c.e: field not allowed:
+            //     ./in.cue:134:8
+            //     ./in.cue:134:13
+            //     ./in.cue:135:5
+            //     ./in.cue:136:10
+          }
+        }
+      }
+    }
+    t3: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval]
+        #D: (#struct){
+        }
+        a: (_|_){
+          // [eval]
+          c: (_|_){
+            // [eval] err.t3.p1.a.c: field not allowed:
+            //     ./in.cue:140:6
+            //     ./in.cue:141:5
+            //     ./in.cue:142:5
+          }
+        }
+      }
+      p2: (_|_){
+        // [eval]
+        #D: (#struct){
+          b: (#struct){
+          }
+        }
+        a: (_|_){
+          // [eval]
+          b: (_|_){
+            // [eval]
+            c: (_|_){
+              // [eval] err.t3.p2.a.b.c: field not allowed:
+              //     ./in.cue:146:9
+              //     ./in.cue:147:5
+              //     ./in.cue:148:8
+            }
+          }
+        }
+      }
+    }
+    t4: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          f: (int){ 1 }
+          h: (_|_){
+            // [eval] err.t4.a.b.h: field not allowed:
+            //     ./in.cue:152:5
+            //     ./in.cue:153:9
+            //     ./in.cue:154:8
+          }
+        }
+      }
+      #A: (#struct){
+        b: (#struct){
+          f: (int){ 1 }
+        }
+      }
+    }
+    t5: (_|_){
+      // [eval]
+      a: (#struct){
+        b: (#struct){
+          f: (int){ 1 }
+          g: (int){ 1 }
+        }
+      }
+      #A: (#struct){
+        b: (#struct){
+          f: (int){ 1 }
+        }
+      }
+      #B: (#struct){
+        b: (#struct){
+          g: (int){ 1 }
+        }
+      }
+      b: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          f: (int){ 1 }
+          g: (int){ 1 }
+          h: (_|_){
+            // [eval] err.t5.b.b.h: field not allowed:
+            //     ./in.cue:159:6
+            //     ./in.cue:159:10
+            //     ./in.cue:160:9
+            //     ./in.cue:161:9
+            //     ./in.cue:162:5
+            //     ./in.cue:163:8
+          }
+        }
+      }
+    }
+    t6: (_|_){
+      // [eval]
+      a: (#struct){
+        b: (#struct){
+          c: (#struct){
+            d: (#struct){
+              e: (#struct){
+                f: (int){ 1 }
+                g: (int){ 1 }
+              }
+            }
+          }
+        }
+      }
+      #A: (#struct){
+        b: (#struct){
+          c: (#struct){
+            d: (#struct){
+              e: (#struct){
+                f: (int){ 1 }
+              }
+            }
+          }
+        }
+      }
+      #B: (#struct){
+        b: (#struct){
+          c: (#struct){
+            d: (#struct){
+              e: (#struct){
+                g: (int){ 1 }
+              }
+            }
+          }
+        }
+      }
+      b: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
+          c: (_|_){
+            // [eval]
+            d: (_|_){
+              // [eval]
+              e: (_|_){
+                // [eval]
+                f: (int){ 1 }
+                g: (int){ 1 }
+                h: (_|_){
+                  // [eval] err.t6.b.b.c.d.e.h: field not allowed:
+                  //     ./in.cue:168:6
+                  //     ./in.cue:168:10
+                  //     ./in.cue:169:18
+                  //     ./in.cue:170:18
+                  //     ./in.cue:171:5
+                  //     ./in.cue:172:17
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    t7: (_|_){
+      // [eval]
+      #D: (#struct){
+        a: (int){ 2 }
+      }
+      a: (_|_){
+        // [eval]
+        a: (int){ 2 }
+        b: (_|_){
+          // [eval] err.t7.a.b: field not allowed:
+          //     ./in.cue:176:10
+          //     ./in.cue:177:5
+          //     ./in.cue:178:5
+        }
+      }
+    }
+    t8: (_|_){
+      // [eval]
+      #S: (#struct){
+        c: (#struct){
+          d: (int){ 1 }
+        }
+      }
+      V: (_|_){
+        // [eval]
+        c: (_|_){
+          // [eval]
+          d: (int){ 1 }
+          e: (_|_){
+            // [eval] err.t8.V.c.e: field not allowed:
+            //     ./in.cue:183:8
+            //     ./in.cue:183:13
+            //     ./in.cue:184:5
+            //     ./in.cue:185:10
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  ok: {
+    t1: {
+      c: 〈0;#R〉
+      c: [
+        {
+          b: int
+        },
+      ]
+      #R: [
+        ...,
+      ]
+    }
+  }
+  ok: {
+    t2: {
+      #A: _
+      l: 〈0;#A〉
+      l: {
+        f: "hi"
+      }
+    }
+  }
+  ok: {
+    t3: {
+      #A: {
+        f: {
+          ...
+        }
+      }
+      #A1: {
+        〈1;#A〉
+      }
+      s: {
+        [string]: 〈1;#A1〉
+      }
+      s: {
+        foo: {
+          f: {
+            d: {
+              foo: 1
+            }
+          }
+        }
+      }
+    }
+  }
+  ok: {
+    t4: {
+      #T: {
+        a: {
+          b: 1
+        }
+      }
+      W: {
+        {
+          〈2;#T〉
+        }
+        b: {
+          c: 2
+        }
+      }
+    }
+  }
+  ok: {
+    t5: {
+      #A: {
+        〈1;Common〉
+        _
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  ok: {
+    t6: {
+      #A: {
+        〈1;Common〉
+        ...
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  ok: {
+    t7: {
+      a: {
+        〈1;#A〉
+        〈1;#B〉
+      }
+      #A: {
+        b: {
+          f: 1
+        }
+      }
+      #B: {
+        b: {
+          g: 1
+        }
+      }
+    }
+  }
+  ok: {
+    t8: {
+      foo: 〈0;#X〉
+      #X: {
+        a: {
+          b: {
+            c: {
+              C: 1
+            }
+          }
+        }
+        for k, _ in 〈0;a〉 {
+          a: {
+            〈2;k〉: {
+              c: {
+                D: 2
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  ok: {
+    t9: {
+      c: 〈0;#R〉
+      c: [
+        {
+          b: int
+        },
+      ]
+      #R: [
+        ...,
+      ]
+    }
+  }
+  ok: {
+    t10: {
+      #A: _
+      l: 〈0;#A〉
+      l: {
+        f: "hi"
+      }
+    }
+  }
+  ok: {
+    t11: {
+      #A: {
+        f: {
+          ...
+        }
+      }
+      #A1: {
+        〈1;#A〉
+      }
+      s: {
+        [string]: 〈1;#A1〉
+      }
+      s: {
+        foo: {
+          f: {
+            d: {
+              foo: "bar"
+            }
+          }
+        }
+      }
+    }
+  }
+  ok: {
+    t12: {
+      #T: {
+        a: {
+          b: 1
+        }
+      }
+      W: {
+        {
+          〈2;#T〉
+        }
+        b: {
+          c: 2
+        }
+      }
+    }
+  }
+  ok: {
+    t13: {
+      #A: {
+        〈1;Common〉
+        _
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  ok: {
+    t14: {
+      #A: {
+        〈1;Common〉
+        ...
+      }
+      Common: {}
+      x: 〈0;#A〉
+      x: {
+        c: int
+      }
+    }
+  }
+  err: {
+    t1: {
+      #D: (_ & {
+        a: 2
+      })
+      a: 〈0;#D〉
+      a: {
+        disallowed: 1
+      }
+    }
+  }
+  err: {
+    t2: {
+      #S: {
+        {
+          c: {
+            d: 1
+          }
+        }
+      }
+      V: 〈0;#S〉
+      V: {
+        c: {
+          e: 1
+        }
+      }
+    }
+  }
+  err: {
+    t3: {
+      p1: {
+        #D: {}
+        a: 〈0;#D〉
+        a: {
+          c: "C"
+        }
+      }
+    }
+  }
+  err: {
+    t3: {
+      p2: {
+        #D: {
+          b: {}
+        }
+        a: 〈0;#D〉
+        a: {
+          b: {
+            c: "C"
+          }
+        }
+      }
+    }
+  }
+  err: {
+    t4: {
+      a: 〈0;#A〉
+      #A: {
+        b: {
+          f: 1
+        }
+      }
+      a: {
+        b: {
+          h: 1
+        }
+      }
+    }
+  }
+  err: {
+    t5: {
+      a: {
+        〈1;#A〉
+        〈1;#B〉
+      }
+      #A: {
+        b: {
+          f: 1
+        }
+      }
+      #B: {
+        b: {
+          g: 1
+        }
+      }
+      b: 〈0;a〉
+      b: {
+        b: {
+          h: 1
+        }
+      }
+    }
+  }
+  err: {
+    t6: {
+      a: {
+        〈1;#A〉
+        〈1;#B〉
+      }
+      #A: {
+        b: {
+          c: {
+            d: {
+              e: {
+                f: 1
+              }
+            }
+          }
+        }
+      }
+      #B: {
+        b: {
+          c: {
+            d: {
+              e: {
+                g: 1
+              }
+            }
+          }
+        }
+      }
+      b: 〈0;a〉
+      b: {
+        b: {
+          c: {
+            d: {
+              e: {
+                h: 1
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  err: {
+    t7: {
+      #D: (_ & {
+        a: 2
+      })
+      a: 〈0;#D〉
+      a: {
+        b: 1
+      }
+    }
+  }
+  err: {
+    t8: {
+      #S: {
+        {
+          c: {
+            d: 1
+          }
+        }
+      }
+      V: 〈0;#S〉
+      V: {
+        c: {
+          e: 1
+        }
+      }
+    }
+  }
+}

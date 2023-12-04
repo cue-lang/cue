@@ -16,6 +16,7 @@ package runtime
 
 import (
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/internal"
 )
 
 // A Runtime maintains data structures for indexing and reuse for evaluation.
@@ -27,6 +28,12 @@ type Runtime struct {
 	// interpreters implement extern functionality. The map key corresponds to
 	// the kind in a file-level @extern(kind) attribute.
 	interpreters map[string]Interpreter
+
+	version internal.EvaluatorVersion
+}
+
+func (r *Runtime) EvaluatorVersion() internal.EvaluatorVersion {
+	return r.version
 }
 
 func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {
@@ -38,10 +45,17 @@ func (r *Runtime) BuildData(b *build.Instance) (x interface{}, ok bool) {
 	return x, ok
 }
 
-// New creates a new Runtime. The builtins registered with RegisterBuiltin
-// are available for
+// New is a wrapper for NewVersioned(internal.DefaultVersion).
 func New() *Runtime {
 	r := &Runtime{}
+	r.Init()
+	return r
+}
+
+// NewVersioned creates a new Runtime using the given runtime version.
+// The builtins registered with RegisterBuiltin are available for evaluation.
+func NewVersioned(v internal.EvaluatorVersion) *Runtime {
+	r := &Runtime{version: v}
 	r.Init()
 	return r
 }

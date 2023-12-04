@@ -246,9 +246,10 @@ func (e *extractor) filter(name string) bool {
 type extractor struct {
 	cmd *Command
 
-	stderr io.Writer
-	pkgs   []*packages.Package
-	done   map[string]bool
+	stderr  io.Writer
+	pkgs    []*packages.Package
+	allPkgs map[string]*packages.Package
+	done    map[string]bool
 
 	// per package
 	orig     map[types.Type]*ast.StructType
@@ -395,10 +396,11 @@ func extract(cmd *Command, args []string) error {
 	}
 
 	e := extractor{
-		cmd:    cmd,
-		stderr: cmd.Stderr(),
-		pkgs:   pkgs,
-		orig:   map[types.Type]*ast.StructType{},
+		cmd:     cmd,
+		stderr:  cmd.Stderr(),
+		pkgs:    pkgs,
+		allPkgs: map[string]*packages.Package{},
+		orig:    map[types.Type]*ast.StructType{},
 	}
 
 	e.initExclusions(flagExclude.String(cmd))
@@ -407,6 +409,7 @@ func extract(cmd *Command, args []string) error {
 
 	for _, p := range pkgs {
 		e.done[p.PkgPath] = true
+		e.addPackage(p)
 	}
 
 	for _, p := range pkgs {
@@ -415,6 +418,19 @@ func extract(cmd *Command, args []string) error {
 		}
 	}
 	return nil
+}
+
+func (e *extractor) addPackage(p *packages.Package) {
+	if pkg, ok := e.allPkgs[p.PkgPath]; ok {
+		if p != pkg {
+			panic(fmt.Sprintf("duplicate package %s", p.PkgPath))
+		}
+		return
+	}
+	e.allPkgs[p.PkgPath] = p
+	for _, pkg := range p.Imports {
+		e.addPackage(pkg)
+	}
 }
 
 func (e *extractor) recordTypeInfo(p *packages.Package) {
@@ -546,8 +562,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
-			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
+			if err := e.extractPkg(root, e.allPkgs[p.PkgPath]); err != nil {
 				return err
 			}
 		}

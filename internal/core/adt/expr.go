@@ -27,6 +27,16 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+var _ Elem = &ConjunctGroup{}
+
+// A ConjunctGroup is an Elem that is used for internal grouping of Conjuncts
+// only.
+type ConjunctGroup []Conjunct
+
+func (g *ConjunctGroup) Source() ast.Node {
+	return nil
+}
+
 // A StructLit represents an unevaluated struct literal or file body.
 type StructLit struct {
 	Src   ast.Node // ast.File or ast.StructLit

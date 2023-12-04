@@ -549,13 +549,24 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
-			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
+			if err := e.extractPkg(root, findPackage(p, path)); err != nil {
 				return err
 			}
 		}
 	}
 
+	return nil
+}
+
+func findPackage(p *packages.Package, path string) *packages.Package {
+	for _, pkg := range p.Imports {
+		if pkg.PkgPath == path {
+			return pkg
+		}
+		if pkg := findPackage(pkg, path); pkg != nil {
+			return pkg
+		}
+	}
 	return nil
 }
 

@@ -42,7 +42,7 @@ func Load(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfi
 	modFilePath := path.Join(modRoot, "cue.mod/module.cue")
 	data, err := fs.ReadFile(fsys, modFilePath)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("cannot read cue.mod file: %x", err.Error())
 	}
 	mf, err := modfile.ParseNonStrict(data, modFilePath)
 	if err != nil {

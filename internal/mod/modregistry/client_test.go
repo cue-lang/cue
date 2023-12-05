@@ -170,6 +170,20 @@ func TestCheckModule(t *testing.T) {
 	}
 }
 
+func TestModuleVersionsOnNonExistentModule(t *testing.T) {
+	c := newTestClient(t)
+	ctx := context.Background()
+	tags, err := c.ModuleVersions(ctx, "not/there@v0")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.HasLen(tags, 0))
+
+	// Bad names hit a slightly different code path, so make
+	// sure they work OK too.
+	tags, err = c.ModuleVersions(ctx, "bad--NAME-@v0")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.HasLen(tags, 0))
+}
+
 func putModule(t *testing.T, c *Client, mv module.Version, txtarData string) []byte {
 	zipData := createZip(t, mv, txtarData)
 	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))

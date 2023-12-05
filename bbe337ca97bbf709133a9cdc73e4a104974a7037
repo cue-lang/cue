@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82f2e6a1_f0729ac9",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T15:53:15Z",
+      "side": 1,
+      "message": "I mirrored the signature of this method: https://pkg.go.dev/golang.org/x/mod/modfile#File.Format.\nGiven the close association of the two, I think it might be worth keeping it named the same.\n\nFWIW I\u0027d expect a `Print` method to actually print something rather than return some data.",
+      "parentUuid": "15e2d52e_8203bbc8",
+      "range": {
+        "startLine": 47,
+        "startChar": 15,
+        "endLine": 47,
+        "endChar": 21
+      },
+      "revId": "bbe337ca97bbf709133a9cdc73e4a104974a7037",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e5f56b20_4f63104b",
@@ -37,6 +61,30 @@
       "writtenOn": "2023-12-05T15:38:49Z",
       "side": 1,
       "message": "I don\u0027t think this belongs in a Format method - perhaps `cue mod tidy` could do this as a sanity check before overwriting a file, to make sure it\u0027s not placing gibberish, but otherwise a format method should assume that cue/format isn\u0027t broken.",
+      "range": {
+        "startLine": 60,
+        "startChar": 1,
+        "endLine": 63,
+        "endChar": 2
+      },
+      "revId": "bbe337ca97bbf709133a9cdc73e4a104974a7037",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e2b810a_3800527c",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T15:53:15Z",
+      "side": 1,
+      "message": "It\u0027s checking more than `cue/format`: it\u0027s also checking that the `module.cue` invariants aren\u0027t broken. For example one of the tests hits this case because `Format` is called with invalid module paths. I _think_ it\u0027s reasonable to check that whatever is produced is also readable by the parser, but happy to remove the check if you think that\u0027s it\u0027s not worth having.",
+      "parentUuid": "e5f56b20_4f63104b",
       "range": {
         "startLine": 60,
         "startChar": 1,

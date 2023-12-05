@@ -29,6 +29,7 @@ type ModuleFile struct {
 
 // AllImports returns a sorted list of all the package paths
 // imported by the module files produced by modFilesIter.
+// It discards any package qualifier suffixes.
 func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, retErr error) {
 	pkgPaths := make(map[string]bool)
 	modFilesIter(func(mf ModuleFile, err error) bool {
@@ -43,6 +44,14 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 				// TODO location formatting
 				retErr = fmt.Errorf("invalid import path %q in %s", imp.Path.Value, mf.FilePath)
 				return false
+			}
+			// Discard package qualifier.
+			// TODO we shouldn't have to do this, because
+			// we'll want to trace dependencies that take into account
+			// the fact that there can be multiple independent packages
+			// in the same directory.
+			if i := strings.LastIndex(pkgPath, ":"); i > 0 {
+				pkgPath = pkgPath[:i]
 			}
 			pkgPaths[pkgPath] = true
 		}

@@ -24,23 +24,47 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/internal/slices"
 )
 
 //go:embed schema.cue
 var moduleSchemaData []byte
 
+// File represents the contents of a cue.mod/module.cue file.
 type File struct {
 	Module   string          `json:"module"`
-	Language Language        `json:"language"`
+	Language *Language       `json:"language,omitempty"`
 	Deps     map[string]*Dep `json:"deps,omitempty"`
 	versions []module.Version
 }
 
+// Format returns a formatted representation of f
+// in CUE syntax.
+func (f *File) Format() ([]byte, error) {
+	// TODO this could be better:
+	// - it should omit the outer braces
+	v := cuecontext.New().Encode(f)
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		return nil, err
+	}
+	n := v.Syntax(cue.Concrete(true))
+	data, err := format.Node(n)
+	if err != nil {
+		return nil, fmt.Errorf("cannot format: %v", err)
+	}
+	// Sanity check that it can be parsed.
+	if _, err := Parse(data, "-"); err != nil {
+		return nil, fmt.Errorf("cannot round-trip module file: %v", err)
+	}
+	return data, err
+}
+
 type Language struct {
-	Version string `json:"version"`
+	Version string `json:"version,omitempty"`
 }
 
 type Dep struct {
@@ -138,8 +162,10 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
 		}
 	}
-	if v := mf.Language.Version; v != "" && !semver.IsValid(v) {
-		return nil, fmt.Errorf("language version %q in %s is not well formed", v, filename)
+	if mf.Language != nil {
+		if v := mf.Language.Version; v != "" && !semver.IsValid(v) {
+			return nil, fmt.Errorf("language version %q in %s is not well formed", v, filename)
+		}
 	}
 	var versions []module.Version
 	// Check that major versions match dependency versions.
@@ -166,6 +192,9 @@ func newCUEError(err error, filename string) error {
 
 // DepVersions returns the versions of all the modules depended on by the
 // file. The caller should not modify the returned slice.
+//
+// This always returns the same value, even if the contents
+// of f are changed. If f was not created with [Parse], it returns nil.
 func (f *File) DepVersions() []module.Version {
-	return f.versions
+	return slices.Clip(f.versions)
 }

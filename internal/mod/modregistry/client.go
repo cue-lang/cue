@@ -113,10 +113,14 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 			tags = append(tags, tag)
 		}
 	}
-	if err := iter.Error(); err != nil {
+	if err := iter.Error(); err != nil && !isNotExist(err) {
 		return nil, err
 	}
 	return tags, nil
+}
+
+func isNotExist(err error) bool {
+	return errors.Is(err, ociregistry.ErrNameUnknown) || errors.Is(err, ociregistry.ErrNameInvalid)
 }
 
 // CheckedModule represents module content that has passed the same

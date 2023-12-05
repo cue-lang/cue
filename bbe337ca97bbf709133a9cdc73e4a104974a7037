@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "15e2d52e_8203bbc8",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-05T15:38:49Z",
+      "side": 1,
+      "message": "This doesn\u0027t appear to implement an interface - is there a specific reason we need a method?\n\nFor example, we have Parse as a top-level func, so I would personally imagine a Print top-level func to mirror it instead. `modfile.Print` is also more explicit about what it does than e.g. `mf.Print`.",
+      "range": {
+        "startLine": 47,
+        "startChar": 15,
+        "endLine": 47,
+        "endChar": 21
+      },
+      "revId": "bbe337ca97bbf709133a9cdc73e4a104974a7037",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5f56b20_4f63104b",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-05T15:38:49Z",
+      "side": 1,
+      "message": "I don\u0027t think this belongs in a Format method - perhaps `cue mod tidy` could do this as a sanity check before overwriting a file, to make sure it\u0027s not placing gibberish, but otherwise a format method should assume that cue/format isn\u0027t broken.",
+      "range": {
+        "startLine": 60,
+        "startChar": 1,
+        "endLine": 63,
+        "endChar": 2
+      },
+      "revId": "bbe337ca97bbf709133a9cdc73e4a104974a7037",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

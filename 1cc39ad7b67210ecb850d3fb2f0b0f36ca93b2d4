@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef72033c_7a30e751",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T09:02:20Z",
+      "side": 1,
+      "message": "\"mod files iter\" :) But you\u0027re right, it\u0027s not a good name. Done",
+      "parentUuid": "5b46dd4c_fb26e445",
+      "range": {
+        "startLine": 31,
+        "startChar": 48,
+        "endLine": 31,
+        "endChar": 51
+      },
+      "revId": "1cc39ad7b67210ecb850d3fb2f0b0f36ca93b2d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0ee7c90_b5cc8f84",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ab15e35_5a84d9c1",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T09:02:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e0ee7c90_b5cc8f84",
+      "revId": "1cc39ad7b67210ecb850d3fb2f0b0f36ca93b2d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5fcdbf85_fa07ba08",
@@ -54,6 +96,30 @@
       "writtenOn": "2023-12-04T23:08:38Z",
       "side": 1,
       "message": "wouldn\u0027t the directory already be included in the error value? do we need it here?",
+      "range": {
+        "startLine": 69,
+        "startChar": 4,
+        "endLine": 69,
+        "endChar": 18
+      },
+      "revId": "1cc39ad7b67210ecb850d3fb2f0b0f36ca93b2d4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ed177bc_7343fece",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T09:02:20Z",
+      "side": 1,
+      "message": "This is fulfilling the part of the `ModuleFile` contract that says:\n\n```\n\t// FilePath holds the path of the module file\n\t// relative to the root of the fs. This will be\n\t// valid even if there\u0027s an associated error.\n```\n\nI think that\u0027s a useful invariant and worth preserving.",
+      "parentUuid": "5fcdbf85_fa07ba08",
       "range": {
         "startLine": 69,
         "startChar": 4,

@@ -29,6 +29,7 @@ type ModuleFile struct {
 
 // AllImports returns a sorted list of all the package paths
 // imported by the module files produced by the mfi iterator.
+// It discards any package qualifier suffixes.
 func AllImports(mfi func(func(ModuleFile, error) bool)) (_ []string, retErr error) {
 	pkgPaths := make(map[string]bool)
 	mfi(func(mf ModuleFile, err error) bool {
@@ -43,6 +44,10 @@ func AllImports(mfi func(func(ModuleFile, error) bool)) (_ []string, retErr erro
 				// TODO location formatting
 				retErr = fmt.Errorf("invalid import path %q in %s", imp.Path.Value, mf.FilePath)
 				return false
+			}
+			// Discard package qualifier. TODO this is almost certainly inadequate.
+			if i := strings.LastIndex(pkgPath, ":"); i > 0 {
+				pkgPath = pkgPath[:i]
 			}
 			pkgPaths[pkgPath] = true
 		}

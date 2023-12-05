@@ -1,0 +1,29 @@
+# Test the errors resulting there's an "ambiguous import" error.
+# The errors _should_ report the full directory name for each module,
+# but currently only report the relative name.
+
+! exec cue mod tidy
+cmp stderr want-stderr
+
+-- want-stderr --
+failed to resolve "example.com/foo/bar@v0": ambiguous import: found package example.com/foo/bar@v0 in multiple modules:
+	example.com@v0 v0.0.1 (foo/bar)
+	example.com/foo@v0 v0.1.0 (bar)
+-- cue.mod/module.cue --
+module: "main.org@v0"
+
+-- main.cue --
+package main
+import "example.com/foo/bar@v0"
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- _registry/example.com_v0.0.1/foo/bar/x.cue --
+package bar
+
+-- _registry/example.com_foo_v0.1.0/cue.mod/module.cue --
+module: "example.com/foo@v0"
+
+-- _registry/example.com_foo_v0.1.0/bar/x.cue --
+package bar

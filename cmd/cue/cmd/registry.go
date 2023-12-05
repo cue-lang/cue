@@ -14,6 +14,9 @@ import (
 	"cuelang.org/go/internal/mod/modresolve"
 )
 
+// getRegistry returns the registry to pull modules from.
+// If external modules are disabled and there's no other issue,
+// it returns (nil, nil).
 func getRegistry() (ociregistry.Interface, error) {
 	// TODO document CUE_REGISTRY via a new "cue help environment" subcommand.
 	env := os.Getenv("CUE_REGISTRY")

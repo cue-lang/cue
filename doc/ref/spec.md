@@ -969,7 +969,7 @@ not allowing surrogates.
 The predeclared string type is `string`; it is a defined type.
 
 The length of a string `s` (its size in bytes) can be discovered using
-the built-in function `len`.
+the builtin function `len`.
 
 
 ### Bytes
@@ -1951,7 +1951,7 @@ The expression is evaluated in the scope it was declared.
 ## Expressions
 
 An expression specifies the computation of a value by applying operators and
-built-in functions to operands.
+builtin functions to operands.
 
 Expressions that require concrete values are called _incomplete_ if any of
 their operands are not concrete, but define a value that would be legal for
@@ -2674,7 +2674,7 @@ Built-in functions are predeclared. They are called like any other function.
 
 ### `len`
 
-The built-in function `len` takes arguments of various types and returns
+The builtin function `len` takes arguments of various types and returns
 a result of type int.
 
 ```
@@ -2708,7 +2708,7 @@ to a fully defined, or closed, struct.
 
 ### `and`
 
-The built-in function `and` takes a list and returns the result of applying
+The builtin function `and` takes a list and returns the result of applying
 the `&` operator to all elements in the list.
 It returns top for the empty list.
 
@@ -2721,7 +2721,7 @@ and([])              _
 
 ### `or`
 
-The built-in function `or` takes a list and returns the result of applying
+The builtin function `or` takes a list and returns the result of applying
 the `|` operator to all elements in the list.
 It returns bottom for the empty list.
 

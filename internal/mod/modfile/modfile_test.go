@@ -22,10 +22,11 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/mod/module"
 )
 
-var tests = []struct {
+var parseTests = []struct {
 	testName     string
 	parse        func(modfile []byte, filename string) (*File, error)
 	data         string
@@ -51,7 +52,7 @@ deps: "example.com@v1": v: "v1.2.3"
 deps: "other.com/something@v0": v: "v0.2.3"
 `,
 	want: &File{
-		Language: Language{
+		Language: &Language{
 			Version: "v0.4.3",
 		},
 		Module: "foo.com/bar@v0",
@@ -152,7 +153,7 @@ cue: lang: "xxx"
 }}
 
 func TestParse(t *testing.T) {
-	for _, test := range tests {
+	for _, test := range parseTests {
 		t.Run(test.testName, func(t *testing.T) {
 			f, err := test.parse([]byte(test.data), "module.cue")
 			if test.wantError != "" {
@@ -165,6 +166,81 @@ func TestParse(t *testing.T) {
 			qt.Assert(t, qt.DeepEquals(f.DepVersions(), test.wantVersions))
 		})
 	}
+}
+
+func TestFormat(t *testing.T) {
+	type formatTest struct {
+		name      string
+		file      *File
+		wantError string
+		want      string
+	}
+	tests := []formatTest{{
+		name: "WithLanguage",
+		file: &File{
+			Language: &Language{
+				Version: "v0.4.3",
+			},
+			Module: "foo.com/bar@v0",
+			Deps: map[string]*Dep{
+				"example.com@v1": {
+					Version: "v1.2.3",
+				},
+				"other.com/something@v0": {
+					Version: "v0.2.3",
+				},
+			},
+		},
+		want: `{
+	module: "foo.com/bar@v0"
+	language: {
+		version: "v0.4.3"
+	}
+	deps: {
+		"example.com@v1": {
+			v: "v1.2.3"
+		}
+		"other.com/something@v0": {
+			v: "v0.2.3"
+		}
+	}
+}`}, {
+		name: "WithoutLanguage",
+		file: &File{
+			Module: "foo.com/bar@v0",
+			Language: &Language{
+				Version: "v0.4.3",
+			},
+		},
+		want: `{
+	module: "foo.com/bar@v0"
+	language: {
+		version: "v0.4.3"
+	}
+}`}, {
+		name: "WithInvalidModuleVersion",
+		file: &File{
+			Module: "foo.com/bar@v0",
+			Language: &Language{
+				Version: "badversion--",
+			},
+		},
+		wantError: `cannot round-trip module file: language version "badversion--" in - is not well formed`,
+	}}
+	cuetest.Run(t, tests, func(t *cuetest.T, test *formatTest) {
+		data, err := test.file.Format()
+		if test.wantError != "" {
+			qt.Assert(t, qt.ErrorMatches(err, test.wantError))
+			return
+		}
+		qt.Assert(t, qt.IsNil(err))
+		t.Equal(string(data), test.want)
+
+		// Check that it round-trips.
+		f, err := Parse(data, "")
+		qt.Assert(t, qt.IsNil(err))
+		qt.Assert(t, qt.CmpEquals(f, test.file, cmpopts.IgnoreUnexported(File{})))
+	})
 }
 
 func parseVersions(vs ...string) []module.Version {

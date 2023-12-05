@@ -24,8 +24,7 @@ type Requirements struct {
 
 	// rootModules is the set of root modules of the graph, sorted and capped to
 	// length. It may contain duplicates, and may contain multiple versions for a
-	// given module path. The root modules of the graph are the set of main
-	// modules in workspace mode, and the main module's direct requirements.
+	// given module path. The root modules are the main module's direct requirements.
 	rootModules    []module.Version
 	maxRootVersion map[string]string
 
@@ -68,6 +67,9 @@ func NewRequirements(mainModulePath string, reg Registry, rootModules []module.V
 		if v.Path() == mainModulePath {
 			panic(fmt.Sprintf("NewRequirements called with untrimmed build list: rootModules[%v] is a main module", i))
 		}
+		if !v.IsValid() {
+			panic("NewRequirements with invalid version")
+		}
 	}
 	rs := &Requirements{
 		registry:          reg,
@@ -97,9 +99,19 @@ func (rs *Requirements) RootSelected(path string) (version string, ok bool) {
 		return "", true
 	}
 	if v, ok := rs.maxRootVersion[path]; ok {
+		if v == "" {
+			panic("maxRootVersion is empty at " + path)
+		}
 		return v, true
 	}
 	return "", false
+}
+
+// rootModules returns the set of root modules of the graph, sorted and capped to
+// length. It may contain duplicates, and may contain multiple versions for a
+// given module path.
+func (rs *Requirements) RootModules() []module.Version {
+	return slices.Clip(rs.rootModules)
 }
 
 // Graph returns the graph of module requirements loaded from the current
@@ -117,6 +129,11 @@ func (rs *Requirements) Graph(ctx context.Context) (*ModuleGraph, error) {
 	})
 	cached := rs.graph.Load()
 	return cached.mg, cached.err
+}
+
+// GraphIsLoaded reports whether Graph has been called previously.
+func (rs *Requirements) GraphIsLoaded() bool {
+	return rs.graph.Load() != nil
 }
 
 // A ModuleGraph represents the complete graph of module dependencies
@@ -186,6 +203,9 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 
 	for _, m := range rs.rootModules {
 		m := m
+		if !m.IsValid() {
+			panic("root module version is invalid")
+		}
 		if m.Version() == "none" {
 			continue
 		}

@@ -1,0 +1,20 @@
+# Test what happens when a package is imported that looks like it's from
+# the standard library but that doesn't exist.
+
+-- want --
+{
+	module: "main.org@v0"
+	deps: {}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+
+-- main.cue --
+package main
+import "notstdlib/package"
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- _registry/example.com_v0.0.1/x.cue --
+package x

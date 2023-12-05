@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fefbe96_04c71121",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T08:56:51Z",
+      "side": 1,
+      "message": "\u003e the only write you ever do is the first and only build\n\nExactly. That\u0027s the write that graphOnce guards. However other code reads the graph pointer directly without triggering the Once (hence the \"but not reads from\").\nFWIW this comment is verbatim from the original cmd/go code and is still applicable so I\u0027m inclined to leave it.",
+      "parentUuid": "9ea9c1b6_b718b655",
+      "revId": "a34ca9714cf204f1bb90553d6681d176b9b5da00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "27afef00_5cc6b571",
@@ -31,6 +49,30 @@
       "writtenOn": "2023-12-04T23:00:09Z",
       "side": 1,
       "message": "does that API exist? if not, should this bit of the godoc be removed?",
+      "range": {
+        "startLine": 140,
+        "startChar": 47,
+        "endLine": 140,
+        "endChar": 63
+      },
+      "revId": "a34ca9714cf204f1bb90553d6681d176b9b5da00",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc1cc88b_dc09ad20",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T08:56:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27afef00_5cc6b571",
       "range": {
         "startLine": 140,
         "startChar": 47,

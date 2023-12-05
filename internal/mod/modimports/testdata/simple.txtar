@@ -1,5 +1,5 @@
 -- want --
-x.cue "dep1" "dep2" "dep3"
+x.cue "dep1" "dep2:a" "dep2:b" "dep3"
 y/y1.cue "dep3" "dep4"
 y/y2.cue
 y/z1.cue
@@ -17,7 +17,8 @@ package example
 
 import (
 	"dep1"
-	"dep2"
+	"dep2:a"
+	"dep2:b"
 )
 import "dep3"
 

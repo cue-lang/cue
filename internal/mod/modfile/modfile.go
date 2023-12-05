@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/internal/slices"
 )
 
 //go:embed schema.cue
@@ -34,13 +35,13 @@ var moduleSchemaData []byte
 
 type File struct {
 	Module   string          `json:"module"`
-	Language Language        `json:"language"`
+	Language *Language       `json:"language,omitempty"`
 	Deps     map[string]*Dep `json:"deps,omitempty"`
 	versions []module.Version
 }
 
 type Language struct {
-	Version string `json:"version"`
+	Version string `json:"version,omitempty"`
 }
 
 type Dep struct {
@@ -138,8 +139,10 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
 		}
 	}
-	if v := mf.Language.Version; v != "" && !semver.IsValid(v) {
-		return nil, fmt.Errorf("language version %q in %s is not well formed", v, filename)
+	if mf.Language != nil {
+		if v := mf.Language.Version; v != "" && !semver.IsValid(v) {
+			return nil, fmt.Errorf("language version %q in %s is not well formed", v, filename)
+		}
 	}
 	var versions []module.Version
 	// Check that major versions match dependency versions.
@@ -167,5 +170,5 @@ func newCUEError(err error, filename string) error {
 // DepVersions returns the versions of all the modules depended on by the
 // file. The caller should not modify the returned slice.
 func (f *File) DepVersions() []module.Version {
-	return f.versions
+	return slices.Clip(f.versions)
 }

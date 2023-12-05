@@ -66,6 +66,10 @@ func (m Version) Version() string {
 	return m.version
 }
 
+func (m Version) IsValid() bool {
+	return m.path != ""
+}
+
 // String returns the string form of the Version:
 // (Path@Version, or just Path if Version is empty).
 func (m Version) String() string {

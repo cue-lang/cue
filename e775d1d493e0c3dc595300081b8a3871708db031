@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "256cf478_d0cf6b97",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-05T15:31:28Z",
+      "side": 1,
+      "message": "please summarize why, or whether we intend to change this in the future.",
+      "revId": "e775d1d493e0c3dc595300081b8a3871708db031",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90a5355c_88f9ee0b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-05T15:31:28Z",
+      "side": 1,
+      "message": "Please summa",
+      "revId": "e775d1d493e0c3dc595300081b8a3871708db031",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

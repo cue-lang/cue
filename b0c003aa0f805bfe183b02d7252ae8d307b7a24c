@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95cc983d_06bb581c",
+        "filename": "internal/mod/module/module.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-05T15:40:48Z",
+      "side": 1,
+      "message": "shouldn\u0027t this check that the module path is valid too, beyond being non-empty?",
+      "revId": "b0c003aa0f805bfe183b02d7252ae8d307b7a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

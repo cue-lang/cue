@@ -16,6 +16,23 @@
       "message": "PTAL.",
       "revId": "0435d06860b6d4555e7a10cd3ace3c5cb518a6e5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8030c11a_39225eb9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-05T19:50:47Z",
+      "side": 1,
+      "message": "LGTM but we\u0027re holding whilst the v0.7.0 release process is in progress.",
+      "revId": "0435d06860b6d4555e7a10cd3ace3c5cb518a6e5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

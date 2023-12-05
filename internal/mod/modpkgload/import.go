@@ -105,10 +105,10 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 				// continue the loop and find the package in some other module,
 				// we need to look at this module to make sure the import is
 				// not ambiguous.
-				return fail(err)
+				return fail(fmt.Errorf("cannot fetch %v: %v", m, err))
 			}
 			if loc, ok, err := locInModule(pkgPathOnly, prefix, mloc, isLocal); err != nil {
-				return fail(err)
+				return fail(fmt.Errorf("cannot find package: %v", err))
 			} else if ok {
 				mods = append(mods, m)
 				locs = append(locs, loc)
@@ -145,7 +145,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 			// the module graph, so we can't return an ImportMissingError here — one
 			// of the missing modules might actually contain the package in question,
 			// in which case we shouldn't go looking for it in some new dependency.
-			return fail(err)
+			return fail(fmt.Errorf("cannot expand module graph: %v", err))
 		}
 	}
 }

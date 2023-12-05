@@ -33,7 +33,7 @@ example.com/blah@v0
 		foo.com/bar/hello/goodbye@v0
 foo.com/bar/hello/goodbye@v0
 	flags: inAll,isRoot,fromRoot
-	error: module foo.com/bar/hello@v0.2.3 not found at _registry/foo.com_bar_hello_v0.2.3
+	error: cannot fetch foo.com/bar/hello@v0.2.3: module foo.com/bar/hello@v0.2.3 not found at _registry/foo.com_bar_hello_v0.2.3
 	missing: false
 -- main.cue --
 package main

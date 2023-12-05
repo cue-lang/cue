@@ -253,7 +253,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	}
 	imports, err := modimports.AllImports(modimports.PackageFiles(pkg.loc.FS, pkg.loc.Dir))
 	if err != nil {
-		pkg.err = err
+		pkg.err = fmt.Errorf("cannot get imports: %v", err)
 		return
 	}
 

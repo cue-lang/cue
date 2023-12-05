@@ -16,6 +16,24 @@
       "message": "You haven\u0027t run CI, but I imagine go.sum needs tidying.",
       "revId": "5d9a7933a0fed95600107b7cc39ea7fd4bb1c8a9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f78672a2_bc841569",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T12:50:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "78eba275_18deeb84",
+      "revId": "5d9a7933a0fed95600107b7cc39ea7fd4bb1c8a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

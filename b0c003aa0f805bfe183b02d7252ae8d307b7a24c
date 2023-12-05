@@ -16,6 +16,24 @@
       "message": "shouldn\u0027t this check that the module path is valid too, beyond being non-empty?",
       "revId": "b0c003aa0f805bfe183b02d7252ae8d307b7a24c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0886e12a_4bb39c56",
+        "filename": "internal/mod/module/module.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 70,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-05T15:54:03Z",
+      "side": 1,
+      "message": "No, because there\u0027s no way of creating a `Version` with an invalid module path.",
+      "parentUuid": "95cc983d_06bb581c",
+      "revId": "b0c003aa0f805bfe183b02d7252ae8d307b7a24c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

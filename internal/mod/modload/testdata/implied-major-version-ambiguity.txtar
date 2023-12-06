@@ -1,0 +1,47 @@
+# This test checks we can have have an import with an implied major version
+# when there's no explicit default in the module file.
+-- want --
+{
+	module: "main.org@v0"
+	deps: {
+		"example.com@v0": {
+			v:       "v0.0.1"
+			default: true
+		}
+	}
+}
+-- cue.mod/module.cue --
+{
+	module: "main.org@v0"
+	deps: {
+		"example.com@v0": {
+			v:       "v0.0.1"
+		}
+		"example.com@v1": {
+			v:       "v1.0.0"
+			default: true
+		}
+	}
+}
+-- main.cue --
+package main
+
+import (
+	"example.com@v0/foo"
+	"example.com@v1/bar"
+)
+-- other.cue --
+package main
+import "example.com/bar"
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- _registry/example.com_v0.0.1/foo/foo.cue --
+package foo
+
+-- _registry/example.com_v1.0.0/cue.mod/module.cue --
+module: "example.com@v1"
+
+-- _registry/example.com_v1.0.0/bar/bar.cue --
+package bar

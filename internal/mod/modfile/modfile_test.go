@@ -33,6 +33,7 @@ var parseTests = []struct {
 	wantError    string
 	want         *File
 	wantVersions []module.Version
+	wantDefaults map[string]string
 }{{
 	testName: "NoDeps",
 	parse:    Parse,
@@ -48,7 +49,10 @@ module: "foo.com/bar@v0"
 	data: `
 language: version: "v0.4.3"
 module: "foo.com/bar@v0"
-deps: "example.com@v1": v: "v1.2.3"
+deps: "example.com@v1": {
+	default: true
+	v: "v1.2.3"
+}
 deps: "other.com/something@v0": v: "v0.2.3"
 `,
 	want: &File{
@@ -58,6 +62,7 @@ deps: "other.com/something@v0": v: "v0.2.3"
 		Module: "foo.com/bar@v0",
 		Deps: map[string]*Dep{
 			"example.com@v1": {
+				Default: true,
 				Version: "v1.2.3",
 			},
 			"other.com/something@v0": {
@@ -66,6 +71,24 @@ deps: "other.com/something@v0": v: "v0.2.3"
 		},
 	},
 	wantVersions: parseVersions("example.com@v1.2.3", "other.com/something@v0.2.3"),
+	wantDefaults: map[string]string{
+		"example.com": "v1",
+	},
+}, {
+	testName: "AmbiguousDefaults",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar@v0"
+deps: "example.com@v1": {
+	default: true
+	v: "v1.2.3"
+}
+deps: "example.com@v2": {
+	default: true
+	v: "v2.0.0"
+}
+`,
+	wantError: `multiple default major versions found for example.com`,
 }, {
 	testName: "MisspelledLanguageVersionField",
 	parse:    Parse,
@@ -164,6 +187,7 @@ func TestParse(t *testing.T) {
 			qt.Assert(t, qt.IsNil(err), qt.Commentf("details: %v", errors.Details(err, nil)))
 			qt.Assert(t, qt.CmpEquals(f, test.want, cmpopts.IgnoreUnexported(File{})))
 			qt.Assert(t, qt.DeepEquals(f.DepVersions(), test.wantVersions))
+			qt.Assert(t, qt.DeepEquals(f.DefaultMajorVersions(), test.wantDefaults))
 		})
 	}
 }

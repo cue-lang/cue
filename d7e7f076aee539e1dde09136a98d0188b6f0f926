@@ -16,6 +16,24 @@
       "message": "Happy if you want to cut an rc.2 to \"test\" this.",
       "revId": "d7e7f076aee539e1dde09136a98d0188b6f0f926",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd486ac0_d78f966a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-06T12:41:18Z",
+      "side": 1,
+      "message": "We will do a v0.8.0 beta/rc not long from now, so I\u0027m happy to live test it then. It seems relatively safe given how goreleaser has had this draft option for years.",
+      "parentUuid": "8e0faea6_7f80feb4",
+      "revId": "d7e7f076aee539e1dde09136a98d0188b6f0f926",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

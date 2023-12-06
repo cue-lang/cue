@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fc88812d_135739f5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T08:10:18Z",
+      "side": 1,
+      "message": "As discussed the other day I think we also need some tests that cover error cases so that we can see the fs.FS \"issues\" you referred to. That way we can know how bad they are (and when to try and fix them)",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77a0df34_bbb53ff1",

@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "98687964_3e7ac65b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T07:51:27Z",
+      "side": 1,
+      "message": "Please reference the modules proposal, and make clear this is experimental.\n\nI would also describe any major features implemented and limitations of the command in this commit message so people don\u0027t have to go digging/looking elsewhere.",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "77a0df34_bbb53ff1",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T07:51:27Z",
+      "side": 1,
+      "message": "Have we captured this as an issue or TODO?",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2ea153d_1092989c",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T07:51:27Z",
+      "side": 1,
+      "message": "`getRegistry` is not documented so it\u0027s unclear when/why it would return nil. What non-success cases are not covered by nil errors that we need to check this?",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dce78353_4bedcabe",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T07:51:27Z",
+      "side": 1,
+      "message": "You could implement only writing the file if it hasn\u0027t changed in \u003c10 lines here, or document the TODO.",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "003d6e96_5e2c97dd",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T07:51:27Z",
+      "side": 1,
+      "message": "This could do with a comment to explain what you are trying to cover here.",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0c16406c_8bd298c0",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T07:51:27Z",
+      "side": 1,
+      "message": "Why does this test not require CUE_EXPERIMENT\u003dmodules to be set?",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

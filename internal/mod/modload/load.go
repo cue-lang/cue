@@ -7,6 +7,7 @@ import (
 	"io/fs"
 	"log"
 	"path"
+	"reflect"
 	"runtime"
 
 	"cuelang.org/go/internal/mod/internal/par"
@@ -53,7 +54,7 @@ func Load(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfi
 		return nil, fmt.Errorf("invalid module path %q: %v", mf.Module, err)
 	}
 	// TODO check that module path is well formed etc
-	rs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions())
+	rs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), mf.DefaultMajorVersions())
 	rootPkgPaths, err := modimports.AllImports(modimports.AllModuleFiles(fsys, modRoot))
 	if err != nil {
 		return nil, err
@@ -78,24 +79,22 @@ func Load(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfi
 	if err != nil {
 		return nil, fmt.Errorf("cannot tidy requirements: %v", err)
 	}
-	mf1, err := modfileFromRequirements(mf, rs)
-	if err != nil {
-		return nil, err
-	}
-	return mf1, err
+	return modfileFromRequirements(mf, rs), nil
 }
 
-func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements) (*modfile.File, error) {
+func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements) *modfile.File {
 	mf := &modfile.File{
 		Module: old.Module,
 		Deps:   make(map[string]*modfile.Dep),
 	}
+	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {
 		mf.Deps[v.Path()] = &modfile.Dep{
 			Version: v.Version(),
+			Default: defaults[v.BasePath()] == semver.Major(v.Version()),
 		}
 	}
-	return mf, nil
+	return mf
 }
 
 func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string, rs *modrequirements.Requirements) (*modrequirements.Requirements, *modpkgload.Packages, error) {
@@ -106,9 +105,12 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 		// TODO the original code calls updateRequirements at this point.
 		// /home/rogpeppe/go/src/cmd/go/internal/modload/load.go:1124
 
-		modAddedBy, err := ld.resolveMissingImports(ctx, pkgs, rs)
+		modAddedBy, defaultMajorVersions, err := ld.resolveMissingImports(ctx, pkgs, rs)
 		if err != nil {
 			return nil, nil, err
+		}
+		if !reflect.DeepEqual(defaultMajorVersions, rs.DefaultMajorVersions()) {
+			rs = rs.WithDefaultMajorVersions(defaultMajorVersions)
 		}
 		if len(modAddedBy) == 0 {
 			// The roots are stable, and we've resolved all of the missing packages
@@ -293,7 +295,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 			// graph so that we can update those roots to be consistent with other
 			// requirements.
 
-			rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots)
+			rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions())
 			var err error
 			mg, err = rs.Graph(ctx)
 			if err != nil {
@@ -383,7 +385,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 		// preserve its cached ModuleGraph (if any).
 		return rs, nil
 	}
-	return modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots), nil
+	return modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, rs.DefaultMajorVersions()), nil
 }
 
 // resolveMissingImports returns a set of modules that could be added as
@@ -391,10 +393,11 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 //
 // It returns a map from each new module version to
 // the first missing package that module would resolve.
-func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Packages, rs *modrequirements.Requirements) (modAddedBy map[module.Version]*modpkgload.Package, err error) {
+func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Packages, rs *modrequirements.Requirements) (modAddedBy map[module.Version]*modpkgload.Package, defaultMajorVersions map[string]string, err error) {
 	type pkgMod struct {
-		pkg  *modpkgload.Package
-		mods *[]module.Version
+		pkg          *modpkgload.Package
+		needsDefault *bool
+		mods         *[]module.Version
 	}
 	var pkgMods []pkgMod
 	work := par.NewQueue(runtime.GOMAXPROCS(0))
@@ -409,9 +412,10 @@ func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Pa
 		}
 		logf("querying %q", pkg.ImportPath())
 		var mods []module.Version // updated asynchronously.
+		var needsDefault bool
 		work.Add(func() {
 			var err error
-			mods, err = ld.queryImport(ctx, pkg.ImportPath(), rs)
+			mods, needsDefault, err = ld.queryImport(ctx, pkg.ImportPath(), rs)
 			if err != nil {
 				// pkg.err was already non-nil, so we can reasonably attribute the error
 				// for pkg to either the original error or the one returned by
@@ -433,23 +437,30 @@ func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Pa
 			// by some other newly-added or newly-upgraded dependency.
 		})
 
-		pkgMods = append(pkgMods, pkgMod{pkg: pkg, mods: &mods})
+		pkgMods = append(pkgMods, pkgMod{pkg: pkg, mods: &mods, needsDefault: &needsDefault})
 	}
 	<-work.Idle()
 
 	modAddedBy = map[module.Version]*modpkgload.Package{}
+	defaultMajorVersions = make(map[string]string)
+	for m, v := range rs.DefaultMajorVersions() {
+		defaultMajorVersions[m] = v
+	}
 	for _, pm := range pkgMods {
-		pkg, mods := pm.pkg, *pm.mods
+		pkg, mods, needsDefault := pm.pkg, *pm.mods, *pm.needsDefault
 		for _, mod := range mods {
 			// TODO support logging progress messages like this but without printing to stderr?
 			logf("cue: found potential %s in %v", pkg.ImportPath(), mod)
 			if modAddedBy[mod] == nil {
 				modAddedBy[mod] = pkg
 			}
+			if needsDefault {
+				defaultMajorVersions[mod.BasePath()] = semver.Major(mod.Version())
+			}
 		}
 	}
 
-	return modAddedBy, nil
+	return modAddedBy, defaultMajorVersions, nil
 }
 
 // tidyRoots returns a minimal set of root requirements that maintains the
@@ -499,7 +510,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 		queued[pkg] = true
 	}
 	module.Sort(roots)
-	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots)
+	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, old.DefaultMajorVersions())
 
 	for len(queue) > 0 {
 		roots = tidy.RootModules()
@@ -531,7 +542,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 
 		if tidyRoots := tidy.RootModules(); len(roots) > len(tidyRoots) {
 			module.Sort(roots)
-			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots)
+			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, tidy.DefaultMajorVersions())
 		}
 	}
 

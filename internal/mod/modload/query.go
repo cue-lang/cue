@@ -16,10 +16,12 @@ import (
 
 // queryImport attempts to locate a module that can be added to the
 // current build list to provide the package with the given import path.
+// It also reports whether a default major version will be required
+// to select the candidates (this will be true if pkgPath lacks
+// a major version).
 //
-// It prefers to add a replaced version of a module before checking the
-// proxies for a version to add.
-func (ld *loader) queryImport(ctx context.Context, pkgPath string, rs *modrequirements.Requirements) ([]module.Version, error) {
+// It avoids results that are already in the given requirements.
+func (ld *loader) queryImport(ctx context.Context, pkgPath string, rs *modrequirements.Requirements) (candidates []module.Version, needsDefault bool, err error) {
 	if modpkgload.IsStdlibPackage(pkgPath) {
 		// This package isn't in the standard library and isn't in any module already
 		// in the build list.
@@ -28,7 +30,7 @@ func (ld *loader) queryImport(ctx context.Context, pkgPath string, rs *modrequir
 		// QueryPattern cannot possibly find a module containing this package.
 		//
 		// Instead of trying QueryPattern, report an ImportMissingError immediately.
-		return nil, &modpkgload.ImportMissingError{Path: pkgPath}
+		return nil, false, &modpkgload.ImportMissingError{Path: pkgPath}
 	}
 
 	// Look up module containing the package, for addition to the build list.
@@ -38,33 +40,47 @@ func (ld *loader) queryImport(ctx context.Context, pkgPath string, rs *modrequir
 	// TODO logging support
 	logf("cue: finding module for package %s", pkgPath)
 
-	candidates, err := ld.queryLatestModules(ctx, pkgPath, rs)
+	candidates, needsDefault, err = ld.queryLatestModules(ctx, pkgPath, rs)
 	if err != nil {
-		return nil, err
+		return nil, false, err
 	}
 	if len(candidates) == 0 {
-		return nil, fmt.Errorf("%v", &modpkgload.ImportMissingError{Path: pkgPath})
+		return nil, false, fmt.Errorf("%v", &modpkgload.ImportMissingError{Path: pkgPath})
 	}
-	return candidates, nil
+	return candidates, needsDefault, nil
 }
 
 // queryLatestModules looks for potential modules that might contain the given
 // package by looking for the latest module version of all viable prefixes of pkgPath.
 // It does not return modules that are already present in the given requirements.
-func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *modrequirements.Requirements) ([]module.Version, error) {
-	mp, mv, ok := module.SplitPathVersion(pkgPath)
-	if !ok {
-		return nil, fmt.Errorf("package %q does not include major version (TODO support latest major version query)", pkgPath)
+// It also reports whether a default major version will be required.
+func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *modrequirements.Requirements) (_vers []module.Version, _def bool, _err error) {
+	mp, mv, hasMajor := module.SplitPathVersion(pkgPath)
+	if !hasMajor {
+		mp = pkgPath
 	}
 	latestModuleForPrefix := func(prefix string) (module.Version, error) {
-		mpath := prefix + "@" + mv
-		if _, ok := rs.RootSelected(mpath); ok {
-			// Already present in current requirements.
-			return module.Version{}, nil
+		mv := mv
+		if !hasMajor {
+			var status modrequirements.MajorVersionDefaultStatus
+			mv, status = rs.DefaultMajorVersion(prefix)
+			if status == modrequirements.AmbiguousDefault {
+				// There are already multiple possibilities and
+				// we don't have any way of choosing one.
+				return module.Version{}, nil
+			}
+		}
+		mpath := prefix
+		if mv != "" {
+			mpath = prefix + "@" + mv
+			if _, ok := rs.RootSelected(mpath); ok {
+				// Already present in current requirements.
+				return module.Version{}, nil
+			}
 		}
 
 		versions, err := ld.registry.ModuleVersions(ctx, mpath)
-		logf("getting module versions for %v -> %q, %v", mpath, versions, err)
+		logf("getting module versions for %q (prefix %q) -> %q, %v", mpath, prefix, versions, err)
 		if err != nil {
 			return module.Version{}, err
 		}
@@ -80,6 +96,7 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 		candidates []module.Version
 		queryErr   error
 	)
+	logf("initial module path %q", mp)
 	for prefix := mp; prefix != "."; prefix = path.Dir(prefix) {
 		prefix := prefix
 		work.Add(func() {
@@ -98,7 +115,7 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 		})
 	}
 	<-work.Idle()
-	return candidates, queryErr
+	return candidates, !hasMajor, queryErr
 }
 
 // latestVersion returns the latest of any of the given versions,

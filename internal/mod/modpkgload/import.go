@@ -41,9 +41,9 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	// take it from requirements; if not present there, search for latest
 	// major version and use that. What should we do when there are
 	// several major versions present in the go.mod file?
-	pkgPathOnly, pkgVersion, ok := module.SplitPathVersion(pkgPath)
-	if !ok {
-		return failf("all imports must currently be qualified with a major version")
+	pkgPathOnly, pkgVersion, hasMajor := module.SplitPathVersion(pkgPath)
+	if !hasMajor {
+		pkgPathOnly = pkgPath
 	}
 	if filepath.IsAbs(pkgPathOnly) || path.IsAbs(pkgPathOnly) {
 		return failf("%q is not a package path", pkgPath)
@@ -82,6 +82,12 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 				v  string
 				ok bool
 			)
+			pkgVersion := pkgVersion
+			if !hasMajor {
+				if pkgVersion, _ = pkgs.requirements.DefaultMajorVersion(prefix); pkgVersion == "" {
+					continue
+				}
+			}
 			prefixPath := prefix + "@" + pkgVersion
 			if mg == nil {
 				v, ok = pkgs.requirements.RootSelected(prefixPath)

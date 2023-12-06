@@ -59,7 +59,7 @@ module: "baz.org@v0"
 
 	rootVersion := mustParseVersion("example.com@v0")
 
-	rs := NewRequirements(rootVersion.Path(), reg, versions("foo.com/bar/hello@v0.2.3"))
+	rs := NewRequirements(rootVersion.Path(), reg, versions("foo.com/bar/hello@v0.2.3"), nil)
 
 	v, ok := rs.RootSelected(rootVersion.Path())
 	qt.Assert(t, qt.IsTrue(ok))
@@ -111,7 +111,7 @@ deps: "bar.com@v0": v: "v0.0.2"	// doesn't exist
 	rs := NewRequirements(rootVersion.Path(), reg, versions(
 		"bar.com@v0.0.2",
 		"foo.com/bar/hello@v0.2.3",
-	))
+	), nil)
 	_, err := rs.Graph(ctx)
 	qt.Assert(t, qt.ErrorMatches(err, `bar.com@v0.0.2: module bar.com@v0.0.2: error response: 404 Not Found: repository name not known to registry`))
 	qt.Assert(t, qt.ErrorAs(err, new(*mvs.BuildListError[module.Version])))

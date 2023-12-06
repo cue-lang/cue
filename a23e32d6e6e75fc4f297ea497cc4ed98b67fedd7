@@ -1,0 +1,112 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14b48d0b_f45e307a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-06T16:20:13Z",
+      "side": 1,
+      "message": "were those not needed? can you summarize?",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33fa4165_4d8a23bc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-06T16:20:13Z",
+      "side": 1,
+      "message": "not sure what this refers to",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d5d7387_b2811ebd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-06T16:20:13Z",
+      "side": 1,
+      "message": "I assume you mean like go.sum? would be good to clarify",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e3360748_65b7df4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-06T16:20:13Z",
+      "side": 1,
+      "message": "I still need to review the rest of load.go. My eyes are getting tired so I\u0027ll do that first thing tomorrow if that\u0027s OK.",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e258c732_79ff87a1",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-06T16:20:13Z",
+      "side": 1,
+      "message": "of? otherwise I\u0027m not sure I can understand",
+      "range": {
+        "startLine": 24,
+        "startChar": 30,
+        "endLine": 24,
+        "endChar": 34
+      },
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcc28d79_c7cb48ff",
+        "filename": "internal/mod/modload/query.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-06T16:20:13Z",
+      "side": 1,
+      "message": "not sure I understand this TODO, you already log here",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

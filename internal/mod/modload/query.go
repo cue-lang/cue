@@ -17,8 +17,7 @@ import (
 // queryImport attempts to locate a module that can be added to the
 // current build list to provide the package with the given import path.
 //
-// It prefers to add a replaced version of a module before checking the
-// proxies for a version to add.
+// It avoids results that are already in the given requirements.
 func (ld *loader) queryImport(ctx context.Context, pkgPath string, rs *modrequirements.Requirements) ([]module.Version, error) {
 	if modpkgload.IsStdlibPackage(pkgPath) {
 		// This package isn't in the standard library and isn't in any module already

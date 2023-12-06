@@ -25,8 +25,9 @@ type Requirements struct {
 	// rootModules is the set of root modules of the graph, sorted and capped to
 	// length. It may contain duplicates, and may contain multiple versions for a
 	// given module path. The root modules are the main module's direct requirements.
-	rootModules    []module.Version
-	maxRootVersion map[string]string
+	rootModules          []module.Version
+	maxRootVersion       map[string]string
+	defaultMajorVersions map[string]string
 
 	graphOnce sync.Once // guards writes to (but not reads from) graph
 	graph     atomic.Pointer[cachedGraph]
@@ -55,11 +56,16 @@ type cachedGraph struct {
 // Registry value at the first call to the Graph method.
 //
 // The rootModules slice must be sorted according to [module.Sort].
-// The caller must not modify the rootModules slice or direct map after passing
-// them to newRequirements.
+//
+// The defaultMajorVersions slice holds the default major version for (major-version-less)
+// mdule paths, if any have been specified. For example {"foo.com/bar": "v0"} specifies
+// that the default major version for the module `foo.com/bar` is `v0`.
+//
+// The caller must not modify rootModules or defaultMajorVersions after passing
+// them to NewRequirements.
 //
 // /home/rogpeppe/go/src/cmd/go/internal/modload/buildlist.go:117
-func NewRequirements(mainModulePath string, reg Registry, rootModules []module.Version) *Requirements {
+func NewRequirements(mainModulePath string, reg Registry, rootModules, defaultMajorVersions map[string]string) *Requirements {
 	mainModuleVersion := module.MustNewVersion(mainModulePath, "")
 	// TODO add direct, so we can tell which modules are directly used by the
 	// main module.
@@ -72,10 +78,11 @@ func NewRequirements(mainModulePath string, reg Registry, rootModules []module.V
 		}
 	}
 	rs := &Requirements{
-		registry:          reg,
-		mainModuleVersion: mainModuleVersion,
-		rootModules:       rootModules,
-		maxRootVersion:    make(map[string]string, len(rootModules)),
+		registry:             reg,
+		mainModuleVersion:    mainModuleVersion,
+		rootModules:          rootModules,
+		defaultMajorVersions: defaultMajorVersions,
+		maxRootVersion:       make(map[string]string, len(rootModules)),
 	}
 	for i, m := range rootModules {
 		if i > 0 {
@@ -88,18 +95,52 @@ func NewRequirements(mainModulePath string, reg Registry, rootModules []module.V
 			rs.maxRootVersion[m.Path()] = m.Version()
 		}
 	}
+	for mpath, v := range defaultMajorVersions {
+		if _, _, ok := module.SplitPathVersion(mpath); ok {
+			panic(fmt.Sprintf("NewRequirements called with major version in defaultMajorVersions %q", mpath))
+		}
+		if semver.Major(v) != v {
+			panic(fmt.Sprintf("NewRequirements called with invalid major version %q for module %q", v, mpath))
+		}
+	}
 	return rs
 }
 
 // RootSelected returns the version of the root dependency with the given module
 // path, or the zero module.Version and ok=false if the module is not a root
 // dependency.
-func (rs *Requirements) RootSelected(path string) (version string, ok bool) {
-	if path == rs.mainModuleVersion.Path() {
+func (rs *Requirements) RootSelected(mpath string) (version string, ok bool) {
+	if mpath == rs.mainModuleVersion.Path() {
 		return "", true
 	}
-	if v, ok := rs.maxRootVersion[path]; ok {
+	if v, ok := rs.maxRootVersion[mpath]; ok {
 		return v, true
+	}
+	return "", false
+}
+
+// CanonicalVersion returns the mpath in canonical form (i.e. with
+// a major version) and reports whether an explicit default was used
+// to arrive at the result and whether it was arr
+// and also whether the
+// If mpath already has a major version, it's
+// returned unchanged; if there's a default major version,
+// mpath is returned with that major version.
+func (rs *Requirements) CanonicalVersion(mpath string) (canonPath string, usedDefault, ok book) {
+	p, v, ok := module.SplitPathVersion(mpath)
+	if ok {
+		return mpath
+	}
+
+	if v := rs.defaultMajorVersions[mpath]; v != "" {
+		mpath += "@" + v
+		if _, _, ok := module.SplitPathVersion(mpath); !ok {
+			// For some reason (perhaps because mpath wasn't well formed
+			// in the first place) we've ended up with an invalid module
+			// path.
+			return "", false
+		}
+		return mpath, true
 	}
 	return "", false
 }

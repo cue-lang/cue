@@ -117,7 +117,7 @@ func (r *hiddenRuntime) Build(p *build.Instance) (*Instance, error) {
 	return r.complete(p, v)
 }
 
-// Deprecated: [Context.BuildInstances]. The use of [Instance] is being phased out.
+// Deprecated: use [Context.BuildInstances]. The use of [Instance] is being phased out.
 func Build(instances []*build.Instance) []*Instance {
 	if len(instances) == 0 {
 		panic("cue: list of instances must not be empty")

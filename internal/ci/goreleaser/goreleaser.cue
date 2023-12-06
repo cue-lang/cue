@@ -29,7 +29,6 @@ config: {
 		]
 	}]
 	archives: [{
-		rlcp:          true
 		name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
 		files: [
 			"LICENSE",
@@ -45,21 +44,25 @@ config: {
 	release: {
 		disable:    false
 		prerelease: "auto"
+
+		// We manually write the release notes, so they need to be added to a release on GitHub.
+		// We don't want to create the release from scratch without goreleaser,
+		// since goreleaser takes care of creating and uploading the release archives.
+		// We also don't want the release to be fully published by goreleaser,
+		// as otherwise the notification emails go out with the release notes missing.
+		// For those reasons, let goreleaser create the release, but leaving it as a draft.
+		draft: true
 	}
 	checksum: name_template: "checksums.txt"
 	snapshot: name_template: "{{ .Tag }}-next"
-	changelog: {
-		sort: "asc"
-		filters: exclude: [
-			"^test:",
-		]
-	}
+	// As explained above, we write our own release notes.
+	changelog: skip: true
 
 	brews: [{
 		if !#latest {
 			skip_upload: true
 		}
-		tap: {
+		repository: {
 			owner: "cue-lang"
 			name:  "homebrew-tap"
 		}

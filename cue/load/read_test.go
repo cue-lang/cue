@@ -49,9 +49,9 @@ var readImportsTests = []readTest{
 	},
 	{
 		`package p
-		
+
 		// comment
-		
+
 		import "x"
 		import _ "x"
 		import a "x"
@@ -72,28 +72,6 @@ var readImportsTests = []readTest{
 
 		ℙvar x = 1
 		`,
-		"",
-	},
-}
-
-var readCommentsTests = []readTest{
-	{
-		`ℙpackage p`,
-		"",
-	},
-	{
-		`ℙpackage p; import "x"`,
-		"",
-	},
-	{
-		`ℙpackage p; import . "x"`,
-		"",
-	},
-	{
-		`// foo
-
-		// asdf
-		ℙHello, world`,
 		"",
 	},
 }
@@ -138,10 +116,6 @@ func TestReadImports(t *testing.T) {
 	testRead(t, readImportsTests, func(r io.Reader) ([]byte, errors.Error) {
 		return readImports(r, true, nil)
 	})
-}
-
-func TestReadComments(t *testing.T) {
-	testRead(t, readCommentsTests, readComments)
 }
 
 var readFailuresTests = []readTest{

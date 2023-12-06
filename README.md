@@ -15,7 +15,6 @@
 -->
 [![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
 [![Github](https://github.com/cue-lang/cue/actions/workflows/trybot.yml/badge.svg)](https://github.com/cue-lang/cue/actions/workflows/trybot.yml?query=branch%3Amaster+event%3Apush)
-[![GolangCI](https://golangci.com/badges/github.com/cue-lang/cue.svg)](https://golangci.com/r/github.com/cue-lang/cue)
 [![Go 1.20+](https://img.shields.io/badge/go-1.20-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 

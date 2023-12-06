@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"sort"
 
-	"cuelang.org/go/internal/mod/mvs/internal/slices"
+	"cuelang.org/go/internal/slices"
 )
 
 // Versions is an interface that should be provided by implementations

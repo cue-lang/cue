@@ -213,7 +213,7 @@ option go_package = "istio.io/api/networking/v1alpha3"; // INLINE
 
 message Gateway {
   // REQUIRED: A list of server specifications.
-  repeated Server servers = 1;
+  repeated Server servers = 1 [(google.api.field_behavior) = REQUIRED];
 
   // REQUIRED: One or more labels that indicate a specific set of pods/VMs
   // on which this gateway configuration should be applied. The scope of

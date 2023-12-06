@@ -248,7 +248,12 @@ func (i *Iterator) Value() Value {
 
 // Selector reports the field label of this iteration.
 func (i *Iterator) Selector() Selector {
-	return wrapConstraint(featureToSel(i.f, i.idx), fromArcType(i.arcType))
+	sel := featureToSel(i.f, i.idx)
+	// Only call wrapConstraint if there is any constraint type to wrap with.
+	if ctype := fromArcType(i.arcType); ctype != 0 {
+		sel = wrapConstraint(sel, ctype)
+	}
+	return sel
 }
 
 // Label reports the label of the value if i iterates over struct fields and ""

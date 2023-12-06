@@ -70,7 +70,7 @@ Allocs: 3
 Retain: 1
 
 Unifications: 53
-Conjuncts:    90
+Conjuncts:    110
 Disjuncts:    54
 -- out/eval --
 Errors:
@@ -121,11 +121,26 @@ Result:
     i: (int){ int }
     f: (float){ float }
     b: (bytes){ bytes }
-    basic1: (int){ int }
-    basic2: (number){ number }
-    basic3: (string){ string }
-    basic4: (float){ float }
-    basic5: (bytes){ bytes }
+    basic1: (_|_){
+      // [incomplete] simplifyExpr.basic1: non-concrete value i for bound <:
+      //     ./in.cue:48:12
+    }
+    basic2: (_|_){
+      // [incomplete] simplifyExpr.basic2: non-concrete value n for bound >:
+      //     ./in.cue:49:12
+    }
+    basic3: (_|_){
+      // [incomplete] simplifyExpr.basic3: non-concrete value s for bound >=:
+      //     ./in.cue:50:13
+    }
+    basic4: (_|_){
+      // [incomplete] simplifyExpr.basic4: non-concrete value f for bound <=:
+      //     ./in.cue:51:13
+    }
+    basic5: (_|_){
+      // [incomplete] simplifyExpr.basic5: non-concrete value b for bound <=:
+      //     ./in.cue:52:13
+    }
     bne1: (_|_){
       // [incomplete] simplifyExpr.bne1: non-concrete value s for bound !=:
       //     ./in.cue:55:11

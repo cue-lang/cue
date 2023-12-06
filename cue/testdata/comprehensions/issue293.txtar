@@ -24,18 +24,27 @@ t: #C
 	}
 }
 t: p: "foo"
--- out/eval/stats --
-Leaks:  2
-Freed:  12
-Reused: 8
-Allocs: 6
-Retain: 3
 
-Unifications: 14
-Conjuncts:    25
-Disjuncts:    15
+-- variant1.cue --
+#V1: {
+	x: close({ f1: int })
+	x: f2: 2
+}
+-- out/eval/stats --
+Leaks:  3
+Freed:  16
+Reused: 12
+Allocs: 7
+Retain: 4
+
+Unifications: 19
+Conjuncts:    33
+Disjuncts:    20
 -- out/eval --
 Errors:
+#V1.x.f2: field not allowed:
+    ./variant1.cue:2:11
+    ./variant1.cue:3:5
 z.x.f2: field not allowed:
     ./in.cue:2:2
     ./in.cue:5:12
@@ -70,6 +79,18 @@ Result:
   #C: (#struct){
     p: (_){ _ }
   }
+  #V1: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval]
+      f1: (int){ int }
+      f2: (_|_){
+        // [eval] #V1.x.f2: field not allowed:
+        //     ./variant1.cue:2:11
+        //     ./variant1.cue:3:5
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -96,5 +117,16 @@ Result:
   }
   t: {
     p: "foo"
+  }
+}
+--- variant1.cue
+{
+  #V1: {
+    x: close({
+      f1: int
+    })
+    x: {
+      f2: 2
+    }
   }
 }

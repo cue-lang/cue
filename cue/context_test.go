@@ -21,7 +21,10 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/astinternal"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/tdtest"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 )
@@ -136,6 +139,57 @@ bar: [
 	if err == nil {
 		t.Fatalf("BuildInstances() = %#v, wanted error", vs)
 	}
+}
+
+func TestEncodeType(t *testing.T) {
+	type testCase struct {
+		name    string
+		x       interface{}
+		wantErr string
+		out     string
+	}
+	testCases := []testCase{{
+		name: "Struct",
+		x: struct {
+			A int    `json:"a"`
+			B string `json:"b,omitempty"`
+			C []bool
+		}{},
+		out: `{a: int64, b?: string, C?: *null|[...bool]}`,
+	}, {
+		name: "CUEValue#1",
+		x: struct {
+			A cue.Value `json:"a"`
+		}{},
+		out: `{a: _}`,
+	}, {
+		name: "CUEValue#2",
+		x:    cue.Value{},
+		out:  `_`,
+	}, {
+		// TODO this looks like a shortcoming of EncodeType.
+		name: "map",
+		x:    map[string]int{},
+		out:  `*null|{}`,
+	}, {
+		name: "slice",
+		x:    []int{},
+		out:  `*null|[...int64]`,
+	}, {
+		name:    "chan",
+		x:       chan int(nil),
+		wantErr: `unsupported Go type \(chan int\)`,
+	}}
+	tdtest.Run(t, testCases, func(t *cuetest.T, tc *testCase) {
+		v := cuecontext.New().EncodeType(tc.x)
+		if tc.wantErr != "" {
+			qt.Assert(t, qt.ErrorMatches(v.Err(), tc.wantErr))
+			return
+		}
+		qt.Assert(t, qt.IsNil(v.Err()))
+		got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
+		t.Equal(got, tc.out)
+	})
 }
 
 func TestContextCheck(t *testing.T) {

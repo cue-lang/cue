@@ -367,7 +367,7 @@ func (x *Bytes) Kind() Kind       { return BytesKind }
 // vertices.
 
 type ListMarker struct {
-	Src    ast.Node
+	Src    ast.Expr
 	IsOpen bool
 }
 
@@ -548,7 +548,11 @@ func (x *BoundExpr) evaluate(ctx *OpContext, state vertexStatus) Value {
 	case *BasicType:
 		switch x.Op {
 		case LessEqualOp, LessThanOp, GreaterEqualOp, GreaterThanOp:
-			return y
+			// TODO: this does not seem correct and results in some weird
+			// behavior for bounds.
+			ctx.addErrf(IncompleteError, token.NoPos,
+				"non-concrete value %s for bound %s", x.Expr, x.Op)
+			return nil
 		}
 	}
 	if v.Concreteness() > Concrete {
@@ -1398,7 +1402,7 @@ func isFinalError(n *Vertex) bool {
 // change after the fact.
 // expectError indicates whether the value should evaluate to an error or not.
 func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectError bool) {
-	if n := env.Vertex.getNodeContext(c, 0); n != nil {
+	if n := env.Vertex.state; n != nil {
 		n.postChecks = append(n.postChecks, envCheck{
 			env:         env,
 			expr:        x,

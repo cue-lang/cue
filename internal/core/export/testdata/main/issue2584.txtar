@@ -1,0 +1,100 @@
+# issue #2584
+
+-- in.cue --
+F1: sub1: sub2: L
+F2: {
+	(string): _
+	L
+}
+D: {}
+let L = D
+-- out/default --
+-- out/definition --
+
+let L = D
+F1: {
+	sub1: {
+		sub2: L
+	}
+}
+F2: {
+	(string): _
+	L
+}
+D: {}
+-- out/doc --
+[]
+[F1]
+[F1 sub1]
+[F1 sub1 sub2]
+[F2]
+[F2 _]
+[D]
+[L]
+-- out/value --
+== Simplified
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}
+== Raw
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}
+== Final
+{
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: _|_ // F2: invalid non-ground value string (must be concrete string)
+	D: {}
+}
+== All
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}
+== Eval
+{
+	let L = D
+	F1: {
+		sub1: {
+			sub2: {}
+		}
+	}
+	F2: {
+		(string): _
+		L
+	}
+	D: {}
+}

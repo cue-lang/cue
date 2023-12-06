@@ -205,7 +205,7 @@ package v1alpha3
 
 #Gateway: {
 	// REQUIRED: A list of server specifications.
-	servers?: [...#Server] @protobuf(1,Server)
+	servers: [...#Server] @protobuf(1,Server)
 
 	// REQUIRED: One or more labels that indicate a specific set of pods/VMs
 	// on which this gateway configuration should be applied. The scope of

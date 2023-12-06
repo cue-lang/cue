@@ -602,7 +602,8 @@ func goTypeToValueRec(ctx *adt.OpContext, allowNullDefault bool, t reflect.Type)
 	// strict instances and there cannot be any tags that further constrain
 	// the values.
 	if t.Implements(jsonMarshaler) || t.Implements(textMarshaler) {
-		return topSentinel, nil
+		e = topSentinel
+		goto store
 	}
 
 	switch k := t.Kind(); k {

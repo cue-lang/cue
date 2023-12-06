@@ -103,40 +103,16 @@ func AuthHandler(handler http.Handler, cfg *AuthConfig) http.Handler {
 }
 
 func pushContent(client *modregistry.Client, mods map[module.Version]*moduleContent) error {
-	pushed := make(map[module.Version]bool)
-	for v := range mods {
-		err := visitDepthFirst(mods, v, func(v module.Version, m *moduleContent) error {
-			if pushed[v] {
-				return nil
-			}
-			var zipContent bytes.Buffer
-			if err := m.writeZip(&zipContent); err != nil {
-				return err
-			}
-			if err := client.PutModule(context.Background(), v, bytes.NewReader(zipContent.Bytes()), int64(zipContent.Len())); err != nil {
-				return err
-			}
-			pushed[v] = true
-			return nil
-		})
-		if err != nil {
+	for v, m := range mods {
+		var zipContent bytes.Buffer
+		if err := m.writeZip(&zipContent); err != nil {
+			return err
+		}
+		if err := client.PutModule(context.Background(), v, bytes.NewReader(zipContent.Bytes()), int64(zipContent.Len())); err != nil {
 			return err
 		}
 	}
 	return nil
-}
-
-func visitDepthFirst(mods map[module.Version]*moduleContent, v module.Version, f func(module.Version, *moduleContent) error) error {
-	m := mods[v]
-	if m == nil {
-		return fmt.Errorf("no module found for version %v", v)
-	}
-	for _, depv := range m.modFile.DepVersions() {
-		if err := visitDepthFirst(mods, depv, f); err != nil {
-			return err
-		}
-	}
-	return f(v, m)
 }
 
 type Registry struct {

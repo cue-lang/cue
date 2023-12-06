@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1c099806_c22c9870",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T08:10:56Z",
+      "side": 1,
+      "message": "Sorry, meant to leave that comment unresolved. Marking so.",
+      "parentUuid": "fc88812d_135739f5",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "77a0df34_bbb53ff1",
         "filename": "cmd/cue/cmd/modtidy.go",
         "patchSetId": 12

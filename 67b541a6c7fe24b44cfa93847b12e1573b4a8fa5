@@ -88,6 +88,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ac086f05_0628135f",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T08:06:59Z",
+      "side": 1,
+      "message": "Do we also need a test that shows the successful removal of superfluous dependencies at the `cue mod tidy` level?",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0c16406c_8bd298c0",
         "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
         "patchSetId": 12

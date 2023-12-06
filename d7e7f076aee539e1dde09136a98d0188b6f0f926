@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8e0faea6_7f80feb4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-06T12:31:49Z",
+      "side": 1,
+      "message": "Happy if you want to cut an rc.2 to \"test\" this.",
+      "revId": "d7e7f076aee539e1dde09136a98d0188b6f0f926",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

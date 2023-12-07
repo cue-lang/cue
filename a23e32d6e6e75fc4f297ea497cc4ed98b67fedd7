@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb97cd58_1ec162be",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14b48d0b_f45e307a",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "33fa4165_4d8a23bc",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8c4d7436_696bd8a1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "33fa4165_4d8a23bc",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8d5d7387_b2811ebd",
@@ -48,6 +84,24 @@
       "writtenOn": "2023-12-06T16:20:13Z",
       "side": 1,
       "message": "I assume you mean like go.sum? would be good to clarify",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78b72bda_8b0a17ab",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 11
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8d5d7387_b2811ebd",
       "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -109,6 +163,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd23256e_8a5d9d85",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e258c732_79ff87a1",
+      "range": {
+        "startLine": 24,
+        "startChar": 30,
+        "endLine": 24,
+        "endChar": 34
+      },
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e78f8301_7b2a60ef",
@@ -122,6 +200,24 @@
       "writtenOn": "2023-12-07T11:12:11Z",
       "side": 1,
       "message": "this func is called in just one place, and it always returns a nil error - I would inline and simplify",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6745544_048dd36b",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "I quite like the separate function because it makes the operation very clear, and it\u0027ll certainly get more involved in the future (preserving previous formatting etc), but I\u0027ll remove the error return.",
+      "parentUuid": "e78f8301_7b2a60ef",
       "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -143,6 +239,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e5ccc48_2c5a10ba",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5a8ddde9_cea063bb",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bb091bbe_4368a89e",
@@ -156,6 +270,24 @@
       "writtenOn": "2023-12-07T11:12:11Z",
       "side": 1,
       "message": "why is it OK to ignore the error here? at least I\u0027d expect a comment with the reasoning",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dff932dc_42b9b334",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "It\u0027s OK to ignore the error because we just checked `GraphIsLoaded` on the line above. The existing comment text (taken verbatim from the original code) seems reasonable enough to me tbh.",
+      "parentUuid": "bb091bbe_4368a89e",
       "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -183,6 +315,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "89c98416_745c7682",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "good call. I don\u0027t think this can ever happen, so made the error hopefully clearer.",
+      "parentUuid": "c1c9b1ee_6167502e",
+      "range": {
+        "startLine": 360,
+        "startChar": 28,
+        "endLine": 360,
+        "endChar": 32
+      },
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "dcc28d79_c7cb48ff",
@@ -196,6 +352,24 @@
       "writtenOn": "2023-12-06T16:20:13Z",
       "side": 1,
       "message": "not sure I understand this TODO, you already log here",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "36fad2b9_4e75d7c5",
+        "filename": "internal/mod/modload/query.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T17:48:55Z",
+      "side": 1,
+      "message": "yeah, it\u0027s a hangover from the past, but I think there\u0027s still a worthy TODO there, so changed it.",
+      "parentUuid": "dcc28d79_c7cb48ff",
       "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

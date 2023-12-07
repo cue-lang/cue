@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "62d5e226_08658705",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2023-12-07T11:47:34Z",
+      "side": 1,
+      "message": "I don\u0027t have permissions to invoke trybots on cue-lang/cue, so I can\u0027t progress this CL any further now that 0.7.0 has been released.",
+      "revId": "6cd714b9780108ea76c274f9a0408716d4786ff4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

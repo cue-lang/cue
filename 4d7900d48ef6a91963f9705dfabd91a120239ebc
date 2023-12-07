@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "48fea2d9_56132628",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-07T09:26:10Z",
+      "side": 1,
+      "message": "FWIW I think that check can be dropped entirely. Because if we determine the number to be not inexact, and hence the type int, then we can simply ask the apd.Decimal for its Int64 value directly (or whatever method we need) rather than trying to extract a value from the coefficient directly.\n\nPer my offline message, this change is, however, absolutely not complete. Because to my mind we should also render:\n\n    (4 + 8 + 12) / 3\n    \nas:\n\n    8\n    \nWe currently render it as:\n\n    8.0\n    \nWhich is a symptom of the same kind of issue: we are not consistently treating not inexact values as integers.",
+      "parentUuid": "324441f3_77c9945b",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "ad388367_eec2b83a",
         "filename": "internal/core/convert/go.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2023-12-07T09:08:56Z",
       "side": 1,
       "message": "Very interesting. https://pkg.go.dev/github.com/cockroachdb/apd/v3#Context.RoundToIntegralExact\u0027s only side effect is modifying `d`, which we started doing in https://cue-review.googlesource.com/c/cue/+/7882. However, we never actually used `d` for anything since then; this apparent bug has been present since 2020.\n\nThe update to apd/v3 didn\u0027t make this bug better or worse as far as I can tell. It only made it more evident since v3 uses slightly different exponents, like you point out in the commit message.\n\nLeaving aside how `d` was unused, the fix still seems correct to me. When the kind is IntKind, we want the underlying value to be an exact integer, so we _do_ want to use the result of that function here.",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f16951c_c946941b",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-07T09:26:10Z",
+      "side": 1,
+      "message": "I\u0027m not entirely clear that it\u0027s correct FWIW. There might be other reasons why we still use the original `v` instead of `d`. But was is clear is that our use of `v` (in other places) has flawed logic, mainly because of the assumption around the exponent being zero for integer values. But it also exposes (per my other comment) us unnecessarily inspecting the coefficient where we should be using apd.Decimal methods directly.",
+      "parentUuid": "ad388367_eec2b83a",
       "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -54,6 +90,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "4404f12f_3abe54a4",
+        "filename": "pkg/list/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-07T09:26:10Z",
+      "side": 1,
+      "message": "Agreed.",
+      "parentUuid": "1bcc1ee0_923cdce4",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e98ca8d2_d0748d3e",
         "filename": "pkg/math/testdata/gen.txtar",
         "patchSetId": 1
@@ -65,6 +119,24 @@
       "writtenOn": "2023-12-07T09:08:56Z",
       "side": 1,
       "message": "again thinking outloud: this seems slightly better.",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "10105009_8a0efdda",
+        "filename": "pkg/math/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-07T09:26:10Z",
+      "side": 1,
+      "message": "Agreed.",
+      "parentUuid": "e98ca8d2_d0748d3e",
       "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

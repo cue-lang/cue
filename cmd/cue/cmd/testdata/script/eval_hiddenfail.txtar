@@ -1,9 +1,15 @@
 ! exec cue eval
 cmp stderr expect-stderr
 
+# TODO(mvdan): note that removing cue.mod below makes the test fail,
+# as the filename in the error strings seems to be relative to the module root.
+# That should probably not be the case; it should be relative to the current directory.
+
 -- expect-stderr --
 build constraints exclude all CUE files in .:
     .foo.cue: filename starts with a '.'
+-- cue.mod/module.cue --
+module: "mod.test"
 -- .foo.cue --
 package foo
 

@@ -3,6 +3,8 @@ cmp stderr expect-stderr
 -- expect-stderr --
 build constraints exclude all CUE files in ./issue174:
     issue174/issue174.cue: no package name
+-- cue.mod/module.cue --
+module: "mod.test"
 -- issue174/issue174.cue --
 import 'foo'
 

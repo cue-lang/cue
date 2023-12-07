@@ -95,6 +95,7 @@ func TestScript(t *testing.T) {
 	if err != nil {
 		t.Fatalf("cannot start proxy: %v", err)
 	}
+	t.Cleanup(srv.Close)
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
@@ -149,6 +150,21 @@ func TestScript(t *testing.T) {
 			},
 		},
 		Setup: func(e *testscript.Env) error {
+			// If a testscript loads CUE packages but forgot to set up a cue.mod,
+			// we might walk up to the system's temporary directory looking for cue.mod.
+			// If /tmp/cue.mod exists for instance, this can lead to test failures
+			// as our behavior when it comes to the module root and file paths changes.
+			// Make the testscript.Params.WorkdirRoot directory a module,
+			// ensuring consistent behavior no matter what parent directories contain.
+			//
+			// Note that creating the directory is enough for now,
+			// and we ignore ErrExist since only the first test will succeed.
+			// We can't create the directory before testscript.Run, as it sets up WorkdirRoot.
+			workdirRoot := filepath.Dir(e.WorkDir)
+			if err := os.Mkdir(filepath.Join(workdirRoot, "cue.mod"), 0o777); err != nil && !errors.Is(err, fs.ErrExist) {
+				return err
+			}
+
 			// Set up a home dir within work dir with a . prefix so that the
 			// Go/CUE pattern ./... does not descend into it.
 			home := filepath.Join(e.WorkDir, homeDirName)

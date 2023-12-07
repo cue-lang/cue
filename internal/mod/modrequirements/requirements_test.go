@@ -59,7 +59,7 @@ module: "baz.org@v0"
 
 	rootVersion := mustParseVersion("example.com@v0")
 
-	rs := NewRequirements(rootVersion.Path(), reg, versions("foo.com/bar/hello@v0.2.3"))
+	rs := NewRequirements(rootVersion.Path(), reg, versions("foo.com/bar/hello@v0.2.3"), nil)
 
 	v, ok := rs.RootSelected(rootVersion.Path())
 	qt.Assert(t, qt.IsTrue(ok))
@@ -111,10 +111,54 @@ deps: "bar.com@v0": v: "v0.0.2"	// doesn't exist
 	rs := NewRequirements(rootVersion.Path(), reg, versions(
 		"bar.com@v0.0.2",
 		"foo.com/bar/hello@v0.2.3",
-	))
+	), nil)
 	_, err := rs.Graph(ctx)
 	qt.Assert(t, qt.ErrorMatches(err, `bar.com@v0.0.2: module bar.com@v0.0.2: error response: 404 Not Found: repository name not known to registry`))
 	qt.Assert(t, qt.ErrorAs(err, new(*mvs.BuildListError[module.Version])))
+}
+
+func TestRequirementsWithDefaultMajorVersions(t *testing.T) {
+	rs := NewRequirements("example.com@v0", nil, versions(
+		"bar.com@v0.0.2",
+		"bar.com@v1.2.3",
+		"bar.com@v2.0.1",
+		"baz.org@v0.10.1",
+		"baz.org@v1.2.3",
+		"foo.com/bar/hello@v0.2.3",
+	), map[string]string{
+		"bar.com": "v1",
+	})
+	qt.Assert(t, qt.DeepEquals(rs.DefaultMajorVersions(), map[string]string{
+		"bar.com": "v1",
+	}))
+	tests := []struct {
+		mpath       string
+		wantVersion string
+		wantStatus  MajorVersionDefaultStatus
+	}{{
+		mpath:       "bar.com",
+		wantVersion: "v1",
+		wantStatus:  ExplicitDefault,
+	}, {
+		mpath:      "baz.org",
+		wantStatus: AmbiguousDefault,
+	}, {
+		mpath:       "foo.com/bar/hello",
+		wantVersion: "v0",
+		wantStatus:  NonExplicitDefault,
+	}, {
+		mpath:       "other.com",
+		wantVersion: "",
+		wantStatus:  NoDefault,
+	}}
+	for _, test := range tests {
+		t.Run("", func(t *testing.T) {
+			v, st := rs.DefaultMajorVersion(test.mpath)
+			qt.Check(t, qt.Equals(v, test.wantVersion))
+			qt.Check(t, qt.Equals(st, test.wantStatus))
+		})
+	}
+
 }
 
 type registryImpl struct {

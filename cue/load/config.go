@@ -33,7 +33,6 @@ const (
 	cueSuffix  = ".cue"
 	modDir     = "cue.mod"
 	moduleFile = "module.cue"
-	pkgDir     = "pkg"
 )
 
 // FromArgsUsage is a partial usage message that applications calling
@@ -384,8 +383,6 @@ func (c Config) isRoot(dir string) bool {
 // findRoot returns the module root that's ancestor
 // of the given absolute directory path, or "" if none was found.
 func (c Config) findRoot(absDir string) string {
-	fs := &c.fileSystem
-
 	abs := absDir
 	for {
 		if c.isRoot(abs) {
@@ -398,21 +395,7 @@ func (c Config) findRoot(absDir string) string {
 			return ""
 		}
 		if len(d) >= len(abs) {
-			break // reached top of file system, no cue.mod
-		}
-		abs = d
-	}
-	abs = absDir
-
-	// TODO(legacy): remove this capability at some point.
-	for {
-		info, err := fs.stat(filepath.Join(abs, pkgDir))
-		if err == nil && info.IsDir() {
-			return abs
-		}
-		d := filepath.Dir(abs)
-		if len(d) >= len(abs) {
-			return "" // reached top of file system, no pkg dir.
+			return "" // reached top of file system, no cue.mod
 		}
 		abs = d
 	}

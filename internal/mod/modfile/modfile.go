@@ -40,6 +40,9 @@ type File struct {
 	Language *Language       `json:"language,omitempty"`
 	Deps     map[string]*Dep `json:"deps,omitempty"`
 	versions []module.Version
+	// defaultMajorVersions maps from module base path to the
+	// major version default for that path.
+	defaultMajorVersions map[string]string
 }
 
 // Format returns a formatted representation of f
@@ -171,6 +174,7 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		}
 	}
 	var versions []module.Version
+	defaultMajorVersions := make(map[string]string)
 	// Check that major versions match dependency versions.
 	for m, dep := range mf.Deps {
 		v, err := module.NewVersion(m, dep.Version)
@@ -181,8 +185,18 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		if strict && v.Path() != m {
 			return nil, fmt.Errorf("invalid module.cue file %s: no major version in %q", filename, m)
 		}
+		if dep.Default {
+			mp := v.BasePath()
+			if _, ok := defaultMajorVersions[mp]; ok {
+				return nil, fmt.Errorf("multiple default major versions found for %v", mp)
+			}
+			defaultMajorVersions[mp] = semver.Major(v.Version())
+		}
 	}
 
+	if len(defaultMajorVersions) > 0 {
+		mf.defaultMajorVersions = defaultMajorVersions
+	}
 	mf.versions = versions[:len(versions):len(versions)]
 	module.Sort(mf.versions)
 	return &mf, nil
@@ -200,4 +214,11 @@ func newCUEError(err error, filename string) error {
 // of f are changed. If f was not created with [Parse], it returns nil.
 func (f *File) DepVersions() []module.Version {
 	return slices.Clip(f.versions)
+}
+
+// DefaultMajorVersions returns a map from module base path
+// to the major version that's specified as the default for that module.
+// The caller should not modify the returned map.
+func (f *File) DefaultMajorVersions() map[string]string {
+	return f.defaultMajorVersions
 }

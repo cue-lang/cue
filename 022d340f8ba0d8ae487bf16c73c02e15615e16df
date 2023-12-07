@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad5b0fbb_a227abec",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "I like it when there are lots of returns and quite a few things to return :) It saves a bunch of churn to update the zero values.",
+      "parentUuid": "135db2bd_c7496a6a",
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6eb3de91_811db953",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-12-06T16:02:21Z",
       "side": 1,
       "message": "add a TODO to use https://pkg.go.dev/slices#Reverse, or add it to your internal slices package like you did with other APIs",
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb44f276_b377513b",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6eb3de91_811db953",
       "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -60,6 +96,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "cbd9656c_109737a2",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3f58c96_20f9862a",
+      "range": {
+        "startLine": 155,
+        "startChar": 15,
+        "endLine": 155,
+        "endChar": 35
+      },
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "4fd16ca6_1083c4b3",
         "filename": "internal/mod/modpkgload/import.go",
         "patchSetId": 11
@@ -71,6 +131,24 @@
       "writtenOn": "2023-12-06T16:02:21Z",
       "side": 1,
       "message": "you seem to be correct:\n\n\u003e (It is permissible for any file to implement this interface, but if so ReadDir should return an error for non-directories.)\n\nSeems like a minor oversight, I couldn\u0027t find an issue. We could consider filing a short one. I think most people wouldn\u0027t run into this because DirEntry already gives you IsDir, so in most cases you can rely on that before you call ReadDir.",
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc2381eb_376f0992",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "I suspect it\u0027s too late unfortunately, because if the expectations changed so that ReadDir is expected to return a known error in this case, it would break existing implementations.",
+      "parentUuid": "4fd16ca6_1083c4b3",
       "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -88,6 +166,30 @@
       "writtenOn": "2023-12-06T16:02:21Z",
       "side": 1,
       "message": "given that you use proper names elsewhere, like Modules instead of Mods, I think you should be consistent and use Locations unless there\u0027s a good reason not to",
+      "range": {
+        "startLine": 257,
+        "startChar": 1,
+        "endLine": 257,
+        "endChar": 5
+      },
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0afd15c8_a2ed7d44",
+        "filename": "internal/mod/modpkgload/import.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 257,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f2ec567_152b65b3",
       "range": {
         "startLine": 257,
         "startChar": 1,
@@ -121,6 +223,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1679c1a6_b1cca502",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52be036a_df9fcdb6",
+      "range": {
+        "startLine": 96,
+        "startChar": 17,
+        "endLine": 96,
+        "endChar": 31
+      },
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6591a4dc_266acf08",
@@ -134,6 +260,24 @@
       "writtenOn": "2023-12-06T16:02:21Z",
       "side": 1,
       "message": "out of all the declaratios to document, IMO this one is needed - for example, I assume Dir is to be used within FS, but I\u0027m not sure.",
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "620b5f90_bcdffc8b",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 109,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6591a4dc_266acf08",
       "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -161,6 +305,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb765aec_0b4ea231",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "It\u0027s like that in the original cmd/go code, and this is still unchanged enough that I think it\u0027s worth avoiding unnecessary changes to identifiers, so I think I\u0027ll leave as is if that\u0027s OK.",
+      "parentUuid": "8a0916af_c459b6e4",
+      "range": {
+        "startLine": 285,
+        "startChar": 1,
+        "endLine": 285,
+        "endChar": 4
+      },
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4711402_e6a64077",
@@ -178,6 +346,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "38ec8077_dd853e06",
+        "filename": "internal/mod/modpkgload/pkgload.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 338,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4711402_e6a64077",
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a955a01_92610339",
@@ -191,6 +377,30 @@
       "writtenOn": "2023-12-06T16:02:21Z",
       "side": 1,
       "message": "nit: you might want to use the basename, so that the test is e.g. `TestFoo/bar.txtar` rather than `TestFoo/testdata/bar.txtar`.\n\nAlso, given that you have `t.Run` below already, I wonder if two levels of subtests are really needed. You could use a single `t.Run` with the string being e.g. `filepath.Base(f) + \"/\" + testDir`, and unindent all the code here by one level.",
+      "range": {
+        "startLine": 27,
+        "startChar": 8,
+        "endLine": 27,
+        "endChar": 9
+      },
+      "revId": "022d340f8ba0d8ae487bf16c73c02e15615e16df",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc6260ea_b42c6e7c",
+        "filename": "internal/mod/modpkgload/pkgload_test.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-07T19:27:27Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a955a01_92610339",
       "range": {
         "startLine": 27,
         "startChar": 8,

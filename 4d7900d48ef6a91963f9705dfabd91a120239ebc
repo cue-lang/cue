@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "324441f3_77c9945b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T09:08:56Z",
+      "side": 1,
+      "message": "Very nice investigation and fix. I\u0027m amazed that the bug went unnoticed for so long.\n\nWe should do a sweep of the codebase to try to spot any other bits of code where we may have flawed logic due to the zero-exponent assumption. I\u0027ll take a look at that later today.",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad388367_eec2b83a",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T09:08:56Z",
+      "side": 1,
+      "message": "Very interesting. https://pkg.go.dev/github.com/cockroachdb/apd/v3#Context.RoundToIntegralExact\u0027s only side effect is modifying `d`, which we started doing in https://cue-review.googlesource.com/c/cue/+/7882. However, we never actually used `d` for anything since then; this apparent bug has been present since 2020.\n\nThe update to apd/v3 didn\u0027t make this bug better or worse as far as I can tell. It only made it more evident since v3 uses slightly different exponents, like you point out in the commit message.\n\nLeaving aside how `d` was unused, the fix still seems correct to me. When the kind is IntKind, we want the underlying value to be an exact integer, so we _do_ want to use the result of that function here.",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bcc1ee0_923cdce4",
+        "filename": "pkg/list/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 147,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T09:08:56Z",
+      "side": 1,
+      "message": "Thinking outloud: this change seems OK, even though you\u0027re \"breaking\" with the v0.5.0 behavior here. it seems OK with me given that we already allowed the starting point to be `0` and not `0.0`, and the values still seem correct.",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e98ca8d2_d0748d3e",
+        "filename": "pkg/math/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T09:08:56Z",
+      "side": 1,
+      "message": "again thinking outloud: this seems slightly better.",
+      "revId": "4d7900d48ef6a91963f9705dfabd91a120239ebc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

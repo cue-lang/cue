@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4456f66_a17b4b2f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:23:53Z",
+      "side": 1,
+      "message": "Agreed that this commit message is far too short. The two previous ones are much better, and this one is even more visible and important to end users, so it needs added context.",
+      "parentUuid": "98687964_3e7ac65b",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "fc88812d_135739f5",
@@ -106,6 +124,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "acfee2b3_b0667f98",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:23:53Z",
+      "side": 1,
+      "message": "We should also use `filepath.Join` when opening files on disk IMO - it\u0027s fine to skip it in test code, but I think we should do the proper thing in non-test code where we might end up using the strings in error strings or logs.\n\nNote that much of the code does use forward slashes and path.Join, but those are for io/fs and not os APIs.",
+      "parentUuid": "dce78353_4bedcabe",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "003d6e96_5e2c97dd",
         "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
         "patchSetId": 12
@@ -151,6 +187,24 @@
       "writtenOn": "2023-12-06T07:51:27Z",
       "side": 1,
       "message": "Why does this test not require CUE_EXPERIMENT\u003dmodules to be set?",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a69b5aa_273076fb",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:23:53Z",
+      "side": 1,
+      "message": "Both CUE_EXPERIMENT\u003dmodules and CUE_REGISTRY are automatically set when a testscript has `_registry/` files, which helps with repetition. We\u0027ve gated logic on the presence of files/directories before :)",
+      "parentUuid": "0c16406c_8bd298c0",
       "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

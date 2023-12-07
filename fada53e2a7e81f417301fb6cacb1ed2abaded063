@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a138fbf3_b271e7eb",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:23:53Z",
+      "side": 1,
+      "message": "I would have imagined that `os.DirFS(\".\")` would work fine, and I\u0027m assuming we don\u0027t `os.Chdir` anywhere afterwards",
+      "revId": "fada53e2a7e81f417301fb6cacb1ed2abaded063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "757bfc1d_98e30e04",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:23:53Z",
+      "side": 1,
+      "message": "you don\u0027t actually need the named results?",
+      "range": {
+        "startLine": 108,
+        "startChar": 73,
+        "endLine": 108,
+        "endChar": 77
+      },
+      "revId": "fada53e2a7e81f417301fb6cacb1ed2abaded063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

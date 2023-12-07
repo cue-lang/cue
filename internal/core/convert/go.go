@@ -275,6 +275,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		res, _ := internal.BaseContext.RoundToIntegralExact(&d, v)
 		if !res.Inexact() {
 			kind = adt.IntKind
+			v = &d
 		}
 		n := &adt.Num{Src: ctx.Source(), K: kind}
 		n.X = *v

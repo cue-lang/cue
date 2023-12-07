@@ -14,6 +14,12 @@ import (
 	"cuelang.org/go/internal/slices"
 )
 
+type majorVersionDefault struct {
+	version          string
+	explicitDefault  bool
+	ambiguousDefault bool
+}
+
 // Requirements holds a set of module requirements. It does not
 // initially load the full module graph, as that can be expensive.
 // Instead the [Registry.Graph] method can be used to lazily construct
@@ -27,6 +33,14 @@ type Requirements struct {
 	// given module path. The root modules are the main module's direct requirements.
 	rootModules    []module.Version
 	maxRootVersion map[string]string
+
+	// origDefaultMajorVersions holds the original passed to New.
+	origDefaultMajorVersions map[string]string
+
+	// defaultMajorVersions is derived from the above information,
+	// also holding modules that have a default due to being unique
+	// in the roots.
+	defaultMajorVersions map[string]majorVersionDefault
 
 	graphOnce sync.Once // guards writes to (but not reads from) graph
 	graph     atomic.Pointer[cachedGraph]
@@ -55,11 +69,14 @@ type cachedGraph struct {
 // Registry value at the first call to the Graph method.
 //
 // The rootModules slice must be sorted according to [module.Sort].
-// The caller must not modify the rootModules slice or direct map after passing
-// them to newRequirements.
 //
-// /home/rogpeppe/go/src/cmd/go/internal/modload/buildlist.go:117
-func NewRequirements(mainModulePath string, reg Registry, rootModules []module.Version) *Requirements {
+// The defaultMajorVersions slice holds the default major version for (major-version-less)
+// mdule paths, if any have been specified. For example {"foo.com/bar": "v0"} specifies
+// that the default major version for the module `foo.com/bar` is `v0`.
+//
+// The caller must not modify rootModules or defaultMajorVersions after passing
+// them to NewRequirements.
+func NewRequirements(mainModulePath string, reg Registry, rootModules []module.Version, defaultMajorVersions map[string]string) *Requirements {
 	mainModuleVersion := module.MustNewVersion(mainModulePath, "")
 	// TODO add direct, so we can tell which modules are directly used by the
 	// main module.
@@ -88,20 +105,108 @@ func NewRequirements(mainModulePath string, reg Registry, rootModules []module.V
 			rs.maxRootVersion[m.Path()] = m.Version()
 		}
 	}
+	rs.initDefaultMajorVersions(defaultMajorVersions)
 	return rs
+}
+
+// WithDefaultMajorVersions returns rs but with the given default major versions.
+// The caller should not modify the map after calling this method.
+func (rs *Requirements) WithDefaultMajorVersions(defaults map[string]string) *Requirements {
+	rs1 := &Requirements{
+		registry:          rs.registry,
+		mainModuleVersion: rs.mainModuleVersion,
+		rootModules:       rs.rootModules,
+		maxRootVersion:    rs.maxRootVersion,
+	}
+	// Initialize graph and graphOnce in rs1 to mimic their state in rs.
+	// We can't copy the sync.Once, so if it's already triggered, we'll
+	// run the Once with a no-op function to get the same effect.
+	rs1.graph.Store(rs.graph.Load())
+	if rs1.GraphIsLoaded() {
+		rs1.graphOnce.Do(func() {})
+	}
+	rs1.initDefaultMajorVersions(defaults)
+	return rs1
+}
+
+func (rs *Requirements) initDefaultMajorVersions(defaultMajorVersions map[string]string) {
+	rs.origDefaultMajorVersions = defaultMajorVersions
+	rs.defaultMajorVersions = make(map[string]majorVersionDefault)
+	for mpath, v := range defaultMajorVersions {
+		if _, _, ok := module.SplitPathVersion(mpath); ok {
+			panic(fmt.Sprintf("NewRequirements called with major version in defaultMajorVersions %q", mpath))
+		}
+		if semver.Major(v) != v {
+			panic(fmt.Sprintf("NewRequirements called with invalid major version %q for module %q", v, mpath))
+		}
+		rs.defaultMajorVersions[mpath] = majorVersionDefault{
+			version:         v,
+			explicitDefault: true,
+		}
+	}
+	// Add defaults for all modules that have exactly one major version
+	// and no existing default.
+	for _, m := range rs.rootModules {
+		mpath := m.BasePath()
+		d, ok := rs.defaultMajorVersions[mpath]
+		if !ok {
+			rs.defaultMajorVersions[mpath] = majorVersionDefault{
+				version: semver.Major(m.Version()),
+			}
+			continue
+		}
+		if d.explicitDefault {
+			continue
+		}
+		d.ambiguousDefault = true
+		rs.defaultMajorVersions[mpath] = d
+	}
 }
 
 // RootSelected returns the version of the root dependency with the given module
 // path, or the zero module.Version and ok=false if the module is not a root
 // dependency.
-func (rs *Requirements) RootSelected(path string) (version string, ok bool) {
-	if path == rs.mainModuleVersion.Path() {
+func (rs *Requirements) RootSelected(mpath string) (version string, ok bool) {
+	if mpath == rs.mainModuleVersion.Path() {
 		return "", true
 	}
-	if v, ok := rs.maxRootVersion[path]; ok {
+	if v, ok := rs.maxRootVersion[mpath]; ok {
 		return v, true
 	}
 	return "", false
+}
+
+// DefaultMajorVersions returns the defaults that the requirements was
+// created with. The returned map should not be modified.
+func (rs *Requirements) DefaultMajorVersions() map[string]string {
+	return rs.origDefaultMajorVersions
+}
+
+type MajorVersionDefaultStatus byte
+
+const (
+	ExplicitDefault MajorVersionDefaultStatus = iota
+	NonExplicitDefault
+	NoDefault
+	AmbiguousDefault
+)
+
+// DefaultMajorVersion returns the default major version for the given
+// module path (which should not itself contain a major version).
+//
+//	It also returns information about the default.
+func (rs *Requirements) DefaultMajorVersion(mpath string) (string, MajorVersionDefaultStatus) {
+	d, ok := rs.defaultMajorVersions[mpath]
+	switch {
+	case !ok:
+		return "", NoDefault
+	case d.ambiguousDefault:
+		return "", AmbiguousDefault
+	case d.explicitDefault:
+		return d.version, ExplicitDefault
+	default:
+		return d.version, NonExplicitDefault
+	}
 }
 
 // rootModules returns the set of root modules of the graph, sorted and capped to

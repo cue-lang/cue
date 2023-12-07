@@ -96,26 +96,35 @@ func (c *Client) repoName(modPath string) string {
 	return path
 }
 
-// ModuleVersions returns all the versions for the module with the given path.
+// ModuleVersions returns all the versions for the module with the given path
+// sorted in semver order.
+// If m has a major version suffix, only versions with that major version will
+// be returned.
 func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error) {
-	_, major, ok := module.SplitPathVersion(m)
-	if !ok {
-		return nil, fmt.Errorf("non-canonical module path %q", m)
+	mpath, major, hasMajor := module.SplitPathVersion(m)
+	if !hasMajor {
+		mpath = m
 	}
 	tags := []string{}
-	iter := c.registry.Tags(ctx, c.repoName(m))
+	// Note: do not use c.repoName because that always expects
+	// a module path with a major version.
+	iter := c.registry.Tags(ctx, mpath)
 	for {
 		tag, ok := iter.Next()
 		if !ok {
 			break
 		}
-		if semver.IsValid(tag) && semver.Major(tag) == major {
+		if !semver.IsValid(tag) {
+			continue
+		}
+		if !hasMajor || semver.Major(tag) == major {
 			tags = append(tags, tag)
 		}
 	}
 	if err := iter.Error(); err != nil && !isNotExist(err) {
 		return nil, err
 	}
+	semver.Sort(tags)
 	return tags, nil
 }
 

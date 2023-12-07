@@ -69,6 +69,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f070842_922ab9b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:12:11Z",
+      "side": 1,
+      "message": "I can\u0027t say I fully grasp the algorithm, but I also assume that you borrowed a lot of this design and godocs from upstream Go, and it seems to work, so I\u0027m choosing not to spend a full day on this :)",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e258c732_79ff87a1",
@@ -87,6 +104,80 @@
         "startChar": 30,
         "endLine": 24,
         "endChar": 34
+      },
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e78f8301_7b2a60ef",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:12:11Z",
+      "side": 1,
+      "message": "this func is called in just one place, and it always returns a nil error - I would inline and simplify",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5a8ddde9_cea063bb",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:12:11Z",
+      "side": 1,
+      "message": "you could add another maps.Keys TODO here, unless we want to keep the per-element logging around forever",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bb091bbe_4368a89e",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 312,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:12:11Z",
+      "side": 1,
+      "message": "why is it OK to ignore the error here? at least I\u0027d expect a comment with the reasoning",
+      "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1c9b1ee_6167502e",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 360,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-07T11:12:11Z",
+      "side": 1,
+      "message": "did you mean to fix this TODO before we submit? I suspect we only want to leave TODOs in comments, not in error strings",
+      "range": {
+        "startLine": 360,
+        "startChar": 28,
+        "endLine": 360,
+        "endChar": 32
       },
       "revId": "a23e32d6e6e75fc4f297ea497cc4ed98b67fedd7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"

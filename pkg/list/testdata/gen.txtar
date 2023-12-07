@@ -61,6 +61,7 @@ t51: list.MinItems([1, 2, 3, 4], 5)
 t52: list.MaxItems([1, 2, 3, 4], 5)
 t53: list.MaxItems([1, 2, 3, 4], 2)
 t54: list.Sort([{a: 1}, {b: 2}], list.Ascending)
+t55: list.Avg([4, 8, 12])
 -- out/list --
 Errors:
 t2: error in call to list.Avg: empty list:
@@ -143,7 +144,7 @@ t27: [0, 1, 2, 3, 4]
 t28: [0]
 t29: [0, 2, 4]
 t30: [5, 4, 3, 2, 1]
-t31: [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
+t31: [0, 0.5, 1, 1.5, 2, 2.5, 3, 3.5, 4, 4.5]
 t32: [2, 3]
 t33: _|_ // t33: error in call to list.Slice: negative index
 t34: _|_ // t34: error in call to list.Slice: invalid index: 3 > 1
@@ -176,3 +177,4 @@ t51: false
 t52: true
 t53: false
 t54: _|_ // t54: error in call to list.Sort: Ascending.x: 2 errors in empty disjunction: (and 5 more errors)
+t55: 8

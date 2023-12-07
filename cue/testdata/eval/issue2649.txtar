@@ -1,0 +1,19 @@
+-- in.cue --
+(4 + 8 + 12) / 3
+-- out/compile --
+--- in.cue
+{
+  (((4 + 8) + 12) / 3)
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  1
+Reused: 0
+Allocs: 1
+Retain: 0
+
+Unifications: 1
+Conjuncts:    2
+Disjuncts:    1
+-- out/eval --
+(float){ 8.0 }

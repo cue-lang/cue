@@ -39,7 +39,7 @@ t6:  _|_ // t6: error in call to math.Jacobi: big: invalid 2nd argument to Int.J
 t7:  1
 t8:  _|_ // t8: cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up
 t16: 4096
-t17: 1e+4
+t17: 10000
 t18: true
 t23: 2.5
 t24: 2.2

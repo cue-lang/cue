@@ -22,7 +22,6 @@ package internal // import "cuelang.org/go/internal"
 import (
 	"bufio"
 	"fmt"
-	"os"
 	"path/filepath"
 	"strings"
 
@@ -435,17 +434,6 @@ func IsEllipsis(x ast.Decl) bool {
 
 // GenPath reports the directory in which to store generated files.
 func GenPath(root string) string {
-	info, err := os.Stat(filepath.Join(root, "cue.mod"))
-	if os.IsNotExist(err) || !info.IsDir() {
-		// Try legacy pkgDir mode
-		pkgDir := filepath.Join(root, "pkg")
-		if err == nil && !info.IsDir() {
-			return pkgDir
-		}
-		if info, err := os.Stat(pkgDir); err == nil && info.IsDir() {
-			return pkgDir
-		}
-	}
 	return filepath.Join(root, "cue.mod", "gen")
 }
 

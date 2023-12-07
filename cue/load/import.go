@@ -97,20 +97,16 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	genDir := GenPath(cfg.ModuleRoot)
 	if strings.HasPrefix(p.Dir, genDir) {
 		dirs = append(dirs, [2]string{genDir, p.Dir})
-		// TODO(legacy): don't support "pkg"
 		// && p.PkgName != "_"
-		if filepath.Base(genDir) != "pkg" {
-			for _, sub := range []string{"pkg", "usr"} {
-				rel, err := filepath.Rel(genDir, p.Dir)
-				if err != nil {
-					// should not happen
-					return retErr(
-						errors.Wrapf(err, token.NoPos, "invalid path"))
-				}
-				base := filepath.Join(cfg.ModuleRoot, modDir, sub)
-				dir := filepath.Join(base, rel)
-				dirs = append(dirs, [2]string{base, dir})
+		for _, sub := range []string{"pkg", "usr"} {
+			rel, err := filepath.Rel(genDir, p.Dir)
+			if err != nil {
+				// should not happen
+				return retErr(errors.Wrapf(err, token.NoPos, "invalid path"))
 			}
+			base := filepath.Join(cfg.ModuleRoot, modDir, sub)
+			dir := filepath.Join(base, rel)
+			dirs = append(dirs, [2]string{base, dir})
 		}
 	} else {
 		dirs = append(dirs, [2]string{cfg.ModuleRoot, p.Dir})
@@ -297,14 +293,6 @@ func (l *loader) importPathFromAbsDir(absDir fsPath, key string) (importPath, er
 		if pkg == "" {
 			return "", errors.Newf(token.NoPos,
 				"invalid package %q (root of %s)", key, modDir)
-		}
-
-		// TODO(legacy): remove.
-	case strings.HasPrefix(pkg, "/pkg/"):
-		pkg = pkg[len("/pkg/"):]
-		if pkg == "" {
-			return "", errors.Newf(token.NoPos,
-				"invalid package %q (root of %s)", key, pkgDir)
 		}
 
 	case l.cfg.Module == "":

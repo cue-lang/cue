@@ -17,6 +17,7 @@ package modregistry
 import (
 	"bytes"
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path"
@@ -31,6 +32,7 @@ import (
 
 	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/internal/mod/semver"
 )
 
 func newTestClient(t *testing.T) *Client {
@@ -62,6 +64,29 @@ x: 42
 	tags, err := c.ModuleVersions(ctx, mv.Path())
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v1.2.3"}))
+}
+
+func TestModuleVersions(t *testing.T) {
+	ctx := context.Background()
+	c := newTestClient(t)
+	for _, v := range []string{"v1.0.0", "v2.3.3-alpha", "v1.2.3", "v0.23.676", "v3.2.1"} {
+		mpath := "example.com/module@" + semver.Major(v)
+		modContents := fmt.Sprintf(`
+-- cue.mod/module.cue --
+module: %q
+
+-- x.cue --
+x: 42
+`, mpath)
+		putModule(t, c, module.MustParseVersion("example.com/module@"+v), modContents)
+	}
+	tags, err := c.ModuleVersions(ctx, "example.com/module")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(tags, []string{"v0.23.676", "v1.0.0", "v1.2.3", "v2.3.3-alpha", "v3.2.1"}))
+
+	tags, err = c.ModuleVersions(ctx, "example.com/module@v1")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(tags, []string{"v1.0.0", "v1.2.3"}))
 }
 
 func TestPutGetWithDependencies(t *testing.T) {

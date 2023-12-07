@@ -53,7 +53,7 @@ func Load(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfi
 		return nil, fmt.Errorf("invalid module path %q: %v", mf.Module, err)
 	}
 	// TODO check that module path is well formed etc
-	rs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions())
+	rs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), nil)
 	rootPkgPaths, err := modimports.AllImports(modimports.AllModuleFiles(fsys, modRoot))
 	if err != nil {
 		return nil, err
@@ -291,7 +291,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 			// graph so that we can update those roots to be consistent with other
 			// requirements.
 
-			rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots)
+			rs = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, nil)
 			var err error
 			mg, err = rs.Graph(ctx)
 			if err != nil {
@@ -381,7 +381,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 		// preserve its cached ModuleGraph (if any).
 		return rs, nil
 	}
-	return modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots), nil
+	return modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, nil), nil
 }
 
 // resolveMissingImports returns a set of modules that could be added as
@@ -497,7 +497,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 		queued[pkg] = true
 	}
 	module.Sort(roots)
-	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots)
+	tidy := modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, nil)
 
 	for len(queue) > 0 {
 		roots = tidy.RootModules()
@@ -529,7 +529,7 @@ func (ld *loader) tidyRoots(ctx context.Context, old *modrequirements.Requiremen
 
 		if tidyRoots := tidy.RootModules(); len(roots) > len(tidyRoots) {
 			module.Sort(roots)
-			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots)
+			tidy = modrequirements.NewRequirements(ld.mainModule.Path(), ld.registry, roots, nil)
 		}
 	}
 

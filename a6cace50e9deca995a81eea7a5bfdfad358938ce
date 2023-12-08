@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "deeffb60_c3921960",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T17:09:02Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "55e8c3bd_08bbb525",
+      "revId": "a6cace50e9deca995a81eea7a5bfdfad358938ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ca9cb95_eed60e29",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a157e59_254f8228",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T17:09:02Z",
+      "side": 1,
+      "message": "Done (in earlier CL)",
+      "parentUuid": "1ca9cb95_eed60e29",
+      "revId": "a6cace50e9deca995a81eea7a5bfdfad358938ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92b3c62a_a627823a",
@@ -65,6 +101,30 @@
       "writtenOn": "2023-12-08T10:02:17Z",
       "side": 1,
       "message": "I was stumped by this code until I re-read it and the Requirements type about five times.\n\nPlease document what you\u0027re doing, e.g.:\n\n\u003e // Initialize graph and graphOnce in rs1 to mimic their state in rs.",
+      "range": {
+        "startLine": 117,
+        "startChar": 1,
+        "endLine": 120,
+        "endChar": 2
+      },
+      "revId": "a6cace50e9deca995a81eea7a5bfdfad358938ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "009266cd_4dbd5a72",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T17:09:02Z",
+      "side": 1,
+      "message": "Done (in earlier CL).",
+      "parentUuid": "92b3c62a_a627823a",
       "range": {
         "startLine": 117,
         "startChar": 1,

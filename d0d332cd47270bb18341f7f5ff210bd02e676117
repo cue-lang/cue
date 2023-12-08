@@ -34,6 +34,24 @@
       "parentUuid": "3e8ec858_ec1dc45a",
       "revId": "d0d332cd47270bb18341f7f5ff210bd02e676117",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10d7c821_ac9ef4e3",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-08T09:56:59Z",
+      "side": 1,
+      "message": "If you\u0027d run CI you would have spotted it ;-)\n\nFWIW I\u0027ve long been of the position that having a filename convention for generated files is a good thing, because it\u0027s more easy to filter for generated files or otherwise. So your suggestion gets a :+1: from me.",
+      "parentUuid": "441c06af_36118884",
+      "revId": "d0d332cd47270bb18341f7f5ff210bd02e676117",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

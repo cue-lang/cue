@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3a269984_0f71dd1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d4456f66_a17b4b2f",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "fc88812d_135739f5",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 12
@@ -71,6 +89,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcadecbb_7ccafb09",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1c099806_c22c9870",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77a0df34_bbb53ff1",
@@ -88,6 +124,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "744243f8_cad796c9",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77a0df34_bbb53ff1",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c2ea153d_1092989c",
@@ -101,6 +155,24 @@
       "writtenOn": "2023-12-06T07:51:27Z",
       "side": 1,
       "message": "`getRegistry` is not documented so it\u0027s unclear when/why it would return nil. What non-success cases are not covered by nil errors that we need to check this?",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "295cadb2_1497b8e8",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "When modules aren\u0027t enabled, getRegistry will return (nil, nil), which is what we want when setting up the Registry field in the cue/load config. I\u0027ve added a doc comment for getRegistry.",
+      "parentUuid": "c2ea153d_1092989c",
       "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -140,6 +212,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7024770_e800cb9d",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 77,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "\u003e or document the TODO.\n\nIs the TODO on line 72 not sufficient?\n\n\u003e We should also use filepath.Join when opening files on disk IMO\n\nDone.",
+      "parentUuid": "acfee2b3_b0667f98",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "003d6e96_5e2c97dd",
@@ -170,6 +260,42 @@
       "writtenOn": "2023-12-06T08:06:59Z",
       "side": 1,
       "message": "Do we also need a test that shows the successful removal of superfluous dependencies at the `cue mod tidy` level?",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8992d43a_5ff9da53",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac086f05_0628135f",
+      "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "80572fef_b8ee7f72",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_initial.txtar",
+        "patchSetId": 12
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "003d6e96_5e2c97dd",
       "revId": "67b541a6c7fe24b44cfa93847b12e1573b4a8fa5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

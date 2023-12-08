@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d83df8e_ad3bc128",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "I _think_ I prefer explicitly calling Getwd so that we fail early if that fails.",
+      "parentUuid": "a138fbf3_b271e7eb",
+      "revId": "fada53e2a7e81f417301fb6cacb1ed2abaded063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "757bfc1d_98e30e04",
@@ -31,6 +49,30 @@
       "writtenOn": "2023-12-07T11:23:53Z",
       "side": 1,
       "message": "you don\u0027t actually need the named results?",
+      "range": {
+        "startLine": 108,
+        "startChar": 73,
+        "endLine": 108,
+        "endChar": 77
+      },
+      "revId": "fada53e2a7e81f417301fb6cacb1ed2abaded063",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "20509797_2e304b49",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 108,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T13:45:05Z",
+      "side": 1,
+      "message": "Yeah, debugging remnant. Done.",
+      "parentUuid": "757bfc1d_98e30e04",
       "range": {
         "startLine": 108,
         "startChar": 73,

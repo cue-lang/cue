@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3919f12e_f2b5a059",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-08T16:01:11Z",
+      "side": 1,
+      "message": "please expand this commit message a bit",
+      "revId": "3054513b3aeee0c17dad9840b7021149b5cd5d3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65b04500_8a40273f",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-08T16:01:11Z",
+      "side": 1,
+      "message": "should this be left around? at minimum it should have a TODO so we remove it sooner than later",
+      "revId": "3054513b3aeee0c17dad9840b7021149b5cd5d3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

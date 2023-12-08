@@ -184,6 +184,9 @@ func TestYAMLValues(t *testing.T) {
 		{`"-.Inf"`, `"-.Inf"`},
 		{`"2002"`, `"2002"`},
 		{`"685_230.15"`, `"685_230.15"`},
+		// Note that go-yaml doesn't quote strings which look like hexadecimal numbers,
+		// but we do in our fork. See: https://github.com/go-yaml/yaml/issues/847
+		{`"0x123456789012345678901234567890"`, `"0x123456789012345678901234567890"`},
 
 		// Legacy values.format.
 		{`"no"`, `"no"`},

@@ -1,33 +1,18 @@
 -- test0/initial-requirements --
-main.test@v0
+main.test@v0 example.com@v0.0.1
 -- test0/root-packages --
 main.test@v0
+example.com/blah
 -- test0/default-major-versions --
+example.com@v0
 -- test0/want --
 main.test@v0
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: main.test@v0
 	location: .
 	imports:
-		example.com/blah@v0
-example.com/blah@v0
-	flags: inAll,isRoot,fromRoot
-	error: cannot find module providing package example.com/blah@v0
-	missing: true
--- test1/initial-requirements --
-main.test@v0
-example.com@v0.0.1
--- test1/root-packages --
-main.test@v0
--- test1/default-major-versions --
--- test1/want --
-main.test@v0
-	flags: inAll,isRoot,fromRoot,importsLoaded
-	mod: main.test@v0
-	location: .
-	imports:
-		example.com/blah@v0
-example.com/blah@v0
+		example.com/blah
+example.com/blah
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: example.com@v0.0.1
 	location: _registry/example.com_v0.0.1/blah
@@ -39,7 +24,7 @@ foo.com/bar/hello/goodbye@v0
 	missing: false
 -- main.cue --
 package main
-import "example.com/blah@v0"
+import "example.com/blah"
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"

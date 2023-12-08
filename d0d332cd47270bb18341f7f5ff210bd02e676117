@@ -16,6 +16,24 @@
       "message": "I suspect this file will be overwritten, and CI should fail. I think it\u0027s OK to ignore generated files.",
       "revId": "d0d332cd47270bb18341f7f5ff210bd02e676117",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "441c06af_36118884",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-08T09:52:53Z",
+      "side": 1,
+      "message": "Ah, I missed that in my swift survey of files. We should probably call this `types_gen.go` to make it clearer in the name that it\u0027s generated.",
+      "parentUuid": "3e8ec858_ec1dc45a",
+      "revId": "d0d332cd47270bb18341f7f5ff210bd02e676117",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

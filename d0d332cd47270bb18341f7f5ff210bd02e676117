@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e8ec858_ec1dc45a",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-08T09:04:59Z",
+      "side": 1,
+      "message": "I suspect this file will be overwritten, and CI should fail. I think it\u0027s OK to ignore generated files.",
+      "revId": "d0d332cd47270bb18341f7f5ff210bd02e676117",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

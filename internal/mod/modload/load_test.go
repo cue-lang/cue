@@ -49,6 +49,7 @@ func TestLoad(t *testing.T) {
 				fmt.Fprintln(&out, v)
 			}
 			if diff := cmp.Diff(string(want), out.String()); diff != "" {
+				t.Log("actual result:\n", out.String())
 				t.Fatalf("unexpected results (-want +got):\n%s", diff)
 			}
 		})

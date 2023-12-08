@@ -41,7 +41,13 @@ func TestLoadPackages(t *testing.T) {
 
 				initialRequirementsStr := strings.Fields(readTestFile("initial-requirements"))
 				mainModulePath, moduleVersions := initialRequirementsStr[0], mapSlice(initialRequirementsStr[1:], module.MustParseVersion)
-				initialRequirements := modrequirements.NewRequirements(mainModulePath, reg, moduleVersions, nil)
+				defaultMajorVersions := make(map[string]string)
+				for _, f := range strings.Fields(readTestFile("default-major-versions")) {
+					p, v, ok := strings.Cut(f, "@")
+					qt.Assert(t, qt.IsTrue(ok))
+					defaultMajorVersions[p] = v
+				}
+				initialRequirements := modrequirements.NewRequirements(mainModulePath, reg, moduleVersions, defaultMajorVersions)
 
 				rootPackages := strings.Fields(readTestFile("root-packages"))
 				want := readTestFile("want")

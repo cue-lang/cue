@@ -36,6 +36,8 @@ func TestEncodeFile(t *testing.T) {
 		in: `
 		package test
 
+		bighex: "0x1234567890123456789001234567890"
+		nothex: "0x1234567890123456789001234567890zz"
 		seq: [
 			1, 2, 3, {
 				a: 1
@@ -50,6 +52,8 @@ func TestEncodeFile(t *testing.T) {
 		}
 		`,
 		out: `
+bighex: "0x1234567890123456789001234567890"
+nothex: 0x1234567890123456789001234567890zz
 seq:
   - 1
   - 2

@@ -69,7 +69,7 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 		}
 		return nil, fmt.Errorf("module %v: %v", m, err)
 	}
-	manifest, err := fetchManifest(ctx, c.registry, repoName, modDesc)
+	manifest, digest, err := fetchManifest(ctx, c.registry, repoName, modDesc)
 	if err != nil {
 		return nil, fmt.Errorf("cannot unmarshal manifest data: %v", err)
 	}
@@ -85,9 +85,10 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 	}
 	// TODO check that the other blobs are of the expected type (application/zip).
 	return &Module{
-		client:   c,
-		repo:     repoName,
-		manifest: *manifest,
+		client:         c,
+		repo:           repoName,
+		manifest:       *manifest,
+		manifestDigest: digest,
 	}, nil
 }
 
@@ -294,9 +295,10 @@ func checkModFile(m module.Version, f *zip.File) ([]byte, *modfile.File, error) 
 
 // Module represents a CUE module instance.
 type Module struct {
-	client   *Client
-	repo     string
-	manifest ocispec.Manifest
+	client         *Client
+	repo           string
+	manifest       ocispec.Manifest
+	manifestDigest ociregistry.Digest
 }
 
 // ModuleFile returns the contents of the cue.mod/module.cue file.
@@ -317,24 +319,30 @@ func (m *Module) GetZip(ctx context.Context) (io.ReadCloser, error) {
 	return m.client.registry.GetBlob(ctx, m.repo, m.manifest.Layers[0].Digest)
 }
 
-func fetchManifest(ctx context.Context, r ociregistry.Interface, repoName string, desc ocispec.Descriptor) (*ociregistry.Manifest, error) {
+// ManifestDigest returns the digest of the manifest representing
+// the module.
+func (m *Module) ManifestDigest() ociregistry.Digest {
+	return m.manifestDigest
+}
+
+func fetchManifest(ctx context.Context, r ociregistry.Interface, repoName string, desc ocispec.Descriptor) (*ociregistry.Manifest, digest.Digest, error) {
 	if !isJSON(desc.MediaType) {
-		return nil, fmt.Errorf("expected JSON media type but %q does not look like JSON", desc.MediaType)
+		return nil, "", fmt.Errorf("expected JSON media type but %q does not look like JSON", desc.MediaType)
 	}
 	rd, err := r.GetManifest(ctx, repoName, desc.Digest)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer rd.Close()
 	data, err := io.ReadAll(rd)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	var m ociregistry.Manifest
 	if err := json.Unmarshal(data, &m); err != nil {
-		return nil, fmt.Errorf("cannot decode %s content as manifest: %v", desc.MediaType, err)
+		return nil, "", fmt.Errorf("cannot decode %s content as manifest: %v", desc.MediaType, err)
 	}
-	return &m, nil
+	return &m, rd.Descriptor().Digest, nil
 }
 
 func isModule(m *ocispec.Manifest) bool {

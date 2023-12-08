@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d165bafc_28179b50",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-08T10:02:17Z",
+      "side": 1,
+      "message": "Please remember to run CI before/while asking for reviews; I reviewed code without knowing whether it even builds :)",
+      "revId": "a6cace50e9deca995a81eea7a5bfdfad358938ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55e8c3bd_08bbb525",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 115,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-08T10:02:17Z",
+      "side": 1,
+      "message": "this usage of reflection hurts my soul :) do we really have to compare the entire map here?\n\nat least we should add a TODO to use https://pkg.go.dev/maps#Equal when we can, to avoid reflection.",
+      "revId": "a6cace50e9deca995a81eea7a5bfdfad358938ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ca9cb95_eed60e29",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-08T10:02:17Z",
+      "side": 1,
+      "message": "please document these maps - for instance it\u0027s not obvious to me why we need origDefaultMajorVersions",
+      "revId": "a6cace50e9deca995a81eea7a5bfdfad358938ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92b3c62a_a627823a",
+        "filename": "internal/mod/modrequirements/requirements.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 120,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-08T10:02:17Z",
+      "side": 1,
+      "message": "I was stumped by this code until I re-read it and the Requirements type about five times.\n\nPlease document what you\u0027re doing, e.g.:\n\n\u003e // Initialize graph and graphOnce in rs1 to mimic their state in rs.",
+      "range": {
+        "startLine": 117,
+        "startChar": 1,
+        "endLine": 120,
+        "endChar": 2
+      },
+      "revId": "a6cace50e9deca995a81eea7a5bfdfad358938ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

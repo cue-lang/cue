@@ -23,7 +23,8 @@ cmp stdout want-stdout
 			v: "v0.0.1"
 		}
 		"foo.com/bar/hello@v0": {
-			v: "v0.2.3"
+			v:       "v0.2.3"
+			default: true
 		}
 	}
 }
@@ -57,9 +58,7 @@ deps: {
 -- _registry/example.com_v0.0.1/top.cue --
 package main
 
-// TODO: import without a major version should
-// the major version from the module.cue file.
-import a "foo.com/bar/hello@v0"
+import a "foo.com/bar/hello"
 a
 main: "main"
 "example.com@v0": "v0.0.1"

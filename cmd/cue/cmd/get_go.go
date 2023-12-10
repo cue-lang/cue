@@ -309,9 +309,6 @@ func typeSignature(name string, params, results []types.Type) *types.Signature {
 	)
 }
 
-// TODO(mvdan): Shouldn't we only consider a Go type "top" if it implements both
-// marshal/unmarhal methods of JSON or YAML?
-
 // Note that we record these interfaces without names, so they will show up in
 // the logs like "interface{MarshalJSON() ([]uint8, error)}" rather than
 // encoding/json.Marshaler. We could construct named types if need be.

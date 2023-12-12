@@ -15,22 +15,14 @@
 package cmd
 
 import (
-	"archive/zip"
-	"bytes"
 	"context"
 	"fmt"
-	"io"
 	"os"
 	"path/filepath"
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modload"
-	"cuelang.org/go/internal/mod/modpkgload"
-	"cuelang.org/go/internal/mod/modregistry"
-	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/mod/module"
 )
 
 func newModTidyCmd(c *Command) *cobra.Command {
@@ -66,7 +58,7 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	loadReg := &modloadRegistry{modregistry.NewClient(reg)}
+	loadReg, err := getCachedRegistry()
 	mf, err := modload.Load(ctx, os.DirFS(wd), ".", loadReg)
 	if err != nil {
 		return err
@@ -82,55 +74,13 @@ func runModTidy(cmd *Command, args []string) error {
 	return nil
 }
 
-type modloadRegistry struct {
-	reg *modregistry.Client
-}
-
-func (r *modloadRegistry) CUEModSummary(ctx context.Context, mv module.Version) (*modrequirements.ModFileSummary, error) {
-	m, err := r.reg.GetModule(ctx, mv)
-	if err != nil {
-		return nil, err
+func modCacheDir() (string, error) {
+	if dir := os.Getenv("CUE_MODCACHE"); dir != "" {
+		return dir, nil
 	}
-	data, err := m.ModuleFile(ctx)
+	sysCacheDir, err := os.UserCacheDir()
 	if err != nil {
-		return nil, fmt.Errorf("cannot get module file from %v: %v", m, err)
+		return "", fmt.Errorf("cannot determine system cache directory: %v", err)
 	}
-	mf, err := modfile.Parse(data, mv.String())
-	if err != nil {
-		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
-	}
-	return &modrequirements.ModFileSummary{
-		Require: mf.DepVersions(),
-		Module:  mv,
-	}, nil
-}
-
-// getModContents downloads the module with the given version
-// and returns the directory where it's stored.
-func (c *modloadRegistry) Fetch(ctx context.Context, mv module.Version) (modpkgload.SourceLoc, error) {
-	m, err := c.reg.GetModule(ctx, mv)
-	if err != nil {
-		return modpkgload.SourceLoc{}, err
-	}
-	r, err := m.GetZip(ctx)
-	if err != nil {
-		return modpkgload.SourceLoc{}, err
-	}
-	defer r.Close()
-	zipData, err := io.ReadAll(r)
-	if err != nil {
-		return modpkgload.SourceLoc{}, err
-	}
-	zipr, err := zip.NewReader(bytes.NewReader(zipData), int64(len(zipData)))
-	if err != nil {
-		return modpkgload.SourceLoc{}, err
-	}
-	return modpkgload.SourceLoc{
-		FS:  zipr,
-		Dir: ".",
-	}, nil
-}
-
-func (r *modloadRegistry) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
-	return r.reg.ModuleVersions(ctx, mpath)
+	return filepath.Join(sysCacheDir, "cue"), nil
 }

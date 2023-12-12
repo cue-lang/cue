@@ -44,7 +44,7 @@ import (
 var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
 
 func defaultConfig() (*config, error) {
-	reg, err := getRegistry()
+	reg, err := getCachedRegistry()
 	if err != nil {
 		return nil, err
 	}

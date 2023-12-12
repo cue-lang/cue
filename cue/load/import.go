@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/mod/modcache"
 	"cuelang.org/go/internal/mod/module"
 )
 
@@ -400,10 +401,17 @@ func (l *loader) externalPackageDir(p importPath) (dir string, err error) {
 	if err != nil {
 		return "", err
 	}
-
-	dir, err = l.regClient.getModContents(context.TODO(), m)
+	loc, err := l.cfg.Registry.Fetch(context.TODO(), m)
 	if err != nil {
 		return "", fmt.Errorf("cannot get contents for %v: %v", m, err)
 	}
-	return filepath.Join(dir, filepath.FromSlash(subPath)), nil
+	osfs, ok := loc.FS.(modcache.OSRootFS)
+	if !ok {
+		return "", fmt.Errorf("cannot get root for downloaded module in FS of type %T", loc.FS)
+	}
+	fsRoot, ok := osfs.OSRoot()
+	if !ok {
+		return "", fmt.Errorf("cannot get root for downloaded module in FS of type %T", loc.FS)
+	}
+	return filepath.Join(fsRoot, filepath.FromSlash(loc.Dir), filepath.FromSlash(subPath)), nil
 }

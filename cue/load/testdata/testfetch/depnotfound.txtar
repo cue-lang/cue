@@ -1,5 +1,5 @@
 -- out/modfetch/error --
-instance: cannot resolve dependencies: example.com@v0.0.1: module example.com@v0.0.1: error response: 404 Not Found: repository name not known to registry
+instance: cannot resolve dependencies: example.com@v0.0.1: module example.com@v0.0.1: 404 Not Found: name unknown: repository name not known to registry
 -- cue.mod/module.cue --
 module: "main.org@v0"
 

@@ -20,13 +20,14 @@ import (
 	"path/filepath"
 	"strings"
 
-	"cuelabs.dev/go/oci/ociregistry"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/mod/modfile"
+	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/internal/mod/module"
 )
 
 const (
@@ -280,9 +281,14 @@ type Config struct {
 	// reading from cue.mod/pkg, cue.mod/usr, and cue.mod/gen.
 	//
 	// THIS IS EXPERIMENTAL FOR NOW. DO NOT USE.
-	Registry ociregistry.Interface
+	Registry modload.Registry
 
 	fileSystem fileSystem
+}
+
+type ModFileSummary struct {
+	Module  module.Version
+	Require []module.Version
 }
 
 func (c *Config) stdin() io.Reader {

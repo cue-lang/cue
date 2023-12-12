@@ -210,6 +210,10 @@ func TestScript(t *testing.T) {
 					// This enables some tests to construct their own malformed
 					// CUE_REGISTRY values that still refer to the test registry.
 					"DEBUG_REGISTRY"+regID+"_HOST="+reg.Host(),
+					// While os.UserCacheDir on Linux is derived from $HOME,
+					// under Windows it's not, so avoid polluting the system cache
+					// directory by setting up the cache specifically.
+					"CUE_CACHEMOD="+filepath.Join(e.WorkDir, "tmp/cache"),
 				)
 				e.Defer(reg.Close)
 			}

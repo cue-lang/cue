@@ -11,6 +11,7 @@ cmp stdout ../expect-eval-stdout
 
 # Sanity check that the module isn't present in the fallback registry.
 env CUE_REGISTRY=$ORIG_CUE_REGISTRY
+env CUE_MODCACHE=$WORK/.tmp/different-cache
 ! exec cue eval
 stderr 'repository name not known to registry'
 

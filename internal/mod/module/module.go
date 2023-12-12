@@ -50,10 +50,12 @@ func (m Version) Path() string {
 	return m.path
 }
 
+// Equal reports whether m is equal to m1.
 func (m Version) Equal(m1 Version) bool {
 	return m.path == m1.path && m.version == m1.version
 }
 
+// BasePath returns the path part of m without its major version suffix.
 func (m Version) BasePath() string {
 	basePath, _, ok := SplitPathVersion(m.path)
 	if !ok {
@@ -62,12 +64,21 @@ func (m Version) BasePath() string {
 	return basePath
 }
 
+// Version returns the version part of m. This is either
+// a canonical semver version or "none" or the empty string.
 func (m Version) Version() string {
 	return m.version
 }
 
+// IsValid reports whether m is non-zero.
 func (m Version) IsValid() bool {
 	return m.path != ""
+}
+
+// IsCanonical reports whether m is valid and has a canonical
+// semver version.
+func (m Version) IsCanonical() bool {
+	return m.IsValid() && m.version != "" && m.version != "none"
 }
 
 // String returns the string form of the Version:

@@ -6,9 +6,11 @@ import (
 	"testing"
 
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
+
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/mod/modcache"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
 )
@@ -34,7 +36,15 @@ func TestModuleFetch(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		t.LoadConfig.Registry = reg
+		cacheDir := t.TempDir()
+		// The fetched files are read-only, so testing fails when trying
+		// to remove them.
+		defer modcache.RemoveAll(cacheDir)
+		reg1, err := modcache.New(reg, cacheDir)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.LoadConfig.Registry = reg1
 		ctx := cuecontext.New()
 		insts := t.RawInstances()
 		if len(insts) != 1 {

@@ -3,6 +3,7 @@
 
 memregistry -auth=foo:bar MEMREGISTRY
 env CUE_EXPERIMENT=modules
+env CUE_MODCACHE=$WORK/.tmp/cache
 env CUE_REGISTRY=$MEMREGISTRY+insecure
 env DOCKER_CONFIG=$WORK/dockerconfig
 env-fill $DOCKER_CONFIG/config.json

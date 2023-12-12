@@ -10,6 +10,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modfile"
+	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/mod/semver"
@@ -106,7 +107,7 @@ func (deps *dependencies) lookup(pkgPath importPath) (v module.Version, subPath 
 
 // resolveDependencies resolves all the versions of all the modules in the given module file,
 // using regClient to fetch dependency information.
-func resolveDependencies(mainModFile *modfile.File, regClient *registryClient) (*dependencies, error) {
+func resolveDependencies(mainModFile *modfile.File, regClient modload.Registry) (*dependencies, error) {
 	vs, err := mvs.BuildList[module.Version](mainModFile.DepVersions(), &mvsReqs{
 		mainModule: mainModFile,
 		regClient:  regClient,
@@ -125,7 +126,7 @@ func resolveDependencies(mainModFile *modfile.File, regClient *registryClient) (
 type mvsReqs struct {
 	module.Versions
 	mainModule *modfile.File
-	regClient  *registryClient
+	regClient  modload.Registry
 }
 
 // Required implements mvs.Reqs.Required.
@@ -133,11 +134,11 @@ func (reqs *mvsReqs) Required(m module.Version) (vs []module.Version, err error)
 	if m.Path() == reqs.mainModule.Module {
 		return reqs.mainModule.DepVersions(), nil
 	}
-	mf, err := reqs.regClient.fetchModFile(context.TODO(), m)
+	mf, err := reqs.regClient.CUEModSummary(context.TODO(), m)
 	if err != nil {
 		return nil, err
 	}
-	return mf.DepVersions(), nil
+	return mf.Require, nil
 }
 
 // Required implements mvs.Reqs.Max.

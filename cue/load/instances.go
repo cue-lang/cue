@@ -21,7 +21,6 @@ package load
 
 import (
 	"fmt"
-	"os"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -50,18 +49,8 @@ func Instances(args []string, c *Config) []*build.Instance {
 	c = newC
 	// TODO use predictable location
 	var deps *dependencies
-	var regClient *registryClient
 	if c.Registry != nil {
-		// TODO use configured cache directory.
-		tmpDir, err := os.MkdirTemp("", "cue-load-")
-		if err != nil {
-			return []*build.Instance{c.newErrInstance(err)}
-		}
-		regClient, err = newRegistryClient(c.Registry, tmpDir)
-		if err != nil {
-			return []*build.Instance{c.newErrInstance(fmt.Errorf("cannot make registry client: %v", err))}
-		}
-		deps1, err := resolveDependencies(c.modFile, regClient)
+		deps1, err := resolveDependencies(c.modFile, c.Registry)
 		if err != nil {
 			return []*build.Instance{c.newErrInstance(fmt.Errorf("cannot resolve dependencies: %v", err))}
 		}
@@ -69,7 +58,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	}
 	tg := newTagger(c)
-	l := newLoader(c, tg, deps, regClient)
+	l := newLoader(c, tg, deps)
 
 	if c.Context == nil {
 		c.Context = build.NewContext(

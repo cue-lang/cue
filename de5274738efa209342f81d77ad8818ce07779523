@@ -33,6 +33,24 @@
       "message": "Scott - apologies, this one slipped through the net. We\u0027ll get this reviewed asap.",
       "revId": "de5274738efa209342f81d77ad8818ce07779523",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd7e9224_9f61e565",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-12T09:18:45Z",
+      "side": 1,
+      "message": "Joining the threads - Scott, I replied to you in https://github.com/cue-lang/cue/issues/2431#issuecomment-1590916276, please see that before we get back to reviewing the CL. I\u0027m happy to review and merge the CL shortly after if we agree on the approach.",
+      "parentUuid": "e68381c8_5427f7fb",
+      "revId": "de5274738efa209342f81d77ad8818ce07779523",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

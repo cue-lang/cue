@@ -6,6 +6,7 @@ exec cue export .
 cmp stdout expect-stdout
 
 # Sanity-check that we get an error when using the wrong password.
+env CUE_MODCACHE=$TMPDIR/different-cache
 env-fill dockerconfig/badpassword.json
 cp dockerconfig/badpassword.json dockerconfig/config.json
 ! exec cue export .

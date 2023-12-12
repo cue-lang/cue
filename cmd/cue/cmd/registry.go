@@ -10,6 +10,8 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
 
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/mod/modcache"
+	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/modmux"
 	"cuelang.org/go/internal/mod/modresolve"
 )
@@ -56,4 +58,19 @@ func getRegistry() (ociregistry.Interface, error) {
 			Authorizer: auth,
 		})
 	}), nil
+}
+
+func getCachedRegistry() (modload.Registry, error) {
+	reg, err := getRegistry()
+	if err != nil {
+		return nil, err
+	}
+	cacheDir, err := modCacheDir()
+	if err != nil {
+		return nil, err
+	}
+	if err := os.MkdirAll(cacheDir, 0o777); err != nil {
+		return nil, fmt.Errorf("cannot create cache directory: %v", err)
+	}
+	return modcache.New(reg, cacheDir)
 }

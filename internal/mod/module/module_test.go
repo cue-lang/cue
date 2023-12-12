@@ -151,3 +151,49 @@ func TestParseVersion(t *testing.T) {
 		})
 	}
 }
+
+var escapeVersionTests = []struct {
+	v   string
+	esc string // empty means same as path
+}{
+	{v: "v1.2.3-alpha"},
+	{v: "v3"},
+	{v: "v2.3.1-ABcD", esc: "v2.3.1-!a!bc!d"},
+}
+
+func TestEscapeVersion(t *testing.T) {
+	for _, tt := range escapeVersionTests {
+		esc, err := EscapeVersion(tt.v)
+		if err != nil {
+			t.Errorf("EscapeVersion(%q): unexpected error: %v", tt.v, err)
+			continue
+		}
+		want := tt.esc
+		if want == "" {
+			want = tt.v
+		}
+		if esc != want {
+			t.Errorf("EscapeVersion(%q) = %q, want %q", tt.v, esc, want)
+		}
+	}
+}
+
+func TestEscapePath(t *testing.T) {
+	// Check invalid paths.
+	for _, tt := range checkPathWithoutVersionTests {
+		if tt.wantErr != "" {
+			_, err := EscapePath(tt.path)
+			if err == nil {
+				t.Errorf("EscapePath(%q): succeeded, want error (invalid path)", tt.path)
+			}
+		}
+	}
+	path := "foo.com/bar"
+	esc, err := EscapePath(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if esc != path {
+		t.Fatalf("EscapePath(%q) = %q, want %q", path, esc, path)
+	}
+}

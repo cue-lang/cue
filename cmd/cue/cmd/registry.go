@@ -62,7 +62,7 @@ func getRegistry() (ociregistry.Interface, error) {
 
 func getCachedRegistry() (modload.Registry, error) {
 	reg, err := getRegistry()
-	if err != nil {
+	if reg == nil {
 		return nil, err
 	}
 	cacheDir, err := modCacheDir()

@@ -143,6 +143,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9bdcd7b2_869e1c24",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T16:21:49Z",
+      "side": 1,
+      "message": "Given that this implies changes to the modcache package, I think I\u0027ll leave this as a TODO and change it in a subsequent CL.",
+      "parentUuid": "6c3fee8e_dbd5794f",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 41
+      },
+      "revId": "25b94df5cb30c15de3db9aec1cc026f56d720e99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fae5225e_35baa189",

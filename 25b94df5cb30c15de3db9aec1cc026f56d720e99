@@ -95,6 +95,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c3fee8e_dbd5794f",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T15:52:15Z",
+      "side": 1,
+      "message": "You\u0027re not technically ruling it out, but in practice you are - we want `${cache}/cue` to be an easy to navigate directory, for example if a user wants to look at it or if it gets too large and a user _needs_ to look at it to figure out what\u0027s happening.\n\nIt\u0027s a lot easier if that directory only contains e.g. `mod` and `wasm`, which are self-describing and clear, and not 200 module-path directories with `wasm` buried somewhere in there.\n\nOne example where this is painful already in Go - they shoved the fuzz cache _inside_ the Go build cache, so `fuzz` is buried underneath dozens of directory names like `0e` or `4a`. At least they got it right with the module cache, where it\u0027s in its own `mod` directory, even if it\u0027s inside the now-defunct GOPATH.\n\nFWIW, I also think the downloads should go in `${cache}/mod/download` and not `${cache}/mod/cache/download` - the latter is I think an artifact from Go\u0027s GOMODCACHE being inside `${GOPATH}/pkg/mod`, which is not a cache, so the cache directory is nested. We are already in a cache directory ourselves.",
+      "parentUuid": "5c334aa2_af1874fe",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 41
+      },
+      "revId": "25b94df5cb30c15de3db9aec1cc026f56d720e99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fae5225e_35baa189",
@@ -132,6 +156,30 @@
       "side": 1,
       "message": "It\u0027s actually a fairly common idiom (random example from the Go source here: https://github.com/golang/go/blob/58c28ba286dd0e98fe4cca80f5d64bbcb824a685/src/cmd/go/internal/modfetch/sumdb.go#L290 - there are many more) - I don\u0027t see much problem with it. The forward slashes don\u0027t remain in the result.",
       "parentUuid": "fae5225e_35baa189",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 2
+      },
+      "revId": "25b94df5cb30c15de3db9aec1cc026f56d720e99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1693347_e8a19b9a",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T15:52:15Z",
+      "side": 1,
+      "message": "TIL Clean (ran by Join) replaces slashes by separators!",
+      "parentUuid": "826c58fe_adf0f448",
       "range": {
         "startLine": 216,
         "startChar": 0,

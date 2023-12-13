@@ -1,0 +1,187 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49d7552c_2dced77d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "presumably this one is downloadZip1 now?",
+      "range": {
+        "startLine": 26,
+        "startChar": 3,
+        "endLine": 26,
+        "endChar": 14
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9fdeec5b_2b9dd9a7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "Does this implementation not leave json/info files in the cache entry directories, like GOMODCACHE? Not that they are strictly needed, but if we\u0027re doing away with those because we don\u0027t think we need them, I think that\u0027s important to mention in the commit message.\n\nI think you should also mention at the top of the commit message that this borrows some of the design from Go\u0027s module download cache. You hint towards it with the other details in the commit message, but it\u0027s good to be clear about it.",
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2a5fa7ab_94b61e60",
+        "filename": "internal/mod/modcache/cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "out of date",
+      "range": {
+        "startLine": 26,
+        "startChar": 12,
+        "endLine": 26,
+        "endChar": 17
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87ed9177_7418e283",
+        "filename": "internal/mod/modcache/cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "out of date",
+      "range": {
+        "startLine": 27,
+        "startChar": 71,
+        "endLine": 27,
+        "endChar": 76
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb46953b_8a336ade",
+        "filename": "internal/mod/modcache/dirfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "how about making the string being empty or not the signal? I don\u0027t think you want to allow an implementation to return `\"\", true` anyway.",
+      "range": {
+        "startLine": 13,
+        "startChar": 36,
+        "endLine": 13,
+        "endChar": 61
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d231e59_4c2b98a6",
+        "filename": "internal/mod/modcache/dirfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "make this a TODO so we remember to tweak this once Go 1.22 is out and we can drop 1.20",
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f2340d0_efedf314",
+        "filename": "internal/mod/modcache/fetch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "stray debug print?",
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c539215_86e904f8",
+        "filename": "internal/mod/modcache/fetch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ce6efe8_76ba6132",
+        "filename": "internal/mod/modcache/modcache_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:54:27Z",
+      "side": 1,
+      "message": "why fetch the same version twice in each goroutine? it\u0027s not obvious to me why this helps, and it might be some sort of copy paste error, so I\u0027d briefly document why",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 64,
+        "endChar": 3
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

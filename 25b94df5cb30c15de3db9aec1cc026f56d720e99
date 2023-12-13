@@ -121,6 +121,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "41e8933a_c0f69e5c",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-13T16:17:34Z",
+      "side": 1,
+      "message": "FWIW I agree with Daniel here. It has long frustrated me the way the go structure works because of the ~ambiguity that is only \"resolved\" by the absence of a `.`. Having a separate subdirectory costs nothing, and greatly improves the simplicity/understandability.",
+      "parentUuid": "6c3fee8e_dbd5794f",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 41
+      },
+      "revId": "25b94df5cb30c15de3db9aec1cc026f56d720e99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "fae5225e_35baa189",
         "filename": "cmd/cue/cmd/script_test.go",
         "patchSetId": 12

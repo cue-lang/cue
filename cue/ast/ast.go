@@ -48,10 +48,10 @@ type Node interface {
 	// the node or nil if there is no such position.
 	pos() *token.Pos
 
-	// Deprecated: use ast.Comments
+	// Deprecated: use [Comments]
 	Comments() []*CommentGroup
 
-	// Deprecated: use ast.AddComment
+	// Deprecated: use [AddComment]
 	AddComment(*CommentGroup)
 	commentInfo() *comments
 }

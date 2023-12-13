@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "0498fe0d_245488f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "49d7552c_2dced77d",
+      "range": {
+        "startLine": 26,
+        "startChar": 3,
+        "endLine": 26,
+        "endChar": 14
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9fdeec5b_2b9dd9a7",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 9
@@ -64,6 +88,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d2f1c04f_b45545a0",
+        "filename": "internal/mod/modcache/cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2a5fa7ab_94b61e60",
+      "range": {
+        "startLine": 26,
+        "startChar": 12,
+        "endLine": 26,
+        "endChar": 17
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "87ed9177_7418e283",
@@ -77,6 +125,30 @@
       "writtenOn": "2023-12-13T13:54:27Z",
       "side": 1,
       "message": "out of date",
+      "range": {
+        "startLine": 27,
+        "startChar": 71,
+        "endLine": 27,
+        "endChar": 76
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "732ca148_7dffa01b",
+        "filename": "internal/mod/modcache/cache.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "87ed9177_7418e283",
       "range": {
         "startLine": 27,
         "startChar": 71,
@@ -110,6 +182,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1ee1e213_db7862d6",
+        "filename": "internal/mod/modcache/dirfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cb46953b_8a336ade",
+      "range": {
+        "startLine": 13,
+        "startChar": 36,
+        "endLine": 13,
+        "endChar": 61
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d231e59_4c2b98a6",
@@ -123,6 +219,24 @@
       "writtenOn": "2023-12-13T13:54:27Z",
       "side": 1,
       "message": "make this a TODO so we remember to tweak this once Go 1.22 is out and we can drop 1.20",
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2ca5c90_27ae8d9f",
+        "filename": "internal/mod/modcache/dirfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2d231e59_4c2b98a6",
       "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -144,6 +258,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cc84680_23868a86",
+        "filename": "internal/mod/modcache/fetch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "turned it into a TODO logging print, because it\u0027s one of the messages that Go prints by default, so worth keeping around.",
+      "parentUuid": "9f2340d0_efedf314",
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7c539215_86e904f8",
@@ -161,6 +293,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8be828de_5c23d2a4",
+        "filename": "internal/mod/modcache/fetch.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7c539215_86e904f8",
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ce6efe8_76ba6132",
@@ -174,6 +324,30 @@
       "writtenOn": "2023-12-13T13:54:27Z",
       "side": 1,
       "message": "why fetch the same version twice in each goroutine? it\u0027s not obvious to me why this helps, and it might be some sort of copy paste error, so I\u0027d briefly document why",
+      "range": {
+        "startLine": 51,
+        "startChar": 2,
+        "endLine": 64,
+        "endChar": 3
+      },
+      "revId": "d6da318f0c6a58759c7d8c2e32ddb5fdc5991720",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "341028cd_49132933",
+        "filename": "internal/mod/modcache/modcache_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T14:18:46Z",
+      "side": 1,
+      "message": "Added a comment to make it clear why we\u0027re doing this.",
+      "parentUuid": "7ce6efe8_76ba6132",
       "range": {
         "startLine": 51,
         "startChar": 2,

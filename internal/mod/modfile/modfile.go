@@ -83,11 +83,12 @@ type noDepsFile struct {
 }
 
 var (
-	moduleSchemaOnce sync.Once
-	_moduleSchema    cue.Value
+	moduleSchemaOnce  sync.Once  // guards the creation of _moduleSchema
+	moduleSchemaMutex sync.Mutex // guards any use of _moduleSchema
+	_moduleSchema     cue.Value
 )
 
-func moduleSchema() cue.Value {
+func moduleSchemaDo[T any](f func(moduleSchema cue.Value) (T, error)) (T, error) {
 	moduleSchemaOnce.Do(func() {
 		ctx := cuecontext.New()
 		schemav := ctx.CompileBytes(moduleSchemaData, cue.Filename("cuelang.org/go/internal/mod/modfile/schema.cue"))
@@ -98,7 +99,9 @@ func moduleSchema() cue.Value {
 		}
 		_moduleSchema = schemav
 	})
-	return _moduleSchema
+	moduleSchemaMutex.Lock()
+	defer moduleSchemaMutex.Unlock()
+	return f(_moduleSchema)
 }
 
 func lookup(v cue.Value, sels ...cue.Selector) cue.Value {
@@ -118,17 +121,19 @@ func Parse(modfile []byte, filename string) (*File, error) {
 // that only supports the single field "module" and ignores all other
 // fields.
 func ParseLegacy(modfile []byte, filename string) (*File, error) {
-	v := moduleSchema().Context().CompileBytes(modfile, cue.Filename(filename))
-	if err := v.Err(); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file")
-	}
-	var f noDepsFile
-	if err := v.Decode(&f); err != nil {
-		return nil, newCUEError(err, filename)
-	}
-	return &File{
-		Module: f.Module,
-	}, nil
+	return moduleSchemaDo(func(schema cue.Value) (*File, error) {
+		v := schema.Context().CompileBytes(modfile, cue.Filename(filename))
+		if err := v.Err(); err != nil {
+			return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file")
+		}
+		var f noDepsFile
+		if err := v.Decode(&f); err != nil {
+			return nil, newCUEError(err, filename)
+		}
+		return &File{
+			Module: f.Module,
+		}, nil
+	})
 }
 
 // ParseNonStrict is like Parse but allows some laxity in the parsing:
@@ -147,50 +152,56 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	}
 	// TODO disallow non-data-mode CUE.
 
-	v := moduleSchema().Context().BuildFile(file)
-	if err := v.Validate(cue.Concrete(true)); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
-	}
-	v = v.Unify(moduleSchema())
-	if err := v.Validate(); err != nil {
-		return nil, newCUEError(err, filename)
-	}
-	var mf File
-	if err := v.Decode(&mf); err != nil {
-		return nil, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into modFile struct")
+	mf, err := moduleSchemaDo(func(schema cue.Value) (*File, error) {
+		v := schema.Context().BuildFile(file)
+		if err := v.Validate(cue.Concrete(true)); err != nil {
+			return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
+		}
+		v = v.Unify(schema)
+		if err := v.Validate(); err != nil {
+			return nil, newCUEError(err, filename)
+		}
+		var mf File
+		if err := v.Decode(&mf); err != nil {
+			return nil, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into modFile struct")
+		}
+		return &mf, nil
+	})
+	if err != nil {
+		return nil, err
 	}
 	if strict {
-		_, v, ok := module.SplitPathVersion(mf.Module)
+		_, vers, ok := module.SplitPathVersion(mf.Module)
 		if !ok {
 			return nil, fmt.Errorf("module path %q in %s does not contain major version", mf.Module, filename)
 		}
-		if semver.Major(v) != v {
+		if semver.Major(vers) != vers {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
 		}
 	}
 	if mf.Language != nil {
-		if v := mf.Language.Version; v != "" && !semver.IsValid(v) {
-			return nil, fmt.Errorf("language version %q in %s is not well formed", v, filename)
+		if vers := mf.Language.Version; vers != "" && !semver.IsValid(vers) {
+			return nil, fmt.Errorf("language version %q in %s is not well formed", vers, filename)
 		}
 	}
 	var versions []module.Version
 	defaultMajorVersions := make(map[string]string)
 	// Check that major versions match dependency versions.
 	for m, dep := range mf.Deps {
-		v, err := module.NewVersion(m, dep.Version)
+		vers, err := module.NewVersion(m, dep.Version)
 		if err != nil {
 			return nil, fmt.Errorf("invalid module.cue file %s: cannot make version from module %q, version %q: %v", filename, m, dep.Version, err)
 		}
-		versions = append(versions, v)
-		if strict && v.Path() != m {
+		versions = append(versions, vers)
+		if strict && vers.Path() != m {
 			return nil, fmt.Errorf("invalid module.cue file %s: no major version in %q", filename, m)
 		}
 		if dep.Default {
-			mp := v.BasePath()
+			mp := vers.BasePath()
 			if _, ok := defaultMajorVersions[mp]; ok {
 				return nil, fmt.Errorf("multiple default major versions found for %v", mp)
 			}
-			defaultMajorVersions[mp] = semver.Major(v.Version())
+			defaultMajorVersions[mp] = semver.Major(vers.Version())
 		}
 	}
 
@@ -199,7 +210,7 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	}
 	mf.versions = versions[:len(versions):len(versions)]
 	module.Sort(mf.versions)
-	return &mf, nil
+	return mf, nil
 }
 
 func newCUEError(err error, filename string) error {

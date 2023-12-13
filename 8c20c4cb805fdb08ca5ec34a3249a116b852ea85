@@ -22,6 +22,30 @@
       },
       "revId": "8c20c4cb805fdb08ca5ec34a3249a116b852ea85",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a115c45_310ba899",
+        "filename": "internal/mod/module/escape.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-13T12:56:02Z",
+      "side": 1,
+      "message": "This is exactly as it was in the original, so I think I\u0027ll leave it for now at least.",
+      "parentUuid": "9e5f14cd_69ffd064",
+      "range": {
+        "startLine": 14,
+        "startChar": 30,
+        "endLine": 14,
+        "endChar": 37
+      },
+      "revId": "8c20c4cb805fdb08ca5ec34a3249a116b852ea85",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e5f14cd_69ffd064",
+        "filename": "internal/mod/module/escape.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T12:28:47Z",
+      "side": 1,
+      "message": "nit: I wonder if the named results in these APIs help in any way. The signatures seem obvious enough to me, and you don\u0027t rely on any naked returns or any recovers anywhere, so I\u0027d personally do without them.",
+      "range": {
+        "startLine": 14,
+        "startChar": 30,
+        "endLine": 14,
+        "endChar": 37
+      },
+      "revId": "8c20c4cb805fdb08ca5ec34a3249a116b852ea85",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

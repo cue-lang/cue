@@ -14,6 +14,7 @@ import (
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry"
+	"github.com/rogpeppe/go-internal/robustio"
 
 	"cuelang.org/go/internal/mod/internal/par"
 	"cuelang.org/go/internal/mod/modfile"
@@ -331,8 +332,7 @@ func RemoveAll(dir string) error {
 		}
 		return nil
 	})
-	// TODO robustio.Removeall
-	return os.RemoveAll(dir)
+	return robustio.RemoveAll(dir)
 }
 
 // quoteGlob returns s with all Glob metacharacters quoted.

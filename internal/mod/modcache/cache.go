@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 
 	"github.com/rogpeppe/go-internal/lockedfile"
+	"github.com/rogpeppe/go-internal/robustio"
 
 	"cuelang.org/go/internal/mod/module"
 )
@@ -39,8 +40,7 @@ func (c *cache) readDiskCache(ctx context.Context, mv module.Version, suffix str
 	if err != nil {
 		return "", nil, errNotCached
 	}
-	// TODO robustio.ReadFile
-	data, err = os.ReadFile(file)
+	data, err = robustio.ReadFile(file)
 	if err != nil {
 		return file, nil, errNotCached
 	}
@@ -80,8 +80,7 @@ func (c *cache) writeDiskCache(ctx context.Context, file string, data []byte) er
 	if err := f.Close(); err != nil {
 		return err
 	}
-	// TODO robustio.Rename
-	if err := os.Rename(f.Name(), file); err != nil {
+	if err := robustio.Rename(f.Name(), file); err != nil {
 		return err
 	}
 	return nil

@@ -1,0 +1,73 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d9d4551_d2977303",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:58:51Z",
+      "side": 1,
+      "message": "can you summarize what is the effect of this? it\u0027s not obvious to me at least",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 10,
+        "endChar": 2
+      },
+      "revId": "25b94df5cb30c15de3db9aec1cc026f56d720e99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "67f1070c_4c4ef0c9",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 84,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:58:51Z",
+      "side": 1,
+      "message": "I think it\u0027s dangerous to take `${cache}/cue` in its entirety for the module download cache. It\u0027s rather likely that we will need other caches in the future, e.g. for wasm or for expensive analyses like backwards compatibility.\n\nI\u0027d personally make this `${cache}/cue/mod` to leave space for other directories.",
+      "range": {
+        "startLine": 84,
+        "startChar": 8,
+        "endLine": 84,
+        "endChar": 41
+      },
+      "revId": "25b94df5cb30c15de3db9aec1cc026f56d720e99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fae5225e_35baa189",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 216,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-13T13:58:51Z",
+      "side": 1,
+      "message": "mixing filepath.Join with literal slashes is rather odd :) I\u0027d replace the slash.",
+      "range": {
+        "startLine": 216,
+        "startChar": 0,
+        "endLine": 216,
+        "endChar": 2
+      },
+      "revId": "25b94df5cb30c15de3db9aec1cc026f56d720e99",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

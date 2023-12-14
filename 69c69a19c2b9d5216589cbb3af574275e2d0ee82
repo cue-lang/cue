@@ -33,6 +33,24 @@
       "message": "add a TODO that we can remove this mutex once https://cuelang.org/issue/2733 is fixed",
       "revId": "69c69a19c2b9d5216589cbb3af574275e2d0ee82",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b1178da_11d338bd",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-14T14:40:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8a704e15_08adce7b",
+      "revId": "69c69a19c2b9d5216589cbb3af574275e2d0ee82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

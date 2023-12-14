@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "91533da1_924ab4e0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 18
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-14T14:31:39Z",
+      "side": 1,
+      "message": "please write more; this means almost nothing to anyone reading the commit message with just a basic understanding of cue/load and CUE modules.",
+      "revId": "6238a1cd4e96e9bcc3a7651591da25bf41cc197b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10429832_431d0ea4",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-14T14:31:39Z",
+      "side": 1,
+      "message": "so the error is entirely ignored now? I\u0027d make it `_` to be clear, otherwise it\u0027s an unused value (and staticcheck should report it)\n\nI\u0027d personally also document why we don\u0027t care about the error",
+      "revId": "6238a1cd4e96e9bcc3a7651591da25bf41cc197b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

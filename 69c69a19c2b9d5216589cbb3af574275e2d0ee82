@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c828d041_908f8bc7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-14T14:18:31Z",
+      "side": 1,
+      "message": "I might have insisted on adding a regression test with concurrency, but we want to move towards supporting concurrency anyway, so SGTM.",
+      "revId": "69c69a19c2b9d5216589cbb3af574275e2d0ee82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a704e15_08adce7b",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-14T14:18:31Z",
+      "side": 1,
+      "message": "add a TODO that we can remove this mutex once https://cuelang.org/issue/2733 is fixed",
+      "revId": "69c69a19c2b9d5216589cbb3af574275e2d0ee82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

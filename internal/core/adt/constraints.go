@@ -110,7 +110,7 @@ func (n *nodeContext) insertConstraint(pattern Value, c Conjunct) bool {
 // matchPattern reports whether f matches pattern. The result reflects
 // whether unification of pattern with f converted to a CUE value succeeds.
 func matchPattern(n *nodeContext, pattern Value, f Feature) bool {
-	if pattern == nil {
+	if pattern == nil || !f.IsRegular() {
 		return false
 	}
 

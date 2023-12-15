@@ -426,12 +426,28 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	v := n.node
 	for c := d.leaf; c.parent != nil; c = c.parent {
 		v.updateArcType(c.arcType)
+		if v.ArcType == ArcNotPresent {
+			parent := v.Parent
+			b := parent.reportFieldCycleError(ctx, d.comp.Syntax.Pos(), v.Label)
+			d.envComprehension.vertex.state.addBottom(b)
+			ctx.current().err = b
+			ctx.current().state = taskFAILED
+			// n.yield() // TODO remove
+			return nil
+		}
 		v = c.arc
 	}
 
 	id := d.id
 
 	for _, env := range d.envs {
+		if n.node.ArcType == ArcNotPresent {
+			b := n.node.reportFieldCycleError(ctx, d.comp.Syntax.Pos(), n.node.Label)
+			ctx.current().err = b
+			n.yield()
+			return nil
+		}
+
 		env = linkChildren(env, d.leaf)
 		n.addExprConjunct(Conjunct{env, d.expr, id}, state)
 	}

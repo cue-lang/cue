@@ -150,7 +150,7 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 		if x == cycle {
 			err := ctx.NewPosf(pos(pattern), "cyclic pattern constraint")
 			for _, c := range ctx.vertex.Conjuncts {
-				err.AddPosition(c.Elem())
+				addPositions(err, c)
 			}
 			ctx.AddBottom(&Bottom{
 				Err: err,

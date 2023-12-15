@@ -73,7 +73,7 @@ var incompleteSentinel = &Bottom{
 // error.
 //
 // TODO: return *Vertex
-func (c *OpContext) evaluate(v *Vertex, r Resolver, state vertexStatus) Value {
+func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 	if v.isUndefined() {
 		// Use node itself to allow for cycle detection.
 		c.unify(v, state)
@@ -150,7 +150,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state vertexStatus) Value {
 // state can be used to indicate to which extent processing should continue.
 // state == finalized means it is evaluated to completion. See vertexStatus
 // for more details.
-func (c *OpContext) unify(v *Vertex, state vertexStatus) {
+func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 	// defer c.PopVertex(c.PushVertex(v))
 	if Debug {
 		c.nest++
@@ -165,6 +165,8 @@ func (c *OpContext) unify(v *Vertex, state vertexStatus) {
 	// not yet Finalized.
 	n := v.getNodeContext(c, 1)
 	defer v.freeNode(n)
+
+	state := flags.vertexStatus()
 
 	// TODO(cycle): verify this happens in all cases when we need it.
 	if n != nil && v.Parent != nil && v.Parent.state != nil {
@@ -467,7 +469,7 @@ func (n *nodeContext) postDisjunct(state vertexStatus) {
 		for n.maybeSetCache(); n.expandOne(state); n.maybeSetCache() {
 		}
 
-		if !n.addLists(state) {
+		if !n.addLists(oldOnly(state)) {
 			break
 		}
 	}
@@ -790,7 +792,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 
 			wasVoid := a.ArcType == ArcPending
 
-			ctx.unify(a, finalized)
+			ctx.unify(a, oldOnly(finalized))
 
 			if a.ArcType == ArcPending {
 				continue
@@ -844,7 +846,7 @@ func (n *nodeContext) completeArcs(state vertexStatus) {
 			// TODO(errors): make Validate return bottom and generate
 			// optimized conflict message. Also track and inject IDs
 			// to determine origin location.s
-			v := ctx.evalState(c.expr, finalized)
+			v := ctx.evalState(c.expr, oldOnly(finalized))
 			v, _ = ctx.getDefault(v)
 			v = Unwrap(v)
 
@@ -1552,7 +1554,7 @@ func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
 		if state == finalized {
 			state = conjuncts
 		}
-		arc, err := ctx.resolveState(v, x, state)
+		arc, err := ctx.resolveState(v, x, oldOnly(state))
 		if err != nil && (!err.IsIncomplete() || err.Permanent) {
 			n.addBottom(err)
 			break
@@ -1589,7 +1591,7 @@ func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
 	case Evaluator:
 		// Interpolation, UnaryExpr, BinaryExpr, CallExpr
 		// Could be unify?
-		val := ctx.evaluateRec(v, partial)
+		val := ctx.evaluateRec(v, oldOnly(partial))
 		if b, ok := val.(*Bottom); ok &&
 			b.IsIncomplete() {
 			n.exprs = append(n.exprs, envExpr{v, b})
@@ -1702,7 +1704,7 @@ func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
 		// is necessary to prevent lookups in unevaluated structs.
 		// TODO(cycles): this can probably most easily be fixed with a
 		// having a more recursive implementation.
-		n.ctx.unify(arc, partial)
+		n.ctx.unify(arc, oldOnly(partial))
 	}
 
 	// Don't add conjuncts if a node is referring to itself.
@@ -2132,7 +2134,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 		x := d.field.Key
 		// Push state to capture and remove errors.
 		s := ctx.PushState(d.env, x.Source())
-		v := ctx.evalState(x, finalized)
+		v := ctx.evalState(x, oldOnly(finalized))
 		b := ctx.PopState(s)
 
 		if b != nil && b.IsIncomplete() {
@@ -2173,7 +2175,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists(state vertexStatus) (progress bool) {
+func (n *nodeContext) addLists(state combinedFlags) (progress bool) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
 		return false
 	}
@@ -2259,7 +2261,7 @@ outer:
 				if err != nil {
 					if err.ForCycle && !l.self {
 						// The list has a comprehension that refers to the list
-						// itself. This means we should postpone evalauting this
+						// itself. This means we should postpone evaluating this
 						// list until all other lists have been evaluated.
 						n.lists[i].ignore = true
 						l.self = true

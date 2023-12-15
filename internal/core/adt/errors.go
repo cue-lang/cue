@@ -254,6 +254,35 @@ func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Verte
 	}
 }
 
+func (v *Vertex) reportFieldCycleError(c *OpContext, pos token.Pos, f Feature) *Bottom {
+	const msg = "cyclic reference to field %[1]v"
+	b := v.reportFieldError(c, pos, f, msg, msg)
+	return b
+}
+
+func (v *Vertex) reportFieldError(c *OpContext, pos token.Pos, f Feature, intMsg, stringMsg string) *Bottom {
+	code := IncompleteError
+	if !v.Accept(c, f) {
+		code = EvalError
+	}
+
+	label := f.SelectorString(c.Runtime)
+
+	var err errors.Error
+	if f.IsInt() {
+		err = c.NewPosf(pos, intMsg, f.Index(), len(v.Elems()))
+	} else {
+		err = c.NewPosf(pos, stringMsg, label)
+	}
+	b := &Bottom{
+		Code: code,
+		Err:  err,
+	}
+	// TODO: yield failure
+	c.AddBottom(b) // TODO: unify error mechanism.
+	return b
+}
+
 // A ValueError is returned as a result of evaluating a value.
 type ValueError struct {
 	r      Runtime

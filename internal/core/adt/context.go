@@ -527,8 +527,11 @@ func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 // concrete returns the concrete value of x after evaluating it.
 // msg is used to mention the context in which an error occurred, if any.
 func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result Value, complete bool) {
+	s := c.PushState(env, x.Source())
 
-	w, complete := c.Evaluate(env, x)
+	w := c.evalState(x, partial)
+
+	_ = c.PopState(s)
 
 	w, ok := c.getDefault(w)
 	if !ok {
@@ -536,6 +539,7 @@ func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result 
 	}
 	v := Unwrap(w)
 
+	complete = w != nil
 	if !IsConcrete(v) {
 		complete = false
 		b := c.NewErrf("non-concrete value %v in operand to %s", w, msg)
@@ -543,11 +547,7 @@ func (c *OpContext) concrete(env *Environment, x Expr, msg interface{}) (result 
 		v = b
 	}
 
-	if !complete {
-		return v, complete
-	}
-
-	return v, true
+	return v, complete
 }
 
 // getDefault resolves a disjunction to a single value. If there is no default

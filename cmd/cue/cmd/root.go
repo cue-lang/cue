@@ -192,6 +192,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 
 		// Hidden
 		newAddCmd(c),
+		newLoginCmd(c),
 	}
 	subCommands = append(subCommands, newHelpTopics(c)...)
 

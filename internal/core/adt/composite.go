@@ -967,7 +967,11 @@ func (v *Vertex) hasConjunct(c Conjunct) (added bool) {
 	default:
 		v.ArcType = ArcMember
 	}
-	for _, x := range v.Conjuncts {
+	return hasConjunct(v.Conjuncts, c)
+}
+
+func hasConjunct(cs []Conjunct, c Conjunct) bool {
+	for _, x := range cs {
 		// TODO: disregard certain fields from comparison (e.g. Refs)?
 		if x.CloseInfo.closeInfo == c.CloseInfo.closeInfo &&
 			x.x == c.x &&

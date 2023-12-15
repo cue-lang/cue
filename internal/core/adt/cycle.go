@@ -455,9 +455,7 @@ outer:
 			a := p.Conjuncts
 			count := 0
 			for _, c := range a {
-				if !c.CloseInfo.IsCyclic {
-					count++
-				}
+				count += getNonCyclicCount(c)
 			}
 			if !alreadyCycle {
 				count--
@@ -476,6 +474,23 @@ outer:
 	}
 
 	return ci, false
+}
+
+func getNonCyclicCount(c Conjunct) int {
+	switch a, ok := c.x.(*ConjunctGroup); {
+	case ok:
+		count := 0
+		for _, c := range *a {
+			count += getNonCyclicCount(c)
+		}
+		return count
+
+	case !c.CloseInfo.IsCyclic:
+		return 1
+
+	default:
+		return 0
+	}
 }
 
 // updateCyclicStatus looks for proof of non-cyclic conjuncts to override

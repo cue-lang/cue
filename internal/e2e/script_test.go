@@ -97,6 +97,9 @@ func TestScript(t *testing.T) {
 			env.Setenv("CUE_EXPERIMENT", "modules")
 			env.Setenv("CUE_REGISTRY", "registry.cue.works")
 			env.Setenv("CUE_CACHED_GOBIN", os.Getenv("CUE_CACHED_GOBIN"))
+
+			// Just like cmd/cue/cmd.TestScript, set up a separate modcache dir per test.
+			env.Setenv("CUE_MODCACHE", filepath.Join(env.WorkDir, "tmp/modcache"))
 			return nil
 		},
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){

@@ -324,6 +324,15 @@ func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
 	}
 }
 
+// func customResourceDefinitionFunc(c *Config, f *build.File) interpretFunc {
+// 	return func(i *cue.Instance) (file *ast.File, id string, err error) {
+// 		file, err = crd.Extract(i, cfg)
+// 		// TODO: simplify currently erases file line info. Reintroduce after fix.
+// 		// file, err = simplify(file, err)
+// 		return file, "", err
+// 	}
+// }
+
 func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {
 	switch s := f.Source.(type) {
 	case nil:

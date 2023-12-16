@@ -5,7 +5,7 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-instance: cannot resolve dependencies: example.com/e@v0.0.2: module example.com/e@v0.0.2: module not found
+instance: cannot resolve dependencies: example.com/e@v0.0.2: 404 Not Found: manifest unknown: manifest unknown to registry
 -- main.cue --
 package main
 import "example.com/e"

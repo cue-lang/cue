@@ -124,6 +124,50 @@ x: a.foo + something.bar
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v0.5.100"}))
 }
 
+func TestGetModuleWithManifest(t *testing.T) {
+	const testMod = `
+-- cue.mod/module.cue --
+module: "foo.com/bar@v0"
+deps: "example.com@v1": v: "v1.2.3"
+deps: "other.com/something@v0": v: "v0.2.3"
+
+-- x.cue --
+package bar
+
+import (
+	a "example.com"
+	"other.com/something"
+)
+x: a.foo + something.bar
+`
+	ctx := context.Background()
+	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
+	reg := ocimem.New()
+
+	c := NewClient(reg)
+	zipData := putModule(t, c, mv, testMod)
+
+	mr, err := reg.GetTag(ctx, "foo.com/bar", "v0.5.100")
+	qt.Assert(t, qt.IsNil(err))
+	defer mr.Close()
+	mdata, err := io.ReadAll(mr)
+	qt.Assert(t, qt.IsNil(err))
+
+	// Remove the tag so that we're sure it isn't
+	// used for the GetModuleWithManifest call.
+	err = reg.DeleteTag(ctx, "foo.com/bar", "v0.5.100")
+	qt.Assert(t, qt.IsNil(err))
+
+	m, err := c.GetModuleWithManifest(ctx, mv, mdata, "application/json")
+	qt.Assert(t, qt.IsNil(err))
+
+	r, err := m.GetZip(ctx)
+	qt.Assert(t, qt.IsNil(err))
+	data, err := io.ReadAll(r)
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(data, zipData))
+}
+
 func TestPutWithInvalidDependencyVersion(t *testing.T) {
 	const testMod = `
 -- cue.mod/module.cue --

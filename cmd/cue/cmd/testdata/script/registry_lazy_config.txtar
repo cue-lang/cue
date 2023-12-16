@@ -12,8 +12,7 @@ cmp stdout expect-stdout
 cp OTHER/main.cue main.cue
 cp OTHER/cue.mod/module.cue cue.mod/module.cue
 ! exec cue export .
-stderr 'instance: cannot resolve dependencies: example.com/e@v0.0.1: module example.com/e@v0.0.1: cannot make client: cannot load OCI auth configuration: invalid config file ".*config.json": decode failed: .*'
-
+stderr 'instance: cannot resolve dependencies: example.com/e@v0.0.1: cannot make client: cannot load OCI auth configuration: invalid config file ".*config.json": decode failed: .*'
 -- dockerconfig/config.json --
 should be JSON but isn't
 -- expect-stdout --

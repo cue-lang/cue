@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30262775_55b0d411",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-17T23:17:44Z",
+      "side": 1,
+      "message": "you rebased atop my CL, clever! i keep forgetting that\u0027s possible :)",
+      "revId": "67dcd70564fbbd28a936d18a4219aace66841bf6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

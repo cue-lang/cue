@@ -3,7 +3,7 @@ module cuelang.org/go
 go 1.20
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20231205091233-3bb0ee105e4a
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20231217163254-6feb86eb6e06
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/emicklei/proto v1.10.0
 	github.com/go-quicktest/qt v1.101.0
@@ -30,7 +30,6 @@ require (
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/kr/text v0.2.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect
-	golang.org/x/exp v0.0.0-20231214170342-aacd6d4b4611 // indirect
 	golang.org/x/sys v0.15.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 )

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d02cc4d0_172b459c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-17T17:46:41Z",
+      "side": 1,
+      "message": "FYI Paul, I already mentioned this build-ignored tool to Marcel and he seemed fine with it. The original CL had a Go API, but we agreed to not expose that straight away - at least not until we have a clear use for it.",
+      "revId": "9d63dc80a8789a4863d00cb7c4e7f9c9fb3b5a36",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -51,6 +51,24 @@
       "parentUuid": "61a1a239_8a132ca9",
       "revId": "59ef5d93a027fefa7779b7680b59185602e01545",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5dec2d80_f74e3a02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-17T17:46:41Z",
+      "side": 1,
+      "message": "Thanks, fixed in the last patchset. The logic to avoid repeatedly visiting notes was buggy (it would count two nil identifiers as duplicates) so I removed it.",
+      "parentUuid": "7b38c8a7_774eb01e",
+      "revId": "59ef5d93a027fefa7779b7680b59185602e01545",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "SGTM, but I think you need to tidy the e2e module too.\n\nFor the sake of conflicts, can we approve and merge https://review.gerrithub.io/c/cue-lang/cue/+/1173724 first? It was actually doing that CL that made me spot x/exp in the graph.",
       "revId": "87cf730a9dce972c24b1a90e8210920406777db5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25c1974d_87befe88",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-17T18:50:42Z",
+      "side": 1,
+      "message": "\u003e SGTM, but I think you need to tidy the e2e module too.\n\nThanks - I should not have requested your review until I got CI working. Apologies!\n\n\u003e For the sake of conflicts, can we approve and merge https://review.gerrithub.io/c/cue-lang/cue/+/1173724 first?\n\nAbsolutely. +2-ed.",
+      "parentUuid": "67225d99_76def8ed",
+      "revId": "87cf730a9dce972c24b1a90e8210920406777db5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

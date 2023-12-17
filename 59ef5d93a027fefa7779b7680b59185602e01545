@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61a1a239_8a132ca9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037600
+      },
+      "writtenOn": "2023-12-17T16:00:27Z",
+      "side": 1,
+      "message": "print_tool works nicely, thank you!\n\nFor my local use, I replaced the indent string \"\\t\" (8 spaces in my terminal) by \"   \". 3 spaces seems to be a good compromise between seeing the nesting hierarchy distinctly vs. having too long lines.",
+      "revId": "59ef5d93a027fefa7779b7680b59185602e01545",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

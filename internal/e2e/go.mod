@@ -10,7 +10,7 @@ require (
 )
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20231205091233-3bb0ee105e4a // indirect
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20231217163254-6feb86eb6e06 // indirect
 	github.com/cockroachdb/apd/v3 v3.2.1 // indirect
 	github.com/emicklei/proto v1.10.0 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
@@ -24,7 +24,6 @@ require (
 	github.com/spf13/cobra v1.8.0 // indirect
 	github.com/spf13/pflag v1.0.5 // indirect
 	github.com/tetratelabs/wazero v1.0.2 // indirect
-	golang.org/x/exp v0.0.0-20231214170342-aacd6d4b4611 // indirect
 	golang.org/x/mod v0.14.0 // indirect
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sys v0.15.0 // indirect

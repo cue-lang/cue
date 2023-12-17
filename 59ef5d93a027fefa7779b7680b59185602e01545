@@ -33,6 +33,24 @@
       "message": "panic... running \n% print_tool 1447.cue\nas in https://github.com/rudifa/cue-issues-fmt-comments/blob/main/testdata/pending/1447.txtar\nthe tool panics at ./cue/ast/print.go:56.\nThis is almost at the end of the ast tree, no great loss.\nHowever, it might be useful if the topol could log the circularity and continue parsing, if possible.",
       "revId": "59ef5d93a027fefa7779b7680b59185602e01545",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfaa4c01_b3ec804b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-17T17:41:15Z",
+      "side": 1,
+      "message": "You can control how large tabs are rendered in your terminal, FYI, which is why I think tabs are fine - they let the user choose how wide the indentation ends up.",
+      "parentUuid": "61a1a239_8a132ca9",
+      "revId": "59ef5d93a027fefa7779b7680b59185602e01545",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

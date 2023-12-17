@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e7e5f2af_2600cc19",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-17T23:49:42Z",
+      "side": 1,
+      "message": "Per Paul\u0027s offline input, having this as an internal/cmd package means that CI will catch build failures, and it also makes the tool a little bit easier to discover and install - while making it clear it\u0027s mainly intended for internal use.",
+      "revId": "e8a6502a96743e3abc49f42f1e833c890aa12e8f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

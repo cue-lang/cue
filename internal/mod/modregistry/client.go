@@ -102,6 +102,7 @@ func (c *Client) GetModuleWithManifest(ctx context.Context, m module.Version, co
 	// TODO check that the other blobs are of the expected type (application/zip).
 	return &Module{
 		client:         c,
+		version:        m,
 		repo:           repoName,
 		manifest:       *manifest,
 		manifestDigest: digest.FromBytes(contents),
@@ -313,8 +314,13 @@ func checkModFile(m module.Version, f *zip.File) ([]byte, *modfile.File, error) 
 type Module struct {
 	client         *Client
 	repo           string
+	version        module.Version
 	manifest       ocispec.Manifest
 	manifestDigest ociregistry.Digest
+}
+
+func (m *Module) Version() module.Version {
+	return m.version
 }
 
 // ModuleFile returns the contents of the cue.mod/module.cue file.

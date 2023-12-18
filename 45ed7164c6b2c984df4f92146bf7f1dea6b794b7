@@ -16,6 +16,24 @@
       "message": "a newline is missing above here",
       "revId": "45ed7164c6b2c984df4f92146bf7f1dea6b794b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2833c461_ce55b526",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-18T16:54:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1772594_4c29c3ed",
+      "revId": "45ed7164c6b2c984df4f92146bf7f1dea6b794b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

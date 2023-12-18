@@ -51,6 +51,24 @@
       "parentUuid": "5e455437_d86186c6",
       "revId": "598373390a6c913b5e36d550eba5e9c2ad475b04",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca1b9466_c32be9df",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-18T17:11:41Z",
+      "side": 1,
+      "message": "Definitely think we should attempt to fix the implementation in the upcoming release. We can be loud and clear about that change in behavior in the changelog.\n\nDo you want to file that issue, or should I?\n\nAnd agreed that it\u0027s entirely fine to leave your workaround as-is, just with a fixed comment, and probably as a TODO linking to the issue.",
+      "parentUuid": "693a4483_9da86532",
+      "revId": "598373390a6c913b5e36d550eba5e9c2ad475b04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

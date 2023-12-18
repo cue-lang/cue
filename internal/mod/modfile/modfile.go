@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/internal/mod/semver"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
@@ -48,18 +49,29 @@ type File struct {
 // Format returns a formatted representation of f
 // in CUE syntax.
 func (f *File) Format() ([]byte, error) {
+	if len(f.Deps) == 0 && f.Deps != nil {
+		// There's no way to get the CUE encoder to omit an empty
+		// but non-nil slice (despite the current doc comment on
+		// [cue.Context.Encode], so make a copy of f to allow us
+		// to do that.
+		f1 := *f
+		f1.Deps = nil
+		f = &f1
+	}
 	// TODO this could be better:
 	// - it should omit the outer braces
 	v := cuecontext.New().Encode(f)
 	if err := v.Validate(cue.Concrete(true)); err != nil {
 		return nil, err
 	}
-	n := v.Syntax(cue.Concrete(true))
-	data, err := format.Node(n)
+	n := v.Syntax(cue.Concrete(true)).(*ast.StructLit)
+
+	data, err := format.Node(&ast.File{
+		Decls: n.Elts,
+	})
 	if err != nil {
 		return nil, fmt.Errorf("cannot format: %v", err)
 	}
-	data = append(data, '\n')
 	// Sanity check that it can be parsed.
 	// TODO this could be more efficient by checking all the file fields
 	// before formatting the output.

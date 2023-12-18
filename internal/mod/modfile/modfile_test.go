@@ -215,18 +215,16 @@ func TestFormat(t *testing.T) {
 				},
 			},
 		},
-		want: `{
-	module: "foo.com/bar@v0"
-	language: {
-		version: "v0.4.3"
+		want: `module: "foo.com/bar@v0"
+language: {
+	version: "v0.4.3"
+}
+deps: {
+	"example.com@v1": {
+		v: "v1.2.3"
 	}
-	deps: {
-		"example.com@v1": {
-			v: "v1.2.3"
-		}
-		"other.com/something@v0": {
-			v: "v0.2.3"
-		}
+	"other.com/something@v0": {
+		v: "v0.2.3"
 	}
 }
 `}, {
@@ -237,11 +235,9 @@ func TestFormat(t *testing.T) {
 				Version: "v0.4.3",
 			},
 		},
-		want: `{
-	module: "foo.com/bar@v0"
-	language: {
-		version: "v0.4.3"
-	}
+		want: `module: "foo.com/bar@v0"
+language: {
+	version: "v0.4.3"
 }
 `}, {
 		name: "WithInvalidModuleVersion",
@@ -252,6 +248,14 @@ func TestFormat(t *testing.T) {
 			},
 		},
 		wantError: `cannot round-trip module file: language version "badversion--" in - is not well formed`,
+	}, {
+		name: "WithNonNilEmptyDeps",
+		file: &File{
+			Module: "foo.com/bar@v0",
+			Deps:   map[string]*Dep{},
+		},
+		want: `module: "foo.com/bar@v0"
+`,
 	}}
 	cuetest.Run(t, tests, func(t *cuetest.T, test *formatTest) {
 		data, err := test.file.Format()
@@ -265,7 +269,7 @@ func TestFormat(t *testing.T) {
 		// Check that it round-trips.
 		f, err := Parse(data, "")
 		qt.Assert(t, qt.IsNil(err))
-		qt.Assert(t, qt.CmpEquals(f, test.file, cmpopts.IgnoreUnexported(File{})))
+		qt.Assert(t, qt.CmpEquals(f, test.file, cmpopts.IgnoreUnexported(File{}), cmpopts.EquateEmpty()))
 	})
 }
 

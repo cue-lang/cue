@@ -33,6 +33,24 @@
       "message": "I\u0027m rather confused.\n\n1 - the json v1 semantics *are* that omitempty ignores both nil and non-nil-but-empty slices. See https://go.dev/play/p/AtJ7s2Jf_eS\n\n2 - you are doing a CUE syntax export, not a json encode, as far as I can tell\n\nThe Context.Encode docs seem to agree with me:\n\n```\n// The \"omitempty\" option specifies that the field should be omitted from the\n// encoding if the field has an empty value, defined as false, 0, a nil pointer,\n// a nil interface value, and any empty array, slice, map, or string.\n```\n\nSo either there\u0027s a disconnect here, or our code is buggy and isn\u0027t following the docs.",
       "revId": "598373390a6c913b5e36d550eba5e9c2ad475b04",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "693a4483_9da86532",
+        "filename": "internal/mod/modfile/modfile.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-18T17:02:29Z",
+      "side": 1,
+      "message": "Yup, the docs are wrong here.\n\nHere\u0027s the evidence: https://go.dev/play/p/_RBcvl9dGwI\nWe should decide what to do about this: my gut feeling is that we should change the behaviour to follow encoding/json, but that might break things, so we should think hard about it.\n\nAt any rate, the doc comment (and my misleading comment here) should be fixed.",
+      "parentUuid": "5e455437_d86186c6",
+      "revId": "598373390a6c913b5e36d550eba5e9c2ad475b04",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

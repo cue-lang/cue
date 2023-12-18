@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da2e6f21_db6fb2be",
+        "filename": "internal/registrytest/registry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 129,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-18T20:28:34Z",
+      "side": 1,
+      "message": "add a TODO to use a future maps.Keys with e.g. slices.Sort?",
+      "revId": "34999a8c26b0d480fcf5af9f543b517b0a7cdfe7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

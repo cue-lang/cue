@@ -120,7 +120,13 @@ func AuthHandler(handler http.Handler, cfg *AuthConfig) http.Handler {
 
 func pushContent(ctx context.Context, client *modregistry.Client, mods map[module.Version]*moduleContent) error {
 	pushed := make(map[module.Version]bool)
+	// Iterate over modules in deterministic order.
+	vs := make([]module.Version, 0, len(mods))
 	for v := range mods {
+		vs = append(vs, v)
+	}
+	module.Sort(vs)
+	for _, v := range vs {
 		err := visitDepthFirst(mods, v, func(v module.Version, m *moduleContent) error {
 			if pushed[v] {
 				return nil

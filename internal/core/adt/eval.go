@@ -952,9 +952,8 @@ type nodeContext struct {
 	nextFree *nodeContext
 	refCount int
 
-	// Keep these two out of the nodeContextState to make them more accessible
+	// Keep node out of the nodeContextState to make them more accessible
 	// for source-level debuggers.
-	ctx  *OpContext
 	node *Vertex
 
 	nodeContextState
@@ -1133,8 +1132,8 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		c.freeListNode = n.nextFree
 
 		*n = nodeContext{
-			ctx:  c,
-			node: node,
+			scheduler: scheduler{ctx: c},
+			node:      node,
 			nodeContextState: nodeContextState{
 				kind: TopKind,
 			},
@@ -1157,17 +1156,22 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			buffer:             n.buffer[:0],
 		}
 		n.scheduler.clear()
+		n.scheduler.node = n
 
 		return n
 	}
 	c.stats.Allocs++
 
-	return &nodeContext{
-		ctx:  c,
+	n := &nodeContext{
+		scheduler: scheduler{
+			ctx: c,
+		},
 		node: node,
 
 		nodeContextState: nodeContextState{kind: TopKind},
 	}
+	n.scheduler.node = n
+	return n
 }
 
 func (v *Vertex) getNodeContext(c *OpContext, ref int) *nodeContext {

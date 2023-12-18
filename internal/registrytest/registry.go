@@ -13,6 +13,7 @@ import (
 	"net/url"
 	"strings"
 
+	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ocifilter"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 	"cuelabs.dev/go/oci/ociregistry/ociserver"
@@ -33,6 +34,26 @@ type AuthConfig struct {
 	Password string `json:"password"`
 }
 
+// Upload uploads the modules found inside fsys (stored
+// in the format described by [New]) to the given registry.
+func Upload(ctx context.Context, r ociregistry.Interface, fsys fs.FS) error {
+	_, err := upload(ctx, r, fsys)
+	return err
+}
+
+func upload(ctx context.Context, r ociregistry.Interface, fsys fs.FS) (authConfig []byte, err error) {
+	client := modregistry.NewClient(r)
+	mods, authConfigData, err := getModules(fsys)
+	if err != nil {
+		return nil, fmt.Errorf("invalid modules: %v", err)
+	}
+
+	if err := pushContent(ctx, client, mods); err != nil {
+		return nil, fmt.Errorf("cannot push modules: %v", err)
+	}
+	return authConfigData, nil
+}
+
 // New starts a registry instance that serves modules found inside fsys.
 // It serves the OCI registry protocol.
 // If prefix is non-empty, all module paths will be prefixed by that,
@@ -50,15 +71,10 @@ type AuthConfig struct {
 // The Registry should be closed after use.
 func New(fsys fs.FS, prefix string) (*Registry, error) {
 	r := ocimem.New()
-	client := modregistry.NewClient(ocifilter.Sub(r, prefix))
 
-	mods, authConfigData, err := getModules(fsys)
+	authConfigData, err := upload(context.Background(), ocifilter.Sub(r, prefix), fsys)
 	if err != nil {
-		return nil, fmt.Errorf("invalid modules: %v", err)
-	}
-
-	if err := pushContent(client, mods); err != nil {
-		return nil, fmt.Errorf("cannot push modules: %v", err)
+		return nil, err
 	}
 	var handler http.Handler = ociserver.New(ocifilter.ReadOnly(r), nil)
 	if authConfigData != nil {
@@ -102,17 +118,41 @@ func AuthHandler(handler http.Handler, cfg *AuthConfig) http.Handler {
 	})
 }
 
-func pushContent(client *modregistry.Client, mods map[module.Version]*moduleContent) error {
-	for v, m := range mods {
-		var zipContent bytes.Buffer
-		if err := m.writeZip(&zipContent); err != nil {
-			return err
-		}
-		if err := client.PutModule(context.Background(), v, bytes.NewReader(zipContent.Bytes()), int64(zipContent.Len())); err != nil {
+func pushContent(ctx context.Context, client *modregistry.Client, mods map[module.Version]*moduleContent) error {
+	pushed := make(map[module.Version]bool)
+	for v := range mods {
+		err := visitDepthFirst(mods, v, func(v module.Version, m *moduleContent) error {
+			if pushed[v] {
+				return nil
+			}
+			var zipContent bytes.Buffer
+			if err := m.writeZip(&zipContent); err != nil {
+				return err
+			}
+			if err := client.PutModule(ctx, v, bytes.NewReader(zipContent.Bytes()), int64(zipContent.Len())); err != nil {
+				return err
+			}
+			pushed[v] = true
+			return nil
+		})
+		if err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func visitDepthFirst(mods map[module.Version]*moduleContent, v module.Version, f func(module.Version, *moduleContent) error) error {
+	m := mods[v]
+	if m == nil {
+		return nil
+	}
+	for _, depv := range m.modFile.DepVersions() {
+		if err := visitDepthFirst(mods, depv, f); err != nil {
+			return err
+		}
+	}
+	return f(v, m)
 }
 
 type Registry struct {

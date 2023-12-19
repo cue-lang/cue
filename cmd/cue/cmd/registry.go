@@ -28,7 +28,7 @@ func getRegistry() (ociregistry.Interface, error) {
 		}
 		return nil, nil
 	}
-	resolver, err := modresolve.ParseCUERegistry(env, "registry.cuelabs.dev")
+	resolver, err := modresolve.ParseCUERegistry(env, "registry.cue.works")
 	if err != nil {
 		return nil, fmt.Errorf("bad value for $CUE_REGISTRY: %v", err)
 	}

@@ -16,6 +16,24 @@
       "message": "add a TODO to deduplicate with the other implementations in this repo?",
       "revId": "c67e7baa88dfd7501a1a9849ee6b464f9e906431",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9fce2a3_cb4e9771",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-19T11:58:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "44edf7bf_ad353b48",
+      "revId": "c67e7baa88dfd7501a1a9849ee6b464f9e906431",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,17 @@
+# Check that cue mod tidy works OK even when not
+# run in the module's root directory.
+
+cd x/y
+exec cue mod tidy
+cd $WORK
+cmp cue.mod/module.cue want-module
+
+-- want-module --
+module: "main.org@v0"
+-- cue.mod/module.cue --
+module: "main.org@v0"
+-- x/y/z.cue --
+package y
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+// This file is just here to ensure that CUE_REGISTRY etc is set.
+module: "example.com@v0"

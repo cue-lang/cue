@@ -476,7 +476,7 @@ func TestCloseContext(t *testing.T) {
 				[d]{1}
 			}
 			a: {1}`,
-		err: `a: field not allowed`,
+		err: `field not allowed`,
 	}}
 
 	cuetest.Run(t, cases, func(t *cuetest.T, tc *testCase) {

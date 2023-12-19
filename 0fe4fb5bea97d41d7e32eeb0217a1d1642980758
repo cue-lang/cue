@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f97c84f5_4e3317f0",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-19T22:04:38Z",
+      "side": 1,
+      "message": "this little refactor is unrelated to the rename, though. did you mean to send this as a separate CL, or amend the commit message?",
+      "revId": "0fe4fb5bea97d41d7e32eeb0217a1d1642980758",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

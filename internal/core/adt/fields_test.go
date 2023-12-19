@@ -16,6 +16,7 @@ package adt_test
 
 import (
 	"fmt"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -533,8 +534,22 @@ func TestCloseContext(t *testing.T) {
 	}}
 
 	cuetest.Run(t, cases, func(t *cuetest.T, tc *testCase) {
+		adt.DebugDeps = true
+		showGraph := false
 		x := adt.NewFieldTester(r)
 		tc.run(x)
+
+		ctx := x.OpContext
+
+		switch graph, hasError := adt.CreateMermaidGraph(ctx, x.Root, true); {
+		case !hasError:
+		case showGraph:
+			path := filepath.Join(".debug", "TestCloseContext", tc.name)
+			adt.OpenNodeGraph(tc.name, path, "in", "out", graph)
+			fallthrough
+		default:
+			t.Errorf("imbalanced counters")
+		}
 
 		t.Equal(writeArcs(x, x.Root), tc.arcs)
 		t.Equal(x.Error(), tc.err)

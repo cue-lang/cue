@@ -268,6 +268,10 @@ type OpContext struct {
 	// as an error if this is true.
 	// TODO: strictly separate validators and functions.
 	IsValidator bool
+
+	// ErrorGraphs contains an analysis, represented as a Mermaid graph, for
+	// each node that has an error.
+	ErrorGraphs map[string]string
 }
 
 func (c *OpContext) CloseInfo() CloseInfo { return c.ci }

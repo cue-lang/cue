@@ -290,6 +290,8 @@ func runImport(cmd *Command, args []string) (err error) {
 			c.fileFilter = `\.(json|jsonl|ldjson)$`
 		case "yaml":
 			c.fileFilter = `\.(yaml|yml)$`
+		case "crd":
+			return runImportCRD(cmd, args)
 		case "text":
 			c.fileFilter = `\.txt$`
 		case "binary":

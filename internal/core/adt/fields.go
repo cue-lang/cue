@@ -342,7 +342,7 @@ func (n *nodeContext) insertArc1(f Feature, mode ArcType, c Conjunct, check bool
 	}
 
 	if cc.isClosed && !v.disallowedField && !matchPattern(n, cc.Expr, f) {
-		n.notAllowedError(f)
+		n.notAllowedError(n.node)
 	}
 
 	return v, isNew
@@ -462,7 +462,7 @@ outer:
 			}
 		}
 		if !matchPattern(n, closed.Expr, a.Label) {
-			n.notAllowedError(a.Label)
+			n.notAllowedError(a)
 			continue
 		}
 	}
@@ -480,13 +480,47 @@ outer:
 	}
 }
 
-// notAllowedError reports a "field not allowed" error in n and sets the value
+func (ctx *OpContext) addPositions(c Conjunct) {
+	if x, ok := c.x.(*ConjunctGroup); ok {
+		for _, c := range *x {
+			ctx.addPositions(c)
+		}
+	}
+	if pos := c.Field(); pos != nil {
+		ctx.AddPosition(pos)
+	}
+}
+
+// notAllowedError reports a field not allowed error in n and sets the value
 // for arc f to that error.
-func (n *nodeContext) notAllowedError(f Feature) {
+func (n *nodeContext) notAllowedError(arc *Vertex) {
 	// Set the error on the same arc as the old implementation
 	// and using the same path.
-	arc := n.node.Lookup(f)
+	// arc := n.node.Lookup(f)
 	v := n.ctx.PushArc(arc)
+
+	defer n.ctx.ReleasePositions(n.ctx.MarkPositions())
+
+	x := arc // n.node
+	for _, c := range x.Conjuncts {
+		n.ctx.addPositions(c)
+	}
+	// XXX(0.7): Find another way to get this provenance information. Not
+	// currently stored in new evaluator.
+	// for _, s := range x.Structs {
+	//  s.AddPositions(n.ctx)
+	// }
+
+	if arc.ArcType == ArcPending {
+		arc.ArcType = ArcNotPresent
+		return
+	}
+	// TODO: setting arc instead of n.node eliminates subfields. This may be
+	// desirable or not, but it differs, at least from <=v0.6 behavior.
+	n.Logf("======----  FIELD NOT ALLOWED -----====")
+	arc.SetValue(n.ctx, n.ctx.NewErrf("field not allowed"))
+
+	// TODO: remove?
 	n.node.SetValue(n.ctx, n.ctx.NewErrf("field not allowed"))
 	arc.disallowedField = true // Is this necessary?
 	n.ctx.PopArc(v)

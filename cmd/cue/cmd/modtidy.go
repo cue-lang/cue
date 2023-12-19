@@ -51,7 +51,7 @@ func runModTidy(cmd *Command, args []string) error {
 		return err
 	}
 	if reg == nil {
-		return fmt.Errorf("no registry configured to upload to")
+		return fmt.Errorf("no module registry configured")
 	}
 	ctx := context.Background()
 	modRoot, err := findModuleRoot()

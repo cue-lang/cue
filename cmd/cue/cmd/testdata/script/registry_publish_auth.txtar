@@ -1,4 +1,4 @@
-# Check that we can use the cue mod upload command to upload to a registry
+# Check that we can use the cue mod publish command to publish to a registry
 # that's protected by authorization.
 
 memregistry -auth=foo:bar MEMREGISTRY
@@ -9,8 +9,8 @@ env DOCKER_CONFIG=$WORK/dockerconfig
 env-fill $DOCKER_CONFIG/config.json
 
 cd example
-exec cue mod upload v0.0.1
-cmp stdout ../expect-upload-stdout
+exec cue mod publish v0.0.1
+cmp stdout ../expect-publish-stdout
 cd ../main
 exec cue eval .
 cmp stdout ../expect-eval-stdout
@@ -25,8 +25,8 @@ cmp stdout ../expect-eval-stdout
 	}
 }
 
--- expect-upload-stdout --
-uploaded example.com@v0.0.1
+-- expect-publish-stdout --
+published example.com@v0.0.1
 -- expect-eval-stdout --
 main:             "main"
 "example.com@v0": "v0.0.1"

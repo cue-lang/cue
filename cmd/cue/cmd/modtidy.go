@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"os"
@@ -53,12 +54,11 @@ func runModTidy(cmd *Command, args []string) error {
 		return fmt.Errorf("no registry configured to upload to")
 	}
 	ctx := context.Background()
-	// TODO don't assume we're running in the module's root directory.
-	wd, err := os.Getwd()
+	modRoot, err := findModuleRoot()
 	if err != nil {
 		return err
 	}
-	mf, err := modload.Load(ctx, os.DirFS(wd), ".", reg)
+	mf, err := modload.Load(ctx, os.DirFS(modRoot), ".", reg)
 	if err != nil {
 		return err
 	}
@@ -67,10 +67,41 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)
 	}
-	if err := os.WriteFile(filepath.Join("cue.mod", "module.cue"), data, 0o666); err != nil {
+	modPath := filepath.Join(modRoot, "cue.mod", "module.cue")
+	oldData, err := os.ReadFile(modPath)
+	if err != nil {
+		// Shouldn't happen because modload.Load returns an error
+		// if it can't load the module file.
+		return err
+	}
+	if bytes.Equal(data, oldData) {
+		return nil
+	}
+	if err := os.WriteFile(modPath, data, 0o666); err != nil {
 		return err
 	}
 	return nil
+}
+
+func findModuleRoot() (string, error) {
+	// TODO this logic is duplicated in multiple places. We should
+	// consider deduplicating it.
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
+			return dir, nil
+		} else if !os.IsNotExist(err) {
+			return "", err
+		}
+		dir1 := filepath.Dir(dir)
+		if dir1 == dir {
+			return "", fmt.Errorf("module root not found")
+		}
+		dir = dir1
+	}
 }
 
 func modCacheDir() (string, error) {

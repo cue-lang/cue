@@ -18,6 +18,7 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 
@@ -33,12 +34,11 @@ func newModUploadCmd(c *Command) *cobra.Command {
 		// the documentation just yet.
 		Hidden: true,
 
-		Use:   "upload <version>",
-		Short: "upload the current module to a registry",
+		Use:   "publish <version>",
+		Short: "publish the current module to a registry",
 		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
 
-Upload the current module to an OCI registry.
-Currently this command must be run in the module's root directory.
+Publish the current module to an OCI registry.
 Also note that this command does no dependency or other checks at the moment.
 `,
 		RunE: mkRunE(c, runModUpload),
@@ -54,16 +54,19 @@ func runModUpload(cmd *Command, args []string) error {
 		return err
 	}
 	if reg == nil {
-		return fmt.Errorf("no registry configured to upload to")
+		return fmt.Errorf("no registry configured to publish to")
 	}
-	modfileData, err := os.ReadFile("cue.mod/module.cue")
+	modRoot, err := findModuleRoot()
 	if err != nil {
-		if os.IsNotExist(err) {
-			return fmt.Errorf("no cue.mod/module.cue file found; cue mod upload must be run in the module's root directory")
-		}
 		return err
 	}
-	mf, err := modfile.Parse(modfileData, "cue.mod/module.cue")
+	// TODO ensure module tidiness.
+	modPath := filepath.Join(modRoot, "cue.mod/module.cue")
+	modfileData, err := os.ReadFile(modPath)
+	if err != nil {
+		return err
+	}
+	mf, err := modfile.Parse(modfileData, modPath)
 	if err != nil {
 		return err
 	}
@@ -71,7 +74,7 @@ func runModUpload(cmd *Command, args []string) error {
 	if err != nil {
 		return fmt.Errorf("cannot form module version: %v", err)
 	}
-	zf, err := os.CreateTemp("", "cue-upload-")
+	zf, err := os.CreateTemp("", "cue-publish-")
 	if err != nil {
 		return err
 	}
@@ -79,7 +82,7 @@ func runModUpload(cmd *Command, args []string) error {
 	defer zf.Close()
 
 	// TODO verify that all dependencies exist in the registry.
-	if err := modzip.CreateFromDir(zf, mv, "."); err != nil {
+	if err := modzip.CreateFromDir(zf, mv, modRoot); err != nil {
 		return err
 	}
 	info, err := zf.Stat()
@@ -91,6 +94,6 @@ func runModUpload(cmd *Command, args []string) error {
 	if err := rclient.PutModule(context.Background(), mv, zf, info.Size()); err != nil {
 		return fmt.Errorf("cannot put module: %v", err)
 	}
-	fmt.Printf("uploaded %s\n", mv)
+	fmt.Printf("published %s\n", mv)
 	return nil
 }

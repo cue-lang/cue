@@ -1,10 +1,10 @@
-# Check that we can use the cue mod upload command to upload to a registry.
+# Check that we can use the cue mod publish command to publish to a registry.
 memregistry MEMREGISTRY
 env ORIG_CUE_REGISTRY=$CUE_REGISTRY
 env CUE_REGISTRY=example.com=$MEMREGISTRY+insecure,$CUE_REGISTRY
 cd example
-exec cue mod upload v0.0.1
-cmp stdout ../expect-upload-stdout
+exec cue mod publish v0.0.1
+cmp stdout ../expect-publish-stdout
 cd ../main
 exec cue eval .
 cmp stdout ../expect-eval-stdout
@@ -15,8 +15,8 @@ env CUE_MODCACHE=$WORK/.tmp/different-cache
 ! exec cue eval
 stderr 'repository name not known to registry'
 
--- expect-upload-stdout --
-uploaded example.com@v0.0.1
+-- expect-publish-stdout --
+published example.com@v0.0.1
 -- expect-eval-stdout --
 main:                   "main"
 "foo.com/bar/hello@v0": "v0.2.3"

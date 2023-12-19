@@ -17,6 +17,8 @@ package adt_test
 import (
 	"flag"
 	"fmt"
+	"path/filepath"
+	"sort"
 	"strings"
 	"testing"
 
@@ -105,6 +107,21 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 	ctx.Version = version
 	v.Finalize(ctx)
 
+	// Print discrepancies in dependencies.
+	if m := ctx.ErrorGraphs; len(m) > 0 {
+		i := 0
+		keys := make([]string, len(m))
+		for k := range m {
+			keys[i] = k
+			i++
+		}
+		t.Errorf("unexpected node errors: %d", len(ctx.ErrorGraphs))
+		sort.Strings(keys)
+		for _, s := range keys {
+			t.Errorf("  -- path: %s", s)
+		}
+	}
+
 	if version != internal.DevVersion {
 		stats := ctx.Stats()
 		w := t.Writer("stats")
@@ -140,6 +157,8 @@ func TestX(t *testing.T) {
 
 	var version internal.EvaluatorVersion
 	version = internal.DevVersion // comment to use default implementation.
+	openGraph := true
+	// openGraph = false
 
 	in := `
 -- cue.mod/module.cue --
@@ -175,13 +194,21 @@ module: "mod.test"
 	v.Finalize(ctx)
 	adt.Verbosity = 0
 
+	out := debug.NodeString(r, v, nil)
+	if openGraph {
+		for p, g := range ctx.ErrorGraphs {
+			path := filepath.Join(".debug/TestX", p)
+			adt.OpenNodeGraph("TestX", path, in, out, g)
+		}
+	}
+
 	if b := validate.Validate(ctx, v, &validate.Config{
 		AllErrors: true,
 	}); b != nil {
 		t.Log(errors.Details(b.Err, nil))
 	}
 
-	t.Error(debug.NodeString(r, v, nil))
+	t.Error(out)
 
 	t.Log(ctx.Stats())
 }

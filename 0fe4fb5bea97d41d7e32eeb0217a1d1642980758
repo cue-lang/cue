@@ -16,6 +16,24 @@
       "message": "this little refactor is unrelated to the rename, though. did you mean to send this as a separate CL, or amend the commit message?",
       "revId": "0fe4fb5bea97d41d7e32eeb0217a1d1642980758",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90828e85_447a98ca",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-20T09:24:59Z",
+      "side": 1,
+      "message": "I thought it was probably not too bad to fold in with the same CL. Adjusted the commit message and added a test (and fixed the code!).",
+      "parentUuid": "f97c84f5_4e3317f0",
+      "revId": "0fe4fb5bea97d41d7e32eeb0217a1d1642980758",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -48,7 +48,11 @@ foo: "foo value"
 -- depend/cue.mod/module.cue --
 module: "depend.localhost"
 
-deps: "${MODVER}": v: "${VERSION}"
+deps: {
+	"${MODVER}": {
+		v: "${VERSION}"
+	}
+}
 -- depend/out_foo.cue --
 package depend
 

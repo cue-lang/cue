@@ -84,7 +84,7 @@ var (
 	githubKeep = envOr("GITHUB_KEEP", "false")
 
 	// gcloudRegistry is an existing Google Cloud Artifact Registry repository
-	// to upload module versions to via "cue mod upload",
+	// to publish module versions to via "cue mod publish",
 	// and authenticated via gcloud's configuration in the host environment.
 	gcloudRegistry = envOr("GCLOUD_REGISTRY", "europe-west1-docker.pkg.dev/project-unity-377819/modules-e2e-registry")
 )

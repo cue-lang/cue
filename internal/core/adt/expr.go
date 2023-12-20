@@ -1963,17 +1963,17 @@ func (x *ForClause) yield(s *compState) {
 		}
 		if !a.isDefined() {
 			a.Finalize(c)
-			switch a.ArcType {
-			case ArcMember:
-			case ArcRequired:
-				c.AddBottom(newRequiredFieldInComprehensionError(c, x, a))
-				continue
-			default:
-				continue
-			}
+		}
+		if !a.definitelyExists() {
+			continue
 		}
 
-		if !a.definitelyExists() {
+		switch a.ArcType {
+		case ArcMember:
+		case ArcRequired:
+			c.AddBottom(newRequiredFieldInComprehensionError(c, x, a))
+			continue
+		default:
 			continue
 		}
 

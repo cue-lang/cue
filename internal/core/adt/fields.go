@@ -252,9 +252,9 @@ func (c *closeContext) incDependent(kind depKind, dependant *closeContext) (debu
 // decDependent needs to be called for any conjunct or child closeContext for
 // which a corresponding incDependent was called after it has been successfully
 // processed.
-func (c *closeContext) decDependent(n *nodeContext, kind depKind, dependant *closeContext) {
+func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *closeContext) {
 	// TODO: fix matching decrements and uncomment.
-	// c.matchDecrement(n.node, kind, dependant)
+	// c.matchDecrement(c.src, kind, dependant)
 
 	c.conjunctCount--
 	if c.conjunctCount > 0 {
@@ -270,7 +270,7 @@ func (c *closeContext) decDependent(n *nodeContext, kind depKind, dependant *clo
 	p := c.parent
 	if p == nil {
 		// Root pattern, set allowed patterns.
-		if pcs := n.node.PatternConstraints; pcs != nil {
+		if pcs := c.src.PatternConstraints; pcs != nil {
 			if pcs.Allowed != nil {
 				panic("unexpected allowed set")
 			}
@@ -283,7 +283,7 @@ func (c *closeContext) decDependent(n *nodeContext, kind depKind, dependant *clo
 	if !c.isEmbed && c.isClosed {
 		// Merge the two closeContexts and ensure that the patterns and fields
 		// are mutually compatible according to the closedness rules.
-		injectClosed(n, c, p)
+		injectClosed(ctx, c, p)
 		p.Expr = mergeConjunctions(p.Expr, c.Expr)
 	} else {
 		// Do not check closedness of fields for embeddings.
@@ -292,7 +292,7 @@ func (c *closeContext) decDependent(n *nodeContext, kind depKind, dependant *clo
 		p.linkPatterns(c)
 	}
 
-	p.decDependent(n, PARENT, c)
+	p.decDependent(ctx, PARENT, c) // REF(decrement: spawn)
 }
 
 // linkPatterns merges the patterns of child into c, if needed.
@@ -324,7 +324,7 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, check bool)
 	// Match and insert patterns.
 	if pcs := n.node.PatternConstraints; pcs != nil {
 		for _, pc := range pcs.Pairs {
-			if matchPattern(n, pc.Pattern, f) {
+			if matchPattern(n.ctx, pc.Pattern, f) {
 				for _, c := range pc.Constraint.Conjuncts {
 					n.insertArc1(f, mode, c, check)
 				}
@@ -361,8 +361,8 @@ func (n *nodeContext) insertArc1(f Feature, mode ArcType, c Conjunct, check bool
 		n.node.Arcs = append(n.node.Arcs, v)
 	}
 
-	if cc.isClosed && !v.disallowedField && !matchPattern(n, cc.Expr, f) {
-		n.notAllowedError(n.node)
+	if cc.isClosed && !v.disallowedField && !matchPattern(n.ctx, cc.Expr, f) {
+		n.ctx.notAllowedError(n.node, n.node)
 	}
 
 	return v, isNew
@@ -425,7 +425,7 @@ func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
 	// from arcs and patterns are grouped under the same vertex.
 	// TODO: verify. See test Pattern 1b
 	for _, a := range n.node.Arcs {
-		if matchPattern(n, pattern, a.Label) {
+		if matchPattern(n.ctx, pattern, a.Label) {
 			// TODO: is it necessary to check for uniqueness here?
 			n.insertArc(a.Label, a.ArcType, c, true)
 		}
@@ -468,7 +468,7 @@ func isTotal(p Value) bool {
 // It first ensures that the fields contained in dst are allowed by the fields
 // and patterns defined in closed. It reports an error in the nodeContext if
 // this is not the case.
-func injectClosed(n *nodeContext, closed, dst *closeContext) {
+func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	// TODO: check that fields are not void arcs.
 outer:
 	for _, a := range dst.Arcs {
@@ -481,8 +481,8 @@ outer:
 				continue outer
 			}
 		}
-		if !matchPattern(n, closed.Expr, a.Label) {
-			n.notAllowedError(a)
+		if !matchPattern(ctx, closed.Expr, a.Label) {
+			ctx.notAllowedError(closed.src, a)
 			continue
 		}
 	}
@@ -513,22 +513,21 @@ func (ctx *OpContext) addPositions(c Conjunct) {
 
 // notAllowedError reports a field not allowed error in n and sets the value
 // for arc f to that error.
-func (n *nodeContext) notAllowedError(arc *Vertex) {
+func (ctx *OpContext) notAllowedError(v, arc *Vertex) {
 	// Set the error on the same arc as the old implementation
 	// and using the same path.
 	// arc := n.node.Lookup(f)
-	v := n.ctx.PushArc(arc)
+	defer ctx.PopArc(ctx.PushArc(arc))
 
-	defer n.ctx.ReleasePositions(n.ctx.MarkPositions())
+	defer ctx.ReleasePositions(ctx.MarkPositions())
 
-	x := arc // n.node
-	for _, c := range x.Conjuncts {
-		n.ctx.addPositions(c)
+	for _, c := range arc.Conjuncts {
+		ctx.addPositions(c)
 	}
 	// XXX(0.7): Find another way to get this provenance information. Not
 	// currently stored in new evaluator.
 	// for _, s := range x.Structs {
-	//  s.AddPositions(n.ctx)
+	//  s.AddPositions(ctx)
 	// }
 
 	if arc.ArcType == ArcPending {
@@ -537,14 +536,13 @@ func (n *nodeContext) notAllowedError(arc *Vertex) {
 	}
 	// TODO: setting arc instead of n.node eliminates subfields. This may be
 	// desirable or not, but it differs, at least from <=v0.6 behavior.
-	arc.SetValue(n.ctx, n.ctx.NewErrf("field not allowed"))
+	arc.SetValue(ctx, ctx.NewErrf("field not allowed"))
 
 	// TODO: remove? We are now setting it on both fields, which seems to be
 	// necessary for now. But we should remove this as it often results in
 	// a duplicate error.
-	n.node.SetValue(n.ctx, n.ctx.NewErrf("field not allowed"))
+	v.SetValue(ctx, ctx.NewErrf("field not allowed"))
 	arc.disallowedField = true // Is this necessary?
-	n.ctx.PopArc(v)
 
 	// TODO: create a special kind of error that gets the positions
 	// of the relevant locations upon request from the arc.

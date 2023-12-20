@@ -58,7 +58,7 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	mf, err := modload.Load(ctx, os.DirFS(modRoot), ".", reg)
+	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, "")
 	if err != nil {
 		return err
 	}

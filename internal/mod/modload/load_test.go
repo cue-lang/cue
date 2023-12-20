@@ -16,7 +16,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modregistry"
@@ -39,14 +38,16 @@ func TestLoad(t *testing.T) {
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))
 
+			cueVers, _ := fs.ReadFile(tfs, "cue-version")
+
 			var out strings.Builder
-			mf, err := Load(context.Background(), tfs, ".", reg)
+			mf, err := Tidy(context.Background(), tfs, ".", reg, strings.TrimSpace(string(cueVers)))
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
-				ctx := cuecontext.New()
-				v := ctx.Encode(mf)
-				fmt.Fprintln(&out, v)
+				data, err := mf.Format()
+				qt.Assert(t, qt.IsNil(err))
+				out.Write(data)
 			}
 			if diff := cmp.Diff(string(want), out.String()); diff != "" {
 				t.Log("actual result:\n", out.String())

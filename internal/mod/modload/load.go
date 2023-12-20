@@ -37,9 +37,11 @@ type loader struct {
 	registry      Registry
 }
 
-// Load evaluates all the requirements of the given main module, using the given
+// Tidy evaluates all the requirements of the given main module, using the given
 // registry to download requirements and returns a resolved and tidied module file.
-func Load(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfile.File, error) {
+// If there's no language version in the module file and cueVers is non-empty
+// it will be used to populate the language version field.
+func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers string) (*modfile.File, error) {
 	modFilePath := path.Join(modRoot, "cue.mod/module.cue")
 	data, err := fs.ReadFile(fsys, modFilePath)
 	if err != nil {
@@ -79,14 +81,19 @@ func Load(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) (*modfi
 	if err != nil {
 		return nil, fmt.Errorf("cannot tidy requirements: %v", err)
 	}
-	return modfileFromRequirements(mf, rs), nil
+	return modfileFromRequirements(mf, rs, cueVers), nil
 }
 
-func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements) *modfile.File {
+func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements, cueVers string) *modfile.File {
 	mf := &modfile.File{
 		Module:   old.Module,
 		Language: old.Language,
 		Deps:     make(map[string]*modfile.Dep),
+	}
+	if cueVers != "" && (mf.Language == nil || mf.Language.Version == "") {
+		mf.Language = &modfile.Language{
+			Version: cueVers,
+		}
 	}
 	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d569e9c5_4806ddd7",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 65,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2023-12-20T11:08:08Z",
+      "side": 1,
+      "message": "\"as impl\" ?",
+      "revId": "3c9f35151c37b7837287be507c3ae0b1336e5c4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

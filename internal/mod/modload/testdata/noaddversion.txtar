@@ -1,0 +1,13 @@
+# Test that a version is not added if present
+-- cue-version --
+v1.2.3
+-- want --
+module: "main.org@v0"
+language: {
+	version: "v1.0.3"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v1.0.3"
+-- main.cue --
+package main

@@ -1,13 +1,11 @@
 # This test checks we can have have an import with an implied major version
 # when there's an explicit default in the module file.
 -- want --
-{
-	module: "main.org@v0"
-	deps: {
-		"example.com@v0": {
-			v:       "v0.0.1"
-			default: true
-		}
+module: "main.org@v0"
+deps: {
+	"example.com@v0": {
+		v:       "v0.0.1"
+		default: true
 	}
 }
 -- cue.mod/module.cue --

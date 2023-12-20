@@ -2,10 +2,7 @@
 # the standard library but that doesn't exist.
 
 -- want --
-{
-	module: "main.org@v0"
-	deps: {}
-}
+module: "main.org@v0"
 -- cue.mod/module.cue --
 module: "main.org@v0"
 

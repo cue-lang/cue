@@ -2,21 +2,19 @@
 # and a module that's unused.
 
 -- want --
-{
-	module: "main.org@v0"
-	deps: {
-		"bar.com@v0": {
-			v: "v0.5.0"
-		}
-		"baz.org@v0": {
-			v: "v0.10.1"
-		}
-		"example.com@v0": {
-			v: "v0.0.1"
-		}
-		"foo.com/bar/hello@v0": {
-			v: "v0.2.3"
-		}
+module: "main.org@v0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.5.0"
+	}
+	"baz.org@v0": {
+		v: "v0.10.1"
+	}
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+	"foo.com/bar/hello@v0": {
+		v: "v0.2.3"
 	}
 }
 -- cue.mod/module.cue --

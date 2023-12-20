@@ -1,4 +1,4 @@
-# Publish a version for a simple CUE module via "cue mod upload"
+# Publish a version for a simple CUE module via "cue mod publish"
 # to an off-the-shelf OCI registry which requires authentication.
 # Then fetch that module as a dependency via cmd/cue.
 
@@ -15,7 +15,7 @@ cd publish
 # cue mod init ${MODVER}
 env-fill cue.mod/module.cue
 
-exec cue mod upload ${VERSION}
+exec cue mod publish ${VERSION}
 
 cd ../depend
 

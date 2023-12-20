@@ -59,7 +59,7 @@ conflictRangingOverSelf.x.age: conflicting values int and "age" (mismatched type
     ./in.cue:36:9
     ./in.cue:40:3
     ./in.cue:41:9
-circularFor.#list: invalid operand tail != null (found bool, want list or struct):
+circularFor.#list: cannot range over tail != null (found bool, want list or struct):
     ./in.cue:12:12
 intField: integer fields not supported:
     ./in.cue:27:4
@@ -77,7 +77,7 @@ Result:
   circularFor: (_|_){
     // [eval]
     #list: (_|_){
-      // [eval] circularFor.#list: invalid operand tail != null (found bool, want list or struct):
+      // [eval] circularFor.#list: cannot range over tail != null (found bool, want list or struct):
       //     ./in.cue:12:12
       tail: (null){ null }
     }

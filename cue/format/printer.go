@@ -45,6 +45,12 @@ type printer struct {
 	indent      int
 	spaceBefore bool
 
+	// TODO(mvdan): This is similar to nooverride but used only for comments,
+	// to ensure that we always print a newline after them.
+	// We should fix our logic with whiteSpace instead, but for now this ensures
+	// we don't break the syntax by omitting the newline after a comment.
+	printingComment bool
+
 	errs errors.Error
 }
 
@@ -230,6 +236,9 @@ func (p *printer) Print(v interface{}) {
 				case token.NewSection:
 					requested |= newsection
 				}
+				if p.printingComment {
+					requested |= newline
+				}
 				p.writeWhitespace(requested)
 				p.allowed = 0
 				p.requested = 0
@@ -246,6 +255,7 @@ func (p *printer) Print(v interface{}) {
 	p.writeWhitespace(p.allowed)
 	p.allowed = 0
 	p.requested = 0
+	p.printingComment = false
 	p.writeString(data, isLit)
 	p.allowed = nextWS
 	_ = impliedComma // TODO: delay comment printings

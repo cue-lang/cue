@@ -672,7 +672,7 @@ func runTask(t *task, mode runMode) {
 		t.node.addBottom(t.err) // TODO: replace with something more principled.
 
 		if t.id.cc != nil {
-			t.id.cc.decDependent(t.node, TASK, nil)
+			t.id.cc.decDependent(ctx, TASK, nil)
 		}
 		t.node.decrementCounts(t.completes)
 		t.completes = 0 // safety

@@ -103,9 +103,11 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 	ctx.Version = version
 	v.Finalize(ctx)
 
-	stats := ctx.Stats()
-	w := t.Writer("stats")
-	fmt.Fprintln(w, stats)
+	if version != internal.DevVersion {
+		stats := ctx.Stats()
+		w := t.Writer("stats")
+		fmt.Fprintln(w, stats)
+	}
 	// if n := stats.Leaks(); n > 0 {
 	// 	t.Skipf("%d leaks reported", n)
 	// }

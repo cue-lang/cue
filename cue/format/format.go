@@ -338,6 +338,7 @@ func (f *formatter) printComment(cg *ast.CommentGroup) {
 		f.Print(c.Slash)
 		f.Print(c)
 		if isEnd {
+			f.printingComment = true
 			f.Print(newline)
 			if cg.Doc {
 				f.Print(nooverride)

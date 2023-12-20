@@ -126,3 +126,16 @@ funcArg3: foo(
 )
 
 //	comment including		some tabs
+
+
+// issue #2567
+
+// TODO: note that the comment is moved inside the index expression,
+// which then breaks parsing due to https://cuelang.org/issue/2738.
+// foo: [
+// 	bar["baz"], //some comment
+// ]
+
+[
+	if true // inline comment
+	{}]

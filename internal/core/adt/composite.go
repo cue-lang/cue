@@ -196,11 +196,6 @@ type Vertex struct {
 	// or any other operation that relies on the set of arcs being constant.
 	LockArcs bool
 
-	// disallowedField means that this arc is not allowed according
-	// to the closedness rules. This is used to avoid duplicate error reporting.
-	// TODO: perhaps rename to notAllowedErrorEmitted.
-	disallowedField bool
-
 	// IsDynamic signifies whether this struct is computed as part of an
 	// expression and not part of the static evaluation tree.
 	// Used for cycle detection.

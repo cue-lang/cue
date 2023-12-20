@@ -361,7 +361,7 @@ func (n *nodeContext) insertArc1(f Feature, mode ArcType, c Conjunct, check bool
 		n.node.Arcs = append(n.node.Arcs, v)
 	}
 
-	if cc.isClosed && !v.disallowedField && !matchPattern(n.ctx, cc.Expr, f) {
+	if cc.isClosed && !matchPattern(n.ctx, cc.Expr, f) {
 		n.ctx.notAllowedError(n.node, n.node)
 	}
 
@@ -474,10 +474,6 @@ outer:
 	for _, a := range dst.Arcs {
 		for _, b := range closed.Arcs {
 			if a.Label == b.Label {
-				if b.disallowedField {
-					// Error was already reported.
-					break
-				}
 				continue outer
 			}
 		}
@@ -542,7 +538,6 @@ func (ctx *OpContext) notAllowedError(v, arc *Vertex) {
 	// necessary for now. But we should remove this as it often results in
 	// a duplicate error.
 	v.SetValue(ctx, ctx.NewErrf("field not allowed"))
-	arc.disallowedField = true // Is this necessary?
 
 	// TODO: create a special kind of error that gets the positions
 	// of the relevant locations upon request from the arc.

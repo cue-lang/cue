@@ -24,7 +24,7 @@ Conjuncts:    18
 Disjuncts:    21
 -- out/eval --
 Errors:
-k: invalid operand e (found int, want list or struct):
+k: cannot range over e (found int, want list or struct):
     ./in.cue:7:14
 
 Result:
@@ -43,7 +43,7 @@ Result:
   y: (struct){
   }
   k: (_|_){
-    // [eval] k: invalid operand e (found int, want list or struct):
+    // [eval] k: cannot range over e (found int, want list or struct):
     //     ./in.cue:7:14
   }
   e: (int){ int }

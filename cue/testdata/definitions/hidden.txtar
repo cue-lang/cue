@@ -104,7 +104,7 @@ diff old new
 -    ./in.cue:6:9
 -    ./in.cue:13:13
      ./in.cue:16:9
-
+ 
  Result:
 @@ -13,9 +11,6 @@
      }

@@ -1005,14 +1005,8 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *V
 
 	switch nv := v.(type) {
 	case nil:
-		switch orig.(type) {
-		case *ForClause:
-			c.addErrf(IncompleteError, pos(x),
-				"cannot range over %s (incomplete)", x)
-		default:
-			c.addErrf(IncompleteError, pos(x),
-				"%s undefined (%s is incomplete)", orig, x)
-		}
+		c.addErrf(IncompleteError, pos(x),
+			"%s undefined (%s is incomplete)", orig, x)
 		return emptyNode
 
 	case *Bottom:
@@ -1029,14 +1023,8 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state combinedFlags) *V
 
 	default:
 		if kind := v.Kind(); kind&StructKind != 0 {
-			switch orig.(type) {
-			case *ForClause:
-				c.addErrf(IncompleteError, pos(x),
-					"cannot range over %s (incomplete type %s)", x, kind)
-			default:
-				c.addErrf(IncompleteError, pos(x),
-					"%s undefined as %s is incomplete (type %s)", orig, x, kind)
-			}
+			c.addErrf(IncompleteError, pos(x),
+				"%s undefined as %s is incomplete (type %s)", orig, x, kind)
 			return emptyNode
 
 		} else if !ok {

@@ -259,9 +259,10 @@ func (ctx *OpContext) newInlineVertex(parent *Vertex, v BaseValue, a ...Conjunct
 
 // updateArcType updates v.ArcType if t is more restrictive.
 func (v *Vertex) updateArcType(t ArcType) {
-	if t < v.ArcType {
-		v.ArcType = t
+	if t >= v.ArcType {
+		return
 	}
+	v.ArcType = t
 }
 
 // isDefined indicates whether this arc is a "value" field, and not a constraint

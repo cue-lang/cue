@@ -249,9 +249,12 @@ type Vertex struct {
 func (v *Vertex) rootCloseContext() *closeContext {
 	if v.cc == nil {
 		v.cc = &closeContext{
-			parent: nil,
-			src:    v,
+			group:           &ConjunctGroup{},
+			parent:          nil,
+			src:             v,
+			parentConjuncts: v,
 		}
+		v.cc.incDependent(ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
 	return v.cc
 }

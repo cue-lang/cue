@@ -61,6 +61,7 @@ func (x *FieldTester) Run(sub ...declaration) {
 		s(x.cc)
 	}
 	x.cc.decDependent(x.n.ctx, TEST, nil)
+	x.cc.decDependent(x.n.ctx, ROOT, nil) // REF(decrement:nodeDone)
 }
 
 // Def represents fields that define a definition, such that
@@ -102,6 +103,13 @@ func (x *FieldTester) spawn(t closeNodeType, sub ...declaration) declaration {
 // For some #D: b: "bar".
 func (x *FieldTester) Embed(sub ...declaration) declaration {
 	return x.spawn(closeEmbed, sub...)
+}
+
+// Group represents fields and embeddings within a single set of curly braces.
+// This is used to test that an embedding of a closed value closes the struct
+// in which it is embedded.
+func (x *FieldTester) Group(sub ...declaration) declaration {
+	return x.spawn(0, sub...)
 }
 
 // EmbedDef represents fields that define a struct and embedded within the
@@ -151,7 +159,7 @@ func (x *FieldTester) field(label string, a any, dedup bool) declaration {
 		c.CloseInfo.FromDef = cc.isDef
 		c.CloseInfo.FromEmbed = cc.isEmbed
 
-		x.n.insertArc(f, ArcMember, c, dedup)
+		x.n.insertArc(f, ArcMember, c, c.CloseInfo, dedup)
 	}
 }
 

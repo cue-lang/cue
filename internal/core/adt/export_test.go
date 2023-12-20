@@ -60,7 +60,7 @@ func (x *FieldTester) Run(sub ...declaration) {
 	for _, s := range sub {
 		s(x.cc)
 	}
-	x.cc.decDependent(x.n, TEST, nil)
+	x.cc.decDependent(x.n.ctx, TEST, nil)
 }
 
 // Def represents fields that define a definition, such that
@@ -85,7 +85,7 @@ func (x *FieldTester) spawn(t closeNodeType, sub ...declaration) declaration {
 		for _, sfn := range sub {
 			sfn(dc)
 		}
-		dc.decDependent(x.n, SPAWN, cc)
+		dc.decDependent(x.n.ctx, SPAWN, cc)
 	}
 }
 

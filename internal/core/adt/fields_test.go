@@ -332,7 +332,61 @@ func TestCloseContext(t *testing.T) {
 	}, {
 		// The point of this test is to see if the "allow" expression nests
 		// properly.
-		name: "conjunctions in embedding",
+		name: "conjunctions in embedding 1",
+		run: func(x *adt.FieldTester) {
+			x.Run(
+				x.Def(
+					x.Embed(
+						x.Def(x.Pat(v(`=~"^[a-s]*$"`), v("3"))),
+						x.Def(x.Pat(v(`=~"^xxx$"`), v("4"))),
+					),
+					x.Pat(v(`=~"^b*$"`), v("4")),
+				),
+				x.Field("b", v("4")),
+			)
+		},
+		arcs: `b: {
+				4
+				[d]{
+					[e]{
+						[d]{3}
+					}
+					4
+				}
+			}`,
+		err: ``,
+		patterns: `
+			=~"^[a-s]*$": {3}
+			=~"^xxx$": {4}
+			=~"^b*$": {4}`, allowed: `|(=~"^b*$", &(=~"^[a-s]*$", =~"^xxx$"))`,
+	}, {
+		name: "conjunctions in embedding 2",
+		run: func(x *adt.FieldTester) {
+			x.Run(
+				x.Embed(
+					x.Field("b", v("4")),
+					x.Embed(
+						x.Def(x.Pat(v(`>"b"`), v("3"))),
+						x.Def(x.Pat(v(`<"h"`), v("4"))),
+					),
+				),
+			)
+		},
+		arcs: `b: {
+				[e]{
+					4
+					[e]{
+						[d]{4}
+					}
+				}
+			}`,
+
+		err: ``,
+		patterns: `
+			>"b": {3}
+			<"h": {4}`,
+	}, {
+		name: "conjunctions in embedding 3",
 		run: func(x *adt.FieldTester) {
 			x.Run(
 				x.Embed(
@@ -477,9 +531,38 @@ func TestCloseContext(t *testing.T) {
 			}
 			a: {1}`,
 		err: `a: field not allowed`,
+	}, {
+		// This test is for debugging and can be changed.
+		name: "X",
+		run: func(x *adt.FieldTester) {
+			x.Run(
+				x.Field("b", "foo"),
+				x.Embed(
+					x.Def(x.Pat(v(`>"b"`), v("3"))),
+					x.Def(x.Pat(v(`<"h"`), v("4"))),
+				),
+			)
+		},
+		// TODO: could probably be b: {"foo" 4}. See TODO(constraintNode).
+		arcs: `b: {
+				"foo"
+				[e]{
+					[d]{4}
+				}
+			}`,
+		err: ``,
+		patterns: `
+			>"b": {3}
+			<"h": {4}`,
+		allowed: `&(>"b", <"h")`,
 	}}
 
 	cuetest.Run(t, cases, func(t *cuetest.T, tc *testCase) {
+		// Uncomment to debug isolated test X.
+		// adt.Debug = true
+		// adt.Verbosity = 2
+		// t.Select("X")
+
 		x := adt.NewFieldTester(r)
 		tc.run(x)
 
@@ -514,7 +597,14 @@ func writeArcs(x adt.Runtime, v *adt.Vertex) string {
 			fmt.Fprint(b, "\n", strings.Repeat(indentString, initialIndent))
 		}
 		fmt.Fprintf(b, "%s: ", a.Label.RawString(x))
-		vertexString(x, b, a, initialIndent)
+
+		// TODO(perf): optimize this so that a single-element conjunct does
+		// not need a group.
+		if len(a.Conjuncts) != 1 {
+			panic("unexpected conjunct length")
+		}
+		g := a.Conjuncts[0].Elem().(*adt.ConjunctGroup)
+		vertexString(x, b, *g, initialIndent)
 	}
 	return b.String()
 }
@@ -527,23 +617,32 @@ func writePatterns(x adt.Runtime, pairs []adt.PatternConstraint) string {
 		}
 		b.WriteString(pExpr(x, pc.Pattern))
 		b.WriteString(": ")
-		vertexString(x, b, pc.Constraint, initialIndent)
+		vertexString(x, b, pc.Constraint.Conjuncts, initialIndent)
 	}
 	return b.String()
 }
 
-func vertexString(x adt.Runtime, b *strings.Builder, v *adt.Vertex, indent int) {
-	hasVertex := false
-	for _, c := range v.Conjuncts {
-		if _, ok := c.Expr().(*adt.Vertex); ok {
-			hasVertex = true
+func hasVertex(a []adt.Conjunct) bool {
+	for _, c := range a {
+		switch c.Elem().(type) {
+		case *adt.ConjunctGroup:
+			return true
+		case *adt.Vertex:
+			return true
 		}
 	}
+	return false
+}
+
+func vertexString(x adt.Runtime, b *strings.Builder, a []adt.Conjunct, indent int) {
+	hasVertex := hasVertex(a)
 
 	b.WriteString("{")
-	for i, c := range v.Conjuncts {
-		if g, ok := c.Expr().(*adt.Vertex); ok {
-			doIndent(b, indent+1)
+	for i, c := range a {
+		if g, ok := c.Elem().(*adt.ConjunctGroup); ok {
+			if hasVertex {
+				doIndent(b, indent+1)
+			}
 			b.WriteString("[")
 			if c.CloseInfo.FromEmbed {
 				b.WriteString("e")
@@ -552,7 +651,7 @@ func vertexString(x adt.Runtime, b *strings.Builder, v *adt.Vertex, indent int) 
 				b.WriteString("d")
 			}
 			b.WriteString("]")
-			vertexString(x, b, g, indent+1)
+			vertexString(x, b, *g, indent+1)
 		} else {
 			if hasVertex {
 				doIndent(b, indent+1)

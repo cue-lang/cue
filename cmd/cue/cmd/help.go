@@ -73,6 +73,7 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 func newHelpTopics(c *Command) []*cobra.Command {
 	return []*cobra.Command{
 		inputsHelp,
+		environmentHelp,
 		flagsHelp,
 		filetypeHelp,
 		injectHelp,
@@ -143,6 +144,59 @@ $ cue export ./pkg -d Foo foo.yaml
 
 # Unify data.json with schema.json.
 $ cue export data.json schema: schema.json
+`,
+}
+
+var environmentHelp = &cobra.Command{
+	Use:   "environment",
+	Short: "environment variables",
+	Long: `The cue command consults environment variables for configuration.
+If an environment variable is unset or empty, it uses a sensible default
+setting.
+
+	CUE_REGISTRY
+		A comma-separated list specifying which registry to use
+		for downloading and publishing modules. A registry is
+		specifed as follows:
+			[modulePrefix=]hostname[:port][/repoPrefix][+insecure]
+		The optional modulePrefix specifes that all modules with
+		the given prefix wil use the associated registry. If there
+		are several specified, the longest matching prefix wins.
+
+		The hostname holds the OCI registry host (in square
+		brackets it's an IPv6 address).  The repoPrefix holds
+		a prefix to use in front of all repositories in the
+		registry.  If there's a "+insecure" suffix, it specifies
+		that an insecure HTTP connection should be used to this
+		registry; otherwise the default is secure except for
+		localhost addresses.
+
+		For example, given:
+			CUE_REGISTRY=central.cue-registry.com,github.com/acmecorp=myregistry.org:6000/modules
+		the module named github.com/foo/bar will be fetched
+		from central.cue-registry.com, where a module named
+		github.com/acmecorp/somemodule will be fetched from the
+		modules/github.com/acmecorp/somemodule repository in
+		the host myregistry.org at port 6000.
+
+		Requires that CUE_EXPERIMENT=modules is enabled.
+
+	CUE_MODCACHE
+		The directory where the cue command will store downloaded
+		modules.]
+
+		Requires that CUE_EXPERIMENT=modules is enabled.
+
+	CUE_EXPERIMENT
+		Comma-separated list of experiments to
+		enable or disable.  The list of available
+		experiments may change arbitrarily over time.
+		See cuelang.org/go/internal/cueexperiment/exp.go for
+		currently value values.
+
+		Warning: This variable is provided for the development
+		and testing of the cue commands itself. Use beyond that
+		purpose is unsupported.
 `,
 }
 

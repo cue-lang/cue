@@ -12,12 +12,21 @@ self: {
 
 	// This is an incomplete error, as it may succeed when the user
 	// explicitly specifies a value for a.b.
-	isConcreteFail: {
+	isConcreteFail: t1:{
 		a: {
 			if a.b == _|_ {
 				b: 1
 			}
 			b: int
+		}
+	}
+
+	isConcreteFail: t2:{
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+			b?: int
 		}
 	}
 
@@ -27,7 +36,7 @@ self: {
 	//     if isconcrete(a.b)  -->> cyclic error evaluating isconcrete.
 	//     if isdefined(a.b)   -->> evaluate to true as a.b is int, result is 1
 	//     if !isdefined(a.b)  -->> evaluate to false, a.b remains int
-	isNotConcrete: {
+	isNotConcrete: t1: {
 		a: {
 			if a.b != _|_ {
 				b: 1
@@ -35,6 +44,15 @@ self: {
 			b: int
 		}
 	}
+	isNotConcrete: t2: {
+		a: {
+			if a.b != _|_ {
+				b: 1
+			}
+			b?: int
+		}
+	}
+
 }
 
 -- mutual.cue --
@@ -264,14 +282,14 @@ nestedChain: {
 }
 -- out/eval/stats --
 Leaks:  1
-Freed:  150
-Reused: 141
+Freed:  158
+Reused: 149
 Allocs: 10
 Retain: 73
 
-Unifications: 151
-Conjuncts:    158
-Disjuncts:    202
+Unifications: 159
+Conjuncts:    169
+Disjuncts:    210
 -- out/eval --
 (struct){
   self: (struct){
@@ -282,18 +300,34 @@ Disjuncts:    202
       }
     }
     isConcreteFail: (struct){
-      a: (_|_){
-        // [cycle] cycle error
-        b: (_|_){
+      t1: (struct){
+        a: (_|_){
           // [cycle] cycle error
+          b: (_|_){
+            // [cycle] cycle error
+          }
+        }
+      }
+      t2: (struct){
+        a: (_|_){
+          // [cycle] self.isConcreteFail.t2.a: circular dependency in evaluation of conditionals: a.b changed after evaluation:
+          //     ./in.cue:25:7
+          b: (int){ 1 }
         }
       }
     }
     isNotConcrete: (struct){
-      a: (_|_){
-        // [cycle] cycle error
-        b: (_|_){
+      t1: (struct){
+        a: (_|_){
           // [cycle] cycle error
+          b: (_|_){
+            // [cycle] cycle error
+          }
+        }
+      }
+      t2: (struct){
+        a: (struct){
+          b?: (int){ int }
         }
       }
     }
@@ -541,19 +575,43 @@ Disjuncts:    202
       }
     }
     isConcreteFail: {
-      a: {
-        if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
-          b: 1
+      t1: {
+        a: {
+          if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b: int
         }
-        b: int
+      }
+    }
+    isConcreteFail: {
+      t2: {
+        a: {
+          if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b?: int
+        }
       }
     }
     isNotConcrete: {
-      a: {
-        if (〈1;a〉.b != _|_(explicit error (_|_ literal) in source)) {
-          b: 1
+      t1: {
+        a: {
+          if (〈1;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b: int
         }
-        b: int
+      }
+    }
+    isNotConcrete: {
+      t2: {
+        a: {
+          if (〈1;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+            b: 1
+          }
+          b?: int
+        }
       }
     }
   }

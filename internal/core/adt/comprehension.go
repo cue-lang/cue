@@ -321,6 +321,8 @@ func (s *compState) yield(env *Environment) (ok bool) {
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
 func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
+	unreachableForDev(n.ctx)
+
 	workRemaining := false
 
 	// We use variables, instead of range, as the list may grow dynamically.
@@ -371,6 +373,8 @@ func (n *nodeContext) injectComprehensions(state vertexStatus) (progress bool) {
 // as iterating over the node in which they are defined. Such comprehensions
 // are legal as long as they do not modify the arc set of the node.
 func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	// We use variables, instead of range, as the list may grow dynamically.
 	for i := 0; i < len(n.selfComprehensions); i++ {
 		n.processComprehension(&n.selfComprehensions[i], state)

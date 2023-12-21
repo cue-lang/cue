@@ -48,6 +48,44 @@ Retain: 4
 Unifications: 10
 Conjuncts:    18
 Disjuncts:    12
+-- out/evalalpha --
+(struct){
+  #a: (_|_){
+    // [incomplete] #a: incomplete bool: bool:
+    //     ./in.cue:5:5
+    b: (bool){ bool }
+  }
+  x: (#struct){
+    b: (bool){ true }
+    c: (int){ 4 }
+  }
+  y: (#struct){
+    b: (bool){ true }
+    c: (int){ 4 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -5,11 +5,11 @@
+     b: (bool){ bool }
+   }
+   x: (#struct){
+-    c: (int){ 4 }
+-    b: (bool){ true }
++    b: (bool){ true }
++    c: (int){ 4 }
+   }
+   y: (#struct){
+-    c: (int){ 4 }
+-    b: (bool){ true }
++    b: (bool){ true }
++    c: (int){ 4 }
+   }
+ }
+-- todo/diff/p3 --
+Reordering
 -- out/eval --
 (struct){
   #a: (_|_){

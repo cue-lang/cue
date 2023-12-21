@@ -35,6 +35,56 @@ Retain: 1
 Unifications: 16
 Conjuncts:    32
 Disjuncts:    17
+-- out/evalalpha --
+(struct){
+  #A: (#struct){
+    a: (int){ int }
+    b: (int){ int }
+  }
+  Common: (struct){
+    a: (int){ int }
+    b: (int){ int }
+  }
+  x: (#struct){
+    c: (int){ int }
+    a: (int){ int }
+    b: (int){ int }
+  }
+  #B: (#struct){
+    a: (int){ int }
+  }
+  y: (#struct){
+    c: (int){ int }
+    a: (int){ int }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -8,15 +8,15 @@
+     b: (int){ int }
+   }
+   x: (#struct){
+-    a: (int){ int }
+-    b: (int){ int }
+-    c: (int){ int }
++    c: (int){ int }
++    a: (int){ int }
++    b: (int){ int }
+   }
+   #B: (#struct){
+     a: (int){ int }
+   }
+   y: (#struct){
+-    a: (int){ int }
+-    c: (int){ int }
++    c: (int){ int }
++    a: (int){ int }
+   }
+ }
+-- diff/explanation --
+Reordering
 -- out/eval --
 (struct){
   #A: (#struct){

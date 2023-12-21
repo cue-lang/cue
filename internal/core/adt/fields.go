@@ -210,6 +210,14 @@ type closeContext struct {
 	// done is true if all dependencies have been decremented.
 	done bool
 
+	// isDecremented is used to keep track of whether the evaluator decremented
+	// a closedContext for the ROOT depKind.
+	isDecremented bool
+
+	// notifyDone indicates that all notifications have been sent and that it
+	// is an error to send more.
+	notifyDone bool
+
 	// needsCloseInSchedule is non-nil if a closeContext that was created
 	// as an arc still needs to be decremented. It points to the creating arc
 	// for reporting purposes.
@@ -495,8 +503,12 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 
 	for _, a := range c.arcs {
 		cc := a.cc
+		if c.notifyDone && a.kind == NOTIFY {
+			continue
+		}
 		cc.decDependent(ctx, a.kind, c) // REF(arcs)
 	}
+	c.notifyDone = true
 
 	c.finalizePattern()
 
@@ -596,7 +608,24 @@ func (cc *closeContext) insertConjunct(key *closeContext, c Conjunct, id CloseIn
 		panic("inconsistent src")
 	}
 
-	return added
+	if !added {
+		return false
+	}
+
+	if n := key.src.state; n != nil {
+		c.CloseInfo.cc = nil
+		id.cc = arc
+		n.scheduleConjunct(c, id)
+
+		for _, rec := range n.notify {
+			if n.node.ArcType == ArcPending {
+				panic("unexpected pending arc")
+			}
+			cc.insertConjunct(rec.cc, c, id, check)
+		}
+	}
+
+	return true
 }
 
 // insertArc inserts conjunct c into n. If check is true it will not add c if it

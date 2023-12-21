@@ -319,7 +319,7 @@ func TestCloseContext(t *testing.T) {
 			}
 			c: {
 				"bar"
-				[e]{
+				[ed]{
 					[d]{1}
 					[d]{2}
 				}
@@ -348,7 +348,7 @@ func TestCloseContext(t *testing.T) {
 		}, arcs: `b: {
 				4
 				[d]{
-					[e]{
+					[ed]{
 						[d]{3}
 					}
 					4
@@ -375,7 +375,7 @@ func TestCloseContext(t *testing.T) {
 		}, arcs: `b: {
 				[e]{
 					4
-					[e]{
+					[ed]{
 						[d]{4}
 					}
 				}
@@ -431,17 +431,17 @@ func TestCloseContext(t *testing.T) {
 							[d]{2}
 							3
 						}
-						[e]{
+						[ed]{
 							[d]{4}
 						}
 						5
 					}
 					[d]{
-						[e]{
+						[ed]{
 							[d]{7}
 							8
 						}
-						[e]{
+						[ed]{
 							[d]{10}
 						}
 						11
@@ -453,23 +453,23 @@ func TestCloseContext(t *testing.T) {
 				[e]{
 					[d]{
 						"bar"
-						[e]{
+						[ed]{
 							[d]{1}
 							[d]{2}
 							3
 						}
-						[e]{
+						[ed]{
 							[d]{3}
 							[d]{4}
 						}
 						5
 					}
 					[d]{
-						[e]{
+						[ed]{
 							[d]{7}
 							8
 						}
-						[e]{
+						[ed]{
 							[d]{10}
 						}
 						"bar"
@@ -531,6 +531,53 @@ func TestCloseContext(t *testing.T) {
 			}
 			a: {1}`,
 		err: `a: field not allowed`,
+	}, {
+		// a: {#A}
+		// a: c: 1
+		// #A: b: 1
+		name: "def embed",
+		run: func(x *adt.FieldTester) {
+			x.Run(
+				x.Group(x.EmbedDef(x.Field("b", "foo"))),
+				x.Field("c", "bar"),
+			)
+		},
+		arcs: `
+			b: {
+				[]{
+					[e]{
+						[d]{"foo"}
+					}
+				}
+			}
+			c: {"bar"}`,
+		err: `c: field not allowed`,
+	}, {
+		// a: {#A}
+		// a: c: 1
+		// #A: b: 1
+		name: "def embed",
+		run: func(x *adt.FieldTester) {
+			x.Run(
+				x.Group(x.EmbedDef(x.Field("b", "foo")),
+					x.Field("c", "foo"),
+				),
+				x.Field("d", "bar"),
+			)
+		},
+		arcs: `
+			b: {
+				[]{
+					[e]{
+						[d]{"foo"}
+					}
+				}
+			}
+			c: {
+				[d]{"foo"}
+			}
+			d: {"bar"}`,
+		err: `d: field not allowed`,
 	}}
 
 	cuetest.Run(t, cases, func(t *cuetest.T, tc *testCase) {

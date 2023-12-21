@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "267f6888_be3559d5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-21T10:05:04Z",
+      "side": 1,
+      "message": "Agreed.",
+      "parentUuid": "4a49a781_0484cd54",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "6c542067_64d27510",
@@ -31,6 +49,57 @@
       "writtenOn": "2023-12-21T09:59:57Z",
       "side": 1,
       "message": "Thank you, and welcome to Gerrit :)",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba9c5035_88701c21",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-21T10:05:04Z",
+      "side": 1,
+      "message": "LGTM with a couple of suggestions, but I will leave to @mvdan@mvdan.cc for the final verdict!",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "292dcbc3_280c74b0",
+        "filename": "pkg/net/ip.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-21T10:05:04Z",
+      "side": 1,
+      "message": "What is `s` a reference to here?",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9953afe_dc035f48",
+        "filename": "pkg/net/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2023-12-21T10:05:04Z",
+      "side": 1,
+      "message": "Nit: I would comment which of these are expected to pass/fail. I realise that pattern is not followed above, but that\u0027s not by itself a reason not to start now.",
       "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

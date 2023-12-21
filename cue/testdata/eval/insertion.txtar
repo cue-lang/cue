@@ -77,7 +77,7 @@ recursive: t1: {
 		c: d: e: g: 1
 }
 
-recursive: t1: {
+recursive: t2: {
 	c
 	c: c: g: 1
 }
@@ -102,14 +102,14 @@ embeddedFunctionalExpr: {
 }
 -- out/eval/stats --
 Leaks:  8
-Freed:  65
-Reused: 60
+Freed:  59
+Reused: 54
 Allocs: 13
 Retain: 24
 
-Unifications: 73
-Conjuncts:    176
-Disjuncts:    79
+Unifications: 67
+Conjuncts:    163
+Disjuncts:    73
 -- out/eval --
 (struct){
   embeddingDirect: (struct){
@@ -186,23 +186,14 @@ Disjuncts:    79
             }
           }
         }
+      }
+    }
+    t2: (struct){
+      c: (struct){
         c: (struct){
           g: (int){ 1 }
         }
         g: (int){ 1 }
-      }
-      d: (struct){
-        e: (struct){
-          f: (int){ 1 }
-          g: (int){ 1 }
-        }
-        c: (struct){
-          d: (struct){
-            e: (struct){
-              g: (int){ 1 }
-            }
-          }
-        }
       }
       g: (int){ 1 }
     }
@@ -319,7 +310,7 @@ Disjuncts:    79
     }
   }
   recursive: {
-    t1: {
+    t2: {
       〈0;c〉
       c: {
         c: {

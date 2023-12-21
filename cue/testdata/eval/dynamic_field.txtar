@@ -80,6 +80,152 @@ Retain: 11
 Unifications: 61
 Conjuncts:    77
 Disjuncts:    66
+-- out/evalalpha --
+Errors:
+invalid interpolation: conflicting values 2 and 1:
+    ./in.cue:12:28
+    ./in.cue:12:31
+    ./in.cue:12:35
+
+Result:
+(_|_){
+  // [eval]
+  constraints: (struct){
+    t1: (string){ "foo" }
+    t2: (string){ "bar" }
+    foo?: (struct){
+      bar!: (int){ 3 }
+    }
+  }
+  a: (string){ "foo" }
+  e: (int){ 2 }
+  b: (string){ "bar" }
+  c: (struct){
+    a: (int){ 1 }
+  }
+  withError: (_|_){
+    // [eval]
+    issue799: (_|_){
+      // [eval] invalid interpolation: conflicting values 2 and 1:
+      //     ./in.cue:12:28
+      //     ./in.cue:12:31
+      //     ./in.cue:12:35
+      key: (int){ &(>=-2147483648, <=2147483647, int) }
+    }
+  }
+  parenExprRefParent: (struct){
+    a: (struct){
+      foo: (struct){
+      }
+    }
+    x: (string){ "foo" }
+  }
+  parenExprRefEqual: (struct){
+    x: (string){ "foo" }
+    foo: (struct){
+    }
+  }
+  chainedResolution: (struct){
+    p1: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p2: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p3: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p4: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p5: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+    p6: (struct){
+      baz: (string){ "foo" }
+      foo: (string){ "bar" }
+      bar: (string){ "baz" }
+    }
+  }
+  noCycleError: (struct){
+    foo: (struct){
+      bar: (struct){
+        entries: (_|_){
+          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+          //     ./in.cue:59:8
+          //     ./in.cue:59:11
+          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string) (and 1 more errors)):
+          //     ./in.cue:61:22
+        }
+        #ID: (_|_){
+          // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
+          //     ./in.cue:59:8
+          //     ./in.cue:59:11
+        }
+      }
+      baz: (struct){
+        #ID: (_|_){
+          // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+          //     ./in.cue:59:8
+          //     ./in.cue:59:11
+        }
+      }
+    }
+  }
+  bar: (struct){
+    a: (int){ 1 }
+  }
+  foo: (struct){
+    b: (struct){
+      c: (struct){
+        d: (int){ 2 }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -81,6 +81,8 @@
+           // [incomplete] noCycleError.foo.baz.#ID: invalid interpolation: non-concrete value string (type string):
+           //     ./in.cue:59:8
+           //     ./in.cue:59:11
++          // noCycleError.foo.bar.entries: key value of dynamic field must be concrete, found _|_(invalid interpolation: noCycleError.foo.baz.#ID: non-concrete value string (type string) (and 1 more errors)):
++          //     ./in.cue:61:22
+         }
+         #ID: (_|_){
+           // [incomplete] noCycleError.foo.bar.#ID: invalid interpolation: non-concrete value string (type string):
+@@ -97,6 +99,9 @@
+       }
+     }
+   }
++  bar: (struct){
++    a: (int){ 1 }
++  }
+   foo: (struct){
+     b: (struct){
+       c: (struct){
+@@ -104,7 +109,4 @@
+       }
+     }
+   }
+-  bar: (struct){
+-    a: (int){ 1 }
+-  }
+ }
+-- diff/todo/p2 --
+Added near-duplicate message
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:

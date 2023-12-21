@@ -159,6 +159,14 @@ type closeContext struct {
 
 	dependencies []*ccDep // For testing only. See debug.go
 
+	// externalDeps lists the closeContexts associated with a root node for
+	// which there are outstanding decrements (can only be NOTIFY or ARC). This
+	// is used to break counter cycles, if necessary.
+	//
+	// This is only used for root closedContext and only for debugging.
+	// TODO: move to nodeContext.
+	externalDeps []ccArcRef
+
 	// child links to a sequence which additional patterns need to be verified
 	// against (&&). If there are more than one, these additional nodes are
 	// linked with next. Only closed nodes with patterns are added. Arc sets are
@@ -210,6 +218,10 @@ type closeContext struct {
 	// done is true if all dependencies have been decremented.
 	done bool
 
+	// isDecremented is used to keep track of whether the evaluator decremented
+	// a closedContext for the ROOT depKind.
+	isDecremented bool
+
 	// needsCloseInSchedule is non-nil if a closeContext that was created
 	// as an arc still needs to be decremented. It points to the creating arc
 	// for reporting purposes.
@@ -251,9 +263,20 @@ func (c *closeContext) Label() Feature {
 }
 
 type ccArc struct {
-	kind depKind
-	key  *closeContext
-	cc   *closeContext
+	kind        depKind
+	decremented bool
+	key         *closeContext
+	cc          *closeContext
+}
+
+// A ccArcRef x refers to the x.src.arcs[x.index].
+// We use this instead of pointers, because the address may change when
+// growing a slice. We use this instead mechanism instead of a pointers so
+// that we do not need to maintain separate free buffers once we use pools of
+// closeContext.
+type ccArcRef struct {
+	src   *closeContext
+	index int
 }
 
 type conjunctGrouper interface {
@@ -344,7 +367,10 @@ func (cc *closeContext) getKeyedCC(key *closeContext, c CycleInfo, checkClosed b
 
 	// A let field never depends on its parent. So it is okay to filter here.
 	if !arc.Label().IsLet() {
-		cc.addDependency(ARC, key, arc)
+		// prevent a dependency on self.
+		if key.src != cc.src {
+			cc.addDependency(ARC, key, arc, key)
+		}
 	}
 
 	v := key.src
@@ -355,14 +381,15 @@ func (cc *closeContext) getKeyedCC(key *closeContext, c CycleInfo, checkClosed b
 	return arc
 }
 
-func (cc *closeContext) linkNotify(key *closeContext, c CycleInfo) {
+func (cc *closeContext) linkNotify(dst *Vertex, key *closeContext, c CycleInfo) bool {
 	for _, a := range cc.arcs {
 		if a.key == key {
-			return
+			return false
 		}
 	}
 
-	cc.addDependency(NOTIFY, key, key)
+	cc.addDependency(NOTIFY, key, key, dst.cc)
+	return true
 }
 
 func (cc *closeContext) assignConjunct(root *closeContext, c Conjunct, check, checkClosed bool) (arc *closeContext, pos int, added bool) {
@@ -415,7 +442,7 @@ func (c CloseInfo) spawnCloseContext(t closeNodeType) (CloseInfo, *closeContext)
 }
 
 // addDependency adds a dependent arc to c. If child is an arc, child.src == key
-func (c *closeContext) addDependency(kind depKind, key, child *closeContext) {
+func (c *closeContext) addDependency(kind depKind, key, child, root *closeContext) {
 	// NOTE: do not increment
 	// - either root closeContext or otherwise resulting from sub closeContext
 	//   all conjuncts will be added now, notified, or scheduled as task.
@@ -433,8 +460,18 @@ func (c *closeContext) addDependency(kind depKind, key, child *closeContext) {
 	// if child.src.Parent != c.src {
 	// 	panic("addArc: inconsistent parent")
 	// }
-
-	c.arcs = append(c.arcs, ccArc{kind: kind, key: key, cc: child})
+	if child.src.cc != root.src.cc {
+		panic("addArc: inconsistent root")
+	}
+	c.arcs = append(c.arcs, ccArc{
+		kind: kind,
+		key:  key,
+		cc:   child,
+	})
+	root.externalDeps = append(root.externalDeps, ccArcRef{
+		src:   c,
+		index: len(c.arcs) - 1,
+	})
 }
 
 // incDependent needs to be called for any conjunct or child closeContext
@@ -493,8 +530,12 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		}
 	}
 
-	for _, a := range c.arcs {
+	for i, a := range c.arcs {
 		cc := a.cc
+		if a.decremented {
+			continue
+		}
+		c.arcs[i].decremented = true
 		cc.decDependent(ctx, a.kind, c) // REF(arcs)
 	}
 
@@ -596,7 +637,24 @@ func (cc *closeContext) insertConjunct(key *closeContext, c Conjunct, id CloseIn
 		panic("inconsistent src")
 	}
 
-	return added
+	if !added {
+		return false
+	}
+
+	if n := key.src.state; n != nil {
+		c.CloseInfo.cc = nil
+		id.cc = arc
+		n.scheduleConjunct(c, id)
+
+		for _, rec := range n.notify {
+			if n.node.ArcType == ArcPending {
+				panic("unexpected pending arc")
+			}
+			cc.insertConjunct(rec.cc, c, id, check, checkClosed)
+		}
+	}
+
+	return true
 }
 
 // insertArc inserts conjunct c into n. If check is true it will not add c if it

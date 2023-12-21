@@ -40,6 +40,134 @@ Retain: 2
 Unifications: 30
 Conjuncts:    40
 Disjuncts:    31
+-- out/evalalpha --
+Errors:
+e._name.c: field not allowed:
+    ./in.cue:16:9
+
+Result:
+(_|_){
+  // [eval]
+  #def: (#struct){
+    _name(:foo): (#struct){
+      d: (int){ int }
+    }
+  }
+  d: (#struct){
+    _name(:foo): (#struct){
+      d: (int){ int }
+    }
+    _val(:foo): (#struct){
+      f: (int){ 4 }
+    }
+    _val(mod.test/pkg): (#struct){
+      f: (int){ 3 }
+    }
+  }
+  e: (_|_){
+    // [eval]
+    _name(:foo): (_|_){
+      // [eval]
+      c: (_|_){
+        // [eval] e._name.c: field not allowed:
+        //     ./in.cue:16:9
+      }
+      d: (int){ int }
+    }
+    _val(:foo): (#struct){
+      g: (int){ int }
+    }
+    _val(mod.test/pkg): (#struct){
+      f: (int){ 3 }
+    }
+  }
+  f: (#struct){
+    _val(:foo): (#struct){
+      f: (int){ 4 }
+    }
+    _val(mod.test/pkg): (#struct){
+      f: (int){ 3 }
+    }
+  }
+  g: (struct){
+    f: (int){ 4 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,5 @@
+ Errors:
+ e._name.c: field not allowed:
+-    ./in.cue:6:9
+-    ./in.cue:13:13
+     ./in.cue:16:9
+ 
+ Result:
+@@ -13,41 +11,39 @@
+     }
+   }
+   d: (#struct){
+-    _val(mod.test/pkg): (#struct){
+-      f: (int){ 3 }
+-    }
+-    _name(:foo): (struct){
+-      d: (int){ int }
+-    }
+-    _val(:foo): (struct){
+-      f: (int){ 4 }
++    _name(:foo): (#struct){
++      d: (int){ int }
++    }
++    _val(:foo): (#struct){
++      f: (int){ 4 }
++    }
++    _val(mod.test/pkg): (#struct){
++      f: (int){ 3 }
+     }
+   }
+   e: (_|_){
+     // [eval]
+-    _val(mod.test/pkg): (#struct){
+-      f: (int){ 3 }
+-    }
+     _name(:foo): (_|_){
+       // [eval]
+-      d: (int){ int }
+       c: (_|_){
+         // [eval] e._name.c: field not allowed:
+-        //     ./in.cue:6:9
+-        //     ./in.cue:13:13
+         //     ./in.cue:16:9
+       }
+-    }
+-    _val(:foo): (struct){
++      d: (int){ int }
++    }
++    _val(:foo): (#struct){
+       g: (int){ int }
+     }
++    _val(mod.test/pkg): (#struct){
++      f: (int){ 3 }
++    }
+   }
+   f: (#struct){
+-    _val(mod.test/pkg): (#struct){
+-      f: (int){ 3 }
+-    }
+-    _val(:foo): (struct){
+-      f: (int){ 4 }
++    _val(:foo): (#struct){
++      f: (int){ 4 }
++    }
++    _val(mod.test/pkg): (#struct){
++      f: (int){ 3 }
+     }
+   }
+   g: (struct){
+-- diff/todo/p2 --
+Reordering / missing positions.
 -- out/eval --
 Errors:
 e._name.c: field not allowed:

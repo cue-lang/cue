@@ -156,8 +156,10 @@ func (n *nodeContext) insertComprehension(
 
 	x := c.Value
 
-	ci = ci.SpawnEmbed(c)
-	ci.closeInfo.span |= ComprehensionSpan
+	if !n.ctx.isDevVersion() {
+		ci = ci.SpawnEmbed(c)
+		ci.closeInfo.span |= ComprehensionSpan
+	}
 
 	var decls []Decl
 	switch v := ToExpr(x).(type) {
@@ -184,7 +186,6 @@ func (n *nodeContext) insertComprehension(
 				conjunct := MakeConjunct(env, c, ci)
 				n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				fields = append(fields, f)
-				// TODO: adjust ci to embed?
 
 			case *LetField:
 				// TODO: consider merging this case with the LetField case.
@@ -251,13 +252,20 @@ func (n *nodeContext) insertComprehension(
 		}
 	}
 
-	n.comprehensions = append(n.comprehensions, envYield{
-		envComprehension: ec,
-		leaf:             c,
-		env:              env,
-		id:               ci,
-		expr:             x,
-	})
+	if n.ctx.isDevVersion() {
+		completes := valueKnown | allTasksCompleted | fieldConjunctsKnown
+		t := n.scheduleTask(processComprehension, env, x, ci, completes, 0)
+		t.comp = ec
+		t.leaf = c
+	} else {
+		n.comprehensions = append(n.comprehensions, envYield{
+			envComprehension: ec,
+			leaf:             c,
+			env:              env,
+			id:               ci,
+			expr:             x,
+		})
+	}
 }
 
 type compState struct {
@@ -452,7 +460,12 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 		}
 
 		env = linkChildren(env, d.leaf)
-		n.addExprConjunct(Conjunct{env, d.expr, id}, state)
+
+		if ctx.isDevVersion() {
+			n.scheduleConjunct(Conjunct{env, d.expr, id}, id)
+		} else {
+			n.addExprConjunct(Conjunct{env, d.expr, id}, state)
+		}
 	}
 
 	return nil

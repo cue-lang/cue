@@ -254,6 +254,12 @@ func newRequiredFieldInComprehensionError(ctx *OpContext, x *ForClause, v *Verte
 	}
 }
 
+func (v *Vertex) reportFieldIndexError(c *OpContext, pos token.Pos, f Feature) {
+	v.reportFieldError(c, pos, f,
+		"index out of range [%d] with length %d",
+		"undefined field: %s")
+}
+
 func (v *Vertex) reportFieldCycleError(c *OpContext, pos token.Pos, f Feature) *Bottom {
 	const msg = "cyclic reference to field %[1]v"
 	b := v.reportFieldError(c, pos, f, msg, msg)

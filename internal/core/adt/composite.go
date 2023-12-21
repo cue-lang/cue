@@ -276,6 +276,17 @@ func (v *Vertex) updateArcType(t ArcType) {
 	if t >= v.ArcType {
 		return
 	}
+	if v.ArcType == ArcNotPresent {
+		return
+	}
+	if s := v.state; s != nil && s.ctx.isDevVersion() {
+		c := s.ctx
+		if s.scheduler.frozen.meets(arcTypeKnown) {
+			parent := v.Parent
+			parent.reportFieldCycleError(c, c.Source().Pos(), v.Label)
+			return
+		}
+	}
 	v.ArcType = t
 }
 
@@ -698,6 +709,7 @@ func (v *Vertex) SetValue(ctx *OpContext, value BaseValue) *Bottom {
 
 func (v *Vertex) setValue(ctx *OpContext, state vertexStatus, value BaseValue) *Bottom {
 	v.BaseValue = value
+	// TODO: should not set status here for new evaluator.
 	v.updateStatus(state)
 	return nil
 }
@@ -1017,7 +1029,7 @@ func (n *nodeContext) addConjunction(c Conjunct, index int) {
 func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	index := len(v.Conjuncts)
 	v.Conjuncts = append(v.Conjuncts, c)
-	if n := v.state; n != nil {
+	if n := v.state; n != nil && !n.ctx.isDevVersion() {
 		n.addConjunction(c, index)
 
 		// TODO: can we remove notifyConjunct here? This method is only

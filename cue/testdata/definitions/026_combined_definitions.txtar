@@ -126,6 +126,127 @@ Retain: 1
 Unifications: 29
 Conjuncts:    41
 Disjuncts:    30
+-- out/evalalpha --
+Errors:
+d1.env.c: field not allowed:
+    ./in.cue:9:17
+#D4.env.b: field not allowed:
+    ./in.cue:26:7
+    ./in.cue:27:7
+
+Result:
+(_|_){
+  // [eval]
+  #D1: (#struct){
+    env: (#struct){
+      a: (string){ "A" }
+      b: (string){ "B" }
+    }
+    #def: (#struct){
+      a: (string){ "A" }
+      b: (string){ "B" }
+    }
+  }
+  d1: (_|_){
+    // [eval]
+    env: (_|_){
+      // [eval]
+      c: (_|_){
+        // [eval] d1.env.c: field not allowed:
+        //     ./in.cue:9:17
+      }
+      a: (string){ "A" }
+      b: (string){ "B" }
+    }
+    #def: (#struct){
+      a: (string){ "A" }
+      b: (string){ "B" }
+    }
+  }
+  #D2: (#struct){
+    a: (int){ int }
+    b: (int){ int }
+  }
+  #D3: (#struct){
+    env: (#struct){
+      a: (string){ "A" }
+      b: (string){ "B" }
+    }
+  }
+  #D4: (_|_){
+    // [eval]
+    env: (_|_){
+      // [eval]
+      b: (_|_){
+        // [eval] #D4.env.b: field not allowed:
+        //     ./in.cue:26:7
+        //     ./in.cue:27:7
+      }
+      a: (int){ int }
+    }
+  }
+  #DC: (#struct){
+    a: (int){ int }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,9 @@
+ Errors:
++d1.env.c: field not allowed:
++    ./in.cue:9:17
+ #D4.env.b: field not allowed:
+     ./in.cue:26:7
+     ./in.cue:27:7
+-    ./in.cue:30:6
+-d1.env.c: field not allowed:
+-    ./in.cue:3:7
+-    ./in.cue:4:7
+-    ./in.cue:9:5
+-    ./in.cue:9:17
+ 
+ Result:
+ (_|_){
+@@ -26,15 +22,12 @@
+     // [eval]
+     env: (_|_){
+       // [eval]
+-      a: (string){ "A" }
+-      b: (string){ "B" }
+       c: (_|_){
+         // [eval] d1.env.c: field not allowed:
+-        //     ./in.cue:3:7
+-        //     ./in.cue:4:7
+-        //     ./in.cue:9:5
+         //     ./in.cue:9:17
+       }
++      a: (string){ "A" }
++      b: (string){ "B" }
+     }
+     #def: (#struct){
+       a: (string){ "A" }
+@@ -55,13 +48,12 @@
+     // [eval]
+     env: (_|_){
+       // [eval]
+-      a: (int){ int }
+       b: (_|_){
+         // [eval] #D4.env.b: field not allowed:
+         //     ./in.cue:26:7
+         //     ./in.cue:27:7
+-        //     ./in.cue:30:6
+-      }
++      }
++      a: (int){ int }
+     }
+   }
+   #DC: (#struct){
+-- diff/todo/p2 --
+Missing positions
+-- diff/todo/p3 --
+Reordering
 -- out/eval --
 Errors:
 #D4.env.b: field not allowed:

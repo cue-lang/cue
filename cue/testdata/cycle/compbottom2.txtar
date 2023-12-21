@@ -290,6 +290,506 @@ Retain: 73
 Unifications: 159
 Conjuncts:    169
 Disjuncts:    210
+-- out/evalalpha --
+(struct){
+  self: (struct){
+    fail: (struct){
+      a: (_|_){
+        // [incomplete] self.fail.a.b: cyclic reference to field b:
+        //     ./in.cue:6:4
+      }
+    }
+    isConcreteFail: (struct){
+      t1: (struct){
+        a: (struct){
+          b: (int){ 1 }
+        }
+      }
+      t2: (struct){
+        a: (struct){
+          b?: (_|_){
+            // [incomplete] self.isConcreteFail.t2.a.b: cyclic reference to field b:
+            //     ./in.cue:26:8
+          }
+        }
+      }
+    }
+    isNotConcrete: (struct){
+      t1: (struct){
+        a: (struct){
+          b: (int){ int }
+        }
+      }
+      t2: (struct){
+        a: (struct){
+          b?: (int){ int }
+        }
+      }
+    }
+  }
+  mutual: (struct){
+    noConflicts: (struct){
+      a: (struct){
+        new: (string){ "" }
+      }
+      b: (struct){
+        new: (string){ "" }
+      }
+    }
+    mutualCycleFail: (struct){
+      b: (_|_){
+        // [incomplete] mutual.mutualCycleFail.b.foo: cyclic reference to field foo:
+        //     ./mutual.cue:8:7
+      }
+      a: (_|_){
+        // [incomplete] mutual.mutualCycleFail.a.bar: cyclic reference to field bar:
+        //     ./mutual.cue:9:7
+      }
+    }
+    brokenCycleSuccess: (struct){
+      a: (struct){
+        foo: (string){ "" }
+        bar: (string){ "" }
+      }
+      b: (struct){
+      }
+    }
+    allowOneDirectionalDependency: (struct){
+      p1: (struct){
+        a: (struct){
+          bar: (string){ "" }
+        }
+        b: (struct){
+        }
+      }
+      p2: (struct){
+        a: (struct){
+        }
+        b: (struct){
+          foo: (string){ "" }
+        }
+      }
+    }
+    oneDirectionalBrokenConflictSuccess: (struct){
+      p1: (struct){
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+        a: (struct){
+        }
+      }
+      p2: (struct){
+        a: (struct){
+        }
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+      }
+      p3: (struct){
+        a: (struct){
+        }
+        b: (struct){
+          new: (string){ "" }
+          foo: (string){ "" }
+        }
+      }
+      p4: (struct){
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+        a: (struct){
+        }
+      }
+      p5: (struct){
+        b: (struct){
+          new: (string){ "" }
+          foo: (string){ "" }
+        }
+        a: (struct){
+        }
+      }
+      p6: (struct){
+        b: (struct){
+          new: (string){ "" }
+          foo: (string){ "" }
+        }
+        a: (struct){
+        }
+      }
+    }
+  }
+  sameStruct: (struct){
+    chainSuccess: (struct){
+      a: (struct){
+        raises?: (struct){
+        }
+        ret: (struct){
+          a: (int){ 1 }
+        }
+        foo: (struct){
+          a: (int){ 1 }
+        }
+      }
+      b: (struct){
+        foo: (struct){
+          a: (int){ 1 }
+        }
+        raises?: (struct){
+        }
+        ret: (struct){
+          a: (int){ 1 }
+        }
+      }
+    }
+    cycleFail: (struct){
+      t1: (struct){
+        p1: (struct){
+          raises?: (struct){
+            a: (_|_){
+              // [incomplete] sameStruct.cycleFail.t1.p1.raises.a: cyclic reference to field raises:
+              //     ./mutualsamestruct.cue:31:15
+            }
+          }
+          ret: (struct){
+            a: (int){ 1 }
+          }
+        }
+        p2: (struct){
+          ret?: (struct){
+            a: (_|_){
+              // [incomplete] sameStruct.cycleFail.t1.p2.ret.a: cyclic reference to field ret:
+              //     ./mutualsamestruct.cue:42:12
+            }
+          }
+          raises?: (struct){
+          }
+        }
+      }
+      t2: (struct){
+        p1: (struct){
+          raises: (_|_){
+            // [cycle] sameStruct.cycleFail.t2.p1.raises: mutual dependency
+            a: (int){ 1 }
+          }
+          ret: (struct){
+          }
+        }
+        p2: (struct){
+          ret: (_|_){
+            // [cycle] sameStruct.cycleFail.t2.p2.ret: mutual dependency
+          }
+          raises: (struct){
+            a: (int){ 1 }
+          }
+        }
+      }
+      t3: (struct){
+        p1: (struct){
+          raises: (_|_){
+            // [cycle] sameStruct.cycleFail.t3.p1.raises: mutual dependency
+            a: (int){ 1 }
+          }
+          ret: (_){ _ }
+        }
+        p2: (struct){
+          ret: (_|_){
+            // [cycle] sameStruct.cycleFail.t3.p2.ret: mutual dependency
+          }
+          raises: (_){
+            _
+            a: (int){ 1 }
+          }
+        }
+      }
+    }
+    defCloseSuccess: (struct){
+      #Example: (#struct){
+        raises?: (#struct){
+          runtime?: (string){ string }
+        }
+        ret?: (_){ _ }
+      }
+      expr: (#struct){
+        ret: (int){ 2 }
+        raises?: (#struct){
+          runtime?: (string){ string }
+        }
+      }
+    }
+  }
+  nestedChain: (struct){
+    cycleFail: (_|_){
+      // [incomplete] nestedChain.cycleFail.#E.x: cyclic reference to field x:
+      //     ./nestedchain.cue:7:3
+      #E: (#struct){
+      }
+    }
+    brokenCycleSuccess: (struct){
+      #E: (#struct){
+        y: (bool){ true }
+        x: (bool){ true }
+      }
+    }
+    doubleAddfail: (_|_){
+      // [incomplete] nestedChain.doubleAddfail.#E.y: cyclic reference to field y:
+      //     ./nestedchain.cue:25:3
+      // nestedChain.doubleAddfail.#E.x: cyclic reference to field x:
+      //     ./nestedchain.cue:28:3
+      #E: (#struct){
+      }
+    }
+    trippleSuccess: (struct){
+      #E: (#struct){
+        y: (bool){ true }
+        x: (bool){ true }
+      }
+      z: (bool){ true }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,34 +2,29 @@
+   self: (struct){
+     fail: (struct){
+       a: (_|_){
+-        // [cycle] self.fail.a: cycle with field a.b:
+-        //     ./in.cue:6:7
++        // [incomplete] self.fail.a.b: cyclic reference to field b:
++        //     ./in.cue:6:4
+       }
+     }
+     isConcreteFail: (struct){
+       t1: (struct){
+-        a: (_|_){
+-          // [cycle] cycle error
+-          b: (_|_){
+-            // [cycle] cycle error
+-          }
+-        }
+-      }
+-      t2: (struct){
+-        a: (_|_){
+-          // [cycle] self.isConcreteFail.t2.a: circular dependency in evaluation of conditionals: a.b changed after evaluation:
+-          //     ./in.cue:25:7
++        a: (struct){
+           b: (int){ 1 }
+         }
+       }
++      t2: (struct){
++        a: (struct){
++          b?: (_|_){
++            // [incomplete] self.isConcreteFail.t2.a.b: cyclic reference to field b:
++            //     ./in.cue:26:8
++          }
++        }
++      }
+     }
+     isNotConcrete: (struct){
+       t1: (struct){
+-        a: (_|_){
+-          // [cycle] cycle error
+-          b: (_|_){
+-            // [cycle] cycle error
+-          }
++        a: (struct){
++          b: (int){ int }
+         }
+       }
+       t2: (struct){
+@@ -50,17 +45,12 @@
+     }
+     mutualCycleFail: (struct){
+       b: (_|_){
+-        // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
+-        //     ./mutual.cue:9:10
+-        foo: (string){ "" }
+-      }
+-      a: (_|_){
+-        // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
+-        //     ./mutual.cue:9:10
+-        bar*: (_|_){
+-          // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
+-          //     ./mutual.cue:9:10
+-        }
++        // [incomplete] mutual.mutualCycleFail.b.foo: cyclic reference to field foo:
++        //     ./mutual.cue:8:7
++      }
++      a: (_|_){
++        // [incomplete] mutual.mutualCycleFail.a.bar: cyclic reference to field bar:
++        //     ./mutual.cue:9:7
+       }
+     }
+     brokenCycleSuccess: (struct){
+@@ -163,62 +153,62 @@
+     }
+     cycleFail: (struct){
+       t1: (struct){
+-        p1: (_|_){
+-          // [cycle] sameStruct.cycleFail.t1.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+-          //     ./mutualsamestruct.cue:26:6
+-          raises: (struct){
+-            a: (int){ 1 }
+-          }
+-          ret: (struct){
+-            a: (int){ 1 }
+-          }
+-        }
+-        p2: (_|_){
+-          // [cycle] sameStruct.cycleFail.t1.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+-          //     ./mutualsamestruct.cue:37:6
+-          ret: (struct){
+-            a: (int){ 1 }
+-          }
+-          raises?: (struct){
+-          }
+-        }
+-      }
+-      t2: (struct){
+-        p1: (_|_){
+-          // [cycle] sameStruct.cycleFail.t2.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+-          //     ./mutualsamestruct.cue:54:6
+-          raises: (struct){
+-            a: (int){ 1 }
+-          }
+-          ret: (struct){
+-            a: (int){ 1 }
+-          }
+-        }
+-        p2: (_|_){
+-          // [cycle] sameStruct.cycleFail.t2.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+-          //     ./mutualsamestruct.cue:69:6
+-          ret: (struct){
+-          }
+-          raises: (struct){
++        p1: (struct){
++          raises?: (struct){
++            a: (_|_){
++              // [incomplete] sameStruct.cycleFail.t1.p1.raises.a: cyclic reference to field raises:
++              //     ./mutualsamestruct.cue:31:15
++            }
++          }
++          ret: (struct){
++            a: (int){ 1 }
++          }
++        }
++        p2: (struct){
++          ret?: (struct){
++            a: (_|_){
++              // [incomplete] sameStruct.cycleFail.t1.p2.ret.a: cyclic reference to field ret:
++              //     ./mutualsamestruct.cue:42:12
++            }
++          }
++          raises?: (struct){
++          }
++        }
++      }
++      t2: (struct){
++        p1: (struct){
++          raises: (_|_){
++            // [cycle] sameStruct.cycleFail.t2.p1.raises: mutual dependency
++            a: (int){ 1 }
++          }
++          ret: (struct){
++          }
++        }
++        p2: (struct){
++          ret: (_|_){
++            // [cycle] sameStruct.cycleFail.t2.p2.ret: mutual dependency
++          }
++          raises: (struct){
++            a: (int){ 1 }
+           }
+         }
+       }
+       t3: (struct){
+-        p1: (_|_){
+-          // [cycle] sameStruct.cycleFail.t3.p1: circular dependency in evaluation of conditionals: raises changed after evaluation:
+-          //     ./mutualsamestruct.cue:83:6
+-          raises: (struct){
+-            a: (int){ 1 }
+-          }
+-          ret: (struct){
+-            a: (int){ 1 }
+-          }
+-        }
+-        p2: (_|_){
+-          // [cycle] sameStruct.cycleFail.t3.p2: circular dependency in evaluation of conditionals: ret changed after evaluation:
+-          //     ./mutualsamestruct.cue:94:6
++        p1: (struct){
++          raises: (_|_){
++            // [cycle] sameStruct.cycleFail.t3.p1.raises: mutual dependency
++            a: (int){ 1 }
++          }
+           ret: (_){ _ }
+-          raises: (_){ _ }
++        }
++        p2: (struct){
++          ret: (_|_){
++            // [cycle] sameStruct.cycleFail.t3.p2.ret: mutual dependency
++          }
++          raises: (_){
++            _
++            a: (int){ 1 }
++          }
+         }
+       }
+     }
+@@ -230,20 +220,18 @@
+         ret?: (_){ _ }
+       }
+       expr: (#struct){
+-        raises?: (#struct){
+-          runtime?: (string){ string }
+-        }
+         ret: (int){ 2 }
++        raises?: (#struct){
++          runtime?: (string){ string }
++        }
+       }
+     }
+   }
+   nestedChain: (struct){
+     cycleFail: (_|_){
+-      // [cycle] nestedChain.cycleFail: cycle with field #E.y:
+-      //     ./nestedchain.cue:7:6
+-      #E: (_|_){
+-        // [cycle] nestedChain.cycleFail: cycle with field #E.y:
+-        //     ./nestedchain.cue:7:6
++      // [incomplete] nestedChain.cycleFail.#E.x: cyclic reference to field x:
++      //     ./nestedchain.cue:7:3
++      #E: (#struct){
+       }
+     }
+     brokenCycleSuccess: (struct){
+@@ -253,12 +241,11 @@
+       }
+     }
+     doubleAddfail: (_|_){
+-      // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
+-      //     ./nestedchain.cue:28:6
+-      #E: (_|_){
+-        // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
+-        //     ./nestedchain.cue:28:6
+-        y: (bool){ true }
++      // [incomplete] nestedChain.doubleAddfail.#E.y: cyclic reference to field y:
++      //     ./nestedchain.cue:25:3
++      // nestedChain.doubleAddfail.#E.x: cyclic reference to field x:
++      //     ./nestedchain.cue:28:3
++      #E: (#struct){
+       }
+     }
+     trippleSuccess: (struct){
+-- diff/explanation --
+self.isConcreteFail: t1: int value is not an error.
+self.isNotConcrete: t1: int value is not an error.
+-- diff/todo/p3 --
+sameStruct.cycleFail: Harmonize and improve cycle errors
 -- out/eval --
 (struct){
   self: (struct){

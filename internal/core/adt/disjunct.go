@@ -124,6 +124,8 @@ func (n *nodeContext) expandDisjuncts(
 	parentMode defaultMode, // default mode of this disjunct
 	recursive, last bool) {
 
+	unreachableForDev(n.ctx)
+
 	n.ctx.stats.Disjuncts++
 
 	// refNode is used to collect cyclicReferences for all disjuncts to be

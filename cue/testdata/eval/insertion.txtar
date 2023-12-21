@@ -77,6 +77,11 @@ recursive: t1: {
 		c: d: e: g: 1
 }
 
+recursive: t1: {
+	c
+	c: c: g: 1
+}
+
 -- issue2169.cue --
 embeddedFunctionalExpr: {
 	#fn: {
@@ -97,14 +102,14 @@ embeddedFunctionalExpr: {
 }
 -- out/eval/stats --
 Leaks:  8
-Freed:  53
-Reused: 48
+Freed:  65
+Reused: 60
 Allocs: 13
-Retain: 23
+Retain: 24
 
-Unifications: 61
-Conjuncts:    151
-Disjuncts:    66
+Unifications: 73
+Conjuncts:    176
+Disjuncts:    79
 -- out/eval --
 (struct){
   embeddingDirect: (struct){
@@ -181,7 +186,25 @@ Disjuncts:    66
             }
           }
         }
+        c: (struct){
+          g: (int){ 1 }
+        }
+        g: (int){ 1 }
       }
+      d: (struct){
+        e: (struct){
+          f: (int){ 1 }
+          g: (int){ 1 }
+        }
+        c: (struct){
+          d: (struct){
+            e: (struct){
+              g: (int){ 1 }
+            }
+          }
+        }
+      }
+      g: (int){ 1 }
     }
   }
   embeddedFunctionalExpr: (string){
@@ -291,6 +314,16 @@ Disjuncts:    66
               }
             }
           }
+        }
+      }
+    }
+  }
+  recursive: {
+    t1: {
+      〈0;c〉
+      c: {
+        c: {
+          g: 1
         }
       }
     }

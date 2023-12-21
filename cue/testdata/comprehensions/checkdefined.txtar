@@ -32,6 +32,9 @@ oko3: {
 	if ({s: [for y in xo.undefined {}]}) != _|_ {a: 1}
 }
 
+// Should Field s exist in okc or not? Depends on whether comparison to bottom
+// is recursive or not. It probably should not.
+// TODO: fix for new evaluator. But possibly address this with new builtins.
 issue1969: okc: {
 	let X = xc.undefined
 	let Y = {} & {s: [for y in list.Range(0, X, 1) {}]}
@@ -121,30 +124,30 @@ Disjuncts:    105
     okc: (struct){
       let X#1 = (_|_){
         // [eval] issue1969.okc.X: undefined field: undefined:
-        //     ./in.cue:32:13
+        //     ./in.cue:35:13
       }
       let Y#2 = (_|_){
         // [eval]
         s: (_|_){
           // [eval] issue1969.okc.X: undefined field: undefined:
-          //     ./in.cue:32:13
+          //     ./in.cue:35:13
         }
       }
     }
     oko: (struct){
       let X#3 = (_|_){
         // [incomplete] issue1969.oko.X: undefined field: undefined:
-        //     ./in.cue:39:13
+        //     ./in.cue:42:13
       }
       let Y#4 = (struct){
         s: (_|_){
           // [incomplete] issue1969.oko.X: undefined field: undefined:
-          //     ./in.cue:39:13
+          //     ./in.cue:42:13
         }
       }
       s: (_|_){
         // [incomplete] issue1969.oko.X: undefined field: undefined:
-        //     ./in.cue:39:13
+        //     ./in.cue:42:13
       }
     }
   }

@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c152002b_e8a42e7b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:59Z",
+      "side": 1,
+      "message": "This should not be a resolved comment.",
+      "parentUuid": "bb3f4d3e_4b25996a",
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9208c9fc_ff4683a8",
         "filename": "cmd/cue/cmd/help.go",
         "patchSetId": 3

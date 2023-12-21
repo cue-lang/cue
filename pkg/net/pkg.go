@@ -82,6 +82,18 @@ var p = &pkg.Package{
 			}
 		},
 	}, {
+		Name: "IPv6",
+		Params: []pkg.Param{
+			{Kind: adt.TopKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *pkg.CallCtxt) {
+			ip := c.Value(0)
+			if c.Do() {
+				c.Ret = IPv6(ip)
+			}
+		},
+	}, {
 		Name: "IP",
 		Params: []pkg.Param{
 			{Kind: adt.TopKind},

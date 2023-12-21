@@ -131,7 +131,7 @@ func netToList(ip []byte) []uint {
 	return a
 }
 
-// IPv4 reports whether s is a valid IPv4 address.
+// IPv4 reports whether ip is a valid IPv4 address.
 //
 // The address may be a string or list of bytes.
 func IPv4(ip cue.Value) bool {
@@ -139,7 +139,14 @@ func IPv4(ip cue.Value) bool {
 	return netGetIP(ip).Is4()
 }
 
-// IP reports whether s is a valid IPv4 or IPv6 address.
+// IPv6 reports whether ip is a valid IPv6 address.
+//
+// The address may be a string or list of bytes.
+func IPv6(ip cue.Value) bool {
+	return netGetIP(ip).Is6()
+}
+
+// IP reports whether ip is a valid IPv4 or IPv6 address.
 //
 // The address may be a string or list of bytes.
 func IP(ip cue.Value) bool {

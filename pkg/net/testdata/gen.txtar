@@ -27,8 +27,15 @@ t21: net.PathEscape("foo/bar")
 t22: net.PathUnescape("foo%2Fbar")
 t23: net.QueryEscape("f%o")
 t24: net.QueryUnescape("f%25o")
+t25: net.IPv6 & "2001:db8::1234567"
+t26: net.IPv6("2001:db8::1")
+t27: net.IPv6() & "23.23.23.23"
+t28: net.IP("0:0:0:0:0:0:23.23.23.23")
 -- out/net --
 Errors:
+t25: invalid value "2001:db8::1234567" (does not satisfy net.IPv6):
+    ./in.cue:27:6
+    ./in.cue:27:17
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
     ./in.cue:11:6
     ./in.cue:11:17
@@ -39,6 +46,9 @@ t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
     ./in.cue:15:19
 t20: error in call to net.IPCIDR: netip.ParsePrefix("172.16.12.3"): no '/':
     ./in.cue:22:6
+t27: invalid value "23.23.23.23" (does not satisfy net.IPv6):
+    ./in.cue:29:6
+    ./in.cue:29:19
 
 Result:
 t1: "foo.bar."
@@ -65,3 +75,7 @@ t21: "foo%2Fbar"
 t22: "foo/bar"
 t23: "f%25o"
 t24: "f%o"
+t25: _|_ // t25: invalid value "2001:db8::1234567" (does not satisfy net.IPv6)
+t26: true
+t27: _|_ // t27: invalid value "23.23.23.23" (does not satisfy net.IPv6)
+t28: true

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a49a781_0484cd54",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T09:59:57Z",
+      "side": 1,
+      "message": "can you add a little bit more context? for example:\n\n```\npkg/net: add IPv6\n\nThis added function mirrors the existing IPv4,\nand is now possible thanks to the recent switch to net/netip.\n```",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6c542067_64d27510",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T09:59:57Z",
+      "side": 1,
+      "message": "Thank you, and welcome to Gerrit :)",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

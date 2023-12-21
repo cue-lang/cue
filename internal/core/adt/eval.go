@@ -372,6 +372,8 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 
 // insertConjuncts inserts conjuncts previously not inserted.
 func (n *nodeContext) insertConjuncts(state vertexStatus) bool {
+	unreachableForDev(n.ctx)
+
 	// Exit early if we have a concrete value and only need partial results.
 	if state == partial {
 		for n.conjunctsPartialPos < len(n.conjuncts) {
@@ -463,6 +465,7 @@ func (n *nodeContext) doNotify() {
 
 func (n *nodeContext) postDisjunct(state vertexStatus) {
 	ctx := n.ctx
+	unreachableForDev(ctx)
 
 	for {
 		// Use maybeSetCache for cycle breaking
@@ -737,6 +740,8 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 // though, that any potential performance issues are eliminated for
 // Protobuf-like oneOf fields.
 func (n *nodeContext) checkClosed(state vertexStatus) bool {
+	unreachableForDev(n.ctx)
+
 	ignore := state != finalized || n.skipNonMonotonicChecks()
 
 	v := n.node
@@ -756,6 +761,8 @@ func (n *nodeContext) checkClosed(state vertexStatus) bool {
 }
 
 func (n *nodeContext) completeArcs(state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	if DebugSort > 0 {
 		DebugSortArcs(n.ctx, n.node)
 	}
@@ -1172,6 +1179,8 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 }
 
 func (v *Vertex) getNodeContext(c *OpContext, ref int) *nodeContext {
+	unreachableForDev(c)
+
 	if v.state == nil {
 		if v.status == finalized {
 			return nil
@@ -1484,6 +1493,8 @@ func (n *nodeContext) addErr(err errors.Error) {
 // into the nodeContext if successful or queue it for later evaluation if it is
 // incomplete or is not value.
 func (n *nodeContext) addExprConjunct(v Conjunct, state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	env := v.Env
 	id := v.CloseInfo
 
@@ -1535,6 +1546,8 @@ func (n *nodeContext) addExprConjunct(v Conjunct, state vertexStatus) {
 // evalExpr is only called by addExprConjunct. If an error occurs, it records
 // the error in n and returns nil.
 func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
+	unreachableForDev(n.ctx)
+
 	// Require an Environment.
 	ctx := n.ctx
 
@@ -1626,6 +1639,8 @@ func (n *nodeContext) evalExpr(v Conjunct, state vertexStatus) {
 }
 
 func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
+	unreachableForDev(n.ctx)
+
 	closeInfo := c.CloseInfo
 
 	// We need to ensure that each arc is only unified once (or at least) a
@@ -2083,6 +2098,8 @@ func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) 
 // TODO(errors): detect when a field is added to a struct that is already used
 // in a for clause.
 func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
+	unreachableForDev(n.ctx)
+
 	// Don't expand incomplete expressions if we detected a cycle.
 	if n.done() || (n.hasCycle && !n.hasNonCycle) {
 		return false
@@ -2120,6 +2137,8 @@ func (n *nodeContext) expandOne(state vertexStatus) (done bool) {
 
 // injectDynamic evaluates and inserts dynamic declarations.
 func (n *nodeContext) injectDynamic() (progress bool) {
+	unreachableForDev(n.ctx)
+
 	ctx := n.ctx
 	k := 0
 

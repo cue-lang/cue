@@ -109,6 +109,218 @@ Retain: 72
 Unifications: 104
 Conjuncts:    271
 Disjuncts:    161
+-- out/evalalpha --
+(struct){
+  shorewallParams: (#struct){
+    KUBERNETES_FOO_INGRESS_ADMIN: (#list){
+      0: (string){ "127.0.0.1" }
+    }
+  }
+  #Cluster: (#struct){
+    clusterName: (string){ string }
+    shorewallPrefix: (_|_){
+      // [incomplete] #Cluster.shorewallPrefix: invalid interpolation: error in call to strings.ToUpper: non-concrete value string:
+      //     ./issue2235.cue:14:19
+      //     ./issue2235.cue:13:19
+      //     ./issue2235.cue:14:33
+    }
+    globalIngressControllers: (#struct){
+      admin: (#struct){
+        class: (string){ "admin" }
+        objects: (#struct){
+          namespaced: (#struct){
+            ingress: (#struct){
+              Service: (#struct){
+                "admin-nginx-ingress-controller": (#struct){
+                  spec: (#struct){
+                    externalIPs: (#list){
+                      0: (string){ "127.0.0.1" }
+                    }
+                  }
+                  metadata: (#struct){
+                    labels: (#struct){
+                      "ingress-class": (string){ "admin" }
+                      stack: (string){ "ingress" }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    objects: (#struct){
+      namespaced: (#struct){
+        ingress: (#struct){
+          Service: (#struct){
+            "admin-nginx-ingress-controller": (#struct){
+              spec: (#struct){
+                externalIPs: (#list){
+                  0: (string){ "127.0.0.1" }
+                }
+              }
+              metadata: (#struct){
+                labels: (#struct){
+                  "ingress-class": (string){ "admin" }
+                  stack: (string){ "ingress" }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  clusters: (struct){
+    foo: (#struct){
+      clusterName: (string){ "foo" }
+      shorewallPrefix: (string){ "KUBERNETES_FOO" }
+      globalIngressControllers: (#struct){
+        admin: (#struct){
+          class: (string){ "admin" }
+          objects: (#struct){
+            namespaced: (#struct){
+              ingress: (#struct){
+                Service: (#struct){
+                  "admin-nginx-ingress-controller": (#struct){
+                    spec: (#struct){
+                      externalIPs: (#list){
+                        0: (string){ "127.0.0.1" }
+                      }
+                    }
+                    metadata: (#struct){
+                      labels: (#struct){
+                        "ingress-class": (string){ "admin" }
+                        stack: (string){ "ingress" }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      objects: (#struct){
+        namespaced: (#struct){
+          ingress: (#struct){
+            Service: (#struct){
+              "admin-nginx-ingress-controller": (#struct){
+                spec: (#struct){
+                  externalIPs: (#list){
+                    0: (string){ "127.0.0.1" }
+                  }
+                }
+                metadata: (#struct){
+                  labels: (#struct){
+                    "ingress-class": (string){ "admin" }
+                    stack: (string){ "ingress" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  #GlobalIngressController: (_|_){
+    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+    //     ./issue2235.cue:43:12
+    class: (string){ string }
+    objects: (#struct){
+      namespaced: (#struct){
+        ingress: (_|_){
+          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+          //     ./issue2235.cue:43:12
+          Service: (_|_){
+            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+            //     ./issue2235.cue:43:12
+          }
+        }
+      }
+    }
+  }
+  t1: (struct){
+    params: (struct){
+      a: (struct){
+      }
+    }
+    x: (struct){
+      y: (struct){
+        a: (struct){
+        }
+      }
+    }
+  }
+  t2: (struct){
+    out: (struct){
+      z: (struct){
+      }
+    }
+    let X#2 = (struct){
+      y: (struct){
+        z: (struct){
+        }
+      }
+    }
+    m: (struct){
+      x: (struct){
+        y: (struct){
+          z: (struct){
+          }
+        }
+      }
+    }
+  }
+  t3: (struct){
+    out: (struct){
+    }
+    foo: (struct){
+      bar: (struct){
+      }
+    }
+  }
+  let svc#1multi = &[&[&[&[&[〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]]]]]]
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -114,20 +114,17 @@
+     }
+   }
+   #GlobalIngressController: (_|_){
+-    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
++    // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+     //     ./issue2235.cue:43:12
+-    //     ./issue2235.cue:40:9
+     class: (string){ string }
+     objects: (#struct){
+       namespaced: (#struct){
+         ingress: (_|_){
+-          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
++          // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+           //     ./issue2235.cue:43:12
+-          //     ./issue2235.cue:40:9
+           Service: (_|_){
+-            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: invalid interpolation: non-concrete value string (type string):
++            // [incomplete] #GlobalIngressController.objects.namespaced.ingress.Service: key value of dynamic field must be concrete, found _|_(invalid interpolation: #GlobalIngressController.objects.namespaced.ingress.Service: non-concrete value string (type string)):
+             //     ./issue2235.cue:43:12
+-            //     ./issue2235.cue:40:9
+           }
+         }
+       }
+@@ -173,5 +170,5 @@
+       }
+     }
+   }
+-  let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
++  let svc#1multi = &[&[&[&[&[〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]]]]]]
+ }
+-- diff/todo/p2 --
+Different, but okay, error message, but missing some positions
 -- out/eval --
 (struct){
   shorewallParams: (#struct){

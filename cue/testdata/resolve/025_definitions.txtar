@@ -127,6 +127,141 @@ Retain: 0
 Unifications: 28
 Conjuncts:    43
 Disjuncts:    28
+-- out/evalalpha --
+Errors:
+foo1.recursive.feild: field not allowed:
+    ./in.cue:19:3
+foo.feild: field not allowed:
+    ./in.cue:12:6
+    ./in.cue:13:7
+
+Result:
+(_|_){
+  // [eval]
+  #Foo: (#struct){
+    field: (int){ int }
+    recursive: (#struct){
+      field: (string){ string }
+    }
+  }
+  #Foo1: (#struct){
+    field: (int){ int }
+    field2: (string){ string }
+  }
+  foo: (_|_){
+    // [eval] foo.feild: field not allowed:
+    //     ./in.cue:12:6
+    //     ./in.cue:13:7
+    feild: (_|_){
+      // [eval] foo.feild: field not allowed:
+      //     ./in.cue:12:6
+      //     ./in.cue:13:7
+    }
+    field: (int){ int }
+    recursive: (#struct){
+      field: (string){ string }
+    }
+  }
+  foo1: (_|_){
+    // [eval]
+    field: (int){ 2 }
+    recursive: (_|_){
+      // [eval] foo1.recursive.feild: field not allowed:
+      //     ./in.cue:19:3
+      feild: (_|_){
+        // [eval] foo1.recursive.feild: field not allowed:
+        //     ./in.cue:19:3
+      }
+      field: (string){ string }
+    }
+  }
+  #Bar: (#struct){
+    field: (int){ int }
+  }
+  bar: (#struct){
+    feild: (int){ 2 }
+    field: (int){ int }
+  }
+  #Mixed: (string){ string }
+  Mixed: (string){ string }
+  mixedRec: (struct){
+    #Mixed: (string){ string }
+    Mixed: (string){ string }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,9 @@
+ Errors:
++foo1.recursive.feild: field not allowed:
++    ./in.cue:19:3
+ foo.feild: field not allowed:
+-    ./in.cue:1:7
+     ./in.cue:12:6
+     ./in.cue:13:7
+-foo1.recursive.feild: field not allowed:
+-    ./in.cue:3:13
+-    ./in.cue:15:7
+-    ./in.cue:19:3
+ 
+ Result:
+ (_|_){
+@@ -22,30 +19,30 @@
+     field2: (string){ string }
+   }
+   foo: (_|_){
+-    // [eval]
+-    field: (int){ int }
+-    recursive: (#struct){
+-      field: (string){ string }
+-    }
++    // [eval] foo.feild: field not allowed:
++    //     ./in.cue:12:6
++    //     ./in.cue:13:7
+     feild: (_|_){
+       // [eval] foo.feild: field not allowed:
+-      //     ./in.cue:1:7
+       //     ./in.cue:12:6
+       //     ./in.cue:13:7
+     }
++    field: (int){ int }
++    recursive: (#struct){
++      field: (string){ string }
++    }
+   }
+   foo1: (_|_){
+     // [eval]
+     field: (int){ 2 }
+     recursive: (_|_){
+-      // [eval]
+-      field: (string){ string }
++      // [eval] foo1.recursive.feild: field not allowed:
++      //     ./in.cue:19:3
+       feild: (_|_){
+         // [eval] foo1.recursive.feild: field not allowed:
+-        //     ./in.cue:3:13
+-        //     ./in.cue:15:7
+         //     ./in.cue:19:3
+       }
++      field: (string){ string }
+     }
+   }
+   #Bar: (#struct){
+@@ -52,8 +49,8 @@
+     field: (int){ int }
+   }
+   bar: (#struct){
+-    field: (int){ int }
+     feild: (int){ 2 }
++    field: (int){ int }
+   }
+   #Mixed: (string){ string }
+   Mixed: (string){ string }
+-- diff/todo/p2 --
+Duplicate field not allowed message.
+Positions.
 -- out/eval --
 Errors:
 foo.feild: field not allowed:

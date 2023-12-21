@@ -190,10 +190,11 @@ func New(v *Vertex, cfg *Config) *OpContext {
 		panic("nil Runtime")
 	}
 	ctx := &OpContext{
-		Runtime: cfg.Runtime,
-		Format:  cfg.Format,
-		vertex:  v,
-		Version: cfg.Runtime.EvaluatorVersion(),
+		Runtime:     cfg.Runtime,
+		Format:      cfg.Format,
+		vertex:      v,
+		Version:     cfg.Runtime.EvaluatorVersion(),
+		taskContext: schedConfig,
 	}
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
@@ -663,7 +664,7 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 				switch b.Code {
 				case IncompleteError:
 				case CycleError:
-					if state.vertexStatus() == partial {
+					if state.vertexStatus() == partial || c.useDevVersion() {
 						break
 					}
 					fallthrough
@@ -710,6 +711,43 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 			c.ci, _ = n.markCycle(arc, nil, x, c.ci)
 		}
 		c.ci.Inline = true
+
+		if c.useDevVersion() {
+			if s := arc.getState(c); s != nil {
+				needs := state.conditions()
+				runMode := state.runMode()
+
+				arc.unify(c, needs|arcTypeKnown, attemptOnly) // to set scalar
+
+				if runMode == finalize {
+					// arc.unify(c, needs, attemptOnly) // to set scalar
+					// Freeze node.
+					arc.state.freeze(needs)
+				} else {
+					arc.unify(c, needs, runMode)
+				}
+
+				v := arc
+				if v.ArcType == ArcPending {
+					if v.status == evaluating {
+						for ; v.Parent != nil && v.ArcType == ArcPending; v = v.Parent {
+						}
+						err := c.Newf("cycle with field %v", x)
+						b := &Bottom{Code: CycleError, Err: err}
+						v.setValue(c, v.status, b)
+						return b
+						// TODO: use this instead, as is usual for incomplete errors,
+						// and also move this block one scope up to also apply to
+						// defined arcs. In both cases, though, doing so results in
+						// some errors to be misclassified as evaluation error.
+						// c.AddBottom(b)
+						// return nil
+					}
+					c.undefinedFieldError(v, IncompleteError)
+					return nil
+				}
+			}
+		}
 		v := c.evaluate(arc, x, state)
 		c.ci = saved
 		return v
@@ -786,8 +824,15 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 			return nil
 		}
 
-		if v.isUndefined() || state.vertexStatus() > v.status {
-			c.unify(v, state)
+		if c.useDevVersion() {
+			if n := v.getState(c); n != nil {
+				// Always yield to not get spurious errors.
+				n.process(arcTypeKnown, yield)
+			}
+		} else {
+			if v.isUndefined() || state.vertexStatus() > v.status {
+				c.unify(v, state)
+			}
 		}
 
 		return v
@@ -799,6 +844,9 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 }
 
 func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFlags) *Vertex {
+	if c.useDevVersion() {
+		return x.lookup(c, pos, l, flags)
+	}
 
 	state := flags.vertexStatus()
 

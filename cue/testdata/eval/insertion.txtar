@@ -207,6 +207,131 @@ Disjuncts:    73
     #in: (string){ "str" }
   }
 }
+-- out/evalalpha --
+(struct){
+  embeddingDirect: (struct){
+    t1: (string){
+      "s"
+      #a: (string){ "s" }
+    }
+  }
+  embeddingExpr: (struct){
+    t1: (string){
+      "s"
+      #a: (string){ "s" }
+    }
+  }
+  unifiedDirect: (struct){
+    t1: (string){
+      "s"
+      #a: (string){ "s" }
+    }
+  }
+  unifiedExpr: (struct){
+    t1: (string){
+      "s"
+      #a: (string){ "s" }
+    }
+  }
+  cross: (struct){
+    t1: (struct){
+      a: (struct){
+        b: (struct){
+          v: (int){ 1 }
+          a: (struct){
+            w: (int){ 2 }
+          }
+          y: (int){ 5 }
+        }
+        x: (int){ 2 }
+        w: (int){ 2 }
+      }
+      b: (struct){
+        a: (struct){
+          x: (int){ 2 }
+          b: (struct){
+            y: (int){ 5 }
+          }
+          w: (int){ 2 }
+        }
+        v: (int){ 1 }
+        y: (int){ 5 }
+      }
+      v: (int){ 1 }
+      w: (int){ 2 }
+      x: (int){ 2 }
+      y: (int){ 5 }
+    }
+  }
+  recursive: (struct){
+    t1: (struct){
+      e: (struct){
+        f: (int){ 1 }
+      }
+      c: (struct){
+        d: (struct){
+          e: (struct){
+            f: (int){ 1 }
+            g: (int){ 1 }
+          }
+          c: (struct){
+            d: (struct){
+              e: (struct){
+                g: (int){ 1 }
+              }
+            }
+          }
+        }
+      }
+    }
+    t2: (struct){
+      c: (struct){
+        c: (struct){
+          g: (int){ 1 }
+        }
+        g: (int){ 1 }
+      }
+      g: (int){ 1 }
+    }
+  }
+  embeddedFunctionalExpr: (string){
+    "str"
+    #fn: (string){
+      "str"
+      #in: (string){ "str" }
+    }
+    #in: (string){ "str" }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -47,10 +47,10 @@
+         v: (int){ 1 }
+         y: (int){ 5 }
+       }
+-      x: (int){ 2 }
+-      y: (int){ 5 }
+       v: (int){ 1 }
+       w: (int){ 2 }
++      x: (int){ 2 }
++      y: (int){ 5 }
+     }
+   }
+   recursive: (struct){
+@@ -57,7 +57,6 @@
+     t1: (struct){
+       e: (struct){
+         f: (int){ 1 }
+-        g: (int){ 1 }
+       }
+       c: (struct){
+         d: (struct){
+-- diff/todo/p3 --
+Reordering.
+-- diff/todo/p0 --
+Missing field recursive.t1.e.g.
 -- out/compile --
 --- a.cue
 {

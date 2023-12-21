@@ -24,6 +24,45 @@ Retain: 0
 Unifications: 3
 Conjuncts:    5
 Disjuncts:    3
+-- out/evalalpha --
+Errors:
+a.0: conflicting values 4 and 3:
+    ./in.cue:1:7
+    ./in.cue:1:11
+
+Result:
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval]
+    0: (_|_){
+      // [eval] a.0: conflicting values 4 and 3:
+      //     ./in.cue:1:7
+      //     ./in.cue:1:11
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,6 +1,5 @@
+ Errors:
+ a.0: conflicting values 4 and 3:
+-    ./in.cue:1:1
+     ./in.cue:1:7
+     ./in.cue:1:11
+ 
+@@ -11,7 +10,6 @@
+     // [eval]
+     0: (_|_){
+       // [eval] a.0: conflicting values 4 and 3:
+-      //     ./in.cue:1:1
+       //     ./in.cue:1:7
+       //     ./in.cue:1:11
+     }
+-- diff/todo/p2 --
+Missing error positions.
 -- out/eval --
 Errors:
 a.0: conflicting values 4 and 3:

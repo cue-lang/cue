@@ -19,8 +19,7 @@ package adt
 
 func unreachableForDev(c *OpContext) {
 	if c.useDevVersion() {
-		// TODO: uncomment when new evaluator is ready.
-		// panic("unreachable for development version")
+		panic("unreachable for development version")
 	}
 }
 

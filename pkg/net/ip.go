@@ -139,6 +139,13 @@ func IPv4(ip cue.Value) bool {
 	return netGetIP(ip).Is4()
 }
 
+// IPv6 reports whether s is a valid IPv6 address.
+//
+// The address may be a string or list of bytes.
+func IPv6(ip cue.Value) bool {
+	return netGetIP(ip).Is6()
+}
+
 // IP reports whether s is a valid IPv4 or IPv6 address.
 //
 // The address may be a string or list of bytes.

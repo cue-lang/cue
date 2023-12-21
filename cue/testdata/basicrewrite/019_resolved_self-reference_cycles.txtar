@@ -36,11 +36,23 @@ math: p6: {
 
 a: 100
 
-c: [c[1], a]
+list: t0: c: [c[0]]
 
-s1: s2 & {a: 1}
-s2: s3 & {b: 2}
-s3: s1 & {c: 3}
+list: t1: p1: c: [c[1], a]
+list: t1: p2: c: [a, c[0]]
+
+nodes: t1: p1: s1: s1 & {a: 1}
+nodes: t1: p2: s1: {a: 1} & s1
+nodes: t2: {
+	s1: s2 & {a: 1}
+	s2: s1 & {b: 2}
+}
+nodes: t3: {
+	s1: s2 & {a: 1}
+	s2: s3 & {b: 2}
+	s3: s1 & {c: 3}
+}
+
 -- out/def --
 a: 100
 b: 200
@@ -141,30 +153,85 @@ s3:
     }
   }
   a: 100
-  c: [
-    〈1;c〉[1],
-    〈1;a〉,
-  ]
-  s1: (〈0;s2〉 & {
-    a: 1
-  })
-  s2: (〈0;s3〉 & {
-    b: 2
-  })
-  s3: (〈0;s1〉 & {
-    c: 3
-  })
+  list: {
+    t0: {
+      c: [
+        〈1;c〉[0],
+      ]
+    }
+  }
+  list: {
+    t1: {
+      p1: {
+        c: [
+          〈1;c〉[1],
+          〈4;a〉,
+        ]
+      }
+    }
+  }
+  list: {
+    t1: {
+      p2: {
+        c: [
+          〈4;a〉,
+          〈1;c〉[0],
+        ]
+      }
+    }
+  }
+  nodes: {
+    t1: {
+      p1: {
+        s1: (〈0;s1〉 & {
+          a: 1
+        })
+      }
+    }
+  }
+  nodes: {
+    t1: {
+      p2: {
+        s1: ({
+          a: 1
+        } & 〈0;s1〉)
+      }
+    }
+  }
+  nodes: {
+    t2: {
+      s1: (〈0;s2〉 & {
+        a: 1
+      })
+      s2: (〈0;s1〉 & {
+        b: 2
+      })
+    }
+  }
+  nodes: {
+    t3: {
+      s1: (〈0;s2〉 & {
+        a: 1
+      })
+      s2: (〈0;s3〉 & {
+        b: 2
+      })
+      s3: (〈0;s1〉 & {
+        c: 3
+      })
+    }
+  }
 }
 -- out/eval/stats --
 Leaks:  0
-Freed:  36
-Reused: 31
-Allocs: 5
-Retain: 9
+Freed:  62
+Reused: 55
+Allocs: 7
+Retain: 10
 
-Unifications: 36
-Conjuncts:    61
-Disjuncts:    43
+Unifications: 62
+Conjuncts:    105
+Disjuncts:    70
 -- out/eval --
 (struct){
   math: (struct){
@@ -194,23 +261,66 @@ Disjuncts:    43
     }
   }
   a: (int){ 100 }
-  c: (#list){
-    0: (int){ 100 }
-    1: (int){ 100 }
+  list: (struct){
+    t0: (struct){
+      c: (#list){
+        0: (_){ _ }
+      }
+    }
+    t1: (struct){
+      p1: (struct){
+        c: (#list){
+          0: (int){ 100 }
+          1: (int){ 100 }
+        }
+      }
+      p2: (struct){
+        c: (#list){
+          0: (int){ 100 }
+          1: (int){ 100 }
+        }
+      }
+    }
   }
-  s1: (struct){
-    a: (int){ 1 }
-    c: (int){ 3 }
-    b: (int){ 2 }
-  }
-  s2: (struct){
-    b: (int){ 2 }
-    a: (int){ 1 }
-    c: (int){ 3 }
-  }
-  s3: (struct){
-    c: (int){ 3 }
-    b: (int){ 2 }
-    a: (int){ 1 }
+  nodes: (struct){
+    t1: (struct){
+      p1: (struct){
+        s1: (struct){
+          a: (int){ 1 }
+        }
+      }
+      p2: (struct){
+        s1: (struct){
+          a: (int){ 1 }
+        }
+      }
+    }
+    t2: (struct){
+      s1: (struct){
+        a: (int){ 1 }
+        b: (int){ 2 }
+      }
+      s2: (struct){
+        b: (int){ 2 }
+        a: (int){ 1 }
+      }
+    }
+    t3: (struct){
+      s1: (struct){
+        a: (int){ 1 }
+        c: (int){ 3 }
+        b: (int){ 2 }
+      }
+      s2: (struct){
+        b: (int){ 2 }
+        a: (int){ 1 }
+        c: (int){ 3 }
+      }
+      s3: (struct){
+        c: (int){ 3 }
+        b: (int){ 2 }
+        a: (int){ 1 }
+      }
+    }
   }
 }

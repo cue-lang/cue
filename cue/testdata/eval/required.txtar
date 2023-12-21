@@ -110,6 +110,76 @@ Retain: 1
 Unifications: 27
 Conjuncts:    40
 Disjuncts:    28
+-- out/evalalpha --
+(_|_){
+  // [eval]
+  self: (struct){
+    t1: (struct){
+      a?: (int){ int }
+    }
+    t2: (struct){
+      a!: (int){ int }
+    }
+  }
+  unify: (struct){
+    t1: (struct){
+      p1: (struct){
+        a: (int){ int }
+      }
+      p2: (struct){
+        a: (int){ int }
+      }
+    }
+    t2: (struct){
+      p1: (struct){
+        a!: (int){ int }
+      }
+      p2: (struct){
+        a!: (int){ int }
+      }
+    }
+  }
+  #Def: (#struct){
+    t1: (#struct){
+      a!: (int){ int }
+    }
+  }
+  allowed: (_|_){
+    // [eval]
+    issue2306: (_|_){
+      // [eval]
+      #A: (_|_){
+        // [eval]
+        a!: (_|_){
+          // [eval] allowed.issue2306.#A.a: field not allowed:
+          //     ./in.cue:35:6
+          //     ./in.cue:34:6
+        }
+        b!: (int){ int }
+      }
+      #B: (#struct){
+        b!: (int){ int }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -39,9 +39,8 @@
+         // [eval]
+         a!: (_|_){
+           // [eval] allowed.issue2306.#A.a: field not allowed:
+-          //     ./in.cue:34:6
+           //     ./in.cue:35:6
+-          //     ./in.cue:37:6
++          //     ./in.cue:34:6
+         }
+         b!: (int){ int }
+       }
+-- diff/todo/p2 --
+Missing position.
 -- out/eval --
 (_|_){
   // [eval]

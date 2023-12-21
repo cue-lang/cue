@@ -69,6 +69,93 @@ Retain: 1047
 Unifications: 680
 Conjuncts:    2709
 Disjuncts:    1414
+-- out/evalalpha --
+(struct){
+  ok1: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  ok2: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  ok3: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  ok4: (struct){
+    f: (struct){
+      in: (number){ number }
+      out: (number){ number }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 0 }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
+  }
+  issue1708: (struct){
+    #add10: (#struct){
+      in: (number){ number }
+      a10: (#struct){
+        i: (number){ number }
+        o: (_|_){
+          // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
+          //     ./in.cue:52:20
+          //     ./in.cue:51:7
+        }
+      }
+      out: (_|_){
+        // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
+        //     ./in.cue:52:20
+        //     ./in.cue:51:7
+      }
+    }
+    k00: (int){ 0 }
+    k10: (int){ 10 }
+    k20: (int){ 20 }
+    k30: (int){ 30 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -48,7 +48,6 @@
+           // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
+           //     ./in.cue:52:20
+           //     ./in.cue:51:7
+-          //     ./in.cue:52:13
+         }
+       }
+       out: (_|_){
+@@ -55,7 +54,6 @@
+         // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
+         //     ./in.cue:52:20
+         //     ./in.cue:51:7
+-        //     ./in.cue:52:13
+       }
+     }
+     k00: (int){ 0 }
+-- diff/todo/p2 --
+error positions
 -- out/eval --
 (struct){
   ok1: (struct){

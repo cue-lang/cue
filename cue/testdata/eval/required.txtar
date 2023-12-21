@@ -110,6 +110,102 @@ Retain: 1
 Unifications: 27
 Conjuncts:    40
 Disjuncts:    28
+-- out/evalalpha --
+Errors:
+allowed.issue2306.#A.a: field not allowed:
+    ./in.cue:35:6
+    ./in.cue:34:6
+
+Result:
+(_|_){
+  // [eval]
+  self: (struct){
+    t1: (struct){
+      a?: (int){ int }
+    }
+    t2: (struct){
+      a!: (int){ int }
+    }
+  }
+  unify: (struct){
+    t1: (struct){
+      p1: (struct){
+        a: (int){ int }
+      }
+      p2: (struct){
+        a: (int){ int }
+      }
+    }
+    t2: (struct){
+      p1: (struct){
+        a!: (int){ int }
+      }
+      p2: (struct){
+        a!: (int){ int }
+      }
+    }
+  }
+  #Def: (#struct){
+    t1: (#struct){
+      a!: (int){ int }
+    }
+  }
+  allowed: (_|_){
+    // [eval]
+    issue2306: (_|_){
+      // [eval]
+      #A: (_|_){
+        // [eval] allowed.issue2306.#A.a: field not allowed:
+        //     ./in.cue:35:6
+        //     ./in.cue:34:6
+        a!: (_|_){
+          // [eval] allowed.issue2306.#A.a: field not allowed:
+          //     ./in.cue:35:6
+          //     ./in.cue:34:6
+        }
+        b!: (int){ int }
+      }
+      #B: (#struct){
+        b!: (int){ int }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,3 +1,9 @@
++Errors:
++allowed.issue2306.#A.a: field not allowed:
++    ./in.cue:35:6
++    ./in.cue:34:6
++
++Result:
+ (_|_){
+   // [eval]
+   self: (struct){
+@@ -36,12 +42,13 @@
+     issue2306: (_|_){
+       // [eval]
+       #A: (_|_){
+-        // [eval]
++        // [eval] allowed.issue2306.#A.a: field not allowed:
++        //     ./in.cue:35:6
++        //     ./in.cue:34:6
+         a!: (_|_){
+           // [eval] allowed.issue2306.#A.a: field not allowed:
+-          //     ./in.cue:34:6
+           //     ./in.cue:35:6
+-          //     ./in.cue:37:6
++          //     ./in.cue:34:6
+         }
+         b!: (int){ int }
+       }
+-- diff/explanation --
+New evaluator now correctly reports error on required field.
+-- diff/todo/p2 --
+Duplicate "field not allowed" message.
 -- out/eval --
 (_|_){
   // [eval]

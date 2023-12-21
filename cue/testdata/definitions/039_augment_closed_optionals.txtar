@@ -92,6 +92,80 @@ Retain: 0
 Unifications: 9
 Conjuncts:    35
 Disjuncts:    9
+-- out/evalalpha --
+Errors:
+c.QQ: field not allowed:
+    ./in.cue:5:18
+    ./in.cue:9:3
+    ./in.cue:11:10
+
+Result:
+(_|_){
+  // [eval]
+  #A: (#struct){
+  }
+  #B: (#struct){
+  }
+  #C: (#struct){
+  }
+  c: (_|_){
+    // [eval] c.QQ: field not allowed:
+    //     ./in.cue:5:18
+    //     ./in.cue:9:3
+    //     ./in.cue:11:10
+    QQ: (_|_){
+      // [eval] c.QQ: field not allowed:
+      //     ./in.cue:5:18
+      //     ./in.cue:9:3
+      //     ./in.cue:11:10
+    }
+  }
+  #D: (#struct){
+  }
+  d: (#struct){
+    aaa: (int){ 4 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,12 @@
+-(struct){
++Errors:
++c.QQ: field not allowed:
++    ./in.cue:5:18
++    ./in.cue:9:3
++    ./in.cue:11:10
++
++Result:
++(_|_){
++  // [eval]
+   #A: (#struct){
+   }
+   #B: (#struct){
+@@ -5,8 +13,17 @@
+   }
+   #C: (#struct){
+   }
+-  c: (#struct){
+-    QQ: (int){ 3 }
++  c: (_|_){
++    // [eval] c.QQ: field not allowed:
++    //     ./in.cue:5:18
++    //     ./in.cue:9:3
++    //     ./in.cue:11:10
++    QQ: (_|_){
++      // [eval] c.QQ: field not allowed:
++      //     ./in.cue:5:18
++      //     ./in.cue:9:3
++      //     ./in.cue:11:10
++    }
+   }
+   #D: (#struct){
+   }
+-- diff/todo/p0 --
+embedding of conjunction fails. Test should pass.
 -- out/eval --
 (struct){
   #A: (#struct){

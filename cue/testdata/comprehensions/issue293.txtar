@@ -40,6 +40,118 @@ Retain: 4
 Unifications: 19
 Conjuncts:    33
 Disjuncts:    20
+-- out/evalalpha --
+Errors:
+z.x.f2: field not allowed:
+    ./in.cue:5:6
+    ./in.cue:14:3
+#V1.x.f2: field not allowed:
+    ./variant1.cue:2:5
+    ./variant1.cue:3:5
+
+Result:
+(_|_){
+  // [eval]
+  #T: (#struct){
+    x: (#struct){
+      f1: (int){ int }
+    }
+  }
+  z: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] z.x.f2: field not allowed:
+      //     ./in.cue:5:6
+      //     ./in.cue:14:3
+      f1: (int){ 99 }
+      f2: (_|_){
+        // [eval] z.x.f2: field not allowed:
+        //     ./in.cue:5:6
+        //     ./in.cue:14:3
+      }
+    }
+  }
+  t: (#struct){
+    p: (string){ "foo" }
+  }
+  #C: (#struct){
+    p: (_){ _ }
+  }
+  #V1: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] #V1.x.f2: field not allowed:
+      //     ./variant1.cue:2:5
+      //     ./variant1.cue:3:5
+      f2: (_|_){
+        // [eval] #V1.x.f2: field not allowed:
+        //     ./variant1.cue:2:5
+        //     ./variant1.cue:3:5
+      }
+      f1: (int){ int }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,10 @@
+ Errors:
+-#V1.x.f2: field not allowed:
+-    ./variant1.cue:2:11
+-    ./variant1.cue:3:5
+ z.x.f2: field not allowed:
+-    ./in.cue:2:2
+-    ./in.cue:5:12
+-    ./in.cue:11:4
++    ./in.cue:5:6
+     ./in.cue:14:3
++#V1.x.f2: field not allowed:
++    ./variant1.cue:2:5
++    ./variant1.cue:3:5
+ 
+ Result:
+ (_|_){
+@@ -19,13 +17,13 @@
+   z: (_|_){
+     // [eval]
+     x: (_|_){
+-      // [eval]
++      // [eval] z.x.f2: field not allowed:
++      //     ./in.cue:5:6
++      //     ./in.cue:14:3
+       f1: (int){ 99 }
+       f2: (_|_){
+         // [eval] z.x.f2: field not allowed:
+-        //     ./in.cue:2:2
+-        //     ./in.cue:5:12
+-        //     ./in.cue:11:4
++        //     ./in.cue:5:6
+         //     ./in.cue:14:3
+       }
+     }
+@@ -39,13 +37,15 @@
+   #V1: (_|_){
+     // [eval]
+     x: (_|_){
+-      // [eval]
+-      f1: (int){ int }
++      // [eval] #V1.x.f2: field not allowed:
++      //     ./variant1.cue:2:5
++      //     ./variant1.cue:3:5
+       f2: (_|_){
+         // [eval] #V1.x.f2: field not allowed:
+-        //     ./variant1.cue:2:11
++        //     ./variant1.cue:2:5
+         //     ./variant1.cue:3:5
+       }
++      f1: (int){ int }
+     }
+   }
+ }
+-- diff/todo/p2 --
+Duplicate "field not allowed" message.
 -- out/eval --
 Errors:
 #V1.x.f2: field not allowed:

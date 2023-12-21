@@ -62,6 +62,12 @@ func (s *Struct) IsOpen() bool {
 	if !s.node.IsClosedStruct() {
 		return true
 	}
+	// Technically this is not correct, but it is in the context of where
+	// it is used.
+	if s.node.PatternConstraints != nil && len(s.node.PatternConstraints.Pairs) > 0 {
+		return true
+	}
+	// The equivalent code for the old implementation.
 	ot := s.node.OptionalTypes()
 	if ot&^adt.HasDynamic != 0 {
 		return true

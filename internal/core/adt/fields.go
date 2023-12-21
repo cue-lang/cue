@@ -459,16 +459,19 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 
 	p := c.parent
 
+	if c.isDef {
+		c.isClosed = true
+		if p != nil {
+			p.isDef = true
+		}
+	}
+
 	for _, a := range c.arcs {
 		cc := a.cc
 		cc.decDependent(ctx, a.kind, c) // REF(arcs)
 	}
 
 	c.finalizePattern()
-
-	if c.isDef {
-		c.isClosed = true
-	}
 
 	if p == nil {
 		// Root pattern, set allowed patterns.

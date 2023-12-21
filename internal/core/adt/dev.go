@@ -17,6 +17,13 @@ package adt
 // This file contains types to help in the transition from the old to new
 // evaluation model.
 
+func unreachableForDev(c *OpContext) {
+	if c.isDevVersion() {
+		// TODO: uncomment when new evaluator is ready.
+		// panic("unreachable for development version")
+	}
+}
+
 type combinedFlags uint32
 
 // oldOnly indicates that a Vertex should only be evaluated for the old
@@ -44,7 +51,7 @@ func final(state vertexStatus, cond condition) combinedFlags {
 }
 
 func deprecated(c *OpContext, state vertexStatus) combinedFlags {
-	// if c.useDevVersion() {
+	// if c.isDevVersion() {
 	// 	panic("calling function may not be used in new evaluator")
 	// }
 	return combinedFlags(state)

@@ -180,6 +180,18 @@ type closeContext struct {
 	// definition.
 	isDef bool
 
+	// hasEllipsis indicates whether the node contains an ellipsis.
+	hasEllipsis bool
+
+	// hasTop indicates a node has at least one conjunct that resembles top.
+	hasTop bool
+
+	// hasNonTop indicates a node has at least one conjunct that is not top.
+	hasNonTop bool
+
+	// isClosedOnce is true if this closeContext is the result of calling close.
+	isClosedOnce bool
+
 	// isEmbed indicates whether the closeContext is created as part of an
 	// embedding.
 	isEmbed bool
@@ -282,8 +294,6 @@ func (v *Vertex) assignConjunct(root *closeContext, c Conjunct, check bool) (a *
 	added = !check || !arc.hasConjunct(c)
 	if added {
 		c.CloseInfo.cc = root
-		// root.needsDec = true
-		// root.incDependent()
 		arc.addConjunctUnchecked(c)
 	}
 
@@ -426,6 +436,13 @@ func (c *closeContext) addDependency(kind depKind, key, child *closeContext) {
 			panic("addArc: Label already exists")
 		}
 	}
+
+	// TODO: this tests seems sensible, but panics. Investigate what could
+	// trigger this.
+	// if child.src.Parent != c.src {
+	// 	panic("addArc: inconsistent parent")
+	// }
+
 	c.arcs = append(c.arcs, ccArc{kind: kind, key: key, cc: child})
 }
 
@@ -471,10 +488,17 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 
 	p := c.parent
 
-	if c.isDef {
+	if c.isDef && !c.hasEllipsis && (!c.hasTop || c.hasNonTop) {
 		c.isClosed = true
 		if p != nil {
 			p.isDef = true
+		}
+	}
+
+	if c.isClosedOnce {
+		c.isClosed = true
+		if p != nil {
+			p.isClosedOnce = true
 		}
 	}
 
@@ -495,6 +519,16 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 			return
 		}
 		return
+	}
+
+	if c.hasEllipsis {
+		p.hasEllipsis = true
+	}
+	if c.hasTop {
+		p.hasTop = true
+	}
+	if c.hasNonTop {
+		p.hasNonTop = true
 	}
 
 	if !c.isEmbed && c.isClosed {

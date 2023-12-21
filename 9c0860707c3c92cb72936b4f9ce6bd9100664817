@@ -1,0 +1,153 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb3f4d3e_4b25996a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:30Z",
+      "side": 1,
+      "message": "Some of the environment variable description lines are wrapped as short as 45 to 50 columns. The text is very narrow and rather hard to read, I would say.\n\nI think we should fairly consistently stick to either 80 or 100 characters. Even just a jump from 50 to 80 is going to be a huge improvement in readability, as the twice-tab-indented description paragraphs would effectively double in paragraph width.\n\nFor example, look at `go help environment`, which is often around 100 columns.",
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9208c9fc_ff4683a8",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:30Z",
+      "side": 1,
+      "message": "nit: I\u0027d do an empty line after this one, since the next one starts a new sentence",
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6b3e253_5bfe888b",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:30Z",
+      "side": 1,
+      "message": "nit: I\u0027d write \"multiple registries with prefixes\", as otherwise I initially read this \"multiple prefixes on a registry\".",
+      "range": {
+        "startLine": 164,
+        "startChar": 6,
+        "endLine": 164,
+        "endChar": 23
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "085f1c4f_c6493a78",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:30Z",
+      "side": 1,
+      "message": "if it\u0027s",
+      "range": {
+        "startLine": 167,
+        "startChar": 11,
+        "endLine": 167,
+        "endChar": 15
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e1990d31_b9fa41af",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:30Z",
+      "side": 1,
+      "message": "a suggestion for clarity:\n\n\u003e CUE_REGISTRY\u003dpublic-registry.com,github.com/acmecorp\u003dregistry.acme.com:6000/modules\n\nThis clarifies that the default registry is a public service, and that the acme corp registry is owned and run by the company.",
+      "range": {
+        "startLine": 175,
+        "startChar": 3,
+        "endLine": 175,
+        "endChar": 88
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ac0e83e_deadc144",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:30Z",
+      "side": 1,
+      "message": "?",
+      "range": {
+        "startLine": 186,
+        "startChar": 10,
+        "endLine": 186,
+        "endChar": 11
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6a6f36b3_3b2efbd0",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:17:30Z",
+      "side": 1,
+      "message": "Add https:// so that the link is clickable from terminals.\n\nAlso, this is a 404. We don\u0027t redirect source files from cuelang.org - maybe we should, but right now it doesn\u0027t work.",
+      "range": {
+        "startLine": 194,
+        "startChar": 6,
+        "endLine": 194,
+        "endChar": 50
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

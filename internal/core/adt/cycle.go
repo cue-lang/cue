@@ -499,7 +499,13 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 	if !c.IsCyclic {
 		n.hasNonCycle = true
 		for _, c := range n.cyclicConjuncts {
-			n.addVertexConjuncts(c.c, c.arc, false)
+			if n.ctx.isDevVersion() {
+				ci := c.c.CloseInfo
+				ci.cc = n.node.rootCloseContext()
+				n.scheduleVertexConjuncts(c.c, c.arc, ci)
+			} else {
+				n.addVertexConjuncts(c.c, c.arc, false)
+			}
 		}
 		n.cyclicConjuncts = n.cyclicConjuncts[:0]
 	}

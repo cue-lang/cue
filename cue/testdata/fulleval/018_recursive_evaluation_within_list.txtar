@@ -68,6 +68,79 @@ Retain: 14
 Unifications: 21
 Conjuncts:    40
 Disjuncts:    31
+-- out/evalalpha --
+(struct){
+  l: (#list){
+    0: (struct){
+      c: (string){ "t" }
+      d: (string){ "t" }
+    }
+  }
+  a: (struct){
+    c: (string){ "t" }
+    d: (string){ "t" }
+  }
+  b: (struct){
+    d: (string){ string }
+    c: (string){ string }
+  }
+  l1: (#list){
+    0: (struct){
+      c: (string){ "t" }
+      d: (string){ "st" }
+    }
+  }
+  a1: (struct){
+    c: (string){ "t" }
+    d: (string){ "st" }
+  }
+  b1: (struct){
+    d: (_|_){
+      // [incomplete] b1.d: non-concrete value string in operand to +:
+      //     ./in.cue:10:5
+      //     ./in.cue:11:5
+    }
+    c: (string){ string }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,13 @@
+ (struct){
+   l: (#list){
+     0: (struct){
++      c: (string){ "t" }
+       d: (string){ "t" }
+-      c: (string){ "t" }
+     }
+   }
+   a: (struct){
++    c: (string){ "t" }
+     d: (string){ "t" }
+-    c: (string){ "t" }
+   }
+   b: (struct){
+     d: (string){ string }
+@@ -15,13 +15,13 @@
+   }
+   l1: (#list){
+     0: (struct){
++      c: (string){ "t" }
+       d: (string){ "st" }
+-      c: (string){ "t" }
+     }
+   }
+   a1: (struct){
++    c: (string){ "t" }
+     d: (string){ "st" }
+-    c: (string){ "t" }
+   }
+   b1: (struct){
+     d: (_|_){
+-- diff/todo/p3 --
+Reordering
 -- out/eval --
 (struct){
   l: (#list){

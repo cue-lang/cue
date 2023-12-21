@@ -218,3 +218,104 @@ const (
 	// At the moment this is equal to 'scalarKnown'.
 	concreteKnown = scalarKnown
 )
+
+// schedConfig configures a taskContext with the states needed for the
+// CUE evaluator. It is used in OpContext.New as a template for creating
+// new taskContexts.
+var schedConfig = taskContext{
+	counterMask: conditionsUsingCounters,
+	autoUnblock: listTypeKnown | scalarKnown | arcTypeKnown,
+	complete:    stateCompletions,
+}
+
+// stateCompletions indicates the completion of conditions based on the
+// completions of other conditions.
+func stateCompletions(s *scheduler) condition {
+	x := s.completed
+	v := s.node.node
+	s.node.Logf("=== stateCompletions: %v  %v", v.Label, s.completed)
+	if x.meets(allAncestorsProcessed) {
+		x |= conditionsUsingCounters &^ s.provided
+		// If we have a pending arc, a sub arc may still cause the arc to
+		// become not pending. For instance, if 'a' is pending in the following
+		//   if x != _!_ {
+		//       a: b: 1
+		//   }
+		// it may still become not pending if 'b' becomes a regular arc.
+		if s.counters[arcTypeKnown] == 0 && x.meets(subFieldsProcessed) {
+			x |= arcTypeKnown
+		}
+	}
+	switch {
+	case v.ArcType == ArcMember, v.ArcType == ArcNotPresent:
+		x |= arcTypeKnown
+	case x&arcTypeKnown != 0 && v.ArcType == ArcPending:
+		v.ArcType = ArcNotPresent
+	}
+
+	if x.meets(valueKnown) {
+		// NOTE: in this case, scalarKnown is not the same as concreteKnown,
+		// especially if this arc is Pending, as it may still become concrete.
+		// We probably want to separate this out.
+		if v.ArcType == ArcMember || v.ArcType == ArcNotPresent {
+			x |= scalarKnown
+		}
+		x |= listTypeKnown
+	}
+
+	if x.meets(needFieldConjunctsKnown | needTasksDone) {
+		switch {
+		case x.meets(subFieldsProcessed):
+			x |= fieldSetKnown
+		default:
+			for _, a := range v.Arcs {
+				if a.ArcType == ArcPending {
+					return x
+				}
+			}
+			x |= fieldSetKnown
+		}
+	}
+	return x
+}
+
+// allChildConjunctsKnown indicates that all conjuncts have been added by
+// the parents and every conjunct that may add fields to subfields have been
+// processed.
+func (v *Vertex) allChildConjunctsKnown() bool {
+	if v == nil {
+		return true
+	}
+
+	return v.state.meets(fieldConjunctsKnown | allAncestorsProcessed)
+}
+
+func (n *nodeContext) scheduleTask(f runner, env *Environment, x Node, ci CloseInfo, completes, needs condition) *task {
+	t := &task{
+		run:  f,
+		node: n,
+
+		env: env,
+		id:  ci,
+		x:   x,
+	}
+	n.insertTask(t, completes, needs)
+	return t
+}
+
+// require ensures that a given condition is met for the given Vertex by
+// evaluating it. It yields execution back to the scheduler if it cannot
+// be completed at this point.
+func (c *OpContext) require(v *Vertex, needs condition) {
+	state := v.getState(c)
+	if state == nil {
+		return
+	}
+	state.process(needs, yield)
+}
+
+// scalarValue evaluates the given expression and either returns a
+// concrete value or schedules the task for later evaluation.
+func (ctx *OpContext) scalarValue(t *task, x Expr) Value {
+	return ctx.value(x, require(0, scalarKnown))
+}

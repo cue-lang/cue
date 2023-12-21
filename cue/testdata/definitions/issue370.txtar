@@ -29,6 +29,46 @@ Retain: 0
 Unifications: 11
 Conjuncts:    27
 Disjuncts:    11
+-- out/evalalpha --
+(struct){
+  #C1: (#struct){
+    name: (string){ string }
+  }
+  #C2: (#struct){
+    age: (int){ int }
+    name: (string){ string }
+  }
+  c1: (#struct){
+    name: (string){ "cueckoo" }
+  }
+  c2: (#struct){
+    age: (int){ 5 }
+    name: (string){ "cueckoo" }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -3,14 +3,14 @@
+     name: (string){ string }
+   }
+   #C2: (#struct){
+-    name: (string){ string }
+     age: (int){ int }
++    name: (string){ string }
+   }
+   c1: (#struct){
+     name: (string){ "cueckoo" }
+   }
+   c2: (#struct){
+-    name: (string){ "cueckoo" }
+     age: (int){ 5 }
++    name: (string){ "cueckoo" }
+   }
+ }
+-- diff/explanation --
+Reordering
 -- out/eval --
 (struct){
   #C1: (#struct){

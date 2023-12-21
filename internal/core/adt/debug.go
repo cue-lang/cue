@@ -588,6 +588,8 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 	addFlag(cc.isDef, '#')
 	addFlag(cc.isEmbed, 'E')
 	addFlag(cc.isClosed, 'c')
+	addFlag(cc.isClosedOnce, 'C')
+	addFlag(cc.hasEllipsis, 'o')
 	io.Copy(w, flags)
 
 	w.WriteString(close)

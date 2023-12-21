@@ -19,6 +19,64 @@ Retain: 0
 Unifications: 8
 Conjuncts:    10
 Disjuncts:    8
+-- out/evalalpha --
+Errors:
+foo.#name: field not allowed:
+    ./in.cue:4:6
+    ./in.cue:9:2
+
+Result:
+(_|_){
+  // [eval]
+  #foo: (#struct){
+    name: (string){ string }
+  }
+  foo: (_|_){
+    // [eval]
+    _name: (string){ "foo" }
+    _#name: (string){ "bar" }
+    #name: (_|_){
+      // [eval] foo.#name: field not allowed:
+      //     ./in.cue:4:6
+      //     ./in.cue:9:2
+    }
+    name: (string){ string }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,11 +1,23 @@
+-(struct){
++Errors:
++foo.#name: field not allowed:
++    ./in.cue:4:6
++    ./in.cue:9:2
++
++Result:
++(_|_){
++  // [eval]
+   #foo: (#struct){
+     name: (string){ string }
+   }
+-  foo: (#struct){
+-    name: (string){ string }
++  foo: (_|_){
++    // [eval]
+     _name: (string){ "foo" }
+     _#name: (string){ "bar" }
+-    #name: (string){ "baz" }
++    #name: (_|_){
++      // [eval] foo.#name: field not allowed:
++      //     ./in.cue:4:6
++      //     ./in.cue:9:2
++    }
++    name: (string){ string }
+   }
+ }
+-- diff/explanation --
+New evaluator now disallows new definitions in closed structs.
 -- out/eval --
 (struct){
   #foo: (#struct){

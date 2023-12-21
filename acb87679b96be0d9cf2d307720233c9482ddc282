@@ -89,6 +89,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8533bbef_9e16ec6d",
+        "filename": "pkg/net/ip.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:06:44Z",
+      "side": 1,
+      "message": "Nice catch, the other APIs like IP and IPv4 have the same mistake.",
+      "parentUuid": "292dcbc3_280c74b0",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c9953afe_dc035f48",
         "filename": "pkg/net/testdata/gen.txtar",
         "patchSetId": 1

@@ -166,6 +166,30 @@
       },
       "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cbcb9833_a23ca584",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-21T10:48:54Z",
+      "side": 1,
+      "message": "Filed https://github.com/cue-lang/cue/issues/2743 to support those source file links.",
+      "parentUuid": "6a6f36b3_3b2efbd0",
+      "range": {
+        "startLine": 194,
+        "startChar": 6,
+        "endLine": 194,
+        "endChar": 50
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

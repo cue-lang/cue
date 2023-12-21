@@ -46,6 +46,57 @@ Retain: 0
 Unifications: 6
 Conjuncts:    9
 Disjuncts:    6
+-- out/evalalpha --
+Errors:
+a.v.b: field not allowed:
+    ./in.cue:5:6
+
+Result:
+(_|_){
+  // [eval]
+  #S: (#struct){
+  }
+  a: (_|_){
+    // [eval]
+    v: (_|_){
+      // [eval] a.v.b: field not allowed:
+      //     ./in.cue:5:6
+      b: (_|_){
+        // [eval] a.v.b: field not allowed:
+        //     ./in.cue:5:6
+      }
+      a: (int){ int }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,5 @@
+ Errors:
+ a.v.b: field not allowed:
+-    ./in.cue:2:12
+-    ./in.cue:4:4
+     ./in.cue:5:6
+ 
+ Result:
+@@ -12,11 +10,10 @@
+   a: (_|_){
+     // [eval]
+     v: (_|_){
+-      // [eval]
++      // [eval] a.v.b: field not allowed:
++      //     ./in.cue:5:6
+       b: (_|_){
+         // [eval] a.v.b: field not allowed:
+-        //     ./in.cue:2:12
+-        //     ./in.cue:4:4
+         //     ./in.cue:5:6
+       }
+       a: (int){ int }
+-- diff/todo/p2 --
+Duplicate "field not allowed" error.
 -- out/eval --
 Errors:
 a.v.b: field not allowed:

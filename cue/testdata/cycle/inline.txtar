@@ -261,3 +261,217 @@ Result:
     }
   }
 }
+-- out/evalalpha --
+Errors:
+structural cycle:
+    ./x.cue:6:9
+structural cycle:
+    ./x.cue:12:24
+structural cycle:
+    ./x.cue:15:9
+structural cycle:
+    ./x.cue:20:9
+in: structural cycle:
+    ./x.cue:34:17
+in: structural cycle:
+    ./x.cue:35:17
+in: structural cycle:
+    ./x.cue:38:17
+in: structural cycle:
+    ./x.cue:49:17
+in: structural cycle:
+    ./x.cue:50:17
+in: structural cycle:
+    ./x.cue:54:17
+
+Result:
+(_|_){
+  // [structural cycle]
+  inline: (_|_){
+    // [structural cycle]
+    small: (_|_){
+      // [structural cycle]
+      f: (_|_){
+        // [structural cycle]
+        n: (int){ int }
+        out: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:6:9
+        }
+      }
+    }
+    medium: (_|_){
+      // [structural cycle]
+      f2: (_|_){
+        // [structural cycle] structural cycle:
+        //     ./x.cue:15:9
+      }
+      fRec: (_|_){
+        // [structural cycle]
+        nn: (int){ int }
+        out: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:12:24
+        }
+      }
+      f: (_|_){
+        // [structural cycle]
+        n: (int){ int }
+        out: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:15:9
+        }
+      }
+    }
+    patterns: (_|_){
+      // [structural cycle]
+      f: (_|_){
+        // [structural cycle]
+        n: (_|_){
+          // [structural cycle] structural cycle:
+          //     ./x.cue:20:9
+        }
+      }
+    }
+    acrossFields: (_|_){
+      // [structural cycle]
+      fail1: (_|_){
+        // [structural cycle]
+        f: (struct){
+          in: (number){ number }
+          out: (_|_){
+            // [incomplete] inline.acrossFields.fail1.f.out: non-concrete value number in operand to +:
+            //     ./x.cue:30:8
+            //     ./x.cue:29:8
+          }
+        }
+        k00: (int){ 0 }
+        k10: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:38:17
+        }
+        k20: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:34:17
+        }
+        k30: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:35:17
+        }
+      }
+      ok1: (_|_){
+        // [structural cycle]
+        f: (struct){
+          in: (number){ number }
+          out: (number){ number }
+        }
+        k00: (int){ 0 }
+        k10: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:54:17
+        }
+        k20: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:49:17
+        }
+        k30: (_|_){
+          // [structural cycle] in: structural cycle:
+          //     ./x.cue:50:17
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,11 +2,23 @@
+ structural cycle:
+     ./x.cue:6:9
+ structural cycle:
++    ./x.cue:12:24
++structural cycle:
+     ./x.cue:15:9
+ structural cycle:
+     ./x.cue:20:9
+ in: structural cycle:
+-    ./x.cue:30:8
++    ./x.cue:34:17
++in: structural cycle:
++    ./x.cue:35:17
++in: structural cycle:
++    ./x.cue:38:17
++in: structural cycle:
++    ./x.cue:49:17
++in: structural cycle:
++    ./x.cue:50:17
++in: structural cycle:
++    ./x.cue:54:17
+ 
+ Result:
+ (_|_){
+@@ -35,7 +47,7 @@
+         nn: (int){ int }
+         out: (_|_){
+           // [structural cycle] structural cycle:
+-          //     ./x.cue:15:9
++          //     ./x.cue:12:24
+         }
+       }
+       f: (_|_){
+@@ -72,26 +84,36 @@
+         k00: (int){ 0 }
+         k10: (_|_){
+           // [structural cycle] in: structural cycle:
+-          //     ./x.cue:30:8
+-        }
+-        k20: (_|_){
+-          // [structural cycle] in: structural cycle:
+-          //     ./x.cue:30:8
+-        }
+-        k30: (_|_){
+-          // [structural cycle] in: structural cycle:
+-          //     ./x.cue:30:8
+-        }
+-      }
+-      ok1: (struct){
++          //     ./x.cue:38:17
++        }
++        k20: (_|_){
++          // [structural cycle] in: structural cycle:
++          //     ./x.cue:34:17
++        }
++        k30: (_|_){
++          // [structural cycle] in: structural cycle:
++          //     ./x.cue:35:17
++        }
++      }
++      ok1: (_|_){
++        // [structural cycle]
+         f: (struct){
+           in: (number){ number }
+           out: (number){ number }
+         }
+         k00: (int){ 0 }
+-        k10: (int){ 0 }
+-        k20: (int){ 0 }
+-        k30: (int){ 0 }
++        k10: (_|_){
++          // [structural cycle] in: structural cycle:
++          //     ./x.cue:54:17
++        }
++        k20: (_|_){
++          // [structural cycle] in: structural cycle:
++          //     ./x.cue:49:17
++        }
++        k30: (_|_){
++          // [structural cycle] in: structural cycle:
++          //     ./x.cue:50:17
++        }
+       }
+     }
+   }
+-- diff/todo/p2 --
+One test now fails. Given TODO, this may be okay.
+This does break Issue #2163.

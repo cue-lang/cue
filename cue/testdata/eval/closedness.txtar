@@ -52,6 +52,156 @@ Retain: 0
 Unifications: 26
 Conjuncts:    39
 Disjuncts:    26
+-- out/evalalpha --
+Errors:
+a.q.e: field not allowed:
+    ./in.cue:7:3
+    ./in.cue:15:3
+issue852.a.Foo: field not allowed:
+    ./in.cue:23:16
+    ./in.cue:28:5
+
+Result:
+(_|_){
+  // [eval]
+  #E: (#struct){
+    c: (int){ int }
+  }
+  #A: (#struct){
+    b: (int){ int }
+    q: (#struct){
+      d: (int){ int }
+      c: (int){ int }
+    }
+  }
+  a: (_|_){
+    // [eval]
+    b: (int){ 3 }
+    q: (_|_){
+      // [eval] a.q.e: field not allowed:
+      //     ./in.cue:7:3
+      //     ./in.cue:15:3
+      c: (int){ 2 }
+      e: (_|_){
+        // [eval] a.q.e: field not allowed:
+        //     ./in.cue:7:3
+        //     ./in.cue:15:3
+      }
+      d: (int){ int }
+    }
+  }
+  issue852: (_|_){
+    // [eval] issue852.a.Foo: field not allowed:
+    //     ./in.cue:23:16
+    //     ./in.cue:28:5
+    #A: (#struct){
+    }
+    a: (_|_){
+      // [eval] issue852.a.Foo: field not allowed:
+      //     ./in.cue:23:16
+      //     ./in.cue:28:5
+      Foo: (_|_){
+        // [eval] issue852.a.Foo: field not allowed:
+        //     ./in.cue:23:16
+        //     ./in.cue:28:5
+      }
+    }
+  }
+  dynamic: (struct){
+    #D: (#struct){
+      key: (string){ "foo" }
+      foo: (int){ int }
+    }
+    d: (#struct){
+      foo: (int){ 3 }
+      key: (string){ "foo" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,9 @@
+ Errors:
+ a.q.e: field not allowed:
+-    ./in.cue:1:5
+-    ./in.cue:6:5
+     ./in.cue:7:3
+-    ./in.cue:11:4
+     ./in.cue:15:3
+ issue852.a.Foo: field not allowed:
+-    ./in.cue:22:6
+-    ./in.cue:26:5
++    ./in.cue:23:16
+     ./in.cue:28:5
+ 
+ Result:
+@@ -19,8 +15,8 @@
+   #A: (#struct){
+     b: (int){ int }
+     q: (#struct){
++      d: (int){ int }
+       c: (int){ int }
+-      d: (int){ int }
+     }
+   }
+   a: (_|_){
+@@ -27,32 +23,31 @@
+     // [eval]
+     b: (int){ 3 }
+     q: (_|_){
+-      // [eval]
++      // [eval] a.q.e: field not allowed:
++      //     ./in.cue:7:3
++      //     ./in.cue:15:3
+       c: (int){ 2 }
+-      d: (int){ int }
+       e: (_|_){
+         // [eval] a.q.e: field not allowed:
+-        //     ./in.cue:1:5
+-        //     ./in.cue:6:5
+         //     ./in.cue:7:3
+-        //     ./in.cue:11:4
+         //     ./in.cue:15:3
+       }
++      d: (int){ int }
+     }
+   }
+   issue852: (_|_){
+     // [eval] issue852.a.Foo: field not allowed:
+-    //     ./in.cue:22:6
+-    //     ./in.cue:26:5
++    //     ./in.cue:23:16
+     //     ./in.cue:28:5
+     #A: (#struct){
+     }
+     a: (_|_){
+-      // [eval]
++      // [eval] issue852.a.Foo: field not allowed:
++      //     ./in.cue:23:16
++      //     ./in.cue:28:5
+       Foo: (_|_){
+         // [eval] issue852.a.Foo: field not allowed:
+-        //     ./in.cue:22:6
+-        //     ./in.cue:26:5
++        //     ./in.cue:23:16
+         //     ./in.cue:28:5
+       }
+     }
+@@ -63,8 +58,8 @@
+       foo: (int){ int }
+     }
+     d: (#struct){
+-      key: (string){ "foo" }
+       foo: (int){ 3 }
++      key: (string){ "foo" }
+     }
+   }
+ }
+-- diff/todo/p2 --
+Duplicate "field not allowed" error.
+Positions.
 -- out/eval --
 Errors:
 a.q.e: field not allowed:

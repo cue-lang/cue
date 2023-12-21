@@ -151,6 +151,12 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 // state == finalized means it is evaluated to completion. See vertexStatus
 // for more details.
 func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
+	if c.isDevVersion() {
+		requires, mode := flags.conditions(), flags.runMode()
+		v.unify(c, requires, mode)
+		return
+	}
+
 	// defer c.PopVertex(c.PushVertex(v))
 	if Debug {
 		c.nest++
@@ -1051,6 +1057,11 @@ type nodeContextState struct {
 	aStruct   Expr
 	aStructID CloseInfo
 
+	// List fields
+	listIsClosed bool
+	maxListLen   int
+	maxNode      Expr
+
 	lowerBound *BoundValue // > or >=
 	upperBound *BoundValue // < or <=
 	errs       *Bottom
@@ -1064,6 +1075,8 @@ type nodeContextState struct {
 	// conjunctsPartialPos is like conjunctsPos, but for the 'partial' phase
 	// of processing where conjuncts are only processed as concrete scalars.
 	conjunctsPartialPos int
+
+	arcPos int
 }
 
 // A receiver receives notifications.
@@ -2046,6 +2059,10 @@ func (n *nodeContext) addStruct(
 // disjunctions.
 func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 	ctx := n.ctx
+	if ctx.isDevVersion() {
+		return n.insertArc(f, mode, x, x.CloseInfo, true)
+	}
+
 	arc, isNew := n.node.GetArc(ctx, f, mode)
 	if f.IsLet() && !isNew {
 		arc.MultiLet = true
@@ -2075,6 +2092,10 @@ func (n *nodeContext) insertField(f Feature, mode ArcType, x Conjunct) *Vertex {
 
 func (n *nodeContext) insertFieldUnchecked(f Feature, mode ArcType, x Conjunct) *Vertex {
 	ctx := n.ctx
+	if ctx.isDevVersion() {
+		return n.insertArc(f, mode, x, x.CloseInfo, false)
+	}
+
 	arc, isNew := n.node.GetArc(ctx, f, mode)
 	if f.IsLet() && !isNew {
 		arc.MultiLet = true

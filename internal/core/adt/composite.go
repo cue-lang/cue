@@ -918,6 +918,8 @@ func (v *Vertex) Elems() []*Vertex {
 // GetArc returns a Vertex for the outgoing arc with label f. It creates and
 // ads one if it doesn't yet exist.
 func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew bool) {
+	unreachableForDev(c)
+
 	arc = v.Lookup(f)
 	if arc != nil {
 		arc.updateArcType(t)
@@ -998,6 +1000,8 @@ func hasConjunct(cs []Conjunct, c Conjunct) bool {
 }
 
 func (n *nodeContext) addConjunction(c Conjunct, index int) {
+	unreachableForDev(n.ctx)
+
 	// NOTE: This does not split binary expressions for comprehensions.
 	// TODO: split for comprehensions and rewrap?
 	if x, ok := c.Elem().(*BinaryExpr); ok && x.Op == AndOp {
@@ -1027,6 +1031,8 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 // addConjunctDynamic adds a conjunct to a vertex and immediately evaluates
 // it, whilst doing the same for any vertices on the notify list, recursively.
 func (n *nodeContext) addConjunctDynamic(c Conjunct) {
+	unreachableForDev(n.ctx)
+
 	n.node.Conjuncts = append(n.node.Conjuncts, c)
 	n.addExprConjunct(c, partial)
 	n.notifyConjunct(c)
@@ -1034,6 +1040,8 @@ func (n *nodeContext) addConjunctDynamic(c Conjunct) {
 }
 
 func (n *nodeContext) notifyConjunct(c Conjunct) {
+	unreachableForDev(n.ctx)
+
 	for _, rec := range n.notify {
 		arc := rec.v
 		if !arc.hasConjunct(c) {

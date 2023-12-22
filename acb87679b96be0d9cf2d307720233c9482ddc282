@@ -38,6 +38,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "34af6dd8_2de919a2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037609
+      },
+      "writtenOn": "2023-12-22T05:52:01Z",
+      "side": 1,
+      "message": "Fixed. Hopefully I\u0027m properly following the Gerrit workflow",
+      "parentUuid": "267f6888_be3559d5",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "6c542067_64d27510",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -66,6 +84,24 @@
       "writtenOn": "2023-12-21T10:05:04Z",
       "side": 1,
       "message": "LGTM with a couple of suggestions, but I will leave to @mvdan@mvdan.cc for the final verdict!",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee31704d_c3f591cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037609
+      },
+      "writtenOn": "2023-12-22T05:52:01Z",
+      "side": 1,
+      "message": "Thank you Daniel. This is going to take some getting used to 😄",
+      "parentUuid": "6c542067_64d27510",
       "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -105,6 +141,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05f2afa4_edd10eab",
+        "filename": "pkg/net/ip.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1037609
+      },
+      "writtenOn": "2023-12-22T05:52:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8533bbef_9e16ec6d",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c9953afe_dc035f48",
@@ -118,6 +172,24 @@
       "writtenOn": "2023-12-21T10:05:04Z",
       "side": 1,
       "message": "Nit: I would comment which of these are expected to pass/fail. I realise that pattern is not followed above, but that\u0027s not by itself a reason not to start now.",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0227f04c_6e1d635a",
+        "filename": "pkg/net/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1037609
+      },
+      "writtenOn": "2023-12-22T05:52:01Z",
+      "side": 1,
+      "message": "I actually thought it was quite intuitive the way the (existing) tests are written. The expected errors and results are already in the test file so comments aren\u0027t really needed. The only issue is that input and expected output are quite far from each other in the test file.\n\nAn improvement would be to have the input and expected output close together, grouped by test. Something like:\n\n-- in.cue --\nimport \"net\"\nt9:  net.IPv4 \u0026 \"23.23.23.2333\"\n-- out/net --\nErrors:\nt9: invalid value \"23.23.23.2333\" (does not satisfy net.IPv4):\n    ./in.cue:11:6\n    ./in.cue:11:17",
+      "parentUuid": "c9953afe_dc035f48",
       "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

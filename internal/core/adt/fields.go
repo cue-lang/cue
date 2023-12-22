@@ -195,6 +195,9 @@ type closeContext struct {
 	// values.
 	isTotal bool
 
+	// done is true if all dependencies have been decremented.
+	done bool
+
 	// needsCloseInSchedule is non-nil if a closeContext that was created
 	// as an arc still needs to be decremented. It points to the creating arc
 	// for reporting purposes.
@@ -436,6 +439,13 @@ func (c *closeContext) incDependent(kind depKind, dependant *closeContext) (debu
 
 	debug = c.addDependent(kind, dependant)
 
+	if c.done {
+		ctx := c.src.state.ctx
+		openDebugGraph(ctx, c.src, "incDependent: already checked")
+
+		panic(fmt.Sprintf("incDependent: already closed: %p", c))
+	}
+
 	c.conjunctCount++
 	return debug
 }
@@ -456,6 +466,8 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	if c.conjunctCount > 0 {
 		return
 	}
+
+	c.done = true
 
 	p := c.parent
 

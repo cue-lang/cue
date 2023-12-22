@@ -56,11 +56,11 @@ type declaration func(cc *closeContext)
 
 // Run simulates a CUE evaluation of the given declarations.
 func (x *FieldTester) Run(sub ...declaration) {
-	x.cc.incDependent()
+	x.cc.incDependent(TEST, nil)
 	for _, s := range sub {
 		s(x.cc)
 	}
-	x.cc.decDependent(x.n)
+	x.cc.decDependent(x.n, TEST, nil)
 }
 
 // Def represents fields that define a definition, such that
@@ -73,15 +73,19 @@ func (x *FieldTester) Run(sub ...declaration) {
 //
 // For some unique #D.
 func (x *FieldTester) Def(sub ...declaration) declaration {
+	return x.spawn(closeDef, sub...)
+}
+
+func (x *FieldTester) spawn(t closeNodeType, sub ...declaration) declaration {
 	return func(cc *closeContext) {
 		ci := CloseInfo{cc: cc}
-		ci, dc := ci.spawnCloseContext(closeDef)
+		ci, dc := ci.spawnCloseContext(t)
 
-		dc.incDependent()
+		dc.incDependent(SPAWN, cc)
 		for _, sfn := range sub {
 			sfn(dc)
 		}
-		dc.decDependent(x.n)
+		dc.decDependent(x.n, SPAWN, cc)
 	}
 }
 
@@ -97,16 +101,7 @@ func (x *FieldTester) Def(sub ...declaration) declaration {
 //
 // For some #D: b: "bar".
 func (x *FieldTester) Embed(sub ...declaration) declaration {
-	return func(cc *closeContext) {
-		ci := CloseInfo{cc: cc}
-		ci, dc := ci.spawnCloseContext(closeEmbed)
-
-		dc.incDependent()
-		for _, sfn := range sub {
-			sfn(dc)
-		}
-		dc.decDependent(x.n)
-	}
+	return x.spawn(closeEmbed, sub...)
 }
 
 // EmbedDef represents fields that define a struct and embedded within the

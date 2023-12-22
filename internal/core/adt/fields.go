@@ -153,6 +153,8 @@ type closeContext struct {
 	// Used to recursively insert Vertices.
 	parent *closeContext
 
+	dependencies []*ccDep // For testing only. See debug.go
+
 	// child links to a sequence which additional patterns need to be verified
 	// against (&&). If there are more than one, these additional nodes are
 	// linked with next. Only closed nodes with patterns are added. Arc sets are
@@ -202,6 +204,11 @@ type closeContext struct {
 	Expr Value
 }
 
+// Label is a convenience function to return the label of the associated Vertex.
+func (c *closeContext) Label() Feature {
+	return c.src.Label
+}
+
 // spawnCloseContext wraps the closeContext in c with a new one and returns
 // this new context along with an updated CloseInfo. The new values reflect
 // that the set of fields represented by c are now, for instance, enclosed in
@@ -209,10 +216,13 @@ type closeContext struct {
 //
 // This call is used when preparing ADT values for evaluation.
 func (c CloseInfo) spawnCloseContext(t closeNodeType) (CloseInfo, *closeContext) {
-	c.cc.incDependent()
+	cc := c.cc
+
+	cc.incDependent(PARENT, c.cc)
 
 	c.cc = &closeContext{
-		parent: c.cc,
+		parent: cc,
+		src:    cc.src,
 	}
 
 	switch t {
@@ -228,14 +238,24 @@ func (c CloseInfo) spawnCloseContext(t closeNodeType) (CloseInfo, *closeContext)
 // incDependent needs to be called for any conjunct or child closeContext
 // scheduled for c that is queued for later processing and not scheduled
 // immediately.
-func (c *closeContext) incDependent() {
+func (c *closeContext) incDependent(kind depKind, dependant *closeContext) (debug *ccDep) {
+	if c.src == nil { // || c.src.state == nil {
+		panic("incDependent: unexpected nil state")
+	}
+
+	debug = c.addDependent(kind, dependant)
+
 	c.conjunctCount++
+	return debug
 }
 
 // decDependent needs to be called for any conjunct or child closeContext for
 // which a corresponding incDependent was called after it has been successfully
 // processed.
-func (c *closeContext) decDependent(n *nodeContext) {
+func (c *closeContext) decDependent(n *nodeContext, kind depKind, dependant *closeContext) {
+	// TODO: fix matching decrements and uncomment.
+	// c.matchDecrement(n.node, kind, dependant)
+
 	c.conjunctCount--
 	if c.conjunctCount > 0 {
 		return
@@ -272,7 +292,7 @@ func (c *closeContext) decDependent(n *nodeContext) {
 		p.linkPatterns(c)
 	}
 
-	p.decDependent(n)
+	p.decDependent(n, PARENT, c)
 }
 
 // linkPatterns merges the patterns of child into c, if needed.

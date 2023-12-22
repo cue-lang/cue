@@ -962,11 +962,6 @@ type nodeContext struct {
 
 	scheduler
 
-	// rootCloseContext should not be cloned as clones need to get their own
-	// copies of this. For this reason it is not included in nodeContextState,
-	// as it prevents it from being set "by default".
-	rootCloseContext *closeContext
-
 	// Below are slices that need to be managed when cloning and reclaiming
 	// nodeContexts for reuse. We want to ensure that, instead of setting
 	// slices to nil, we truncate the existing buffers so that they do not

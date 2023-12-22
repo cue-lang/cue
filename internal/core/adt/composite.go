@@ -157,12 +157,16 @@ type Vertex struct {
 	//   eval: *,   BaseValue: *   -- finalized
 	//
 	state *nodeContext
-	// TODO: move the following status fields to nodeContext.
+
+	// cc manages the closedness logic for this Vertex. It is created
+	// by rootCloseContext.
+	// TODO: move back to nodeContext, but be sure not to clone it.
+	cc *closeContext
 
 	// Label is the feature leading to this vertex.
 	Label Feature
 
-	// TODO: move the following status fields to nodeContext.
+	// TODO: move the following fields to nodeContext.
 
 	// status indicates the evaluation progress of this vertex.
 	status vertexStatus
@@ -243,6 +247,18 @@ type Vertex struct {
 	// Structs is a slice of struct literals that contributed to this value.
 	// This information is used to compute the topological sort of arcs.
 	Structs []*StructInfo
+}
+
+// rootCloseContext creates a closeContext for this Vertex or returns the
+// existing one.
+func (v *Vertex) rootCloseContext() *closeContext {
+	if v.cc == nil {
+		v.cc = &closeContext{
+			parent: nil,
+			src:    v,
+		}
+	}
+	return v.cc
 }
 
 // newInlineVertex creates a Vertex that is needed for computation, but for

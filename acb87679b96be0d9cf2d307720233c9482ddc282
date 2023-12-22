@@ -56,6 +56,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2961e1e8_6f178bb8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-22T10:01:09Z",
+      "side": 1,
+      "message": "Looks good!",
+      "parentUuid": "34af6dd8_2de919a2",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "6c542067_64d27510",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -190,6 +208,24 @@
       "side": 1,
       "message": "I actually thought it was quite intuitive the way the (existing) tests are written. The expected errors and results are already in the test file so comments aren\u0027t really needed. The only issue is that input and expected output are quite far from each other in the test file.\n\nAn improvement would be to have the input and expected output close together, grouped by test. Something like:\n\n-- in.cue --\nimport \"net\"\nt9:  net.IPv4 \u0026 \"23.23.23.2333\"\n-- out/net --\nErrors:\nt9: invalid value \"23.23.23.2333\" (does not satisfy net.IPv4):\n    ./in.cue:11:6\n    ./in.cue:11:17",
       "parentUuid": "c9953afe_dc035f48",
+      "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58e3cfdc_61ab2829",
+        "filename": "pkg/net/testdata/gen.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-22T10:01:09Z",
+      "side": 1,
+      "message": "I agree with you both that the current mechanism is slightly unintuitive, but it\u0027s also widespread in the existing testdata files, so I don\u0027t think we need to figure out how to improve it right now :)",
+      "parentUuid": "0227f04c_6e1d635a",
       "revId": "acb87679b96be0d9cf2d307720233c9482ddc282",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

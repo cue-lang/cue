@@ -25,8 +25,10 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
@@ -67,12 +69,21 @@ var needFix = map[string]string{
 	"DIR/NAME": "reason",
 }
 
-var todoAlpha = map[string]string{
-	"DIR/NAME": "reason",
-}
-
 func TestEvalAlpha(t *testing.T) {
 	adt.DebugDeps = true // check unmatched dependencies.
+
+	var todoAlpha = map[string]string{
+		// The list package defines some disjunctions. Even those these tests
+		// do not have any disjunctions in the test, they still fail because
+		// they trigger the disjunction in the list package.
+		// Some other tests use the 'or' builtin, which is also not yet
+		// supported.
+		"builtins/list/sort": "list package",
+		"benchmarks/sort":    "list package",
+		"fulleval/032_or_builtin_should_not_fail_on_non-concrete_empty_list": "unimplemented",
+		"resolve/048_builtins":                     "unimplemented",
+		"fulleval/049_alias_reuse_in_nested_scope": "list",
+	}
 
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
@@ -86,12 +97,43 @@ func TestEvalAlpha(t *testing.T) {
 		test.ToDo = nil
 	}
 
+	var ran, skipped, errorCount int
+
 	test.Run(t, func(t *cuetxtar.Test) {
-		runEvalTest(t, internal.DevVersion)
+		if reason := skipFiles(t.Instance().Files...); reason != "" {
+			skipped++
+			t.Skip(reason)
+		}
+		ran++
+
+		errorCount += runEvalTest(t, internal.DevVersion)
 	})
+
+	t.Logf("todo: %d, ran: %d, skipped: %d, nodeErrors: %d",
+		len(todoAlpha), ran, skipped, errorCount)
 }
 
-func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
+// skipFiles returns true if the given files contain CUE that is not yet handled
+// by the development version of the evaluator.
+func skipFiles(a ...*ast.File) (reason string) {
+	// Skip disjunctions.
+	var fn func(n ast.Node) bool
+	fn = func(n ast.Node) bool {
+		switch x := n.(type) {
+		case *ast.BinaryExpr:
+			if x.Op == token.OR {
+				reason = "disjunctions"
+			}
+		}
+		return true
+	}
+	for _, f := range a {
+		ast.Walk(f, fn, nil)
+	}
+	return reason
+}
+
+func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) (errorCount int) {
 	a := t.Instance()
 	// TODO: use version once we implement disjunctions.
 	r := runtime.NewVersioned(internal.DefaultVersion)
@@ -109,6 +151,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 
 	// Print discrepancies in dependencies.
 	if m := ctx.ErrorGraphs; len(m) > 0 {
+		errorCount += 1 // Could use len(m), but this seems more useful.
 		i := 0
 		keys := make([]string, len(m))
 		for k := range m {
@@ -146,6 +189,8 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 
 	debug.WriteNode(t, r, v, &debug.Config{Cwd: t.Dir})
 	fmt.Fprintln(t)
+
+	return
 }
 
 // TestX is for debugging. Do not delete.

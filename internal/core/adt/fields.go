@@ -241,7 +241,7 @@ func (c *closeContext) decDependent(n *nodeContext) {
 		return
 	}
 
-	c.finalizePattern(n)
+	c.finalizePattern()
 
 	if c.isDef {
 		c.isClosed = true
@@ -567,7 +567,7 @@ func mergeConjunctions(a, b Value) Value {
 // children is closed, the result will be a conjunction of all these closed
 // values. Otherwise it will be a disjunction of all its children. A nil value
 // represents all values.
-func (c *closeContext) finalizePattern(n *nodeContext) {
+func (c *closeContext) finalizePattern() {
 	switch {
 	case c.Expr != nil: // Patterns and expression are already set.
 		if !c.isClosed {

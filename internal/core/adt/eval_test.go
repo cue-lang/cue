@@ -70,6 +70,8 @@ var todoAlpha = map[string]string{
 }
 
 func TestEvalAlpha(t *testing.T) {
+	adt.DebugDeps = true // check unmatched dependencies.
+
 	test := cuetxtar.TxTarTest{
 		Root:     "../../../cue/testdata",
 		Name:     "evalalpha",
@@ -133,6 +135,8 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) {
 func TestX(t *testing.T) {
 	var verbosity int
 	verbosity = 1 // comment to turn logging off.
+
+	adt.DebugDeps = true
 
 	var version internal.EvaluatorVersion
 	version = internal.DevVersion // comment to use default implementation.

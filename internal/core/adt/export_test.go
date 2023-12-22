@@ -37,14 +37,10 @@ func NewFieldTester(r Runtime) *FieldTester {
 	ctx := New(v, &Config{Runtime: r})
 	n := v.getNodeContext(ctx, 1)
 
-	n.rootCloseContext = &closeContext{
-		src: v,
-	}
-
 	return &FieldTester{
 		OpContext: ctx,
 		n:         n,
-		cc:        n.rootCloseContext,
+		cc:        v.rootCloseContext(),
 		Root:      v,
 	}
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4cf9a98a_7bc02334",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-25T22:14:30Z",
+      "side": 1,
+      "message": "Cannot submit due to conflicts.\n\nDid you somehow end up with multiple disjoint chains of CLs?",
+      "revId": "2e54e8a9e1b8d84dbc9b2c96305d35ea22f531f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

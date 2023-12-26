@@ -1,0 +1,489 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b45ee41_6097d1ca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "Largely SGTM, but I had to stop reviewing the rest of the test cases because I honstly cannot follow what\u0027s going on.\n\nI suggested a few renames, but please feel free to leave any of them as TODOs to prevent merge conflict pain.",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4735d8ad_829caa69",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "I assume this should be a space, as it follows a bullet point rather than starting a new one",
+      "range": {
+        "startLine": 45,
+        "startChar": 3,
+        "endLine": 45,
+        "endChar": 4
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9d029e5d_a7fe3fc0",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "did you perhaps mean...\n\u003e in the dependency graph\n\notherwise I can\u0027t parse this sentence",
+      "range": {
+        "startLine": 50,
+        "startChar": 10,
+        "endLine": 50,
+        "endChar": 26
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a43d6d62_cfa3166c",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "did you mean \"unblocking\"? because further down you talk about blocking and unblocking, but you never again mention locking/unlocking.",
+      "range": {
+        "startLine": 51,
+        "startChar": 48,
+        "endLine": 51,
+        "endChar": 57
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9cb6b27_45772074",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "singluar: task",
+      "range": {
+        "startLine": 73,
+        "startChar": 54,
+        "endLine": 73,
+        "endChar": 59
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0ba48128_9b630834",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 172,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "nit: please clarify in the godocs which of these types are bitsets",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b98c3672_ca21c2ab",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 210,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "document this briefly, please",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23dbbd71_0838f427",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 230,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "\u003e the bitset",
+      "range": {
+        "startLine": 230,
+        "startChar": 17,
+        "endLine": 230,
+        "endChar": 26
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba812575_0921ccd3",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "it seems to me like `needs` and `provided` should be consistent as names, so I\u0027d personally go for `needs` and `provides`, but you could also consider `needed` and `provided`.",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6cddbdaf_69058da0",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 245,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "we have both frozen and isFrozen as fields, which is rather confusing. I\u0027d suggest different names, or at least a godoc here to clarify",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd699e1d_463744a2",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 256,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "nit: when you rename tasks to queue, you could also rename this for clarity, e.g. nextQueueIndex",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4fd4464_1ad3bfda",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 274,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "state",
+      "range": {
+        "startLine": 274,
+        "startChar": 29,
+        "endLine": 274,
+        "endChar": 33
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b4b5e5e_8c206346",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 430,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "why do you range over blocking three times in a row? that isn\u0027t obvious to me, so I would either change the code or document why it must be this way.",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a315d239_da60d9e3",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "I\u0027d move the blockedOn nil check outside the loop - otherwise you might loop over all elements and do nothing if blockedOn is nil.",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9aae73e6_eee8ffc1",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 439,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "add a reminder here for why this might be true, e.g.\n\u003e // s.tasks might have grown during processing.",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fff56f5_1d164d95",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 472,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "perhaps ensure that via asserts/panics?",
+      "range": {
+        "startLine": 471,
+        "startChar": 41,
+        "endLine": 472,
+        "endChar": 17
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30476fe9_36d40dec",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 500,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "this continue appears to be a no-op. is that ok?",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfec7ad1_8a40ef35",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "is this godoc in the wrong place?",
+      "range": {
+        "startLine": 521,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 2
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4513cd9a_c1cfee9d",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 532,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "incomplete godoc?",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "45e82023_e3232a17",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "`id` and `x` don\u0027t seem like very helpful field names, can we be more explicit?\n\n`id` never seems to be set, as far as I can tell. and `x` is only used in the tests. so perhaps remove the first, and keep the second under a name like testNode?",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3bcb3d8e_a1a9d321",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "when could err be non-nil before a task has run? that feels like an odd case that we shouldn\u0027t allow",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66bb7190_410ff188",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 651,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "originate from",
+      "range": {
+        "startLine": 651,
+        "startChar": 34,
+        "endLine": 651,
+        "endChar": 43
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78677e1d_4864b211",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "place this on a separate line for clarity",
+      "range": {
+        "startLine": 261,
+        "startChar": 17,
+        "endLine": 261,
+        "endChar": 21
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2dfadca_84214174",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 272,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "nit: trailing whitespace, caused by the trailing space in the names above",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abfa6953_d94048d7",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2023-12-26T20:26:29Z",
+      "side": 1,
+      "message": "I\u0027m a bit lost. If `t1:bar` has a dependency on `t0` completing `c1`, why would `t0` run after `t1:bar` and not the other way around?\n\nI also find this rather tricky to follow. It\u0027s hard to remember what the parameters to completes/success do, for example. I\u0027m not sure what the colons in e.g. `t1:bar` are meant to do. And I\u0027m not sure I follow why `t0` uses `baz` as its nodeContext, but the other two tasks use `v0` directly.\n\nOverall I kind of see what the test is aiming to do, but I can\u0027t say I follow the code properly.",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

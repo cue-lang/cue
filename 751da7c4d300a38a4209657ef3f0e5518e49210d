@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2681717_ffd03b02",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037600
+      },
+      "writtenOn": "2023-12-26T18:52:39Z",
+      "side": 1,
+      "message": "It is curious that we need to add special code to ensure that the formatter adds a newline after a Line comment, since the definition of Line comment is, or should be, \u0027a comment that terminates a code line\u0027.\n\nIt would be interesting to find out what is preventing the formatter (as before this change) from adding the new line in this particular case.",
+      "revId": "751da7c4d300a38a4209657ef3f0e5518e49210d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

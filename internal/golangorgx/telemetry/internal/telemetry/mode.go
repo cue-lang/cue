@@ -35,7 +35,7 @@ func init() {
 	if err != nil {
 		return
 	}
-	gotelemetrydir := filepath.Join(cfgDir, "go", "telemetry")
+	gotelemetrydir := filepath.Join(cfgDir, "cue", "telemetry")
 	LocalDir = filepath.Join(gotelemetrydir, "local")
 	UploadDir = filepath.Join(gotelemetrydir, "upload")
 	ModeFile = ModeFilePath(filepath.Join(gotelemetrydir, "mode"))

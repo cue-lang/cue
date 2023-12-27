@@ -9,12 +9,7 @@ package hooks // import "cuelang.org/go/internal/golangorgx/gopls/hooks"
 
 import (
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
-	"mvdan.cc/xurls/v2"
 )
 
 func Options(options *settings.Options) {
-	options.LicensesText = licensesText
-	options.URLRegexp = xurls.Relaxed()
-	updateAnalyzers(options)
-	updateGofumpt(options)
 }

@@ -84,7 +84,7 @@ func Message(goVersion int, fromBuild bool) (string, bool) {
 			}
 			fmt.Fprintf(&msgBuilder, "Please upgrade to Go 1.%d or later and reinstall gopls. ", OldestSupported())
 			fmt.Fprintf(&msgBuilder, "If you can't upgrade and want this message to go away, please install gopls %s. ", v.InstallGoplsVersion)
-			fmt.Fprint(&msgBuilder, "See https://go.dev/s/gopls-support-policy for more details.")
+			fmt.Fprint(&msgBuilder, "See https://go.dev/s/cuepls-support-policy for more details.")
 
 			return msgBuilder.String(), isError
 		}

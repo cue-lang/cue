@@ -396,9 +396,9 @@ func (i *Instance) SetLogFile(logfile string, isDaemon bool) (func(), error) {
 	if logfile != "" {
 		if logfile == "auto" {
 			if isDaemon {
-				logfile = filepath.Join(os.TempDir(), fmt.Sprintf("gopls-daemon-%d.log", os.Getpid()))
+				logfile = filepath.Join(os.TempDir(), fmt.Sprintf("cuepls-daemon-%d.log", os.Getpid()))
 			} else {
-				logfile = filepath.Join(os.TempDir(), fmt.Sprintf("gopls-%d.log", os.Getpid()))
+				logfile = filepath.Join(os.TempDir(), fmt.Sprintf("cuepls-%d.log", os.Getpid()))
 			}
 		}
 		f, err := os.Create(logfile)

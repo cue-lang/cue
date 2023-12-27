@@ -13,62 +13,9 @@ import (
 	"strings"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/deprecated"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/embeddirective"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/fillreturns"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/fillstruct"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/infertypeargs"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/nonewvars"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/noresultvalues"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifycompositelit"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifyrange"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifyslice"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/stubmethods"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/undeclaredname"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/unusedparams"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/unusedvariable"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/useany"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
-	"cuelang.org/go/internal/golangorgx/gopls/lsp/command"
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
 	"golang.org/x/tools/go/analysis"
-	"golang.org/x/tools/go/analysis/passes/appends"
-	"golang.org/x/tools/go/analysis/passes/asmdecl"
-	"golang.org/x/tools/go/analysis/passes/assign"
-	"golang.org/x/tools/go/analysis/passes/atomic"
-	"golang.org/x/tools/go/analysis/passes/atomicalign"
-	"golang.org/x/tools/go/analysis/passes/bools"
-	"golang.org/x/tools/go/analysis/passes/buildtag"
-	"golang.org/x/tools/go/analysis/passes/cgocall"
-	"golang.org/x/tools/go/analysis/passes/composite"
-	"golang.org/x/tools/go/analysis/passes/copylock"
-	"golang.org/x/tools/go/analysis/passes/deepequalerrors"
-	"golang.org/x/tools/go/analysis/passes/defers"
-	"golang.org/x/tools/go/analysis/passes/directive"
-	"golang.org/x/tools/go/analysis/passes/errorsas"
-	"golang.org/x/tools/go/analysis/passes/fieldalignment"
-	"golang.org/x/tools/go/analysis/passes/httpresponse"
-	"golang.org/x/tools/go/analysis/passes/ifaceassert"
-	"golang.org/x/tools/go/analysis/passes/loopclosure"
-	"golang.org/x/tools/go/analysis/passes/lostcancel"
-	"golang.org/x/tools/go/analysis/passes/nilfunc"
-	"golang.org/x/tools/go/analysis/passes/nilness"
-	"golang.org/x/tools/go/analysis/passes/printf"
-	"golang.org/x/tools/go/analysis/passes/shadow"
-	"golang.org/x/tools/go/analysis/passes/shift"
-	"golang.org/x/tools/go/analysis/passes/slog"
-	"golang.org/x/tools/go/analysis/passes/sortslice"
-	"golang.org/x/tools/go/analysis/passes/stdmethods"
-	"golang.org/x/tools/go/analysis/passes/stringintconv"
-	"golang.org/x/tools/go/analysis/passes/structtag"
-	"golang.org/x/tools/go/analysis/passes/testinggoroutine"
-	"golang.org/x/tools/go/analysis/passes/tests"
-	"golang.org/x/tools/go/analysis/passes/timeformat"
-	"golang.org/x/tools/go/analysis/passes/unmarshal"
-	"golang.org/x/tools/go/analysis/passes/unreachable"
-	"golang.org/x/tools/go/analysis/passes/unsafeptr"
-	"golang.org/x/tools/go/analysis/passes/unusedresult"
-	"golang.org/x/tools/go/analysis/passes/unusedwrite"
 )
 
 type Annotation string
@@ -801,15 +748,6 @@ func (o *Options) EnableAllExperiments() {
 }
 
 func (o *Options) enableAllExperimentMaps() {
-	if _, ok := o.Codelenses[string(command.GCDetails)]; !ok {
-		o.Codelenses[string(command.GCDetails)] = true
-	}
-	if _, ok := o.Analyses[unusedparams.Analyzer.Name]; !ok {
-		o.Analyses[unusedparams.Analyzer.Name] = true
-	}
-	if _, ok := o.Analyses[unusedvariable.Analyzer.Name]; !ok {
-		o.Analyses[unusedvariable.Analyzer.Name] = true
-	}
 }
 
 // validateDirectoryFilter validates if the filter string
@@ -1352,124 +1290,17 @@ func (r *OptionResult) setStringSlice(s *[]string) {
 }
 
 func typeErrorAnalyzers() map[string]*Analyzer {
-	return map[string]*Analyzer{
-		fillreturns.Analyzer.Name: {
-			Analyzer: fillreturns.Analyzer,
-			// TODO(rfindley): is SourceFixAll even necessary here? Is that not implied?
-			ActionKind: []protocol.CodeActionKind{protocol.SourceFixAll, protocol.QuickFix},
-			Enabled:    true,
-		},
-		nonewvars.Analyzer.Name: {
-			Analyzer: nonewvars.Analyzer,
-			Enabled:  true,
-		},
-		noresultvalues.Analyzer.Name: {
-			Analyzer: noresultvalues.Analyzer,
-			Enabled:  true,
-		},
-		undeclaredname.Analyzer.Name: {
-			Analyzer: undeclaredname.Analyzer,
-			Fix:      UndeclaredName,
-			Enabled:  true,
-		},
-		unusedvariable.Analyzer.Name: {
-			Analyzer: unusedvariable.Analyzer,
-			Enabled:  false,
-		},
-	}
+	return map[string]*Analyzer{}
 }
 
 // TODO(golang/go#61559): remove convenience analyzers now that they are not
 // used from the analysis framework.
 func convenienceAnalyzers() map[string]*Analyzer {
-	return map[string]*Analyzer{
-		fillstruct.Analyzer.Name: {
-			Analyzer:   fillstruct.Analyzer,
-			Fix:        FillStruct,
-			Enabled:    true,
-			ActionKind: []protocol.CodeActionKind{protocol.RefactorRewrite},
-		},
-		stubmethods.Analyzer.Name: {
-			Analyzer: stubmethods.Analyzer,
-			Fix:      StubMethods,
-			Enabled:  true,
-		},
-		infertypeargs.Analyzer.Name: {
-			Analyzer:   infertypeargs.Analyzer,
-			Enabled:    true,
-			ActionKind: []protocol.CodeActionKind{protocol.RefactorRewrite},
-		},
-	}
+	return map[string]*Analyzer{}
 }
 
 func defaultAnalyzers() map[string]*Analyzer {
-	return map[string]*Analyzer{
-		// The traditional vet suite:
-		appends.Analyzer.Name:       {Analyzer: appends.Analyzer, Enabled: true},
-		asmdecl.Analyzer.Name:       {Analyzer: asmdecl.Analyzer, Enabled: true},
-		assign.Analyzer.Name:        {Analyzer: assign.Analyzer, Enabled: true},
-		atomic.Analyzer.Name:        {Analyzer: atomic.Analyzer, Enabled: true},
-		bools.Analyzer.Name:         {Analyzer: bools.Analyzer, Enabled: true},
-		buildtag.Analyzer.Name:      {Analyzer: buildtag.Analyzer, Enabled: true},
-		cgocall.Analyzer.Name:       {Analyzer: cgocall.Analyzer, Enabled: true},
-		composite.Analyzer.Name:     {Analyzer: composite.Analyzer, Enabled: true},
-		copylock.Analyzer.Name:      {Analyzer: copylock.Analyzer, Enabled: true},
-		defers.Analyzer.Name:        {Analyzer: defers.Analyzer, Enabled: true},
-		deprecated.Analyzer.Name:    {Analyzer: deprecated.Analyzer, Enabled: true, Severity: protocol.SeverityHint, Tag: []protocol.DiagnosticTag{protocol.Deprecated}},
-		directive.Analyzer.Name:     {Analyzer: directive.Analyzer, Enabled: true},
-		errorsas.Analyzer.Name:      {Analyzer: errorsas.Analyzer, Enabled: true},
-		httpresponse.Analyzer.Name:  {Analyzer: httpresponse.Analyzer, Enabled: true},
-		ifaceassert.Analyzer.Name:   {Analyzer: ifaceassert.Analyzer, Enabled: true},
-		loopclosure.Analyzer.Name:   {Analyzer: loopclosure.Analyzer, Enabled: true},
-		lostcancel.Analyzer.Name:    {Analyzer: lostcancel.Analyzer, Enabled: true},
-		nilfunc.Analyzer.Name:       {Analyzer: nilfunc.Analyzer, Enabled: true},
-		printf.Analyzer.Name:        {Analyzer: printf.Analyzer, Enabled: true},
-		shift.Analyzer.Name:         {Analyzer: shift.Analyzer, Enabled: true},
-		slog.Analyzer.Name:          {Analyzer: slog.Analyzer, Enabled: true},
-		stdmethods.Analyzer.Name:    {Analyzer: stdmethods.Analyzer, Enabled: true},
-		stringintconv.Analyzer.Name: {Analyzer: stringintconv.Analyzer, Enabled: true},
-		structtag.Analyzer.Name:     {Analyzer: structtag.Analyzer, Enabled: true},
-		tests.Analyzer.Name:         {Analyzer: tests.Analyzer, Enabled: true},
-		unmarshal.Analyzer.Name:     {Analyzer: unmarshal.Analyzer, Enabled: true},
-		unreachable.Analyzer.Name:   {Analyzer: unreachable.Analyzer, Enabled: true},
-		unsafeptr.Analyzer.Name:     {Analyzer: unsafeptr.Analyzer, Enabled: true},
-		unusedresult.Analyzer.Name:  {Analyzer: unusedresult.Analyzer, Enabled: true},
-
-		// Non-vet analyzers:
-		atomicalign.Analyzer.Name:      {Analyzer: atomicalign.Analyzer, Enabled: true},
-		deepequalerrors.Analyzer.Name:  {Analyzer: deepequalerrors.Analyzer, Enabled: true},
-		fieldalignment.Analyzer.Name:   {Analyzer: fieldalignment.Analyzer, Enabled: false},
-		nilness.Analyzer.Name:          {Analyzer: nilness.Analyzer, Enabled: true},
-		shadow.Analyzer.Name:           {Analyzer: shadow.Analyzer, Enabled: false},
-		sortslice.Analyzer.Name:        {Analyzer: sortslice.Analyzer, Enabled: true},
-		testinggoroutine.Analyzer.Name: {Analyzer: testinggoroutine.Analyzer, Enabled: true},
-		unusedparams.Analyzer.Name:     {Analyzer: unusedparams.Analyzer, Enabled: false},
-		unusedwrite.Analyzer.Name:      {Analyzer: unusedwrite.Analyzer, Enabled: false},
-		useany.Analyzer.Name:           {Analyzer: useany.Analyzer, Enabled: false},
-		timeformat.Analyzer.Name:       {Analyzer: timeformat.Analyzer, Enabled: true},
-		embeddirective.Analyzer.Name: {
-			Analyzer: embeddirective.Analyzer,
-			Enabled:  true,
-			Fix:      AddEmbedImport,
-		},
-
-		// gofmt -s suite:
-		simplifycompositelit.Analyzer.Name: {
-			Analyzer:   simplifycompositelit.Analyzer,
-			Enabled:    true,
-			ActionKind: []protocol.CodeActionKind{protocol.SourceFixAll, protocol.QuickFix},
-		},
-		simplifyrange.Analyzer.Name: {
-			Analyzer:   simplifyrange.Analyzer,
-			Enabled:    true,
-			ActionKind: []protocol.CodeActionKind{protocol.SourceFixAll, protocol.QuickFix},
-		},
-		simplifyslice.Analyzer.Name: {
-			Analyzer:   simplifyslice.Analyzer,
-			Enabled:    true,
-			ActionKind: []protocol.CodeActionKind{protocol.SourceFixAll, protocol.QuickFix},
-		},
-	}
+	return map[string]*Analyzer{}
 }
 
 func urlRegexp() *regexp.Regexp {

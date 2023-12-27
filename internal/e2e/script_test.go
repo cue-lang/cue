@@ -113,7 +113,7 @@ func TestScript(t *testing.T) {
 				// githubToken should have read and write access to repository
 				// administration and contents within githubOrg,
 				// to be able to create repositories under the org and git push to them.
-				// Not a global, since
+				// Not a global, since we only want to require GITHUB_TOKEN when needed.
 				githubToken := envMust(t, "GITHUB_TOKEN")
 
 				repoName := testModuleName(ts)

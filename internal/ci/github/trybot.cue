@@ -171,7 +171,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			for module in . internal/e2e; do
 				(
 					cd $module
-					go vet ./...
+					go vet $(go list ./... | grep -v cuelang.org/go/internal/golangorgx/tools/testenv)
 					go mod tidy
 				)
 			done

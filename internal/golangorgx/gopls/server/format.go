@@ -27,6 +27,11 @@ func (s *server) Formatting(ctx context.Context, params *protocol.DocumentFormat
 	switch snapshot.FileKind(fh) {
 	case file.Go:
 		return golang.Format(ctx, snapshot, fh)
+	case file.CUE:
+		return golang.FormatCUE(ctx, snapshot, fh)
+	default:
+		// TODO warn that we did not know how to format that file... why was the
+		// request routed to this LSP?
 	}
 	return nil, nil // empty result
 }

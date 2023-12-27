@@ -13,6 +13,24 @@ import (
 	"strings"
 	"time"
 
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/deprecated"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/embeddirective"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/fillreturns"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/fillstruct"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/infertypeargs"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/nonewvars"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/noresultvalues"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifycompositelit"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifyrange"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifyslice"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/stubmethods"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/undeclaredname"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/unusedparams"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/unusedvariable"
+	"cuelang.org/go/internal/golangorgx/gopls/analysis/useany"
+	"cuelang.org/go/internal/golangorgx/gopls/file"
+	"cuelang.org/go/internal/golangorgx/gopls/lsp/command"
+	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
 	"golang.org/x/tools/go/analysis"
 	"golang.org/x/tools/go/analysis/passes/appends"
 	"golang.org/x/tools/go/analysis/passes/asmdecl"
@@ -51,24 +69,6 @@ import (
 	"golang.org/x/tools/go/analysis/passes/unsafeptr"
 	"golang.org/x/tools/go/analysis/passes/unusedresult"
 	"golang.org/x/tools/go/analysis/passes/unusedwrite"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/deprecated"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/embeddirective"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/fillreturns"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/fillstruct"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/infertypeargs"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/nonewvars"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/noresultvalues"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifycompositelit"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifyrange"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/simplifyslice"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/stubmethods"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/undeclaredname"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/unusedparams"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/unusedvariable"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/useany"
-	"cuelang.org/go/internal/golangorgx/gopls/file"
-	"cuelang.org/go/internal/golangorgx/gopls/lsp/command"
-	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
 )
 
 type Annotation string
@@ -340,9 +340,6 @@ type DiagnosticOptions struct {
 	// Annotations specifies the various kinds of optimization diagnostics
 	// that should be reported by the gc_details command.
 	Annotations map[Annotation]bool `status:"experimental"`
-
-	// Vulncheck enables vulnerability scanning.
-	Vulncheck VulncheckMode `status:"experimental"`
 
 	// DiagnosticsDelay controls the amount of time that gopls waits
 	// after the most recent file modification before computing deep diagnostics.
@@ -643,18 +640,6 @@ const (
 	Structured HoverKind = "Structured"
 )
 
-type VulncheckMode string
-
-const (
-	// Disable vulnerability analysis.
-	ModeVulncheckOff VulncheckMode = "Off"
-	// In Imports mode, `gopls` will report vulnerabilities that affect packages
-	// directly and indirectly used by the analyzed main module.
-	ModeVulncheckImports VulncheckMode = "Imports"
-
-	// TODO: VulncheckRequire, VulncheckCallgraph
-)
-
 type DiagnosticsTrigger string
 
 const (
@@ -818,9 +803,6 @@ func (o *Options) EnableAllExperiments() {
 func (o *Options) enableAllExperimentMaps() {
 	if _, ok := o.Codelenses[string(command.GCDetails)]; !ok {
 		o.Codelenses[string(command.GCDetails)] = true
-	}
-	if _, ok := o.Codelenses[string(command.RunGovulncheck)]; !ok {
-		o.Codelenses[string(command.RunGovulncheck)] = true
 	}
 	if _, ok := o.Analyses[unusedparams.Analyzer.Name]; !ok {
 		o.Analyses[unusedparams.Analyzer.Name] = true
@@ -988,14 +970,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 
 	case "annotations":
 		result.setAnnotationMap(&o.Annotations)
-
-	case "vulncheck":
-		if s, ok := result.asOneOf(
-			string(ModeVulncheckOff),
-			string(ModeVulncheckImports),
-		); ok {
-			o.Vulncheck = VulncheckMode(s)
-		}
 
 	case "codelenses", "codelens":
 		var lensOverrides map[string]bool

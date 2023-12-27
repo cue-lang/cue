@@ -125,7 +125,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// https://github.com/google-github-actions/setup-gcloud#service-account-key-json
 		{
 			name: "gcloud auth for end-to-end tests"
-			id: "auth"
+			id:   "auth"
 			uses: "google-github-actions/auth@v1"
 			// E2E_GCLOUD_KEY is a key for the service account cue-e2e-ci,
 			// which has the Artifact Registry Repository Administrator role.
@@ -160,11 +160,11 @@ workflows: trybot: _repo.bashWorkflow & {
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
 		name: "Check"
-		run:  """
+		run: """
 			for module in . internal/e2e; do
 				(
 					cd $module
-					go vet ./...
+					go vet $(go list ./... | grep -v cuelang.org/go/internal/golangorgx/tools/testenv)
 					go mod tidy
 				)
 			done

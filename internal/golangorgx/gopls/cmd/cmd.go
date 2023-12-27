@@ -277,29 +277,9 @@ func (app *Application) internalCommands() []tool.Application {
 
 func (app *Application) featureCommands() []tool.Application {
 	return []tool.Application{
-		&callHierarchy{app: app},
-		&check{app: app},
-		&codelens{app: app},
-		&definition{app: app},
-		&execute{app: app},
-		&foldingRanges{app: app},
 		&format{app: app},
-		&highlight{app: app},
-		&implementation{app: app},
-		&imports{app: app},
 		newRemote(app, ""),
 		newRemote(app, "inspect"),
-		&links{app: app},
-		&prepareRename{app: app},
-		&references{app: app},
-		&rename{app: app},
-		&semtok{app: app},
-		&signature{app: app},
-		&stats{app: app},
-		&suggestedFix{app: app},
-		&symbols{app: app},
-
-		&workspaceSymbol{app: app},
 	}
 }
 

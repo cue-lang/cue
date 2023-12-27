@@ -17,7 +17,7 @@ import (
 )
 
 // default for mode 'on'. Overridden in tests.
-var uploadURL = "https://telemetry.go.dev/upload"
+var uploadURL = "https://telemetry.cue.works/upload"
 
 var (
 	dateRE     = regexp.MustCompile(`(\d\d\d\d-\d\d-\d\d)[.]json$`)

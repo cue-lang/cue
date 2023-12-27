@@ -115,7 +115,7 @@ func NewUploader(config *telemetry.UploadConfig) *Uploader {
 		LocalDir:        it.LocalDir,
 		UploadDir:       it.UploadDir,
 		ModeFilePath:    it.ModeFile,
-		UploadServerURL: "https://telemetry.go.dev/upload",
+		UploadServerURL: "https://telemetry.cue.works/upload",
 		StartTime:       time.Now().UTC(),
 	}
 }

@@ -228,9 +228,16 @@ func (g *generator) processCUE() error {
 		return err
 	}
 	b = bytes.ReplaceAll(b, []byte("\n\n"), []byte("\n"))
-	// body = strings.ReplaceAll(body, "\t", "")
-	// TODO: escape backtick
-	fmt.Fprintf(g.w, "CUE: `%s`,\n", string(b))
+	// Try to use a Go string with backquotes, for readability.
+	// If not possible due to cueSrc itself having backquotes,
+	// use a single-line double quoted string, removing tabs for brevity.
+	// We don't use strconv.CanBackquote as it is for quoting as a single line.
+	if cueSrc := string(b); !strings.Contains(cueSrc, "`") {
+		fmt.Fprintf(g.w, "CUE: `%s`,\n", cueSrc)
+	} else {
+		cueSrc = strings.ReplaceAll(cueSrc, "\t", "")
+		fmt.Fprintf(g.w, "CUE: %q,\n", cueSrc)
+	}
 	return nil
 }
 

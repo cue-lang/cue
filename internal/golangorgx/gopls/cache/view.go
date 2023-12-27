@@ -23,7 +23,6 @@ import (
 	"sort"
 	"strings"
 	"sync"
-	"time"
 
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
@@ -32,7 +31,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
 	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
-	"cuelang.org/go/internal/golangorgx/gopls/vulncheck"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/gocommand"
 	"cuelang.org/go/internal/golangorgx/tools/imports"
@@ -768,7 +766,6 @@ type StateChange struct {
 	Modifications  []file.Modification // if set, the raw modifications originating this change
 	Files          map[protocol.DocumentURI]file.Handle
 	ModuleUpgrades map[protocol.DocumentURI]map[string]string
-	Vulns          map[protocol.DocumentURI]*vulncheck.Result
 	GCDetails      map[metadata.PackageID]bool // package -> whether or not we want details
 }
 
@@ -1181,40 +1178,6 @@ func (s *Snapshot) ModuleUpgrades(modfile protocol.DocumentURI) map[string]strin
 		upgrades[mod] = ver
 	}
 	return upgrades
-}
-
-// MaxGovulncheckResultsAge defines the maximum vulnerability age considered
-// valid by gopls.
-//
-// Mutable for testing.
-var MaxGovulncheckResultAge = 1 * time.Hour
-
-// Vulnerabilities returns known vulnerabilities for the given modfile.
-//
-// Results more than an hour old are excluded.
-//
-// TODO(suzmue): replace command.Vuln with a different type, maybe
-// https://pkg.go.dev/golang.org/x/vuln/cmd/govulncheck/govulnchecklib#Summary?
-//
-// TODO(rfindley): move to snapshot.go
-func (s *Snapshot) Vulnerabilities(modfiles ...protocol.DocumentURI) map[protocol.DocumentURI]*vulncheck.Result {
-	m := make(map[protocol.DocumentURI]*vulncheck.Result)
-	now := time.Now()
-
-	s.mu.Lock()
-	defer s.mu.Unlock()
-
-	if len(modfiles) == 0 { // empty means all modfiles
-		modfiles = s.vulns.Keys()
-	}
-	for _, modfile := range modfiles {
-		vuln, _ := s.vulns.Get(modfile)
-		if vuln != nil && now.Sub(vuln.AsOf) > MaxGovulncheckResultAge {
-			vuln = nil
-		}
-		m[modfile] = vuln
-	}
-	return m
 }
 
 // GoVersion returns the effective release Go version (the X in go1.X) for this

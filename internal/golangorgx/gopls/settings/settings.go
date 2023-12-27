@@ -342,9 +342,6 @@ type DiagnosticOptions struct {
 	// that should be reported by the gc_details command.
 	Annotations map[Annotation]bool `status:"experimental"`
 
-	// Vulncheck enables vulnerability scanning.
-	Vulncheck VulncheckMode `status:"experimental"`
-
 	// DiagnosticsDelay controls the amount of time that gopls waits
 	// after the most recent file modification before computing deep diagnostics.
 	// Simple diagnostics (parsing and type-checking) are always run immediately
@@ -653,18 +650,6 @@ const (
 	Structured HoverKind = "Structured"
 )
 
-type VulncheckMode string
-
-const (
-	// Disable vulnerability analysis.
-	ModeVulncheckOff VulncheckMode = "Off"
-	// In Imports mode, `gopls` will report vulnerabilities that affect packages
-	// directly and indirectly used by the analyzed main module.
-	ModeVulncheckImports VulncheckMode = "Imports"
-
-	// TODO: VulncheckRequire, VulncheckCallgraph
-)
-
 type DiagnosticsTrigger string
 
 const (
@@ -833,9 +818,6 @@ func (o *Options) enableAllExperimentMaps() {
 	if _, ok := o.Codelenses[string(command.GCDetails)]; !ok {
 		o.Codelenses[string(command.GCDetails)] = true
 	}
-	if _, ok := o.Codelenses[string(command.RunGovulncheck)]; !ok {
-		o.Codelenses[string(command.RunGovulncheck)] = true
-	}
 	if _, ok := o.Analyses[unusedvariable.Analyzer.Name]; !ok {
 		o.Analyses[unusedvariable.Analyzer.Name] = true
 	}
@@ -999,14 +981,6 @@ func (o *Options) set(name string, value interface{}, seen map[string]struct{}) 
 
 	case "annotations":
 		result.setAnnotationMap(&o.Annotations)
-
-	case "vulncheck":
-		if s, ok := result.asOneOf(
-			string(ModeVulncheckOff),
-			string(ModeVulncheckImports),
-		); ok {
-			o.Vulncheck = VulncheckMode(s)
-		}
 
 	case "codelenses", "codelens":
 		var lensOverrides map[string]bool

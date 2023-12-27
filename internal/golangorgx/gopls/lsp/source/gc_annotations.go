@@ -25,12 +25,12 @@ func GCOptimizationDetails(ctx context.Context, snapshot *cache.Snapshot, mp *me
 		return nil, nil
 	}
 	pkgDir := filepath.Dir(mp.CompiledGoFiles[0].Path())
-	outDir := filepath.Join(os.TempDir(), fmt.Sprintf("gopls-%d.details", os.Getpid()))
+	outDir := filepath.Join(os.TempDir(), fmt.Sprintf("cuepls-%d.details", os.Getpid()))
 
 	if err := os.MkdirAll(outDir, 0700); err != nil {
 		return nil, err
 	}
-	tmpFile, err := os.CreateTemp(os.TempDir(), "gopls-x")
+	tmpFile, err := os.CreateTemp(os.TempDir(), "cuepls-x")
 	if err != nil {
 		return nil, err
 	}

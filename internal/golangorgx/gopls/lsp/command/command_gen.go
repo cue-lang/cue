@@ -30,7 +30,6 @@ const (
 	CheckUpgrades           Command = "check_upgrades"
 	DiagnoseFiles           Command = "diagnose_files"
 	EditGoDirective         Command = "edit_go_directive"
-	FetchVulncheckResult    Command = "fetch_vulncheck_result"
 	GCDetails               Command = "gc_details"
 	Generate                Command = "generate"
 	GoGetPackage            Command = "go_get_package"
@@ -42,7 +41,6 @@ const (
 	RemoveDependency        Command = "remove_dependency"
 	ResetGoModDiagnostics   Command = "reset_go_mod_diagnostics"
 	RunGoWorkCommand        Command = "run_go_work_command"
-	RunGovulncheck          Command = "run_govulncheck"
 	RunTests                Command = "run_tests"
 	StartDebugging          Command = "start_debugging"
 	StartProfile            Command = "start_profile"
@@ -65,7 +63,6 @@ var Commands = []Command{
 	CheckUpgrades,
 	DiagnoseFiles,
 	EditGoDirective,
-	FetchVulncheckResult,
 	GCDetails,
 	Generate,
 	GoGetPackage,
@@ -77,7 +74,6 @@ var Commands = []Command{
 	RemoveDependency,
 	ResetGoModDiagnostics,
 	RunGoWorkCommand,
-	RunGovulncheck,
 	RunTests,
 	StartDebugging,
 	StartProfile,
@@ -141,12 +137,6 @@ func Dispatch(ctx context.Context, params *protocol.ExecuteCommandParams, s Inte
 			return nil, err
 		}
 		return nil, s.EditGoDirective(ctx, a0)
-	case "gopls.fetch_vulncheck_result":
-		var a0 URIArg
-		if err := UnmarshalArgs(params.Arguments, &a0); err != nil {
-			return nil, err
-		}
-		return s.FetchVulncheckResult(ctx, a0)
 	case "gopls.gc_details":
 		var a0 protocol.DocumentURI
 		if err := UnmarshalArgs(params.Arguments, &a0); err != nil {
@@ -205,12 +195,6 @@ func Dispatch(ctx context.Context, params *protocol.ExecuteCommandParams, s Inte
 			return nil, err
 		}
 		return nil, s.RunGoWorkCommand(ctx, a0)
-	case "gopls.run_govulncheck":
-		var a0 VulncheckArgs
-		if err := UnmarshalArgs(params.Arguments, &a0); err != nil {
-			return nil, err
-		}
-		return s.RunGovulncheck(ctx, a0)
 	case "gopls.run_tests":
 		var a0 RunTestsArgs
 		if err := UnmarshalArgs(params.Arguments, &a0); err != nil {
@@ -375,18 +359,6 @@ func NewEditGoDirectiveCommand(title string, a0 EditGoDirectiveArgs) (protocol.C
 	}, nil
 }
 
-func NewFetchVulncheckResultCommand(title string, a0 URIArg) (protocol.Command, error) {
-	args, err := MarshalArgs(a0)
-	if err != nil {
-		return protocol.Command{}, err
-	}
-	return protocol.Command{
-		Title:     title,
-		Command:   "gopls.fetch_vulncheck_result",
-		Arguments: args,
-	}, nil
-}
-
 func NewGCDetailsCommand(title string, a0 protocol.DocumentURI) (protocol.Command, error) {
 	args, err := MarshalArgs(a0)
 	if err != nil {
@@ -515,18 +487,6 @@ func NewRunGoWorkCommandCommand(title string, a0 RunGoWorkArgs) (protocol.Comman
 	return protocol.Command{
 		Title:     title,
 		Command:   "gopls.run_go_work_command",
-		Arguments: args,
-	}, nil
-}
-
-func NewRunGovulncheckCommand(title string, a0 VulncheckArgs) (protocol.Command, error) {
-	args, err := MarshalArgs(a0)
-	if err != nil {
-		return protocol.Command{}, err
-	}
-	return protocol.Command{
-		Title:     title,
-		Command:   "gopls.run_govulncheck",
 		Arguments: args,
 	}, nil
 }

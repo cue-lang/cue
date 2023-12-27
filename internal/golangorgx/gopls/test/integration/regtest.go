@@ -147,7 +147,7 @@ func Main(m *testing.M, hook func(*settings.Options)) {
 		}
 	}
 
-	dir, err := os.MkdirTemp("", "gopls-test-")
+	dir, err := os.MkdirTemp("", "cuepls-test-")
 	if err != nil {
 		panic(fmt.Errorf("creating temp directory: %v", err))
 	}

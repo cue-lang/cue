@@ -55,7 +55,7 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	// pid). Some clients might start multiple gopls servers, though they
 	// probably shouldn't.
 	pid := os.Getpid()
-	s.tempDir = filepath.Join(os.TempDir(), fmt.Sprintf("gopls-%d.%s", pid, s.session.ID()))
+	s.tempDir = filepath.Join(os.TempDir(), fmt.Sprintf("cuepls-%d.%s", pid, s.session.ID()))
 	err := os.Mkdir(s.tempDir, 0700)
 	if err != nil {
 		// MkdirTemp could fail due to permissions issues. This is a problem with

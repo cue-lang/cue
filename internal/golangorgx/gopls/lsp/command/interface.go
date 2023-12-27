@@ -2,7 +2,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-
 // Package command defines the interface provided by gopls for the
 // workspace/executeCommand LSP request.
 //
@@ -17,7 +16,6 @@ import (
 	"context"
 
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
-	"cuelang.org/go/internal/golangorgx/gopls/vulncheck"
 )
 
 // Interface defines the interface gopls exposes for the
@@ -167,16 +165,6 @@ type Interface interface {
 	// This command is intended for internal use only, by the gopls benchmark
 	// runner.
 	StopProfile(context.Context, StopProfileArgs) (StopProfileResult, error)
-
-	// RunGovulncheck: Run vulncheck
-	//
-	// Run vulnerability check (`govulncheck`).
-	RunGovulncheck(context.Context, VulncheckArgs) (RunVulncheckResult, error)
-
-	// FetchVulncheckResult: Get known vulncheck result
-	//
-	// Fetch the result of latest vulnerability check (`govulncheck`).
-	FetchVulncheckResult(context.Context, URIArg) (map[protocol.DocumentURI]*vulncheck.Result, error)
 
 	// MemStats: Fetch memory statistics
 	//

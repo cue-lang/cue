@@ -73,7 +73,6 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 							Inline: true,
 							Nil:    true,
 						},
-						Vulncheck:                 ModeVulncheckOff,
 						DiagnosticsDelay:          1 * time.Second,
 						DiagnosticsTrigger:        DiagnosticsOnEdit,
 						AnalysisProgressReporting: true,
@@ -103,7 +102,6 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 						string(command.GCDetails):         false,
 						string(command.UpgradeDependency): true,
 						string(command.Vendor):            true,
-						// TODO(hyangah): enable command.RunGovulncheck.
 					},
 				},
 			},

@@ -356,13 +356,6 @@ func (s *server) diagnose(ctx context.Context, snapshot *cache.Snapshot) (diagMa
 	}
 	store("diagnosing go.mod upgrades", upgradeReports, upgradeErr)
 
-	// Diagnose vulnerabilities.
-	vulnReports, vulnErr := mod.VulnerabilityDiagnostics(ctx, snapshot)
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
-	store("diagnosing vulnerabilities", vulnReports, vulnErr)
-
 	workspacePkgs, err := snapshot.WorkspaceMetadata(ctx)
 	if s.shouldIgnoreError(snapshot, err) {
 		return diagnostics, ctx.Err()

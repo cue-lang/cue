@@ -25,9 +25,6 @@ import (
 	"strings"
 	"sync"
 
-	"golang.org/x/sync/errgroup"
-	"golang.org/x/tools/go/packages"
-	"golang.org/x/tools/go/types/objectpath"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/methodsets"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/typerefs"
@@ -43,7 +40,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/util/pathutil"
 	"cuelang.org/go/internal/golangorgx/gopls/util/persistent"
 	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
-	"cuelang.org/go/internal/golangorgx/gopls/vulncheck"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/label"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
@@ -51,6 +47,9 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/memoize"
 	"cuelang.org/go/internal/golangorgx/tools/packagesinternal"
 	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
+	"golang.org/x/sync/errgroup"
+	"golang.org/x/tools/go/packages"
+	"golang.org/x/tools/go/types/objectpath"
 )
 
 // A Snapshot represents the current state for a given view.
@@ -180,7 +179,6 @@ type Snapshot struct {
 	// the view's go.mod file.
 	modTidyHandles *persistent.Map[protocol.DocumentURI, *memoize.Promise] // *memoize.Promise[modTidyResult]
 	modWhyHandles  *persistent.Map[protocol.DocumentURI, *memoize.Promise] // *memoize.Promise[modWhyResult]
-	modVulnHandles *persistent.Map[protocol.DocumentURI, *memoize.Promise] // *memoize.Promise[modVulnResult]
 
 	// importGraph holds a shared import graph to use for type-checking. Adding
 	// more packages to this import graph can speed up type checking, at the
@@ -196,9 +194,6 @@ type Snapshot struct {
 	// moduleUpgrades tracks known upgrades for module paths in each modfile.
 	// Each modfile has a map of module name to upgrade version.
 	moduleUpgrades *persistent.Map[protocol.DocumentURI, map[string]string]
-
-	// vulns maps each go.mod file's URI to its known vulnerabilities.
-	vulns *persistent.Map[protocol.DocumentURI, *vulncheck.Result]
 
 	// gcOptimizationDetails describes the packages for which we want
 	// optimization details to be included in the diagnostics.
@@ -246,11 +241,9 @@ func (s *Snapshot) decref() {
 		s.parseModHandles.Destroy()
 		s.parseWorkHandles.Destroy()
 		s.modTidyHandles.Destroy()
-		s.modVulnHandles.Destroy()
 		s.modWhyHandles.Destroy()
 		s.unloadableFiles.Destroy()
 		s.moduleUpgrades.Destroy()
-		s.vulns.Destroy()
 		s.done()
 	}
 }
@@ -1675,7 +1668,7 @@ func (s *Snapshot) clone(ctx, bgCtx context.Context, changed StateChange, done f
 
 	// TODO(rfindley): reorganize this function to make the derivation of
 	// needsDiagnosis clearer.
-	needsDiagnosis := len(changed.GCDetails) > 0 || len(changed.ModuleUpgrades) > 0 || len(changed.Vulns) > 0
+	needsDiagnosis := len(changed.GCDetails) > 0 || len(changed.ModuleUpgrades) > 0
 
 	bgCtx, cancel := context.WithCancel(bgCtx)
 	result := &Snapshot{
@@ -1700,11 +1693,9 @@ func (s *Snapshot) clone(ctx, bgCtx context.Context, changed StateChange, done f
 		parseWorkHandles:  cloneWithout(s.parseWorkHandles, changedFiles, &needsDiagnosis),
 		modTidyHandles:    cloneWithout(s.modTidyHandles, changedFiles, &needsDiagnosis),
 		modWhyHandles:     cloneWithout(s.modWhyHandles, changedFiles, &needsDiagnosis),
-		modVulnHandles:    cloneWithout(s.modVulnHandles, changedFiles, &needsDiagnosis),
 		importGraph:       s.importGraph,
 		pkgIndex:          s.pkgIndex,
 		moduleUpgrades:    cloneWith(s.moduleUpgrades, changed.ModuleUpgrades),
-		vulns:             cloneWith(s.vulns, changed.Vulns),
 	}
 
 	// Compute the new set of packages for which we want gc details, after
@@ -1896,7 +1887,6 @@ func (s *Snapshot) clone(ctx, bgCtx context.Context, changed StateChange, done f
 			//
 			// TODO(rfindley): no tests fail if I delete the line below.
 			result.modWhyHandles.Clear()
-			result.modVulnHandles.Clear()
 		}
 	}
 

@@ -14,20 +14,19 @@ import (
 	"go/parser"
 	"go/scanner"
 	"go/token"
-	"log"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"golang.org/x/tools/go/packages"
-	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/cache/metadata"
-	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
+	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
+	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
+	"golang.org/x/tools/go/packages"
 )
 
 // goPackagesErrorDiagnostics translates the given go/packages Error into a
@@ -294,63 +293,6 @@ func toSourceDiagnostic(srcAnalyzer *settings.Analyzer, gobDiag *gobDiagnostic) 
 		Related:  related,
 		Tags:     srcAnalyzer.Tag,
 	}
-
-	// We cross the set of fixes (whether edit- or command-based)
-	// with the set of kinds, as a single fix may represent more
-	// than one kind of action (e.g. refactor, quickfix, fixall),
-	// each corresponding to a distinct client UI element
-	// or operation.
-	kinds := srcAnalyzer.ActionKinds
-	if len(kinds) == 0 {
-		kinds = []protocol.CodeActionKind{protocol.QuickFix}
-	}
-
-	var fixes []SuggestedFix
-	for _, fix := range gobDiag.SuggestedFixes {
-		if len(fix.TextEdits) > 0 {
-			// Accumulate edit-based fixes supplied by the diagnostic itself.
-			edits := make(map[protocol.DocumentURI][]protocol.TextEdit)
-			for _, e := range fix.TextEdits {
-				uri := e.Location.URI
-				edits[uri] = append(edits[uri], protocol.TextEdit{
-					Range:   e.Location.Range,
-					NewText: string(e.NewText),
-				})
-			}
-			for _, kind := range kinds {
-				fixes = append(fixes, SuggestedFix{
-					Title:      fix.Message,
-					Edits:      edits,
-					ActionKind: kind,
-				})
-			}
-
-		} else {
-			// Accumulate command-based fixes, whose edits
-			// are not provided by the analyzer but are computed on demand
-			// by logic "adjacent to" the analyzer.
-			//
-			// The analysis.Diagnostic.Category is used as the fix name.
-			cmd, err := command.NewApplyFixCommand(fix.Message, command.ApplyFixArgs{
-				Fix:   diag.Code,
-				URI:   gobDiag.Location.URI,
-				Range: gobDiag.Location.Range,
-			})
-			if err != nil {
-				// JSON marshalling of these argument values cannot fail.
-				log.Fatalf("internal error in NewApplyFixCommand: %v", err)
-			}
-			for _, kind := range kinds {
-				fixes = append(fixes, SuggestedFixFromCommand(cmd, kind))
-			}
-
-			// Ensure that the analyzer specifies a category for all its no-edit fixes.
-			if diag.Code == "" || diag.Code == "default" {
-				panic(fmt.Sprintf("missing Diagnostic.Code: %#v", *diag))
-			}
-		}
-	}
-	diag.SuggestedFixes = fixes
 
 	// If the fixes only delete code, assume that the diagnostic is reporting dead code.
 	if onlyDeletions(diag.SuggestedFixes) {

@@ -14,14 +14,11 @@ import (
 	"go/parser"
 	"go/scanner"
 	"go/token"
-	"log"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
 
-	"golang.org/x/tools/go/packages"
-	"cuelang.org/go/internal/golangorgx/gopls/analysis/embeddirective"
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/cache/metadata"
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/command"
@@ -29,6 +26,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"cuelang.org/go/internal/golangorgx/tools/typesinternal"
+	"golang.org/x/tools/go/packages"
 )
 
 // goPackagesErrorDiagnostics translates the given go/packages Error into a
@@ -272,39 +270,6 @@ func decodeDiagnostics(data []byte) []*Diagnostic {
 	return srcDiags
 }
 
-// canFixFuncs maps an analyer to a function that determines whether or not a
-// fix is possible for the given diagnostic.
-//
-// TODO(rfindley): clean this up.
-var canFixFuncs = map[settings.Fix]func(*Diagnostic) bool{
-	settings.AddEmbedImport: fixedByImportingEmbed,
-}
-
-// fixedByImportingEmbed returns true if diag can be fixed by addEmbedImport.
-func fixedByImportingEmbed(diag *Diagnostic) bool {
-	if diag == nil {
-		return false
-	}
-	return diag.Message == embeddirective.MissingImportMessage
-}
-
-// canFix returns true if Analyzer.Fix can fix the Diagnostic.
-//
-// It returns true by default: only if the analyzer is configured explicitly to
-// ignore this diagnostic does it return false.
-//
-// TODO(rfindley): reconcile the semantics of 'Fix' and
-// 'suggestedAnalysisFixes'.
-func canFix(a *settings.Analyzer, d *Diagnostic) bool {
-	f, ok := canFixFuncs[a.Fix]
-	if !ok {
-		// See the above TODO: this doesn't make sense, but preserves pre-existing
-		// semantics.
-		return true
-	}
-	return f(d)
-}
-
 // toSourceDiagnostic converts a gobDiagnostic to "source" form.
 func toSourceDiagnostic(srcAnalyzer *settings.Analyzer, gobDiag *gobDiagnostic) *Diagnostic {
 	var related []protocol.DiagnosticRelatedInformation
@@ -332,24 +297,6 @@ func toSourceDiagnostic(srcAnalyzer *settings.Analyzer, gobDiag *gobDiagnostic) 
 		Message:  gobDiag.Message,
 		Related:  related,
 		Tags:     srcAnalyzer.Tag,
-	}
-	if canFix(srcAnalyzer, diag) {
-		fixes := suggestedAnalysisFixes(gobDiag, kinds)
-		if srcAnalyzer.Fix != "" {
-			cmd, err := command.NewApplyFixCommand(gobDiag.Message, command.ApplyFixArgs{
-				URI:   gobDiag.Location.URI,
-				Range: gobDiag.Location.Range,
-				Fix:   string(srcAnalyzer.Fix),
-			})
-			if err != nil {
-				// JSON marshalling of these argument values cannot fail.
-				log.Fatalf("internal error in NewApplyFixCommand: %v", err)
-			}
-			for _, kind := range kinds {
-				fixes = append(fixes, SuggestedFixFromCommand(cmd, kind))
-			}
-		}
-		diag.SuggestedFixes = fixes
 	}
 
 	// If the fixes only delete code, assume that the diagnostic is reporting dead code.

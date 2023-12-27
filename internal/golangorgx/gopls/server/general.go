@@ -107,15 +107,6 @@ func (s *server) Initialize(ctx context.Context, params *protocol.ParamInitializ
 	}
 
 	var codeActionProvider interface{} = true
-	if ca := params.Capabilities.TextDocument.CodeAction; len(ca.CodeActionLiteralSupport.CodeActionKind.ValueSet) > 0 {
-		// If the client has specified CodeActionLiteralSupport,
-		// send the code actions we support.
-		//
-		// Using CodeActionOptions is only valid if codeActionLiteralSupport is set.
-		codeActionProvider = &protocol.CodeActionOptions{
-			CodeActionKinds: s.getSupportedCodeActions(),
-		}
-	}
 	var renameOpts interface{} = true
 	if r := params.Capabilities.TextDocument.Rename; r != nil && r.PrepareSupport {
 		renameOpts = protocol.RenameOptions{

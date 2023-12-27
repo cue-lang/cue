@@ -66,7 +66,7 @@ func TestMarshalling(t *testing.T) {
 			inst.ImportPath = "test/pkg"
 			want := fmt.Sprint(inst.Value())
 
-			val := inst.value()
+			val := inst.Value()
 			b, err := r.Marshal(&val)
 			if err != nil {
 				t.Fatal(err)
@@ -185,7 +185,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 
 			vals := make([]InstanceOrValue, 0)
 			for _, inst := range insts {
-				val := inst.value()
+				val := inst.Value()
 				vals = append(vals, &val)
 			}
 

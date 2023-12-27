@@ -899,7 +899,7 @@ func (c *commandHandler) StartDebugging(ctx context.Context, args command.Debugg
 }
 
 func (c *commandHandler) StartProfile(ctx context.Context, args command.StartProfileArgs) (result command.StartProfileResult, _ error) {
-	file, err := os.CreateTemp("", "gopls-profile-*")
+	file, err := os.CreateTemp("", "cuepls-profile-*")
 	if err != nil {
 		return result, fmt.Errorf("creating temp profile file: %v", err)
 	}

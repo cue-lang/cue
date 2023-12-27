@@ -368,12 +368,12 @@ func (r *Runner) separateProcessServer(optsHook func(*settings.Options)) jsonrpc
 	}
 
 	r.startRemoteOnce.Do(func() {
-		socketDir, err := os.MkdirTemp(r.tempDir, "gopls-test-socket")
+		socketDir, err := os.MkdirTemp(r.tempDir, "cuepls-test-socket")
 		if err != nil {
 			r.remoteErr = err
 			return
 		}
-		r.remoteSocket = filepath.Join(socketDir, "gopls-test-daemon")
+		r.remoteSocket = filepath.Join(socketDir, "cuepls-test-daemon")
 
 		// The server should be killed by when the test runner exits, but to be
 		// conservative also set a listen timeout.

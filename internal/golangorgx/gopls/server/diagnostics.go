@@ -25,9 +25,7 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/template"
 	"cuelang.org/go/internal/golangorgx/gopls/util/maps"
-	"cuelang.org/go/internal/golangorgx/gopls/work"
 	"cuelang.org/go/internal/golangorgx/tools/event"
-	"cuelang.org/go/internal/golangorgx/tools/event/keys"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 )
 
@@ -335,13 +333,6 @@ func (s *server) diagnose(ctx context.Context, snapshot *cache.Snapshot) (diagMa
 	// Diagnostics below are organized by increasing specificity:
 	//  go.work > mod > mod upgrade > mod vuln > package, etc.
 
-	// Diagnose go.work file.
-	workReports, workErr := work.Diagnostics(ctx, snapshot)
-	if ctx.Err() != nil {
-		return nil, ctx.Err()
-	}
-	store("diagnosing go.work file", workReports, workErr)
-
 	// Diagnose go.mod file.
 	modReports, modErr := mod.ParseDiagnostics(ctx, snapshot)
 	if ctx.Err() != nil {
@@ -423,13 +414,6 @@ func (s *server) diagnose(ctx context.Context, snapshot *cache.Snapshot) (diagMa
 		}
 	}
 
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		gcDetailsReports, err := s.gcDetailsDiagnostics(ctx, snapshot, toDiagnose)
-		store("collecting gc_details", gcDetailsReports, err)
-	}()
-
 	// Package diagnostics and analysis diagnostics must both be computed and
 	// merged before they can be reported.
 	var pkgDiags, analysisDiags diagMap
@@ -441,21 +425,6 @@ func (s *server) diagnose(ctx context.Context, snapshot *cache.Snapshot) (diagMa
 		pkgDiags, err = snapshot.PackageDiagnostics(ctx, maps.Keys(toDiagnose)...)
 		if err != nil {
 			event.Error(ctx, "warning: diagnostics failed", err, snapshot.Labels()...)
-		}
-	}()
-
-	// Get diagnostics from analysis framework.
-	// This includes type-error analyzers, which suggest fixes to compiler errors.
-	wg.Add(1)
-	go func() {
-		defer wg.Done()
-		var err error
-		// TODO(rfindley): here and above, we should avoid using the first result
-		// if err is non-nil (though as of today it's OK).
-		analysisDiags, err = source.Analyze(ctx, snapshot, toAnalyze, s.progress)
-		if err != nil {
-			event.Error(ctx, "warning: analyzing package", err, append(snapshot.Labels(), tag.Package.Of(keys.Join(maps.Keys(toDiagnose))))...)
-			return
 		}
 	}()
 
@@ -473,52 +442,6 @@ func (s *server) diagnose(ctx context.Context, snapshot *cache.Snapshot) (diagMa
 	store("type checking", pkgDiags, nil)           // error reported above
 	store("analyzing packages", analysisDiags, nil) // error reported above
 
-	return diagnostics, nil
-}
-
-func (s *server) gcDetailsDiagnostics(ctx context.Context, snapshot *cache.Snapshot, toDiagnose map[metadata.PackageID]*metadata.Package) (diagMap, error) {
-	// Process requested gc_details diagnostics.
-	//
-	// TODO(rfindley): this could be improved:
-	//   1. This should memoize its results if the package has not changed.
-	//   2. This should not even run gc_details if the package contains unsaved
-	//      files.
-	//   3. See note below about using ReadFile.
-	// Consider that these points, in combination with the note below about
-	// races, suggest that gc_details should be tracked on the Snapshot.
-	var toGCDetail map[metadata.PackageID]*metadata.Package
-	for _, mp := range toDiagnose {
-		if snapshot.WantGCDetails(mp.ID) {
-			if toGCDetail == nil {
-				toGCDetail = make(map[metadata.PackageID]*metadata.Package)
-			}
-			toGCDetail[mp.ID] = mp
-		}
-	}
-
-	diagnostics := make(diagMap)
-	for _, mp := range toGCDetail {
-		gcReports, err := source.GCOptimizationDetails(ctx, snapshot, mp)
-		if err != nil {
-			event.Error(ctx, "warning: gc details", err, append(snapshot.Labels(), tag.Package.Of(string(mp.ID)))...)
-			continue
-		}
-		for uri, diags := range gcReports {
-			// TODO(rfindley): reading here should not be necessary: if a file has
-			// been deleted we should be notified, and diagnostics will eventually
-			// become consistent.
-			fh, err := snapshot.ReadFile(ctx, uri)
-			if err != nil {
-				return nil, err
-			}
-			// Don't publish gc details for unsaved buffers, since the underlying
-			// logic operates on the file on disk.
-			if fh == nil || !fh.SameContentsOnDisk() {
-				continue
-			}
-			diagnostics[uri] = append(diagnostics[uri], diags...)
-		}
-	}
 	return diagnostics, nil
 }
 

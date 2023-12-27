@@ -29,11 +29,8 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/progress"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/gopls/protocol/command"
-	"cuelang.org/go/internal/golangorgx/gopls/settings"
 	"cuelang.org/go/internal/golangorgx/gopls/telemetry"
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
-	"cuelang.org/go/internal/golangorgx/gopls/vulncheck"
-	"cuelang.org/go/internal/golangorgx/gopls/vulncheck/scan"
 	"cuelang.org/go/internal/golangorgx/tools/diff"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/gocommand"
@@ -313,9 +310,6 @@ func (c *commandHandler) ResetGoModDiagnostics(ctx context.Context, args command
 		return c.modifyState(ctx, FromResetGoModDiagnostics, func() (*cache.Snapshot, func(), error) {
 			return c.s.session.InvalidateView(ctx, deps.snapshot.View(), cache.StateChange{
 				ModuleUpgrades: map[protocol.DocumentURI]map[string]string{
-					deps.fh.URI(): nil,
-				},
-				Vulns: map[protocol.DocumentURI]*vulncheck.Result{
 					deps.fh.URI(): nil,
 				},
 			})
@@ -928,95 +922,6 @@ func (c *commandHandler) StopProfile(ctx context.Context, args command.StopProfi
 	}
 	result.File = prof.Name()
 	return result, nil
-}
-
-func (c *commandHandler) FetchVulncheckResult(ctx context.Context, arg command.URIArg) (map[protocol.DocumentURI]*vulncheck.Result, error) {
-	ret := map[protocol.DocumentURI]*vulncheck.Result{}
-	err := c.run(ctx, commandConfig{forURI: arg.URI}, func(ctx context.Context, deps commandDeps) error {
-		if deps.snapshot.Options().Vulncheck == settings.ModeVulncheckImports {
-			for _, modfile := range deps.snapshot.View().ModFiles() {
-				res, err := deps.snapshot.ModVuln(ctx, modfile)
-				if err != nil {
-					return err
-				}
-				ret[modfile] = res
-			}
-		}
-		// Overwrite if there is any govulncheck-based result.
-		for modfile, result := range deps.snapshot.Vulnerabilities() {
-			ret[modfile] = result
-		}
-		return nil
-	})
-	return ret, err
-}
-
-func (c *commandHandler) RunGovulncheck(ctx context.Context, args command.VulncheckArgs) (command.RunVulncheckResult, error) {
-	if args.URI == "" {
-		return command.RunVulncheckResult{}, errors.New("VulncheckArgs is missing URI field")
-	}
-
-	// Return the workdone token so that clients can identify when this
-	// vulncheck invocation is complete.
-	//
-	// Since the run function executes asynchronously, we use a channel to
-	// synchronize the start of the run and return the token.
-	tokenChan := make(chan protocol.ProgressToken, 1)
-	err := c.run(ctx, commandConfig{
-		async:       true, // need to be async to be cancellable
-		progress:    "govulncheck",
-		requireSave: true,
-		forURI:      args.URI,
-	}, func(ctx context.Context, deps commandDeps) error {
-		tokenChan <- deps.work.Token()
-
-		workDoneWriter := progress.NewWorkDoneWriter(ctx, deps.work)
-		dir := filepath.Dir(args.URI.Path())
-		pattern := args.Pattern
-
-		result, err := scan.RunGovulncheck(ctx, pattern, deps.snapshot, dir, workDoneWriter)
-		if err != nil {
-			return err
-		}
-
-		snapshot, release, err := c.s.session.InvalidateView(ctx, deps.snapshot.View(), cache.StateChange{
-			Vulns: map[protocol.DocumentURI]*vulncheck.Result{args.URI: result},
-		})
-		if err != nil {
-			return err
-		}
-		defer release()
-		c.s.diagnoseSnapshot(snapshot, nil, 0)
-
-		affecting := make(map[string]bool, len(result.Entries))
-		for _, finding := range result.Findings {
-			if len(finding.Trace) > 1 { // at least 2 frames if callstack exists (vulnerability, entry)
-				affecting[finding.OSV] = true
-			}
-		}
-		if len(affecting) == 0 {
-			showMessage(ctx, c.s.client, protocol.Info, "No vulnerabilities found")
-			return nil
-		}
-		affectingOSVs := make([]string, 0, len(affecting))
-		for id := range affecting {
-			affectingOSVs = append(affectingOSVs, id)
-		}
-		sort.Strings(affectingOSVs)
-
-		showMessage(ctx, c.s.client, protocol.Warning, fmt.Sprintf("Found %v", strings.Join(affectingOSVs, ", ")))
-
-		return nil
-	})
-	if err != nil {
-		return command.RunVulncheckResult{}, err
-	}
-	select {
-	case <-ctx.Done():
-		return command.RunVulncheckResult{}, ctx.Err()
-	case token := <-tokenChan:
-		return command.RunVulncheckResult{Token: token}, nil
-	}
 }
 
 // MemStats implements the MemStats command. It returns an error as a

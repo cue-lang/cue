@@ -7,6 +7,7 @@ import (
 
 	"cuelang.org/go/internal/golangorgx/gopls/hooks"
 	. "cuelang.org/go/internal/golangorgx/gopls/test/integration"
+	"cuelang.org/go/internal/golangorgx/gopls/test/integration/fake"
 	"github.com/go-quicktest/qt"
 )
 
@@ -20,14 +21,17 @@ func TestFormatFile(t *testing.T) {
 module mod.com
 
 go 1.12
--- foo.go --
-	package foo
+-- foo.cue --
+package foo
+
+  // this is a test
 `
 	Run(t, files, func(t *testing.T, env *Env) {
-		env.OpenFile("foo.go")
-		env.FormatBuffer("foo.go")
-		got := env.BufferText("foo.go")
-		want := "package foo\n"
+		env.OpenFile("foo.cue")
+		env.EditBuffer("foo.cue", fake.NewEdit(0, 0, 1, 0, "package bar\n"))
+		env.FormatBuffer("foo.cue")
+		got := env.BufferText("foo.cue")
+		want := "package bar\n\n// this is a test\n"
 		qt.Assert(t, qt.Equals(got, want))
 	})
 }

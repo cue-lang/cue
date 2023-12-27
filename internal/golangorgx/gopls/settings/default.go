@@ -8,7 +8,6 @@ import (
 	"sync"
 	"time"
 
-	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/command"
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
 )
@@ -39,23 +38,6 @@ func DefaultOptions(overrides ...func(*Options)) *Options {
 				HierarchicalDocumentSymbolSupport:          true,
 			},
 			ServerOptions: ServerOptions{
-				SupportedCodeActions: map[file.Kind]map[protocol.CodeActionKind]bool{
-					file.Go: {
-						protocol.SourceFixAll:          true,
-						protocol.SourceOrganizeImports: true,
-						protocol.QuickFix:              true,
-						protocol.RefactorRewrite:       true,
-						protocol.RefactorInline:        true,
-						protocol.RefactorExtract:       true,
-					},
-					file.Mod: {
-						protocol.SourceOrganizeImports: true,
-						protocol.QuickFix:              true,
-					},
-					file.Work: {},
-					file.Sum:  {},
-					file.Tmpl: {},
-				},
 				SupportedCommands: commands,
 			},
 			UserOptions: UserOptions{

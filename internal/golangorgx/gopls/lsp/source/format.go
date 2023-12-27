@@ -16,6 +16,8 @@ import (
 	"strings"
 	"text/scanner"
 
+	cueformat "cuelang.org/go/cue/format"
+
 	"cuelang.org/go/internal/golangorgx/gopls/file"
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/cache"
 	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
@@ -25,6 +27,36 @@ import (
 	"cuelang.org/go/internal/golangorgx/tools/imports"
 	"cuelang.org/go/internal/golangorgx/tools/tokeninternal"
 )
+
+// FormatCUE formats a CUE file with a given range.
+func FormatCUE(ctx context.Context, snapshot *cache.Snapshot, fh file.Handle) ([]protocol.TextEdit, error) {
+	ctx, done := event.Start(ctx, "source.FormatCUE")
+	defer done()
+
+	// TODO cache the parsed artefacts, which will include the mapper
+
+	src, err := fh.Content()
+	if err != nil {
+		return nil, err
+	}
+	res, err := cueformat.Source(src)
+	if err != nil {
+		// TODO fix up the AST like gopls so we can do more with
+		// partial/incomplete code.
+		//
+		// For now return early because there is nothing we can do.
+		return nil, nil
+	}
+
+	// If the format did nothing, do nothing
+	if bytes.Equal(src, res) {
+		return nil, nil
+	}
+
+	mapper := protocol.NewMapper(fh.URI(), src)
+	edits := diff.Strings(string(src), string(res))
+	return protocol.EditsFromDiffEdits(mapper, edits)
+}
 
 // Format formats a file with a given range.
 func Format(ctx context.Context, snapshot *cache.Snapshot, fh file.Handle) ([]protocol.TextEdit, error) {
@@ -99,6 +131,17 @@ func formatSource(ctx context.Context, fh file.Handle) ([]byte, error) {
 		return nil, err
 	}
 	return format.Source(data)
+}
+
+func formatCUESource(ctx context.Context, fh file.Handle) ([]byte, error) {
+	_, done := event.Start(ctx, "source.formatCUESource")
+	defer done()
+
+	data, err := fh.Content()
+	if err != nil {
+		return nil, err
+	}
+	return cueformat.Source(data)
 }
 
 type ImportFix struct {

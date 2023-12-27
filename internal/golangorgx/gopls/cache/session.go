@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/internal/golangorgx/gopls/util/bug"
 	"cuelang.org/go/internal/golangorgx/gopls/util/persistent"
 	"cuelang.org/go/internal/golangorgx/gopls/util/slices"
-	"cuelang.org/go/internal/golangorgx/gopls/vulncheck"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/gocommand"
 	"cuelang.org/go/internal/golangorgx/tools/imports"
@@ -249,11 +248,9 @@ func (s *Session) createView(ctx context.Context, def *viewDefinition) (*View, *
 		parseModHandles:  new(persistent.Map[protocol.DocumentURI, *memoize.Promise]),
 		parseWorkHandles: new(persistent.Map[protocol.DocumentURI, *memoize.Promise]),
 		modTidyHandles:   new(persistent.Map[protocol.DocumentURI, *memoize.Promise]),
-		modVulnHandles:   new(persistent.Map[protocol.DocumentURI, *memoize.Promise]),
 		modWhyHandles:    new(persistent.Map[protocol.DocumentURI, *memoize.Promise]),
 		pkgIndex:         typerefs.NewPackageIndex(),
 		moduleUpgrades:   new(persistent.Map[protocol.DocumentURI, map[string]string]),
-		vulns:            new(persistent.Map[protocol.DocumentURI, *vulncheck.Result]),
 	}
 
 	// Snapshots must observe all open files, as there are some caching

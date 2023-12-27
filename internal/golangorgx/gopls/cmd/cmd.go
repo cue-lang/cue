@@ -272,9 +272,7 @@ func (app *Application) mainCommands() []tool.Application {
 }
 
 func (app *Application) internalCommands() []tool.Application {
-	return []tool.Application{
-		&vulncheck{app: app},
-	}
+	return []tool.Application{}
 }
 
 func (app *Application) featureCommands() []tool.Application {

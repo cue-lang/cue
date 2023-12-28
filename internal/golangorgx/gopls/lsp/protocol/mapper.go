@@ -71,6 +71,8 @@ import (
 	"sync"
 	"unicode/utf8"
 
+	cueast "cuelang.org/go/cue/ast"
+	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/golangorgx/gopls/util/safetoken"
 )
 
@@ -334,6 +336,16 @@ func (m *Mapper) PosLocation(tf *token.File, start, end token.Pos) (Location, er
 	return m.RangeLocation(rng), nil
 }
 
+// PosLocationCUE converts a token range to a protocol (UTF-16) location.
+func (m *Mapper) PosLocationCUE(tf *cuetoken.File, start, end cuetoken.Pos) (Location, error) {
+	startOffset, endOffset := tf.Offset(start), tf.Offset(end)
+	rng, err := m.OffsetRange(startOffset, endOffset)
+	if err != nil {
+		return Location{}, err
+	}
+	return m.RangeLocation(rng), nil
+}
+
 // PosRange converts a token range to a protocol (UTF-16) range.
 func (m *Mapper) PosRange(tf *token.File, start, end token.Pos) (Range, error) {
 	startOffset, endOffset, err := safetoken.Offsets(tf, start, end)
@@ -343,9 +355,20 @@ func (m *Mapper) PosRange(tf *token.File, start, end token.Pos) (Range, error) {
 	return m.OffsetRange(startOffset, endOffset)
 }
 
+// PosRangeCUE converts a token range to a protocol (UTF-16) range.
+func (m *Mapper) PosRangeCUE(tf *cuetoken.File, start, end cuetoken.Pos) (Range, error) {
+	startOffset, endOffset := tf.Offset(start), tf.Offset(end)
+	return m.OffsetRange(startOffset, endOffset)
+}
+
 // NodeRange converts a syntax node range to a protocol (UTF-16) range.
 func (m *Mapper) NodeRange(tf *token.File, node ast.Node) (Range, error) {
 	return m.PosRange(tf, node.Pos(), node.End())
+}
+
+// NodeRangeCUE converts a syntax node range to a protocol (UTF-16) range.
+func (m *Mapper) NodeRangeCUE(tf *cuetoken.File, node cueast.Node) (Range, error) {
+	return m.PosRangeCUE(tf, node.Pos(), node.End())
 }
 
 // RangeLocation pairs a protocol Range with its URI, in a Location.
@@ -362,9 +385,20 @@ func (m *Mapper) PosMappedRange(tf *token.File, start, end token.Pos) (MappedRan
 	return m.OffsetMappedRange(startOffset, endOffset)
 }
 
+// PosMappedRangeCUE returns a MappedRange for the given token.Pos range.
+func (m *Mapper) PosMappedRangeCUE(tf *cuetoken.File, start, end cuetoken.Pos) (MappedRange, error) {
+	startOffset, endOffset := tf.Offset(start), tf.Offset(end)
+	return m.OffsetMappedRange(startOffset, endOffset)
+}
+
 // NodeMappedRange returns a MappedRange for the given node range.
 func (m *Mapper) NodeMappedRange(tf *token.File, node ast.Node) (MappedRange, error) {
 	return m.PosMappedRange(tf, node.Pos(), node.End())
+}
+
+// NodeMappedRangeCUE returns a MappedRange for the given node range.
+func (m *Mapper) NodeMappedRangeCUE(tf *cuetoken.File, node cueast.Node) (MappedRange, error) {
+	return m.PosMappedRangeCUE(tf, node.Pos(), node.End())
 }
 
 // -- MappedRange --

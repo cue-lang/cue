@@ -71,7 +71,7 @@ import (
 	"fmt"
 	"os"
 	"strings"
-	"sync"
+	"sync/atomic"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
@@ -175,8 +175,7 @@ type Controller struct {
 	// which is likely going to tbe the bulk of the operations.
 	taskStats stats.Counts
 
-	mut  *sync.Mutex
-	done bool
+	done atomic.Bool
 
 	// keys maps task keys to their index. This allows a recreation of the
 	// Instance while retaining the original task indices.
@@ -238,7 +237,6 @@ func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 
 		taskCh: make(chan *Task),
 		keys:   map[string]*Task{},
-		mut:    &sync.Mutex{},
 	}
 
 	if cfg != nil {
@@ -263,9 +261,7 @@ func (c *Controller) Run(ctx context.Context) error {
 	// This is used to determine if the controller value can be retrieved.
 	// When the controller value is safe to be read concurrently this tracking
 	// can be removed.
-	c.mut.Lock()
-	defer c.mut.Unlock()
-	c.done = true
+	c.done.Store(true)
 
 	return c.errs
 }
@@ -275,9 +271,7 @@ func (c *Controller) Run(ctx context.Context) error {
 // It is safe to use the value only after Run() has returned.
 // It panics if the flow is running.
 func (c *Controller) Value() cue.Value {
-	c.mut.Lock()
-	defer c.mut.Unlock()
-	if !c.done {
+	if !c.done.Load() {
 		panic("can't retrieve value before flow has terminated")
 	}
 	return c.inst

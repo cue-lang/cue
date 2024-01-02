@@ -323,6 +323,8 @@ func fileKind(fh file.Handle) file.Kind {
 		return file.Sum
 	case ".work":
 		return file.Work
+	case ".cue":
+		return file.CUE
 	}
 	return file.UnknownKind
 }

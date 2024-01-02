@@ -293,6 +293,8 @@ func (s *Snapshot) FileKind(fh file.Handle) file.Kind {
 		return file.Sum
 	case ".work":
 		return file.Work
+	case ".cue":
+		return file.CUE
 	}
 	exts := s.Options().TemplateExtensions
 	for _, ext := range exts {
@@ -301,7 +303,7 @@ func (s *Snapshot) FileKind(fh file.Handle) file.Kind {
 		}
 	}
 	// and now what? This should never happen, but it does for cgo before go1.15
-	return file.Go
+	return file.UnknownKind
 }
 
 // Options returns the options associated with this snapshot.

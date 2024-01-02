@@ -24,6 +24,8 @@ const (
 	Tmpl
 	// Work is a go.work file.
 	Work
+	// CUE is a CUE source file
+	CUE
 )
 
 func (k Kind) String() string {
@@ -38,6 +40,8 @@ func (k Kind) String() string {
 		return "tmpl"
 	case Work:
 		return "go.work"
+	case CUE:
+		return "cue"
 	default:
 		return fmt.Sprintf("internal error: unknown file kind %d", k)
 	}
@@ -58,6 +62,8 @@ func KindForLang(langID string) Kind {
 		return Tmpl
 	case "go.work":
 		return Work
+	case "cue":
+		return CUE
 	default:
 		return UnknownKind
 	}

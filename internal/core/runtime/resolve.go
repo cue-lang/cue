@@ -15,8 +15,10 @@
 package runtime
 
 import (
+	"math/rand"
 	"path"
 	"strconv"
+	"time"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -152,6 +154,7 @@ func resolveFile(
 			u.Scope = f
 			continue
 		}
+		time.Sleep(time.Millisecond * time.Duration(rand.Intn(10)+1))
 		f.Unresolved[k] = u
 		k++
 	}

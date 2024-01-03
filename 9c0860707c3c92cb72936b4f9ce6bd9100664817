@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f9e354d3_9df8aa2d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-03T10:53:34Z",
+      "side": 1,
+      "message": "FWIW I ran it through fmt (default width 72), which seems to be what people mostly use. I\u0027ve now changed the tab width to 4 and ran it through `fmt -w 80`. It seems a bit unwieldy at 100 columns, but YMMV.",
+      "parentUuid": "c152002b_e8a42e7b",
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9208c9fc_ff4683a8",
@@ -53,6 +71,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2139240d_341fff13",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 161,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-03T10:53:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9208c9fc_ff4683a8",
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6b3e253_5bfe888b",
@@ -66,6 +102,30 @@
       "writtenOn": "2023-12-21T10:17:30Z",
       "side": 1,
       "message": "nit: I\u0027d write \"multiple registries with prefixes\", as otherwise I initially read this \"multiple prefixes on a registry\".",
+      "range": {
+        "startLine": 164,
+        "startChar": 6,
+        "endLine": 164,
+        "endChar": 23
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ad14e51_5446102b",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-03T10:53:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d6b3e253_5bfe888b",
       "range": {
         "startLine": 164,
         "startChar": 6,
@@ -99,6 +159,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "62e07028_86bc9a20",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 167,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-03T10:53:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "085f1c4f_c6493a78",
+      "range": {
+        "startLine": 167,
+        "startChar": 11,
+        "endLine": 167,
+        "endChar": 15
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e1990d31_b9fa41af",
@@ -122,6 +206,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7fe56b4e_f279c137",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 175,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-03T10:53:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e1990d31_b9fa41af",
+      "range": {
+        "startLine": 175,
+        "startChar": 3,
+        "endLine": 175,
+        "endChar": 88
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6ac0e83e_deadc144",
@@ -135,6 +243,30 @@
       "writtenOn": "2023-12-21T10:17:30Z",
       "side": 1,
       "message": "?",
+      "range": {
+        "startLine": 186,
+        "startChar": 10,
+        "endLine": 186,
+        "endChar": 11
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "553b54e1_fa7a0522",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-03T10:53:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6ac0e83e_deadc144",
       "range": {
         "startLine": 186,
         "startChar": 10,
@@ -182,6 +314,30 @@
       "side": 1,
       "message": "Filed https://github.com/cue-lang/cue/issues/2743 to support those source file links.",
       "parentUuid": "6a6f36b3_3b2efbd0",
+      "range": {
+        "startLine": 194,
+        "startChar": 6,
+        "endLine": 194,
+        "endChar": 50
+      },
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fda6cc3b_07daebc7",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-03T10:53:34Z",
+      "side": 1,
+      "message": "I changed it to just mention the package path and file name instead. A link seems awkward for the above reason.",
+      "parentUuid": "cbcb9833_a23ca584",
       "range": {
         "startLine": 194,
         "startChar": 6,

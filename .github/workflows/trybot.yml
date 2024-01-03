@@ -22,7 +22,7 @@ jobs:
         runner:
           - ubuntu-22.04
           - macos-11
-          - windows-2022
+          - windows-2019
     runs-on: ${{ matrix.runner }}
     defaults:
       run:

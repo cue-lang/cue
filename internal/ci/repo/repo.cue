@@ -26,7 +26,7 @@ botGitHubUserEmail: "cueckoo@gmail.com"
 
 linuxMachine:   "ubuntu-22.04"
 macosMachine:   "macos-11"
-windowsMachine: "windows-2022"
+windowsMachine: "windows-2019"
 
 previousStableGo: "1.20.x"
 

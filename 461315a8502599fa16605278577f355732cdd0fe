@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5a97140d_e125526c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-01-03T10:48:44Z",
+      "side": 1,
+      "message": "There does not appear to be any difference using windows-2019 vs windows-2022. ~2min go test runs with fully cached test results. Will abandon this experiment.",
+      "revId": "461315a8502599fa16605278577f355732cdd0fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

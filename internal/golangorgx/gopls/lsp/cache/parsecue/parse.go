@@ -9,7 +9,7 @@ import (
 
 	"cuelang.org/go/cue/parser"
 
-	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
+	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 	"cuelang.org/go/internal/golangorgx/tools/event"
 	"cuelang.org/go/internal/golangorgx/tools/event/tag"
 )

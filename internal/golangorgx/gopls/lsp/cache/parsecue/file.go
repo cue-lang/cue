@@ -8,7 +8,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/golangorgx/gopls/lsp/protocol"
+	"cuelang.org/go/internal/golangorgx/gopls/protocol"
 )
 
 // A File contains the results of parsing a Go file.

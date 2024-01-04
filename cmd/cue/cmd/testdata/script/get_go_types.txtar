@@ -18,6 +18,9 @@ cmp ./pkg_generics/pkg_generics_go_gen.cue ./pkg_generics/pkg_generics_go_gen.cu
 # Verify dependencies did not change
 cmp go.mod go.mod.golden
 
+# Sanity check that the output is actually valid
+exec cue vet -c ./...
+
 -- go.mod --
 module mod.test
 
@@ -205,7 +208,7 @@ type Interface interface {
 -- pkg2/add.cue --
 package pkgtwo
 
-Barzer: {
+#Barzer: {
 	S: =~"cat$"
 }
 -- pkg2/pkg2.go --
@@ -261,7 +264,7 @@ type Barzer = pkgtwo.Barzer
 
 package pkg1
 
-import "mod.test/pkg2"
+import "mod.test/pkg2:pkgtwo"
 
 #MyBarzer: pkgtwo.#Barzer
 -- pkg1/file1_go_gen.cue.golden --

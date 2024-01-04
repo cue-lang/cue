@@ -42,6 +42,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/mod/module"
 )
 
 // TODO:
@@ -215,6 +216,9 @@ restrictive enum interpretation of #Switch remains.
 	cmd.Flags().Bool(string(flagLocal), false,
 		"generates files in the main module locally")
 
+	cmd.Flags().BoolP(string(flagModule), "m", false,
+		"import into the current module")
+
 	cmd.Flags().StringP(string(flagPackage), "p", "", "package name for generated CUE files")
 
 	return cmd
@@ -223,6 +227,7 @@ restrictive enum interpretation of #Switch remains.
 const (
 	flagExclude flagName = "exclude"
 	flagLocal   flagName = "local"
+	flagModule  flagName = "module"
 )
 
 func (e *extractor) initExclusions(str string) {
@@ -246,33 +251,48 @@ func (e *extractor) filter(name string) bool {
 type extractor struct {
 	cmd *Command
 
-	stderr io.Writer
-	pkgs   []*packages.Package
-	done   map[string]bool
+	stderr         io.Writer
+	pkgs           map[string]*packages.Package
+	done           map[string]bool
+	mainModule     string
+	mainModuleRoot string
+
+	importPath map[string]string
 
 	// per package
 	orig     map[types.Type]*ast.StructType
 	usedPkgs map[string]bool
 
 	// per file
-	cmap     ast.CommentMap
-	pkg      *packages.Package
-	consts   map[string][]string
-	pkgNames map[string]pkgInfo
+	cmap   ast.CommentMap
+	pkg    *packages.Package
+	consts map[string][]string
+	// pkgNames maps from Go import path to
+	// the identifier that package is imported as in the file.
+	pkgNames map[string]string
 
 	exclusions []*regexp.Regexp
 	exclude    string
 }
 
 type pkgInfo struct {
-	id   string
+	// cueImportPath is the package's import path in CUE.
+	cueImportPath string
+	// name is the package identifier name. This may or may
+	// not be used as the actual identifier in the code.
 	name string
+	// dstDir holds the directory for storing the CUE package.
+	dstDir string
 }
 
 func (e *extractor) logf(format string, args ...interface{}) {
 	if flagVerbose.Bool(e.cmd) {
 		fmt.Fprintf(e.stderr, format+"\n", args...)
 	}
+}
+
+func (e *extractor) debugf(format string, args ...any) {
+	e.logf(format, args...)
 }
 
 func (e *extractor) usedPkg(pkg string) {
@@ -366,8 +386,7 @@ func extract(cmd *Command, args []string) error {
 	// determine module root:
 	binst := loadFromArgs([]string{"."}, nil)[0]
 
-	// TODO: require explicitly set root.
-	root := binst.Root
+	// TODO: require that binst.Root has been explicitly set.
 
 	cfg := &packages.Config{
 		Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles |
@@ -379,6 +398,7 @@ func extract(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	pkgsByPath := make(map[string]*packages.Package)
 	var errs []string
 	for _, p := range pkgs {
 		for _, e := range p.Errors {
@@ -389,16 +409,19 @@ func extract(cmd *Command, args []string) error {
 				errs = append(errs, fmt.Sprintf("\t%s: %v", p.PkgPath, e))
 			}
 		}
+		addImports(pkgsByPath, p)
 	}
 	if len(errs) > 0 {
 		return fmt.Errorf("could not load Go packages:\n%s", strings.Join(errs, "\n"))
 	}
 
 	e := extractor{
-		cmd:    cmd,
-		stderr: cmd.Stderr(),
-		pkgs:   pkgs,
-		orig:   map[types.Type]*ast.StructType{},
+		cmd:            cmd,
+		stderr:         cmd.Stderr(),
+		pkgs:           pkgsByPath,
+		orig:           map[types.Type]*ast.StructType{},
+		mainModule:     binst.Module,
+		mainModuleRoot: binst.Root,
 	}
 
 	e.initExclusions(flagExclude.String(cmd))
@@ -410,11 +433,21 @@ func extract(cmd *Command, args []string) error {
 	}
 
 	for _, p := range pkgs {
-		if err := e.extractPkg(root, p); err != nil {
+		if err := e.extractPkg(p); err != nil {
 			return err
 		}
 	}
 	return nil
+}
+
+func addImports(pkgs map[string]*packages.Package, p *packages.Package) {
+	if pkgs[p.PkgPath] != nil {
+		return
+	}
+	pkgs[p.PkgPath] = p
+	for _, ip := range p.Imports {
+		addImports(pkgs, ip)
+	}
 }
 
 func (e *extractor) recordTypeInfo(p *packages.Package) {
@@ -429,7 +462,7 @@ func (e *extractor) recordTypeInfo(p *packages.Package) {
 	}
 }
 
-func (e *extractor) extractPkg(root string, p *packages.Package) error {
+func (e *extractor) extractPkg(p *packages.Package) error {
 	e.pkg = p
 	e.logf("--- Package %s", p.PkgPath)
 
@@ -446,48 +479,35 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 	}
 
-	pkg := p.PkgPath
-	dir := filepath.Join(load.GenPath(root), filepath.FromSlash(pkg))
+	info := e.pkgInfo(p)
 
-	isMain := flagLocal.Bool(e.cmd) && p.Module != nil && p.Module.Main
-	if isMain {
-		dir = p.Module.Dir
-		sub := p.PkgPath[len(p.Module.Path):]
-		if sub != "" {
-			dir = filepath.FromSlash(dir + sub)
-		}
-	}
-
-	if err := os.MkdirAll(dir, 0777); err != nil {
+	if err := os.MkdirAll(info.dstDir, 0777); err != nil {
 		return err
 	}
 
 	e.usedPkgs = map[string]bool{}
 
-	args := pkg
+	args := p.PkgPath
 	if e.exclude != "" {
 		args += " --exclude=" + e.exclude
 	}
 
 	for i, f := range p.Syntax {
+		e.logf("---- File %v", p.Fset.Position(f.Package))
 		e.cmap = ast.NewCommentMap(p.Fset, f, f.Comments)
 
-		e.pkgNames = map[string]pkgInfo{}
+		e.pkgNames = map[string]string{}
 
 		for _, spec := range f.Imports {
 			pkgPath, _ := strconv.Unquote(spec.Path.Value)
 			pkg := p.Imports[pkgPath]
-
-			info := pkgInfo{id: pkgPath, name: pkg.Name}
-			if path.Base(pkgPath) != pkg.Name {
-				info.id += ":" + pkg.Name
-			}
-
+			info := e.pkgInfo(pkg)
+			ident := info.name
 			if spec.Name != nil {
-				info.name = spec.Name.Name
+				ident = spec.Name.Name
+				e.debugf("yes, there's ident %q for pkg %q", ident, pkgPath)
 			}
-
-			e.pkgNames[pkgPath] = info
+			e.pkgNames[pkgPath] = ident
 		}
 
 		decls := []cueast.Decl{}
@@ -531,23 +551,22 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		if err != nil {
 			return err
 		}
-		err = os.WriteFile(filepath.Join(dir, file), b, 0666)
+		err = os.WriteFile(filepath.Join(info.dstDir, file), b, 0666)
 		if err != nil {
 			return err
 		}
+		e.debugf("written %q", filepath.Join(info.dstDir, file))
 	}
 
-	if !isMain {
-		if err := e.importCUEFiles(p, dir, args); err != nil {
-			return err
-		}
+	if err := e.importCUEFiles(p, info.dstDir, args); err != nil {
+		return err
 	}
 
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
 			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
+			if err := e.extractPkg(p); err != nil {
 				return err
 			}
 		}
@@ -556,9 +575,56 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	return nil
 }
 
+func (e *extractor) pkgInfo(pkg *packages.Package) pkgInfo {
+	info := pkgInfo{
+		cueImportPath: pkg.PkgPath,
+		name:          pkg.Name,
+	}
+	if path.Base(info.cueImportPath) != info.name {
+		info.cueImportPath += ":" + info.name
+	}
+	isMain := pkg.Module != nil && pkg.Module.Main
+	switch {
+	case flagLocal.Bool(e.cmd) && isMain:
+		dir := pkg.Module.Dir
+		sub := pkg.PkgPath[len(pkg.Module.Path):]
+		if sub != "" {
+			dir = filepath.FromSlash(dir + sub)
+		}
+		info.dstDir = dir
+	case !flagModule.Bool(e.cmd):
+		// Use legacy gen directory.
+		info.dstDir = filepath.Join(load.GenPath(e.mainModuleRoot), filepath.FromSlash(pkg.PkgPath))
+	case module.PackageContains(e.mainModule, pkg.PkgPath):
+		// The package lives inside the CUE main module, so extract
+		// it there.
+		dir := e.mainModuleRoot
+		sub := pkg.PkgPath[len(e.mainModule):]
+		if sub != "" {
+			dir = filepath.FromSlash(dir + sub)
+		}
+		info.dstDir = dir
+	default:
+		// TODO determine a good default destination for generated files.
+		rel := path.Join("internal/gen", pkg.PkgPath)
+		info.dstDir = filepath.Join(e.mainModuleRoot, rel)
+		info.cueImportPath = path.Join(e.mainModule, rel)
+	}
+	return info
+}
+
 func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error {
+	// TODO the below code reads each directory N times when there are N
+	// Go files in the same directory.
 	for _, o := range p.CompiledGoFiles {
 		root := filepath.Dir(o)
+		if root == dir {
+			// No need to import CUE files if we're generating into
+			// the same directory as the package itself.
+			continue
+		}
+		// TODO Using the recursive WalkDir here seems needlessly obfuscatory.
+		// We could use os.ReadDir instead.
 		err := filepath.WalkDir(root, func(path string, entry fs.DirEntry, err error) error {
 			if err != nil {
 				return err
@@ -1030,7 +1096,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		// TODO: replace these literal types with a reference to the fixed
 		switch obj.Type().String() {
 		case "time.Time":
-			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
+			ref := e.ident(e.pkgNames[obj.Pkg().Path()], false)
 			var name *cueast.Ident
 			if ref.Name != "time" {
 				name = e.ident(ref.Name, false)
@@ -1054,21 +1120,26 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 
 		result = e.ident(obj.Name(), true)
 		if pkg := obj.Pkg(); pkg != nil && pkg != e.pkg.Types {
-			info := e.pkgNames[pkg.Path()]
-			if info.name == "" {
-				info.name = pkg.Name()
+			ppkg, ok := e.pkgs[pkg.Path()]
+			if !ok {
+				panic(fmt.Errorf("package %q not found in all imported packages", pkg.Path()))
 			}
-			p := e.ident(info.name, false)
-			var name *cueast.Ident
-			if info.name != pkg.Name() {
-				name = e.ident(info.name, false)
-			}
-			if info.id == "" {
+			info := e.pkgInfo(ppkg)
+			name := e.pkgNames[pkg.Path()]
+			if name == "" {
+				e.debugf("no import ident for %q", pkg.Path())
 				// This may happen if an alias is defined in a different file
 				// within this package referring to yet another package.
-				info.id = pkg.Path()
+				name = info.name
+			} else {
+				e.debugf("import ident for %q is %q; info.name: %q", pkg.Path(), name, info.name)
 			}
-			p.Node = cueast.NewImport(name, info.id)
+			p := e.ident(name, false)
+			var impName *cueast.Ident
+			if info.name != name {
+				impName = e.ident(name, false)
+			}
+			p.Node = cueast.NewImport(impName, info.cueImportPath)
 			// makeType is always called to describe a type, so whatever
 			// this is referring to, it must be a definition.
 			result = cueast.NewSel(p, "#"+obj.Name())
@@ -1311,8 +1382,8 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		// Add field tag to convert back to Go.
 		typeName := f.Type().String()
 		// simplify type names:
-		for path, info := range e.pkgNames {
-			typeName = strings.Replace(typeName, path+".", info.name+".", -1)
+		for path, name := range e.pkgNames {
+			typeName = strings.Replace(typeName, path+".", name+".", -1)
 		}
 		typeName = strings.Replace(typeName, e.pkg.Types.Path()+".", "", -1)
 

@@ -405,17 +405,11 @@ func (r *resolver) ResolveToLocation(mpath, vers string) (Location, bool) {
 			bestMatchReg = reg
 			break
 		}
-		if !strings.HasPrefix(mpath, pat) {
+		if !module.PackageContains(pat, mpath) {
 			continue
 		}
 		if len(bestMatch) > len(pat) {
 			// We've already found a more specific match.
-			continue
-		}
-		if mpath[len(pat)] != '/' {
-			// The path doesn't have a separator at the end of
-			// the prefix, which means that it doesn't match.
-			// For example, foo.com/bar does not match foo.com/ba.
 			continue
 		}
 		// It's a possible match but not necessarily the longest one.

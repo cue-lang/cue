@@ -244,7 +244,7 @@ func locInModule(pkgPath, mpath string, mloc module.SourceLoc, isLocal bool) (lo
 	// Determine where to expect the package.
 	if pkgPath == mpath {
 		loc = mloc
-	} else if len(pkgPath) > len(mpath) && pkgPath[len(mpath)] == '/' && pkgPath[:len(mpath)] == mpath {
+	} else if module.PackageContains(mpath, pkgPath) {
 		loc.Dir = path.Join(mloc.Dir, pkgPath[len(mpath)+1:])
 	} else {
 		return module.SourceLoc{}, false, nil

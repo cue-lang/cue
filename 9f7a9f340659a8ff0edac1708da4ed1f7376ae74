@@ -358,6 +358,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87ee7a31_50b6450d",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 238,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "395ffaa1_1201c0d1",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6cddbdaf_69058da0",
@@ -545,6 +563,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42114593_f6e0b5bf",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 431,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "Oops, misreading on my part.",
+      "parentUuid": "4dec836c_e8835def",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9aae73e6_eee8ffc1",
@@ -709,6 +745,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "474a5dd2_51941ccb",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 521,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e520c6a5_e86dd077",
+      "range": {
+        "startLine": 521,
+        "startChar": 0,
+        "endLine": 521,
+        "endChar": 2
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4513cd9a_c1cfee9d",
@@ -779,6 +839,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef103e72_c91f2b32",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 547,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "62414eb7_4bff5f0b",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3bcb3d8e_a1a9d321",
@@ -810,6 +888,24 @@
       "side": 1,
       "message": "added comment. \nThe same task may be potentially run multiple times if it was blocked and subsequently unblocked. The scheduler allows for a task to have set an error in such case.\nIt seems indeed to have no effect removing this line, but it seems safer to do so.",
       "parentUuid": "3bcb3d8e_a1a9d321",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a399422_0d7d3d1f",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 618,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "ack, thank you",
+      "parentUuid": "669e89d8_7038e5e6",
       "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -863,6 +959,29 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "47632e32_14f05a13",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "what is the point of a boolean result if it\u0027s always true? I also see `if proces(...)` below",
+      "range": {
+        "startLine": 88,
+        "startChar": 2,
+        "endLine": 88,
+        "endChar": 13
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "78677e1d_4864b211",
         "filename": "internal/core/adt/sched_test.go",
         "patchSetId": 2
@@ -903,6 +1022,29 @@
         "startChar": 17,
         "endLine": 261,
         "endChar": 21
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "994e3ff0_07a17c18",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "surely you mean \"same node\" here?",
+      "range": {
+        "startLine": 262,
+        "startChar": 53,
+        "endLine": 262,
+        "endChar": 67
       },
       "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
@@ -974,6 +1116,87 @@
       "side": 1,
       "message": "The dependencies are dynamic. See the test function \"process\": the implementation of the dependencies is done within the execution of the tasks.\n\nSo it is possible to run a task that depends on a task of another node to run before that task completes. The dependency will just be run as part of running that task, but starting later.\n\nBlocking only occurs if there is a mutual dependency that cannot be resolved without first blocking the task and coming back to it later.\n\nNote that in the test \"dependency chain on nodes within scheduler\" all tests DO execute in dependency order. The difference is that these tasks are all defined on the same node, in which case the order must be and will be strictly enforced.",
       "parentUuid": "abfa6953_d94048d7",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "367e3eaa_f3a194f6",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "I see. Somewhat unintuitive, I think - perhaps more introductory documentation in the funcs like process would be helpful. I definitely would have not understood this without your explanation.",
+      "parentUuid": "9c81d6ba_ad03ee30",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "805aeee6_42f670dc",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "nit: remove extra newline for consistency",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c5c3217_9f5e7c1c",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "nit: no period for consistency",
+      "range": {
+        "startLine": 350,
+        "startChar": 50,
+        "endLine": 350,
+        "endChar": 51
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "238bb6d0_0e6d6b51",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-04T00:41:21Z",
+      "side": 1,
+      "message": "nit: newline missing here for consistency, and same in a few other lines if you search for `, state:`",
+      "range": {
+        "startLine": 364,
+        "startChar": 24,
+        "endLine": 364,
+        "endChar": 26
+      },
       "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

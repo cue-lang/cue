@@ -18,6 +18,14 @@ var (
 	tagPat      = regexp.MustCompile(`^[a-zA-Z0-9_][a-zA-Z0-9._-]{0,127}$`)
 )
 
+// PackageContains reports whether p2 is lexically "inside" (a child of) p1.
+func PackageContains(p1 string, p2 string) bool {
+	if len(p2) == len(p1) {
+		return p1 == p2
+	}
+	return len(p2) > len(p1) && p2[len(p1)] == '/' && p2[:len(p1)] == p1
+}
+
 // Check checks that a given module path, version pair is valid.
 // In addition to the path being a valid module path
 // and the version being a valid semantic version,

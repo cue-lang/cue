@@ -15,6 +15,9 @@
 package cmd
 
 import (
+	"os"
+	"strings"
+
 	"github.com/spf13/cobra"
 )
 
@@ -34,7 +37,7 @@ func newHelpCmd(c *Command) *cobra.Command {
 		Long: `Help provides help for any command in the application.
 Simply type ` + c.Name() + ` help [path to command] for full details.`,
 		Run: func(_ *cobra.Command, args []string) {
-			cmd, _, e := c.Root().Find(args)
+			cmd, rests, e := c.Root().Find(args)
 			if len(args) > 0 && args[0] == "cmd" {
 				// args is one of:
 				//
@@ -52,15 +55,15 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 				if err == nil {
 					addCustomCommands(c, cmd, commandSection, tools)
 					// For the sake of `cue help cmd mycmd`, find the command again.
-					cmd, _, e = c.Root().Find(args)
+					cmd, rests, e = c.Root().Find(args)
 				}
 			}
-			if cmd == nil || e != nil {
-				c.Printf("Unknown help topic %#q\n", args)
-				cobra.CheckErr(c.Root().Usage())
-			} else {
-				cobra.CheckErr(cmd.Help())
+			// If rests are not empty, args are invalid.
+			if cmd == nil || e != nil || len(rests) != 0 {
+				c.PrintErrf("Unknown help command: %#q\n", strings.Join(args, " "))
+				os.Exit(1)
 			}
+			cobra.CheckErr(cmd.Help())
 		},
 	}
 	return cmd

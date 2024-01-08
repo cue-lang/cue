@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9f331f91_9babf7ea",
+        "filename": "cue/testdata/cycle/freeze.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:37:30Z",
+      "side": 1,
+      "message": "nit: typo",
+      "range": {
+        "startLine": 13,
+        "startChar": 61,
+        "endLine": 13,
+        "endChar": 62
+      },
+      "revId": "4545760ff436e029ff23bb9f5683bba22c566115",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1caf7236_955b752f",
+        "filename": "cue/testdata/cycle/freeze.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:37:30Z",
+      "side": 1,
+      "message": "I assume these are TODOs for the new evaluator to fix",
+      "range": {
+        "startLine": 142,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 89
+      },
+      "revId": "4545760ff436e029ff23bb9f5683bba22c566115",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

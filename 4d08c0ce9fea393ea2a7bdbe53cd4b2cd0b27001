@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b05ea10d_c39a558b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:53:45Z",
+      "side": 1,
+      "message": "please expand on this a bit. which positions or error messages would get better? at least from what I can see here, just one message changes in the tests and it seems to be for the worse, and I can\u0027t see any position changes.",
+      "revId": "4d08c0ce9fea393ea2a7bdbe53cd4b2cd0b27001",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62bfc025_4cf2333c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 499,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:53:45Z",
+      "side": 1,
+      "message": "delete?",
+      "revId": "4d08c0ce9fea393ea2a7bdbe53cd4b2cd0b27001",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1973cd70_58a9a82c",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 479,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:53:45Z",
+      "side": 1,
+      "message": "this seems worse; I can\u0027t see why the error message shouldn\u0027t be the same as \"disallowed before\" in the previous test case.",
+      "revId": "4d08c0ce9fea393ea2a7bdbe53cd4b2cd0b27001",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

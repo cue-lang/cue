@@ -18,6 +18,40 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "efe870b2_dd2696e2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:42:34Z",
+      "side": 1,
+      "message": "Forgot one comment.",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84b5618f_69819e85",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:42:34Z",
+      "side": 1,
+      "message": "... but it is commented out already :) I\u0027m a bit confused by this line",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81d121e6_cc22b65c",

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e50509c2_6499b76a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:40:50Z",
+      "side": 1,
+      "message": "r",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81d121e6_cc22b65c",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:40:50Z",
+      "side": 1,
+      "message": "I\u0027d either delete this or leave a comment like a TODO alongside it, otherwise it\u0027s not clear why it\u0027s here but commented out.",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40f14e28_a8e945c9",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:40:50Z",
+      "side": 1,
+      "message": "nit: why not an if/else?\n\nin fact, is this necessary? at least in this CL you always pass intMsg\u003d\u003dstringMsg. It\u0027s hard to see whether you\u0027ll need this later, perhaps you could call it out in the commit message if so.",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c1809c0_8129bda8",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-08T16:40:50Z",
+      "side": 1,
+      "message": "ditto; unclear why this is left commented out.",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

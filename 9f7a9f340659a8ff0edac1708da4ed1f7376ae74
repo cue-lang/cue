@@ -982,6 +982,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7e511950_8f4a5030",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-08T13:11:33Z",
+      "side": 1,
+      "message": "It was supposed to return false if any of the dependencies could not be completed.\n\nThe control logic simplified a bit from the initial implementation, so it doesn\u0027t really matter anymore.\n\nI\u0027ll keep the logic until w really know for sure we don\u0027t need it.",
+      "parentUuid": "47632e32_14f05a13",
+      "range": {
+        "startLine": 88,
+        "startChar": 2,
+        "endLine": 88,
+        "endChar": 13
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "78677e1d_4864b211",
         "filename": "internal/core/adt/sched_test.go",
         "patchSetId": 2
@@ -1040,6 +1064,30 @@
       "writtenOn": "2024-01-04T00:41:21Z",
       "side": 1,
       "message": "surely you mean \"same node\" here?",
+      "range": {
+        "startLine": 262,
+        "startChar": 53,
+        "endLine": 262,
+        "endChar": 67
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4021a7ea_eabbbff1",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 262,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-08T13:11:33Z",
+      "side": 1,
+      "message": "There is one scheduler per node. So either way.",
+      "parentUuid": "994e3ff0_07a17c18",
       "range": {
         "startLine": 262,
         "startChar": 53,
@@ -1138,6 +1186,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "154835ff_bda2b6cf",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 307,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-08T13:11:33Z",
+      "side": 1,
+      "message": "Dispersed the comments above at the relevant points in the code.",
+      "parentUuid": "367e3eaa_f3a194f6",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "805aeee6_42f670dc",
@@ -1151,6 +1217,24 @@
       "writtenOn": "2024-01-04T00:41:21Z",
       "side": 1,
       "message": "nit: remove extra newline for consistency",
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ced74b1_2c6cc43d",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 339,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-08T13:11:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "805aeee6_42f670dc",
       "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -1178,6 +1262,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "13fa7f6f_57c7339b",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 350,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-08T13:11:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5c5c3217_9f5e7c1c",
+      "range": {
+        "startLine": 350,
+        "startChar": 50,
+        "endLine": 350,
+        "endChar": 51
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "238bb6d0_0e6d6b51",
@@ -1191,6 +1299,30 @@
       "writtenOn": "2024-01-04T00:41:21Z",
       "side": 1,
       "message": "nit: newline missing here for consistency, and same in a few other lines if you search for `, state:`",
+      "range": {
+        "startLine": 364,
+        "startChar": 24,
+        "endLine": 364,
+        "endChar": 26
+      },
+      "revId": "9f7a9f340659a8ff0edac1708da4ed1f7376ae74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d5f135e3_c1ceb2a5",
+        "filename": "internal/core/adt/sched_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-08T13:11:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "238bb6d0_0e6d6b51",
       "range": {
         "startLine": 364,
         "startChar": 24,

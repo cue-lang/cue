@@ -385,6 +385,9 @@ func extract(cmd *Command, args []string) error {
 	// and where for some reason the
 	// determine module root:
 	binst := loadFromArgs([]string{"."}, nil)[0]
+	if flagModule.Bool(cmd) && binst.Module == "" {
+		return fmt.Errorf("no module found or empty module path")
+	}
 
 	// TODO: require that binst.Root has been explicitly set.
 

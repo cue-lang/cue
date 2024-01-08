@@ -116,6 +116,34 @@ func runFixAll(cmd *Command, args []string) error {
 	return errs
 }
 
+func allCUEModPackages(dir string) (map[string]bool, error) {
+	pkgs := make(map[string]bool)
+	for _, d := range []string{"gen", "usr", "pkg"} {
+		pkgDir := filepath.Join(dir, "cue.mod", d)
+		if info, err := os.Stat(pkgDir); err != nil || !info.IsDir() {
+			continue
+		}
+		if err := filepath.WalkDir(pkgDir, func(pathStr string, d fs.DirEntry, err error) error {
+			if err != nil {
+				return err
+			}
+			base := filepath.Base(pathStr)
+			if !d.IsDir() || pathStr == pkgDir {
+				return nil
+			}
+			if base == "go.mod" || strings.HasPrefix(base, "_") || strings.HasPrefix(base, ".") {
+				return fs.SkipDir
+			}
+			pkg := filepath.ToSlash(pathStr[len(pkgDir)+1:])
+			pkgs[pkg] = true
+			return nil
+		}); err != nil {
+			return nil, err
+		}
+	}
+	return pkgs, nil
+}
+
 func appendDirs(a []string, base string) []string {
 	_ = filepath.WalkDir(base, func(path string, entry fs.DirEntry, err error) error {
 		if err == nil && entry.IsDir() && path != base {

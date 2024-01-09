@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b775af7_bc386690",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T09:46:31Z",
+      "side": 1,
+      "message": "Thanks, the new commit message makes sense to me now :)",
+      "revId": "c878f5700719efb6802c0ac85362991ed42a0d27",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

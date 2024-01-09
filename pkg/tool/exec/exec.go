@@ -152,13 +152,14 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
 
 	cmd := exec.CommandContext(ctx.Context, bin, args...)
 
-	cmd.Dir, _ = ctx.Obj.Lookup("dir").String()
+	cmd.Dir, _ = ctx.Obj.LookupPath(cue.ParsePath("dir")).String()
 
-	env := ctx.Obj.Lookup("env")
+	env := ctx.Obj.LookupPath(cue.ParsePath("env"))
 
 	// List case.
 	for iter, _ := env.List(); iter.Next(); {
-		str, err := iter.Value().String()
+		v, _ := iter.Value().Default()
+		str, err := v.String()
 		if err != nil {
 			return nil, "", errors.Wrapf(err, v.Pos(),
 				"invalid environment variable value %q", v)
@@ -167,9 +168,9 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
 	}
 
 	// Struct case.
-	for iter, _ := ctx.Obj.Lookup("env").Fields(); iter.Next(); {
+	for iter, _ := env.Fields(); iter.Next(); {
 		label := iter.Label()
-		v := iter.Value()
+		v, _ := iter.Value().Default()
 		var str string
 		switch v.Kind() {
 		case cue.StringKind:

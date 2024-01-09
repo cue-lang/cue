@@ -29,9 +29,10 @@ func TestEnv(t *testing.T) {
 		desc string
 		val  string
 		env  []string
-	}{{
-		desc: "mapped",
-		val: `
+	}{
+		{
+			desc: "mapped",
+			val: `
 		cmd: "echo"
 		env: {
 			WHO:  "World"
@@ -39,16 +40,38 @@ func TestEnv(t *testing.T) {
 			WHEN: "Now!"
 		}
 		`,
-		env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},
-	}, {
-		val: `
+			env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},
+		},
+		{
+			desc: "list",
+			val: `
 		cmd: "echo"
 		env: ["WHO=World", "WHAT=Hello", "WHEN=Now!"]
 		`,
-		env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},
-	}}
+			env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},
+		},
+		{
+			desc: "struct handles default values",
+			val: `
+		cmd: "echo"
+		env: {
+			WHEN: *"Now!" | string
+			HOW: *WHEN | string
+		}
+		`,
+			env: []string{"WHEN=Now!", "HOW=Now!"},
+		},
+		{
+			desc: "list handles default values",
+			val: `
+		cmd: "echo"
+		env: ["WHO=World", "WHAT=Hello", *"COMMAND=\(cmd)" | string]
+		`,
+			env: []string{"WHO=World", "WHAT=Hello", "COMMAND=echo"},
+		},
+	}
 	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
+		t.Run(tc.desc, func(t *testing.T) {
 			var r cue.Runtime
 			inst, err := r.Compile(tc.desc, tc.val)
 			if err != nil {
@@ -60,7 +83,7 @@ func TestEnv(t *testing.T) {
 				Obj:     inst.Value(),
 			})
 			if err != nil {
-				t.Fatal(err)
+				t.Fatalf("mkCommand error = %v", err)
 			}
 
 			if diff := cmp.Diff(cmd.Env, tc.env); diff != "" {

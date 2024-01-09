@@ -1,0 +1,34 @@
+exec cue cmd execEnv
+cmp stdout stdout.golden
+
+-- cue.mod/module.cue --
+module: "example.com"
+
+-- stdout.golden --
+usesDefaultsStruct: hello from John Doe
+
+-- foo_tool.cue --
+package foo
+
+import (
+	"tool/cli"
+	"tool/exec"
+)
+
+#message: *"hello" | string
+
+command: execEnv: {
+    usesDefaultsStruct: exec.Run & {
+        cmd: ["sh", "-c", "echo $MESSAGE from $SENDER"]
+        stdout: *"" | string
+        env: {
+            MESSAGE: #message
+            SENDER: *"John Doe" | string
+        }
+    }
+    result: cli.Print & {
+        text: """
+        usesDefaultsStruct: \(usesDefaultsStruct.stdout)
+        """
+    }
+}

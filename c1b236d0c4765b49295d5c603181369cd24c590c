@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e94cc073_a4604794",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T10:33:28Z",
+      "side": 1,
+      "message": "Good point. Added TODO to clean things up.",
+      "parentUuid": "aca510dd_74a49cfb",
+      "revId": "c1b236d0c4765b49295d5c603181369cd24c590c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "26822d22_0a534562",
@@ -43,6 +61,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "74efd1b7_e39a77fa",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T10:33:28Z",
+      "side": 1,
+      "message": "removed \"that\"",
+      "parentUuid": "26822d22_0a534562",
+      "range": {
+        "startLine": 88,
+        "startChar": 33,
+        "endLine": 88,
+        "endChar": 40
+      },
+      "revId": "c1b236d0c4765b49295d5c603181369cd24c590c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "90a002ad_789836b6",
         "filename": "internal/core/adt/states.go",
         "patchSetId": 5
@@ -54,6 +96,24 @@
       "writtenOn": "2024-01-09T09:55:05Z",
       "side": 1,
       "message": "there are a significant number of commented out lines in this file, even some that shouldn\u0027t compile like 218. is this on purpose?",
+      "revId": "c1b236d0c4765b49295d5c603181369cd24c590c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4210a9c2_9fc86833",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T10:33:28Z",
+      "side": 1,
+      "message": "Cleaned it up a bit. This has (had) some remnants of some shifts in implementation and pre-simplifying things.",
+      "parentUuid": "90a002ad_789836b6",
       "revId": "c1b236d0c4765b49295d5c603181369cd24c590c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

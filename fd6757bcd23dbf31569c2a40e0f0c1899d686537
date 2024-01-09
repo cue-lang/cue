@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "70da7190_15dcc34a",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T10:33:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "10e11c0b_338cae45",
+      "range": {
+        "startLine": 204,
+        "startChar": 20,
+        "endLine": 204,
+        "endChar": 33
+      },
+      "revId": "fd6757bcd23dbf31569c2a40e0f0c1899d686537",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e0d5d29a_3a4d6c67",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-01-09T09:55:05Z",
       "side": 1,
       "message": "my understanding is that XXX needs to be fixed before merging. does this code need to be rewritten, or should the comment be a TODO?",
+      "range": {
+        "startLine": 1320,
+        "startChar": 38,
+        "endLine": 1320,
+        "endChar": 41
+      },
+      "revId": "fd6757bcd23dbf31569c2a40e0f0c1899d686537",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45ee1d7b_d71c142f",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1320,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T10:33:28Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "e0d5d29a_3a4d6c67",
       "range": {
         "startLine": 1320,
         "startChar": 38,

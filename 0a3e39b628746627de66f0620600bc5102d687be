@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "edc0bea5_da65b803",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "removed the panic altogether.",
+      "parentUuid": "7518dddb_dced3cbb",
+      "range": {
+        "startLine": 359,
+        "startChar": 1,
+        "endLine": 363,
+        "endChar": 2
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2c5789f_b261cdf7",
@@ -54,6 +78,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "the parentheses on the left seem unnecessary",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a89ed21b_b584278f",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2c5789f_b261cdf7",
       "revId": "0a3e39b628746627de66f0620600bc5102d687be",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -81,6 +123,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c3007eb_ad5c7245",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eda8e045_8cb2c457",
+      "range": {
+        "startLine": 518,
+        "startChar": 41,
+        "endLine": 518,
+        "endChar": 48
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a1c54f0e_c89c5b3c",
@@ -94,6 +160,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "you could consider inverting this condition and returning early to unindent the rest",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2226f509_654c7199",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1c54f0e_c89c5b3c",
       "revId": "0a3e39b628746627de66f0620600bc5102d687be",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -115,6 +199,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1de7564_30a8d0ed",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc6ddae9_036a14e8",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ee8109bb_221dbc48",
@@ -132,6 +234,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "670468c6_4ad6480f",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ee8109bb_221dbc48",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ebbac59_8a71ba39",
@@ -145,6 +265,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "remove?",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a77c2b81_0f7ad0d8",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ebbac59_8a71ba39",
       "revId": "0a3e39b628746627de66f0620600bc5102d687be",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -174,6 +312,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6f81e1bb_220b9742",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "I usually try to do that. This is an artifact of automatically generating the test cases. And I sometimes miss correcting it.\n\nIdeally the test generation is fixed to always indent correctly.\n\nI probably should not modify the AST, but rather do textual replacement. AST replacement doesn\u0027t work as well in Go as it works in CUE.",
+      "parentUuid": "6611acd5_a86d31a3",
+      "range": {
+        "startLine": 347,
+        "startChar": 5,
+        "endLine": 347,
+        "endChar": 9
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "21c263d1_728c77fd",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 7
@@ -185,6 +347,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "this comment got split in two in a weird way, I\u0027d undo that",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0fac29a2_b91e1786",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "I guess the comment moved around after the AST rewriting.",
+      "parentUuid": "21c263d1_728c77fd",
       "revId": "0a3e39b628746627de66f0620600bc5102d687be",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -214,6 +394,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "80e85821_7944f87b",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "ditto. \n\nDone",
+      "parentUuid": "ba8526f9_bbc5416d",
+      "range": {
+        "startLine": 361,
+        "startChar": 69,
+        "endLine": 361,
+        "endChar": 73
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "58e8501f_a8eab51e",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 7
@@ -231,6 +435,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "86b4a2b2_4742b59d",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Yep. As Go uses absolute positions, formatting a modified AST has all kinds of adverse consequences. We should use textual manipulation of Go files instead.",
+      "parentUuid": "58e8501f_a8eab51e",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e4d6d565_59cd0ae6",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 7
@@ -242,6 +464,30 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "on a separate line to clearly split the test cases",
+      "range": {
+        "startLine": 386,
+        "startChar": 13,
+        "endLine": 386,
+        "endChar": 17
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fe8996e_54339a03",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4d6d565_59cd0ae6",
       "range": {
         "startLine": 386,
         "startChar": 13,
@@ -277,6 +523,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b94f9e7c_7d278d85",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "added numbers.",
+      "parentUuid": "b8a59703_f53886ce",
+      "range": {
+        "startLine": 388,
+        "startChar": 9,
+        "endLine": 388,
+        "endChar": 34
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8ac8faf3_93df4852",
         "filename": "internal/core/adt/fields_test.go",
         "patchSetId": 7
@@ -288,6 +558,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "it seems like an existing test case changes behavior here, is that intentional and good? if so, mention it in the commit message and briefly explain why",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e00eeb14_60a364b6",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "This is indeed an incorrect. Need to investigate.",
+      "parentUuid": "8ac8faf3_93df4852",
       "revId": "0a3e39b628746627de66f0620600bc5102d687be",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

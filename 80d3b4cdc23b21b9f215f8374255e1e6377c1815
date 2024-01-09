@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e3f03bce_5c38f2d0",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Not really. In my experience maps are far too slow for smaller numbers. Even if we have larger numbers of arcs, it makes sense to use something like a heap to make it easier to reuse allocations.",
+      "parentUuid": "6ab80620_6209cd25",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b9c3694b_efc136ef",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 6
@@ -31,6 +49,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "please document - also, this is only set but never used.",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b70520af_9b97defe",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b9c3694b_efc136ef",
       "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +94,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cca86c5c_b7b4040f",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16cb132f_5dd3cf3f",
+      "range": {
+        "startLine": 251,
+        "startChar": 6,
+        "endLine": 251,
+        "endChar": 9
+      },
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a0ab0c1_c54bbeb8",
@@ -71,6 +131,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "a lot of commented out code here; should it be removed, or a TODO left to explain what\u0027s going on?",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce53b60a_b89c2a81",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a0ab0c1_c54bbeb8",
       "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -98,6 +176,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "77b76165_2b560b25",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3767ebcc_7246338f",
+      "range": {
+        "startLine": 290,
+        "startChar": 24,
+        "endLine": 290,
+        "endChar": 34
+      },
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6b766771_ed1e4615",
@@ -111,6 +213,24 @@
       "writtenOn": "2024-01-09T11:00:37Z",
       "side": 1,
       "message": "a surprising amount of commented out code, like in the other file",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c93f017_3b33b377",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T12:19:00Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6b766771_ed1e4615",
       "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aca510dd_74a49cfb",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T09:55:05Z",
+      "side": 1,
+      "message": "I assume these are notes for yourself, so I\u0027m skipping them :)",
+      "revId": "c1b236d0c4765b49295d5c603181369cd24c590c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26822d22_0a534562",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T09:55:05Z",
+      "side": 1,
+      "message": "did you mean something else?",
+      "range": {
+        "startLine": 88,
+        "startChar": 33,
+        "endLine": 88,
+        "endChar": 40
+      },
+      "revId": "c1b236d0c4765b49295d5c603181369cd24c590c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90a002ad_789836b6",
+        "filename": "internal/core/adt/states.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 243,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T09:55:05Z",
+      "side": 1,
+      "message": "there are a significant number of commented out lines in this file, even some that shouldn\u0027t compile like 218. is this on purpose?",
+      "revId": "c1b236d0c4765b49295d5c603181369cd24c590c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

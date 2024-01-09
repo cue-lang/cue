@@ -1,0 +1,50 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10e11c0b_338cae45",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T09:55:05Z",
+      "side": 1,
+      "message": "nit: I\u0027d call this `isDevVersion` because otherwise it sounds like you\u0027re switching the version rather than checking it",
+      "range": {
+        "startLine": 204,
+        "startChar": 20,
+        "endLine": 204,
+        "endChar": 33
+      },
+      "revId": "fd6757bcd23dbf31569c2a40e0f0c1899d686537",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e0d5d29a_3a4d6c67",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1320,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T09:55:05Z",
+      "side": 1,
+      "message": "my understanding is that XXX needs to be fixed before merging. does this code need to be rewritten, or should the comment be a TODO?",
+      "range": {
+        "startLine": 1320,
+        "startChar": 38,
+        "endLine": 1320,
+        "endChar": 41
+      },
+      "revId": "fd6757bcd23dbf31569c2a40e0f0c1899d686537",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

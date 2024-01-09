@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42f4bbf1_d58f8a68",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 435,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T09:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "84b5618f_69819e85",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81d121e6_cc22b65c",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-01-08T16:40:50Z",
       "side": 1,
       "message": "I\u0027d either delete this or leave a comment like a TODO alongside it, otherwise it\u0027s not clear why it\u0027s here but commented out.",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a33d7b22_8d3a4b46",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 260,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T09:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81d121e6_cc22b65c",
       "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "86cab62c_4a0563a0",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 273,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T09:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "40f14e28_a8e945c9",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9c1809c0_8129bda8",
@@ -99,6 +153,24 @@
       "writtenOn": "2024-01-08T16:40:50Z",
       "side": 1,
       "message": "ditto; unclear why this is left commented out.",
+      "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2c47d235_7b62cee6",
+        "filename": "internal/core/adt/errors.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T09:44:55Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c1809c0_8129bda8",
       "revId": "c3b97c84bee3e7adae846b233e38d2d31f131750",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6ab80620_6209cd25",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 211,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "Did you consider a map? The majority of accesses do a linear search, and perhaps the ranges need to keep the same order or be deterministic. Either way it would be good to comment here why you\u0027re using a slice, e.g. \"we expect the length to be small so linear searches are OK\".",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9c3694b_efc136ef",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "please document - also, this is only set but never used.",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16cb132f_5dd3cf3f",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "same as before - did you intend to fix this before merging? if not it should be a TODO I think",
+      "range": {
+        "startLine": 251,
+        "startChar": 6,
+        "endLine": 251,
+        "endChar": 9
+      },
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a0ab0c1_c54bbeb8",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 283,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "a lot of commented out code here; should it be removed, or a TODO left to explain what\u0027s going on?",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3767ebcc_7246338f",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 290,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "nit: I might call this something like `getOrAddKeyedCC` to be clear that this method may append to the arcs slice, and that would explain why e.g. linkNotify does not call this method.",
+      "range": {
+        "startLine": 290,
+        "startChar": 24,
+        "endLine": 290,
+        "endChar": 34
+      },
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b766771_ed1e4615",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 373,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "a surprising amount of commented out code, like in the other file",
+      "revId": "80d3b4cdc23b21b9f215f8374255e1e6377c1815",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

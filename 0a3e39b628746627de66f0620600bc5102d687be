@@ -1,0 +1,295 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d681271d_a5550c81",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "Not sure if you\u0027re using your \"update Go test code with expected output\" cuetest logic, but it might be leading to some funky Go syntax, with missing newlines and comments in weird places :)",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7518dddb_dced3cbb",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 363,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "these two seem out of order, i.e. if arc.group is nil you will panic on the first line with a nil dereference",
+      "range": {
+        "startLine": 359,
+        "startChar": 1,
+        "endLine": 363,
+        "endChar": 2
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2c5789f_b261cdf7",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "the parentheses on the left seem unnecessary",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eda8e045_8cb2c457",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "there is no parameter f",
+      "range": {
+        "startLine": 518,
+        "startChar": 41,
+        "endLine": 518,
+        "endChar": 48
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1c54f0e_c89c5b3c",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 524,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "you could consider inverting this condition and returning early to unindent the rest",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc6ddae9_036a14e8",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 544,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "remove?",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee8109bb_221dbc48",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "`return added` :)",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ebbac59_8a71ba39",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 579,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "remove?",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6611acd5_a86d31a3",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 347,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "I\u0027d consistently put each test case field in a separate line (arcs, patterns, allowed, err...) - otherwise reading the test cases is more confusing and the indentation doesn\u0027t match up",
+      "range": {
+        "startLine": 347,
+        "startChar": 5,
+        "endLine": 347,
+        "endChar": 9
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21c263d1_728c77fd",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 356,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "this comment got split in two in a weird way, I\u0027d undo that",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba8526f9_bbc5416d",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 361,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "on a separate line to clearly split the test cases",
+      "range": {
+        "startLine": 361,
+        "startChar": 69,
+        "endLine": 361,
+        "endChar": 73
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58e8501f_a8eab51e",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 382,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "ditto.\n\ndid these comments get moved? the original test has it before the name, which IMO is clearer. perhaps keep a single comment for the three similar test cases.",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4d6d565_59cd0ae6",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 386,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "on a separate line to clearly split the test cases",
+      "range": {
+        "startLine": 386,
+        "startChar": 13,
+        "endLine": 386,
+        "endChar": 17
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8a59703_f53886ce",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 388,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "we now have multiple test cases with this name, is that okay?",
+      "range": {
+        "startLine": 388,
+        "startChar": 9,
+        "endLine": 388,
+        "endChar": 34
+      },
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ac8faf3_93df4852",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 490,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T11:00:37Z",
+      "side": 1,
+      "message": "it seems like an existing test case changes behavior here, is that intentional and good? if so, mention it in the commit message and briefly explain why",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

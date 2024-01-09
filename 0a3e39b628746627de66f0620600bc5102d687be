@@ -270,6 +270,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "297c4854_c3012412",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 562,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T12:21:19Z",
+      "side": 1,
+      "message": "Ah, makes sense.",
+      "parentUuid": "48c4a210_b0014b3c",
+      "revId": "0a3e39b628746627de66f0620600bc5102d687be",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1ebbac59_8a71ba39",

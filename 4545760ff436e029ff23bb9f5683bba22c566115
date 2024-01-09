@@ -26,6 +26,30 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "c3970770_a2ed4b45",
+        "filename": "cue/testdata/cycle/freeze.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T09:11:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f331f91_9babf7ea",
+      "range": {
+        "startLine": 13,
+        "startChar": 61,
+        "endLine": 13,
+        "endChar": 62
+      },
+      "revId": "4545760ff436e029ff23bb9f5683bba22c566115",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "1caf7236_955b752f",
         "filename": "cue/testdata/cycle/freeze.txtar",
         "patchSetId": 4
@@ -37,6 +61,30 @@
       "writtenOn": "2024-01-08T16:37:30Z",
       "side": 1,
       "message": "I assume these are TODOs for the new evaluator to fix",
+      "range": {
+        "startLine": 142,
+        "startChar": 0,
+        "endLine": 144,
+        "endChar": 89
+      },
+      "revId": "4545760ff436e029ff23bb9f5683bba22c566115",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c175adc2_0eee70ee",
+        "filename": "cue/testdata/cycle/freeze.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T09:11:26Z",
+      "side": 1,
+      "message": "yep",
+      "parentUuid": "1caf7236_955b752f",
       "range": {
         "startLine": 142,
         "startChar": 0,

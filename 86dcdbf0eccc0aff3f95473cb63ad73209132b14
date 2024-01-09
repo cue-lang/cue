@@ -43,6 +43,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "8e18c0c9_f8a01565",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T11:49:52Z",
+      "side": 1,
+      "message": "Done. Removed SPAWN, as it is really the same as PARENT.",
+      "parentUuid": "97702804_5d894235",
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "5082ba38_fb964ba4",
         "filename": "internal/core/adt/debug.go",
         "patchSetId": 5
@@ -75,6 +93,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a13c8173_19fd0254",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T11:49:52Z",
+      "side": 1,
+      "message": "Agreed. Added a TODO to add it once we actually have CUE_DEBUG (Go style).",
+      "parentUuid": "1673da64_6c756f25",
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7119a063_544ee8d3",
@@ -94,6 +130,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "1ef35af8_cc5b17fd",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T11:49:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7119a063_544ee8d3",
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "d903ddaa_82c4619d",
         "filename": "internal/core/adt/sched.go",
         "patchSetId": 5
@@ -105,6 +159,30 @@
       "writtenOn": "2024-01-09T10:27:26Z",
       "side": 1,
       "message": "what is this comment for? I\u0027ve never seen anything like it",
+      "range": {
+        "startLine": 675,
+        "startChar": 43,
+        "endLine": 675,
+        "endChar": 66
+      },
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d403abd6_f986ccc5",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-09T11:49:52Z",
+      "side": 1,
+      "message": "It is to see where the matching increment for this decrement is defined.\n\nIt isn\u0027t really necessary anymore, though, now we have the depKind type as argument, as one can just use the LSP to find the matching points. I actually removed most of these already and will remove these as well.",
+      "parentUuid": "d903ddaa_82c4619d",
       "range": {
         "startLine": 675,
         "startChar": 43,

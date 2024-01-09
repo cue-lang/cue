@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74fe4f01_8a5e7afc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T10:27:26Z",
+      "side": 1,
+      "message": "I think you mean matchDecrement here",
+      "range": {
+        "startLine": 13,
+        "startChar": 10,
+        "endLine": 13,
+        "endChar": 24
+      },
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97702804_5d894235",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T10:27:26Z",
+      "side": 1,
+      "message": "nit: document SPAWN and INIT, they are the only ones without one",
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5082ba38_fb964ba4",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T10:27:26Z",
+      "side": 1,
+      "message": "FWIW you should get used to using stringer :) I will do that refactor myself once your entire stack is merged, since it\u0027s not hugely important, but FYI.",
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1673da64_6c756f25",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 105,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T10:27:26Z",
+      "side": 1,
+      "message": "should this be hooked up to CUE_DEBUG? perhaps leave a TODO about it, it could be useful when debugging bugs like other CUE_DEBUG knobs such as \"sort arcs\".",
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7119a063_544ee8d3",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 242,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T10:27:26Z",
+      "side": 1,
+      "message": "nit: add a TODO about the commented out code or remove it",
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d903ddaa_82c4619d",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 675,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-09T10:27:26Z",
+      "side": 1,
+      "message": "what is this comment for? I\u0027ve never seen anything like it",
+      "range": {
+        "startLine": 675,
+        "startChar": 43,
+        "endLine": 675,
+        "endChar": 66
+      },
+      "revId": "86dcdbf0eccc0aff3f95473cb63ad73209132b14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

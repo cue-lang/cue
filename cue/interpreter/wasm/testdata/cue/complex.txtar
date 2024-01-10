@@ -1,0 +1,40 @@
+# Check that we can pass to Wasm structs that have holes in them.
+
+exec cue eval -E --out cue
+cmp stdout out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+cornucopia: _ @extern("struct.wasm", abi=c, sig="func(#cornucopia): int64")
+
+#cornucopia: {
+	b: bool
+	n0: int16
+	n1: uint8
+	n2: int64
+}
+
+_c0: {b: true, n0: 10, n1: 20, n2: 30}
+_c1: {b: false, n0: 1, n1: 2, n2: 3}
+_c2: {b: false, n0: -1, n1: 0, n2: 100}
+_c3: {b: false, n0: -15000, n1: 10, n2: -10000000}
+
+c0: cornucopia(_c0)
+c1: cornucopia(_c1)
+c2: cornucopia(_c2)
+c3: cornucopia(_c3)
+-- struct.wasm --
+-- out/wasm --
+cornucopia: cornucopia()
+#cornucopia: {
+    b:  bool
+    n0: int16
+    n1: uint8
+    n2: int64
+}
+c0: 42
+c1: 6
+c2: 99
+c3: -10014990

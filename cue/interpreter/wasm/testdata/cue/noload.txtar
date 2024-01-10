@@ -1,0 +1,12 @@
+# Check that we can enable Wasm without using it.
+
+exec cue eval -E --out cue
+cmp stdout out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+x: 42
+-- out/wasm --
+x: 42

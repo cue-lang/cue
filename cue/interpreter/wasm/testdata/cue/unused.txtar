@@ -1,0 +1,21 @@
+# Check that an unused Wasm module does not impact CUE evaluation.
+
+exec cue eval -E --out cue
+cmp stdout out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+add: _ @extern("basic.wasm", abi=c, sig="func(int64, int64): int64")
+
+x0: add(1, 2)
+x1: add(-1, 2)
+x2: add(100, 1)
+-- basic.wasm --
+-- empty.wasm --
+-- out/wasm --
+add: add
+x0:  3
+x1:  1
+x2:  101

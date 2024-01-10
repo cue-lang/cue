@@ -3,6 +3,7 @@ package modresolve
 import (
 	"fmt"
 	"net"
+	"net/netip"
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry/ociref"
@@ -194,18 +195,27 @@ func parseRegistry(env string) (Location, error) {
 	}, nil
 }
 
+var (
+	ipV4Localhost = netip.MustParseAddr("127.0.0.1")
+	ipV6Localhost = netip.MustParseAddr("::1")
+)
+
 func isInsecureHost(hostPort string) bool {
 	host, _, err := net.SplitHostPort(hostPort)
 	if err != nil {
 		host = hostPort
+		if strings.HasPrefix(host, "[") && strings.HasSuffix(host, "]") {
+			host = host[1 : len(host)-1]
+		}
 	}
-	switch host {
-	case "localhost",
-		"127.0.0.1",
-		"::1", "[::1]":
+	if host == "localhost" {
 		return true
+	}
+	addr, err := netip.ParseAddr(host)
+	if err != nil {
+		return false
 	}
 	// TODO other clients have logic for RFC1918 too, amongst other
 	// things. Maybe we should do that too.
-	return false
+	return addr == ipV4Localhost || addr == ipV6Localhost
 }

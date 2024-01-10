@@ -408,8 +408,6 @@ func CheckZipFile(m module.Version, zipFile string) (CheckedFiles, error) {
 //
 // Note that checkZip does not read individual files, so zip.Unzip may still fail
 // when checkZip is successful due to I/O errors.
-//
-// TODO update this for new semantics (no top level module directory).
 func CheckZip(m module.Version, r io.ReaderAt, zipSize int64) (*zip.Reader, *zip.File, CheckedFiles, error) {
 	if zipSize > MaxZipFile {
 		cf := CheckedFiles{SizeError: fmt.Errorf("module zip file is too large (%d bytes; limit is %d bytes)", zipSize, MaxZipFile)}

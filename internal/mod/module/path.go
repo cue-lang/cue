@@ -152,9 +152,6 @@ func CheckPathWithoutVersion(basePath string) (err error) {
 // (ASCII digits) and must not begin with a leading zero.
 //
 // Third, no path element may begin with a dot.
-//
-// TODO we probably need function to check module paths that
-// may not contain a major version.
 func CheckPath(mpath string) (err error) {
 	defer func() {
 		if err != nil {

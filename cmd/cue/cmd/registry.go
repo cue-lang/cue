@@ -1,7 +1,9 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"sync"
 
@@ -41,14 +43,36 @@ func getRegistry() (ociregistry.Interface, error) {
 
 	return modmux.New(resolver, func(host string, insecure bool) (ociregistry.Interface, error) {
 		authOnce.Do(func() {
+			// If a registry was authenticated via `cue login`, use that.
+			// If not, fall back to authentication via Docker's config.json.
+			// Note that the order below is backwards, since we layer interfaces.
+
 			config, err := ociauth.Load(nil)
 			if err != nil {
 				authErr = fmt.Errorf("cannot load OCI auth configuration: %v", err)
 				return
 			}
+			// XXX: what is the easiest way to layer our device flow auth atop StdAuthorizer?
+			// Layering of the Authorizer interface?
 			auth = ociauth.NewStdAuthorizer(ociauth.StdAuthorizerParams{
 				Config: config,
 			})
+
+			loginsPath, err := findLoginsPath()
+			if err != nil {
+				authErr = fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
+				return
+			}
+			logins, err := readLogins(loginsPath)
+			if err != nil {
+				authErr = fmt.Errorf("cannot load CUE registry logins: %v", err)
+				return
+			}
+			auth = &cueLoginsAuthorizer{
+				logins:        logins,
+				cachedClients: make(map[string]*http.Client),
+				next:          auth,
+			}
 		})
 		if authErr != nil {
 			return nil, authErr
@@ -58,6 +82,34 @@ func getRegistry() (ociregistry.Interface, error) {
 			Authorizer: auth,
 		})
 	}), nil
+}
+
+type cueLoginsAuthorizer struct {
+	logins        *cueLogins
+	cachedClients map[string]*http.Client
+	next          ociauth.Authorizer
+}
+
+func (a *cueLoginsAuthorizer) DoRequest(req *http.Request, requiredScope ociauth.Scope) (*http.Response, error) {
+	// TODO: note that a CUE registry may include a path prefix,
+	// so using solely the host will not work with such a path.
+	// Can we do better here, perhaps keeping the path prefix up to "/v2/"?
+	host := req.URL.Host
+	login, ok := a.logins.Registries[host]
+	if !ok {
+		return a.next.DoRequest(req, requiredScope)
+	}
+
+	client := a.cachedClients[host]
+	if client == nil {
+		tok := tokenFromLogin(login)
+		oauthCfg := registryOAuthConfig(host)
+		// TODO: When this client refreshes an access token,
+		// we should store the refreshed token on disk.
+		client = oauthCfg.Client(context.Background(), tok)
+		a.cachedClients[host] = client
+	}
+	return client.Do(req)
 }
 
 func getCachedRegistry() (modload.Registry, error) {

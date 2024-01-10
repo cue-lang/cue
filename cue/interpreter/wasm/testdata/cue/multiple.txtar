@@ -1,0 +1,44 @@
+# Check that we can load multiple Wasm modules into the same CUE package.
+
+exec cue eval -E --out cue
+cmp stdout out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+neg32: _ @extern("basic1.wasm", abi=c, sig="func(int32): int32")
+add: _ @extern("basic.wasm", abi=c, sig="func(int64, int64): int64")
+
+x0: add(1, 2)
+x1: add(-1, 2)
+x2: add(100, 1)
+-- b.cue --
+@extern("wasm")
+package p
+
+isPrime: _ @extern("basic1.wasm", abi=c, name=is_prime, sig="func(uint64): bool")
+fact: _ @extern("basic1.wasm", abi=c, sig="func(uint64): uint64")
+
+a0: neg32(42)
+
+b1: isPrime(127)
+b2: isPrime(128)
+
+c1: fact(7)
+c2: fact(9)
+-- basic.wasm --
+-- basic1.wasm --
+-- out/wasm --
+neg32:   neg32()
+add:     add
+x0:      3
+x1:      1
+isPrime: is_prime()
+fact:    fact()
+a0:      -42
+b1:      true
+b2:      false
+c1:      5040
+x2:      101
+c2:      362880

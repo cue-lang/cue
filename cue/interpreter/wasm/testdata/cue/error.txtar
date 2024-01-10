@@ -1,0 +1,22 @@
+# Checks that invalid function signatures is an error.
+
+#error
+
+! exec cue export -E --out cue
+cmp stderr out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+add: _ @extern("basic.wasm", abi=c, sig="func(int64, int64)")
+mul: _ @extern("basic.wasm", abi=c, sig="func(float64, float64): []")
+not: _ @extern("basic.wasm", abi=c, sig="func(*): bool")
+-- basic.wasm --
+-- out/wasm --
+can't load from external module: invalid function signature: expected ':', found newline:
+    ./a.cue:4:8
+can't load from external module: invalid function signature: expected identifier, found *ast.ListLit:
+    ./a.cue:5:8
+can't load from external module: invalid function signature: expected operand, found ')':
+    ./a.cue:6:8

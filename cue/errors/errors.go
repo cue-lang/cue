@@ -274,13 +274,12 @@ var _ Error = &posError{}
 // the offending token, and the error condition is described
 // by Msg.
 type posError struct {
-	pos    token.Pos
-	inputs []token.Pos
+	pos token.Pos
 	Message
 }
 
 func (e *posError) Path() []string              { return nil }
-func (e *posError) InputPositions() []token.Pos { return e.inputs }
+func (e *posError) InputPositions() []token.Pos { return nil }
 func (e *posError) Position() token.Pos         { return e.pos }
 
 // Append combines two errors, flattening Lists as necessary.

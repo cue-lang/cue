@@ -281,6 +281,7 @@ func (c *closeContext) matchDecrement(v *Vertex, kind depKind, dependant *closeC
 // mermaidContext is used to create a dependency analysis for a node.
 type mermaidContext struct {
 	ctx *OpContext
+	v   *Vertex
 
 	all bool
 
@@ -326,6 +327,7 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 
 	m := &mermaidContext{
 		ctx:         ctx,
+		v:           v,
 		roots:       map[*closeContext]*mermaidVertex{},
 		processed:   map[*closeContext]bool{},
 		inConjuncts: map[*closeContext]bool{},
@@ -630,7 +632,9 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 
 	if cc.conjunctCount > 0 {
 		fmt.Fprintf(w, ":::err")
-		m.hasError = true
+		if cc.src == m.v {
+			m.hasError = true
+		}
 	}
 
 	w.WriteString("\n")

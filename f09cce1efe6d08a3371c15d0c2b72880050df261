@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d5efe75_b95d8d70",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "As a basic way of testing and demonstrating, it would be nice to include a testscript which dumps the mermaid for a short CUE file, and we can use the diffs on `CUE_UPDATE\u003d1 go test` to see how the mermaid is changing in its format or shape. The CUE in the test could also contain different bits of syntax to trigger most of what is done in this mermaid logic.",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7d6cdd0e_f13354b3",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "This is just for debugging, but I still feel compelled to mention you should be using html/template here :) Even security aside, named arguments are easier to understand than indexed ones too, like `%[1]s`.\n\nIf we\u0027re OK with Sprintf, then I think a very short comment is worth adding, to at least make it clear we are OK with it.",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5174d1e3_b00b83c0",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "this string combines spaces and tabs for indentation - use tabs consistently",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9202f8a7_e85c3e2e",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "nit: check error",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fd732034_bceaf25d",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "nit: strings.Builder",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "de5e7be1_74ce34d7",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "what is this for?",
+      "range": {
+        "startLine": 528,
+        "startChar": 18,
+        "endLine": 528,
+        "endChar": 27
+      },
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d170ca1_d9eda83d",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "I know this is just for debugging, but FYI, you\u0027re leaking exec.Cmd bits here:\n\n\u003e After a successful call to Start the Wait method must be called in order to release associated system resources. \n\nPerhaps add a goroutine calling Wait asynchronously, even if just to throw away the result.",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d300c91c_a3de1337",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T13:16:14Z",
+      "side": 1,
+      "message": "should this be left on in master?",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

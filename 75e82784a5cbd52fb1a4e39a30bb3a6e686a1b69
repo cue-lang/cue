@@ -16,6 +16,24 @@
       "message": "Just to confirm it does this by virtue of it being impossible for a commit to not have an author, and hence there is always at least one author/committer and hence there would be an error in case there was no signed-off-by?",
       "revId": "75e82784a5cbd52fb1a4e39a30bb3a6e686a1b69",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06b10fe4_5556df0e",
+        "filename": ".github/workflows/trybot.yml",
+        "patchSetId": 1
+      },
+      "lineNbr": 127,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-10T09:20:53Z",
+      "side": 1,
+      "message": "Correct. Even setting git aside for a second, Gerrit requires an author as well.",
+      "parentUuid": "a00c0c11_163c52d2",
+      "revId": "75e82784a5cbd52fb1a4e39a30bb3a6e686a1b69",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,75 @@
+# Check that we can pass nested structs to Wasm.
+
+exec cue eval -E --out cue
+cmp stdout out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+#vector2: {
+	x: float64
+	y: float64
+}
+
+#foo: {
+	b: bool
+	bar: #bar
+}
+
+#bar: {
+	b: bool
+	baz: #baz
+	n: uint16
+}
+
+#baz: {
+	vec: #vector2
+}
+
+mag: _ @extern("struct.wasm", abi=c, name=magnitude_foo, sig="func(#foo): float64")
+
+mb0: mag({b: false, bar: {b: true, baz: {vec: {x: 1, y: 1}}, n: 0}})
+mb1: mag({b: true, bar: {b: false, baz: {vec: {x: 3, y: 4}}, n: 1}})
+mb2: mag({b: false, bar: {b: true, baz: {vec: {x: 12, y: 35}}, n: 5}})
+mb3: mag({b: false, bar: {b: false, baz: {vec: {x: 3.33, y: 5.55}}, n: 110}})
+-- struct.wasm --
+-- out/wasm --
+#vector2: {
+    x: float64
+    y: float64
+}
+#foo: {
+    b: bool
+    bar: {
+        b: bool
+        baz: {
+            vec: {
+                x: float64
+                y: float64
+            }
+        }
+        n: uint16
+    }
+}
+#bar: {
+    b: bool
+    baz: {
+        vec: {
+            x: float64
+            y: float64
+        }
+    }
+    n: uint16
+}
+#baz: {
+    vec: {
+        x: float64
+        y: float64
+    }
+}
+mag: magnitude_foo()
+mb0: 1.4142135623730951
+mb1: 5.0
+mb2: 37.0
+mb3: 6.472356603278283

@@ -1,0 +1,16 @@
+# Checks that we can't load Wasm without enabling it at the package-level.
+
+#error
+
+! exec cue eval -E --out cue
+cmp stderr out/wasm
+
+-- a.cue --
+package p
+
+add: _ @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
+
+x00: add(1, 2)
+-- out/wasm --
+x00: cannot call non-function add (type _):
+    ./a.cue:5:6

@@ -15,22 +15,26 @@
 package wasm_test
 
 import (
+	"fmt"
 	"io/fs"
 	"os"
 	"path/filepath"
-	"runtime"
+	stdruntime "runtime"
 	"strings"
 	"testing"
 
 	"cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/interpreter/wasm"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/cuetxtar"
 
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
@@ -47,12 +51,13 @@ func TestMain(m *testing.M) {
 // TestExe tests Wasm using the command-line tool.
 func TestExe(t *testing.T) {
 	root := must(filepath.Abs("testdata"))(t)
+	wasmFiles := filepath.Join(root, "cue")
 	p := testscript.Params{
-		Dir:                 "testdata",
+		Dir:                 "testdata/cue",
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
 		RequireExplicitExec: true,
 		Setup: func(e *testscript.Env) error {
-			copyWasmFiles(t, e.WorkDir, root)
+			copyWasmFiles(t, e.WorkDir, wasmFiles)
 			return nil
 		},
 		Condition: cuetest.Condition,
@@ -65,20 +70,70 @@ func TestExe(t *testing.T) {
 
 // TestWasm tests Wasm using the API.
 func TestWasm(t *testing.T) {
-	files := must(os.ReadDir("testdata"))(t)
-	for _, f := range files {
-		if !f.IsDir() {
-			continue
-		}
-		dir := f.Name()
-		t.Run(dir, func(t *testing.T) {
-			v := loadDir(t, filepath.Join("testdata", dir))
-			got := must(format.Node(v.Syntax(
-				cue.All(), cue.Concrete(true), cue.ErrorsAsValues(true),
-			)))(t)
-			check(t, dir, string(got))
-		})
+	test := cuetxtar.TxTarTest{
+		Root: "./testdata/cue",
+		Name: "wasm",
 	}
+
+	test.Run(t, func(t *cuetxtar.Test) {
+		ctx := cuecontext.New(cuecontext.Interpreter(wasm.New()))
+
+		// if #cuecmd is set the test is only for the CUE command,
+		// not the API, so skip it.
+		if t.HasTag("cuecmd") {
+			return
+		}
+
+		bi := t.Instance()
+
+		// the BuildInstance created above doesn't know about
+		// the .wasm files (why not?), so add them here.
+		for _, f := range t.Archive.Files {
+			if strings.HasSuffix(f.Name, ".wasm") {
+				bf := &build.File{
+					Filename: f.Name,
+				}
+				bi.UnknownFiles = append(bi.UnknownFiles, bf)
+			}
+		}
+
+		v := ctx.BuildInstance(bi)
+		err := v.Validate()
+
+		// if #error is set we're checking for a specific error,
+		// so only print the error then bail out.
+		if t.HasTag("error") {
+			for _, err := range errors.Errors(err) {
+				t.WriteErrors(err)
+			}
+			return
+		}
+
+		// we got an unexpected error. print both the error
+		// and the CUE value, to aid debugging.
+		if err != nil {
+			fmt.Fprintln(t, "Errors:")
+			for _, err := range errors.Errors(err) {
+				t.WriteErrors(err)
+			}
+			fmt.Fprintln(t, "")
+			fmt.Fprintln(t, "Result:")
+		}
+
+		syntax := v.Syntax(
+			cue.Attributes(false), cue.Final(), cue.Definitions(true), cue.ErrorsAsValues(true),
+		)
+		file, err := astutil.ToFile(syntax.(ast.Expr))
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got, err := format.Node(file, format.UseSpaces(4), format.TabIndent(false))
+		if err != nil {
+			t.Fatal(err)
+		}
+		fmt.Fprint(t, string(got))
+	})
 }
 
 func copyWasmFiles(t *testing.T, dstDir, srcDir string) {
@@ -151,7 +206,7 @@ func must[T any](v T, err error) func(t *testing.T) T {
 	}
 	return func(t *testing.T) T {
 		if fail {
-			_, file, line, _ := runtime.Caller(1)
+			_, file, line, _ := stdruntime.Caller(1)
 			file = filepath.Base(file)
 			t.Fatalf("unexpected error at %v:%v: %v", file, line, err)
 		}

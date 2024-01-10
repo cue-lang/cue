@@ -1,0 +1,36 @@
+# Ensure that we have Wasm functionality in cue def.
+
+#cuecmd
+
+exec cue def -E
+cmp stdout out/cue-def-stdout
+
+-- a.cue --
+@extern("wasm")
+package p
+
+add: _ @extern("basic.wasm", abi=c, sig="func(int64, int64): int64")
+
+x0: add(1, 2)
+x1: add(-1, 2)
+-- b.cue --
+@extern("wasm")
+package p
+
+isPrime: _ @extern("basic1.wasm", abi=c, name=is_prime, sig="func(uint64): bool")
+fact: _ @extern("basic1.wasm", abi=c, sig="func(uint64): uint64")
+
+b1: isPrime(127)
+c1: fact(7)
+-- basic.wasm --
+-- basic1.wasm --
+-- out/cue-def-stdout --
+package p
+
+add:     add() @extern("basic.wasm", abi=c, sig="func(int64, int64): int64")
+x0:      add(1, 2)
+isPrime: is_prime() @extern("basic1.wasm", abi=c, name=is_prime, sig="func(uint64): bool")
+fact:    fact()     @extern("basic1.wasm", abi=c, sig="func(uint64): uint64")
+b1:      isPrime(127)
+x1:      add(-1, 2)
+c1:      fact(7)

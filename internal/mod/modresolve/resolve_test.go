@@ -166,6 +166,15 @@ func TestResolver(t *testing.T) {
 				Insecure: true,
 			},
 		},
+	}, {
+		testName: "[0:0::1]IsInsecure",
+		in:       "[0:0::1]",
+		lookups: map[string]Location{
+			"fruit.com/apple": {
+				Host:     "[0:0::1]",
+				Insecure: true,
+			},
+		},
 	}}
 
 	for _, tc := range testCases {

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "672a1df7_d2419f4f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-10T11:22:37Z",
+      "side": 1,
+      "message": "There seems to be a bug introduced.",
+      "revId": "7b51615c5cc542c86e5915472340ecb95a75fa1a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

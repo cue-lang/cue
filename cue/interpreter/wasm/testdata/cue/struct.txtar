@@ -1,0 +1,76 @@
+exec cue eval -E --out cue
+cmp stdout out/wasm
+
+-- a.cue --
+@extern("wasm")
+package p
+
+import "math"
+
+#vector2: {
+	x: float64
+	y: float64
+}
+
+magnitude2: _ @extern("struct.wasm", abi=c, sig="func(#vector2): float64")
+magnitude3: _ @extern("struct.wasm", abi=c, sig="func(#vector3): float64")
+
+_v0: {x: 1, y: 1}
+_v1: {x: math.Sqrt2, y: math.Sqrt2}
+_v2: {x: 123.456, y: 789.012}
+
+m0: magnitude2(_v0)
+m1: magnitude2(_v1)
+m2: magnitude2(_v2)
+
+normalize2: _ @extern("struct.wasm", abi=c, sig="func(#vector2): #vector2")
+n2: normalize2(_v1)
+n2m: magnitude2(n2)
+
+#vector3: {
+	x: float64
+	y: float64
+	z: float64
+}
+
+_v3: {x: 1, y: 1, z: 1}
+_v4: {x: 0, y: 2, z: 2}
+_v5: {x: 3.84900179459750509672765853667971637098401167513417917345734884322651781535288897129144, y: 3.84900179459750509672765853667971637098401167513417917345734884322651781535288897129144, z: 3.84900179459750509672765853667971637098401167513417917345734884322651781535288897129144}
+
+m3: magnitude3(_v3)
+m4: magnitude3(_v4)
+m5: magnitude3(_v5)
+
+double3: _ @extern("struct.wasm", abi=c, sig="func(#vector3): #vector3")
+d4: double3(_v4)
+-- struct.wasm --
+-- out/wasm --
+#vector2: {
+    x: float64
+    y: float64
+}
+magnitude2: magnitude2()
+magnitude3: magnitude3()
+m0:         1.4142135623730951
+m1:         2.0
+m2:         798.6121211702211
+normalize2: normalize2
+n2: {
+    x: 0.7071067811865476
+    y: 0.7071067811865476
+}
+n2m: 1.0
+#vector3: {
+    x: float64
+    y: float64
+    z: float64
+}
+m3:      1.7320508075688772
+m4:      2.8284271247461903
+m5:      6.666666666666667
+double3: double3
+d4: {
+    x: 0.0
+    y: 4.0
+    z: 4.0
+}

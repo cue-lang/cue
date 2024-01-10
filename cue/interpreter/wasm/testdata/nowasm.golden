@@ -1,4 +1,0 @@
-{
-	add: _   @extern("foo.wasm", abi=c, sig="func(int64, int64): int64")
-	x00: _|_ // x00: cannot call non-function add (type _)
-}

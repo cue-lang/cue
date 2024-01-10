@@ -25,6 +25,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	"runtime"
 	goruntime "runtime"
 	"strings"
 	"testing"
@@ -177,6 +178,12 @@ func TestScript(t *testing.T) {
 				"GONOSUMDB=*", // GOPROXY is a private proxy
 				homeEnvName()+"="+home,
 			)
+			if runtime.GOOS == "windows" {
+				// os.UserConfigDir on Windows requires %AppData% to be set,
+				// and it does not fall back to the home directory in any way.
+				// Set it up as well, so that cmd/cue can function normally.
+				e.Vars = append(e.Vars, "AppData="+filepath.Join(home, "appdata"))
+			}
 			entries, err := os.ReadDir(e.WorkDir)
 			if err != nil {
 				return fmt.Errorf("cannot read workdir: %v", err)

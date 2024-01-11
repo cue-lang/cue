@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6bba91fd_c2a9465f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-11T10:39:46Z",
+      "side": 1,
+      "message": "s/mentioned/mention/ ?",
+      "revId": "65dae94704ccd2df1437d074933257880ef6cc20",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c784bc91_0dfc5b26",
+        "filename": "cue/interpreter/wasm/testdata/def.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-11T10:39:46Z",
+      "side": 1,
+      "message": "Add a comment to explain why the WASM implementations are represented as a function call.",
+      "revId": "65dae94704ccd2df1437d074933257880ef6cc20",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

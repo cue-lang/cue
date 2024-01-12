@@ -222,6 +222,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad147762_3eb1060e",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 646,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T17:34:36Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5d170ca1_d9eda83d",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d300c91c_a3de1337",

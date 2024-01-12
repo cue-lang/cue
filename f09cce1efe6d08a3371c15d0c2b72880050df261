@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "58b912ae_462302ae",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T17:34:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d6cdd0e_f13354b3",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5174d1e3_b00b83c0",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-01-10T13:16:14Z",
       "side": 1,
       "message": "this string combines spaces and tabs for indentation - use tabs consistently",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cffd2691_23a4e571",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T17:34:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5174d1e3_b00b83c0",
       "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eefe7128_2726fce2",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 86,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T17:34:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9202f8a7_e85c3e2e",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd732034_bceaf25d",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fdbfe0e_c85664c4",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 308,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T17:34:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd732034_bceaf25d",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "de5e7be1_74ce34d7",
@@ -99,6 +171,30 @@
       "writtenOn": "2024-01-10T13:16:14Z",
       "side": 1,
       "message": "what is this for?",
+      "range": {
+        "startLine": 528,
+        "startChar": 18,
+        "endLine": 528,
+        "endChar": 27
+      },
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbb515c9_6449742c",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 528,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T17:34:03Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "de5e7be1_74ce34d7",
       "range": {
         "startLine": 528,
         "startChar": 18,
@@ -139,6 +235,24 @@
       "writtenOn": "2024-01-10T13:16:14Z",
       "side": 1,
       "message": "should this be left on in master?",
+      "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "12b40357_e0362a38",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T17:34:03Z",
+      "side": 1,
+      "message": "Yes. Showing the graph is turned off by default, but adding DebugDeps will enable extra strict checks during processing.",
+      "parentUuid": "d300c91c_a3de1337",
       "revId": "f09cce1efe6d08a3371c15d0c2b72880050df261",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

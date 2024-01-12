@@ -150,9 +150,10 @@ func (pkg *Package) Mod() module.Version {
 	return pkg.mod
 }
 
-// LoadPackages loads information about all the given packages, using
-// modules from the given requirements to determine which modules
-// they might be obtained from, and reg to download module contents.
+// LoadPackages loads information about all the given packages and the
+// packages they import, recursively, using modules from the given
+// requirements to determine which modules they might be obtained from,
+// and reg to download module contents.
 func LoadPackages(
 	ctx context.Context,
 	mainModulePath string,
@@ -251,7 +252,8 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 	if pkgs.mainModuleVersion.Path() == pkg.mod.Path() {
 		pkgs.applyPkgFlags(ctx, pkg, PkgInAll)
 	}
-	imports, err := modimports.AllImports(modimports.PackageFiles(pkg.loc.FS, pkg.loc.Dir))
+	pkgQual := module.ParseImportPath(pkg.path).Qualifier
+	imports, err := modimports.AllImports(modimports.PackageFiles(pkg.loc.FS, pkg.loc.Dir, pkgQual))
 	if err != nil {
 		pkg.err = fmt.Errorf("cannot get imports: %v", err)
 		return

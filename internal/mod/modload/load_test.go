@@ -119,5 +119,9 @@ func (c *registryImpl) Fetch(ctx context.Context, mv module.Version) (modpkgload
 }
 
 func (r *registryImpl) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
-	return r.reg.ModuleVersions(ctx, mpath)
+	versions, err := r.reg.ModuleVersions(ctx, mpath)
+	if err != nil {
+		return nil, fmt.Errorf("cannot obtain versions for module %q: %v", mpath, err)
+	}
+	return versions, nil
 }

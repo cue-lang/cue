@@ -1,7 +1,7 @@
 # Test that using a bad import path does not result in a panic.
 
 -- want --
-error: failed to resolve "x.com/Foo--bar@v0": invalid OCI request: invalid repository name
+error: failed to resolve "x.com/Foo--bar@v0": cannot obtain versions for module "x.com/Foo--bar@v0": invalid OCI request: invalid repository name
 -- cue.mod/module.cue --
 module: "main.org@v0"
 

@@ -1,12 +1,12 @@
 -- test0/initial-requirements --
 main.test@v0 example.com@v0.0.1
 -- test0/root-packages --
-main.test@v0
+main.test@v0:main
 example.com/blah
 -- test0/default-major-versions --
 example.com@v0
 -- test0/want --
-main.test@v0
+main.test@v0:main
 	flags: inAll,isRoot,fromRoot,importsLoaded
 	mod: main.test@v0
 	location: .

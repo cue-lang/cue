@@ -16,6 +16,24 @@
       "message": "The more I look at these test cases, the more I wish that `run` was replaced by CUE source as a string. having the plain source is easier to understand, and it\u0027s already duplicated as a comment anyway.",
       "revId": "60ecd9bc4feb55d6a777f85dceb69241d2208728",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db1bdae9_a8f94ebc",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T15:36:18Z",
+      "side": 1,
+      "message": "The thing about these tests, though, is that it is tested separately from the CUE evaluator (at this point in the chain the evaluator doesn\u0027t even exist yet). So not sure how that would work.",
+      "parentUuid": "541e2972_451dea70",
+      "revId": "60ecd9bc4feb55d6a777f85dceb69241d2208728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

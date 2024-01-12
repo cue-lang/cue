@@ -336,25 +336,9 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	}
 
 	// Extract the package name.
-
-	name = string(p)
-	switch i := strings.LastIndexAny(name, "/:"); {
-	case i < 0:
-	case p[i] == ':':
-		name = string(p[i+1:])
-		p = p[:i]
-
-	default: // p[i] == '/'
-		mp, _, ok := module.SplitPathVersion(string(p))
-		if ok {
-			// import of the form: example.com/foo/bar@v1
-			if i := strings.LastIndex(mp, "/"); i >= 0 {
-				name = mp[i+1:]
-			}
-		} else {
-			name = string(p[i+1:])
-		}
-	}
+	parts := module.ParseImportPath(string(p))
+	name = parts.Qualifier
+	p = importPath(parts.Unqualified().String())
 	// TODO: fully test that name is a valid identifier.
 	if name == "" {
 		err = errors.Newf(pos, "empty package name in import path %q", p)

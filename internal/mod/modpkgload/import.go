@@ -36,15 +36,12 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	failf := func(format string, args ...interface{}) (module.Version, SourceLoc, []module.Version, error) {
 		return fail(fmt.Errorf(format, args...))
 	}
-	// TODO if there's no @ in the import path, take the version from the
-	// user's go.mod file as an initial preference; if not present there, then
-	// take it from requirements; if not present there, search for latest
-	// major version and use that. What should we do when there are
-	// several major versions present in the go.mod file?
-	pkgPathOnly, pkgVersion, hasMajor := module.SplitPathVersion(pkgPath)
-	if !hasMajor {
-		pkgPathOnly = pkgPath
-	}
+	// Note: we don't care about the package qualifier at this point
+	// because any directory with CUE files in counts as a possible
+	// candidate, regardless of what packages are in it.
+	pathParts := module.ParseImportPath(pkgPath)
+	pkgPathOnly := pathParts.Path
+
 	if filepath.IsAbs(pkgPathOnly) || path.IsAbs(pkgPathOnly) {
 		return failf("%q is not a package path", pkgPath)
 	}
@@ -77,13 +74,14 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	for {
 		var altMods []module.Version
 		// TODO we could probably do this loop concurrently.
+
 		for prefix := pkgPathOnly; prefix != "."; prefix = path.Dir(prefix) {
 			var (
 				v  string
 				ok bool
 			)
-			pkgVersion := pkgVersion
-			if !hasMajor {
+			pkgVersion := pathParts.Version
+			if pkgVersion == "" {
 				if pkgVersion, _ = pkgs.requirements.DefaultMajorVersion(prefix); pkgVersion == "" {
 					continue
 				}

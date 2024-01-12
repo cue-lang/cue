@@ -12,6 +12,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cueimports"
+	"cuelang.org/go/internal/mod/module"
 )
 
 type ModuleFile struct {
@@ -28,8 +29,8 @@ type ModuleFile struct {
 }
 
 // AllImports returns a sorted list of all the package paths
-// imported by the module files produced by modFilesIter.
-// It discards any package qualifier suffixes.
+// imported by the module files produced by modFilesIter
+// in canonical form.
 func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, retErr error) {
 	pkgPaths := make(map[string]bool)
 	modFilesIter(func(mf ModuleFile, err error) bool {
@@ -45,14 +46,8 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 				retErr = fmt.Errorf("invalid import path %q in %s", imp.Path.Value, mf.FilePath)
 				return false
 			}
-			// Discard package qualifier.
-			// TODO we shouldn't have to do this, because
-			// we'll want to trace dependencies that take into account
-			// the fact that there can be multiple independent packages
-			// in the same directory.
-			if i := strings.LastIndex(pkgPath, ":"); i > 0 {
-				pkgPath = pkgPath[:i]
-			}
+			// Canonicalize the path.
+			pkgPath = module.ParseImportPath(pkgPath).Canonical()
 			pkgPaths[pkgPath] = true
 		}
 		return true
@@ -70,8 +65,9 @@ func AllImports(modFilesIter func(func(ModuleFile, error) bool)) (_ []string, re
 }
 
 // PackageFiles returns an iterator that produces all the CUE files
-// inside the package at the given location.
-func PackageFiles(fsys fs.FS, dir string) func(func(ModuleFile, error) bool) {
+// inside the package with the given name at the given location.
+// If pkgQualifier is "*", files from all packages in the directory will be produced.
+func PackageFiles(fsys fs.FS, dir string, pkgQualifier string) func(func(ModuleFile, error) bool) {
 	return func(yield func(ModuleFile, error) bool) {
 		entries, err := fs.ReadDir(fsys, dir)
 		if err != nil {
@@ -81,7 +77,7 @@ func PackageFiles(fsys fs.FS, dir string) func(func(ModuleFile, error) bool) {
 			return
 		}
 		for _, e := range entries {
-			if !yieldPackageFile(fsys, path.Join(dir, e.Name()), yield) {
+			if !yieldPackageFile(fsys, path.Join(dir, e.Name()), pkgQualifier, yield) {
 				return
 			}
 		}
@@ -127,7 +123,7 @@ func AllModuleFiles(fsys fs.FS, root string) func(func(ModuleFile, error) bool) 
 				}
 				return nil
 			}
-			if !yieldPackageFile(fsys, fpath, yield) {
+			if !yieldPackageFile(fsys, fpath, "*", yield) {
 				return fs.SkipAll
 			}
 			return nil
@@ -135,7 +131,7 @@ func AllModuleFiles(fsys fs.FS, root string) func(func(ModuleFile, error) bool) 
 	}
 }
 
-func yieldPackageFile(fsys fs.FS, fpath string, yield func(ModuleFile, error) bool) bool {
+func yieldPackageFile(fsys fs.FS, fpath string, pkgQualifier string, yield func(ModuleFile, error) bool) bool {
 	if !strings.HasSuffix(fpath, ".cue") {
 		return true
 	}
@@ -155,6 +151,18 @@ func yieldPackageFile(fsys fs.FS, fpath string, yield func(ModuleFile, error) bo
 	if err != nil {
 		return yield(pf, err)
 	}
+	if pkgQualifier != "*" && packageName(syntax) != pkgQualifier {
+		return true
+	}
 	pf.Syntax = syntax
 	return yield(pf, nil)
+}
+
+func packageName(f *ast.File) string {
+	for _, decl := range f.Decls {
+		if pkgDecl, ok := decl.(*ast.Package); ok {
+			return pkgDecl.Name.Name
+		}
+	}
+	return ""
 }

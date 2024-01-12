@@ -6,7 +6,8 @@ y/z1.cue
 y/z2.cue
 -- want-imports --
 dep1
-dep2
+dep2:a
+dep2:b
 dep3
 dep4
 -- cue.mod/module.cue --

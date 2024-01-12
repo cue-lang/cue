@@ -55,13 +55,10 @@ func (ld *loader) queryImport(ctx context.Context, pkgPath string, rs *modrequir
 // It does not return modules that are already present in the given requirements.
 // It also reports whether a default major version will be required.
 func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *modrequirements.Requirements) ([]module.Version, bool, error) {
-	mp, mv, hasMajor := module.SplitPathVersion(pkgPath)
-	if !hasMajor {
-		mp = pkgPath
-	}
+	parts := module.ParseImportPath(pkgPath)
 	latestModuleForPrefix := func(prefix string) (module.Version, error) {
-		mv := mv
-		if !hasMajor {
+		mv := parts.Version
+		if mv == "" {
 			var status modrequirements.MajorVersionDefaultStatus
 			mv, status = rs.DefaultMajorVersion(prefix)
 			if status == modrequirements.AmbiguousDefault {
@@ -96,8 +93,8 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 		candidates []module.Version
 		queryErr   error
 	)
-	logf("initial module path %q", mp)
-	for prefix := mp; prefix != "."; prefix = path.Dir(prefix) {
+	logf("initial module path %q", parts.Path)
+	for prefix := parts.Path; prefix != "."; prefix = path.Dir(prefix) {
 		prefix := prefix
 		work.Add(func() {
 			v, err := latestModuleForPrefix(prefix)
@@ -115,7 +112,7 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 		})
 	}
 	<-work.Idle()
-	return candidates, !hasMajor, queryErr
+	return candidates, parts.Version == "", queryErr
 }
 
 // latestVersion returns the latest of any of the given versions,

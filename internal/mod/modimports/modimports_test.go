@@ -71,7 +71,18 @@ import (
 package x
 
 import (
-	"something.else"
+	"something.else:other"
+	"bar.com/baz:baz"
+)
+-- y.cue --
+package y
+
+import (
+	"something.that.is/imported/by/y"
+)
+-- nopkg.cue --
+import (
+	"something.that.is/imported/by/nopkg"
 )
 -- foo/y.cue --
 import "other"
@@ -81,10 +92,23 @@ import "other"
 package y
 `))
 	tfs := txtarfs.FS(dirContents)
-	imps, err := AllImports(PackageFiles(tfs, "."))
+	imps, err := AllImports(PackageFiles(tfs, ".", "*"))
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.DeepEquals(imps, []string{"bar.com/baz", "foo", "something.else"}))
-	imps, err = AllImports(PackageFiles(tfs, "foo"))
+	qt.Assert(t, qt.DeepEquals(imps, []string{
+		"bar.com/baz",
+		"foo",
+		"something.else:other",
+		"something.that.is/imported/by/nopkg",
+		"something.that.is/imported/by/y",
+	}))
+	imps, err = AllImports(PackageFiles(tfs, ".", "x"))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(imps, []string{
+		"bar.com/baz",
+		"foo",
+		"something.else:other",
+	}))
+	imps, err = AllImports(PackageFiles(tfs, "foo", "*"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(imps, []string{"other"}))
 }

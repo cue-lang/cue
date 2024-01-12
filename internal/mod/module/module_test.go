@@ -197,3 +197,97 @@ func TestEscapePath(t *testing.T) {
 		t.Fatalf("EscapePath(%q) = %q, want %q", path, esc, path)
 	}
 }
+
+var parseImportPathTests = []struct {
+	testName      string
+	p             string
+	want          ImportPathParts
+	wantCanonical string
+}{{
+	testName: "StdlibLikeWithSlash",
+	p:        "stdlib/path",
+	want: ImportPathParts{
+		Path:      "stdlib/path",
+		Qualifier: "path",
+	},
+}, {
+	testName: "StdlibLikeNoSlash",
+	p:        "math",
+	want: ImportPathParts{
+		Path:      "math",
+		Qualifier: "math",
+	},
+}, {
+	testName: "StdlibLikeExplicitQualifier",
+	p:        "stdlib/path:other",
+	want: ImportPathParts{
+		Path:              "stdlib/path",
+		ExplicitQualifier: true,
+		Qualifier:         "other",
+	},
+}, {
+	testName: "StdlibLikeExplicitQualifierNoSlash",
+	p:        "math:other",
+	want: ImportPathParts{
+		Path:              "math",
+		ExplicitQualifier: true,
+		Qualifier:         "other",
+	},
+}, {
+	testName: "WithMajorVersion",
+	p:        "foo.com/bar@v0",
+	want: ImportPathParts{
+		Path:      "foo.com/bar",
+		Version:   "v0",
+		Qualifier: "bar",
+	},
+}, {
+	testName: "WithMajorVersionNoSlash",
+	p:        "main.test@v0",
+	want: ImportPathParts{
+		Path:      "main.test",
+		Version:   "v0",
+		Qualifier: "main.test",
+	},
+}, {
+	testName: "WithMajorVersionAndExplicitQualifier",
+	p:        "foo.com/bar@v0:other",
+	want: ImportPathParts{
+		Path:              "foo.com/bar",
+		Version:           "v0",
+		ExplicitQualifier: true,
+		Qualifier:         "other",
+	},
+}, {
+	testName: "WithMajorVersionAndNoQualifier",
+	p:        "foo.com/bar@v0",
+	want: ImportPathParts{
+		Path:      "foo.com/bar",
+		Version:   "v0",
+		Qualifier: "bar",
+	},
+}, {
+	testName: "WithRedundantQualifier",
+	p:        "foo.com/bar@v0:bar",
+	want: ImportPathParts{
+		Path:              "foo.com/bar",
+		Version:           "v0",
+		ExplicitQualifier: true,
+		Qualifier:         "bar",
+	},
+	wantCanonical: "foo.com/bar@v0",
+}}
+
+func TestParseImportPath(t *testing.T) {
+	for _, test := range parseImportPathTests {
+		t.Run(test.testName, func(t *testing.T) {
+			parts := ParseImportPath(test.p)
+			qt.Assert(t, qt.DeepEquals(parts, test.want))
+			qt.Assert(t, qt.Equals(parts.String(), test.p))
+			if test.wantCanonical == "" {
+				test.wantCanonical = test.p
+			}
+			qt.Assert(t, qt.Equals(parts.Canonical(), test.wantCanonical))
+		})
+	}
+}

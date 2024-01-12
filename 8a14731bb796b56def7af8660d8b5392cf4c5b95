@@ -41,6 +41,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd5e040b_3582a1cd",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 186,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T15:39:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d44d46d3_491d7962",
+      "range": {
+        "startLine": 186,
+        "startChar": 59,
+        "endLine": 186,
+        "endChar": 68
+      },
+      "revId": "8a14731bb796b56def7af8660d8b5392cf4c5b95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "981d2226_11791b3c",
@@ -54,6 +78,30 @@
       "writtenOn": "2024-01-10T13:24:42Z",
       "side": 1,
       "message": "nit: \"the close builtin\" to be clearer.",
+      "range": {
+        "startLine": 192,
+        "startChar": 71,
+        "endLine": 192,
+        "endChar": 76
+      },
+      "revId": "8a14731bb796b56def7af8660d8b5392cf4c5b95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0b168b1_0b68b328",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-01-12T15:39:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "981d2226_11791b3c",
       "range": {
         "startLine": 192,
         "startChar": 71,

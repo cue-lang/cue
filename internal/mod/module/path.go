@@ -189,21 +189,17 @@ func CheckPath(mpath string) (err error) {
 //
 // The element prefix up to the first dot must not be a reserved file name
 // on Windows, regardless of case (CON, com1, NuL, and so on).
-func CheckImportPath(path0 string) error {
-	path := path0
-	basePath, vers, ok := SplitPathVersion(path)
-	if ok {
-		if semver.Major(vers) != vers {
-			return &InvalidPathError{
-				Kind: "import",
-				Path: path,
-				Err:  fmt.Errorf("import paths can only contain a major version specifier"),
-			}
+func CheckImportPath(path string) error {
+	parts := ParseImportPath(path)
+	if semver.Major(parts.Version) != parts.Version {
+		return &InvalidPathError{
+			Kind: "import",
+			Path: path,
+			Err:  fmt.Errorf("import paths can only contain a major version specifier"),
 		}
-		path = basePath
 	}
-	if err := checkPath(path, importPath); err != nil {
-		return &InvalidPathError{Kind: "import", Path: path0, Err: err}
+	if err := checkPath(parts.Path, importPath); err != nil {
+		return &InvalidPathError{Kind: "import", Path: path, Err: err}
 	}
 	return nil
 }
@@ -392,6 +388,89 @@ func SplitPathVersion(path string) (prefix, version string, ok bool) {
 		return "", "", false
 	}
 	return path[:split], path[split+1:], true
+}
+
+// ImportPath holds the various components of an import path.
+type ImportPath struct {
+	// Path holds the base package/directory path, similar
+	// to that returned by [Version.BasePath].
+	Path string
+
+	// Version holds the version of the import
+	// or empty if not present. Note: in general this
+	// will contain a major version only, but there's no
+	// guarantee of that.
+	Version string
+
+	// Qualifier holds the package qualifier within the path.
+	// This will be derived from the last component of Path
+	// if it wasn't explicitly present in the import path.
+	// This is not guaranteed to be a valid CUE identifier.
+	Qualifier string
+
+	// ExplicitQualifier holds whether the qualifier was explicitly
+	// present in the import path.
+	ExplicitQualifier bool
+}
+
+// Canonical returns the canonical form of the import path.
+// Specifically, it will only include the package qualifier
+// if it's different from the last component of parts.Path.
+func (parts ImportPath) Canonical() ImportPath {
+	if i := strings.LastIndex(parts.Path, "/"); i >= 0 && parts.Path[i+1:] == parts.Qualifier {
+		parts.Qualifier = ""
+		parts.ExplicitQualifier = false
+	}
+	return parts
+}
+
+// Unqualified returns the import path without any package qualifier.
+func (parts ImportPath) Unqualified() ImportPath {
+	parts.Qualifier = ""
+	parts.ExplicitQualifier = false
+	return parts
+}
+
+func (parts ImportPath) String() string {
+	if parts.Version == "" && !parts.ExplicitQualifier {
+		// Fast path.
+		return parts.Path
+	}
+	var buf strings.Builder
+	buf.WriteString(parts.Path)
+	if parts.Version != "" {
+		buf.WriteByte('@')
+		buf.WriteString(parts.Version)
+	}
+	if parts.ExplicitQualifier {
+		buf.WriteByte(':')
+		buf.WriteString(parts.Qualifier)
+	}
+	return buf.String()
+}
+
+// ParseImportPath returns the various components of an import path.
+func ParseImportPath(p string) ImportPath {
+	var parts ImportPath
+	pathWithoutQualifier := p
+	if i := strings.LastIndexAny(p, "/:"); i >= 0 && p[i] == ':' {
+		pathWithoutQualifier = p[:i]
+		parts.Qualifier = p[i+1:]
+		parts.ExplicitQualifier = true
+	}
+	parts.Path = pathWithoutQualifier
+	if path, version, ok := SplitPathVersion(pathWithoutQualifier); ok {
+		parts.Version = version
+		parts.Path = path
+	}
+	if !parts.ExplicitQualifier {
+		if i := strings.LastIndex(parts.Path, "/"); i >= 0 {
+			parts.Qualifier = parts.Path[i+1:]
+		} else {
+			parts.Qualifier = parts.Path
+		}
+	}
+	return parts
 }
 
 // MatchPathMajor reports whether the semantic version v

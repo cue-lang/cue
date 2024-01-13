@@ -7,6 +7,8 @@ module: "example.com"
 -- stdout.golden --
 usesDefaultsStruct: hello from John Doe
 
+usesDefaultsList: hello from John Doe
+
 -- foo_tool.cue --
 package foo
 
@@ -15,20 +17,27 @@ import (
 	"tool/exec"
 )
 
-#message: *"hello" | string
+#messageText: *"hello" | string
+message: *"MESSAGE=\(#messageText)" | string
 
 command: execEnv: {
     usesDefaultsStruct: exec.Run & {
         cmd: ["sh", "-c", "echo $MESSAGE from $SENDER"]
         stdout: *"" | string
         env: {
-            MESSAGE: #message
+            MESSAGE: #messageText
             SENDER: *"John Doe" | string
         }
+    }
+    usesDefaultsList: exec.Run & {
+        cmd: ["sh", "-c", "echo $MESSAGE from $SENDER"]
+        stdout: *"" | string
+        env: [message, *"SENDER=John Doe" | string ]
     }
     result: cli.Print & {
         text: """
         usesDefaultsStruct: \(usesDefaultsStruct.stdout)
+        usesDefaultsList: \(usesDefaultsList.stdout)
         """
     }
 }

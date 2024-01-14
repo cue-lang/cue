@@ -59,4 +59,25 @@ func TestHelp(t *testing.T) {
 	if err := run("eval", "--help"); err != nil {
 		t.Error("help command failed unexpectedly")
 	}
+
+	// os.Exit(1) is expected
+	testOsExit(t, 1, []string{"help", "foo"}, run)
+
+	testOsExit(t, 1, []string{"help", "cmd", "foo"}, run)
+}
+
+// testOsExit tests that os.Exit is called with the given code when running f.
+func testOsExit(t *testing.T, code int, args []string, f func(args ...string) error) {
+	t.Helper()
+	oldExit := osExit
+	defer func() { osExit = oldExit }()
+	var status int
+	exit := func(code int) {
+		status = code
+	}
+	osExit = exit
+	f(args...)
+	if status != code {
+		t.Errorf("os.Exit(%d) not called", code)
+	}
 }

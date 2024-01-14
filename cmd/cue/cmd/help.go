@@ -21,6 +21,8 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var osExit = os.Exit
+
 // TODO: intersperse the examples at the end of the texts in the
 // body of text to make things more concrete for the user early on?
 // The current approach works will if users just print the text without
@@ -61,7 +63,7 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 			// If rests are not empty, args are invalid.
 			if cmd == nil || e != nil || len(rests) != 0 {
 				c.PrintErrf("Unknown help command: %#q\n", strings.Join(args, " "))
-				os.Exit(1)
+				osExit(1)
 			}
 			cobra.CheckErr(cmd.Help())
 		},

@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54757d7b_a40e62ea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T10:56:52Z",
+      "side": 1,
+      "message": "Personally I would go all the way to 100 for readability, and some of your example lines already do, but it\u0027s not the biggest deal :)",
+      "parentUuid": "f9e354d3_9df8aa2d",
+      "revId": "9c0860707c3c92cb72936b4f9ce6bd9100664817",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9208c9fc_ff4683a8",

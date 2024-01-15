@@ -34,6 +34,24 @@
       "parentUuid": "541e2972_451dea70",
       "revId": "60ecd9bc4feb55d6a777f85dceb69241d2208728",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e6789af_3bbccf70",
+        "filename": "internal/core/adt/fields_test.go",
+        "patchSetId": 10
+      },
+      "lineNbr": 538,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T09:00:42Z",
+      "side": 1,
+      "message": "Ah, gotcha.",
+      "parentUuid": "db1bdae9_a8f94ebc",
+      "revId": "60ecd9bc4feb55d6a777f85dceb69241d2208728",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

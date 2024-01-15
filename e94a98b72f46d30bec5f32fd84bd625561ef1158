@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "494e9528_8d115ae5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T10:45:58Z",
+      "side": 1,
+      "message": "I think this is slightly confused, I think you mean:\n\n\u003e so _if_ there are two equivalent forms of the same import path, say `foo.com/bar:bar` and `foo.com/bar`, they won\u0027t be _de_duplicated",
+      "range": {
+        "startLine": 16,
+        "startChar": 30,
+        "endLine": 18,
+        "endChar": 19
+      },
+      "revId": "e94a98b72f46d30bec5f32fd84bd625561ef1158",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a518ece_f3f6c46c",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T10:45:58Z",
+      "side": 1,
+      "message": "nit: note that in these func types you can deduplicate the `string` type",
+      "range": {
+        "startLine": 134,
+        "startChar": 40,
+        "endLine": 134,
+        "endChar": 46
+      },
+      "revId": "e94a98b72f46d30bec5f32fd84bd625561ef1158",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f16cf1e2_f1cd758f",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T10:45:58Z",
+      "side": 1,
+      "message": "replace this with File.PackageName, which already exists for this purpose.",
+      "revId": "e94a98b72f46d30bec5f32fd84bd625561ef1158",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

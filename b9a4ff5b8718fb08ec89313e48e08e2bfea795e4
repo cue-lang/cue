@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ed63b56_b0a449f8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T10:03:08Z",
+      "side": 1,
+      "message": "FYI I only see a rebase, so no changes relating to the review",
+      "revId": "b9a4ff5b8718fb08ec89313e48e08e2bfea795e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

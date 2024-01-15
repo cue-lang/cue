@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "fc07944b_d883a6d9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T10:03:08Z",
+      "side": 1,
+      "message": "Oops, I meant to leave this as unresolved.",
+      "parentUuid": "362d0bd4_3871412d",
+      "revId": "8a14731bb796b56def7af8660d8b5392cf4c5b95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d44d46d3_491d7962",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 8

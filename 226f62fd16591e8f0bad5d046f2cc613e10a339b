@@ -16,6 +16,23 @@
       "message": "Thanks!",
       "revId": "226f62fd16591e8f0bad5d046f2cc613e10a339b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04d63449_bc4ea3e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-15T10:04:49Z",
+      "side": 1,
+      "message": "One of the Unity outputs changes due to the schema change, but that\u0027s okay. I will update the golden files after merging this.",
+      "revId": "226f62fd16591e8f0bad5d046f2cc613e10a339b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

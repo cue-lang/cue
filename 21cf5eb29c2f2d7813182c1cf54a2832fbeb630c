@@ -16,6 +16,24 @@
       "message": "FWIW I don\u0027t see the central server ever starting to use scopes. Scopes are more of an issue with the standard OCI authorization logic, but I don\u0027t know if we\u0027ll end up storing those tokens in this same file.",
       "revId": "21cf5eb29c2f2d7813182c1cf54a2832fbeb630c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e7251c8_1ceaa930",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-16T15:44:08Z",
+      "side": 1,
+      "message": "This is a TODO, not a strongly held opinion or plan :) Though with Paul we had agreed that generating unrestricted tokens in our registry has always been something that we will need to do away with at some point. For example, should a cmd/cue device token also give you access to delete your account or transfer ownership of a module? Probably not - it should be restricted/scoped to only pushing and pulling modules.",
+      "parentUuid": "f145bc95_4a4bb7a3",
+      "revId": "21cf5eb29c2f2d7813182c1cf54a2832fbeb630c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

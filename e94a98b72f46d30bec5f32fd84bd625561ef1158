@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "87144191_24cef50c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:30:57Z",
+      "side": 1,
+      "message": "I don\u0027t _think_ so. We want them to be de-duplicated, but if we don\u0027t canonicalize them, they won\u0027t be (i.e. we\u0027ll end up with two versions of the same import path in the package dependencies). But perhaps I\u0027m being confused by my own logic here?",
+      "parentUuid": "494e9528_8d115ae5",
+      "range": {
+        "startLine": 16,
+        "startChar": 30,
+        "endLine": 18,
+        "endChar": 19
+      },
+      "revId": "e94a98b72f46d30bec5f32fd84bd625561ef1158",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7a518ece_f3f6c46c",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64b5b44b_ad982d44",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:30:57Z",
+      "side": 1,
+      "message": "I kinda prefer to keep them separate as although they\u0027re both technically strings, they\u0027re different \"kinds\" of string (i.e. not both paths) so I have a slight preference for the separate types.",
+      "parentUuid": "7a518ece_f3f6c46c",
+      "range": {
+        "startLine": 134,
+        "startChar": 40,
+        "endLine": 134,
+        "endChar": 46
+      },
+      "revId": "e94a98b72f46d30bec5f32fd84bd625561ef1158",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f16cf1e2_f1cd758f",
@@ -60,6 +108,24 @@
       "writtenOn": "2024-01-15T10:45:58Z",
       "side": 1,
       "message": "replace this with File.PackageName, which already exists for this purpose.",
+      "revId": "e94a98b72f46d30bec5f32fd84bd625561ef1158",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b9c258f_8b0f84b6",
+        "filename": "internal/mod/modimports/modimports.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:30:57Z",
+      "side": 1,
+      "message": "Ah cool, I missed that! Done.",
+      "parentUuid": "f16cf1e2_f1cd758f",
       "revId": "e94a98b72f46d30bec5f32fd84bd625561ef1158",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

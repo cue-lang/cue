@@ -17,6 +17,7 @@ package wasm
 import (
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
@@ -44,17 +45,22 @@ func (i *interpreter) Kind() string {
 // build.Instance.
 func (i *interpreter) NewCompiler(b *build.Instance, r *coreruntime.Runtime) (coreruntime.Compiler, errors.Error) {
 	return &compiler{
-		b:         b,
-		runtime:   r,
-		instances: make(map[string]*instance),
+		b:           b,
+		runtime:     r,
+		wasmRuntime: newRuntime(),
+		instances:   make(map[string]*instance),
 	}, nil
 }
 
 // A compiler is a [coreruntime.Compiler]
 // that provides Wasm functionality to the runtime.
 type compiler struct {
-	b       *build.Instance
-	runtime *coreruntime.Runtime
+	b           *build.Instance
+	runtime     *coreruntime.Runtime
+	wasmRuntime runtime
+
+	// mu serializes access to instances.
+	mu sync.Mutex
 
 	// instances maps absolute file names to compiled Wasm modules
 	// loaded into memory.
@@ -99,9 +105,11 @@ func (c *compiler) Compile(funcName string, scope adt.Value, a *internal.Attr) (
 // instance returns the instance corresponding to filename, compiling
 // and loading it if necessary.
 func (c *compiler) instance(filename string) (inst *instance, err error) {
+	c.mu.Lock()
+	defer c.mu.Unlock()
 	inst, ok := c.instances[filename]
 	if !ok {
-		inst, err = compileAndLoad(filename)
+		inst, err = c.wasmRuntime.compileAndLoad(filename)
 		if err != nil {
 			return nil, err
 		}

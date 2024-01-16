@@ -18,26 +18,12 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"sync"
 
 	"github.com/tetratelabs/wazero"
 	"github.com/tetratelabs/wazero/api"
 	"github.com/tetratelabs/wazero/imports/wasi_snapshot_preview1"
 )
-
-// defaultRuntime is a global runtime for all Wasm modules used in a
-// CUE process. It acts as a compilation cache, however, every module
-// instance is independent. The same module loaded by two different
-// CUE packages will not share memory, although it will share the
-// excutable code produced by the runtime.
-var defaultRuntime runtime
-
-func init() {
-	ctx := context.Background()
-	defaultRuntime = runtime{
-		ctx:     ctx,
-		Runtime: newRuntime(ctx),
-	}
-}
 
 // A runtime is a Wasm runtime that can compile, load, and execute
 // Wasm code.
@@ -49,10 +35,15 @@ type runtime struct {
 	wazero.Runtime
 }
 
-func newRuntime(ctx context.Context) wazero.Runtime {
+func newRuntime() runtime {
+	ctx := context.Background()
 	r := wazero.NewRuntime(ctx)
 	wasi_snapshot_preview1.MustInstantiate(ctx, r)
-	return r
+
+	return runtime{
+		ctx:     ctx,
+		Runtime: r,
+	}
 }
 
 // compile takes the name of a Wasm module, and returns its compiled
@@ -74,10 +65,10 @@ func (r *runtime) compile(name string) (*module, error) {
 	}, nil
 }
 
-// compileAndLoad is a convenience function that compile a module then
+// compileAndLoad is a convenience method that compiles a module then
 // loads it into memory returning the loaded instance, or an error.
-func compileAndLoad(name string) (*instance, error) {
-	m, err := defaultRuntime.compile(name)
+func (r *runtime) compileAndLoad(name string) (*instance, error) {
+	m, err := r.compile(name)
 	if err != nil {
 		return nil, err
 	}
@@ -126,11 +117,17 @@ type instance struct {
 	// free is a guest function that frees guest memory on
 	// behalf of the host.
 	free api.Function
+
+	// mu serializes access to instance.
+	mu sync.Mutex
 }
 
 // load attempts to load the named function from the instance, returning
 // it if found, or an error.
 func (i *instance) load(funcName string) (api.Function, error) {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
 	f := i.instance.ExportedFunction(funcName)
 	if f == nil {
 		return nil, fmt.Errorf("can't find function %q in Wasm module %v", funcName, i.module.Name())
@@ -141,6 +138,9 @@ func (i *instance) load(funcName string) (api.Function, error) {
 // Alloc returns a reference to newly allocated guest memory that spans
 // the provided size.
 func (i *instance) Alloc(size uint32) (*memory, error) {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
 	res, err := i.alloc.Call(i.ctx, uint64(size))
 	if err != nil {
 		return nil, fmt.Errorf("can't allocate memory: requested %d bytes", size)
@@ -154,11 +154,17 @@ func (i *instance) Alloc(size uint32) (*memory, error) {
 
 // Free frees previously allocated guest memory.
 func (i *instance) Free(m *memory) {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
 	i.free.Call(i.ctx, uint64(m.ptr), uint64(m.len))
 }
 
 // Free frees several previously allocated guest memories.
 func (i *instance) FreeAll(ms []*memory) {
+	i.mu.Lock()
+	defer i.mu.Unlock()
+
 	for _, m := range ms {
 		i.free.Call(i.ctx, uint64(m.ptr), uint64(m.len))
 	}
@@ -174,6 +180,9 @@ type memory struct {
 
 // Bytes return a copy of the contents of the guest memory to the host.
 func (m *memory) Bytes() []byte {
+	m.i.mu.Lock()
+	defer m.i.mu.Unlock()
+
 	bytes, ok := m.i.instance.Memory().Read(m.ptr, m.len)
 	if !ok {
 		panic(fmt.Sprintf("can't read %d bytes from Wasm address %#x", m.len, m.ptr))
@@ -187,6 +196,9 @@ func (m *memory) WriteAt(p []byte, off int64) (int, error) {
 	if (off < 0) || (off >= 1<<32-1) {
 		panic(fmt.Sprintf("can't write %d bytes to Wasm address %#x", len(p), m.ptr))
 	}
+
+	m.i.mu.Lock()
+	defer m.i.mu.Unlock()
 
 	ok := m.i.instance.Memory().Write(m.ptr+uint32(off), p)
 	if !ok {

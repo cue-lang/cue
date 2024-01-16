@@ -1,0 +1,157 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3f576a2a_8a40db1d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "This looks nice in general, but I think it could be considerably more efficient for very little effort; maybe worth considering, or at least adding a TODO.",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f8bbdbb_be852d1e",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "actual",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8a32eae_687f185f",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "Save an allocation or two?\n\nargLayouts :\u003d make([]*structLayout, 0, len(argsTyp))",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4f54800f_a3270d1e",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "Preallocate the args slice to avoid multiple allocations?",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14a2f079_25adaa31",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "A bit more grammatical might be:\n\"Where each expr is a valid CUE identifier or selector.\"\n\n(assuming each expression doesn\u0027t have to be both an identifier _and_ a selector - I don\u0027t think that\u0027s actually possible even though that\u0027s what the sentence currently says).",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f41df860_0899a93f",
+        "filename": "cue/interpreter/wasm/layout.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "I might be misunderstanding the underlying reasoning here, but this all seems a bit needlessly inefficient here. AIUI, we\u0027re doing an underlying allocation for a struct value and then reading that data back across the wasm boundary if it happens to be inside another struct.\n\nGiven that all fields are currently by-value, can\u0027t we do the whole thing in a single Go allocation, followed by a single encBytes call? (or alternatively, if memory.Write is sufficiently cheap, one call to allocate followed by n calls to Write).\n\nISTM that this could have a significant effect on performance whenever there are structs.",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "737cf77c_579f5841",
+        "filename": "cue/interpreter/wasm/layout.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "This in particular seems gratuitous because we could allocate that first element up front rather than copying all elements over just to make room for it.",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03009c65_877aa0e2",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "It\u0027s a bit weird that this method signature mirrors `io.Writer` but doesn\u0027t update any internal offset, so if Write is called twice in succession, the data from the second will overwrite the first.\n\nI\u0027d be inclined to make the signature something like this instead.\n\n// WriteAt writes the given at the given relative offset within m.\n// It panics if off is out of bounds.\nfunc (m *memory) WriteAt(buf []byte, off int)",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f39203c9_6607d7bd",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T11:52:09Z",
+      "side": 1,
+      "message": "directly",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

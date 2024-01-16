@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8197ac4_66877d4e",
+        "filename": "internal/mod/module/module_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95d9e1b4_4520a26c",
+      "range": {
+        "startLine": 203,
+        "startChar": 1,
+        "endLine": 203,
+        "endChar": 2
+      },
+      "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5a5a9af_c912a1d6",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-01-15T10:38:15Z",
       "side": 1,
       "message": "no need to split this godoc line?",
+      "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42603957_ccea86b6",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 397,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f5a5a9af_c912a1d6",
       "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7528811a_f47bfb12",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1e88410f_d573d082",
+      "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a745cc98_3b66b800",
@@ -71,6 +131,30 @@
       "writtenOn": "2024-01-15T10:38:15Z",
       "side": 1,
       "message": "hm. the word \"base\" in the context of paths usually means the last component, so this is somewhat confusing.\n\nhow about \"slash-separated location of a package\"?",
+      "range": {
+        "startLine": 399,
+        "startChar": 19,
+        "endLine": 399,
+        "endChar": 46
+      },
+      "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "338399b2_a98a8e14",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 399,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:03:58Z",
+      "side": 1,
+      "message": "We already have Version.BasePath, so I\u0027ve just referenced that instead.",
+      "parentUuid": "a745cc98_3b66b800",
       "range": {
         "startLine": 399,
         "startChar": 19,
@@ -104,6 +188,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9a8bb0ab_d42c13b5",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 401,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:03:58Z",
+      "side": 1,
+      "message": "I actually started off naming it MajorVersion, but then moved away from that because it\u0027s not necessarily a major version (ParseImportPath doesn\u0027t validate the import path and just invokes SplitPathVersion which also accepts minor versions)",
+      "parentUuid": "3b05be2a_48ffc96b",
+      "range": {
+        "startLine": 401,
+        "startChar": 22,
+        "endLine": 401,
+        "endChar": 29
+      },
+      "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7aaae713_1348c836",
@@ -117,6 +225,24 @@
       "writtenOn": "2024-01-15T10:38:15Z",
       "side": 1,
       "message": "I wonder if these should return ImportPath, then one can call either `path.Unqualified()` or `path.Unqualified().String()` as needed. If/when we add more methods, it would also be nice to be able to chain them without round-tripping to string each time.",
+      "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2cf5509_8b751576",
+        "filename": "internal/mod/module/path.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 429,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T12:03:58Z",
+      "side": 1,
+      "message": "Good idea. Done.",
+      "parentUuid": "7aaae713_1348c836",
       "revId": "2d120b3a0dce671ae1d6b9f83f7a02998095e628",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

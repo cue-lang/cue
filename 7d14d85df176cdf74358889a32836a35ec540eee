@@ -16,6 +16,24 @@
       "message": "LGTM assuming it\u0027s been manually tested at least.",
       "revId": "7d14d85df176cdf74358889a32836a35ec540eee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7929676e_228a1935",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-16T15:44:51Z",
+      "side": 1,
+      "message": "Indeed manually tested - I shared some logs on Discord :)",
+      "parentUuid": "a4ee29c6_31fd5f4d",
+      "revId": "7d14d85df176cdf74358889a32836a35ec540eee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

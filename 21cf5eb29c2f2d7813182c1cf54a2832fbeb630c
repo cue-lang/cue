@@ -34,6 +34,24 @@
       "parentUuid": "f145bc95_4a4bb7a3",
       "revId": "21cf5eb29c2f2d7813182c1cf54a2832fbeb630c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "425748c9_564262c6",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T15:48:59Z",
+      "side": 1,
+      "message": "FWIW, even if tokens are restricted in scope, I\u0027m not entirely sure that we need to support the complexity of storing several at the same time. Just storing a single restricted-scope token is probably fine - then the client is de-facto restricted even though it doesn\u0027t know the scope of the token that it currently has.",
+      "parentUuid": "9e7251c8_1ceaa930",
+      "revId": "21cf5eb29c2f2d7813182c1cf54a2832fbeb630c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

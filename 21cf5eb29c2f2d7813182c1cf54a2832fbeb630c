@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f145bc95_4a4bb7a3",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 203,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-16T15:40:14Z",
+      "side": 1,
+      "message": "FWIW I don\u0027t see the central server ever starting to use scopes. Scopes are more of an issue with the standard OCI authorization logic, but I don\u0027t know if we\u0027ll end up storing those tokens in this same file.",
+      "revId": "21cf5eb29c2f2d7813182c1cf54a2832fbeb630c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

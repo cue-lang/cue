@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7acbe25c_be566be1",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f8bbdbb_be852d1e",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b8a32eae_687f185f",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-01-16T11:52:09Z",
       "side": 1,
       "message": "Save an allocation or two?\n\nargLayouts :\u003d make([]*structLayout, 0, len(argsTyp))",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d79e340_947b0b7b",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b8a32eae_687f185f",
       "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2b5ed54_bb42a4e7",
+        "filename": "cue/interpreter/wasm/call.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4f54800f_a3270d1e",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "14a2f079_25adaa31",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-01-16T11:52:09Z",
       "side": 1,
       "message": "A bit more grammatical might be:\n\"Where each expr is a valid CUE identifier or selector.\"\n\n(assuming each expression doesn\u0027t have to be both an identifier _and_ a selector - I don\u0027t think that\u0027s actually possible even though that\u0027s what the sentence currently says).",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2a7a70b_6c5976e9",
+        "filename": "cue/interpreter/wasm/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "14a2f079_25adaa31",
       "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c6b23cb_798edc44",
+        "filename": "cue/interpreter/wasm/layout.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "A lot of the apparent complexity comes from the fact that we do in fact support structs containing pointers, just not in this CL.\n\nHowever, for now I have simplified the code to only allocate once.",
+      "parentUuid": "f41df860_0899a93f",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "737cf77c_579f5841",
@@ -116,6 +206,24 @@
       "writtenOn": "2024-01-16T11:52:09Z",
       "side": 1,
       "message": "This in particular seems gratuitous because we could allocate that first element up front rather than copying all elements over just to make room for it.",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f061b232_5a6af6e9",
+        "filename": "cue/interpreter/wasm/layout.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "737cf77c_579f5841",
       "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b5b96a6_0748bc84",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 179,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "Yeah, this method worked differently in a previous version of the code. Updated it to match `io.WriteAt`.",
+      "parentUuid": "03009c65_877aa0e2",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f39203c9_6607d7bd",
@@ -150,6 +276,24 @@
       "writtenOn": "2024-01-16T11:52:09Z",
       "side": 1,
       "message": "directly",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88477552_da4a5bb6",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:14:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f39203c9_6607d7bd",
       "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

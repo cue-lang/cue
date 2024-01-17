@@ -16,6 +16,24 @@
       "message": "This makes it a tad bit harder to expose the Interpreter interface externally at some point. But I guess we should clean up these types at some point anyway. So we can punt to later.",
       "revId": "587b8b0cd18a1b8372cb09dd524f38108d32e22f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b72464da_a753df2f",
+        "filename": "internal/core/runtime/extern.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-01-17T17:13:22Z",
+      "side": 1,
+      "message": "Indeed, currently it\u0027s a bootstrapping issue. Ideally we\u0027d pass a `cue.Context` instead of a `Runtime`, but we can\u0027t because of Go\u0027s circular dependency restriction. We\u0027d need to move this interface to another package.\n\nAlso, down below `Compile` could return `any` instead of `adt.Vertex` (that might be a good idea, actually), but there\u0027s no way to pass it a `cue.Value` instead of an `adt.Value` because of the same circular dependency problem.\n\nBut if/when we decide to export this interface, we will need to move it from here anyway.",
+      "parentUuid": "ce405c9c_f83ec909",
+      "revId": "587b8b0cd18a1b8372cb09dd524f38108d32e22f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

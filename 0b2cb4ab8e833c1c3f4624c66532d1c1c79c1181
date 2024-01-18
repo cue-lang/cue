@@ -193,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d8ecc4a_0dde24b5",
+        "filename": "cue/interpreter/wasm/layout.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-18T14:38:05Z",
+      "side": 1,
+      "message": "That\u0027s way nicer, thanks! An added bonus that the resulting code is a little bit smaller too 😊",
+      "parentUuid": "1c6b23cb_798edc44",
+      "revId": "0b2cb4ab8e833c1c3f4624c66532d1c1c79c1181",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "737cf77c_579f5841",

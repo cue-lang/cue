@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75e191ec_bd4f3369",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-19T16:45:20Z",
+      "side": 1,
+      "message": "Very nice improvement, thanks!",
+      "revId": "14b3cc361a64b5f5dc95d7dfeaadd092f0fc4f82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc8dd585_a12ff714",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-19T16:45:20Z",
+      "side": 1,
+      "message": "nit: IMO comments like this read more nicely when they\u0027re inside the body of the if rather than outside:\n\n   if t.HasTag(\"error\") {\n      // #error is set, so we\u0027re checking for a specific error.\n      ...\n   }",
+      "revId": "14b3cc361a64b5f5dc95d7dfeaadd092f0fc4f82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "516e1865_eb48b6a4",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-19T16:45:20Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "14b3cc361a64b5f5dc95d7dfeaadd092f0fc4f82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

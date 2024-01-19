@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abbf749f_224f46d1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-19T16:34:37Z",
+      "side": 1,
+      "message": "Looks reasonable, but is that mutex really necessary at that level rather than per-instance?",
+      "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ddf21dda_2ed24491",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-19T16:34:37Z",
+      "side": 1,
+      "message": "So even though different instances of the same module don\u0027t share memory, they all have to share a common mutex? Seems a little odd, but if so, maybe worth adding that to the doc comment for this field.\n\nAlso, nit: a mutex field is conventionally named `mu` in Go (there\u0027s only one occurrence in the Go source of a mutex field named m, compared to 103 named mu, and that occurrence is only in a test file). The convention is also used in the CUE source.",
+      "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2920151c_7118013e",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-19T16:34:37Z",
+      "side": 1,
+      "message": "Maybe move this lock after the ReadFile call? :shrug:",
+      "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8ff2011_91c3c2f6",
+        "filename": "cue/interpreter/wasm/wasm.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-19T16:34:37Z",
+      "side": 1,
+      "message": "ditto for mu rather than m.",
+      "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

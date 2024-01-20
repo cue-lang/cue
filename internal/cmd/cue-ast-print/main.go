@@ -75,15 +75,16 @@ func (d *debugPrinter) value(v reflect.Value) {
 	if v.Kind() == reflect.Interface {
 		v = v.Elem()
 	}
-	// We print the original pointer type if there was one.
-	origType := v.Type()
-	v = reflect.Indirect(v)
-
+	// Check for nil before referencing v.Type().
 	if !v.IsValid() {
 		// Indirecting a nil interface/pointer gives a zero value.
 		d.printf("nil")
 		return
 	}
+	// We print the original pointer type if there was one.
+	origType := v.Type()
+	v = reflect.Indirect(v)
+
 	t := v.Type()
 	switch t {
 	// Simple types which can stringify themselves.

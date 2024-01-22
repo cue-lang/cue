@@ -61,7 +61,7 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		return nil, errors.Newf(token.NoPos, "protobuf: %v", err)
 	}
 
-	tfile := token.NewFile(filename, 0, len(b))
+	tfile := token.NewFile(filename, -1, len(b))
 	tfile.SetLinesForContent(b)
 
 	p = &protoConverter{

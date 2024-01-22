@@ -148,7 +148,7 @@ func ParseAttrBody(pos token.Pos, s string) (a Attr) {
 	// Create temporary token.File so that scanner has something
 	// to work with.
 	// TODO it's probably possible to do this without allocations.
-	tmpFile := token.NewFile("", 0, len(s))
+	tmpFile := token.NewFile("", -1, len(s))
 	if len(s) > 0 {
 		tmpFile.AddLine(len(s) - 1)
 	}

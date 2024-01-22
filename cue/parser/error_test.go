@@ -154,7 +154,7 @@ func checkErrors(t *testing.T, filename string, input interface{}) {
 	// we are expecting the following errors
 	// (collect these after parsing a file so that it is found in the file set)
 	if file == nil {
-		t.Fatal("")
+		t.Fatal("no token.File for ast.File")
 	}
 	expected := expectedErrors(t, file, src)
 

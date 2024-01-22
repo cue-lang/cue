@@ -77,7 +77,7 @@ func (d *Decoder) Parse(schema cue.Value, filename string, b []byte) (ast.Expr, 
 
 	// dec.errs = nil
 
-	f := token.NewFile(filename, 0, len(b))
+	f := token.NewFile(filename, -1, len(b))
 	f.SetLinesForContent(b)
 	dec.file = f
 

@@ -33,7 +33,6 @@ var debugStr = astinternal.DebugStr
 // The parser structure holds the parser's internal state.
 type parser struct {
 	file    *token.File
-	offset  int
 	errors  errors.Error
 	scanner scanner.Scanner
 
@@ -68,11 +67,10 @@ type parser struct {
 }
 
 func (p *parser) init(filename string, src []byte, mode []Option) {
-	p.offset = -1
 	for _, f := range mode {
 		f(p)
 	}
-	p.file = token.NewFile(filename, p.offset, len(src))
+	p.file = token.NewFile(filename, -1, len(src))
 
 	var m scanner.Mode
 	if p.mode&parseCommentsMode != 0 {

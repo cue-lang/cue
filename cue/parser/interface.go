@@ -118,8 +118,10 @@ const (
 )
 
 // FileOffset specifies the File position info to use.
+//
+// Deprecated: this has no effect.
 func FileOffset(pos int) Option {
-	return func(p *parser) { p.offset = pos }
+	return func(p *parser) {}
 }
 
 // A mode value is a set of flags (or 0).

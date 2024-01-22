@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "eecc3bd4_1066128a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-22T10:02:17Z",
+      "side": 1,
+      "message": "this is the same repo, so you can just say #2768.\n\nAlso, isn\u0027t this a \"fixes\"? If it\u0027s not, then either the issue or this commit message should clarify what is left to be done to close the issue.",
+      "revId": "501e8e1e644d4767ccb7519f43862134f251f62c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "72c86ce4_ad90378b",

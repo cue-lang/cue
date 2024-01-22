@@ -199,26 +199,35 @@ func toPos(x index) int {
 // -----------------------------------------------------------------------------
 // File
 
+// index represents an offset into the file.
+// It's 1-based rather than zero-based so that
+// we can distinguish the zero Pos from a Pos that
+// just has a zero offset.
 type index int
 
 // A File has a name, size, and line offset table.
 type File struct {
 	mutex sync.RWMutex
 	name  string // file name as provided to AddFile
-	base  index  // Pos index range for this file is [base...base+size]
-	size  index  // file size as provided to AddFile
+	// base is deprecated and stored only so that [File.Base]
+	// can continue to return the same value passed to [NewFile].
+	base index
+	size index // file size as provided to AddFile
 
 	// lines and infos are protected by set.mutex
 	lines []index // lines contains the offset of the first character for each line (the first entry is always 0)
 	infos []lineInfo
 }
 
-// NewFile returns a new file.
-func NewFile(filename string, base, size int) *File {
-	if base < 0 {
-		base = 1
+// NewFile returns a new file with the given OS file name. The size provides the
+// size of the whole file.
+//
+// The second argument is deprecated. It has no effect.
+func NewFile(filename string, deprecatedBase, size int) *File {
+	if deprecatedBase < 0 {
+		deprecatedBase = 1
 	}
-	return &File{sync.RWMutex{}, filename, index(base), index(size), []index{0}, nil}
+	return &File{sync.RWMutex{}, filename, index(deprecatedBase), index(size), []index{0}, nil}
 }
 
 // Name returns the file name of file f as registered with AddFile.
@@ -226,12 +235,14 @@ func (f *File) Name() string {
 	return f.name
 }
 
-// Base returns the base offset of file f as registered with AddFile.
+// Base returns the base offset of file f as passed to NewFile.
+//
+// Deprecated: this method just returns the (deprecated) second argument passed to NewFile.
 func (f *File) Base() int {
 	return int(f.base)
 }
 
-// Size returns the size of file f as registered with AddFile.
+// Size returns the size of file f as passed to NewFile.
 func (f *File) Size() int {
 	return int(f.size)
 }
@@ -359,7 +370,7 @@ func (f *File) Pos(offset int, rel RelPos) Pos {
 	if index(offset) > f.size {
 		panic("illegal file offset")
 	}
-	return Pos{f, toPos(f.base+index(offset)) + int(rel)}
+	return Pos{f, toPos(1+index(offset)) + int(rel)}
 }
 
 // Offset returns the offset for the given file position p;
@@ -367,10 +378,10 @@ func (f *File) Pos(offset int, rel RelPos) Pos {
 // f.Offset(f.Pos(offset)) == offset.
 func (f *File) Offset(p Pos) int {
 	x := p.index()
-	if x < f.base || x > f.base+index(f.size) {
+	if x < 1 || x > 1+index(f.size) {
 		panic("illegal Pos value")
 	}
-	return int(x - f.base)
+	return int(x - 1)
 }
 
 // Line returns the line number for the given file position p;
@@ -405,7 +416,7 @@ func (f *File) unpack(offset index, adjusted bool) (filename string, line, colum
 }
 
 func (f *File) position(p Pos, adjusted bool) (pos Position) {
-	offset := p.index() - f.base
+	offset := p.index() - 1
 	pos.Offset = int(offset)
 	pos.Filename, pos.Line, pos.Column = f.unpack(offset, adjusted)
 	return
@@ -418,7 +429,7 @@ func (f *File) position(p Pos, adjusted bool) (pos Position) {
 func (f *File) PositionFor(p Pos, adjusted bool) (pos Position) {
 	x := p.index()
 	if p != NoPos {
-		if x < f.base || x > f.base+f.size {
+		if x < 1 || x > 1+f.size {
 			panic("illegal Pos value")
 		}
 		pos = f.position(p, adjusted)

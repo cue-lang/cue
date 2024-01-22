@@ -99,19 +99,17 @@ func extract(path string, b []byte) (ast.Expr, error) {
 // The runtime may be nil if Decode isn't used.
 func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
 	return &Decoder{
-		r:      r,
-		path:   path,
-		dec:    json.NewDecoder(src),
-		offset: 1,
+		r:    r,
+		path: path,
+		dec:  json.NewDecoder(src),
 	}
 }
 
 // A Decoder converts JSON values to CUE.
 type Decoder struct {
-	r      *cue.Runtime
-	path   string
-	dec    *json.Decoder
-	offset int
+	r    *cue.Runtime
+	path string
+	dec  *json.Decoder
 }
 
 // Extract converts the current JSON value to a CUE ast. It returns io.EOF
@@ -131,13 +129,12 @@ func (d *Decoder) extract() (ast.Expr, error) {
 	if err == io.EOF {
 		return nil, err
 	}
-	offset := d.offset
-	d.offset += len(raw)
 	if err != nil {
-		pos := token.NewFile(d.path, offset, len(raw)).Pos(0, 0)
+		pos := token.NewFile(d.path, -1, len(raw)).Pos(0, 0)
 		return nil, errors.Wrapf(err, pos, "invalid JSON for file %q", d.path)
 	}
-	expr, err := parser.ParseExpr(d.path, []byte(raw), parser.FileOffset(offset))
+	expr, err := parser.ParseExpr(d.path, []byte(raw))
+
 	if err != nil {
 		return nil, err
 	}

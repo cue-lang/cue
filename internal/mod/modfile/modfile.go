@@ -183,14 +183,20 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	if err != nil {
 		return nil, err
 	}
-	if strict {
-		_, vers, ok := module.SplitPathVersion(mf.Module)
-		if !ok {
-			return nil, fmt.Errorf("module path %q in %s does not contain major version", mf.Module, filename)
-		}
-		if semver.Major(vers) != vers {
+	mainPath, mainMajor, ok := module.SplitPathVersion(mf.Module)
+	if strict && !ok {
+		return nil, fmt.Errorf("module path %q in %s does not contain major version", mf.Module, filename)
+	}
+	if ok {
+		if semver.Major(mainMajor) != mainMajor {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
 		}
+	} else {
+		// There's no main module major version: default to v0.
+		mainPath = mf.Module
+		mainMajor = "v0"
+		// TODO perhaps we'd be better preserving the original?
+		mf.Module += "@v0"
 	}
 	if mf.Language != nil {
 		if vers := mf.Language.Version; vers != "" && !semver.IsValid(vers) {
@@ -198,7 +204,10 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		}
 	}
 	var versions []module.Version
-	defaultMajorVersions := make(map[string]string)
+	// The main module is always the default for its own major version.
+	defaultMajorVersions := map[string]string{
+		mainPath: mainMajor,
+	}
 	// Check that major versions match dependency versions.
 	for m, dep := range mf.Deps {
 		vers, err := module.NewVersion(m, dep.Version)

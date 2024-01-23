@@ -43,6 +43,9 @@ module: "foo.com/bar@v0"
 	want: &File{
 		Module: "foo.com/bar@v0",
 	},
+	wantDefaults: map[string]string{
+		"foo.com/bar": "v0",
+	},
 }, {
 	testName: "WithDeps",
 	parse:    Parse,
@@ -72,6 +75,7 @@ deps: "other.com/something@v0": v: "v0.2.3"
 	},
 	wantVersions: parseVersions("example.com@v1.2.3", "other.com/something@v0.2.3"),
 	wantDefaults: map[string]string{
+		"foo.com/bar": "v0",
 		"example.com": "v1",
 	},
 }, {
@@ -89,6 +93,17 @@ deps: "example.com@v2": {
 }
 `,
 	wantError: `multiple default major versions found for example.com`,
+}, {
+	testName: "AmbiguousDefaultsWithMainModule",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar@v0"
+deps: "foo.com/bar@v1": {
+	default: true
+	v: "v1.2.3"
+}
+`,
+	wantError: `multiple default major versions found for foo.com/bar`,
 }, {
 	testName: "MisspelledLanguageVersionField",
 	parse:    Parse,
@@ -154,7 +169,7 @@ module: "foo.com/bar"
 deps: "example.com": v: "v1.2.3"
 `,
 	want: &File{
-		Module: "foo.com/bar",
+		Module: "foo.com/bar@v0",
 		Deps: map[string]*Dep{
 			"example.com": {
 				Version: "v1.2.3",
@@ -162,6 +177,9 @@ deps: "example.com": v: "v1.2.3"
 		},
 	},
 	wantVersions: parseVersions("example.com@v1.2.3"),
+	wantDefaults: map[string]string{
+		"foo.com/bar": "v0",
+	},
 }, {
 	testName: "LegacyWithExtraFields",
 	parse:    ParseLegacy,

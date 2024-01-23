@@ -16,6 +16,7 @@ package load
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	iofs "io/fs"
 	"os"
@@ -36,9 +37,14 @@ type overlayFile struct {
 	isDir    bool
 }
 
-func (f *overlayFile) Name() string       { return f.basename }
-func (f *overlayFile) Size() int64        { return int64(len(f.contents)) }
-func (f *overlayFile) Mode() os.FileMode  { return 0644 }
+func (f *overlayFile) Name() string { return f.basename }
+func (f *overlayFile) Size() int64  { return int64(len(f.contents)) }
+func (f *overlayFile) Mode() iofs.FileMode {
+	if f.isDir {
+		return iofs.ModeDir | 0o555
+	}
+	return 0o444
+}
 func (f *overlayFile) ModTime() time.Time { return f.modtime }
 func (f *overlayFile) IsDir() bool        { return f.isDir }
 func (f *overlayFile) Sys() interface{}   { return nil }
@@ -59,19 +65,36 @@ func (fs *fileSystem) getDir(dir string, create bool) map[string]*overlayFile {
 	return m
 }
 
-func (fs *fileSystem) init(c *Config) error {
-	fs.cwd = c.Dir
+// ioFS returns an implementation of [iofs.FS] that holds
+// the contents of fs under the given filepath root.
+//
+// Note: we can't return an FS implementation that covers the
+// entire of fs because the overlay paths may not all share
+// a common root.
+func (fs *fileSystem) ioFS(root string) iofs.FS {
+	dir := fs.getDir(root, false)
+	if dir == nil {
+		return os.DirFS(root)
+	}
+	return &ioFS{
+		fs:   fs,
+		root: root,
+	}
+}
 
-	overlay := c.Overlay
+func (fs *fileSystem) init(cwd string, overlay map[string]Source) error {
+	fs.cwd = cwd
 	fs.overlayDirs = map[string]map[string]*overlayFile{}
 
 	// Organize overlay
 	for filename, src := range overlay {
+		if !filepath.IsAbs(filename) {
+			return fmt.Errorf("non-absolute file path %q in overlay", filename)
+		}
 		// TODO: do we need to further clean the path or check that the
 		// specified files are within the root/ absolute files?
 		dir, base := filepath.Split(filename)
 		m := fs.getDir(dir, true)
-
 		b, file, err := src.contents()
 		if err != nil {
 			return err
@@ -106,15 +129,11 @@ func (fs *fileSystem) joinPath(elem ...string) string {
 	return filepath.Join(elem...)
 }
 
-func (fs *fileSystem) isAbsPath(path string) bool {
-	return filepath.IsAbs(path)
-}
-
 func (fs *fileSystem) makeAbs(path string) string {
-	if fs.isAbsPath(path) {
+	if filepath.IsAbs(path) {
 		return path
 	}
-	return filepath.Clean(filepath.Join(fs.cwd, path))
+	return filepath.Join(fs.cwd, path)
 }
 
 func (fs *fileSystem) isDir(path string) bool {
@@ -135,23 +154,24 @@ func (fs *fileSystem) readDir(path string) ([]iofs.DirEntry, errors.Error) {
 			return nil, errors.Wrapf(err, token.NoPos, "readDir")
 		}
 	}
-	if m != nil {
-		done := map[string]bool{}
-		for i, fi := range items {
-			done[fi.Name()] = true
-			if o := m[fi.Name()]; o != nil {
-				items[i] = iofs.FileInfoToDirEntry(o)
-			}
-		}
-		for _, o := range m {
-			if !done[o.Name()] {
-				items = append(items, iofs.FileInfoToDirEntry(o))
-			}
-		}
-		sort.Slice(items, func(i, j int) bool {
-			return items[i].Name() < items[j].Name()
-		})
+	if m == nil {
+		return items, nil
 	}
+	done := map[string]bool{}
+	for i, fi := range items {
+		done[fi.Name()] = true
+		if o := m[fi.Name()]; o != nil {
+			items[i] = iofs.FileInfoToDirEntry(o)
+		}
+	}
+	for _, o := range m {
+		if !done[o.Name()] {
+			items = append(items, iofs.FileInfoToDirEntry(o))
+		}
+	}
+	sort.Slice(items, func(i, j int) bool {
+		return items[i].Name() < items[j].Name()
+	})
 	return items, nil
 }
 
@@ -163,7 +183,7 @@ func (fs *fileSystem) getOverlay(path string) *overlayFile {
 	return nil
 }
 
-func (fs *fileSystem) stat(path string) (os.FileInfo, errors.Error) {
+func (fs *fileSystem) stat(path string) (iofs.FileInfo, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		return fi, nil
@@ -175,7 +195,7 @@ func (fs *fileSystem) stat(path string) (os.FileInfo, errors.Error) {
 	return fi, nil
 }
 
-func (fs *fileSystem) lstat(path string) (os.FileInfo, errors.Error) {
+func (fs *fileSystem) lstat(path string) (iofs.FileInfo, errors.Error) {
 	path = fs.makeAbs(path)
 	if fi := fs.getOverlay(path); fi != nil {
 		return fi, nil
@@ -250,4 +270,102 @@ func (fs *fileSystem) walkRec(path string, entry iofs.DirEntry, f walkFunc) erro
 		}
 	}
 	return nil
+}
+
+var _ interface {
+	iofs.FS
+	iofs.ReadDirFS
+	iofs.ReadFileFS
+} = (*ioFS)(nil)
+
+type ioFS struct {
+	fs   *fileSystem
+	root string
+}
+
+func (fs *ioFS) Open(name string) (iofs.File, error) {
+	if !iofs.ValidPath(name) {
+		return nil, fmt.Errorf("invalid io/fs path %q", name)
+	}
+	fpath := filepath.Join(fs.root, name)
+	r, err := fs.fs.openFile(fpath)
+	if err != nil {
+		return nil, err // TODO mangle error
+	}
+	return &ioFSFile{
+		fs:   fs.fs,
+		path: fpath,
+		rc:   r,
+	}, nil
+}
+
+// ReadDir implements [iofs.ReadDirFS].
+func (fs *ioFS) ReadDir(name string) ([]iofs.DirEntry, error) {
+	if !iofs.ValidPath(name) {
+		return nil, fmt.Errorf("invalid io/fs path %q", name)
+	}
+	return fs.fs.readDir(filepath.Join(fs.root, name))
+}
+
+// ReadDir implements [iofs.ReadFileFS].
+func (fs *ioFS) ReadFile(name string) ([]byte, error) {
+	if !iofs.ValidPath(name) {
+		return nil, fmt.Errorf("invalid io/fs path %q", name)
+	}
+	fpath := filepath.Join(fs.root, name)
+	if fi := fs.fs.getOverlay(fpath); fi != nil {
+		return bytes.Clone(fi.contents), nil
+	}
+	return os.ReadFile(fpath)
+}
+
+// ioFSFile implements [iofs.File] for the overlay filesystem.f
+type ioFSFile struct {
+	fs      *fileSystem
+	path    string
+	rc      io.ReadCloser
+	entries []iofs.DirEntry
+}
+
+var _ interface {
+	iofs.File
+	iofs.ReadDirFile
+} = (*ioFSFile)(nil)
+
+func (f *ioFSFile) Stat() (iofs.FileInfo, error) {
+	return f.fs.stat(f.path)
+}
+
+func (f *ioFSFile) Read(buf []byte) (int, error) {
+	return f.rc.Read(buf)
+}
+
+func (f *ioFSFile) Close() error {
+	return f.rc.Close()
+}
+
+func (f *ioFSFile) ReadDir(n int) ([]iofs.DirEntry, error) {
+	if f.entries == nil {
+		entries, err := f.fs.readDir(f.path)
+		if err != nil {
+			return entries, err
+		}
+		if entries == nil {
+			entries = []iofs.DirEntry{}
+		}
+		f.entries = entries
+	}
+	if n <= 0 {
+		entries := f.entries
+		f.entries = f.entries[len(f.entries):]
+		return entries, nil
+	}
+	var err error
+	if n >= len(f.entries) {
+		n = len(f.entries)
+		err = io.EOF
+	}
+	entries := f.entries[:n]
+	f.entries = f.entries[n:]
+	return entries, err
 }

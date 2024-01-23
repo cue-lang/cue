@@ -236,7 +236,6 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	if !isLocalImport(path) {
 		panic(fmt.Errorf("non-relative import path %q passed to newRelInstance", path))
 	}
-	fs := l.cfg.fileSystem
 
 	var err errors.Error
 	dir := path
@@ -263,7 +262,7 @@ func (l *loader) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 
 	p.Dir = dir
 
-	if fs.isAbsPath(path) || strings.HasPrefix(path, "/") {
+	if filepath.IsAbs(path) || strings.HasPrefix(path, "/") {
 		err = errors.Append(err, errors.Newf(pos,
 			"absolute import path %q not allowed", path))
 	}

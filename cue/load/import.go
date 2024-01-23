@@ -15,7 +15,6 @@
 package load
 
 import (
-	"context"
 	"fmt"
 	"os"
 	pathpkg "path"
@@ -29,6 +28,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/mod/modcache"
+	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/module"
 )
 
@@ -338,7 +338,6 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	parts := module.ParseImportPath(string(p))
 	name = parts.Qualifier
 	p = importPath(parts.Unqualified().String())
-	// TODO: fully test that name is a valid identifier.
 	if name == "" {
 		err = errors.Newf(pos, "empty package name in import path %q", p)
 	} else if strings.IndexByte(name, '.') >= 0 {
@@ -348,8 +347,24 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		err = errors.Newf(pos,
 			"implied package identifier %q from import path %q is not valid", name, p)
 	}
+	if l.cfg.Registry != nil {
+		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
+		pkg := l.pkgs.Pkg(parts.Canonical().String())
+		if pkg == nil {
+			return "", name, errors.Newf(pos, "no dependency found for package %q", p)
+		}
+		if err := pkg.Error(); err != nil {
+			return "", name, errors.Newf(pos, "cannot find package %q: %v", p, err)
+		}
+		absDir1, err1 := absPathForSourceLoc(pkg.Location())
+		if err != nil {
+			return "", name, errors.Newf(pos, "cannot determine source directory for package %q: %v", p, err1)
+		}
 
-	// Determine the directory.
+		return absDir1, name, nil
+	}
+
+	// Determine the directory without using the registry.
 
 	sub := filepath.FromSlash(string(p))
 	switch hasPrefix := strings.HasPrefix(string(p), l.cfg.Module); {
@@ -360,41 +375,19 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		absDir = filepath.Join(l.cfg.ModuleRoot, sub[len(l.cfg.Module)+1:])
 
 	default:
-		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
-		if l.cfg.Registry != nil {
-			var err error
-			absDir, err = l.externalPackageDir(p)
-			if err != nil {
-				// TODO why can't we use %w ?
-				return "", name, errors.Newf(token.NoPos, "cannot get directory for external module %q: %v", p, err)
-			}
-		} else {
-			absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), sub)
-		}
+		absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), sub)
 	}
-
 	return absDir, name, err
 }
 
-func (l *loader) externalPackageDir(p importPath) (dir string, err error) {
-	if l.deps == nil {
-		return "", fmt.Errorf("no dependency found for import path %q (no dependencies at all)", p)
-	}
-	m, subPath, err := l.deps.lookup(p)
-	if err != nil {
-		return "", err
-	}
-	loc, err := l.cfg.Registry.Fetch(context.TODO(), m)
-	if err != nil {
-		return "", fmt.Errorf("cannot get contents for %v: %v", m, err)
-	}
+func absPathForSourceLoc(loc modpkgload.SourceLoc) (string, error) {
 	osfs, ok := loc.FS.(modcache.OSRootFS)
 	if !ok {
-		return "", fmt.Errorf("cannot get root for downloaded module in FS of type %T", loc.FS)
+		return "", fmt.Errorf("cannot get absolute path for FS of type %T", loc.FS)
 	}
-	fsRoot := osfs.OSRoot()
-	if fsRoot == "" {
-		return "", fmt.Errorf("cannot get root for downloaded module in FS of type %T", loc.FS)
+	osPath := osfs.OSRoot()
+	if osPath == "" {
+		return "", fmt.Errorf("cannot get absolute path for FS of type %T", loc.FS)
 	}
-	return filepath.Join(fsRoot, filepath.FromSlash(loc.Dir), filepath.FromSlash(subPath)), nil
+	return filepath.Join(osPath, loc.Dir), nil
 }

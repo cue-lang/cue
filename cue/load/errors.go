@@ -85,7 +85,7 @@ func (e *NoFilesError) Error() string {
 		}
 	}
 
-	// path := shortPath(e.Package.Root, e.Package.Dir)
+	// path := fmt.Sprintf("%v (root %v; dir %q)", e.Package.DisplayPath, e.Package.Root, e.Package.Dir)
 	path := e.Package.DisplayPath
 
 	if len(e.Package.IgnoredFiles) > dummy {

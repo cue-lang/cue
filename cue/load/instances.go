@@ -20,11 +20,15 @@ package load
 //    - go/build
 
 import (
+	"context"
 	"fmt"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/mod/modimports"
+	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/internal/mod/modrequirements"
 
 	// Trigger the unconditional loading of all core builtin packages if load
 	// is used. This was deemed the simplest way to avoid having to import
@@ -39,6 +43,7 @@ import (
 // instance, but errors that occur loading dependencies are recorded in these
 // dependencies.
 func Instances(args []string, c *Config) []*build.Instance {
+	ctx := context.TODO()
 	if c == nil {
 		c = &Config{}
 	}
@@ -47,18 +52,20 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
 	c = newC
-	// TODO use predictable location
-	var deps *dependencies
-	if c.Registry != nil {
-		deps1, err := resolveDependencies(c.modFile, c.Registry)
-		if err != nil {
-			return []*build.Instance{c.newErrInstance(fmt.Errorf("cannot resolve dependencies: %v", err))}
-		}
-		deps = deps1
 
+	// TODO use predictable location
+	var pkgs *modpkgload.Packages
+	if c.Registry != nil {
+		pkgs, err = loadPackages(ctx, c)
+		if err != nil {
+			return []*build.Instance{c.newErrInstance(err)}
+		}
+		//for _, p := range pkgs.All() {
+		//	log.Printf("found package %q (err: %v)", p.ImportPath(), p.Error())
+		//}
 	}
 	tg := newTagger(c)
-	l := newLoader(c, tg, deps)
+	l := newLoader(c, tg, pkgs)
 
 	if c.Context == nil {
 		c.Context = build.NewContext(
@@ -128,4 +135,29 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	return a
+}
+
+func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error) {
+	reqs := modrequirements.NewRequirements(
+		cfg.modFile.Module,
+		cfg.Registry,
+		cfg.modFile.DepVersions(),
+		cfg.modFile.DefaultMajorVersions(),
+	)
+	mainModLoc := modpkgload.SourceLoc{
+		FS:  cfg.fileSystem.ioFS(cfg.ModuleRoot),
+		Dir: ".",
+	}
+	allImports, err := modimports.AllImports(modimports.AllModuleFiles(mainModLoc.FS, mainModLoc.Dir))
+	if err != nil {
+		return nil, fmt.Errorf("cannot enumerate all module imports: %v", err)
+	}
+	return modpkgload.LoadPackages(
+		ctx,
+		cfg.Module,
+		mainModLoc,
+		reqs,
+		cfg.Registry,
+		allImports,
+	), nil
 }

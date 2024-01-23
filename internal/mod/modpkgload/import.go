@@ -29,11 +29,11 @@ import (
 // If the package is present in exactly one module, importFromModules will
 // return the module, its root directory, and a list of other modules that
 // lexically could have provided the package but did not.
-func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m module.Version, loc SourceLoc, altMods []module.Version, err error) {
-	fail := func(err error) (module.Version, SourceLoc, []module.Version, error) {
-		return module.Version{}, SourceLoc{}, nil, err
+func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m module.Version, pkgLocs []SourceLoc, altMods []module.Version, err error) {
+	fail := func(err error) (module.Version, []SourceLoc, []module.Version, error) {
+		return module.Version{}, []SourceLoc(nil), nil, err
 	}
-	failf := func(format string, args ...interface{}) (module.Version, SourceLoc, []module.Version, error) {
+	failf := func(format string, args ...interface{}) (module.Version, []SourceLoc, []module.Version, error) {
 		return fail(fmt.Errorf(format, args...))
 	}
 	// Note: we don't care about the package qualifier at this point
@@ -54,9 +54,17 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	}
 
 	// Check each module on the build list.
-	var locs []SourceLoc
+	var locs [][]SourceLoc
 	var mods []module.Version
 	var mg *modrequirements.ModuleGraph
+	localPkgLocs, err := pkgs.findLocalPackage(pkgPathOnly)
+	if err != nil {
+		return fail(err)
+	}
+	if len(localPkgLocs) > 0 {
+		mods = append(mods, module.MustNewVersion("local", ""))
+		locs = append(locs, localPkgLocs)
+	}
 
 	// Iterate over possible modules for the path, not all selected modules.
 	// Iterating over selected modules would make the overall loading time
@@ -115,7 +123,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 				return fail(fmt.Errorf("cannot find package: %v", err))
 			} else if ok {
 				mods = append(mods, m)
-				locs = append(locs, loc)
+				locs = append(locs, []SourceLoc{loc})
 			} else {
 				altMods = append(altMods, m)
 			}
@@ -210,6 +218,24 @@ func locInModule(pkgPath, mpath string, mloc SourceLoc, isLocal bool) (loc Sourc
 	return loc, haveCUEFiles, err
 }
 
+var localPkgDirs = []string{"cue.mod/gen", "cue.mod/usr", "cue.mod/pkg"}
+
+func (pkgs *Packages) findLocalPackage(pkgPath string) ([]SourceLoc, error) {
+	var locs []SourceLoc
+	for _, d := range localPkgDirs {
+		loc := pkgs.mainModuleLoc
+		loc.Dir = path.Join(loc.Dir, d, pkgPath)
+		ok, err := isDirWithCUEFiles(loc)
+		if err != nil {
+			return nil, err
+		}
+		if ok {
+			locs = append(locs, loc)
+		}
+	}
+	return locs, nil
+}
+
 func isDirWithCUEFiles(loc SourceLoc) (bool, error) {
 	// It would be nice if we could inspect the error returned from
 	// ReadDir to see if it's failing because it's not a directory,
@@ -256,7 +282,7 @@ func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc Source
 // directory.
 type AmbiguousImportError struct {
 	ImportPath string
-	Locations  []SourceLoc
+	Locations  [][]SourceLoc
 	Modules    []module.Version // Either empty or 1:1 with Dirs.
 }
 
@@ -278,9 +304,9 @@ func (e *AmbiguousImportError) Error() string {
 				fmt.Fprintf(&buf, " %s", m.Version())
 			}
 			// TODO work out how to present source locations in error messages.
-			fmt.Fprintf(&buf, " (%s)", loc.Dir)
+			fmt.Fprintf(&buf, " (%s)", loc[0].Dir)
 		} else {
-			buf.WriteString(loc.Dir)
+			buf.WriteString(loc[0].Dir)
 		}
 	}
 

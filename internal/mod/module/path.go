@@ -153,6 +153,9 @@ func CheckPathWithoutVersion(basePath string) (err error) {
 //
 // Third, no path element may begin with a dot.
 func CheckPath(mpath string) (err error) {
+	if mpath == "local" {
+		return nil
+	}
 	defer func() {
 		if err != nil {
 			err = &InvalidPathError{Kind: "module", Path: mpath, Err: err}

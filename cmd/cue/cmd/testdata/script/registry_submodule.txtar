@@ -1,13 +1,12 @@
 # Note: this test exposes an error in the current dependency resolution code.
 # this `cue eval` call should not fail, because there is no actual ambiguity here:
 # example.com/foo is only present in a single module.
-! exec cue eval .
-stderr 'import failed: cannot get directory for external module "example.com/foo@v0": more than one default module for import path "example.com/foo@v0"'
-# cmp stdout expect-stdout
+exec cue eval .
+cmp stdout expect-stdout
 -- expect-stdout --
 a: {
-	e: true
-	f: true
+    e: true
+    f: true
 }
 -- cue.mod/module.cue --
 module: "main.org"

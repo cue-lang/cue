@@ -4,6 +4,8 @@
 env CUE_REGISTRY=${CUE_REGISTRY1},baz.org=$CUE_REGISTRY2
 env DOCKER_CONFIG=$WORK/dockerconfig
 env-fill $DOCKER_CONFIG/config.json
+exec cue mod tidy
+exec cat cue.mod/module.cue
 exec cue eval .
 cmp stdout expect-stdout
 -- expect-stdout --

@@ -9,7 +9,11 @@
 -- cue.mod/module.cue --
 module: "main.org"
 
-deps: "example.com@v0": v: "v0.0.1"
+deps: {
+	"example.com@v0": v: "v0.0.1"
+	"foo.com/bar/hello@v0": v: "v0.2.3"
+	"baz.org@v0": v: "v0.10.1"
+}
 
 -- main.cue --
 package main

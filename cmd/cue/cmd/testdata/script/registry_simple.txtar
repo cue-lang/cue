@@ -1,3 +1,4 @@
+exec cat cue.mod/module.cue
 exec cue eval .
 cmp stdout expect-stdout
 -- expect-stdout --
@@ -7,10 +8,22 @@ main:                   "main"
 "baz.org@v0":           "v0.10.1"
 "example.com@v0":       "v0.0.1"
 -- cue.mod/module.cue --
-module: "main.org"
-
-deps: "example.com@v0": v: "v0.0.1"
-
+module: "main.org@v0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.5.0"
+	}
+	"baz.org@v0": {
+		v: "v0.10.1"
+	}
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+	"foo.com/bar/hello@v0": {
+		v:       "v0.2.3"
+		default: true
+	}
+}
 -- main.cue --
 package main
 import "example.com@v0:main"

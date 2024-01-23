@@ -21,7 +21,6 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 	"time"
 
 	"cuelang.org/go/cue/ast"
@@ -107,10 +106,6 @@ func (fs *fileSystem) joinPath(elem ...string) string {
 	return filepath.Join(elem...)
 }
 
-func (fs *fileSystem) splitPathList(s string) []string {
-	return filepath.SplitList(s)
-}
-
 func (fs *fileSystem) isAbsPath(path string) bool {
 	return filepath.IsAbs(path)
 }
@@ -129,40 +124,6 @@ func (fs *fileSystem) isDir(path string) bool {
 	}
 	fi, err := os.Stat(path)
 	return err == nil && fi.IsDir()
-}
-
-func (fs *fileSystem) hasSubdir(root, dir string) (rel string, ok bool) {
-	// Try using paths we received.
-	if rel, ok = hasSubdir(root, dir); ok {
-		return
-	}
-
-	// Try expanding symlinks and comparing
-	// expanded against unexpanded and
-	// expanded against expanded.
-	rootSym, _ := filepath.EvalSymlinks(root)
-	dirSym, _ := filepath.EvalSymlinks(dir)
-
-	if rel, ok = hasSubdir(rootSym, dir); ok {
-		return
-	}
-	if rel, ok = hasSubdir(root, dirSym); ok {
-		return
-	}
-	return hasSubdir(rootSym, dirSym)
-}
-
-func hasSubdir(root, dir string) (rel string, ok bool) {
-	const sep = string(filepath.Separator)
-	root = filepath.Clean(root)
-	if !strings.HasSuffix(root, sep) {
-		root += sep
-	}
-	dir = filepath.Clean(dir)
-	if !strings.HasPrefix(dir, root) {
-		return "", false
-	}
-	return filepath.ToSlash(dir[len(root):]), true
 }
 
 func (fs *fileSystem) readDir(path string) ([]iofs.DirEntry, errors.Error) {

@@ -292,10 +292,6 @@ func (c *Config) stdin() io.Reader {
 	return c.Stdin
 }
 
-func toImportPath(dir string) importPath {
-	return importPath(filepath.ToSlash(dir))
-}
-
 type importPath string
 
 type fsPath string

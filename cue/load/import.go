@@ -162,7 +162,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 					})
 					continue // skip unrecognized file types
 				}
-				fp.add(pos, dir, file, importComment)
+				fp.add(dir, file, importComment)
 			}
 
 			if p.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {

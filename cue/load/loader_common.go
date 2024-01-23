@@ -16,7 +16,6 @@ package load
 
 import (
 	"bytes"
-	"path"
 	pathpkg "path"
 	"path/filepath"
 	"sort"
@@ -37,16 +36,11 @@ import (
 type importMode uint
 
 const (
-	// If findOnly is set, Import stops after locating the directory
-	// that should contain the sources for a package. It does not
-	// read any files in the directory.
-	findOnly importMode = 1 << iota
-
 	// If importComment is set, parse import comments on package statements.
 	// Import returns an error if it finds a comment it cannot understand
 	// or finds conflicting comments in multiple source files.
 	// See golang.org/s/go14customimport for more information.
-	importComment
+	importComment importMode = 1 << iota
 
 	allowAnonymous
 )
@@ -167,7 +161,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	return nil
 }
 
-func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode importMode) (added bool) {
+func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (added bool) {
 	fullPath := file.Filename
 	if fullPath != "-" {
 		if !filepath.IsAbs(fullPath) {
@@ -471,12 +465,12 @@ func cleanPatterns(patterns []string) []string {
 
 		// Put argument in canonical form, but preserve leading ./.
 		if strings.HasPrefix(a, "./") {
-			a = "./" + path.Clean(a)
+			a = "./" + pathpkg.Clean(a)
 			if a == "./." {
 				a = "."
 			}
 		} else {
-			a = path.Clean(a)
+			a = pathpkg.Clean(a)
 		}
 		out = append(out, a)
 	}
@@ -517,102 +511,5 @@ func hasFilepathPrefix(s, prefix string) bool {
 			return strings.HasPrefix(s, prefix)
 		}
 		return s[len(prefix)] == filepath.Separator && s[:len(prefix)] == prefix
-	}
-}
-
-// isStandardImportPath reports whether $GOROOT/src/path should be considered
-// part of the standard distribution. For historical reasons we allow people to add
-// their own code to $GOROOT instead of using $GOPATH, but we assume that
-// code will start with a domain name (dot in the first element).
-//
-// Note that this function is meant to evaluate whether a directory found in GOROOT
-// should be treated as part of the standard library. It should not be used to decide
-// that a directory found in GOPATH should be rejected: directories in GOPATH
-// need not have dots in the first element, and they just take their chances
-// with future collisions in the standard library.
-func isStandardImportPath(path string) bool {
-	i := strings.Index(path, "/")
-	if i < 0 {
-		i = len(path)
-	}
-	elem := path[:i]
-	return !strings.Contains(elem, ".")
-}
-
-// isRelativePath reports whether pattern should be interpreted as a directory
-// path relative to the current directory, as opposed to a pattern matching
-// import paths.
-func isRelativePath(pattern string) bool {
-	return strings.HasPrefix(pattern, "./") || strings.HasPrefix(pattern, "../") || pattern == "." || pattern == ".."
-}
-
-// inDir checks whether path is in the file tree rooted at dir.
-// If so, inDir returns an equivalent path relative to dir.
-// If not, inDir returns an empty string.
-// inDir makes some effort to succeed even in the presence of symbolic links.
-// TODO(rsc): Replace internal/test.inDir with a call to this function for Go 1.12.
-func inDir(path, dir string) string {
-	if rel := inDirLex(path, dir); rel != "" {
-		return rel
-	}
-	xpath, err := filepath.EvalSymlinks(path)
-	if err != nil || xpath == path {
-		xpath = ""
-	} else {
-		if rel := inDirLex(xpath, dir); rel != "" {
-			return rel
-		}
-	}
-
-	xdir, err := filepath.EvalSymlinks(dir)
-	if err == nil && xdir != dir {
-		if rel := inDirLex(path, xdir); rel != "" {
-			return rel
-		}
-		if xpath != "" {
-			if rel := inDirLex(xpath, xdir); rel != "" {
-				return rel
-			}
-		}
-	}
-	return ""
-}
-
-// inDirLex is like inDir but only checks the lexical form of the file names.
-// It does not consider symbolic links.
-// TODO(rsc): This is a copy of str.HasFilePathPrefix, modified to
-// return the suffix. Most uses of str.HasFilePathPrefix should probably
-// be calling InDir instead.
-func inDirLex(path, dir string) string {
-	pv := strings.ToUpper(filepath.VolumeName(path))
-	dv := strings.ToUpper(filepath.VolumeName(dir))
-	path = path[len(pv):]
-	dir = dir[len(dv):]
-	switch {
-	default:
-		return ""
-	case pv != dv:
-		return ""
-	case len(path) == len(dir):
-		if path == dir {
-			return "."
-		}
-		return ""
-	case dir == "":
-		return path
-	case len(path) > len(dir):
-		if dir[len(dir)-1] == filepath.Separator {
-			if path[:len(dir)] == dir {
-				return path[len(dir):]
-			}
-			return ""
-		}
-		if path[len(dir)] == filepath.Separator && path[:len(dir)] == dir {
-			if len(path) == len(dir)+1 {
-				return "."
-			}
-			return path[len(dir)+1:]
-		}
-		return ""
 	}
 }

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"runtime"
+	"sort"
 	"strings"
 	"sync/atomic"
 
@@ -95,7 +96,7 @@ type Package struct {
 
 	// Populated by [loader.load].
 	mod          module.Version // module providing package
-	loc          SourceLoc      // location of source code
+	locs         []SourceLoc    // location of source code directories
 	err          error          // error loading package
 	imports      []*Package     // packages imported by this one
 	inStd        bool
@@ -122,8 +123,8 @@ func (pkg *Package) FromExternalModule() bool {
 	return pkg.fromExternal
 }
 
-func (pkg *Package) Location() SourceLoc {
-	return pkg.loc
+func (pkg *Package) Locations() []SourceLoc {
+	return pkg.locs
 }
 
 func (pkg *Package) Error() error {
@@ -245,7 +246,7 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		return
 	}
 	pkg.fromExternal = pkg.mod != pkgs.mainModuleVersion
-	pkg.mod, pkg.loc, pkg.altMods, pkg.err = pkgs.importFromModules(ctx, pkg.path)
+	pkg.mod, pkg.locs, pkg.altMods, pkg.err = pkgs.importFromModules(ctx, pkg.path)
 	if pkg.err != nil {
 		return
 	}
@@ -253,11 +254,22 @@ func (pkgs *Packages) load(ctx context.Context, pkg *Package) {
 		pkgs.applyPkgFlags(ctx, pkg, PkgInAll)
 	}
 	pkgQual := module.ParseImportPath(pkg.path).Qualifier
-	imports, err := modimports.AllImports(modimports.PackageFiles(pkg.loc.FS, pkg.loc.Dir, pkgQual))
-	if err != nil {
-		pkg.err = fmt.Errorf("cannot get imports: %v", err)
-		return
+	importsMap := make(map[string]bool)
+	for _, loc := range pkg.locs {
+		imports, err := modimports.AllImports(modimports.PackageFiles(loc.FS, loc.Dir, pkgQual))
+		if err != nil {
+			pkg.err = fmt.Errorf("cannot get imports: %v", err)
+			return
+		}
+		for _, imp := range imports {
+			importsMap[imp] = true
+		}
 	}
+	imports := make([]string, 0, len(importsMap))
+	for imp := range importsMap {
+		imports = append(imports, imp)
+	}
+	sort.Strings(imports) // Make the algorithm deterministic for tests.
 
 	pkg.imports = make([]*Package, 0, len(imports))
 	var importFlags Flags

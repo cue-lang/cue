@@ -1,33 +1,72 @@
 # When CUE_REGISTRY is correctly set, packages in the
-# pkg directory are ignored.
+# pkg, usr and gen directories will be used when they don't conflict with
+# other module dependencies.
+
 exec cue export .
 cmp stdout expect-stdout
 
 -- expect-stdout --
-"registry source"
+{
+    "e": {
+        "a": {
+            "remote": true
+        }
+    },
+    "local_pkg": {
+        "a": {
+            "pkg": true
+        }
+    },
+    "local_pkg_usr": {
+        "a": {
+            "pkg": true,
+            "usr": true
+        }
+    },
+    "local_gen_usr": {
+        "a": {
+            "gen": true,
+            "usr": true
+        }
+    }
+}
 -- main.cue --
 package main
-import "example.com/e"
+import (
+	"example.com/e"
+	local_pkg "example.com/e/local_pkg:x"
+	local_pkg_usr "example.com/e/local_pkg_usr:x"
+	local_gen_usr "example.com/e/local_gen_usr:x"
+)
 
-e.foo
+"e": e
+"local_pkg": local_pkg
+"local_pkg_usr": local_pkg_usr
+"local_gen_usr": local_gen_usr
 
 -- cue.mod/module.cue --
 module: "test.org"
 deps: "example.com/e": v: "v0.0.1"
 
--- cue.mod/pkg/example.com/e/cue.mod/module.cue --
-module: "example.com/e"
+-- cue.mod/pkg/example.com/e/local_pkg/x.cue --
+package x
+a: pkg: true
 
--- cue.mod/pkg/example.com/e/main.cue --
-package e
-foo: "cue.mod/pkg source"
+-- cue.mod/pkg/example.com/e/local_pkg_usr/x.cue --
+package x
+a: pkg: true
 
--- cue.mod/pkg/example.com/e/cue.mod/module.cue --
-module: "example.com/e"
+-- cue.mod/usr/example.com/e/local_pkg_usr/x.cue --
+package x
+a: usr: true
 
--- cue.mod/pkg/example.com/e/main.cue --
-package e
-foo: "cue.mod/pkg source"
+-- cue.mod/usr/example.com/e/local_gen_usr/x.cue --
+package x
+a: usr: true
+
+-- cue.mod/gen/example.com/e/local_gen_usr/x.cue --
+package x
+a: gen: true
 
 -- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
 module: "example.com/e@v0"
@@ -35,4 +74,5 @@ module: "example.com/e@v0"
 -- _registry/example.com_e_v0.0.1/main.cue --
 package e
 
-foo: "registry source"
+a: remote: true
+

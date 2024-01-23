@@ -1,0 +1,56 @@
+# test0 shows that we can have a local import
+# and it's OK even when there's a matching module
+# in the registry.
+
+# test1 shows that if there is a matching module already
+# in the requirements that we get an "ambiguous import"
+# error.
+
+-- test0/initial-requirements --
+main.test@v0
+-- test0/root-packages --
+main.test@v0:main
+-- test0/default-major-versions --
+-- test0/want --
+main.test@v0:main
+	flags: inAll,isRoot,fromRoot,importsLoaded
+	mod: main.test@v0
+	location: .
+	imports:
+		example.com/blah
+example.com/blah
+	flags: inAll,isRoot,fromRoot,importsLoaded
+	mod: local
+	location: cue.mod/gen/example.com/blah
+-- test1/initial-requirements --
+main.test@v0
+example.com@v0.0.1
+-- test1/root-packages --
+main.test@v0:main
+-- test1/default-major-versions --
+-- test1/want --
+main.test@v0:main
+	flags: inAll,isRoot,fromRoot,importsLoaded
+	mod: main.test@v0
+	location: .
+	imports:
+		example.com/blah
+example.com/blah
+	flags: inAll,isRoot,fromRoot
+	error: ambiguous import: found package example.com/blah in multiple modules:
+	example.com@v0 v0.0.1 (_registry/example.com_v0.0.1/blah)
+	local (cue.mod/gen/example.com/blah)
+	missing: false
+-- main.cue --
+package main
+import "example.com/blah"
+-- cue.mod/gen/example.com/blah/x.cue --
+package blah
+-- main.cue --
+package main
+import "example.com/blah"
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+-- _registry/example.com_v0.0.1/blah/blah.cue --
+package blah

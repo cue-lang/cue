@@ -1,0 +1,43 @@
+# This tests what happens when there's a remote module that includes
+# a gen directory. It's not usable unless a local gen directory is
+# created too.
+
+! exec cue export .
+stderr 'import failed: import failed: cannot find package "other.com/p": cannot find module providing package other.com/p:'
+mkdir cue.mod/gen/other.com/p
+cp _registry/example.com_e_v0.0.1/gen/other.com/p/p.cue cue.mod/gen/other.com/p
+exec cue export .
+cmp stdout expect-stdout
+-- expect-stdout --
+{
+    "e": {
+        "a": {
+            "a": {
+                "p": true
+            }
+        }
+    }
+}
+-- main.cue --
+package main
+import "example.com/e"
+
+"e": e
+
+-- cue.mod/module.cue --
+module: "test.org"
+deps: "example.com/e": v: "v0.0.1"
+
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+package e
+import "other.com/p"
+
+a: p
+
+-- _registry/example.com_e_v0.0.1/gen/other.com/p/p.cue --
+package p
+a: p: true
+

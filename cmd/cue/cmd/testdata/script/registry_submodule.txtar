@@ -1,6 +1,5 @@
-# Note: this test exposes an error in the current dependency resolution code.
-# this `cue eval` call should not fail, because there is no actual ambiguity here:
-# example.com/foo is only present in a single module.
+# This test tests that submodules work OK.
+
 exec cue eval .
 cmp stdout expect-stdout
 -- expect-stdout --

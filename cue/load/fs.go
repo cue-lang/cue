@@ -28,6 +28,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+
+	"github.com/rogpeppe/misc/runtime/debug"
 )
 
 type overlayFile struct {
@@ -302,13 +304,13 @@ func (fs *ioFS) Open(name string) (iofs.File, error) {
 
 func (fs *ioFS) absPathFromFSPath(name string) (string, error) {
 	if !iofs.ValidPath(name) {
-		return "", fmt.Errorf("invalid io/fs path %q", name)
+		return "", fmt.Errorf("invalid io/fs path %q (%s)", name, debug.Callers(2, 20))
 	}
 	// Technically we should mimic Go's internal/safefilepath.fromFS
 	// functionality here, but as we're using this in a relatively limited
 	// context, we can just prohibit some characters.
 	if strings.ContainsAny(name, ":\\") {
-		return "", fmt.Errorf("invalid io/fs path %q", name)
+		return "", fmt.Errorf("invalid io/fs path %q (%s)", name, debug.Callers(2, 20))
 	}
 	return filepath.Join(fs.root, name), nil
 }

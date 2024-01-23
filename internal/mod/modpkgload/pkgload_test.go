@@ -65,7 +65,9 @@ func TestLoadPackages(t *testing.T) {
 						printf("\tmissing: %v\n", errors.As(pkg.Error(), new(*ImportMissingError)))
 					} else {
 						printf("\tmod: %v\n", pkg.Mod())
-						printf("\tlocation: %v\n", pkg.Location().Dir)
+						for _, loc := range pkg.Locations() {
+							printf("\tlocation: %v\n", loc.Dir)
+						}
 						if imps := pkg.Imports(); len(imps) > 0 {
 							printf("\timports:\n")
 							for _, imp := range imps {

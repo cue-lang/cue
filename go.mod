@@ -16,6 +16,7 @@ require (
 	github.com/opencontainers/image-spec v1.1.0-rc4
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230328191034-3462fbc510c0
 	github.com/rogpeppe/go-internal v1.12.0
+	github.com/rogpeppe/misc v0.0.0-20220127131711-37e4b992f215
 	github.com/spf13/cobra v1.8.0
 	github.com/spf13/pflag v1.0.5
 	github.com/tetratelabs/wazero v1.6.0

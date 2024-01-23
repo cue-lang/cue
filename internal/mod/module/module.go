@@ -207,7 +207,7 @@ func NewVersion(path string, vers string) (Version, error) {
 			}
 			path = fullPath
 		}
-	} else {
+	} else if path != "local" {
 		if _, _, ok := SplitPathVersion(path); !ok {
 			return Version{}, fmt.Errorf("path %q has no major version", path)
 		}

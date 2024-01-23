@@ -1,0 +1,27 @@
+-- test0/initial-requirements --
+main.test@v0
+-- test0/root-packages --
+main.test@v0:main
+-- test0/default-major-versions --
+-- test0/want --
+main.test@v0:main
+	flags: inAll,isRoot,fromRoot,importsLoaded
+	mod: main.test@v0
+	location: .
+	imports:
+		other.com/blah
+other.com/blah
+	flags: inAll,isRoot,fromRoot,importsLoaded
+	mod: local
+	location: cue.mod/gen/other.com/blah
+	location: cue.mod/usr/other.com/blah
+	location: cue.mod/pkg/other.com/blah
+-- main.cue --
+package main
+import "other.com/blah"
+-- cue.mod/gen/other.com/blah/x.cue --
+package blah
+-- cue.mod/usr/other.com/blah/x.cue --
+package blah
+-- cue.mod/pkg/other.com/blah/x.cue --
+package blah

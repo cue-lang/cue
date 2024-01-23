@@ -356,12 +356,24 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		if err := pkg.Error(); err != nil {
 			return "", name, errors.Newf(pos, "cannot find package %q: %v", p, err)
 		}
-		absDir1, err1 := absPathForSourceLoc(pkg.Location())
-		if err != nil {
-			return "", name, errors.Newf(pos, "cannot determine source directory for package %q: %v", p, err1)
+		if mv := pkg.Mod(); mv.Path() == "local" {
+			// It's a local package that's present inside one or both of the gen, usr or pkg
+			// directories. Even though modpkgload tells us exactly what those directories
+			// are, the rest of the cue/load logic expects only a single directory for now,
+			// so just use that.
+			absDir = filepath.Join(GenPath(l.cfg.ModuleRoot), parts.Path)
+		} else {
+			locs := pkg.Locations()
+			if len(locs) > 1 {
+				return "", "", errors.Newf(pos, "package %q unexpectedly found in multiple locations", p)
+			}
+			var err error
+			absDir, err = absPathForSourceLoc(locs[0])
+			if err != nil {
+				return "", name, errors.Newf(pos, "cannot determine source directory for package %q: %v", p, err)
+			}
 		}
-
-		return absDir1, name, nil
+		return absDir, name, nil
 	}
 
 	// Determine the directory without using the registry.

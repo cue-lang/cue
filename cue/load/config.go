@@ -347,7 +347,7 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	// TODO: we could populate this already with absolute file paths,
 	// but relative paths cannot be added. Consider what is reasonable.
-	if err := c.fileSystem.init(&c); err != nil {
+	if err := c.fileSystem.init(c.Dir, c.Overlay); err != nil {
 		return nil, err
 	}
 

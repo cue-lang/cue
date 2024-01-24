@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8edbe80_9d5c9766",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:20:54Z",
+      "side": 1,
+      "message": "nit: over the limit :)",
+      "revId": "df2e8a985baab25f239c23d763c322d843f24a9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ff99cd8_2e3644e1",
+        "filename": "cmd/cue/cmd/testdata/script/registry_submodule.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:20:54Z",
+      "side": 1,
+      "message": "personally I\u0027d make this a TODO, to clarify that we intend to fix it soon, as opposed to a note that is meant to stay long term",
+      "range": {
+        "startLine": 1,
+        "startChar": 2,
+        "endLine": 1,
+        "endChar": 6
+      },
+      "revId": "df2e8a985baab25f239c23d763c322d843f24a9d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

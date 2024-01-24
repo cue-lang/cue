@@ -1,0 +1,130 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fd74763_6b648c5b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:19:04Z",
+      "side": 1,
+      "message": "nit: just over the limit",
+      "revId": "b3b8622071d1868ed6771ffbc28d8554c4f2d321",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "19f21732_cfaa0051",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:19:04Z",
+      "side": 1,
+      "message": "wrap these, like:\n\n```\n- one very long line\n  continues here\n- another very long line\n  continues there\n```\n\nthis still renders the same under markdown, and allows staying within the limit",
+      "revId": "b3b8622071d1868ed6771ffbc28d8554c4f2d321",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42a1c897_6b090c93",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:19:04Z",
+      "side": 1,
+      "message": "nit: `[io/fs.FS]` would be more natural to the reader, since with the godoc rendering (or without scrollig up in an editor) they can\u0027t see what we named our imports\n\n(same elsewhere)",
+      "range": {
+        "startLine": 69,
+        "startChar": 38,
+        "endLine": 69,
+        "endChar": 42
+      },
+      "revId": "b3b8622071d1868ed6771ffbc28d8554c4f2d321",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ad330f74_a5854bd7",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 73,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:19:04Z",
+      "side": 1,
+      "message": "entire fs? entirety of fs?",
+      "range": {
+        "startLine": 73,
+        "startChar": 3,
+        "endLine": 73,
+        "endChar": 15
+      },
+      "revId": "b3b8622071d1868ed6771ffbc28d8554c4f2d321",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f95dff95_0a181800",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 294,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:19:04Z",
+      "side": 1,
+      "message": "can you clarify what this means? I would normally think that \"mangling an error\" means making it worse, so I don\u0027t understand",
+      "range": {
+        "startLine": 294,
+        "startChar": 26,
+        "endLine": 294,
+        "endChar": 32
+      },
+      "revId": "b3b8622071d1868ed6771ffbc28d8554c4f2d321",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a25d85e2_a6b78bbe",
+        "filename": "cue/load/fs.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 337,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-24T14:19:04Z",
+      "side": 1,
+      "message": "remove?",
+      "range": {
+        "startLine": 337,
+        "startChar": 62,
+        "endLine": 337,
+        "endChar": 63
+      },
+      "revId": "b3b8622071d1868ed6771ffbc28d8554c4f2d321",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

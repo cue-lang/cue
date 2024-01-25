@@ -34,6 +34,24 @@
       "parentUuid": "cdbf01d9_146e4ace",
       "revId": "177f961a1ddb5256ad6e2a094ca6457ca363f323",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d6f3083_c5526e70",
+        "filename": "cue/load/testdata/testfetch/depnotfound.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-25T14:55:40Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "7c3c6473_dfd9ec3c",
+      "revId": "177f961a1ddb5256ad6e2a094ca6457ca363f323",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

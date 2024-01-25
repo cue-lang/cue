@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f2bfeb6_c77a74d4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-25T14:38:34Z",
+      "side": 1,
+      "message": "I think I would have split this last bit up into a separate CL, but this CL isn\u0027t huge, so SGTM",
+      "revId": "8e923ac2e22ddac90681b274295b1551d67f7fca",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -36,7 +36,7 @@ cd ../depend
 # Double check that cmd/cue cannot download the dependency either.
 env-fill cue.mod/module.cue out_foo.cue
 ! exec cue export
-stderr 'cannot resolve dependencies'
+stderr 'cannot find package.*module not found'
 
 -- publish/cue.mod/module.cue --
 module: "${MODVER}"

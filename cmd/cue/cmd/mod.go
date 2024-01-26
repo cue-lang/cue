@@ -17,12 +17,14 @@ package cmd
 import (
 	"fmt"
 	"math/rand"
-	"net/url"
 	"os"
 	"path/filepath"
 	"strings"
 
 	"github.com/spf13/cobra"
+
+	"cuelang.org/go/internal/mod/modfile"
+	"cuelang.org/go/internal/mod/module"
 )
 
 func newModCmd(c *Command) *cobra.Command {
@@ -80,18 +82,22 @@ func runModInit(cmd *Command, args []string) (err error) {
 		}
 	}()
 
-	module := ""
+	modulePath := ""
 	if len(args) > 0 {
 		if len(args) != 1 {
 			return fmt.Errorf("too many arguments")
 		}
-		module = args[0]
-		u, err := url.Parse("https://" + module)
-		if err != nil {
-			return fmt.Errorf("invalid module name: %v", module)
-		}
-		if h := u.Hostname(); !strings.Contains(h, ".") {
-			return fmt.Errorf("invalid host name %s", h)
+		modulePath = args[0]
+		if err := module.CheckPath(modulePath); err != nil {
+			// It might just be lacking a major version.
+			if err1 := module.CheckPathWithoutVersion(modulePath); err1 != nil {
+				if strings.Contains(modulePath, "@") {
+					err1 = err
+				}
+				return fmt.Errorf("invalid module name %q: %v", modulePath, err1)
+			}
+			// Default major version to v0.
+			modulePath += "@v0"
 		}
 	}
 
@@ -116,20 +122,23 @@ func runModInit(cmd *Command, args []string) (err error) {
 	if err == nil {
 		return fmt.Errorf("cue.mod directory already exists")
 	}
+	mf := &modfile.File{
+		Module: modulePath,
+		// TODO Language
+	}
 
 	err = os.Mkdir(mod, 0755)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
 
-	f, err := os.Create(filepath.Join(mod, "module.cue"))
+	data, err := mf.Format()
 	if err != nil {
 		return err
 	}
-	defer f.Close()
-
-	// Set module even if it is empty, making it easier for users to fill it in.
-	_, err = fmt.Fprintf(f, "module: %q\n", module)
+	if err := os.WriteFile(filepath.Join(mod, "module.cue"), data, 0o666); err != nil {
+		return err
+	}
 
 	if err = os.Mkdir(filepath.Join(mod, "usr"), 0755); err != nil {
 		return err

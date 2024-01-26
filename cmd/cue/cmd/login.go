@@ -153,9 +153,13 @@ func registryOAuthConfig(host string) oauth2.Config {
 // changed between reading and writing the file.
 
 func findLoginsPath() (string, error) {
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return "", err
+	configDir := os.Getenv("CUE_CONFIG_DIR")
+	if configDir == "" {
+		var err error
+		configDir, err = os.UserConfigDir()
+		if err != nil {
+			return "", err
+		}
 	}
 	return filepath.Join(configDir, "cue", "logins.json"), nil
 }

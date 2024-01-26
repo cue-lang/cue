@@ -1,0 +1,6 @@
+# TODO reduce error message redundancy
+
+! exec cue mod init bad.com@v2.2
+cmp stderr want-stderr
+-- want-stderr --
+invalid module name "bad.com@v2.2": malformed module path "bad.com@v2.2": path can contain major version only

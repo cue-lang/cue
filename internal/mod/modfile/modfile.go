@@ -75,7 +75,7 @@ func (f *File) Format() ([]byte, error) {
 	// Sanity check that it can be parsed.
 	// TODO this could be more efficient by checking all the file fields
 	// before formatting the output.
-	if _, err := Parse(data, "-"); err != nil {
+	if _, err := ParseNonStrict(data, "-"); err != nil {
 		return nil, fmt.Errorf("cannot round-trip module file: %v", err)
 	}
 	return data, err

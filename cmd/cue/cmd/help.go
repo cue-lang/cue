@@ -154,6 +154,14 @@ var environmentHelp = &cobra.Command{
 If an environment variable is unset or empty, it uses a sensible default
 setting.
 
+	CUE_CONFIG_DIR
+		The directory where the cue command keeps configuration and state files.
+		This defaults to a directory for user-specific configuration data, such as:
+
+			"$XDG_CONFIG_HOME/cue" or "$HOME/.config/cue" on Linux
+			"$HOME/Library/Application Support" on MacOS
+			"%AppData%/cue" on Windows
+
 	CUE_REGISTRY
 		A comma-separated list specifying which registry to use for
 		downloading and publishing modules. A registry is specifed

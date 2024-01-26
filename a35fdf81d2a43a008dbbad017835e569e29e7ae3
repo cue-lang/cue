@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "015e0193_e3d4d56d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-26T15:46:50Z",
+      "side": 1,
+      "message": "is it worth naming this something that is less likely or even impossible to clash with existing module paths people might already be declaring? e.g. today I could already have a `module: \"local\"`",
+      "range": {
+        "startLine": 16,
+        "startChar": 17,
+        "endLine": 16,
+        "endChar": 22
+      },
+      "revId": "a35fdf81d2a43a008dbbad017835e569e29e7ae3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

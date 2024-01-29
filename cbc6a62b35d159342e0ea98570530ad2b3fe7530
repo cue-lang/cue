@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "32336df3_d3a34172",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-29T17:36:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74e80aaf_14da4d3f",
+      "range": {
+        "startLine": 9,
+        "startChar": 5,
+        "endLine": 9,
+        "endChar": 10
+      },
+      "revId": "cbc6a62b35d159342e0ea98570530ad2b3fe7530",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bfce855a_73fc33d1",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-01-29T14:42:47Z",
       "side": 1,
       "message": "I\u0027d leave a TODO here; we might want to deprecate or even remove this \"empty module path\" mode. I seem to recall Marcel/Paul mentioning there wasn\u0027t a lot of thought put into it, other than allowing the creation of a \"scratch\" module as quickly as possible.",
+      "revId": "cbc6a62b35d159342e0ea98570530ad2b3fe7530",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c3b216d_8f071b86",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_noargs.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-29T17:36:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bfce855a_73fc33d1",
       "revId": "cbc6a62b35d159342e0ea98570530ad2b3fe7530",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,15 @@
+! exec cue export x.cue
+cmp stderr want-stderr
+-- want-stderr --
+import failed: imports are unavailable because there is no cue.mod/module.cue file:
+    ./x.cue:1:8
+-- x.cue --
+import "foo.com/bar"
+
+x: bar.X
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- _registry/example.com_v0.0.1/top.cue --
+package main

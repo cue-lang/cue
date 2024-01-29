@@ -348,6 +348,9 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 			"implied package identifier %q from import path %q is not valid", name, p)
 	}
 	if l.cfg.Registry != nil {
+		if l.pkgs == nil {
+			return "", name, errors.Newf(pos, "imports are unavailable because there is no cue.mod/module.cue file")
+		}
 		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
 		pkg := l.pkgs.Pkg(parts.Canonical().String())
 		if pkg == nil {

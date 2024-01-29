@@ -16,6 +16,24 @@
       "message": "nit: use https://cuelang.org/issue/2776",
       "revId": "894b180d2c571b29638ed4c8ee5d1a2ffdc18dc3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c734e2a1_f5e8335e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-29T18:12:20Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d419822c_ac235ce1",
+      "revId": "894b180d2c571b29638ed4c8ee5d1a2ffdc18dc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

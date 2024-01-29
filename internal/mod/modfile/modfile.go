@@ -17,6 +17,7 @@ package modfile
 import (
 	_ "embed"
 	"fmt"
+	"strings"
 	"sync"
 
 	"cuelang.org/go/internal/mod/semver"
@@ -76,7 +77,7 @@ func (f *File) Format() ([]byte, error) {
 	// TODO this could be more efficient by checking all the file fields
 	// before formatting the output.
 	if _, err := ParseNonStrict(data, "-"); err != nil {
-		return nil, fmt.Errorf("cannot round-trip module file: %v", err)
+		return nil, fmt.Errorf("cannot round-trip module file: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
 	}
 	return data, err
 }
@@ -191,9 +192,11 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		if semver.Major(mainMajor) != mainMajor {
 			return nil, fmt.Errorf("module path %s in %q should contain the major version only", mf.Module, filename)
 		}
-	} else {
+	} else if mainPath = mf.Module; mainPath != "" {
+		if err := module.CheckPathWithoutVersion(mainPath); err != nil {
+			return nil, fmt.Errorf("module path %q in %q is not valid: %v", mainPath, filename, err)
+		}
 		// There's no main module major version: default to v0.
-		mainPath = mf.Module
 		mainMajor = "v0"
 		// TODO perhaps we'd be better preserving the original?
 		mf.Module += "@v0"

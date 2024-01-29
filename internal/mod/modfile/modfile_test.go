@@ -202,7 +202,7 @@ func TestParse(t *testing.T) {
 				qt.Assert(t, qt.Matches(gotErr, test.wantError))
 				return
 			}
-			qt.Assert(t, qt.IsNil(err), qt.Commentf("details: %v", errors.Details(err, nil)))
+			qt.Assert(t, qt.IsNil(err), qt.Commentf("details: %v", strings.TrimSuffix(errors.Details(err, nil), "\n")))
 			qt.Assert(t, qt.CmpEquals(f, test.want, cmpopts.IgnoreUnexported(File{})))
 			qt.Assert(t, qt.DeepEquals(f.DepVersions(), test.wantVersions))
 			qt.Assert(t, qt.DeepEquals(f.DefaultMajorVersions(), test.wantDefaults))

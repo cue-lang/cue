@@ -53,13 +53,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 	c = newC
 
-	// TODO use predictable location
-	var pkgs *modpkgload.Packages
-	if c.Registry != nil {
-		pkgs, err = loadPackages(ctx, c)
-		if err != nil {
-			return []*build.Instance{c.newErrInstance(err)}
-		}
+	pkgs, err := loadPackages(ctx, c)
+	if err != nil {
+		return []*build.Instance{c.newErrInstance(err)}
 	}
 	tg := newTagger(c)
 	l := newLoader(c, tg, pkgs)
@@ -135,6 +131,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 }
 
 func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error) {
+	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
+		return nil, nil
+	}
 	reqs := modrequirements.NewRequirements(
 		cfg.modFile.Module,
 		cfg.Registry,

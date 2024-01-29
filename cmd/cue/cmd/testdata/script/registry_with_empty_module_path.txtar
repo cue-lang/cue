@@ -1,0 +1,15 @@
+exec cue export x.cue
+cmp stdout want-stdout
+-- want-stdout --
+{
+    "a": 1
+}
+-- cue.mod/module.cue --
+module: ""
+-- x.cue --
+a: 1
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- _registry/example.com_v0.0.1/top.cue --
+package main

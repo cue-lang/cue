@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4e66fe67_8afa01f9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-30T15:04:11Z",
+      "side": 1,
+      "message": "Overall SGTM but I think I disagree with two of the changes",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec52e812_ad3fc31d",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-30T15:04:11Z",
+      "side": 1,
+      "message": "this doesn\u0027t look right; what about `go install cuelang.org/go/cmd/cue@master`?\n\n```\n$ cue version\ncue version v0.7.1-0.20240130142347-7855e15cb701\n\ngo version devel go1.23-923ab13f9b Tue Jan 30 04:10:45 2024 +0000\n      -buildmode exe\n       -compiler gc\n  DefaultGODEBUG httplaxcontentlength\u003d1,httpmuxgo121\u003d1,panicnil\u003d1,tls10server\u003d1,tlsrsakex\u003d1,tlsunsafeekm\u003d1\n     CGO_ENABLED 1\n          GOARCH amd64\n            GOOS linux\n         GOAMD64 v3\n```\n\nSurely we don\u0027t want to insert `language: version: \"v0.7.1-0.20240130142347-7855e15cb701\"`?\n\nI think one reasonable option is to not insert anything. Another reasonable option is to detect such non-v0.0.0 pseudo-versions, strip the `-0.$timestamp-$commit` suffix, and subtract 1 from the bugfix release (this is a commit following v0.7.0, not following v0.7.1).",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9dab166a_5a6f5acb",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_with_pseudoversion.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-30T15:04:11Z",
+      "side": 1,
+      "message": "if you want to make this a more realistic scenario where someone git clones master and builds, \"vcs.modified\" should be false. it\u0027s also worth testing that we don\u0027t use the \"devel\" version even when modified\u003dfalse.",
+      "range": {
+        "startLine": 5,
+        "startChar": 210,
+        "endLine": 5,
+        "endChar": 214
+      },
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51874774_e859494d",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-30T15:04:11Z",
+      "side": 1,
+      "message": "I would add `\u0026\u0026 inTest` until we\u0027re sure we want to expose this to users, even when undocumented. Other knobs like CUE_TEST_MEMSTATS are already kept out of reach from users this way.",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5da49184_5207618c",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-30T15:04:11Z",
+      "side": 1,
+      "message": "ditto; this one is my fault as I wrote this originally, but it still applies :)",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

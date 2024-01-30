@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bfa3f750_bf1ba8df",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-30T16:36:06Z",
+      "side": 1,
+      "message": "Done that last suggestion (luckily, there\u0027s already a `PseudoVersionBase` function in x/mod/module which implements exactly that).",
+      "parentUuid": "ec52e812_ad3fc31d",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9dab166a_5a6f5acb",
         "filename": "cmd/cue/cmd/testdata/script/modtidy_with_pseudoversion.txtar",
         "patchSetId": 1
@@ -48,6 +66,30 @@
       "writtenOn": "2024-01-30T15:04:11Z",
       "side": 1,
       "message": "if you want to make this a more realistic scenario where someone git clones master and builds, \"vcs.modified\" should be false. it\u0027s also worth testing that we don\u0027t use the \"devel\" version even when modified\u003dfalse.",
+      "range": {
+        "startLine": 5,
+        "startChar": 210,
+        "endLine": 5,
+        "endChar": 214
+      },
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f81200a0_2e53dab0",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_with_pseudoversion.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-30T16:36:06Z",
+      "side": 1,
+      "message": "Given that we don\u0027t look at vcs.modified at all in the cueVersion code, I don\u0027t think there\u0027s a great risk of that happening, so I\u0027ll leave it as is.",
+      "parentUuid": "9dab166a_5a6f5acb",
       "range": {
         "startLine": 5,
         "startChar": 210,
@@ -75,6 +117,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcb707df_a7b2cacb",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-30T16:36:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "51874774_e859494d",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5da49184_5207618c",
@@ -88,6 +148,24 @@
       "writtenOn": "2024-01-30T15:04:11Z",
       "side": 1,
       "message": "ditto; this one is my fault as I wrote this originally, but it still applies :)",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75849b57_89d7ba98",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-30T16:36:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5da49184_5207618c",
       "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

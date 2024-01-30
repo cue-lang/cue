@@ -16,6 +16,24 @@
       "message": "removing this global var breaks end users, per the comment above:\n\nhttps://gitlab.archlinux.org/archlinux/packaging/packages/cue/-/blob/4b51fcdbdde4f35be103b8fea6f714c98ddb245f/PKGBUILD#L22\n\nI think we need to leave it around for now. Linux distros want to build from local source in their own way, so we need to provide them some way so we don\u0027t fall back to \"devel\".\n\nif you removed it because you don\u0027t like the global name \"version\", as it may lead to direct use without running the code to use build info, I would tend to agree with that - although changing it at this point is _also_ a breaking change. So I would leave it alone, at least in this CL.",
       "revId": "b0358a63d2d9bd35c82d160a788c063f340b11fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44748695_6a16d2da",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-30T16:36:06Z",
+      "side": 0,
+      "message": "Done",
+      "parentUuid": "3396716b_09d4d031",
+      "revId": "b0358a63d2d9bd35c82d160a788c063f340b11fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

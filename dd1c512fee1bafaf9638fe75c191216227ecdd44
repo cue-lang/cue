@@ -89,6 +89,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a77d383d_f13bd183",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-30T16:52:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35315583_cda7ec92",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9dab166a_5a6f5acb",

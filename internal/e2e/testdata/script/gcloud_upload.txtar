@@ -11,9 +11,7 @@ env MODVER=${MODULE}@v0
 
 cd publish
 
-# TODO: replace by "cue mod init" once it supports versioned module names.
-# cue mod init ${MODVER}
-env-fill cue.mod/module.cue
+exec cue mod init ${MODVER}
 
 exec cue mod publish ${VERSION}
 
@@ -25,8 +23,6 @@ cmp stdout export.golden
 
 -- docker-config/config.json --
 {"credHelpers": {"${CUE_REGISTRY_HOST}": "gcloud"}}
--- publish/cue.mod/module.cue --
-module: "${MODVER}"
 -- publish/foo.cue --
 package publish
 

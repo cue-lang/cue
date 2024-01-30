@@ -9,9 +9,7 @@ env MODVER=${MODULE}@v0
 
 cd publish
 
-# TODO: replace by "cue mod init" once it supports versioned module names.
-# cue mod init ${MODVER}
-env-fill cue.mod/module.cue
+exec cue mod init ${MODVER}
 
 exec git init --initial-branch main
 exec git config user.name 'modules_e2e'
@@ -32,8 +30,6 @@ env-fill cue.mod/module.cue out_foo.cue
 exec cue export
 cmp stdout export.golden
 
--- publish/cue.mod/module.cue --
-module: "${MODVER}"
 -- publish/foo.cue --
 package publish
 

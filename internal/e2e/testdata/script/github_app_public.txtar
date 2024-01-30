@@ -26,7 +26,9 @@ cue-mod-wait
 
 cd ../depend
 
-env-fill cue.mod/module.cue out_foo.cue
+env-fill out_foo.cue
+exec cue mod init depend.localhost
+exec cue mod tidy
 exec cue export
 cmp stdout export.golden
 
@@ -35,14 +37,6 @@ package publish
 
 foo: "foo value"
 
--- depend/cue.mod/module.cue --
-module: "depend.localhost"
-
-deps: {
-	"${MODVER}": {
-		v: "${VERSION}"
-	}
-}
 -- depend/out_foo.cue --
 package depend
 

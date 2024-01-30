@@ -1,0 +1,35 @@
+# Check that cue mod tidy won't change the language
+# version when the field is already present in the module.cue file.
+
+env CUE_VERSION_OVERRIDE=v0.9.9
+exec cue mod tidy
+cmp cue.mod/module.cue want-module
+
+
+# Check that the resulting module evaluates as expected.
+exec cue export .
+cmp stdout want-stdout
+-- want-stdout --
+{
+    "x": 1
+}
+-- want-module --
+module: "main.org@v0"
+language: {
+	version: "v0.1.2"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: {
+	version: "v0.1.2"
+}
+
+-- main.cue --
+package main
+x: 1
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- _registry/example.com_v0.0.1/top.cue --
+package main

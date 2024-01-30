@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "35315583_cda7ec92",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-30T16:42:35Z",
+      "side": 1,
+      "message": "Ah perfect :) Please add a test case for this, since building a commit/branch from the proxy is just as common as building a commit/branch from a local git clone. They both leave you with a timestamp and hash, but in different ways. Perhaps rename `modtidy_with_pseudoversion` to `modtidy_with_vcsinfo`, and make `modtidy_with_pseudoversion` test the `go install cue@master` case?\n\nfor instance, you regularly build cue master from a local git clone (I assume), but I regularly build master via the proxy, so we want to make sure it works for both of us.",
+      "parentUuid": "bfa3f750_bf1ba8df",
+      "revId": "dd1c512fee1bafaf9638fe75c191216227ecdd44",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9dab166a_5a6f5acb",
         "filename": "cmd/cue/cmd/testdata/script/modtidy_with_pseudoversion.txtar",
         "patchSetId": 1

@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "385db907_ef2c2e1b",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 42,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-30T16:42:35Z",
+      "side": 1,
+      "message": "This be much better! I can into English sometimes.",
+      "range": {
+        "startLine": 42,
+        "startChar": 11,
+        "endLine": 42,
+        "endChar": 14
+      },
+      "revId": "c7c81592b5479046a14fd22d24b0268b23d1061f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

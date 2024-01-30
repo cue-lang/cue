@@ -32,23 +32,16 @@ exec git push origin main cue-${VERSION}
 cd ../depend
 
 # Double check that cmd/cue cannot download the dependency either.
-env-fill cue.mod/module.cue out_foo.cue
-! exec cue export
-stderr 'cannot find package.*module not found'
+env-fill out_foo.cue
+exec cue mod init depend.localhost
+! exec cue mod tidy
+stderr 'failed to resolve.*app_private.*cannot find module'
 
 -- publish/foo.cue --
 package publish
 
 foo: "foo value"
 
--- depend/cue.mod/module.cue --
-module: "depend.localhost"
-
-deps: {
-	"${MODVER}": {
-		v: "${VERSION}"
-	}
-}
 -- depend/out_foo.cue --
 package depend
 

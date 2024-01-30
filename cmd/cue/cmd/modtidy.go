@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/spf13/cobra"
 
@@ -58,7 +59,14 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, "")
+	bi, _ := readBuildInfo()
+	version := cueVersion(bi)
+	if strings.HasPrefix(version, "v0.0.0-") {
+		// It's a made-up pseudoversion, so ignore it because it's
+		// not a useful language version to put in the module.cue file.
+		version = ""
+	}
+	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, version)
 	if err != nil {
 		return err
 	}

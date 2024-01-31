@@ -119,6 +119,9 @@ func (m Version) Equal(m1 Version) bool {
 
 // BasePath returns the path part of m without its major version suffix.
 func (m Version) BasePath() string {
+	if m.IsLocal() {
+		return m.path
+	}
 	basePath, _, ok := SplitPathVersion(m.path)
 	if !ok {
 		panic(fmt.Errorf("broken invariant: failed to split version in %q", m.path))
@@ -141,6 +144,10 @@ func (m Version) IsValid() bool {
 // semver version.
 func (m Version) IsCanonical() bool {
 	return m.IsValid() && m.version != "" && m.version != "none"
+}
+
+func (m Version) IsLocal() bool {
+	return m.path == "local"
 }
 
 // String returns the string form of the Version:
@@ -187,8 +194,16 @@ func MustNewVersion(path string, vers string) Version {
 // The version must be canonical, empty or "none".
 // If the path doesn't have a major version suffix, one will be added
 // if the version isn't empty; if the version is empty, it's an error.
+//
+// As a special case, the path "local" is used to mean all packages
+// held in the gen, pkg and usr directories.
 func NewVersion(path string, vers string) (Version, error) {
-	if vers != "" && vers != "none" {
+	switch {
+	case path == "local":
+		if vers != "" {
+			return Version{}, fmt.Errorf("module 'local' cannot have version")
+		}
+	case vers != "" && vers != "none":
 		if !semver.IsValid(vers) {
 			return Version{}, fmt.Errorf("version %q (of module %q) is not well formed", vers, path)
 		}
@@ -207,9 +222,13 @@ func NewVersion(path string, vers string) (Version, error) {
 			}
 			path = fullPath
 		}
-	} else if path != "local" {
-		if _, _, ok := SplitPathVersion(path); !ok {
+	default:
+		base, _, ok := SplitPathVersion(path)
+		if !ok {
 			return Version{}, fmt.Errorf("path %q has no major version", path)
+		}
+		if base == "local" {
+			return Version{}, fmt.Errorf("module 'local' cannot have version")
 		}
 	}
 	if vers == "" {

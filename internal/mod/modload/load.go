@@ -97,6 +97,9 @@ func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements
 	}
 	defaults := rs.DefaultMajorVersions()
 	for _, v := range rs.RootModules() {
+		if v.IsLocal() {
+			continue
+		}
 		mf.Deps[v.Path()] = &modfile.Dep{
 			Version: v.Version(),
 			Default: defaults[v.BasePath()] == semver.Major(v.Version()),

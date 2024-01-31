@@ -359,7 +359,7 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		if err := pkg.Error(); err != nil {
 			return "", name, errors.Newf(pos, "cannot find package %q: %v", p, err)
 		}
-		if mv := pkg.Mod(); mv.Path() == "local" {
+		if mv := pkg.Mod(); mv.IsLocal() {
 			// It's a local package that's present inside one or both of the gen, usr or pkg
 			// directories. Even though modpkgload tells us exactly what those directories
 			// are, the rest of the cue/load logic expects only a single directory for now,

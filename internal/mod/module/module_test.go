@@ -113,6 +113,19 @@ var newVersionTests = []struct {
 	path:      "x.com",
 	vers:      "bad",
 	wantError: `version "bad" \(of module "x.com"\) is not well formed`,
+}, {
+	path:         "local",
+	vers:         "",
+	wantPath:     "local",
+	wantBasePath: "local",
+}, {
+	path:      "local",
+	vers:      "v0.1.2",
+	wantError: `module 'local' cannot have version`,
+}, {
+	path:      "local@v1",
+	vers:      "",
+	wantError: `module 'local' cannot have version`,
 }}
 
 func TestNewVersion(t *testing.T) {

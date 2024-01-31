@@ -1,0 +1,43 @@
+# Check that cue mod tidy can add dependencies by
+# querying the registry, that it doesn't upgrade existing
+# dependencies, and that it removes dependencies that
+# aren't needed any more.
+
+exec cue mod tidy
+cmp cue.mod/module.cue want-module
+
+# Check that the resulting module evaluates as expected.
+exec cue export .
+cmp stdout want-stdout
+-- want-module --
+module: "main.org@v0"
+deps: {
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+}
+-- want-stdout --
+{
+    "example.com": "v0.0.1",
+    "bar": "local"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+-- cue.mod/gen/foo.com/bar/x.cue --
+package bar
+bar: "local"
+
+-- main.cue --
+package main
+import (
+	"example.com@v0:main"
+	"foo.com/bar"
+)
+main
+bar
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+-- _registry/example.com_v0.0.1/top.cue --
+package main
+"example.com": "v0.0.1"

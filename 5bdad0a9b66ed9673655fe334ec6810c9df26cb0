@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba321c7c_0ce3226d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-31T16:47:36Z",
+      "side": 1,
+      "message": "LGTM with one thought.",
+      "revId": "5bdad0a9b66ed9673655fe334ec6810c9df26cb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0e2a0da3_c662a452",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-31T16:47:36Z",
+      "side": 1,
+      "message": "If someone has specified CUE_CONFIG_DIR, it _could_ be seen as redundant that we\u0027re using a directory named \"cue\" inside that. Instead, we could default to UserConfigDir/cue and use CUE_CONFIG_DIR directly if it\u0027s set. Not sure tbh, just throwing out the thought.",
+      "revId": "5bdad0a9b66ed9673655fe334ec6810c9df26cb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

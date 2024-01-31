@@ -19,7 +19,6 @@ import (
 	"context"
 	cryptorand "crypto/rand"
 	"fmt"
-	"net/http"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -30,7 +29,6 @@ import (
 
 	"github.com/google/go-github/v56/github"
 	"github.com/rogpeppe/go-internal/testscript"
-	"github.com/rogpeppe/retry"
 )
 
 func TestMain(m *testing.M) {
@@ -97,15 +95,33 @@ func TestScript(t *testing.T) {
 			env.Setenv("CUE_EXPERIMENT", "modules")
 			env.Setenv("CUE_REGISTRY", "registry.cue.works")
 			env.Setenv("CUE_CACHED_GOBIN", os.Getenv("CUE_CACHED_GOBIN"))
+			env.Setenv("CUE_REGISTRY_TOKEN", os.Getenv("CUE_REGISTRY_TOKEN"))
 
 			// Just like cmd/cue/cmd.TestScript, set up separate cache and config dirs per test.
 			env.Setenv("CUE_MODCACHE", filepath.Join(env.WorkDir, "tmp/modcache"))
-			env.Setenv("CUE_CONFIG_DIR", filepath.Join(env.WorkDir, "tmp/configdir"))
+			configDir := filepath.Join(env.WorkDir, "tmp/configdir")
+			env.Setenv("CUE_CONFIG_DIR", configDir)
+
+			// CUE_LOGINS is a secret used by the scripts publishing to registry.cue.works.
+			// When unset, those tests would fail with an auth error.
+			if logins := os.Getenv("CUE_LOGINS"); logins != "" {
+				if err := os.MkdirAll(configDir, 0o777); err != nil {
+					return err
+				}
+				if err := os.WriteFile(filepath.Join(configDir, "logins.json"), []byte(logins), 0o666); err != nil {
+					return err
+				}
+			}
 			return nil
 		},
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){
 			// create-github-repo creates a unique repository under githubOrg
 			// and sets $MODULE to its resulting module path.
+			// TODO(mvdan): once we support nested modules,
+			// such as github.com/owner/repo/subpath@v1.2.3,
+			// we could rely on an existing github.com/owner/repo repository on GitHub
+			// and use unique subpaths for each test run,
+			// meaning that the e2e tests would no longer need a GitHub token.
 			"create-github-repo": func(ts *testscript.TestScript, neg bool, args []string) {
 				if neg {
 					ts.Fatalf("usage: create-github-repo [field=value...]")
@@ -169,38 +185,6 @@ func TestScript(t *testing.T) {
 					data := ts.ReadFile(path)
 					data = tsExpand(ts, data)
 					ts.Check(os.WriteFile(path, []byte(data), 0o666))
-				}
-			},
-			// cue-mod-wait waits for a CUE module to exist in a registry for up to 20s.
-			// Since this is easily done via an HTTP HEAD request, an OCI client isn't necessary.
-			"cue-mod-wait": func(ts *testscript.TestScript, neg bool, args []string) {
-				if len(args) > 1 {
-					ts.Fatalf("usage: [!] cue-mod-wait [timeout]")
-				}
-				manifest := tsExpand(ts, "https://${CUE_REGISTRY}/v2/${MODULE}/manifests/${VERSION}")
-				timeout := 20 * time.Second
-				if len(args) > 0 {
-					var err error
-					timeout, err = time.ParseDuration(args[0])
-					ts.Check(err)
-				}
-				retries := retry.Strategy{
-					Delay:       10 * time.Millisecond,
-					MaxDelay:    time.Second,
-					MaxDuration: timeout,
-				}
-				for it := retries.Start(); it.Next(nil); {
-					resp, err := http.Head(manifest)
-					ts.Check(err)
-					if resp.StatusCode == http.StatusOK {
-						if neg {
-							ts.Fatalf("%s was unexpectedly published", manifest)
-						}
-						return
-					}
-				}
-				if !neg {
-					ts.Fatalf("timed out waiting for %s", manifest)
 				}
 			},
 			// gcloud-auth-docker configures gcloud so that it uses the host's existing configuration,

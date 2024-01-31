@@ -21,9 +21,13 @@ import (
 )
 
 func ExampleParseFile() {
-	// Parse the file containing this very example
-	// but stop after processing the imports.
-	f, err := parser.ParseFile("testdata/test.cue", nil)
+	// Parse some CUE source but stop after processing the imports.
+	f, err := parser.ParseFile("example.cue", `
+		import "math"
+
+		foo: 1
+		bar: "baz"
+	`, parser.ImportsOnly)
 	if err != nil {
 		fmt.Println(err)
 		return

@@ -141,7 +141,10 @@ workflows: trybot: _repo.bashWorkflow & {
 			// owned by the porcuepine bot account with read+write access to repo administration and code
 			// on the entire cue-labs-modules-testing org. Note that porcuepine is also an org admin,
 			// since otherwise the repo admin access to create and delete repos does not work.
-			env: GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
+			env: {
+				GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
+				CUE_LOGINS: "${{ secrets.E2E_CUE_LOGINS }}"
+			}
 			run: """
 				cd internal/e2e
 				go test

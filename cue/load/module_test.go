@@ -6,7 +6,6 @@ import (
 	"testing"
 
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
-	"cuelabs.dev/go/oci/ociregistry/ocidebug"
 
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -37,7 +36,8 @@ func TestModuleFetch(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		reg = ocidebug.New(reg, nil)
+		// Uncomment to debug:
+		// reg = ocidebug.New(reg, nil)
 		cacheDir := t.TempDir()
 		// The fetched files are read-only, so testing fails when trying
 		// to remove them.

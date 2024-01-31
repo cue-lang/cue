@@ -84,21 +84,28 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 			if strings.Contains(registry, ",") {
 				return fmt.Errorf("need a single CUE registry to log into")
 			}
+			var tok *oauth2.Token
+			tokStr := flagToken.String(cmd)
+			if tokStr != "" {
+				if err := json.Unmarshal([]byte(tokStr), &tok); err != nil {
+					return fmt.Errorf("invalid token provided to --token: %v", err)
+				}
+			} else {
+				oauthCfg := registryOAuthConfig(registry)
 
-			oauthCfg := registryOAuthConfig(registry)
-
-			resp, err := oauthCfg.DeviceAuth(ctx)
-			if err != nil {
-				return fmt.Errorf("cannot start the OAuth2 device flow: %v", err)
-			}
-			// TODO: we could try using $BROWSER or xdg-open here,
-			// falling back to the text instructions below
-			fmt.Printf("Enter the code %s via: %s\n", resp.UserCode, resp.VerificationURI)
-			fmt.Printf("Or just open: %s\n", resp.VerificationURIComplete)
-			fmt.Println()
-			tok, err := oauthCfg.DeviceAccessToken(ctx, resp)
-			if err != nil {
-				return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
+				resp, err := oauthCfg.DeviceAuth(ctx)
+				if err != nil {
+					return fmt.Errorf("cannot start the OAuth2 device flow: %v", err)
+				}
+				// TODO: we could try using $BROWSER or xdg-open here,
+				// falling back to the text instructions below
+				fmt.Printf("Enter the code %s via: %s\n", resp.UserCode, resp.VerificationURI)
+				fmt.Printf("Or just open: %s\n", resp.VerificationURIComplete)
+				fmt.Println()
+				tok, err = oauthCfg.DeviceAccessToken(ctx, resp)
+				if err != nil {
+					return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
+				}
 			}
 
 			loginsPath, err := findLoginsPath()
@@ -120,8 +127,15 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 			return nil
 		}),
 	}
+	cmd.Flags().String(string(flagToken), "",
+		"provide a JSON OAuth2 token rather than obtaining a new one")
 	return cmd
 }
+
+const (
+	// Consider a --token-stdin flag too, like other "login" commands do.
+	flagToken flagName = "token"
+)
 
 func registryOAuthConfig(host string) oauth2.Config {
 	// For now, we use the OAuth endpoints as implemented by registry.cue.works,

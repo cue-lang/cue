@@ -147,6 +147,9 @@ func (rs *Requirements) initDefaultMajorVersions(defaultMajorVersions map[string
 	// Add defaults for all modules that have exactly one major version
 	// and no existing default.
 	for _, m := range rs.rootModules {
+		if m.IsLocal() {
+			continue
+		}
 		mpath := m.BasePath()
 		d, ok := rs.defaultMajorVersions[mpath]
 		if !ok {
@@ -308,7 +311,7 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 		if !m.IsValid() {
 			panic("root module version is invalid")
 		}
-		if m.Version() == "none" {
+		if m.IsLocal() || m.Version() == "none" {
 			continue
 		}
 

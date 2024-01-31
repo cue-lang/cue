@@ -86,6 +86,24 @@
       "parentUuid": "f0e5e3a4_3e6f6807",
       "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63173253_296cb8ba",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-31T21:47:47Z",
+      "side": 1,
+      "message": "That said, once we have a web page to generate these tokens, like https://registry.cue.works/settings/tokens, we can link it from here as one example where one can obtain such a token. For now I\u0027m doint it by extracting the token from logins.json.",
+      "parentUuid": "63537fa3_5adca79e",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

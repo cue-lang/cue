@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7c321b96_a8e8d5f1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-31T17:06:00Z",
+      "side": 1,
+      "message": "LGTM with a couple of minor suggestions, thanks.",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4d81dac_88de737d",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-31T17:06:00Z",
+      "side": 1,
+      "message": "It\u0027s possibly not clear to the user that the token in question is the one passed in the --token flag. How about \"badly formed token provided to --token: %v\" ?",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0e5e3a4_3e6f6807",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-01-31T17:06:00Z",
+      "side": 1,
+      "message": "```suggestion\n\t\t\"login auth token in JSON format (see https://xxx for details of the format)\")\n```\nOr document the format fully in the help text.",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

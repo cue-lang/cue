@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45ad5cb0_c8593304",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-31T21:44:57Z",
+      "side": 1,
+      "message": "Done a slight variation of yours.",
+      "parentUuid": "f4d81dac_88de737d",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f0e5e3a4_3e6f6807",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-01-31T17:06:00Z",
       "side": 1,
       "message": "```suggestion\n\t\t\"login auth token in JSON format (see https://xxx for details of the format)\")\n```\nOr document the format fully in the help text.",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63537fa3_5adca79e",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-31T21:44:57Z",
+      "side": 1,
+      "message": "This is basically https://pkg.go.dev/golang.org/x/oauth2#Token. It\u0027s not from an RFC as far as I can tell; the OAuth RFC only defines the types used in endpoint responses, like https://datatracker.ietf.org/doc/html/rfc6749#section-4.2.2, but we cannot use that because the expiry is a relative duration (in seconds) so it\u0027s useless at rest.\n\nThe main purpose for this flag would be that, once a user can generate a token on the web UI, they can copy-paste it into this flag argument to use it. We could also consider something like `cue login --print` to print the token to stdout rather than storing it in logins.json, for example.\n\nPersonally I don\u0027t think we need to document the format. I document it\u0027s OAuth2 and JSON because it\u0027s helpful to understand what it\u0027s meant for, but the user shouldn\u0027t be constructing or using the JSON themselves, so it\u0027s as good as a base64 opaque string to them. I only avoided base64 encoding because we\u0027d end up with even longer tokens, and debugging would get harder :)",
+      "parentUuid": "f0e5e3a4_3e6f6807",
       "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

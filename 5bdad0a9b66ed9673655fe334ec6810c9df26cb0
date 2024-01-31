@@ -33,6 +33,24 @@
       "message": "If someone has specified CUE_CONFIG_DIR, it _could_ be seen as redundant that we\u0027re using a directory named \"cue\" inside that. Instead, we could default to UserConfigDir/cue and use CUE_CONFIG_DIR directly if it\u0027s set. Not sure tbh, just throwing out the thought.",
       "revId": "5bdad0a9b66ed9673655fe334ec6810c9df26cb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45372210_acb59675",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 164,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-01-31T16:50:31Z",
+      "side": 1,
+      "message": "Yes, I meant it this way! And I even documented it this way in help.go :) I just forgot to fix the implementation accordingly. Thanks for spotting this.",
+      "parentUuid": "0e2a0da3_c662a452",
+      "revId": "5bdad0a9b66ed9673655fe334ec6810c9df26cb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -37,13 +37,13 @@ func TestLoad(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	testdataDir := testMod("testmod")
+	testdataDir := testdata("testmod")
 	dirCfg := &Config{
 		Dir:   testdataDir,
 		Tools: true,
 	}
 	badModCfg := &Config{
-		Dir: testMod("badmod"),
+		Dir: testdata("badmod"),
 	}
 	type loadTest struct {
 		cfg  *Config
@@ -177,7 +177,7 @@ files:
     $CWD/testdata/testmod/other/anon.cue`}, {
 		cfg: dirCfg,
 		// Absolute file is normalized.
-		args: args(filepath.Join(testMod("testmod"), "anon.cue")),
+		args: args(filepath.Join(cwd, testdata("testmod", "anon.cue"))),
 		want: `path:   ""
 module: ""
 root:   $CWD/testdata/testmod

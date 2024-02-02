@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4632bda8_5037a68b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-02T14:43:47Z",
+      "side": 1,
+      "message": "PTAL again, this now uses a $CUE_LOGINS secret env var with the whole logins.json file.",
+      "revId": "2283ce52011bdd4a1558a36167ece6eb77d06346",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

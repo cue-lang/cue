@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4cc1282_3bc02092",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-02T09:23:21Z",
+      "side": 1,
+      "message": "I\u0027ll sound like a broken record here, but please expand the commit message. I know this may seem like a trivial fix, but if I\u0027m reading `git log`, this commit message gives me zero information about what the fix is about. For example, I might write:\n\n\u003e We forgot to check an error value, which led to a nil dereference panic below.",
+      "revId": "bf3bf5e538bdb55438129d697b0eca0bba0f1bce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

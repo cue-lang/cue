@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18122eb8_5b255024",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-02T12:34:50Z",
+      "side": 1,
+      "message": "LGTM in principle with one query, thanks.",
+      "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c59cb47f_89011220",
+        "filename": "cue/load/testdata/testmod/example/example.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-02T12:34:50Z",
+      "side": 1,
+      "message": "Doesn\u0027t this external file mean the example won\u0027t work in pkg.go.dev because it\u0027s not self-contained (as per the first CL in this chain). Or is that OK in this case?",
+      "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

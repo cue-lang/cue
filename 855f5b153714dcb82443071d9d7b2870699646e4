@@ -122,6 +122,24 @@
       "parentUuid": "63173253_296cb8ba",
       "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c8999485_afb22600",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-02T12:30:02Z",
+      "side": 1,
+      "message": "I can\u0027t say whether or not `cue login --token` as it is implemented right now is right or not, but I disagree in principle that we should not expose something like this. Once we have the ability to generate user tokens in the web UI, we _will need_ a way for a person to set up that token in their logins.json file. Having them manually create or edit the file is definitely not good.\n\nI don\u0027t want to spend more time on this now, though, so I\u0027m just going to abandon and move ahead with setting up an entire logins.json in the e2e tests. Just flagging that I do think we will need a flag like this sooner than later. My thinking here was to get ahead of that since the e2e tests have almost the same use case, but I don\u0027t want to block the e2e work until we reach an agreement here.",
+      "parentUuid": "d7393a27_d2e8cc08",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

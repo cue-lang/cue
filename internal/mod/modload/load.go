@@ -71,6 +71,9 @@ func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers
 	}
 
 	rs, pkgs, err := ld.resolveDependencies(ctx, rootPkgPaths, rs)
+	if err != nil {
+		return nil, fmt.Errorf("cannot resolve dependencies: %v", err)
+	}
 	for _, pkg := range pkgs.All() {
 		if pkg.Error() != nil {
 			return nil, fmt.Errorf("failed to resolve %q: %v", pkg.ImportPath(), pkg.Error())

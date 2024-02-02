@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "08e67adb_cba549b6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-02T12:26:14Z",
+      "side": 1,
+      "message": "LGTM with slight reservations about the utility of the flag in general.",
+      "revId": "db66915b80d412f9307b15a666956c3eeba7d383",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

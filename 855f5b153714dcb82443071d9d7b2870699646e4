@@ -104,6 +104,24 @@
       "parentUuid": "63537fa3_5adca79e",
       "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7393a27_d2e8cc08",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-02T12:26:14Z",
+      "side": 1,
+      "message": "The issue I have is that it says that it needs a JSON token but doesn\u0027t say anything about what format that token might be, so the flag is basically unusable for users in practice unless they read the Go code. I guess that\u0027s OK because it\u0027s just for our tests, but maybe we should hide the flag or something?\n\nAnother way of documenting it might be \"as stored in the logins.json file\".\n\nIn fact, I\u0027m not entirely convinced that this flag is worth it over just creating the `logins.json` file directly and skipping the `cue login` invocation, because essentially all that `cue login` is doing when passed the `--token` flag is writing it directly to that file AFAICS, with not much other logic. It certainly doesn\u0027t seem worth having it as a user-visible flag.",
+      "parentUuid": "63173253_296cb8ba",
+      "revId": "855f5b153714dcb82443071d9d7b2870699646e4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

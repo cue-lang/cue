@@ -16,6 +16,23 @@
       "message": "PTAL again, this now uses a $CUE_LOGINS secret env var with the whole logins.json file.",
       "revId": "2283ce52011bdd4a1558a36167ece6eb77d06346",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0cc6ba79_18822569",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-05T10:09:04Z",
+      "side": 1,
+      "message": "LGTM, thanks!",
+      "revId": "2283ce52011bdd4a1558a36167ece6eb77d06346",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/mod/modpkgload"
 )
 
 type overlayFile struct {
@@ -72,10 +73,16 @@ func (fs *fileSystem) getDir(dir string, create bool) map[string]*overlayFile {
 // Note: we can't return an FS implementation that covers the
 // entirety of fs because the overlay paths may not all share
 // a common root.
+//
+// Note also: the returned FS also implements
+// [modpkgload.OSRootFS] so that we can map
+// the resulting source locations back to the filesystem
+// paths required by most of the `cue/load` package
+// implementation.
 func (fs *fileSystem) ioFS(root string) iofs.FS {
 	dir := fs.getDir(root, false)
 	if dir == nil {
-		return os.DirFS(root)
+		return modpkgload.OSDirFS(root)
 	}
 	return &ioFS{
 		fs:   fs,
@@ -277,11 +284,16 @@ var _ interface {
 	iofs.FS
 	iofs.ReadDirFS
 	iofs.ReadFileFS
+	modpkgload.OSRootFS
 } = (*ioFS)(nil)
 
 type ioFS struct {
 	fs   *fileSystem
 	root string
+}
+
+func (fs *ioFS) OSRoot() string {
+	return fs.root
 }
 
 func (fs *ioFS) Open(name string) (iofs.File, error) {

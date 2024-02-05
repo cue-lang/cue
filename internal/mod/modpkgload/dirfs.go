@@ -1,4 +1,4 @@
-package modcache
+package modpkgload
 
 import (
 	"io/fs"
@@ -7,15 +7,19 @@ import (
 
 // OSRootFS can be implemented by an [fs.FS]
 // implementation to return its root directory as
-// an OS file path,
+// an OS file path.
 type OSRootFS interface {
+	fs.FS
+
 	// OSRoot returns the root directory of the FS
 	// as an OS file path. If it wasn't possible to do that,
 	// it returns the empty string.
 	OSRoot() string
 }
 
-func dirFS(p string) fs.FS {
+// OSDirFS is like [os.DirFS] but the returned value implements
+// [OSRootFS] by returning p.
+func OSDirFS(p string) fs.FS {
 	return dirFSImpl{
 		augmentedFS: os.DirFS(p).(augmentedFS),
 		osRoot:      p,

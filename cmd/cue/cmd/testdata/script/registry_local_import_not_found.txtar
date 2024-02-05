@@ -1,9 +1,8 @@
 # TODO: this evaluation should work OK.
-! exec cue eval .
-cmp stderr expect-stderr
--- expect-stderr --
-import failed: cannot determine source directory for package "main.org/foo/bar": cannot get absolute path for FS of type os.dirFS:
-    ./foo.cue:2:8
+exec cue eval .
+cmp stdout expect-stdout
+-- expect-stdout --
+x: 5
 -- cue.mod/module.cue --
 module: "main.org/foo@v0"
 -- foo.cue --

@@ -109,7 +109,7 @@ package x
 			return false
 		}
 		// Check that the location can be used to retrieve the OS file path.
-		osrFS, ok := loc.FS.(OSRootFS)
+		osrFS, ok := loc.FS.(modpkgload.OSRootFS)
 		if !qt.Check(t, qt.IsTrue(ok)) {
 			return false
 		}

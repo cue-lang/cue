@@ -290,7 +290,7 @@ func (c *cache) downloadModFile1(ctx context.Context, mod module.Version, modfil
 
 func (c *cache) dirToLocation(fpath string) modpkgload.SourceLoc {
 	return modpkgload.SourceLoc{
-		FS:  dirFS(fpath),
+		FS:  modpkgload.OSDirFS(fpath),
 		Dir: ".",
 	}
 }

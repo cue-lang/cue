@@ -16,6 +16,23 @@
       "message": "PTAL.",
       "revId": "172530546c0753401d51afc27d8b9672c3642102",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38a2cbfe_9e136fb0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-02-06T13:01:01Z",
+      "side": 1,
+      "message": "I don\u0027t have (and am not asking for) permission to submit this CL.",
+      "revId": "172530546c0753401d51afc27d8b9672c3642102",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -51,6 +51,24 @@
       "parentUuid": "c59cb47f_89011220",
       "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b538156_a94df035",
+        "filename": "cue/load/testdata/testmod/example/example.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-06T09:17:06Z",
+      "side": 1,
+      "message": "If it\u0027s not too much hassle, I think that the former option could work OK. Otherwise maybe just leave a TODO explaining that the example isn\u0027t runnable and why?",
+      "parentUuid": "efba4b17_10024b99",
+      "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -9,7 +9,7 @@ require (
 )
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20231217163254-6feb86eb6e06 // indirect
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20240206113203-1f693b7466af // indirect
 	github.com/cockroachdb/apd/v3 v3.2.1 // indirect
 	github.com/emicklei/proto v1.10.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect

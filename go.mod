@@ -3,7 +3,7 @@ module cuelang.org/go
 go 1.20
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20231217163254-6feb86eb6e06
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20240206113203-1f693b7466af
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/emicklei/proto v1.10.0
 	github.com/go-quicktest/qt v1.101.0

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b82c0a38_d9742cdc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-07T10:29:31Z",
+      "side": 1,
+      "message": "Added sort\u003dsemver; otherwise\n\nhttps://img.shields.io/docker/v/cuelang/cue?label\u003ddocker\n\nincludes \"amd64\" for some reason, and it defaults to sorting by date, so it might e.g. pick up v0.6.1 over v0.7.0 if we did a backporting release.\n\nnow it\u0027s nicer:\n\nhttps://img.shields.io/docker/v/cuelang/cue?sort\u003dsemver\u0026label\u003ddocker",
+      "revId": "361edf5268a1d0183f18df6d42f67236297a235e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

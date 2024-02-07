@@ -33,7 +33,7 @@ jobs:
       Dispatch-Trailer: {"type":"'))
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.sha }}
           fetch-depth: 0
@@ -76,7 +76,7 @@ jobs:
           EOD
           false
       - name: Install Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           cache: false
           go-version: ${{ matrix.go-version }}
@@ -89,7 +89,7 @@ jobs:
       - if: |-
           (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: |-
             ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
@@ -99,7 +99,7 @@ jobs:
       - if: |-
           ! (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test'))
-        uses: actions/cache/restore@v3
+        uses: actions/cache/restore@v4
         with:
           path: |-
             ${{ steps.go-mod-cache-dir.outputs.dir }}/cache/download
@@ -171,14 +171,14 @@ jobs:
         if: |-
           github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')
-        uses: google-github-actions/auth@v1
+        uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
           github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')
         name: gcloud setup for end-to-end tests
-        uses: google-github-actions/setup-gcloud@v1
+        uses: google-github-actions/setup-gcloud@v2
       - if: |-
           github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
           Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.21.x' && matrix.runner == 'ubuntu-22.04')

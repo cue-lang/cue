@@ -17,7 +17,7 @@ bashWorkflow: json.#Workflow & {
 
 installGo: json.#step & {
 	name: "Install Go"
-	uses: "actions/setup-go@v4"
+	uses: "actions/setup-go@v5"
 	with: {
 		// We do our own caching in setupGoActionsCaches.
 		cache:        false
@@ -28,7 +28,7 @@ installGo: json.#step & {
 checkoutCode: {
 	#actionsCheckout: json.#step & {
 		name: "Checkout code"
-		uses: "actions/checkout@v3"
+		uses: "actions/checkout@v4"
 
 		// "pull_request" builds will by default use a merge commit,
 		// testing the PR's HEAD merged on top of the master branch.
@@ -223,7 +223,7 @@ setupGoActionsCaches: {
 		if !#readonly {
 			cacheStep & {
 				if:   readWriteCacheExpr
-				uses: "actions/cache@v3"
+				uses: "actions/cache@v4"
 			}
 		},
 
@@ -236,7 +236,7 @@ setupGoActionsCaches: {
 				if: "! \(readWriteCacheExpr)"
 			}
 
-			uses: "actions/cache/restore@v3"
+			uses: "actions/cache/restore@v4"
 		},
 
 		if #cleanTestCache {
@@ -356,7 +356,7 @@ containsDispatchTrailer: {
 	//
 	//     Dispatch-Trailer: {"type:}
 	//
-	let _typeCheck = [ if #type != _|_ {#type + "\""}, ""][0]
+	let _typeCheck = [if #type != _|_ {#type + "\""}, ""][0]
 	"""
 	(contains(\(_dispatchTrailerVariable), '\n\(dispatchTrailer): {"type":"\(_typeCheck)'))
 	"""

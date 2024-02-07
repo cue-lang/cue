@@ -49,15 +49,15 @@ workflows: release: _repo.bashWorkflow & {
 			},
 			json.#step & {
 				name: "Setup qemu"
-				uses: "docker/setup-qemu-action@v2"
+				uses: "docker/setup-qemu-action@v3"
 			},
 			json.#step & {
 				name: "Set up Docker Buildx"
-				uses: "docker/setup-buildx-action@v2"
+				uses: "docker/setup-buildx-action@v3"
 			},
 			json.#step & {
 				name: "Docker Login"
-				uses: "docker/login-action@v2"
+				uses: "docker/login-action@v3"
 				with: {
 					registry: "docker.io"
 					username: "cueckoo"

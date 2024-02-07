@@ -10,19 +10,13 @@ Go 1.20 or higher (see below)
 
 ### Installing CUE
 
-<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txtar -->
-
 To download and install the `cue` command line tool, run:
 
-```
-go install cuelang.org/go/cmd/cue@latest
-```
+	go install cuelang.org/go/cmd/cue@latest
 
 To also download the API and documentation, run:
 
-```
-go get cuelang.org/go/cue@latest
-```
+	go get cuelang.org/go/cue@latest
 
 in a module context.
 

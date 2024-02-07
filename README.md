@@ -17,6 +17,7 @@
 [![Github](https://github.com/cue-lang/cue/actions/workflows/trybot.yml/badge.svg)](https://github.com/cue-lang/cue/actions/workflows/trybot.yml?query=branch%3Amaster+event%3Apush)
 [![Go 1.20+](https://img.shields.io/badge/go-1.20-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
+[![Docker Image](https://img.shields.io/docker/v/cuelang/cue?sort=semver&label=docker)](https://hub.docker.com/r/cuelang/cue)
 
 # The CUE Data Constraint Language
 
@@ -94,23 +95,23 @@ Some aspects of this are:
 
 [Download](https://github.com/cue-lang/cue/releases) the latest release from GitHub.
 
+#### Run with Docker
+
+The release binaries are published as a Docker image described by our [Dockerfile](Dockerfile):
+
+	docker run cuelang/cue version
+
 #### Install using Homebrew
 
 Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
-```
-brew install cue-lang/tap/cue
-```
+	brew install cue-lang/tap/cue
 
 #### Install from Source
 
-<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txtar -->
-
 To install the `cue` command line tool, run:
 
-```
-go install cuelang.org/go/cmd/cue@latest
-```
+	go install cuelang.org/go/cmd/cue@latest
 
 For more details, see [Installing CUE](./doc/install.md).
 

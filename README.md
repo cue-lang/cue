@@ -109,12 +109,11 @@ Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
 #### Install from Source
 
-To install the `cue` command line tool, run:
+You need Go 1.20 or later to build CUE from source; follow the instructions at https://go.dev/doc/install.
+
+To download install the `cue` command line tool, run:
 
 	go install cuelang.org/go/cmd/cue@latest
-
-For more details, see [Installing CUE](./doc/install.md).
-
 
 ### Learning CUE
 

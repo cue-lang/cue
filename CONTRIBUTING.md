@@ -395,8 +395,6 @@ Changes to CUE must be reviewed before they are accepted, no matter who makes
 the change.  A custom `git` command called `git-codereview` simplifies sending
 changes to Gerrit.
 
-<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/contributing_install*.txtar -->
-
 Install the `git-codereview` command by running,
 
 ```console

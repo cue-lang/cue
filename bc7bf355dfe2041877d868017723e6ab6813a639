@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b57854f_815e2a17",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-07T19:42:10Z",
+      "side": 1,
+      "message": "Confirmation that the release task no longer generates any warnings:\n\nhttps://github.com/cue-lang/cue/actions/runs/7820237576",
+      "revId": "bc7bf355dfe2041877d868017723e6ab6813a639",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

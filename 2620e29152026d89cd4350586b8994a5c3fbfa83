@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "834075b4_e60153a8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-08T11:21:46Z",
+      "side": 1,
+      "message": "can you say something like this, to clarify I will follow up with a test?\n\n\u003e This authorizer isn\u0027t covered by the script tests, only by the end-to-end tests.\n\u003e A follow-up CL will add script test coverage.",
+      "range": {
+        "startLine": 10,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 21
+      },
+      "revId": "2620e29152026d89cd4350586b8994a5c3fbfa83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6204bff_457cd1de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-08T11:21:46Z",
+      "side": 1,
+      "message": "SGTM, happy to merge this and I will send a test CL tomorrow or Monday.",
+      "revId": "2620e29152026d89cd4350586b8994a5c3fbfa83",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

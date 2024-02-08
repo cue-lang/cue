@@ -83,9 +83,11 @@ func getRegistry() (ociregistry.Interface, error) {
 }
 
 type cueLoginsAuthorizer struct {
-	logins        *cueLogins
+	logins *cueLogins
+	next   ociauth.Authorizer
+	// mu guards the fields below.
+	mu            sync.Mutex
 	cachedClients map[string]*http.Client
-	next          ociauth.Authorizer
 }
 
 func (a *cueLoginsAuthorizer) DoRequest(req *http.Request, requiredScope ociauth.Scope) (*http.Response, error) {
@@ -98,6 +100,7 @@ func (a *cueLoginsAuthorizer) DoRequest(req *http.Request, requiredScope ociauth
 		return a.next.DoRequest(req, requiredScope)
 	}
 
+	a.mu.Lock()
 	client := a.cachedClients[host]
 	if client == nil {
 		tok := tokenFromLogin(login)
@@ -107,6 +110,7 @@ func (a *cueLoginsAuthorizer) DoRequest(req *http.Request, requiredScope ociauth
 		client = oauthCfg.Client(context.Background(), tok)
 		a.cachedClients[host] = client
 	}
+	a.mu.Unlock()
 	return client.Do(req)
 }
 

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f4a01e8f_b85a084c",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-09T13:49:48Z",
+      "side": 1,
+      "message": "I\u0027d replace this TODO with a note that it is intended as a hidden command, only to be used for the sake of testing or tutorials. There\u0027s nothing really experimental about it, given that we don\u0027t have plans to actually expose or support it long term, at least for now.",
+      "revId": "f254a301c8cd575002a1c638872fe9994f6dae75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63fe325f_14ccf6de",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-09T13:49:48Z",
+      "side": 1,
+      "message": "ditto, I would make this a note instead.",
+      "revId": "f254a301c8cd575002a1c638872fe9994f6dae75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

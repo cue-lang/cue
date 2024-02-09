@@ -49,6 +49,7 @@ func newModCmd(c *Command) *cobra.Command {
 	cmd.AddCommand(newModInitCmd(c))
 	cmd.AddCommand(newModUploadCmd(c))
 	cmd.AddCommand(newModTidyCmd(c))
+	cmd.AddCommand(newModRegistryCmd(c))
 	return cmd
 }
 

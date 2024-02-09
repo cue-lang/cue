@@ -16,6 +16,23 @@
       "message": "for alpha.1, so that any Go downstreams get a good error if they try to still use Go 1.20.",
       "revId": "56902f45855ddf656dcb5674ef2d2b54ec984e3b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d21d20d1_45a063fd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-09T13:45:21Z",
+      "side": 1,
+      "message": "Thank you - with hindsight, I missed these in my haste to get the earlier CL out, apologies. Thanks for catching these and fixing things up.",
+      "revId": "56902f45855ddf656dcb5674ef2d2b54ec984e3b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

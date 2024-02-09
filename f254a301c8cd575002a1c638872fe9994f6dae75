@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f82d52fa_e6e449d3",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-09T13:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f4a01e8f_b85a084c",
+      "revId": "f254a301c8cd575002a1c638872fe9994f6dae75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "63fe325f_14ccf6de",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-09T13:49:48Z",
       "side": 1,
       "message": "ditto, I would make this a note instead.",
+      "revId": "f254a301c8cd575002a1c638872fe9994f6dae75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25b27484_c1466930",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-09T13:55:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "63fe325f_14ccf6de",
       "revId": "f254a301c8cd575002a1c638872fe9994f6dae75",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

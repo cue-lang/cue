@@ -15,7 +15,7 @@
 -->
 [![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
 [![Github](https://github.com/cue-lang/cue/actions/workflows/trybot.yml/badge.svg)](https://github.com/cue-lang/cue/actions/workflows/trybot.yml?query=branch%3Amaster+event%3Apush)
-[![Go 1.20+](https://img.shields.io/badge/go-1.20-9cf.svg)](https://golang.org/dl/)
+[![Go 1.21+](https://img.shields.io/badge/go-1.21-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 [![Docker Image](https://img.shields.io/docker/v/cuelang/cue?sort=semver&label=docker)](https://hub.docker.com/r/cuelang/cue)
 
@@ -109,7 +109,7 @@ Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
 #### Install from Source
 
-You need Go 1.20 or later to build CUE from source; follow the instructions at https://go.dev/doc/install.
+You need Go 1.21 or later to build CUE from source; follow the instructions at https://go.dev/doc/install.
 
 To download and install the `cue` command line tool, run:
 

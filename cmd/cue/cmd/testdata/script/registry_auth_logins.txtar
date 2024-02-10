@@ -1,0 +1,74 @@
+# Test that we can authenticate to a registry with bearer token auth via logins.json.
+# We use multiple dependencies to test concurrent fetches as well, to catch races.
+
+env CUE_CONFIG_DIR=$WORK/cueconfig
+env-fill $CUE_CONFIG_DIR/logins.json
+exec cue export .
+cmp stdout expect-stdout
+
+# Sanity-check that we get an error when using the wrong token.
+env CUE_MODCACHE=$WORK/.tmp/different-cache
+env-fill cueconfig/badtoken.json
+cp cueconfig/badtoken.json cueconfig/logins.json
+! exec cue export .
+stderr 'import failed: cannot find package .* 401 Unauthorized; body: "invalid credentials'
+-- cueconfig/logins.json --
+{
+	"registries": {
+		"${DEBUG_REGISTRY_HOST}": {
+			"access_token": "goodtoken"
+		}
+	}
+}
+-- cueconfig/badtoken.json --
+{
+	"registries": {
+		"${DEBUG_REGISTRY_HOST}": {
+			"access_token": "badtoken"
+		}
+	}
+}
+-- expect-stdout --
+[
+    "ok1",
+    "ok2",
+    "ok3"
+]
+-- main.cue --
+package main
+import "example.com/e1"
+import "example.com/e2"
+import "example.com/e3"
+
+[e1.foo, e2.foo, e3.foo]
+
+-- cue.mod/module.cue --
+module: "test.org"
+deps: "example.com/e1": v: "v0.0.1"
+deps: "example.com/e2": v: "v0.0.1"
+deps: "example.com/e3": v: "v0.0.1"
+-- _registry/auth.json --
+{"bearerToken": "goodtoken"}
+-- _registry_prefix --
+somewhere/other
+-- _registry/example.com_e1_v0.0.1/cue.mod/module.cue --
+module: "example.com/e1@v0"
+
+-- _registry/example.com_e1_v0.0.1/main.cue --
+package e1
+
+foo: "ok1"
+-- _registry/example.com_e2_v0.0.1/cue.mod/module.cue --
+module: "example.com/e2@v0"
+
+-- _registry/example.com_e2_v0.0.1/main.cue --
+package e2
+
+foo: "ok2"
+-- _registry/example.com_e3_v0.0.1/cue.mod/module.cue --
+module: "example.com/e3@v0"
+
+-- _registry/example.com_e3_v0.0.1/main.cue --
+package e3
+
+foo: "ok3"

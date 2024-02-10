@@ -28,10 +28,12 @@ import (
 )
 
 // AuthConfig specifies authorization requirements for the server.
-// Currently it only supports basic auth.
+// Currently it only supports basic and bearer auth.
 type AuthConfig struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+
+	BearerToken string `json:"bearerToken"`
 }
 
 // Upload uploads the modules found inside fsys (stored
@@ -100,19 +102,32 @@ func New(fsys fs.FS, prefix string) (*Registry, error) {
 // in cfg. If cfg is nil or there are no auth requirements, it returns handler
 // unchanged.
 func AuthHandler(handler http.Handler, cfg *AuthConfig) http.Handler {
-	if cfg == nil || cfg.Username == "" {
+	if cfg == nil || (*cfg == AuthConfig{}) {
 		return handler
 	}
 	return http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
-		if req.Header.Get("Authorization") == "" {
-			w.Header().Set("Www-Authenticate", "Basic service=registry")
+		auth := req.Header.Get("Authorization")
+		if auth == "" {
+			if cfg.BearerToken != "" {
+				w.Header().Set("Www-Authenticate", "Basic service=registry")
+			} else {
+				w.Header().Set("Www-Authenticate", "Bearer service=registry")
+			}
 			http.Error(w, "no credentials", http.StatusUnauthorized)
 			return
 		}
-		username, password, ok := req.BasicAuth()
-		if !ok || username != cfg.Username || password != cfg.Password {
-			http.Error(w, "invalid credentials", http.StatusUnauthorized)
-			return
+		if cfg.BearerToken != "" {
+			token, ok := strings.CutPrefix(auth, "Bearer ")
+			if !ok || token != cfg.BearerToken {
+				http.Error(w, "invalid credentials", http.StatusUnauthorized)
+				return
+			}
+		} else {
+			username, password, ok := req.BasicAuth()
+			if !ok || username != cfg.Username || password != cfg.Password {
+				http.Error(w, "invalid credentials", http.StatusUnauthorized)
+				return
+			}
 		}
 		handler.ServeHTTP(w, req)
 	})

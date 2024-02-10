@@ -188,7 +188,7 @@ jobs:
           CUE_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}
         run: |-
           cd internal/e2e
-          go test
+          go test -race
       - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: Check
         run: |-

@@ -145,9 +145,13 @@ workflows: trybot: _repo.bashWorkflow & {
 				GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
 				CUE_LOGINS:   "${{ secrets.E2E_CUE_LOGINS }}"
 			}
+			// Our regular tests run with both `go test ./...` and `go test -race ./...`.
+			// The end-to-end tests should only be run once, given the slowness and API rate limits.
+			// We want to catch any data races they spot as soon as possible, and they aren't CPU-bound,
+			// so running them only with -race seems reasonable.
 			run: """
 				cd internal/e2e
-				go test
+				go test -race
 				"""
 		},
 	]

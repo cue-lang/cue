@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2b4933ae_a661cc94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037647
+      },
+      "writtenOn": "2024-02-10T17:18:53Z",
+      "side": 1,
+      "message": "I considered handling this within exec.Run or newExecCmd, but I noticed that this may also be an issue in pkg/tool/http (particularly with tls.verify) so made the change here. Let me know if this isn\u0027t the best approach :)",
+      "revId": "f50f77fa7a5f6f112b765b2f1d71b3fea6e1b65c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

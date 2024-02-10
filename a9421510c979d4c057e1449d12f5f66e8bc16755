@@ -16,6 +16,24 @@
       "message": "After the rename from `cue mod upload`, I think we\u0027re fine with these commands as-is for the foreseeable future. SGTM",
       "revId": "a9421510c979d4c057e1449d12f5f66e8bc16755",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa8711a5_9bfdf3e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-10T15:45:34Z",
+      "side": 1,
+      "message": "Indeed. Even if the names change, the only thing we will need to do going forward is coordinate CUE releases with (automated) updates over at (alpha.)cuelang.org.",
+      "parentUuid": "935a1085_a21cf232",
+      "revId": "a9421510c979d4c057e1449d12f5f66e8bc16755",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

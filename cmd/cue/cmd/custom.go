@@ -221,8 +221,10 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 				return nil, errors.Promote(err1, "newTask")
 			}
 		}
+		var isLegacy bool
 		if k, ok := legacyKinds[kind]; ok {
 			kind = k
+			isLegacy = true
 		}
 		rf := itask.Lookup(kind)
 		if rf == nil {
@@ -242,12 +244,17 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		}
 
 		return flow.RunnerFunc(func(t *flow.Task) error {
+			obj := t.Value()
+
+			if isLegacy {
+				obj = obj.Unify(v)
+			}
 			c := &itask.Context{
 				Context: t.Context(),
 				Stdin:   cmd.InOrStdin(),
 				Stdout:  cmd.OutOrStdout(),
 				Stderr:  cmd.OutOrStderr(),
-				Obj:     t.Value(),
+				Obj:     obj,
 			}
 			value, err := runner.Run(c)
 			if err != nil {

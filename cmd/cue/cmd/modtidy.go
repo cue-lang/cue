@@ -29,10 +29,6 @@ import (
 
 func newModTidyCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		// TODO: this command is still experimental, don't show it in
-		// the documentation just yet.
-		Hidden: true,
-
 		Use:   "tidy",
 		Short: "download and tidy module dependencies",
 		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.

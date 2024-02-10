@@ -30,10 +30,6 @@ import (
 
 func newModUploadCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		// TODO: this command is still experimental, don't show it in
-		// the documentation just yet.
-		Hidden: true,
-
 		Use:   "publish <version>",
 		Short: "publish the current module to a registry",
 		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.

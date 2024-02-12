@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "31a8dd63_686c308c",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-02-12T15:18:14Z",
+      "side": 1,
+      "message": "Removed the mutex from here and made it per-instance. Also renamed all mutexes to `mu`.",
+      "parentUuid": "ddf21dda_2ed24491",
+      "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2920151c_7118013e",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b50bc8c7_bfe2d5f0",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-02-12T15:18:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2920151c_7118013e",
+      "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f8ff2011_91c3c2f6",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-01-19T16:34:37Z",
       "side": 1,
       "message": "ditto for mu rather than m.",
+      "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9ea123b4_df91632f",
+        "filename": "cue/interpreter/wasm/wasm.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-02-12T15:18:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f8ff2011_91c3c2f6",
       "revId": "3c2de715b8a282bd5ab54f9ac9035618ec6bb730",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

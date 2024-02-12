@@ -34,8 +34,10 @@ func newModUploadCmd(c *Command) *cobra.Command {
 		Short: "publish the current module to a registry",
 		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
 
-Publish the current module to an OCI registry.
-Also note that this command does no dependency or other checks at the moment.
+Publish the current module to an OCI registry. It consults $CUE_REGISTRY
+to determine where the module should be published (see "cue help
+environment" for details).  Also note that this command does no dependency
+or other checks at the moment.
 `,
 		RunE: mkRunE(c, runModUpload),
 		Args: cobra.ExactArgs(1),

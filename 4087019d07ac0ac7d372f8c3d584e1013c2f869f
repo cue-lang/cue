@@ -33,6 +33,24 @@
       "message": "One final nit: it\u0027s conventional to put the mutex above the fields that it guards, so maybe move `instance` below this? Then someone doing a swift scan of the struct fields will encounter the mutex first, and there\u0027s a nice dividing line (the mutex) between fields that are guarded by the mutex and those that aren\u0027t,",
       "revId": "4087019d07ac0ac7d372f8c3d584e1013c2f869f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a52b5fc_f5a800e0",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-02-12T16:42:27Z",
+      "side": 1,
+      "message": "This guards the whole `instance` struct though, not just the `instance` field. I have moved it to be the first field and changed the comment.",
+      "parentUuid": "a878cf7d_8b6334b8",
+      "revId": "4087019d07ac0ac7d372f8c3d584e1013c2f869f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

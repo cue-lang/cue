@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4365ad9_53e316b4",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 103,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-02-12T15:18:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc8dd585_a12ff714",
+      "revId": "14b3cc361a64b5f5dc95d7dfeaadd092f0fc4f82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "516e1865_eb48b6a4",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-01-19T16:45:20Z",
       "side": 1,
       "message": "ditto",
+      "revId": "14b3cc361a64b5f5dc95d7dfeaadd092f0fc4f82",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "db9aca53_b1bffd76",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 112,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-02-12T15:18:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "516e1865_eb48b6a4",
       "revId": "14b3cc361a64b5f5dc95d7dfeaadd092f0fc4f82",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

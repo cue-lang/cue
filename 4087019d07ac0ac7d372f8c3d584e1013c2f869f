@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55deec4a_acb77568",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-12T16:26:36Z",
+      "side": 1,
+      "message": "LGTM with one final suggestion, thanks!",
+      "revId": "4087019d07ac0ac7d372f8c3d584e1013c2f869f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a878cf7d_8b6334b8",
+        "filename": "cue/interpreter/wasm/runtime.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-12T16:26:36Z",
+      "side": 1,
+      "message": "One final nit: it\u0027s conventional to put the mutex above the fields that it guards, so maybe move `instance` below this? Then someone doing a swift scan of the struct fields will encounter the mutex first, and there\u0027s a nice dividing line (the mutex) between fields that are guarded by the mutex and those that aren\u0027t,",
+      "revId": "4087019d07ac0ac7d372f8c3d584e1013c2f869f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

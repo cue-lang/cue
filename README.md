@@ -134,18 +134,22 @@ an existing set of Kubernetes configurations is available in
 
 - [`cue` Command line reference](./doc/cmd/cue.md): the `cue` command
 
+### Go release support policy
+
+As a general rule, we support the two most recent major releases of Go,
+matching Go's [security policy](https://go.dev/doc/security/policy).
+For example, if CUE v0.7.0 is released when Go's latest version is 1.21.5,
+v0.7.x including any following bugfix releases will require Go 1.20 or later.
 
 ### Contributing
 
 To contribute, please read the [Contribution Guide](CONTRIBUTING.md).
-
 
 ## Code of Conduct
 
 Guidelines for participating in CUE community spaces and a reporting process for
 handling issues can be found in the [Code of
 Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).
-
 
 ## Contact
 

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e89e863d_1beae984",
+        "filename": "internal/golangorgx/gopls/cuelang/format.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-13T22:00:41Z",
+      "side": 1,
+      "message": "is this func used at all?",
+      "revId": "2aceffcf84e92073aaf53a434a1f76a63d5cc2c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

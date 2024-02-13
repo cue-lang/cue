@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3533ca22_bdb54e7f",
+        "filename": "cmd/cuepls/internal/test/integration/base/base_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-13T21:57:14Z",
+      "side": 1,
+      "message": "nit: I\u0027d personally avoid dot imports if possible",
+      "revId": "8383e26ffce801209f36c86b414bf00d57e6bb3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

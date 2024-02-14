@@ -272,24 +272,22 @@ func init() {
 	itask.Register("cmd/cue/cmd.Test", newTestServerCmd)
 }
 
-var testOnce sync.Once
+var testServerOnce = sync.OnceValue(func() string {
+	s := httptest.NewServer(http.HandlerFunc(
+		func(w http.ResponseWriter, req *http.Request) {
+			data, _ := io.ReadAll(req.Body)
+			d := map[string]interface{}{
+				"data": string(data),
+				"when": "now",
+			}
+			enc := json.NewEncoder(w)
+			_ = enc.Encode(d)
+		}))
+	return s.URL
+})
 
 func newTestServerCmd(v cue.Value) (itask.Runner, error) {
-	server := ""
-	testOnce.Do(func() {
-		s := httptest.NewServer(http.HandlerFunc(
-			func(w http.ResponseWriter, req *http.Request) {
-				data, _ := io.ReadAll(req.Body)
-				d := map[string]interface{}{
-					"data": string(data),
-					"when": "now",
-				}
-				enc := json.NewEncoder(w)
-				_ = enc.Encode(d)
-			}))
-		server = s.URL
-	})
-	return testServerCmd(server), nil
+	return testServerCmd(testServerOnce()), nil
 }
 
 type testServerCmd string

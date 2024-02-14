@@ -4,12 +4,11 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
+	"slices"
 	"testing"
 	"testing/fstest"
 
 	"github.com/go-quicktest/qt"
-
-	"cuelang.org/go/internal/slices"
 )
 
 func TestIOFS(t *testing.T) {

@@ -16,6 +16,23 @@
       "message": "I somehow managed to not commit all changed files, apologies. Should be green now.",
       "revId": "c2dc36c2fde469709bbe18031fba21cb12e284ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d7a4a15_a88e1611",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-14T14:35:56Z",
+      "side": 1,
+      "message": "D\u0027oh, Unity is using Go 1.20. I had forgotten about that entirely. Sending a CL...",
+      "revId": "c2dc36c2fde469709bbe18031fba21cb12e284ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

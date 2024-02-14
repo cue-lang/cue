@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ffcd7aae_76e82f03",
+        "filename": "cmd/cuepls/main.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T05:25:43Z",
+      "side": 1,
+      "message": "Fixed to mention our LSP, not the original.",
+      "parentUuid": "beceb8b8_28f7e382",
+      "range": {
+        "startLine": 5,
+        "startChar": 0,
+        "endLine": 11,
+        "endChar": 41
+      },
+      "revId": "51b918205de98014cfafa065cf67d12fcb71741b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c013c733_2e2f52a1",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "34c4002d_1df3d138",
+        "filename": "cmd/cuepls/main.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T05:25:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c013c733_2e2f52a1",
+      "revId": "51b918205de98014cfafa065cf67d12fcb71741b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac7623e3_1e909b12",
@@ -54,6 +96,24 @@
       "writtenOn": "2024-02-13T21:55:07Z",
       "side": 1,
       "message": "I thought we didn\u0027t use telemetry?",
+      "revId": "51b918205de98014cfafa065cf67d12fcb71741b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6a16d38e_2cc2140e",
+        "filename": "cmd/cuepls/main.go",
+        "patchSetId": 15
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T05:25:43Z",
+      "side": 1,
+      "message": "We have left telemetry \"in\" for now in so far as I have not removed the hooks in code. But CUE\u0027s telemetry cannot be turned on, it has not endpoint to be uploaded to, and so it\u0027s effectively useless right now. In later CLs, and with proper announcement, we will turn it \u0027on\u0027 in so far as we will enable people to opt in.",
+      "parentUuid": "ac7623e3_1e909b12",
       "revId": "51b918205de98014cfafa065cf67d12fcb71741b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

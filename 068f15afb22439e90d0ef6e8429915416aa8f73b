@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fed9ecb8_618bdd90",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T15:57:41Z",
+      "side": 1,
+      "message": "The release workflow is being tested as part of https://github.com/cue-lang/cue/actions/runs/7903887534 - will mark with a hold until the result of that is clear.",
+      "revId": "068f15afb22439e90d0ef6e8429915416aa8f73b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

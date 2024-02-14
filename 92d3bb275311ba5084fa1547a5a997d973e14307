@@ -16,6 +16,24 @@
       "message": "make this a string? binary is missing too I think",
       "revId": "92d3bb275311ba5084fa1547a5a997d973e14307",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06511902_30e52f5e",
+        "filename": "internal/ci/goreleaser/goreleaser.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T15:57:02Z",
+      "side": 1,
+      "message": "Done. I actually want to create and publish a version of the GoReleaser config from the JSON schema version they maintain... but that\u0027s not for now.",
+      "parentUuid": "fe51ea80_690f84ad",
+      "revId": "92d3bb275311ba5084fa1547a5a997d973e14307",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

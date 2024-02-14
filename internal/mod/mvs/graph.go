@@ -6,9 +6,8 @@ package mvs
 
 import (
 	"fmt"
+	"slices"
 	"sort"
-
-	"cuelang.org/go/internal/slices"
 )
 
 // Versions is an interface that should be provided by implementations

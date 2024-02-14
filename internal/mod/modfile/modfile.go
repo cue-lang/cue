@@ -17,6 +17,7 @@ package modfile
 import (
 	_ "embed"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 
@@ -30,7 +31,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/module"
-	"cuelang.org/go/internal/slices"
 )
 
 //go:embed schema.cue

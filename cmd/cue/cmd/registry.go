@@ -37,43 +37,39 @@ func getRegistry() (ociregistry.Interface, error) {
 	// If the user isn't doing anything that requires a registry, we
 	// shouldn't complain about reading a bad configuration file,
 	// so check only when required.
-	var auth ociauth.Authorizer
-	var authErr error
-	var authOnce sync.Once
+	authOnce := sync.OnceValues(func() (ociauth.Authorizer, error) {
+		// If a registry was authenticated via `cue login`, use that.
+		// If not, fall back to authentication via Docker's config.json.
+		// Note that the order below is backwards, since we layer interfaces.
+
+		config, err := ociauth.Load(nil)
+		if err != nil {
+			return nil, fmt.Errorf("cannot load OCI auth configuration: %v", err)
+		}
+		var auth ociauth.Authorizer = ociauth.NewStdAuthorizer(ociauth.StdAuthorizerParams{
+			Config: config,
+		})
+
+		loginsPath, err := findLoginsPath()
+		if err != nil {
+			return nil, fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
+		}
+		logins, err := readLogins(loginsPath)
+		if err != nil {
+			return nil, fmt.Errorf("cannot load CUE registry logins: %v", err)
+		}
+		auth = &cueLoginsAuthorizer{
+			logins:        logins,
+			cachedClients: make(map[string]*http.Client),
+			next:          auth,
+		}
+		return auth, nil
+	})
 
 	return modmux.New(resolver, func(host string, insecure bool) (ociregistry.Interface, error) {
-		authOnce.Do(func() {
-			// If a registry was authenticated via `cue login`, use that.
-			// If not, fall back to authentication via Docker's config.json.
-			// Note that the order below is backwards, since we layer interfaces.
-
-			config, err := ociauth.Load(nil)
-			if err != nil {
-				authErr = fmt.Errorf("cannot load OCI auth configuration: %v", err)
-				return
-			}
-			auth = ociauth.NewStdAuthorizer(ociauth.StdAuthorizerParams{
-				Config: config,
-			})
-
-			loginsPath, err := findLoginsPath()
-			if err != nil {
-				authErr = fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
-				return
-			}
-			logins, err := readLogins(loginsPath)
-			if err != nil {
-				authErr = fmt.Errorf("cannot load CUE registry logins: %v", err)
-				return
-			}
-			auth = &cueLoginsAuthorizer{
-				logins:        logins,
-				cachedClients: make(map[string]*http.Client),
-				next:          auth,
-			}
-		})
-		if authErr != nil {
-			return nil, authErr
+		auth, err := authOnce()
+		if err != nil {
+			return nil, err
 		}
 		return ociclient.New(host, &ociclient.Options{
 			Insecure:   insecure,

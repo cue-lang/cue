@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/fs"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"sync/atomic"
@@ -13,7 +14,6 @@ import (
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/mod/module"
-	"cuelang.org/go/internal/slices"
 )
 
 // Registry represents a module registry, or at least this package's view of it.

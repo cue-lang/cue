@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"runtime"
+	"slices"
 	"sync"
 	"sync/atomic"
 
@@ -11,7 +12,6 @@ import (
 	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/mod/semver"
-	"cuelang.org/go/internal/slices"
 )
 
 type majorVersionDefault struct {

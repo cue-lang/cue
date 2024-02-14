@@ -6,10 +6,11 @@ import (
 	"fmt"
 	"io/fs"
 	"log"
+	"maps"
 	"path"
 	"runtime"
+	"slices"
 
-	"cuelang.org/go/internal/maps"
 	"cuelang.org/go/internal/mod/internal/par"
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modimports"
@@ -17,7 +18,6 @@ import (
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/semver"
-	"cuelang.org/go/internal/slices"
 )
 
 const logging = false // TODO hook this up to CUE_DEBUG

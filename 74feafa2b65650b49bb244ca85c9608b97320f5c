@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "06b1ae66_5b5973de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T05:15:01Z",
+      "side": 1,
+      "message": "Approving my own CL because @mvdan@mvdan.cc contributed along the way :)",
+      "revId": "74feafa2b65650b49bb244ca85c9608b97320f5c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

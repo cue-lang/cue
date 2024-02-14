@@ -33,6 +33,24 @@
       "message": "D\u0027oh, Unity is using Go 1.20. I had forgotten about that entirely. Sending a CL...",
       "revId": "c2dc36c2fde469709bbe18031fba21cb12e284ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3149a544_d8540e67",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-14T14:45:46Z",
+      "side": 1,
+      "message": "Sent: https://github.com/cue-unity/unity-private/pull/22\n\nWill mark this as resolved once it\u0027s merged and this CL is green again.",
+      "parentUuid": "8d7a4a15_a88e1611",
+      "revId": "c2dc36c2fde469709bbe18031fba21cb12e284ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

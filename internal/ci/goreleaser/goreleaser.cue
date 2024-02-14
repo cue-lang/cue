@@ -5,29 +5,38 @@ config: {
 
 	project_name: "cue"
 	gomod: proxy: true
-	builds: [{
-		env: [
+
+	// Template based on common settings
+	builds: [...{
+		env: *[
 			"CGO_ENABLED=0",
-		]
-		main:   "./cmd/cue"
-		binary: "cue"
-		ldflags: [
+		] | _
+		ldflags: *[
 			"-s -w",
-		]
-		flags: [
+		] | _
+		flags: *[
 			"-trimpath",
-		]
-		mod_timestamp: '{{ .CommitTimestamp }}'
-		goos: [
+		] | _
+		id:            main
+		main:          string
+		binary:        string
+		mod_timestamp: *'{{ .CommitTimestamp }}' | _
+		goos: *[
 			"darwin",
 			"linux",
 			"windows",
-		]
-		goarch: [
+		] | _
+		goarch: *[
 			"amd64",
 			"arm64",
-		]
+		] | _
 	}]
+
+	builds: [
+		{main: "./cmd/cue", binary:    "cue"},
+		{main: "./cmd/cuepls", binary: "cuepls"},
+	]
+
 	archives: [{
 		name_template: "{{ .ProjectName }}_{{ .Tag }}_{{ .Os }}_{{ .Arch }}{{ if .Arm }}v{{ .Arm }}{{ end }}{{ if .Mips }}_{{ .Mips }}{{ end }}"
 		files: [

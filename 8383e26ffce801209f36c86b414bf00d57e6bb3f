@@ -16,6 +16,24 @@
       "message": "nit: I\u0027d personally avoid dot imports if possible",
       "revId": "8383e26ffce801209f36c86b414bf00d57e6bb3f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b3c8ac6_b8d4be0b",
+        "filename": "cmd/cuepls/internal/test/integration/base/base_test.go",
+        "patchSetId": 17
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T05:25:43Z",
+      "side": 1,
+      "message": "From https://pkg.go.dev/golang.org/x/tools/gopls/internal/test/integration:\n\n\u003e The integration test package uses a couple of uncommon patterns to reduce boilerplate in test bodies. First, it is intended to be imported as \".\" so that helpers do not need to be qualified.\n\nIn any case I suggested we avoid too many real code changes thoughts at this stage in the interests of adding some more LSP methods, following existing patterns. And then see whether any alternative approaches jump out at us.",
+      "parentUuid": "3533ca22_bdb54e7f",
+      "revId": "8383e26ffce801209f36c86b414bf00d57e6bb3f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

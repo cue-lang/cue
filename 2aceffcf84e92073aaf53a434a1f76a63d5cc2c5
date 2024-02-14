@@ -16,6 +16,24 @@
       "message": "is this func used at all?",
       "revId": "2aceffcf84e92073aaf53a434a1f76a63d5cc2c5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6f36c0d_ac04f27a",
+        "filename": "internal/golangorgx/gopls/cuelang/format.go",
+        "patchSetId": 18
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T05:25:43Z",
+      "side": 1,
+      "message": "It is not. This is a relic from a previous refactor by the looks of things. Removed.",
+      "parentUuid": "e89e863d_1beae984",
+      "revId": "2aceffcf84e92073aaf53a434a1f76a63d5cc2c5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "The release workflow is being tested as part of https://github.com/cue-lang/cue/actions/runs/7903887534 - will mark with a hold until the result of that is clear.",
       "revId": "068f15afb22439e90d0ef6e8429915416aa8f73b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "259553ee_a18392d4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-14T19:51:10Z",
+      "side": 1,
+      "message": "Removing hold. This passed and had the expected output:\n\n```\n  • building binaries\n    • building                                       binary\u003ddist/cmd/cue_linux_arm64/cue\n    • building                                       binary\u003ddist/cmd/cue_linux_amd64_v1/cue\n    • building                                       binary\u003ddist/cmd/cue_darwin_amd64_v1/cue\n    • building                                       binary\u003ddist/cmd/cue_darwin_arm64/cue\n    • building                                       binary\u003ddist/cmd/cue_windows_amd64_v1/cue.exe\n    • building                                       binary\u003ddist/cmd/cue_windows_arm64/cue.exe\n    • building                                       binary\u003ddist/cmd/cuepls_darwin_amd64_v1/cuepls\n    • building                                       binary\u003ddist/cmd/cuepls_darwin_arm64/cuepls\n    • building                                       binary\u003ddist/cmd/cuepls_linux_amd64_v1/cuepls\n    • building                                       binary\u003ddist/cmd/cuepls_linux_arm64/cuepls\n    • building                                       binary\u003ddist/cmd/cuepls_windows_amd64_v1/cuepls.exe\n    • building                                       binary\u003ddist/cmd/cuepls_windows_arm64/cuepls.exe\n```",
+      "parentUuid": "fed9ecb8_618bdd90",
+      "revId": "068f15afb22439e90d0ef6e8429915416aa8f73b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

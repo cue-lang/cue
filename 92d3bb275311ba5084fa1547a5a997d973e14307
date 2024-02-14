@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fe51ea80_690f84ad",
+        "filename": "internal/ci/goreleaser/goreleaser.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-14T08:35:21Z",
+      "side": 1,
+      "message": "make this a string? binary is missing too I think",
+      "revId": "92d3bb275311ba5084fa1547a5a997d973e14307",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

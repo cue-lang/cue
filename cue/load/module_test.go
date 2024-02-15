@@ -11,6 +11,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/mod/modcache"
+	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
 )
@@ -42,7 +43,7 @@ func TestModuleFetch(t *testing.T) {
 		// The fetched files are read-only, so testing fails when trying
 		// to remove them.
 		defer modcache.RemoveAll(cacheDir)
-		reg1, err := modcache.New(reg, cacheDir)
+		reg1, err := modcache.New(modregistry.NewClient(reg), cacheDir)
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -58,7 +58,10 @@ func runModRegistry(cmd *Command, args []string) error {
 		return err
 	}
 	fmt.Printf("listening on %v\n", l.Addr())
-	return http.Serve(l, ociserver.New(ociTagLoggerRegistry{ocimem.New()}, nil))
+	r := ocimem.NewWithConfig(&ocimem.Config{
+		ImmutableTags: true,
+	})
+	return http.Serve(l, ociserver.New(ociTagLoggerRegistry{r}, nil))
 }
 
 type ociTagLoggerRegistry struct {

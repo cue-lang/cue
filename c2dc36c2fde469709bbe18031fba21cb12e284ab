@@ -51,6 +51,24 @@
       "parentUuid": "8d7a4a15_a88e1611",
       "revId": "c2dc36c2fde469709bbe18031fba21cb12e284ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24087e1f_4966d67c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-15T12:16:22Z",
+      "side": 1,
+      "message": "Green now; PTAL.",
+      "parentUuid": "3149a544_d8540e67",
+      "revId": "c2dc36c2fde469709bbe18031fba21cb12e284ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

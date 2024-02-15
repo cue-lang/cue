@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "58359152_8b31a5a0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-15T11:37:57Z",
+      "side": 1,
+      "message": "Please also reference https://github.com/cue-lang/cue/issues/2821 as fixed.",
+      "revId": "3df15c68f4341670903085db5bf92889c25737a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "70dc4132_154c3a56",

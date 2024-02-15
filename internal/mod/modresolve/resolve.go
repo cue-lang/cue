@@ -1,31 +1,214 @@
+// Copyright 2024 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 package modresolve
 
 import (
+	"crypto/sha256"
+	_ "embed"
 	"fmt"
 	"net"
 	"net/netip"
+	"path"
+	"sort"
 	"strings"
+	"sync"
 
 	"cuelabs.dev/go/oci/ociregistry/ociref"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/module"
 )
 
-// Resolve resolves a module path (a.k.a. OCI repository name) to the
-// location for that path. Invalid paths will map to the default location.
+// pathEncoding represents one of the possible types of
+// encoding for module paths within a registry.
+// It reflects the #registry.pathEncoding disjunction
+// in schema.cue.
+// TODO it would be nice if this could be auto-generated
+// from the schema.
+type pathEncoding string
+
+const (
+	encPath       pathEncoding = "path"
+	encHashAsRepo pathEncoding = "hashAsRepo"
+	encHashAsTag  pathEncoding = "hashAsTag"
+)
+
+// Resolver resolves module paths to their location in a registry.
 type Resolver interface {
-	Resolve(path string) Location
+	// Resolve resolves a base module path (without a version suffix,
+	// a.k.a. OCI repository name) and
+	// optional version to the location for that path.
+	// It reports whether it can find appropriate location for the module.
+	//
+	// If the version is empty, the Tag in the returned Location
+	// will hold the prefix that all versions of the module in its
+	// repository have. That prefix will be followed by the version itself.
+	Resolve(path string, vers string) (Location, bool)
+
+	// AllHosts returns all the registry hosts that the resolver
+	// might resolve to, ordered lexically.
+	AllHosts() []Host
 }
 
-// Location represents the location for a given path.
+// Host represents a registry host name.
+type Host struct {
+	// Name holds the IP host name of the registry.
+	// If it's an IP v6 address, it will be surrounded with
+	// square brackets ([, ]).
+	Name string
+	// Insecure holds whether this host should be connected
+	// to insecurely (with an HTTP rather than HTTP connection).
+	Insecure bool
+}
+
+// Location represents the location for a given module version or versions.
 type Location struct {
 	// Host holds the host or host:port of the registry.
 	Host string
-	// Prefix holds a prefix to be added to the path.
-	Prefix string
 	// Insecure holds whether an insecure connection
 	// should be used when connecting to the registry.
 	Insecure bool
+	// Repository holds the repository to store the module in.
+	Repository string
+	// Tag holds the tag for the module version.
+	// If an empty version was passed to
+	// Resolve, it holds the prefix shared by all version
+	// tags for the module.
+	Tag string
+}
+
+// config mirrors the #File definition in schema.cue.
+// TODO it would be nice to be able to generate this
+// type directly from the schema.
+type config struct {
+	ModuleRegistries map[string]*registryConfig `json:"moduleRegistries,omitempty"`
+	DefaultRegistry  *registryConfig            `json:"defaultRegistry,omitempty"`
+}
+
+func (cfg *config) validate() error {
+	for prefix, reg := range cfg.ModuleRegistries {
+		if err := module.CheckPathWithoutVersion(prefix); err != nil {
+			return fmt.Errorf("invalid module path %q: %v", prefix, err)
+		}
+		if err := reg.validate(); err != nil {
+			return fmt.Errorf("invalid registry configuration in %q: %v", prefix, err)
+		}
+	}
+	if cfg.DefaultRegistry != nil {
+		if err := cfg.DefaultRegistry.validate(); err != nil {
+			return fmt.Errorf("invalid default registry configuration: %v", err)
+		}
+	}
+	return nil
+}
+
+type registryConfig struct {
+	Host         string       `json:"host,omitempty"`
+	Insecure     bool         `json:"insecure,omitempty"`
+	Repository   string       `json:"repository,omitempty"`
+	PathEncoding pathEncoding `json:"pathEncoding,omitempty"`
+	PrefixForTag string       `json:"prefixForTag,omitempty"`
+	StripPrefix  bool         `json:"stripPrefix,omitempty"`
+}
+
+func (r *registryConfig) validate() error {
+	if !ociref.IsValidHost(r.Host) {
+		return fmt.Errorf("invalid host name %q", r.Host)
+	}
+	if r.Repository != "" {
+		if !ociref.IsValidRepository(r.Repository) {
+			return fmt.Errorf("invalid repository %q", r.Repository)
+		}
+	}
+	if r.PrefixForTag != "" {
+		if !ociref.IsValidTag(r.PrefixForTag) {
+			return fmt.Errorf("invalid tag prefix %q", r.PrefixForTag)
+		}
+	}
+	if r.PathEncoding == "" {
+		// Shouldn't happen because default should apply.
+		return fmt.Errorf("empty pathEncoding")
+	}
+	if r.StripPrefix && r.PathEncoding != encPath {
+		return fmt.Errorf("cannot strip prefix unless using path encoding")
+	}
+	return nil
+}
+
+var (
+	configSchemaOnce sync.Once // guards the creation of _configSchema
+	// TODO remove this mutex when https://cuelang.org/issue/2733 is fixed.
+	configSchemaMutex sync.Mutex // guards any use of _configSchema
+	_configSchema     cue.Value
+)
+
+//go:embed schema.cue
+var configSchemaData []byte
+
+// ParseConfig parses the registry configuration with the given contents and file name.
+// If there is no default registry, then the single registry specified in catchAllDefault
+// will be used as a default.
+func ParseConfig(configFile []byte, filename string, catchAllDefault string) (Resolver, error) {
+	configSchemaOnce.Do(func() {
+		ctx := cuecontext.New()
+		schemav := ctx.CompileBytes(configSchemaData, cue.Filename("cuelang.org/go/internal/mod/modresolve/schema.cue"))
+		schemav = schemav.LookupPath(cue.MakePath(cue.Def("#file")))
+		if err := schemav.Validate(); err != nil {
+			panic(fmt.Errorf("internal error: invalid CUE registry config schema: %v", errors.Details(err, nil)))
+		}
+		_configSchema = schemav
+	})
+	configSchemaMutex.Lock()
+	defer configSchemaMutex.Unlock()
+
+	v := _configSchema.Context().CompileBytes(configFile, cue.Filename(filename))
+	if err := v.Err(); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid registry configuration file")
+	}
+	v = v.Unify(_configSchema)
+	if err := v.Err(); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "invalid configuration file")
+	}
+	var cfg config
+	if err := v.Decode(&cfg); err != nil {
+		return nil, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into registry config struct")
+	}
+	if err := cfg.validate(); err != nil {
+		return nil, err
+	}
+	if cfg.DefaultRegistry == nil {
+		if catchAllDefault == "" {
+			return nil, fmt.Errorf("no default catch-all registry provided")
+		}
+		// TODO is it too limiting to have the catch-all registry specified as a simple string?
+		reg, err := parseRegistry(catchAllDefault)
+		if err != nil {
+			return nil, fmt.Errorf("invalid catch-all registry %q: %v", catchAllDefault, err)
+		}
+		cfg.DefaultRegistry = reg
+	}
+	r := &resolver{
+		cfg: cfg,
+	}
+	if err := r.initHosts(); err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 // ParseCUERegistry parses a registry routing specification that
@@ -64,9 +247,11 @@ func ParseCUERegistry(s string, catchAllDefault string) (Resolver, error) {
 	if s == "" && catchAllDefault == "" {
 		return nil, fmt.Errorf("no catch-all registry or default")
 	}
-	locs := make(map[string]Location)
 	if s == "" {
 		s = catchAllDefault
+	}
+	cfg := config{
+		ModuleRegistries: make(map[string]*registryConfig),
 	}
 	parts := strings.Split(s, ",")
 	for _, part := range parts {
@@ -76,7 +261,7 @@ func ParseCUERegistry(s string, catchAllDefault string) (Resolver, error) {
 				// TODO or just ignore it?
 				return nil, fmt.Errorf("empty registry part")
 			}
-			if _, ok := locs[""]; ok {
+			if _, ok := cfg.ModuleRegistries[""]; ok {
 				return nil, fmt.Errorf("duplicate catch-all registry")
 			}
 			key, val = "", part
@@ -90,66 +275,145 @@ func ParseCUERegistry(s string, catchAllDefault string) (Resolver, error) {
 			if err := module.CheckPathWithoutVersion(key); err != nil {
 				return nil, fmt.Errorf("invalid module path %q: %v", key, err)
 			}
-			if _, ok := locs[key]; ok {
+			if _, ok := cfg.ModuleRegistries[key]; ok {
 				return nil, fmt.Errorf("duplicate module prefix %q", key)
 			}
 		}
-		loc, err := parseRegistry(val)
+		reg, err := parseRegistry(val)
 		if err != nil {
 			return nil, fmt.Errorf("invalid registry %q: %v", val, err)
 		}
-		locs[key] = loc
+		cfg.ModuleRegistries[key] = reg
 	}
-	if _, ok := locs[""]; !ok {
+	if _, ok := cfg.ModuleRegistries[""]; !ok {
 		if catchAllDefault == "" {
 			return nil, fmt.Errorf("no default catch-all registry provided")
 		}
-		loc, err := parseRegistry(catchAllDefault)
+		reg, err := parseRegistry(catchAllDefault)
 		if err != nil {
 			return nil, fmt.Errorf("invalid catch-all registry %q: %v", catchAllDefault, err)
 		}
-		locs[""] = loc
+		cfg.ModuleRegistries[""] = reg
 	}
-	return &resolver{
-		locs: locs,
-	}, nil
+	cfg.DefaultRegistry = cfg.ModuleRegistries[""]
+	delete(cfg.ModuleRegistries, "")
+
+	r := &resolver{
+		cfg: cfg,
+	}
+	if err := r.initHosts(); err != nil {
+		return nil, err
+	}
+	return r, nil
 }
 
 type resolver struct {
-	locs map[string]Location
+	allHosts []Host
+	cfg      config
 }
 
-func (r *resolver) Resolve(path string) Location {
-	if path == "" {
-		return r.locs[""]
+func (r *resolver) initHosts() error {
+	hosts := make(map[string]bool)
+	addHost := func(reg *registryConfig) error {
+		if insecure, ok := hosts[reg.Host]; ok {
+			if insecure != reg.Insecure {
+				return fmt.Errorf("registry host %q is specified both as secure and insecure", reg.Host)
+			}
+		} else {
+			hosts[reg.Host] = reg.Insecure
+		}
+		return nil
+	}
+	for _, reg := range r.cfg.ModuleRegistries {
+		if err := addHost(reg); err != nil {
+			return err
+		}
+	}
+
+	if reg := r.cfg.DefaultRegistry; reg != nil {
+		if err := addHost(reg); err != nil {
+			return err
+		}
+	}
+	allHosts := make([]Host, 0, len(hosts))
+	for host, insecure := range hosts {
+		allHosts = append(allHosts, Host{
+			Name:     host,
+			Insecure: insecure,
+		})
+	}
+	sort.Slice(allHosts, func(i, j int) bool {
+		return allHosts[i].Name < allHosts[j].Name
+	})
+	r.allHosts = allHosts
+	return nil
+}
+
+// AllHosts implements Resolver.AllHosts.
+func (r *resolver) AllHosts() []Host {
+	return r.allHosts
+}
+
+func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
+	if mpath == "" {
+		return Location{}, false
 	}
 	bestMatch := ""
 	// Note: there's always a wildcard match.
-	bestMatchLoc := r.locs[""]
-	for pat, loc := range r.locs {
-		if pat == path {
-			return loc
+	bestMatchReg := r.cfg.DefaultRegistry
+	for pat, reg := range r.cfg.ModuleRegistries {
+		if pat == mpath {
+			bestMatchReg = reg
+			break
 		}
-		if !strings.HasPrefix(path, pat) {
+		if !strings.HasPrefix(mpath, pat) {
 			continue
 		}
 		if len(bestMatch) > len(pat) {
 			// We've already found a more specific match.
 			continue
 		}
-		if path[len(pat)] != '/' {
+		if mpath[len(pat)] != '/' {
 			// The path doesn't have a separator at the end of
 			// the prefix, which means that it doesn't match.
 			// For example, foo.com/bar does not match foo.com/ba.
 			continue
 		}
 		// It's a possible match but not necessarily the longest one.
-		bestMatch, bestMatchLoc = pat, loc
+		bestMatch, bestMatchReg = pat, reg
 	}
-	return bestMatchLoc
+	if bestMatchReg == nil {
+		return Location{}, false
+	}
+	reg := bestMatchReg
+	loc := Location{
+		Host:     reg.Host,
+		Insecure: reg.Insecure,
+		Tag:      vers,
+	}
+	switch reg.PathEncoding {
+	case encPath:
+		if reg.StripPrefix {
+			mpath = strings.TrimPrefix(mpath, bestMatch)
+			mpath = strings.TrimPrefix(mpath, "/")
+		}
+		loc.Repository = path.Join(reg.Repository, mpath)
+	case encHashAsRepo:
+		loc.Repository = fmt.Sprintf("%s/%x", reg.Repository, sha256.Sum256([]byte(mpath)))
+	case encHashAsTag:
+		loc.Repository = reg.Repository
+	default:
+		panic("unreachable")
+	}
+	if reg.PathEncoding == encHashAsTag {
+		loc.Tag = fmt.Sprintf("%s%x-%s", reg.PrefixForTag, sha256.Sum256([]byte(mpath)), vers)
+	} else {
+		loc.Tag = reg.PrefixForTag + vers
+	}
+	return loc, true
 }
 
-func parseRegistry(env string) (Location, error) {
+func parseRegistry(env string) (*registryConfig, error) {
 	var suffix string
 	if i := strings.LastIndex(env, "+"); i > 0 {
 		suffix = env[i:]
@@ -161,16 +425,16 @@ func parseRegistry(env string) (Location, error) {
 		// but we do.
 		r.Host = env
 		if !ociref.IsValidHost(r.Host) {
-			return Location{}, fmt.Errorf("invalid host name %q in registry", r.Host)
+			return nil, fmt.Errorf("invalid host name %q in registry", r.Host)
 		}
 	} else {
 		var err error
 		r, err = ociref.Parse(env)
 		if err != nil {
-			return Location{}, err
+			return nil, err
 		}
 		if r.Tag != "" || r.Digest != "" {
-			return Location{}, fmt.Errorf("cannot have an associated tag or digest")
+			return nil, fmt.Errorf("cannot have an associated tag or digest")
 		}
 	}
 	if suffix == "" {
@@ -186,12 +450,13 @@ func parseRegistry(env string) (Location, error) {
 		insecure = true
 	case "+secure":
 	default:
-		return Location{}, fmt.Errorf("unknown suffix (%q), need +insecure, +secure or no suffix)", suffix)
+		return nil, fmt.Errorf("unknown suffix (%q), need +insecure, +secure or no suffix)", suffix)
 	}
-	return Location{
-		Host:     r.Host,
-		Prefix:   r.Repository,
-		Insecure: insecure,
+	return &registryConfig{
+		Host:         r.Host,
+		Repository:   r.Repository,
+		Insecure:     insecure,
+		PathEncoding: encPath,
 	}, nil
 }
 

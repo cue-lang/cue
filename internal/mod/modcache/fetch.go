@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"cuelabs.dev/go/oci/ociregistry"
 	"github.com/rogpeppe/go-internal/robustio"
 
 	"cuelang.org/go/internal/mod/internal/par"
@@ -36,7 +35,7 @@ const logging = false // TODO hook this up to CUE_DEBUG
 // returned by the registry implement the `OSRootFS` interface,
 // allowing a caller to find the native OS filepath where modules
 // are stored.
-func New(registry ociregistry.Interface, dir string) (modload.Registry, error) {
+func New(registry *modregistry.Client, dir string) (modload.Registry, error) {
 	info, err := os.Stat(dir)
 	if err != nil {
 		return nil, err
@@ -46,7 +45,7 @@ func New(registry ociregistry.Interface, dir string) (modload.Registry, error) {
 	}
 	return &cache{
 		dir: dir,
-		reg: modregistry.NewClient(registry),
+		reg: registry,
 	}, nil
 }
 

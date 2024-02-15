@@ -40,7 +40,25 @@ var ErrNotFound = fmt.Errorf("module not found")
 // Client represents a OCI-registry-backed client that
 // provides a store for CUE modules.
 type Client struct {
-	registry ociregistry.Interface
+	resolver Resolver
+}
+
+type Resolver interface {
+	Resolve(mpath, vers string) (RegistryLocation, error)
+}
+
+// RegistryLocation holds a registry and a location within it
+// that a specific module (or set of versions for a module)
+// will be stored.
+type RegistryLocation struct {
+	// Registry holds the registry to use to access the module.
+	Registry ociregistry.Interface
+	// Repository holds the repository where the module is located.
+	Repository string
+	// Tag holds the tag for the module version. If an empty version
+	// was passed to Resolve, it holds the prefix shared by all
+	// version tags for the module.
+	Tag string
 }
 
 const (
@@ -53,7 +71,15 @@ const (
 // hostname.
 func NewClient(registry ociregistry.Interface) *Client {
 	return &Client{
-		registry: registry,
+		resolver: SingleResolver{registry},
+	}
+}
+
+// NewClientWithResolver returns a new client that uses the given
+// resolver to decide which registries to fetch from or push to.
+func NewClientWithResolver(resolver Resolver) *Client {
+	return &Client{
+		resolver: resolver,
 	}
 }
 
@@ -61,8 +87,11 @@ func NewClient(registry ociregistry.Interface) *Client {
 // It returns an error that satisfies errors.Is(ErrNotFound) if the
 // module is not present in the store at this version.
 func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, error) {
-	repoName := c.repoName(m.Path())
-	rd, err := c.registry.GetTag(ctx, repoName, m.Version())
+	loc, err := c.resolve(m)
+	if err != nil {
+		return nil, err
+	}
+	rd, err := loc.Registry.GetTag(ctx, loc.Repository, loc.Tag)
 	if err != nil {
 		if errors.Is(err, ociregistry.ErrManifestUnknown) {
 			return nil, fmt.Errorf("module %v: %w", m, ErrNotFound)
@@ -83,7 +112,10 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 // It assumes that the module will be tagged with the given
 // version.
 func (c *Client) GetModuleWithManifest(ctx context.Context, m module.Version, contents []byte, mediaType string) (*Module, error) {
-	repoName := c.repoName(m.Path())
+	loc, err := c.resolve(m)
+	if err != nil {
+		return nil, err
+	}
 
 	manifest, err := unmarshalManifest(ctx, contents, mediaType)
 	if err != nil {
@@ -102,16 +134,11 @@ func (c *Client) GetModuleWithManifest(ctx context.Context, m module.Version, co
 	// TODO check that the other blobs are of the expected type (application/zip).
 	return &Module{
 		client:         c,
+		loc:            loc,
 		version:        m,
-		repo:           repoName,
 		manifest:       *manifest,
 		manifestDigest: digest.FromBytes(contents),
 	}, nil
-}
-
-func (c *Client) repoName(modPath string) string {
-	path, _, _ := module.SplitPathVersion(modPath)
-	return path
 }
 
 // ModuleVersions returns all the versions for the module with the given path
@@ -123,31 +150,35 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 	if !hasMajor {
 		mpath = m
 	}
-	tags := []string{}
+	loc, err := c.resolver.Resolve(mpath, "")
+	if err != nil {
+		return nil, err
+	}
+	versions := []string{}
 	// Note: do not use c.repoName because that always expects
 	// a module path with a major version.
-	iter := c.registry.Tags(ctx, mpath)
+	iter := loc.Registry.Tags(ctx, loc.Repository)
 	for {
 		tag, ok := iter.Next()
 		if !ok {
 			break
 		}
-		if !semver.IsValid(tag) {
+		vers, ok := strings.CutPrefix(tag, loc.Tag)
+		if !ok {
 			continue
 		}
-		if !hasMajor || semver.Major(tag) == major {
-			tags = append(tags, tag)
+		if !semver.IsValid(vers) {
+			continue
+		}
+		if !hasMajor || semver.Major(vers) == major {
+			versions = append(versions, vers)
 		}
 	}
 	if err := iter.Error(); err != nil && !isNotExist(err) {
 		return nil, err
 	}
-	semver.Sort(tags)
-	return tags, nil
-}
-
-func isNotExist(err error) bool {
-	return errors.Is(err, ociregistry.ErrNameUnknown) || errors.Is(err, ociregistry.ErrNameInvalid)
+	semver.Sort(versions)
+	return versions, nil
 }
 
 // CheckedModule represents module content that has passed the same
@@ -185,14 +216,17 @@ func (m *CheckedModule) Zip() *zip.Reader {
 // PutCheckedModule is like [Client.PutModule] except that it allows the
 // caller to do some additional checks (see [CheckModule] for more info).
 func (c *Client) PutCheckedModule(ctx context.Context, m *CheckedModule) error {
-	repoName := c.repoName(m.mv.Path())
+	loc, err := c.resolve(m.mv)
+	if err != nil {
+		return err
+	}
 	selfDigest, err := digest.FromReader(io.NewSectionReader(m.blobr, 0, m.size))
 	if err != nil {
 		return fmt.Errorf("cannot read module zip file: %v", err)
 	}
 	// Upload the actual module's content
 	// TODO should we use a custom media type for this?
-	configDesc, err := c.scratchConfig(ctx, repoName, moduleArtifactType)
+	configDesc, err := c.scratchConfig(ctx, loc, moduleArtifactType)
 	if err != nil {
 		return fmt.Errorf("cannot make scratch config: %v", err)
 	}
@@ -214,17 +248,17 @@ func (c *Client) PutCheckedModule(ctx context.Context, m *CheckedModule) error {
 		}},
 	}
 
-	if _, err := c.registry.PushBlob(ctx, repoName, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
+	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
 		return fmt.Errorf("cannot push module contents: %v", err)
 	}
-	if _, err := c.registry.PushBlob(ctx, repoName, manifest.Layers[1], bytes.NewReader(m.modFileContent)); err != nil {
+	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, manifest.Layers[1], bytes.NewReader(m.modFileContent)); err != nil {
 		return fmt.Errorf("cannot push cue.mod/module.cue contents: %v", err)
 	}
 	manifestData, err := json.Marshal(manifest)
 	if err != nil {
 		return fmt.Errorf("cannot marshal manifest: %v", err)
 	}
-	if _, err := c.registry.PushManifest(ctx, repoName, m.mv.Version(), manifestData, ocispec.MediaTypeImageManifest); err != nil {
+	if _, err := loc.Registry.PushManifest(ctx, loc.Repository, loc.Tag, manifestData, ocispec.MediaTypeImageManifest); err != nil {
 		return fmt.Errorf("cannot tag %v: %v", m.mv, err)
 	}
 	return nil
@@ -313,7 +347,7 @@ func checkModFile(m module.Version, f *zip.File) ([]byte, *modfile.File, error) 
 // Module represents a CUE module instance.
 type Module struct {
 	client         *Client
-	repo           string
+	loc            RegistryLocation
 	version        module.Version
 	manifest       ocispec.Manifest
 	manifestDigest ociregistry.Digest
@@ -325,7 +359,7 @@ func (m *Module) Version() module.Version {
 
 // ModuleFile returns the contents of the cue.mod/module.cue file.
 func (m *Module) ModuleFile(ctx context.Context) ([]byte, error) {
-	r, err := m.client.registry.GetBlob(ctx, m.repo, m.manifest.Layers[1].Digest)
+	r, err := m.loc.Registry.GetBlob(ctx, m.loc.Repository, m.manifest.Layers[1].Digest)
 	if err != nil {
 		return nil, err
 	}
@@ -338,13 +372,30 @@ func (m *Module) ModuleFile(ctx context.Context) ([]byte, error) {
 // and the contents should not be assumed to be correct until the close
 // error has been checked.
 func (m *Module) GetZip(ctx context.Context) (io.ReadCloser, error) {
-	return m.client.registry.GetBlob(ctx, m.repo, m.manifest.Layers[0].Digest)
+	return m.loc.Registry.GetBlob(ctx, m.loc.Repository, m.manifest.Layers[0].Digest)
 }
 
 // ManifestDigest returns the digest of the manifest representing
 // the module.
 func (m *Module) ManifestDigest() ociregistry.Digest {
 	return m.manifestDigest
+}
+
+func (c *Client) resolve(m module.Version) (RegistryLocation, error) {
+	loc, err := c.resolver.Resolve(m.BasePath(), m.Version())
+	if err != nil {
+		return RegistryLocation{}, err
+	}
+	if loc.Registry == nil {
+		return RegistryLocation{}, fmt.Errorf("module %v unexpectedly resolved to nil registry", m)
+	}
+	if loc.Repository == "" {
+		return RegistryLocation{}, fmt.Errorf("module %v unexpectedly resolved to empty location", m)
+	}
+	if loc.Tag == "" {
+		return RegistryLocation{}, fmt.Errorf("module %v unexpectedly resolved to empty tag", m)
+	}
+	return loc, nil
 }
 
 func unmarshalManifest(ctx context.Context, data []byte, mediaType string) (*ociregistry.Manifest, error) {
@@ -356,6 +407,10 @@ func unmarshalManifest(ctx context.Context, data []byte, mediaType string) (*oci
 		return nil, fmt.Errorf("cannot decode %s content as manifest: %v", mediaType, err)
 	}
 	return &m, nil
+}
+
+func isNotExist(err error) bool {
+	return errors.Is(err, ociregistry.ErrNameUnknown) || errors.Is(err, ociregistry.ErrNameInvalid)
 }
 
 func isModule(m *ocispec.Manifest) bool {
@@ -378,7 +433,7 @@ func isJSON(mediaType string) bool {
 // scratchConfig returns a dummy configuration consisting only of the
 // two-byte configuration {}.
 // https://github.com/opencontainers/image-spec/blob/main/manifest.md#example-of-a-scratch-config-or-layer-descriptor
-func (c *Client) scratchConfig(ctx context.Context, repoName string, mediaType string) (ocispec.Descriptor, error) {
+func (c *Client) scratchConfig(ctx context.Context, loc RegistryLocation, mediaType string) (ocispec.Descriptor, error) {
 	// TODO check if it exists already to avoid push?
 	content := []byte("{}")
 	desc := ocispec.Descriptor{
@@ -386,8 +441,23 @@ func (c *Client) scratchConfig(ctx context.Context, repoName string, mediaType s
 		MediaType: mediaType,
 		Size:      int64(len(content)),
 	}
-	if _, err := c.registry.PushBlob(ctx, repoName, desc, bytes.NewReader(content)); err != nil {
+	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, desc, bytes.NewReader(content)); err != nil {
 		return ocispec.Descriptor{}, err
 	}
 	return desc, nil
+}
+
+// SingleResolver implements Resolver by always returning R,
+// and mapping module paths directly to repository paths in
+// the registry.
+type SingleResolver struct {
+	R ociregistry.Interface
+}
+
+func (r SingleResolver) Resolve(mpath, vers string) (RegistryLocation, error) {
+	return RegistryLocation{
+		Registry:   r.R,
+		Repository: mpath,
+		Tag:        vers,
+	}, nil
 }

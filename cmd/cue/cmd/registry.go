@@ -14,15 +14,19 @@ import (
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/mod/modcache"
 	"cuelang.org/go/internal/mod/modload"
-	"cuelang.org/go/internal/mod/modmux"
+	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modresolve"
 )
 
-// getRegistry returns the registry to pull modules from.
+const defaultRegistry = "registry.cue.works"
+
+// getRegistryResolver returns an implementation of [modregistry.Resolver]
+// that resolves to registries as specified in the configuration.
+//
 // If external modules are disabled and there's no other issue,
 // it returns (nil, nil).
-func getRegistry() (ociregistry.Interface, error) {
-	// TODO document CUE_REGISTRY via a new "cue help environment" subcommand.
+func getRegistryResolver() (*registryResolver, error) {
+	// TODO support registry configuration file too.
 	env := os.Getenv("CUE_REGISTRY")
 	if !cueexperiment.Flags.Modules {
 		if env != "" {
@@ -30,7 +34,7 @@ func getRegistry() (ociregistry.Interface, error) {
 		}
 		return nil, nil
 	}
-	resolver, err := modresolve.ParseCUERegistry(env, "registry.cue.works")
+	resolver, err := modresolve.ParseCUERegistry(env, defaultRegistry)
 	if err != nil {
 		return nil, fmt.Errorf("bad value for $CUE_REGISTRY: %v", err)
 	}
@@ -46,7 +50,7 @@ func getRegistry() (ociregistry.Interface, error) {
 		if err != nil {
 			return nil, fmt.Errorf("cannot load OCI auth configuration: %v", err)
 		}
-		var auth ociauth.Authorizer = ociauth.NewStdAuthorizer(ociauth.StdAuthorizerParams{
+		auth := ociauth.NewStdAuthorizer(ociauth.StdAuthorizerParams{
 			Config: config,
 		})
 
@@ -58,15 +62,14 @@ func getRegistry() (ociregistry.Interface, error) {
 		if err != nil {
 			return nil, fmt.Errorf("cannot load CUE registry logins: %v", err)
 		}
-		auth = &cueLoginsAuthorizer{
+		return &cueLoginsAuthorizer{
 			logins:        logins,
 			cachedClients: make(map[string]*http.Client),
 			next:          auth,
-		}
-		return auth, nil
+		}, nil
 	})
 
-	return modmux.New(resolver, func(host string, insecure bool) (ociregistry.Interface, error) {
+	newRegistry := func(host string, insecure bool) (ociregistry.Interface, error) {
 		auth, err := authOnce()
 		if err != nil {
 			return nil, err
@@ -75,7 +78,60 @@ func getRegistry() (ociregistry.Interface, error) {
 			Insecure:   insecure,
 			Authorizer: auth,
 		})
-	}), nil
+	}
+	return &registryResolver{
+		resolver:    resolver,
+		newRegistry: newRegistry,
+		registries:  make(map[string]ociregistry.Interface),
+	}, nil
+}
+
+type registryResolver struct {
+	resolver    modresolve.Resolver
+	newRegistry func(host string, insecure bool) (ociregistry.Interface, error)
+	mu          sync.Mutex
+	registries  map[string]ociregistry.Interface
+}
+
+// Resolve implements modregistry.Resolver.Resolve.
+func (r *registryResolver) Resolve(mpath string, vers string) (modregistry.RegistryLocation, error) {
+	loc, ok := r.resolver.Resolve(mpath, vers)
+	if !ok {
+		// This can only happen mpath is invalid, which should not
+		// happen in practice, as the only caller is modregistry which
+		// vets module paths before calling Resolve.
+		return modregistry.RegistryLocation{}, fmt.Errorf("cannot resolve %s (version %s) to registry", mpath, vers)
+	}
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	reg := r.registries[loc.Host]
+	if reg == nil {
+		reg1, err := r.newRegistry(loc.Host, loc.Insecure)
+		if err != nil {
+			return modregistry.RegistryLocation{}, fmt.Errorf("cannot make client: %v", err)
+		}
+		r.registries[loc.Host] = reg1
+		reg = reg1
+	}
+	return modregistry.RegistryLocation{
+		Registry:   reg,
+		Repository: loc.Repository,
+		Tag:        loc.Tag,
+	}, nil
+}
+
+func getRegistryEnv() (string, bool) {
+	env := os.Getenv("CUE_REGISTRY")
+	if !cueexperiment.Flags.Modules {
+		if env != "" {
+			fmt.Fprintf(os.Stderr, "warning: ignoring CUE_REGISTRY because modules experiment is not enabled. Set CUE_EXPERIMENT=modules to enable it.\n")
+		}
+		return "", false
+	}
+	if env == "" {
+		env = defaultRegistry
+	}
+	return env, true
 }
 
 type cueLoginsAuthorizer struct {
@@ -111,8 +167,8 @@ func (a *cueLoginsAuthorizer) DoRequest(req *http.Request, requiredScope ociauth
 }
 
 func getCachedRegistry() (modload.Registry, error) {
-	reg, err := getRegistry()
-	if reg == nil {
+	resolver, err := getRegistryResolver()
+	if resolver == nil {
 		return nil, err
 	}
 	cacheDir, err := modCacheDir()
@@ -122,5 +178,5 @@ func getCachedRegistry() (modload.Registry, error) {
 	if err := os.MkdirAll(cacheDir, 0o777); err != nil {
 		return nil, fmt.Errorf("cannot create cache directory: %v", err)
 	}
-	return modcache.New(reg, cacheDir)
+	return modcache.New(modregistry.NewClientWithResolver(resolver), cacheDir)
 }

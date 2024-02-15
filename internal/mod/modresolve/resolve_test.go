@@ -1,18 +1,21 @@
 package modresolve
 
 import (
+	"crypto/sha256"
+	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/go-quicktest/qt"
 )
 
-func TestResolver(t *testing.T) {
+func TestParseCUERegistry(t *testing.T) {
 	testCases := []struct {
 		testName        string
 		in              string
 		catchAllDefault string
 		err             string
-		lookups         map[string]Location
+		lookups         map[string]*Location
 	}{{
 		testName: "MultipleFallbacks",
 		in:       "registry.somewhere,registry.other",
@@ -77,102 +80,110 @@ func TestResolver(t *testing.T) {
 	}, {
 		testName:        "SingleCatchAll",
 		catchAllDefault: "registry.somewhere",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host: "registry.somewhere",
+				Host:       "registry.somewhere",
+				Repository: "fruit.com/apple",
 			},
 		},
 	}, {
 		testName: "CatchAllWithNoDefault",
 		in:       "registry.somewhere",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host: "registry.somewhere",
+				Host:       "registry.somewhere",
+				Repository: "fruit.com/apple",
 			},
 		},
 	}, {
 		testName:        "CatchAllWithDefault",
 		in:              "registry.somewhere",
 		catchAllDefault: "other.cue.somewhere",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host: "registry.somewhere",
+				Repository: "fruit.com/apple",
+				Host:       "registry.somewhere",
 			},
-			"": {
-				Host: "registry.somewhere",
-			},
+			"": nil,
 		},
 	}, {
 		testName: "PrefixWithCatchAllNoDefault",
 		in:       "example.com=registry.example.com/offset,registry.somewhere",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host: "registry.somewhere",
+				Host:       "registry.somewhere",
+				Repository: "fruit.com/apple",
 			},
 			"example.com/blah": {
-				Host:   "registry.example.com",
-				Prefix: "offset",
+				Host:       "registry.example.com",
+				Repository: "offset/example.com/blah",
 			},
 			"example.com": {
-				Host:   "registry.example.com",
-				Prefix: "offset",
+				Host:       "registry.example.com",
+				Repository: "offset/example.com",
 			},
 		},
 	}, {
 		testName:        "PrefixWithCatchAllDefault",
 		in:              "example.com=registry.example.com/offset",
 		catchAllDefault: "registry.somewhere",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host: "registry.somewhere",
+				Host:       "registry.somewhere",
+				Repository: "fruit.com/apple",
 			},
 			"example.com/blah": {
-				Host:   "registry.example.com",
-				Prefix: "offset",
+				Host:       "registry.example.com",
+				Repository: "offset/example.com/blah",
 			},
 		},
 	}, {
 		testName: "LocalhostIsInsecure",
 		in:       "localhost:5000",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host:     "localhost:5000",
-				Insecure: true,
+				Host:       "localhost:5000",
+				Insecure:   true,
+				Repository: "fruit.com/apple",
 			},
 		},
 	}, {
 		testName: "SecureLocalhost",
 		in:       "localhost:1234+secure",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host: "localhost:1234",
+				Host:       "localhost:1234",
+				Repository: "fruit.com/apple",
 			},
 		},
 	}, {
 		testName: "127.0.0.1IsInsecure",
 		in:       "127.0.0.1",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host:     "127.0.0.1",
-				Insecure: true,
+				Host:       "127.0.0.1",
+				Insecure:   true,
+				Repository: "fruit.com/apple",
 			},
 		},
 	}, {
 		testName: "[::1]IsInsecure",
 		in:       "[::1]",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host:     "[::1]",
-				Insecure: true,
+				Host:       "[::1]",
+				Insecure:   true,
+				Repository: "fruit.com/apple",
 			},
 		},
 	}, {
 		testName: "[0:0::1]IsInsecure",
 		in:       "[0:0::1]",
-		lookups: map[string]Location{
+		lookups: map[string]*Location{
 			"fruit.com/apple": {
-				Host:     "[0:0::1]",
-				Insecure: true,
+				Host:       "[0:0::1]",
+				Insecure:   true,
+				Repository: "fruit.com/apple",
 			},
 		},
 	}}
@@ -185,10 +196,91 @@ func TestResolver(t *testing.T) {
 				return
 			}
 			qt.Assert(t, qt.IsNil(err))
-			for prefix, want := range tc.lookups {
-				got := r.Resolve(prefix)
-				qt.Assert(t, qt.Equals(got, want), qt.Commentf("prefix %q", prefix))
+			testLookups(t, r, tc.lookups)
+		})
+	}
+}
+
+func TestParseConfig(t *testing.T) {
+	testCases := []struct {
+		testName        string
+		in              string
+		catchAllDefault string
+		err             string
+		lookups         map[string]*Location
+	}{{
+		testName:        "NoRegistryOrDefault",
+		catchAllDefault: "",
+		err:             "no default catch-all registry provided",
+	}, {
+		testName: "InvalidRegistry",
+		in: `
+defaultRegistry: host: "$#foo"
+`,
+		err: `invalid default registry configuration: invalid host name "\$#foo"`,
+	}, {
+		testName: "EncHashAsRepo",
+		in: `
+defaultRegistry: {
+	host: "registry.somewhere"
+	repository: "hello"
+	pathEncoding: "hashAsRepo"
+	prefixForTags: "mod-"
+}
+`,
+		lookups: map[string]*Location{
+			"foo.com/bar v1.2.3": {
+				Host:       "registry.somewhere",
+				Repository: "hello/" + hashOf("foo.com/bar"),
+				Tag:        "v1.2.3",
+			},
+		},
+	}, {
+		testName: "EncHashAsTag",
+		in: `
+defaultRegistry: {
+	host: "registry.somewhere"
+	repository: "hello"
+	pathEncoding: "hashAsTag"
+	prefixForTags: "mod-"
+}
+`,
+		lookups: map[string]*Location{
+			"foo.com/bar v1.2.3": {
+				Host:       "registry.somewhere",
+				Repository: "hello",
+				Tag:        hashOf("foo.com/bar") + "-v1.2.3",
+			},
+		},
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.testName, func(t *testing.T) {
+			r, err := ParseConfig([]byte(tc.in), "somefile.cue", tc.catchAllDefault)
+			if tc.err != "" {
+				qt.Assert(t, qt.ErrorMatches(err, tc.err))
+				return
+			}
+			qt.Assert(t, qt.IsNil(err))
+			testLookups(t, r, tc.lookups)
+		})
+	}
+}
+
+func testLookups(t *testing.T, r Resolver, lookups map[string]*Location) {
+	for key, want := range lookups {
+		t.Run(key, func(t *testing.T) {
+			m, v, _ := strings.Cut(key, " ")
+			got, ok := r.Resolve(m, v)
+			if want == nil {
+				qt.Assert(t, qt.IsFalse(ok))
+			} else {
+				qt.Assert(t, qt.DeepEquals(&got, want))
 			}
 		})
 	}
+}
+
+func hashOf(s string) string {
+	return fmt.Sprintf("%x", sha256.Sum256([]byte(s)))
 }

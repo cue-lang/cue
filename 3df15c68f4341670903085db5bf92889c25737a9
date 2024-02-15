@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70dc4132_154c3a56",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-15T11:16:02Z",
+      "side": 1,
+      "message": "LGTM with one suggestion and assuming green trybots.",
+      "revId": "3df15c68f4341670903085db5bf92889c25737a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16b6aadb_50ddcafb",
+        "filename": "cmd/cue/cmd/modregistry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-15T11:16:02Z",
+      "side": 1,
+      "message": "Per our offline chat, please add a TODO on adding tests (of some kind) for this command.",
+      "revId": "3df15c68f4341670903085db5bf92889c25737a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

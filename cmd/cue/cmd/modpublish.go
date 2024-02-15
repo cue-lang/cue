@@ -45,11 +45,11 @@ Also note that this command does no dependency or other checks at the moment.
 }
 
 func runModUpload(cmd *Command, args []string) error {
-	reg, err := getRegistry()
+	resolver, err := getRegistryResolver()
 	if err != nil {
 		return err
 	}
-	if reg == nil {
+	if resolver == nil {
 		return fmt.Errorf("no registry configured to publish to")
 	}
 	modRoot, err := findModuleRoot()
@@ -86,7 +86,7 @@ func runModUpload(cmd *Command, args []string) error {
 		return err
 	}
 
-	rclient := modregistry.NewClient(reg)
+	rclient := modregistry.NewClientWithResolver(resolver)
 	if err := rclient.PutModule(context.Background(), mv, zf, info.Size()); err != nil {
 		return fmt.Errorf("cannot put module: %v", err)
 	}

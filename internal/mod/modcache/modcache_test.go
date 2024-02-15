@@ -16,6 +16,7 @@ import (
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/registrytest"
@@ -44,7 +45,7 @@ deps: {
 	var wg sync.WaitGroup
 	fetch := func(r ociregistry.Interface) {
 		defer wg.Done()
-		cr, err := New(r, dir)
+		cr, err := New(modregistry.NewClient(r), dir)
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
@@ -129,7 +130,7 @@ package x
 	var wg sync.WaitGroup
 	fetch := func(r ociregistry.Interface) {
 		defer wg.Done()
-		cr, err := New(r, dir)
+		cr, err := New(modregistry.NewClient(r), dir)
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}

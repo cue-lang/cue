@@ -20,6 +20,8 @@ import (
 
 const defaultRegistry = "registry.cue.works"
 
+var ignoringCUERegistryOnce sync.Once
+
 // getRegistryResolver returns an implementation of [modregistry.Resolver]
 // that resolves to registries as specified in the configuration.
 //
@@ -30,7 +32,9 @@ func getRegistryResolver() (*registryResolver, error) {
 	env := os.Getenv("CUE_REGISTRY")
 	if !cueexperiment.Flags.Modules {
 		if env != "" {
-			fmt.Fprintf(os.Stderr, "warning: ignoring CUE_REGISTRY because modules experiment is not enabled. Set CUE_EXPERIMENT=modules to enable it.\n")
+			ignoringCUERegistryOnce.Do(func() {
+				fmt.Fprintf(os.Stderr, "warning: ignoring CUE_REGISTRY because modules experiment is not enabled. Set CUE_EXPERIMENT=modules to enable it.\n")
+			})
 		}
 		return nil, nil
 	}

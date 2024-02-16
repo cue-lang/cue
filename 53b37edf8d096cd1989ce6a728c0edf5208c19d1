@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "69f3323f_9a26fd9d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "nit: commit message line length again",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a7f69074_65f9f252",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "LGTM from my perspective with a couple more suggestions. I\u0027ve replied to a couple of comments asking @mvdan@mvdan.cc for final thoughts. Will leave him to +2 therefore.",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "777aa2eb_92f9df6d",
+        "filename": "internal/mod/modresolve/resolve_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "nit: you don\u0027t appear to have a test that combines `defaultRegistry` and `moduleRegistries`?",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ff860e1e_55afd358",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "nit: is \"holds\" a verb we are leaning towards here? vs \"declares\"?",
+      "range": {
+        "startLine": 36,
+        "startChar": 9,
+        "endLine": 36,
+        "endChar": 14
+      },
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0db23057_11f947a5",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "We could encode this via:\n\n```\nif pathEncoding !\u003d _|_ \u0026\u0026 pathEncoding \u003d\u003d \"path\" {\n    stripPrefix?: bool\n}\n```",
+      "range": {
+        "startLine": 71,
+        "startChar": 11,
+        "endLine": 71,
+        "endChar": 56
+      },
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5cb71bf6_e4f4aaf8",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "nit: \"this definition\" that you refer to is the same definition as the one above to my mind. \n\nIs there any reason we wouldn\u0027t refer to these defaults as a regular field, perhaps `registryDefaults`, with the RHS the unification of the `#registry` definition and the struct value you propose? That way we side-step the naming issue.",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

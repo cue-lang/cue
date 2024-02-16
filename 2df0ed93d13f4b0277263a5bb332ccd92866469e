@@ -357,6 +357,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d42ba9b_afd88987",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "Yes, my suggestion of documenting as \"corresponding to the CUE schema\" was meant to indicate that the CUE schema is indeed the source of truth. The need to document these in Go code would disappear if we used `cue get go`.",
+      "parentUuid": "d3ed0d49_3cc8cf73",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1a2ad710_a41abb56",
@@ -406,6 +424,24 @@
       "side": 1,
       "message": "The main reason is that it\u0027s useful to have a lexical-only implementation of the resolver (this package) which can be used for other purposes too. For example, the `cue mod where` command that\u0027s mooted above needs to see the host name but not the registry itself. This package has no need to know how to create a registry implementation. I personally think the separation of concerns is fairly reasonable, although perhaps the naming could be improved.\n\nAny better naming suggestions welcome. For now, my 2c is that this is internal code for now and as such the naming isn\u0027t super crucial.",
       "parentUuid": "cccc5742_ec27627e",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c4ad6189_5eb4fb89",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "\u003e Any better naming suggestions welcome. For now, my 2c is that this is internal code for now and as such the naming isn\u0027t super crucial.\n\nHappy with this conclusion, because I don\u0027t have any better names right now. But again I defer to @mvdan@mvdan.cc who first raised the point... not least because he might have some suggestions.",
+      "parentUuid": "f0fda420_1bfcbaa8",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -593,6 +629,24 @@
       "side": 1,
       "message": "Unfortunately the character set we\u0027ve got to deal with is `[a-z\\-._]` which precludes base64. We could go with lower-case base32 without padding, I guess, which would end up with 52 characters, but I\u0027m not entirely convinced it\u0027s worth it. The registry specification specifically allows for tags up to 128 characters, and I suspect that version numbers larger than 63 characters are quite rare.\n\nRe using a shorter hash, I think it\u0027s probably important to use a properly collision resistant hash, otherwise someone malicious might be craft a version number that results in a collision, resulting in the possibility of a DoS attack or worse.",
       "parentUuid": "a031deeb_4c5ff7b2",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68ee9329_54f512d2",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T19:20:31Z",
+      "side": 1,
+      "message": "I would tend to agree with Rog here. Worst case we need to revisit the default strategies we offer, but this feels like a good starting point. Leaving @mvdan@mvdan.cc to mark resolved if he is comfortable with that position.",
+      "parentUuid": "ee1282f5_2de6cf7f",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

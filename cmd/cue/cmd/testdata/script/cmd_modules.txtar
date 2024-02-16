@@ -1,0 +1,32 @@
+exec cue cmd print
+cmp stdout expect-stdout
+
+-- expect-stdout --
+hello, world
+-- task_tool.cue --
+package home
+
+import (
+	"tool/cli"
+	textPkg "foo.example/text"
+)
+
+command: print: {
+	print: cli.Print & {
+		text: "hello, \(textPkg.value)"
+	}
+}
+-- cue.mod/module.cue --
+module: "main.example"
+
+deps: "foo.example/text@v0": {
+	default: true
+	v: "v0.0.1"
+}
+-- task.cue --
+package home
+-- _registry/foo.example_text_v0.0.1/cue.mod/module.cue --
+module: "foo.example/text@v0"
+-- _registry/foo.example_text_v0.0.1/text.cue --
+package text
+value: "world"

@@ -41,6 +41,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "b18fe5a8_35238f88",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "As part of this issue and your discussions with Max, did you confirm that one of the strategies introduced in this CL will fix the GitLab situation, modulo other fixes required as part of #2817?\n\nAssuming you did, please explain in the commit message how the GitLab situation is fixed.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "ff0efa58_09b2ead6",
@@ -94,6 +111,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7d953341_0d535129",
+        "filename": "go.mod",
+        "patchSetId": 5
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "This upgrade should be called out in the commit message.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "6f2f6ad4_816b22f9",
         "filename": "internal/mod/modregistry/client.go",
         "patchSetId": 5
@@ -134,6 +168,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0c649510_d8c9661b",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "These should be documented as corresponding to the CUE schema introduced in this change. Like with a TODO explaining why we haven\u0027t used cue get go to generate it.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "1a2ad710_a41abb56",
         "filename": "internal/mod/modresolve/resolve.go",
         "patchSetId": 5
@@ -145,6 +196,24 @@
       "writtenOn": "2024-02-16T13:34:46Z",
       "side": 1,
       "message": "I\u0027m very confused by the fact that we end up with two Resolve interfaces in two different packages, which are similar but actually incompatible with their Resolve methods.\n\nDo we actually need the two interfaces? I get that not every implementation needs an AllHosts method, but that could always be an optional interface on top of the shared Resolver interface.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cccc5742_ec27627e",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "The need for both is clear to my mind, at least based on discussions with Rog. But I admit my review here is relatively cursory so happy to be corrected on that. \n\nIf they remain as two interfaces I think we could name them rather more precisely. And also document where the interfaces get used, e.g. the hypothesised `cue mod where` in https://cuelang.org/cl/2829.",
+      "parentUuid": "1a2ad710_a41abb56",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -168,6 +237,40 @@
         "endLine": 82,
         "endChar": 33
       },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27252739_f679f406",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "This should be documented as corresponding to the CUE schema introduced in this change. Like with a TODO explaining why we haven\u0027t used `cue get go` to generate it.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1455d84b_475c4fd7",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "This should be documented as corresponding to the CUE schema introduced in this change. Like with a TODO explaining why we haven\u0027t used `cue get go` to generate it.",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -208,6 +311,40 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "37ef93fa_d8ea6fb5",
+        "filename": "internal/mod/modresolve/resolve_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 220,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "There doesn\u0027t appear to be any coverage of `moduleRegistries` in these tests?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a84733a8_64ca75d6",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "Please document these fields. These schema changes lie at the heart of this change.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "387199e8_3e391519",
         "filename": "internal/mod/modresolve/schema.cue",
         "patchSetId": 5
@@ -231,6 +368,47 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "8b34bcc7_82454bd6",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "Same question from me too.",
+      "parentUuid": "387199e8_3e391519",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 1
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "062d40d3_279b02ae",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "The valid values here need documenting. This schema will likely be surfaced as-is for documentation.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "8f60cbd9_07b436e2",
         "filename": "internal/mod/modresolve/schema.cue",
         "patchSetId": 5
@@ -242,6 +420,24 @@
       "writtenOn": "2024-02-16T13:34:46Z",
       "side": 1,
       "message": "please document these fields, particularly the last two, as they\u0027re not immediately obvious to me. for example, what kind of hashing are you doing? should the tag prefix still try to be semver-compatible or is it whatever I like?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "583bce75_d9e9d253",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-16T14:08:51Z",
+      "side": 1,
+      "message": "Agreed. And document the definition itself.",
+      "parentUuid": "8f60cbd9_07b436e2",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

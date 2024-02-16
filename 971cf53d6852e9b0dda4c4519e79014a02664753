@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89fe84d9_19d70be0",
+        "filename": "cmd/cue/cmd/testdata/script/registry_simple.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:38:04Z",
+      "side": 1,
+      "message": "shouldn\u0027t each of these tests use an empty module cache? otherwise you might not notice if e.g. command 1 fills the cache, and command 2 has broken registry support but happily succeeds thanks to the cache.",
+      "revId": "971cf53d6852e9b0dda4c4519e79014a02664753",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -778,13 +778,15 @@ func buildToolInstances(binst []*build.Instance) ([]*cue.Instance, error) {
 }
 
 func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
-	cfg := &load.Config{
-		Tools: true,
+	cfg, err := defaultConfig()
+	if err != nil {
+		return nil, err
 	}
+	cfg.loadCfg.Tools = true
 	f := cmd.cmd.Flags()
-	setTags(cfg, f, cmd.cmd.Parent().Flags())
+	setTags(cfg.loadCfg, f, cmd.cmd.Parent().Flags())
 
-	binst := loadFromArgs(args, cfg)
+	binst := loadFromArgs(args, cfg.loadCfg)
 	if len(binst) == 0 {
 		return nil, nil
 	}

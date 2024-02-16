@@ -1,0 +1,249 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16fe1b35_40c682b6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "out of curiosity, why do some, but not all, of your sentences end with two spaces? Not a huge deal but the way it\u0027s inconsistent is distracting me slightly when I read.",
+      "range": {
+        "startLine": 10,
+        "startChar": 19,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "728aa722_12299ce5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "please remember to not go over the limit if you can",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff0efa58_09b2ead6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "I\u0027m reluctant to +2 straight away as the double Resolver interface stumps me. Maybe we must have two incompatible interfaces, but in that case, at least I\u0027d like to see the reasoning explained in their godocs, and for them to have better names so they are not confused.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "344e83c1_51ecf92d",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "nit: separate the fields guarded by the mutex with an empty line, given that you don\u0027t explicitly document which are protected. or with a comment, like you did elsewhere.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "06733ded_a06d86df",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "is a word missing here, like \"when\"?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f2f6ad4_816b22f9",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "please document these.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fe450e7_df294b3b",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "slightly confusing :) can we reword, like \"the tag where the module version is located\"?",
+      "range": {
+        "startLine": 55,
+        "startChar": 14,
+        "endLine": 55,
+        "endChar": 33
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1a2ad710_a41abb56",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "I\u0027m very confused by the fact that we end up with two Resolve interfaces in two different packages, which are similar but actually incompatible with their Resolve methods.\n\nDo we actually need the two interfaces? I get that not every implementation needs an AllHosts method, but that could always be an optional interface on top of the shared Resolver interface.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5bfc37a_687ed6f0",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "Similar to my earlier comment, I\u0027m not a fan of the wording :) Which is perhaps not surprising, given that this is a copy-paste. So another reason why I don\u0027t understand the duplication.",
+      "range": {
+        "startLine": 82,
+        "startChar": 4,
+        "endLine": 82,
+        "endChar": 33
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce3a364e_9334e29a",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "incomplete godoc?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a031deeb_4c5ff7b2",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "using whole sha256 sums encoded in hex will mean fairly large strings (64 characters I believe), which might cause issues with some registries due to length limits, and make the logs and actual artifacts just harder to deal with.\n\ncan we use base64.URLEncoding, or perhaps a shorter hash like half of sha256?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "387199e8_3e391519",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "why is this bit separate? i.e. below you could just have\n\n    pathEncoding: *\"path\" | \"hashAsRepo\" | \"hashAsTag\"",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 1
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f60cbd9_07b436e2",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-16T13:34:46Z",
+      "side": 1,
+      "message": "please document these fields, particularly the last two, as they\u0027re not immediately obvious to me. for example, what kind of hashing are you doing? should the tag prefix still try to be semver-compatible or is it whatever I like?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

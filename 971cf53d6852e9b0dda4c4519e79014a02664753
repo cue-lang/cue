@@ -16,6 +16,24 @@
       "message": "shouldn\u0027t each of these tests use an empty module cache? otherwise you might not notice if e.g. command 1 fills the cache, and command 2 has broken registry support but happily succeeds thanks to the cache.",
       "revId": "971cf53d6852e9b0dda4c4519e79014a02664753",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b490d03f_2f52abee",
+        "filename": "cmd/cue/cmd/testdata/script/registry_simple.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:42:49Z",
+      "side": 1,
+      "message": "I don\u0027t think that matters much, tbh, as it\u0027s not possible to wire up the cache support without also wiring up the underlying module fetching support (the two go hand in hand in the implementation).",
+      "parentUuid": "89fe84d9_19d70be0",
+      "revId": "971cf53d6852e9b0dda4c4519e79014a02664753",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

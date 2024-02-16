@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5ff3395c_1fa030e0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Because I\u0027m using /usr/bin/fmt to wrap the text and it turns out that doesn\u0027t normalise spaces after a period. I\u0027ll switch to using a different version that does.",
+      "parentUuid": "16fe1b35_40c682b6",
+      "range": {
+        "startLine": 10,
+        "startChar": 19,
+        "endLine": 10,
+        "endChar": 21
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "728aa722_12299ce5",
@@ -41,6 +65,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c616cfc3_3ad847d4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "728aa722_12299ce5",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b18fe5a8_35238f88",
@@ -54,6 +96,24 @@
       "writtenOn": "2024-02-16T14:08:51Z",
       "side": 1,
       "message": "As part of this issue and your discussions with Max, did you confirm that one of the strategies introduced in this CL will fix the GitLab situation, modulo other fixes required as part of #2817?\n\nAssuming you did, please explain in the commit message how the GitLab situation is fixed.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a08283c3_e31593b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b18fe5a8_35238f88",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -92,6 +152,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d92ca793_64787a08",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "344e83c1_51ecf92d",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "06733ded_a06d86df",
@@ -105,6 +183,24 @@
       "writtenOn": "2024-02-16T13:34:46Z",
       "side": 1,
       "message": "is a word missing here, like \"when\"?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d8653ea_f671a655",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 100,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Yup.",
+      "parentUuid": "06733ded_a06d86df",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -126,6 +222,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b102f624_b93b16cc",
+        "filename": "go.mod",
+        "patchSetId": 5
+      },
+      "lineNbr": 6,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7d953341_0d535129",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6f2f6ad4_816b22f9",
@@ -139,6 +253,24 @@
       "writtenOn": "2024-02-16T13:34:46Z",
       "side": 1,
       "message": "please document these.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a5c57d0_3cb96ddd",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f2f6ad4_816b22f9",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -166,6 +298,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "99b812fc_3daef3b4",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fe450e7_df294b3b",
+      "range": {
+        "startLine": 55,
+        "startChar": 14,
+        "endLine": 55,
+        "endChar": 33
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0c649510_d8c9661b",
@@ -179,6 +335,24 @@
       "writtenOn": "2024-02-16T14:08:51Z",
       "side": 1,
       "message": "These should be documented as corresponding to the CUE schema introduced in this change. Like with a TODO explaining why we haven\u0027t used cue get go to generate it.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3ed0d49_3cc8cf73",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Wouldn\u0027t we want the CUE schema to be the source of truth in this case anyway?\nI\u0027ll write a TODO but the other way around.",
+      "parentUuid": "0c649510_d8c9661b",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -220,6 +394,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f0fda420_1bfcbaa8",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "The main reason is that it\u0027s useful to have a lexical-only implementation of the resolver (this package) which can be used for other purposes too. For example, the `cue mod where` command that\u0027s mooted above needs to see the host name but not the registry itself. This package has no need to know how to create a registry implementation. I personally think the separation of concerns is fairly reasonable, although perhaps the naming could be improved.\n\nAny better naming suggestions welcome. For now, my 2c is that this is internal code for now and as such the naming isn\u0027t super crucial.",
+      "parentUuid": "cccc5742_ec27627e",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5bfc37a_687ed6f0",
         "filename": "internal/mod/modresolve/resolve.go",
         "patchSetId": 5
@@ -231,6 +423,30 @@
       "writtenOn": "2024-02-16T13:34:46Z",
       "side": 1,
       "message": "Similar to my earlier comment, I\u0027m not a fan of the wording :) Which is perhaps not surprising, given that this is a copy-paste. So another reason why I don\u0027t understand the duplication.",
+      "range": {
+        "startLine": 82,
+        "startChar": 4,
+        "endLine": 82,
+        "endChar": 33
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5eb8541c_0506505a",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d5bfc37a_687ed6f0",
       "range": {
         "startLine": 82,
         "startChar": 4,
@@ -258,6 +474,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "143fbb0f_60b93385",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 89,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "27252739_f679f406",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1455d84b_475c4fd7",
@@ -271,6 +505,24 @@
       "writtenOn": "2024-02-16T14:08:51Z",
       "side": 1,
       "message": "This should be documented as corresponding to the CUE schema introduced in this change. Like with a TODO explaining why we haven\u0027t used `cue get go` to generate it.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21239eb3_9a9a01fd",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1455d84b_475c4fd7",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -292,6 +544,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab2640af_7eba62d3",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 154,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce3a364e_9334e29a",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a031deeb_4c5ff7b2",
@@ -305,6 +575,24 @@
       "writtenOn": "2024-02-16T13:34:46Z",
       "side": 1,
       "message": "using whole sha256 sums encoded in hex will mean fairly large strings (64 characters I believe), which might cause issues with some registries due to length limits, and make the logs and actual artifacts just harder to deal with.\n\ncan we use base64.URLEncoding, or perhaps a shorter hash like half of sha256?",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ee1282f5_2de6cf7f",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Unfortunately the character set we\u0027ve got to deal with is `[a-z\\-._]` which precludes base64. We could go with lower-case base32 without padding, I guess, which would end up with 52 characters, but I\u0027m not entirely convinced it\u0027s worth it. The registry specification specifically allows for tags up to 128 characters, and I suspect that version numbers larger than 63 characters are quite rare.\n\nRe using a shorter hash, I think it\u0027s probably important to use a properly collision resistant hash, otherwise someone malicious might be craft a version number that results in a collision, resulting in the possibility of a DoS attack or worse.",
+      "parentUuid": "a031deeb_4c5ff7b2",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -339,6 +627,24 @@
       "writtenOn": "2024-02-16T14:08:51Z",
       "side": 1,
       "message": "Please document these fields. These schema changes lie at the heart of this change.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d0180108_69d88620",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a84733a8_64ca75d6",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -390,6 +696,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "767b5bc4_1569f218",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "I\u0027ve done it this way because it\u0027s best practice to keep regular fields out of pure schema. So this is arguably a bit of a hack to make the code simpler, while keeping the actual schema separate so it can be understood independently as a pure schema.\n\nI\u0027ve added a note to that effect.",
+      "parentUuid": "8b34bcc7_82454bd6",
+      "range": {
+        "startLine": 21,
+        "startChar": 0,
+        "endLine": 23,
+        "endChar": 1
+      },
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "062d40d3_279b02ae",
@@ -403,6 +733,24 @@
       "writtenOn": "2024-02-16T14:08:51Z",
       "side": 1,
       "message": "The valid values here need documenting. This schema will likely be surfaced as-is for documentation.",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "68f1f9b5_9f119c7e",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "062d40d3_279b02ae",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -438,6 +786,24 @@
       "side": 1,
       "message": "Agreed. And document the definition itself.",
       "parentUuid": "8f60cbd9_07b436e2",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d18a49e_544d111d",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-16T15:36:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "583bce75_d9e9d253",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

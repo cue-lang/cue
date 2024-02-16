@@ -22,7 +22,6 @@ import (
 	"io/fs"
 	"os"
 	"path/filepath"
-	"strings"
 	"time"
 
 	"github.com/spf13/cobra"
@@ -64,27 +63,26 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			ctx := context.Background()
 
-			// TODO: deduplicate some of this logic with getRegistry;
-			// note that ParseCUERegistry returns a Resolver, which doesn't expose the list of registries.
-			// We also want to verify that a registry string is valid.
-			var registry string
-			if len(args) == 1 {
-				registry = args[0]
-				if registry == "" {
-					// An explicit argument must be valid.
-					return fmt.Errorf("need a CUE registry to log into")
-				}
-			} else {
-				registry = os.Getenv("CUE_REGISTRY")
-				if registry == "" {
-					// CUE_REGISTRY defaults to the central registry.
-					registry = "registry.cue.works"
-				}
+			resolver, err := getRegistryResolver()
+			if err != nil {
+				return err
 			}
-			if strings.Contains(registry, ",") {
+			if resolver == nil {
+				return fmt.Errorf("cannot log in when modules are not enabled")
+			}
+			registryHosts := resolver.resolver.AllHosts()
+			if len(registryHosts) > 1 {
 				return fmt.Errorf("need a single CUE registry to log into")
 			}
-
+			registry := registryHosts[0].Name
+			loginsPath, err := findLoginsPath()
+			if err != nil {
+				return fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
+			}
+			logins, err := readLogins(loginsPath)
+			if err != nil {
+				return fmt.Errorf("cannot load CUE registry logins: %v", err)
+			}
 			oauthCfg := registryOAuthConfig(registry)
 
 			resp, err := oauthCfg.DeviceAuth(ctx)
@@ -99,15 +97,6 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 			tok, err := oauthCfg.DeviceAccessToken(ctx, resp)
 			if err != nil {
 				return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
-			}
-
-			loginsPath, err := findLoginsPath()
-			if err != nil {
-				return fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
-			}
-			logins, err := readLogins(loginsPath)
-			if err != nil {
-				return fmt.Errorf("cannot load CUE registry logins: %v", err)
 			}
 
 			logins.Registries[registry] = loginFromToken(tok)

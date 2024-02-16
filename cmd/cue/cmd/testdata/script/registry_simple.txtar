@@ -1,12 +1,26 @@
 exec cat cue.mod/module.cue
 exec cue eval .
 cmp stdout expect-stdout
+
+# Check that other commands work with modules too.
+exec cue export .
+cmp stdout expect-stdout-json
+exec cue trim .
+exec cue vet .
 -- expect-stdout --
 main:                   "main"
 "foo.com/bar/hello@v0": "v0.2.3"
 "bar.com@v0":           "v0.5.0"
 "baz.org@v0":           "v0.10.1"
 "example.com@v0":       "v0.0.1"
+-- expect-stdout-json --
+{
+    "main": "main",
+    "foo.com/bar/hello@v0": "v0.2.3",
+    "bar.com@v0": "v0.5.0",
+    "baz.org@v0": "v0.10.1",
+    "example.com@v0": "v0.0.1"
+}
 -- cue.mod/module.cue --
 module: "main.org@v0"
 deps: {

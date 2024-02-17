@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55d4e260_37260b4a",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-17T18:54:16Z",
+      "side": 1,
+      "message": "I\u0027d delete this TODO for now; I don\u0027t think we want to support this. And if we do in the future, we can discuss/track it in the issue tracker.",
+      "revId": "7e1c77c445d01752f266ebd55569a75013571f91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

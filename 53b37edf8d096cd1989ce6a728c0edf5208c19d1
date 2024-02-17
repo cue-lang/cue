@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a97209c9_7f204e36",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-17T18:53:42Z",
+      "side": 1,
+      "message": "nit: godoc. in fact there was a godoc before, as far as I can see.",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "777aa2eb_92f9df6d",
         "filename": "internal/mod/modresolve/resolve_test.go",
         "patchSetId": 7

@@ -448,6 +448,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0ae5ba92_b42aee7a",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-17T18:53:42Z",
+      "side": 1,
+      "message": "Gotcha. Perhaps summarize the need for this interface versus the other in this godoc here, as otherwise the context that you gave here is largely lost to the commit/review history.\n\nSome names that come to mind: HostResolver and ConfigResolver. Alternatively we could leave a TODO to come up with a better name at some point. I realise naming is hard, but even as part of this review, having to remember which Resolver interface I\u0027m looking at is tricky, especially since they share a method name.",
+      "parentUuid": "c4ad6189_5eb4fb89",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d5bfc37a_687ed6f0",
         "filename": "internal/mod/modresolve/resolve.go",
         "patchSetId": 5
@@ -647,6 +665,24 @@
       "side": 1,
       "message": "I would tend to agree with Rog here. Worst case we need to revisit the default strategies we offer, but this feels like a good starting point. Leaving @mvdan@mvdan.cc to mark resolved if he is comfortable with that position.",
       "parentUuid": "ee1282f5_2de6cf7f",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a153060_ded43b0e",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-17T18:53:42Z",
+      "side": 1,
+      "message": "Gotcha, makes sense.",
+      "parentUuid": "68ee9329_54f512d2",
       "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

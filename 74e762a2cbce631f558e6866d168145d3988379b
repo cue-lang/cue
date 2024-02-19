@@ -77,6 +77,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1d5db959_bf977c31",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T09:28:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3cd8b8b_bb62e7c5",
+      "range": {
+        "startLine": 39,
+        "startChar": 26,
+        "endLine": 39,
+        "endChar": 27
+      },
+      "revId": "74e762a2cbce631f558e6866d168145d3988379b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "60ac2915_b59fc8bf",
@@ -90,6 +114,30 @@
       "writtenOn": "2024-02-12T13:09:43Z",
       "side": 1,
       "message": "add this to the publish command too?",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 31
+      },
+      "revId": "74e762a2cbce631f558e6866d168145d3988379b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a5065a4_84b4cdec",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T09:28:07Z",
+      "side": 1,
+      "message": "The publish command help already references `cue help environment`. Do you think it\u0027s worth doing that twice?",
+      "parentUuid": "60ac2915_b59fc8bf",
       "range": {
         "startLine": 45,
         "startChar": 0,

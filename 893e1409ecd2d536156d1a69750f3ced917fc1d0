@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1f792f4_b901848c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-19T18:03:36Z",
+      "side": 1,
+      "message": "Ah, I ended up writing this in https://review.gerrithub.io/c/cue-lang/cue/+/1177046.",
+      "parentUuid": "61130e0b_743ad07d",
+      "revId": "893e1409ecd2d536156d1a69750f3ced917fc1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "edbdba04_21d53da9",

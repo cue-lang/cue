@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "14047fac_bc08605b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-19T17:34:25Z",
+      "side": 1,
+      "message": "did you format this commit message to e.g. 60 columns? the limit is 76, as you can see from the vertical column in Gerrit\u0027s web UI or https://go.dev/wiki/CommitMessage. Not terrible that it\u0027s shorter, but short lines are a bit harder to read.\n\nI seem to recall you do this with fmt - perhaps worth looking into how to automate this somehow with acme, so that it automatically wraps long lines for you in Go comments (at 80) and git commits (at 76) so you don\u0027t need to remember to do the thing each time. at least most mainstream editors will either wrap for you or have some sort of line length limit guide, like Gerrit\u0027s UI here.",
+      "revId": "8a1233cc352dd0cc4804bea51df3e9eeb261ceea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "297778a4_0a222688",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-19T17:34:25Z",
+      "side": 1,
+      "message": "personally I lean towards `inline`, which should already be familiar to most CUE or Go programmers, e.g. ``Field `json:\",inline\"` `` or `cue def --inline-imports`. I don\u0027t think \"direct\" has any precedence; in fact it reminds me of `GOPROXY\u003ddirect`, which is something entirely different.",
+      "revId": "8a1233cc352dd0cc4804bea51df3e9eeb261ceea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

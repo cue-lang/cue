@@ -289,6 +289,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dd1f411e_ebd0dcf6",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-19T11:19:50Z",
+      "side": 1,
+      "message": "I would 100% make this a TODO then, because we need to remind ourselves to come back here once CUE has better errors/builtins.",
+      "parentUuid": "09aa45d9_b44a66b7",
+      "range": {
+        "startLine": 71,
+        "startChar": 11,
+        "endLine": 71,
+        "endChar": 56
+      },
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "5cb71bf6_e4f4aaf8",
         "filename": "internal/mod/modresolve/schema.cue",
         "patchSetId": 7

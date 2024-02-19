@@ -146,6 +146,30 @@
       },
       "revId": "74e762a2cbce631f558e6866d168145d3988379b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67552b0a_85280813",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-19T09:29:08Z",
+      "side": 1,
+      "message": "Ah good point.",
+      "parentUuid": "3a5065a4_84b4cdec",
+      "range": {
+        "startLine": 45,
+        "startChar": 0,
+        "endLine": 46,
+        "endChar": 31
+      },
+      "revId": "74e762a2cbce631f558e6866d168145d3988379b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

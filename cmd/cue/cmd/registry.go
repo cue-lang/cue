@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"sync"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -38,7 +39,28 @@ func getRegistryResolver() (*registryResolver, error) {
 		}
 		return nil, nil
 	}
-	resolver, err := modresolve.ParseCUERegistry(env, defaultRegistry)
+	var configData []byte
+	var configPath string
+	kind, rest, _ := strings.Cut(env, ":")
+	switch kind {
+	case "file":
+		data, err := os.ReadFile(rest)
+		if err != nil {
+			return nil, err
+		}
+		configData, configPath = data, rest
+	case "direct":
+		configData, configPath = []byte(rest), "$CUE_REGISTRY"
+	case "simple":
+		env = rest
+	}
+	var resolver modresolve.HostResolver
+	var err error
+	if configPath != "" {
+		resolver, err = modresolve.ParseConfig(configData, configPath, defaultRegistry)
+	} else {
+		resolver, err = modresolve.ParseCUERegistry(env, defaultRegistry)
+	}
 	if err != nil {
 		return nil, fmt.Errorf("bad value for $CUE_REGISTRY: %v", err)
 	}

@@ -3,7 +3,7 @@
 
 memregistry MEMREGISTRY
 env CUE_EXPERIMENT=modules
-env CUE_MODCACHE=$WORK/.tmp/cache
+env CUE_CACHE_DIR=$WORK/.tmp/cache
 env CUE_REGISTRY=$MEMREGISTRY+insecure
 
 cd example/foo

@@ -98,7 +98,7 @@ func TestScript(t *testing.T) {
 			env.Setenv("CUE_REGISTRY_TOKEN", os.Getenv("CUE_REGISTRY_TOKEN"))
 
 			// Just like cmd/cue/cmd.TestScript, set up separate cache and config dirs per test.
-			env.Setenv("CUE_MODCACHE", filepath.Join(env.WorkDir, "tmp/modcache"))
+			env.Setenv("CUE_CACHE_DIR", filepath.Join(env.WorkDir, "tmp/modcache"))
 			configDir := filepath.Join(env.WorkDir, "tmp/configdir")
 			env.Setenv("CUE_CONFIG_DIR", configDir)
 

@@ -75,7 +75,7 @@ deps: {
 	fetch(nil)
 
 	// Check that the file is stored in the expected place.
-	data, err := os.ReadFile(filepath.Join(dir, "cache/download/example.com/foo/@v/v0.0.1.mod"))
+	data, err := os.ReadFile(filepath.Join(dir, "download/example.com/foo/@v/v0.0.1.mod"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.Matches(string(data), `(?s).*module: "example.com/foo@v0".*`))
 }
@@ -124,7 +124,7 @@ package x
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.Equals(string(data), "package example\n"))
 		// Check that the actual paths are as expected.
-		qt.Check(t, qt.Equals(srcPath, filepath.Join(dir, "example.com", "foo@v0.0.1", "example.cue")))
+		qt.Check(t, qt.Equals(srcPath, filepath.Join(dir, "pkg", "example.com", "foo@v0.0.1", "example.cue")))
 		return true
 	}
 	var wg sync.WaitGroup

@@ -105,7 +105,7 @@ func (c *cache) downloadDir(ctx context.Context, m module.Version) (string, erro
 	}
 
 	// Check whether the directory itself exists.
-	dir := filepath.Join(c.dir, enc+"@"+encVer)
+	dir := filepath.Join(c.dir, "pkg", enc+"@"+encVer)
 	if fi, err := os.Stat(dir); os.IsNotExist(err) {
 		return dir, err
 	} else if err != nil {
@@ -140,7 +140,7 @@ func (c *cache) cachePath(ctx context.Context, m module.Version, suffix string) 
 	if err != nil {
 		return "", err
 	}
-	return filepath.Join(c.dir, "cache/download", esc, "/@v", encVer+"."+suffix), nil
+	return filepath.Join(c.dir, "download", esc, "/@v", encVer+"."+suffix), nil
 }
 
 // downloadDirPartialError is returned by DownloadDir if a module directory

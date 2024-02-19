@@ -190,9 +190,9 @@ setting.
 
 		Requires that CUE_EXPERIMENT=modules is enabled.
 
-	CUE_MODCACHE
+	CUE_CACHE_DIR
 		The directory where the cue command will store downloaded
-		modules.
+		modules and other cached files.
 
 		Requires that CUE_EXPERIMENT=modules is enabled.
 

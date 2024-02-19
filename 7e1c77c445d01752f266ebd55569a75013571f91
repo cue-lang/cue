@@ -16,6 +16,24 @@
       "message": "I\u0027d delete this TODO for now; I don\u0027t think we want to support this. And if we do in the future, we can discuss/track it in the issue tracker.",
       "revId": "7e1c77c445d01752f266ebd55569a75013571f91",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18b5df8f_fadb5599",
+        "filename": "cmd/cue/cmd/login.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T12:41:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "55d4e260_37260b4a",
+      "revId": "7e1c77c445d01752f266ebd55569a75013571f91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,42 +33,51 @@
 }
 
 #registry: {
-	// host specifies the host name or host:port pair of the registry.
-	// IPv6 host names should be enclosed in square brackets.
-	host!: #hostname
+	// registry specifies the registry host name and optionally, the
+	// repository prefix to use for all modules in the repository,
+	// and the security to use when accessing the host.
+	//
+	// It is in the form:
+	// 	hostname[:port][/repoPrefix][+insecure]
+	//
+	// The hostname must be specified in square brackets if it's an
+	// IPv6 address.
+	//
+	// Connections will be secure unless explicitly specified
+	// otherwise, except for localhost connections which default to
+	// insecure.
+	//
+	// See the doc comment on pathEncoding for details as to how
+	// repoPrefix is used to determine the repository to use for a
+	// specific module.
+	//
+	// Examples:
+	//	"localhost:1234"
+	//	"myregistry.example/my-modules+secure"
+	registry!: string
 
-	// insecure specifies whether an insecure connection should
-	// be made to the host.
-	insecure?: bool
-
-	// repository specifies the repository in the registry for storing
-	// modules. If pathEncoding is "path", this specifies the prefix
-	// for all modules in the repository. For example, if repository
-	// is foo/bar, module "x.example/y" will be stored at
-	// "foo/bar/x.example/y".
-	repository?: #repository
-
-	// pathEncoding specifies how module versions map to repositories
-	// within a registry.
+	// pathEncoding specifies how module versions map to
+	// repositories within a registry.
 	// Possible values are:
 	// - "path": the repository is used as a prefix to the unencoded
 	// module path. The version of the module is used as a tag.
-	// - "hashAsPath": the hex-encoded SHA256 hash of the path
-	// is used as a suffix to the above repository value. The version
+	// - "hashAsPath": the hex-encoded SHA256 hash of the path is
+	// used as a suffix to the above repository value. The version
 	// of the module is used as a tag.
 	// - "hashAsTag": the repository is used as is: the hex-encoded
 	// SHA256 hash of the path followed by a hyphen and the version
 	// is used as a tag.
 	pathEncoding?: "path" | "hashAsRepo" | "hashAsTag"
 
-	// prefixForTags specifies an arbitrary prefix that's added to all tags.
-	// This can be used to disambiguate tags when there might be
-	// some possibility of confusion with tags in use for other purposes.
+	// prefixForTags specifies an arbitrary prefix that's added to
+	// all tags. This can be used to disambiguate tags when there
+	// might be some possibility of confusion with tags in use for
+	// other purposes.
 	prefixForTags?: #tag
 
-	// TODO we could encode the invariant below in CUE
-	// but that would result in poor error messages. With an
-	// error builtin, that could perhaps be improved.
+	// TODO we could encode the invariant below in CUE but that
+	// would result in poor error messages. With an error builtin,
+	// that could perhaps be improved.
 
 	// stripPrefix specifies that the pattern prefix should be
 	// stripped from the module path before using as a repository
@@ -78,8 +87,6 @@
 
 // TODO more specific schemas below
 #modulePath: string
-#hostname: string
-#repository: string
 #tag: string
 
 // This aspect of #registry encodes the defaults used by the resolver

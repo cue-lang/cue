@@ -1,6 +1,27 @@
-env CUE_REGISTRY=${CUE_REGISTRY1},baz.org=$CUE_REGISTRY2
+# Check that the registry multiplexing can be specified in the simple format.
+env CUE_REGISTRY=${CUE_REGISTRY1},baz.org=$DEBUG_REGISTRY2_HOST/foo/bar+insecure
 exec cue eval .
 cmp stdout expect-stdout
+
+# Check that it also works with the "simple:" prefix.
+env CUE_REGISTRY=simple:${CUE_REGISTRY1},baz.org=$DEBUG_REGISTRY2_HOST/foo/bar+insecure
+exec cue eval .
+cmp stdout expect-stdout
+
+# Check that we can specify it as a file.
+env-fill _config/registry_config.cue
+env CUE_REGISTRY=file:_config/registry_config.cue
+exec cue eval .
+cmp stdout expect-stdout
+
+# Check that the configuration data can be passed directly in the env var.
+env CUE_REGISTRY='inline:defaultRegistry: registry: "'${CUE_REGISTRY1}'", moduleRegistries: "baz.org": registry: "'${CUE_REGISTRY2}'"'
+exec cue eval .
+cmp stdout expect-stdout
+
+-- _config/registry_config.cue --
+defaultRegistry: registry:     "${CUE_REGISTRY1}"
+moduleRegistries: "baz.org": registry:       "${CUE_REGISTRY2}"
 -- expect-stdout --
 main:                   "main"
 "foo.com/bar/hello@v0": "v0.2.3"
@@ -29,6 +50,10 @@ package main
 import "example.com@v0:main"
 
 main
+
+-- _registry2_prefix --
+foo/bar
+
 
 -- _registry1/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"

@@ -87,10 +87,8 @@ package protobuf
 import (
 	"os"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
-
-	"github.com/mpvl/unique"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -300,20 +298,20 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 
 	for _, p := range b.imports {
 		instances = append(instances, p)
-		sort.Strings(p.ImportPaths)
-		unique.Strings(&p.ImportPaths)
+		slices.Sort(p.ImportPaths)
+		p.ImportPaths = slices.Compact(p.ImportPaths)
 		for _, i := range p.ImportPaths {
 			if imp := b.imports[i]; imp != nil {
 				p.Imports = append(p.Imports, imp)
 			}
 		}
 
-		sort.Slice(p.Files, func(i, j int) bool {
-			return p.Files[i].Filename < p.Files[j].Filename
+		slices.SortFunc(p.Files, func(a, b *ast.File) int {
+			return strings.Compare(a.Filename, b.Filename)
 		})
 	}
-	sort.Slice(instances, func(i, j int) bool {
-		return instances[i].ImportPath < instances[j].ImportPath
+	slices.SortFunc(instances, func(a, b *build.Instance) int {
+		return strings.Compare(a.ImportPath, b.ImportPath)
 	})
 
 	if err != nil {

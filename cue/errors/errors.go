@@ -20,14 +20,14 @@
 package errors // import "cuelang.org/go/cue/errors"
 
 import (
+	"cmp"
 	"errors"
 	"fmt"
 	"io"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
-
-	"github.com/mpvl/unique"
 
 	"cuelang.org/go/cue/token"
 )
@@ -133,12 +133,11 @@ func Positions(err error) []token.Pos {
 
 	a := make([]token.Pos, 0, 3)
 
-	sortOffset := 0
 	pos := e.Position()
 	if pos.IsValid() {
 		a = append(a, pos)
-		sortOffset = 1
 	}
+	sortOffset := len(a)
 
 	for _, p := range e.InputPositions() {
 		if p.IsValid() && p != pos {
@@ -146,18 +145,9 @@ func Positions(err error) []token.Pos {
 		}
 	}
 
-	byPos := byPos(a[sortOffset:])
-	sort.Sort(byPos)
-	k := unique.ToFront(byPos)
-	return a[:k+sortOffset]
+	slices.SortFunc(a[sortOffset:], comparePos)
+	return slices.Compact(a)
 }
-
-type byPos []token.Pos
-
-func (s *byPos) Truncate(n int)    { (*s) = (*s)[:n] }
-func (s byPos) Len() int           { return len(s) }
-func (s byPos) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
-func (s byPos) Less(i, j int) bool { return comparePos(s[i], s[j]) == -1 }
 
 // Path returns the path of an Error if err is of that type.
 func Path(err error) []string {
@@ -384,22 +374,15 @@ func (p list) Less(i, j int) bool {
 	return p[i].Error() < p[j].Error()
 }
 
-func lessOrMore(isLess bool) int {
-	if isLess {
-		return -1
-	}
-	return 1
-}
-
 func comparePos(a, b token.Pos) int {
 	if a.Filename() != b.Filename() {
-		return lessOrMore(a.Filename() < b.Filename())
+		return cmp.Compare(a.Filename(), b.Filename())
 	}
 	if a.Line() != b.Line() {
-		return lessOrMore(a.Line() < b.Line())
+		return cmp.Compare(a.Line(), b.Line())
 	}
 	if a.Column() != b.Column() {
-		return lessOrMore(a.Column() < b.Column())
+		return cmp.Compare(a.Column(), b.Column())
 	}
 	return 0
 }

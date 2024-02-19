@@ -33,6 +33,24 @@
       "message": "In the interests of brevity, and because so many files sit under this, I\u0027d probably go for \"mod\" here. Or at any rate, prefer the singular form \"module\".",
       "revId": "087f60729f8cb03731abbdcbbd7ee9fe0ab042fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4c2cae1_78ffd9ef",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T18:10:59Z",
+      "side": 1,
+      "message": "(we use \"mod\" as an abbreviation for \"module\" in many places, so it seems reasonable here too to me).",
+      "parentUuid": "8a232937_d3a79624",
+      "revId": "087f60729f8cb03731abbdcbbd7ee9fe0ab042fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

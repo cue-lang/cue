@@ -16,12 +16,14 @@ package cmd
 
 import (
 	"bytes"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/spf13/pflag"
 	"golang.org/x/text/language"
@@ -846,3 +848,25 @@ func shortFile(root string, f *build.File) string {
 	}
 	return dir
 }
+
+var cueConfigDir = sync.OnceValues(func() (string, error) {
+	if dir := os.Getenv("CUE_CONFIG_DIR"); dir != "" {
+		return dir, nil
+	}
+	dir, err := os.UserConfigDir()
+	if err != nil {
+		return "", fmt.Errorf("cannot determine system config directory: %v", err)
+	}
+	return filepath.Join(dir, "cue"), nil
+})
+
+var cueCacheDir = sync.OnceValues(func() (string, error) {
+	if dir := os.Getenv("CUE_CACHE_DIR"); dir != "" {
+		return dir, nil
+	}
+	dir, err := os.UserCacheDir()
+	if err != nil {
+		return "", fmt.Errorf("cannot determine system cache directory: %v", err)
+	}
+	return filepath.Join(dir, "cue"), nil
+})

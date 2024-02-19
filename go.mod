@@ -11,7 +11,6 @@ require (
 	github.com/google/shlex v0.0.0-20191202100458-e7afc7fbc510
 	github.com/google/uuid v1.2.0
 	github.com/kr/pretty v0.3.1
-	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc4
 	github.com/protocolbuffers/txtpbfmt v0.0.0-20230328191034-3462fbc510c0

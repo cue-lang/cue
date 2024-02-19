@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "23c6ae53_f2f5c976",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "All the logic in internal/mod/modresolve for parsing the contents of the config file is present in this CL, so I\u0027d say this CL does exactly what it says here.",
+      "parentUuid": "be1f5a27_cc0e0ea1",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "69f3323f_9a26fd9d",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-16T19:20:31Z",
       "side": 1,
       "message": "nit: commit message line length again",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "28bdef2c_88221e71",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "69f3323f_9a26fd9d",
       "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7a802093_a5a07630",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "That\u0027s definitely a question to discuss in that later CL indeed.",
+      "parentUuid": "49891535_aee41485",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a97209c9_7f204e36",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-02-17T18:53:42Z",
       "side": 1,
       "message": "nit: godoc. in fact there was a godoc before, as far as I can see.",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "982ab51f_22624cd3",
+        "filename": "internal/mod/modregistry/client.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "I looked and couldn\u0027t find one... Added now.",
+      "parentUuid": "a97209c9_7f204e36",
       "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cf4c346_eec0470d",
+        "filename": "internal/mod/modresolve/resolve_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 278,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "777aa2eb_92f9df6d",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ff860e1e_55afd358",
@@ -116,6 +206,30 @@
       "writtenOn": "2024-02-16T19:20:31Z",
       "side": 1,
       "message": "nit: is \"holds\" a verb we are leaning towards here? vs \"declares\"?",
+      "range": {
+        "startLine": 36,
+        "startChar": 9,
+        "endLine": 36,
+        "endChar": 14
+      },
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a1b83a2f_fbab57e0",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "I definitely wouldn\u0027t use \"declares\", as to me that\u0027s more of a type-level thing. Could go with \"defines\" or \"specifies\", but I\u0027m also happy with \"holds\" tbh (and it is a word that\u0027s been used before in this context without controversy). I\u0027ve gone with \"specifies\" throughout as it seems like you\u0027re not keen on \"holds\".",
+      "parentUuid": "ff860e1e_55afd358",
       "range": {
         "startLine": 36,
         "startChar": 9,
@@ -149,6 +263,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "09aa45d9_b44a66b7",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "Yup, that would be possible, but the resulting error would be way harder for the user to understand, as it wouldn\u0027t even mention the pathEncoding that causes the field to disappear. I think it\u0027s better as is tbh. In the future there are going to be a bunch of places we could use the `error` primitive.",
+      "parentUuid": "0db23057_11f947a5",
+      "range": {
+        "startLine": 71,
+        "startChar": 11,
+        "endLine": 71,
+        "endChar": 56
+      },
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cb71bf6_e4f4aaf8",
@@ -162,6 +300,24 @@
       "writtenOn": "2024-02-16T19:20:31Z",
       "side": 1,
       "message": "nit: \"this definition\" that you refer to is the same definition as the one above to my mind. \n\nIs there any reason we wouldn\u0027t refer to these defaults as a regular field, perhaps `registryDefaults`, with the RHS the unification of the `#registry` definition and the struct value you propose? That way we side-step the naming issue.",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcd1dd2f_259929af",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "Discussed this directly. I\u0027ve added a TODO.",
+      "parentUuid": "5cb71bf6_e4f4aaf8",
       "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

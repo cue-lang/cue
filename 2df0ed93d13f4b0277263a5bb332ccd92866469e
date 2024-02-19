@@ -464,6 +464,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc888fcf_90de2f14",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T11:16:05Z",
+      "side": 1,
+      "message": "Done.",
+      "parentUuid": "0ae5ba92_b42aee7a",
+      "revId": "2df0ed93d13f4b0277263a5bb332ccd92866469e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d5bfc37a_687ed6f0",

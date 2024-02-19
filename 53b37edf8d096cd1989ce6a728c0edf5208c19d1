@@ -311,6 +311,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "941627e7_5e1a5895",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 7
+      },
+      "lineNbr": 71,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T12:40:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dd1f411e_ebd0dcf6",
+      "range": {
+        "startLine": 71,
+        "startChar": 11,
+        "endLine": 71,
+        "endChar": 56
+      },
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5cb71bf6_e4f4aaf8",

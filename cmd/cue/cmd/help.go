@@ -159,8 +159,16 @@ setting.
 		This defaults to a directory for user-specific configuration data, such as:
 
 			"$XDG_CONFIG_HOME/cue" or "$HOME/.config/cue" on Linux
-			"$HOME/Library/Application Support" on MacOS
+			"$HOME/Library/Application Support/cue" on MacOS
 			"%AppData%/cue" on Windows
+
+	CUE_CACHE_DIR
+		The directory where the cue command keeps a cache of files to be reused.
+		This defaults to a directory for user-specific temporary cache data, such as:
+
+			"$XDG_CACHE_HOME/cue" or "$HOME/.cache/cue" on Linux
+			"$HOME/Library/Caches/cue" on MacOS
+			"%LocalAppData%/cue" on Windows
 
 	CUE_REGISTRY
 		A comma-separated list specifying which registry to use for
@@ -187,12 +195,6 @@ setting.
 		github.com/acmecorp/somemodule will be fetched from the
 		modules/github.com/acmecorp/somemodule repository in the host
 		registry.acme.com at port 6000.
-
-		Requires that CUE_EXPERIMENT=modules is enabled.
-
-	CUE_MODCACHE
-		The directory where the cue command will store downloaded
-		modules.
 
 		Requires that CUE_EXPERIMENT=modules is enabled.
 

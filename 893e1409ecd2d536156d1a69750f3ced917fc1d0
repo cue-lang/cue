@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fe49fc0_b4862bc8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-19T17:20:49Z",
+      "side": 1,
+      "message": "You might want to tweak your editor to",
+      "revId": "893e1409ecd2d536156d1a69750f3ced917fc1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "edbdba04_21d53da9",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-19T17:20:49Z",
+      "side": 1,
+      "message": "this could easily be two lines, using a newline right after the comma following https://sembr.org/\n\nalso, please be consistent with the line lengths - you have some paragraphs here wrapped at around 80 characters (like the first), but others wrapped to less than 60 (like the last before the examples).",
+      "revId": "893e1409ecd2d536156d1a69750f3ced917fc1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

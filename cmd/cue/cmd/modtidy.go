@@ -112,13 +112,9 @@ func findModuleRoot() (string, error) {
 }
 
 func modCacheDir() (string, error) {
-	if dir := os.Getenv("CUE_MODCACHE"); dir != "" {
-		return dir, nil
-	}
-	sysCacheDir, err := os.UserCacheDir()
+	cacheDir, err := cueCacheDir()
 	if err != nil {
-		return "", fmt.Errorf("cannot determine system cache directory: %v", err)
+		return "", err
 	}
-	// TODO rethink cache namespace as per comments in https://review.gerrithub.io/c/cue-lang/cue/+/1173535/18
-	return filepath.Join(sysCacheDir, "cue"), nil
+	return filepath.Join(cacheDir, "modules"), nil
 }

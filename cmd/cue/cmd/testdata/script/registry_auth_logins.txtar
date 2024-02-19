@@ -7,7 +7,7 @@ exec cue export .
 cmp stdout expect-stdout
 
 # Sanity-check that we get an error when using the wrong token.
-env CUE_MODCACHE=$WORK/.tmp/different-cache
+env CUE_CACHE_DIR=$WORK/.tmp/different-cache
 env-fill cueconfig/badtoken.json
 cp cueconfig/badtoken.json cueconfig/logins.json
 ! exec cue export .

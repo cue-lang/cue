@@ -220,7 +220,7 @@ func TestScript(t *testing.T) {
 					// While os.UserCacheDir on Linux is derived from $HOME,
 					// under Windows it's not, so avoid polluting the system cache
 					// directory by setting up the cache specifically.
-					"CUE_MODCACHE="+filepath.Join(e.WorkDir, "tmp/cache"),
+					"CUE_CACHE_DIR="+filepath.Join(e.WorkDir, "tmp/cache"),
 				)
 				e.Defer(reg.Close)
 			}

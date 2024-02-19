@@ -232,15 +232,14 @@ func TestParseConfig(t *testing.T) {
 	}, {
 		testName: "InvalidRegistry",
 		in: `
-defaultRegistry: host: "$#foo"
+defaultRegistry: registry: "$#foo"
 `,
-		err: `invalid default registry configuration: invalid host name "\$#foo"`,
+		err: `invalid default registry configuration: invalid host name "\$#foo" in registry`,
 	}, {
 		testName: "EncHashAsRepo",
 		in: `
 defaultRegistry: {
-	host: "registry.somewhere"
-	repository: "hello"
+	registry: "registry.somewhere/hello"
 	pathEncoding: "hashAsRepo"
 	prefixForTags: "mod-"
 }
@@ -257,8 +256,7 @@ defaultRegistry: {
 		testName: "EncHashAsTag",
 		in: `
 defaultRegistry: {
-	host: "registry.somewhere"
-	repository: "hello"
+	registry: "registry.somewhere/hello"
 	pathEncoding: "hashAsTag"
 	prefixForTags: "mod-"
 }
@@ -275,11 +273,11 @@ defaultRegistry: {
 		testName: "DefaultRegistryWithModuleRegistries",
 		in: `
 defaultRegistry: {
-	host: "registry.somewhere"
+	registry: "registry.somewhere"
 }
 moduleRegistries: {
 	"a.com": {
-		host: "registry.otherwhere"
+		registry: "registry.otherwhere"
 	}
 }
 `,
@@ -302,24 +300,18 @@ moduleRegistries: {
 		in: `
 moduleRegistries: {
 	"a.com": {
-		host: "r1.example"
-		repository: "a/b"
-		insecure: true,
+		registry: "r1.example/a/b+insecure"
 	}
 	"a.com/foo/bar": {
-		host: "r2.example"
-		repository: "xxx",
+		registry: "r2.example/xxx"
 		pathEncoding: "hashAsRepo"
 		prefixForTags: "cue-"
 	}
 	"a.com/foo": {
-		host: "r1.example"
-		repository: "hello"
-		insecure: true
+		registry: "r1.example/hello+insecure"
 	}
 	"stripped.org/bar": {
-		host: "r3.example"
-		repository: "repo"
+		registry: "r3.example/repo"
 		stripPrefix: true
 	}
 }
@@ -378,7 +370,7 @@ moduleRegistries: {
 		testName: "InvalidModulePath",
 		in: `
 moduleRegistries: "bad+module": {
-	host: "foo.com"
+	registry: "foo.com"
 }
 `,
 		err: `invalid module path "bad\+module": invalid char '\+'`,
@@ -386,25 +378,23 @@ moduleRegistries: "bad+module": {
 		testName: "InvalidHost",
 		in: `
 moduleRegistries: "foo.example": {
-		host: "badhost:"
+		registry: "badhost:"
 }
 `,
-		err: `invalid registry configuration in "foo.example": invalid host name "badhost:"`,
+		err: `invalid registry configuration in "foo.example": invalid host name "badhost:" in registry`,
 	}, {
 		testName: "InvalidRepository",
 		in: `
 moduleRegistries: "foo.example": {
-		host: "ok.com"
-		repository: "A",
+		registry: "ok.com/A"
 }
 `,
-		err: `invalid registry configuration in "foo.example": invalid repository "A"`,
+		err: `invalid registry configuration in "foo.example": invalid reference syntax \("ok.com/A"\)`,
 	}, {
 		testName: "UnknownField",
 		in: `
 registiries: "foo.example": {
-		host: "ok.com"
-		repository: "A",
+		registry: "ok.com/A",
 }
 `,
 		err: `invalid configuration file: registiries: field not allowed`,
@@ -414,11 +404,10 @@ registiries: "foo.example": {
 		in: `
 moduleRegistries: {
 	"a.example": {
-		host: "ok.com"
-		insecure: true
+		registry: "ok.com+insecure"
 	}
 	"b.example": {
-		host: "ok.com"
+		registry: "ok.com"
 	}
 }
 `,

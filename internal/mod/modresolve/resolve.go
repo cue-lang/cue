@@ -85,11 +85,14 @@ type Host struct {
 type Location struct {
 	// Host holds the host or host:port of the registry.
 	Host string
+
 	// Insecure holds whether an insecure connection
 	// should be used when connecting to the registry.
 	Insecure bool
+
 	// Repository holds the repository to store the module in.
 	Repository string
+
 	// Tag holds the tag for the module version.
 	// If an empty version was passed to
 	// Resolve, it holds the prefix shared by all version
@@ -105,17 +108,17 @@ type config struct {
 	DefaultRegistry  *registryConfig            `json:"defaultRegistry,omitempty"`
 }
 
-func (cfg *config) validate() error {
+func (cfg *config) init() error {
 	for prefix, reg := range cfg.ModuleRegistries {
 		if err := module.CheckPathWithoutVersion(prefix); err != nil {
 			return fmt.Errorf("invalid module path %q: %v", prefix, err)
 		}
-		if err := reg.validate(); err != nil {
+		if err := reg.init(); err != nil {
 			return fmt.Errorf("invalid registry configuration in %q: %v", prefix, err)
 		}
 	}
 	if cfg.DefaultRegistry != nil {
-		if err := cfg.DefaultRegistry.validate(); err != nil {
+		if err := cfg.DefaultRegistry.init(); err != nil {
 			return fmt.Errorf("invalid default registry configuration: %v", err)
 		}
 	}
@@ -123,23 +126,24 @@ func (cfg *config) validate() error {
 }
 
 type registryConfig struct {
-	Host          string       `json:"host,omitempty"`
-	Insecure      bool         `json:"insecure,omitempty"`
-	Repository    string       `json:"repository,omitempty"`
+	Registry      string       `json:"registry,omitempty"`
 	PathEncoding  pathEncoding `json:"pathEncoding,omitempty"`
 	PrefixForTags string       `json:"prefixForTags,omitempty"`
 	StripPrefix   bool         `json:"stripPrefix,omitempty"`
+
+	// The following fields are filled in from Registry after parsing.
+	host       string
+	repository string
+	insecure   bool
 }
 
-func (r *registryConfig) validate() error {
-	if !ociref.IsValidHost(r.Host) {
-		return fmt.Errorf("invalid host name %q", r.Host)
+func (r *registryConfig) init() error {
+	r1, err := parseRegistry(r.Registry)
+	if err != nil {
+		return err
 	}
-	if r.Repository != "" {
-		if !ociref.IsValidRepository(r.Repository) {
-			return fmt.Errorf("invalid repository %q", r.Repository)
-		}
-	}
+	r.host, r.repository, r.insecure = r1.host, r1.repository, r1.insecure
+
 	if r.PrefixForTags != "" {
 		if !ociref.IsValidTag(r.PrefixForTags) {
 			return fmt.Errorf("invalid tag prefix %q", r.PrefixForTags)
@@ -193,7 +197,7 @@ func ParseConfig(configFile []byte, filename string, catchAllDefault string) (Ho
 	if err := v.Decode(&cfg); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into registry config struct")
 	}
-	if err := cfg.validate(); err != nil {
+	if err := cfg.init(); err != nil {
 		return nil, err
 	}
 	if cfg.DefaultRegistry == nil {
@@ -320,12 +324,12 @@ type resolver struct {
 func (r *resolver) initHosts() error {
 	hosts := make(map[string]bool)
 	addHost := func(reg *registryConfig) error {
-		if insecure, ok := hosts[reg.Host]; ok {
-			if insecure != reg.Insecure {
-				return fmt.Errorf("registry host %q is specified both as secure and insecure", reg.Host)
+		if insecure, ok := hosts[reg.host]; ok {
+			if insecure != reg.insecure {
+				return fmt.Errorf("registry host %q is specified both as secure and insecure", reg.host)
 			}
 		} else {
-			hosts[reg.Host] = reg.Insecure
+			hosts[reg.host] = reg.insecure
 		}
 		return nil
 	}
@@ -392,8 +396,8 @@ func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
 	}
 	reg := bestMatchReg
 	loc := Location{
-		Host:     reg.Host,
-		Insecure: reg.Insecure,
+		Host:     reg.host,
+		Insecure: reg.insecure,
 		Tag:      vers,
 	}
 	switch reg.PathEncoding {
@@ -402,11 +406,11 @@ func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
 			mpath = strings.TrimPrefix(mpath, bestMatch)
 			mpath = strings.TrimPrefix(mpath, "/")
 		}
-		loc.Repository = path.Join(reg.Repository, mpath)
+		loc.Repository = path.Join(reg.repository, mpath)
 	case encHashAsRepo:
-		loc.Repository = fmt.Sprintf("%s/%x", reg.Repository, sha256.Sum256([]byte(mpath)))
+		loc.Repository = fmt.Sprintf("%s/%x", reg.repository, sha256.Sum256([]byte(mpath)))
 	case encHashAsTag:
-		loc.Repository = reg.Repository
+		loc.Repository = reg.repository
 	default:
 		panic("unreachable")
 	}
@@ -418,7 +422,8 @@ func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
 	return loc, true
 }
 
-func parseRegistry(env string) (*registryConfig, error) {
+func parseRegistry(env0 string) (*registryConfig, error) {
+	env := env0
 	var suffix string
 	if i := strings.LastIndex(env, "+"); i > 0 {
 		suffix = env[i:]
@@ -458,10 +463,11 @@ func parseRegistry(env string) (*registryConfig, error) {
 		return nil, fmt.Errorf("unknown suffix (%q), need +insecure, +secure or no suffix)", suffix)
 	}
 	return &registryConfig{
-		Host:         r.Host,
-		Repository:   r.Repository,
-		Insecure:     insecure,
+		Registry:     env0,
 		PathEncoding: encPath,
+		host:         r.Host,
+		repository:   r.Repository,
+		insecure:     insecure,
 	}, nil
 }
 

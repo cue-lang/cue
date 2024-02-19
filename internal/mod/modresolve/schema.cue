@@ -33,20 +33,28 @@
 }
 
 #registry: {
-	// host specifies the host name or host:port pair of the registry.
-	// IPv6 host names should be enclosed in square brackets.
-	host!: #hostname
-
-	// insecure specifies whether an insecure connection should
-	// be made to the host.
-	insecure?: bool
-
-	// repository specifies the repository in the registry for storing
-	// modules. If pathEncoding is "path", this specifies the prefix
-	// for all modules in the repository. For example, if repository
-	// is foo/bar, module "x.example/y" will be stored at
-	// "foo/bar/x.example/y".
-	repository?: #repository
+	// registry specifies the registry host name and optionally, the repository
+	// prefix to use for all modules in the repository, and the security
+	// to use when accessing the host.
+	//
+	// It is in the form:
+	// 	hostname[:port][/repoPrefix][+insecure]
+	//
+	// The hostname must be specified in square brackets
+	// if it's an IPv6 address.
+	//
+	// Connections will be secure unless
+	// explicitly specified otherwise, except for localhost
+	// connections which default to insecure.
+	//
+	// See the doc comment on pathEncoding for details as to
+	// how repoPrefix is used to determine the repository
+	// to use for a specific module.
+	//
+	// Examples:
+	//	"localhost:1234"
+	//	"myregistry.example/my-modules+secure"
+	registry!: string
 
 	// pathEncoding specifies how module versions map to repositories
 	// within a registry.
@@ -78,8 +86,6 @@
 
 // TODO more specific schemas below
 #modulePath: string
-#hostname: string
-#repository: string
 #tag: string
 
 // This aspect of #registry encodes the defaults used by the resolver

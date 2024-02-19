@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd3d6042_f0158229",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T18:10:11Z",
+      "side": 1,
+      "message": "LGTM with one suggestion. Also the original discussion suggested splitting out downloads from unarchived modules, so I think that\u0027s worth doing too ($CUE_CACHE_DIR/mod/download and $CUE_CACHE_DIR/mod/pkg perhaps?). I had  stupidly forgotten that you\u0027d self-assigned this, so duplicated the work in https://review.gerrithub.io/c/cue-lang/cue/+/1177060. You could maybe take the modcache changes from there.",
+      "revId": "087f60729f8cb03731abbdcbbd7ee9fe0ab042fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8a232937_d3a79624",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T18:10:11Z",
+      "side": 1,
+      "message": "In the interests of brevity, and because so many files sit under this, I\u0027d probably go for \"mod\" here. Or at any rate, prefer the singular form \"module\".",
+      "revId": "087f60729f8cb03731abbdcbbd7ee9fe0ab042fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

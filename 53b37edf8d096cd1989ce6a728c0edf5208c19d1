@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "be1f5a27_cc0e0ea1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-19T05:42:32Z",
+      "side": 1,
+      "message": "Nit: the actual support for a file-based specifying of config is following in a later CL, correct (per the TODO)?",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "69f3323f_9a26fd9d",
         "filename": "/COMMIT_MSG",
         "patchSetId": 7
@@ -31,6 +48,23 @@
       "writtenOn": "2024-02-16T19:20:31Z",
       "side": 1,
       "message": "LGTM from my perspective with a couple more suggestions. I\u0027ve replied to a couple of comments asking @mvdan@mvdan.cc for final thoughts. Will leave him to +2 therefore.",
+      "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "49891535_aee41485",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-19T05:42:32Z",
+      "side": 1,
+      "message": "This might be a question better suited to the CL that will follow and address this TODO, but I\u0027m assuming we will have some precedence between the config file and CUE_REGISTRY as opposed to trying to unify them? Or given that the configuration is based on a module path prefix (as opposed to string prefix) we could unify them?",
       "revId": "53b37edf8d096cd1989ce6a728c0edf5208c19d1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

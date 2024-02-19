@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea0e44f6_4f9a132a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-19T13:48:59Z",
+      "side": 1,
+      "message": "FYI I wouldn\u0027t worry too much about the Go docs being runnable, because we are able to land a who load of docs on alpha.cuelang.org, like https://review.gerrithub.io/c/cue-lang/cuelang.org/+/1170263. Preview (of the proof of concept) here:\n\nhttps://cl-1170263-48--cue-cls.netlify.app/docs/howto/go-api-basics/",
+      "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c59cb47f_89011220",

@@ -51,6 +51,24 @@
       "message": "personally I lean towards `inline`, which should already be familiar to most CUE or Go programmers, e.g. ``Field `json:\",inline\"` `` or `cue def --inline-imports`. I don\u0027t think \"direct\" has any precedence; in fact it reminds me of `GOPROXY\u003ddirect`, which is something entirely different.",
       "revId": "8a1233cc352dd0cc4804bea51df3e9eeb261ceea",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce656696_4ed17106",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-19T18:21:23Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "297778a4_0a222688",
+      "revId": "8a1233cc352dd0cc4804bea51df3e9eeb261ceea",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

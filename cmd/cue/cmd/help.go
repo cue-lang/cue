@@ -178,8 +178,10 @@ setting.
 			[modulePrefix=]hostname[:port][/repoPrefix][+insecure]
 
 		The optional modulePrefix specifes that all modules with the
-		given prefix wil use the associated registry. If there are
+		given prefix will use the associated registry. If there are
 		multiple registries with a prefix, the longest matching prefix wins.
+		When matching a prefix, only complete path elements (non-slash
+		characters) are considered.
 
 		The hostname holds the OCI registry host (in square brackets if it's
 		an IPv6 address).  The repoPrefix holds a prefix to use in front
@@ -189,12 +191,19 @@ setting.
 		for localhost addresses.
 
 		For example, given:
+
 			CUE_REGISTRY=public-registry.com,github.com/acmecorp=registry.acme.com:6000/modules
-		the module named github.com/foo/bar will be fetched
-		from public-registry.com; a module named
-		github.com/acmecorp/somemodule will be fetched from the
-		modules/github.com/acmecorp/somemodule repository in the host
-		registry.acme.com at port 6000.
+
+		- the module named github.com/foo/bar will be fetched
+		from the github.com/foo/bar repository in the registry
+		host public-registry.com
+		- a module named github.com/acmecorp/somemodule will
+		be fetched from the
+		modules/github.com/acmecorp/somemodule repository in
+		the host registry.acme.com at port 6000
+		- a module named github.com/acmecorpus/x will be
+		fetched from the github.com/acmecorpus/x repository in
+		the host public-registry.com
 
 		Requires that CUE_EXPERIMENT=modules is enabled.
 

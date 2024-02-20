@@ -297,7 +297,12 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		}
 	}
 
-	arc = &Vertex{Parent: v, Label: f, ArcType: mode}
+	arc = &Vertex{
+		Parent:    v,
+		Label:     f,
+		ArcType:   mode,
+		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
+	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {
 		b := n.ctx.NewErrf("field %v not allowed by earlier comprehension or reference cycle", f)
 		n.ctx.AddBottom(b)

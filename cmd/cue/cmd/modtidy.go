@@ -22,7 +22,6 @@ import (
 	"path/filepath"
 
 	"github.com/spf13/cobra"
-	gomodule "golang.org/x/mod/module"
 
 	"cuelang.org/go/internal/mod/modload"
 )
@@ -69,17 +68,7 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	bi, _ := readBuildInfo()
-	version := cueVersion(bi)
-	if gomodule.IsPseudoVersion(version) {
-		// If we have a version like v0.7.1-0.20240130142347-7855e15cb701
-		// we want it to turn into the base version (v0.7.0 in that example).
-		// If there's no base version (e.g. v0.0.0-...) then PseudoVersionBase
-		// will return the empty string, which is exactly what we want
-		// because we don't want to put v0.0.0 in a module.cue file.
-		version, _ = gomodule.PseudoVersionBase(version)
-	}
-	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, version)
+	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, versionForModFile())
 	if err != nil {
 		return err
 	}

@@ -1,0 +1,8 @@
+env CUE_VERSION_OVERRIDE=v0.1.2
+exec cue mod init foo.example
+cmp cue.mod/module.cue want-module
+-- want-module --
+module: "foo.example@v0"
+language: {
+	version: "v0.1.2"
+}

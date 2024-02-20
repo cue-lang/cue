@@ -74,6 +74,60 @@ Retain: 10
 Unifications: 29
 Conjuncts:    40
 Disjuncts:    29
+-- out/evalalpha --
+(struct){
+  #Foo: (#struct){
+    let X#1 = (_|_){
+      // [incomplete] empty list in call to or:
+      //     ./in.cue:2:10
+    }
+    connection: (_|_){
+      // [incomplete] empty list in call to or:
+      //     ./in.cue:2:10
+    }
+  }
+  #A: (#struct){
+    foo: (string){ "key" }
+    let X#2 = (string){ "key" }
+    a: (#struct){
+      foo: (#struct){
+      }
+    }
+  }
+  #B: (#struct){
+    foo: (string){ string }
+    let X#3 = (string){ string }
+    a: (#struct){
+      foo: (#struct){
+      }
+    }
+  }
+  b: (#struct){
+    foo: (string){ "key" }
+    let X#3 = (string){ "key" }
+    a: (#struct){
+      foo: (#struct){
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -4,7 +4,9 @@
+       // [incomplete] empty list in call to or:
+       //     ./in.cue:2:10
+     }
+-    connection: (#struct){
++    connection: (_|_){
++      // [incomplete] empty list in call to or:
++      //     ./in.cue:2:10
+     }
+   }
+   #A: (#struct){
+-- diff/explanation --
+Seems reasonable to report error at connection as well.
 -- out/eval --
 (struct){
   #Foo: (#struct){

@@ -50,6 +50,119 @@ Retain: 14
 Unifications: 52
 Conjuncts:    120
 Disjuncts:    66
+-- out/evalalpha --
+(struct){
+  #d1: (#struct){
+    as: (list){
+    }
+    #c: (#list){
+      0: (#struct){
+        as: (#list){
+          0: (string){ "go" }
+        }
+        do: (string){ "f1" }
+      }
+    }
+  }
+  #d2: (#struct){
+    p: (string){ |(*(string){ "." }, (string){ string }) }
+    #c: (#list){
+      0: (#struct){
+        from: (#struct){
+          as: (#list){
+            0: (string){ |(*(string){ "." }, (string){ string }) }
+          }
+          #c: (#list){
+            0: (#struct){
+              as: (#list){
+                0: (string){ "go" }
+                1: (string){ |(*(string){ "." }, (string){ string }) }
+              }
+              do: (string){ "f1" }
+            }
+          }
+        }
+        do: (string){ "f2" }
+      }
+    }
+  }
+  #c1: (_){
+    _
+    #c: (list){
+    }
+  }
+  #o: (#struct){ |((#struct){
+      do: (string){ "f1" }
+      as: (list){
+      }
+    }, (#struct){
+      do: (string){ "f2" }
+      from: (_){
+        _
+        #c: (list){
+        }
+      }
+    }) }
+  #f1: (#struct){
+    do: (string){ "f1" }
+    as: (list){
+    }
+  }
+  #f2: (#struct){
+    do: (string){ "f2" }
+    from: (_){
+      _
+      #c: (list){
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -4,10 +4,10 @@
+     }
+     #c: (#list){
+       0: (#struct){
+-        do: (string){ "f1" }
+         as: (#list){
+           0: (string){ "go" }
+         }
++        do: (string){ "f1" }
+       }
+     }
+   }
+@@ -15,21 +15,21 @@
+     p: (string){ |(*(string){ "." }, (string){ string }) }
+     #c: (#list){
+       0: (#struct){
+-        do: (string){ "f2" }
+         from: (#struct){
++          as: (#list){
++            0: (string){ |(*(string){ "." }, (string){ string }) }
++          }
+           #c: (#list){
+             0: (#struct){
+-              do: (string){ "f1" }
+               as: (#list){
+                 0: (string){ "go" }
+                 1: (string){ |(*(string){ "." }, (string){ string }) }
+               }
++              do: (string){ "f1" }
+             }
+           }
+-          as: (#list){
+-            0: (string){ |(*(string){ "." }, (string){ string }) }
+-          }
+-        }
++        }
++        do: (string){ "f2" }
+       }
+     }
+   }
+-- diff/todo/p3 --
+Reordering
 -- out/eval --
 (struct){
   #d1: (#struct){

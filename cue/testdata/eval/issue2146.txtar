@@ -49,6 +49,278 @@ Retain: 18
 Unifications: 173
 Conjuncts:    557
 Disjuncts:    189
+-- out/evalalpha --
+(struct){
+  p1: (struct){
+    #A: (#struct){ |(*(#struct){
+        x?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./in.cue:10:8
+        }
+        y: (int){ 1 }
+        let list#1 = (#list){
+          0: (int){ int }
+          1: (int){ int }
+        }
+        all: (#list){
+        }
+      }, (#struct){
+        x?: (int){ int }
+        y?: (int){ int }
+        let list#1 = (#list){
+          0: (int){ int }
+          1: (int){ int }
+        }
+        all: (#list){
+        }
+      }) }
+    a: (#struct){
+      x: (int){ 3 }
+      y?: (int){ int }
+      let list#1 = (#list){
+        0: (int){ 3 }
+        1: (int){ int }
+      }
+      all: (#list){
+        0: (int){ 3 }
+      }
+    }
+    b: (#struct){
+      x: (int){ 3 }
+      y?: (int){ int }
+      let list#1 = (#list){
+        0: (int){ 3 }
+        1: (int){ int }
+      }
+      all: (#list){
+        0: (int){ 3 }
+      }
+    }
+  }
+  p2: (struct){
+    #A: (#struct){ |(*(#struct){
+        x?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./in.cue:27:8
+        }
+        y: (int){ 1 }
+        let list#2 = (#list){
+          0: (int){ int }
+          1: (int){ int }
+        }
+        all: (#list){
+        }
+      }, (#struct){
+        x?: (int){ int }
+        y?: (int){ int }
+        let list#2 = (#list){
+          0: (int){ int }
+          1: (int){ int }
+        }
+        all: (#list){
+        }
+      }) }
+    a: (#struct){
+      x: (int){ 3 }
+      y: (int){ 2 }
+      let list#2 = (#list){
+        0: (int){ 3 }
+        1: (int){ 2 }
+      }
+      all: (#list){
+        0: (int){ 3 }
+        1: (int){ 2 }
+      }
+    }
+    b: (#struct){
+      x: (int){ 3 }
+      y: (int){ 2 }
+      let list#2 = (#list){
+        0: (int){ 3 }
+        1: (int){ 2 }
+      }
+      all: (#list){
+        0: (int){ 3 }
+        1: (int){ 2 }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -7,52 +7,39 @@
+         }
+         y: (int){ 1 }
+         let list#1 = (#list){
+-          0: (_|_){
+-            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:6:15
+-          }
+-          1: (int){ 1 }
+-        }
+-        all: (#list){
+-          0: (int){ 1 }
+-        }
+-      }, (#struct){
+-        x?: (int){ int }
+-        y?: (int){ int }
+-        let list#1 = (#list){
+-          0: (_|_){
+-            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:6:15
+-          }
+-          1: (_|_){
+-            // [incomplete] p1.#A.list.1: cannot reference optional field: y:
+-            //     ./in.cue:6:18
+-          }
+-        }
+-        all: (#list){
+-        }
+-      }) }
+-    a: (#struct){
+-      x: (int){ 3 }
+-      y?: (int){ int }
+-      let list#1 = (#list){
+-        0: (int){ 3 }
+-        1: (_|_){
+-          // [incomplete] p1.a.list.1: cannot reference optional field: y:
+-          //     ./in.cue:6:18
+-        }
+-      }
+-      all: (#list){
+-        0: (int){ 3 }
+-      }
+-    }
+-    b: (#struct){
+-      x: (int){ 3 }
+-      y?: (int){ int }
+-      let list#1multi = [
+-        〈1;x〉,
+-        〈1;y〉,
+-      ]
++          0: (int){ int }
++          1: (int){ int }
++        }
++        all: (#list){
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#1 = (#list){
++          0: (int){ int }
++          1: (int){ int }
++        }
++        all: (#list){
++        }
++      }) }
++    a: (#struct){
++      x: (int){ 3 }
++      y?: (int){ int }
++      let list#1 = (#list){
++        0: (int){ 3 }
++        1: (int){ int }
++      }
++      all: (#list){
++        0: (int){ 3 }
++      }
++    }
++    b: (#struct){
++      x: (int){ 3 }
++      y?: (int){ int }
++      let list#1 = (#list){
++        0: (int){ 3 }
++        1: (int){ int }
++      }
+       all: (#list){
+         0: (int){ 3 }
+       }
+@@ -66,50 +53,40 @@
+         }
+         y: (int){ 1 }
+         let list#2 = (#list){
+-          0: (_|_){
+-            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:23:15
+-          }
+-          1: (int){ 1 }
+-        }
+-        all: (#list){
+-          0: (int){ 1 }
+-        }
+-      }, (#struct){
+-        x?: (int){ int }
+-        y?: (int){ int }
+-        let list#2 = (#list){
+-          0: (_|_){
+-            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
+-            //     ./in.cue:23:15
+-          }
+-          1: (_|_){
+-            // [incomplete] p2.#A.list.1: cannot reference optional field: y:
+-            //     ./in.cue:23:18
+-          }
+-        }
+-        all: (#list){
+-        }
+-      }) }
+-    a: (#struct){
+-      x: (int){ 3 }
+-      y: (int){ 2 }
+-      let list#2 = (#list){
+-        0: (int){ 3 }
+-        1: (int){ 2 }
+-      }
+-      all: (#list){
+-        0: (int){ 3 }
+-        1: (int){ 2 }
+-      }
+-    }
+-    b: (#struct){
+-      x: (int){ 3 }
+-      y: (int){ 2 }
+-      let list#2multi = [
+-        〈1;x〉,
+-        〈1;y〉,
+-      ]
++          0: (int){ int }
++          1: (int){ int }
++        }
++        all: (#list){
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#2 = (#list){
++          0: (int){ int }
++          1: (int){ int }
++        }
++        all: (#list){
++        }
++      }) }
++    a: (#struct){
++      x: (int){ 3 }
++      y: (int){ 2 }
++      let list#2 = (#list){
++        0: (int){ 3 }
++        1: (int){ 2 }
++      }
++      all: (#list){
++        0: (int){ 3 }
++        1: (int){ 2 }
++      }
++    }
++    b: (#struct){
++      x: (int){ 3 }
++      y: (int){ 2 }
++      let list#2 = (#list){
++        0: (int){ 3 }
++        1: (int){ 2 }
++      }
+       all: (#list){
+         0: (int){ 3 }
+         1: (int){ 2 }
 -- out/eval --
 (struct){
   p1: (struct){

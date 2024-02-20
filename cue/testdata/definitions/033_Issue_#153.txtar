@@ -70,6 +70,71 @@ Retain: 1
 Unifications: 11
 Conjuncts:    23
 Disjuncts:    16
+-- out/evalalpha --
+Errors:
+listOfCloseds.0.b: field not allowed:
+    ./in.cue:16:12
+
+Result:
+(_|_){
+  // [eval]
+  Foo: (struct){
+    listOfCloseds: (list){
+    }
+  }
+  #Closed: (#struct){
+    a: (int){ |(*(int){ 0 }, (int){ int }) }
+  }
+  Junk: (struct){
+    b: (int){ 2 }
+  }
+  listOfCloseds: (_|_){
+    // [eval]
+    0: (_|_){
+      // [eval]
+      a: (int){ |(*(int){ 0 }, (int){ int }) }
+      b: (_|_){
+        // [eval] listOfCloseds.0.b: field not allowed:
+        //     ./in.cue:16:12
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,12 +1,6 @@
+ Errors:
+ listOfCloseds.0.b: field not allowed:
+-    ./in.cue:2:18
+-    ./in.cue:2:21
+-    ./in.cue:5:10
+-    ./in.cue:13:1
+-    ./in.cue:14:18
+-    ./in.cue:15:3
+-    ./in.cue:16:4
++    ./in.cue:16:12
+ 
+ Result:
+ (_|_){
+@@ -28,13 +22,7 @@
+       a: (int){ |(*(int){ 0 }, (int){ int }) }
+       b: (_|_){
+         // [eval] listOfCloseds.0.b: field not allowed:
+-        //     ./in.cue:2:18
+-        //     ./in.cue:2:21
+-        //     ./in.cue:5:10
+-        //     ./in.cue:13:1
+-        //     ./in.cue:14:18
+-        //     ./in.cue:15:3
+-        //     ./in.cue:16:4
++        //     ./in.cue:16:12
+       }
+     }
+   }
+-- diff/todo/p3 --
+missing error positions
 -- out/eval --
 Errors:
 listOfCloseds.0.b: field not allowed:

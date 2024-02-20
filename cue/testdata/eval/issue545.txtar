@@ -45,6 +45,76 @@ Retain: 0
 Unifications: 65
 Conjuncts:    205
 Disjuncts:    121
+-- out/evalalpha --
+(struct){
+  t1: (struct){
+    #Test: (#struct){
+      #HTTP: (string){ =~"^http://" }
+      #SSH: (string){ !~"^ssh://" }
+      #USER: (string){ strings.MinRunes(3) }
+      source: (string){ |((string){ =~"^http://" }, (string){ !~"^ssh://" }, (string){ strings.MinRunes(3) }) }
+    }
+    foo: (#struct){
+      source: (string){ "http://blablabla" }
+      #HTTP: (string){ =~"^http://" }
+      #SSH: (string){ !~"^ssh://" }
+      #USER: (string){ strings.MinRunes(3) }
+    }
+    bar: (#struct){
+      source: (#struct){
+        source: (string){ "http://blablabla" }
+        #HTTP: (string){ =~"^http://" }
+        #SSH: (string){ !~"^ssh://" }
+        #USER: (string){ strings.MinRunes(3) }
+      }
+      #HTTP: (string){ =~"^http://" }
+      #SSH: (string){ !~"^ssh://" }
+      #USER: (string){ strings.MinRunes(3) }
+    }
+  }
+  t2: (struct){
+    str: (string){ "foo" }
+    a: (string){ =~"foo" }
+    b: (string){ =~"foo" }
+    c: (string){ =~"foo" }
+    d: (string){ time.Time() }
+    e: (string){ time.Time() }
+    f: (string){ time.Time() }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -7,21 +7,21 @@
+       source: (string){ |((string){ =~"^http://" }, (string){ !~"^ssh://" }, (string){ strings.MinRunes(3) }) }
+     }
+     foo: (#struct){
+-      #HTTP: (string){ =~"^http://" }
+-      #SSH: (string){ !~"^ssh://" }
+-      #USER: (string){ strings.MinRunes(3) }
+       source: (string){ "http://blablabla" }
++      #HTTP: (string){ =~"^http://" }
++      #SSH: (string){ !~"^ssh://" }
++      #USER: (string){ strings.MinRunes(3) }
+     }
+     bar: (#struct){
+-      #HTTP: (string){ =~"^http://" }
+-      #SSH: (string){ !~"^ssh://" }
+-      #USER: (string){ strings.MinRunes(3) }
+       source: (#struct){
++        source: (string){ "http://blablabla" }
+         #HTTP: (string){ =~"^http://" }
+         #SSH: (string){ !~"^ssh://" }
+         #USER: (string){ strings.MinRunes(3) }
+-        source: (string){ "http://blablabla" }
+       }
++      #HTTP: (string){ =~"^http://" }
++      #SSH: (string){ !~"^ssh://" }
++      #USER: (string){ strings.MinRunes(3) }
+     }
+   }
+   t2: (struct){
 -- out/eval --
 (struct){
   t1: (struct){

@@ -131,6 +131,295 @@ Retain: 10
 Unifications: 111
 Conjuncts:    249
 Disjuncts:    126
+-- out/evalalpha --
+(struct){
+  networkingv1: (struct){
+    metav1: (struct){
+      #LabelSelector: (#struct){
+        matchLabels: (#struct){
+        }
+      }
+    }
+    #NetworkPolicy: (#struct){
+      spec: (#struct){
+        ingress: (list){
+        }
+        egress: (list){
+        }
+      }
+    }
+    #NetworkPolicySpec: (#struct){
+      ingress: (list){
+      }
+      egress: (list){
+      }
+    }
+    #NetworkPolicyIngressRule: (#struct){
+      from: (list){
+      }
+    }
+    #NetworkPolicyEgressRule: (#struct){
+      to: (list){
+      }
+    }
+    #NetworkPolicyPeer: (#struct){
+      namespaceSelector: ((null|struct)){ |((null){ null }, (#struct){
+          matchLabels: (#struct){
+          }
+        }) }
+    }
+  }
+  global_config: (struct){
+    #GlobalConfig: (#struct){
+      auth0: (#struct){
+        enabled: (bool){ bool }
+      }
+    }
+  }
+  common: (struct){
+    #SomeConfig: (_|_){
+      // [incomplete] common.#SomeConfig: incomplete bool: bool:
+      //     ./in.cue:41:12
+      enabled: (bool){ bool }
+    }
+  }
+  foo: (struct){
+    #Values: (#struct){
+      global: (#struct){
+        auth0: (#struct){
+          enabled: (bool){ bool }
+        }
+      }
+    }
+  }
+  #Config: (#struct){
+    tenant: (#struct){
+      id: (string){ string }
+    }
+    auth0: (_|_){
+      // [incomplete] #Config.auth0: incomplete bool: bool:
+      //     ./in.cue:58:12
+      enabled: (bool){ bool }
+    }
+    charts: (#struct){
+      foo: (#struct){
+        global: (#struct){
+          auth0: (#struct){
+            enabled: (_|_){
+              // [incomplete] #Config.auth0: incomplete bool: bool:
+              //     ./in.cue:58:12
+            }
+          }
+        }
+      }
+    }
+    global: (#struct){
+      auth0: (#struct){
+        enabled: (_|_){
+          // [incomplete] #Config.auth0: incomplete bool: bool:
+          //     ./in.cue:58:12
+        }
+      }
+    }
+  }
+  #NetworkPolicy: (#struct){
+    spec: (#struct){
+      ingress: (list){
+      }
+      egress: (list){
+      }
+    }
+  }
+  #Flux: (#struct){
+    charts: (#struct){
+      foo: (#struct){
+        global: (#struct){
+          auth0: (#struct){
+            enabled: (bool){ bool }
+          }
+        }
+      }
+    }
+    formatOutput: (#struct){
+      foo: (#struct){
+      }
+      "ns/network": (#struct){
+        spec: (#struct){
+          ingress: (#list){
+            0: (#struct){
+              from: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          egress: (#list){
+            0: (#struct){
+              to: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    _outputs(:config): (#struct){
+      foo: (#struct){
+      }
+      "ns/network": (#struct){
+        spec: (#struct){
+          ingress: (#list){
+            0: (#struct){
+              from: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          egress: (#list){
+            0: (#struct){
+              to: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    tenant: (#struct){
+      id: (string){ string }
+    }
+    auth0: (_|_){
+      // [incomplete] #Flux.auth0: incomplete bool: bool:
+      //     ./in.cue:58:12
+      enabled: (bool){ bool }
+    }
+    global: (#struct){
+      auth0: (#struct){
+        enabled: (_|_){
+          // [incomplete] #Flux.auth0: incomplete bool: bool:
+          //     ./in.cue:58:12
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -64,7 +64,7 @@
+     }
+     auth0: (_|_){
+       // [incomplete] #Config.auth0: incomplete bool: bool:
+-      //     ./in.cue:41:12
++      //     ./in.cue:58:12
+       enabled: (bool){ bool }
+     }
+     charts: (#struct){
+@@ -73,7 +73,7 @@
+           auth0: (#struct){
+             enabled: (_|_){
+               // [incomplete] #Config.auth0: incomplete bool: bool:
+-              //     ./in.cue:41:12
++              //     ./in.cue:58:12
+             }
+           }
+         }
+@@ -83,7 +83,7 @@
+       auth0: (#struct){
+         enabled: (_|_){
+           // [incomplete] #Config.auth0: incomplete bool: bool:
+-          //     ./in.cue:41:12
++          //     ./in.cue:58:12
+         }
+       }
+     }
+@@ -97,31 +97,12 @@
+     }
+   }
+   #Flux: (#struct){
+-    tenant: (#struct){
+-      id: (string){ string }
+-    }
+-    auth0: (_|_){
+-      // [incomplete] #Flux.auth0: incomplete bool: bool:
+-      //     ./in.cue:41:12
+-      enabled: (bool){ bool }
+-    }
+-    charts: (#struct){
+-      foo: (#struct){
+-        global: (#struct){
+-          auth0: (#struct){
+-            enabled: (_|_){
+-              // [incomplete] #Flux.auth0: incomplete bool: bool:
+-              //     ./in.cue:41:12
+-            }
+-          }
+-        }
+-      }
+-    }
+-    global: (#struct){
+-      auth0: (#struct){
+-        enabled: (_|_){
+-          // [incomplete] #Flux.auth0: incomplete bool: bool:
+-          //     ./in.cue:41:12
++    charts: (#struct){
++      foo: (#struct){
++        global: (#struct){
++          auth0: (#struct){
++            enabled: (bool){ bool }
++          }
+         }
+       }
+     }
+@@ -193,5 +174,21 @@
+         }
+       }
+     }
++    tenant: (#struct){
++      id: (string){ string }
++    }
++    auth0: (_|_){
++      // [incomplete] #Flux.auth0: incomplete bool: bool:
++      //     ./in.cue:58:12
++      enabled: (bool){ bool }
++    }
++    global: (#struct){
++      auth0: (#struct){
++        enabled: (_|_){
++          // [incomplete] #Flux.auth0: incomplete bool: bool:
++          //     ./in.cue:58:12
++        }
++      }
++    }
+   }
+ }
+-- diff/todo/p1 --
+#Flux.charts.foo.global.auth0.enabled: missing error
+  The error messages should say which expression was incomplete!!!
 -- out/eval --
 (struct){
   networkingv1: (struct){

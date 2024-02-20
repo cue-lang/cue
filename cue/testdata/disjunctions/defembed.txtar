@@ -37,6 +37,175 @@ Retain: 0
 Unifications: 52
 Conjuncts:    373
 Disjuncts:    306
+-- out/evalalpha --
+(struct){ |((struct){
+    x: (struct){
+      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+    }
+    y1: (struct){
+      m4: (int){ 6 }
+      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+    }
+    y2: (struct){
+      m4: (int){ 6 }
+      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+    }
+    y3: (struct){
+      m4: (int){ 6 }
+      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+    }
+    y4: (struct){
+      m4: (int){ 6 }
+      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+    }
+    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+  }, (struct){
+    x: (struct){
+      m1: (number){ &(>=2, <=3) }
+      m2: (_){ _ }
+      m3: (_){ _ }
+    }
+    y1: (struct){
+      m4: (int){ 6 }
+      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+    }
+    y2: (struct){
+      m4: (int){ 6 }
+      m1: (number){ &(>=2, <=3) }
+      m2: (_){ _ }
+      m3: (_){ _ }
+    }
+    y3: (struct){
+      m4: (int){ 6 }
+      m1: (number){ &(>=2, <=3) }
+      m2: (_){ _ }
+      m3: (_){ _ }
+    }
+    y4: (struct){
+      m4: (int){ 6 }
+      m1: (number){ &(>=2, <=3) }
+      m2: (_){ _ }
+      m3: (_){ _ }
+    }
+    b: (int){ int }
+  }) }
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,33 +1,64 @@
+-(struct){
+-  x: (struct){
+-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-  }
+-  y1: (struct){
+-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m4: (int){ 6 }
+-  }
+-  y2: (struct){
+-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m4: (int){ 6 }
+-  }
+-  y3: (struct){
+-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m4: (int){ 6 }
+-  }
+-  y4: (struct){
+-    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+-    m4: (int){ 6 }
+-  }
+-  b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+-  a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+-}
++(struct){ |((struct){
++    x: (struct){
++      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
++    }
++    y1: (struct){
++      m4: (int){ 6 }
++      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
++    }
++    y2: (struct){
++      m4: (int){ 6 }
++      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
++    }
++    y3: (struct){
++      m4: (int){ 6 }
++      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
++    }
++    y4: (struct){
++      m4: (int){ 6 }
++      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
++    }
++    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
++    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
++  }, (struct){
++    x: (struct){
++      m1: (number){ &(>=2, <=3) }
++      m2: (_){ _ }
++      m3: (_){ _ }
++    }
++    y1: (struct){
++      m4: (int){ 6 }
++      m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
++      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
++    }
++    y2: (struct){
++      m4: (int){ 6 }
++      m1: (number){ &(>=2, <=3) }
++      m2: (_){ _ }
++      m3: (_){ _ }
++    }
++    y3: (struct){
++      m4: (int){ 6 }
++      m1: (number){ &(>=2, <=3) }
++      m2: (_){ _ }
++      m3: (_){ _ }
++    }
++    y4: (struct){
++      m4: (int){ 6 }
++      m1: (number){ &(>=2, <=3) }
++      m2: (_){ _ }
++      m3: (_){ _ }
++    }
++    b: (int){ int }
++  }) }
+-- diff/todo/p0 --
+Implement cross product.
 -- out/eval --
 (struct){
   x: (struct){

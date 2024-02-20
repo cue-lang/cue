@@ -69,6 +69,87 @@ Retain: 0
 Unifications: 25
 Conjuncts:    45
 Disjuncts:    33
+-- out/evalalpha --
+Errors:
+bar.c: field not allowed:
+    ./in.cue:12:7
+
+Result:
+(_|_){
+  // [eval]
+  #Foo: (#struct){ |((#struct){
+      field: (int){ int }
+      a: (int){ 1 }
+    }, (#struct){
+      field: (int){ int }
+      b: (int){ 2 }
+    }) }
+  foo: (#struct){
+    a: (int){ 1 }
+    field: (int){ int }
+  }
+  bar: (_|_){
+    // [eval] bar.c: field not allowed:
+    //     ./in.cue:12:7
+    c: (int){ 2 }
+    field: (int){ int }
+  }
+  baz: (#struct){
+    b: (int){ 2 }
+    field: (int){ int }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,8 +1,5 @@
+ Errors:
+ bar.c: field not allowed:
+-    ./in.cue:1:7
+-    ./in.cue:4:2
+-    ./in.cue:11:6
+     ./in.cue:12:7
+ 
+ Result:
+@@ -16,28 +13,17 @@
+       b: (int){ 2 }
+     }) }
+   foo: (#struct){
+-    field: (int){ int }
+     a: (int){ 1 }
++    field: (int){ int }
+   }
+   bar: (_|_){
+     // [eval] bar.c: field not allowed:
+-    //     ./in.cue:1:7
+-    //     ./in.cue:4:2
+-    //     ./in.cue:11:6
+     //     ./in.cue:12:7
+-    field: (int){ int }
+-    c: (_|_){
+-      // [eval] bar.c: field not allowed:
+-      //     ./in.cue:1:7
+-      //     ./in.cue:4:2
+-      //     ./in.cue:5:2
+-      //     ./in.cue:11:6
+-      //     ./in.cue:12:7
+-    }
+-    b: (int){ 2 }
++    c: (int){ 2 }
++    field: (int){ int }
+   }
+   baz: (#struct){
+-    field: (int){ int }
+-    b: (int){ 2 }
++    b: (int){ 2 }
++    field: (int){ int }
+   }
+ }
+-- diff/todo/p2 --
+Missing error positions.
+-- diff/todo/p1 --
+bar.b: spurious field "b: 2"
 -- out/eval --
 Errors:
 bar.c: field not allowed:

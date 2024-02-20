@@ -71,6 +71,70 @@ Retain: 2
 Unifications: 28
 Conjuncts:    217
 Disjuncts:    172
+-- out/evalalpha --
+(struct){
+  Q: (int){ |(*(int){ 1 }, (int){ int }) }
+  q: (int){ |(*(int){ 1 }, (int){ int }) }
+  P: (int){ 2 }
+  p: (int){ |(*(int){ 2 }, (int){ int }) }
+  r: (int){ |((int){ 1 }, (int){ 2 }) }
+  s: (int){ |(*(int){ 1 }, (int){ 2 }) }
+  s1: (#struct){
+    min: (int){ 5 }
+    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+  }
+  #Size: (#struct){
+    max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+  }
+  staged: (struct){
+    c: (string){ |(*(string){ "a" }, *(string){ "b" }) }
+    d: (string){ |(*(string){ "a" }, (string){ "b" }) }
+  }
+  issue763a: (struct){
+    #A: (#struct){
+      v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
+    }
+    h: (struct){
+      a: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      baa: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      boo: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -6,9 +6,9 @@
+   r: (int){ |((int){ 1 }, (int){ 2 }) }
+   s: (int){ |(*(int){ 1 }, (int){ 2 }) }
+   s1: (#struct){
+-    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
+-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+     min: (int){ 5 }
++    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
++    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+   }
+   #Size: (#struct){
+     max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
+@@ -16,7 +16,7 @@
+     min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+   }
+   staged: (struct){
+-    c: (string){ |(*(string){ "a" }, (string){ "b" }) }
++    c: (string){ |(*(string){ "a" }, *(string){ "b" }) }
+     d: (string){ |(*(string){ "a" }, (string){ "b" }) }
+   }
+   issue763a: (struct){
 -- out/eval --
 (struct){
   Q: (int){ |(*(int){ 1 }, (int){ int }) }

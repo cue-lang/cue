@@ -96,6 +96,97 @@ Retain: 18
 Unifications: 26
 Conjuncts:    181
 Disjuncts:    82
+-- out/evalalpha --
+Errors:
+cell2.b: conflicting values 0 and 1:
+    ./in.cue:31:11
+    ./in.cue:35:11
+
+Result:
+(_|_){
+  // [eval]
+  #size: (int){ 2 }
+  #CellValue: (int){ |((int){ 0 }, (int){ 1 }, (int){ 2 }, (int){ 3 }) }
+  cell: (struct){
+    "0": (struct){
+      "0": (int){ 0 }
+      "1": (int){ 1 }
+    }
+    "1": (struct){
+      "0": (int){ 2 }
+      "1": (int){ 3 }
+    }
+  }
+  cell2: (_|_){
+    // [eval]
+    a: (int){ |((int){ 0 }, (int){ 1 }) }
+    b: (_|_){
+      // [eval] cell2.b: conflicting values 0 and 1:
+      //     ./in.cue:31:11
+      //     ./in.cue:35:11
+    }
+  }
+  cell3: (struct){
+    a: (int){ 0 }
+    b: (int){ 1 }
+  }
+  cell4: (struct){
+    a: (int){ 0 }
+    b: (int){ 1 }
+  }
+  cell5: (struct){
+    b: (int){ |((int){ 0 }, (int){ 1 }) }
+    a: (int){ 0 }
+  }
+  a: (int){ 0 }
+  b: (int){ 1 }
+  c: (int){ 2 }
+  d: (int){ 3 }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,11 @@
+-(struct){
++Errors:
++cell2.b: conflicting values 0 and 1:
++    ./in.cue:31:11
++    ./in.cue:35:11
++
++Result:
++(_|_){
++  // [eval]
+   #size: (int){ 2 }
+   #CellValue: (int){ |((int){ 0 }, (int){ 1 }, (int){ 2 }, (int){ 3 }) }
+   cell: (struct){
+@@ -11,9 +18,14 @@
+       "1": (int){ 3 }
+     }
+   }
+-  cell2: (struct){
+-    a: (int){ 0 }
+-    b: (int){ 1 }
++  cell2: (_|_){
++    // [eval]
++    a: (int){ |((int){ 0 }, (int){ 1 }) }
++    b: (_|_){
++      // [eval] cell2.b: conflicting values 0 and 1:
++      //     ./in.cue:31:11
++      //     ./in.cue:35:11
++    }
+   }
+   cell3: (struct){
+     a: (int){ 0 }
+@@ -24,7 +36,7 @@
+     b: (int){ 1 }
+   }
+   cell5: (struct){
+-    b: (int){ 1 }
++    b: (int){ |((int){ 0 }, (int){ 1 }) }
+     a: (int){ 0 }
+   }
+   a: (int){ 0 }
 -- out/eval --
 (struct){
   #size: (int){ 2 }

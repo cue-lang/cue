@@ -39,6 +39,159 @@ Retain: 12
 Unifications: 40
 Conjuncts:    50
 Disjuncts:    45
+-- out/evalalpha --
+Errors:
+outOfBoundsDisjunction: index out of range [1] with length 0:
+    ./in.cue:7:36
+indexDoesNotDistribute: index out of range [0] with length 0:
+    ./in.cue:10:37
+doesNotDistributeType.a: undefined field: "3":
+    ./in.cue:13:21
+stringIndexToList: undefined field: "":
+    ./in.cue:16:24
+indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
+    ./in.cue:17:20
+booleanIndex: invalid index true (invalid type bool):
+    ./in.cue:18:20
+    ./in.cue:18:23
+indexOutOfBounds3: index out of range [4] with length 3:
+    ./in.cue:19:30
+negativeIndex: invalid index -1 (index must be non-negative):
+    ./in.cue:20:20
+    ./in.cue:20:30
+varIndexTooLarge.a: index out of range [3] with length 3:
+    ./in.cue:24:15
+varNegativeIndex.a: index n out of range [-1]:
+    ./in.cue:29:5
+    ./in.cue:28:5
+    ./in.cue:29:15
+
+Result:
+(_|_){
+  // [eval]
+  intIndex: (int){ 2 }
+  stringIndex: (string){ "bar" }
+  stringOfNumberIndex: (int){ 3 }
+  indexToDefault: (int){ 0 }
+  outOfBoundsDisjunction: (_|_){
+    // [eval] outOfBoundsDisjunction: index out of range [1] with length 0:
+    //     ./in.cue:7:36
+  }
+  indexDoesNotDistribute: (_|_){
+    // [eval] indexDoesNotDistribute: index out of range [0] with length 0:
+    //     ./in.cue:10:37
+  }
+  doesNotDistributeType: (_|_){
+    // [eval]
+    l: (#list){
+    }
+    a: (_|_){
+      // [eval] doesNotDistributeType.a: undefined field: "3":
+      //     ./in.cue:13:21
+    }
+  }
+  stringIndexToList: (_|_){
+    // [eval] stringIndexToList: undefined field: "":
+    //     ./in.cue:16:24
+  }
+  indexOutOfBounds2: (_|_){
+    // [eval] indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
+    //     ./in.cue:17:20
+  }
+  booleanIndex: (_|_){
+    // [eval] booleanIndex: invalid index true (invalid type bool):
+    //     ./in.cue:18:20
+    //     ./in.cue:18:23
+  }
+  indexOutOfBounds3: (_|_){
+    // [eval] indexOutOfBounds3: index out of range [4] with length 3:
+    //     ./in.cue:19:30
+  }
+  negativeIndex: (_|_){
+    // [eval] negativeIndex: invalid index -1 (index must be non-negative):
+    //     ./in.cue:20:20
+    //     ./in.cue:20:30
+  }
+  varIndexTooLarge: (_|_){
+    // [eval]
+    n: (int){ 3 }
+    a: (_|_){
+      // [eval] varIndexTooLarge.a: index out of range [3] with length 3:
+      //     ./in.cue:24:15
+    }
+  }
+  varNegativeIndex: (_|_){
+    // [eval]
+    n: (int){ -1 }
+    a: (_|_){
+      // [eval] varNegativeIndex.a: index n out of range [-1]:
+      //     ./in.cue:29:5
+      //     ./in.cue:28:5
+      //     ./in.cue:29:15
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,11 +1,11 @@
+ Errors:
+-outOfBoundsDisjunction: invalid list index 1 (out of bounds):
++outOfBoundsDisjunction: index out of range [1] with length 0:
+     ./in.cue:7:36
+ indexDoesNotDistribute: index out of range [0] with length 0:
+     ./in.cue:10:37
+-doesNotDistributeType.a: invalid list index "3" (type string):
++doesNotDistributeType.a: undefined field: "3":
+     ./in.cue:13:21
+-stringIndexToList: invalid list index "" (type string):
++stringIndexToList: undefined field: "":
+     ./in.cue:16:24
+ indexOutOfBounds2: invalid operand 2 (found int, want list or struct):
+     ./in.cue:17:20
+@@ -12,7 +12,7 @@
+ booleanIndex: invalid index true (invalid type bool):
+     ./in.cue:18:20
+     ./in.cue:18:23
+-indexOutOfBounds3: invalid list index 4 (out of bounds):
++indexOutOfBounds3: index out of range [4] with length 3:
+     ./in.cue:19:30
+ negativeIndex: invalid index -1 (index must be non-negative):
+     ./in.cue:20:20
+@@ -32,7 +32,7 @@
+   stringOfNumberIndex: (int){ 3 }
+   indexToDefault: (int){ 0 }
+   outOfBoundsDisjunction: (_|_){
+-    // [eval] outOfBoundsDisjunction: invalid list index 1 (out of bounds):
++    // [eval] outOfBoundsDisjunction: index out of range [1] with length 0:
+     //     ./in.cue:7:36
+   }
+   indexDoesNotDistribute: (_|_){
+@@ -44,12 +44,12 @@
+     l: (#list){
+     }
+     a: (_|_){
+-      // [eval] doesNotDistributeType.a: invalid list index "3" (type string):
++      // [eval] doesNotDistributeType.a: undefined field: "3":
+       //     ./in.cue:13:21
+     }
+   }
+   stringIndexToList: (_|_){
+-    // [eval] stringIndexToList: invalid list index "" (type string):
++    // [eval] stringIndexToList: undefined field: "":
+     //     ./in.cue:16:24
+   }
+   indexOutOfBounds2: (_|_){
+@@ -62,7 +62,7 @@
+     //     ./in.cue:18:23
+   }
+   indexOutOfBounds3: (_|_){
+-    // [eval] indexOutOfBounds3: invalid list index 4 (out of bounds):
++    // [eval] indexOutOfBounds3: index out of range [4] with length 3:
+     //     ./in.cue:19:30
+   }
+   negativeIndex: (_|_){
 -- out/eval --
 Errors:
 outOfBoundsDisjunction: invalid list index 1 (out of bounds):

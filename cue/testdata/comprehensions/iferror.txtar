@@ -156,6 +156,195 @@ Retain: 14
 Unifications: 33
 Conjuncts:    66
 Disjuncts:    57
+-- out/evalalpha --
+Errors:
+issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
+    ./in.cue:63:11
+    ./in.cue:63:15
+issue1972.err1.patchs: field not allowed:
+    ./in.cue:63:3
+    ./in.cue:63:15
+    ./in.cue:66:4
+issue1972.err1.someCondition: field not allowed:
+    ./in.cue:62:3
+    ./in.cue:63:15
+wrongConcreteType: cannot use 2 (type int) as type bool:
+    ./in.cue:4:2
+    ./in.cue:1:8
+wrongType: cannot use int (type int) as type bool:
+    ./in.cue:10:2
+    ./in.cue:1:14
+issue1972.err1: cannot use {} (type struct) as type bool:
+    ./in.cue:65:3
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+    b: (int){ 2 }
+    c: (int){ int }
+  }
+  wrongConcreteType: (_|_){
+    // [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
+    //     ./in.cue:4:2
+    //     ./in.cue:1:8
+  }
+  wrongType: (_|_){
+    // [eval] wrongType: cannot use int (type int) as type bool:
+    //     ./in.cue:10:2
+    //     ./in.cue:1:14
+  }
+  incomplete: (_|_){
+    // [incomplete] incomplete: undefined field: d:
+    //     ./in.cue:16:7
+    list: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+  }
+  useDefault: (struct){
+    a: (struct){
+      x: (string){ |(*(string){ "foo" }, (string){ string }) }
+      y: (string){ |(*(string){ "foo" }, (string){ string }) }
+    }
+    issue809: (struct){
+      #A: (#struct){
+        a: (string){ string }
+        b: (string){ string }
+      }
+      s: (struct){
+        bar: (#struct){
+          a: (string){ "bar" }
+          b: (string){ |(*(string){ "bar" }, (string){ string }) }
+        }
+      }
+      foo: (#list){
+        0: (#struct){
+          a: (string){ "bar" }
+          b: (string){ |(*(string){ "bar" }, (string){ string }) }
+        }
+      }
+    }
+  }
+  issue1972: (_|_){
+    // [eval]
+    err1: (_|_){
+      // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
+      //     ./in.cue:63:11
+      //     ./in.cue:63:15
+      // issue1972.err1: cannot use {} (type struct) as type bool:
+      //     ./in.cue:65:3
+      #patchs: (#list){
+      }
+      #someCondition: (_|_){
+        // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
+        //     ./in.cue:63:11
+        //     ./in.cue:63:15
+        // issue1972.err1: cannot use {} (type struct) as type bool:
+        //     ./in.cue:65:3
+      }
+      someCondition: (_|_){
+        // [eval] issue1972.err1.someCondition: field not allowed:
+        //     ./in.cue:62:3
+        //     ./in.cue:63:15
+      }
+      patchs: (_|_){
+        // [eval] issue1972.err1.patchs: field not allowed:
+        //     ./in.cue:63:3
+        //     ./in.cue:63:15
+        //     ./in.cue:66:4
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,14 @@
+ Errors:
+-issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+-    ./in.cue:54:12
+-    ./in.cue:61:8
++issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
++    ./in.cue:63:11
++    ./in.cue:63:15
++issue1972.err1.patchs: field not allowed:
++    ./in.cue:63:3
++    ./in.cue:63:15
++    ./in.cue:66:4
++issue1972.err1.someCondition: field not allowed:
++    ./in.cue:62:3
++    ./in.cue:63:15
+ wrongConcreteType: cannot use 2 (type int) as type bool:
+     ./in.cue:4:2
+     ./in.cue:1:8
+@@ -8,8 +15,8 @@
+ wrongType: cannot use int (type int) as type bool:
+     ./in.cue:10:2
+     ./in.cue:1:14
+-issue1972.err1: invalid list index someCondition (type string):
+-    ./in.cue:65:6
++issue1972.err1: cannot use {} (type struct) as type bool:
++    ./in.cue:65:3
+ 
+ Result:
+ (_|_){
+@@ -31,8 +38,6 @@
+   incomplete: (_|_){
+     // [incomplete] incomplete: undefined field: d:
+     //     ./in.cue:16:7
+-    // incomplete: undefined field: d:
+-    //     ./in.cue:23:21
+     list: (#list){
+       0: (int){ 1 }
+       1: (int){ 2 }
+@@ -66,17 +71,31 @@
+   issue1972: (_|_){
+     // [eval]
+     err1: (_|_){
+-      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+-      //     ./in.cue:54:12
+-      //     ./in.cue:61:8
+-      // issue1972.err1: invalid list index someCondition (type string):
+-      //     ./in.cue:65:6
++      // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
++      //     ./in.cue:63:11
++      //     ./in.cue:63:15
++      // issue1972.err1: cannot use {} (type struct) as type bool:
++      //     ./in.cue:65:3
+       #patchs: (#list){
+       }
+-      someCondition: (_){ _ }
+-      patchs: (list){
+-      }
+-      #someCondition: (_){ _ }
++      #someCondition: (_|_){
++        // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
++        //     ./in.cue:63:11
++        //     ./in.cue:63:15
++        // issue1972.err1: cannot use {} (type struct) as type bool:
++        //     ./in.cue:65:3
++      }
++      someCondition: (_|_){
++        // [eval] issue1972.err1.someCondition: field not allowed:
++        //     ./in.cue:62:3
++        //     ./in.cue:63:15
++      }
++      patchs: (_|_){
++        // [eval] issue1972.err1.patchs: field not allowed:
++        //     ./in.cue:63:3
++        //     ./in.cue:63:15
++        //     ./in.cue:66:4
++      }
+     }
+   }
+ }
+-- diff/todo/p0 --
+issue1972: incorrect errors: "field not allowed" when they are actually allowed.
+-- diff/todo/p1 --
+incomplete: missing error (second incomplete block)
 -- out/eval --
 Errors:
 issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):

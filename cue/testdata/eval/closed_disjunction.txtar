@@ -23,6 +23,108 @@ Retain: 0
 Unifications: 34
 Conjuncts:    60
 Disjuncts:    46
+-- out/evalalpha --
+Errors:
+b.c: field not allowed:
+    ./in.cue:12:2
+b.d: field not allowed:
+    ./in.cue:13:2
+
+Result:
+(_|_){
+  // [eval]
+  #A: (#struct){ |(*(#struct){
+      b?: (int){ int }
+    }, (#struct){
+      b?: (int){ int }
+      c?: (int){ int }
+    }, (#struct){
+      b?: (int){ int }
+      d?: (int){ int }
+    }, (#struct){
+      b?: (int){ int }
+      e?: (int){ int }
+    }) }
+  a: (#struct){
+    b: (int){ 3 }
+    c: (int){ 3 }
+  }
+  b: (_|_){
+    // [eval] b.c: field not allowed:
+    //     ./in.cue:12:2
+    // b.d: field not allowed:
+    //     ./in.cue:13:2
+    c: (int){ 3 }
+    d: (int){ 4 }
+    b?: (int){ int }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,16 +1,7 @@
+ Errors:
+-b: 2 errors in empty disjunction:
+ b.c: field not allowed:
+-    ./in.cue:1:5
+-    ./in.cue:3:2
+-    ./in.cue:3:3
+-    ./in.cue:11:4
+     ./in.cue:12:2
+ b.d: field not allowed:
+-    ./in.cue:1:5
+-    ./in.cue:3:2
+-    ./in.cue:3:8
+-    ./in.cue:11:4
+     ./in.cue:13:2
+ 
+ Result:
+@@ -33,36 +24,12 @@
+     c: (int){ 3 }
+   }
+   b: (_|_){
+-    // [eval] b: 2 errors in empty disjunction:
+-    // b.c: field not allowed:
+-    //     ./in.cue:1:5
+-    //     ./in.cue:3:2
+-    //     ./in.cue:3:3
+-    //     ./in.cue:11:4
++    // [eval] b.c: field not allowed:
+     //     ./in.cue:12:2
+     // b.d: field not allowed:
+-    //     ./in.cue:1:5
+-    //     ./in.cue:3:2
+-    //     ./in.cue:3:8
+-    //     ./in.cue:11:4
+     //     ./in.cue:13:2
++    c: (int){ 3 }
++    d: (int){ 4 }
+     b?: (int){ int }
+-    c: (_|_){
+-      // [eval] b.c: field not allowed:
+-      //     ./in.cue:1:5
+-      //     ./in.cue:3:2
+-      //     ./in.cue:3:32
+-      //     ./in.cue:11:4
+-      //     ./in.cue:12:2
+-    }
+-    d: (_|_){
+-      // [eval] b.d: field not allowed:
+-      //     ./in.cue:1:5
+-      //     ./in.cue:3:2
+-      //     ./in.cue:3:32
+-      //     ./in.cue:11:4
+-      //     ./in.cue:13:2
+-    }
+-    e?: (int){ int }
+   }
+ }
+-- diff/todo/p1 --
+Missing "empty disjunction" error.
+Missing error positions.
+-- diff/explanation --
+Dropping e? is correct.
 -- out/eval --
 Errors:
 b: 2 errors in empty disjunction:

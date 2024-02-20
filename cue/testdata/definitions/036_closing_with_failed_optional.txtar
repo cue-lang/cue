@@ -107,6 +107,94 @@ Retain: 1
 Unifications: 24
 Conjuncts:    43
 Disjuncts:    29
+-- out/evalalpha --
+(struct){
+  #k1: (#struct){
+    a: (int){ int }
+    b?: (_|_){
+      // [eval] #k1.b: field not allowed:
+      //     ./in.cue:1:26
+      //     ./in.cue:1:15
+    }
+  }
+  #k2: (#struct){
+    a: (int){ int }
+    b?: (_|_){
+      // [eval] #k2.b: field not allowed:
+      //     ./in.cue:3:6
+      //     ./in.cue:3:20
+    }
+  }
+  o1: (struct){
+    a?: (_|_){
+      // [eval] o1.a: conflicting values 4 and 3:
+      //     ./in.cue:5:10
+      //     ./in.cue:5:20
+    }
+  }
+  #o2: (#struct){
+    a?: (_|_){
+      // [eval] #o2.a: conflicting values 4 and 3:
+      //     ./in.cue:8:11
+      //     ./in.cue:8:21
+    }
+  }
+  #d1: (#struct){ |((#struct){
+      a?: (int){ 2 }
+      b: (int){ 4 }
+    }, (#struct){
+      a?: (int){ 3 }
+      c: (int){ 5 }
+    }) }
+  v1: (#struct){
+    a?: (_|_){
+      // [eval] v1.a: conflicting values 2 and 3:
+      //     ./in.cue:10:11
+      //     ./in.cue:12:16
+    }
+    b: (int){ 4 }
+  }
+  #A: (#struct){
+    a: (int){ int }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,11 +1,19 @@
+ (struct){
+   #k1: (#struct){
+     a: (int){ int }
+-    b?: (int){ int }
++    b?: (_|_){
++      // [eval] #k1.b: field not allowed:
++      //     ./in.cue:1:26
++      //     ./in.cue:1:15
++    }
+   }
+   #k2: (#struct){
+     a: (int){ int }
+-    b?: (int){ int }
++    b?: (_|_){
++      // [eval] #k2.b: field not allowed:
++      //     ./in.cue:3:6
++      //     ./in.cue:3:20
++    }
+   }
+   o1: (struct){
+     a?: (_|_){
+@@ -32,7 +40,6 @@
+     a?: (_|_){
+       // [eval] v1.a: conflicting values 2 and 3:
+       //     ./in.cue:10:11
+-      //     ./in.cue:12:5
+       //     ./in.cue:12:16
+     }
+     b: (int){ 4 }
+-- diff/todo/p0 --
+#k1.b: incorrect "field not allowed"
+    error passes through optional field.
 -- out/eval --
 (struct){
   #k1: (#struct){

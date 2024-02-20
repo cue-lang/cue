@@ -100,6 +100,180 @@ Retain: 3
 Unifications: 58
 Conjuncts:    103
 Disjuncts:    71
+-- out/evalalpha --
+Errors:
+noEraseDefinition.a.0.b: field not allowed:
+    ./in.cue:55:17
+
+Result:
+(_|_){
+  // [eval]
+  dynamicTop: (struct){
+    #D: (#struct){
+      foo: (int){ 123 }
+    }
+  }
+  dynamicDepth1: (struct){
+    #D: (#struct){
+      a: (#struct){
+        foo: (int){ 123 }
+      }
+      b: (#struct){
+        foo: (int){ 123 }
+      }
+    }
+  }
+  allowed: (struct){
+    #D: (#struct){
+      d: (int){ int }
+    }
+    vErr: (#struct){
+      d: (int){ 5 }
+    }
+  }
+  disallowed: (struct){
+    #D: (#struct){
+    }
+    vErr: (#struct){
+      d: (int){ 5 }
+    }
+  }
+  comprehensionIsEmbed: (struct){
+    #A: (#struct){
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    #B: (#struct){
+      kind: (string){ string }
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    x: (#struct){
+      kind: (string){ "A" }
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+  }
+  noEraseDefinition: (_|_){
+    // [eval]
+    #Foo: (#list){
+      0: (#struct){
+        a: (int){ int }
+      }
+    }
+    a: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] noEraseDefinition.a.0.b: field not allowed:
+          //     ./in.cue:55:17
+        }
+        a: (int){ int }
+      }
+    }
+  }
+  issue1956: (struct){
+    #Details: (#struct){
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    #Thing: (_|_){
+      // [incomplete] issue1956.#Thing: unresolved disjunction "KindA" | "KindB" (type string):
+      //     ./in.cue:65:6
+      kind: (string){ |((string){ "KindA" }, (string){ "KindB" }) }
+    }
+    x: (#struct){
+      kind: (string){ "KindA" }
+      size: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+  }
+  dedupTodo: (struct){
+    #sub: (_|_){
+      // [incomplete] dedupTodo.#sub: c.n undefined as c is incomplete (type _):
+      //     ./in.cue:80:6
+      c: (_){ _ }
+    }
+    out: (#struct){
+      c: (#struct){
+        n: (string){ "c" }
+      }
+      X: (#struct){
+        test: (#struct){
+          n: (string){ "c" }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,14 +1,5 @@
+ Errors:
+-disallowed.vErr.d: field not allowed:
+-    ./in.cue:26:6
+-    ./in.cue:27:3
+-    ./in.cue:27:12
+-    ./in.cue:28:4
+-    ./in.cue:32:8
+-    ./in.cue:32:14
+ noEraseDefinition.a.0.b: field not allowed:
+-    ./in.cue:54:17
+-    ./in.cue:55:7
+     ./in.cue:55:17
+ 
+ Result:
+@@ -37,21 +28,11 @@
+       d: (int){ 5 }
+     }
+   }
+-  disallowed: (_|_){
+-    // [eval]
+-    #D: (#struct){
+-    }
+-    vErr: (_|_){
+-      // [eval]
+-      d: (_|_){
+-        // [eval] disallowed.vErr.d: field not allowed:
+-        //     ./in.cue:26:6
+-        //     ./in.cue:27:3
+-        //     ./in.cue:27:12
+-        //     ./in.cue:28:4
+-        //     ./in.cue:32:8
+-        //     ./in.cue:32:14
+-      }
++  disallowed: (struct){
++    #D: (#struct){
++    }
++    vErr: (#struct){
++      d: (int){ 5 }
+     }
+   }
+   comprehensionIsEmbed: (struct){
+@@ -78,13 +59,11 @@
+       // [eval]
+       0: (_|_){
+         // [eval]
+-        a: (int){ int }
+         b: (_|_){
+           // [eval] noEraseDefinition.a.0.b: field not allowed:
+-          //     ./in.cue:54:17
+-          //     ./in.cue:55:7
+           //     ./in.cue:55:17
+         }
++        a: (int){ int }
+       }
+     }
+   }
+@@ -109,7 +88,7 @@
+       c: (_){ _ }
+     }
+     out: (#struct){
+-      c: (struct){
++      c: (#struct){
+         n: (string){ "c" }
+       }
+       X: (#struct){
+-- diff/todo/p0 --
+disallowed.vErr: Closedness in comprehensions
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:

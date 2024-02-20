@@ -42,6 +42,46 @@ Retain: 3
 Unifications: 59
 Conjuncts:    105
 Disjuncts:    93
+-- out/evalalpha --
+(struct){
+  args: (#list){
+  }
+  v1: (int){ 0 }
+  v2: (int){ 0 }
+  v3: (int){ 0 }
+  v4: (int){ 1 }
+  v5: (_|_){
+    // [incomplete] v5: unresolved disjunction {a:3} | {a:4} (type struct):
+    //     ./in.cue:6:7
+  }
+  v6: (_|_){
+    // [incomplete] v6: unresolved disjunction 'sf' | 'dd' (type bytes):
+    //     ./in.cue:7:7
+  }
+  v7: (int){ 2 }
+  v8: (_|_){
+    // [incomplete] v8: unresolved disjunction [2] | [1,2] (type list):
+    //     ./in.cue:9:7
+  }
+  v9: (int){ 4 }
+  v10: (int){ 0 }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,7 +1,6 @@
+ (struct){
+-  args: (list){ |(*(#list){
+-    }, (list){
+-    }) }
++  args: (#list){
++  }
+   v1: (int){ 0 }
+   v2: (int){ 0 }
+   v3: (int){ 0 }
+-- diff/todo/p0 --
+Incorrectly chosen default.
 -- out/eval --
 (struct){
   args: (list){ |(*(#list){

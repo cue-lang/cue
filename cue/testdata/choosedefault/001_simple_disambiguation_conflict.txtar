@@ -29,6 +29,25 @@ Retain: 0
 Unifications: 4
 Conjuncts:    17
 Disjuncts:    14
+-- out/evalalpha --
+(struct){
+  a: (string){ |(*(string){ "a" }, (string){ "b" }) }
+  b: (string){ |(*(string){ "b" }, (string){ "a" }) }
+  c: (string){ |((string){ "a" }, (string){ "b" }) }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,5 +1,5 @@
+ (struct){
+   a: (string){ |(*(string){ "a" }, (string){ "b" }) }
+   b: (string){ |(*(string){ "b" }, (string){ "a" }) }
+-  c: (string){ |((string){ "a" }, (string){ "b" }) }
++  c: (string){ |(*(string){ "a" }, (string){ "b" }) }
+ }
+-- diff/todo/p0 --
+crossproduct to compute defaults
 -- out/eval --
 (struct){
   a: (string){ |(*(string){ "a" }, (string){ "b" }) }

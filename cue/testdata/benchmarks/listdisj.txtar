@@ -64,6 +64,972 @@ Retain: 0
 Unifications: 287
 Conjuncts:    894
 Disjuncts:    447
+-- out/evalalpha --
+(struct){
+  #T: (#list){ |((#list){
+      0: (string){ "a" }
+      1: (#list){ |((#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "b" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "c" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (list){
+      0: (string){ "d" }
+    }) }
+  x: (#list){ |((#list){
+      0: (string){ "a" }
+      1: (#list){ |((#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "b" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "c" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (list){
+      0: (string){ "d" }
+    }) }
+  y: (#list){ |((#list){
+      0: (string){ "a" }
+      1: (#list){ |((#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "b" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "c" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (list){
+      0: (string){ "d" }
+    }) }
+  z: (#list){ |((#list){
+      0: (string){ "a" }
+      1: (#list){ |((#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "b" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "c" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (list){
+      0: (string){ "d" }
+    }) }
+  v: (#list){ |((#list){
+      0: (string){ "a" }
+      1: (#list){ |((#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "b" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "c" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (list){
+      0: (string){ "d" }
+    }) }
+  #X: (#list){ |((#list){
+      0: (string){ "a" }
+      1: (#list){ |((#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "b" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "c" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (#list){
+      0: (string){ "c" }
+      1: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (list){
+                0: (string){ "d" }
+              }
+            }, (list){
+              0: (string){ "d" }
+            }) }
+        }, (list){
+          0: (string){ "d" }
+        }) }
+    }, (list){
+      0: (string){ "d" }
+    }) }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,20 +1,470 @@
+ (struct){
+-  #T: (list){
+-    0: (string){ "d" }
+-  }
+-  x: (list){
+-    0: (string){ "d" }
+-  }
+-  y: (list){
+-    0: (string){ "d" }
+-  }
+-  z: (list){
+-    0: (string){ "d" }
+-  }
+-  v: (list){
+-    0: (string){ "d" }
+-  }
+-  #X: (list){
+-    0: (string){ "d" }
+-  }
++  #T: (#list){ |((#list){
++      0: (string){ "a" }
++      1: (#list){ |((#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "b" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "c" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (list){
++      0: (string){ "d" }
++    }) }
++  x: (#list){ |((#list){
++      0: (string){ "a" }
++      1: (#list){ |((#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "b" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "c" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (list){
++      0: (string){ "d" }
++    }) }
++  y: (#list){ |((#list){
++      0: (string){ "a" }
++      1: (#list){ |((#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "b" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "c" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (list){
++      0: (string){ "d" }
++    }) }
++  z: (#list){ |((#list){
++      0: (string){ "a" }
++      1: (#list){ |((#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "b" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "c" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (list){
++      0: (string){ "d" }
++    }) }
++  v: (#list){ |((#list){
++      0: (string){ "a" }
++      1: (#list){ |((#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "b" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "c" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (list){
++      0: (string){ "d" }
++    }) }
++  #X: (#list){ |((#list){
++      0: (string){ "a" }
++      1: (#list){ |((#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "b" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "c" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (#list){
++      0: (string){ "c" }
++      1: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (list){
++                0: (string){ "d" }
++              }
++            }, (list){
++              0: (string){ "d" }
++            }) }
++        }, (list){
++          0: (string){ "d" }
++        }) }
++    }, (list){
++      0: (string){ "d" }
++    }) }
+ }
+-- diff/todo/p0 --
+Structural cycles detected too late.
 -- out/eval --
 (struct){
   #T: (list){

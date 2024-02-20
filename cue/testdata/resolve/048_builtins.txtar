@@ -89,6 +89,195 @@ Retain: 22
 Unifications: 55
 Conjuncts:    125
 Disjuncts:    75
+-- out/evalalpha --
+Errors:
+o3.a: conflicting values "bar" and "foo":
+    ./in.cue:17:5
+    ./in.cue:20:14
+o3.a: conflicting values "baz" and "foo":
+    ./in.cue:20:14
+    ./in.cue:20:24
+a3.a: invalid value "bar" (out of bound =~"oo"):
+    ./in.cue:8:5
+    ./in.cue:12:14
+a3.a: invalid value "bar" (out of bound =~"fo"):
+    ./in.cue:9:5
+    ./in.cue:12:14
+stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
+    ./in.cue:31:11
+    ./in.cue:30:7
+stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
+    ./in.cue:36:27
+decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
+    ./in.cue:43:11
+    ./in.cue:42:7
+
+Result:
+(_|_){
+  // [eval]
+  a1: (struct){
+    a: (string){ &(=~"oo", =~"fo") }
+    b: (string){ =~"oo" }
+    c: (string){ =~"fo" }
+  }
+  a2: (struct){
+    a: (string){ "foo" }
+    b: (string){ =~"oo" }
+    c: (string){ =~"fo" }
+  }
+  a3: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
+      //     ./in.cue:8:5
+      //     ./in.cue:12:14
+      // a3.a: invalid value "bar" (out of bound =~"fo"):
+      //     ./in.cue:9:5
+      //     ./in.cue:12:14
+    }
+    b: (string){ =~"oo" }
+    c: (string){ =~"fo" }
+  }
+  o1: (struct){
+    a: (string){ |((string){ string }, (string){ "bar" }) }
+    b: (string){ string }
+    c: (string){ "bar" }
+  }
+  o2: (struct){
+    a: (string){ "foo" }
+    b: (string){ string }
+    c: (string){ "bar" }
+  }
+  o3: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] o3.a: conflicting values "bar" and "foo":
+      //     ./in.cue:17:5
+      //     ./in.cue:20:14
+      // o3.a: conflicting values "baz" and "foo":
+      //     ./in.cue:20:14
+      //     ./in.cue:20:24
+    }
+    b: (string){ "baz" }
+    c: (string){ "bar" }
+  }
+  stringListErrors: (_|_){
+    // [eval]
+    a: (struct){
+      x: (list){
+        0: (string){ string }
+      }
+      result: (_|_){
+        // [incomplete] stringListErrors.a.result: non-concrete value string for element 0 of string list argument 0:
+        //     ./in.cue:26:11
+        //     ./in.cue:25:7
+      }
+    }
+    b: (_|_){
+      // [eval]
+      x: (list){
+        0: (int){ int }
+      }
+      result: (_|_){
+        // [eval] stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
+        //     ./in.cue:31:11
+        //     ./in.cue:30:7
+      }
+    }
+    c: (_|_){
+      // [eval]
+      x: (#list){
+      }
+      result: (_|_){
+        // [eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
+        //     ./in.cue:36:27
+      }
+    }
+  }
+  decimalListErrors: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval]
+      x: (#list){
+        0: (string){ string }
+      }
+      result: (_|_){
+        // [eval] decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
+        //     ./in.cue:43:11
+        //     ./in.cue:42:7
+      }
+    }
+    b: (struct){
+      x: (list){
+        0: (int){ int }
+      }
+      result: (_|_){
+        // [incomplete] decimalListErrors.b.result: non-concrete value int for element 0 of number list argument 0:
+        //     ./in.cue:48:11
+        //     ./in.cue:47:7
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,22 +1,15 @@
+ Errors:
+-o3.a: 2 errors in empty disjunction:
+ o3.a: conflicting values "bar" and "foo":
+-    ./in.cue:15:12
+     ./in.cue:17:5
+-    ./in.cue:20:5
+     ./in.cue:20:14
+ o3.a: conflicting values "baz" and "foo":
+-    ./in.cue:15:9
+-    ./in.cue:20:5
+     ./in.cue:20:14
+     ./in.cue:20:24
+ a3.a: invalid value "bar" (out of bound =~"oo"):
+     ./in.cue:8:5
+-    ./in.cue:7:5
+     ./in.cue:12:14
+ a3.a: invalid value "bar" (out of bound =~"fo"):
+     ./in.cue:9:5
+-    ./in.cue:7:5
+     ./in.cue:12:14
+ stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
+     ./in.cue:31:11
+@@ -45,11 +38,9 @@
+     a: (_|_){
+       // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
+       //     ./in.cue:8:5
+-      //     ./in.cue:7:5
+       //     ./in.cue:12:14
+       // a3.a: invalid value "bar" (out of bound =~"fo"):
+       //     ./in.cue:9:5
+-      //     ./in.cue:7:5
+       //     ./in.cue:12:14
+     }
+     b: (string){ =~"oo" }
+@@ -68,15 +59,10 @@
+   o3: (_|_){
+     // [eval]
+     a: (_|_){
+-      // [eval] o3.a: 2 errors in empty disjunction:
+-      // o3.a: conflicting values "bar" and "foo":
+-      //     ./in.cue:15:12
++      // [eval] o3.a: conflicting values "bar" and "foo":
+       //     ./in.cue:17:5
+-      //     ./in.cue:20:5
+       //     ./in.cue:20:14
+       // o3.a: conflicting values "baz" and "foo":
+-      //     ./in.cue:15:9
+-      //     ./in.cue:20:5
+       //     ./in.cue:20:14
+       //     ./in.cue:20:24
+     }
+-- diff/todo/p2 --
+Missing "empty disjunction" message.
+Missing error positions.
 -- out/eval --
 Errors:
 o3.a: 2 errors in empty disjunction:

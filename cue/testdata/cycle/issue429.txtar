@@ -58,6 +58,230 @@ Retain: 12
 Unifications: 40
 Conjuncts:    150
 Disjuncts:    101
+-- out/evalalpha --
+Errors:
+es3.max: conflicting values 1 and 5:
+    ./in.cue:4:16
+    ./in.cue:22:7
+es3.max: conflicting values 10 and 5:
+    ./in.cue:21:7
+    ./in.cue:22:7
+es3.max: invalid value 5 (out of bound >10):
+    ./in.cue:5:7
+    ./in.cue:22:7
+er3.max: invalid value 5 (out of bound >5):
+    ./in.cue:30:7
+    ./in.cue:45:7
+
+Result:
+(_|_){
+  // [eval]
+  #Size: (#struct){
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+    max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
+  }
+  s0: (#struct){
+    res: (int){ 1 }
+    min: (number){ |(*(int){ 2 }, (number){ >1 }) }
+    max: (number){ |(*(int){ 2 }, (number){ >1 }, (number){ >2 }) }
+  }
+  s1: (#struct){
+    min: (int){ 5 }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
+  }
+  s2: (#struct){
+    max: (int){ 5 }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+  }
+  s3: (#struct){
+    min: (int){ 5 }
+    max: (int){ 10 }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+  }
+  es3: (_|_){
+    // [eval]
+    min: (int){ 10 }
+    max: (_|_){
+      // [eval] es3.max: conflicting values 1 and 5:
+      //     ./in.cue:4:16
+      //     ./in.cue:22:7
+      // es3.max: conflicting values 10 and 5:
+      //     ./in.cue:21:7
+      //     ./in.cue:22:7
+      // es3.max: invalid value 5 (out of bound >10):
+      //     ./in.cue:5:7
+      //     ./in.cue:22:7
+    }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+  }
+  #nonEmptyRange: (#struct){
+    min: (int){ |(*(int){ 1 }, (int){ int }) }
+    max: (number){ >1 }
+  }
+  r1: (#struct){
+    min: (int){ 3 }
+    max: (number){ >3 }
+  }
+  r2: (#struct){
+    max: (int){ 5 }
+    min: (int){ |(*(int){ 1 }, (int){ &(<5, int) }) }
+  }
+  r3: (#struct){
+    min: (int){ 3 }
+    max: (int){ 6 }
+  }
+  er3: (_|_){
+    // [eval]
+    min: (int){ 5 }
+    max: (_|_){
+      // [eval] er3.max: invalid value 5 (out of bound >5):
+      //     ./in.cue:30:7
+      //     ./in.cue:45:7
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,26 +1,16 @@
+ Errors:
+-er3.min: 2 errors in empty disjunction:
+-er3.min: conflicting values 1 and 5:
+-    ./in.cue:28:8
+-    ./in.cue:43:6
+-    ./in.cue:44:7
+-es3.max: 3 errors in empty disjunction:
+ es3.max: conflicting values 1 and 5:
+     ./in.cue:4:16
+-    ./in.cue:5:15
+-    ./in.cue:20:6
+     ./in.cue:22:7
+ es3.max: conflicting values 10 and 5:
+-    ./in.cue:5:15
+-    ./in.cue:20:6
+     ./in.cue:21:7
+     ./in.cue:22:7
+ es3.max: invalid value 5 (out of bound >10):
+     ./in.cue:5:7
+     ./in.cue:22:7
+-er3.min: invalid value 5 (out of bound <5):
+-    ./in.cue:29:7
+-    ./in.cue:44:7
++er3.max: invalid value 5 (out of bound >5):
++    ./in.cue:30:7
++    ./in.cue:45:7
+ 
+ Result:
+ (_|_){
+@@ -36,34 +26,28 @@
+     max: (number){ |(*(int){ 2 }, (number){ >1 }, (number){ >2 }) }
+   }
+   s1: (#struct){
+-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+-    min: (int){ 5 }
++    min: (int){ 5 }
++    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+     max: (number){ |(*(int){ 5 }, (number){ >5 }) }
+   }
+   s2: (#struct){
+-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+-    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+-    max: (int){ 5 }
++    max: (int){ 5 }
++    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
++    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+   }
+   s3: (#struct){
+-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+     min: (int){ 5 }
+     max: (int){ 10 }
++    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+   }
+   es3: (_|_){
+     // [eval]
+-    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+     min: (int){ 10 }
+     max: (_|_){
+-      // [eval] es3.max: 3 errors in empty disjunction:
+-      // es3.max: conflicting values 1 and 5:
++      // [eval] es3.max: conflicting values 1 and 5:
+       //     ./in.cue:4:16
+-      //     ./in.cue:5:15
+-      //     ./in.cue:20:6
+       //     ./in.cue:22:7
+       // es3.max: conflicting values 10 and 5:
+-      //     ./in.cue:5:15
+-      //     ./in.cue:20:6
+       //     ./in.cue:21:7
+       //     ./in.cue:22:7
+       // es3.max: invalid value 5 (out of bound >10):
+@@ -70,11 +54,10 @@
+       //     ./in.cue:5:7
+       //     ./in.cue:22:7
+     }
++    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+   }
+   #nonEmptyRange: (#struct){
+-    min: (_|_){
+-      // [cycle] cycle error
+-    }
++    min: (int){ |(*(int){ 1 }, (int){ int }) }
+     max: (number){ >1 }
+   }
+   r1: (#struct){
+@@ -82,8 +65,8 @@
+     max: (number){ >3 }
+   }
+   r2: (#struct){
++    max: (int){ 5 }
+     min: (int){ |(*(int){ 1 }, (int){ &(<5, int) }) }
+-    max: (int){ 5 }
+   }
+   r3: (#struct){
+     min: (int){ 3 }
+@@ -91,25 +74,11 @@
+   }
+   er3: (_|_){
+     // [eval]
+-    min: (_|_){
+-      // [eval] er3.min: 2 errors in empty disjunction:
+-      // er3.min: conflicting values 1 and 5:
+-      //     ./in.cue:28:8
+-      //     ./in.cue:43:6
+-      //     ./in.cue:44:7
+-      // er3.min: invalid value 5 (out of bound <5):
+-      //     ./in.cue:29:7
+-      //     ./in.cue:44:7
+-    }
+-    max: (_|_){
+-      // [eval] er3.min: 2 errors in empty disjunction:
+-      // er3.min: conflicting values 1 and 5:
+-      //     ./in.cue:28:8
+-      //     ./in.cue:43:6
+-      //     ./in.cue:44:7
+-      // er3.min: invalid value 5 (out of bound <5):
+-      //     ./in.cue:29:7
+-      //     ./in.cue:44:7
++    min: (int){ 5 }
++    max: (_|_){
++      // [eval] er3.max: invalid value 5 (out of bound >5):
++      //     ./in.cue:30:7
++      //     ./in.cue:45:7
+     }
+   }
+ }
+-- diff/todo/p2 --
+#nonEmptyRange: missing disjunction error, or at least missing validation.
+At least this seems more correct than the old evaluator. It is an
+incomplete error at best.
+-- diff/todo/p3 --
+Reordering.
+Missing empty disjunction message.
+Missing error positions.
 -- out/eval --
 Errors:
 er3.min: 2 errors in empty disjunction:

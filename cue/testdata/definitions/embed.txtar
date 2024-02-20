@@ -83,6 +83,211 @@ Retain: 6
 Unifications: 59
 Conjuncts:    124
 Disjuncts:    69
+-- out/evalalpha --
+Errors:
+recloseSimple.a.b: field not allowed:
+    ./in.cue:17:6
+    ./in.cue:17:15
+reclose1.z.d: field not allowed:
+    ./in.cue:33:5
+    ./in.cue:34:5
+
+Result:
+(_|_){
+  // [eval]
+  deployment: (struct){
+    foo: (#struct){
+      spec: (#struct){
+        replicas: (int){ 1 }
+      }
+    }
+  }
+  #Deployment: (#struct){
+    spec: (#struct){
+      replicas: (int){ int }
+    }
+  }
+  #Spec: (#struct){
+    replicas: (int){ int }
+  }
+  #TypeMeta: (#struct){
+  }
+  recloseSimple: (_|_){
+    // [eval]
+    #foo: (#struct){
+    }
+    a: (_|_){
+      // [eval]
+      b: (_|_){
+        // [eval] recloseSimple.a.b: field not allowed:
+        //     ./in.cue:17:6
+        //     ./in.cue:17:15
+      }
+    }
+  }
+  reclose1: (_|_){
+    // [eval]
+    #D: (#struct){
+      x: (int){ int }
+      y: (int){ int }
+    }
+    #a: (#struct){
+      b: (#struct){
+        c: (int){ int }
+      }
+      x: (int){ int }
+      y: (int){ int }
+    }
+    z: (_|_){
+      // [eval]
+      d: (_|_){
+        // [eval] reclose1.z.d: field not allowed:
+        //     ./in.cue:33:5
+        //     ./in.cue:34:5
+      }
+      c: (int){ int }
+    }
+  }
+  reclose2: (struct){
+    #D: (#struct){
+      x: (int){ int }
+      y: (int){ int }
+    }
+    a: (#struct){
+      b: (#struct){
+        c: (int){ int }
+      }
+      x: (int){ int }
+      y: (int){ int }
+    }
+    z: (struct){
+      d: (int){ 3 }
+      c: (int){ int }
+    }
+  }
+  reclose3: (struct){
+    #Step: (#struct){ |((#struct){
+        Name: (string){ string }
+        Something: (int){ int }
+      }, (#struct){
+        Name: (string){ string }
+        Else: (int){ int }
+      }) }
+    #Common: (#struct){
+      Name: (string){ string }
+    }
+    #A: (#struct){
+      Something: (int){ int }
+      Name: (string){ string }
+    }
+    #B: (#struct){
+      Else: (int){ int }
+      Name: (string){ string }
+    }
+    x: (#struct){
+      Name: (string){ "a" }
+      Something: (int){ 4 }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,10 @@
+ Errors:
+-reclose1.z.d: field not allowed:
+-    ./in.cue:28:6
+-    ./in.cue:33:5
+-    ./in.cue:34:5
+ recloseSimple.a.b: field not allowed:
+-    ./in.cue:16:8
+-    ./in.cue:17:5
+     ./in.cue:17:6
+     ./in.cue:17:15
++reclose1.z.d: field not allowed:
++    ./in.cue:33:5
++    ./in.cue:34:5
+ 
+ Result:
+ (_|_){
+@@ -37,8 +34,6 @@
+       // [eval]
+       b: (_|_){
+         // [eval] recloseSimple.a.b: field not allowed:
+-        //     ./in.cue:16:8
+-        //     ./in.cue:17:5
+         //     ./in.cue:17:6
+         //     ./in.cue:17:15
+       }
+@@ -51,21 +46,20 @@
+       y: (int){ int }
+     }
+     #a: (#struct){
+-      x: (int){ int }
+-      y: (int){ int }
+-      b: (#struct){
+-        c: (int){ int }
+-      }
++      b: (#struct){
++        c: (int){ int }
++      }
++      x: (int){ int }
++      y: (int){ int }
+     }
+     z: (_|_){
+       // [eval]
+-      c: (int){ int }
+       d: (_|_){
+         // [eval] reclose1.z.d: field not allowed:
+-        //     ./in.cue:28:6
+         //     ./in.cue:33:5
+         //     ./in.cue:34:5
+       }
++      c: (int){ int }
+     }
+   }
+   reclose2: (struct){
+@@ -74,15 +68,15 @@
+       y: (int){ int }
+     }
+     a: (#struct){
+-      x: (int){ int }
+-      y: (int){ int }
+-      b: (struct){
+-        c: (int){ int }
+-      }
++      b: (#struct){
++        c: (int){ int }
++      }
++      x: (int){ int }
++      y: (int){ int }
+     }
+     z: (struct){
+-      c: (int){ int }
+       d: (int){ 3 }
++      c: (int){ int }
+     }
+   }
+   reclose3: (struct){
+@@ -97,12 +91,12 @@
+       Name: (string){ string }
+     }
+     #A: (#struct){
+-      Name: (string){ string }
+       Something: (int){ int }
++      Name: (string){ string }
+     }
+     #B: (#struct){
+-      Name: (string){ string }
+       Else: (int){ int }
++      Name: (string){ string }
+     }
+     x: (#struct){
+       Name: (string){ "a" }
+-- diff/todo/p3 --
+Reordering
+Missing error positions
 -- out/eval --
 Errors:
 reclose1.z.d: field not allowed:

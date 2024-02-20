@@ -16,6 +16,24 @@
       "message": "SGTM but needs a test, even if tiny. It could also cover e.g. what happens when I explicitly set e.g. `CUE_EXPERIMENT\u003dmodules CUE_REGISTRY\u003d\u0027\u0027`.",
       "revId": "f935a54bb135a14734e556757c93191ed24cdda4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b82d108f_e5ff6b94",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-20T13:30:30Z",
+      "side": 1,
+      "message": "not resolved, my bad",
+      "parentUuid": "ef97f574_69f729d3",
+      "revId": "f935a54bb135a14734e556757c93191ed24cdda4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

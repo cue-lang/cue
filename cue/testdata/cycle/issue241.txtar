@@ -33,6 +33,41 @@ Retain: 7
 Unifications: 11
 Conjuncts:    101
 Disjuncts:    47
+-- out/evalalpha --
+(struct){
+  #Value: (int){ |((int){ 0 }, (int){ 1 }) }
+  foo: (int){ |((int){ 0 }, (int){ 1 }) }
+  bar: (int){ |((int){ 0 }, (int){ 1 }) }
+  Foo: (int){ |((int){ 0 }, (int){ 1 }) }
+  Bar: (int){ 0 }
+  cell: (struct){
+    a: (int){ 0 }
+    b: (int){ 1 }
+  }
+  a: (int){ 0 }
+  b: (int){ 1 }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,11 +1,8 @@
+ (struct){
+   #Value: (int){ |((int){ 0 }, (int){ 1 }) }
+-  foo: (_|_){
+-    // [incomplete] foo: unresolved disjunction 0 | 1 (type int):
+-    //     ./in.cue:4:6
+-  }
++  foo: (int){ |((int){ 0 }, (int){ 1 }) }
+   bar: (int){ |((int){ 0 }, (int){ 1 }) }
+-  Foo: (int){ 1 }
++  Foo: (int){ |((int){ 0 }, (int){ 1 }) }
+   Bar: (int){ 0 }
+   cell: (struct){
+     a: (int){ 0 }
+-- diff/todo/p0 --
+many errors: resolve scalars correctly in combination with disjunctions
+foo: alternative: no error, but include constraints in output.
 -- out/eval --
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }

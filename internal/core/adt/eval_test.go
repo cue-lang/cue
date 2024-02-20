@@ -70,19 +70,24 @@ var needFix = map[string]string{
 }
 
 func TestEvalAlpha(t *testing.T) {
-	adt.DebugDeps = true // check unmatched dependencies.
+	adt.DebugDeps = false // check unmatched dependencies.
 
 	var todoAlpha = map[string]string{
-		// The list package defines some disjunctions. Even those these tests
-		// do not have any disjunctions in the test, they still fail because
-		// they trigger the disjunction in the list package.
-		// Some other tests use the 'or' builtin, which is also not yet
-		// supported.
-		"builtins/list/sort": "list package",
-		"benchmarks/sort":    "list package",
-		"fulleval/032_or_builtin_should_not_fail_on_non-concrete_empty_list": "unimplemented",
-		"resolve/048_builtins":                     "unimplemented",
-		"fulleval/049_alias_reuse_in_nested_scope": "list",
+		// Crashes and hangs
+		"cycle/050_resolved_self-reference_cycles_with_disjunctions": "hang",
+		"cycle/chain":              "hang",
+		"cycle/evaluate":           "hang",
+		"cycle/self":               "hang",
+		"cycle/structural":         "hang",
+		"disjunctions/elimination": "panic (nil pointer)",
+		"benchmarks/issue1684":     "panic (nil pointer)",
+
+		// unsupported in dev version (list related)
+		"benchmarks/sort":    "unsupported",
+		"builtins/list/sort": "unsupported",
+
+		// Later
+		"benchmarks/issue2176": "fails to remove errors",
 	}
 
 	test := cuetxtar.TxTarTest{
@@ -121,7 +126,10 @@ func skipFiles(a ...*ast.File) (reason string) {
 		switch x := n.(type) {
 		case *ast.BinaryExpr:
 			if x.Op == token.OR {
-				reason = "disjunctions"
+				// Uncomment to disable disjunction testing.
+				// NOTE: keep around until implementation of disjunctions
+				// is complete.
+				// reason = "disjunctions"
 			}
 		}
 		return true

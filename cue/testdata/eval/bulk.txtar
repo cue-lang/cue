@@ -79,6 +79,332 @@ Retain: 12
 Unifications: 63
 Conjuncts:    126
 Disjuncts:    90
+-- out/evalalpha --
+Errors:
+t1.c.z: field not allowed:
+    ./in.cue:16:18
+    ./in.cue:19:11
+t2.c.z: field not allowed:
+    ./in.cue:24:16
+    ./in.cue:27:11
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+    foo: (struct){
+      a: (int){ 1 }
+      b: (int){ 1 }
+      name: (string){ "foo" }
+    }
+  }
+  d: (struct){
+    foobar: (struct){
+      c: (int){ 2 }
+      b: (int){ 1 }
+      name: (string){ "foobar" }
+    }
+    foo: (struct){
+      a: (int){ 1 }
+      b: (int){ 1 }
+      name: (string){ "foo" }
+    }
+  }
+  t1: (_|_){
+    // [eval]
+    #a: (#struct){
+    }
+    b: (#struct){
+      f: (int){ 4 }
+    }
+    c: (_|_){
+      // [eval]
+      z: (_|_){
+        // [eval] t1.c.z: field not allowed:
+        //     ./in.cue:16:18
+        //     ./in.cue:19:11
+      }
+    }
+  }
+  t2: (_|_){
+    // [eval]
+    #a: (#struct){
+    }
+    b: (#struct){
+      x: (int){ 4 }
+    }
+    c: (_|_){
+      // [eval]
+      z: (_|_){
+        // [eval] t2.c.z: field not allowed:
+        //     ./in.cue:24:16
+        //     ./in.cue:27:11
+      }
+    }
+  }
+  patternCycle: (struct){
+    issue2109: (struct){
+      p1: (struct){
+        countries: (#list){
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
+        }
+        FlagsURLs: (struct){
+        }
+      }
+      p2: (struct){
+        FlagsURLs: (struct){
+        }
+        countries: (#list){
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
+        }
+      }
+      p3: (struct){
+        FlagsURLs: (struct){
+        }
+        countries: (#list){
+          0: (string){ "US" }
+          1: (string){ "GB" }
+          2: (string){ "AU" }
+        }
+      }
+    }
+    t1: (struct){
+      p1: (struct){
+        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
+        FlagsURLs: (struct){
+        }
+      }
+      p2: (struct){
+        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
+        FlagsURLs: (struct){
+        }
+      }
+      p3: (struct){
+        FlagsURLs: (struct){
+        }
+        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,30 +1,10 @@
+ Errors:
+ t1.c.z: field not allowed:
+-    ./in.cue:15:6
+-    ./in.cue:19:5
++    ./in.cue:16:18
+     ./in.cue:19:11
+ t2.c.z: field not allowed:
+-    ./in.cue:23:6
+-    ./in.cue:27:5
++    ./in.cue:24:16
+     ./in.cue:27:11
+-patternCycle.issue2109.p1.countries: cyclic pattern constraint:
+-    ./issue2109.cue:11:15
+-    ./issue2109.cue:10:13
+-patternCycle.issue2109.p2.countries: cyclic pattern constraint:
+-    ./issue2109.cue:15:15
+-    ./issue2109.cue:17:13
+-patternCycle.issue2109.p3.countries: cyclic pattern constraint:
+-    ./issue2109.cue:21:15
+-    ./issue2109.cue:22:13
+-patternCycle.t1.p1.countries: cyclic pattern constraint:
+-    ./issue2109.cue:27:15
+-    ./issue2109.cue:26:13
+-patternCycle.t1.p2.countries: cyclic pattern constraint:
+-    ./issue2109.cue:33:15
+-    ./issue2109.cue:32:13
+-patternCycle.t1.p3.countries: cyclic pattern constraint:
+-    ./issue2109.cue:37:15
+-    ./issue2109.cue:38:13
+ 
+ Result:
+ (_|_){
+@@ -37,16 +17,16 @@
+     }
+   }
+   d: (struct){
+-    foo: (struct){
+-      a: (int){ 1 }
+-      b: (int){ 1 }
+-      name: (string){ "foo" }
+-    }
+     foobar: (struct){
+       c: (int){ 2 }
+       b: (int){ 1 }
+       name: (string){ "foobar" }
+     }
++    foo: (struct){
++      a: (int){ 1 }
++      b: (int){ 1 }
++      name: (string){ "foo" }
++    }
+   }
+   t1: (_|_){
+     // [eval]
+@@ -59,8 +39,7 @@
+       // [eval]
+       z: (_|_){
+         // [eval] t1.c.z: field not allowed:
+-        //     ./in.cue:15:6
+-        //     ./in.cue:19:5
++        //     ./in.cue:16:18
+         //     ./in.cue:19:11
+       }
+     }
+@@ -76,93 +55,56 @@
+       // [eval]
+       z: (_|_){
+         // [eval] t2.c.z: field not allowed:
+-        //     ./in.cue:23:6
+-        //     ./in.cue:27:5
++        //     ./in.cue:24:16
+         //     ./in.cue:27:11
+       }
+     }
+   }
+-  patternCycle: (_|_){
+-    // [eval]
+-    issue2109: (_|_){
+-      // [eval]
+-      p1: (_|_){
+-        // [eval]
+-        countries: (_|_){
+-          // [eval] patternCycle.issue2109.p1.countries: cyclic pattern constraint:
+-          //     ./issue2109.cue:11:15
+-          //     ./issue2109.cue:10:13
+-          0: (string){ "US" }
+-          1: (string){ "GB" }
+-          2: (string){ "AU" }
+-        }
+-        FlagsURLs: (struct){
+-        }
+-      }
+-      p2: (_|_){
+-        // [eval]
+-        FlagsURLs: (struct){
+-        }
+-        countries: (_|_){
+-          // [eval] patternCycle.issue2109.p2.countries: cyclic pattern constraint:
+-          //     ./issue2109.cue:15:15
+-          //     ./issue2109.cue:17:13
+-          0: (_|_){// "US"
+-          }
+-          1: (_|_){// "GB"
+-          }
+-          2: (_|_){// "AU"
+-          }
+-        }
+-      }
+-      p3: (_|_){
+-        // [eval]
+-        FlagsURLs: (struct){
+-        }
+-        countries: (_|_){
+-          // [eval] patternCycle.issue2109.p3.countries: cyclic pattern constraint:
+-          //     ./issue2109.cue:21:15
+-          //     ./issue2109.cue:22:13
+-          0: (_|_){// "US"
+-          }
+-          1: (_|_){// "GB"
+-          }
+-          2: (_|_){// "AU"
+-          }
+-        }
+-      }
+-    }
+-    t1: (_|_){
+-      // [eval]
+-      p1: (_|_){
+-        // [eval]
+-        countries: (_|_){
+-          // [eval] patternCycle.t1.p1.countries: cyclic pattern constraint:
+-          //     ./issue2109.cue:27:15
+-          //     ./issue2109.cue:26:13
+-        }
+-        FlagsURLs: (struct){
+-        }
+-      }
+-      p2: (_|_){
+-        // [eval]
+-        countries: (_|_){
+-          // [eval] patternCycle.t1.p2.countries: cyclic pattern constraint:
+-          //     ./issue2109.cue:33:15
+-          //     ./issue2109.cue:32:13
+-        }
+-        FlagsURLs: (struct){
+-        }
+-      }
+-      p3: (_|_){
+-        // [eval]
+-        FlagsURLs: (struct){
+-        }
+-        countries: (_|_){
+-          // [eval] patternCycle.t1.p3.countries: cyclic pattern constraint:
+-          //     ./issue2109.cue:37:15
+-          //     ./issue2109.cue:38:13
+-        }
++  patternCycle: (struct){
++    issue2109: (struct){
++      p1: (struct){
++        countries: (#list){
++          0: (string){ "US" }
++          1: (string){ "GB" }
++          2: (string){ "AU" }
++        }
++        FlagsURLs: (struct){
++        }
++      }
++      p2: (struct){
++        FlagsURLs: (struct){
++        }
++        countries: (#list){
++          0: (string){ "US" }
++          1: (string){ "GB" }
++          2: (string){ "AU" }
++        }
++      }
++      p3: (struct){
++        FlagsURLs: (struct){
++        }
++        countries: (#list){
++          0: (string){ "US" }
++          1: (string){ "GB" }
++          2: (string){ "AU" }
++        }
++      }
++    }
++    t1: (struct){
++      p1: (struct){
++        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
++        FlagsURLs: (struct){
++        }
++      }
++      p2: (struct){
++        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
++        FlagsURLs: (struct){
++        }
++      }
++      p3: (struct){
++        FlagsURLs: (struct){
++        }
++        countries: (string){ |((string){ "US" }, (string){ "GB" }, (string){ "AU" }) }
+       }
+     }
+   }
+-- diff/todo/p3 --
+Reordering of error messages.
+-- diff/explanation --
+Overall, the previous errors now passing is acceptable and consistent with
+the behavior of the new evaluator.
 -- out/eval --
 Errors:
 t1.c.z: field not allowed:

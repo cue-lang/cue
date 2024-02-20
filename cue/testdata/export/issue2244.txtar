@@ -41,6 +41,80 @@ Retain: 30
 Unifications: 24
 Conjuncts:    58
 Disjuncts:    40
+-- out/evalalpha --
+Errors:
+m.if.#pattern: field not allowed:
+    ./in.cue:11:24
+    ./in.cue:8:2
+    ./in.cue:24:35
+
+Result:
+(_|_){
+  // [eval]
+  _#matchPattern(:x): (_|_){
+    // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
+    //     ./in.cue:11:6
+    //     ./in.cue:8:12
+    #pattern: (string){ string }
+  }
+  _#isReleaseTag(:x): (string){
+    "refs/tags/v"
+    #pattern: (string){ "refs/tags/v*" }
+    let prefix#1 = (string){ "refs/tags/v" }
+  }
+  #step: (#struct){
+    if: ((string|number)){ |((number){ number }, (string){ string }) }
+  }
+  m: (_|_){
+    // [eval]
+    if: (_|_){
+      // [eval] m.if.#pattern: field not allowed:
+      //     ./in.cue:11:24
+      //     ./in.cue:8:2
+      //     ./in.cue:24:35
+      #pattern: (string){ "refs/tags/v*" }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,12 @@
+-(struct){
++Errors:
++m.if.#pattern: field not allowed:
++    ./in.cue:11:24
++    ./in.cue:8:2
++    ./in.cue:24:35
++
++Result:
++(_|_){
++  // [eval]
+   _#matchPattern(:x): (_|_){
+     // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
+     //     ./in.cue:11:6
+@@ -13,11 +21,14 @@
+   #step: (#struct){
+     if: ((string|number)){ |((number){ number }, (string){ string }) }
+   }
+-  m: (#struct){
+-    if: (string){
+-      "refs/tags/v"
++  m: (_|_){
++    // [eval]
++    if: (_|_){
++      // [eval] m.if.#pattern: field not allowed:
++      //     ./in.cue:11:24
++      //     ./in.cue:8:2
++      //     ./in.cue:24:35
+       #pattern: (string){ "refs/tags/v*" }
+-      let prefix#1 = (string){ "refs/tags/v" }
+     }
+   }
+ }
+-- diff/explanation --
+New definition semantics: #pattern is not allowed in #step
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){

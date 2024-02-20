@@ -168,6 +168,624 @@ Retain: 184
 Unifications: 196
 Conjuncts:    365
 Disjuncts:    241
+-- out/evalalpha --
+Errors:
+indirectReference.y: conflicting values 2 and 1:
+    ./incomprehension.cue:42:7
+    ./incomprehension.cue:42:10
+indirectReference.y: conflicting values 3 and 1:
+    ./incomprehension.cue:42:7
+    ./incomprehension.cue:42:13
+letWithDynamicInComprehension.T: conflicting values "e" and "d":
+    ./issue2166.cue:3:6
+    ./issue2166.cue:4:6
+referencesForDirectly."0": conflicting values 12 and 4:
+    ./incomprehension.cue:16:11
+referencesForDirectly."0": conflicting values 8 and 4:
+    ./incomprehension.cue:16:11
+referencesForDirectly."1": conflicting values 12 and 4:
+    ./incomprehension.cue:16:11
+referencesForDirectly."1": conflicting values 8 and 4:
+    ./incomprehension.cue:16:11
+referencesForDirectly."2": conflicting values 12 and 4:
+    ./incomprehension.cue:16:11
+referencesForDirectly."2": conflicting values 8 and 4:
+    ./incomprehension.cue:16:11
+referencesForViaLet."0": conflicting values 12 and 4:
+    ./incomprehension.cue:23:24
+referencesForViaLet."0": conflicting values 8 and 4:
+    ./incomprehension.cue:23:24
+referencesForViaLet."1": conflicting values 12 and 4:
+    ./incomprehension.cue:23:24
+referencesForViaLet."1": conflicting values 8 and 4:
+    ./incomprehension.cue:23:24
+referencesForViaLet."2": conflicting values 12 and 4:
+    ./incomprehension.cue:23:24
+referencesForViaLet."2": conflicting values 8 and 4:
+    ./incomprehension.cue:23:24
+nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
+    ./incomprehension.cue:55:5
+    ./incomprehension.cue:53:15
+    ./incomprehension.cue:53:18
+nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
+    ./incomprehension.cue:55:5
+    ./incomprehension.cue:53:15
+    ./incomprehension.cue:53:18
+
+Result:
+(_|_){
+  // [eval]
+  let A#1 = (int){ 9 }
+  let B#2 = (int){ 18 }
+  let C#3 = (int){ 36 }
+  let D#4 = (int){ 72 }
+  let E#5 = (int){ 144 }
+  let F#6 = (int){ 288 }
+  b: (struct){
+    let G#7 = (int){ 576 }
+    let H#8 = (int){ 1152 }
+    let I#9 = (int){ 2304 }
+    let J#A = (int){ 4608 }
+    let K#B = (int){ 9216 }
+    let L#C = (int){ 18432 }
+    let M#D = (int){ 36864 }
+    let N#E = (int){ 73728 }
+    let O#F = (int){ 147456 }
+    let P#10 = (int){ 294912 }
+    let Q#11 = (int){ 589824 }
+    let R#12 = (int){ 1179648 }
+    let S#13 = (int){ 2359296 }
+    let T#14 = (int){ 4718592 }
+    a: (int){ 4718592 }
+    b: (int){ 288 }
+  }
+  issue1828: (struct){
+    volumes: (struct){
+    }
+    let L3#15 = (struct){
+    }
+    let L2#16 = (#list){
+    }
+    let L1#17 = (#list){
+    }
+  }
+  ignoreErrorInLet: (struct){
+    let X#18 = (_|_){
+      // [eval] ignoreErrorInLet.X: conflicting values 2 and 1:
+      //     ./in.cue:37:10
+      //     ./in.cue:37:14
+    }
+    disjunction: (int){ 3 }
+  }
+  list: (struct){
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    c: (#list){
+      0: (int){
+        4
+        let X#19 = (int){ 4 }
+      }
+      1: (int){
+        8
+        let X#19 = (int){ 8 }
+      }
+      2: (int){
+        12
+        let X#19 = (int){ 12 }
+      }
+    }
+  }
+  referencesForDirectly: (_|_){
+    // [eval]
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    let Y#1Amulti = &[&[&[&[(〈1;v〉 * 4)]]]]
+    "0": (_|_){
+      // [eval] referencesForDirectly."0": conflicting values 12 and 4:
+      //     ./incomprehension.cue:16:11
+      // referencesForDirectly."0": conflicting values 8 and 4:
+      //     ./incomprehension.cue:16:11
+    }
+    "1": (_|_){
+      // [eval] referencesForDirectly."1": conflicting values 12 and 4:
+      //     ./incomprehension.cue:16:11
+      // referencesForDirectly."1": conflicting values 8 and 4:
+      //     ./incomprehension.cue:16:11
+    }
+    "2": (_|_){
+      // [eval] referencesForDirectly."2": conflicting values 12 and 4:
+      //     ./incomprehension.cue:16:11
+      // referencesForDirectly."2": conflicting values 8 and 4:
+      //     ./incomprehension.cue:16:11
+    }
+  }
+  referencesForViaLet: (_|_){
+    // [eval]
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    let Y#1Bmulti = &[&[&[&[〈1;X〉]]]]
+    "0": (_|_){
+      // [eval] referencesForViaLet."0": conflicting values 12 and 4:
+      //     ./incomprehension.cue:23:24
+      // referencesForViaLet."0": conflicting values 8 and 4:
+      //     ./incomprehension.cue:23:24
+    }
+    "1": (_|_){
+      // [eval] referencesForViaLet."1": conflicting values 12 and 4:
+      //     ./incomprehension.cue:23:24
+      // referencesForViaLet."1": conflicting values 8 and 4:
+      //     ./incomprehension.cue:23:24
+    }
+    "2": (_|_){
+      // [eval] referencesForViaLet."2": conflicting values 12 and 4:
+      //     ./incomprehension.cue:23:24
+      // referencesForViaLet."2": conflicting values 8 and 4:
+      //     ./incomprehension.cue:23:24
+    }
+  }
+  letClauseReferencesInert: (struct){
+    x: (int){ 2 }
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    let Y#1C = (int){ 2 }
+    "0": (int){ 2 }
+    "1": (int){ 2 }
+    "2": (int){ 2 }
+  }
+  indirectReference: (_|_){
+    // [eval]
+    l: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+    y: (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+    }
+    let X#1D = (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+    }
+    "0": (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+    }
+    "1": (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+    }
+    "2": (_|_){
+      // [eval] indirectReference.y: conflicting values 2 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:10
+      // indirectReference.y: conflicting values 3 and 1:
+      //     ./incomprehension.cue:42:7
+      //     ./incomprehension.cue:42:13
+    }
+  }
+  nestedFor: (_|_){
+    // [eval]
+    let X#1Emulti = &[&[&[&[{
+      for _, x in [
+        1,
+        2,
+      ] {
+        let X#1Fmulti = 〈1;x〉
+        "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+      }
+    }]]]]
+    "0": (_|_){
+      // [eval] nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
+      //     ./incomprehension.cue:55:5
+      //     ./incomprehension.cue:53:15
+      //     ./incomprehension.cue:53:18
+      let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
+    }
+    "1": (_|_){
+      // [eval] nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
+      //     ./incomprehension.cue:55:5
+      //     ./incomprehension.cue:53:15
+      //     ./incomprehension.cue:53:18
+      let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
+    }
+  }
+  keepDescending: (struct){
+    t1: (struct){
+      ec: (struct){
+      }
+      bs: (struct){
+        let m#21 = (_|_){
+          // [incomplete] keepDescending.t1.bs.m: undefined field: b:
+          //     ./issue2063.cue:10:14
+        }
+        x: (struct){
+          y: (string){ "" }
+        }
+      }
+    }
+    t2: (struct){
+      x: (string){ "X:\n  \"Y\": \"\"\n" }
+      ec: (struct){
+      }
+      bs: (struct){
+        let m#22 = (_|_){
+          // [incomplete] keepDescending.t2.bs.m: undefined field: b:
+          //     ./issue2063.cue:21:14
+        }
+        X: (struct){
+          Y: (string){ "" }
+        }
+      }
+    }
+  }
+  letWithDynamicInComprehension: (_|_){
+    // [eval] letWithDynamicInComprehension.T: conflicting values "e" and "d":
+    //     ./issue2166.cue:3:6
+    //     ./issue2166.cue:4:6
+    _i: (struct){
+      a: (string){ "d" }
+      b: (string){ "e" }
+    }
+    let T#23multi = &[&[&[&[〈1;v〉]]]]
+  }
+  _parent_configs: (struct){
+    PARENT: (bool){ true }
+  }
+  _configs: (struct){
+    CHILD1: (struct){
+      property: (bool){ true }
+    }
+    CHILD2: (struct){
+      property: (bool){ true }
+      parent: (string){ "PARENT" }
+    }
+  }
+  disabled_parent_test: (struct){
+    let parent_config#24multi = &[&[&[&[(*〈3;_parent_configs〉[〈1;v〉.parent]|false)]]]]
+    CHILD1: (struct){
+      parent_config: (bool){ false }
+    }
+    CHILD2: (struct){
+      parent_config: (bool){ false }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -2,13 +2,44 @@
+ indirectReference.y: conflicting values 2 and 1:
+     ./incomprehension.cue:42:7
+     ./incomprehension.cue:42:10
+-    ./incomprehension.cue:43:2
+-    ./incomprehension.cue:44:6
+ indirectReference.y: conflicting values 3 and 1:
+     ./incomprehension.cue:42:7
+     ./incomprehension.cue:42:13
+-    ./incomprehension.cue:43:2
+-    ./incomprehension.cue:44:6
++letWithDynamicInComprehension.T: conflicting values "e" and "d":
++    ./issue2166.cue:3:6
++    ./issue2166.cue:4:6
++referencesForDirectly."0": conflicting values 12 and 4:
++    ./incomprehension.cue:16:11
++referencesForDirectly."0": conflicting values 8 and 4:
++    ./incomprehension.cue:16:11
++referencesForDirectly."1": conflicting values 12 and 4:
++    ./incomprehension.cue:16:11
++referencesForDirectly."1": conflicting values 8 and 4:
++    ./incomprehension.cue:16:11
++referencesForDirectly."2": conflicting values 12 and 4:
++    ./incomprehension.cue:16:11
++referencesForDirectly."2": conflicting values 8 and 4:
++    ./incomprehension.cue:16:11
++referencesForViaLet."0": conflicting values 12 and 4:
++    ./incomprehension.cue:23:24
++referencesForViaLet."0": conflicting values 8 and 4:
++    ./incomprehension.cue:23:24
++referencesForViaLet."1": conflicting values 12 and 4:
++    ./incomprehension.cue:23:24
++referencesForViaLet."1": conflicting values 8 and 4:
++    ./incomprehension.cue:23:24
++referencesForViaLet."2": conflicting values 12 and 4:
++    ./incomprehension.cue:23:24
++referencesForViaLet."2": conflicting values 8 and 4:
++    ./incomprehension.cue:23:24
++nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
++    ./incomprehension.cue:55:5
++    ./incomprehension.cue:53:15
++    ./incomprehension.cue:53:18
++nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
++    ./incomprehension.cue:55:5
++    ./incomprehension.cue:53:15
++    ./incomprehension.cue:53:18
+ 
+ Result:
+ (_|_){
+@@ -76,27 +107,59 @@
+       }
+     }
+   }
+-  referencesForDirectly: (struct){
+-    l: (#list){
+-      0: (int){ 1 }
+-      1: (int){ 2 }
+-      2: (int){ 3 }
+-    }
+-    let Y#1Amulti = (〈1;v〉 * 4)
+-    "0": (int){ 4 }
+-    "1": (int){ 8 }
+-    "2": (int){ 12 }
+-  }
+-  referencesForViaLet: (struct){
+-    l: (#list){
+-      0: (int){ 1 }
+-      1: (int){ 2 }
+-      2: (int){ 3 }
+-    }
+-    let Y#1Bmulti = 〈1;X〉
+-    "0": (int){ 4 }
+-    "1": (int){ 8 }
+-    "2": (int){ 12 }
++  referencesForDirectly: (_|_){
++    // [eval]
++    l: (#list){
++      0: (int){ 1 }
++      1: (int){ 2 }
++      2: (int){ 3 }
++    }
++    let Y#1Amulti = &[&[&[&[(〈1;v〉 * 4)]]]]
++    "0": (_|_){
++      // [eval] referencesForDirectly."0": conflicting values 12 and 4:
++      //     ./incomprehension.cue:16:11
++      // referencesForDirectly."0": conflicting values 8 and 4:
++      //     ./incomprehension.cue:16:11
++    }
++    "1": (_|_){
++      // [eval] referencesForDirectly."1": conflicting values 12 and 4:
++      //     ./incomprehension.cue:16:11
++      // referencesForDirectly."1": conflicting values 8 and 4:
++      //     ./incomprehension.cue:16:11
++    }
++    "2": (_|_){
++      // [eval] referencesForDirectly."2": conflicting values 12 and 4:
++      //     ./incomprehension.cue:16:11
++      // referencesForDirectly."2": conflicting values 8 and 4:
++      //     ./incomprehension.cue:16:11
++    }
++  }
++  referencesForViaLet: (_|_){
++    // [eval]
++    l: (#list){
++      0: (int){ 1 }
++      1: (int){ 2 }
++      2: (int){ 3 }
++    }
++    let Y#1Bmulti = &[&[&[&[〈1;X〉]]]]
++    "0": (_|_){
++      // [eval] referencesForViaLet."0": conflicting values 12 and 4:
++      //     ./incomprehension.cue:23:24
++      // referencesForViaLet."0": conflicting values 8 and 4:
++      //     ./incomprehension.cue:23:24
++    }
++    "1": (_|_){
++      // [eval] referencesForViaLet."1": conflicting values 12 and 4:
++      //     ./incomprehension.cue:23:24
++      // referencesForViaLet."1": conflicting values 8 and 4:
++      //     ./incomprehension.cue:23:24
++    }
++    "2": (_|_){
++      // [eval] referencesForViaLet."2": conflicting values 12 and 4:
++      //     ./incomprehension.cue:23:24
++      // referencesForViaLet."2": conflicting values 8 and 4:
++      //     ./incomprehension.cue:23:24
++    }
+   }
+   letClauseReferencesInert: (struct){
+     x: (int){ 2 }
+@@ -121,65 +184,46 @@
+       // [eval] indirectReference.y: conflicting values 2 and 1:
+       //     ./incomprehension.cue:42:7
+       //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-      // indirectReference.y: conflicting values 3 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:13
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:13
+     }
+     let X#1D = (_|_){
+       // [eval] indirectReference.y: conflicting values 2 and 1:
+       //     ./incomprehension.cue:42:7
+       //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-      // indirectReference.y: conflicting values 3 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:13
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-    }
+-    "0": (_|_){
+-      // [eval] indirectReference.y: conflicting values 2 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-      // indirectReference.y: conflicting values 3 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:13
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-    }
+-    "1": (_|_){
+-      // [eval] indirectReference.y: conflicting values 2 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-      // indirectReference.y: conflicting values 3 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:13
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-    }
+-    "2": (_|_){
+-      // [eval] indirectReference.y: conflicting values 2 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:10
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-      // indirectReference.y: conflicting values 3 and 1:
+-      //     ./incomprehension.cue:42:7
+-      //     ./incomprehension.cue:42:13
+-      //     ./incomprehension.cue:43:2
+-      //     ./incomprehension.cue:44:6
+-    }
+-  }
+-  nestedFor: (struct){
+-    let X#1Emulti = {
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:13
++    }
++    "0": (_|_){
++      // [eval] indirectReference.y: conflicting values 2 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:10
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:13
++    }
++    "1": (_|_){
++      // [eval] indirectReference.y: conflicting values 2 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:10
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:13
++    }
++    "2": (_|_){
++      // [eval] indirectReference.y: conflicting values 2 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:10
++      // indirectReference.y: conflicting values 3 and 1:
++      //     ./incomprehension.cue:42:7
++      //     ./incomprehension.cue:42:13
++    }
++  }
++  nestedFor: (_|_){
++    // [eval]
++    let X#1Emulti = &[&[&[&[{
+       for _, x in [
+         1,
+         2,
+@@ -187,16 +231,20 @@
+         let X#1Fmulti = 〈1;x〉
+         "\(〈0;let X#1F〉)": 〈0;let X#1F〉
+       }
+-    }
+-    "0": (struct){
+-      let X#1Fmulti = 〈1;x〉
+-      "1": (int){ 1 }
+-      "2": (int){ 2 }
+-    }
+-    "1": (struct){
+-      let X#1Fmulti = 〈1;x〉
+-      "1": (int){ 1 }
+-      "2": (int){ 2 }
++    }]]]]
++    "0": (_|_){
++      // [eval] nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
++      //     ./incomprehension.cue:55:5
++      //     ./incomprehension.cue:53:15
++      //     ./incomprehension.cue:53:18
++      let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
++    }
++    "1": (_|_){
++      // [eval] nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
++      //     ./incomprehension.cue:55:5
++      //     ./incomprehension.cue:53:15
++      //     ./incomprehension.cue:53:18
++      let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
+     }
+   }
+   keepDescending: (struct){
+@@ -228,14 +276,15 @@
+       }
+     }
+   }
+-  letWithDynamicInComprehension: (struct){
++  letWithDynamicInComprehension: (_|_){
++    // [eval] letWithDynamicInComprehension.T: conflicting values "e" and "d":
++    //     ./issue2166.cue:3:6
++    //     ./issue2166.cue:4:6
+     _i: (struct){
+       a: (string){ "d" }
+       b: (string){ "e" }
+     }
+-    let T#23multi = 〈1;v〉
+-    d: (string){ "1" }
+-    e: (string){ "1" }
++    let T#23multi = &[&[&[&[〈1;v〉]]]]
+   }
+   _parent_configs: (struct){
+     PARENT: (bool){ true }
+@@ -250,12 +299,12 @@
+     }
+   }
+   disabled_parent_test: (struct){
+-    let parent_config#24multi = (*〈3;_parent_configs〉[〈1;v〉.parent]|false)
+-    CHILD1: (struct){
+-      parent_config: (bool){ false }
+-    }
+-    CHILD2: (struct){
+-      parent_config: (bool){ |(*(bool){ true }, (bool){ false }) }
++    let parent_config#24multi = &[&[&[&[(*〈3;_parent_configs〉[〈1;v〉.parent]|false)]]]]
++    CHILD1: (struct){
++      parent_config: (bool){ false }
++    }
++    CHILD2: (struct){
++      parent_config: (bool){ false }
+     }
+   }
+ }
+-- diff/todo/p0 --
+letWithDynamicInComprehension: LET BUG
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:

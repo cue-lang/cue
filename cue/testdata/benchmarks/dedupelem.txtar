@@ -34,6 +34,78 @@ Retain: 0
 Unifications: 10
 Conjuncts:    94
 Disjuncts:    16
+-- out/evalalpha --
+Errors:
+foo.0.type: conflicting values "int" and "float":
+    ./in.cue:3:16
+    ./in.cue:5:14
+foo.0.type: conflicting values "string" and "float":
+    ./in.cue:5:14
+    ./in.cue:12:14
+
+Result:
+(_|_){
+  // [eval]
+  #Value: (#struct){ |((#struct){
+      type: (string){ "int" }
+    }, (#struct){
+      type: (string){ "float" }
+    }, (#struct){
+      type: (string){ "string" }
+    }) }
+  foo: (_|_){
+    // [eval]
+    0: (_|_){
+      // [eval] foo.0.type: conflicting values "int" and "float":
+      //     ./in.cue:3:16
+      //     ./in.cue:5:14
+      // foo.0.type: conflicting values "string" and "float":
+      //     ./in.cue:5:14
+      //     ./in.cue:10:14
+      type: (_|_){
+        // [eval] foo.0.type: conflicting values "string" and "float":
+        //     ./in.cue:5:14
+        //     ./in.cue:10:14
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,13 +1,10 @@
+ Errors:
+-foo.0: 2 errors in empty disjunction:
+ foo.0.type: conflicting values "int" and "float":
+     ./in.cue:3:16
+     ./in.cue:5:14
+-    ./in.cue:5:27
+-    ./in.cue:5:30
+ foo.0.type: conflicting values "string" and "float":
+     ./in.cue:5:14
+-    ./in.cue:10:14
++    ./in.cue:12:14
+ 
+ Result:
+ (_|_){
+@@ -22,12 +19,9 @@
+   foo: (_|_){
+     // [eval]
+     0: (_|_){
+-      // [eval] foo.0: 2 errors in empty disjunction:
+-      // foo.0.type: conflicting values "int" and "float":
++      // [eval] foo.0.type: conflicting values "int" and "float":
+       //     ./in.cue:3:16
+       //     ./in.cue:5:14
+-      //     ./in.cue:5:27
+-      //     ./in.cue:5:30
+       // foo.0.type: conflicting values "string" and "float":
+       //     ./in.cue:5:14
+       //     ./in.cue:10:14
+-- diff/todo/p2 --
+Missing "empty disjunction" error message.
+Missing error positions.
 -- out/eval --
 Errors:
 foo.0: 2 errors in empty disjunction:

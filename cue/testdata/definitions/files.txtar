@@ -36,6 +36,119 @@ Retain: 1
 Unifications: 21
 Conjuncts:    69
 Disjuncts:    26
+-- out/evalalpha --
+Errors:
+#Config: field not allowed:
+    ./in.cue:15:1
+#theme: field not allowed:
+    ./in.cue:3:1
+dark: field not allowed:
+    ./in.cue:7:1
+light: field not allowed:
+    ./in.cue:11:1
+
+Result:
+(_|_){
+  // [eval]
+  console: (#struct){
+    color: (string){ "dark" }
+    ctermbg: (string){ "239" }
+  }
+  #theme: (_|_){
+    // [eval] #theme: field not allowed:
+    //     ./in.cue:3:1
+    color: (string){ string }
+    ctermbg: (string){ string }
+  }
+  dark: (_|_){
+    // [eval] dark: field not allowed:
+    //     ./in.cue:7:1
+    color: (string){ "dark" }
+    ctermbg: (string){ "239" }
+  }
+  light: (_|_){
+    // [eval] light: field not allowed:
+    //     ./in.cue:11:1
+    color: (string){ "light" }
+    ctermbg: (string){ "254" }
+  }
+  #Config: (_|_){
+    // [eval] #Config: field not allowed:
+    //     ./in.cue:15:1
+    console: (#struct){ |(*(#struct){
+        color: (string){ "light" }
+        ctermbg: (string){ "254" }
+      }, (#struct){
+        color: (string){ "dark" }
+        ctermbg: (string){ "239" }
+      }) }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,17 +1,41 @@
+-(#struct){
+-  #theme: (#struct){
++Errors:
++#Config: field not allowed:
++    ./in.cue:15:1
++#theme: field not allowed:
++    ./in.cue:3:1
++dark: field not allowed:
++    ./in.cue:7:1
++light: field not allowed:
++    ./in.cue:11:1
++
++Result:
++(_|_){
++  // [eval]
++  console: (#struct){
++    color: (string){ "dark" }
++    ctermbg: (string){ "239" }
++  }
++  #theme: (_|_){
++    // [eval] #theme: field not allowed:
++    //     ./in.cue:3:1
+     color: (string){ string }
+     ctermbg: (string){ string }
+   }
+-  dark: (#struct){
+-    color: (string){ "dark" }
+-    ctermbg: (string){ "239" }
+-  }
+-  light: (#struct){
++  dark: (_|_){
++    // [eval] dark: field not allowed:
++    //     ./in.cue:7:1
++    color: (string){ "dark" }
++    ctermbg: (string){ "239" }
++  }
++  light: (_|_){
++    // [eval] light: field not allowed:
++    //     ./in.cue:11:1
+     color: (string){ "light" }
+     ctermbg: (string){ "254" }
+   }
+-  #Config: (#struct){
++  #Config: (_|_){
++    // [eval] #Config: field not allowed:
++    //     ./in.cue:15:1
+     console: (#struct){ |(*(#struct){
+         color: (string){ "light" }
+         ctermbg: (string){ "254" }
+@@ -20,8 +44,4 @@
+         ctermbg: (string){ "239" }
+       }) }
+   }
+-  console: (#struct){
+-    color: (string){ "dark" }
+-    ctermbg: (string){ "239" }
+-  }
+ }
+-- diff/todo/p3 --
+Reordering.
 -- out/eval --
 (#struct){
   #theme: (#struct){

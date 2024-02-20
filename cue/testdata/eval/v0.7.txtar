@@ -913,7 +913,6 @@ Result:
         }
         e: (struct){
           f: (int){ 1 }
-          g: (int){ 1 }
         }
       }
     }
@@ -925,8 +924,8 @@ Result:
               a: (int){ 1 }
               b: (int){ 2 }
             }
-            b: (int){ 2 }
             a: (int){ 1 }
+            b: (int){ 2 }
           }
           x: (struct){
             b: (struct){
@@ -1025,8 +1024,8 @@ Result:
               a: (int){ 1 }
               b: (int){ 2 }
             }
-            b: (int){ 2 }
             a: (int){ 1 }
+            b: (int){ 2 }
           }
           x: (struct){
             b: (struct){
@@ -1220,10 +1219,14 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -264,134 +248,130 @@
+@@ -260,138 +244,133 @@
          }
-       }
-     }
+         e: (struct){
+           f: (int){ 1 }
+-          g: (int){ 1 }
+-        }
+-      }
+-    }
 -    t4: (_|_){
 -      // [eval]
 -      ok: (_|_){
@@ -1352,6 +1355,9 @@ diff old new
 -          y: (struct){
 -            c: (struct){
 -              a: (int){ 1 }
++        }
++      }
++    }
 +    t4: (struct){
 +      ok: (struct){
 +        p0: (struct){
@@ -1360,8 +1366,8 @@ diff old new
 +              a: (int){ 1 }
 +              b: (int){ 2 }
 +            }
-+            b: (int){ 2 }
 +            a: (int){ 1 }
++            b: (int){ 2 }
 +          }
 +          x: (struct){
 +            b: (struct){
@@ -1460,8 +1466,8 @@ diff old new
 +              a: (int){ 1 }
 +              b: (int){ 2 }
 +            }
-+            b: (int){ 2 }
 +            a: (int){ 1 }
++            b: (int){ 2 }
 +          }
 +          x: (struct){
 +            b: (struct){
@@ -1479,7 +1485,7 @@ diff old new
              }
            }
          }
-@@ -401,23 +381,23 @@
+@@ -401,23 +380,23 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1522,6 +1528,12 @@ diff old new
          check: (struct){
 -- diff/explanation --
 Bug fixes
+-- diff/todo/p0 --
+Dropped fields: this is a result of registering for notification after
+inserting conjuncts, instead of before it. This change was made to avoid
+forcing adding a level of conjunction insertion unnecessarily. To fix this
+we should uncouple adding notification from insertion.
+See scheduleVertexConjuncts in conjuncts.go.
 -- diff/todo/p2 --
 Reordering / positions.
 -- out/compile --

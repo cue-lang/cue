@@ -157,6 +157,10 @@ type closeContext struct {
 	// Used to recursively insert Vertices.
 	parent *closeContext
 
+	// overlay is used to temporarily link a closeContext to its "overlay" copy,
+	// as it is used in a corresponding disjunction.
+	overlay *closeContext
+
 	dependencies []*ccDep // For testing only. See debug.go
 
 	// externalDeps lists the closeContexts associated with a root node for
@@ -171,6 +175,7 @@ type closeContext struct {
 	// against (&&). If there are more than one, these additional nodes are
 	// linked with next. Only closed nodes with patterns are added. Arc sets are
 	// already merged during processing.
+	// A child is always done. This means it cannot be modified.
 	child *closeContext
 
 	// next holds a linked list of nodes to process.
@@ -181,6 +186,12 @@ type closeContext struct {
 	// closedness can be checked. To ensure that this is true, there should
 	// be an additional increment at the start before any processing is done.
 	conjunctCount int
+
+	// disjunctCount counts the number of disjunctions that contribute to
+	// conjunctCount. When a node is unfinished, for instance due to an error,
+	// we allow disjunctions to not be decremented. This count is then used
+	// to suppress errors about missing decrements.
+	disjunctCount int
 
 	src *Vertex
 
@@ -285,6 +296,7 @@ type conjunctGrouper interface {
 }
 
 func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) {
+	// TODO(disjunct,perf): CopyOnRead
 	v := n.node
 	for _, a := range v.Arcs {
 		if a.Label == f {
@@ -485,7 +497,7 @@ func (c *closeContext) addDependency(kind depKind, key, child, root *closeContex
 // immediately.
 func (c *closeContext) incDependent(kind depKind, dependant *closeContext) (debug *ccDep) {
 	if c.src == nil {
-		panic("incDependent: unexpected nil state")
+		panic("incDependent: unexpected nil src")
 	}
 
 	debug = c.addDependent(kind, dependant)
@@ -551,7 +563,9 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		// Root pattern, set allowed patterns.
 		if pcs := v.PatternConstraints; pcs != nil {
 			if pcs.Allowed != nil {
-				panic("unexpected allowed set")
+				// This can happen for lists.
+				// TODO: unify the values.
+				// panic("unexpected allowed set")
 			}
 			pcs.Allowed = c.Expr
 			return
@@ -591,6 +605,38 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 	if dep := p.needsCloseInSchedule; dep != nil {
 		p.needsCloseInSchedule = nil
 		p.decDependent(ctx, EVAL, dep)
+	}
+}
+
+// incDisjunct increases disjunction-related counters. We require kind to be
+// passed explicitly so that we can easily find the points where certain kinds
+// are used.
+func (c *closeContext) incDisjunct(kind depKind) {
+	if kind != DISJUNCT {
+		panic("unexpected kind")
+	}
+	c.incDependent(DISJUNCT, nil)
+
+	// TODO: the counters are only used in debug mode and we could skip this
+	// if debug is disabled.
+	for ; c != nil; c = c.parent {
+		c.disjunctCount++
+	}
+}
+
+// decDisjunct decreases disjunction-related counters. We require kind to be
+// passed explicitly so that we can easily find the points where certain kinds
+// are used.
+func (c *closeContext) decDisjunct(ctx *OpContext, kind depKind) {
+	if kind != DISJUNCT {
+		panic("unexpected kind")
+	}
+	c.decDependent(ctx, DISJUNCT, nil)
+
+	// TODO: the counters are only used in debug mode and we could skip this
+	// if debug is disabled.
+	for ; c != nil; c = c.parent {
+		c.disjunctCount++
 	}
 }
 
@@ -681,7 +727,7 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 	v, insertedArc := n.getArc(f, mode)
 
 	if v.ArcType == ArcNotPresent {
-		n.node.reportFieldCycleError(n.ctx, c.Source().Pos(), f)
+		n.node.reportFieldCycleError(n.ctx, pos(c.x), f)
 		return v
 	}
 

@@ -22,6 +22,7 @@ import (
 	"sort"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/types"
 )
@@ -52,6 +53,11 @@ func (s *valueSorter) Less(i, j int) bool {
 	if s.err != nil {
 		return false
 	}
+
+	if s.ctx.Version == internal.DevVersion {
+		return s.lessNew(i, j)
+	}
+
 	var x, y types.Value
 	s.a[i].Core(&x)
 	s.a[j].Core(&y)
@@ -92,6 +98,54 @@ func (s *valueSorter) Less(i, j int) bool {
 	*s.cmp = saveCmp
 	*s.x = saveX
 	*s.y = saveY
+
+	return isLess
+}
+
+func (s *valueSorter) lessNew(i, j int) bool {
+	ctx := s.ctx
+
+	n := &adt.Vertex{
+		Label:     s.cmp.Label,
+		Parent:    s.cmp.Parent,
+		Conjuncts: s.cmp.Conjuncts,
+	}
+
+	n.Init(ctx)
+
+	less := getArc(ctx, n, "less")
+	xa := getArc(ctx, n, "x")
+	ya := getArc(ctx, n, "y")
+
+	var x, y types.Value
+	s.a[i].Core(&x)
+	s.a[j].Core(&y)
+
+	for _, c := range x.V.Conjuncts {
+		xa.AddConjunct(c)
+	}
+	for _, c := range y.V.Conjuncts {
+		ya.AddConjunct(c)
+	}
+
+	// TODO(perf): if we can determine that the comparator values for
+	// x and y are idempotent (no arcs and a basevalue being top or
+	// a struct or list marker), then we do not need to reevaluate the input.
+	// In that case, we can use the below code instead of the above two loops
+	// setting the conjuncts. This may improve performance significantly.
+	//
+	// s.x.BaseValue = x.V.BaseValue
+	// s.x.Arcs = x.V.Arcs
+	// s.y.BaseValue = y.V.BaseValue
+	// s.y.Arcs = y.V.Arcs
+
+	less.Finalize(s.ctx)
+
+	isLess := s.ctx.BoolValue(less)
+	if b := less.Err(s.ctx); b != nil && s.err == nil {
+		s.err = b.Err
+		return true
+	}
 
 	return isLess
 }

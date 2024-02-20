@@ -713,6 +713,10 @@ func (v *Vertex) CompleteArcs(c *OpContext) {
 	c.unify(v, final(conjuncts, allKnown))
 }
 
+func (v *Vertex) CompleteArcsOnly(c *OpContext) {
+	c.unify(v, final(conjuncts, fieldSetKnown))
+}
+
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
 	v.SetValue(ctx, CombineErrors(nil, v.Value(), b))
 }
@@ -947,15 +951,21 @@ func (v *Vertex) Elems() []*Vertex {
 	return a
 }
 
+func (v *Vertex) Init(c *OpContext) {
+	v.getState(c)
+}
+
 // GetArc returns a Vertex for the outgoing arc with label f. It creates and
 // ads one if it doesn't yet exist.
 func (v *Vertex) GetArc(c *OpContext, f Feature, t ArcType) (arc *Vertex, isNew bool) {
-	unreachableForDev(c)
-
 	arc = v.Lookup(f)
 	if arc != nil {
 		arc.updateArcType(t)
 		return arc, false
+	}
+
+	if c.isDevVersion() {
+		return nil, false
 	}
 
 	if v.LockArcs {

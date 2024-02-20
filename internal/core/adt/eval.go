@@ -131,7 +131,7 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 		return nil
 	}
 
-	if v.status < finalized && v.state != nil {
+	if v.status < finalized && v.state != nil && !c.isDevVersion() {
 		// TODO: errors are slightly better if we always add addNotify, but
 		// in this case it is less likely to cause a performance penalty.
 		// See https://cuelang.org/issue/661. It may be possible to
@@ -971,6 +971,10 @@ type nodeContext struct {
 	// for source-level debuggers.
 	node *Vertex
 
+	// overlays is set if this node is the root of a disjunct created in
+	// doDisjunct. It points to the direct parent nodeContext.
+	overlays *nodeContext
+
 	nodeContextState
 
 	scheduler
@@ -1006,6 +1010,16 @@ type nodeContext struct {
 	// Disjunction handling
 	disjunctions []envDisjunct
 
+	// disjunctCCs holds the close context that represent "holes" in which
+	// pending disjuncts are to be inserted for the clone represented by this
+	// nodeContext. Holes that are not yet filled will always need to be cloned
+	// when a disjunction branches in doDisjunct.
+	//
+	// Holes may accumulate as nested disjunctions get added and filled holes
+	// may be removed. So the list of disjunctCCs is may differ from the number
+	// of disjunctions.
+	disjunctCCs []disjunctHole
+
 	// usedDefault indicates the for each of possibly multiple parent
 	// disjunctions whether it is unified with a default disjunct or not.
 	// This is then later used to determine whether a disjunction should
@@ -1015,6 +1029,7 @@ type nodeContext struct {
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
+	disjunct     Conjunct
 
 	// snapshot holds the last value of the vertex before calling postDisjunct.
 	snapshot Vertex
@@ -1169,6 +1184,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			vLists:             n.vLists[:0],
 			exprs:              n.exprs[:0],
 			disjunctions:       n.disjunctions[:0],
+			disjunctCCs:        n.disjunctCCs[:0],
 			usedDefault:        n.usedDefault[:0],
 			disjunctErrs:       n.disjunctErrs[:0],
 			disjuncts:          n.disjuncts[:0],

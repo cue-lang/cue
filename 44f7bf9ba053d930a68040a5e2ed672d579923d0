@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "621e2cb9_30ae118e",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-20T11:16:06Z",
+      "side": 1,
+      "message": "these paragraphs are too short in an inconsistent way again - look at the paragraph on line 186 for example. I suspect every single one of these bullet points could be one line shorter.\n\nalso, for the sake of plaintext readability, indent the continuations, like:\n\n```\n- here begins the first bullet point\n  and here it continues\n- here begins the second one\n```",
+      "revId": "44f7bf9ba053d930a68040a5e2ed672d579923d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

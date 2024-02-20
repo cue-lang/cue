@@ -18,7 +18,6 @@ package copy
 import (
 	"fmt"
 	"io"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 )
@@ -68,7 +67,7 @@ func copyDir(info os.FileInfo, src, dst string) error {
 		}
 	}
 
-	entries, err := ioutil.ReadDir(src)
+	entries, err := os.ReadDir(src)
 	if err != nil {
 		return fmt.Errorf("reading dir %s: %v", src, err)
 	}
@@ -77,13 +76,17 @@ func copyDir(info os.FileInfo, src, dst string) error {
 		srcPath := filepath.Join(src, e.Name())
 		dstPath := filepath.Join(dst, e.Name())
 
-		switch mode := e.Mode(); mode & os.ModeType {
+		info, err := e.Info()
+		if err != nil {
+			return err
+		}
+		switch e.Type() {
 		case os.ModeSymlink:
-			err = copySymLink(e, srcPath, dstPath)
+			err = copySymLink(info, srcPath, dstPath)
 		case os.ModeDir:
-			err = copyDir(e, srcPath, dstPath)
+			err = copyDir(info, srcPath, dstPath)
 		default:
-			err = copyFile(e, srcPath, dstPath)
+			err = copyFile(info, srcPath, dstPath)
 		}
 		if err != nil {
 			return err

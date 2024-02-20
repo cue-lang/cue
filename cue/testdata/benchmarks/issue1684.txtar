@@ -42,6 +42,229 @@ Retain: 0
 Unifications: 791999
 Conjuncts:    2479541
 Disjuncts:    1064043
+-- out/evalalpha --
+(struct){
+  #Secret: (#struct){
+    $secret: (#struct){
+      id: (string){ string }
+      _id: (string){ string }
+    }
+  }
+  #secrets: (#struct){ |((#struct){
+      $secret: (#struct){
+        id: (string){ string }
+        _id: (string){ string }
+      }
+    }, (#struct){
+    }) }
+  out: (#struct){ |((#struct){
+      FOO: (#struct){
+        $secret: (#struct){
+          id: (string){ "100" }
+          _id: (string){ "100" }
+        }
+      }
+      ONE: (#struct){
+        TWO: (#struct){
+          THREE: (#struct){
+            $secret: (#struct){
+              id: (string){ "123" }
+              _id: (string){ "123" }
+            }
+          }
+        }
+      }
+      $secret: (#struct){
+        id: (string){ string }
+        _id: (string){ string }
+      }
+    }, (#struct){
+      FOO: (#struct){ |((#struct){
+          $secret: (#struct){
+            id: (string){ "100" }
+            _id: (string){ "100" }
+          }
+        }, (#struct){
+          $secret: (#struct){
+            id: (_|_){
+              // [eval] out.FOO.$secret.id: field not allowed:
+              //     ./in.cue:4:11
+              //     ./in.cue:7:16
+            }
+            _id: (string){ "100" }
+            $secret: (#struct){
+              id: (string){ string }
+              _id: (string){ string }
+            }
+          }
+        }) }
+      ONE: (#struct){ |((#struct){
+          TWO: (#struct){
+            THREE: (#struct){
+              $secret: (#struct){
+                id: (string){ "123" }
+                _id: (string){ "123" }
+              }
+            }
+          }
+          $secret: (#struct){
+            id: (string){ string }
+            _id: (string){ string }
+          }
+        }, (#struct){
+          TWO: (#struct){ |((#struct){
+              THREE: (#struct){
+                $secret: (#struct){
+                  id: (string){ "123" }
+                  _id: (string){ "123" }
+                }
+              }
+              $secret: (#struct){
+                id: (string){ string }
+                _id: (string){ string }
+              }
+            }, (#struct){
+              THREE: (#struct){ |((#struct){
+                  $secret: (#struct){
+                    id: (string){ "123" }
+                    _id: (string){ "123" }
+                  }
+                }, (#struct){
+                  $secret: (#struct){
+                    id: (_|_){
+                      // [eval] out.ONE.TWO.THREE.$secret.id: field not allowed:
+                      //     ./in.cue:4:11
+                      //     ./in.cue:8:28
+                    }
+                    _id: (string){ "123" }
+                    $secret: (#struct){
+                      id: (string){ string }
+                      _id: (string){ string }
+                    }
+                  }
+                }) }
+            }) }
+        }) }
+    }) }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -12,22 +12,93 @@
+       }
+     }, (#struct){
+     }) }
+-  out: (#struct){
+-    FOO: (#struct){
+-      $secret: (#struct){
+-        id: (string){ "100" }
+-        _id: (string){ "100" }
+-      }
+-    }
+-    ONE: (#struct){
+-      TWO: (#struct){
+-        THREE: (#struct){
+-          $secret: (#struct){
+-            id: (string){ "123" }
+-            _id: (string){ "123" }
+-          }
+-        }
+-      }
+-    }
+-  }
++  out: (#struct){ |((#struct){
++      FOO: (#struct){
++        $secret: (#struct){
++          id: (string){ "100" }
++          _id: (string){ "100" }
++        }
++      }
++      ONE: (#struct){
++        TWO: (#struct){
++          THREE: (#struct){
++            $secret: (#struct){
++              id: (string){ "123" }
++              _id: (string){ "123" }
++            }
++          }
++        }
++      }
++      $secret: (#struct){
++        id: (string){ string }
++        _id: (string){ string }
++      }
++    }, (#struct){
++      FOO: (#struct){ |((#struct){
++          $secret: (#struct){
++            id: (string){ "100" }
++            _id: (string){ "100" }
++          }
++        }, (#struct){
++          $secret: (#struct){
++            id: (_|_){
++              // [eval] out.FOO.$secret.id: field not allowed:
++              //     ./in.cue:4:11
++              //     ./in.cue:7:16
++            }
++            _id: (string){ "100" }
++            $secret: (#struct){
++              id: (string){ string }
++              _id: (string){ string }
++            }
++          }
++        }) }
++      ONE: (#struct){ |((#struct){
++          TWO: (#struct){
++            THREE: (#struct){
++              $secret: (#struct){
++                id: (string){ "123" }
++                _id: (string){ "123" }
++              }
++            }
++          }
++          $secret: (#struct){
++            id: (string){ string }
++            _id: (string){ string }
++          }
++        }, (#struct){
++          TWO: (#struct){ |((#struct){
++              THREE: (#struct){
++                $secret: (#struct){
++                  id: (string){ "123" }
++                  _id: (string){ "123" }
++                }
++              }
++              $secret: (#struct){
++                id: (string){ string }
++                _id: (string){ string }
++              }
++            }, (#struct){
++              THREE: (#struct){ |((#struct){
++                  $secret: (#struct){
++                    id: (string){ "123" }
++                    _id: (string){ "123" }
++                  }
++                }, (#struct){
++                  $secret: (#struct){
++                    id: (_|_){
++                      // [eval] out.ONE.TWO.THREE.$secret.id: field not allowed:
++                      //     ./in.cue:4:11
++                      //     ./in.cue:8:28
++                    }
++                    _id: (string){ "123" }
++                    $secret: (#struct){
++                      id: (string){ string }
++                      _id: (string){ string }
++                    }
++                  }
++                }) }
++            }) }
++        }) }
++    }) }
+ }
+-- diff/todo/p0 --
+Bug. This is related to adding tasks.
 -- out/eval --
 (struct){
   #Secret: (#struct){

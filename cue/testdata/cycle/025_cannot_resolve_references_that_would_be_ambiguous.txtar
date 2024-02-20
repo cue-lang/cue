@@ -63,6 +63,46 @@ Retain: 19
 Unifications: 24
 Conjuncts:    80
 Disjuncts:    52
+-- out/evalalpha --
+(struct){
+  a1: (int){ |(*(int){ 0 }, (int){ 1 }) }
+  a2: (int){ |(*(int){ 0 }, (int){ 1 }) }
+  a3: (int){ 1 }
+  b1: (int){ |((int){ 0 }, (int){ 1 }) }
+  b2: (int){ |((int){ 0 }, (int){ 1 }) }
+  c1: (struct){ |((struct){
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }, (struct){
+      b: (int){ 1 }
+      a: (int){ 2 }
+    }) }
+  c2: (struct){ |((struct){
+      a: (int){ 2 }
+      b: (int){ 1 }
+    }, (struct){
+      b: (int){ 2 }
+      a: (int){ 1 }
+    }) }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,6 @@
+ (struct){
+-  a1: (_|_){
+-    // [cycle] cycle error:
+-    //     ./in.cue:2:5
+-  }
+-  a2: (int){ 1 }
++  a1: (int){ |(*(int){ 0 }, (int){ 1 }) }
++  a2: (int){ |(*(int){ 0 }, (int){ 1 }) }
+   a3: (int){ 1 }
+   b1: (int){ |((int){ 0 }, (int){ 1 }) }
+   b2: (int){ |((int){ 0 }, (int){ 1 }) }
+-- diff/todo/p1 --
+a1: should be an error or include validators in result.
 -- out/eval --
 (struct){
   a1: (_|_){

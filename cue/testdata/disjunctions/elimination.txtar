@@ -497,6 +497,2703 @@ Retain: 115
 Unifications: 1260
 Conjuncts:    3417
 Disjuncts:    2454
+-- out/evalalpha --
+Errors:
+preserveClosedness.small.p1.#A.a: field not allowed:
+    ./in.cue:145:3
+    ./in.cue:142:12
+
+Result:
+(_|_){
+  // [eval]
+  disambiguateClosed: (struct){
+    b: (#struct){ |((#struct){
+        x: (bool){ true }
+      }, (#struct){
+        y: (bool){ true }
+      }) }
+    a: (#struct){ |((#struct){
+        x: (bool){ true }
+      }, (#struct){
+        y: (bool){ true }
+      }) }
+    #Def: (#struct){ |((#struct){
+        x: (bool){ true }
+      }, (#struct){
+        y: (bool){ true }
+      }) }
+  }
+  alwaysCheckMatchers1: (struct){
+    b: (struct){
+      c: (string){ "yyyyy" }
+    }
+  }
+  alwaysCheckPatterns2: (struct){
+    a: (#struct){
+      c: (string){ "yyyyy" }
+    }
+    b: (#struct){
+      c: (string){ "yyyyy" }
+    }
+    #X: ((string|struct)){ |((string){ string }, (#struct){
+        c: (string){ string }
+      }) }
+  }
+  nestedNonMonotonic: (struct){
+    resolved: (struct){
+      n1: (struct){
+        x: ((null|struct)){ |((struct){
+            a: (struct){ struct.MinFields(2) }
+          }, (null){ null }) }
+      }
+      n2: (struct){
+        x: ((null|struct)){ |((struct){
+            a: (struct){
+              b: (struct){ struct.MinFields(2) }
+            }
+          }, (null){ null }) }
+      }
+    }
+    eliminated: (struct){
+      n1: (struct){
+        p1: (struct){
+          x: ((null|struct)){ |((struct){
+              a: (struct){ struct.MaxFields(1) }
+            }, (null){ null }) }
+        }
+        p2: (struct){
+          x: ((null|struct)){ |((struct){
+              a: (struct){
+                c: (int){ 1 }
+              }
+            }, (null){ null }) }
+        }
+      }
+      n2: (struct){
+        p1: (struct){
+          x: ((null|struct)){ |((struct){
+              a: (struct){
+                b: (struct){ struct.MaxFields(1) }
+              }
+            }, (null){ null }) }
+        }
+        p2: (struct){
+          x: ((null|struct)){ |((struct){
+              a: (struct){
+                b: (struct){
+                  c: (int){ 1 }
+                }
+              }
+            }, (null){ null }) }
+        }
+      }
+    }
+    incomplete: (struct){
+      a: (struct){
+        n1: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){ struct.MinFields(2) }
+              }, (null){ null }) }
+          }
+          p2: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  c: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+        }
+        n2: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  b: (struct){ struct.MinFields(2) }
+                }
+              }, (null){ null }) }
+          }
+          p2: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  b: (struct){
+                    c: (int){ 1 }
+                  }
+                }
+              }, (null){ null }) }
+          }
+        }
+      }
+      b: (struct){
+        n1: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){ struct.MinFields(3) }
+              }, (null){ null }) }
+          }
+          p2: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  c: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+          p3: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  c: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+        }
+        n2: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  b: (struct){ struct.MinFields(3) }
+                }
+              }, (null){ null }) }
+          }
+        }
+      }
+    }
+  }
+  preserveClosedness: (_|_){
+    // [eval]
+    small: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval]
+        #A: (_|_){
+          // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
+          //     ./in.cue:145:3
+          //     ./in.cue:142:12
+          a: (_|_){
+            // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
+            //     ./in.cue:145:3
+            //     ./in.cue:142:12
+          }
+        }
+        #B: (#struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+          }) }
+      }
+      p2: (struct){
+        #A: (#struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (int){ int }
+          }) }
+        #B: (#struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+          }) }
+      }
+    }
+    medium: (struct){
+      p1: (struct){
+        #A: (#struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+          }) }
+        #B: (#struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+          }) }
+      }
+      p2: (struct){
+        #A: (#struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+          }) }
+        #B: (#struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+          }) }
+      }
+      p3: (struct){
+        #A: (#struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+          }) }
+        #B: (#struct){ |(*(#struct){
+          }, (#struct){
+            b: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+          }) }
+      }
+    }
+  }
+  noChildError: (struct){
+    issue1608: (struct){
+      myValue: (#struct){
+        fieldName: (string){ "some string" }
+      }
+      #type: (#struct){
+        fieldName: ((string|struct)){ |((string){ string }, (#struct){
+            foo: (string){ string }
+          }, (#struct){
+            bar: ((string|struct)){ |((string){ string }, (#struct){
+                foo: (string){ string }
+              }) }
+          }) }
+      }
+      #subtype: ((string|struct)){ |((string){ string }, (#struct){
+          foo: (string){ string }
+        }, (#struct){
+          bar: ((string|struct)){ |((string){ string }, (#struct){
+              foo: (string){ string }
+            }) }
+        }) }
+    }
+    t1: (struct){
+      #D: (#struct){ |((#struct){
+          b: (string){ string }
+        }, (#struct){
+          c: (#struct){
+            b: (string){ string }
+          }
+        }) }
+      o: (#struct){
+        b: (string){ "test" }
+      }
+    }
+    t2: (struct){
+      o: (#struct){
+        b: (string){ "test" }
+      }
+      #D: (#struct){ |((#struct){
+          b: (string){ string }
+        }, (#struct){
+          c: (#struct){
+            b: (string){ string }
+          }
+        }) }
+    }
+    t3: (struct){
+      #D: (#struct){ |((#struct){
+          a: (null){ null }
+        }, (#struct){
+          b: (string){ string }
+        }, (#struct){
+          c: (#struct){ |((#struct){
+              a: (null){ null }
+            }, (#struct){
+              b: (string){ string }
+            }) }
+        }) }
+      o: (#struct){
+        b: (string){ "test" }
+      }
+    }
+    t4: (struct){
+      o: (#struct){
+        b: (string){ "test" }
+      }
+      #D: (#struct){ |((#struct){
+          a: (null){ null }
+        }, (#struct){
+          b: (string){ string }
+        }, (#struct){
+          c: (#struct){ |((#struct){
+              a: (null){ null }
+            }, (#struct){
+              b: (string){ string }
+            }) }
+        }) }
+    }
+  }
+  issue1924: (struct){
+    t1: (struct){
+      m: (struct){
+        a: (int){ 2 }
+      }
+      x: (int){ 2 }
+    }
+    t2: (struct){
+      m: (struct){
+        a: (int){ 2 }
+      }
+      x: (int){ 3 }
+    }
+    t3: (struct){
+      m: (struct){
+        a: (int){ 2 }
+      }
+      x: (int){ 1 }
+    }
+  }
+  issue1838: (struct){
+    t1: (struct){
+      p?: (#list){
+      }
+      a: (null){ null }
+    }
+    t2: (struct){
+      p?: (#list){
+      }
+      a: (null){ null }
+    }
+  }
+  noHang: (struct){
+    #T: (#list){ |((#list){
+        0: (string){ "a" }
+        1: (list){
+          0: (string){ "d" }
+        }
+      }, (list){
+        0: (string){ "d" }
+      }) }
+    x: (#list){ |((#list){
+        0: (string){ "a" }
+        1: (list){
+          0: (string){ "d" }
+        }
+      }, (list){
+        0: (string){ "d" }
+      }) }
+    #X: (#list){ |((#list){
+        0: (string){ "a" }
+        1: (list){
+          0: (string){ "d" }
+        }
+      }, (list){
+        0: (string){ "d" }
+      }) }
+  }
+  issue1940: (struct){
+    #T: (#list){ |((#list){
+        0: (string){ "a" }
+        1: (#list){ |((#list){
+            0: (string){ "b" }
+            1: (#list){ |((#list){
+                0: (string){ "c" }
+                1: (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "c" }
+            1: (#list){ |((#list){
+                0: (string){ "b" }
+                1: (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "d" }
+            1: (list){
+            }
+          }) }
+      }, (#list){
+        0: (string){ "b" }
+        1: (#list){ |((#list){
+            0: (string){ "a" }
+            1: (#list){ |((#list){
+                0: (string){ "c" }
+                1: (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "c" }
+            1: (#list){ |((#list){
+                0: (string){ "a" }
+                1: (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "d" }
+            1: (list){
+            }
+          }) }
+      }, (#list){
+        0: (string){ "c" }
+        1: (#list){ |((#list){
+            0: (string){ "a" }
+            1: (#list){ |((#list){
+                0: (string){ "b" }
+                1: (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "b" }
+            1: (#list){ |((#list){
+                0: (string){ "a" }
+                1: (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "d" }
+            1: (list){
+            }
+          }) }
+      }, (#list){
+        0: (string){ "d" }
+        1: (list){
+        }
+      }) }
+    #A: (#struct){
+      type: (#list){ |((#list){
+          0: (string){ "a" }
+          1: (#list){ |((#list){
+              0: (string){ "b" }
+              1: (#list){ |((#list){
+                  0: (string){ "c" }
+                  1: (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }
+                }, (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }) }
+            }, (#list){
+              0: (string){ "c" }
+              1: (#list){ |((#list){
+                  0: (string){ "b" }
+                  1: (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }
+                }, (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }) }
+            }, (#list){
+              0: (string){ "d" }
+              1: (list){
+              }
+            }) }
+        }, (#list){
+          0: (string){ "b" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (#list){ |((#list){
+                  0: (string){ "c" }
+                  1: (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }
+                }, (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }) }
+            }, (#list){
+              0: (string){ "c" }
+              1: (#list){ |((#list){
+                  0: (string){ "a" }
+                  1: (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }
+                }, (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }) }
+            }, (#list){
+              0: (string){ "d" }
+              1: (list){
+              }
+            }) }
+        }, (#list){
+          0: (string){ "c" }
+          1: (#list){ |((#list){
+              0: (string){ "a" }
+              1: (#list){ |((#list){
+                  0: (string){ "b" }
+                  1: (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }
+                }, (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }) }
+            }, (#list){
+              0: (string){ "b" }
+              1: (#list){ |((#list){
+                  0: (string){ "a" }
+                  1: (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }
+                }, (#list){
+                  0: (string){ "d" }
+                  1: (list){
+                  }
+                }) }
+            }, (#list){
+              0: (string){ "d" }
+              1: (list){
+              }
+            }) }
+        }, (#list){
+          0: (string){ "d" }
+          1: (list){
+          }
+        }) }
+    }
+    #B: (#struct){
+    }
+    #C: (#struct){
+      x: (#struct){
+        type: (#list){ |((#list){
+            0: (string){ "a" }
+            1: (#list){ |((#list){
+                0: (string){ "b" }
+                1: (#list){ |((#list){
+                    0: (string){ "c" }
+                    1: (#list){
+                      0: (string){ "d" }
+                      1: (list){
+                      }
+                    }
+                  }, (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }) }
+              }, (#list){
+                0: (string){ "c" }
+                1: (#list){ |((#list){
+                    0: (string){ "b" }
+                    1: (#list){
+                      0: (string){ "d" }
+                      1: (list){
+                      }
+                    }
+                  }, (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }) }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "b" }
+            1: (#list){ |((#list){
+                0: (string){ "a" }
+                1: (#list){ |((#list){
+                    0: (string){ "c" }
+                    1: (#list){
+                      0: (string){ "d" }
+                      1: (list){
+                      }
+                    }
+                  }, (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }) }
+              }, (#list){
+                0: (string){ "c" }
+                1: (#list){ |((#list){
+                    0: (string){ "a" }
+                    1: (#list){
+                      0: (string){ "d" }
+                      1: (list){
+                      }
+                    }
+                  }, (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }) }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "c" }
+            1: (#list){ |((#list){
+                0: (string){ "a" }
+                1: (#list){ |((#list){
+                    0: (string){ "b" }
+                    1: (#list){
+                      0: (string){ "d" }
+                      1: (list){
+                      }
+                    }
+                  }, (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }) }
+              }, (#list){
+                0: (string){ "b" }
+                1: (#list){ |((#list){
+                    0: (string){ "a" }
+                    1: (#list){
+                      0: (string){ "d" }
+                      1: (list){
+                      }
+                    }
+                  }, (#list){
+                    0: (string){ "d" }
+                    1: (list){
+                    }
+                  }) }
+              }, (#list){
+                0: (string){ "d" }
+                1: (list){
+                }
+              }) }
+          }, (#list){
+            0: (string){ "d" }
+            1: (list){
+            }
+          }) }
+      }
+    }
+  }
+  issue2209: (struct){
+    simplified: (struct){
+      t1: (struct){
+        #SpecFoo: (#struct){
+          foo: (#struct){
+            min: (int){ 1 }
+          }
+        }
+        #SpecBar: (#struct){
+          bar: (#struct){
+            min: (int){ 1 }
+          }
+        }
+        spec: (#struct){
+          bar: (#struct){
+            min: (int){ 1 }
+          }
+        }
+        out: (struct){ |((struct){
+            minBar: (int){ 1 }
+            X: (#struct){
+              bar: (#struct){
+                min: (int){ 1 }
+              }
+            }
+            minFoo: (int){ int }
+          }, (struct){
+            minBar: (int){ 1 }
+            X: (#struct){
+              bar: (#struct){
+                min: (int){ 1 }
+              }
+            }
+          }) }
+      }
+      t2: (_|_){
+        // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+        //     ./issue2209full.cue:24:17
+        #SpecFoo: (#struct){
+          foo: (#struct){
+          }
+        }
+        #SpecBar: (#struct){
+          bar: (#struct){
+            x: (int){ 1 }
+          }
+        }
+        spec: (struct){ |(*(#struct){
+            bar: (_|_){
+              // [eval] issue2209.simplified.t2.spec.bar: field not allowed:
+              //     ./issue2209full.cue:22:8
+              //     ./issue2209full.cue:21:8
+            }
+            foo: (#struct){
+            }
+          }, (#struct){
+            bar: (#struct){
+              x: (int){ 1 }
+            }
+          }) }
+        BAZ: (_|_){
+          // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+          //     ./issue2209full.cue:24:17
+        }
+      }
+      t3: (struct){ |((struct){
+          #A: (#struct){
+            v: (int){ 1 }
+          }
+          BAZ: (_){ _ }
+          S: (struct){ |(*(#struct){
+              x: (_|_){
+                // [eval] issue2209.simplified.t3.S.x: field not allowed:
+                //     ./issue2209full.cue:36:5
+                //     ./issue2209full.cue:38:5
+              }
+              v: (int){ 1 }
+            }, (#struct){
+              x: (int){ 1 }
+              y: (int){ 1 }
+            }) }
+          #B: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          f2: (int){ int }
+        }, (struct){
+          #A: (#struct){
+            v: (int){ 1 }
+          }
+          BAZ: (_){ _ }
+          S: (struct){
+            x: (int){ 1 }
+          }
+          #B: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          b2: (int){ int }
+        }) }
+    }
+    full: (struct){
+      Foo: (#struct){
+        spec: (#struct){
+          foo: (#struct){
+            min: (int){ |(*(int){ 10 }, (int){ int }) }
+            max: (int){ |(*(int){ 20 }, (int){ int }) }
+          }
+        }
+        resource: (#struct){
+          _X: (#struct){
+            spec: (#struct){
+              foo: (#struct){
+                min: (int){ |(*(int){ 10 }, (int){ int }) }
+                max: (int){ |(*(int){ 20 }, (int){ int }) }
+              }
+            }
+          }
+          spec: (#struct){ |(*(#struct){
+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minBar?: (null){ null }
+              maxBar?: (null){ null }
+              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+              fuga?: (null){ null }
+            }, (#struct){
+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minBar?: (null){ null }
+              maxBar?: (null){ null }
+              hoge?: (null){ null }
+              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            }) }
+        }
+      }
+      Bar: (#struct){
+        spec: (#struct){
+          bar: (#struct){
+            min: (int){ |(*(int){ 30 }, (int){ int }) }
+            max: (int){ |(*(int){ 40 }, (int){ int }) }
+          }
+        }
+        resource: (#struct){
+          _X: (#struct){
+            spec: (#struct){
+              bar: (#struct){
+                min: (int){ |(*(int){ 30 }, (int){ int }) }
+                max: (int){ |(*(int){ 40 }, (int){ int }) }
+              }
+            }
+          }
+          spec: (#struct){ |(*(#struct){
+              minFoo?: (null){ null }
+              maxFoo?: (null){ null }
+              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
+              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
+              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+              fuga?: (null){ null }
+            }, (#struct){
+              minFoo?: (null){ null }
+              maxFoo?: (null){ null }
+              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
+              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
+              hoge?: (null){ null }
+              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            }) }
+        }
+      }
+      #Abstract: (#struct){
+        spec: (#struct){ |(*(#struct){
+            foo: (#struct){
+              min: (int){ |(*(int){ 10 }, (int){ int }) }
+              max: (int){ |(*(int){ 20 }, (int){ int }) }
+            }
+          }, (#struct){
+            bar: (#struct){
+              min: (int){ |(*(int){ 30 }, (int){ int }) }
+              max: (int){ |(*(int){ 40 }, (int){ int }) }
+            }
+          }) }
+        resource: (#struct){
+          _X: (#struct){
+            spec: (#struct){ |(*(#struct){
+                foo: (#struct){
+                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+                }
+              }, (#struct){
+                bar: (#struct){
+                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+                }
+              }) }
+          }
+          spec: (#struct){ |(*(#struct){
+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minBar?: (null){ null }
+              maxBar?: (null){ null }
+              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+              fuga?: (null){ null }
+            }, (#struct){
+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minBar?: (null){ null }
+              maxBar?: (null){ null }
+              hoge?: (null){ null }
+              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            }) }
+        }
+      }
+      _#Spec: (#struct){ |(*(#struct){
+          foo: (#struct){
+            min: (int){ |(*(int){ 10 }, (int){ int }) }
+            max: (int){ |(*(int){ 20 }, (int){ int }) }
+          }
+        }, (#struct){
+          bar: (#struct){
+            min: (int){ |(*(int){ 30 }, (int){ int }) }
+            max: (int){ |(*(int){ 40 }, (int){ int }) }
+          }
+        }) }
+      _#SpecFoo: (#struct){
+        foo: (#struct){
+          min: (int){ |(*(int){ 10 }, (int){ int }) }
+          max: (int){ |(*(int){ 20 }, (int){ int }) }
+        }
+      }
+      _#SpecBar: (#struct){
+        bar: (#struct){
+          min: (int){ |(*(int){ 30 }, (int){ int }) }
+          max: (int){ |(*(int){ 40 }, (int){ int }) }
+        }
+      }
+      _Thing: (#struct){
+        _X: (_){ _ }
+        spec: (#struct){ |((#struct){
+            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }, (#struct){
+            minFoo?: (null){ null }
+            maxFoo?: (null){ null }
+            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
+            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }) }
+      }
+      #Constrained: (#struct){
+        spec: (#struct){ |((#struct){
+            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }, (#struct){
+            minFoo?: (null){ null }
+            maxFoo?: (null){ null }
+            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
+            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          }) }
+      }
+      #Base: (#struct){
+        spec: (#struct){
+          minFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
+          maxFoo?: ((null|int)){ |((null){ null }, (int){ int }) }
+          minBar?: ((null|int)){ |((null){ null }, (int){ int }) }
+          maxBar?: ((null|int)){ |((null){ null }, (int){ int }) }
+          hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+          fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+        }
+      }
+    }
+  }
+  issue2246: (struct){
+    simplified: (struct){
+      #FormFoo: (#struct){
+        fooID: (string){ string }
+      }
+      #FormBar: (#struct){
+        barID: (string){ string }
+      }
+      #Form: (#struct){ |((#struct){
+          fooID: (string){ string }
+        }, (#struct){
+          barID: (string){ string }
+        }) }
+      data: (struct){
+        fooID: (string){ "123" }
+      }
+      out1: (#struct){
+        fooID: (string){ "123" }
+      }
+      out2: (#struct){
+        fooID: (string){ "123" }
+      }
+    }
+    full: (struct){
+      data: (struct){
+        forms: (#list){
+          0: (struct){
+            fooID: (string){ "00-0000001" }
+          }
+        }
+      }
+      form1040: (#list){
+        0: (_|_){
+          // [incomplete] issue2246.full.form1040.0: unresolved disjunction {fooID:"00-0000001",common:3} | {fooID:"00-0000001",barID:string,common:3} (type struct):
+          //     ./issue2246.cue:38:29
+        }
+      }
+      #K1: (#struct){
+        #_base: (#struct){
+          common: (int){ 3 }
+        }
+        #FormFoo: (#struct){
+          fooID: (string){ string }
+          common: (int){ 3 }
+        }
+        #FormBar: (#struct){
+          barID: (string){ string }
+          common: (int){ 3 }
+        }
+        #Form: (#struct){ |((#struct){
+            fooID: (string){ string }
+            common: (int){ 3 }
+          }, (#struct){
+            barID: (string){ string }
+            common: (int){ 3 }
+          }) }
+      }
+      #Input: (#struct){
+        forms: (list){
+        }
+      }
+      #summarizeReturn: (#struct){
+        in: (#struct){
+          forms: (list){
+          }
+        }
+        out: (#list){
+        }
+      }
+      #compute: (#struct){
+        in: (#struct){
+          forms: (list){
+          }
+        }
+        out: (#list){
+        }
+      }
+    }
+  }
+  issue2263: (struct){
+    simplified: (struct){
+      metrics: (#struct){
+        id: (string){ "foo" }
+        avg: (int){ 60 }
+      }
+      #Metric: (#struct){ |((#struct){
+          id: (string){ string }
+        }, (#struct){
+        }) }
+      #IDSource: (#struct){
+        id: (string){ string }
+      }
+      #TargetAverage: (#struct){
+        avg: (number){ number }
+      }
+    }
+    full: (struct){
+      metrics: (#list){
+        0: (#struct){ |((#struct){
+            id: (string){ "foo" }
+            avg: (int){ 60 }
+          }, (#struct){
+            id: (string){ "foo" }
+            avg: (int){ 60 }
+            uri: (string){ string }
+          }) }
+        1: (#struct){ |((#struct){
+            id: (string){ "bar" }
+            value: (int){ 80 }
+          }, (#struct){
+            id: (string){ "bar" }
+            value: (int){ 80 }
+            uri: (string){ string }
+          }) }
+        2: (#struct){ |((#struct){
+            uri: (string){ "baz" }
+            avg: (int){ 70 }
+            id: (string){ string }
+          }, (#struct){
+            uri: (string){ "baz" }
+            avg: (int){ 70 }
+          }) }
+        3: (#struct){ |((#struct){
+            uri: (string){ "qux" }
+            value: (int){ 90 }
+            id: (string){ string }
+          }, (#struct){
+            uri: (string){ "qux" }
+            value: (int){ 90 }
+          }) }
+      }
+      #Metric: (#struct){ |((#struct){
+          id: (string){ string }
+        }, (#struct){
+          uri: (string){ string }
+        }) }
+      #Source: (#struct){ |((#struct){
+          id: (string){ string }
+        }, (#struct){
+          uri: (string){ string }
+        }) }
+      #Target: (#struct){ |((#struct){
+          avg: (number){ number }
+        }, (#struct){
+          value: (number){ number }
+        }) }
+      #IDSource: (#struct){
+        id: (string){ string }
+      }
+      #URISource: (#struct){
+        uri: (string){ string }
+      }
+      #TargetAverage: (#struct){
+        avg: (number){ number }
+      }
+      #TargetValue: (#struct){
+        value: (number){ number }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,32 +1,7 @@
+ Errors:
+-issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+-issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+-issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+-    ./issue2209full.cue:43:7
+-    ./issue2209full.cue:48:13
+-    ./issue2209full.cue:67:10
+-    ./issue2209full.cue:83:16
+-    ./issue2209full.cue:87:13
+-    ./issue2209full.cue:107:20
+-issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+-issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-    ./issue2209full.cue:43:7
+-    ./issue2209full.cue:48:13
+-    ./issue2209full.cue:55:16
+-    ./issue2209full.cue:71:4
+-    ./issue2209full.cue:72:13
+-    ./issue2209full.cue:92:13
+-issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+-    ./issue2209full.cue:43:7
+-    ./issue2209full.cue:48:13
+-    ./issue2209full.cue:67:10
+-    ./issue2209full.cue:83:16
+-    ./issue2209full.cue:92:13
+-    ./issue2209full.cue:105:20
+-issue2209.simplified.t3.BAZ: undefined field: y:
+-    ./issue2209full.cue:35:9
+-issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+-    ./issue2209full.cue:77:25
++preserveClosedness.small.p1.#A.a: field not allowed:
++    ./in.cue:145:3
++    ./in.cue:142:12
+ 
+ Result:
+ (_|_){
+@@ -68,19 +43,13 @@
+     resolved: (struct){
+       n1: (struct){
+         x: ((null|struct)){ |((struct){
+-            a: (struct){
+-              c: (int){ 1 }
+-              d: (int){ 1 }
+-            }
+-          }, (null){ null }) }
+-      }
+-      n2: (struct){
+-        x: ((null|struct)){ |((struct){
+-            a: (struct){
+-              b: (struct){
+-                c: (int){ 1 }
+-                d: (int){ 1 }
+-              }
++            a: (struct){ struct.MinFields(2) }
++          }, (null){ null }) }
++      }
++      n2: (struct){
++        x: ((null|struct)){ |((struct){
++            a: (struct){
++              b: (struct){ struct.MinFields(2) }
+             }
+           }, (null){ null }) }
+       }
+@@ -88,18 +57,34 @@
+     eliminated: (struct){
+       n1: (struct){
+         p1: (struct){
+-          x: (null){ null }
+-        }
+-        p2: (struct){
+-          x: (null){ null }
+-        }
+-      }
+-      n2: (struct){
+-        p1: (struct){
+-          x: (null){ null }
+-        }
+-        p2: (struct){
+-          x: (null){ null }
++          x: ((null|struct)){ |((struct){
++              a: (struct){ struct.MaxFields(1) }
++            }, (null){ null }) }
++        }
++        p2: (struct){
++          x: ((null|struct)){ |((struct){
++              a: (struct){
++                c: (int){ 1 }
++              }
++            }, (null){ null }) }
++        }
++      }
++      n2: (struct){
++        p1: (struct){
++          x: ((null|struct)){ |((struct){
++              a: (struct){
++                b: (struct){ struct.MaxFields(1) }
++              }
++            }, (null){ null }) }
++        }
++        p2: (struct){
++          x: ((null|struct)){ |((struct){
++              a: (struct){
++                b: (struct){
++                  c: (int){ 1 }
++                }
++              }
++            }, (null){ null }) }
+         }
+       }
+     }
+@@ -107,34 +92,30 @@
+       a: (struct){
+         n1: (struct){
+           p1: (struct){
+-            x: (null){ null }
+-          }
+-          p2: (struct){
+-            x: (null){ null }
+-          }
+-        }
+-        n2: (struct){
+-          p1: (struct){
+-            x: ((null|struct)){ |((struct){
+-                a: (struct){
+-                  b: (_|_){
+-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+-                    //     ./in.cue:96:15
+-                    //     ./in.cue:96:32
+-                    //     ./in.cue:97:12
+-                    c: (int){ 1 }
+-                  }
+-                }
+-              }, (null){ null }) }
+-          }
+-          p2: (struct){
+-            x: ((null|struct)){ |((struct){
+-                a: (struct){
+-                  b: (_|_){
+-                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+-                    //     ./in.cue:102:15
+-                    //     ./in.cue:101:12
+-                    //     ./in.cue:102:32
++            x: ((null|struct)){ |((struct){
++                a: (struct){ struct.MinFields(2) }
++              }, (null){ null }) }
++          }
++          p2: (struct){
++            x: ((null|struct)){ |((struct){
++                a: (struct){
++                  c: (int){ 1 }
++                }
++              }, (null){ null }) }
++          }
++        }
++        n2: (struct){
++          p1: (struct){
++            x: ((null|struct)){ |((struct){
++                a: (struct){
++                  b: (struct){ struct.MinFields(2) }
++                }
++              }, (null){ null }) }
++          }
++          p2: (struct){
++            x: ((null|struct)){ |((struct){
++                a: (struct){
++                  b: (struct){
+                     c: (int){ 1 }
+                   }
+                 }
+@@ -145,75 +126,68 @@
+       b: (struct){
+         n1: (struct){
+           p1: (struct){
+-            x: (null){ null }
+-          }
+-          p2: (struct){
+-            x: (null){ null }
++            x: ((null|struct)){ |((struct){
++                a: (struct){ struct.MinFields(3) }
++              }, (null){ null }) }
++          }
++          p2: (struct){
++            x: ((null|struct)){ |((struct){
++                a: (struct){
++                  c: (int){ 1 }
++                }
++              }, (null){ null }) }
+           }
+           p3: (struct){
+-            x: (null){ null }
+-          }
+-        }
+-        n2: (struct){
+-          p1: (struct){
+-            x: ((null|struct)){ |((struct){
+-                a: (struct){
+-                  b: (_|_){
+-                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+-                    //     ./in.cue:138:15
+-                    //     ./in.cue:124:15
+-                    //     ./in.cue:125:12
+-                    //     ./in.cue:126:12
+-                    //     ./in.cue:130:12
+-                    //     ./in.cue:131:15
+-                    //     ./in.cue:132:12
+-                    //     ./in.cue:136:12
+-                    //     ./in.cue:137:12
+-                    //     ./in.cue:138:32
+-                    c: (int){ 1 }
+-                    d: (int){ 1 }
+-                  }
+-                }
+-              }, (null){ null }) }
+-          }
+-        }
+-      }
+-    }
+-  }
+-  preserveClosedness: (struct){
+-    small: (struct){
+-      p1: (struct){
+-        #A: (#struct){ |(*(#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            b: (int){ int }
+-          }) }
+-        #B: (#struct){ |(*(#struct){
+-          }, (#struct){
+-            b: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            b: (int){ int }
+-          }) }
+-      }
+-      p2: (struct){
+-        #A: (#struct){ |(*(#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            b: (int){ int }
+-          }) }
+-        #B: (#struct){ |(*(#struct){
+-          }, (#struct){
+-            a: (string){ string }
+-            b: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            b: (int){ int }
++            x: ((null|struct)){ |((struct){
++                a: (struct){
++                  c: (int){ 1 }
++                }
++              }, (null){ null }) }
++          }
++        }
++        n2: (struct){
++          p1: (struct){
++            x: ((null|struct)){ |((struct){
++                a: (struct){
++                  b: (struct){ struct.MinFields(3) }
++                }
++              }, (null){ null }) }
++          }
++        }
++      }
++    }
++  }
++  preserveClosedness: (_|_){
++    // [eval]
++    small: (_|_){
++      // [eval]
++      p1: (_|_){
++        // [eval]
++        #A: (_|_){
++          // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
++          //     ./in.cue:145:3
++          //     ./in.cue:142:12
++          a: (_|_){
++            // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
++            //     ./in.cue:145:3
++            //     ./in.cue:142:12
++          }
++        }
++        #B: (#struct){ |(*(#struct){
++          }, (#struct){
++            a: (string){ string }
++          }) }
++      }
++      p2: (struct){
++        #A: (#struct){ |(*(#struct){
++            a: (string){ string }
++          }, (#struct){
++            a: (string){ string }
++            b: (int){ int }
++          }) }
++        #B: (#struct){ |(*(#struct){
++          }, (#struct){
++            a: (string){ string }
+           }) }
+       }
+     }
+@@ -223,65 +197,27 @@
+             a: (string){ string }
+           }, (#struct){
+             a: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-            d: (string){ string }
+-          }) }
+-        #B: (#struct){ |(*(#struct){
+-          }, (#struct){
+-            c: (int){ int }
+-          }, (#struct){
+-            d: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-            d: (string){ string }
+-          }, (#struct){
+-            b: (string){ string }
+-          }, (#struct){
+-            b: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            b: (string){ string }
+-            d: (string){ string }
+-          }) }
+-      }
+-      p2: (struct){
+-        #A: (#struct){ |(*(#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-            d: (string){ string }
+-          }) }
+-        #B: (#struct){ |(*(#struct){
+-          }, (#struct){
+-            a: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-            d: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            c: (int){ int }
+-          }, (#struct){
+-            d: (string){ string }
+-          }, (#struct){
+-            b: (string){ string }
+-          }, (#struct){
+-            b: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            b: (string){ string }
+-            d: (string){ string }
++            b: (string){ string }
++          }) }
++        #B: (#struct){ |(*(#struct){
++          }, (#struct){
++            a: (string){ string }
++          }, (#struct){
++            b: (string){ string }
++          }) }
++      }
++      p2: (struct){
++        #A: (#struct){ |(*(#struct){
++            a: (string){ string }
++          }, (#struct){
++            a: (string){ string }
++            b: (string){ string }
++          }) }
++        #B: (#struct){ |(*(#struct){
++          }, (#struct){
++            a: (string){ string }
++          }, (#struct){
++            b: (string){ string }
+           }) }
+       }
+       p3: (struct){
+@@ -289,32 +225,13 @@
+             a: (string){ string }
+           }, (#struct){
+             a: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-            d: (string){ string }
+-          }) }
+-        #B: (#struct){ |(*(#struct){
+-          }, (#struct){
+-            a: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            a: (string){ string }
+-            d: (string){ string }
+-          }, (#struct){
+-            b: (string){ string }
+-          }, (#struct){
+-            b: (string){ string }
+-            c: (int){ int }
+-          }, (#struct){
+-            b: (string){ string }
+-            d: (string){ string }
+-          }, (#struct){
+-            a: (string){ string }
+-          }, (#struct){
+-            c: (int){ int }
+-          }, (#struct){
+-            d: (string){ string }
++            b: (string){ string }
++          }) }
++        #B: (#struct){ |(*(#struct){
++          }, (#struct){
++            b: (string){ string }
++          }, (#struct){
++            a: (string){ string }
+           }) }
+       }
+     }
+@@ -335,29 +252,47 @@
+       }
+       #subtype: ((string|struct)){ |((string){ string }, (#struct){
+           foo: (string){ string }
+-        }) }
+-    }
+-    t1: (struct){
+-      #D: (#struct){
+-        b: (string){ string }
+-      }
+-      o: (#struct){
+-        b: (string){ "test" }
+-      }
+-    }
+-    t2: (struct){
+-      o: (#struct){
+-        b: (string){ "test" }
+-      }
+-      #D: (#struct){
+-        b: (string){ string }
+-      }
+-    }
+-    t3: (struct){
+-      #D: (#struct){ |((#struct){
+-          a: (null){ null }
+-        }, (#struct){
+-          b: (string){ string }
++        }, (#struct){
++          bar: ((string|struct)){ |((string){ string }, (#struct){
++              foo: (string){ string }
++            }) }
++        }) }
++    }
++    t1: (struct){
++      #D: (#struct){ |((#struct){
++          b: (string){ string }
++        }, (#struct){
++          c: (#struct){
++            b: (string){ string }
++          }
++        }) }
++      o: (#struct){
++        b: (string){ "test" }
++      }
++    }
++    t2: (struct){
++      o: (#struct){
++        b: (string){ "test" }
++      }
++      #D: (#struct){ |((#struct){
++          b: (string){ string }
++        }, (#struct){
++          c: (#struct){
++            b: (string){ string }
++          }
++        }) }
++    }
++    t3: (struct){
++      #D: (#struct){ |((#struct){
++          a: (null){ null }
++        }, (#struct){
++          b: (string){ string }
++        }, (#struct){
++          c: (#struct){ |((#struct){
++              a: (null){ null }
++            }, (#struct){
++              b: (string){ string }
++            }) }
+         }) }
+       o: (#struct){
+         b: (string){ "test" }
+@@ -371,6 +306,12 @@
+           a: (null){ null }
+         }, (#struct){
+           b: (string){ string }
++        }, (#struct){
++          c: (#struct){ |((#struct){
++              a: (null){ null }
++            }, (#struct){
++              b: (string){ string }
++            }) }
+         }) }
+     }
+   }
+@@ -407,45 +348,373 @@
+     }
+   }
+   noHang: (struct){
+-    #T: (list){
+-      0: (string){ "d" }
+-    }
+-    x: (list){
+-      0: (string){ "d" }
+-    }
+-    #X: (list){
+-      0: (string){ "d" }
+-    }
++    #T: (#list){ |((#list){
++        0: (string){ "a" }
++        1: (list){
++          0: (string){ "d" }
++        }
++      }, (list){
++        0: (string){ "d" }
++      }) }
++    x: (#list){ |((#list){
++        0: (string){ "a" }
++        1: (list){
++          0: (string){ "d" }
++        }
++      }, (list){
++        0: (string){ "d" }
++      }) }
++    #X: (#list){ |((#list){
++        0: (string){ "a" }
++        1: (list){
++          0: (string){ "d" }
++        }
++      }, (list){
++        0: (string){ "d" }
++      }) }
+   }
+   issue1940: (struct){
+-    #T: (#list){
+-      0: (string){ "d" }
+-      1: (list){
+-      }
+-    }
++    #T: (#list){ |((#list){
++        0: (string){ "a" }
++        1: (#list){ |((#list){
++            0: (string){ "b" }
++            1: (#list){ |((#list){
++                0: (string){ "c" }
++                1: (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "c" }
++            1: (#list){ |((#list){
++                0: (string){ "b" }
++                1: (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "d" }
++            1: (list){
++            }
++          }) }
++      }, (#list){
++        0: (string){ "b" }
++        1: (#list){ |((#list){
++            0: (string){ "a" }
++            1: (#list){ |((#list){
++                0: (string){ "c" }
++                1: (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "c" }
++            1: (#list){ |((#list){
++                0: (string){ "a" }
++                1: (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "d" }
++            1: (list){
++            }
++          }) }
++      }, (#list){
++        0: (string){ "c" }
++        1: (#list){ |((#list){
++            0: (string){ "a" }
++            1: (#list){ |((#list){
++                0: (string){ "b" }
++                1: (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "b" }
++            1: (#list){ |((#list){
++                0: (string){ "a" }
++                1: (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "d" }
++            1: (list){
++            }
++          }) }
++      }, (#list){
++        0: (string){ "d" }
++        1: (list){
++        }
++      }) }
+     #A: (#struct){
+-      type: (#list){
+-        0: (string){ "d" }
+-        1: (list){
+-        }
+-      }
++      type: (#list){ |((#list){
++          0: (string){ "a" }
++          1: (#list){ |((#list){
++              0: (string){ "b" }
++              1: (#list){ |((#list){
++                  0: (string){ "c" }
++                  1: (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }
++                }, (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }) }
++            }, (#list){
++              0: (string){ "c" }
++              1: (#list){ |((#list){
++                  0: (string){ "b" }
++                  1: (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }
++                }, (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }) }
++            }, (#list){
++              0: (string){ "d" }
++              1: (list){
++              }
++            }) }
++        }, (#list){
++          0: (string){ "b" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (#list){ |((#list){
++                  0: (string){ "c" }
++                  1: (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }
++                }, (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }) }
++            }, (#list){
++              0: (string){ "c" }
++              1: (#list){ |((#list){
++                  0: (string){ "a" }
++                  1: (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }
++                }, (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }) }
++            }, (#list){
++              0: (string){ "d" }
++              1: (list){
++              }
++            }) }
++        }, (#list){
++          0: (string){ "c" }
++          1: (#list){ |((#list){
++              0: (string){ "a" }
++              1: (#list){ |((#list){
++                  0: (string){ "b" }
++                  1: (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }
++                }, (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }) }
++            }, (#list){
++              0: (string){ "b" }
++              1: (#list){ |((#list){
++                  0: (string){ "a" }
++                  1: (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }
++                }, (#list){
++                  0: (string){ "d" }
++                  1: (list){
++                  }
++                }) }
++            }, (#list){
++              0: (string){ "d" }
++              1: (list){
++              }
++            }) }
++        }, (#list){
++          0: (string){ "d" }
++          1: (list){
++          }
++        }) }
+     }
+     #B: (#struct){
+     }
+     #C: (#struct){
+       x: (#struct){
+-        type: (#list){
+-          0: (string){ "d" }
+-          1: (list){
+-          }
+-        }
+-      }
+-    }
+-  }
+-  issue2209: (_|_){
+-    // [eval]
+-    simplified: (_|_){
+-      // [eval]
++        type: (#list){ |((#list){
++            0: (string){ "a" }
++            1: (#list){ |((#list){
++                0: (string){ "b" }
++                1: (#list){ |((#list){
++                    0: (string){ "c" }
++                    1: (#list){
++                      0: (string){ "d" }
++                      1: (list){
++                      }
++                    }
++                  }, (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }) }
++              }, (#list){
++                0: (string){ "c" }
++                1: (#list){ |((#list){
++                    0: (string){ "b" }
++                    1: (#list){
++                      0: (string){ "d" }
++                      1: (list){
++                      }
++                    }
++                  }, (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }) }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "b" }
++            1: (#list){ |((#list){
++                0: (string){ "a" }
++                1: (#list){ |((#list){
++                    0: (string){ "c" }
++                    1: (#list){
++                      0: (string){ "d" }
++                      1: (list){
++                      }
++                    }
++                  }, (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }) }
++              }, (#list){
++                0: (string){ "c" }
++                1: (#list){ |((#list){
++                    0: (string){ "a" }
++                    1: (#list){
++                      0: (string){ "d" }
++                      1: (list){
++                      }
++                    }
++                  }, (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }) }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "c" }
++            1: (#list){ |((#list){
++                0: (string){ "a" }
++                1: (#list){ |((#list){
++                    0: (string){ "b" }
++                    1: (#list){
++                      0: (string){ "d" }
++                      1: (list){
++                      }
++                    }
++                  }, (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }) }
++              }, (#list){
++                0: (string){ "b" }
++                1: (#list){ |((#list){
++                    0: (string){ "a" }
++                    1: (#list){
++                      0: (string){ "d" }
++                      1: (list){
++                      }
++                    }
++                  }, (#list){
++                    0: (string){ "d" }
++                    1: (list){
++                    }
++                  }) }
++              }, (#list){
++                0: (string){ "d" }
++                1: (list){
++                }
++              }) }
++          }, (#list){
++            0: (string){ "d" }
++            1: (list){
++            }
++          }) }
++      }
++    }
++  }
++  issue2209: (struct){
++    simplified: (struct){
+       t1: (struct){
+         #SpecFoo: (#struct){
+           foo: (#struct){
+@@ -463,37 +732,20 @@
+           }
+         }
+         out: (struct){ |((struct){
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
+-            nullFoo: (null){ null }
+-            minFoo: (int){ int }
+-          }, (struct){
+-            minBar: (int){ int }
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
+-            nullFoo: (null){ null }
+-          }, (struct){
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
+-            nullBar: (null){ null }
+-            minFoo: (int){ int }
+-          }, (struct){
+-            minBar: (int){ int }
+-            X: (#struct){
+-              bar: (#struct){
+-                min: (int){ 1 }
+-              }
+-            }
+-            nullBar: (null){ null }
++            minBar: (int){ 1 }
++            X: (#struct){
++              bar: (#struct){
++                min: (int){ 1 }
++              }
++            }
++            minFoo: (int){ int }
++          }, (struct){
++            minBar: (int){ 1 }
++            X: (#struct){
++              bar: (#struct){
++                min: (int){ 1 }
++              }
++            }
+           }) }
+       }
+       t2: (_|_){
+@@ -508,8 +760,11 @@
+             x: (int){ 1 }
+           }
+         }
+-        spec: (#struct){ |(*(#struct){
+-            bar: (struct){
++        spec: (struct){ |(*(#struct){
++            bar: (_|_){
++              // [eval] issue2209.simplified.t2.spec.bar: field not allowed:
++              //     ./issue2209full.cue:22:8
++              //     ./issue2209full.cue:21:8
+             }
+             foo: (#struct){
+             }
+@@ -522,34 +777,44 @@
+           // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+           //     ./issue2209full.cue:24:17
+         }
+-        b2: (int){ int }
+-      }
+-      t3: (_|_){
+-        // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
+-        //     ./issue2209full.cue:35:9
+-        #A: (#struct){
+-          v: (int){ 1 }
+-        }
+-        BAZ: (_|_){
+-          // [eval] issue2209.simplified.t3.BAZ: undefined field: y:
+-          //     ./issue2209full.cue:35:9
+-        }
+-        S: (#struct){ |(*(#struct){
+-            x: (int){ 1 }
+-            v: (int){ 1 }
+-          }, (#struct){
+-            x: (int){ 1 }
+-            y: (int){ 1 }
+-          }) }
+-        #B: (#struct){
+-          x: (int){ 1 }
+-          y: (int){ 1 }
+-        }
+-        b2: (int){ int }
+-      }
+-    }
+-    full: (_|_){
+-      // [eval]
++      }
++      t3: (struct){ |((struct){
++          #A: (#struct){
++            v: (int){ 1 }
++          }
++          BAZ: (_){ _ }
++          S: (struct){ |(*(#struct){
++              x: (_|_){
++                // [eval] issue2209.simplified.t3.S.x: field not allowed:
++                //     ./issue2209full.cue:36:5
++                //     ./issue2209full.cue:38:5
++              }
++              v: (int){ 1 }
++            }, (#struct){
++              x: (int){ 1 }
++              y: (int){ 1 }
++            }) }
++          #B: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          f2: (int){ int }
++        }, (struct){
++          #A: (#struct){
++            v: (int){ 1 }
++          }
++          BAZ: (_){ _ }
++          S: (struct){
++            x: (int){ 1 }
++          }
++          #B: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          b2: (int){ int }
++        }) }
++    }
++    full: (struct){
+       Foo: (#struct){
+         spec: (#struct){
+           foo: (#struct){
+@@ -558,135 +823,62 @@
+           }
+         }
+         resource: (#struct){
+-          spec: (#struct){ |(*(#struct){
+-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-              minBar?: (null){ null }
+-              maxBar?: (null){ null }
+-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-              fuga?: (null){ null }
+-            }, (#struct){
+-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-              minBar?: (null){ null }
+-              maxBar?: (null){ null }
+-              hoge?: (null){ null }
+-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            }) }
+-          _X: (#struct){
+-            spec: (#struct){ |(*(#struct){
+-                foo: (#struct){
+-                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+-                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+-                }
+-              }, (#struct){
+-                foo: (#struct){
+-                }
+-                bar: (#struct){
+-                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+-                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+-                }
+-              }) }
+-          }
+-        }
+-      }
+-      Bar: (_|_){
+-        // [eval]
+-        spec: (#struct){
+-          bar: (#struct){
+-            min: (int){ |(*(int){ 30 }, (int){ int }) }
+-            max: (int){ |(*(int){ 40 }, (int){ int }) }
+-          }
+-        }
+-        resource: (_|_){
+-          // [eval]
+-          spec: (_|_){
+-            // [eval] issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
+-            // issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
+-            // issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
+-            //     ./issue2209full.cue:43:7
+-            //     ./issue2209full.cue:48:13
+-            //     ./issue2209full.cue:67:10
+-            //     ./issue2209full.cue:83:16
+-            //     ./issue2209full.cue:87:13
+-            //     ./issue2209full.cue:107:20
+-            // issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+-            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-            //     ./issue2209full.cue:43:7
+-            //     ./issue2209full.cue:48:13
+-            //     ./issue2209full.cue:55:16
+-            //     ./issue2209full.cue:71:4
+-            //     ./issue2209full.cue:72:13
+-            //     ./issue2209full.cue:92:13
+-            // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+-            //     ./issue2209full.cue:43:7
+-            //     ./issue2209full.cue:48:13
+-            //     ./issue2209full.cue:67:10
+-            //     ./issue2209full.cue:83:16
+-            //     ./issue2209full.cue:92:13
+-            //     ./issue2209full.cue:105:20
+-            // issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+-            //     ./issue2209full.cue:77:25
+-            minFoo: (_|_){
+-              // [eval] issue2209.full.Bar.resource.spec.minFoo: 2 errors in empty disjunction:
+-              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and 10 (mismatched types null and int):
+-              //     ./issue2209full.cue:43:7
+-              //     ./issue2209full.cue:48:13
+-              //     ./issue2209full.cue:55:16
+-              //     ./issue2209full.cue:71:4
+-              //     ./issue2209full.cue:72:13
+-              //     ./issue2209full.cue:92:13
+-              // issue2209.full.Bar.resource.spec.minFoo: conflicting values null and int (mismatched types null and int):
+-              //     ./issue2209full.cue:43:7
+-              //     ./issue2209full.cue:48:13
+-              //     ./issue2209full.cue:67:10
+-              //     ./issue2209full.cue:83:16
+-              //     ./issue2209full.cue:92:13
+-              //     ./issue2209full.cue:105:20
+-            }
+-            maxFoo: (_|_){
+-              // [eval] issue2209.full.Bar.resource.spec.maxFoo: 2 errors in empty disjunction:
+-              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and 20 (mismatched types null and int):
+-              //     ./issue2209full.cue:43:7
+-              //     ./issue2209full.cue:48:13
+-              //     ./issue2209full.cue:56:16
+-              //     ./issue2209full.cue:71:4
+-              //     ./issue2209full.cue:73:13
+-              //     ./issue2209full.cue:93:13
+-              // issue2209.full.Bar.resource.spec.maxFoo: conflicting values null and int (mismatched types null and int):
+-              //     ./issue2209full.cue:43:7
+-              //     ./issue2209full.cue:48:13
+-              //     ./issue2209full.cue:67:10
+-              //     ./issue2209full.cue:83:16
+-              //     ./issue2209full.cue:93:13
+-              //     ./issue2209full.cue:106:20
+-            }
+-            minBar: (_|_){
+-              // [eval] issue2209.full.Bar.resource.spec.minBar: undefined field: min:
+-              //     ./issue2209full.cue:77:25
+-            }
+-            maxBar: (_|_){
+-              // [eval] issue2209.full.Bar.resource.spec.maxBar: undefined field: max:
+-              //     ./issue2209full.cue:78:25
+-            }
+-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          }
+-          _X: (#struct){
+-            spec: (#struct){ |(*(#struct){
+-                bar: (#struct){
+-                }
+-                foo: (#struct){
+-                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+-                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+-                }
+-              }, (#struct){
+-                bar: (#struct){
+-                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+-                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+-                }
+-              }) }
+-          }
++          _X: (#struct){
++            spec: (#struct){
++              foo: (#struct){
++                min: (int){ |(*(int){ 10 }, (int){ int }) }
++                max: (int){ |(*(int){ 20 }, (int){ int }) }
++              }
++            }
++          }
++          spec: (#struct){ |(*(#struct){
++              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minBar?: (null){ null }
++              maxBar?: (null){ null }
++              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++              fuga?: (null){ null }
++            }, (#struct){
++              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minBar?: (null){ null }
++              maxBar?: (null){ null }
++              hoge?: (null){ null }
++              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            }) }
++        }
++      }
++      Bar: (#struct){
++        spec: (#struct){
++          bar: (#struct){
++            min: (int){ |(*(int){ 30 }, (int){ int }) }
++            max: (int){ |(*(int){ 40 }, (int){ int }) }
++          }
++        }
++        resource: (#struct){
++          _X: (#struct){
++            spec: (#struct){
++              bar: (#struct){
++                min: (int){ |(*(int){ 30 }, (int){ int }) }
++                max: (int){ |(*(int){ 40 }, (int){ int }) }
++              }
++            }
++          }
++          spec: (#struct){ |(*(#struct){
++              minFoo?: (null){ null }
++              maxFoo?: (null){ null }
++              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
++              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
++              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++              fuga?: (null){ null }
++            }, (#struct){
++              minFoo?: (null){ null }
++              maxFoo?: (null){ null }
++              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
++              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
++              hoge?: (null){ null }
++              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            }) }
+         }
+       }
+       #Abstract: (#struct){
+@@ -702,34 +894,34 @@
+             }
+           }) }
+         resource: (#struct){
+-          spec: (#struct){ |(*(#struct){
+-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-              minBar?: (null){ null }
+-              maxBar?: (null){ null }
+-              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-              fuga?: (null){ null }
+-            }, (#struct){
+-              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-              minBar?: (null){ null }
+-              maxBar?: (null){ null }
+-              hoge?: (null){ null }
+-              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            }) }
+-          _X: (#struct){
+-            spec: (#struct){ |(*(#struct){
+-                foo: (#struct){
+-                  min: (int){ |(*(int){ 10 }, (int){ int }) }
+-                  max: (int){ |(*(int){ 20 }, (int){ int }) }
+-                }
+-              }, (#struct){
+-                bar: (#struct){
+-                  min: (int){ |(*(int){ 30 }, (int){ int }) }
+-                  max: (int){ |(*(int){ 40 }, (int){ int }) }
+-                }
+-              }) }
+-          }
++          _X: (#struct){
++            spec: (#struct){ |(*(#struct){
++                foo: (#struct){
++                  min: (int){ |(*(int){ 10 }, (int){ int }) }
++                  max: (int){ |(*(int){ 20 }, (int){ int }) }
++                }
++              }, (#struct){
++                bar: (#struct){
++                  min: (int){ |(*(int){ 30 }, (int){ int }) }
++                  max: (int){ |(*(int){ 40 }, (int){ int }) }
++                }
++              }) }
++          }
++          spec: (#struct){ |(*(#struct){
++              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minBar?: (null){ null }
++              maxBar?: (null){ null }
++              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++              fuga?: (null){ null }
++            }, (#struct){
++              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minBar?: (null){ null }
++              maxBar?: (null){ null }
++              hoge?: (null){ null }
++              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            }) }
+         }
+       }
+       _#Spec: (#struct){ |(*(#struct){
+@@ -756,65 +948,37 @@
+         }
+       }
+       _Thing: (#struct){
+-        spec: (#struct){ |(*(#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            fuga?: (null){ null }
+-          }, *(#struct){
+-            minFoo?: (null){ null }
+-            maxFoo?: (null){ null }
+-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            fuga?: (null){ null }
+-          }, (#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: (null){ null }
+-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          }, (#struct){
+-            minFoo?: (null){ null }
+-            maxFoo?: (null){ null }
+-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+-            hoge?: (null){ null }
+-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          }) }
+         _X: (_){ _ }
++        spec: (#struct){ |((#struct){
++            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++            minBar?: (null){ null }
++            maxBar?: (null){ null }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          }, (#struct){
++            minFoo?: (null){ null }
++            maxFoo?: (null){ null }
++            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
++            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          }) }
+       }
+       #Constrained: (#struct){
+-        spec: (#struct){ |(*(#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            fuga?: (null){ null }
+-          }, *(#struct){
+-            minFoo?: (null){ null }
+-            maxFoo?: (null){ null }
+-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-            fuga?: (null){ null }
+-          }, (#struct){
+-            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+-            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+-            minBar?: (null){ null }
+-            maxBar?: (null){ null }
+-            hoge?: (null){ null }
+-            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+-          }, (#struct){
+-            minFoo?: (null){ null }
+-            maxFoo?: (null){ null }
+-            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+-            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+-            hoge?: (null){ null }
++        spec: (#struct){ |((#struct){
++            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++            minBar?: (null){ null }
++            maxBar?: (null){ null }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++          }, (#struct){
++            minFoo?: (null){ null }
++            maxFoo?: (null){ null }
++            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
++            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+             fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+           }) }
+       }
+@@ -862,7 +1026,10 @@
+         }
+       }
+       form1040: (#list){
+-        0: (int){ 3 }
++        0: (_|_){
++          // [incomplete] issue2246.full.form1040.0: unresolved disjunction {fooID:"00-0000001",common:3} | {fooID:"00-0000001",barID:string,common:3} (type struct):
++          //     ./issue2246.cue:38:29
++        }
+       }
+       #K1: (#struct){
+         #_base: (#struct){
+@@ -869,19 +1036,19 @@
+           common: (int){ 3 }
+         }
+         #FormFoo: (#struct){
+-          common: (int){ 3 }
+-          fooID: (string){ string }
++          fooID: (string){ string }
++          common: (int){ 3 }
+         }
+         #FormBar: (#struct){
+-          common: (int){ 3 }
+-          barID: (string){ string }
++          barID: (string){ string }
++          common: (int){ 3 }
+         }
+         #Form: (#struct){ |((#struct){
+-            common: (int){ 3 }
+             fooID: (string){ string }
+-          }, (#struct){
+-            common: (int){ 3 }
++            common: (int){ 3 }
++          }, (#struct){
+             barID: (string){ string }
++            common: (int){ 3 }
+           }) }
+       }
+       #Input: (#struct){
+@@ -914,11 +1081,6 @@
+       }
+       #Metric: (#struct){ |((#struct){
+           id: (string){ string }
+-          avg: (number){ number }
+-        }, (#struct){
+-          id: (string){ string }
+-        }, (#struct){
+-          avg: (number){ number }
+         }, (#struct){
+         }) }
+       #IDSource: (#struct){
+@@ -930,35 +1092,43 @@
+     }
+     full: (struct){
+       metrics: (#list){
+-        0: (#struct){
+-          id: (string){ "foo" }
+-          avg: (int){ 60 }
+-        }
+-        1: (#struct){
+-          id: (string){ "bar" }
+-          value: (int){ 80 }
+-        }
+-        2: (#struct){
+-          uri: (string){ "baz" }
+-          avg: (int){ 70 }
+-        }
+-        3: (#struct){
+-          uri: (string){ "qux" }
+-          value: (int){ 90 }
+-        }
+-      }
+-      #Metric: (#struct){ |((#struct){
+-          id: (string){ string }
+-          avg: (number){ number }
+-        }, (#struct){
+-          id: (string){ string }
+-          value: (number){ number }
+-        }, (#struct){
+-          uri: (string){ string }
+-          avg: (number){ number }
+-        }, (#struct){
+-          uri: (string){ string }
+-          value: (number){ number }
++        0: (#struct){ |((#struct){
++            id: (string){ "foo" }
++            avg: (int){ 60 }
++          }, (#struct){
++            id: (string){ "foo" }
++            avg: (int){ 60 }
++            uri: (string){ string }
++          }) }
++        1: (#struct){ |((#struct){
++            id: (string){ "bar" }
++            value: (int){ 80 }
++          }, (#struct){
++            id: (string){ "bar" }
++            value: (int){ 80 }
++            uri: (string){ string }
++          }) }
++        2: (#struct){ |((#struct){
++            uri: (string){ "baz" }
++            avg: (int){ 70 }
++            id: (string){ string }
++          }, (#struct){
++            uri: (string){ "baz" }
++            avg: (int){ 70 }
++          }) }
++        3: (#struct){ |((#struct){
++            uri: (string){ "qux" }
++            value: (int){ 90 }
++            id: (string){ string }
++          }, (#struct){
++            uri: (string){ "qux" }
++            value: (int){ 90 }
++          }) }
++      }
++      #Metric: (#struct){ |((#struct){
++          id: (string){ string }
++        }, (#struct){
++          uri: (string){ string }
+         }) }
+       #Source: (#struct){ |((#struct){
+           id: (string){ string }
+-- diff/todo/p0 --
+Many errors. Fix cross product first.
 -- out/eval --
 Errors:
 issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:

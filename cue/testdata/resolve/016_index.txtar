@@ -101,6 +101,165 @@ Retain: 16
 Unifications: 34
 Conjuncts:    48
 Disjuncts:    46
+-- out/evalalpha --
+Errors:
+c: undefined field: "3":
+    ./in.cue:3:20
+d: index out of range [0] with length 0:
+    ./in.cue:4:16
+e1: undefined field: "":
+    ./in.cue:6:9
+e2: invalid operand 2 (found int, want list or struct):
+    ./in.cue:7:5
+e3: invalid index true (invalid type bool):
+    ./in.cue:8:5
+    ./in.cue:8:8
+e4: index out of range [3] with length 3:
+    ./in.cue:9:15
+e5: invalid index -1 (index must be non-negative):
+    ./in.cue:10:5
+    ./in.cue:10:15
+e6: index out of range [1] with length 0:
+    ./in.cue:11:16
+e7: index out of range [3] with length 3:
+    ./in.cue:12:15
+e8: invalid index -1 (index must be non-negative):
+    ./in.cue:13:5
+    ./in.cue:13:15
+e9: index out of range [1] with length 0:
+    ./in.cue:14:16
+
+Result:
+(_|_){
+  // [eval]
+  a: (int){ 2 }
+  b: (string){ "bar" }
+  c: (_|_){
+    // [eval] c: undefined field: "3":
+    //     ./in.cue:3:20
+  }
+  d: (_|_){
+    // [eval] d: index out of range [0] with length 0:
+    //     ./in.cue:4:16
+  }
+  l: (#list){
+  }
+  e1: (_|_){
+    // [eval] e1: undefined field: "":
+    //     ./in.cue:6:9
+  }
+  e2: (_|_){
+    // [eval] e2: invalid operand 2 (found int, want list or struct):
+    //     ./in.cue:7:5
+  }
+  e3: (_|_){
+    // [eval] e3: invalid index true (invalid type bool):
+    //     ./in.cue:8:5
+    //     ./in.cue:8:8
+  }
+  e4: (_|_){
+    // [eval] e4: index out of range [3] with length 3:
+    //     ./in.cue:9:15
+  }
+  e5: (_|_){
+    // [eval] e5: invalid index -1 (index must be non-negative):
+    //     ./in.cue:10:5
+    //     ./in.cue:10:15
+  }
+  e6: (_|_){
+    // [eval] e6: index out of range [1] with length 0:
+    //     ./in.cue:11:16
+  }
+  e7: (_|_){
+    // [eval] e7: index out of range [3] with length 3:
+    //     ./in.cue:12:15
+  }
+  e8: (_|_){
+    // [eval] e8: invalid index -1 (index must be non-negative):
+    //     ./in.cue:13:5
+    //     ./in.cue:13:15
+  }
+  e9: (_|_){
+    // [eval] e9: index out of range [1] with length 0:
+    //     ./in.cue:14:16
+  }
+  def: (struct){
+    a: (int){ 1 }
+    #b: (int){ 3 }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+ Errors:
+-c: invalid list index "3" (type string):
++c: undefined field: "3":
+     ./in.cue:3:20
+ d: index out of range [0] with length 0:
+     ./in.cue:4:16
+-e1: invalid list index "" (type string):
++e1: undefined field: "":
+     ./in.cue:6:9
+ e2: invalid operand 2 (found int, want list or struct):
+     ./in.cue:7:5
+@@ -15,7 +15,7 @@
+ e5: invalid index -1 (index must be non-negative):
+     ./in.cue:10:5
+     ./in.cue:10:15
+-e6: invalid list index 1 (out of bounds):
++e6: index out of range [1] with length 0:
+     ./in.cue:11:16
+ e7: index out of range [3] with length 3:
+     ./in.cue:12:15
+@@ -22,7 +22,7 @@
+ e8: invalid index -1 (index must be non-negative):
+     ./in.cue:13:5
+     ./in.cue:13:15
+-e9: invalid list index 1 (out of bounds):
++e9: index out of range [1] with length 0:
+     ./in.cue:14:16
+ 
+ Result:
+@@ -31,7 +31,7 @@
+   a: (int){ 2 }
+   b: (string){ "bar" }
+   c: (_|_){
+-    // [eval] c: invalid list index "3" (type string):
++    // [eval] c: undefined field: "3":
+     //     ./in.cue:3:20
+   }
+   d: (_|_){
+@@ -41,7 +41,7 @@
+   l: (#list){
+   }
+   e1: (_|_){
+-    // [eval] e1: invalid list index "" (type string):
++    // [eval] e1: undefined field: "":
+     //     ./in.cue:6:9
+   }
+   e2: (_|_){
+@@ -63,7 +63,7 @@
+     //     ./in.cue:10:15
+   }
+   e6: (_|_){
+-    // [eval] e6: invalid list index 1 (out of bounds):
++    // [eval] e6: index out of range [1] with length 0:
+     //     ./in.cue:11:16
+   }
+   e7: (_|_){
+@@ -76,7 +76,7 @@
+     //     ./in.cue:13:15
+   }
+   e9: (_|_){
+-    // [eval] e9: invalid list index 1 (out of bounds):
++    // [eval] e9: index out of range [1] with length 0:
+     //     ./in.cue:14:16
+   }
+   def: (struct){
+-- diff/todo/p3 --
+Error messages slightly different.
 -- out/eval --
 Errors:
 c: invalid list index "3" (type string):

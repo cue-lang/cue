@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d6d738c_3522e9a7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-20T10:57:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0db93b84_3e42e2f6",
+      "revId": "a94bb1367016e796b94f417235977016e84a3c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95c5b983_b117afdb",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-20T10:50:00Z",
       "side": 1,
       "message": "personally I\u0027d also copy-paste the commit message summary of why `cue mod init` should be adding language.version here - so that we remember why this test is important",
+      "revId": "a94bb1367016e796b94f417235977016e84a3c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cfdb4403_2175a056",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_with_version.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-20T10:57:40Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "95c5b983_b117afdb",
       "revId": "a94bb1367016e796b94f417235977016e84a3c09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

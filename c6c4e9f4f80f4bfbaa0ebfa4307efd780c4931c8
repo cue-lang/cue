@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d75e51e9_9386e879",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-20T12:46:22Z",
+      "side": 1,
+      "message": "LGTM modulo the CI test failure, thanks!",
+      "revId": "c6c4e9f4f80f4bfbaa0ebfa4307efd780c4931c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

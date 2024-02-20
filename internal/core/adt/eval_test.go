@@ -78,10 +78,6 @@ func TestEvalAlpha(t *testing.T) {
 		"cycle/evaluate":           "hang",
 		"disjunctions/elimination": "panic (nil pointer)",
 
-		// unsupported in dev version (list related)
-		"benchmarks/sort":    "unsupported",
-		"builtins/list/sort": "unsupported",
-
 		// Later
 		"benchmarks/issue2176": "fails to remove errors",
 	}

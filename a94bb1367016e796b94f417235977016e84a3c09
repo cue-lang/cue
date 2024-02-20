@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0db93b84_3e42e2f6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-20T10:50:00Z",
+      "side": 1,
+      "message": "please add some context. in particular, it\u0027s important to note how `cue mod tidy` should be a no-op when run immediately after `cue mod init`.",
+      "revId": "a94bb1367016e796b94f417235977016e84a3c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95c5b983_b117afdb",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_with_version.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-20T10:50:00Z",
+      "side": 1,
+      "message": "personally I\u0027d also copy-paste the commit message summary of why `cue mod init` should be adding language.version here - so that we remember why this test is important",
+      "revId": "a94bb1367016e796b94f417235977016e84a3c09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

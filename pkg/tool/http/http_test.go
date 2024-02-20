@@ -53,7 +53,7 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 
 func TestTLS(t *testing.T) {
 	s := newTLSServer()
-	defer s.Close()
+	t.Cleanup(s.Close)
 
 	v1 := parse(t, "tool/http.Get", fmt.Sprintf(`{url: "%s"}`, s.URL))
 	_, err := (*httpCmd).Run(nil, &task.Context{Obj: v1})

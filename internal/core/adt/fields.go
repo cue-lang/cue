@@ -314,7 +314,7 @@ func (v *Vertex) assignConjunct(root *closeContext, c Conjunct, check, checkClos
 
 	arc := root.src
 
-	pos = len(arc.Conjuncts) - 1
+	pos = len(arc.Conjuncts)
 
 	added = !check || !arc.hasConjunct(c)
 	if added {
@@ -396,7 +396,7 @@ func (cc *closeContext) linkNotify(dst *Vertex, key *closeContext, c CycleInfo) 
 func (cc *closeContext) assignConjunct(root *closeContext, c Conjunct, check, checkClosed bool) (arc *closeContext, pos int, added bool) {
 	arc = cc.getKeyedCC(root, c.CloseInfo.CycleInfo, checkClosed)
 
-	pos = len(*arc.group) - 1
+	pos = len(*arc.group)
 
 	c.CloseInfo.cc = nil
 	added = !check || !hasConjunct(*arc.group, c)

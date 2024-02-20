@@ -142,6 +142,9 @@ const (
 	// TASK dependencies are used to track the completion of a task.
 	TASK
 
+	// DISJUNCT is used to mark an incomplete disjunct.
+	DISJUNCT
+
 	// EVAL tracks that the conjunct associated with a closeContext has been
 	// inserted using scheduleConjunct. A closeContext may not be deleted
 	// as long as the conjunct has not been evaluated yet.
@@ -175,6 +178,8 @@ func (k depKind) String() string {
 		return "NOTIFY"
 	case TASK:
 		return "TASK"
+	case DISJUNCT:
+		return "DISJUNCT"
 	case EVAL:
 		return "EVAL"
 	case ROOT:
@@ -470,7 +475,7 @@ func (m *mermaidContext) task(d *ccDep) string {
 		fmt.Fprintf(vc.tasks, "subgraph %s_tasks[tasks]\n", m.vertexID(v))
 	}
 
-	if v != d.task.node.node {
+	if d.task != nil && v != d.task.node.node {
 		panic("inconsistent task")
 	}
 	taskID := fmt.Sprintf("%s_%d", m.vertexID(v), d.taskID)
@@ -539,14 +544,17 @@ func (m *mermaidContext) cc(cc *closeContext) {
 				return
 			}
 			fallthrough
-		case ARC, NOTIFY:
+		case ARC, NOTIFY, DISJUNCT:
 			w = global
 			indentLevel = 1
 			name = m.pstr(d.dependency)
 
 		case TASK:
 			w = node
-			taskID := m.task(d)
+			taskID := "disjunct"
+			if d.task != nil {
+				taskID = m.task(d)
+			}
 			name = fmt.Sprintf("%s((%d))", taskID, d.taskID)
 		case ROOT, INIT:
 			w = node
@@ -614,7 +622,7 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 	w.WriteString(open)
 	w.WriteString("cc")
 	if cc.conjunctCount > 0 {
-		fmt.Fprintf(w, " c:%d", cc.conjunctCount)
+		fmt.Fprintf(w, " c:%d: d:%d", cc.conjunctCount, cc.disjunctCount)
 	}
 	indentOnNewline(w, 3)
 	w.WriteString(ptr)
@@ -634,7 +642,14 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 
 	w.WriteString(close)
 
-	if cc.conjunctCount > 0 {
+	switch {
+	case cc.conjunctCount == 0:
+	case cc.conjunctCount <= cc.disjunctCount:
+		// TODO: Extra checks for disjunctions?
+		// E.g.: cc.src is not a disjunction
+	default:
+		// If cc.conjunctCount > cc.disjunctCount.
+		// TODO: count the number of non-decremented DISJUNCT dependencies.
 		fmt.Fprintf(w, ":::err")
 		if cc.src == m.v {
 			m.hasError = true

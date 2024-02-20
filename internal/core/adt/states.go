@@ -166,6 +166,10 @@ const (
 	//
 	subFieldsProcessed
 
+	// disjunctionTask indicates that this task is a disjunction. This is
+	// used to trigger finalization of disjunctions.
+	disjunctionTask
+
 	leftOfMaxCoreCondition
 
 	finalStateKnown condition = leftOfMaxCoreCondition - 1
@@ -192,6 +196,9 @@ const (
 		scalarKnown |
 		valueKnown |
 		fieldConjunctsKnown
+
+	// genericDisjunction is used to record processDisjunction tasks.
+	genericDisjunction = genericConjunct | disjunctionTask
 
 	// a fieldConjunct is on that only adds a new field to the struct.
 	fieldConjunct = allTasksCompleted |

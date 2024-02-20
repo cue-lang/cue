@@ -25,6 +25,7 @@ import (
 
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/module"
+	gomodule "golang.org/x/mod/module"
 )
 
 func newModCmd(c *Command) *cobra.Command {
@@ -125,7 +126,11 @@ func runModInit(cmd *Command, args []string) (err error) {
 	}
 	mf := &modfile.File{
 		Module: modulePath,
-		// TODO Language
+	}
+	if vers := versionForModFile(); vers != "" {
+		mf.Language = &modfile.Language{
+			Version: vers,
+		}
 	}
 
 	err = os.Mkdir(mod, 0755)
@@ -183,4 +188,18 @@ func backport(mod, cwd string) error {
 	}
 
 	return nil
+}
+
+func versionForModFile() string {
+	bi, _ := readBuildInfo()
+	version := cueVersion(bi)
+	if gomodule.IsPseudoVersion(version) {
+		// If we have a version like v0.7.1-0.20240130142347-7855e15cb701
+		// we want it to turn into the base version (v0.7.0 in that example).
+		// If there's no base version (e.g. v0.0.0-...) then PseudoVersionBase
+		// will return the empty string, which is exactly what we want
+		// because we don't want to put v0.0.0 in a module.cue file.
+		version, _ = gomodule.PseudoVersionBase(version)
+	}
+	return version
 }

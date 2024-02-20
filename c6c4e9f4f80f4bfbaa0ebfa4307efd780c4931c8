@@ -16,6 +16,24 @@
       "message": "LGTM modulo the CI test failure, thanks!",
       "revId": "c6c4e9f4f80f4bfbaa0ebfa4307efd780c4931c8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a514c28_4a86159e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-20T13:08:50Z",
+      "side": 1,
+      "message": "Per our Discord exchange, I\u0027ve undone the cue.mod/module.cue change, so that internal/ci works again without the experiment enabled.",
+      "parentUuid": "d75e51e9_9386e879",
+      "revId": "c6c4e9f4f80f4bfbaa0ebfa4307efd780c4931c8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

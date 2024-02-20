@@ -1,0 +1,4 @@
+! exec cue mod tidy
+cmp stderr want-stderr
+-- want-stderr --
+modules experiment not enabled (enable with CUE_EXPERIMENT=modules)

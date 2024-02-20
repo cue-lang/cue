@@ -56,7 +56,7 @@ func runModUpload(cmd *Command, args []string) error {
 		return err
 	}
 	if resolver == nil {
-		return fmt.Errorf("no registry configured to publish to")
+		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
 	}
 	modRoot, err := findModuleRoot()
 	if err != nil {

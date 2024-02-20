@@ -61,7 +61,7 @@ func runModTidy(cmd *Command, args []string) error {
 		return err
 	}
 	if reg == nil {
-		return fmt.Errorf("no module registry configured")
+		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
 	}
 	ctx := context.Background()
 	modRoot, err := findModuleRoot()

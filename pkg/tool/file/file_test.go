@@ -16,7 +16,6 @@ package file
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -69,20 +68,14 @@ func TestRead(t *testing.T) {
 }
 
 func TestAppend(t *testing.T) {
-	f, err := ioutil.TempFile("", "filetest")
-	if err != nil {
-		t.Fatal(err)
-	}
-	name := f.Name()
-	defer os.Remove(name)
-	f.Close()
+	name := filepath.Join(t.TempDir(), "file")
 	name = filepath.ToSlash(name)
 
 	v := parse(t, "tool/file.Append", fmt.Sprintf(`{
 		filename: "%s"
 		contents: "This is a test."
 	}`, name))
-	_, err = (*cmdAppend).Run(nil, &task.Context{Obj: v})
+	_, err := (*cmdAppend).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -98,20 +91,14 @@ func TestAppend(t *testing.T) {
 }
 
 func TestCreate(t *testing.T) {
-	f, err := ioutil.TempFile("", "filetest")
-	if err != nil {
-		t.Fatal(err)
-	}
-	name := f.Name()
-	defer os.Remove(name)
-	f.Close()
+	name := filepath.Join(t.TempDir(), "file")
 	name = filepath.ToSlash(name)
 
 	v := parse(t, "tool/file.Create", fmt.Sprintf(`{
 		filename: "%s"
 		contents: "This is a test."
 	}`, name))
-	_, err = (*cmdCreate).Run(nil, &task.Context{Obj: v})
+	_, err := (*cmdCreate).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -140,16 +127,12 @@ func TestGlob(t *testing.T) {
 }
 
 func TestMkdir(t *testing.T) {
-	baseDir, err := os.MkdirTemp("", "")
-	if err != nil {
-		t.Fatal(err)
-	}
-	defer os.RemoveAll(baseDir)
+	baseDir := t.TempDir()
 
 	// simple dir creation
 	d1 := filepath.Join(baseDir, "foo")
 	v := parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: #"%s"#}`, d1))
-	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
+	_, err := (*cmdMkdir).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -185,7 +168,7 @@ func TestMkdir(t *testing.T) {
 	}
 
 	// file at same path
-	f, err := ioutil.TempFile(baseDir, "")
+	f, err := os.CreateTemp(baseDir, "")
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -207,7 +190,7 @@ func TestMkdirTemp(t *testing.T) {
 		t.Fatal("no directory path returned")
 	}
 	path := r.(map[string]interface{})["path"].(string)
-	defer os.RemoveAll(path)
+	t.Cleanup(func() { os.RemoveAll(path) })
 	fi, err := os.Stat(path)
 	if err != nil {
 		t.Fatal(err)

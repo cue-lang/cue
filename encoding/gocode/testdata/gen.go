@@ -15,7 +15,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"log"
 	"os"
 	"path/filepath"
@@ -27,7 +26,7 @@ import (
 )
 
 func main() {
-	dirs, err := ioutil.ReadDir("testdata")
+	dirs, err := os.ReadDir("testdata")
 	if err != nil {
 		log.Fatal(err)
 	}

@@ -66,7 +66,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			id.cc = n.node.rootCloseContext()
 		}
 		if id.cc == cc {
-			panic("inconsistent state")
+			panic("inconsistent state: same closeContext")
 		}
 		var t closeNodeType
 		if c.CloseInfo.FromDef {
@@ -84,7 +84,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		}
 
 		if id.cc.src != n.node {
-			panic("inconsistent state")
+			panic("inconsistent state: nodes differ")
 		}
 	default:
 
@@ -98,6 +98,10 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		id.CycleInfo = c.CloseInfo.CycleInfo
 	}
 
+	// 	n.scheduleConjunctRaw(c, id)
+	// }
+
+	// func (n *nodeContext) scheduleConjunctRaw(c Conjunct, id CloseInfo) {
 	if id.cc.needsCloseInSchedule != nil {
 		dep := id.cc.needsCloseInSchedule
 		id.cc.needsCloseInSchedule = nil
@@ -163,8 +167,23 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.scheduleTask(handleListLit, env, x, id)
 
 	case *DisjunctionExpr:
-		panic("unimplemented")
-		// n.addDisjunction(env, x, id)
+		// TODO(perf): reuse envDisjunct values so that we can also reuse the
+		// disjunct slice.
+		d := envDisjunct{
+			env:     env,
+			cloneID: id,
+			src:     x,
+			expr:    x,
+		}
+		for i, dv := range x.Values {
+			d.disjuncts = append(d.disjuncts, disjunct{
+				pos:       i,
+				expr:      dv.Val,
+				isDefault: dv.Default,
+				mode:      mode(x.HasDefaults, dv.Default),
+			})
+		}
+		n.scheduleDisjunction(d)
 
 	case *Comprehension:
 		// always a partial comprehension.
@@ -351,21 +370,37 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		defer dc.decDependent(n.ctx, DEFER, nil)
 	}
 
-	if state := arc.getState(n.ctx); state != nil {
-		state.addNotify2(n.node, closeInfo)
+	// XXX: Maybe do regular here, and dynamic, including disjunctions, below.
+
+	// if !n.node.nonRooted || n.node.IsDynamic {
+	// 	if state := arc.getState(n.ctx); state != nil {
+	// 		// n.completeNodeTasks()
+	// 	}
+	// }
+	if d, ok := arc.BaseValue.(*Disjunction); ok && false {
+		n.scheduleConjunct(MakeConjunct(c.Env, d, closeInfo), closeInfo)
+	} else {
+		for i := 0; i < len(arc.Conjuncts); i++ {
+			c := arc.Conjuncts[i]
+
+			// Note that we are resetting the tree here. We hereby assume that
+			// closedness conflicts resulting from unifying the referenced arc were
+			// already caught there and that we can ignore further errors here.
+			// c.CloseInfo = closeInfo
+
+			// We can use the original, but we know it will not be used
+
+			n.scheduleConjunct(c, closeInfo)
+		}
+
 	}
 
-	for i := 0; i < len(arc.Conjuncts); i++ {
-		c := arc.Conjuncts[i]
-
-		// Note that we are resetting the tree here. We hereby assume that
-		// closedness conflicts resulting from unifying the referenced arc were
-		// already caught there and that we can ignore further errors here.
-		// c.CloseInfo = closeInfo
-
-		// We can use the original, but we know it will not be used
-
-		n.scheduleConjunct(c, closeInfo)
+	if !n.node.nonRooted || n.node.IsDynamic {
+		// TODO: Make a distinction between initializing state and just allowing
+		// notifications to be registered.
+		if state := arc.getState(n.ctx); state != nil {
+			state.addNotify2(n.node, closeInfo)
+		}
 	}
 }
 
@@ -482,7 +517,23 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 	switch x := v.(type) {
 	case *Disjunction:
-		n.addDisjunctionValue(env, x, id)
+		// TODO(perf)(perf): reuse envDisjunct values so that we can also reuse the
+		// disjunct slice.
+		d := envDisjunct{
+			env:     env,
+			cloneID: id,
+			src:     x,
+			value:   x,
+		}
+		for i, dv := range x.Values {
+			d.disjuncts = append(d.disjuncts, disjunct{
+				pos:       i,
+				expr:      dv,
+				isDefault: i < x.NumDefaults,
+				mode:      mode(x.HasDefaults, i < x.NumDefaults),
+			})
+		}
+		n.scheduleDisjunction(d)
 
 	case *Conjunction:
 		for _, x := range x.Values {

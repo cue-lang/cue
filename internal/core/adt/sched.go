@@ -561,10 +561,19 @@ type runner struct {
 	// needes indicates which states of the corresponding node need to be
 	// completed before this task can be run.
 	needs condition
+
+	// a lower priority indicates a preference to run a task before tasks
+	// of a higher priority.
+	priority int8
 }
 
 type task struct {
 	state taskState
+
+	// TODO: defunct marker: task is copied into disjunctions, but cannot yet
+	// be terminated.
+	parent *task // for disjunctions to terminate parent task if disjunction
+	// is picked.
 
 	completes condition // cycles may alter the completion mask. TODO: is this still true?
 
@@ -575,6 +584,9 @@ type task struct {
 	// the scheduler, which conditions it is blocking on, and the stack of
 	// tasks executed leading to the block.
 
+	// blockedOn cannot be needed in a clone for a disjunct, because as long
+	// as the disjunct is unresolved, its value cannot contribute to another
+	// scheduler.
 	blockedOn      *scheduler
 	blockCondition condition
 	blockStack     []*task // TODO: use; for error reporting.
@@ -623,6 +635,15 @@ func (s *scheduler) insertTask(t *task) {
 		}
 	}
 	s.tasks = append(s.tasks, t)
+
+	// sort by priority.
+	for i := len(s.tasks) - 1; i > s.taskPos; i-- {
+		if s.tasks[i-1].run.priority <= s.tasks[i].run.priority {
+			break
+		}
+		s.tasks[i], s.tasks[i-1] = s.tasks[i-1], s.tasks[i]
+	}
+
 	if s.completed&needs != needs {
 		t.waitFor(s, needs)
 	}

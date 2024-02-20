@@ -51,6 +51,24 @@
       "parentUuid": "8a232937_d3a79624",
       "revId": "087f60729f8cb03731abbdcbbd7ee9fe0ab042fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "107d0c17_1f3b953d",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 119,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-20T10:09:32Z",
+      "side": 1,
+      "message": "Good point, we also have `cue.mod`. Done.",
+      "parentUuid": "d4c2cae1_78ffd9ef",
+      "revId": "087f60729f8cb03731abbdcbbd7ee9fe0ab042fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

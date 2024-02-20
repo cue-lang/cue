@@ -249,7 +249,7 @@ type Vertex struct {
 func (v *Vertex) rootCloseContext() *closeContext {
 	if v.cc == nil {
 		v.cc = &closeContext{
-			group:           &ConjunctGroup{},
+			group:           (*ConjunctGroup)(&v.Conjuncts),
 			parent:          nil,
 			src:             v,
 			parentConjuncts: v,

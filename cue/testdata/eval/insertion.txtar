@@ -258,16 +258,15 @@ Disjuncts:    73
         y: (int){ 5 }
       }
       v: (int){ 1 }
-      w: (int){ 2 }
       x: (int){ 2 }
       y: (int){ 5 }
+      w: (int){ 2 }
     }
   }
   recursive: (struct){
     t1: (struct){
       e: (struct){
         f: (int){ 1 }
-        g: (int){ 1 }
       }
       c: (struct){
         d: (struct){
@@ -292,7 +291,6 @@ Disjuncts:    73
         }
         g: (int){ 1 }
       }
-      g: (int){ 1 }
     }
   }
   embeddedFunctionalExpr: (string){
@@ -308,19 +306,39 @@ Disjuncts:    73
 diff old new
 --- old
 +++ new
-@@ -47,10 +47,10 @@
+@@ -47,9 +47,9 @@
          v: (int){ 1 }
          y: (int){ 5 }
        }
--      x: (int){ 2 }
--      y: (int){ 5 }
-       v: (int){ 1 }
++      v: (int){ 1 }
+       x: (int){ 2 }
+       y: (int){ 5 }
+-      v: (int){ 1 }
        w: (int){ 2 }
-+      x: (int){ 2 }
-+      y: (int){ 5 }
      }
    }
-   recursive: (struct){
+@@ -57,7 +57,6 @@
+     t1: (struct){
+       e: (struct){
+         f: (int){ 1 }
+-        g: (int){ 1 }
+       }
+       c: (struct){
+         d: (struct){
+@@ -82,7 +81,6 @@
+         }
+         g: (int){ 1 }
+       }
+-      g: (int){ 1 }
+     }
+   }
+   embeddedFunctionalExpr: (string){
+-- diff/todo/p0 --
+Dropped fields: this is a result of registering for notification after
+inserting conjuncts, instead of before it. This change was made to avoid
+forcing adding a level of conjunction insertion unnecessarily. To fix this
+we should uncouple adding notification from insertion.
+See scheduleVertexConjuncts in conjuncts.go.
 -- diff/todo/p3 --
 Reordering.
 -- out/compile --

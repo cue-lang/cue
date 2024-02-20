@@ -111,10 +111,14 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	// So this condition is very likely to trigger. If for some reason the
 	// parent has not been processed yet, we could attempt to process more
 	// of its tasks to increase the chances of being able to find the
-	// information we are looking for here. For now we just continue as is,
-	// though.
+	// information we are looking for here. For now we just continue as is.
+	//
 	// For dynamic nodes, the parent only exists to provide a path context.
-	if v.Label.IsLet() || v.IsDynamic || v.Parent.allChildConjunctsKnown() {
+	//
+	// Note that if mode is final, we will guarantee that the conditions for
+	// this if clause are met down the line. So we assume this is already the
+	// case and set the signal accordingly if so.
+	if v.Label.IsLet() || v.IsDynamic || v.Parent.allChildConjunctsKnown() || mode == finalize {
 		n.signal(allAncestorsProcessed)
 	}
 
@@ -140,6 +144,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	case n.meets(nodeOnlyNeeds):
 		// pass through next phase.
 	case mode != finalize:
+		// TODO: disjunctions may benefit from evaluation as much prematurely
+		// as possible, as this increases the chances of premature failure.
+		// We should consider doing a recursive "attemptOnly" evaluation here.
 		return false
 	}
 
@@ -150,7 +157,9 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		n.updateNodeType(StructKind, n.aStruct, n.aStructID)
 	}
 
-	n.validateValue(finalized)
+	// TODO: rewrite to use mode when we get rid of old evaluator.
+	state := finalized
+	n.validateValue(state)
 
 	if err, ok := n.node.BaseValue.(*Bottom); ok {
 		for _, arc := range n.node.Arcs {
@@ -185,13 +194,18 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 		switch {
 		case assertStructuralCycle(n):
+		// TODO: consider bailing on error if n.errs != nil.
 		case n.completeAllArcs(needs, mode):
 		}
 
-		n.signal(subFieldsProcessed)
+		if mode == finalize {
+			n.signal(subFieldsProcessed)
+		}
 
 		if v.BaseValue == nil {
-			v.BaseValue = n.getValidators(finalized)
+			// TODO: this seems to not be possible. Possibly remove.
+			state := finalized
+			v.BaseValue = n.getValidators(state)
 		}
 		if v := n.node.Value(); v != nil && IsConcrete(v) {
 			// Ensure that checks are not run again when this value is used
@@ -220,10 +234,16 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		n.node.BaseValue = err
 	}
 
+	if mode == attemptOnly {
+		return n.meets(needs)
+	}
+
 	if mask := n.completed & needs; mask != 0 {
 		// TODO: phase3: validation
 		n.signal(mask)
 	}
+
+	n.finalizeDisjunctions()
 
 	// validationCompleted
 	if n.completed&(subFieldsProcessed) != 0 {
@@ -363,7 +383,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		a := n.node.Arcs[n.arcPos]
 		n.arcPos++
 
-		if !a.unify(n.ctx, needs, finalize) {
+		if !a.unify(n.ctx, needs, mode) {
 			success = false
 		}
 

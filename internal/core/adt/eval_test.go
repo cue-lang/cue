@@ -134,8 +134,7 @@ func skipFiles(a ...*ast.File) (reason string) {
 
 func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) (errorCount int) {
 	a := t.Instance()
-	// TODO: use version once we implement disjunctions.
-	r := runtime.NewVersioned(internal.DefaultVersion)
+	r := runtime.NewVersioned(version)
 
 	v, err := r.Build(nil, a)
 	if err != nil {

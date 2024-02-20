@@ -27,7 +27,7 @@ var (
 	handleComprehension     *runner
 	handleListLit           *runner
 	handleListVertex        *runner
-	handleDisjunction       *runner
+	handleDisjunctions      *runner
 )
 
 // Use init to avoid a (spurious?) cyclic dependency in Go.
@@ -68,6 +68,12 @@ func init() {
 		f:         processListVertex,
 		completes: fieldConjunct,
 		needs:     listTypeKnown,
+	}
+	handleDisjunctions = &runner{
+		name:      "Disjunctions",
+		f:         processDisjunctions,
+		completes: genericDisjunction,
+		priority:  1,
 	}
 }
 
@@ -163,6 +169,17 @@ func processComprehension(ctx *OpContext, t *task, mode runMode) {
 	err := n.processComprehension(y, 0)
 	t.err = CombineErrors(nil, t.err, err)
 	t.comp.vertex.state.addBottom(err)
+}
+
+func processDisjunctions(c *OpContext, t *task, mode runMode) {
+	n := t.node
+	err := n.processDisjunctions()
+	t.err = CombineErrors(nil, t.err, err)
+}
+
+func processFinalizeDisjunctions(c *OpContext, t *task, mode runMode) {
+	n := t.node
+	n.finalizeDisjunctions()
 }
 
 func processListLit(c *OpContext, t *task, mode runMode) {
@@ -298,7 +315,7 @@ func (n *nodeContext) updateListType(list Expr, id CloseInfo, isClosed bool, ell
 		m = &ListMarker{
 			IsOpen: true,
 		}
-		n.node.setValue(n.ctx, partial, m)
+		n.node.setValue(n.ctx, conjuncts, m)
 	}
 	m.IsOpen = m.IsOpen && !isClosed
 

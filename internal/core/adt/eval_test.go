@@ -74,11 +74,8 @@ func TestEvalAlpha(t *testing.T) {
 
 	var todoAlpha = map[string]string{
 		// Crashes and hangs
-		"cycle/050_resolved_self-reference_cycles_with_disjunctions": "hang",
 		"cycle/chain":              "hang",
 		"cycle/evaluate":           "hang",
-		"cycle/self":               "hang",
-		"cycle/structural":         "hang",
 		"disjunctions/elimination": "panic (nil pointer)",
 		"benchmarks/issue1684":     "panic (nil pointer)",
 

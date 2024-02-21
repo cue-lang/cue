@@ -375,6 +375,20 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 	}
 
 	n.node.updateStatus(evaluatingArcs)
+	if n.underlying != nil {
+		// References within the disjunct may end up referencing the layer that
+		// this node overlays. Also for these nodes we want to be able to detect
+		// structural cycles early. For this reason, we also set the
+		// evaluatingArcs status in the underlying layer.
+		//
+		// TODO: for now, this seems not necessary. Moreover, this will cause
+		// benchmarks/cycle to display a spurious structural cycle. But it
+		// shortens some of the structural cycle depths. So consider using this.
+		//
+		// status := n.underlying.status
+		// n.underlying.updateStatus(evaluatingArcs) defer func() {
+		// n.underlying.status = status }()
+	}
 
 	// XXX(0.7): only set success if needs complete arcs.
 	success := true

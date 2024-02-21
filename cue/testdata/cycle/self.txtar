@@ -272,6 +272,972 @@ Retain: 27
 Unifications: 236
 Conjuncts:    686
 Disjuncts:    439
+-- out/evalalpha --
+Errors:
+disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
+    ./in.cue:99:6
+    ./in.cue:103:5
+disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
+    ./in.cue:99:6
+    ./in.cue:103:6
+disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
+    ./in.cue:99:6
+    ./in.cue:103:7
+disjList.ok1.y.0.0.0: field not allowed:
+    ./in.cue:103:8
+expr.error1.a: conflicting values 4 and 3:
+    ./in.cue:2:5
+    ./in.cue:3:5
+expr.error2.a: conflicting values 4 and 3:
+    ./in.cue:6:5
+    ./in.cue:7:5
+list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
+list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
+list.error2.a.0: conflicting values "3" and "1":
+    ./in.cue:15:6
+    ./in.cue:16:6
+disjList.ok1.y.0: field not allowed:
+    ./in.cue:103:5
+disjList.ok1.y.0.0: field not allowed:
+    ./in.cue:103:6
+disjList.ok1.y.0.0.0: field not allowed:
+    ./in.cue:103:7
+
+Result:
+(_|_){
+  // [eval]
+  expr: (_|_){
+    // [eval]
+    error1: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] expr.error1.a: conflicting values 4 and 3:
+        //     ./in.cue:2:5
+        //     ./in.cue:3:5
+      }
+    }
+    error2: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] expr.error2.a: conflicting values 4 and 3:
+        //     ./in.cue:6:5
+        //     ./in.cue:7:5
+      }
+    }
+  }
+  list: (_|_){
+    // [eval]
+    error1: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
+        0: (string){ "1" }
+        1: (string){ "2" }
+      }
+    }
+    error2: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
+        // list.error2.a.0: conflicting values "3" and "1":
+        //     ./in.cue:15:6
+        //     ./in.cue:16:6
+        0: (_|_){
+          // [eval] list.error2.a.0: conflicting values "3" and "1":
+          //     ./in.cue:15:6
+          //     ./in.cue:16:6
+        }
+        1: (_|_){
+          // [eval] list.error2.a.1: conflicting values "1" and "2":
+          //     ./in.cue:16:6
+          //     ./in.cue:16:11
+          // list.error2.a.1: conflicting values "3" and "2":
+          //     ./in.cue:15:6
+          //     ./in.cue:16:11
+        }
+      }
+    }
+  }
+  selfEmbed: (struct){
+    ok1: (struct){
+      a: (struct){
+      }
+      Y: (struct){
+      }
+      x: (struct){
+      }
+    }
+    ok2: (struct){
+      Y: (struct){
+      }
+      a: (struct){
+        b: (struct){
+        }
+      }
+      x: (struct){
+        b: (struct){
+        }
+      }
+    }
+    ok3: (struct){
+      Y: (struct){
+      }
+      a: (struct){
+      }
+      x: (struct){
+      }
+    }
+    ok4: (struct){
+      a: (struct){
+      }
+      x: (struct){
+      }
+      Y: (struct){
+      }
+    }
+    ok5: (struct){
+      x: (struct){
+      }
+      a: (struct){
+      }
+      Y: (struct){
+      }
+    }
+    ok6: (struct){
+      x: (struct){
+        b: (struct){
+        }
+      }
+      Y: (struct){
+      }
+      a: (struct){
+        b: (struct){
+        }
+      }
+    }
+  }
+  disjSelf: (struct){
+    ok1: (struct){
+      #A: (_){ |((string){ string }, (_){ _ }) }
+      x: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (_){ _ }) }
+      #A: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok3: (struct){
+      #A: (_){ |((_){ _ }, (string){ string }) }
+      x: (_){ |((_){ _ }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((_){ _ }, (string){ string }) }
+      #A: (_){ |((_){ _ }, (string){ string }) }
+    }
+  }
+  disjEmbed: (struct){
+    ok1: (struct){
+      #A: (_){ |((string){ string }, (#struct){
+        }) }
+      x: (_){ |((string){ string }, (#struct){
+        }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (#struct){
+        }) }
+      #A: (_){ |((string){ string }, (#struct){
+        }) }
+    }
+    ok3: (struct){
+      #A: (_){ |((#struct){
+        }, (string){ string }) }
+      x: (_){ |((#struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((#struct){
+        }, (string){ string }) }
+      #A: (_){ |((#struct){
+        }, (string){ string }) }
+    }
+  }
+  disjList: (_|_){
+    // [eval]
+    ok1: (_|_){
+      // [eval]
+      #A: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      y: (_|_){
+        // [eval] disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
+        //     ./in.cue:99:6
+        //     ./in.cue:103:5
+        // disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
+        //     ./in.cue:99:6
+        //     ./in.cue:103:6
+        // disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
+        //     ./in.cue:99:6
+        //     ./in.cue:103:7
+        // disjList.ok1.y.0.0.0: field not allowed:
+        //     ./in.cue:103:8
+        // disjList.ok1.y.0: field not allowed:
+        //     ./in.cue:103:5
+        // disjList.ok1.y.0.0: field not allowed:
+        //     ./in.cue:103:6
+        // disjList.ok1.y.0.0.0: field not allowed:
+        //     ./in.cue:103:7
+        0: (#list){
+          0: (#list){
+            0: (#list){
+              0: (string){ string }
+            }
+          }
+        }
+      }
+    }
+    ok2: (struct){
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      #A: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+    }
+    ok3: (struct){
+      #A: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      #A: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+    }
+  }
+  name: (string){ "foo" }
+  dynamicSelf: (struct){
+    ok1: (struct){
+      x: (_){ |((string){ string }, (_){ _ }) }
+      foo: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (_){ _ }) }
+      foo: (_){ |((string){ string }, (_){ _ }) }
+    }
+    ok3: (struct){
+      x: (_){ |((_){ _ }, (string){ string }) }
+      foo: (_){ |((_){ _ }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((_){ _ }, (string){ string }) }
+      foo: (_){ |((_){ _ }, (string){ string }) }
+    }
+  }
+  dynamicEmbed: (struct){
+    ok1: (struct){
+      x: (_){ |((string){ string }, (struct){
+        }) }
+      foo: (_){ |((string){ string }, (struct){
+        }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (struct){
+        }) }
+      foo: (_){ |((string){ string }, (struct){
+        }) }
+    }
+    ok3: (struct){
+      x: (_){ |((struct){
+        }, (string){ string }) }
+      foo: (_){ |((struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((struct){
+        }, (string){ string }) }
+      foo: (_){ |((struct){
+        }, (string){ string }) }
+    }
+  }
+  dynamicList: (struct){
+    ok1: (struct){
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      y: (#list){
+        0: (#list){
+          0: (#list){
+            0: (#list){
+              0: (string){ string }
+            }
+          }
+        }
+      }
+      foo: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+    }
+    ok2: (struct){
+      x: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      foo: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+    }
+    ok3: (struct){
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      foo: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      foo: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+    }
+  }
+  dynamicPatternSelf: (struct){
+    ok1: (struct){
+    }
+    ok2: (struct){
+    }
+  }
+  dynamicPatternEmbed: (struct){
+    ok1: (struct){
+    }
+    ok2: (struct){
+    }
+  }
+  dynamicPatternList: (struct){
+    ok1: (struct){
+    }
+    ok2: (struct){
+    }
+  }
+  valueSelf: (struct){
+    ok1: (struct){
+      y: (_){ |((string){ string }, (struct){
+        }) }
+      x: (_){ |((string){ string }, (struct){
+        }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (struct){
+        }) }
+      y: (_){ |((string){ string }, (struct){
+        }) }
+    }
+    ok3: (struct){
+      y: (_){ |((struct){
+        }, (string){ string }) }
+      x: (_){ |((struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((struct){
+        }, (string){ string }) }
+      y: (_){ |((struct){
+        }, (string){ string }) }
+    }
+  }
+  valueEmbed: (struct){
+    ok1: (struct){
+      y: (_){ |((string){ string }, (struct){
+        }) }
+      x: (_){ |((string){ string }, (struct){
+        }) }
+    }
+    ok2: (struct){
+      x: (_){ |((string){ string }, (struct){
+        }) }
+      y: (_){ |((string){ string }, (struct){
+        }) }
+    }
+    ok3: (struct){
+      y: (_){ |((struct){
+        }, (string){ string }) }
+      x: (_){ |((struct){
+        }, (string){ string }) }
+    }
+    ok4: (struct){
+      x: (_){ |((struct){
+        }, (string){ string }) }
+      y: (_){ |((struct){
+        }, (string){ string }) }
+    }
+  }
+  valueList: (struct){
+    ok1: (struct){
+      y: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+      x: (string){ string }
+    }
+    ok2: (struct){
+      x: (string){ string }
+      y: ((string|list)){ |((string){ string }, (#list){
+          0: (string){ string }
+        }) }
+    }
+    ok3: (struct){
+      y: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+      x: (string){ string }
+    }
+    ok4: (struct){
+      x: (string){ string }
+      y: ((string|list)){ |((#list){
+          0: (string){ string }
+        }, (string){ string }) }
+    }
+  }
+  issue1729: (struct){
+    t1: (struct){
+      #x: (_){ |((#struct){
+        }, (#struct){
+        }) }
+      x: (#struct){
+      }
+    }
+    t2: (struct){
+      x: (#struct){
+      }
+      #x: (_){ |((#struct){
+        }, (#struct){
+        }) }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,15 @@
+ Errors:
++disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
++    ./in.cue:99:6
++    ./in.cue:103:5
++disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
++    ./in.cue:99:6
++    ./in.cue:103:6
++disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
++    ./in.cue:99:6
++    ./in.cue:103:7
++disjList.ok1.y.0.0.0: field not allowed:
++    ./in.cue:103:8
+ expr.error1.a: conflicting values 4 and 3:
+     ./in.cue:2:5
+     ./in.cue:3:5
+@@ -5,23 +16,17 @@
+ expr.error2.a: conflicting values 4 and 3:
+     ./in.cue:6:5
+     ./in.cue:7:5
+-list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
+-list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
++list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
++list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
+ list.error2.a.0: conflicting values "3" and "1":
+     ./in.cue:15:6
+     ./in.cue:16:6
+-list.error2.a.1: conflicting values "1" and "2":
+-    ./in.cue:16:6
+-    ./in.cue:16:11
+-list.error2.a.1: conflicting values "3" and "2":
+-    ./in.cue:15:6
+-    ./in.cue:16:11
+-list.error2.a.2: conflicting values "1" and "2":
+-    ./in.cue:16:6
+-    ./in.cue:16:11
+-list.error2.a.2: conflicting values "3" and "2":
+-    ./in.cue:15:6
+-    ./in.cue:16:11
++disjList.ok1.y.0: field not allowed:
++    ./in.cue:103:5
++disjList.ok1.y.0.0: field not allowed:
++    ./in.cue:103:6
++disjList.ok1.y.0.0.0: field not allowed:
++    ./in.cue:103:7
+ 
+ Result:
+ (_|_){
+@@ -50,16 +55,18 @@
+     error1: (_|_){
+       // [eval]
+       a: (_|_){
+-        // [eval] list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
++        // [eval] list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
+         0: (string){ "1" }
+         1: (string){ "2" }
+-        2: (string){ "3" }
+-      }
+-    }
+-    error2: (_|_){
+-      // [eval]
+-      a: (_|_){
+-        // [eval] list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
++      }
++    }
++    error2: (_|_){
++      // [eval]
++      a: (_|_){
++        // [eval] list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
++        // list.error2.a.0: conflicting values "3" and "1":
++        //     ./in.cue:15:6
++        //     ./in.cue:16:6
+         0: (_|_){
+           // [eval] list.error2.a.0: conflicting values "3" and "1":
+           //     ./in.cue:15:6
+@@ -73,14 +80,6 @@
+           //     ./in.cue:15:6
+           //     ./in.cue:16:11
+         }
+-        2: (_|_){
+-          // [eval] list.error2.a.2: conflicting values "1" and "2":
+-          //     ./in.cue:16:6
+-          //     ./in.cue:16:11
+-          // list.error2.a.2: conflicting values "3" and "2":
+-          //     ./in.cue:15:6
+-          //     ./in.cue:16:11
+-        }
+       }
+     }
+   }
+@@ -162,55 +161,90 @@
+   }
+   disjEmbed: (struct){
+     ok1: (struct){
+-      #A: ((string|struct)){ |((string){ string }, (#struct){
+-        }) }
+-      x: ((string|struct)){ |((string){ string }, (#struct){
+-        }) }
+-    }
+-    ok2: (struct){
+-      x: ((string|struct)){ |((string){ string }, (#struct){
+-        }) }
+-      #A: ((string|struct)){ |((string){ string }, (#struct){
+-        }) }
+-    }
+-    ok3: (struct){
+-      #A: ((string|struct)){ |((#struct){
+-        }, (string){ string }) }
+-      x: ((string|struct)){ |((#struct){
+-        }, (string){ string }) }
+-    }
+-    ok4: (struct){
+-      x: ((string|struct)){ |((#struct){
+-        }, (string){ string }) }
+-      #A: ((string|struct)){ |((#struct){
+-        }, (string){ string }) }
+-    }
+-  }
+-  disjList: (struct){
+-    ok1: (struct){
+-      #A: (string){ string }
+-      x: (string){ string }
+-      y: (#list){
+-        0: (#list){
+-          0: (#list){
+-            0: (#list){
+-              0: (string){ string }
+-            }
+-          }
+-        }
+-      }
+-    }
+-    ok2: (struct){
+-      x: (string){ string }
+-      #A: (string){ string }
+-    }
+-    ok3: (struct){
+-      #A: (string){ string }
+-      x: (string){ string }
+-    }
+-    ok4: (struct){
+-      x: (string){ string }
+-      #A: (string){ string }
++      #A: (_){ |((string){ string }, (#struct){
++        }) }
++      x: (_){ |((string){ string }, (#struct){
++        }) }
++    }
++    ok2: (struct){
++      x: (_){ |((string){ string }, (#struct){
++        }) }
++      #A: (_){ |((string){ string }, (#struct){
++        }) }
++    }
++    ok3: (struct){
++      #A: (_){ |((#struct){
++        }, (string){ string }) }
++      x: (_){ |((#struct){
++        }, (string){ string }) }
++    }
++    ok4: (struct){
++      x: (_){ |((#struct){
++        }, (string){ string }) }
++      #A: (_){ |((#struct){
++        }, (string){ string }) }
++    }
++  }
++  disjList: (_|_){
++    // [eval]
++    ok1: (_|_){
++      // [eval]
++      #A: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++      x: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++      y: (_|_){
++        // [eval] disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
++        //     ./in.cue:99:6
++        //     ./in.cue:103:5
++        // disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
++        //     ./in.cue:99:6
++        //     ./in.cue:103:6
++        // disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
++        //     ./in.cue:99:6
++        //     ./in.cue:103:7
++        // disjList.ok1.y.0.0.0: field not allowed:
++        //     ./in.cue:103:8
++        // disjList.ok1.y.0: field not allowed:
++        //     ./in.cue:103:5
++        // disjList.ok1.y.0.0: field not allowed:
++        //     ./in.cue:103:6
++        // disjList.ok1.y.0.0.0: field not allowed:
++        //     ./in.cue:103:7
++        0: (#list){
++          0: (#list){
++            0: (#list){
++              0: (string){ string }
++            }
++          }
++        }
++      }
++    }
++    ok2: (struct){
++      x: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++      #A: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++    }
++    ok3: (struct){
++      #A: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
++      x: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
++    }
++    ok4: (struct){
++      x: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
++      #A: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
+     }
+   }
+   name: (string){ "foo" }
+@@ -234,55 +268,71 @@
+   }
+   dynamicEmbed: (struct){
+     ok1: (struct){
+-      x: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-      foo: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-    }
+-    ok2: (struct){
+-      x: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-      foo: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-    }
+-    ok3: (struct){
+-      x: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-      foo: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-    }
+-    ok4: (struct){
+-      x: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-      foo: ((string|struct)){ |((struct){
++      x: (_){ |((string){ string }, (struct){
++        }) }
++      foo: (_){ |((string){ string }, (struct){
++        }) }
++    }
++    ok2: (struct){
++      x: (_){ |((string){ string }, (struct){
++        }) }
++      foo: (_){ |((string){ string }, (struct){
++        }) }
++    }
++    ok3: (struct){
++      x: (_){ |((struct){
++        }, (string){ string }) }
++      foo: (_){ |((struct){
++        }, (string){ string }) }
++    }
++    ok4: (struct){
++      x: (_){ |((struct){
++        }, (string){ string }) }
++      foo: (_){ |((struct){
+         }, (string){ string }) }
+     }
+   }
+   dynamicList: (struct){
+     ok1: (struct){
+-      x: (string){ string }
+-      y: (#list){
+-        0: (#list){
+-          0: (#list){
+-            0: (#list){
+-              0: (string){ string }
+-            }
+-          }
+-        }
+-      }
+-      foo: (string){ string }
+-    }
+-    ok2: (struct){
+-      x: (string){ string }
+-      foo: (string){ string }
+-    }
+-    ok3: (struct){
+-      x: (string){ string }
+-      foo: (string){ string }
+-    }
+-    ok4: (struct){
+-      x: (string){ string }
+-      foo: (string){ string }
++      x: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++      y: (#list){
++        0: (#list){
++          0: (#list){
++            0: (#list){
++              0: (string){ string }
++            }
++          }
++        }
++      }
++      foo: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++    }
++    ok2: (struct){
++      x: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++      foo: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++    }
++    ok3: (struct){
++      x: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
++      foo: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
++    }
++    ok4: (struct){
++      x: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
++      foo: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
+     }
+   }
+   dynamicPatternSelf: (struct){
+@@ -305,78 +355,87 @@
+   }
+   valueSelf: (struct){
+     ok1: (struct){
+-      y: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-      x: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-    }
+-    ok2: (struct){
+-      x: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-      y: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-    }
+-    ok3: (struct){
+-      y: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-      x: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-    }
+-    ok4: (struct){
+-      x: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-      y: ((string|struct)){ |((struct){
++      y: (_){ |((string){ string }, (struct){
++        }) }
++      x: (_){ |((string){ string }, (struct){
++        }) }
++    }
++    ok2: (struct){
++      x: (_){ |((string){ string }, (struct){
++        }) }
++      y: (_){ |((string){ string }, (struct){
++        }) }
++    }
++    ok3: (struct){
++      y: (_){ |((struct){
++        }, (string){ string }) }
++      x: (_){ |((struct){
++        }, (string){ string }) }
++    }
++    ok4: (struct){
++      x: (_){ |((struct){
++        }, (string){ string }) }
++      y: (_){ |((struct){
+         }, (string){ string }) }
+     }
+   }
+   valueEmbed: (struct){
+     ok1: (struct){
+-      y: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-      x: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-    }
+-    ok2: (struct){
+-      x: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-      y: ((string|struct)){ |((string){ string }, (struct){
+-        }) }
+-    }
+-    ok3: (struct){
+-      y: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-      x: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-    }
+-    ok4: (struct){
+-      x: ((string|struct)){ |((struct){
+-        }, (string){ string }) }
+-      y: ((string|struct)){ |((struct){
++      y: (_){ |((string){ string }, (struct){
++        }) }
++      x: (_){ |((string){ string }, (struct){
++        }) }
++    }
++    ok2: (struct){
++      x: (_){ |((string){ string }, (struct){
++        }) }
++      y: (_){ |((string){ string }, (struct){
++        }) }
++    }
++    ok3: (struct){
++      y: (_){ |((struct){
++        }, (string){ string }) }
++      x: (_){ |((struct){
++        }, (string){ string }) }
++    }
++    ok4: (struct){
++      x: (_){ |((struct){
++        }, (string){ string }) }
++      y: (_){ |((struct){
+         }, (string){ string }) }
+     }
+   }
+   valueList: (struct){
+     ok1: (struct){
+-      y: (string){ string }
+-      x: (string){ string }
+-    }
+-    ok2: (struct){
+-      x: (string){ string }
+-      y: (string){ string }
+-    }
+-    ok3: (struct){
+-      y: (string){ string }
+-      x: (string){ string }
+-    }
+-    ok4: (struct){
+-      x: (string){ string }
+-      y: (string){ string }
++      y: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++      x: (string){ string }
++    }
++    ok2: (struct){
++      x: (string){ string }
++      y: ((string|list)){ |((string){ string }, (#list){
++          0: (string){ string }
++        }) }
++    }
++    ok3: (struct){
++      y: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
++      x: (string){ string }
++    }
++    ok4: (struct){
++      x: (string){ string }
++      y: ((string|list)){ |((#list){
++          0: (string){ string }
++        }, (string){ string }) }
+     }
+   }
+   issue1729: (struct){
+     t1: (struct){
+-      #x: (#struct){
+-      }
++      #x: (_){ |((#struct){
++        }, (#struct){
++        }) }
+       x: (#struct){
+       }
+     }
+@@ -383,8 +442,9 @@
+     t2: (struct){
+       x: (#struct){
+       }
+-      #x: (#struct){
+-      }
++      #x: (_){ |((#struct){
++        }, (#struct){
++        }) }
+     }
+   }
+ }
+-- diff/todo/p0 --
+disjList: field not allowed is incorrect.
+Some nested disjunctions still need to be expanded.
+disjEmbed: incorrect aggregate type _, instead of string|struct. mergeVertex
+-- diff/todo/p2 --
+disjList.ok2: cut off structural cycle earlier?
+dynamicEmbed.*: cut off structural cycle earlier?
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

@@ -303,13 +303,13 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 		// graph will always be the same address. Hence, if this is a
 		// finalized arc with a different address, it resembles a reference that
 		// is included through a different path and is not a cycle.
-		if r.Arc != arc && arc.status == finalized {
+		if !equalDeref(r.Arc, arc) && arc.status == finalized {
 			continue
 		}
 
 		// For dynamically created structs we mark this as an error. Otherwise
 		// there is only an error if we have visited the arc before.
-		if ci.Inline && (arc.IsDynamic || r.Arc == arc) {
+		if ci.Inline && (arc.IsDynamic || equalDeref(r.Arc, arc)) {
 			n.reportCycleError()
 			return ci, true
 		}
@@ -317,7 +317,14 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 		// We have a reference cycle, as distinguished from a structural
 		// cycle. Reference cycles represent equality, and thus are equal
 		// to top. We can stop processing here.
-		if r.Node == n.node {
+		// var nn1, nn2 *Vertex
+		// if u := r.Node.state.underlay; u != nil {
+		// 	nn1 = u.node
+		// }
+		// if u := n.node.state.underlay; u != nil {
+		// 	nn2 = u.node
+		// }
+		if equalDeref(r.Node, n.node) {
 			return ci, true
 		}
 
@@ -341,7 +348,7 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 				// "parent" conjuncts? This mechanism seems not entirely
 				// accurate. Maybe a pointer up to find the root and then
 				// "spread" downwards?
-				if r.Ref == x && r.Arc == rr.Arc {
+				if r.Ref == x && equalDeref(r.Arc, rr.Arc) {
 					n.node.Conjuncts[i].CloseInfo.IsCyclic = true
 					break
 				}
@@ -368,7 +375,7 @@ outer:
 		}
 
 		arc.cyclicReferences = &RefNode{
-			Arc:  arc,
+			Arc:  deref(arc),
 			Ref:  x,
 			Next: arc.cyclicReferences,
 		}
@@ -385,8 +392,8 @@ outer:
 				}
 			}
 			ci.Refs = &RefNode{
-				Arc:  r.Arc,
-				Node: n.node,
+				Arc:  deref(r.Arc),
+				Node: deref(n.node),
 
 				Ref:   x,
 				Next:  ci.Refs,
@@ -420,10 +427,14 @@ outer:
 		// gives somewhat better error messages.
 		// We also need to add the reference again if the depth differs, as
 		// the depth is used for tracking "new structure".
+		// var nn *Vertex
+		// if u := n.node.state.underlay; u != nil {
+		// 	nn = u.node
+		// }
 		ci.Refs = &RefNode{
-			Arc:   arc,
+			Arc:   deref(arc),
 			Ref:   x,
-			Node:  n.node,
+			Node:  deref(n.node),
 			Next:  ci.Refs,
 			Depth: n.depth,
 		}

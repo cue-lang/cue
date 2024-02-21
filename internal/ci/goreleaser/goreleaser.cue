@@ -4,6 +4,9 @@ config: {
 	#latest: bool @tag(latest, type=bool)
 
 	project_name: "cue"
+	// Note that gomod.proxy is ignored by `goreleaser release --snapshot`,
+	// which we use in CI to test the goreleaser config and build,
+	// as --snapshot is meant for entirely local builds without a git tag.
 	gomod: proxy: true
 
 	// Template based on common settings
@@ -17,7 +20,9 @@ config: {
 		flags: *[
 			"-trimpath",
 		] | _
-		id:            main
+		// Note that goreleaser says that id defaults to the binary name,
+		// but it then complains about "cue" being duplicate even though we use "cue" and "cuepls".
+		id:            binary
 		main:          string
 		binary:        string
 		mod_timestamp: *'{{ .CommitTimestamp }}' | _

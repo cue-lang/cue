@@ -971,6 +971,10 @@ type nodeContext struct {
 	// for source-level debuggers.
 	node *Vertex
 
+	// underlying is the original Vertex that this node overlays. It should be
+	// set for all Vertex values that were cloned.
+	underlying *Vertex
+
 	// overlays is set if this node is the root of a disjunct created in
 	// doDisjunct. It points to the direct parent nodeContext.
 	overlays *nodeContext
@@ -1192,6 +1196,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		}
 		n.scheduler.clear()
 		n.scheduler.node = n
+		n.underlying = node
 
 		return n
 	}
@@ -1206,6 +1211,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		nodeContextState: nodeContextState{kind: TopKind},
 	}
 	n.scheduler.node = n
+	n.underlying = node
 	return n
 }
 

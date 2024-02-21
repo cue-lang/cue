@@ -322,8 +322,8 @@ loop2:
 // scheduleVertexConjuncts injects the conjuncst of src n. If src was not fully
 // evaluated, it subscribes dst for future updates.
 func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo CloseInfo) {
-	// Don't add conjuncts if a node is referring to itself.
-	if n.node == arc {
+	// disjunctions, we need to dereference he underlying node.
+	if deref(n.node) == deref(arc) {
 		return
 	}
 

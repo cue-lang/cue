@@ -244,6 +244,21 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
+func deref(v *Vertex) *Vertex {
+	n := v.state
+	if n != nil {
+		v = n.underlying
+	}
+	if v == nil {
+		panic("unexpected nil underlying with non-nil state")
+	}
+	return v
+}
+
+func equalDeref(a, b *Vertex) bool {
+	return deref(a) == deref(b)
+}
+
 // rootCloseContext creates a closeContext for this Vertex or returns the
 // existing one.
 func (v *Vertex) rootCloseContext() *closeContext {

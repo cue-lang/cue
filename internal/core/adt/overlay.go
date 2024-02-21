@@ -172,6 +172,10 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 
 func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
 	d := n.ctx.newNodeContext(n.node)
+	d.underlying = n.underlying
+	if n.underlying == nil {
+		panic("unexpected nil underlying")
+	}
 
 	d.refCount++
 

@@ -68,6 +68,9 @@ command: release: {
 			"--snapshot"
 		},
 	]
+	let goreleaserConfigYAML = yaml.Marshal(config & {
+		#latest: _githubRefName == strings.TrimSpace(latestCUE.stdout)
+	})
 
 	info: cli.Print & {
 		text: """
@@ -75,6 +78,9 @@ command: release: {
 			git ref: \(_githubRef)
 			release name: \(_githubRefName)
 			goreleaser cmd: \(strings.Join(goreleaserCmd, " "))
+
+			goreleaser config yaml, indented for readability:
+			  \(strings.Replace(goreleaserConfigYAML, "\n", "\n  ", -1))
 			"""
 	}
 
@@ -82,9 +88,7 @@ command: release: {
 		$after: info
 
 		// Set the goreleaser configuration to be stdin
-		stdin: yaml.Marshal(config & {
-			#latest: _githubRefName == strings.TrimSpace(latestCUE.stdout)
-		})
+		stdin: goreleaserConfigYAML
 
 		// Run at the root of the module
 		dir: strings.TrimSpace(cueModRoot.stdout)

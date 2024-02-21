@@ -467,9 +467,9 @@ func isHiddenOrDefinition(s string) bool {
 	return strings.HasPrefix(s, "#") || strings.HasPrefix(s, "_")
 }
 
-// Hid returns a selector for a hidden field. It panics is pkg is empty.
+// Hid returns a selector for a hidden field. It panics if pkg is empty.
 // Hidden fields are scoped by package, and pkg indicates for which package
-// the hidden field must apply.For anonymous packages, it must be set to "_".
+// the hidden field must apply. For anonymous packages, it must be set to "_".
 func Hid(name, pkg string) Selector {
 	if !ast.IsValidIdent(name) {
 		panic(fmt.Sprintf("invalid identifier %s", name))

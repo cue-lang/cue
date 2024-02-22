@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7c215e4_0c1be1b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-22T21:46:00Z",
+      "side": 1,
+      "message": "Yeah, I guess you could say I repurposed it.\n\nThe title of the issue is \"mod publish fails with ECR\" and this makes it possible to publish modules to ECR, so on the surface I\u0027d say that wasn\u0027t too far off, even if the body of the issue describes a different problem.\n\nThere were about three problems publishing to ECR, two of which never made it as far as issue creation. I guess I could create issues in retrospect, but it doesn\u0027t really seem worth it to me.",
+      "parentUuid": "129f26e8_851018f0",
+      "revId": "a78df4894e028f89b3011700eb8e99f43f03db14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "237b0a57_7819bfab",

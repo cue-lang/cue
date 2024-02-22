@@ -12,6 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// This aspect of #registry encodes the defaults used by the resolver
+// parser. It's kept separate because it's technically bad practice to
+// define regular fields as part of a schema, and by defining it this
+// way, the pure schema can be read independently as such.
+//
+// TODO work out a nice way of doing this such that we don't have to
+// mirror the fields in #file that mention #registry
+#registry: {
+	pathEncoding: *"path" | _
+}
+
+// Note: public part of schema (included in help output) starts
+// at "// #file" below.
+
 // #file represents the registry configuration schema.
 #file: {
 	// moduleRegistries specifies a mapping from module path prefix
@@ -88,14 +102,3 @@
 // TODO more specific schemas below
 #modulePath: string
 #tag: string
-
-// This aspect of #registry encodes the defaults used by the resolver
-// parser. It's kept separate because it's technically bad practice to
-// define regular fields as part of a schema, and by defining it this
-// way, the pure schema can be read independently as such.
-//
-// TODO work out a nice way of doing this such that we don't have to
-// mirror the fields in #file that mention #registry
-#registry: {
-	pathEncoding: *"path" | _
-}

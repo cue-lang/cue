@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// start of help include
+//---
+
 // #file represents the registry configuration schema.
 #file: {
 	// moduleRegistries specifies a mapping from module path prefix
@@ -88,6 +91,9 @@
 // TODO more specific schemas below
 #modulePath: string
 #tag: string
+
+//---
+// end of help include
 
 // This aspect of #registry encodes the defaults used by the resolver
 // parser. It's kept separate because it's technically bad practice to

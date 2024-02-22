@@ -6,8 +6,24 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"github.com/go-quicktest/qt"
 )
+
+func TestRegistryConfigSchema(t *testing.T) {
+	schema := RegistryConfigSchema()
+	// Sanity check that it parses OK as CUE and can
+	// validate a legitimate schema.
+	ctx := cuecontext.New()
+	v := ctx.CompileString(schema)
+	fileSchema := v.LookupPath(cue.MakePath(cue.Def("#file")))
+	qt.Assert(t, qt.IsNil(fileSchema.Err()))
+	cfgVal := ctx.CompileString(`defaultRegistry: registry: "something.example"`)
+	qt.Assert(t, qt.IsNil(cfgVal.Err()))
+	cfgVal = cfgVal.Unify(fileSchema)
+	qt.Assert(t, qt.IsNil(cfgVal.Err()))
+}
 
 func TestParseCUERegistry(t *testing.T) {
 	testCases := []struct {

@@ -169,6 +169,17 @@ var (
 //go:embed schema.cue
 var configSchemaData []byte
 
+// RegistryConfigSchema returns the CUE schema
+// for the configuration parsed by [ParseConfig].
+func RegistryConfigSchema() string {
+	schema := string(configSchemaData)
+	// Cut out the copyright header and the trailer that's
+	// not pure schema.
+	_, schema, _ = strings.Cut(schema, "\n//---\n")
+	schema, _, _ = strings.Cut(schema, "\n//---\n")
+	return schema
+}
+
 // ParseConfig parses the registry configuration with the given contents and file name.
 // If there is no default registry, then the single registry specified in catchAllDefault
 // will be used as a default.

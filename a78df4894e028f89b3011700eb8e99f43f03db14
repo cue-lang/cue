@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "129f26e8_851018f0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-22T20:03:16Z",
+      "side": 1,
+      "message": "Are you sure you got the right issue number? That issue has no matches for \"page\", \"limit\", \"size\", or \"digest\", so I can\u0027t see how this fix is at all related to what is described in that issue. As it stands now, it seems to be about repository creation.\n\nAt the very least, if you repurposed that issue to be about general ECR support including the page size issue, I would expect more context added to the issue via a comment, otherwise this \"Fixes\" doesn\u0027t make much sense.",
+      "revId": "a78df4894e028f89b3011700eb8e99f43f03db14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "237b0a57_7819bfab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-22T20:03:16Z",
+      "side": 1,
+      "message": "SGTM but the \"fixes\" link is rather confusing with what\u0027s written right now.",
+      "revId": "a78df4894e028f89b3011700eb8e99f43f03db14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

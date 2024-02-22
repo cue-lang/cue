@@ -56,6 +56,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "88df7f2a_94b1dcbd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-22T22:15:48Z",
+      "side": 1,
+      "message": "I updated the commit message a little.",
+      "parentUuid": "d7c215e4_0c1be1b5",
+      "revId": "a78df4894e028f89b3011700eb8e99f43f03db14",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "237b0a57_7819bfab",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3

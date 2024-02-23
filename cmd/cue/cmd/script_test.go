@@ -25,8 +25,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"runtime"
-	goruntime "runtime"
 	"strings"
 	"testing"
 	"time"
@@ -43,10 +41,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/registrytest"
-)
-
-const (
-	homeDirName = ".user-home"
 )
 
 // TestLatest checks that the examples match the latest language standard,
@@ -166,24 +160,10 @@ func TestScript(t *testing.T) {
 				return err
 			}
 
-			// Set up a home dir within work dir with a . prefix so that the
-			// Go/CUE pattern ./... does not descend into it.
-			home := filepath.Join(e.WorkDir, homeDirName)
-			if err := os.Mkdir(home, 0777); err != nil {
-				return err
-			}
-
 			e.Vars = append(e.Vars,
 				"GOPROXY="+srv.URL,
 				"GONOSUMDB=*", // GOPROXY is a private proxy
-				homeEnvName()+"="+home,
 			)
-			if runtime.GOOS == "windows" {
-				// os.UserConfigDir on Windows requires %AppData% to be set,
-				// and it does not fall back to the home directory in any way.
-				// Set it up as well, so that cmd/cue can function normally.
-				e.Vars = append(e.Vars, "AppData="+filepath.Join(home, "appdata"))
-			}
 			entries, err := os.ReadDir(e.WorkDir)
 			if err != nil {
 				return fmt.Errorf("cannot read workdir: %v", err)
@@ -217,10 +197,10 @@ func TestScript(t *testing.T) {
 					// This enables some tests to construct their own malformed
 					// CUE_REGISTRY values that still refer to the test registry.
 					"DEBUG_REGISTRY"+regID+"_HOST="+reg.Host(),
-					// While os.UserCacheDir on Linux is derived from $HOME,
-					// under Windows it's not, so avoid polluting the system cache
-					// directory by setting up the cache specifically.
-					"CUE_CACHE_DIR="+filepath.Join(e.WorkDir, "tmp/cache"),
+					// Some tests execute cue commands that need to write cache files.
+					// Since os.UserCacheDir relies on OS-specific env vars that we don't set,
+					// explicitly set up the cache directory somewhere predictable.
+					"CUE_CACHE_DIR="+filepath.Join(e.WorkDir, ".tmp/cache"),
 				)
 				e.Defer(reg.Close)
 			}
@@ -330,20 +310,6 @@ func tsExpand(ts *testscript.TestScript, s string) string {
 	return os.Expand(s, func(key string) string {
 		return ts.Getenv(key)
 	})
-}
-
-// homeEnvName extracts the logic from os.UserHomeDir to get the
-// name of the environment variable that should be used when
-// setting the user's home directory
-func homeEnvName() string {
-	switch goruntime.GOOS {
-	case "windows":
-		return "USERPROFILE"
-	case "plan9":
-		return "home"
-	default:
-		return "HOME"
-	}
 }
 
 func mainTestStdinPipe() error {

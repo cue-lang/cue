@@ -12,6 +12,25 @@ env-fill cueconfig/badtoken.json
 cp cueconfig/badtoken.json cueconfig/logins.json
 ! exec cue export .
 stderr 'import failed: cannot find package .* 401 Unauthorized; body: "invalid credentials'
+
+# An invalid logins.json should result in an immediate error.
+env CUE_CONFIG_DIR=$WORK/badconfig
+! exec cue export .
+stderr 'cannot load CUE registry logins: json: cannot unmarshal string into Go struct field'
+
+# Setting CUE_CONFIG_DIR to an empty directory should still try Docker auth.
+# Note that Docker auth fails entirely, but we don't refuse to continue without a logins.json.
+env CUE_CONFIG_DIR=$WORK/emptyconfig
+mkdir $CUE_CONFIG_DIR
+! exec cue export .
+stderr 'module example.com/e1@v0.0.1: cannot do HTTP request'
+
+# If no CUE_CONFIG_DIR is set and we can't find its default location,
+# we should still carry on with Docker auth assuming that logins.json does not exist.
+env HOME= CUE_CONFIG_DIR=
+exec env
+! exec cue export .
+stderr 'module example.com/e1@v0.0.1: cannot do HTTP request'
 -- cueconfig/logins.json --
 {
 	"registries": {
@@ -28,6 +47,8 @@ stderr 'import failed: cannot find package .* 401 Unauthorized; body: "invalid c
 		}
 	}
 }
+-- badconfig/logins.json --
+{"registries": "unexpected json"}
 -- expect-stdout --
 [
     "ok1",

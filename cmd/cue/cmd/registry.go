@@ -2,7 +2,9 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 	"strings"
@@ -81,11 +83,16 @@ func getRegistryResolver() (*registryResolver, error) {
 			Config: config,
 		})
 
+		// If we can't locate a logins.json file at all, skip cueLoginsAuthorizer entirely.
+		// We only refuse to continue if we find an invalid logins.json file.
 		loginsPath, err := findLoginsPath()
 		if err != nil {
-			return nil, fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
+			return auth, nil
 		}
 		logins, err := readLogins(loginsPath)
+		if errors.Is(err, fs.ErrNotExist) {
+			return auth, nil
+		}
 		if err != nil {
 			return nil, fmt.Errorf("cannot load CUE registry logins: %v", err)
 		}

@@ -17,9 +17,7 @@ package cmd
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
-	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
@@ -150,16 +148,13 @@ func findLoginsPath() (string, error) {
 }
 
 func readLogins(path string) (*cueLogins, error) {
+	body, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
 	logins := &cueLogins{
 		// Initialize the map so we can insert entries.
 		Registries: map[string]cueRegistryLogin{},
-	}
-	body, err := os.ReadFile(path)
-	if err != nil {
-		if errors.Is(err, fs.ErrNotExist) {
-			return logins, nil
-		}
-		return nil, err
 	}
 	if err := json.Unmarshal(body, logins); err != nil {
 		return nil, err

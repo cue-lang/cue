@@ -1,0 +1,16 @@
+- id: cue-fmt
+  name: cue-fmt
+  description: Format cue files.
+  entry: cue fmt
+  types: [cue]
+  language: golang
+  require_serial: true
+
+- id: cue-vet
+  name: cue-vet
+  description: Vet cue files.
+  entry: cue vet
+  types: [cue]
+  language: golang
+  require_serial: true
+  pass_filenames: false

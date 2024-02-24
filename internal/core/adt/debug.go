@@ -275,7 +275,7 @@ func (c *closeContext) matchDecrement(v *Vertex, kind depKind, dependant *closeC
 		return
 	}
 
-	panic("unmatched decrement")
+	panic(fmt.Sprintf("unmatched decrement: %s", kind))
 }
 
 // mermaidContext is used to create a dependency analysis for a node.
@@ -476,14 +476,18 @@ func (m *mermaidContext) task(d *ccDep) string {
 	taskID := fmt.Sprintf("%s_%d", m.vertexID(v), d.taskID)
 	var state string
 	var completes condition
+	var kind string
 	if d.task != nil {
 		state = d.task.state.String()[:2]
 		completes = d.task.completes
+		kind = d.task.run.name
 	}
 	indentOnNewline(vc.tasks, 3)
 	fmt.Fprintf(vc.tasks, "%s(%d", taskID, d.taskID)
 	indentOnNewline(vc.tasks, 4)
 	io.WriteString(vc.tasks, state)
+	indentOnNewline(vc.tasks, 4)
+	io.WriteString(vc.tasks, kind)
 	indentOnNewline(vc.tasks, 4)
 	fmt.Fprintf(vc.tasks, "%x)\n", completes)
 

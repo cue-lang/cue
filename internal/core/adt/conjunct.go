@@ -150,7 +150,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		// Even though disjunctions and conjunctions are excluded, the result
 		// must may still be list in the case of list arithmetic. This could
 		// be a scalar value only once this is no longer supported.
-		n.scheduleTask(processExpr, env, x, id, genericConjunct, 0)
+		n.scheduleTask(handleExpr, env, x, id)
 
 	case *StructLit:
 		n.scheduleStruct(env, x, id)
@@ -160,7 +160,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			Up:     env,
 			Vertex: n.node,
 		}
-		n.scheduleTask(processListLit, env, x, id, fieldConjunct, listTypeKnown)
+		n.scheduleTask(handleListLit, env, x, id)
 
 	case *DisjunctionExpr:
 		panic("unimplemented")
@@ -171,11 +171,11 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.insertComprehension(env, x, id)
 
 	case Resolver:
-		n.scheduleTask(processResolver, env, x, id, genericConjunct, 0)
+		n.scheduleTask(handleResolver, env, x, id)
 
 	case Evaluator:
 		// Interpolation, UnaryExpr, CallExpr
-		n.scheduleTask(processExpr, env, x, id, genericConjunct, 0)
+		n.scheduleTask(handleExpr, env, x, id)
 
 	default:
 		panic("unreachable")
@@ -271,14 +271,12 @@ loop2:
 				n.aStruct = s
 				n.aStructID = ci
 			}
-			n.scheduleTask(processDynamic, childEnv, x, ci, fieldConjunct, 0)
+			n.scheduleTask(handleDynamic, childEnv, x, ci)
 
 		case *BulkOptionalField:
 
 			// All do not depend on each other, so can be added at once.
-			n.scheduleTask(processPatternConstraint,
-				childEnv, x, ci,
-				allTasksCompleted|fieldConjunctsKnown, 0)
+			n.scheduleTask(handlePatternConstraint, childEnv, x, ci)
 
 		case Expr:
 			// TODO: perhaps special case scalar Values to avoid creating embedding.
@@ -445,7 +443,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 
 		case *ListMarker:
 			// TODO: arguably we know now that the type _must_ be a list.
-			n.scheduleTask(processListVertex, env, x, id, fieldConjunct, listTypeKnown)
+			n.scheduleTask(handleListVertex, env, x, id)
 
 			return
 

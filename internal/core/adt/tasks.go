@@ -19,6 +19,58 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+var (
+	handleExpr              *runner
+	handleResolver          *runner
+	handleDynamic           *runner
+	handlePatternConstraint *runner
+	handleComprehension     *runner
+	handleListLit           *runner
+	handleListVertex        *runner
+	handleDisjunction       *runner
+)
+
+// Use init to avoid a (spurious?) cyclic dependency in Go.
+func init() {
+	handleExpr = &runner{
+		name:      "Expr",
+		f:         processExpr,
+		completes: genericConjunct,
+	}
+	handleResolver = &runner{
+		name:      "Resolver",
+		f:         processResolver,
+		completes: genericConjunct,
+	}
+	handleDynamic = &runner{
+		name:      "Dynamic",
+		f:         processDynamic,
+		completes: fieldConjunct,
+	}
+	handlePatternConstraint = &runner{
+		name:      "PatternConstraint",
+		f:         processPatternConstraint,
+		completes: allTasksCompleted | fieldConjunctsKnown,
+	}
+	handleComprehension = &runner{
+		name:      "Comprehension",
+		f:         processComprehension,
+		completes: valueKnown | allTasksCompleted | fieldConjunctsKnown,
+	}
+	handleListLit = &runner{
+		name:      "ListLit",
+		f:         processListLit,
+		completes: fieldConjunct,
+		needs:     listTypeKnown,
+	}
+	handleListVertex = &runner{
+		name:      "ListVertex",
+		f:         processListVertex,
+		completes: fieldConjunct,
+		needs:     listTypeKnown,
+	}
+}
+
 // This file contains task runners (func(ctx *OpContext, t *task, mode runMode)).
 
 func processExpr(ctx *OpContext, t *task, mode runMode) {

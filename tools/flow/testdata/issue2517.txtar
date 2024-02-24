@@ -6,6 +6,7 @@ package x
 root: {
 	prepare: {
 		$id: "prepare"
+		stdout: string
 	}
 	env2: {
 		input: prepare.stdout

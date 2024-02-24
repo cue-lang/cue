@@ -290,16 +290,16 @@ func (v *Vertex) allChildConjunctsKnown() bool {
 	return v.state.meets(fieldConjunctsKnown | allAncestorsProcessed)
 }
 
-func (n *nodeContext) scheduleTask(f runner, env *Environment, x Node, ci CloseInfo, completes, needs condition) *task {
+func (n *nodeContext) scheduleTask(r *runner, env *Environment, x Node, ci CloseInfo) *task {
 	t := &task{
-		run:  f,
+		run:  r,
 		node: n,
 
 		env: env,
 		id:  ci,
 		x:   x,
 	}
-	n.insertTask(t, completes, needs)
+	n.insertTask(t)
 	return t
 }
 

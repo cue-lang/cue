@@ -104,28 +104,35 @@ func TestScheduler(t *testing.T) {
 	// success creates a task that will succeed.
 	success := func(name string, n *nodeContext, completes, needs condition, deps ...dep) *task {
 		t := &task{
-			run: func(ctx *OpContext, t *task, mode runMode) {
-				process(name, t, deps...)
+			run: &runner{
+				f: func(ctx *OpContext, t *task, mode runMode) {
+					process(name, t, deps...)
+				},
+				completes: completes,
+				needs:     needs,
 			},
 			node: n,
 			x:    &String{Str: name}, // Set name for debugging purposes.
 		}
-		n.insertTask(t, completes, needs)
+		n.insertTask(t)
 		return t
 	}
 
 	// signal is a task that unconditionally sets a completion bit.
 	signal := func(name string, n *nodeContext, completes condition, deps ...dep) *task {
 		t := &task{
-			run: func(ctx *OpContext, t *task, mode runMode) {
-				if process(name, t, deps...) {
-					n.scheduler.signal(completes)
-				}
+			run: &runner{
+				f: func(ctx *OpContext, t *task, mode runMode) {
+					if process(name, t, deps...) {
+						n.scheduler.signal(completes)
+					}
+				},
+				completes: completes,
 			},
 			node: n,
 			x:    &String{Str: name}, // Set name for debugging purposes.
 		}
-		n.insertTask(t, completes, 0)
+		n.insertTask(t)
 		return t
 	}
 
@@ -133,15 +140,18 @@ func TestScheduler(t *testing.T) {
 	completes := func(name string, n, other *nodeContext, completes condition, deps ...dep) *task {
 		other.scheduler.incrementCounts(completes)
 		t := &task{
-			run: func(ctx *OpContext, t *task, mode runMode) {
-				if process(name, t, deps...) {
-					other.scheduler.decrementCounts(completes)
-				}
+			run: &runner{
+				f: func(ctx *OpContext, t *task, mode runMode) {
+					if process(name, t, deps...) {
+						other.scheduler.decrementCounts(completes)
+					}
+				},
+				completes: completes,
 			},
 			node: n,
 			x:    &String{Str: name}, // Set name for debugging purposes.
 		}
-		n.insertTask(t, completes, 0)
+		n.insertTask(t)
 		return t
 	}
 
@@ -149,15 +159,19 @@ func TestScheduler(t *testing.T) {
 	fail := func(name string, n *nodeContext, completes, needs condition, deps ...dep) *task {
 		t := &task{
 
-			run: func(ctx *OpContext, t *task, mode runMode) {
-				fmt.Fprintf(w, "\n\t\t    running task %s:", name)
-				t.err = &Bottom{}
-				fmt.Fprint(w, " FAIL")
+			run: &runner{
+				f: func(ctx *OpContext, t *task, mode runMode) {
+					fmt.Fprintf(w, "\n\t\t    running task %s:", name)
+					t.err = &Bottom{}
+					fmt.Fprint(w, " FAIL")
+				},
+				completes: completes,
+				needs:     needs,
 			},
 			node: n,
 			x:    &String{Str: name}, // Set name for debugging purposes.
 		}
-		n.insertTask(t, completes, needs)
+		n.insertTask(t)
 		return t
 	}
 

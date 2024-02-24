@@ -546,10 +546,22 @@ func (s *scheduler) signalDoneAdding() {
 	s.signal(s.needs &^ s.provided)
 }
 
-// runner implements a task. The mode argument indicates whether the scheduler
-// of this field is finalizing. It is passed as a component of the required
-// state to various evaluation methods.
-type runner func(ctx *OpContext, t *task, mode runMode)
+// runner defines properties of a type of task, including a function to run it.
+type runner struct {
+	name string
+
+	// The mode argument indicates whether the scheduler
+	// of this field is finalizing. It is passed as a component of the required
+	// state to various evaluation methods.
+	f func(ctx *OpContext, t *task, mode runMode)
+
+	// completes indicates which states this tasks contributes to.
+	completes condition
+
+	// needes indicates which states of the corresponding node need to be
+	// completed before this task can be run.
+	needs condition
+}
 
 type task struct {
 	state taskState
@@ -572,7 +584,7 @@ type task struct {
 	// The node from which this conjunct originates.
 	node *nodeContext
 
-	run runner // TODO: use struct to make debugging easier?
+	run *runner // TODO: use struct to make debugging easier?
 
 	// The Conjunct processed by this task.
 	env *Environment
@@ -584,7 +596,10 @@ type task struct {
 	leaf *Comprehension
 }
 
-func (s *scheduler) insertTask(t *task, completes, needs condition) {
+func (s *scheduler) insertTask(t *task) {
+	completes := t.run.completes
+	needs := t.run.needs
+
 	s.needs |= needs
 	s.provided |= completes
 
@@ -655,7 +670,7 @@ func runTask(t *task, mode runMode) {
 	// A task may have recorded an error on a previous try. Clear it.
 	t.err = nil
 
-	t.run(ctx, t, mode)
+	t.run.f(ctx, t, mode)
 
 	if t.state != taskWAITING {
 		t.blockedOn = nil

@@ -6,6 +6,7 @@ package x
 root: {
 	prepare: {
 		$id: "prepare"
+		stdout: string
 	}
 	env2: {
 		input: prepare.stdout
@@ -41,7 +42,7 @@ Allocs: 5
 Retain: 0
 
 Unifications: 11
-Conjuncts:    17
+Conjuncts:    20
 Disjuncts:    11
 -- out/run/t2 --
 graph TD
@@ -65,7 +66,7 @@ Allocs: 0
 Retain: 0
 
 Unifications: 12
-Conjuncts:    21
+Conjuncts:    24
 Disjuncts:    12
 -- out/run/stats/totals --
 Leaks:  0
@@ -75,5 +76,5 @@ Allocs: 5
 Retain: 0
 
 Unifications: 23
-Conjuncts:    38
+Conjuncts:    44
 Disjuncts:    23

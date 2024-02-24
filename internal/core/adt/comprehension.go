@@ -253,8 +253,7 @@ func (n *nodeContext) insertComprehension(
 	}
 
 	if n.ctx.isDevVersion() {
-		completes := valueKnown | allTasksCompleted | fieldConjunctsKnown
-		t := n.scheduleTask(processComprehension, env, x, ci, completes, 0)
+		t := n.scheduleTask(handleComprehension, env, x, ci)
 		t.comp = ec
 		t.leaf = c
 	} else {

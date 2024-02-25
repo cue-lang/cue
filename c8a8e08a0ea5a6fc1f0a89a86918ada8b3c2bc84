@@ -16,6 +16,23 @@
       "message": "Very nice find, and very nice test :) Thank you!",
       "revId": "c8a8e08a0ea5a6fc1f0a89a86918ada8b3c2bc84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "366fa6e9_d8fce27d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-25T14:05:47Z",
+      "side": 1,
+      "message": "to fix CI, can you try:\n\n    CUE_UPDATE\u003d1 go test ./...",
+      "revId": "c8a8e08a0ea5a6fc1f0a89a86918ada8b3c2bc84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

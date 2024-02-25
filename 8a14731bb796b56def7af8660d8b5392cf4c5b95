@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "690a04f7_c7961e0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-25T12:01:17Z",
+      "side": 1,
+      "message": "This is remaining FYI - otherwise SGTM",
+      "parentUuid": "fc07944b_d883a6d9",
+      "revId": "8a14731bb796b56def7af8660d8b5392cf4c5b95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d44d46d3_491d7962",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 8

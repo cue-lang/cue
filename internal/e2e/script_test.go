@@ -16,6 +16,7 @@ package e2e_test
 
 import (
 	"bytes"
+	"cmp"
 	"context"
 	cryptorand "crypto/rand"
 	"fmt"
@@ -77,14 +78,14 @@ var (
 	// GitHub App has been installed on all repositories.
 	// This is necessary since we will create a new repository per test,
 	// and there's no way to easily install the app on each repo via the API.
-	githubOrg = envOr("GITHUB_ORG", "cue-labs-modules-testing")
+	githubOrg = cmp.Or(os.Getenv("GITHUB_ORG"), "cue-labs-modules-testing")
 	// githubKeep leaves the newly created repo around when set to true.
-	githubKeep = envOr("GITHUB_KEEP", "false")
+	githubKeep = cmp.Or(os.Getenv("GITHUB_KEEP"), "false")
 
 	// gcloudRegistry is an existing Google Cloud Artifact Registry repository
 	// to publish module versions to via "cue mod publish",
 	// and authenticated via gcloud's configuration in the host environment.
-	gcloudRegistry = envOr("GCLOUD_REGISTRY", "europe-west1-docker.pkg.dev/project-unity-377819/modules-e2e-registry")
+	gcloudRegistry = cmp.Or(os.Getenv("GCLOUD_REGISTRY"), "europe-west1-docker.pkg.dev/project-unity-377819/modules-e2e-registry")
 )
 
 func TestScript(t *testing.T) {
@@ -218,13 +219,6 @@ func TestScript(t *testing.T) {
 }
 
 func addr[T any](t T) *T { return &t }
-
-func envOr(name, fallback string) string {
-	if s := os.Getenv(name); s != "" {
-		return s
-	}
-	return fallback
-}
 
 func envMust(t *testing.T, name string) string {
 	if s := os.Getenv(name); s != "" {

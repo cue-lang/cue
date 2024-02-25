@@ -17,6 +17,7 @@
 package main
 
 import (
+	"cmp"
 	"context"
 	"fmt"
 	"log"
@@ -27,7 +28,7 @@ import (
 )
 
 var (
-	githubOrg   = envOr("GITHUB_ORG", "cue-labs-modules-testing")
+	githubOrg   = cmp.Or(os.Getenv("GITHUB_ORG"), "cue-labs-modules-testing")
 	githubToken = envMust("GITHUB_TOKEN")
 )
 
@@ -75,13 +76,6 @@ moreRepos:
 			break
 		}
 	}
-}
-
-func envOr(name, fallback string) string {
-	if s := os.Getenv(name); s != "" {
-		return s
-	}
-	return fallback
 }
 
 func envMust(name string) string {

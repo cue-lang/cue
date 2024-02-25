@@ -18,6 +18,7 @@ import (
 	"bytes"
 	pathpkg "path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -94,7 +95,7 @@ func (s *importStack) Pop() {
 }
 
 func (s *importStack) Copy() []string {
-	return append([]string{}, *s...)
+	return slices.Clone(*s)
 }
 
 type fileProcessor struct {

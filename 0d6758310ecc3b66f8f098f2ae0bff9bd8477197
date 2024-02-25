@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c258178c_f5705f9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-25T12:06:59Z",
+      "side": 1,
+      "message": "We reviewed this together; LGTM. Below are some minor comments. We agreed that there are rough edges and bits that will need to be fixed up, but that will happen in follow-up CLs for the sake of avoiding conflicts and moving forward.\n\nFYI, Unity is failing but if you rebase the CL stack, it should be green again.",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "50163eb7_7ec80c9a",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-25T12:06:59Z",
+      "side": 1,
+      "message": "did you intend to solve this XXX before submitting? if not, make it a TODO with a bit more detail",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "062c25e4_966ebbee",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-25T12:06:59Z",
+      "side": 1,
+      "message": "did you intend to solve this XXX before submitting? if not, make it a TODO with a bit more detail",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97b2852b_2e231cc6",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-25T12:06:59Z",
+      "side": 1,
+      "message": "did you intend to solve this XXX before submitting? if not, make it a TODO with a bit more detail",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "506db0fa_2ef34d0b",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-25T12:06:59Z",
+      "side": 1,
+      "message": "did you intend to solve this XXX before submitting? if not, make it a TODO with a bit more detail",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

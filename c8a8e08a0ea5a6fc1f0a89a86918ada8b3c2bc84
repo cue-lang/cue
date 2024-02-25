@@ -33,6 +33,24 @@
       "message": "to fix CI, can you try:\n\n    CUE_UPDATE\u003d1 go test ./...",
       "revId": "c8a8e08a0ea5a6fc1f0a89a86918ada8b3c2bc84",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbb8ea80_186e3e4c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037647
+      },
+      "writtenOn": "2024-02-25T17:19:36Z",
+      "side": 1,
+      "message": "Thanks! Should be good now. (Also good to know that env var exists, I updated the values in similar tests manually in prior changes 😄)",
+      "parentUuid": "366fa6e9_d8fce27d",
+      "revId": "c8a8e08a0ea5a6fc1f0a89a86918ada8b3c2bc84",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

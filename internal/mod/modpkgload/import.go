@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/mod/module"
 )
 
 // importFromModules finds the module and source location in the dependency graph of

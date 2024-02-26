@@ -24,8 +24,8 @@ import (
 
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modregistry"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/mod/module"
 )
 
 func newModUploadCmd(c *Command) *cobra.Command {

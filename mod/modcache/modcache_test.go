@@ -15,15 +15,13 @@ import (
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/mod/modpkgload"
-	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
 )
 
-func TestCUEModSummary(t *testing.T) {
+func TestRequirements(t *testing.T) {
 	dir := t.TempDir()
 	ctx := context.Background()
 	r := newRegistry(t, `
@@ -34,12 +32,9 @@ deps: {
 	"bar.com@v0": v: "v0.5.0"
 }
 `)
-	wantSummary := &modrequirements.ModFileSummary{
-		Module: module.MustNewVersion("example.com/foo", "v0.0.1"),
-		Require: []module.Version{
-			module.MustNewVersion("bar.com", "v0.5.0"),
-			module.MustNewVersion("foo.com/bar/hello", "v0.2.3"),
-		},
+	wantRequirements := []module.Version{
+		module.MustNewVersion("bar.com", "v0.5.0"),
+		module.MustNewVersion("foo.com/bar/hello", "v0.2.3"),
 	}
 	// Test two concurrent fetches both using the same directory.
 	var wg sync.WaitGroup
@@ -49,19 +44,19 @@ deps: {
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		summary, err := cr.CUEModSummary(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		summary, err := cr.Requirements(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		if !qt.Check(t, qt.DeepEquals(summary, wantSummary)) {
+		if !qt.Check(t, qt.DeepEquals(summary, wantRequirements)) {
 			return
 		}
 		// Fetch again so that we test the in-memory cache-hit path.
-		summary, err = cr.CUEModSummary(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		summary, err = cr.Requirements(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		if !qt.Check(t, qt.DeepEquals(summary, wantSummary)) {
+		if !qt.Check(t, qt.DeepEquals(summary, wantRequirements)) {
 			return
 		}
 	}
@@ -101,7 +96,7 @@ package x
 	r := newRegistry(t, registryContents)
 	wantContents, err := txtarContents(fsSub(txtarfs.FS(txtar.Parse([]byte(registryContents))), "example.com_foo_v0.0.1"))
 	qt.Assert(t, qt.IsNil(err))
-	checkContents := func(t *testing.T, loc modpkgload.SourceLoc) bool {
+	checkContents := func(t *testing.T, loc module.SourceLoc) bool {
 		gotContents, err := txtarContents(fsSub(loc.FS, loc.Dir))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return false
@@ -110,7 +105,7 @@ package x
 			return false
 		}
 		// Check that the location can be used to retrieve the OS file path.
-		osrFS, ok := loc.FS.(modpkgload.OSRootFS)
+		osrFS, ok := loc.FS.(module.OSRootFS)
 		if !qt.Check(t, qt.IsTrue(ok)) {
 			return false
 		}

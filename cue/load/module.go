@@ -134,11 +134,7 @@ func (reqs *mvsReqs) Required(m module.Version) (vs []module.Version, err error)
 	if m.Path() == reqs.mainModule.Module {
 		return reqs.mainModule.DepVersions(), nil
 	}
-	mf, err := reqs.regClient.CUEModSummary(context.TODO(), m)
-	if err != nil {
-		return nil, err
-	}
-	return mf.Require, nil
+	return reqs.regClient.Requirements(context.TODO(), m)
 }
 
 // Required implements mvs.Reqs.Max.

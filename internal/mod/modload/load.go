@@ -33,7 +33,7 @@ type Registry interface {
 
 type loader struct {
 	mainModule    module.Version
-	mainModuleLoc modpkgload.SourceLoc
+	mainModuleLoc module.SourceLoc
 	registry      Registry
 }
 
@@ -64,7 +64,7 @@ func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers
 	ld := &loader{
 		mainModule: mainModuleVersion,
 		registry:   reg,
-		mainModuleLoc: modpkgload.SourceLoc{
+		mainModuleLoc: module.SourceLoc{
 			FS:  fsys,
 			Dir: modRoot,
 		},
@@ -586,13 +586,13 @@ func (ld *loader) spotCheckRoots(ctx context.Context, rs *modrequirements.Requir
 				return
 			}
 
-			summary, err := ld.registry.CUEModSummary(ctx, m)
+			require, err := ld.registry.Requirements(ctx, m)
 			if err != nil {
 				cancel()
 				return
 			}
 
-			for _, r := range summary.Require {
+			for _, r := range require {
 				if v, ok := rs.RootSelected(r.Path()); ok && semver.Compare(v, r.Version()) < 0 {
 					cancel()
 					return

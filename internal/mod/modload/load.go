@@ -12,11 +12,11 @@ import (
 	"slices"
 
 	"cuelang.org/go/internal/mod/internal/par"
-	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
 

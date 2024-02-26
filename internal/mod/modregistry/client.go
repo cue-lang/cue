@@ -30,8 +30,8 @@ import (
 	specs "github.com/opencontainers/image-spec/specs-go"
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
-	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
 

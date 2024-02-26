@@ -105,7 +105,7 @@ var (
 func moduleSchemaDo[T any](f func(moduleSchema cue.Value) (T, error)) (T, error) {
 	moduleSchemaOnce.Do(func() {
 		ctx := cuecontext.New()
-		schemav := ctx.CompileBytes(moduleSchemaData, cue.Filename("cuelang.org/go/internal/mod/modfile/schema.cue"))
+		schemav := ctx.CompileBytes(moduleSchemaData, cue.Filename("cuelang.org/go/mod/modfile/schema.cue"))
 		schemav = lookup(schemav, cue.Def("#File"))
 		//schemav = schemav.Unify(lookup(schemav, cue.Hid("#Strict", "_")))
 		if err := schemav.Validate(); err != nil {

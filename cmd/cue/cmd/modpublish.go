@@ -22,9 +22,9 @@ import (
 
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
 

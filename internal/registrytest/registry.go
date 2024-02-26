@@ -22,9 +22,9 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/mod/modregistry"
-	"cuelang.org/go/internal/mod/modzip"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
+	"cuelang.org/go/mod/modzip"
 )
 
 // AuthConfig specifies authorization requirements for the server.

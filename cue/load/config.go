@@ -15,6 +15,7 @@
 package load
 
 import (
+	"context"
 	"io"
 	"os"
 	"path/filepath"
@@ -25,8 +26,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/mod/modconfig"
 	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/module"
 )
 
 const (
@@ -276,11 +279,13 @@ type Config struct {
 
 	// Registry is used to fetch CUE module dependencies.
 	//
-	// When nil, dependencies will be resolved in legacy mode:
-	// reading from cue.mod/pkg, cue.mod/usr, and cue.mod/gen.
+	// When nil, if the modules experiment is enabled
+	// (CUE_EXPERIMENT=modules), [modconfig.NewRegistry]
+	// will be used to create a registry instance using the
+	// usual cmd/cue conventions for environment variables.
 	//
-	// THIS IS EXPERIMENTAL FOR NOW. DO NOT USE.
-	Registry modload.Registry
+	// THIS IS EXPERIMENTAL. API MIGHT CHANGE.
+	Registry modconfig.Registry
 
 	fileSystem fileSystem
 }
@@ -363,6 +368,20 @@ func (c Config) complete() (cfg *Config, err error) {
 	} else if !filepath.IsAbs(c.ModuleRoot) {
 		c.ModuleRoot = filepath.Join(c.Dir, c.ModuleRoot)
 	}
+	// Note: if cueexperiment.Flags.Modules _isn't_ set but c.Registry
+	// is, we consider that a good enough hint that modules support
+	// should be enabled and hence don't return an error in that case.
+	if cueexperiment.Flags.Modules && c.Registry == nil {
+		registry, err := modconfig.NewRegistry(nil)
+		if err != nil {
+			// If there's an error in the registry configuration,
+			// don't error immediately, but only when we actually
+			// need to resolve modules.
+			//panic("errorRegistry " + err.Error())
+			registry = errorRegistry{err}
+		}
+		c.Registry = registry
+	}
 	if err := c.loadModule(); err != nil {
 		return nil, err
 	}
@@ -403,4 +422,21 @@ func (c *Config) newErrInstance(err error) *build.Instance {
 	i.Module = c.Module
 	i.Err = errors.Promote(err, "instance")
 	return i
+}
+
+// errorRegistry implements [modconfig.Registry] by returning err from all methods.
+type errorRegistry struct {
+	err error
+}
+
+func (r errorRegistry) Requirements(ctx context.Context, m module.Version) ([]module.Version, error) {
+	return nil, r.err
+}
+
+func (r errorRegistry) Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error) {
+	return module.SourceLoc{}, r.err
+}
+
+func (r errorRegistry) ModuleVersions(ctx context.Context, mpath string) ([]string, error) {
+	return nil, r.err
 }

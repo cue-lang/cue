@@ -51,14 +51,14 @@ type Client struct {
 // Resolver resolves module paths to a registry and a location
 // within that registry.
 type Resolver interface {
-	// Resolve resolves a base module path (without a version)
+	// ResolveToRegistry resolves a base module path (without a version)
 	// and optional version to the location for that path.
 	//
 	// If the version is empty, the Tag in the returned Location
 	// will hold the prefix that all versions of the module in its
 	// repository have. That prefix will be followed by the version
 	// itself.
-	Resolve(mpath, vers string) (RegistryLocation, error)
+	ResolveToRegistry(mpath, vers string) (RegistryLocation, error)
 }
 
 // RegistryLocation holds a registry and a location within it
@@ -164,7 +164,7 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 	if !hasMajor {
 		mpath = m
 	}
-	loc, err := c.resolver.Resolve(mpath, "")
+	loc, err := c.resolver.ResolveToRegistry(mpath, "")
 	if err != nil {
 		return nil, err
 	}
@@ -396,7 +396,7 @@ func (m *Module) ManifestDigest() ociregistry.Digest {
 }
 
 func (c *Client) resolve(m module.Version) (RegistryLocation, error) {
-	loc, err := c.resolver.Resolve(m.BasePath(), m.Version())
+	loc, err := c.resolver.ResolveToRegistry(m.BasePath(), m.Version())
 	if err != nil {
 		return RegistryLocation{}, err
 	}
@@ -468,7 +468,7 @@ type SingleResolver struct {
 	R ociregistry.Interface
 }
 
-func (r SingleResolver) Resolve(mpath, vers string) (RegistryLocation, error) {
+func (r SingleResolver) ResolveToRegistry(mpath, vers string) (RegistryLocation, error) {
 	return RegistryLocation{
 		Registry:   r.R,
 		Repository: mpath,

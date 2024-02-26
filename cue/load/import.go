@@ -27,7 +27,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
-	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/mod/module"
 )
 
@@ -394,8 +393,8 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	return absDir, name, err
 }
 
-func absPathForSourceLoc(loc modpkgload.SourceLoc) (string, error) {
-	osfs, ok := loc.FS.(modpkgload.OSRootFS)
+func absPathForSourceLoc(loc module.SourceLoc) (string, error) {
+	osfs, ok := loc.FS.(module.OSRootFS)
 	if !ok {
 		return "", fmt.Errorf("cannot get absolute path for FS of type %T", loc.FS)
 	}

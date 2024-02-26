@@ -29,11 +29,11 @@ import (
 // If the package is present in exactly one module, importFromModules will
 // return the module, its root directory, and a list of other modules that
 // lexically could have provided the package but did not.
-func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m module.Version, pkgLocs []SourceLoc, altMods []module.Version, err error) {
-	fail := func(err error) (module.Version, []SourceLoc, []module.Version, error) {
-		return module.Version{}, []SourceLoc(nil), nil, err
+func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m module.Version, pkgLocs []module.SourceLoc, altMods []module.Version, err error) {
+	fail := func(err error) (module.Version, []module.SourceLoc, []module.Version, error) {
+		return module.Version{}, []module.SourceLoc(nil), nil, err
 	}
-	failf := func(format string, args ...interface{}) (module.Version, []SourceLoc, []module.Version, error) {
+	failf := func(format string, args ...interface{}) (module.Version, []module.SourceLoc, []module.Version, error) {
 		return fail(fmt.Errorf(format, args...))
 	}
 	// Note: we don't care about the package qualifier at this point
@@ -54,7 +54,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 	}
 
 	// Check each module on the build list.
-	var locs [][]SourceLoc
+	var locs [][]module.SourceLoc
 	var mods []module.Version
 	var mg *modrequirements.ModuleGraph
 	localPkgLocs, err := pkgs.findLocalPackage(pkgPathOnly)
@@ -123,7 +123,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 				return fail(fmt.Errorf("cannot find package: %v", err))
 			} else if ok {
 				mods = append(mods, m)
-				locs = append(locs, []SourceLoc{loc})
+				locs = append(locs, []module.SourceLoc{loc})
 			} else {
 				altMods = append(altMods, m)
 			}
@@ -174,7 +174,7 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 // whether there are in fact CUE source files in that directory.
 // A non-nil error indicates that the existence of the directory and/or
 // source files could not be determined, for example due to a permission error.
-func locInModule(pkgPath, mpath string, mloc SourceLoc, isLocal bool) (loc SourceLoc, haveCUEFiles bool, err error) {
+func locInModule(pkgPath, mpath string, mloc module.SourceLoc, isLocal bool) (loc module.SourceLoc, haveCUEFiles bool, err error) {
 	loc.FS = mloc.FS
 
 	// Determine where to expect the package.
@@ -183,7 +183,7 @@ func locInModule(pkgPath, mpath string, mloc SourceLoc, isLocal bool) (loc Sourc
 	} else if len(pkgPath) > len(mpath) && pkgPath[len(mpath)] == '/' && pkgPath[:len(mpath)] == mpath {
 		loc.Dir = path.Join(mloc.Dir, pkgPath[len(mpath)+1:])
 	} else {
-		return SourceLoc{}, false, nil
+		return module.SourceLoc{}, false, nil
 	}
 
 	// Check that there aren't other modules in the way.
@@ -196,7 +196,7 @@ func locInModule(pkgPath, mpath string, mloc SourceLoc, isLocal bool) (loc Sourc
 			// TODO should we count it as a module file if it's a directory?
 			haveCUEMod := err == nil
 			if haveCUEMod {
-				return SourceLoc{}, false, nil
+				return module.SourceLoc{}, false, nil
 			}
 			parent := path.Dir(d)
 			if parent == d {
@@ -213,15 +213,15 @@ func locInModule(pkgPath, mpath string, mloc SourceLoc, isLocal bool) (loc Sourc
 	// We're just looking for a plausible directory.
 	haveCUEFiles, err = isDirWithCUEFiles(loc)
 	if err != nil {
-		return SourceLoc{}, false, err
+		return module.SourceLoc{}, false, err
 	}
 	return loc, haveCUEFiles, err
 }
 
 var localPkgDirs = []string{"cue.mod/gen", "cue.mod/usr", "cue.mod/pkg"}
 
-func (pkgs *Packages) findLocalPackage(pkgPath string) ([]SourceLoc, error) {
-	var locs []SourceLoc
+func (pkgs *Packages) findLocalPackage(pkgPath string) ([]module.SourceLoc, error) {
+	var locs []module.SourceLoc
 	for _, d := range localPkgDirs {
 		loc := pkgs.mainModuleLoc
 		loc.Dir = path.Join(loc.Dir, d, pkgPath)
@@ -236,7 +236,7 @@ func (pkgs *Packages) findLocalPackage(pkgPath string) ([]SourceLoc, error) {
 	return locs, nil
 }
 
-func isDirWithCUEFiles(loc SourceLoc) (bool, error) {
+func isDirWithCUEFiles(loc module.SourceLoc) (bool, error) {
 	// It would be nice if we could inspect the error returned from
 	// ReadDir to see if it's failing because it's not a directory,
 	// but unfortunately that doesn't seem to be something defined
@@ -268,7 +268,7 @@ func isDirWithCUEFiles(loc SourceLoc) (bool, error) {
 //
 // The isLocal return value reports whether the replacement,
 // if any, is within the local main module.
-func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc SourceLoc, isLocal bool, err error) {
+func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc module.SourceLoc, isLocal bool, err error) {
 	if mod == pkgs.mainModuleVersion {
 		return pkgs.mainModuleLoc, true, nil
 	}
@@ -282,7 +282,7 @@ func (pkgs *Packages) fetch(ctx context.Context, mod module.Version) (loc Source
 // directory.
 type AmbiguousImportError struct {
 	ImportPath string
-	Locations  [][]SourceLoc
+	Locations  [][]module.SourceLoc
 	Modules    []module.Version // Either empty or 1:1 with Dirs.
 }
 

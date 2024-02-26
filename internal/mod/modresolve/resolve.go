@@ -48,13 +48,15 @@ const (
 	encHashAsTag  pathEncoding = "hashAsTag"
 )
 
-// HostResolver resolves module paths to their location in a registry.
+// LocationResolver resolves module paths to a location
+// consisting of a host name of a registry and where
+// in that registry the module is to be found.
 //
 // Note: The implementation in this package operates entirely lexically,
 // which is why [Location] contains only a host name and not an actual
 // [ociregistry.Interface] implementation.
-type HostResolver interface {
-	// Resolve resolves a base module path (without a version
+type LocationResolver interface {
+	// ResolveToLocation resolves a base module path (without a version
 	// suffix, a.k.a. OCI repository name) and optional version to
 	// the location for that path. It reports whether it can find
 	// appropriate location for the module.
@@ -63,10 +65,10 @@ type HostResolver interface {
 	// will hold the prefix that all versions of the module in its
 	// repository have. That prefix will be followed by the version
 	// itself.
-	Resolve(path string, vers string) (Location, bool)
+	ResolveToLocation(path string, vers string) (Location, bool)
 
 	// AllHosts returns all the registry hosts that the resolver
-	// might resolve to, ordered lexically.
+	// might resolve to, ordered lexically by hostname.
 	AllHosts() []Host
 }
 
@@ -172,7 +174,7 @@ var configSchemaData []byte
 // ParseConfig parses the registry configuration with the given contents and file name.
 // If there is no default registry, then the single registry specified in catchAllDefault
 // will be used as a default.
-func ParseConfig(configFile []byte, filename string, catchAllDefault string) (HostResolver, error) {
+func ParseConfig(configFile []byte, filename string, catchAllDefault string) (LocationResolver, error) {
 	configSchemaOnce.Do(func() {
 		ctx := cuecontext.New()
 		schemav := ctx.CompileBytes(configSchemaData, cue.Filename("cuelang.org/go/internal/mod/modresolve/schema.cue"))
@@ -252,7 +254,7 @@ func ParseConfig(configFile []byte, filename string, catchAllDefault string) (Ho
 // and no catchAllDefault is provided.
 //
 // [docker reference]: https://pkg.go.dev/github.com/distribution/reference
-func ParseCUERegistry(s string, catchAllDefault string) (HostResolver, error) {
+func ParseCUERegistry(s string, catchAllDefault string) (LocationResolver, error) {
 	if s == "" && catchAllDefault == "" {
 		return nil, fmt.Errorf("no catch-all registry or default")
 	}
@@ -363,7 +365,7 @@ func (r *resolver) AllHosts() []Host {
 	return r.allHosts
 }
 
-func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
+func (r *resolver) ResolveToLocation(mpath, vers string) (Location, bool) {
 	if mpath == "" {
 		return Location{}, false
 	}

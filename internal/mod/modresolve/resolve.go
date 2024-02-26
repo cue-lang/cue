@@ -54,7 +54,7 @@ const (
 // which is why [Location] contains only a host name and not an actual
 // [ociregistry.Interface] implementation.
 type HostResolver interface {
-	// Resolve resolves a base module path (without a version
+	// ResolveToHost resolves a base module path (without a version
 	// suffix, a.k.a. OCI repository name) and optional version to
 	// the location for that path. It reports whether it can find
 	// appropriate location for the module.
@@ -63,7 +63,7 @@ type HostResolver interface {
 	// will hold the prefix that all versions of the module in its
 	// repository have. That prefix will be followed by the version
 	// itself.
-	Resolve(path string, vers string) (Location, bool)
+	ResolveToHost(path string, vers string) (Location, bool)
 
 	// AllHosts returns all the registry hosts that the resolver
 	// might resolve to, ordered lexically.
@@ -363,7 +363,7 @@ func (r *resolver) AllHosts() []Host {
 	return r.allHosts
 }
 
-func (r *resolver) Resolve(mpath, vers string) (Location, bool) {
+func (r *resolver) ResolveToHost(mpath, vers string) (Location, bool) {
 	if mpath == "" {
 		return Location{}, false
 	}

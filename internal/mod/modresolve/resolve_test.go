@@ -432,7 +432,7 @@ func testLookups(t *testing.T, r HostResolver, lookups map[string]*Location) {
 	for key, want := range lookups {
 		t.Run(key, func(t *testing.T) {
 			m, v, _ := strings.Cut(key, " ")
-			got, ok := r.Resolve(m, v)
+			got, ok := r.ResolveToHost(m, v)
 			if want == nil {
 				qt.Assert(t, qt.IsFalse(ok))
 			} else {

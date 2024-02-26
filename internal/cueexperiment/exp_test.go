@@ -44,7 +44,7 @@ func TestInit(t *testing.T) {
 		t.Run(test.testName, func(t *testing.T) {
 			setZero(&Flags)
 			t.Setenv("CUE_EXPERIMENT", test.cueExperiment)
-			err := Init()
+			err := _init()
 			if test.wantError != "" {
 				qt.Assert(t, qt.ErrorMatches(err, test.wantError))
 				return

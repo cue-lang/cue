@@ -16,9 +16,7 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modregistry"
-	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modfile"
@@ -74,7 +72,7 @@ type registryImpl struct {
 	reg *modregistry.Client
 }
 
-func (r *registryImpl) CUEModSummary(ctx context.Context, mv module.Version) (*modrequirements.ModFileSummary, error) {
+func (r *registryImpl) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
 	m, err := r.reg.GetModule(ctx, mv)
 	if err != nil {
 		return nil, err
@@ -87,33 +85,30 @@ func (r *registryImpl) CUEModSummary(ctx context.Context, mv module.Version) (*m
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
 	}
-	return &modrequirements.ModFileSummary{
-		Require: mf.DepVersions(),
-		Module:  mv,
-	}, nil
+	return mf.DepVersions(), nil
 }
 
 // getModContents downloads the module with the given version
 // and returns the directory where it's stored.
-func (c *registryImpl) Fetch(ctx context.Context, mv module.Version) (modpkgload.SourceLoc, error) {
+func (c *registryImpl) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc, error) {
 	m, err := c.reg.GetModule(ctx, mv)
 	if err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	r, err := m.GetZip(ctx)
 	if err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	defer r.Close()
 	zipData, err := io.ReadAll(r)
 	if err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	zipr, err := zip.NewReader(bytes.NewReader(zipData), int64(len(zipData)))
 	if err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
-	return modpkgload.SourceLoc{
+	return module.SourceLoc{
 		FS:  zipr,
 		Dir: ".",
 	}, nil

@@ -1,9 +1,17 @@
-package modpkgload
+package module
 
 import (
 	"io/fs"
 	"os"
 )
+
+// SourceLoc represents the location of some CUE source code.
+type SourceLoc struct {
+	// FS is the filesystem containing the source.
+	FS fs.FS
+	// Dir is the directory within the above filesystem.
+	Dir string
+}
 
 // OSRootFS can be implemented by an [fs.FS]
 // implementation to return its root directory as

@@ -16,8 +16,6 @@ import (
 	"github.com/rogpeppe/go-internal/robustio"
 
 	"cuelang.org/go/internal/mod/modload"
-	"cuelang.org/go/internal/mod/modpkgload"
-	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/par"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
@@ -31,7 +29,7 @@ const logging = false // TODO hook this up to CUE_DEBUG
 // stores persistent cached content inside the given
 // OS directory.
 //
-// The `modpkgload.SourceLoc.FS` fields in the locations
+// The `module.SourceLoc.FS` fields in the locations
 // returned by the registry implement the `OSRootFS` interface,
 // allowing a caller to find the native OS filepath where modules
 // are stored.
@@ -56,7 +54,7 @@ type cache struct {
 	modFileCache     par.ErrCache[string, []byte]
 }
 
-func (c *cache) CUEModSummary(ctx context.Context, mv module.Version) (*modrequirements.ModFileSummary, error) {
+func (c *cache) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
 	data, err := c.downloadModFile(ctx, mv)
 	if err != nil {
 		return nil, err
@@ -65,22 +63,19 @@ func (c *cache) CUEModSummary(ctx context.Context, mv module.Version) (*modrequi
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse module file from %v: %v", mv, err)
 	}
-	return &modrequirements.ModFileSummary{
-		Require: mf.DepVersions(),
-		Module:  mv,
-	}, nil
+	return mf.DepVersions(), nil
 }
 
 // Fetch returns the location of the contents for the given module
 // version, downloading it if necessary.
-func (c *cache) Fetch(ctx context.Context, mv module.Version) (modpkgload.SourceLoc, error) {
+func (c *cache) Fetch(ctx context.Context, mv module.Version) (module.SourceLoc, error) {
 	dir, err := c.downloadDir(ctx, mv)
 	if err == nil {
 		// The directory has already been completely extracted (no .partial file exists).
 		return c.dirToLocation(dir), nil
 	}
 	if dir == "" || !errors.Is(err, fs.ErrNotExist) {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 
 	// To avoid cluttering the cache with extraneous files,
@@ -88,12 +83,12 @@ func (c *cache) Fetch(ctx context.Context, mv module.Version) (modpkgload.Source
 	// Invoke DownloadZip before locking the file.
 	zipfile, err := c.downloadZip(ctx, mv)
 	if err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 
 	unlock, err := c.lockVersion(ctx, mv)
 	if err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	defer unlock()
 
@@ -119,13 +114,13 @@ func (c *cache) Fetch(ctx context.Context, mv module.Version) (modpkgload.Source
 	}
 	if dirExists {
 		if err := RemoveAll(dir); err != nil {
-			return modpkgload.SourceLoc{}, err
+			return module.SourceLoc{}, err
 		}
 	}
 
 	partialPath, err := c.cachePath(ctx, mv, "partial")
 	if err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 
 	// Extract the module zip directory at its final location.
@@ -139,19 +134,19 @@ func (c *cache) Fetch(ctx context.Context, mv module.Version) (modpkgload.Source
 	// ERROR_ACCESS_DENIED when another process (usually an anti-virus scanner)
 	// opened files in the temporary directory.
 	if err := os.MkdirAll(parentDir, 0777); err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	if err := os.WriteFile(partialPath, nil, 0666); err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	if err := modzip.Unzip(dir, mv, zipfile); err != nil {
 		if rmErr := RemoveAll(dir); rmErr == nil {
 			os.Remove(partialPath)
 		}
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	if err := os.Remove(partialPath); err != nil {
-		return modpkgload.SourceLoc{}, err
+		return module.SourceLoc{}, err
 	}
 	makeDirsReadOnly(dir)
 	return c.dirToLocation(dir), nil
@@ -287,9 +282,9 @@ func (c *cache) downloadModFile1(ctx context.Context, mod module.Version, modfil
 	return data, nil
 }
 
-func (c *cache) dirToLocation(fpath string) modpkgload.SourceLoc {
-	return modpkgload.SourceLoc{
-		FS:  modpkgload.OSDirFS(fpath),
+func (c *cache) dirToLocation(fpath string) module.SourceLoc {
+	return module.SourceLoc{
+		FS:  module.OSDirFS(fpath),
 		Dir: ".",
 	}
 }
@@ -318,7 +313,7 @@ func makeDirsReadOnly(dir string) {
 	}
 }
 
-// RemoveAll removes a directory written by Fetch, first applying
+// RemoveAll removes a directory written by the cache, first applying
 // any permission changes needed to do so.
 func RemoveAll(dir string) error {
 	// Module cache has 0555 directories; make them writable in order to remove content.

@@ -25,8 +25,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modload"
+	"cuelang.org/go/mod/modfile"
 )
 
 const (

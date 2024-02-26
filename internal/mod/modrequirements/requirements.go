@@ -8,9 +8,9 @@ import (
 	"sync"
 	"sync/atomic"
 
-	"cuelang.org/go/internal/mod/internal/par"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/internal/par"
 	"cuelang.org/go/mod/module"
 )
 

@@ -5,6 +5,7 @@ import (
 	"os"
 	"reflect"
 	"strings"
+	"sync"
 )
 
 // Flags holds the set of CUE_EXPERIMENT flags. It is initialized
@@ -17,8 +18,14 @@ var Flags struct {
 // don't always want it to be called (for example we don't want it to be
 // called when running "cue help"), and also because we want the failure
 // mode to be one of error not panic, which would be the only option if
-// it was a top level init function
+// it was a top level init function.
 func Init() error {
+	return initOnce()
+}
+
+var initOnce = sync.OnceValue(_init)
+
+func _init() error {
 	exp := os.Getenv("CUE_EXPERIMENT")
 	if exp == "" {
 		return nil

@@ -49,12 +49,7 @@ type Requirements struct {
 // Registry holds the contents of a registry. It's expected that this will
 // cache any results that it returns.
 type Registry interface {
-	CUEModSummary(ctx context.Context, m module.Version) (*ModFileSummary, error)
-}
-
-type ModFileSummary struct {
-	Module  module.Version
-	Require []module.Version
+	Requirements(ctx context.Context, m module.Version) ([]module.Version, error)
 }
 
 // A cachedGraph is a non-nil *ModuleGraph, together with any error discovered
@@ -262,9 +257,21 @@ type ModuleGraph struct {
 // itself, as its requirements may change.
 //
 // The caller must not modify the returned summary.
-func (rs *Requirements) cueModSummary(ctx context.Context, m module.Version) (*ModFileSummary, error) {
+func (rs *Requirements) cueModSummary(ctx context.Context, m module.Version) (*modFileSummary, error) {
+	require, err := rs.registry.Requirements(ctx, m)
+	if err != nil {
+		return nil, err
+	}
 	// TODO account for replacements, exclusions, etc.
-	return rs.registry.CUEModSummary(ctx, m)
+	return &modFileSummary{
+		module:  m,
+		require: require,
+	}, nil
+}
+
+type modFileSummary struct {
+	module  module.Version
+	require []module.Version
 }
 
 // readModGraph reads and returns the module dependency graph starting at the
@@ -285,18 +292,18 @@ func (rs *Requirements) readModGraph(ctx context.Context) (*ModuleGraph, error) 
 	var (
 		loadQueue = par.NewQueue(runtime.GOMAXPROCS(0))
 		loading   sync.Map // module.Version → nil; the set of modules that have been or are being loaded
-		loadCache par.ErrCache[module.Version, *ModFileSummary]
+		loadCache par.ErrCache[module.Version, *modFileSummary]
 	)
 
 	// loadOne synchronously loads the explicit requirements for module m.
 	// It does not load the transitive requirements of m.
-	loadOne := func(m module.Version) (*ModFileSummary, error) {
-		return loadCache.Do(m, func() (*ModFileSummary, error) {
+	loadOne := func(m module.Version) (*modFileSummary, error) {
+		return loadCache.Do(m, func() (*modFileSummary, error) {
 			summary, err := rs.cueModSummary(ctx, m)
 
 			mu.Lock()
 			if err == nil {
-				mg.g.Require(m, summary.Require)
+				mg.g.Require(m, summary.require)
 			} else {
 				hasError = true
 			}
@@ -373,7 +380,7 @@ func (mg *ModuleGraph) BuildList() []module.Version {
 	return mg.buildList
 }
 
-func (mg *ModuleGraph) findError(loadCache *par.ErrCache[module.Version, *ModFileSummary]) error {
+func (mg *ModuleGraph) findError(loadCache *par.ErrCache[module.Version, *modFileSummary]) error {
 	errStack := mg.g.FindPath(func(m module.Version) bool {
 		_, err := loadCache.Get(m)
 		return err != nil && err != par.ErrCacheEntryNotFound

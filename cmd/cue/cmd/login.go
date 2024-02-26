@@ -16,14 +16,10 @@ package cmd
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
-	"path/filepath"
-	"time"
 
+	"cuelang.org/go/internal/cueconfig"
 	"github.com/spf13/cobra"
-	"golang.org/x/oauth2"
 )
 
 // TODO: We need a testscript to cover "cue login" with its oauth2 device flow.
@@ -68,20 +64,20 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 			if resolver == nil {
 				return fmt.Errorf("cannot log in when modules are not enabled")
 			}
-			registryHosts := resolver.resolver.AllHosts()
+			registryHosts := resolver.AllHosts()
 			if len(registryHosts) > 1 {
 				return fmt.Errorf("need a single CUE registry to log into")
 			}
-			registry := registryHosts[0].Name
-			loginsPath, err := findLoginsPath()
+			registry := registryHosts[0]
+			loginsPath, err := cueconfig.LoginConfigPath()
 			if err != nil {
 				return fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
 			}
-			logins, err := readLogins(loginsPath)
+			logins, err := cueconfig.ReadLogins(loginsPath)
 			if err != nil {
 				return fmt.Errorf("cannot load CUE registry logins: %v", err)
 			}
-			oauthCfg := registryOAuthConfig(registry)
+			oauthCfg := cueconfig.RegistryOAuthConfig(registry)
 
 			resp, err := oauthCfg.DeviceAuth(ctx)
 			if err != nil {
@@ -97,9 +93,9 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 				return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
 			}
 
-			logins.Registries[registry] = loginFromToken(tok)
+			logins.Registries[registry] = cueconfig.LoginFromToken(tok)
 
-			if err := writeLogins(loginsPath, logins); err != nil {
+			if err := cueconfig.WriteLogins(loginsPath, logins); err != nil {
 				return fmt.Errorf("cannot store CUE registry logins: %v", err)
 			}
 			fmt.Printf("Login for %s stored in %s\n", registry, loginsPath)
@@ -108,121 +104,4 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 		}),
 	}
 	return cmd
-}
-
-func registryOAuthConfig(host string) oauth2.Config {
-	// For now, we use the OAuth endpoints as implemented by registry.cue.works,
-	// but other OCI registries may support the OAuth device flow with different ones.
-	//
-	// TODO: Query /.well-known/oauth-authorization-server to obtain
-	// token_endpoint and device_authorization_endpoint per the Oauth RFCs:
-	// * https://datatracker.ietf.org/doc/html/rfc8414#section-3
-	// * https://datatracker.ietf.org/doc/html/rfc8628#section-4
-	return oauth2.Config{
-		Endpoint: oauth2.Endpoint{
-			DeviceAuthURL: "https://" + host + "/login/device/code",
-			TokenURL:      "https://" + host + "/login/oauth/token",
-		},
-	}
-}
-
-// TODO: Encrypt the JSON file if the system has a secret store available,
-// such as libsecret on Linux. Such secret stores tend to have low size limits,
-// so rather than store the entire JSON blob there, store an encryption key.
-// There are a number of Go packages which integrate with multiple OS keychains.
-//
-// The encrypted form of logins.json can be logins.json.enc, for example.
-// If a user has an existing logins.json file and encryption is available,
-// we should replace the file with logins.json.enc transparently.
-
-// TODO: When running "cue login", try to prevent overwriting concurrent changes
-// when writing to the file on disk. For example, grab a lock, or check if the size
-// changed between reading and writing the file.
-
-func findLoginsPath() (string, error) {
-	configDir, err := cueConfigDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(configDir, "logins.json"), nil
-}
-
-func readLogins(path string) (*cueLogins, error) {
-	body, err := os.ReadFile(path)
-	if err != nil {
-		return nil, err
-	}
-	logins := &cueLogins{
-		// Initialize the map so we can insert entries.
-		Registries: map[string]cueRegistryLogin{},
-	}
-	if err := json.Unmarshal(body, logins); err != nil {
-		return nil, err
-	}
-	return logins, nil
-}
-
-func writeLogins(path string, logins *cueLogins) error {
-	// Indenting and a trailing newline are not necessary, but nicer to humans.
-	body, err := json.MarshalIndent(logins, "", "\t")
-	if err != nil {
-		return err
-	}
-	body = append(body, '\n')
-
-	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
-		return err
-	}
-	// Discourage other users from reading this file.
-	if err := os.WriteFile(path, body, 0o600); err != nil {
-		return err
-	}
-	return nil
-}
-
-type cueLogins struct {
-	// TODO: perhaps add a version string to simplify making changes in the future
-
-	// TODO: Sooner or later we will likely need more than one token per registry,
-	// such as when our central registry starts using scopes.
-
-	Registries map[string]cueRegistryLogin `json:"registries"`
-}
-
-type cueRegistryLogin struct {
-	// These fields mirror [oauth2.Token].
-	// We don't directly reference the type so we can be in control of our file format.
-	// Note that Expiry is a pointer, so omitempty can work as intended.
-
-	AccessToken string `json:"access_token"`
-
-	TokenType string `json:"token_type,omitempty"`
-
-	RefreshToken string `json:"refresh_token,omitempty"`
-
-	Expiry *time.Time `json:"expiry,omitempty"`
-}
-
-func loginFromToken(tok *oauth2.Token) cueRegistryLogin {
-	login := cueRegistryLogin{
-		AccessToken:  tok.AccessToken,
-		TokenType:    tok.TokenType,
-		RefreshToken: tok.RefreshToken,
-	}
-	if !tok.Expiry.IsZero() {
-		login.Expiry = &tok.Expiry
-	}
-	return login
-}
-
-func tokenFromLogin(login cueRegistryLogin) *oauth2.Token {
-	tok := &oauth2.Token{
-		AccessToken:  login.AccessToken,
-		TokenType:    login.TokenType,
-		RefreshToken: login.RefreshToken,
-	}
-	if login.Expiry != nil {
-		tok.Expiry = *login.Expiry
-	}
-	return tok
 }

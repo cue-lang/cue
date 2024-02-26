@@ -11,9 +11,9 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modload"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/mod/module"
 )
 
 // loadModule loads the module file, resolves and downloads module

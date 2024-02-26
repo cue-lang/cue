@@ -11,10 +11,10 @@ import (
 
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modregistry"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/mvs"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/module"
 )
 
 func TestRequirements(t *testing.T) {

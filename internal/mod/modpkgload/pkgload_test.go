@@ -16,8 +16,8 @@ import (
 
 	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/module"
 )
 
 func TestLoadPackages(t *testing.T) {

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ef2c828d_a2790dce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-26T08:53:59Z",
+      "side": 1,
+      "message": "Good point. I would make it very clear when howtos are mirrors of Go examples, just so we can keep them up to date via e.g. `go generate` or some other automation rather than maintaining them twice and cause drift.",
+      "parentUuid": "ea0e44f6_4f9a132a",
+      "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c59cb47f_89011220",
@@ -84,6 +102,24 @@
       "side": 1,
       "message": "If it\u0027s not too much hassle, I think that the former option could work OK. Otherwise maybe just leave a TODO explaining that the example isn\u0027t runnable and why?",
       "parentUuid": "efba4b17_10024b99",
+      "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb580aa3_2c335d71",
+        "filename": "cue/load/testdata/testmod/example/example.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-26T08:53:59Z",
+      "side": 1,
+      "message": "I thought about this some more and decided against preparing the files on MkdirTemp via extra Go code. It would draw away from the real point of the example, cue/load, and the users most likely won\u0027t be loading CUE files from temporary directories.\n\nI also think it\u0027s not unreasonable for pkg.go.dev to support reading files from testdata, and I think it will at some point (https://github.com/golang/go/issues/45475).",
+      "parentUuid": "5b538156_a94df035",
       "revId": "e629887d3331eff46effd734c562b11c83ffc40d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

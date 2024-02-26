@@ -18,9 +18,9 @@ import (
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/module"
 )
 
 func TestCUEModSummary(t *testing.T) {

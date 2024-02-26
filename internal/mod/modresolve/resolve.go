@@ -31,7 +31,7 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/mod/module"
 )
 
 // pathEncoding represents one of the possible types of

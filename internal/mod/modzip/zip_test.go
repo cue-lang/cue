@@ -21,8 +21,8 @@ import (
 	"github.com/google/go-cmp/cmp"
 
 	"cuelang.org/go/internal/cuetest"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/mod/module"
 	"golang.org/x/mod/sumdb/dirhash"
 	"golang.org/x/tools/txtar"
 )

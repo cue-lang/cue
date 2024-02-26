@@ -28,7 +28,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/mod/modpkgload"
-	"cuelang.org/go/internal/mod/module"
+	"cuelang.org/go/mod/module"
 )
 
 // importPkg returns details about the CUE package named by the import path,

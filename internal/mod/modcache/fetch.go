@@ -21,8 +21,8 @@ import (
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/mod/module"
 )
 
 const logging = false // TODO hook this up to CUE_DEBUG

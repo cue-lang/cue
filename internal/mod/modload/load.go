@@ -16,8 +16,8 @@ import (
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/mod/module"
 )
 
 const logging = false // TODO hook this up to CUE_DEBUG

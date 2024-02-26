@@ -30,9 +30,9 @@ import (
 
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
 
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/modzip"
 	"cuelang.org/go/internal/mod/semver"
+	"cuelang.org/go/mod/module"
 )
 
 func newTestClient(t *testing.T) *Client {

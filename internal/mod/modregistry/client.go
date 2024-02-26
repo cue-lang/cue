@@ -31,8 +31,8 @@ import (
 	ocispec "github.com/opencontainers/image-spec/specs-go/v1"
 
 	"cuelang.org/go/internal/mod/modfile"
-	"cuelang.org/go/internal/mod/module"
 	"cuelang.org/go/internal/mod/modzip"
+	"cuelang.org/go/mod/module"
 )
 
 var ErrNotFound = fmt.Errorf("module not found")

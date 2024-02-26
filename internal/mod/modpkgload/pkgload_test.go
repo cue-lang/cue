@@ -56,7 +56,7 @@ func TestLoadPackages(t *testing.T) {
 				printf := func(f string, a ...any) {
 					fmt.Fprintf(&out, f, a...)
 				}
-				pkgs := LoadPackages(context.Background(), mainModulePath, SourceLoc{tfs, "."}, initialRequirements, reg, rootPackages)
+				pkgs := LoadPackages(context.Background(), mainModulePath, module.SourceLoc{tfs, "."}, initialRequirements, reg, rootPackages)
 				for _, pkg := range pkgs.All() {
 					printf("%s\n", pkg.ImportPath())
 					printf("\tflags: %v\n", pkg.Flags())
@@ -89,16 +89,16 @@ type testRegistry struct {
 	fs fs.FS
 }
 
-func (r testRegistry) Fetch(ctx context.Context, m module.Version) (SourceLoc, error) {
+func (r testRegistry) Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error) {
 	mpath := r.modpath(m)
 	info, err := fs.Stat(r.fs, mpath)
 	if err != nil || !info.IsDir() {
-		return SourceLoc{}, fmt.Errorf("module %v not found at %v", m, mpath)
+		return module.SourceLoc{}, fmt.Errorf("module %v not found at %v", m, mpath)
 	}
-	return SourceLoc{r.fs, mpath}, nil
+	return module.SourceLoc{r.fs, mpath}, nil
 }
 
-func (r testRegistry) CUEModSummary(ctx context.Context, m module.Version) (*modrequirements.ModFileSummary, error) {
+func (r testRegistry) Requirements(ctx context.Context, m module.Version) ([]module.Version, error) {
 	mpath := path.Join(r.modpath(m), "cue.mod/module.cue")
 	data, err := fs.ReadFile(r.fs, mpath)
 	if err != nil {
@@ -108,10 +108,7 @@ func (r testRegistry) CUEModSummary(ctx context.Context, m module.Version) (*mod
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
 	}
-	return &modrequirements.ModFileSummary{
-		Require: mf.DepVersions(),
-		Module:  m,
-	}, nil
+	return mf.DepVersions(), nil
 }
 
 func (r testRegistry) modpath(m module.Version) string {

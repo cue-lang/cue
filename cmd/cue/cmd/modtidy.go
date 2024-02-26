@@ -113,11 +113,3 @@ func findModuleRoot() (string, error) {
 		dir = dir1
 	}
 }
-
-func modCacheDir() (string, error) {
-	cacheDir, err := cueCacheDir()
-	if err != nil {
-		return "", err
-	}
-	return filepath.Join(cacheDir, "mod"), nil
-}

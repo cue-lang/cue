@@ -25,10 +25,12 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/mod/module"
 
 	// Trigger the unconditional loading of all core builtin packages if load
 	// is used. This was deemed the simplest way to avoid having to import
@@ -46,6 +48,11 @@ func Instances(args []string, c *Config) []*build.Instance {
 	ctx := context.TODO()
 	if c == nil {
 		c = &Config{}
+	}
+	// We want to consult the CUE_EXPERIMENT flag to see whether
+	// consult external registries by default.
+	if err := cueexperiment.Init(); err != nil {
+		return []*build.Instance{c.newErrInstance(err)}
 	}
 	newC, err := c.complete()
 	if err != nil {
@@ -140,7 +147,7 @@ func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error
 		cfg.modFile.DepVersions(),
 		cfg.modFile.DefaultMajorVersions(),
 	)
-	mainModLoc := modpkgload.SourceLoc{
+	mainModLoc := module.SourceLoc{
 		FS:  cfg.fileSystem.ioFS(cfg.ModuleRoot),
 		Dir: ".",
 	}

@@ -167,7 +167,7 @@ type registryImpl struct {
 
 var _ Registry = (*registryImpl)(nil)
 
-func (r *registryImpl) CUEModSummary(ctx context.Context, mv module.Version) (*ModFileSummary, error) {
+func (r *registryImpl) Requirements(ctx context.Context, mv module.Version) ([]module.Version, error) {
 	m, err := r.reg.GetModule(ctx, mv)
 	if err != nil {
 		return nil, err
@@ -180,10 +180,7 @@ func (r *registryImpl) CUEModSummary(ctx context.Context, mv module.Version) (*M
 	if err != nil {
 		return nil, fmt.Errorf("cannot parse module file from %v: %v", m, err)
 	}
-	return &ModFileSummary{
-		Require: mf.DepVersions(),
-		Module:  mv,
-	}, nil
+	return mf.DepVersions(), nil
 }
 
 func versions(vs ...string) []module.Version {

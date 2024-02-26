@@ -15,6 +15,7 @@
 package load
 
 import (
+	"context"
 	"io"
 	"os"
 	"path/filepath"
@@ -27,6 +28,7 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modfile"
+	"cuelang.org/go/mod/module"
 )
 
 const (
@@ -284,6 +286,29 @@ type Config struct {
 
 	fileSystem fileSystem
 }
+
+// Registry is used to access CUE modules from external sources.
+type Registry interface {
+	// Requirements returns a list of the modules required by the given module
+	// version.
+	Requirements(ctx context.Context, m module.Version) ([]module.Version, error)
+
+	// Fetch returns the location of the contents for the given module
+	// version, downloading it if necessary.
+	Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error)
+
+	// ModuleVersions returns all the versions for the module with the
+	// given path, which should contain a major version.
+	ModuleVersions(ctx context.Context, mpath string) ([]string, error)
+}
+
+// We don't want to make modload part of the cue/load API,
+// so we define the above type independently, but we want
+// it to be interchangeable, so check that statically here.
+var (
+	_ Registry         = modload.Registry(nil)
+	_ modload.Registry = Registry(nil)
+)
 
 func (c *Config) stdin() io.Reader {
 	if c.Stdin == nil {

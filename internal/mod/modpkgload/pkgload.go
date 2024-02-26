@@ -3,7 +3,6 @@ package modpkgload
 import (
 	"context"
 	"fmt"
-	"io/fs"
 	"runtime"
 	"slices"
 	"sort"
@@ -20,7 +19,7 @@ import (
 type Registry interface {
 	// Fetch returns the location of the contents for the given module
 	// version, downloading it if necessary.
-	Fetch(ctx context.Context, m module.Version) (SourceLoc, error)
+	Fetch(ctx context.Context, m module.Version) (module.SourceLoc, error)
 }
 
 // Flags is a set of flags tracking metadata about a package.
@@ -78,7 +77,7 @@ func (f Flags) has(cond Flags) bool {
 
 type Packages struct {
 	mainModuleVersion module.Version
-	mainModuleLoc     SourceLoc
+	mainModuleLoc     module.SourceLoc
 	pkgCache          par.Cache[string, *Package]
 	pkgs              []*Package
 	rootPkgs          []*Package
@@ -95,24 +94,16 @@ type Package struct {
 	flags atomicLoadPkgFlags
 
 	// Populated by [loader.load].
-	mod          module.Version // module providing package
-	locs         []SourceLoc    // location of source code directories
-	err          error          // error loading package
-	imports      []*Package     // packages imported by this one
+	mod          module.Version     // module providing package
+	locs         []module.SourceLoc // location of source code directories
+	err          error              // error loading package
+	imports      []*Package         // packages imported by this one
 	inStd        bool
 	fromExternal bool
 	altMods      []module.Version // modules that could have contained the package but did not
 
 	// Populated by postprocessing in [Packages.buildStacks]:
 	stack *Package // package importing this one in minimal import stack for this pkg
-}
-
-// SourceLoc represents the location of some CUE source code.
-type SourceLoc struct {
-	// FS is the filesystem containing the source.
-	FS fs.FS
-	// Dir is the directory within the above filesystem.
-	Dir string
 }
 
 func (pkg *Package) ImportPath() string {
@@ -123,7 +114,7 @@ func (pkg *Package) FromExternalModule() bool {
 	return pkg.fromExternal
 }
 
-func (pkg *Package) Locations() []SourceLoc {
+func (pkg *Package) Locations() []module.SourceLoc {
 	return pkg.locs
 }
 
@@ -158,7 +149,7 @@ func (pkg *Package) Mod() module.Version {
 func LoadPackages(
 	ctx context.Context,
 	mainModulePath string,
-	mainModuleLoc SourceLoc,
+	mainModuleLoc module.SourceLoc,
 	rs *modrequirements.Requirements,
 	reg Registry,
 	rootPkgPaths []string,

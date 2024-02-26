@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eb2a247f_c7c4f205",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-26T09:06:47Z",
+      "side": 1,
+      "message": "Note that the CL trybot didn\u0027t catch this as we don\u0027t test the releases in CLs, as it\u0027s too slow.",
+      "revId": "057216318862c9f850825d517f51325fad5efd89",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

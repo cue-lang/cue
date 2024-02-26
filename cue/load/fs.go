@@ -28,7 +28,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/mod/modpkgload"
+	"cuelang.org/go/mod/module"
 )
 
 type overlayFile struct {
@@ -82,7 +82,7 @@ func (fs *fileSystem) getDir(dir string, create bool) map[string]*overlayFile {
 func (fs *fileSystem) ioFS(root string) iofs.FS {
 	dir := fs.getDir(root, false)
 	if dir == nil {
-		return modpkgload.OSDirFS(root)
+		return module.OSDirFS(root)
 	}
 	return &ioFS{
 		fs:   fs,
@@ -284,7 +284,7 @@ var _ interface {
 	iofs.FS
 	iofs.ReadDirFS
 	iofs.ReadFileFS
-	modpkgload.OSRootFS
+	module.OSRootFS
 } = (*ioFS)(nil)
 
 type ioFS struct {

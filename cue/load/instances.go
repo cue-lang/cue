@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/mod/module"
 
 	// Trigger the unconditional loading of all core builtin packages if load
 	// is used. This was deemed the simplest way to avoid having to import
@@ -140,7 +141,7 @@ func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error
 		cfg.modFile.DepVersions(),
 		cfg.modFile.DefaultMajorVersions(),
 	)
-	mainModLoc := modpkgload.SourceLoc{
+	mainModLoc := module.SourceLoc{
 		FS:  cfg.fileSystem.ioFS(cfg.ModuleRoot),
 		Dir: ".",
 	}

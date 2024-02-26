@@ -15,9 +15,9 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
 
 	"cuelang.org/go/internal/cueexperiment"
-	"cuelang.org/go/internal/mod/modcache"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/modresolve"
+	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modregistry"
 )
 

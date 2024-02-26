@@ -16,12 +16,12 @@ import (
 	"github.com/google/go-cmp/cmp"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/mod/modfile"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modrequirements"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
 )
 

@@ -10,9 +10,9 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/cuetxtar"
-	"cuelang.org/go/internal/mod/modcache"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/modcache"
 	"cuelang.org/go/mod/modregistry"
 )
 

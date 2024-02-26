@@ -24,12 +24,26 @@ import (
 	"text/template"
 	"unicode"
 
+	"github.com/go-quicktest/qt"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/str"
 	"cuelang.org/go/internal/tdtest"
 )
+
+func init() {
+	// Ignore the value of CUE_EXPERIMENT for the purposes
+	// of these tests, which we want to test both with the experiment
+	// enabled and disabled.
+	os.Setenv("CUE_EXPERIMENT", "")
+
+	// Once we've called cueexperiment.Init, cueexperiment.Vars
+	// will not be touched again, so we can set fields in it for the tests.
+	cueexperiment.Init()
+}
 
 // TestLoad is an end-to-end test.
 func TestLoad(t *testing.T) {
@@ -422,4 +436,15 @@ func race(f func()) {
 			wg.Done()
 		}()
 	}
+}
+
+func testModulesExperimentBothWays(t *testing.T, tf func(t *testing.T)) {
+	t.Run("ModulesDisabled", func(t *testing.T) {
+		qt.Patch(t, &cueexperiment.Flags.Modules, false)
+		tf(t)
+	})
+	t.Run("ModulesEnabled", func(t *testing.T) {
+		qt.Patch(t, &cueexperiment.Flags.Modules, true)
+		tf(t)
+	})
 }

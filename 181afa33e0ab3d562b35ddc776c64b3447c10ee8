@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d8eee507_ca249706",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T17:26:35Z",
+      "side": 1,
+      "message": "why would a user ever want to set this? I thought CUE_REGISTRY itself already supported a fallback, e.g. `mycorp\u003dregistry.mycorp.com,fallback.registry.cue.works`\n\nin other words, cmd/cue only exposes one knob via CUE_REGISTRY, it doesn\u0027t expose CUE_DEFAULT_REGISTRY, so I don\u0027t think we should do something different here",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4079ec37_fd88f27c",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T17:26:35Z",
+      "side": 1,
+      "message": "you could say\n\n\u003e by \"cue login\" and \"docker login\".\n\nto be consistent",
+      "range": {
+        "startLine": 53,
+        "startChar": 30,
+        "endLine": 54,
+        "endChar": 39
+      },
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

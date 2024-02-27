@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6399654b_971a2fdc",
+        "filename": "cue/load/config.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 311,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T17:26:35Z",
+      "side": 1,
+      "message": "you could always consider an alias, although then the godoc wouldn\u0027t be as nice. so I agree this is fine.",
+      "revId": "4797b13c2f7a1eece9f8fd6f2e482b8599aaab1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c48b5d2_4bfd9084",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T17:26:35Z",
+      "side": 1,
+      "message": "this move should be called out in the commit message - you do mention SourceLoc, but other APIs being moved like OSDirFS caught me by surprise as I reviewed the code.",
+      "revId": "4797b13c2f7a1eece9f8fd6f2e482b8599aaab1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

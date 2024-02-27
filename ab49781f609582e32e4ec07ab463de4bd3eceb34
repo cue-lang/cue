@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eccbbcfc_8d38e34b",
+        "filename": "cue/load/config.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-27T19:29:56Z",
+      "side": 1,
+      "message": "I think we need to have dropped this \"DO NOT USE\" notice by this point? \n\nAlso, it seems odd that the type here is an internal type?",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f5fc7dbb_9a57d0b1",
         "filename": "cue/load/example_test.go",
         "patchSetId": 7
@@ -54,6 +71,23 @@
       "writtenOn": "2024-02-27T17:22:57Z",
       "side": 1,
       "message": "this comment could be two lines for the two sentences and it would read better: https://sembr.org/",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0ea3795_71aa43b7",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-27T19:29:56Z",
+      "side": 1,
+      "message": "Per my other comment, this field is marked as \"DO NOT USE\" with an internal type. So it\u0027s hard to see how a user would know it\u0027s ok to use it.",
       "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

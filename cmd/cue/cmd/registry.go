@@ -17,8 +17,8 @@ import (
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/mod/modcache"
 	"cuelang.org/go/internal/mod/modload"
-	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/mod/modresolve"
+	"cuelang.org/go/mod/modregistry"
 )
 
 const defaultRegistry = "registry.cue.works"

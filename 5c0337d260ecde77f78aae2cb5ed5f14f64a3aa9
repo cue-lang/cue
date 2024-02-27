@@ -16,6 +16,24 @@
       "message": "briefly say why, i.e. to not tie the API to zip archives? also elsewhere",
       "revId": "5c0337d260ecde77f78aae2cb5ed5f14f64a3aa9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a67356c_c9768baf",
+        "filename": "mod/modzip/zip.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 198,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T16:37:02Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a22cf6ae_ac9846ad",
+      "revId": "5c0337d260ecde77f78aae2cb5ed5f14f64a3aa9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

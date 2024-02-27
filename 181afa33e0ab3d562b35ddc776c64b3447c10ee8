@@ -3,6 +3,63 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f5d86abe_1c2dc3cd",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-27T19:29:48Z",
+      "side": 1,
+      "message": "Does this struct carry its weight? It seems only to be used as a container for arguments to `NewResolver` below?",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "365bd830_bf61f539",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-27T19:29:48Z",
+      "side": 1,
+      "message": "Per the comment above about the struct not carrying its weight, this comment definitely feels better suited to an argument to `NewResolver` and a struct field which, by definition, cannot influence behaviour by itself.",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a140765d_2e473ea6",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-27T19:29:48Z",
+      "side": 1,
+      "message": "This comment doesn\u0027t make sense to me. \"it\u0027s\" is presumably a reference to the field in question, `DefaultRegistry`?",
+      "range": {
+        "startLine": 47,
+        "startChar": 37,
+        "endLine": 48,
+        "endChar": 35
+      },
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d8eee507_ca249706",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 12
@@ -37,6 +94,40 @@
         "endLine": 54,
         "endChar": 39
       },
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f5527dc_fb6aaebd",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-27T19:29:48Z",
+      "side": 1,
+      "message": "Is there a reason you chose not to make this type public? The `Config` struct and code above seems a rather rigid \"interface\" to what is a simple type that could simply be exposed? With then a separate, better scoped function that resolves from a `CUE_REGISTRY`-based config to a resolver? \n\nThe `Host` and `Location` types by the `modresolve` package are in effect publicly defined types according to the docker config \"spec\", no?",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "57b3f8be_c49beed6",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-27T19:29:48Z",
+      "side": 1,
+      "message": "Why isn\u0027t this used by `cmd/cue`?",
       "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

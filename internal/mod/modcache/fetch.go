@@ -15,10 +15,10 @@ import (
 
 	"github.com/rogpeppe/go-internal/robustio"
 
-	"cuelang.org/go/internal/mod/internal/par"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/modpkgload"
 	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/internal/par"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"

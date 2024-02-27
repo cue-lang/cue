@@ -14,8 +14,8 @@ import (
 	"cuelabs.dev/go/oci/ociregistry/ocifilter"
 	"golang.org/x/tools/txtar"
 
-	"cuelang.org/go/internal/mod/modregistry"
 	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/modregistry"
 	"cuelang.org/go/mod/module"
 )
 

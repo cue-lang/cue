@@ -4,6 +4,9 @@
 
 // Package modzip provides functions for creating and extracting module zip files.
 //
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
+//
 // Module zip files have several restrictions listed below. These are necessary
 // to ensure that module zip files can be extracted consistently on supported
 // platforms and file systems.

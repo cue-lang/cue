@@ -1,3 +1,7 @@
+// Package modcache provides a file-based cache for modules.
+//
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
 package modcache
 
 import (

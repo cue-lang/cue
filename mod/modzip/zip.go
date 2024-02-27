@@ -4,6 +4,9 @@
 
 // Package modzip provides functions for creating and extracting module zip files.
 //
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
+//
 // Module zip files have several restrictions listed below. These are necessary
 // to ensure that module zip files can be extracted consistently on supported
 // platforms and file systems.
@@ -71,6 +74,8 @@ const (
 // File provides an abstraction for a file in a directory, zip, or anything
 // else that looks like a file - it knows how to open files represented
 // as a particular type without being a file itself.
+//
+// Deprecated: this will be removed in a future API iteration.
 type FileIO[F any] interface {
 	// Path returns a clean slash-separated relative path from the module root
 	// directory to the file.
@@ -189,6 +194,8 @@ var (
 // Note that CheckFiles will not open any files, so Create may still fail when
 // CheckFiles is successful due to I/O errors, reported size differences
 // or an invalid module.cue file.
+//
+// Deprecated: this will be removed in a future API iteration.
 func CheckFiles[F any](files []F, fio FileIO[F]) (CheckedFiles, error) {
 	cf, _, _ := checkFiles(files, fio)
 	return cf, cf.Err()
@@ -354,6 +361,8 @@ func checkFiles[F any](files []F, fio FileIO[F]) (cf CheckedFiles, validFiles []
 //
 // Note that CheckDir will not open any files, so CreateFromDir may still fail
 // when CheckDir is successful due to I/O errors.
+//
+// Deprecated: this will be removed in a future API iteration.
 func CheckDir(dir string) (CheckedFiles, error) {
 	// List files (as CreateFromDir would) and check which ones are omitted
 	// or invalid.
@@ -506,6 +515,8 @@ func CheckZip(m module.Version, r io.ReaderAt, zipSize int64) (*zip.Reader, *zip
 // In particular, Create will not include files in modules found in
 // subdirectories, most files in vendor directories, or irregular files (such
 // as symbolic links) in the output archive.
+//
+// Deprecated: this will be removed in a future API iteration.
 func Create[F any](w io.Writer, m module.Version, files []F, fio FileIO[F]) (err error) {
 	defer func() {
 		if err != nil {

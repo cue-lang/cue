@@ -281,6 +281,9 @@ type Config struct {
 	// When nil, dependencies will be resolved in legacy mode:
 	// reading from cue.mod/pkg, cue.mod/usr, and cue.mod/gen.
 	//
+	// See [cuelang.org/go/mod/modconfig.NewRegistry] for
+	// a way of creating instances of this type.
+	//
 	// THIS IS EXPERIMENTAL FOR NOW. DO NOT USE.
 	Registry modload.Registry
 

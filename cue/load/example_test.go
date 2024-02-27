@@ -16,11 +16,17 @@ package load_test
 
 import (
 	"fmt"
+	"os"
 	"path/filepath"
+
+	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/internal/registrytest"
+	"cuelang.org/go/internal/txtarfs"
+	"cuelang.org/go/mod/modconfig"
 )
 
 // Note that this example may not be runnable on pkg.go.dev,
@@ -79,4 +85,87 @@ func Example() {
 	// example.cue with 3 declarations
 	//
 	// Field string: Hello Joe
+}
+
+// Note that this example may not be runnable on pkg.go.dev,
+// as it expects files to be present inside testdata/testmod.
+// Using cue/load with a "real" registry and real files on disk keeps the example realistic
+// and enables the user to easily tweak the code to their needs.
+func ExampleWithExternalModules() {
+	// setUpModulesExample starts a temporary in-memory
+	// registry, populates it with an example module and sets CUE_REGISTRY
+	// to refer to it
+	cleanup := setUpModulesExample()
+	defer cleanup()
+
+	registry, err := modconfig.NewRegistry(nil)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	insts := load.Instances([]string{"."}, &load.Config{
+		Registry: registry,
+		Dir:      filepath.Join("testdata", "testmod-external"),
+	})
+	inst := insts[0]
+	if err := inst.Err; err != nil {
+		fmt.Println(err)
+		return
+	}
+	ctx := cuecontext.New()
+	val := ctx.BuildInstance(inst)
+	if err := val.Err(); err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	// Inspect the contents of the value, such as one string field.
+	fieldStr, err := val.LookupPath(cue.MakePath(cue.Str("output"))).String()
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	fmt.Println("Field string:", fieldStr)
+	// Output:
+	// Field string: hello, world
+}
+
+func setUpModulesExample() func() {
+	registryArchive := txtar.Parse([]byte(`
+-- foo.example_v0.0.1/cue.mod/module.cue --
+module: "foo.example@v0"
+-- foo.example_v0.0.1/bar/bar.cue --
+package bar
+
+value: "world"
+`))
+
+	var cleanups []func()
+	cleanup := func(cf func()) {
+		cleanups = append(cleanups, cf)
+	}
+	setenv := func(env, val string) {
+		old := os.Getenv(env)
+		cleanup(func() {
+			os.Setenv(env, old)
+		})
+		os.Setenv(env, val)
+	}
+	registry, err := registrytest.New(txtarfs.FS(registryArchive), "")
+	if err != nil {
+		panic(err)
+	}
+	cleanup(registry.Close)
+	setenv("CUE_REGISTRY", registry.Host()+"+insecure")
+	dir, err := os.MkdirTemp("", "")
+	if err != nil {
+		panic(err)
+	}
+	setenv("CUE_CACHE_DIR", dir)
+
+	return func() {
+		for i := len(cleanups) - 1; i >= 0; i-- {
+			cleanups[i]()
+		}
+	}
 }

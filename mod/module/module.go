@@ -4,6 +4,9 @@
 
 // Package module defines the module.Version type along with support code.
 //
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
+//
 // The module.Version type is a simple Path, Version pair:
 //
 //	type Version struct {

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78eef4b0_e822d1a4",
+        "filename": "cue/load/config.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:22:37Z",
+      "side": 1,
+      "message": "Good point. Done.",
+      "parentUuid": "eccbbcfc_8d38e34b",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f5fc7dbb_9a57d0b1",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-02-27T17:22:57Z",
       "side": 1,
       "message": "testmod-external",
+      "range": {
+        "startLine": 91,
+        "startChar": 53,
+        "endLine": 91,
+        "endChar": 60
+      },
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bce94225_2d4b0ba0",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:22:37Z",
+      "side": 1,
+      "message": "removed as per other suggestion.",
+      "parentUuid": "f5fc7dbb_9a57d0b1",
       "range": {
         "startLine": 91,
         "startChar": 53,
@@ -58,6 +100,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7d8bc2ef_e8185f9d",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:22:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "52eef063_61907a24",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "113ca18c_e3c6d727",
@@ -75,6 +135,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d158ff1_ba09952e",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:22:37Z",
+      "side": 1,
+      "message": "There\u0027s only one sentence, but yeah, I know what you\u0027re getting at, and agree in general. Done.",
+      "parentUuid": "113ca18c_e3c6d727",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c0ea3795_71aa43b7",
@@ -88,6 +166,24 @@
       "writtenOn": "2024-02-27T19:29:56Z",
       "side": 1,
       "message": "Per my other comment, this field is marked as \"DO NOT USE\" with an internal type. So it\u0027s hard to see how a user would know it\u0027s ok to use it.",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bbbed36b_ed814944",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:22:37Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c0ea3795_71aa43b7",
       "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

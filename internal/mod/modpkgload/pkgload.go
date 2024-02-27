@@ -10,9 +10,9 @@ import (
 	"strings"
 	"sync/atomic"
 
-	"cuelang.org/go/internal/mod/internal/par"
 	"cuelang.org/go/internal/mod/modimports"
 	"cuelang.org/go/internal/mod/modrequirements"
+	"cuelang.org/go/internal/par"
 	"cuelang.org/go/mod/module"
 )
 

@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f5fc7dbb_9a57d0b1",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T17:22:57Z",
+      "side": 1,
+      "message": "testmod-external",
+      "range": {
+        "startLine": 91,
+        "startChar": 53,
+        "endLine": 91,
+        "endChar": 60
+      },
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "52eef063_61907a24",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T17:22:57Z",
+      "side": 1,
+      "message": "at this point I\u0027d make the note apply to the entire file and all of its examples, rather than copy-pasting it for every example",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "113ca18c_e3c6d727",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T17:22:57Z",
+      "side": 1,
+      "message": "this comment could be two lines for the two sentences and it would read better: https://sembr.org/",
+      "revId": "ab49781f609582e32e4ec07ab463de4bd3eceb34",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

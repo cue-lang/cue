@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package modregistry provides functionality for reading and writing
+// CUE modules from an OCI registry.
+//
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
 package modregistry
 
 import (

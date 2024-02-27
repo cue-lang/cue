@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package modfile provides functionality for reading and parsing
+// the CUE module file, cue.mod/module.cue.
+//
+// WARNING: THIS PACKAGE IS EXPERIMENTAL.
+// ITS API MAY CHANGE AT ANY TIME.
 package modfile
 
 import (

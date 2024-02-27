@@ -33,6 +33,24 @@
       "message": "this move should be called out in the commit message - you do mention SourceLoc, but other APIs being moved like OSDirFS caught me by surprise as I reviewed the code.",
       "revId": "4797b13c2f7a1eece9f8fd6f2e482b8599aaab1c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5450065f_1592c8fe",
+        "filename": "mod/module/dirfs.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9c48b5d2_4bfd9084",
+      "revId": "4797b13c2f7a1eece9f8fd6f2e482b8599aaab1c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

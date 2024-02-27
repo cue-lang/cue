@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "abbbd7a5_83f71cea",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "I wanted to make the API as simple as possible but also open to future expansion, which pointed towards using a struct, as I already had three arguments.\n\nWithout `DefaultRegistry`, the balance perhaps tips the other way, but I\u0027m not sure. We\u0027ve still got two arguments, and there may well be more in the future. `modconfig.NewRegistry(nil)` as the standard idiom seems marginally better than `modconfig.NewRegistry(\"\", nil)`.\n\nFWIW there are definitely examples of existing `Config` types in the CUE module that expose only one or two fields, so I don\u0027t think this is without precedent.",
+      "parentUuid": "f5d86abe_1c2dc3cd",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "365bd830_bf61f539",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 12
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-27T19:29:48Z",
       "side": 1,
       "message": "Per the comment above about the struct not carrying its weight, this comment definitely feels better suited to an argument to `NewResolver` and a struct field which, by definition, cannot influence behaviour by itself.",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c842fefc_901586ac",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "\u003e a struct field which, by definition, cannot influence behaviour by itself.\n\nI don\u0027t understand this, but I\u0027ll change to passing this as an argument to the function directly, as suggested.",
+      "parentUuid": "365bd830_bf61f539",
       "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -58,6 +94,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7be5a112_a8ec9357",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "Yes, \"it\u0027s\" is indeed a reference to that field. I put square brackets around the other reference to DefaultRegistry because that\u0027s a reference to the constant of that name (and according to the go doc comment specs should resolve to that, I believe, and be linkified accordingly).\nFollowing @mvdan@mvdan.cc\u0027s suggestion, I\u0027ll be removing DefaultRegistry, so this comment becomes moot.",
+      "parentUuid": "a140765d_2e473ea6",
+      "range": {
+        "startLine": 47,
+        "startChar": 37,
+        "endLine": 48,
+        "endChar": 35
+      },
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d8eee507_ca249706",
@@ -75,6 +135,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "eabd59d9_0f24ae0a",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "Fair enough. I was thinking about a situation where a company might have its own default \"central\" registry, but that\u0027s probably over-thinking indeed.\nRemoved.",
+      "parentUuid": "d8eee507_ca249706",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4079ec37_fd88f27c",
@@ -88,6 +166,30 @@
       "writtenOn": "2024-02-27T17:26:35Z",
       "side": 1,
       "message": "you could say\n\n\u003e by \"cue login\" and \"docker login\".\n\nto be consistent",
+      "range": {
+        "startLine": 53,
+        "startChar": 30,
+        "endLine": 54,
+        "endChar": 39
+      },
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c58161bd_ca87e106",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "good idea. done.",
+      "parentUuid": "4079ec37_fd88f27c",
       "range": {
         "startLine": 53,
         "startChar": 30,
@@ -117,6 +219,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "1e17e7d7_71f0ad7e",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "I thought that exposing the `modresolve` API was just beyond the bounds of necessity. I _think_ you may be confusing `modregistry.Resolver` with `modresolve.HostResolver`. The former is used to instantiate a `modregistry.Client` instance. The latter is (currently) an implementation detail only - I don\u0027t believe that HostResolver or the Host type that it uses are exposed anywhere in the public API.\n\n\u003e The `Host` and `Location` types by the `modresolve` package are in effect publicly defined types according to the docker config \"spec\", no?\n\nSorry, I don\u0027t understand this. Which docker config \"spec\" are you talking about here?",
+      "parentUuid": "5f5527dc_fb6aaebd",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "57b3f8be_c49beed6",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 12
@@ -128,6 +248,24 @@
       "writtenOn": "2024-02-27T19:29:48Z",
       "side": 1,
       "message": "Why isn\u0027t this used by `cmd/cue`?",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8d41de60_bcee9898",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-27T20:14:09Z",
+      "side": 1,
+      "message": "Because cmd/cue needs to warn about CUE_REGISTRY being set when CUE_EXPERIMENT doesn\u0027t mention modules. On balance I decided that doing that here wasn\u0027t necessary, as by definition someone that is importing this package is \"buying into\" the experiment, so requiring CUE_EXPERIMENT in this package doesn\u0027t seem quite right, hence the warning doesn\u0027t work either. Happy to change it the other way if you think that\u0027s better.",
+      "parentUuid": "57b3f8be_c49beed6",
       "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

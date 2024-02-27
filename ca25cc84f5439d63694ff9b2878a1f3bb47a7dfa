@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a499ad11_25acfdc0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-27T15:56:54Z",
+      "side": 1,
+      "message": "SGTM as discussed since this will be experimental for now, and also since we already need to import these Go packages from our other modules, akin to how Go already exposes their module Go APIs via x/mod.",
+      "revId": "ca25cc84f5439d63694ff9b2878a1f3bb47a7dfa",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

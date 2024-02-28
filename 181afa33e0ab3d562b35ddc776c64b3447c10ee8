@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d32da0e3_3f758960",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T14:09:38Z",
+      "side": 1,
+      "message": "As discussed, I think this is worthwhile, so left in place (although modified)",
+      "parentUuid": "abbbd7a5_83f71cea",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "365bd830_bf61f539",
@@ -231,6 +249,24 @@
       "side": 1,
       "message": "I thought that exposing the `modresolve` API was just beyond the bounds of necessity. I _think_ you may be confusing `modregistry.Resolver` with `modresolve.HostResolver`. The former is used to instantiate a `modregistry.Client` instance. The latter is (currently) an implementation detail only - I don\u0027t believe that HostResolver or the Host type that it uses are exposed anywhere in the public API.\n\n\u003e The `Host` and `Location` types by the `modresolve` package are in effect publicly defined types according to the docker config \"spec\", no?\n\nSorry, I don\u0027t understand this. Which docker config \"spec\" are you talking about here?",
       "parentUuid": "5f5527dc_fb6aaebd",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e0a03280_13defec2",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T14:09:38Z",
+      "side": 1,
+      "message": "Discussed and resolved directly.",
+      "parentUuid": "1e17e7d7_71f0ad7e",
       "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c39d9149_01418c00",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-28T09:58:10Z",
+      "side": 1,
+      "message": "Per our discussion: if we assume that the modules proposal is accepted, then having to write these lines every time I want `load.Instances` is going to become tiring. \n\nNoting also a point from @mvdan@mvdan.cc that if we do make modules the default, i.e. don\u0027t require one to be specified and provide an option for _not_ doing modules.",
+      "revId": "a7bd5831c39f821351c4e0dc69a206b4e3d24a0c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

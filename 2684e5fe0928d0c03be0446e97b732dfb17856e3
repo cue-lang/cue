@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3171e651_ce71d5d6",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 206,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T15:48:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a1ce2ad3_7e47f4c1",
+      "revId": "2684e5fe0928d0c03be0446e97b732dfb17856e3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da974212_73eab011",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "82631f94_9ae00b40",
+        "filename": "cmd/cue/cmd/testdata/script/help_registryconfig.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 87,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T15:48:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da974212_73eab011",
+      "revId": "2684e5fe0928d0c03be0446e97b732dfb17856e3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a9d354b4_aaa66db0",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-02-23T18:14:20Z",
       "side": 1,
       "message": "perhaps start the include at the first `// #file` match?\n\nyou would still need an end line perhaps, or alternatively you could put those extra bits at the top before #file.",
+      "revId": "2684e5fe0928d0c03be0446e97b732dfb17856e3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6fc563be_9534eca8",
+        "filename": "internal/mod/modresolve/schema.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T15:48:50Z",
+      "side": 1,
+      "message": "good idea. Done.",
+      "parentUuid": "a9d354b4_aaa66db0",
       "revId": "2684e5fe0928d0c03be0446e97b732dfb17856e3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -84,6 +84,24 @@
       "message": "I really don\u0027t know what the convention here is, but do we need to document that `cfg0`, if non nil, will be copied instead of modified? A pointer argument suggests two things to my mind: 1) I don\u0027t need to provide anything but also 2) what I provide could be modified. It feels like we need to explicitly state that we will copy `cfg0` is non-nil and never modify it. Same for `NewRegistry` below. But I defer to you and @mvdan@mvdan.cc for what is convention with such args.",
       "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ab352428_ffe71034",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T15:25:39Z",
+      "side": 1,
+      "message": "I don\u0027t actually know if there\u0027s a convention on read-only vs modify in place, but documenting what we do here is probably good either way just in case.",
+      "parentUuid": "b469d6f5_fea883af",
+      "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

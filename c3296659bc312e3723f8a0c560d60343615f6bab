@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "45fb8ca7_b0e308dd",
+        "filename": "cue/load/example_test.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-28T15:20:37Z",
+      "side": 1,
+      "message": "This looks brilliant. Because there is zero change from the author\u0027s perspective.",
+      "revId": "c3296659bc312e3723f8a0c560d60343615f6bab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

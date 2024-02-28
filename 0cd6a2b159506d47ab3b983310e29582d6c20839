@@ -16,6 +16,24 @@
       "message": "Maybe also mention that it panics if name isn\u0027t a valid identifier that starts with `_`?",
       "revId": "0cd6a2b159506d47ab3b983310e29582d6c20839",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "091bb589_f496264b",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T17:12:11Z",
+      "side": 1,
+      "message": "Please note this is a third person\u0027s PR I already reviewed on github, so me making non-trivial changes here is a bit odd. I mainly ask for a code review from another person on the Gerrit side because I can\u0027t +2 my own CLs (even though I\u0027m not the author here) and using a bot like cueckoo for that purpose feels unnecessary - and perhaps I messed up the import to Gerrit somehow.\n\nPerfectly fine if you want to send a follow-up CL, but I\u0027d rather not touch the user\u0027s patch if we can avoid it. Maybe I wasn\u0027t clear about this being a PR that was already reviewed, but I thought it was obvious enough from the info at the top.",
+      "parentUuid": "e8a2ae28_e9da7732",
+      "revId": "0cd6a2b159506d47ab3b983310e29582d6c20839",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "81072478_79ebf224",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T22:10:28Z",
+      "side": 1,
+      "message": "SGTM; just one thought about letting cue/format do the printing.",
+      "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc50b83f_be18d944",
+        "filename": "cmd/cue/cmd/testdata/script/def_package.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T22:10:28Z",
+      "side": 1,
+      "message": "hm, why do we end up with two empty lines here? (this is related to my other comment)",
+      "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "149799c8_89222a70",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T22:10:28Z",
+      "side": 1,
+      "message": "I think the better solution would be to set the package name in the ast.File and let cue/format deal with the printing and good formatting of the package declaration. you can do a copy of https://github.com/cue-lang/cue/blob/723438a57754/cue/ast/ast.go#L1005 for instance - arguably we could have a Package method that returns a pointer for convenience.\n\non one hand this is to encapsulate syntax printing in one package, but especially since cue/format ensures good formatting, e.g. not too many empty lines.",
+      "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

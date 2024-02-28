@@ -3,6 +3,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "e34dc3a5_eb8b5477",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-28T10:00:22Z",
+      "side": 1,
+      "message": "Just noting a comment here: we should add tests to confirm that CUE that does not rely on modules does not create any cache dirs etc.",
+      "revId": "47c3b9c215e5875a28720b884154324f056bcb42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "439e7e00_2557bc7e",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 13

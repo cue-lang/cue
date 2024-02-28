@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b6968d56_1f5b98af",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 16
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T14:25:25Z",
+      "side": 1,
+      "message": "SGTM",
+      "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dfdf17a2_b0b1e55f",
+        "filename": "cue/load/config.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T14:25:25Z",
+      "side": 1,
+      "message": "do we want to error if `!cueexperiment.Flags.Modules \u0026\u0026 c.Registry !\u003d nil`, for the sake of saying \"you set up a registry, but did not enable the modules experiment\"? I think not, just like you have it here, as setting Registry explicitly seems like enough of an opt-in signal to me. Perhaps briefly mention this assumption.",
+      "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f534373_8216e4bf",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T14:25:25Z",
+      "side": 1,
+      "message": "Big +1 to the different method names now. I like these better. The only nit I have is that ResolveToHost returning a Location feels odd - it should either return a Host, or be called ResolveToLocation. Particularly since you do have a Host type in this same package, so it\u0027s somewhat misleading.\n\nThe same could be said about HostResolver - perhaps name it LocationResolver.",
+      "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+# Verify that -p works when exporting as CUE.
+
+# Case 1: only non-CUE inputs
+exec cue export --out cue -p blah x.json y.json
+cmp stdout stdout.golden
+
+# Case 2: CUE input which does not declare a package (with JSON)
+exec cue export --out cue -p blah nopkg.cue x.json y.json
+cmp stdout stdout.golden
+
+# Case 3: CUE input which does declare same package (with JSON)
+exec cue export --out cue -p blah pkg.cue x.json y.json
+cmp stdout stdout.golden
+
+# Case 4: CUE input with mis-matched package (with JSON)
+#
+# TODO: in the future we could allow "repackaging" via --force which would
+# cause this export to succeed with the package clause 'blah' in the result.
+! exec cue export --out cue -p blah diffpkg.cue x.json y.json
+cmp stderr stderr.golden
+
+-- x.json --
+{
+    "x": 5
+}
+-- y.json --
+{
+    "y": 4
+}
+-- nopkg.cue --
+x: 5
+y: 4
+-- pkg.cue --
+package blah
+
+x: 5
+y: 4
+-- diffpkg.cue --
+package other
+
+x: 5
+y: 4
+-- stdout.golden --
+package blah
+
+x: 5
+y: 4
+-- stderr.golden --
+"package" flag clashes with existing package name (blah vs other)

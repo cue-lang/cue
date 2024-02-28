@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e8a2ae28_e9da7732",
+        "filename": "cue/path.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 470,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T17:00:34Z",
+      "side": 1,
+      "message": "Maybe also mention that it panics if name isn\u0027t a valid identifier that starts with `_`?",
+      "revId": "0cd6a2b159506d47ab3b983310e29582d6c20839",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

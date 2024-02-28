@@ -286,6 +286,24 @@
       "parentUuid": "8d41de60_bcee9898",
       "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa4d9d97_78afd4a9",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-28T09:24:28Z",
+      "side": 1,
+      "message": "FWIW I think we do need config parameters here. Emulating the cmd/cue interface 100% and making this \"zero config\" would be a mistake - how would a Go API user set the registry, via `os.Setenv(\"CUE_REGISTRY\", ...)`? That feels very awkward.\n\nAs for whether or not to have `Config` - I do think that we will need more parameters sooner than later, so I think adding it now is a good idea.",
+      "parentUuid": "66fe9c5e_ff4889b1",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

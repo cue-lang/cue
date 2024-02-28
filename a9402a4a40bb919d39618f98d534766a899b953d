@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af94eea3_8f0ef70b",
+        "filename": "cue/load/config.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 371,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T15:25:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dfdf17a2_b0b1e55f",
+      "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8f534373_8216e4bf",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-02-28T14:25:25Z",
       "side": 1,
       "message": "Big +1 to the different method names now. I like these better. The only nit I have is that ResolveToHost returning a Location feels odd - it should either return a Host, or be called ResolveToLocation. Particularly since you do have a Host type in this same package, so it\u0027s somewhat misleading.\n\nThe same could be said about HostResolver - perhaps name it LocationResolver.",
+      "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f951826_7d6d4e83",
+        "filename": "internal/mod/modresolve/resolve.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T15:25:54Z",
+      "side": 1,
+      "message": "Fair point. Done.",
+      "parentUuid": "8f534373_8216e4bf",
       "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

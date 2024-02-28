@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "439e7e00_2557bc7e",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-28T07:34:32Z",
+      "side": 1,
+      "message": "This appears to bury an error in, for example, the situation that our user config dir is not properly setup.",
+      "revId": "47c3b9c215e5875a28720b884154324f056bcb42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9f895ea_837073e4",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-28T07:34:32Z",
+      "side": 1,
+      "message": "Why not defer the unlock immediately after the lock?",
+      "revId": "47c3b9c215e5875a28720b884154324f056bcb42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

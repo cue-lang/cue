@@ -268,6 +268,24 @@
       "parentUuid": "57b3f8be_c49beed6",
       "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "66fe9c5e_ff4889b1",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-28T07:34:32Z",
+      "side": 1,
+      "message": "\u003e Because cmd/cue needs to warn about CUE_REGISTRY being set when CUE_EXPERIMENT doesn\u0027t mention modules.\n\nBut that is a transient check that will go away if we accept the proposal, no? So there is in effect zero cost to doing that sense check on env vars in `cmd/cue` and then delegating to this entry point for the loading and parsing of `CUE_REGISTRY`. \n\nAnd if we don\u0027t accept the proposal, then the code will go away for a different reason. \n\n(Granted at this stage it looks more likely than not that we will accept the proposal, based on evidence/reports from users.)\n\nIt feels like with this `Config` \"interface\" we land in an awkward half-way house that isn\u0027t zero config, nor is it the component parts (including `modresolve.HostResolver` for example). Which feels like we are creating more API surface to hide API surface. \n\nWhy not have a zero config approach to creating a registry and leave it at that? We can always make public more API as we go.",
+      "parentUuid": "8d41de60_bcee9898",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -149,7 +149,15 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 
 			// Casting an ast.Expr to an ast.File ensures that it always ends
 			// with a newline.
-			b, err := format.Node(internal.ToFile(n), opts...)
+			f := internal.ToFile(n)
+			if e.cfg.PkgName != "" && f.PackageName() == "" {
+				f.Decls = append([]ast.Decl{
+					&ast.Package{
+						Name: ast.NewIdent(e.cfg.PkgName),
+					},
+				}, f.Decls...)
+			}
+			b, err := format.Node(f, opts...)
 			if err != nil {
 				return err
 			}

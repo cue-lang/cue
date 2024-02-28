@@ -1,0 +1,34 @@
+# Ensure that cue def with a --package flag outputs CUE that belongs to a
+# package.
+
+# Regular cue def
+exec cue def -p blah x.cue
+cmp stdout orig.golden
+
+# Self-contained
+exec cue def -p blah -e x x.cue
+cmp stdout self_contained.golden
+
+
+-- x.cue --
+#Def: int
+x:    #Def & 5
+
+-- orig.golden --
+package blah
+
+#Def: int
+x: #Def & {
+	5
+}
+-- self_contained.golden --
+package blah
+
+DEF.#x & {
+	5
+}
+
+//cue:path: #Def
+let DEF = {
+	#x: int
+}

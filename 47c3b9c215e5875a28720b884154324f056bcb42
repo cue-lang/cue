@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "05d015a0_3b16b18c",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T14:01:23Z",
+      "side": 1,
+      "message": "Note: this is existing logic already present in cmd/cue, just copied from there.\n\nThere is only one way that a user configuration directory can be \"not properly set up\", and that\u0027s if the relevant environment variables aren\u0027t set (see the code here: https://cs.opensource.google/go/go/+/refs/tags/go1.22.0:src/os/file.go;l\u003d509)\nIf that\u0027s the case, it shouldn\u0027t be a showstopper - it just means there is no logins.json file. That I don\u0027t think we should cause cmd/cue to fail just because there\u0027s no user configuration data set up.\n\nThus this still seems fine to me.",
+      "parentUuid": "439e7e00_2557bc7e",
+      "revId": "47c3b9c215e5875a28720b884154324f056bcb42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9f895ea_837073e4",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-02-28T07:34:32Z",
       "side": 1,
       "message": "Why not defer the unlock immediately after the lock?",
+      "revId": "47c3b9c215e5875a28720b884154324f056bcb42",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0bd0a051_266d9430",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 13
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T14:01:23Z",
+      "side": 1,
+      "message": "Because we don\u0027t want to hold the lock when making the HTTP request, because that would preclude any concurrency when making HTTP requests, something we make considerable use of. I\u0027ll add a comment to make that clear.",
+      "parentUuid": "e9f895ea_837073e4",
       "revId": "47c3b9c215e5875a28720b884154324f056bcb42",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

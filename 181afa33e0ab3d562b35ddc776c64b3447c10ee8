@@ -304,6 +304,24 @@
       "parentUuid": "66fe9c5e_ff4889b1",
       "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5fd3be69_60417e41",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 227,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T14:07:59Z",
+      "side": 1,
+      "message": "Ok, as discussed, I\u0027ve left Config in place a removed the CUERegistry field from the configuration for now (we can add more Go-like functionality later by adding a Resolver field or similar).",
+      "parentUuid": "fa4d9d97_78afd4a9",
+      "revId": "181afa33e0ab3d562b35ddc776c64b3447c10ee8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

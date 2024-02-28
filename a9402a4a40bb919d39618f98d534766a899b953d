@@ -138,6 +138,24 @@
       "parentUuid": "b469d6f5_fea883af",
       "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5142bd08_5d3373c3",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 16
+      },
+      "lineNbr": 78,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-02-28T15:59:11Z",
+      "side": 1,
+      "message": "\u003e 2) what I provide could be modified.\n\nI\u0027m not sure I agree with that, FWIW. I don\u0027t think that passing a pointer necessarily implies that the argument might be modified - if something might be modified, that should be explicitly called out in the docs.\n\nAs an existing example of this convention, `load.Instances` does exactly as we\u0027re doing here, and `gocode.Generate` is similar, as are many other places.\n\nGiven the existing prevalence of the convention, I think it\u0027s OK as is tbh, but I\u0027ve added a doc comment anyway.",
+      "parentUuid": "ab352428_ffe71034",
+      "revId": "a9402a4a40bb919d39618f98d534766a899b953d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

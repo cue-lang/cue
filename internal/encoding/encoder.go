@@ -134,6 +134,10 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 
 		useSep := false
 		format := func(name string, n ast.Node) error {
+			f, ok := n.(*ast.File)
+			if (!ok || f.PackageName() == "") && e.cfg.PkgName != "" {
+				fmt.Fprintf(w, "package %s\n\n", e.cfg.PkgName)
+			}
 			if name != "" && cfg.Stream {
 				// TODO: make this relative to DIR
 				fmt.Fprintf(w, "// %s\n", filepath.Base(name))

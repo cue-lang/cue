@@ -37,6 +37,23 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "0b2d9c18_78d661ae",
+        "filename": "cmd/cue/cmd/testdata/script/export_cue.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-02-29T07:28:00Z",
+      "side": 1,
+      "message": "Why not allow \"repacking\"?\n\nIf the intention is to allow this in the future, or considering it, please add this as a TODO comment.",
+      "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "149799c8_89222a70",
         "filename": "internal/encoding/encoder.go",
         "patchSetId": 1
@@ -48,6 +65,24 @@
       "writtenOn": "2024-02-28T22:10:28Z",
       "side": 1,
       "message": "I think the better solution would be to set the package name in the ast.File and let cue/format deal with the printing and good formatting of the package declaration. you can do a copy of https://github.com/cue-lang/cue/blob/723438a57754/cue/ast/ast.go#L1005 for instance - arguably we could have a Package method that returns a pointer for convenience.\n\non one hand this is to encapsulate syntax printing in one package, but especially since cue/format ensures good formatting, e.g. not too many empty lines.",
+      "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e770bdd9_908e05ac",
+        "filename": "internal/encoding/encoder.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 140,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-02-29T07:28:00Z",
+      "side": 1,
+      "message": "I agree. We should shy away from textual manipulation.",
+      "parentUuid": "149799c8_89222a70",
       "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

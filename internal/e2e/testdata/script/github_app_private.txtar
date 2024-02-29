@@ -10,7 +10,11 @@ env MODVER=${MODULE}@v0
 
 cd publish
 
-exec cue mod init ${MODVER}
+# TODO: replace by "cue mod init" once we can programatically insert
+# a language.version string, such as via "cue mod edit".
+# Otherwise registry.cue.works complains about the lack of language.version.
+# cue mod init ${MODVER}
+env-fill cue.mod/module.cue
 
 exec cue mod publish ${VERSION}
 
@@ -25,6 +29,11 @@ cmp stdout export.golden
 # TODO(mvdan): Use another registry token without access to this private repo
 # and check that they cannot list the module's versions or download any of them.
 
+-- publish/cue.mod/module.cue --
+module: "${MODVER}"
+language: {
+	version: "v0.8.0-alpha.3"
+}
 -- publish/foo.cue --
 package publish
 

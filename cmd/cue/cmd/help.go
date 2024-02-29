@@ -21,6 +21,7 @@ import (
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/internal/mod/modresolve"
+	"cuelang.org/go/mod/modconfig"
 )
 
 // TODO: intersperse the examples at the end of the texts in the
@@ -207,7 +208,7 @@ given module is stored in, and what repository within that registry, without
 making any network calls.
 
 If no explicit registry configuration is present, a default central registry
-(` + defaultRegistry + `) will be used for all modules.
+(` + modconfig.DefaultRegistry + `) will be used for all modules.
 
 The simplest way of specifying a registry configuration is to set $CUE_REGISTRY
 to the hostname of that registry.

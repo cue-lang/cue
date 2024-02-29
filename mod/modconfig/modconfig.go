@@ -68,6 +68,10 @@ type Config struct {
 	// If it's nil, a default authorizer will be used that consults
 	// the information stored by "cue login" and "docker login".
 	Authorizer ociauth.Authorizer
+
+	// Env provides environment variable values. If this is nil,
+	// the current process's environment will be used.
+	Env []string
 }
 
 // NewResolver returns an implementation of [modregistry.Resolver]
@@ -83,9 +87,10 @@ func NewResolver(cfg0 *Config) (*Resolver, error) {
 	if cfg0 != nil {
 		cfg = *cfg0
 	}
+	getenv := getenvFunc(cfg.Env)
 	var configData []byte
 	var configPath string
-	cueRegistry := os.Getenv("CUE_REGISTRY")
+	cueRegistry := getenv("CUE_REGISTRY")
 	kind, rest, _ := strings.Cut(cueRegistry, ":")
 	switch kind {
 	case "file":
@@ -120,7 +125,7 @@ func NewResolver(cfg0 *Config) (*Resolver, error) {
 		// If not, fall back to authentication via Docker's config.json.
 		// Note that the order below is backwards, since we layer interfaces.
 
-		config, err := ociauth.Load(nil)
+		config, err := ociauth.LoadWithEnv(nil, cfg.Env)
 		if err != nil {
 			return nil, fmt.Errorf("cannot load OCI auth configuration: %v", err)
 		}
@@ -130,7 +135,7 @@ func NewResolver(cfg0 *Config) (*Resolver, error) {
 
 		// If we can't locate a logins.json file at all, skip cueLoginsAuthorizer entirely.
 		// We only refuse to continue if we find an invalid logins.json file.
-		loginsPath, err := cueconfig.LoginConfigPath()
+		loginsPath, err := cueconfig.LoginConfigPath(getenv)
 		if err != nil {
 			return auth, nil
 		}
@@ -250,14 +255,32 @@ func (a *cueLoginsAuthorizer) DoRequest(req *http.Request, requiredScope ociauth
 // NewRegistry returns an implementation of the Registry
 // interface suitable for passing to [load.Instances].
 // It uses the standard CUE cache directory.
-func NewRegistry(cfg *Config) (Registry, error) {
-	resolver, err := NewResolver(cfg)
+func NewRegistry(cfg0 *Config) (Registry, error) {
+	var cfg Config
+	if cfg0 != nil {
+		cfg = *cfg0
+	}
+	resolver, err := NewResolver(&cfg)
 	if err != nil {
 		return nil, err
 	}
-	cacheDir, err := cueconfig.CacheDir()
+	cacheDir, err := cueconfig.CacheDir(getenvFunc(cfg.Env))
 	if err != nil {
 		return nil, err
 	}
 	return modcache.New(modregistry.NewClientWithResolver(resolver), cacheDir)
+}
+
+func getenvFunc(env []string) func(string) string {
+	if env == nil {
+		return os.Getenv
+	}
+	return func(key string) string {
+		for i := len(env) - 1; i >= 0; i-- {
+			if e := env[i]; len(e) >= len(key)+1 && e[len(key)] == '=' && e[:len(key)] == key {
+				return e[len(key)+1:]
+			}
+		}
+		return ""
+	}
 }

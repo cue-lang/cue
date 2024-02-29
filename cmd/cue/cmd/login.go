@@ -17,6 +17,7 @@ package cmd
 import (
 	"context"
 	"fmt"
+	"os"
 
 	"cuelang.org/go/internal/cueconfig"
 	"github.com/spf13/cobra"
@@ -69,7 +70,7 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 				return fmt.Errorf("need a single CUE registry to log into")
 			}
 			registry := registryHosts[0]
-			loginsPath, err := cueconfig.LoginConfigPath()
+			loginsPath, err := cueconfig.LoginConfigPath(os.Getenv)
 			if err != nil {
 				return fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
 			}

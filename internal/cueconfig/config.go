@@ -36,16 +36,16 @@ type RegistryLogin struct {
 	Expiry *time.Time `json:"expiry,omitempty"`
 }
 
-func LoginConfigPath() (string, error) {
-	configDir, err := ConfigDir()
+func LoginConfigPath(getenv func(string) string) (string, error) {
+	configDir, err := ConfigDir(getenv)
 	if err != nil {
 		return "", err
 	}
 	return filepath.Join(configDir, "logins.json"), nil
 }
 
-func ConfigDir() (string, error) {
-	if dir := os.Getenv("CUE_CONFIG_DIR"); dir != "" {
+func ConfigDir(getenv func(string) string) (string, error) {
+	if dir := getenv("CUE_CONFIG_DIR"); dir != "" {
 		return dir, nil
 	}
 	dir, err := os.UserConfigDir()
@@ -55,8 +55,8 @@ func ConfigDir() (string, error) {
 	return filepath.Join(dir, "cue"), nil
 }
 
-func CacheDir() (string, error) {
-	if dir := os.Getenv("CUE_CACHE_DIR"); dir != "" {
+func CacheDir(getenv func(string) string) (string, error) {
+	if dir := getenv("CUE_CACHE_DIR"); dir != "" {
 		return dir, nil
 	}
 	dir, err := os.UserCacheDir()

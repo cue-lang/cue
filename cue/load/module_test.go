@@ -58,6 +58,16 @@ func TestModuleLoadWithInvalidRegistryConfig(t *testing.T) {
 	}
 	insts = load.Instances([]string{"."}, cfg)
 	qt.Assert(t, qt.ErrorMatches(insts[0].Err, `import failed: cannot find package "example.com@v0": cannot fetch example.com@v0.0.1: bad value for \$CUE_REGISTRY: invalid registry "invalid}host:": invalid host name "invalid}host:" in registry`))
+
+	// Try again with environment variables passed in Env.
+	// This is really just a smoke test to make sure that Env is
+	// passed through to the underlying modconfig call.
+	cfg.Env = []string{
+		"CUE_REGISTRY=invalid}host2:",
+		"CUE_CACHE_DIR=" + cacheDir,
+	}
+	insts = load.Instances([]string{"."}, cfg)
+	qt.Assert(t, qt.ErrorMatches(insts[0].Err, `import failed: cannot find package "example.com@v0": cannot fetch example.com@v0.0.1: bad value for \$CUE_REGISTRY: invalid registry "invalid}host2:": invalid host name "invalid}host2:" in registry`))
 }
 
 func TestModuleFetch(t *testing.T) {

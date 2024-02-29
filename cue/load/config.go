@@ -282,10 +282,17 @@ type Config struct {
 	// When nil, if the modules experiment is enabled
 	// (CUE_EXPERIMENT=modules), [modconfig.NewRegistry]
 	// will be used to create a registry instance using the
-	// usual cmd/cue conventions for environment variables.
+	// usual cmd/cue conventions for environment variables
+	// (but see the Env field below).
 	//
 	// THIS IS EXPERIMENTAL. API MIGHT CHANGE.
 	Registry modconfig.Registry
+
+	// Env provides environment variables for use in the configuration.
+	// Currently this is only used in the construction of the Registry
+	// value (see above). If this is nil, the current process's environment
+	// will be used.
+	Env []string
 
 	fileSystem fileSystem
 }
@@ -372,12 +379,13 @@ func (c Config) complete() (cfg *Config, err error) {
 	// is, we consider that a good enough hint that modules support
 	// should be enabled and hence don't return an error in that case.
 	if cueexperiment.Flags.Modules && c.Registry == nil {
-		registry, err := modconfig.NewRegistry(nil)
+		registry, err := modconfig.NewRegistry(&modconfig.Config{
+			Env: c.Env,
+		})
 		if err != nil {
 			// If there's an error in the registry configuration,
 			// don't error immediately, but only when we actually
 			// need to resolve modules.
-			//panic("errorRegistry " + err.Error())
 			registry = errorRegistry{err}
 		}
 		c.Registry = registry

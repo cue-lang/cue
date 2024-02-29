@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bb3e733b_0fc36a6f",
+        "filename": "cmd/cue/cmd/testdata/script/export_cue.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-02-29T07:43:42Z",
+      "side": 1,
+      "message": "That seems to work for me. I\u0027ve added a TODO comment to that effect.",
+      "parentUuid": "44eee604_295cbc94",
+      "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "149799c8_89222a70",

@@ -171,25 +171,24 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 	versions := []string{}
 	// Note: do not use c.repoName because that always expects
 	// a module path with a major version.
-	iter := loc.Registry.Tags(ctx, loc.Repository)
-	for {
-		tag, ok := iter.Next()
-		if !ok {
-			break
+	iter := loc.Registry.Tags(ctx, loc.Repository, "")
+	var _err error
+	iter(func(tag string, err error) bool {
+		if err != nil {
+			_err = err
+			return false
 		}
 		vers, ok := strings.CutPrefix(tag, loc.Tag)
-		if !ok {
-			continue
-		}
-		if !semver.IsValid(vers) {
-			continue
+		if !ok || !semver.IsValid(vers) {
+			return true
 		}
 		if !hasMajor || semver.Major(vers) == major {
 			versions = append(versions, vers)
 		}
-	}
-	if err := iter.Error(); err != nil && !isNotExist(err) {
-		return nil, err
+		return true
+	})
+	if _err != nil && !isNotExist(_err) {
+		return nil, _err
 	}
 	semver.Sort(versions)
 	return versions, nil

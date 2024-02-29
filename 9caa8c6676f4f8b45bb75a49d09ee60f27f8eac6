@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "44eee604_295cbc94",
+        "filename": "cmd/cue/cmd/testdata/script/export_cue.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-02-29T07:35:14Z",
+      "side": 1,
+      "message": "I think reusing --package is the most intuitive. Perhaps we could allow it if the users also uses --force.",
+      "parentUuid": "13a9dea3_abc198e0",
+      "revId": "9caa8c6676f4f8b45bb75a49d09ee60f27f8eac6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "149799c8_89222a70",
         "filename": "internal/encoding/encoder.go",
         "patchSetId": 1

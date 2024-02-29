@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d8250259_7a0d2d30",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-02-29T11:29:39Z",
+      "side": 1,
+      "message": "Much better, thank you! Nice idea to reuse PackageName and append at the start of Decls.",
+      "revId": "dd6946a888e799a05f9efecd566adca9ba4a1b58",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

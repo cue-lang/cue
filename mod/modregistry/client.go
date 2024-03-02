@@ -85,7 +85,7 @@ const (
 // hostname.
 func NewClient(registry ociregistry.Interface) *Client {
 	return &Client{
-		resolver: SingleResolver{registry},
+		resolver: singleResolver{registry},
 	}
 }
 
@@ -461,14 +461,14 @@ func (c *Client) scratchConfig(ctx context.Context, loc RegistryLocation, mediaT
 	return desc, nil
 }
 
-// SingleResolver implements Resolver by always returning R,
+// singleResolver implements Resolver by always returning R,
 // and mapping module paths directly to repository paths in
 // the registry.
-type SingleResolver struct {
+type singleResolver struct {
 	R ociregistry.Interface
 }
 
-func (r SingleResolver) ResolveToRegistry(mpath, vers string) (RegistryLocation, error) {
+func (r singleResolver) ResolveToRegistry(mpath, vers string) (RegistryLocation, error) {
 	return RegistryLocation{
 		Registry:   r.R,
 		Repository: mpath,

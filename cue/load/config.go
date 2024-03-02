@@ -388,6 +388,51 @@ func (c Config) complete() (cfg *Config, err error) {
 	return &c, nil
 }
 
+// loadModule loads the module file, resolves and downloads module
+// dependencies. It sets c.Module if it's empty or checks it for
+// consistency with the module file otherwise.
+func (c *Config) loadModule() error {
+	// TODO: also make this work if run from outside the module?
+	mod := filepath.Join(c.ModuleRoot, modDir)
+	info, cerr := c.fileSystem.stat(mod)
+	if cerr != nil {
+		return nil
+	}
+	// TODO remove support for legacy non-directory module.cue file
+	// by returning an error if info.IsDir is false.
+	if info.IsDir() {
+		mod = filepath.Join(mod, moduleFile)
+	}
+	f, cerr := c.fileSystem.openFile(mod)
+	if cerr != nil {
+		return nil
+	}
+	defer f.Close()
+	data, err := io.ReadAll(f)
+	if err != nil {
+		return err
+	}
+	parseModFile := modfile.ParseNonStrict
+	if c.Registry == nil {
+		parseModFile = modfile.ParseLegacy
+	}
+	mf, err := parseModFile(data, mod)
+	if err != nil {
+		return err
+	}
+	c.modFile = mf
+	if mf.Module == "" {
+		// Backward compatibility: allow empty module.cue file.
+		// TODO maybe check that the rest of the fields are empty too?
+		return nil
+	}
+	if c.Module != "" && c.Module != mf.Module {
+		return errors.Newf(token.NoPos, "inconsistent modules: got %q, want %q", mf.Module, c.Module)
+	}
+	c.Module = mf.Module
+	return nil
+}
+
 func (c Config) isRoot(dir string) bool {
 	fs := &c.fileSystem
 	// Note: cue.mod used to be a file. We still allow both to match.

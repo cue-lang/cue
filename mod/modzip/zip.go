@@ -875,20 +875,3 @@ func splitCUEMod(p string) (string, string) {
 		s = dir
 	}
 }
-
-// ZipFileIO implements FileIO for *zip.File.
-type ZipFileIO struct {
-	// StripPrefix causes the given prefix to be stripped from
-	// all file names with that prefix.
-	StripPrefix string
-}
-
-func (fio ZipFileIO) Path(f *zip.File) string {
-	return strings.TrimPrefix(f.Name, fio.StripPrefix)
-}
-func (ZipFileIO) Lstat(f *zip.File) (os.FileInfo, error) {
-	return f.FileInfo(), nil
-}
-func (ZipFileIO) Open(f *zip.File) (io.ReadCloser, error) {
-	return f.Open()
-}

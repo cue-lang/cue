@@ -476,14 +476,6 @@ func ParseImportPath(p string) ImportPath {
 	return parts
 }
 
-// MatchPathMajor reports whether the semantic version v
-// matches the path major version pathMajor.
-//
-// MatchPathMajor returns true if and only if CheckPathMajor returns nil.
-func MatchPathMajor(v, pathMajor string) bool {
-	return CheckPathMajor(v, pathMajor) == nil
-}
-
 // CheckPathMajor returns a non-nil error if the semantic version v
 // does not match the path major version pathMajor.
 func CheckPathMajor(v, pathMajor string) error {

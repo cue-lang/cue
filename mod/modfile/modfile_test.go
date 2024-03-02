@@ -73,7 +73,7 @@ deps: "other.com/something@v0": v: "v0.2.3"
 			},
 		},
 	},
-	wantVersions: parseVersions("example.com@v1.2.3", "other.com/something@v0.2.3"),
+	wantVersions: mustParseVersions("example.com@v1.2.3", "other.com/something@v0.2.3"),
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
 		"example.com": "v1",
@@ -176,7 +176,7 @@ deps: "example.com": v: "v1.2.3"
 			},
 		},
 	},
-	wantVersions: parseVersions("example.com@v1.2.3"),
+	wantVersions: mustParseVersions("example.com@v1.2.3"),
 	wantDefaults: map[string]string{
 		"foo.com/bar": "v0",
 	},
@@ -291,10 +291,14 @@ language: {
 	})
 }
 
-func parseVersions(vs ...string) []module.Version {
+func mustParseVersions(vs ...string) []module.Version {
 	vvs := make([]module.Version, 0, len(vs))
 	for _, v := range vs {
-		vvs = append(vvs, module.MustParseVersion(v))
+		mv, err := module.ParseVersion(v)
+		if err != nil {
+			panic(err)
+		}
+		vvs = append(vvs, mv)
 	}
 	return vvs
 }

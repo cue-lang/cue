@@ -76,13 +76,12 @@ module: "baz.org@v0"
 
 	mg, err := rs.Graph(ctx)
 	qt.Assert(t, qt.IsNil(err))
-	_ = mg
 	rv, ok := mg.RequiredBy(rootVersion)
 	qt.Assert(t, qt.Equals(ok, true))
-	qt.Assert(t, qt.DeepEquals(rv, []module.Version{
-		module.MustParseVersion("foo.com/bar/hello@v0.2.3"),
-	}))
-	rv, ok = mg.RequiredBy(module.MustParseVersion("foo.com/bar/hello@v0.2.3"))
+	mv, err := module.ParseVersion("foo.com/bar/hello@v0.2.3")
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(rv, []module.Version{mv}))
+	rv, ok = mg.RequiredBy(mv)
 	qt.Assert(t, qt.Equals(ok, true))
 	qt.Assert(t, qt.DeepEquals(rv, versions("bar.com@v0.0.2", "baz.org@v0.10.1")))
 

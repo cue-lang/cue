@@ -162,18 +162,8 @@ func (m Version) String() string {
 	return m.BasePath() + "@" + m.version
 }
 
-func MustParseVersion(s string) Version {
-	v, err := ParseVersion(s)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
-// ParseVersion parses a $module@$version
-// string into a Version.
-// The version must be canonical (i.e. it can't be
-// just a major version).
+// ParseVersion parses a $module@$version string into a Version.
+// The version must be canonical (i.e. it can't be just a major version).
 func ParseVersion(s string) (Version, error) {
 	basePath, vers, ok := SplitPathVersion(s)
 	if !ok {

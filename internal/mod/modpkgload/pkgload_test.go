@@ -40,7 +40,7 @@ func TestLoadPackages(t *testing.T) {
 				}
 
 				initialRequirementsStr := strings.Fields(readTestFile("initial-requirements"))
-				mainModulePath, moduleVersions := initialRequirementsStr[0], mapSlice(initialRequirementsStr[1:], module.MustParseVersion)
+				mainModulePath, moduleVersions := initialRequirementsStr[0], mustParseVersions(initialRequirementsStr[1:]...)
 				defaultMajorVersions := make(map[string]string)
 				for _, f := range strings.Fields(readTestFile("default-major-versions")) {
 					p, v, ok := strings.Cut(f, "@")
@@ -126,10 +126,14 @@ func (r testRegistry) modpath(m module.Version) string {
 	return path.Join("_registry", strings.ReplaceAll(mpath, "/", "_")+"_"+m.Version())
 }
 
-func mapSlice[From, To any](ss []From, f func(From) To) []To {
-	ts := make([]To, len(ss))
-	for i := range ss {
-		ts[i] = f(ss[i])
+func mustParseVersions(vs ...string) []module.Version {
+	vvs := make([]module.Version, 0, len(vs))
+	for _, v := range vs {
+		mv, err := module.ParseVersion(v)
+		if err != nil {
+			panic(err)
+		}
+		vvs = append(vvs, mv)
 	}
-	return ts
+	return vvs
 }

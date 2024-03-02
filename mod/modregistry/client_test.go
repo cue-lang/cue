@@ -48,7 +48,8 @@ module: "example.com/module@v1"
 x: 42
 `
 	ctx := context.Background()
-	mv := module.MustParseVersion("example.com/module@v1.2.3")
+	mv, err := module.ParseVersion("example.com/module@v1.2.3")
+	qt.Assert(t, qt.IsNil(err))
 	c := newTestClient(t)
 	zipData := putModule(t, c, mv, testMod)
 
@@ -78,7 +79,9 @@ module: %q
 -- x.cue --
 x: 42
 `, mpath)
-		putModule(t, c, module.MustParseVersion("example.com/module@"+v), modContents)
+		mv, err := module.ParseVersion("example.com/module@" + v)
+		qt.Assert(t, qt.IsNil(err))
+		putModule(t, c, mv, modContents)
 	}
 	tags, err := c.ModuleVersions(ctx, "example.com/module")
 	qt.Assert(t, qt.IsNil(err))
@@ -106,7 +109,8 @@ import (
 x: a.foo + something.bar
 `
 	ctx := context.Background()
-	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
+	mv, err := module.ParseVersion("foo.com/bar@v0.5.100")
+	qt.Assert(t, qt.IsNil(err))
 	c := newTestClient(t)
 	zipData := putModule(t, c, mv, testMod)
 
@@ -141,7 +145,8 @@ import (
 x: a.foo + something.bar
 `
 	ctx := context.Background()
-	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
+	mv, err := module.ParseVersion("foo.com/bar@v0.5.100")
+	qt.Assert(t, qt.IsNil(err))
 	reg := ocimem.New()
 
 	c := NewClient(reg)
@@ -177,10 +182,11 @@ deps: "example.com@v1": v: "v1.2"
 -- x.cue --
 x: 42
 `
-	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
+	mv, err := module.ParseVersion("foo.com/bar@v0.5.100")
+	qt.Assert(t, qt.IsNil(err))
 	c := newTestClient(t)
 	zipData := createZip(t, mv, testMod)
-	err := c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
+	err = c.PutModule(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)))
 	qt.Assert(t, qt.ErrorMatches(err, `module.cue file check failed: invalid module.cue file cue.mod/module.cue: cannot make version from module "example.com@v1", version "v1.2": version "v1.2" \(of module "example.com@v1"\) is not canonical`))
 }
 

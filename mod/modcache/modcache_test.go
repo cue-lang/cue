@@ -33,8 +33,8 @@ deps: {
 }
 `)
 	wantRequirements := []module.Version{
-		module.MustNewVersion("bar.com", "v0.5.0"),
-		module.MustNewVersion("foo.com/bar/hello", "v0.2.3"),
+		must2(module.NewVersion("bar.com", "v0.5.0")),
+		must2(module.NewVersion("foo.com/bar/hello", "v0.2.3")),
 	}
 	// Test two concurrent fetches both using the same directory.
 	var wg sync.WaitGroup
@@ -44,7 +44,7 @@ deps: {
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		summary, err := cr.Requirements(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		summary, err := cr.Requirements(ctx, must2(module.NewVersion("example.com/foo", "v0.0.1")))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
@@ -52,7 +52,7 @@ deps: {
 			return
 		}
 		// Fetch again so that we test the in-memory cache-hit path.
-		summary, err = cr.Requirements(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		summary, err = cr.Requirements(ctx, must2(module.NewVersion("example.com/foo", "v0.0.1")))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
@@ -129,7 +129,7 @@ package x
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
-		loc, err := cr.Fetch(ctx, module.MustNewVersion("example.com/foo", "v0.0.1"))
+		loc, err := cr.Fetch(ctx, must2(module.NewVersion("example.com/foo", "v0.0.1")))
 		if !qt.Check(t, qt.IsNil(err)) {
 			return
 		}
@@ -184,4 +184,11 @@ func newRegistry(t *testing.T, registryContents string) ociregistry.Interface {
 	})
 	qt.Assert(t, qt.IsNil(err))
 	return regOCI
+}
+
+func must2[T any](t T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return t
 }

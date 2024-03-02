@@ -197,14 +197,14 @@ var checkModuleTests = []struct {
 	wantError string
 }{{
 	testName: "Minimal",
-	mv:       module.MustNewVersion("foo.com/bar", "v0.1.2"),
+	mv:       must2(module.NewVersion("foo.com/bar", "v0.1.2")),
 	content: `
 -- cue.mod/module.cue --
 module: "foo.com/bar@v0"
 `,
 }, {
 	testName: "MismatchedMajorVersion",
-	mv:       module.MustNewVersion("foo.com/bar", "v0.1.2"),
+	mv:       must2(module.NewVersion("foo.com/bar", "v0.1.2")),
 	content: `
 -- cue.mod/module.cue --
 module: "foo.com/bar@v1"
@@ -212,7 +212,7 @@ module: "foo.com/bar@v1"
 	wantError: `module.cue file check failed: module path "foo.com/bar@v1" found in cue.mod/module.cue does not match module path being published "foo.com/bar@v0"`,
 }, {
 	testName: "ModuleWithMinorVersion",
-	mv:       module.MustNewVersion("foo.com/bar", "v1.2.3"),
+	mv:       must2(module.NewVersion("foo.com/bar", "v1.2.3")),
 	content: `
 -- cue.mod/module.cue --
 module: "foo@v1.2.3"
@@ -220,7 +220,7 @@ module: "foo@v1.2.3"
 	wantError: `module.cue file check failed: module path foo@v1.2.3 in "cue.mod/module.cue" should contain the major version only`,
 }, {
 	testName: "DependencyWithInvalidVersion",
-	mv:       module.MustNewVersion("foo.com/bar", "v1.2.3"),
+	mv:       must2(module.NewVersion("foo.com/bar", "v1.2.3")),
 	content: `
 -- cue.mod/module.cue --
 module: "foo@v1"
@@ -311,3 +311,10 @@ func (fi txtarFileInfo) Mode() os.FileMode {
 func (fi txtarFileInfo) ModTime() time.Time { return time.Time{} }
 func (fi txtarFileInfo) IsDir() bool        { return false }
 func (fi txtarFileInfo) Sys() interface{}   { return nil }
+
+func must2[T any](t T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return t
+}

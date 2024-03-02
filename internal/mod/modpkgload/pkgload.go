@@ -154,8 +154,12 @@ func LoadPackages(
 	reg Registry,
 	rootPkgPaths []string,
 ) *Packages {
+	mv, err := module.NewVersion(mainModulePath, "")
+	if err != nil {
+		panic(err)
+	}
 	pkgs := &Packages{
-		mainModuleVersion: module.MustNewVersion(mainModulePath, ""),
+		mainModuleVersion: mv,
 		mainModuleLoc:     mainModuleLoc,
 		requirements:      rs,
 		registry:          reg,

@@ -84,13 +84,13 @@ package x
 	r, err := NewRegistry(nil)
 	qt.Assert(t, qt.IsNil(err))
 	ctx := context.Background()
-	gotRequirements, err := r.Requirements(ctx, module.MustNewVersion("foo.example@v0", "v0.0.1"))
+	gotRequirements, err := r.Requirements(ctx, must2(module.NewVersion("foo.example@v0", "v0.0.1")))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.DeepEquals(gotRequirements, []module.Version{
-		module.MustNewVersion("bar.example@v0", "v0.0.1"),
+		must2(module.NewVersion("bar.example@v0", "v0.0.1")),
 	}))
 
-	loc, err := r.Fetch(ctx, module.MustNewVersion("bar.example@v0", "v0.0.1"))
+	loc, err := r.Fetch(ctx, must2(module.NewVersion("bar.example@v0", "v0.0.1")))
 	qt.Assert(t, qt.IsNil(err))
 	data, err := fs.ReadFile(loc.FS, path.Join(loc.Dir, "x/x.cue"))
 	qt.Assert(t, qt.IsNil(err))
@@ -118,4 +118,11 @@ type dockerConfig struct {
 type authConfig struct {
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
+}
+
+func must2[T any](t T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return t
 }

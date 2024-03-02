@@ -175,14 +175,6 @@ func ParseVersion(s string) (Version, error) {
 	return Version{basePath + "@" + semver.Major(vers), vers}, nil
 }
 
-func MustNewVersion(path string, vers string) Version {
-	v, err := NewVersion(path, vers)
-	if err != nil {
-		panic(err)
-	}
-	return v
-}
-
 // NewVersion forms a Version from the given path and version.
 // The version must be canonical, empty or "none".
 // If the path doesn't have a major version suffix, one will be added

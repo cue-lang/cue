@@ -351,7 +351,7 @@ func TestCheckZip(t *testing.T) {
 			}
 
 			// Check the zip.
-			m := module.MustNewVersion(test.path, test.version)
+			m := must2(module.NewVersion(test.path, test.version))
 			cf, checkZipErr := modzip.CheckZipFile(m, tmpZipPath)
 			got := formatCheckedFiles(cf)
 			if diff := cmp.Diff(test.want, got); diff != "" {
@@ -403,7 +403,7 @@ func TestCreate(t *testing.T) {
 
 			// Write zip to temporary file.
 			tmpZipFile := tempFile(t, "tmp.zip")
-			m := module.MustNewVersion(test.path, test.version)
+			m := must2(module.NewVersion(test.path, test.version))
 			files := make([]fakeFile, len(test.archive.Files))
 			for i, tf := range test.archive.Files {
 				files[i] = fakeFile{
@@ -496,7 +496,7 @@ func TestCreateFromDir(t *testing.T) {
 
 			// Create zip from the directory.
 			tmpZipFile := tempFile(t, "tmp.zip")
-			m := module.MustNewVersion(test.path, test.version)
+			m := must2(module.NewVersion(test.path, test.version))
 			if err := modzip.CreateFromDir(tmpZipFile, m, tmpDir); err != nil {
 				if test.wantErr == "" {
 					t.Fatalf("unexpected error: %v", err)
@@ -579,7 +579,7 @@ func TestCreateFromDirSpecial(t *testing.T) {
 			dir := test.setup(t, tmpDir)
 
 			tmpZipFile := tempFile(t, "tmp.zip")
-			m := module.MustNewVersion("example.com/m@v1", "v1.0.0")
+			m := must2(module.NewVersion("example.com/m@v1", "v1.0.0"))
 
 			if err := modzip.CreateFromDir(tmpZipFile, m, dir); err != nil {
 				t.Fatal(err)
@@ -626,7 +626,7 @@ func TestUnzip(t *testing.T) {
 
 			// Extract to a temporary directory.
 			tmpDir := t.TempDir()
-			m := module.MustNewVersion(test.path, test.version)
+			m := must2(module.NewVersion(test.path, test.version))
 			if err := modzip.Unzip(tmpDir, m, tmpZipPath); err != nil {
 				if test.wantErr == "" {
 					t.Fatalf("unexpected error: %v", err)
@@ -718,7 +718,7 @@ var sizeLimitTests = [...]sizeLimitTest{
 	},
 }
 
-var sizeLimitVersion = module.MustNewVersion("example.com/large@v1", "v1.0.0")
+var sizeLimitVersion = must2(module.NewVersion("example.com/large@v1", "v1.0.0"))
 
 func TestCreateSizeLimits(t *testing.T) {
 	if testing.Short() || cuetest.RaceEnabled {
@@ -863,7 +863,7 @@ func TestUnzipSizeLimitsSpecial(t *testing.T) {
 	}{
 		{
 			desc: "large_zip",
-			m:    module.MustNewVersion("example.com/m@v1", "v1.0.0"),
+			m:    must2(module.NewVersion("example.com/m@v1", "v1.0.0")),
 			writeZip: func(t *testing.T, zipFile *os.File) {
 				if err := zipFile.Truncate(modzip.MaxZipFile); err != nil {
 					t.Fatal(err)
@@ -875,7 +875,7 @@ func TestUnzipSizeLimitsSpecial(t *testing.T) {
 			wantErr: "not a valid zip file",
 		}, {
 			desc: "too_large_zip",
-			m:    module.MustNewVersion("example.com/m@v1", "v1.0.0"),
+			m:    must2(module.NewVersion("example.com/m@v1", "v1.0.0")),
 			writeZip: func(t *testing.T, zipFile *os.File) {
 				if err := zipFile.Truncate(modzip.MaxZipFile + 1); err != nil {
 					t.Fatal(err)
@@ -884,7 +884,7 @@ func TestUnzipSizeLimitsSpecial(t *testing.T) {
 			wantErr: "module zip file is too large",
 		}, {
 			desc: "size_is_a_lie",
-			m:    module.MustNewVersion("example.com/m@v1", "v1.0.0"),
+			m:    must2(module.NewVersion("example.com/m@v1", "v1.0.0")),
 			writeZip: func(t *testing.T, zipFile *os.File) {
 				// Create a normal zip file in memory containing one file full of zero
 				// bytes. Use a distinctive size so we can find it later.
@@ -972,4 +972,11 @@ func tempFile(t *testing.T, name string) *os.File {
 	}
 	t.Cleanup(func() { f.Close() })
 	return f
+}
+
+func must2[T any](t T, err error) T {
+	if err != nil {
+		panic(err)
+	}
+	return t
 }

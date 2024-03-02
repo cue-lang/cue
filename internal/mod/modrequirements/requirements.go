@@ -72,7 +72,10 @@ type cachedGraph struct {
 // The caller must not modify rootModules or defaultMajorVersions after passing
 // them to NewRequirements.
 func NewRequirements(mainModulePath string, reg Registry, rootModules []module.Version, defaultMajorVersions map[string]string) *Requirements {
-	mainModuleVersion := module.MustNewVersion(mainModulePath, "")
+	mainModuleVersion, err := module.NewVersion(mainModulePath, "")
+	if err != nil {
+		panic(err)
+	}
 	// TODO add direct, so we can tell which modules are directly used by the
 	// main module.
 	for i, v := range rootModules {

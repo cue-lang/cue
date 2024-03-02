@@ -62,7 +62,11 @@ func (pkgs *Packages) importFromModules(ctx context.Context, pkgPath string) (m 
 		return fail(err)
 	}
 	if len(localPkgLocs) > 0 {
-		mods = append(mods, module.MustNewVersion("local", ""))
+		mv, err := module.NewVersion("local", "")
+		if err != nil {
+			return fail(err)
+		}
+		mods = append(mods, mv)
 		locs = append(locs, localPkgLocs)
 	}
 

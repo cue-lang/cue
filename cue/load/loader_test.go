@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/cueexperiment"
-	"cuelang.org/go/internal/str"
 	"cuelang.org/go/internal/tdtest"
 )
 
@@ -63,10 +62,9 @@ func TestLoad(t *testing.T) {
 		want string
 	}
 
-	args := str.StringList
 	testCases := []loadTest{{
 		cfg:  badModCfg,
-		args: args("."),
+		args: []string{"."},
 		want: `err:    module: cannot use value 123 (type int) as string:
     $CWD/testdata/badmod/cue.mod/module.cue:2:9
 path:   ""
@@ -93,7 +91,7 @@ imports:
 		// the module is test. So "package test" is correctly the default
 		// package of this directory.
 		cfg:  dirCfg,
-		args: args("."),
+		args: []string{"."},
 		want: `path:   mod.test/test
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -106,7 +104,7 @@ imports:
 		// TODO:
 		// - path incorrect, should be mod.test/test/other:main.
 		cfg:  dirCfg,
-		args: args("./other/..."),
+		args: []string{"./other/..."},
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
 path:   ""
@@ -115,7 +113,7 @@ root:   $CWD/testdata/testmod
 dir:    ""
 display:""`}, {
 		cfg:  dirCfg,
-		args: args("./anon"),
+		args: []string{"./anon"},
 		want: `err:    build constraints exclude all CUE files in ./anon:
     anon/anon.cue: no package name
 path:   mod.test/test/anon
@@ -126,7 +124,7 @@ display:./anon`}, {
 		// TODO:
 		// - paths are incorrect, should be mod.test/test/other:main.
 		cfg:  dirCfg,
-		args: args("./other"),
+		args: []string{"./other"},
 		want: `err:    import failed: relative import paths not allowed ("./file"):
     $CWD/testdata/testmod/other/main.cue:6:2
 path:   mod.test/test/other:main
@@ -139,7 +137,7 @@ files:
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
-		args: args("./hello"),
+		args: []string{"./hello"},
 		want: `path:   mod.test/test/hello:test
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -153,7 +151,7 @@ imports:
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
-		args: args("mod.test/test/hello:test"),
+		args: []string{"mod.test/test/hello:test"},
 		want: `path:   mod.test/test/hello:test
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -167,7 +165,7 @@ imports:
 		// TODO:
 		// - incorrect path, should be mod.test/test/hello:test
 		cfg:  dirCfg,
-		args: args("mod.test/test/hello:nonexist"),
+		args: []string{"mod.test/test/hello:nonexist"},
 		want: `err:    build constraints exclude all CUE files in mod.test/test/hello:nonexist:
     anon.cue: no package name
     test.cue: package is test, want nonexist
@@ -178,7 +176,7 @@ root:   $CWD/testdata/testmod
 dir:    $CWD/testdata/testmod/hello
 display:mod.test/test/hello:nonexist`}, {
 		cfg:  dirCfg,
-		args: args("./anon.cue", "./other/anon.cue"),
+		args: []string{"./anon.cue", "./other/anon.cue"},
 		want: `path:   ""
 module: ""
 root:   $CWD/testdata/testmod
@@ -189,7 +187,7 @@ files:
     $CWD/testdata/testmod/other/anon.cue`}, {
 		cfg: dirCfg,
 		// Absolute file is normalized.
-		args: args(filepath.Join(cwd, testdata("testmod", "anon.cue"))),
+		args: []string{filepath.Join(cwd, testdata("testmod", "anon.cue"))},
 		want: `path:   ""
 module: ""
 root:   $CWD/testdata/testmod
@@ -198,7 +196,7 @@ display:command-line-arguments
 files:
     $CWD/testdata/testmod/anon.cue`}, {
 		cfg:  dirCfg,
-		args: args("-"),
+		args: []string{"-"},
 		want: `path:   ""
 module: ""
 root:   $CWD/testdata/testmod
@@ -208,7 +206,7 @@ files:
     -`}, {
 		// NOTE: dir should probably be set to $CWD/testdata, but either way.
 		cfg:  dirCfg,
-		args: args("non-existing"),
+		args: []string{"non-existing"},
 		want: `err:    implied package identifier "non-existing" from import path "non-existing" is not valid
 path:   non-existing
 module: mod.test/test
@@ -217,7 +215,7 @@ dir:    $CWD/testdata/testmod/cue.mod/gen/non-existing
 display:non-existing`,
 	}, {
 		cfg:  dirCfg,
-		args: args("./empty"),
+		args: []string{"./empty"},
 		want: `err:    no CUE files in ./empty
 path:   mod.test/test/empty
 module: mod.test/test
@@ -226,7 +224,7 @@ dir:    $CWD/testdata/testmod/empty
 display:./empty`,
 	}, {
 		cfg:  dirCfg,
-		args: args("./imports"),
+		args: []string{"./imports"},
 		want: `path:   mod.test/test/imports
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -238,7 +236,7 @@ imports:
     mod.test/catch: $CWD/testdata/testmod/cue.mod/pkg/mod.test/catch/catch.cue
     mod.test/helper:helper1: $CWD/testdata/testmod/cue.mod/pkg/mod.test/helper/helper1.cue`}, {
 		cfg:  dirCfg,
-		args: args("./toolonly"),
+		args: []string{"./toolonly"},
 		want: `path:   mod.test/test/toolonly:foo
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -249,7 +247,7 @@ files:
 		cfg: &Config{
 			Dir: testdataDir,
 		},
-		args: args("./toolonly"),
+		args: []string{"./toolonly"},
 		want: `err:    build constraints exclude all CUE files in ./toolonly:
     anon.cue: no package name
     test.cue: package is test, want foo
@@ -263,7 +261,7 @@ display:./toolonly`}, {
 			Dir:  testdataDir,
 			Tags: []string{"prod"},
 		},
-		args: args("./tags"),
+		args: []string{"./tags"},
 		want: `path:   mod.test/test/tags
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -275,7 +273,7 @@ files:
 			Dir:  testdataDir,
 			Tags: []string{"prod", "foo=bar"},
 		},
-		args: args("./tags"),
+		args: []string{"./tags"},
 		want: `path:   mod.test/test/tags
 module: mod.test/test
 root:   $CWD/testdata/testmod
@@ -287,7 +285,7 @@ files:
 			Dir:  testdataDir,
 			Tags: []string{"prod"},
 		},
-		args: args("./tagsbad"),
+		args: []string{"./tagsbad"},
 		want: `err:    tag "prod" not used in any file
 previous declaration here:
     $CWD/testdata/testmod/tagsbad/prod.cue:1:1
@@ -301,7 +299,7 @@ display:./tagsbad`}, {
 		cfg: &Config{
 			Dir: testdataDir,
 		},
-		args: args("./cycle"),
+		args: []string{"./cycle"},
 		want: `err:    import failed: import failed: import failed: package import cycle not allowed:
     $CWD/testdata/testmod/cycle/cycle.cue:3:8
     $CWD/testdata/testmod/cue.mod/pkg/mod.test/cycle/bar/bar.cue:3:8

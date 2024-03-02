@@ -482,22 +482,6 @@ func isMetaPackage(name string) bool {
 	return name == "std" || name == "cmd" || name == "all"
 }
 
-// hasPathPrefix reports whether the path s begins with the
-// elements in prefix.
-func hasPathPrefix(s, prefix string) bool {
-	switch {
-	default:
-		return false
-	case len(s) == len(prefix):
-		return s == prefix
-	case len(s) > len(prefix):
-		if prefix != "" && prefix[len(prefix)-1] == '/' {
-			return strings.HasPrefix(s, prefix)
-		}
-		return s[len(prefix)] == '/' && s[:len(prefix)] == prefix
-	}
-}
-
 // hasFilepathPrefix reports whether the path s begins with the
 // elements in prefix.
 func hasFilepathPrefix(s, prefix string) bool {

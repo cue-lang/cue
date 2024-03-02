@@ -44,9 +44,8 @@ var _ interface {
 type augmentedFS interface {
 	fs.FS
 	fs.StatFS
-	// Note: os.DirFS only started implementing ReadFileFS and
-	// ReadDirFS in Go 1.21, so we can't include those here.
-	// TODO add ReadDirFS and ReadFileFS when we can assume Go 1.21.
+	fs.ReadDirFS
+	fs.ReadFileFS
 }
 
 type dirFSImpl struct {
@@ -56,12 +55,4 @@ type dirFSImpl struct {
 
 func (fsys dirFSImpl) OSRoot() string {
 	return fsys.osRoot
-}
-
-func (fsys dirFSImpl) ReadFile(name string) ([]byte, error) {
-	return fs.ReadFile(fsys.augmentedFS, name)
-}
-
-func (fsys dirFSImpl) ReadDir(name string) ([]fs.DirEntry, error) {
-	return fs.ReadDir(fsys.augmentedFS, name)
 }

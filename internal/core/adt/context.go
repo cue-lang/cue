@@ -710,7 +710,11 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 		// Save the old CloseInfo and restore after evaluate to avoid detecting
 		// spurious cycles.
 		saved := c.ci
-		if n := arc.state; n != nil {
+		n := arc.state
+		if c.isDevVersion() {
+			n = arc.getState(c)
+		}
+		if n != nil {
 			c.ci, _ = n.markCycle(arc, nil, x, c.ci)
 		}
 		c.ci.Inline = true
@@ -944,6 +948,8 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 		}
 	} else {
 		if x.state != nil {
+			x.state.assertInitialized()
+
 			for _, e := range x.state.exprs {
 				if isCyclePlaceholder(e.err) {
 					hasCycle = true

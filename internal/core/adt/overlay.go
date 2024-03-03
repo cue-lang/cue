@@ -92,7 +92,7 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 
 	// Note that this may trigger tasks to run, so it should be called after
 	// everything is initialized.
-	v.state.signal(allAncestorsProcessed)
+	// v.state.signal(allAncestorsProcessed)
 
 	// TODO: walk overlay vertices and decrement counters of non-disjunction
 	// running tasks?
@@ -184,6 +184,11 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 }
 
 func (ctx *overlayContext) cloneNodeContext(n *nodeContext) *nodeContext {
+	if !n.isInitialized {
+		// n = n.node.getState(n.ctx)
+		panic("unexpected uninitialized node")
+
+	}
 	d := n.ctx.newNodeContext(n.node)
 	d.underlying = n.underlying
 	if n.underlying == nil {
@@ -425,12 +430,14 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 			if t.node != src || t.blockedOn != ss {
 				break
 			}
+			t.defunct = true
 			t := ctx.cloneTask(t, ds, ss)
 			ds.tasks = append(ds.tasks, t)
 			ds.blocking = append(ds.blocking, t)
 			ctx.ctx.blocking = append(ctx.ctx.blocking, t)
 
 		case taskREADY:
+			t.defunct = true
 			t := ctx.cloneTask(t, ds, ss)
 			ds.tasks = append(ds.tasks, t)
 		}

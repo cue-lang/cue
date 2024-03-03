@@ -107,13 +107,13 @@ Result:
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }, *(string){
         "X"
-        #early: (_){ _ }
+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }, (string){
         string
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }, (string){
         string
-        #early: (_){ _ }
+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }) }
   }
   handleComprehensions: (struct){
@@ -189,13 +189,13 @@ diff old new
 +        #early: (string){ |(*(string){ "X" }, (string){ string }) }
 +      }, *(string){
 +        "X"
-+        #early: (_){ _ }
++        #early: (string){ |(*(string){ "X" }, (string){ string }) }
 +      }, (string){
 +        string
 +        #early: (string){ |(*(string){ "X" }, (string){ string }) }
 +      }, (string){
 +        string
-+        #early: (_){ _ }
++        #early: (string){ |(*(string){ "X" }, (string){ string }) }
 +      }) }
    }
    handleComprehensions: (struct){

@@ -261,7 +261,7 @@ Result:
       s: (struct){
         foo: (#struct){
           f: (#struct){
-            d: (#struct){
+            d: (struct){
               foo: (int){ 1 }
             }
           }
@@ -275,7 +275,7 @@ Result:
         }
       }
       W: (#struct){
-        b: (#struct){
+        b: (struct){
           c: (int){ 2 }
         }
         a: (#struct){
@@ -374,7 +374,7 @@ Result:
       s: (struct){
         foo: (#struct){
           f: (#struct){
-            d: (#struct){
+            d: (struct){
               foo: (string){ "bar" }
             }
           }
@@ -388,7 +388,7 @@ Result:
         }
       }
       W: (#struct){
-        b: (#struct){
+        b: (struct){
           c: (int){ 2 }
         }
         a: (#struct){
@@ -490,12 +490,9 @@ Result:
         }
       }
     }
-    t4: (_|_){
-      // [eval]
-      a: (_|_){
-        // [eval]
-        b: (_|_){
-          // [eval]
+    t4: (struct){
+      a: (#struct){
+        b: (#struct){
           h: (_|_){
             // [eval] err.t4.a.b.h: field not allowed:
             //     ./in.cue:154:8
@@ -729,15 +726,6 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -88,7 +59,7 @@
-       s: (struct){
-         foo: (#struct){
-           f: (#struct){
--            d: (struct){
-+            d: (#struct){
-               foo: (int){ 1 }
-             }
-           }
 @@ -102,11 +73,11 @@
          }
        }
@@ -747,7 +735,7 @@ diff old new
 -        }
 -        b: (struct){
 -          c: (int){ 2 }
-+        b: (#struct){
++        b: (struct){
 +          c: (int){ 2 }
 +        }
 +        a: (#struct){
@@ -784,15 +772,6 @@ diff old new
          f: (string){ "hi" }
        }
      }
-@@ -204,7 +172,7 @@
-       s: (struct){
-         foo: (#struct){
-           f: (#struct){
--            d: (struct){
-+            d: (#struct){
-               foo: (string){ "bar" }
-             }
-           }
 @@ -218,11 +186,11 @@
          }
        }
@@ -802,7 +781,7 @@ diff old new
 -        }
 -        b: (struct){
 -          c: (int){ 2 }
-+        b: (#struct){
++        b: (struct){
 +          c: (int){ 2 }
 +        }
 +        a: (#struct){
@@ -869,11 +848,20 @@ diff old new
                //     ./in.cue:148:8
              }
            }
-@@ -336,54 +294,47 @@
-         // [eval]
-         b: (_|_){
-           // [eval]
+@@ -330,60 +288,50 @@
+         }
+       }
+     }
+-    t4: (_|_){
+-      // [eval]
+-      a: (_|_){
+-        // [eval]
+-        b: (_|_){
+-          // [eval]
 -          f: (int){ 1 }
++    t4: (struct){
++      a: (#struct){
++        b: (#struct){
            h: (_|_){
              // [eval] err.t4.a.b.h: field not allowed:
 -            //     ./in.cue:152:5
@@ -957,7 +945,7 @@ diff old new
          }
        }
      }
-@@ -433,17 +384,12 @@
+@@ -433,17 +381,12 @@
                // [eval]
                e: (_|_){
                  // [eval]
@@ -977,7 +965,7 @@ diff old new
                }
              }
            }
-@@ -457,13 +403,12 @@
+@@ -457,13 +400,12 @@
        }
        a: (_|_){
          // [eval]
@@ -992,7 +980,7 @@ diff old new
        }
      }
      t8: (_|_){
-@@ -477,14 +422,11 @@
+@@ -477,14 +419,11 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -1008,6 +996,8 @@ diff old new
          }
        }
      }
+-- diff/todo/p1 --
+closedness incorrect.
 -- diff/todo/p2 --
 error positions and reordering.
 -- out/eval --

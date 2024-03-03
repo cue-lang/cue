@@ -111,8 +111,7 @@ Unifications: 27
 Conjuncts:    40
 Disjuncts:    28
 -- out/evalalpha --
-(_|_){
-  // [eval]
+(struct){
   self: (struct){
     t1: (struct){
       a?: (int){ int }
@@ -144,15 +143,11 @@ Disjuncts:    28
       a!: (int){ int }
     }
   }
-  allowed: (_|_){
-    // [eval]
-    issue2306: (_|_){
-      // [eval]
-      #A: (_|_){
-        // [eval]
+  allowed: (struct){
+    issue2306: (struct){
+      #A: (#struct){
         a!: (_|_){
           // [eval] allowed.issue2306.#A.a: field not allowed:
-          //     ./in.cue:35:6
           //     ./in.cue:34:6
         }
         b!: (int){ int }
@@ -167,14 +162,31 @@ Disjuncts:    28
 diff old new
 --- old
 +++ new
-@@ -39,9 +39,8 @@
-         // [eval]
+@@ -1,5 +1,4 @@
+-(_|_){
+-  // [eval]
++(struct){
+   self: (struct){
+     t1: (struct){
+       a?: (int){ int }
+@@ -31,17 +30,12 @@
+       a!: (int){ int }
+     }
+   }
+-  allowed: (_|_){
+-    // [eval]
+-    issue2306: (_|_){
+-      // [eval]
+-      #A: (_|_){
+-        // [eval]
++  allowed: (struct){
++    issue2306: (struct){
++      #A: (#struct){
          a!: (_|_){
            // [eval] allowed.issue2306.#A.a: field not allowed:
--          //     ./in.cue:34:6
-           //     ./in.cue:35:6
+           //     ./in.cue:34:6
+-          //     ./in.cue:35:6
 -          //     ./in.cue:37:6
-+          //     ./in.cue:34:6
          }
          b!: (int){ int }
        }

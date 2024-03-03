@@ -186,11 +186,12 @@ func (n *nodeContext) insertComprehension(
 
 				conjunct := MakeConjunct(env, c, ci)
 				if n.ctx.isDevVersion() {
-					_, c.arcCC = n.node.state.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
+					n.assertInitialized()
+					_, c.arcCC = n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
 					c.cc = ci.cc
 					ci.cc.incDependent(COMP, c.arcCC)
 				} else {
-					n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
+					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				}
 
 				fields = append(fields, f)
@@ -212,7 +213,8 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				arc := n.node.state.insertFieldUnchecked(f.Label, ArcMember, conjunct)
+				n.assertInitialized()
+				arc := n.insertFieldUnchecked(f.Label, ArcMember, conjunct)
 				arc.MultiLet = f.IsMulti
 
 				fields = append(fields, f)

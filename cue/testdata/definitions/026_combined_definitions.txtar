@@ -128,11 +128,10 @@ Conjuncts:    41
 Disjuncts:    30
 -- out/evalalpha --
 Errors:
+#D4.env.b: field not allowed:
+    ./in.cue:27:7
 d1.env.c: field not allowed:
     ./in.cue:9:17
-#D4.env.b: field not allowed:
-    ./in.cue:26:7
-    ./in.cue:27:7
 
 Result:
 (_|_){
@@ -173,13 +172,10 @@ Result:
       b: (string){ "B" }
     }
   }
-  #D4: (_|_){
-    // [eval]
-    env: (_|_){
-      // [eval]
+  #D4: (#struct){
+    env: (#struct){
       b: (_|_){
         // [eval] #D4.env.b: field not allowed:
-        //     ./in.cue:26:7
         //     ./in.cue:27:7
       }
       a: (int){ int }
@@ -193,23 +189,20 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,9 @@
+@@ -1,12 +1,7 @@
  Errors:
-+d1.env.c: field not allowed:
-+    ./in.cue:9:17
  #D4.env.b: field not allowed:
-     ./in.cue:26:7
+-    ./in.cue:26:7
      ./in.cue:27:7
 -    ./in.cue:30:6
--d1.env.c: field not allowed:
+ d1.env.c: field not allowed:
 -    ./in.cue:3:7
 -    ./in.cue:4:7
 -    ./in.cue:9:5
--    ./in.cue:9:17
+     ./in.cue:9:17
  
  Result:
- (_|_){
-@@ -26,15 +22,12 @@
+@@ -26,15 +21,12 @@
      // [eval]
      env: (_|_){
        // [eval]
@@ -227,14 +220,20 @@ diff old new
      }
      #def: (#struct){
        a: (string){ "A" }
-@@ -55,13 +48,12 @@
-     // [eval]
-     env: (_|_){
-       // [eval]
+@@ -51,17 +43,13 @@
+       b: (string){ "B" }
+     }
+   }
+-  #D4: (_|_){
+-    // [eval]
+-    env: (_|_){
+-      // [eval]
 -      a: (int){ int }
++  #D4: (#struct){
++    env: (#struct){
        b: (_|_){
          // [eval] #D4.env.b: field not allowed:
-         //     ./in.cue:26:7
+-        //     ./in.cue:26:7
          //     ./in.cue:27:7
 -        //     ./in.cue:30:6
 -      }

@@ -191,13 +191,9 @@ Result:
   xa3: (int){ 6 }
   xa4: (int){ 10 }
   xb1: (int){ 8 }
-  xb2: (int){ 8 }
+  xb2: (int){ 11 }
   xb3: (int){ 6 }
-  xb4: (_|_){
-    // [incomplete] xb4: non-concrete value _ in operand to +:
-    //     ./in.cue:18:6
-    //     ./in.cue:16:6
-  }
+  xb4: (int){ 13 }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
   xc3: (int){ 6 }
@@ -234,13 +230,9 @@ Result:
     //     ./in.cue:46:6
   }
   xf1: (int){ 8 }
-  xf2: (int){ 8 }
+  xf2: (int){ 11 }
   xf3: (int){ 6 }
-  xf4: (_|_){
-    // [incomplete] xf4: non-concrete value _ in operand to +:
-    //     ./in.cue:51:6
-    //     ./in.cue:49:6
-  }
+  xf4: (int){ 13 }
   z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
   z3: (int){ 8 }
@@ -260,7 +252,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -10,28 +10,17 @@
+@@ -10,28 +10,13 @@
    xa2: (int){ 8 }
    xa3: (int){ 6 }
    xa4: (int){ 10 }
@@ -276,15 +268,14 @@ diff old new
 -    //     ./in.cue:16:6
 -  }
 -  xb3: (int){ |((int){ 6 }, (int){ 9 }) }
-+  xb1: (int){ 8 }
-+  xb2: (int){ 8 }
-+  xb3: (int){ 6 }
-   xb4: (_|_){
+-  xb4: (_|_){
 -    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
-+    // [incomplete] xb4: non-concrete value _ in operand to +:
-+    //     ./in.cue:18:6
-     //     ./in.cue:16:6
-   }
+-    //     ./in.cue:16:6
+-  }
++  xb1: (int){ 8 }
++  xb2: (int){ 11 }
++  xb3: (int){ 6 }
++  xb4: (int){ 13 }
    xc1: (int){ |((int){ 8 }, (int){ 9 }) }
    xc2: (int){ 8 }
 -  xc3: (_|_){
@@ -295,7 +286,7 @@ diff old new
    xc4: (int){ 9 }
    xc5: (int){ 10 }
    xd1: (int){ 8 }
-@@ -39,35 +28,40 @@
+@@ -39,35 +24,36 @@
    xd3: (int){ 6 }
    xd4: (int){ 9 }
    xd5: (int){ 10 }
@@ -330,6 +321,10 @@ diff old new
 -    //     ./in.cue:49:6
 -  }
 -  xf3: (int){ |((int){ 6 }, (int){ 9 }) }
+-  xf4: (_|_){
+-    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
+-    //     ./in.cue:49:6
+-  }
 +    // [eval] xe1: conflicting values 8 and 9:
 +    //     ./in.cue:41:12
 +    //     ./in.cue:46:6
@@ -345,14 +340,9 @@ diff old new
 +    //     ./in.cue:46:6
 +  }
 +  xf1: (int){ 8 }
-+  xf2: (int){ 8 }
++  xf2: (int){ 11 }
 +  xf3: (int){ 6 }
-   xf4: (_|_){
--    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
-+    // [incomplete] xf4: non-concrete value _ in operand to +:
-+    //     ./in.cue:51:6
-     //     ./in.cue:49:6
-   }
++  xf4: (int){ 13 }
    z1: (int){ |((int){ 11 }, (int){ 13 }) }
    z2: (int){ 10 }
 -  z3: (_|_){
@@ -361,6 +351,8 @@ diff old new
 -  }
 +  z3: (int){ 8 }
  }
+-- todo/diff/p1 --
+xb now resolves incorrectly. This is related to completeNodeTasks.
 -- diff/explanation --
 x(e|f)*: is better to have an error at each field.
 z3: include the "unchecked" validator.

@@ -148,13 +148,9 @@ Result:
   xa3: (int){ 6 }
   xa4: (int){ 10 }
   xb1: (int){ 8 }
-  xb2: (int){ 8 }
+  xb2: (int){ 11 }
   xb3: (int){ 6 }
-  xb4: (_|_){
-    // [incomplete] xb4: non-concrete value _ in operand to +:
-    //     ./in.cue:11:6
-    //     ./in.cue:9:6
-  }
+  xb4: (int){ 13 }
   xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
   xc3: (int){ 6 }
@@ -209,22 +205,20 @@ diff old new
  
  Result:
  (_|_){
-@@ -12,8 +12,12 @@
+@@ -11,9 +11,9 @@
+   xa3: (int){ 6 }
    xa4: (int){ 10 }
    xb1: (int){ 8 }
-   xb2: (int){ 8 }
+-  xb2: (int){ 8 }
 -  xb3: (int){ |(*(int){ 6 }, (int){ 9 }) }
 -  xb4: (int){ 10 }
++  xb2: (int){ 11 }
 +  xb3: (int){ 6 }
-+  xb4: (_|_){
-+    // [incomplete] xb4: non-concrete value _ in operand to +:
-+    //     ./in.cue:11:6
-+    //     ./in.cue:9:6
-+  }
++  xb4: (int){ 13 }
    xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
    xc2: (int){ 8 }
    xc3: (int){ 6 }
-@@ -24,15 +28,31 @@
+@@ -24,15 +24,31 @@
    xd3: (int){ 6 }
    xd4: (int){ 9 }
    xd5: (int){ 10 }
@@ -266,7 +260,8 @@ diff old new
    z3: (int){ 8 }
 -- diff/todo/p1 --
 Verify differences.
-xb4: invalid error.
+xb2: Incorrect result.
+xb4: Incorrect result. This is related to completeNodeTasks.
 -- out/eval --
 Errors:
 xe3: conflicting values 7 and 6:

@@ -237,6 +237,13 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 	})
 }
 
+func initArcs(ctx *OpContext, v *Vertex) {
+	for _, a := range v.Arcs {
+		a.getState(ctx)
+		initArcs(ctx, a)
+	}
+}
+
 func (n *nodeContext) processDisjunctions() *Bottom {
 	defer func() {
 		// TODO:
@@ -250,7 +257,11 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	a := n.disjunctions
 	n.disjunctions = n.disjunctions[:0]
 
+	n.completeNodeConjuncts()
+	initArcs(n.ctx, n.node)
+
 	// TODO(perf): single pass for quick filter on all disjunctions.
+	// n.node.unify(n.ctx, allKnown, attemptOnly)
 
 	// Initially we compute the cross product of a disjunction with the
 	// nodeContext as it is processed so far.
@@ -321,8 +332,11 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 // crossProduct computes the cross product of the disjuncts of a disjunction
 // with an existing set of results.
 func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
-
 	for _, p := range cross {
+		// TODO: use a partial unify instead
+		// p.completeNodeConjuncts()
+		initArcs(n.ctx, p.node)
+
 		for j, d := range dn.disjuncts {
 			c := MakeConjunct(dn.env, d.expr, dn.cloneID)
 			r, err := p.doDisjunct(c, d.mode, mode)

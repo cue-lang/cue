@@ -486,6 +486,8 @@ func (s *scheduler) yield() {
 
 // meets reports whether all needed completion states in s are met.
 func (s *scheduler) meets(needs condition) bool {
+	s.node.assertInitialized()
+
 	if s.state != schedREADY {
 		// Automatically qualify for conditions that are not provided by this node.
 		// NOTE: in the evaluator this is generally not the case, as tasks my still

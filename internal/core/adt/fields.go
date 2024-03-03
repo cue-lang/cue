@@ -676,6 +676,8 @@ func (c *closeContext) linkPatterns(child *closeContext) {
 // checkArc validates that the node corresponding to cc allows a field with
 // label v.Label.
 func (n *nodeContext) checkArc(cc *closeContext, v *Vertex) *Vertex {
+	n.assertInitialized()
+
 	f := v.Label
 	ctx := n.ctx
 
@@ -708,7 +710,7 @@ func (n *nodeContext) checkArc(cc *closeContext, v *Vertex) *Vertex {
 }
 
 // insertConjunct inserts conjunct c into cc.
-func (cc *closeContext) insertConjunct(key *closeContext, c Conjunct, id CloseInfo, mode ArcType, check, checkClosed bool) (arc *closeContext, added bool) {
+func (cc *closeContext) insertConjunct(ctx *OpContext, key *closeContext, c Conjunct, id CloseInfo, mode ArcType, check, checkClosed bool) (arc *closeContext, added bool) {
 	arc, _, added = cc.assignConjunct(key, c, mode, check, checkClosed)
 	if key.src != arc.src {
 		panic("inconsistent src")
@@ -718,17 +720,26 @@ func (cc *closeContext) insertConjunct(key *closeContext, c Conjunct, id CloseIn
 		return
 	}
 
-	if n := key.src.state; n != nil {
+	n := key.src.getBareState(ctx)
+	if n == nil {
+		// already done
+		return
+	}
+
+	if key.src.isInProgress() {
 		c.CloseInfo.cc = nil
 		id.cc = arc
 		n.scheduleConjunct(c, id)
+	}
 
-		for _, rec := range n.notify {
-			if mode == ArcPending {
-				panic("unexpected pending arc")
-			}
-			cc.insertConjunct(rec.cc, c, id, mode, check, checkClosed)
+	for _, rec := range n.notify {
+		if mode == ArcPending {
+			panic("unexpected pending arc")
 		}
+		// TODO: we should probably only notify a conjunct once the root of the
+		// conjunct group is completed. This will make it easier to "stitch" the
+		// conjunct trees together, as its correctness will be guaranteed.
+		cc.insertConjunct(ctx, rec.cc, c, id, mode, check, checkClosed)
 	}
 
 	return
@@ -743,6 +754,8 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 // was already added.
 // Returns the arc of n.node with label f.
 func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseInfo, check bool) (*Vertex, *closeContext) {
+	n.assertInitialized()
+
 	if n == nil {
 		panic("nil nodeContext")
 	}
@@ -771,7 +784,7 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 		v.cc.generation = n.node.cc.generation
 	}
 
-	arc, added := cc.insertConjunct(v.cc, c, id, mode, check, true)
+	arc, added := cc.insertConjunct(n.ctx, v.cc, c, id, mode, check, true)
 	if !added {
 		return v, arc
 	}
@@ -811,6 +824,8 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 //
 // The arc must be the node arc to which the conjunct is added.
 func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check bool) {
+	n.assertInitialized()
+
 	// TODO(perf): avoid cloning the Environment, if:
 	// - the pattern constraint has no LabelReference
 	//   (require compile-time support)
@@ -837,10 +852,12 @@ func (n *nodeContext) addConstraint(arc *Vertex, mode ArcType, c Conjunct, check
 	arc, _ = n.getArc(f, mode)
 
 	root := arc.rootCloseContext()
-	cc.insertConjunct(root, c, c.CloseInfo, mode, check, false)
+	cc.insertConjunct(n.ctx, root, c, c.CloseInfo, mode, check, false)
 }
 
 func (n *nodeContext) insertPattern(pattern Value, c Conjunct) {
+	n.assertInitialized()
+
 	ctx := n.ctx
 	cc := c.CloseInfo.cc
 

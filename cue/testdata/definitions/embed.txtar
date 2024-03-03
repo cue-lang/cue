@@ -154,7 +154,7 @@ Result:
       y: (int){ int }
     }
     a: (#struct){
-      b: (#struct){
+      b: (struct){
         c: (int){ int }
       }
       x: (int){ int }
@@ -226,12 +226,9 @@ diff old new
      #a: (#struct){
 -      x: (int){ int }
 -      y: (int){ int }
--      b: (#struct){
--        c: (int){ int }
--      }
-+      b: (#struct){
-+        c: (int){ int }
-+      }
+       b: (#struct){
+         c: (int){ int }
+       }
 +      x: (int){ int }
 +      y: (int){ int }
      }
@@ -254,12 +251,9 @@ diff old new
      a: (#struct){
 -      x: (int){ int }
 -      y: (int){ int }
--      b: (struct){
--        c: (int){ int }
--      }
-+      b: (#struct){
-+        c: (int){ int }
-+      }
+       b: (struct){
+         c: (int){ int }
+       }
 +      x: (int){ int }
 +      y: (int){ int }
      }

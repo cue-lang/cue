@@ -36,8 +36,8 @@ Conjuncts:    94
 Disjuncts:    16
 -- out/evalalpha --
 Errors:
-foo.0.type: conflicting values "int" and "float":
-    ./in.cue:3:16
+foo.0: conflicting values "string" and "float":
+    ./in.cue:3:50
     ./in.cue:5:14
 foo.0.type: conflicting values "string" and "float":
     ./in.cue:5:14
@@ -56,8 +56,8 @@ Result:
   foo: (_|_){
     // [eval]
     0: (_|_){
-      // [eval] foo.0.type: conflicting values "int" and "float":
-      //     ./in.cue:3:16
+      // [eval] foo.0: conflicting values "string" and "float":
+      //     ./in.cue:3:50
       //     ./in.cue:5:14
       // foo.0.type: conflicting values "string" and "float":
       //     ./in.cue:5:14
@@ -77,11 +77,14 @@ diff old new
 @@ -1,13 +1,10 @@
  Errors:
 -foo.0: 2 errors in empty disjunction:
- foo.0.type: conflicting values "int" and "float":
-     ./in.cue:3:16
-     ./in.cue:5:14
+-foo.0.type: conflicting values "int" and "float":
+-    ./in.cue:3:16
+-    ./in.cue:5:14
 -    ./in.cue:5:27
 -    ./in.cue:5:30
++foo.0: conflicting values "string" and "float":
++    ./in.cue:3:50
++    ./in.cue:5:14
  foo.0.type: conflicting values "string" and "float":
      ./in.cue:5:14
 -    ./in.cue:10:14
@@ -95,11 +98,13 @@ diff old new
      0: (_|_){
 -      // [eval] foo.0: 2 errors in empty disjunction:
 -      // foo.0.type: conflicting values "int" and "float":
-+      // [eval] foo.0.type: conflicting values "int" and "float":
-       //     ./in.cue:3:16
-       //     ./in.cue:5:14
+-      //     ./in.cue:3:16
+-      //     ./in.cue:5:14
 -      //     ./in.cue:5:27
 -      //     ./in.cue:5:30
++      // [eval] foo.0: conflicting values "string" and "float":
++      //     ./in.cue:3:50
++      //     ./in.cue:5:14
        // foo.0.type: conflicting values "string" and "float":
        //     ./in.cue:5:14
        //     ./in.cue:10:14

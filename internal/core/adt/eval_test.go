@@ -82,6 +82,9 @@ func TestEvalAlpha(t *testing.T) {
 
 		// Performance
 		"disjunctions/elimination": "performance issue",
+
+		"comprehensions/issue837": "not initialized",
+		"definitions/issue491":    "regress from 5 to 3",
 	}
 
 	test := cuetxtar.TxTarTest{

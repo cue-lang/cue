@@ -19,17 +19,13 @@ Disjuncts:    7
 -- out/evalalpha --
 Errors:
 a.c: field not allowed:
-    ./in.cue:2:2
     ./in.cue:5:4
 
 Result:
-(_|_){
-  // [eval]
-  a: (_|_){
-    // [eval]
+(struct){
+  a: (#struct){
     c: (_|_){
       // [eval] a.c: field not allowed:
-      //     ./in.cue:2:2
       //     ./in.cue:5:4
     }
     b: (int){ 1 }
@@ -42,25 +38,26 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,9 +1,7 @@
+@@ -1,23 +1,15 @@
  Errors:
  a.c: field not allowed:
 -    ./in.cue:1:4
-     ./in.cue:2:2
+-    ./in.cue:2:2
      ./in.cue:5:4
 -    ./in.cue:7:5
  
  Result:
- (_|_){
-@@ -10,14 +8,12 @@
-   // [eval]
-   a: (_|_){
-     // [eval]
+-(_|_){
+-  // [eval]
+-  a: (_|_){
+-    // [eval]
 -    b: (int){ 1 }
++(struct){
++  a: (#struct){
      c: (_|_){
        // [eval] a.c: field not allowed:
 -      //     ./in.cue:1:4
-       //     ./in.cue:2:2
+-      //     ./in.cue:2:2
        //     ./in.cue:5:4
 -      //     ./in.cue:7:5
      }

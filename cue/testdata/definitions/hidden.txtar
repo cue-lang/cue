@@ -54,10 +54,10 @@ Result:
     }
   }
   d: (#struct){
-    _name(:foo): (#struct){
+    _name(:foo): (struct){
       d: (int){ int }
     }
-    _val(:foo): (#struct){
+    _val(:foo): (struct){
       f: (int){ 4 }
     }
     _val(mod.test/pkg): (#struct){
@@ -74,7 +74,7 @@ Result:
       }
       d: (int){ int }
     }
-    _val(:foo): (#struct){
+    _val(:foo): (struct){
       g: (int){ int }
     }
     _val(mod.test/pkg): (#struct){
@@ -82,7 +82,7 @@ Result:
     }
   }
   f: (#struct){
-    _val(:foo): (#struct){
+    _val(:foo): (struct){
       f: (int){ 4 }
     }
     _val(mod.test/pkg): (#struct){
@@ -105,27 +105,23 @@ diff old new
      ./in.cue:16:9
  
  Result:
-@@ -13,41 +11,39 @@
+@@ -13,9 +11,6 @@
      }
    }
    d: (#struct){
 -    _val(mod.test/pkg): (#struct){
 -      f: (int){ 3 }
 -    }
--    _name(:foo): (struct){
--      d: (int){ int }
--    }
--    _val(:foo): (struct){
--      f: (int){ 4 }
-+    _name(:foo): (#struct){
-+      d: (int){ int }
-+    }
-+    _val(:foo): (#struct){
-+      f: (int){ 4 }
-+    }
+     _name(:foo): (struct){
+       d: (int){ int }
+     }
+@@ -22,32 +17,33 @@
+     _val(:foo): (struct){
+       f: (int){ 4 }
+     }
 +    _val(mod.test/pkg): (#struct){
 +      f: (int){ 3 }
-     }
++    }
    }
    e: (_|_){
      // [eval]
@@ -141,11 +137,9 @@ diff old new
 -        //     ./in.cue:13:13
          //     ./in.cue:16:9
        }
--    }
--    _val(:foo): (struct){
 +      d: (int){ int }
-+    }
-+    _val(:foo): (#struct){
+     }
+     _val(:foo): (struct){
        g: (int){ int }
      }
 +    _val(mod.test/pkg): (#struct){
@@ -158,7 +152,7 @@ diff old new
 -    }
 -    _val(:foo): (struct){
 -      f: (int){ 4 }
-+    _val(:foo): (#struct){
++    _val(:foo): (struct){
 +      f: (int){ 4 }
 +    }
 +    _val(mod.test/pkg): (#struct){

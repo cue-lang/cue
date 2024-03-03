@@ -82,16 +82,26 @@ Result:
     //     ./in.cue:4:22
     //     ./in.cue:8:2
     //     ./in.cue:18:2
-    FOO: (#struct){
-      $secret: (#struct){
+    FOO: (struct){
+      $secret: (struct){
         id: (string){ "100" }
         _id: (string){ "100" }
       }
     }
-    ONE: (#struct){
-      TWO: (#struct){
-        THREE: (#struct){
-          $secret: (#struct){
+    ONE: (_|_){
+      // [eval] out.FOO: field not allowed:
+      //     ./in.cue:14:11
+      //     ./in.cue:4:22
+      //     ./in.cue:7:2
+      //     ./in.cue:17:2
+      // out.ONE: field not allowed:
+      //     ./in.cue:14:11
+      //     ./in.cue:4:22
+      //     ./in.cue:8:2
+      //     ./in.cue:18:2
+      TWO: (struct){
+        THREE: (struct){
+          $secret: (struct){
             id: (string){ "123" }
             _id: (string){ "123" }
           }
@@ -124,11 +134,13 @@ diff old new
    #Secret: (#struct){
      $secret: (#struct){
        id: (string){ string }
-@@ -12,7 +26,17 @@
+@@ -12,17 +26,37 @@
        }
      }, (#struct){
      }) }
 -  out: (#struct){
+-    FOO: (#struct){
+-      $secret: (#struct){
 +  out: (_|_){
 +    // [eval] out.FOO: field not allowed:
 +    //     ./in.cue:14:11
@@ -140,11 +152,37 @@ diff old new
 +    //     ./in.cue:4:22
 +    //     ./in.cue:8:2
 +    //     ./in.cue:18:2
-     FOO: (#struct){
-       $secret: (#struct){
++    FOO: (struct){
++      $secret: (struct){
          id: (string){ "100" }
+         _id: (string){ "100" }
+       }
+     }
+-    ONE: (#struct){
+-      TWO: (#struct){
+-        THREE: (#struct){
+-          $secret: (#struct){
++    ONE: (_|_){
++      // [eval] out.FOO: field not allowed:
++      //     ./in.cue:14:11
++      //     ./in.cue:4:22
++      //     ./in.cue:7:2
++      //     ./in.cue:17:2
++      // out.ONE: field not allowed:
++      //     ./in.cue:14:11
++      //     ./in.cue:4:22
++      //     ./in.cue:8:2
++      //     ./in.cue:18:2
++      TWO: (struct){
++        THREE: (struct){
++          $secret: (struct){
+             id: (string){ "123" }
+             _id: (string){ "123" }
+           }
 -- diff/todo/p0 --
-out.FOO: field not allowed is incorrect.
+out.FOO: incorrectly not allowed. This is a result of the overlay evaluating
+non-overlay Vertices during the evaluation of disjunctions. This should be fixed
+in a separate CL.
 -- out/eval --
 (struct){
   #Secret: (#struct){

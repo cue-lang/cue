@@ -140,7 +140,7 @@ Disjuncts:    29
     }) }
   v1: (#struct){
     a?: (_|_){
-      // [eval] v1.a: conflicting values 2 and 3:
+      // [eval] v1: conflicting values 2 and 3:
       //     ./in.cue:10:11
       //     ./in.cue:12:16
     }
@@ -154,14 +154,19 @@ Disjuncts:    29
 diff old new
 --- old
 +++ new
-@@ -32,7 +32,6 @@
+@@ -30,9 +30,8 @@
+     }) }
+   v1: (#struct){
      a?: (_|_){
-       // [eval] v1.a: conflicting values 2 and 3:
+-      // [eval] v1.a: conflicting values 2 and 3:
++      // [eval] v1: conflicting values 2 and 3:
        //     ./in.cue:10:11
 -      //     ./in.cue:12:5
        //     ./in.cue:12:16
      }
      b: (int){ 4 }
+-- diff/todo/p2 --
+v1.a: Incorrect path in error message.
 -- diff/todo/p3 --
 Missing error position.
 -- out/eval --

@@ -435,7 +435,7 @@ unblockTasks:
 	// relevant states first to finish up any tasks that were just waiting for
 	// types, such as lists.
 	for _, t := range c.blocking {
-		if t.blockedOn != nil {
+		if t.blockedOn != nil { // && !t.defunct {
 			t.blockedOn.signal(s.ctx.autoUnblock)
 		}
 	}
@@ -444,7 +444,7 @@ unblockTasks:
 	// tasks. Doing this before running the remaining tasks ensures that we get
 	// the same errors, regardless of the order in which tasks are unblocked.
 	for _, t := range c.blocking {
-		if t.blockedOn != nil {
+		if t.blockedOn != nil { // && !t.defunct {
 			t.blockedOn.freeze(t.blockCondition)
 			t.unblocked = true
 		}
@@ -486,6 +486,8 @@ func (s *scheduler) yield() {
 
 // meets reports whether all needed completion states in s are met.
 func (s *scheduler) meets(needs condition) bool {
+	s.node.assertInitialized()
+
 	if s.state != schedREADY {
 		// Automatically qualify for conditions that are not provided by this node.
 		// NOTE: in the evaluator this is generally not the case, as tasks my still

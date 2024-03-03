@@ -753,15 +753,13 @@ Conjuncts:    640
 Disjuncts:    472
 -- out/evalalpha --
 Errors:
-noStackOverflowStructCycle.#list.tail: structural cycle
-noStackOverflowStructCycle.list.tail: structural cycle
 embed.fail1.p: field not allowed:
-    ./in.cue:46:7
     ./in.cue:46:4
     ./in.cue:49:9
 embed.fail4.p: field not allowed:
-    ./in.cue:74:10
     ./in.cue:74:4
+noStackOverflowStructCycle.#list.tail: structural cycle
+noStackOverflowStructCycle.list.tail: structural cycle
 fieldMismatch.a: cannot combine regular field "x" with 2:
     ./in.cue:139:7
     ./in.cue:137:3
@@ -813,13 +811,10 @@ Result:
       //     ./in.cue:30:3
     }
   }
-  embed: (_|_){
-    // [eval]
-    fail1: (_|_){
-      // [eval]
+  embed: (struct){
+    fail1: (#struct){
       p: (_|_){
         // [eval] embed.fail1.p: field not allowed:
-        //     ./in.cue:46:7
         //     ./in.cue:46:4
         //     ./in.cue:49:9
       }
@@ -836,11 +831,9 @@ Result:
     }
     #C3: (#struct){
     }
-    fail4: (_|_){
-      // [eval]
+    fail4: (#struct){
       p: (_|_){
         // [eval] embed.fail4.p: field not allowed:
-        //     ./in.cue:74:10
         //     ./in.cue:74:4
         q: (int){ 1 }
       }
@@ -1396,16 +1389,13 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,27 +1,19 @@
+@@ -1,27 +1,17 @@
  Errors:
-+noStackOverflowStructCycle.#list.tail: structural cycle
-+noStackOverflowStructCycle.list.tail: structural cycle
  embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
 -    ./in.cue:38:7
 -    ./in.cue:45:3
 -    ./in.cue:45:12
-+    ./in.cue:46:7
      ./in.cue:46:4
      ./in.cue:49:9
  embed.fail4.p: field not allowed:
@@ -1413,10 +1403,9 @@ diff old new
 -    ./in.cue:70:7
 -    ./in.cue:71:9
 -    ./in.cue:72:3
-+    ./in.cue:74:10
      ./in.cue:74:4
--noStackOverflowStructCycle.#list.tail: structural cycle
--noStackOverflowStructCycle.list.tail: structural cycle
+ noStackOverflowStructCycle.#list.tail: structural cycle
+ noStackOverflowStructCycle.list.tail: structural cycle
 -provideIncompleteSuccess.t2.a.c.d: field not allowed:
 -    ./in.cue:187:7
 -    ./in.cue:189:4
@@ -1431,42 +1420,50 @@ diff old new
  
  Result:
  (_|_){
-@@ -63,8 +55,8 @@
+@@ -63,20 +53,14 @@
    }
    fail: (struct){
      a: (_|_){
 -      // [cycle] fail.a: cycle with field a.b:
 -      //     ./in.cue:30:6
+-    }
+-  }
+-  embed: (_|_){
+-    // [eval]
+-    fail1: (_|_){
+-      // [eval]
 +      // [incomplete] fail.a.b: cyclic reference to field b:
 +      //     ./in.cue:30:3
-     }
-   }
-   embed: (_|_){
-@@ -73,10 +65,7 @@
-       // [eval]
++    }
++  }
++  embed: (struct){
++    fail1: (#struct){
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
 -        //     ./in.cue:37:9
 -        //     ./in.cue:38:7
 -        //     ./in.cue:45:3
 -        //     ./in.cue:45:12
-+        //     ./in.cue:46:7
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -97,10 +86,7 @@
-       // [eval]
+@@ -93,14 +77,9 @@
+     }
+     #C3: (#struct){
+     }
+-    fail4: (_|_){
+-      // [eval]
++    fail4: (#struct){
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
 -        //     ./in.cue:69:9
 -        //     ./in.cue:70:7
 -        //     ./in.cue:71:9
 -        //     ./in.cue:72:3
-+        //     ./in.cue:74:10
          //     ./in.cue:74:4
          q: (int){ 1 }
        }
-@@ -125,7 +111,6 @@
+@@ -125,7 +104,6 @@
          // [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
          //     ./in.cue:93:6
          //     ./in.cue:94:6
@@ -1474,7 +1471,7 @@ diff old new
        }
        q: (int){ int }
      }
-@@ -189,12 +174,12 @@
+@@ -189,12 +167,12 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1491,7 +1488,7 @@ diff old new
        }
      }
      t2: (_|_){
-@@ -211,10 +196,8 @@
+@@ -211,10 +189,8 @@
            // [eval]
            d: (_|_){
              // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1503,7 +1500,7 @@ diff old new
            }
          }
          b: (bool){ true }
-@@ -245,17 +228,22 @@
+@@ -245,17 +221,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1530,7 +1527,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -412,17 +400,10 @@
+@@ -412,17 +393,10 @@
          }
        }
        E: (_|_){
@@ -1549,7 +1546,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -433,17 +414,10 @@
+@@ -433,17 +407,10 @@
          }
        }
        E: (_|_){
@@ -1568,7 +1565,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -562,13 +536,13 @@
+@@ -562,13 +529,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1586,7 +1583,7 @@ diff old new
          }
        }
      }
-@@ -590,7 +564,7 @@
+@@ -590,7 +557,7 @@
        y: (int){ 1 }
      }
      a: (struct){
@@ -1595,7 +1592,7 @@ diff old new
      }
    }
    nestedWithEmbeddingOK: (struct){
-@@ -605,9 +579,7 @@
+@@ -605,9 +572,7 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1606,6 +1603,10 @@ diff old new
        y: (int){ 1 }
      }
    }
+-- diff/todo/p1 --
+embed.fail1.p: error not propagated to parent.
+provideIncompleteSuccess.t2.a.c.d: missing error.
+A bit esoteric, but should work.
 -- diff/todo/p2 --
 Missing empty disjunction message.
 -- diff/explanation --

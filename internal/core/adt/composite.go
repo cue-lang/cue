@@ -294,7 +294,7 @@ func (v *Vertex) updateArcType(t ArcType) {
 	if v.ArcType == ArcNotPresent {
 		return
 	}
-	if s := v.state; s != nil && s.ctx.isDevVersion() {
+	if s := v.state; (s != nil || v.isFinal()) && s.ctx.isDevVersion() {
 		c := s.ctx
 		if s.scheduler.frozen.meets(arcTypeKnown) {
 			parent := v.Parent
@@ -584,6 +584,12 @@ func (v *Vertex) isUndefined() bool {
 		return true
 	}
 	return false
+}
+
+// isFinal reports whether this node may still be modified.
+func (v *Vertex) isFinal() bool {
+	v = v.Indirect()
+	return v.status == finalized
 }
 
 func (x *Vertex) IsConcrete() bool {
@@ -923,7 +929,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 			if matchPattern(ctx, pc.Pattern, arc.Label) {
 				for _, c := range pc.Constraint.Conjuncts {
 					root := arc.rootCloseContext()
-					root.insertConjunct(root, c, c.CloseInfo, ArcMember, true, false)
+					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
 				}
 			}
 		}
@@ -1069,6 +1075,7 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	index := len(v.Conjuncts)
 	v.Conjuncts = append(v.Conjuncts, c)
 	if n := v.state; n != nil && !n.ctx.isDevVersion() {
+		// XXX(notify): we may need to notify here.
 		n.addConjunction(c, index)
 
 		// TODO: can we remove notifyConjunct here? This method is only

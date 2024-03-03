@@ -671,7 +671,6 @@ Errors:
 definition.t0.err.d1.env.c: field not allowed:
     ./definition.cue:3:11
 definition.t1.err.a.c: field not allowed:
-    ./definition.cue:8:5
     ./definition.cue:9:5
 
 Result:
@@ -724,15 +723,11 @@ Result:
         }
       }
     }
-    t1: (_|_){
-      // [eval]
-      err: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval]
+    t1: (struct){
+      err: (struct){
+        a: (#struct){
           c: (_|_){
             // [eval] definition.t1.err.a.c: field not allowed:
-            //     ./definition.cue:8:5
             //     ./definition.cue:9:5
           }
         }
@@ -913,6 +908,7 @@ Result:
         }
         e: (struct){
           f: (int){ 1 }
+          g: (int){ 1 }
         }
       }
     }
@@ -1083,8 +1079,8 @@ Result:
               a: (int){ 1 }
               b: (int){ 2 }
             }
-            a: (int){ 1 }
             b: (int){ 2 }
+            a: (int){ 1 }
           }
           y: (struct){
             c: (struct){
@@ -1101,14 +1097,14 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,16 +1,9 @@
+@@ -1,16 +1,8 @@
  Errors:
  definition.t0.err.d1.env.c: field not allowed:
 -    ./definition.cue:2:12
      ./definition.cue:3:11
 -    ./definition.cue:4:6
  definition.t1.err.a.c: field not allowed:
-     ./definition.cue:8:5
+-    ./definition.cue:8:5
      ./definition.cue:9:5
 -    ./definition.cue:11:6
 -mutual.t4.ok.p0.z: cannot add to field b
@@ -1118,7 +1114,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -19,12 +12,7 @@
+@@ -19,12 +11,7 @@
      t1: (struct){
        ok: (struct){
          s3: (string){ strings.ContainsAny("dd") }
@@ -1132,25 +1128,41 @@ diff old new
        }
      }
      t2: (struct){
-@@ -61,9 +49,7 @@
+@@ -61,25 +48,18 @@
              // [eval]
              c: (_|_){
                // [eval] definition.t0.err.d1.env.c: field not allowed:
 -              //     ./definition.cue:2:12
                //     ./definition.cue:3:11
 -              //     ./definition.cue:4:6
-             }
-           }
-         }
-@@ -79,7 +65,6 @@
+-            }
+-          }
+-        }
+-      }
+-    }
+-    t1: (_|_){
+-      // [eval]
+-      err: (_|_){
+-        // [eval]
+-        a: (_|_){
+-          // [eval]
++            }
++          }
++        }
++      }
++    }
++    t1: (struct){
++      err: (struct){
++        a: (#struct){
+           c: (_|_){
              // [eval] definition.t1.err.a.c: field not allowed:
-             //     ./definition.cue:8:5
+-            //     ./definition.cue:8:5
              //     ./definition.cue:9:5
 -            //     ./definition.cue:11:6
            }
          }
          #A: (#struct){
-@@ -93,32 +78,32 @@
+@@ -93,32 +73,32 @@
              a: (int){ int }
            }
            x: (#struct){
@@ -1209,7 +1221,7 @@ diff old new
            }
            #A: (#struct){
              a: (int){ int }
-@@ -196,8 +181,7 @@
+@@ -196,8 +176,7 @@
        }
      }
    }
@@ -1219,14 +1231,10 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -260,138 +244,133 @@
+@@ -264,134 +243,130 @@
          }
-         e: (struct){
-           f: (int){ 1 }
--          g: (int){ 1 }
--        }
--      }
--    }
+       }
+     }
 -    t4: (_|_){
 -      // [eval]
 -      ok: (_|_){
@@ -1355,9 +1363,6 @@ diff old new
 -          y: (struct){
 -            c: (struct){
 -              a: (int){ 1 }
-+        }
-+      }
-+    }
 +    t4: (struct){
 +      ok: (struct){
 +        p0: (struct){
@@ -1485,7 +1490,7 @@ diff old new
              }
            }
          }
-@@ -401,23 +380,23 @@
+@@ -401,23 +376,23 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1526,14 +1531,19 @@ diff old new
            }
          }
          check: (struct){
+@@ -435,8 +410,8 @@
+               a: (int){ 1 }
+               b: (int){ 2 }
+             }
+-            a: (int){ 1 }
+-            b: (int){ 2 }
++            b: (int){ 2 }
++            a: (int){ 1 }
+           }
+           y: (struct){
+             c: (struct){
 -- diff/explanation --
 Bug fixes
--- diff/todo/p0 --
-Dropped fields: this is a result of registering for notification after
-inserting conjuncts, instead of before it. This change was made to avoid
-forcing adding a level of conjunction insertion unnecessarily. To fix this
-we should uncouple adding notification from insertion.
-See scheduleVertexConjuncts in conjuncts.go.
 -- diff/todo/p2 --
 Reordering / positions.
 -- out/compile --

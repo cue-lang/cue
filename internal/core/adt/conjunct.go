@@ -35,6 +35,8 @@ import (
 // scheduleConjunct splits c into parts to be incrementally processed and queues
 // these parts up for processing. it will itself not cause recursive processing.
 func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
+	n.assertInitialized()
+
 	// Explanation of switch statement:
 	//
 	// A Conjunct can be a leaf or, through a ConjunctGroup, a tree. The tree
@@ -380,14 +382,11 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		defer dc.decDependent(n.ctx, DEFER, nil)
 	}
 
-	// TODO: need to split initialization phases to allow only initializing
-	// notifications without evaluating the node. This will be done later.
-	//
-	// if !n.node.nonRooted || n.node.IsDynamic {
-	// 	if state := arc.getState(n.ctx); state != nil {
-	// 		// n.completeNodeTasks()
-	// 	}
-	// }
+	if !n.node.nonRooted || n.node.IsDynamic {
+		if state := arc.getBareState(n.ctx); state != nil {
+			state.addNotify2(n.node, closeInfo)
+		}
+	}
 
 	if d, ok := arc.BaseValue.(*Disjunction); ok && false {
 		n.scheduleConjunct(MakeConjunct(c.Env, d, closeInfo), closeInfo)
@@ -404,24 +403,28 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 
 			n.scheduleConjunct(c, closeInfo)
 		}
-
 	}
 
 	if !n.node.nonRooted || n.node.IsDynamic {
-		// TODO: Make a distinction between initializing state and just allowing
-		// notifications to be registered.
 		if state := arc.getState(n.ctx); state != nil {
-			state.addNotify2(n.node, closeInfo)
+			n.completeNodeTasks()
+
 		}
 	}
 }
 
 func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
-	n.completeNodeTasks()
+	if n.node.isInProgress() {
+		n.completeNodeTasks()
+	}
 
 	// No need to do the notification mechanism if we are already complete.
 	old := n.notify
-	if n.meets(allAncestorsProcessed) {
+	switch {
+	case n.node.isFinal():
+		return old
+	case !n.node.isInProgress():
+	case n.meets(allAncestorsProcessed):
 		return old
 	}
 
@@ -446,7 +449,9 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 
 	if root.linkNotify(v, cc, c.CycleInfo) {
 		n.notify = append(n.notify, receiver{v, cc})
-		n.completeNodeTasks()
+		if n.node.isInProgress() {
+			n.completeNodeTasks()
+		}
 	}
 
 	return old

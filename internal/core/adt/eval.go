@@ -99,6 +99,8 @@ func (c *OpContext) evaluate(v *Vertex, r Resolver, state combinedFlags) Value {
 	}
 
 	if n := v.state; n != nil {
+		n.assertInitialized()
+
 		if n.errs != nil && !n.errs.IsIncomplete() {
 			return n.errs
 		}
@@ -682,6 +684,7 @@ func (n *nodeContext) incompleteErrors(final bool) *Bottom {
 		// n := d.node.getNodeContext(ctx)
 		// n.addBottom(err)
 		if final && c.vertex != nil && c.vertex.status != finalized {
+			c.vertex.state.assertInitialized()
 			c.vertex.state.addBottom(err)
 			c.vertex = nil
 		}
@@ -1054,6 +1057,9 @@ type conjunct struct {
 }
 
 type nodeContextState struct {
+	// isInitialized indicates whether conjuncts have been inserted in the node.
+	isInitialized bool
+
 	// State info
 
 	hasTop      bool
@@ -1398,6 +1404,8 @@ func (n *nodeContext) finalDone() bool {
 // hasErr is used to determine if an evaluation path, for instance a single
 // path after expanding all disjunctions, has an error.
 func (n *nodeContext) hasErr() bool {
+	n.assertInitialized()
+
 	if n.node.ChildErrors != nil {
 		return true
 	}
@@ -1408,12 +1416,16 @@ func (n *nodeContext) hasErr() bool {
 }
 
 func (n *nodeContext) getErr() *Bottom {
+	n.assertInitialized()
+
 	n.errs = CombineErrors(nil, n.errs, n.ctx.Err())
 	return n.errs
 }
 
 // getValidators sets the vertex' Value in case there was no concrete value.
 func (n *nodeContext) getValidators(state vertexStatus) BaseValue {
+	n.assertInitialized()
+
 	ctx := n.ctx
 
 	a := []Value{}
@@ -1514,6 +1526,8 @@ type envCheck struct {
 }
 
 func (n *nodeContext) addBottom(b *Bottom) {
+	n.assertInitialized()
+
 	n.errs = CombineErrors(nil, n.errs, b)
 	// TODO(errors): consider doing this
 	// n.kindExpr = n.errs
@@ -1521,6 +1535,8 @@ func (n *nodeContext) addBottom(b *Bottom) {
 }
 
 func (n *nodeContext) addErr(err errors.Error) {
+	n.assertInitialized()
+
 	if err != nil {
 		n.addBottom(&Bottom{Err: err})
 	}

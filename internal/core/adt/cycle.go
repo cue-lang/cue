@@ -280,6 +280,8 @@ type cyclicConjunct struct {
 // the conjunct seems to be fully cyclic so far or if there is a valid reference
 // cycle.
 func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci CloseInfo) (_ CloseInfo, skip bool) {
+	n.assertInitialized()
+
 	// TODO(perf): this optimization can work if we also check for any
 	// references pointing to arc within arc. This can be done with compiler
 	// support. With this optimization, almost all references could avoid cycle

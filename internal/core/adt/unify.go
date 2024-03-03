@@ -20,13 +20,31 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-func (v *Vertex) getState(c *OpContext) *nodeContext {
+func (v *Vertex) isInitialized() bool {
+	return v.status == finalized || (v.state != nil && v.state.isInitialized)
+}
+
+func (n *nodeContext) assertInitialized() {
+	if n != nil && n.ctx.isDevVersion() {
+		if v := n.node; !v.isInitialized() {
+			panic(fmt.Sprintf("vertex %p not initialized", v))
+		}
+	}
+}
+
+// isInProgress reports whether v is in the midst of being evaluated. This means
+// that conjuncts have been scheduled, but that it has not been finalized.
+func (v *Vertex) isInProgress() bool {
+	return v.status != finalized && v.state != nil && v.state.isInitialized
+}
+
+func (v *Vertex) getBareState(c *OpContext) *nodeContext {
 	if v.status == finalized { // TODO: use BaseValue != nil
 		return nil
 	}
 	if v.state == nil {
 		v.state = c.newNodeContext(v)
-		v.state.initNode()
+		v.state.initBare()
 		v.state.refCount = 1
 	}
 
@@ -39,8 +57,16 @@ func (v *Vertex) getState(c *OpContext) *nodeContext {
 	return v.state
 }
 
+func (v *Vertex) getState(c *OpContext) *nodeContext {
+	s := v.getBareState(c)
+	if s != nil && !s.isInitialized {
+		s.scheduleConjuncts()
+	}
+	return s
+}
+
 // initNode initializes a nodeContext for the evaluation of the given Vertex.
-func (n *nodeContext) initNode() {
+func (n *nodeContext) initBare() {
 	v := n.node
 	if v.Parent != nil && v.Parent.state != nil {
 		v.state.depth = v.Parent.state.depth + 1
@@ -58,7 +84,12 @@ func (n *nodeContext) initNode() {
 			v.Closed = true
 		}
 	}
+}
 
+func (n *nodeContext) scheduleConjuncts() {
+	n.isInitialized = true
+
+	v := n.node
 	ctx := n.ctx
 
 	ctx.stats.Unifications++
@@ -168,6 +199,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 			}
 			c := MakeConjunct(nil, err, c.CloseInfo())
 			if arc.state != nil {
+				// TODO: should we do insert conjunct instead? that would also
+				// notify.
+				arc.getState(n.ctx)
+				// TODO: Maybe insert when not yet in progress?
 				arc.state.scheduleConjunct(c, c.CloseInfo)
 			}
 		}
@@ -284,6 +319,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 //     completes, or is on a different cycle, in which case it completes as
 //     well.
 func (n *nodeContext) completeNodeConjuncts() {
+	n.assertInitialized()
+
 	const conjunctsKnown = fieldConjunctsKnown | valueKnown // | fieldSetKnown
 
 	if n.meets(conjunctsKnown) {
@@ -304,6 +341,8 @@ func (n *nodeContext) completeNodeConjuncts() {
 // NOT:
 // - complete value. That is reserved for Unify.
 func (n *nodeContext) completeNodeTasks() (ok bool) {
+	n.assertInitialized()
+
 	v := n.node
 	c := n.ctx
 
@@ -525,7 +564,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	default:
 		arc = &Vertex{Parent: state.node, Label: f, ArcType: ArcPending}
 		v.Arcs = append(v.Arcs, arc)
-		arcState = arc.getState(c)
+		arcState = arc.getState(c) // TODO: consider using getBareState.
 	}
 
 	if arcState != nil && (!arcState.meets(needTasksDone) || !arcState.meets(arcTypeKnown)) {

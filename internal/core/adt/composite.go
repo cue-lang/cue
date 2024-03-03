@@ -294,7 +294,7 @@ func (v *Vertex) updateArcType(t ArcType) {
 	if v.ArcType == ArcNotPresent {
 		return
 	}
-	if s := v.state; s != nil && s.ctx.isDevVersion() {
+	if s := v.state; (s != nil || v.isFinal()) && s.ctx.isDevVersion() {
 		c := s.ctx
 		if s.scheduler.frozen.meets(arcTypeKnown) {
 			parent := v.Parent
@@ -584,6 +584,12 @@ func (v *Vertex) isUndefined() bool {
 		return true
 	}
 	return false
+}
+
+// isFinal reports whether this node may no longer be modified.
+func (v *Vertex) isFinal() bool {
+	v = v.Indirect()
+	return v.status == finalized
 }
 
 func (x *Vertex) IsConcrete() bool {
@@ -1060,6 +1066,10 @@ func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	index := len(v.Conjuncts)
 	v.Conjuncts = append(v.Conjuncts, c)
 	if n := v.state; n != nil && !n.ctx.isDevVersion() {
+		// TODO(notify): consider this as a central place to send out
+		// notifications. At the moment this is not necessary, but it may
+		// be if we move the notification mechanism outside of the path of
+		// running tasks.
 		n.addConjunction(c, index)
 
 		// TODO: can we remove notifyConjunct here? This method is only

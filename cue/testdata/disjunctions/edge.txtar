@@ -1,0 +1,481 @@
+# This file mostly contains edge cases of disjunction semantics.
+# We should ensure that all these cases can be derived from thee spec.
+#
+# Many of these cases were discovered as part of the development of the new
+# evaluator that started at v0.7 and do not pass for that version.
+-- in.cue --
+cyclicalInsertInDisjunction: {
+	// We do not allow lookups across unresolved disjunctions. As such, the
+	// references across disjunctions are not allowed to disambiguate a
+	// disjunction.
+	//
+	// Algorithmically, the distinction between allowing this or not is
+	// achieved by allowing dereferencing of the node in which a disjunction
+	// occurs to the disjunct under evaluation. Effectively this is what the
+	// v0.6 evaluator does.
+
+	ok1: {
+		// In this case, unifying the comprehension into the processing of the
+		// disjunctions would _not_ case the reference to cross disjunction
+		// boundaries.
+		c: {d: e, e: _}
+		c: {d: 1, e: 2} | {d : 2, e: 2}
+	}
+	maybe1: {
+		// In this case, the reference c.e crosses a disjunction boundary.
+		// However, since the reference starts from within a disjunction, this
+		// could be allowed, if we define it to be.
+		c: d: c.e
+		c: {d: 1, e: 2} | {d : 2, e: 2}
+	}
+	err1: {
+		// This should be an error: to resolve x in c.d, we need to first
+		// resolve x to a concrete value. As `x` is defined outside the
+		// disjunction, and the disjunction cannot be resolved without it, `x`
+		// cannot be evaluated to a concrete value, resulting in an error.
+		x: c.e
+		c: d: x
+		c: {d: 1, e: 2} | {d : 2, e: 2}
+	}
+	err2: {
+		// This is a more obviously erroneous variant of err1. The div in x
+		// requires a concrete value for c.e. However, the disjunction can only
+		// be disambiguated as a result of computing x. This means c.e cannot
+		// be concrete at the time of evaluation.
+		x: div(c.e, 2)
+		c: d: x
+		c: {d: 1, e: 2} | {d : 2, e: 3}
+	}
+	err3: {
+		// Here it is clear that d will not disambiguate the disjunction at c.
+		// So c.e. cannot be resolved.
+		x: c.e
+		c: d: 1 | 2 | x
+		c: {d: 1, e: 2} | {d : 2, e: 3}
+	}
+}
+
+preseveBottomSemantics: ok: {
+	// `a: a`, which just says that `a` is `a`, is logically equivalent to
+	// `a: _`. Consequently, the disjunction `a: a | X` is equivalent to
+	// `a: _ | X`. As we do not simplify disjunctions, the result is `a: _ | X`.
+	// However, we could consider simplifying in this case to `a: _` if we can
+	// come up with a good general mechanism for subsumption.
+	#x: { #x | {} }
+}
+
+eliminateOpenVariant: ok: {
+	// We have two structs in the disjunction that are identical in every way
+	// except openness. TODO: should we disambiguate those?
+	c: {a: 1} | #b
+	#b: {a: 1}
+}
+
+cyclicSelfElimination: ok: {
+	// This should resolve to {y: 1} (works for new evaluator)
+	y: 1 | {y: 1}
+	y
+}
+-- out/eval/stats --
+Leaks:  0
+Freed:  73
+Reused: 62
+Allocs: 11
+Retain: 11
+
+Unifications: 49
+Conjuncts:    105
+Disjuncts:    74
+-- out/eval --
+(struct){
+  cyclicalInsertInDisjunction: (struct){
+    ok1: (struct){
+      c: (struct){
+        d: (int){ 2 }
+        e: (int){ 2 }
+      }
+    }
+    maybe1: (struct){
+      c: (struct){
+        d: (int){ 2 }
+        e: (int){ 2 }
+      }
+    }
+    err1: (struct){
+      x: (int){ 2 }
+      c: (struct){
+        d: (int){ 2 }
+        e: (int){ 2 }
+      }
+    }
+    err2: (struct){
+      x: (int){ 1 }
+      c: (struct){
+        d: (int){ 1 }
+        e: (int){ 2 }
+      }
+    }
+    err3: (struct){
+      x: (_|_){
+        // [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
+        //     ./in.cue:46:6
+      }
+      c: (struct){ |((struct){
+          d: (int){ 1 }
+          e: (int){ 2 }
+        }, (struct){
+          d: (int){ 2 }
+          e: (int){ 3 }
+        }) }
+    }
+  }
+  preseveBottomSemantics: (struct){
+    ok: (struct){
+      #x: (#struct){
+      }
+    }
+  }
+  eliminateOpenVariant: (struct){
+    ok: (struct){
+      c: (#struct){ |((struct){
+          a: (int){ 1 }
+        }, (#struct){
+          a: (int){ 1 }
+        }) }
+      #b: (#struct){
+        a: (int){ 1 }
+      }
+    }
+  }
+  cyclicSelfElimination: (struct){
+    ok: (_|_){
+      // [incomplete] cyclicSelfElimination.ok: 2 errors in empty disjunction:
+      // cyclicSelfElimination.ok: conflicting values 1 and {y:(1|{y:1}),y} (mismatched types int and struct):
+      //     ./in.cue:68:28
+      //     ./in.cue:70:5
+      // cyclicSelfElimination.ok: cannot add field y: was already used:
+      //     ./in.cue:70:10
+      y: ((int|struct)){ |((int){ 1 }, (struct){
+          y: (int){ 1 }
+        }) }
+    }
+  }
+}
+-- out/evalalpha --
+(struct){
+  cyclicalInsertInDisjunction: (struct){
+    ok1: (struct){
+      c: (struct){ |((struct){
+          d: (int){ 1 }
+          e: (int){ 2 }
+        }, (struct){
+          d: (int){ 2 }
+          e: (int){ 2 }
+        }) }
+    }
+    maybe1: (struct){
+      c: (struct){ |((struct){
+          d: (int){ 1 }
+          e: (int){ 2 }
+        }, (struct){
+          d: (int){ 2 }
+          e: (int){ 2 }
+        }) }
+    }
+    err1: (struct){
+      x: (_){ _ }
+      c: (struct){ |((struct){
+          d: (int){ 1 }
+          e: (int){ 2 }
+        }, (struct){
+          d: (int){ 2 }
+          e: (int){ 2 }
+        }) }
+    }
+    err2: (struct){
+      x: (_|_){
+        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
+        //     ./in.cue:39:12
+        // cyclicalInsertInDisjunction.err2.x: cyclic reference to field e:
+        //     ./in.cue:39:12
+        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
+        //     ./in.cue:41:29
+      }
+      c: (_|_){
+        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
+        //     ./in.cue:39:12
+        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
+        //     ./in.cue:41:29
+        d: (_|_){
+          // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
+          //     ./in.cue:39:12
+          // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
+          //     ./in.cue:41:29
+        }
+      }
+    }
+    err3: (struct){
+      x: (_){ _ }
+      c: (struct){ |((struct){
+          d: (int){ 1 }
+          e: (int){ 2 }
+        }, (struct){
+          d: (int){ 2 }
+          e: (int){ 3 }
+        }) }
+    }
+  }
+  preseveBottomSemantics: (struct){
+    ok: (struct){
+      #x: (_){ |((#struct){
+        }, (#struct){
+        }) }
+    }
+  }
+  eliminateOpenVariant: (struct){
+    ok: (struct){
+      c: (struct){ |((struct){
+          a: (int){ 1 }
+        }, (#struct){
+          a: (int){ 1 }
+        }) }
+      #b: (#struct){
+        a: (int){ 1 }
+      }
+    }
+  }
+  cyclicSelfElimination: (struct){
+    ok: (struct){
+      y: (int){ 1 }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,36 +1,57 @@
+ (struct){
+   cyclicalInsertInDisjunction: (struct){
+     ok1: (struct){
+-      c: (struct){
+-        d: (int){ 2 }
+-        e: (int){ 2 }
+-      }
++      c: (struct){ |((struct){
++          d: (int){ 1 }
++          e: (int){ 2 }
++        }, (struct){
++          d: (int){ 2 }
++          e: (int){ 2 }
++        }) }
+     }
+     maybe1: (struct){
+-      c: (struct){
+-        d: (int){ 2 }
+-        e: (int){ 2 }
+-      }
++      c: (struct){ |((struct){
++          d: (int){ 1 }
++          e: (int){ 2 }
++        }, (struct){
++          d: (int){ 2 }
++          e: (int){ 2 }
++        }) }
+     }
+     err1: (struct){
+-      x: (int){ 2 }
+-      c: (struct){
+-        d: (int){ 2 }
+-        e: (int){ 2 }
+-      }
++      x: (_){ _ }
++      c: (struct){ |((struct){
++          d: (int){ 1 }
++          e: (int){ 2 }
++        }, (struct){
++          d: (int){ 2 }
++          e: (int){ 2 }
++        }) }
+     }
+     err2: (struct){
+-      x: (int){ 1 }
+-      c: (struct){
+-        d: (int){ 1 }
+-        e: (int){ 2 }
+-      }
+-    }
+-    err3: (struct){
+       x: (_|_){
+-        // [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
+-        //     ./in.cue:46:6
+-      }
++        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
++        //     ./in.cue:39:12
++        // cyclicalInsertInDisjunction.err2.x: cyclic reference to field e:
++        //     ./in.cue:39:12
++        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
++        //     ./in.cue:41:29
++      }
++      c: (_|_){
++        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
++        //     ./in.cue:39:12
++        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
++        //     ./in.cue:41:29
++        d: (_|_){
++          // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
++          //     ./in.cue:39:12
++          // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
++          //     ./in.cue:41:29
++        }
++      }
++    }
++    err3: (struct){
++      x: (_){ _ }
+       c: (struct){ |((struct){
+           d: (int){ 1 }
+           e: (int){ 2 }
+@@ -42,13 +63,14 @@
+   }
+   preseveBottomSemantics: (struct){
+     ok: (struct){
+-      #x: (#struct){
+-      }
++      #x: (_){ |((#struct){
++        }, (#struct){
++        }) }
+     }
+   }
+   eliminateOpenVariant: (struct){
+     ok: (struct){
+-      c: (#struct){ |((struct){
++      c: (struct){ |((struct){
+           a: (int){ 1 }
+         }, (#struct){
+           a: (int){ 1 }
+@@ -59,16 +81,8 @@
+     }
+   }
+   cyclicSelfElimination: (struct){
+-    ok: (_|_){
+-      // [incomplete] cyclicSelfElimination.ok: 2 errors in empty disjunction:
+-      // cyclicSelfElimination.ok: conflicting values 1 and {y:(1|{y:1}),y} (mismatched types int and struct):
+-      //     ./in.cue:68:28
+-      //     ./in.cue:70:5
+-      // cyclicSelfElimination.ok: cannot add field y: was already used:
+-      //     ./in.cue:70:10
+-      y: ((int|struct)){ |((int){ 1 }, (struct){
+-          y: (int){ 1 }
+-        }) }
++    ok: (struct){
++      y: (int){ 1 }
+     }
+   }
+ }
+-- diff/todo/p1 --
+cyclicalInsertInDisjunction.ok1:   should eliminate disjunction.
+cyclicalInsertInDisjunction.maybe: discrepancy may be okay
+-- diff/todo/p2 --
+cyclicalInsertInDisjunction.err1: should be an err for the old and new evaluator.
+preseveBottomSemantics: both the old and new evaluator are incorrect here.
+  The result should be either _ or _|{}.
+-- diff/explanation --
+cyclicalInsertInDisjunction.err2: The new evaluator handles this correctly.
+eliminateOpenVariant.ok: closedness of c is different. Seems correct, or at
+  least okay.
+cyclicSelfElimination.ok: The new evaluator handles this correctly.
+-- out/compile --
+--- in.cue
+{
+  cyclicalInsertInDisjunction: {
+    ok1: {
+      c: {
+        d: 〈0;e〉
+        e: _
+      }
+      c: ({
+        d: 1
+        e: 2
+      }|{
+        d: 2
+        e: 2
+      })
+    }
+    maybe1: {
+      c: {
+        d: 〈1;c〉.e
+      }
+      c: ({
+        d: 1
+        e: 2
+      }|{
+        d: 2
+        e: 2
+      })
+    }
+    err1: {
+      x: 〈0;c〉.e
+      c: {
+        d: 〈1;x〉
+      }
+      c: ({
+        d: 1
+        e: 2
+      }|{
+        d: 2
+        e: 2
+      })
+    }
+    err2: {
+      x: div(〈0;c〉.e, 2)
+      c: {
+        d: 〈1;x〉
+      }
+      c: ({
+        d: 1
+        e: 2
+      }|{
+        d: 2
+        e: 3
+      })
+    }
+    err3: {
+      x: 〈0;c〉.e
+      c: {
+        d: (1|2|〈1;x〉)
+      }
+      c: ({
+        d: 1
+        e: 2
+      }|{
+        d: 2
+        e: 3
+      })
+    }
+  }
+  preseveBottomSemantics: {
+    ok: {
+      #x: {
+        (〈1;#x〉|{})
+      }
+    }
+  }
+  eliminateOpenVariant: {
+    ok: {
+      c: ({
+        a: 1
+      }|〈0;#b〉)
+      #b: {
+        a: 1
+      }
+    }
+  }
+  cyclicSelfElimination: {
+    ok: {
+      y: (1|{
+        y: 1
+      })
+      〈0;y〉
+    }
+  }
+}

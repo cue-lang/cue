@@ -47,10 +47,11 @@ func newModCmd(c *Command) *cobra.Command {
 		}),
 	}
 
+	cmd.AddCommand(newModGetCmd(c))
 	cmd.AddCommand(newModInitCmd(c))
-	cmd.AddCommand(newModUploadCmd(c))
-	cmd.AddCommand(newModTidyCmd(c))
 	cmd.AddCommand(newModRegistryCmd(c))
+	cmd.AddCommand(newModTidyCmd(c))
+	cmd.AddCommand(newModUploadCmd(c))
 	return cmd
 }
 

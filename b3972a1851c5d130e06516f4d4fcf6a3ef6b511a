@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ff64334_90c4372d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-04T10:24:27Z",
+      "side": 1,
+      "message": "LGTM although, as I said, I have mixed feelings about removing `MustParseVersion` - I think it\u0027s trivial enough that it pulls its weight. I won\u0027t block this landing on those grounds though: it\u0027s up to you.",
+      "revId": "b3972a1851c5d130e06516f4d4fcf6a3ef6b511a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

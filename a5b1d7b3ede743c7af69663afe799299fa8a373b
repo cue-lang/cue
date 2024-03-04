@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce1b0a73_076bab27",
+        "filename": "mod/module/module.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 165,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-04T10:24:27Z",
+      "side": 0,
+      "message": "tbh I think this is trivial (and useful) enough that it\u0027s worth leaving around. :shrug:",
+      "revId": "a5b1d7b3ede743c7af69663afe799299fa8a373b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,231 @@
+# Check that cue mod get will upgrade an existing
+# dependency.
+cp cue.mod/module.cue module-original
+
+# cue mod get should update to v0.10.2 but not to the
+# latest prerelease v0.11.0-alpha
+exec cue mod get baz.org
+cmp cue.mod/module.cue want-module-1
+exec cue export .
+cmp stdout want-stdout-1
+
+# Check that the same thing happens when we use an
+# explicit @latest suffix.
+cp module-original cue.mod/module.cue
+exec cue mod get baz.org@latest
+cmp cue.mod/module.cue want-module-1
+exec cue export .
+cmp stdout want-stdout-1
+
+# We can update to the latest prerelease by providing an
+# explicit version.
+exec cue mod get baz.org@v0.11.0-alpha
+cmp cue.mod/module.cue want-module-2
+exec cue export .
+cmp stdout want-stdout-2
+
+# Check that we can also do the above by specifying
+# an explicit v0.11 prefix
+cp want-module-1 cue.mod/module.cue
+exec cue mod get baz.org@v0.11
+cmp cue.mod/module.cue want-module-2
+exec cue export .
+cmp stdout want-stdout-2
+
+# If we try it again without an argument, it'll downgrade.
+exec cue mod get baz.org
+cmp cue.mod/module.cue want-module-1
+exec cue export .
+cmp stdout want-stdout-1
+
+# If we try to downgrade when some other dependency
+# is reliant on a later version, we'll get an error.
+! exec cue mod get baz.org@v0.5.0
+stderr 'other requirements prevent changing module baz.org@v0 to version v0.5.0 \(actual selected version: v0.10.1\)'
+
+-- want-module-1 --
+module: "main.org@v0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.5.0"
+	}
+	"baz.org@v0": {
+		v: "v0.10.2"
+	}
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+	"foo.com/bar/hello@v0": {
+		v:       "v0.2.3"
+		default: true
+	}
+}
+-- want-stdout-1 --
+{
+    "main": "main",
+    "foo.com/bar/hello@v0": "v0.2.3",
+    "bar.com@v0": "v0.5.0",
+    "baz.org@v0": "v0.10.2",
+    "example.com@v0": "v0.0.1"
+}
+-- want-module-2 --
+module: "main.org@v0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.5.0"
+	}
+	"baz.org@v0": {
+		v: "v0.11.0-alpha"
+	}
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+	"foo.com/bar/hello@v0": {
+		v:       "v0.2.3"
+		default: true
+	}
+}
+-- want-stdout-2 --
+{
+    "main": "main",
+    "foo.com/bar/hello@v0": "v0.2.3",
+    "bar.com@v0": "v0.5.0",
+    "baz.org@v0": "v0.11.0-alpha",
+    "example.com@v0": "v0.0.1"
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.5.0"
+	}
+	"baz.org@v0": {
+		v: "v0.10.1"
+	}
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+	"foo.com/bar/hello@v0": {
+		v:       "v0.2.3"
+		default: true
+	}
+}
+
+-- main.cue --
+package main
+import "example.com@v0:main"
+
+main
+
+-- _registry/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+deps: {
+	"foo.com/bar/hello@v0": v: "v0.2.3"
+	"bar.com@v0": v: "v0.5.0"
+}
+
+-- _registry/example.com_v0.0.1/top.cue --
+package main
+
+import a "foo.com/bar/hello"
+a
+main: "main"
+"example.com@v0": "v0.0.1"
+
+-- _registry/example.com_v0.1.2/cue.mod/module.cue --
+module: "example.com@v0"
+
+-- _registry/example.com_v0.1.2/top.cue --
+package main
+"example.com@v0": "v0.1.2"
+
+// TODO: import without a major version should
+// the major version from the module.cue file.
+main: "main"
+"example.com@v0": "v0.0.1"
+
+-- _registry/foo.com_bar_hello_v0.2.3/cue.mod/module.cue --
+module: "foo.com/bar/hello@v0"
+deps: {
+	"bar.com@v0": v: "v0.0.2"
+	"baz.org@v0": v: "v0.10.1"
+}
+
+-- _registry/foo.com_bar_hello_v0.2.3/x.cue --
+package hello
+import (
+	a "bar.com/bar@v0"
+	b "baz.org@v0:baz"
+)
+"foo.com/bar/hello@v0": "v0.2.3"
+a
+b
+
+
+-- _registry/bar.com_v0.0.2/cue.mod/module.cue --
+module: "bar.com@v0"
+deps: "baz.org@v0": v: "v0.0.2"
+
+-- _registry/bar.com_v0.0.2/bar/x.cue --
+package bar
+import a "baz.org@v0:baz"
+"bar.com@v0": "v0.0.2"
+a
+
+
+-- _registry/bar.com_v0.5.0/cue.mod/module.cue --
+module: "bar.com@v0"
+deps: "baz.org@v0": v: "v0.5.0"
+
+-- _registry/bar.com_v0.5.0/bar/x.cue --
+package bar
+import a "baz.org@v0:baz"
+"bar.com@v0": "v0.5.0"
+a
+
+
+-- _registry/baz.org_v0.0.2/cue.mod/module.cue --
+module: "baz.org@v0"
+
+-- _registry/baz.org_v0.0.2/baz.cue --
+package baz
+"baz.org@v0": "v0.0.2"
+
+
+-- _registry/baz.org_v0.1.2/cue.mod/module.cue --
+module: "baz.org@v0"
+
+-- _registry/baz.org_v0.1.2/baz.cue --
+package baz
+"baz.org@v0": "v0.1.2"
+
+
+-- _registry/baz.org_v0.5.0/cue.mod/module.cue --
+module: "baz.org@v0"
+
+-- _registry/baz.org_v0.5.0/baz.cue --
+package baz
+"baz.org@v0": "v0.5.0"
+
+
+-- _registry/baz.org_v0.10.1/cue.mod/module.cue --
+module: "baz.org@v0"
+
+-- _registry/baz.org_v0.10.1/baz.cue --
+package baz
+"baz.org@v0": "v0.10.1"
+
+
+-- _registry/baz.org_v0.10.2/cue.mod/module.cue --
+module: "baz.org@v0"
+
+-- _registry/baz.org_v0.10.2/baz.cue --
+package baz
+"baz.org@v0": "v0.10.2"
+
+-- _registry/baz.org_v0.11.0-alpha/cue.mod/module.cue --
+module: "baz.org@v0"
+
+-- _registry/baz.org_v0.11.0-alpha/baz.cue --
+package baz
+"baz.org@v0": "v0.11.0-alpha"

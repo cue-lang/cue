@@ -368,7 +368,7 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 	}
 	n.ctx.stats.Disjuncts++
 
-	oc := &overlayContext{ctx: n.ctx}
+	oc := newOverlayContext(n.ctx)
 
 	var ccHole *closeContext
 

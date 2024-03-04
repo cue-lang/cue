@@ -1,0 +1,32 @@
+# Test that a version can be downgraded when there are no other
+# dependencies that require a higher version.
+-- versions --
+bar.com@v0.0.2
+-- want --
+module: "main.org@v0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.0.2"
+	}
+}
+-- cue.mod/module.cue --
+module: "main.org@v0"
+deps: {
+	"bar.com@v0": {
+		v: "v0.5.0"
+	}
+}
+-- main.cue --
+package main
+
+-- _registry/bar.com_v0.0.2/cue.mod/module.cue --
+module: "bar.com@v0"
+
+-- _registry/bar.com_v0.0.2/bar/x.cue --
+package bar
+
+-- _registry/bar.com_v0.5.0/cue.mod/module.cue --
+module: "bar.com@v0"
+
+-- _registry/bar.com_v0.5.0/bar/x.cue --
+package bar

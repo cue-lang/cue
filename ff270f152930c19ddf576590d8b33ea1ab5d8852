@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40f31d88_4c6da570",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-04T15:26:56Z",
+      "side": 1,
+      "message": "isn\u0027t this backwards? we only accept module paths, not package paths",
+      "revId": "ff270f152930c19ddf576590d8b33ea1ab5d8852",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ebc0c764_ac46fbed",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-04T15:26:56Z",
+      "side": 1,
+      "message": "please clarify how, which I think can be summarized in one sentence like you did in the previous CL",
+      "revId": "ff270f152930c19ddf576590d8b33ea1ab5d8852",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "32d5f124_43775673",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-04T15:26:56Z",
+      "side": 1,
+      "message": "I fail to understand what this means, I\u0027m afraid. can you clarify?",
+      "revId": "ff270f152930c19ddf576590d8b33ea1ab5d8852",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71db9df4_29e9af41",
+        "filename": "cmd/cue/cmd/modget.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 43,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-04T15:26:56Z",
+      "side": 1,
+      "message": "perhaps document how `cue mod get` behaves in terms of version prefixes, even if briefly - by looking at this help text, I wouldn\u0027t think that prefix matching is supported",
+      "revId": "ff270f152930c19ddf576590d8b33ea1ab5d8852",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

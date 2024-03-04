@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "3eafd14a_76fe83c5",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-04T16:39:35Z",
+      "side": 1,
+      "message": "My initial thought was that it\u0027s clearer to use the more commonly-used sync.Mutex, but the code with atomic.Pointer is pretty decent, so done.",
+      "parentUuid": "3a0ebf1b_ff336a66",
+      "revId": "c2c7c6781377c41dc73d9bc58b2a498e87a70fc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "e661214a_86ccd441",
         "filename": "internal/mod/modload/load.go",
         "patchSetId": 2
@@ -48,6 +66,30 @@
       "writtenOn": "2024-03-04T15:20:44Z",
       "side": 1,
       "message": "this will look a bit odd, e.g. `(\"foo\")` - can we do away with the double surround characters?",
+      "range": {
+        "startLine": 207,
+        "startChar": 64,
+        "endLine": 207,
+        "endChar": 68
+      },
+      "revId": "c2c7c6781377c41dc73d9bc58b2a498e87a70fc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ad0a2c7_682ac1b7",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-04T16:39:35Z",
+      "side": 1,
+      "message": "Good call. Also fixed the typo 😊",
+      "parentUuid": "5c6ec220_10d761a8",
       "range": {
         "startLine": 207,
         "startChar": 64,

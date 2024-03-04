@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3a0ebf1b_ff336a66",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-04T15:20:44Z",
+      "side": 1,
+      "message": "nit: you could swap \"keep the first non-nil\" patterns using Mutex with atomic.Pointer[error] and CompareAndSwap: https://pkg.go.dev/sync/atomic#Pointer.CompareAndSwap",
+      "revId": "c2c7c6781377c41dc73d9bc58b2a498e87a70fc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e661214a_86ccd441",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 183,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-04T15:20:44Z",
+      "side": 1,
+      "message": "Can\u0027t wait to get rid of this stuff on Go 1.22+...",
+      "revId": "c2c7c6781377c41dc73d9bc58b2a498e87a70fc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5c6ec220_10d761a8",
+        "filename": "internal/mod/modload/load.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-04T15:20:44Z",
+      "side": 1,
+      "message": "this will look a bit odd, e.g. `(\"foo\")` - can we do away with the double surround characters?",
+      "range": {
+        "startLine": 207,
+        "startChar": 64,
+        "endLine": 207,
+        "endChar": 68
+      },
+      "revId": "c2c7c6781377c41dc73d9bc58b2a498e87a70fc0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

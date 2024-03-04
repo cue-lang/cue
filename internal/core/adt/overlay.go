@@ -36,11 +36,24 @@ package adt
 // TODO(perf): implement copy on write: instead of copying the entire tree, we
 // could get by with only copying arcs to that are modified in the copy.
 
+var nextGeneration int
+
+func newOverlayContext(ctx *OpContext) *overlayContext {
+	nextGeneration++
+	return &overlayContext{ctx: ctx, generation: nextGeneration}
+}
+
 // An overlayContext keeps track of copied vertices, closeContexts, and tasks.
 // This allows different passes to know which of each were created, without
 // having to walk the entire tree.
 type overlayContext struct {
 	ctx *OpContext
+
+	// generation is used to identify the current overlayContext. All
+	// closeContexts created by this overlayContext will have this generation.
+	// Whenever a counter of a closedContext is changed, this may only cause
+	// a cascade of changes if the generation is the same.
+	generation int
 
 	// closeContexts holds the allocated closeContexts created by allocCC.
 	//
@@ -232,7 +245,7 @@ func (ctx *overlayContext) allocCC(cc *closeContext) *closeContext {
 		return cc.overlay
 	}
 
-	o := &closeContext{}
+	o := &closeContext{generation: ctx.generation}
 	cc.overlay = o
 
 	if cc.parent != nil {

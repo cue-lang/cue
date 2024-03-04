@@ -194,10 +194,10 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 	return versions, nil
 }
 
-// CheckedModule represents module content that has passed the same
+// checkedModule represents module content that has passed the same
 // checks made by [Client.PutModule]. The caller should not mutate
 // any of the values returned by its methods.
-type CheckedModule struct {
+type checkedModule struct {
 	mv             module.Version
 	blobr          io.ReaderAt
 	size           int64
@@ -206,29 +206,9 @@ type CheckedModule struct {
 	modFileContent []byte
 }
 
-// Version returns the version that the module will be tagged as.
-func (m *CheckedModule) Version() module.Version {
-	return m.mv
-}
-
-// Version returns the parsed contents of the modules cue.mod/module.cue file.
-func (m *CheckedModule) ModFile() *modfile.File {
-	return m.modFile
-}
-
-// ModFileContent returns the raw contents of the modules cue.mod/module.cue file.
-func (m *CheckedModule) ModFileContent() []byte {
-	return m.modFileContent
-}
-
-// Zip returns the reader for the module's zip archive.
-func (m *CheckedModule) Zip() *zip.Reader {
-	return m.zipr
-}
-
-// PutCheckedModule is like [Client.PutModule] except that it allows the
+// putCheckedModule is like [Client.PutModule] except that it allows the
 // caller to do some additional checks (see [CheckModule] for more info).
-func (c *Client) PutCheckedModule(ctx context.Context, m *CheckedModule) error {
+func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule) error {
 	loc, err := c.resolve(m.mv)
 	if err != nil {
 		return err
@@ -284,21 +264,21 @@ func (c *Client) PutCheckedModule(ctx context.Context, m *CheckedModule) error {
 // TODO check deps are resolved correctly? Or is that too domain-specific for this package?
 // Is it a problem to call zip.CheckZip twice?
 func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt, size int64) error {
-	cm, err := CheckModule(m, r, size)
+	cm, err := checkModule(m, r, size)
 	if err != nil {
 		return err
 	}
-	return c.PutCheckedModule(ctx, cm)
+	return c.putCheckedModule(ctx, cm)
 }
 
-// CheckModule checks a module's zip file before uploading it.
+// checkModule checks a module's zip file before uploading it.
 // This does the same checks that [Client.PutModule] does, so
 // can be used to avoid doing duplicate work when an uploader
 // wishes to do more checks that are implemented by that method.
 //
 // Note that the returned [CheckedModule] value contains r, so will
 // be invalidated if r is closed.
-func CheckModule(m module.Version, blobr io.ReaderAt, size int64) (*CheckedModule, error) {
+func checkModule(m module.Version, blobr io.ReaderAt, size int64) (*checkedModule, error) {
 	zipr, modf, _, err := modzip.CheckZip(m, blobr, size)
 	if err != nil {
 		return nil, fmt.Errorf("module zip file check failed: %v", err)
@@ -307,7 +287,7 @@ func CheckModule(m module.Version, blobr io.ReaderAt, size int64) (*CheckedModul
 	if err != nil {
 		return nil, fmt.Errorf("module.cue file check failed: %v", err)
 	}
-	return &CheckedModule{
+	return &checkedModule{
 		mv:             m,
 		blobr:          blobr,
 		size:           size,

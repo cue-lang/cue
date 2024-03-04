@@ -2,21 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-// Package module defines the module.Version type along with support code.
+// Package module defines the [Version] type along with support code.
 //
 // WARNING: THIS PACKAGE IS EXPERIMENTAL.
 // ITS API MAY CHANGE AT ANY TIME.
 //
-// The module.Version type is a simple Path, Version pair:
-//
-//	type Version struct {
-//		Path string
-//		Version string
-//	}
-//
-// There are no restrictions imposed directly by use of this structure,
-// but additional checking functions, most notably Check, verify that
-// a particular path, version pair is valid.
+// The [Version] type holds a pair of module path and version.
+// The module path conforms to the checks implemented by [Check].
 //
 // # Escaped Paths
 //
@@ -185,8 +177,8 @@ func ParseVersion(s string) (Version, error) {
 	return Version{basePath + "@" + semver.Major(vers), vers}, nil
 }
 
-func MustNewVersion(path string, vers string) Version {
-	v, err := NewVersion(path, vers)
+func MustNewVersion(path string, version string) Version {
+	v, err := NewVersion(path, version)
 	if err != nil {
 		panic(err)
 	}
@@ -200,28 +192,28 @@ func MustNewVersion(path string, vers string) Version {
 //
 // As a special case, the path "local" is used to mean all packages
 // held in the gen, pkg and usr directories.
-func NewVersion(path string, vers string) (Version, error) {
+func NewVersion(path string, version string) (Version, error) {
 	switch {
 	case path == "local":
-		if vers != "" {
+		if version != "" {
 			return Version{}, fmt.Errorf("module 'local' cannot have version")
 		}
-	case vers != "" && vers != "none":
-		if !semver.IsValid(vers) {
-			return Version{}, fmt.Errorf("version %q (of module %q) is not well formed", vers, path)
+	case version != "" && version != "none":
+		if !semver.IsValid(version) {
+			return Version{}, fmt.Errorf("version %q (of module %q) is not well formed", version, path)
 		}
-		if semver.Canonical(vers) != vers {
-			return Version{}, fmt.Errorf("version %q (of module %q) is not canonical", vers, path)
+		if semver.Canonical(version) != version {
+			return Version{}, fmt.Errorf("version %q (of module %q) is not canonical", version, path)
 		}
-		maj := semver.Major(vers)
+		maj := semver.Major(version)
 		_, vmaj, ok := SplitPathVersion(path)
 		if ok && maj != vmaj {
-			return Version{}, fmt.Errorf("mismatched major version suffix in %q (version %v)", path, vers)
+			return Version{}, fmt.Errorf("mismatched major version suffix in %q (version %v)", path, version)
 		}
 		if !ok {
 			fullPath := path + "@" + maj
 			if _, _, ok := SplitPathVersion(fullPath); !ok {
-				return Version{}, fmt.Errorf("cannot form version path from %q, version %v", path, vers)
+				return Version{}, fmt.Errorf("cannot form version path from %q, version %v", path, version)
 			}
 			path = fullPath
 		}
@@ -234,18 +226,18 @@ func NewVersion(path string, vers string) (Version, error) {
 			return Version{}, fmt.Errorf("module 'local' cannot have version")
 		}
 	}
-	if vers == "" {
+	if version == "" {
 		if err := CheckPath(path); err != nil {
 			return Version{}, err
 		}
 	} else {
-		if err := Check(path, vers); err != nil {
+		if err := Check(path, version); err != nil {
 			return Version{}, err
 		}
 	}
 	return Version{
 		path:    path,
-		version: vers,
+		version: version,
 	}, nil
 }
 

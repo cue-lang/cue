@@ -1,4 +1,4 @@
-// Copyright 2023 The CUE Authors
+// Copyright 2024 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -26,20 +26,25 @@ import (
 	"cuelang.org/go/internal/mod/modload"
 )
 
-func newModTidyCmd(c *Command) *cobra.Command {
+func newModGetCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "tidy",
-		Short: "download and tidy module dependencies",
+		Use:   "get",
+		Short: "add and upgrade module dependencies",
 		Long: `WARNING: THIS COMMAND IS EXPERIMENTAL.
 
-Tidy resolves all module dependencies in the current module and updates
-the cue.mod/module.cue file to reflect them.
+Get updates module dependencies, fetching new dependencies if
+needed and changing versions to specified versions. It can downgrade
+a version only when a higher version is not required by other
+dependencies.
 
-It also removes dependencies that are not needed.
+Each argument specifies a module path and optionally a version
+suffix. If there is no version suffix, the latest non-prerelease version
+of the module will be requested; alternatively a suffix of "@latest"
+also specifies the latest version.
 
-It will attempt to fetch modules that aren't yet present in the
-dependencies by fetching the latest available version from
-a registry.
+If the desired version cannot be chosen (for example because a
+dependency already uses a later version than the desired version),
+this command will fail.
 
 See "cue help environment" for details on how $CUE_REGISTRY is used to
 determine the modules registry.
@@ -48,14 +53,14 @@ Note: you must enable the modules experiment with:
 	export CUE_EXPERIMENT=modules
 for this command to work.
 `,
-		RunE: mkRunE(c, runModTidy),
-		Args: cobra.ExactArgs(0),
+		RunE: mkRunE(c, runModGet),
+		Args: cobra.MinimumNArgs(1),
 	}
 
 	return cmd
 }
 
-func runModTidy(cmd *Command, args []string) error {
+func runModGet(cmd *Command, args []string) error {
 	reg, err := getCachedRegistry()
 	if err != nil {
 		return err
@@ -68,7 +73,7 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, versionForModFile())
+	mf, err := modload.UpdateVersions(ctx, os.DirFS(modRoot), ".", reg, args)
 	if err != nil {
 		return err
 	}
@@ -91,4 +96,25 @@ func runModTidy(cmd *Command, args []string) error {
 		return err
 	}
 	return nil
+}
+
+func findModuleRoot() (string, error) {
+	// TODO this logic is duplicated in multiple places. We should
+	// consider deduplicating it.
+	dir, err := os.Getwd()
+	if err != nil {
+		return "", err
+	}
+	for {
+		if _, err := os.Stat(filepath.Join(dir, "cue.mod")); err == nil {
+			return dir, nil
+		} else if !os.IsNotExist(err) {
+			return "", err
+		}
+		dir1 := filepath.Dir(dir)
+		if dir1 == dir {
+			return "", fmt.Errorf("module root not found")
+		}
+		dir = dir1
+	}
 }

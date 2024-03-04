@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "39bc3fa7_33e8b8e6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-04T10:28:21Z",
+      "side": 1,
+      "message": "This is useful enough in tests that I think it\u0027s worth having it in the API, but again, I won\u0027t block it on that.",
+      "revId": "b6cb218c90f0332c398121b925edcea4f7a2e0c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1212376b_f6a91f6d",

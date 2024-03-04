@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1212376b_f6a91f6d",
+        "filename": "mod/modcache/modcache_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-04T10:27:45Z",
+      "side": 1,
+      "message": "honestly, I\u0027d just define `mustNewVersion` instead of this, making the code smaller instead of larger (and must2 is only used for that one purpose).",
+      "revId": "b6cb218c90f0332c398121b925edcea4f7a2e0c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40125860_96f92421",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-04T10:27:45Z",
+      "side": 1,
+      "message": "same for defining mustNewVersion.",
+      "revId": "b6cb218c90f0332c398121b925edcea4f7a2e0c3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

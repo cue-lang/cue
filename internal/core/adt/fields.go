@@ -160,6 +160,9 @@ type closeContext struct {
 	// overlay is used to temporarily link a closeContext to its "overlay" copy,
 	// as it is used in a corresponding disjunction.
 	overlay *closeContext
+	// generation is used to track the current generation of the closeContext
+	// in disjunction overlays. This is mostly for debugging.
+	generation int
 
 	dependencies []*ccDep // For testing only. See debug.go
 
@@ -365,6 +368,7 @@ func (cc *closeContext) getKeyedCC(key *closeContext, c CycleInfo, checkClosed b
 	}, false, checkClosed)
 
 	arc := &closeContext{
+		generation:      cc.generation,
 		parent:          parent,
 		parentConjuncts: parent,
 		parentIndex:     pos,
@@ -442,6 +446,7 @@ func (c CloseInfo) spawnCloseContext(t closeNodeType) (CloseInfo, *closeContext)
 	}
 
 	c.cc = &closeContext{
+		generation:      cc.generation,
 		parent:          cc,
 		src:             cc.src,
 		parentConjuncts: cc,
@@ -498,6 +503,9 @@ func (c *closeContext) addDependency(kind depKind, key, child, root *closeContex
 func (c *closeContext) incDependent(kind depKind, dependant *closeContext) (debug *ccDep) {
 	if c.src == nil {
 		panic("incDependent: unexpected nil src")
+	}
+	if dependant != nil && c.generation != dependant.generation {
+		// panic(fmt.Sprintf("incDependent: inconsistent generation: %d %d", c.generation, dependant.generation))
 	}
 
 	debug = c.addDependent(kind, dependant)
@@ -731,7 +739,12 @@ func (n *nodeContext) insertArc(f Feature, mode ArcType, c Conjunct, id CloseInf
 		return v
 	}
 
-	if !cc.insertConjunct(v.rootCloseContext(), c, id, check, true) {
+	if v.cc == nil {
+		v.cc = v.rootCloseContext()
+		v.cc.generation = n.node.cc.generation
+	}
+
+	if !cc.insertConjunct(v.cc, c, id, check, true) {
 		return v
 	}
 

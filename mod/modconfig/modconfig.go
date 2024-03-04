@@ -186,18 +186,18 @@ type HostLocation = modresolve.Location
 
 // ResolveToLocation returns the host location for the given module path and version
 // without creating a Registry instance for it.
-func (r *Resolver) ResolveToLocation(mpath string, vers string) (HostLocation, bool) {
-	return r.resolver.ResolveToLocation(mpath, vers)
+func (r *Resolver) ResolveToLocation(mpath string, version string) (HostLocation, bool) {
+	return r.resolver.ResolveToLocation(mpath, version)
 }
 
 // Resolve implements modregistry.Resolver.Resolve.
-func (r *Resolver) ResolveToRegistry(mpath string, vers string) (modregistry.RegistryLocation, error) {
-	loc, ok := r.resolver.ResolveToLocation(mpath, vers)
+func (r *Resolver) ResolveToRegistry(mpath string, version string) (modregistry.RegistryLocation, error) {
+	loc, ok := r.resolver.ResolveToLocation(mpath, version)
 	if !ok {
 		// This can only happen when mpath is invalid, which should not
 		// happen in practice, as the only caller is modregistry which
 		// vets module paths before calling Resolve.
-		return modregistry.RegistryLocation{}, fmt.Errorf("cannot resolve %s (version %s) to registry", mpath, vers)
+		return modregistry.RegistryLocation{}, fmt.Errorf("cannot resolve %s (version %s) to registry", mpath, version)
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()

@@ -227,14 +227,14 @@ func TestCheckModule(t *testing.T) {
 	for _, test := range checkModuleTests {
 		t.Run(test.testName, func(t *testing.T) {
 			data := createZip(t, test.mv, test.content)
-			m, err := CheckModule(test.mv, bytes.NewReader(data), int64(len(data)))
+			m, err := checkModule(test.mv, bytes.NewReader(data), int64(len(data)))
 			if test.wantError != "" {
 				qt.Assert(t, qt.ErrorMatches(err, test.wantError))
 				return
 			}
 			qt.Assert(t, qt.IsNil(err))
 			qt.Assert(t, qt.Not(qt.IsNil(m)))
-			qt.Assert(t, qt.DeepEquals(m.Version(), test.mv))
+			qt.Assert(t, qt.DeepEquals(m.mv, test.mv))
 		})
 	}
 }

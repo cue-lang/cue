@@ -1,0 +1,83 @@
+-- in.cue --
+#def: {
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {c: string}
+    {} | {a: string}
+}
+x: #def
+x: c: "foo"
+-- out/eval/stats --
+Leaks:  0
+Freed:  4674
+Reused: 3903
+Allocs: 771
+Retain: 0
+
+Unifications: 2590
+Conjuncts:    13409
+Disjuncts:    4674
+-- out/eval --
+(struct){
+  #def: (#struct){ |((#struct){
+    }, (#struct){
+      a: (string){ string }
+    }, (#struct){
+      c: (string){ string }
+    }, (#struct){
+      c: (string){ string }
+      a: (string){ string }
+    }) }
+  x: (#struct){ |((#struct){
+      c: (string){ "foo" }
+    }, (#struct){
+      c: (string){ "foo" }
+      a: (string){ string }
+    }) }
+}
+-- out/compile --
+--- in.cue
+{
+  #def: {
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      c: string
+    })
+    ({}|{
+      a: string
+    })
+  }
+  x: 〈0;#def〉
+  x: {
+    c: "foo"
+  }
+}

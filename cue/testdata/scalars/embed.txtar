@@ -162,18 +162,6 @@ Conjuncts:    297
 Disjuncts:    164
 -- out/evalalpha --
 Errors:
-merged.t1.p1.x: field not allowed:
-    ./issue2113.cue:5:2
-merged.t1.p2.x: field not allowed:
-    ./issue2113.cue:10:2
-merged.t1.p3.x: field not allowed:
-    ./issue2113.cue:13:2
-merged.t2.p1.x: field not allowed:
-    ./issue2113.cue:20:2
-merged.t2.p2.x: field not allowed:
-    ./issue2113.cue:25:2
-merged.t2.p3.x: field not allowed:
-    ./issue2113.cue:28:2
 listEmbed.b6: index out of range [5] with length 2:
     ./in.cue:28:9
 
@@ -282,47 +270,39 @@ Result:
       0: (string){ "foo" }
     }
   }
-  merged: (_|_){
-    // [eval]
-    t1: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
+  merged: (struct){
+    t1: (struct){
+      p1: (struct){
         #fn: (string){
           string
           #in2: (#struct){
             c1: (string){ string }
           }
         }
-        x: (_|_){
-          // [eval] merged.t1.p1.x: field not allowed:
-          //     ./issue2113.cue:5:2
+        x: (string){
+          "V 1"
           #in2: (#struct){
             c1: (string){ "V 1" }
           }
         }
       }
-      p2: (_|_){
-        // [eval]
+      p2: (struct){
         #fn: (string){
           string
           #in2: (#struct){
             c1: (string){ string }
           }
         }
-        x: (_|_){
-          // [eval] merged.t1.p2.x: field not allowed:
-          //     ./issue2113.cue:10:2
+        x: (string){
+          "V 1"
           #in2: (#struct){
             c1: (string){ "V 1" }
           }
         }
       }
-      p3: (_|_){
-        // [eval]
-        x: (_|_){
-          // [eval] merged.t1.p3.x: field not allowed:
-          //     ./issue2113.cue:13:2
+      p3: (struct){
+        x: (string){
+          "V 1"
           #in2: (#struct){
             c1: (string){ "V 1" }
           }
@@ -335,45 +315,38 @@ Result:
         }
       }
     }
-    t2: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
+    t2: (struct){
+      p1: (struct){
         #fn: (string){
           string
           #in2: (#struct){
             c1: (string){ string }
           }
         }
-        x: (_|_){
-          // [eval] merged.t2.p1.x: field not allowed:
-          //     ./issue2113.cue:20:2
+        x: (string){
+          "V 1"
           #in2: (#struct){
             c1: (string){ "V 1" }
           }
         }
       }
-      p2: (_|_){
-        // [eval]
+      p2: (struct){
         #fn: (string){
           string
           #in2: (#struct){
             c1: (string){ string }
           }
         }
-        x: (_|_){
-          // [eval] merged.t2.p2.x: field not allowed:
-          //     ./issue2113.cue:25:2
+        x: (string){
+          "V 1"
           #in2: (#struct){
             c1: (string){ "V 1" }
           }
         }
       }
-      p3: (_|_){
-        // [eval]
-        x: (_|_){
-          // [eval] merged.t2.p3.x: field not allowed:
-          //     ./issue2113.cue:28:2
+      p3: (struct){
+        x: (string){
+          "V 1"
           #in2: (#struct){
             c1: (string){ "V 1" }
           }
@@ -404,26 +377,14 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,17 @@
+@@ -1,5 +1,5 @@
  Errors:
 -listEmbed.b6: invalid list index 5 (out of bounds):
-+merged.t1.p1.x: field not allowed:
-+    ./issue2113.cue:5:2
-+merged.t1.p2.x: field not allowed:
-+    ./issue2113.cue:10:2
-+merged.t1.p3.x: field not allowed:
-+    ./issue2113.cue:13:2
-+merged.t2.p1.x: field not allowed:
-+    ./issue2113.cue:20:2
-+merged.t2.p2.x: field not allowed:
-+    ./issue2113.cue:25:2
-+merged.t2.p3.x: field not allowed:
-+    ./issue2113.cue:28:2
 +listEmbed.b6: index out of range [5] with length 2:
      ./in.cue:28:9
  
  Result:
-@@ -36,7 +48,7 @@
+@@ -36,7 +36,7 @@
      }
      b5: (int){ 2 }
      b6: (_|_){
@@ -432,7 +393,7 @@ diff old new
        //     ./in.cue:28:9
      }
      b7: (int){ 1 }
-@@ -69,9 +81,9 @@
+@@ -69,9 +69,9 @@
        #b: (int){ int }
      }
      used: (struct){
@@ -443,7 +404,7 @@ diff old new
      }
    }
    arithmetic: (struct){
-@@ -92,7 +104,7 @@
+@@ -92,7 +92,7 @@
      }
      b: (int){ 1 }
    }
@@ -452,182 +413,6 @@ diff old new
        value?: (string){ string }
      }) }
    optionalCheck: (struct){
-@@ -107,83 +119,98 @@
-       0: (string){ "foo" }
-     }
-   }
--  merged: (struct){
--    t1: (struct){
--      p1: (struct){
--        #fn: (string){
--          string
--          #in2: (#struct){
--            c1: (string){ string }
--          }
--        }
--        x: (string){
--          "V 1"
--          #in2: (#struct){
--            c1: (string){ "V 1" }
--          }
--        }
--      }
--      p2: (struct){
--        #fn: (string){
--          string
--          #in2: (#struct){
--            c1: (string){ string }
--          }
--        }
--        x: (string){
--          "V 1"
--          #in2: (#struct){
--            c1: (string){ "V 1" }
--          }
--        }
--      }
--      p3: (struct){
--        x: (string){
--          "V 1"
--          #in2: (#struct){
--            c1: (string){ "V 1" }
--          }
--        }
--        #fn: (string){
--          string
--          #in2: (#struct){
--            c1: (string){ string }
--          }
--        }
--      }
--    }
--    t2: (struct){
--      p1: (struct){
--        #fn: (string){
--          string
--          #in2: (#struct){
--            c1: (string){ string }
--          }
--        }
--        x: (string){
--          "V 1"
--          #in2: (#struct){
--            c1: (string){ "V 1" }
--          }
--        }
--      }
--      p2: (struct){
--        #fn: (string){
--          string
--          #in2: (#struct){
--            c1: (string){ string }
--          }
--        }
--        x: (string){
--          "V 1"
--          #in2: (#struct){
--            c1: (string){ "V 1" }
--          }
--        }
--      }
--      p3: (struct){
--        x: (string){
--          "V 1"
-+  merged: (_|_){
-+    // [eval]
-+    t1: (_|_){
-+      // [eval]
-+      p1: (_|_){
-+        // [eval]
-+        #fn: (string){
-+          string
-+          #in2: (#struct){
-+            c1: (string){ string }
-+          }
-+        }
-+        x: (_|_){
-+          // [eval] merged.t1.p1.x: field not allowed:
-+          //     ./issue2113.cue:5:2
-+          #in2: (#struct){
-+            c1: (string){ "V 1" }
-+          }
-+        }
-+      }
-+      p2: (_|_){
-+        // [eval]
-+        #fn: (string){
-+          string
-+          #in2: (#struct){
-+            c1: (string){ string }
-+          }
-+        }
-+        x: (_|_){
-+          // [eval] merged.t1.p2.x: field not allowed:
-+          //     ./issue2113.cue:10:2
-+          #in2: (#struct){
-+            c1: (string){ "V 1" }
-+          }
-+        }
-+      }
-+      p3: (_|_){
-+        // [eval]
-+        x: (_|_){
-+          // [eval] merged.t1.p3.x: field not allowed:
-+          //     ./issue2113.cue:13:2
-+          #in2: (#struct){
-+            c1: (string){ "V 1" }
-+          }
-+        }
-+        #fn: (string){
-+          string
-+          #in2: (#struct){
-+            c1: (string){ string }
-+          }
-+        }
-+      }
-+    }
-+    t2: (_|_){
-+      // [eval]
-+      p1: (_|_){
-+        // [eval]
-+        #fn: (string){
-+          string
-+          #in2: (#struct){
-+            c1: (string){ string }
-+          }
-+        }
-+        x: (_|_){
-+          // [eval] merged.t2.p1.x: field not allowed:
-+          //     ./issue2113.cue:20:2
-+          #in2: (#struct){
-+            c1: (string){ "V 1" }
-+          }
-+        }
-+      }
-+      p2: (_|_){
-+        // [eval]
-+        #fn: (string){
-+          string
-+          #in2: (#struct){
-+            c1: (string){ string }
-+          }
-+        }
-+        x: (_|_){
-+          // [eval] merged.t2.p2.x: field not allowed:
-+          //     ./issue2113.cue:25:2
-+          #in2: (#struct){
-+            c1: (string){ "V 1" }
-+          }
-+        }
-+      }
-+      p3: (_|_){
-+        // [eval]
-+        x: (_|_){
-+          // [eval] merged.t2.p3.x: field not allowed:
-+          //     ./issue2113.cue:28:2
-           #in2: (#struct){
-             c1: (string){ "V 1" }
-           }
 -- diff/todo/p1 --
 optionaExists: return type incorrect.
 -- diff/todo/p3 --

@@ -436,27 +436,27 @@ Result:
   }
   disjEmbed: (struct){
     ok1: (struct){
-      #A: (_){ |((string){ string }, (#struct){
+      #A: ((string|struct)){ |((string){ string }, (#struct){
         }) }
-      x: (_){ |((string){ string }, (#struct){
+      x: ((string|struct)){ |((string){ string }, (#struct){
         }) }
     }
     ok2: (struct){
-      x: (_){ |((string){ string }, (#struct){
+      x: ((string|struct)){ |((string){ string }, (#struct){
         }) }
-      #A: (_){ |((string){ string }, (#struct){
+      #A: ((string|struct)){ |((string){ string }, (#struct){
         }) }
     }
     ok3: (struct){
-      #A: (_){ |((#struct){
+      #A: ((string|struct)){ |((#struct){
         }, (string){ string }) }
-      x: (_){ |((#struct){
+      x: ((string|struct)){ |((#struct){
         }, (string){ string }) }
     }
     ok4: (struct){
-      x: (_){ |((#struct){
+      x: ((string|struct)){ |((#struct){
         }, (string){ string }) }
-      #A: (_){ |((#struct){
+      #A: ((string|struct)){ |((#struct){
         }, (string){ string }) }
     }
   }
@@ -543,27 +543,27 @@ Result:
   }
   dynamicEmbed: (struct){
     ok1: (struct){
-      x: (_){ |((string){ string }, (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
         }) }
-      foo: (_){ |((string){ string }, (struct){
+      foo: ((string|struct)){ |((string){ string }, (struct){
         }) }
     }
     ok2: (struct){
-      x: (_){ |((string){ string }, (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
         }) }
-      foo: (_){ |((string){ string }, (struct){
+      foo: ((string|struct)){ |((string){ string }, (struct){
         }) }
     }
     ok3: (struct){
-      x: (_){ |((struct){
+      x: ((string|struct)){ |((struct){
         }, (string){ string }) }
-      foo: (_){ |((struct){
+      foo: ((string|struct)){ |((struct){
         }, (string){ string }) }
     }
     ok4: (struct){
-      x: (_){ |((struct){
+      x: ((string|struct)){ |((struct){
         }, (string){ string }) }
-      foo: (_){ |((struct){
+      foo: ((string|struct)){ |((struct){
         }, (string){ string }) }
     }
   }
@@ -630,53 +630,53 @@ Result:
   }
   valueSelf: (struct){
     ok1: (struct){
-      y: (_){ |((string){ string }, (struct){
+      y: ((string|struct)){ |((string){ string }, (struct){
         }) }
-      x: (_){ |((string){ string }, (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
         }) }
     }
     ok2: (struct){
-      x: (_){ |((string){ string }, (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
         }) }
-      y: (_){ |((string){ string }, (struct){
+      y: ((string|struct)){ |((string){ string }, (struct){
         }) }
     }
     ok3: (struct){
-      y: (_){ |((struct){
+      y: ((string|struct)){ |((struct){
         }, (string){ string }) }
-      x: (_){ |((struct){
+      x: ((string|struct)){ |((struct){
         }, (string){ string }) }
     }
     ok4: (struct){
-      x: (_){ |((struct){
+      x: ((string|struct)){ |((struct){
         }, (string){ string }) }
-      y: (_){ |((struct){
+      y: ((string|struct)){ |((struct){
         }, (string){ string }) }
     }
   }
   valueEmbed: (struct){
     ok1: (struct){
-      y: (_){ |((string){ string }, (struct){
+      y: ((string|struct)){ |((string){ string }, (struct){
         }) }
-      x: (_){ |((string){ string }, (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
         }) }
     }
     ok2: (struct){
-      x: (_){ |((string){ string }, (struct){
+      x: ((string|struct)){ |((string){ string }, (struct){
         }) }
-      y: (_){ |((string){ string }, (struct){
+      y: ((string|struct)){ |((string){ string }, (struct){
         }) }
     }
     ok3: (struct){
-      y: (_){ |((struct){
+      y: ((string|struct)){ |((struct){
         }, (string){ string }) }
-      x: (_){ |((struct){
+      x: ((string|struct)){ |((struct){
         }, (string){ string }) }
     }
     ok4: (struct){
-      x: (_){ |((struct){
+      x: ((string|struct)){ |((struct){
         }, (string){ string }) }
-      y: (_){ |((struct){
+      y: ((string|struct)){ |((struct){
         }, (string){ string }) }
     }
   }
@@ -708,18 +708,16 @@ Result:
   }
   issue1729: (struct){
     t1: (struct){
-      #x: (_){ |((#struct){
-        }, (#struct){
-        }) }
+      #x: (#struct){
+      }
       x: (#struct){
       }
     }
     t2: (struct){
       x: (#struct){
       }
-      #x: (_){ |((#struct){
-        }, (#struct){
-        }) }
+      #x: (#struct){
+      }
     }
   }
 }
@@ -817,34 +815,10 @@ diff old new
        }
      }
    }
-@@ -162,55 +161,90 @@
+@@ -186,31 +185,66 @@
+         }, (string){ string }) }
+     }
    }
-   disjEmbed: (struct){
-     ok1: (struct){
--      #A: ((string|struct)){ |((string){ string }, (#struct){
--        }) }
--      x: ((string|struct)){ |((string){ string }, (#struct){
--        }) }
--    }
--    ok2: (struct){
--      x: ((string|struct)){ |((string){ string }, (#struct){
--        }) }
--      #A: ((string|struct)){ |((string){ string }, (#struct){
--        }) }
--    }
--    ok3: (struct){
--      #A: ((string|struct)){ |((#struct){
--        }, (string){ string }) }
--      x: ((string|struct)){ |((#struct){
--        }, (string){ string }) }
--    }
--    ok4: (struct){
--      x: ((string|struct)){ |((#struct){
--        }, (string){ string }) }
--      #A: ((string|struct)){ |((#struct){
--        }, (string){ string }) }
--    }
--  }
 -  disjList: (struct){
 -    ok1: (struct){
 -      #A: (string){ string }
@@ -870,30 +844,6 @@ diff old new
 -    ok4: (struct){
 -      x: (string){ string }
 -      #A: (string){ string }
-+      #A: (_){ |((string){ string }, (#struct){
-+        }) }
-+      x: (_){ |((string){ string }, (#struct){
-+        }) }
-+    }
-+    ok2: (struct){
-+      x: (_){ |((string){ string }, (#struct){
-+        }) }
-+      #A: (_){ |((string){ string }, (#struct){
-+        }) }
-+    }
-+    ok3: (struct){
-+      #A: (_){ |((#struct){
-+        }, (string){ string }) }
-+      x: (_){ |((#struct){
-+        }, (string){ string }) }
-+    }
-+    ok4: (struct){
-+      x: (_){ |((#struct){
-+        }, (string){ string }) }
-+      #A: (_){ |((#struct){
-+        }, (string){ string }) }
-+    }
-+  }
 +  disjList: (_|_){
 +    // [eval]
 +    ok1: (_|_){
@@ -957,54 +907,7 @@ diff old new
      }
    }
    name: (string){ "foo" }
-@@ -234,55 +268,71 @@
-   }
-   dynamicEmbed: (struct){
-     ok1: (struct){
--      x: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--      foo: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--    }
--    ok2: (struct){
--      x: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--      foo: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--    }
--    ok3: (struct){
--      x: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--      foo: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--    }
--    ok4: (struct){
--      x: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--      foo: ((string|struct)){ |((struct){
-+      x: (_){ |((string){ string }, (struct){
-+        }) }
-+      foo: (_){ |((string){ string }, (struct){
-+        }) }
-+    }
-+    ok2: (struct){
-+      x: (_){ |((string){ string }, (struct){
-+        }) }
-+      foo: (_){ |((string){ string }, (struct){
-+        }) }
-+    }
-+    ok3: (struct){
-+      x: (_){ |((struct){
-+        }, (string){ string }) }
-+      foo: (_){ |((struct){
-+        }, (string){ string }) }
-+    }
-+    ok4: (struct){
-+      x: (_){ |((struct){
-+        }, (string){ string }) }
-+      foo: (_){ |((struct){
-         }, (string){ string }) }
-     }
+@@ -260,29 +294,45 @@
    }
    dynamicList: (struct){
      ok1: (struct){
@@ -1073,101 +976,7 @@ diff old new
      }
    }
    dynamicPatternSelf: (struct){
-@@ -305,78 +355,87 @@
-   }
-   valueSelf: (struct){
-     ok1: (struct){
--      y: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--      x: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--    }
--    ok2: (struct){
--      x: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--      y: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--    }
--    ok3: (struct){
--      y: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--      x: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--    }
--    ok4: (struct){
--      x: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--      y: ((string|struct)){ |((struct){
-+      y: (_){ |((string){ string }, (struct){
-+        }) }
-+      x: (_){ |((string){ string }, (struct){
-+        }) }
-+    }
-+    ok2: (struct){
-+      x: (_){ |((string){ string }, (struct){
-+        }) }
-+      y: (_){ |((string){ string }, (struct){
-+        }) }
-+    }
-+    ok3: (struct){
-+      y: (_){ |((struct){
-+        }, (string){ string }) }
-+      x: (_){ |((struct){
-+        }, (string){ string }) }
-+    }
-+    ok4: (struct){
-+      x: (_){ |((struct){
-+        }, (string){ string }) }
-+      y: (_){ |((struct){
-         }, (string){ string }) }
-     }
-   }
-   valueEmbed: (struct){
-     ok1: (struct){
--      y: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--      x: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--    }
--    ok2: (struct){
--      x: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--      y: ((string|struct)){ |((string){ string }, (struct){
--        }) }
--    }
--    ok3: (struct){
--      y: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--      x: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--    }
--    ok4: (struct){
--      x: ((string|struct)){ |((struct){
--        }, (string){ string }) }
--      y: ((string|struct)){ |((struct){
-+      y: (_){ |((string){ string }, (struct){
-+        }) }
-+      x: (_){ |((string){ string }, (struct){
-+        }) }
-+    }
-+    ok2: (struct){
-+      x: (_){ |((string){ string }, (struct){
-+        }) }
-+      y: (_){ |((string){ string }, (struct){
-+        }) }
-+    }
-+    ok3: (struct){
-+      y: (_){ |((struct){
-+        }, (string){ string }) }
-+      x: (_){ |((struct){
-+        }, (string){ string }) }
-+    }
-+    ok4: (struct){
-+      x: (_){ |((struct){
-+        }, (string){ string }) }
-+      y: (_){ |((struct){
-         }, (string){ string }) }
-     }
+@@ -357,20 +407,28 @@
    }
    valueList: (struct){
      ok1: (struct){
@@ -1210,31 +1019,8 @@ diff old new
      }
    }
    issue1729: (struct){
-     t1: (struct){
--      #x: (#struct){
--      }
-+      #x: (_){ |((#struct){
-+        }, (#struct){
-+        }) }
-       x: (#struct){
-       }
-     }
-@@ -383,8 +442,9 @@
-     t2: (struct){
-       x: (#struct){
-       }
--      #x: (#struct){
--      }
-+      #x: (_){ |((#struct){
-+        }, (#struct){
-+        }) }
-     }
-   }
- }
 -- diff/todo/p0 --
 disjList: field not allowed is incorrect.
-Some nested disjunctions still need to be expanded.
-disjEmbed: incorrect aggregate type _, instead of string|struct. mergeVertex
 -- diff/todo/p2 --
 disjList.ok2: cut off structural cycle earlier?
 dynamicEmbed.*: cut off structural cycle earlier?

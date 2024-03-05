@@ -683,7 +683,7 @@ nestedWithEmbeddingOK: {
 	}
 }
 
-nestedWithDynamicFieldOK: { // TODO(broken)
+nestedWithDynamicFieldOK: {
 	_c: y: 1
 
 	a: {
@@ -753,7 +753,6 @@ Conjuncts:    640
 Disjuncts:    472
 -- out/evalalpha --
 Errors:
-cannot convert value "(struct){\n  y: (struct){\n  }\n}" of type *adt.Vertex to JSON
 noStackOverflowStructCycle.#list.tail: structural cycle
 noStackOverflowStructCycle.list.tail: structural cycle
 fieldMismatch.a: cannot combine regular field "x" with 2:
@@ -1344,8 +1343,7 @@ Result:
     root: (#struct){
     }
   }
-  unifyDynamicReflectSuccess: (_|_){
-    // [eval]
+  unifyDynamicReflectSuccess: (struct){
     X: (struct){
       X: (struct){
         x: (struct){
@@ -1354,17 +1352,14 @@ Result:
         }
       }
     }
-    foo: (_|_){
-      // [eval]
+    foo: (struct){
       X: (struct){
         x: (struct){
           y: (struct){
           }
         }
       }
-      Y: (_|_){
-        // [eval] cannot convert value "(struct){\n  y: (struct){\n  }\n}" of type *adt.Vertex to JSON
-      }
+      Y: (string){ "{\"x\":{\"y\":{}}}" }
     }
   }
 }
@@ -1372,7 +1367,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,24 +1,7 @@
+@@ -1,24 +1,6 @@
  Errors:
 -embed.fail1.p: field not allowed:
 -    ./in.cue:37:9
@@ -1387,7 +1382,6 @@ diff old new
 -    ./in.cue:71:9
 -    ./in.cue:72:3
 -    ./in.cue:74:4
-+cannot convert value "(struct){\n  y: (struct){\n  }\n}" of type *adt.Vertex to JSON
  noStackOverflowStructCycle.#list.tail: structural cycle
  noStackOverflowStructCycle.list.tail: structural cycle
 -provideIncompleteSuccess.t2.a.c.d: field not allowed:
@@ -1398,7 +1392,7 @@ diff old new
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:139:7
      ./in.cue:137:3
-@@ -63,23 +46,13 @@
+@@ -63,23 +45,13 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1429,7 +1423,7 @@ diff old new
      }
      #C1: (#struct){
      }
-@@ -94,16 +67,8 @@
+@@ -94,16 +66,8 @@
      #C3: (#struct){
      }
      fail4: (_|_){
@@ -1448,7 +1442,7 @@ diff old new
      }
      #C4: (#struct){
      }
-@@ -125,7 +90,6 @@
+@@ -125,7 +89,6 @@
          // [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
          //     ./in.cue:93:6
          //     ./in.cue:94:6
@@ -1456,7 +1450,7 @@ diff old new
        }
        q: (int){ int }
      }
-@@ -180,8 +144,7 @@
+@@ -180,8 +143,7 @@
        }
      }
    }
@@ -1466,7 +1460,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -189,16 +152,15 @@
+@@ -189,16 +151,15 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1490,7 +1484,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -206,16 +168,9 @@
+@@ -206,16 +167,9 @@
        #c: (#struct){
        }
        a: (_|_){
@@ -1510,7 +1504,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -245,17 +200,22 @@
+@@ -245,17 +199,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1537,7 +1531,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -412,17 +372,10 @@
+@@ -412,17 +371,10 @@
          }
        }
        E: (_|_){
@@ -1556,7 +1550,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -433,17 +386,10 @@
+@@ -433,17 +385,10 @@
          }
        }
        E: (_|_){
@@ -1575,7 +1569,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -562,13 +508,13 @@
+@@ -562,13 +507,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1593,7 +1587,7 @@ diff old new
          }
        }
      }
-@@ -590,7 +536,7 @@
+@@ -590,7 +535,7 @@
        y: (int){ 1 }
      }
      a: (struct){
@@ -1602,7 +1596,7 @@ diff old new
      }
    }
    nestedWithEmbeddingOK: (struct){
-@@ -605,9 +551,7 @@
+@@ -605,9 +550,7 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1613,48 +1607,20 @@ diff old new
        y: (int){ 1 }
      }
    }
-@@ -646,7 +590,8 @@
-     root: (#struct){
-     }
-   }
--  unifyDynamicReflectSuccess: (struct){
-+  unifyDynamicReflectSuccess: (_|_){
-+    // [eval]
-     X: (struct){
-       X: (struct){
-         x: (struct){
-@@ -655,14 +600,17 @@
-         }
-       }
-     }
--    foo: (struct){
--      X: (struct){
--        x: (struct){
--          y: (struct){
--          }
--        }
--      }
--      Y: (string){ "{\"x\":{\"y\":{}}}" }
-+    foo: (_|_){
-+      // [eval]
-+      X: (struct){
-+        x: (struct){
-+          y: (struct){
-+          }
-+        }
-+      }
-+      Y: (_|_){
-+        // [eval] cannot convert value "(struct){\n  y: (struct){\n  }\n}" of type *adt.Vertex to JSON
-+      }
-     }
-   }
- }
 -- diff/todo/p0 --
-Many errors, including
-if false {
-	p: _
-}
-p: "foo"
+embed.fail.p:
+	if false {
+		p: _
+	}
+	p: "foo"
+-- diff/todo/p1 --
+provideIncompleteSuccess.t2.a.c.d: missing error.
+A bit esoteric, but should work.
+-- diff/todo/p2 --
+Missing empty disjunction message.
+-- diff/explanation --
+cyclicError: improved error message.
+nestedWithDynamicFieldOK: fixed bug.
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:

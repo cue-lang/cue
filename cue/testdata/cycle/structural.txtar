@@ -1603,12 +1603,12 @@ Result:
   }
   e5: (struct){
     a: (struct){
-      c: (_){ |((struct){
+      c: ((int|struct)){ |((struct){
           c: (int){ int }
         }, (int){ int }) }
     }
     b: (struct){
-      c: (_){ |((struct){
+      c: ((int|struct)){ |((struct){
           c: (int){ int }
         }, (int){ int }) }
     }
@@ -2629,12 +2629,12 @@ diff old new
 -    }
 -    b: (struct){
 -      c: (int){ int }
-+      c: (_){ |((struct){
++      c: ((int|struct)){ |((struct){
 +          c: (int){ int }
 +        }, (int){ int }) }
 +    }
 +    b: (struct){
-+      c: (_){ |((struct){
++      c: ((int|struct)){ |((struct){
 +          c: (int){ int }
 +        }, (int){ int }) }
      }

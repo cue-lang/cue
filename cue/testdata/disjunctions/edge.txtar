@@ -230,9 +230,8 @@ Disjuncts:    74
   }
   preseveBottomSemantics: (struct){
     ok: (struct){
-      #x: (_){ |((#struct){
-        }, (#struct){
-        }) }
+      #x: (#struct){
+      }
     }
   }
   eliminateOpenVariant: (struct){
@@ -338,16 +337,7 @@ diff old new
        c: (struct){ |((struct){
            d: (int){ 1 }
            e: (int){ 2 }
-@@ -42,13 +63,14 @@
-   }
-   preseveBottomSemantics: (struct){
-     ok: (struct){
--      #x: (#struct){
--      }
-+      #x: (_){ |((#struct){
-+        }, (#struct){
-+        }) }
-     }
+@@ -48,7 +69,7 @@
    }
    eliminateOpenVariant: (struct){
      ok: (struct){
@@ -356,7 +346,7 @@ diff old new
            a: (int){ 1 }
          }, (#struct){
            a: (int){ 1 }
-@@ -59,16 +81,8 @@
+@@ -59,16 +80,8 @@
      }
    }
    cyclicSelfElimination: (struct){
@@ -380,6 +370,7 @@ cyclicalInsertInDisjunction.ok1:   should eliminate disjunction.
 cyclicalInsertInDisjunction.maybe: discrepancy may be okay
 -- diff/todo/p2 --
 cyclicalInsertInDisjunction.err1: should be an err for the old and new evaluator.
+-- diff/todo/p3 --
 preseveBottomSemantics: both the old and new evaluator are incorrect here.
   The result should be either _ or _|{}.
 -- diff/explanation --

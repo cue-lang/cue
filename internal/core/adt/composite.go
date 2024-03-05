@@ -793,14 +793,14 @@ func (v *Vertex) Kind() Kind {
 	// This is possible when evaluating comprehensions. It is potentially
 	// not known at this time what the type is.
 	switch {
-	// TODO: using this line would be more stable.
-	// case v.status != finalized && v.state != nil:
+	case v.state != nil && v.state.kind == BottomKind:
+		return BottomKind
+	case v.BaseValue != nil && !isCyclePlaceholder(v.BaseValue):
+		return v.BaseValue.Kind()
 	case v.state != nil:
 		return v.state.kind
-	case v.BaseValue == nil:
-		return TopKind
 	default:
-		return v.BaseValue.Kind()
+		return TopKind
 	}
 }
 

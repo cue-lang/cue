@@ -869,6 +869,9 @@ func injectClosed(ctx *OpContext, closed, dst *closeContext) {
 	// TODO: check that fields are not void arcs.
 outer:
 	for _, a := range dst.arcs {
+		if a.kind != ARC {
+			continue
+		}
 		ca := a.cc
 		f := ca.Label()
 		// TODO: disallow new definitions in closed structs.

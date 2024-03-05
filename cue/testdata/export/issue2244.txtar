@@ -42,15 +42,7 @@ Unifications: 24
 Conjuncts:    58
 Disjuncts:    40
 -- out/evalalpha --
-Errors:
-m.if.#pattern: field not allowed:
-    ./in.cue:11:24
-    ./in.cue:8:2
-    ./in.cue:24:35
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   _#matchPattern(:x): (_|_){
     // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
     //     ./in.cue:11:6
@@ -65,56 +57,46 @@ Result:
   #step: (#struct){
     if: ((string|number)){ |((number){ number }, (string){ string }) }
   }
-  m: (_|_){
-    // [eval]
-    if: (_|_){
-      // [eval] m.if.#pattern: field not allowed:
-      //     ./in.cue:11:24
-      //     ./in.cue:8:2
-      //     ./in.cue:24:35
-      #pattern: (string){ "refs/tags/v*" }
-    }
+  m: (#struct){
+    if: ((string|number)){ |((number){
+        number
+        #pattern: (string){ "refs/tags/v*" }
+      }, (string){
+        string
+        #pattern: (string){ "refs/tags/v*" }
+      }) }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,12 @@
--(struct){
-+Errors:
-+m.if.#pattern: field not allowed:
-+    ./in.cue:11:24
-+    ./in.cue:8:2
-+    ./in.cue:24:35
-+
-+Result:
-+(_|_){
-+  // [eval]
-   _#matchPattern(:x): (_|_){
-     // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
-     //     ./in.cue:11:6
-@@ -13,11 +21,14 @@
-   #step: (#struct){
+@@ -14,10 +14,12 @@
      if: ((string|number)){ |((number){ number }, (string){ string }) }
    }
--  m: (#struct){
+   m: (#struct){
 -    if: (string){
 -      "refs/tags/v"
-+  m: (_|_){
-+    // [eval]
-+    if: (_|_){
-+      // [eval] m.if.#pattern: field not allowed:
-+      //     ./in.cue:11:24
-+      //     ./in.cue:8:2
-+      //     ./in.cue:24:35
-       #pattern: (string){ "refs/tags/v*" }
+-      #pattern: (string){ "refs/tags/v*" }
 -      let prefix#1 = (string){ "refs/tags/v" }
-     }
+-    }
++    if: ((string|number)){ |((number){
++        number
++        #pattern: (string){ "refs/tags/v*" }
++      }, (string){
++        string
++        #pattern: (string){ "refs/tags/v*" }
++      }) }
    }
  }
+-- diff/todo/p0 --
+disjunction with number is not properly eliminated. The issue seems to be that
+the embedded string scalar is not properly propagated. This, in turn, is related
+to tasks starting before, while ending after, the start of processing
+disjunctions.
 -- diff/explanation --
-New definition semantics: #pattern is not allowed in #step
+New evaluator should ultimately disallow new definitions in closed structs
+and not allow #pattern in #step
 -- out/eval --
 (struct){
   _#matchPattern(:x): (_|_){

@@ -37,13 +37,6 @@ Unifications: 21
 Conjuncts:    69
 Disjuncts:    26
 -- out/evalalpha --
-Errors:
-dark: field not allowed:
-    ./in.cue:7:1
-light: field not allowed:
-    ./in.cue:11:1
-
-Result:
 (#struct){
   console: (#struct){
     color: (string){ "dark" }
@@ -53,15 +46,11 @@ Result:
     color: (string){ string }
     ctermbg: (string){ string }
   }
-  dark: (_|_){
-    // [eval] dark: field not allowed:
-    //     ./in.cue:7:1
+  dark: (#struct){
     color: (string){ "dark" }
     ctermbg: (string){ "239" }
   }
-  light: (_|_){
-    // [eval] light: field not allowed:
-    //     ./in.cue:11:1
+  light: (#struct){
     color: (string){ "light" }
     ctermbg: (string){ "254" }
   }
@@ -79,14 +68,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,28 @@
-+Errors:
-+dark: field not allowed:
-+    ./in.cue:7:1
-+light: field not allowed:
-+    ./in.cue:11:1
-+
-+Result:
+@@ -1,4 +1,8 @@
  (#struct){
 +  console: (#struct){
 +    color: (string){ "dark" }
@@ -95,25 +77,7 @@ diff old new
    #theme: (#struct){
      color: (string){ string }
      ctermbg: (string){ string }
-   }
--  dark: (#struct){
--    color: (string){ "dark" }
--    ctermbg: (string){ "239" }
--  }
--  light: (#struct){
-+  dark: (_|_){
-+    // [eval] dark: field not allowed:
-+    //     ./in.cue:7:1
-+    color: (string){ "dark" }
-+    ctermbg: (string){ "239" }
-+  }
-+  light: (_|_){
-+    // [eval] light: field not allowed:
-+    //     ./in.cue:11:1
-     color: (string){ "light" }
-     ctermbg: (string){ "254" }
-   }
-@@ -20,8 +35,4 @@
+@@ -20,8 +24,4 @@
          ctermbg: (string){ "239" }
        }) }
    }

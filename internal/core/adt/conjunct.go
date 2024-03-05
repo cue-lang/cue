@@ -14,7 +14,11 @@
 
 package adt
 
-import "fmt"
+import (
+	"fmt"
+
+	"cuelang.org/go/cue/ast"
+)
 
 // This file contains functionality for processing conjuncts to insert the
 // corresponding values in the Vertex.
@@ -244,7 +248,14 @@ loop2:
 		case *Comprehension, Expr:
 			// No need to increment and decrement, as there will be at least
 			// one entry.
-			ci, _ = ci.spawnCloseContext(0)
+			if _, ok := s.Src.(*ast.File); !ok {
+				// If this is not a file, the struct indicates the scope/
+				// boundary at which closedness should apply. This is not true
+				// for files.
+				// TODO: set this as a flag in StructLit so as to not have to
+				// do the somewhat dangerous cast here.
+				ci, _ = ci.spawnCloseContext(0)
+			}
 			// Note: adding a count is not needed here, as there will be an
 			// embed spawn below.
 			hasEmbed = true

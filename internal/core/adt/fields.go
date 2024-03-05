@@ -871,7 +871,8 @@ outer:
 	for _, a := range dst.arcs {
 		ca := a.cc
 		f := ca.Label()
-		if f.IsHidden() || f.IsLet() {
+		// TODO: disallow new definitions in closed structs.
+		if f.IsHidden() || f.IsLet() || f.IsDef() {
 			continue
 		}
 		for _, b := range closed.arcs {

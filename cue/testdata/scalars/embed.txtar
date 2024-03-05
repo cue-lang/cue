@@ -255,7 +255,7 @@ Result:
     }
     b: (int){ 1 }
   }
-  optionalExists: (_){ |((string){ string }, (struct){
+  optionalExists: ((string|struct)){ |((string){ string }, (struct){
       value?: (string){ string }
     }) }
   optionalCheck: (struct){
@@ -404,17 +404,6 @@ diff old new
      }
    }
    arithmetic: (struct){
-@@ -92,7 +92,7 @@
-     }
-     b: (int){ 1 }
-   }
--  optionalExists: ((string|struct)){ |((string){ string }, (struct){
-+  optionalExists: (_){ |((string){ string }, (struct){
-       value?: (string){ string }
-     }) }
-   optionalCheck: (struct){
--- diff/todo/p1 --
-optionaExists: return type incorrect.
 -- diff/todo/p3 --
 Reordering.
 -- diff/explanation --

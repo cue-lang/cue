@@ -282,7 +282,7 @@ Disjuncts:    161
       }
     }
   }
-  let svc#1multi = &[&[&[&[&[〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]]]]]]
+  let svc#1multi = &[&[&[&[〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]]]]]
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -317,7 +317,7 @@ diff old new
      }
    }
 -  let svc#1multi = 〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]
-+  let svc#1multi = &[&[&[&[&[〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]]]]]]
++  let svc#1multi = &[&[&[&[〈1;controller〉.objects.namespaced.ingress.Service["\(〈1;class〉)-nginx-ingress-controller"]]]]]
  }
 -- diff/todo/p2 --
 Different, but okay, error message, but missing some positions

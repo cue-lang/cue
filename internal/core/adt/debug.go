@@ -40,9 +40,34 @@ func RecordDebugGraph(ctx *OpContext, v *Vertex, name string) {
 	}
 }
 
+var (
+	// DebugDeps enables dependency tracking for debugging purposes.
+	// It is off by default, as it adds a significant overhead.
+	//
+	// TODO: hook this init CUE_DEBUG, once we have set this up as a single
+	// environment variable. For instance, CUE_DEBUG=matchdeps=1.
+	DebugDeps = false
+
+	OpenGraphs = false
+
+	// MaxGraphs is the maximum number of debug graphs to be opened. To avoid
+	// confusion, a panic will be raised if this number is exceeded.
+	MaxGraphs = 10
+
+	numberOpened = 0
+)
+
 // OpenNodeGraph takes a given mermaid graph and opens it in the system default
 // browser.
 func OpenNodeGraph(title, path, code, out, graph string) {
+	if !OpenGraphs {
+		return
+	}
+	if numberOpened > MaxGraphs {
+		panic("too many debug graphs opened")
+	}
+	numberOpened++
+
 	err := os.MkdirAll(path, 0755)
 	if err != nil {
 		log.Fatal(err)
@@ -213,13 +238,6 @@ type ccDep struct {
 	// taskID indicates the sequence number of a task within a scheduler.
 	taskID int
 }
-
-// DebugDeps enables dependency tracking for debugging purposes.
-// It is off by default, as it adds a significant overhead.
-//
-// TODO: hook this init CUE_DEBUG, once we have set this up as a single
-// environment variable. For instance, CUE_DEBUG=matchdeps=1.
-var DebugDeps = false
 
 func (c *closeContext) addDependent(kind depKind, dependant *closeContext) *ccDep {
 	if !DebugDeps {
@@ -643,6 +661,7 @@ func (m *mermaidContext) pstr(cc *closeContext) string {
 	addFlag(cc.isClosed, 'c')
 	addFlag(cc.isClosedOnce, 'C')
 	addFlag(cc.hasEllipsis, 'o')
+	flags.WriteByte(cc.arcType.String()[0])
 	io.Copy(w, flags)
 
 	w.WriteString(close)

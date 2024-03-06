@@ -1936,7 +1936,7 @@ import (
 #ProjectedVolumeSource: {
 	// list of volume projections
 	// +optional
-	sources: [...#VolumeProjection] @go(Sources,[]VolumeProjection) @protobuf(1,bytes,rep)
+	sources?: [...#VolumeProjection] @go(Sources,[]VolumeProjection) @protobuf(1,bytes,rep)
 
 	// Mode bits used to set permissions on created files by default.
 	// Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
@@ -5468,7 +5468,7 @@ import (
 	// Names by which this image is known.
 	// e.g. ["k8s.gcr.io/hyperkube:v1.0.7", "dockerhub.io/google_containers/hyperkube:v1.0.7"]
 	// +optional
-	names: [...string] @go(Names,[]string) @protobuf(1,bytes,rep)
+	names?: [...string] @go(Names,[]string) @protobuf(1,bytes,rep)
 
 	// The size of the image in bytes.
 	// +optional
@@ -6182,11 +6182,11 @@ import (
 
 	// Name of the controller that emitted this Event, e.g. `kubernetes.io/kubelet`.
 	// +optional
-	reportingComponent: string @go(ReportingController) @protobuf(14,bytes,opt)
+	reportingComponent?: string @go(ReportingController) @protobuf(14,bytes,opt)
 
 	// ID of the controller instance, e.g. `kubelet-xyzf`.
 	// +optional
-	reportingInstance: string @go(ReportingInstance) @protobuf(15,bytes,opt)
+	reportingInstance?: string @go(ReportingInstance) @protobuf(15,bytes,opt)
 }
 
 // EventSeries contain information on series of events, i.e. thing that was/is happening

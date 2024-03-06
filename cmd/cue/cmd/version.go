@@ -21,10 +21,8 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
-	"time"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/mod/module"
 )
 
 func newVersionCmd(c *Command) *cobra.Command {
@@ -37,8 +35,6 @@ func newVersionCmd(c *Command) *cobra.Command {
 	return cmd
 }
 
-const defaultVersion = "(devel)"
-
 // version can be set by a builder using
 // -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=<version>'.
 // However, people should prefer building via a mechanism which
@@ -47,6 +43,15 @@ const defaultVersion = "(devel)"
 // from the *debug.BuildInfo (see below). So this mechanism is
 // considered legacy.
 var version string
+
+// fallbackVersion is used as-is when the -ldflags above isn't used
+// and when there isn't a recorded main module version,
+// for example when building via `go install ./cmd/cue`.
+// It should reflect the last release in the current branch.
+//
+// TODO: remove once Go stamps local builds with a main module version
+// derived from the local VCS information per https://go.dev/issue/50603.
+const fallbackVersion = "v0.8.0-alpha.5"
 
 func runVersion(cmd *Command, args []string) error {
 	w := cmd.OutOrStdout()
@@ -57,11 +62,7 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	version := cueVersion(bi)
-	if version == "" {
-		version = defaultVersion
-	}
-	fmt.Fprintf(w, "cue version %s\n\n", version)
+	fmt.Fprintf(w, "cue version %s\n\n", cueVersion(bi))
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	for _, s := range bi.Settings {
 		if s.Value == "" {
@@ -88,41 +89,19 @@ func cueVersion(bi *debug.BuildInfo) string {
 	}
 	v := version
 	if v != "" {
-		// The global version variable has been
-		// configured via ldflags.
+		// The global version variable has been configured via ldflags.
 		return v
 	}
 	if bi == nil {
-		return ""
+		return fallbackVersion
 	}
-	if bi.Main.Version != "" && bi.Main.Version != defaultVersion {
+	if bi.Main.Version != "" && bi.Main.Version != "(devel)" {
 		v = bi.Main.Version
 	}
 	if v != "" {
 		return v
 	}
-	// a specific version was not provided by ldflags or buildInfo
-	// attempt to make our own
-	var vcsTime time.Time
-	var vcsRevision string
-	for _, s := range bi.Settings {
-		switch s.Key {
-		case "vcs.time":
-			// If the format is invalid, we'll print a zero timestamp.
-			vcsTime, _ = time.Parse(time.RFC3339Nano, s.Value)
-		case "vcs.revision":
-			vcsRevision = s.Value
-			// module.PseudoVersion recommends the revision to be a 12-byte
-			// commit hash prefix, which is what cmd/go uses as well.
-			if len(vcsRevision) > 12 {
-				vcsRevision = vcsRevision[:12]
-			}
-		}
-	}
-	if vcsRevision != "" {
-		return module.PseudoVersion("", "", vcsTime, vcsRevision)
-	}
-	return ""
+	return fallbackVersion
 }
 
 func readBuildInfo() (*debug.BuildInfo, bool) {

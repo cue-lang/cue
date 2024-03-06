@@ -201,11 +201,10 @@ func TestX(t *testing.T) {
 	verbosity = 1 // comment to turn logging off.
 
 	adt.DebugDeps = true
+	// adt.OpenGraphs = true
 
 	var version internal.EvaluatorVersion
 	version = internal.DevVersion // comment to use default implementation.
-	openGraph := true
-	openGraph = false
 
 	in := `
 -- cue.mod/module.cue --
@@ -242,7 +241,7 @@ module: "mod.test"
 	adt.Verbosity = 0
 
 	out := debug.NodeString(r, v, nil)
-	if openGraph {
+	if adt.OpenGraphs {
 		for p, g := range ctx.ErrorGraphs {
 			path := filepath.Join(".debug/TestX", p)
 			adt.OpenNodeGraph("TestX", path, in, out, g)

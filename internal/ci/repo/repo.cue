@@ -37,7 +37,7 @@ latestStableGo: "1.22.x"
 // Use a specific latest version for release builds.
 // Note that we don't want ".x" for the sake of reproducibility,
 // so we instead pin a specific Go release.
-pinnedReleaseGo: "1.22.0"
+pinnedReleaseGo: "1.22.1"
 
 goreleaserVersion: "v1.24.0"
 

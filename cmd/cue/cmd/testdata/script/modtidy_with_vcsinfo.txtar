@@ -15,6 +15,9 @@ cmp stdout want-stdout
 }
 -- want-module --
 module: "main.org@v0"
+language: {
+	version: "v0.8.0-alpha.5"
+}
 -- cue.mod/module.cue --
 module: "main.org@v0"
 

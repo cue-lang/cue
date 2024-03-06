@@ -5,3 +5,6 @@ exists cue.mod/pkg
 
 -- want-module.cue --
 module: "foo.com/bar@v1"
+language: {
+	version: "v0.8.0-alpha.5"
+}

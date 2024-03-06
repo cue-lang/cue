@@ -15,6 +15,7 @@ import (
 	"cuelabs.dev/go/oci/ociregistry"
 	"cuelabs.dev/go/oci/ociregistry/ociauth"
 	"cuelabs.dev/go/oci/ociregistry/ociclient"
+	"golang.org/x/oauth2"
 
 	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/mod/modload"
@@ -64,10 +65,9 @@ type Resolver struct {
 type Config struct {
 	// TODO allow for a custom resolver to be passed in.
 
-	// Authorizer is used to authorize registry requests.
-	// If it's nil, a default authorizer will be used that consults
-	// the information stored by "cue login" and "docker login".
-	Authorizer ociauth.Authorizer
+	// Transport is used to make the underlying HTTP requests.
+	// If it's nil, [http.DefaultTransport] will be used.
+	Transport http.RoundTripper
 
 	// Env provides environment variable values. If this is nil,
 	// the current process's environment will be used.
@@ -82,10 +82,10 @@ type Config struct {
 // cue command.
 //
 // The contents of the configuration will not be mutated.
-func NewResolver(cfg0 *Config) (*Resolver, error) {
-	var cfg Config
-	if cfg0 != nil {
-		cfg = *cfg0
+func NewResolver(cfg *Config) (*Resolver, error) {
+	cfg = newRef(cfg)
+	if cfg.Transport == nil {
+		cfg.Transport = http.DefaultTransport
 	}
 	getenv := getenvFunc(cfg.Env)
 	var configData []byte
@@ -114,59 +114,18 @@ func NewResolver(cfg0 *Config) (*Resolver, error) {
 	if err != nil {
 		return nil, fmt.Errorf("bad value for $CUE_REGISTRY: %v", err)
 	}
-	// If the user isn't doing anything that requires a registry, we
-	// shouldn't complain about reading a bad configuration file,
-	// so check only when required.
-	authOnce := sync.OnceValues(func() (ociauth.Authorizer, error) {
-		if cfg.Authorizer != nil {
-			return cfg.Authorizer, nil
-		}
-		// If a registry was authenticated via `cue login`, use that.
-		// If not, fall back to authentication via Docker's config.json.
-		// Note that the order below is backwards, since we layer interfaces.
-
-		config, err := ociauth.LoadWithEnv(nil, cfg.Env)
-		if err != nil {
-			return nil, fmt.Errorf("cannot load OCI auth configuration: %v", err)
-		}
-		auth := ociauth.NewStdAuthorizer(ociauth.StdAuthorizerParams{
-			Config: config,
-		})
-
-		// If we can't locate a logins.json file at all, skip cueLoginsAuthorizer entirely.
-		// We only refuse to continue if we find an invalid logins.json file.
-		loginsPath, err := cueconfig.LoginConfigPath(getenv)
-		if err != nil {
-			return auth, nil
-		}
-		logins, err := cueconfig.ReadLogins(loginsPath)
-		if errors.Is(err, fs.ErrNotExist) {
-			return auth, nil
-		}
-		if err != nil {
-			return nil, fmt.Errorf("cannot load CUE registry logins: %v", err)
-		}
-		return &cueLoginsAuthorizer{
-			logins:        logins,
-			cachedClients: make(map[string]*http.Client),
-			next:          auth,
-		}, nil
-	})
-
-	newRegistry := func(host string, insecure bool) (ociregistry.Interface, error) {
-		auth, err := authOnce()
-		if err != nil {
-			return nil, err
-		}
-		return ociclient.New(host, &ociclient.Options{
-			Insecure:   insecure,
-			Authorizer: auth,
-		})
-	}
 	return &Resolver{
-		resolver:    resolver,
-		newRegistry: newRegistry,
-		registries:  make(map[string]ociregistry.Interface),
+		resolver: resolver,
+		newRegistry: func(host string, insecure bool) (ociregistry.Interface, error) {
+			return ociclient.New(host, &ociclient.Options{
+				Insecure: insecure,
+				Transport: &cueLoginsTransport{
+					getenv: getenv,
+					cfg:    cfg,
+				},
+			})
+		},
+		registries: make(map[string]ociregistry.Interface),
 	}, nil
 }
 
@@ -217,50 +176,118 @@ func (r *Resolver) ResolveToRegistry(mpath string, version string) (modregistry.
 	}, nil
 }
 
-type cueLoginsAuthorizer struct {
-	logins *cueconfig.Logins
-	next   ociauth.Authorizer
+// cueLoginsTransport implements [http.RoundTripper] by using
+// tokens from the CUE login information when available, falling
+// back to using the standard [ociauth] transport implementation.
+type cueLoginsTransport struct {
+	cfg    *Config
+	getenv func(string) string
+
+	// initOnce guards initErr, logins, and transport.
+	initOnce sync.Once
+	initErr  error
+	logins   *cueconfig.Logins
+	// transport holds the underlying transport. This wraps
+	// t.cfg.Transport.
+	transport http.RoundTripper
+
 	// mu guards the fields below.
-	mu            sync.Mutex
-	cachedClients map[string]*http.Client
+	mu sync.Mutex
+
+	// cachedTransports holds a transport per host.
+	// This is needed because the oauth2 API requires a
+	// different client for each host. Each of these transports
+	// wraps the transport above.
+	cachedTransports map[string]http.RoundTripper
 }
 
-func (a *cueLoginsAuthorizer) DoRequest(req *http.Request, requiredScope ociauth.Scope) (*http.Response, error) {
+func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	// Return an error lazily on the first request because if the
+	// user isn't doing anything that requires a registry, we
+	// shouldn't complain about reading a bad configuration file.
+	if err := t.init(); err != nil {
+		return nil, err
+	}
+	if t.logins == nil {
+		return t.transport.RoundTrip(req)
+	}
 	// TODO: note that a CUE registry may include a path prefix,
 	// so using solely the host will not work with such a path.
 	// Can we do better here, perhaps keeping the path prefix up to "/v2/"?
 	host := req.URL.Host
-	login, ok := a.logins.Registries[host]
+	login, ok := t.logins.Registries[host]
 	if !ok {
-		return a.next.DoRequest(req, requiredScope)
+		return t.transport.RoundTrip(req)
 	}
 
-	a.mu.Lock()
-	client := a.cachedClients[host]
-	if client == nil {
+	t.mu.Lock()
+	transport := t.cachedTransports[host]
+	if transport == nil {
 		tok := cueconfig.TokenFromLogin(login)
 		oauthCfg := cueconfig.RegistryOAuthConfig(host)
 		// TODO: When this client refreshes an access token,
 		// we should store the refreshed token on disk.
-		client = oauthCfg.Client(context.Background(), tok)
-		a.cachedClients[host] = client
+
+		// Make the oauth client use the transport that was set up
+		// in init.
+		ctx := context.WithValue(req.Context(), oauth2.HTTPClient, &http.Client{
+			Transport: t.transport,
+		})
+		transport = oauthCfg.Client(ctx, tok).Transport
+		t.cachedTransports[host] = transport
 	}
 	// Unlock immediately so we don't hold the lock for the entire
 	// request, which would preclude any concurrency when
 	// making HTTP requests.
-	a.mu.Unlock()
-	return client.Do(req)
+	t.mu.Unlock()
+	return transport.RoundTrip(req)
+}
+
+func (t *cueLoginsTransport) init() error {
+	t.initOnce.Do(func() {
+		t.initErr = t._init()
+	})
+	return t.initErr
+}
+
+func (t *cueLoginsTransport) _init() error {
+	// If a registry was authenticated via `cue login`, use that.
+	// If not, fall back to authentication via Docker's config.json.
+	// Note that the order below is backwards, since we layer interfaces.
+
+	config, err := ociauth.LoadWithEnv(nil, t.cfg.Env)
+	if err != nil {
+		return fmt.Errorf("cannot load OCI auth configuration: %v", err)
+	}
+	t.transport = ociauth.NewStdTransport(ociauth.StdTransportParams{
+		Config:    config,
+		Transport: t.cfg.Transport,
+	})
+
+	// If we can't locate a logins.json file at all, then we'll
+	// We only refuse to continue if we find an invalid logins.json file.
+	loginsPath, err := cueconfig.LoginConfigPath(t.getenv)
+	if err != nil {
+		return nil
+	}
+	logins, err := cueconfig.ReadLogins(loginsPath)
+	if errors.Is(err, fs.ErrNotExist) {
+		return nil
+	}
+	if err != nil {
+		return fmt.Errorf("cannot load CUE registry logins: %v", err)
+	}
+	t.logins = logins
+	t.cachedTransports = make(map[string]http.RoundTripper)
+	return nil
 }
 
 // NewRegistry returns an implementation of the Registry
 // interface suitable for passing to [load.Instances].
 // It uses the standard CUE cache directory.
-func NewRegistry(cfg0 *Config) (Registry, error) {
-	var cfg Config
-	if cfg0 != nil {
-		cfg = *cfg0
-	}
-	resolver, err := NewResolver(&cfg)
+func NewRegistry(cfg *Config) (Registry, error) {
+	cfg = newRef(cfg)
+	resolver, err := NewResolver(cfg)
 	if err != nil {
 		return nil, err
 	}
@@ -283,4 +310,12 @@ func getenvFunc(env []string) func(string) string {
 		}
 		return ""
 	}
+}
+
+func newRef[T any](x *T) *T {
+	var x1 T
+	if x != nil {
+		x1 = *x
+	}
+	return &x1
 }

@@ -5,10 +5,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/fs"
+	"net/http"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
+	"sync/atomic"
 	"testing"
 
 	"github.com/go-quicktest/qt"
@@ -81,7 +83,13 @@ package x
 		modcache.RemoveAll(cacheDir)
 	})
 
-	r, err := NewRegistry(nil)
+	var transportInvoked atomic.Bool
+	r, err := NewRegistry(&Config{
+		Transport: roundTripperFunc(func(req *http.Request) (*http.Response, error) {
+			transportInvoked.Store(true)
+			return http.DefaultTransport.RoundTrip(req)
+		}),
+	})
 	qt.Assert(t, qt.IsNil(err))
 	ctx := context.Background()
 	gotRequirements, err := r.Requirements(ctx, module.MustNewVersion("foo.example@v0", "v0.0.1"))
@@ -105,6 +113,9 @@ package x
 	sort.Strings(wantAllHosts)
 
 	qt.Assert(t, qt.DeepEquals(gotAllHosts, wantAllHosts))
+
+	// Check that the underlying custom transport was used.
+	qt.Assert(t, qt.IsTrue(transportInvoked.Load()))
 }
 
 // dockerConfig describes the minimal subset of the docker
@@ -118,4 +129,10 @@ type dockerConfig struct {
 type authConfig struct {
 	Username string `json:"username,omitempty"`
 	Password string `json:"password,omitempty"`
+}
+
+type roundTripperFunc func(*http.Request) (*http.Response, error)
+
+func (f roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
+	return f(req)
 }

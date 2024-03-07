@@ -81,6 +81,24 @@
       "parentUuid": "598bd60e_4e9f9601",
       "revId": "be98a2e78c7f469d137a36d538d4c5978a0be20f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25282bf8_e0b94770",
+        "filename": "internal/core/adt/tasks.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-07T10:44:53Z",
+      "side": 1,
+      "message": "Oh right, unfortunate. I see you added a brief comment about it, thank you.",
+      "parentUuid": "8ed9c7ff_cfaf526a",
+      "revId": "be98a2e78c7f469d137a36d538d4c5978a0be20f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

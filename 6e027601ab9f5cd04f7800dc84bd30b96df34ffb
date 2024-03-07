@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "02ed0677_1d31558b",
+        "filename": "cmd/cue/cmd/testdata/script/registry_lazy_config.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-07T16:49:17Z",
+      "side": 1,
+      "message": "the error strings are getting longer and longer :) we should perhaps revisit the error message length UX for v0.9. add a TODO to remember to revisit this particular one, perhaps?",
+      "revId": "6e027601ab9f5cd04f7800dc84bd30b96df34ffb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d02a13a_549d9bc8",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-07T16:49:17Z",
+      "side": 1,
+      "message": "I really wish they had accepted https://github.com/golang/go/issues/21670 ...",
+      "revId": "6e027601ab9f5cd04f7800dc84bd30b96df34ffb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

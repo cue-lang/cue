@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b37abb3d_20c08977",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 549,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:45:30Z",
+      "side": 1,
+      "message": "I think it actually was an interface in an earlier implementation. 😊\n\nElaborated.",
+      "parentUuid": "4851dfc8_182fde27",
+      "range": {
+        "startLine": 549,
+        "startChar": 10,
+        "endLine": 549,
+        "endChar": 27
+      },
+      "revId": "be98a2e78c7f469d137a36d538d4c5978a0be20f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "598bd60e_4e9f9601",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-03-01T14:20:23Z",
       "side": 1,
       "message": "why is an init func needed? can this not be a `var ( ... )` directly with the values? even if it\u0027s functionally the same, it would be less repetitive and help the compiler see that the global values are static and not modified",
+      "revId": "be98a2e78c7f469d137a36d538d4c5978a0be20f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ed9c7ff_cfaf526a",
+        "filename": "internal/core/adt/tasks.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:45:30Z",
+      "side": 1,
+      "message": "Doing so will cause the Go compiler to spit out many and humongous(!) cyclic dependencies.",
+      "parentUuid": "598bd60e_4e9f9601",
       "revId": "be98a2e78c7f469d137a36d538d4c5978a0be20f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

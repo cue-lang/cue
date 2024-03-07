@@ -40,21 +40,9 @@ var tests = []struct {
 }}
 
 func TestInit(t *testing.T) {
-	for _, test := range tests {
-		t.Run(test.testName, func(t *testing.T) {
-			setZero(&Flags)
-			t.Setenv("CUE_EXPERIMENT", test.cueExperiment)
-			err := _init()
-			if test.wantError != "" {
-				qt.Assert(t, qt.ErrorMatches(err, test.wantError))
-				return
-			}
-			qt.Assert(t, qt.IsNil(err))
-			qt.Assert(t, qt.Equals(*test.flagVal, test.want))
-		})
-	}
-}
-
-func setZero[T any](x *T) {
-	*x = *new(T)
+	// This is just a smoke test to make sure it's all wired up OK.
+	t.Setenv("CUE_EXPERIMENT", "modules")
+	err := Init()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.IsTrue(Flags.Modules))
 }

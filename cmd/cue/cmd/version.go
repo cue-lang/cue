@@ -95,11 +95,12 @@ func cueVersion(bi *debug.BuildInfo) string {
 	if bi == nil {
 		return fallbackVersion
 	}
-	if bi.Main.Version != "" && bi.Main.Version != "(devel)" {
-		v = bi.Main.Version
-	}
-	if v != "" {
-		return v
+	switch bi.Main.Version {
+	case "": // missing version
+	case "(devel)": // local build
+	case "v0.0.0-00010101000000-000000000000": // build via a directory replace directive
+	default:
+		return bi.Main.Version
 	}
 	return fallbackVersion
 }

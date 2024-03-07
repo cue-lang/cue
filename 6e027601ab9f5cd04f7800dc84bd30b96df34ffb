@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ead2cd4c_879b5de9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-07T16:50:04Z",
+      "side": 1,
+      "message": "To be clear, by this I mean like:\n\nFor #123.\nFor #456.",
+      "parentUuid": "adeaab6c_244d46e6",
+      "revId": "6e027601ab9f5cd04f7800dc84bd30b96df34ffb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "02ed0677_1d31558b",

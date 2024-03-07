@@ -1,4 +1,4 @@
-package cueexperiment
+package cuedebug
 
 import (
 	"sync"
@@ -6,10 +6,9 @@ import (
 	"cuelang.org/go/internal/envflag"
 )
 
-// Flags holds the set of CUE_EXPERIMENT flags. It is initialized
-// by Init.
+// Flags holds the set of CUE_DEBUG flags. It is initialized by Init.
 var Flags struct {
-	Modules bool
+	HTTP bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we
@@ -22,5 +21,5 @@ func Init() error {
 }
 
 var initOnce = sync.OnceValue(func() error {
-	return envflag.Init(&Flags, "CUE_EXPERIMENT")
+	return envflag.Init(&Flags, "CUE_DEBUG")
 })

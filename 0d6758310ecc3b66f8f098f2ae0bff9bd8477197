@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7df4e18_cc61158c",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 121,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:34:14Z",
+      "side": 1,
+      "message": "I can confirm it *cannot* be removed. Removed comment.",
+      "parentUuid": "50163eb7_7ec80c9a",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "062c25e4_966ebbee",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-02-25T12:06:59Z",
       "side": 1,
       "message": "did you intend to solve this XXX before submitting? if not, make it a TODO with a bit more detail",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "61dc6914_43b95e38",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 138,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:34:14Z",
+      "side": 1,
+      "message": "Removed comment altogether. It seemed out of place.",
+      "parentUuid": "062c25e4_966ebbee",
       "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d6e68b6_77a03b74",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 304,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:34:14Z",
+      "side": 1,
+      "message": "I can confirm that this can be removed. Done.",
+      "parentUuid": "97b2852b_2e231cc6",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "506db0fa_2ef34d0b",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-02-25T12:06:59Z",
       "side": 1,
       "message": "did you intend to solve this XXX before submitting? if not, make it a TODO with a bit more detail",
+      "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72e78908_fe0baf45",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 516,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:34:14Z",
+      "side": 1,
+      "message": "Changed to TODO.",
+      "parentUuid": "506db0fa_2ef34d0b",
       "revId": "0d6758310ecc3b66f8f098f2ae0bff9bd8477197",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

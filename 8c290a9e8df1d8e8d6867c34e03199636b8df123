@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "706c590b_14b310a4",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:34:14Z",
+      "side": 1,
+      "message": "Added description in this CL. Could be done without causing issues on the commit stack.",
+      "parentUuid": "c6549ed9_254e65e3",
+      "revId": "8c290a9e8df1d8e8d6867c34e03199636b8df123",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "db9180e1_3b748c20",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-02-25T12:06:59Z",
       "side": 1,
       "message": "nit: this length check is unnecessary for the range below",
+      "revId": "8c290a9e8df1d8e8d6867c34e03199636b8df123",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "489affad_cb1e2758",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:34:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "db9180e1_3b748c20",
       "revId": "8c290a9e8df1d8e8d6867c34e03199636b8df123",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

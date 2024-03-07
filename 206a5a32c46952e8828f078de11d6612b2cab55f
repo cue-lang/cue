@@ -16,6 +16,24 @@
       "message": "nit: reflow the paragraph under 72, you can see the vertical column here",
       "revId": "206a5a32c46952e8828f078de11d6612b2cab55f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6f2a1527_6aba574d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T08:00:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d15b4bd4_12f2c3ca",
+      "revId": "206a5a32c46952e8828f078de11d6612b2cab55f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

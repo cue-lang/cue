@@ -56,6 +56,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "eff0eaf7_b10c28ff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-07T07:57:03Z",
+      "side": 1,
+      "message": "See other comment",
+      "parentUuid": "690a04f7_c7961e0f",
+      "revId": "8a14731bb796b56def7af8660d8b5392cf4c5b95",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "d44d46d3_491d7962",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 8

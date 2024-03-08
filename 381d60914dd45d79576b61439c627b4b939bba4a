@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c9d9c9d7_b8b8cb77",
+        "filename": "internal/httplog/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T14:37:45Z",
+      "side": 1,
+      "message": "why not make these result parameters? pointer to interface as a result gives me C vibes, and all the pointer gymnastics below feel unnecessary",
+      "range": {
+        "startLine": 137,
+        "startChar": 38,
+        "endLine": 137,
+        "endChar": 70
+      },
+      "revId": "381d60914dd45d79576b61439c627b4b939bba4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c6d039d_a41efc06",
+        "filename": "internal/httplog/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T14:37:45Z",
+      "side": 1,
+      "message": "remember to not use ioutil anymore :) here and elsewhere.",
+      "range": {
+        "startLine": 145,
+        "startChar": 14,
+        "endLine": 145,
+        "endChar": 20
+      },
+      "revId": "381d60914dd45d79576b61439c627b4b939bba4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4200499_f93577c8",
+        "filename": "internal/httplog/event.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T14:37:45Z",
+      "side": 1,
+      "message": "how about client_send and client_recv? when using tools like jq or grep, the special characters will get in the way, and you\u0027re not saving many characters",
+      "revId": "381d60914dd45d79576b61439c627b4b939bba4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

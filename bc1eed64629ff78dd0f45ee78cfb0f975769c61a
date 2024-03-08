@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8ac77416_bc9ee946",
+        "filename": "internal/httplog/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T14:37:45Z",
+      "side": 1,
+      "message": "Hm, so when logging is enabled, we read entire response bodies into memory? I guess not a huge deal given most users shouldn\u0027t turn this on, but it still scares me slightly for e.g. downloading many module zips which could be reasonably large. At least we could document the increased memory usage.",
+      "revId": "bc1eed64629ff78dd0f45ee78cfb0f975769c61a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bce7129c_5296d254",
+        "filename": "internal/httplog/event.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T14:37:45Z",
+      "side": 1,
+      "message": "Personally, I would also include two durations relative to when we made the request:\n\n1) how long until we got the response headers (i.e. the request roundtrip to the server)\n2) how long until we read the entire response body\n\nthese would help us debug when e.g. `cue mod tidy` is slow, as it could be because it\u0027s downloading huge zips and the internet is slow, or that their roundtrip to the server location is slow and we\u0027re making lots of sequential requests.\n\ndoesn\u0027t have to be right now, but at least for a TODO, I think.",
+      "revId": "bc1eed64629ff78dd0f45ee78cfb0f975769c61a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f8b3f68_d256115a",
+        "filename": "internal/httplog/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T14:37:45Z",
+      "side": 1,
+      "message": "is this meant to be deleted until a later CL? I\u0027m confused.",
+      "revId": "bc1eed64629ff78dd0f45ee78cfb0f975769c61a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

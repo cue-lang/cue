@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -63,7 +62,7 @@ func runModTidy(cmd *Command, args []string) error {
 	if reg == nil {
 		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
 	}
-	ctx := context.Background()
+	ctx := backgroundContext()
 	modRoot, err := findModuleRoot()
 	if err != nil {
 		return err

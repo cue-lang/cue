@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -93,7 +92,7 @@ func runModUpload(cmd *Command, args []string) error {
 	}
 
 	rclient := modregistry.NewClientWithResolver(resolver)
-	if err := rclient.PutModule(context.Background(), mv, zf, info.Size()); err != nil {
+	if err := rclient.PutModule(backgroundContext(), mv, zf, info.Size()); err != nil {
 		return fmt.Errorf("cannot put module: %v", err)
 	}
 	fmt.Printf("published %s\n", mv)

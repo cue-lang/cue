@@ -23,6 +23,7 @@ import (
 
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/internal/httplog"
 	"cuelang.org/go/internal/mod/modload"
 )
 
@@ -73,7 +74,7 @@ func runModGet(cmd *Command, args []string) error {
 	if reg == nil {
 		return fmt.Errorf("modules experiment not enabled (enable with CUE_EXPERIMENT=modules)")
 	}
-	ctx := context.Background()
+	ctx := backgroundContext()
 	modRoot, err := findModuleRoot()
 	if err != nil {
 		return err
@@ -122,4 +123,34 @@ func findModuleRoot() (string, error) {
 		}
 		dir = dir1
 	}
+}
+
+func backgroundContext() context.Context {
+	// TODO move this into the ociregistry module
+	return httplog.ContextWithAllowedURLQueryParams(
+		context.Background(),
+		allowURLQueryParam,
+	)
+}
+
+// The set of query string keys that we expect to send as part of the OCI
+// protocol. Anything else is potentially dangerous to leak, as it's probably
+// from a redirect. These redirects often included tokens or signed URLs.
+// TODO move this into the ociregistry module.
+var paramAllowlist = map[string]bool{
+	// Token exchange
+	"scope":   true,
+	"service": true,
+	// Cross-repo mounting
+	"mount": true,
+	"from":  true,
+	// Layer PUTerror
+	"digest": true,
+	// Listing tags and catalog
+	"n":    true,
+	"last": true,
+}
+
+func allowURLQueryParam(k string) bool {
+	return paramAllowlist[k]
 }

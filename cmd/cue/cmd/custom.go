@@ -17,7 +17,6 @@ package cmd
 // This file contains code or initializing and running custom commands.
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -153,7 +152,7 @@ func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 
 	c := flow.New(cfg, root, newTaskFunc(cmd))
 
-	err := c.Run(context.Background())
+	err := c.Run(backgroundContext())
 	exitOnErr(cmd, err, true)
 
 	return err

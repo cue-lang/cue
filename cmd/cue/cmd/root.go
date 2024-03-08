@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/interpreter/wasm"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
@@ -86,6 +87,9 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		statsEnc := statsEncoder(c)
 
 		if err := cueexperiment.Init(); err != nil {
+			return err
+		}
+		if err := cuedebug.Init(); err != nil {
 			return err
 		}
 
@@ -234,7 +238,7 @@ func MainTest() int {
 func Main() int {
 	cwd, _ := os.Getwd()
 	cmd, _ := New(os.Args[1:])
-	if err := cmd.Run(context.Background()); err != nil {
+	if err := cmd.Run(backgroundContext()); err != nil {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
 				Cwd:     cwd,

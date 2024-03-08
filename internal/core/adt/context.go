@@ -703,6 +703,11 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 		if arc == nil {
 			return nil
 		}
+		// XXX: this should be in a standalone CL if it is on the path of
+		// the old evaluator as well.
+		// TODO: consider moving this after markCycle, depending on how we
+		// implement markCycle.
+		arc = arc.Indirect()
 
 		// Save the old CloseInfo and restore after evaluate to avoid detecting
 		// spurious cycles.
@@ -823,6 +828,11 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 		if v == nil {
 			return nil
 		}
+		// XXX: this should be in a standalone CL if it is on the path of
+		// the old evaluator as well.
+		// TODO: consider moving this after markCycle, depending on how we
+		// implement markCycle.
+		v = v.Indirect()
 
 		if c.isDevVersion() {
 			if n := v.getState(c); n != nil {

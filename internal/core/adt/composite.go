@@ -908,6 +908,8 @@ func (v *Vertex) IsList() bool {
 func (v *Vertex) Lookup(f Feature) *Vertex {
 	for _, a := range v.Arcs {
 		if a.Label == f {
+			// TODO(share): this indirection should ultimately be eliminated,
+			// and left up the caller, as it may remove useful information.
 			a = a.Indirect()
 			return a
 		}

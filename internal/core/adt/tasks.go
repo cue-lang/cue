@@ -89,6 +89,9 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 		// TODO: yield instead?
 		return
 	}
+	// TODO: consider moving after markCycle or removing.
+	arc = arc.Indirect()
+
 	// A reference that points to itself indicates equality. In that case
 	// we are done computing and we can return the arc as is.
 	ci, skip := t.node.markCycle(arc, t.env, r, t.id)

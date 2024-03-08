@@ -33,6 +33,24 @@
       "message": "Why is this changing?",
       "revId": "c97ded1713ec8b725153966c5121dab284b8a6b6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "349dad57_fbe59d7f",
+        "filename": "doc/tutorial/kubernetes/quick/cue.mod/gen/k8s.io/api/core/v1/types_go_gen.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 1939,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T21:18:08Z",
+      "side": 1,
+      "message": "I ran `CUE_UPDATE\u003d1 CUE_LONG\u003d1 go test ./...`; we apparently hadn\u0027t updated these test outputs after https://review.gerrithub.io/c/cue-lang/cue/+/1171971 tweaked `cue get go` to use optional fields in a few more cases. It seemed to not affect the long test outcome either way.",
+      "parentUuid": "3733275f_a19acfa1",
+      "revId": "c97ded1713ec8b725153966c5121dab284b8a6b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

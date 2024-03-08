@@ -16,6 +16,24 @@
       "message": "join these lines; they fit just fine in a single line, and splitting mid-sentence unnecessarily is odd",
       "revId": "e9e68ae272a570f86510007516b40a68ea3d09f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4446d4a1_fe9ead61",
+        "filename": "internal/cuedebug/debug.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T14:29:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6f204cc7_f0d30dcc",
+      "revId": "e9e68ae272a570f86510007516b40a68ea3d09f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

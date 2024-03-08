@@ -122,6 +122,17 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	nodeOnlyNeeds := needs &^ (subFieldsProcessed)
 	n.process(nodeOnlyNeeds, mode)
+	w := v.Indirect() // Dereference the disjunction result.
+	if w != v {
+		if w.Closed {
+			// Should resolve with dereference.
+			v.Closed = true
+		}
+		v.ArcType = w.ArcType
+		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
+		v.Arcs = nil
+		return w.state.meets(needs)
+	}
 	n.updateScalar()
 
 	// First process all but the subfields.

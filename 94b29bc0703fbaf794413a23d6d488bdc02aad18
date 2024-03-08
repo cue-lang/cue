@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "fc3ade85_3ffeb27d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T16:49:19Z",
+      "side": 1,
+      "message": "this... Fixes #2815 😊",
+      "parentUuid": "477f2213_29a0b4b7",
+      "revId": "94b29bc0703fbaf794413a23d6d488bdc02aad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "0f31ec8a_5d2a26ed",
         "filename": "cmd/cue/cmd/registry.go",
         "patchSetId": 6

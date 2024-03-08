@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f31ec8a_5d2a26ed",
+        "filename": "cmd/cue/cmd/registry.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-08T14:41:05Z",
+      "side": 1,
+      "message": "I think the JSON logger is the right choice anyway, because it makes e.g. filtering the logs with jq possible.",
+      "revId": "94b29bc0703fbaf794413a23d6d488bdc02aad18",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

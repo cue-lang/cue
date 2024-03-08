@@ -161,6 +161,7 @@ func (w *printer) interpolation(x *adt.Interpolation) {
 func (w *printer) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
+		x = x.Indirect()
 		var kind adt.Kind
 		if x.BaseValue != nil {
 			kind = x.BaseValue.Kind()

@@ -908,6 +908,11 @@ func (v *Vertex) IsList() bool {
 func (v *Vertex) Lookup(f Feature) *Vertex {
 	for _, a := range v.Arcs {
 		if a.Label == f {
+			// TODO(share): this indirection should ultimately be eliminated:
+			// the original node may have useful information (like original
+			// conjuncts) that are eliminated after indirection.
+			// We should leave it up to the user of Lookup at what point an
+			// indirection is necessary.
 			a = a.Indirect()
 			return a
 		}

@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1fae820_be3ed330",
+        "filename": "internal/httplog/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T16:49:19Z",
+      "side": 1,
+      "message": "It makes things a bit easier to use BodyData as a destination (because we\u0027re setting its value in an existing struct and having `BodyData{}` in every return is nasty looking. I refactored it to be a `BodyData.init` method which hopefully reads a little better to you.",
+      "parentUuid": "c9d9c9d7_b8b8cb77",
+      "range": {
+        "startLine": 137,
+        "startChar": 38,
+        "endLine": 137,
+        "endChar": 70
+      },
+      "revId": "381d60914dd45d79576b61439c627b4b939bba4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1c6d039d_a41efc06",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "50ba61ad_8c7bddce",
+        "filename": "internal/httplog/client.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 145,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T16:49:19Z",
+      "side": 1,
+      "message": "ha, that code originated in some i wrote pre-2018, before `io.ReadAll` was available. Done.",
+      "parentUuid": "1c6d039d_a41efc06",
+      "range": {
+        "startLine": 145,
+        "startChar": 14,
+        "endLine": 145,
+        "endChar": 20
+      },
+      "revId": "381d60914dd45d79576b61439c627b4b939bba4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d4200499_f93577c8",
@@ -60,6 +108,24 @@
       "writtenOn": "2024-03-08T14:37:45Z",
       "side": 1,
       "message": "how about client_send and client_recv? when using tools like jq or grep, the special characters will get in the way, and you\u0027re not saving many characters",
+      "revId": "381d60914dd45d79576b61439c627b4b939bba4a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bdb7c415_4865c375",
+        "filename": "internal/httplog/event.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T16:49:19Z",
+      "side": 1,
+      "message": "Personally I\u0027ve found this arrow notation really intuitive and helpful in the past when poring over big logs involving both client and server messages where it\u0027s very easy to get confused, so I think I\u0027ll keep it as is for now (although I added an \"http\" qualifier so it\u0027s clear that we\u0027re talking about an HTTP client.\n\nIf we find it awkward or annoying in the future, let\u0027s change it then.",
+      "parentUuid": "d4200499_f93577c8",
       "revId": "381d60914dd45d79576b61439c627b4b939bba4a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

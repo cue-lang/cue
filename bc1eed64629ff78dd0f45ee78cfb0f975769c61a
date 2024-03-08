@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "640ab772_21928419",
+        "filename": "internal/httplog/client.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T16:49:19Z",
+      "side": 1,
+      "message": "The maximum size is limited by MaxBodySize. It\u0027s careful not to read arbitrarily large request or response bodies.",
+      "parentUuid": "8ac77416_bc9ee946",
+      "revId": "bc1eed64629ff78dd0f45ee78cfb0f975769c61a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bce7129c_5296d254",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f699cab7_5f11a3c6",
+        "filename": "internal/httplog/event.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T16:49:19Z",
+      "side": 1,
+      "message": "We could include the former, but we don\u0027t always know the latter because for large response bodies we only read the start of the data. Added a TODO.",
+      "parentUuid": "bce7129c_5296d254",
+      "revId": "bc1eed64629ff78dd0f45ee78cfb0f975769c61a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3f8b3f68_d256115a",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-03-08T14:37:45Z",
       "side": 1,
       "message": "is this meant to be deleted until a later CL? I\u0027m confused.",
+      "revId": "bc1eed64629ff78dd0f45ee78cfb0f975769c61a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "88a11c18_a6914f2a",
+        "filename": "internal/httplog/server.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T16:49:19Z",
+      "side": 1,
+      "message": "Yes, the original httplog package had support for server-side logging too and I intend to add it back at some point (probably when this package is extracted to an external module). I\u0027ll remove this for now though, as it\u0027s clearly somewhat confusing.",
+      "parentUuid": "3f8b3f68_d256115a",
       "revId": "bc1eed64629ff78dd0f45ee78cfb0f975769c61a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -432,4 +432,5 @@ func race(f func()) {
 			wg.Done()
 		}()
 	}
+	wg.Wait()
 }

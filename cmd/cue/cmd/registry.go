@@ -2,10 +2,12 @@ package cmd
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"sync"
 
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/httplog"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modconfig"
 )
@@ -21,14 +23,28 @@ func getRegistryResolver() (*modconfig.Resolver, error) {
 	if !modulesExperimentEnabled() {
 		return nil, nil
 	}
-	return modconfig.NewResolver(nil)
+	var transport http.RoundTripper
+	if httpLogging {
+		transport = httplog.Transport(nil)
+	}
+	return modconfig.NewResolver(&modconfig.Config{
+		Transport: transport,
+	})
 }
+
+const httpLogging = true
 
 func getCachedRegistry() (modload.Registry, error) {
 	if !modulesExperimentEnabled() {
 		return nil, nil
 	}
-	return modconfig.NewRegistry(nil)
+	var transport http.RoundTripper
+	if httpLogging {
+		transport = httplog.Transport(nil, nil)
+	}
+	return modconfig.NewRegistry(&modconfig.Config{
+		Transport: transport,
+	})
 }
 
 func modulesExperimentEnabled() bool {

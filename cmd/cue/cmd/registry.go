@@ -2,10 +2,13 @@ package cmd
 
 import (
 	"fmt"
+	"log/slog"
 	"os"
 	"sync"
 
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/httplog"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modconfig"
 )
@@ -21,14 +24,30 @@ func getRegistryResolver() (*modconfig.Resolver, error) {
 	if !modulesExperimentEnabled() {
 		return nil, nil
 	}
-	return modconfig.NewResolver(nil)
+	return modconfig.NewResolver(newModConfig())
 }
 
 func getCachedRegistry() (modload.Registry, error) {
 	if !modulesExperimentEnabled() {
 		return nil, nil
 	}
-	return modconfig.NewRegistry(nil)
+	return modconfig.NewRegistry(newModConfig())
+}
+
+func newModConfig() *modconfig.Config {
+	if !cuedebug.Flags.HTTP {
+		return nil
+	}
+	return &modconfig.Config{
+		Transport: httplog.Transport(&httplog.TransportConfig{
+			// It would be nice to use the default slog logger,
+			// but that does a terrible job of printing structured
+			// values, so use JSON output instead.
+			Logger: httplog.SlogLogger{
+				Logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
+			},
+		}),
+	}
 }
 
 func modulesExperimentEnabled() bool {

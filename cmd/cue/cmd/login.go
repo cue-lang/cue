@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"context"
 	"fmt"
 	"os"
 
@@ -56,7 +55,7 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 `,
 		Args: cobra.MaximumNArgs(1),
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			ctx := context.Background()
+			ctx := backgroundContext()
 
 			resolver, err := getRegistryResolver()
 			if err != nil {

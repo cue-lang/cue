@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "115c28c7_6cc9b20d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T15:58:06Z",
+      "side": 1,
+      "message": "LGTM with one minor query.",
+      "revId": "c97ded1713ec8b725153966c5121dab284b8a6b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3733275f_a19acfa1",
+        "filename": "doc/tutorial/kubernetes/quick/cue.mod/gen/k8s.io/api/core/v1/types_go_gen.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 1939,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-08T15:58:06Z",
+      "side": 1,
+      "message": "Why is this changing?",
+      "revId": "c97ded1713ec8b725153966c5121dab284b8a6b6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

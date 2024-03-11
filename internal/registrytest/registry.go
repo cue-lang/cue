@@ -72,6 +72,25 @@ func upload(ctx context.Context, r ociregistry.Interface, fsys fs.FS) (authConfi
 //
 // The Registry should be closed after use.
 func New(fsys fs.FS, prefix string) (*Registry, error) {
+	handler, err := NewHandler(fsys, prefix)
+	if err != nil {
+		return nil, err
+	}
+	srv := httptest.NewServer(handler)
+	u, err := url.Parse(srv.URL)
+	if err != nil {
+		return nil, err
+	}
+	return &Registry{
+		srv:  srv,
+		host: u.Host,
+	}, nil
+}
+
+// NewHandler is similar to [New] except that it just returns
+// the HTTP handler for the server instead of actually starting
+// a server.
+func NewHandler(fsys fs.FS, prefix string) (http.Handler, error) {
 	r := ocimem.New()
 
 	authConfigData, err := upload(context.Background(), ocifilter.Sub(r, prefix), fsys)
@@ -86,15 +105,7 @@ func New(fsys fs.FS, prefix string) (*Registry, error) {
 		}
 		handler = AuthHandler(handler, &cfg)
 	}
-	srv := httptest.NewServer(handler)
-	u, err := url.Parse(srv.URL)
-	if err != nil {
-		return nil, err
-	}
-	return &Registry{
-		srv:  srv,
-		host: u.Host,
-	}, nil
+	return handler, nil
 }
 
 // AuthHandler wraps the given handler with logic that checks

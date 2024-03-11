@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a2afdfa3_4661b7ad",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:32:35Z",
+      "side": 1,
+      "message": "duplicate, remove",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 4
+      },
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "332db1a0_3ea3f2e7",
+        "filename": "internal/mod/modload/testdata/tidy/tidy-check-fails-with-extra-deps.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:32:35Z",
+      "side": 1,
+      "message": "this comment doesn\u0027t feel right - the check fails, it\u0027s the other txtar file that only has formatting changes.",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ae9b7e68_e9a4ce73",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:32:35Z",
+      "side": 1,
+      "message": "... in canonical semver form",
+      "range": {
+        "startLine": 46,
+        "startChar": 17,
+        "endLine": 46,
+        "endChar": 35
+      },
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4831b5c2_327e3c0a",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:32:35Z",
+      "side": 1,
+      "message": "nit: join these if conditionals",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03eb2c3d_037a90f9",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:32:35Z",
+      "side": 1,
+      "message": "Ideally it would be best to avoid reflect.DeepEqual here; for the former, I believe we should use `slices.EqualFunc(rs0.RootModules(), rs1.RootModlues(), module.Version.Equal)`, and for the second simply `maps.Equal(rs0.DefaultMajorVersions(), rs1.DefaultMajorVersions()`.\n\nNot so much that reflect is bad here, but we want to avoid as much magic or inferred logic as possible, and if we expose a Version.Equal method, we should make sure we use it consistently.\n\nAlternatively, if we say \"no, comparing module.Version values directly is fine\", then I don\u0027t understand why we are exposing an Equal method at all.",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ce5bbe7c_05c6954d",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:32:35Z",
+      "side": 1,
+      "message": "can you expand briefly on this? why is the rest of the func body irrelevant when in check mode?",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

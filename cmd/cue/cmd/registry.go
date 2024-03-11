@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log/slog"
+	"net/http"
 	"os"
 	"sync"
 
@@ -35,19 +36,23 @@ func getCachedRegistry() (modload.Registry, error) {
 }
 
 func newModConfig() *modconfig.Config {
-	if !cuedebug.Flags.HTTP {
-		return nil
-	}
 	return &modconfig.Config{
-		Transport: httplog.Transport(&httplog.TransportConfig{
-			// It would be nice to use the default slog logger,
-			// but that does a terrible job of printing structured
-			// values, so use JSON output instead.
-			Logger: httplog.SlogLogger{
-				Logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
-			},
-		}),
+		Transport: httpTransport(),
 	}
+}
+
+func httpTransport() http.RoundTripper {
+	if !cuedebug.Flags.HTTP {
+		return http.DefaultTransport
+	}
+	return httplog.Transport(&httplog.TransportConfig{
+		// It would be nice to use the default slog logger,
+		// but that does a terrible job of printing structured
+		// values, so use JSON output instead.
+		Logger: httplog.SlogLogger{
+			Logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
+		},
+	})
 }
 
 func modulesExperimentEnabled() bool {

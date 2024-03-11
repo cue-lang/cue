@@ -1,6 +1,8 @@
 # Test that a version is added if not present
 -- cue-version --
 v1.2.3
+-- tidy-check-error --
+no language version found in cue.mod/module.cue
 -- want --
 module: "main.org@v0"
 language: {

@@ -15,11 +15,16 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"net/http"
 	"os"
 
-	"cuelang.org/go/internal/cueconfig"
 	"github.com/spf13/cobra"
+	"golang.org/x/oauth2"
+
+	"cuelang.org/go/internal/cueconfig"
+	"cuelang.org/go/internal/httplog"
 )
 
 // TODO: We need a testscript to cover "cue login" with its oauth2 device flow.
@@ -56,6 +61,13 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 		Args: cobra.MaximumNArgs(1),
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			ctx := backgroundContext()
+			// Cause the oauth2 logic to log HTTP requests when logging is enabled.
+			ctx = context.WithValue(ctx, oauth2.HTTPClient, &http.Client{
+				Transport: httpTransport(),
+			})
+			// Elide request and response bodies because they're likely to include sensitive information.
+			ctx = httplog.RedactRequestBody(ctx, "request body can contain sensitive data when logging in")
+			ctx = httplog.RedactResponseBody(ctx, "response body can contain sensitive data when logging in")
 
 			resolver, err := getRegistryResolver()
 			if err != nil {

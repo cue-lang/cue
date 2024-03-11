@@ -200,6 +200,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ec7f45b5_abd8db8a",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T19:34:54Z",
+      "side": 1,
+      "message": "Oh, right, slices.Equal is fine because the types are comparable. SGTM then.",
+      "parentUuid": "5b671d27_39f446a8",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce5bbe7c_05c6954d",

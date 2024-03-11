@@ -36,10 +36,16 @@ func TestTidy(t *testing.T) {
 			want, err := fs.ReadFile(tfs, "want")
 			qt.Assert(t, qt.IsNil(err))
 
-			cueVers, _ := fs.ReadFile(tfs, "cue-version")
+			err = CheckTidy(context.Background(), tfs, ".", reg)
+			wantCheckTidyError := stringFromFile(tfs, "tidy-check-error")
+			if wantCheckTidyError == "" {
+				qt.Check(t, qt.IsNil(err))
+			} else {
+				qt.Check(t, qt.ErrorMatches(err, wantCheckTidyError))
+			}
 
 			var out strings.Builder
-			mf, err := Tidy(context.Background(), tfs, ".", reg, strings.TrimSpace(string(cueVers)))
+			mf, err := Tidy(context.Background(), tfs, ".", reg, stringFromFile(tfs, "cue-version"))
 			if err != nil {
 				fmt.Fprintf(&out, "error: %v\n", err)
 			} else {
@@ -53,6 +59,11 @@ func TestTidy(t *testing.T) {
 			}
 		})
 	}
+}
+
+func stringFromFile(fsys fs.FS, file string) string {
+	data, _ := fs.ReadFile(fsys, file)
+	return strings.TrimSpace(string(data))
 }
 
 func newRegistry(t *testing.T, fsys fs.FS, root string) Registry {

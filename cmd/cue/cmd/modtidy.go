@@ -50,6 +50,7 @@ for this command to work.
 		RunE: mkRunE(c, runModTidy),
 		Args: cobra.ExactArgs(0),
 	}
+	cmd.Flags().Bool(string(flagCheck), false, "check for tidiness only; do not write module.cue file")
 
 	return cmd
 }
@@ -67,11 +68,13 @@ func runModTidy(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
+	if flagCheck.Bool(cmd) {
+		return modload.CheckTidy(ctx, os.DirFS(modRoot), ".", reg)
+	}
 	mf, err := modload.Tidy(ctx, os.DirFS(modRoot), ".", reg, versionForModFile())
 	if err != nil {
 		return err
 	}
-	// TODO check whether it's changed or not.
 	data, err := mf.Format()
 	if err != nil {
 		return fmt.Errorf("internal error: invalid module.cue file generated: %v", err)

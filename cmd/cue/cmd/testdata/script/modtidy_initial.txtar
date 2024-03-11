@@ -9,6 +9,9 @@ cmp cue.mod/module.cue want-module
 # Check that the resulting module evaluates as expected.
 exec cue export .
 cmp stdout want-stdout
+
+# Check that the tidy check succeeds
+exec cue mod tidy --check
 -- want-module --
 module: "main.org@v0"
 language: {

@@ -8,6 +8,7 @@ import (
 	"log"
 	"maps"
 	"path"
+	"reflect"
 	"runtime"
 	"slices"
 
@@ -37,6 +38,17 @@ type loader struct {
 	mainModule    module.Version
 	mainModuleLoc module.SourceLoc
 	registry      Registry
+	checkTidy     bool
+}
+
+// CheckTidy checks that the module file in the given main module is considered tidy.
+// A module file is considered tidy when:
+// - it contains a language version
+// - it includes valid modules for all of its dependencies
+// - it does not include any unnecessary dependencies.
+func CheckTidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry) error {
+	_, err := tidy(ctx, fsys, modRoot, reg, "", true)
+	return err
 }
 
 // Tidy evaluates all the requirements of the given main module, using the given
@@ -44,12 +56,22 @@ type loader struct {
 // If there's no language version in the module file and cueVers is non-empty
 // it will be used to populate the language version field.
 func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers string) (*modfile.File, error) {
+	return tidy(ctx, fsys, modRoot, reg, cueVers, false)
+}
+
+func tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers string, checkTidy bool) (*modfile.File, error) {
 	mainModuleVersion, mf, err := readModuleFile(ctx, fsys, modRoot)
 	if err != nil {
 		return nil, err
 	}
+	if checkTidy {
+		// This is the cheapest check, so do it first.
+		if mf.Language == nil || mf.Language.Version == "" {
+			return nil, fmt.Errorf("no language version found in cue.mod/module.cue")
+		}
+	}
 	// TODO check that module path is well formed etc
-	rs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), mf.DefaultMajorVersions())
+	origRs := modrequirements.NewRequirements(mf.Module, reg, mf.DepVersions(), mf.DefaultMajorVersions())
 	rootPkgPaths, err := modimports.AllImports(modimports.AllModuleFiles(fsys, modRoot))
 	if err != nil {
 		return nil, err
@@ -61,11 +83,12 @@ func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers
 			FS:  fsys,
 			Dir: modRoot,
 		},
+		checkTidy: checkTidy,
 	}
 
-	rs, pkgs, err := ld.resolveDependencies(ctx, rootPkgPaths, rs)
+	rs, pkgs, err := ld.resolveDependencies(ctx, rootPkgPaths, origRs)
 	if err != nil {
-		return nil, fmt.Errorf("cannot resolve dependencies: %v", err)
+		return nil, err
 	}
 	for _, pkg := range pkgs.All() {
 		if pkg.Error() != nil {
@@ -77,7 +100,18 @@ func Tidy(ctx context.Context, fsys fs.FS, modRoot string, reg Registry, cueVers
 	if err != nil {
 		return nil, fmt.Errorf("cannot tidy requirements: %v", err)
 	}
+	if ld.checkTidy {
+		if !equalRequirements(origRs, rs) {
+			// TODO be more specific in this error?
+			return nil, fmt.Errorf("module is not tidy")
+		}
+	}
 	return modfileFromRequirements(mf, rs, cueVers), nil
+}
+
+func equalRequirements(rs0, rs1 *modrequirements.Requirements) bool {
+	return reflect.DeepEqual(rs0.RootModules(), rs1.RootModules()) &&
+		reflect.DeepEqual(rs0.DefaultMajorVersions(), rs1.DefaultMajorVersions())
 }
 
 func readModuleFile(ctx context.Context, fsys fs.FS, modRoot string) (module.Version, *modfile.File, error) {
@@ -125,14 +159,20 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 	for {
 		logf("---- LOADING from requirements %q", rs.RootModules())
 		pkgs := modpkgload.LoadPackages(ctx, ld.mainModule.Path(), ld.mainModuleLoc, rs, ld.registry, rootPkgPaths)
+		if ld.checkTidy {
+			for _, pkg := range pkgs.All() {
+				if err := pkg.Error(); err != nil {
+					return nil, nil, fmt.Errorf("module is not tidy: %v", err)
+				}
+			}
+			// All packages could be loaded OK so we're good.
+			return rs, pkgs, nil
+		}
 
 		// TODO the original code calls updateRequirements at this point.
 		// /home/rogpeppe/go/src/cmd/go/internal/modload/load.go:1124
 
-		modAddedBy, defaultMajorVersions, err := ld.resolveMissingImports(ctx, pkgs, rs)
-		if err != nil {
-			return nil, nil, err
-		}
+		modAddedBy, defaultMajorVersions := ld.resolveMissingImports(ctx, pkgs, rs)
 		if !maps.Equal(defaultMajorVersions, rs.DefaultMajorVersions()) {
 			rs = rs.WithDefaultMajorVersions(defaultMajorVersions)
 		}
@@ -150,6 +190,7 @@ func (ld *loader) resolveDependencies(ctx context.Context, rootPkgPaths []string
 		}
 		module.Sort(toAdd) // to make errors deterministic
 		oldRs := rs
+		var err error
 		rs, err = ld.updateRoots(ctx, rs, pkgs, toAdd)
 		if err != nil {
 			return nil, nil, err
@@ -418,7 +459,7 @@ func (ld *loader) updateRoots(ctx context.Context, rs *modrequirements.Requireme
 //
 // It returns a map from each new module version to
 // the first missing package that module would resolve.
-func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Packages, rs *modrequirements.Requirements) (modAddedBy map[module.Version]*modpkgload.Package, defaultMajorVersions map[string]string, err error) {
+func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Packages, rs *modrequirements.Requirements) (modAddedBy map[module.Version]*modpkgload.Package, defaultMajorVersions map[string]string) {
 	type pkgMod struct {
 		pkg          *modpkgload.Package
 		needsDefault *bool
@@ -485,7 +526,7 @@ func (ld *loader) resolveMissingImports(ctx context.Context, pkgs *modpkgload.Pa
 		}
 	}
 
-	return modAddedBy, defaultMajorVersions, nil
+	return modAddedBy, defaultMajorVersions
 }
 
 // tidyRoots returns a minimal set of root requirements that maintains the

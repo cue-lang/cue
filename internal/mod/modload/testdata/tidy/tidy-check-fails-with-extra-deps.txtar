@@ -1,8 +1,8 @@
-# This test checks that stable releases are preferred over
-# pre-releases.
+# Test that when the module.cue file is differently formatted but
+# contains the expected dependencies, the tidiness check succeeds.
 
 -- tidy-check-error --
-module is not tidy: cannot find module providing package example.com.*
+module is not tidy
 -- want --
 module: "main.org@v0"
 language: {
@@ -15,23 +15,22 @@ deps: {
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"
-language: {
-	version: "v0.99.99"
+language: version: "v0.99.99"
+// With a comment.
+deps: {
+	"example.com@v0": v: "v0.0.1"
+	"unused.com@v0": v: "v0.1.2"
 }
 
 -- main.cue --
 package main
+import "example.com@v0:main"
 
-import "example.com@v0"
+main
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
 
 -- _registry/example.com_v0.0.1/top.cue --
 package main
-
--- _registry/example.com_v0.0.3-alpha/cue.mod/module.cue --
-module: "example.com@v0"
-
--- _registry/example.com_v0.0.3-alpha/top.cue --
-package main
+"example.com@v0": "v0.0.1"

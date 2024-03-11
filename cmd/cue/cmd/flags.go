@@ -21,6 +21,7 @@ import (
 // Common flags
 const (
 	flagAll           flagName = "all"
+	flagCheck         flagName = "check"
 	flagDryrun        flagName = "dryrun"
 	flagVerbose       flagName = "verbose"
 	flagAllErrors     flagName = "all-errors"

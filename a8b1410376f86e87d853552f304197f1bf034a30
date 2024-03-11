@@ -1,0 +1,90 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26e7f972_02eaccbe",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:35:41Z",
+      "side": 1,
+      "message": "Some CUE users will only check the commit which added tidy --check to cmd/cue; can you again summarize what the flag is for?",
+      "revId": "a8b1410376f86e87d853552f304197f1bf034a30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3fc6a585_3a566a90",
+        "filename": "cmd/cue/cmd/modtidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:35:41Z",
+      "side": 1,
+      "message": "nit: update? IMHO slightly clearer as we replace an existing file rather than writing a new one",
+      "range": {
+        "startLine": 53,
+        "startChar": 77,
+        "endLine": 53,
+        "endChar": 82
+      },
+      "revId": "a8b1410376f86e87d853552f304197f1bf034a30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "03777ec1_cbaa246b",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_check.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:35:41Z",
+      "side": 1,
+      "message": "I would rather be clearer, as \"fully tidy\" is not really a concept we document:\n\n\u003e is formatted differently, e.g. language.version in a single line",
+      "range": {
+        "startLine": 2,
+        "startChar": 28,
+        "endLine": 2,
+        "endChar": 44
+      },
+      "revId": "a8b1410376f86e87d853552f304197f1bf034a30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "26d9cbf7_73b29cea",
+        "filename": "cmd/cue/cmd/testdata/script/modtidy_check_fail.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:35:41Z",
+      "side": 1,
+      "message": "this word appears out of place.\n\nalso, I think this whole comment fits in one line just fine",
+      "range": {
+        "startLine": 1,
+        "startChar": 45,
+        "endLine": 1,
+        "endChar": 48
+      },
+      "revId": "a8b1410376f86e87d853552f304197f1bf034a30",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,5 +1,5 @@
-cuelabs.dev/go/oci/ociregistry v0.0.0-20240306131303-f3720d0e1bec h1:Efit8soNx3KIVToy1yY0iM/59bPj5EpYGb/mgRVVns0=
-cuelabs.dev/go/oci/ociregistry v0.0.0-20240306131303-f3720d0e1bec/go.mod h1:ApHceQLLwcOkCEXM1+DyCXTHEJhNGDpJ2kmV6axsx24=
+cuelabs.dev/go/oci/ociregistry v0.0.0-20240311165848-2bd90cc6df5e h1:J+NGQOAyDdyCrkPujaypjk9dk1PBx28jZ9mK1jo1q64=
+cuelabs.dev/go/oci/ociregistry v0.0.0-20240311165848-2bd90cc6df5e/go.mod h1:ApHceQLLwcOkCEXM1+DyCXTHEJhNGDpJ2kmV6axsx24=
 github.com/cockroachdb/apd/v3 v3.2.1 h1:U+8j7t0axsIgvQUqthuNm82HIrYXodOV2iWLWtEaIwg=
 github.com/cockroachdb/apd/v3 v3.2.1/go.mod h1:klXJcjp+FffLTHlhIG69tezTDvdP065naDsHzKhYSqc=
 github.com/cpuguy83/go-md2man/v2 v2.0.3/go.mod h1:tgQtvFlXSQOSOSIRvRPT7W67SCa46tRHOmNcaadrF8o=

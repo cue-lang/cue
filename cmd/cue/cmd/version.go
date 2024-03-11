@@ -23,6 +23,8 @@ import (
 	"runtime/debug"
 
 	"github.com/spf13/cobra"
+
+	"cuelang.org/go/internal/cueversion"
 )
 
 func newVersionCmd(c *Command) *cobra.Command {
@@ -62,7 +64,7 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	fmt.Fprintf(w, "cue version %s\n\n", cueVersion(bi))
+	fmt.Fprintf(w, "cue version %s\n\n", cueVersion())
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	for _, s := range bi.Settings {
 		if s.Value == "" {
@@ -83,26 +85,17 @@ func runVersion(cmd *Command, args []string) error {
 // cueVersion returns the version of the CUE module as much
 // as can reasonably be determined. If no version can be
 // determined, it returns the empty string.
-func cueVersion(bi *debug.BuildInfo) string {
-	if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" && inTest {
-		return v
+func cueVersion() string {
+	if inTest {
+		if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" {
+			return v
+		}
 	}
-	v := version
-	if v != "" {
+	if v := version; v != "" {
 		// The global version variable has been configured via ldflags.
 		return v
 	}
-	if bi == nil {
-		return fallbackVersion
-	}
-	switch bi.Main.Version {
-	case "": // missing version
-	case "(devel)": // local build
-	case "v0.0.0-00010101000000-000000000000": // build via a directory replace directive
-	default:
-		return bi.Main.Version
-	}
-	return fallbackVersion
+	return cueversion.Version()
 }
 
 func readBuildInfo() (*debug.BuildInfo, bool) {

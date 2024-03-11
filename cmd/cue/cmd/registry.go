@@ -37,7 +37,8 @@ func getCachedRegistry() (modload.Registry, error) {
 
 func newModConfig() *modconfig.Config {
 	return &modconfig.Config{
-		Transport: httpTransport(),
+		Transport:  httpTransport(),
+		ClientType: "cmd/cue",
 	}
 }
 

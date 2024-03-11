@@ -18,6 +18,7 @@ import (
 	"golang.org/x/oauth2"
 
 	"cuelang.org/go/internal/cueconfig"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/modresolve"
 	"cuelang.org/go/mod/modcache"
@@ -72,6 +73,11 @@ type Config struct {
 	// Env provides environment variable values. If this is nil,
 	// the current process's environment will be used.
 	Env []string
+
+	// ClientType is used as part of the User-Agent header
+	// that's added in each outgoing HTTP request.
+	// If it's empty, it defaults to "cuelang.org/go".
+	ClientType string
 }
 
 // NewResolver returns an implementation of [modregistry.Resolver]
@@ -84,9 +90,7 @@ type Config struct {
 // The contents of the configuration will not be mutated.
 func NewResolver(cfg *Config) (*Resolver, error) {
 	cfg = newRef(cfg)
-	if cfg.Transport == nil {
-		cfg.Transport = http.DefaultTransport
-	}
+	cfg.Transport = cueversion.NewTransport(cfg.ClientType, cfg.Transport)
 	getenv := getenvFunc(cfg.Env)
 	var configData []byte
 	var configPath string

@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"io/fs"
 	"net/http"
+	"net/http/httptest"
+	"net/url"
 	"os"
 	"path"
 	"path/filepath"
@@ -16,6 +18,7 @@ import (
 	"github.com/go-quicktest/qt"
 	"golang.org/x/tools/txtar"
 
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
 	"cuelang.org/go/mod/modcache"
@@ -116,6 +119,48 @@ package x
 
 	// Check that the underlying custom transport was used.
 	qt.Assert(t, qt.IsTrue(transportInvoked.Load()))
+}
+
+func TestDefaultTransportSetsUserAgent(t *testing.T) {
+	// This test also checks that providing a nil Config.Transport
+	// does the right thing.
+
+	modules := txtar.Parse([]byte(`
+-- bar.example_v0.0.1/cue.mod/module.cue --
+module: "bar.example@v0"
+-- bar.example_v0.0.1/x/x.cue --
+package x
+`))
+	rh, err := registrytest.NewHandler(txtarfs.FS(modules), "")
+	qt.Assert(t, qt.IsNil(err))
+	agent := cueversion.UserAgent("cuelang.org/go")
+	checked := false
+	checkUserAgentHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
+		qt.Check(t, qt.Equals(req.UserAgent(), agent))
+		checked = true
+		rh.ServeHTTP(w, req)
+	})
+	srv := httptest.NewServer(checkUserAgentHandler)
+	u, err := url.Parse(srv.URL)
+	qt.Assert(t, qt.IsNil(err))
+
+	dir := t.TempDir()
+	t.Setenv("DOCKER_CONFIG", dir)
+	t.Setenv("CUE_REGISTRY", u.Host+"+insecure")
+	cacheDir := filepath.Join(dir, "cache")
+	t.Setenv("CUE_CACHE_DIR", cacheDir)
+	t.Cleanup(func() {
+		modcache.RemoveAll(cacheDir)
+	})
+
+	r, err := NewRegistry(nil)
+	qt.Assert(t, qt.IsNil(err))
+	ctx := context.Background()
+	gotRequirements, err := r.Requirements(ctx, module.MustNewVersion("bar.example@v0", "v0.0.1"))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.HasLen(gotRequirements, 0))
+
+	qt.Assert(t, qt.IsTrue(checked))
 }
 
 // dockerConfig describes the minimal subset of the docker

@@ -3,12 +3,14 @@ package cmd
 import (
 	"fmt"
 	"log/slog"
+	"maps"
 	"net/http"
 	"os"
 	"sync"
 
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/httplog"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modconfig"
@@ -43,7 +45,7 @@ func newModConfig() *modconfig.Config {
 
 func httpTransport() http.RoundTripper {
 	if !cuedebug.Flags.HTTP {
-		return http.DefaultTransport
+		return newUserAgentTransport(cueversion.UserAgent("cmd/cue"), http.DefaultTransport)
 	}
 	return httplog.Transport(&httplog.TransportConfig{
 		// It would be nice to use the default slog logger,
@@ -53,6 +55,35 @@ func httpTransport() http.RoundTripper {
 			Logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
 		},
 	})
+}
+
+func newUserAgentTransport(userAgent string, t http.RoundTripper) http.RoundTripper {
+	if userAgent == "" {
+		return t
+	}
+	return &userAgentTransport{
+		transport: t,
+		userAgent: userAgent,
+	}
+}
+
+type userAgentTransport struct {
+	transport http.RoundTripper
+	userAgent string
+}
+
+func (t *userAgentTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	// Don't override the user agent if it's already set explicitly.
+	if req.UserAgent() != "" {
+		return t.transport.RoundTrip(req)
+	}
+
+	// RoundTrip isn't allowed to modify the request, but we
+	// can avoid doing a full clone.
+	req1 := *req
+	req1.Header = maps.Clone(req.Header)
+	req1.Header.Set("User-Agent", t.userAgent)
+	return t.transport.RoundTrip(&req1)
 }
 
 func modulesExperimentEnabled() bool {

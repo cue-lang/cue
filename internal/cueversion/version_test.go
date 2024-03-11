@@ -17,3 +17,10 @@ func TestVersion(t *testing.T) {
 	vers := Version()
 	qt.Assert(t, qt.Satisfies(vers, semver.IsValid))
 }
+
+func TestUserAgent(t *testing.T) {
+	agent := UserAgent("custom")
+	qt.Assert(t, qt.Matches(agent,
+		`Cue/v[^ ]+ Go/go1\.[^ ]+ \([^/]+/[^/]+\)`,
+	))
+}

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2109f5b0_97cdb66f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c5a3c801_a165da3c",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53a65a83_1de9ccff",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-11T15:43:30Z",
       "side": 1,
       "message": "did you forget to remove this constant?",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f3431ff_abddc1b6",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Yup, done.",
+      "parentUuid": "53a65a83_1de9ccff",
       "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "19de036f_af9b3f09",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da31d9b3_8564f124",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7b855f49_1bed3f17",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-03-11T15:43:30Z",
       "side": 1,
       "message": "This invariant/assertions seems good to me; I would just document in the Version godoc that the returned string is always a valid semver string.",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "24085e6b_84e2a9d9",
+        "filename": "internal/cueversion/version_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7b855f49_1bed3f17",
       "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

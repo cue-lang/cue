@@ -123,6 +123,21 @@ language: version: "vblah"
 module: "foo.com/bar@v0"`,
 	wantError: `language version "vblah" in module.cue is not well formed`,
 }, {
+	testName: "EmptyLanguageVersion",
+	parse:    Parse,
+	data: `
+language: {}
+module: "foo.com/bar@v0"`,
+	wantError: `language version "" in module.cue is not well formed`,
+}, {
+	testName: "NonCanonicalLanguageVersion",
+	parse:    Parse,
+	data: `
+module: "foo.com/bar@v0"
+language: version: "v0.8"
+`,
+	wantError: `language version v0.8 in module.cue is not canonical`,
+}, {
 	testName: "InvalidDepVersion",
 	parse:    Parse,
 	data: `

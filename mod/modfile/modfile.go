@@ -207,8 +207,12 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 		mf.Module += "@v0"
 	}
 	if mf.Language != nil {
-		if vers := mf.Language.Version; vers != "" && !semver.IsValid(vers) {
+		vers := mf.Language.Version
+		if !semver.IsValid(vers) {
 			return nil, fmt.Errorf("language version %q in %s is not well formed", vers, filename)
+		}
+		if semver.Canonical(vers) != vers {
+			return nil, fmt.Errorf("language version %v in %s is not canonical", vers, filename)
 		}
 	}
 	var versions []module.Version

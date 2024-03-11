@@ -9,6 +9,7 @@ import (
 
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/httplog"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/mod/modconfig"
@@ -42,17 +43,19 @@ func newModConfig() *modconfig.Config {
 }
 
 func httpTransport() http.RoundTripper {
-	if !cuedebug.Flags.HTTP {
-		return http.DefaultTransport
+	transport := http.DefaultTransport
+	if cuedebug.Flags.HTTP {
+		transport = httplog.Transport(&httplog.TransportConfig{
+			// It would be nice to use the default slog logger,
+			// but that does a terrible job of printing structured
+			// values, so use JSON output instead.
+			Logger: httplog.SlogLogger{
+				Logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
+			},
+		})
 	}
-	return httplog.Transport(&httplog.TransportConfig{
-		// It would be nice to use the default slog logger,
-		// but that does a terrible job of printing structured
-		// values, so use JSON output instead.
-		Logger: httplog.SlogLogger{
-			Logger: slog.New(slog.NewJSONHandler(os.Stderr, nil)),
-		},
-	})
+	// Always add a User-Agent header.
+	return cueversion.NewTransport("cmd/cue", transport)
 }
 
 func modulesExperimentEnabled() bool {

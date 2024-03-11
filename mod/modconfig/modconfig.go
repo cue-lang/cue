@@ -18,6 +18,7 @@ import (
 	"golang.org/x/oauth2"
 
 	"cuelang.org/go/internal/cueconfig"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/mod/modload"
 	"cuelang.org/go/internal/mod/modresolve"
 	"cuelang.org/go/mod/modcache"
@@ -85,7 +86,7 @@ type Config struct {
 func NewResolver(cfg *Config) (*Resolver, error) {
 	cfg = newRef(cfg)
 	if cfg.Transport == nil {
-		cfg.Transport = http.DefaultTransport
+		cfg.Transport = cueversion.NewTransport("lib", http.DefaultTransport)
 	}
 	getenv := getenvFunc(cfg.Env)
 	var configData []byte

@@ -3,6 +3,8 @@
 package cueversion
 
 import (
+	"fmt"
+	"runtime"
 	"runtime/debug"
 	"sync"
 )
@@ -37,3 +39,17 @@ var versionOnce = sync.OnceValue(func() string {
 	}
 	return fallbackVersion
 })
+
+// UserAgent returns a string suitable for adding as the User-Agent
+// header in an HTTP agent. The clientType argument specifies
+// how CUE is being used: if this is empty it defaults to "lib".
+//
+// Example:
+//
+//	Cue/v0.8.0 (cmd/cue) (linux/amd64) Go/go1.22.0
+func UserAgent(clientType string) string {
+	if clientType == "" {
+		clientType = "lib"
+	}
+	return fmt.Sprintf("Cue/%s (%s) Go/%s (%s/%s)", Version(), clientType, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+}

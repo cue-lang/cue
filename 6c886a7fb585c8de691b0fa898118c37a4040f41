@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c5a3c801_a165da3c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:43:30Z",
+      "side": 1,
+      "message": "this appears to be wrapped at well under 60 characters; remember that commit messages are up to 72, so you could easily save a couple of lines and help readability. the gerrit settings page has an option to turn on a vertical guide bar for commit messages, which makes it really obvious when you have lots of space left over, like here.",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "53a65a83_1de9ccff",
+        "filename": "cmd/cue/cmd/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:43:30Z",
+      "side": 1,
+      "message": "did you forget to remove this constant?",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da31d9b3_8564f124",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:43:30Z",
+      "side": 1,
+      "message": "did you miss \"is used\" here?",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7b855f49_1bed3f17",
+        "filename": "internal/cueversion/version_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:43:30Z",
+      "side": 1,
+      "message": "This invariant/assertions seems good to me; I would just document in the Version godoc that the returned string is always a valid semver string.",
+      "revId": "6c886a7fb585c8de691b0fa898118c37a4040f41",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b97b6fa5_28cd4799",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T15:20:10Z",
+      "side": 1,
+      "message": "SGTM; my only input is that if someone runs `cue mod tidy` with `language: version: \"v0.8\"`, we could consider being nice and rewriting that as `v0.8.0`, per the standard canonicalization of semver strings. I don\u0027t have strong feelings as it should be rare, but it could be a nice UX TODO to leave around.",
+      "revId": "0ce8b1e329f33db3141d78a1f047a6b5f98f8eb1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

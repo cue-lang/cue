@@ -23,6 +23,8 @@ import (
 	"runtime/debug"
 
 	"github.com/spf13/cobra"
+
+	"cuelang.org/go/internal/cueversion"
 )
 
 func newVersionCmd(c *Command) *cobra.Command {
@@ -44,15 +46,6 @@ func newVersionCmd(c *Command) *cobra.Command {
 // considered legacy.
 var version string
 
-// fallbackVersion is used as-is when the -ldflags above isn't used
-// and when there isn't a recorded main module version,
-// for example when building via `go install ./cmd/cue`.
-// It should reflect the last release in the current branch.
-//
-// TODO: remove once Go stamps local builds with a main module version
-// derived from the local VCS information per https://go.dev/issue/50603.
-const fallbackVersion = "v0.8.0-alpha.5"
-
 func runVersion(cmd *Command, args []string) error {
 	w := cmd.OutOrStdout()
 
@@ -62,7 +55,7 @@ func runVersion(cmd *Command, args []string) error {
 		// shouldn't happen
 		return errors.New("unknown error reading build-info")
 	}
-	fmt.Fprintf(w, "cue version %s\n\n", cueVersion(bi))
+	fmt.Fprintf(w, "cue version %s\n\n", cueVersion())
 	fmt.Fprintf(w, "go version %s\n", runtime.Version())
 	for _, s := range bi.Settings {
 		if s.Value == "" {
@@ -83,26 +76,17 @@ func runVersion(cmd *Command, args []string) error {
 // cueVersion returns the version of the CUE module as much
 // as can reasonably be determined. If no version can be
 // determined, it returns the empty string.
-func cueVersion(bi *debug.BuildInfo) string {
-	if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" && inTest {
-		return v
+func cueVersion() string {
+	if inTest {
+		if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" {
+			return v
+		}
 	}
-	v := version
-	if v != "" {
+	if v := version; v != "" {
 		// The global version variable has been configured via ldflags.
 		return v
 	}
-	if bi == nil {
-		return fallbackVersion
-	}
-	switch bi.Main.Version {
-	case "": // missing version
-	case "(devel)": // local build
-	case "v0.0.0-00010101000000-000000000000": // build via a directory replace directive
-	default:
-		return bi.Main.Version
-	}
-	return fallbackVersion
+	return cueversion.Version()
 }
 
 func readBuildInfo() (*debug.BuildInfo, bool) {

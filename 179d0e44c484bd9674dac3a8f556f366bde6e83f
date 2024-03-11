@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4542204b_a7bfb2ef",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-11T10:21:01Z",
+      "side": 1,
+      "message": "I wrote this while we were trying to get pkg.go.dev to render godocs for Roger\u0027s unmerged mod APIs. Still useful to have, I think, and we can then lock down git push access to github entirely.",
+      "revId": "179d0e44c484bd9674dac3a8f556f366bde6e83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

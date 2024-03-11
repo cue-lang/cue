@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "17f10ea4_c2233907",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a2afdfa3_4661b7ad",
+      "range": {
+        "startLine": 12,
+        "startChar": 0,
+        "endLine": 12,
+        "endChar": 4
+      },
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "332db1a0_3ea3f2e7",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-03-11T15:32:35Z",
       "side": 1,
       "message": "this comment doesn\u0027t feel right - the check fails, it\u0027s the other txtar file that only has formatting changes.",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ee8238a_40378729",
+        "filename": "internal/mod/modload/testdata/tidy/tidy-check-fails-with-extra-deps.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Good copy/pasta catch. Done.",
+      "parentUuid": "332db1a0_3ea3f2e7",
       "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "16055a88_25a077b0",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ae9b7e68_e9a4ce73",
+      "range": {
+        "startLine": 46,
+        "startChar": 17,
+        "endLine": 46,
+        "endChar": 35
+      },
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4831b5c2_327e3c0a",
@@ -77,6 +143,24 @@
       "writtenOn": "2024-03-11T15:32:35Z",
       "side": 1,
       "message": "nit: join these if conditionals",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "55a3a9e8_a6d13ebd",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4831b5c2_327e3c0a",
       "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -98,6 +182,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5b671d27_39f446a8",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 114,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "The reason for exposing `module.Version.Equal` is really just for convenience: it means we can use `cmp.Diff` without it complaining about comparison of unexported fields. The doc comment for `module.Version` does explicitly say \"this type is comparable\", so I think it\u0027s OK. Note that we use `module.Version` as map key in various places, so this isn\u0027t an assumption we\u0027re not already making anyway.\n\nThat said, I think it\u0027s a reasonable idea to use `slices.Equal` and `maps.Equal` (I\u0027d forgotten they existed) so I\u0027ve done that.",
+      "parentUuid": "03eb2c3d_037a90f9",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ce5bbe7c_05c6954d",
@@ -111,6 +213,24 @@
       "writtenOn": "2024-03-11T15:32:35Z",
       "side": 1,
       "message": "can you expand briefly on this? why is the rest of the func body irrelevant when in check mode?",
+      "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2f180a4_88522cd9",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 168,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-11T18:50:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ce5bbe7c_05c6954d",
       "revId": "79fc9a781517b16b2f20dc41ba7e5a36d0703b2e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

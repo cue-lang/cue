@@ -39,6 +39,7 @@ func Example() {
 	// Akin to loading via: cd testdata/testmod && cue export ./example
 	insts := load.Instances([]string{"./example"}, &load.Config{
 		Dir: filepath.Join("testdata", "testmod"),
+		Env: []string{}, // or nil to use os.Environ
 	})
 
 	// testdata/testmod/example just has one file without any build tags,
@@ -92,11 +93,12 @@ func Example_externalModules() {
 	// setUpModulesExample starts a temporary in-memory registry,
 	// populates it with an example module, and sets CUE_REGISTRY
 	// to refer to it
-	cleanup := setUpModulesExample()
+	env, cleanup := setUpModulesExample()
 	defer cleanup()
 
 	insts := load.Instances([]string{"."}, &load.Config{
 		Dir: filepath.Join("testdata", "testmod-external"),
+		Env: env, // or nil to use os.Environ
 	})
 	inst := insts[0]
 	if err := inst.Err; err != nil {
@@ -121,7 +123,7 @@ func Example_externalModules() {
 	// Field string: hello, world
 }
 
-func setUpModulesExample() func() {
+func setUpModulesExample() (env []string, cleanup func()) {
 	registryArchive := txtar.Parse([]byte(`
 -- foo.example_v0.0.1/cue.mod/module.cue --
 module: "foo.example@v0"
@@ -131,35 +133,23 @@ package bar
 value: "world"
 `))
 
-	var cleanups []func()
-	cleanup := func(cf func()) {
-		cleanups = append(cleanups, cf)
-	}
-	setenv := func(env, val string) {
-		old := os.Getenv(env)
-		cleanup(func() {
-			os.Setenv(env, old)
-		})
-		os.Setenv(env, val)
-	}
 	registry, err := registrytest.New(txtarfs.FS(registryArchive), "")
 	if err != nil {
 		panic(err)
 	}
-	cleanup(registry.Close)
-	setenv("CUE_REGISTRY", registry.Host()+"+insecure")
+	cleanups := []func(){registry.Close}
+	env = append(env, "CUE_REGISTRY="+registry.Host()+"+insecure")
 	dir, err := os.MkdirTemp("", "")
 	if err != nil {
 		panic(err)
 	}
-	setenv("CUE_CACHE_DIR", dir)
+	env = append(env, "CUE_CACHE_DIR="+dir)
 	oldModulesExperiment := cueexperiment.Flags.Modules
 	cueexperiment.Flags.Modules = true
-	cleanup(func() {
+	cleanups = append(cleanups, func() {
 		cueexperiment.Flags.Modules = oldModulesExperiment
 	})
-
-	return func() {
+	return env, func() {
 		for i := len(cleanups) - 1; i >= 0; i-- {
 			cleanups[i]()
 		}

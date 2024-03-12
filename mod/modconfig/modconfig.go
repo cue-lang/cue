@@ -133,15 +133,14 @@ func NewResolver(cfg *Config) (*Resolver, error) {
 	}, nil
 }
 
-// AllHosts returns information on all the registry host names referred to
-// by the resolver.
-func (r *Resolver) AllHosts() []string {
-	allHosts := r.resolver.AllHosts()
-	names := make([]string, len(allHosts))
-	for i, h := range allHosts {
-		names[i] = h.Name
-	}
-	return names
+// Host represents a registry host name and whether
+// it should be accessed via a secure connection or not.
+type Host = modresolve.Host
+
+// AllHosts returns all the registry hosts that the resolver might resolve to,
+// ordered lexically by hostname.
+func (r *Resolver) AllHosts() []Host {
+	return r.resolver.AllHosts()
 }
 
 // HostLocation represents a registry host and a location with it.
@@ -228,7 +227,10 @@ func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error
 	transport := t.cachedTransports[host]
 	if transport == nil {
 		tok := cueconfig.TokenFromLogin(login)
-		oauthCfg := cueconfig.RegistryOAuthConfig(host)
+		oauthCfg := cueconfig.RegistryOAuthConfig(Host{
+			Name:     host,
+			Insecure: req.URL.Scheme == "http",
+		})
 		// TODO: When this client refreshes an access token,
 		// we should store the refreshed token on disk.
 

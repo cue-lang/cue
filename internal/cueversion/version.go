@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"runtime"
 	"runtime/debug"
+	"strings"
 	"sync"
 )
 
@@ -51,5 +52,10 @@ func UserAgent(clientType string) string {
 	if clientType == "" {
 		clientType = "cuelang.org/go"
 	}
-	return fmt.Sprintf("Cue/%s (%s) Go/%s (%s/%s)", Version(), clientType, runtime.Version(), runtime.GOOS, runtime.GOARCH)
+	// The Go version can contain spaces, but we don't want spaces inside
+	// Component/Version pair, so replace them with underscores.
+	// As the runtime version won't contain underscores itself, this
+	// is reversible.
+	goVersion := strings.Replace(runtime.Version(), "_", " ")
+	return fmt.Sprintf("Cue/%s (%s) Go/%s (%s/%s)", Version(), clientType, goVersion, runtime.GOOS, runtime.GOARCH)
 }

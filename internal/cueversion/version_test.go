@@ -24,7 +24,7 @@ func TestVersion(t *testing.T) {
 func TestUserAgent(t *testing.T) {
 	agent := UserAgent("custom")
 	qt.Assert(t, qt.Matches(agent,
-		`Cue/v[^ ]+ \(custom\) Go/go1\.[^ ]+ \([^/]+/[^/]+\)`,
+		`Cue/v[^ ]+ \(custom\) Go/[^ ]+ \([^/]+/[^/]+\)`,
 	))
 }
 

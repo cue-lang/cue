@@ -1,3 +1,4 @@
+env CUE_VERSION_OVERRIDE=v0.1.2
 exec cue mod init foo.com/bar@v1
 cmp cue.mod/module.cue want-module.cue
 exists cue.mod/usr
@@ -6,5 +7,5 @@ exists cue.mod/pkg
 -- want-module.cue --
 module: "foo.com/bar@v1"
 language: {
-	version: "v0.8.0-alpha.5"
+	version: "v0.1.2"
 }

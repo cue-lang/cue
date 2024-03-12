@@ -3,6 +3,7 @@
 # dependencies, and that it removes dependencies that
 # aren't needed any more.
 
+env CUE_VERSION_OVERRIDE=v0.1.2
 exec cue mod tidy
 cmp cue.mod/module.cue want-module
 
@@ -15,7 +16,7 @@ exec cue mod tidy --check
 -- want-module --
 module: "main.org@v0"
 language: {
-	version: "v0.8.0-alpha.5"
+	version: "v0.1.2"
 }
 deps: {
 	"bar.com@v0": {

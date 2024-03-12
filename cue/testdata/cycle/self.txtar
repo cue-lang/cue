@@ -1020,7 +1020,7 @@ diff old new
    }
    issue1729: (struct){
 -- diff/todo/p0 --
-disjList: field not allowed is incorrect.
+disjList: y is not a nested list.
 -- diff/todo/p2 --
 disjList.ok2: cut off structural cycle earlier?
 dynamicEmbed.*: cut off structural cycle earlier?

@@ -33,6 +33,24 @@
       "message": "Am I blind, or is this backwards? Did you test on Go tip?",
       "revId": "32b2b4a32eab0e75c8a44d6d3d0c4f159cc7843e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1dbd46d_9de166e0",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 59,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T16:35:55Z",
+      "side": 1,
+      "message": "Doh! Fixed (and just building Go tip locally to test it with - unusually I wasn\u0027t actually using Go tip)",
+      "parentUuid": "6e1abb85_b7917150",
+      "revId": "32b2b4a32eab0e75c8a44d6d3d0c4f159cc7843e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -225,6 +225,9 @@ func TestTutorial(t *testing.T) {
 		}
 
 		err = filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
+			if filepath.Base(path) == "module.cue" {
+				return nil // avoid language.version noise
+			}
 			if isCUE(path) {
 				dst := path[len(dir)+1:]
 				err := os.MkdirAll(filepath.Dir(dst), 0755)
@@ -245,6 +248,9 @@ func TestTutorial(t *testing.T) {
 	err = filepath.WalkDir(dir, func(path string, entry fs.DirEntry, err error) error {
 		if err != nil {
 			t.Fatal(err)
+		}
+		if filepath.Base(path) == "module.cue" {
+			return nil // avoid language.version noise
 		}
 		if filepath.Ext(path) != ".cue" {
 			return nil

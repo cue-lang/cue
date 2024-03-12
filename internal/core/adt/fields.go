@@ -781,6 +781,11 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 		for _, pc := range pcs.Pairs {
 			if matchPattern(n.ctx, pc.Pattern, f) {
 				for _, c := range pc.Constraint.Conjuncts {
+					// TODO: consider using the root cc, but probably does not
+					// matter.
+					// This is necessary if we defunct tasks, but otherwise not.
+					// It breaks the CloseContext tests, though.
+					// c.CloseInfo.cc = id.cc
 					n.addConstraint(v, mode, c, check)
 				}
 			}

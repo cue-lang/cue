@@ -425,12 +425,14 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 			if t.node != src || t.blockedOn != ss {
 				break
 			}
+			t.defunct = true
 			t := ctx.cloneTask(t, ds, ss)
 			ds.tasks = append(ds.tasks, t)
 			ds.blocking = append(ds.blocking, t)
 			ctx.ctx.blocking = append(ctx.ctx.blocking, t)
 
 		case taskREADY:
+			t.defunct = true
 			t := ctx.cloneTask(t, ds, ss)
 			ds.tasks = append(ds.tasks, t)
 		}

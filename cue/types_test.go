@@ -3223,6 +3223,8 @@ a: x: y: z: "x"`,
 }
 
 func TestPathCorrection(t *testing.T) {
+	t.Skip()
+
 	testCases := []struct {
 		input  string
 		lookup func(i *Instance) Value

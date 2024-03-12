@@ -1,0 +1,106 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7293d373_e24200c2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:47:53Z",
+      "side": 1,
+      "message": "LGTM with a few minor suggestions, thanks!",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9776ad7b_e1436410",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:47:53Z",
+      "side": 1,
+      "message": "It\u0027s a bit annoying to have to delve through the implementation\nto find what the possible modes are, and there\u0027s no explanation of what\nthey actually mean even there, so maybe describe them briefly here?",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1797038_8739c079",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:47:53Z",
+      "side": 1,
+      "message": "Maybe add +insecure just to make it clear?\n\n```suggestion\n\t\t\t\tts.Setenv(\"CUE_REGISTRY\", u.Host + \"+insecure\")\n```",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e79d1540_dd64ea2e",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:47:53Z",
+      "side": 1,
+      "message": "Technically this is racy if anything does concurrent requests.\nI\u0027d suggest either using `atomic.Bool` or adding a comment saying why it\u0027s OK.",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6e90b864_0755c0f4",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:47:53Z",
+      "side": 1,
+      "message": "curl users aren\u0027t a huge concern in tests, I\u0027d imagine! 😊",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9d71261_02f8e564",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:47:53Z",
+      "side": 1,
+      "message": "```suggestion\n// Host represents a registry host name and whether\n// it should be accessed via a secure connection or not.\n```\n\n?",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

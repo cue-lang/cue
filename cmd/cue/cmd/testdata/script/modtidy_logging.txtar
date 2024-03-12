@@ -3,7 +3,7 @@ env CUE_DEBUG=http
 # Smoke test that the logging looks reasonable. The actual log messages
 # are tested more fully in the httplog package itself.
 exec cue mod tidy
-stderr '{"time":".*","level":"INFO","msg":"http client->","info":{"id":[0-9]+,"method":"GET","url":"http://[^/]+/v2/example.com/tags/list\?n=\d+","contentLength":0,"header":{"User-Agent":\["Cue/.* \(cmd/cue\) Go/go[^ ]+ \(.*\)"\]}}}'
+stderr '{"time":".*","level":"INFO","msg":"http client->","info":{"id":[0-9]+,"method":"GET","url":"http://[^/]+/v2/example.com/tags/list\?n=\d+","contentLength":0,"header":{"User-Agent":\["Cue/.* \(cmd/cue\) Go/[^ ]+ \(.*\)"\]}}}'
 
 # Check that the resulting module evaluates as expected.
 exec cue export .

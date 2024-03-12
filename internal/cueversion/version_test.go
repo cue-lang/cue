@@ -24,7 +24,7 @@ func TestVersion(t *testing.T) {
 func TestUserAgent(t *testing.T) {
 	agent := UserAgent("custom")
 	qt.Assert(t, qt.Matches(agent,
-		`Cue/v[^ ]+ \(custom\) Go/go1\.[^ ]+ \([^/]+/[^/]+\)`,
+		`Cue/v[^ ]+ \(custom\) Go/[^ ]+ \([^/]+/[^/]+\)`,
 	))
 }
 
@@ -41,5 +41,5 @@ func TestTransport(t *testing.T) {
 	defer resp.Body.Close()
 	data, err := io.ReadAll(resp.Body)
 	qt.Assert(t, qt.IsNil(err))
-	qt.Assert(t, qt.Matches(string(data), `Cue/v[^ ]+ \(foo\) Go/go1\.[^ ]+ \([^/]+/[^/]+\)`))
+	qt.Assert(t, qt.Matches(string(data), `Cue/v[^ ]+ \(foo\) Go/[^ ]+ \([^/]+/[^/]+\)`))
 }

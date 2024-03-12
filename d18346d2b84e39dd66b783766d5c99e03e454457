@@ -1,0 +1,96 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "344f26c4_1e733f7c",
+        "filename": "internal/cueversion/transport.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T13:43:13Z",
+      "side": 1,
+      "message": "call this \"next\" for clarity? I\u0027ve seen that parameter name used quite a bit for HTTP middlewares, and I\u0027ve grown fond of it. it is also explicit about the parameter func being called after.",
+      "range": {
+        "startLine": 12,
+        "startChar": 37,
+        "endLine": 12,
+        "endChar": 38
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d12f862e_48ff8696",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T13:43:13Z",
+      "side": 1,
+      "message": "how about the default being `cuelang.org/go`? there may be other libraries in the future, so this would be better in terms of uniqueness. `cmd/cue` should remain unique I reckon.",
+      "range": {
+        "startLine": 52,
+        "startChar": 16,
+        "endLine": 52,
+        "endChar": 19
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9c2f91fb_e6729b85",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T13:43:13Z",
+      "side": 1,
+      "message": "per https://github.com/cue-lang/cue/issues/2897#issuecomment-1972927498, the go version goes last, and I still prefer it that way. is there a reason you went with a different order? the spec basically says that the order is from most to least important, and I think the goos/goarch are more important than the go version, given that e.g. the difference between windows and linux is much larger than between go 1.21 and 1.22.",
+      "range": {
+        "startLine": 54,
+        "startChar": 33,
+        "endLine": 54,
+        "endChar": 38
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c84bc398_4bf8794f",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T13:43:13Z",
+      "side": 1,
+      "message": "I\u0027m not sure I agree with us skipping the user agent if the user provides their own transport. IMHO we should do:\n\n```suggestion\n\tif cfg.Transport \u003d\u003d nil {\n\t\tcfg.Transport \u003d http.DefaultTransport\n\t}\n\tcfg.Transport \u003d cueversion.NewTransport(\"\", cfg.Transport)\n```\n\nThat is, when someone provides their own transport, our user agent should be opt-out, not opt-in - they should opt out of it by setting a different user agent in their own transport, which runs after ours. otherwise the default once again is the Go user agent, which is useless.\n\n(and also, no need to repeat \"lib\", since it\u0027s the default)",
+      "range": {
+        "startLine": 88,
+        "startChar": 1,
+        "endLine": 90,
+        "endChar": 2
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

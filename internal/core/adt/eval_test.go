@@ -77,7 +77,6 @@ func TestEvalAlpha(t *testing.T) {
 		"cycle/chain":              "hang",
 		"cycle/evaluate":           "hang",
 		"disjunctions/elimination": "panic (nil pointer)",
-		"benchmarks/issue1684":     "panic (nil pointer)",
 
 		// unsupported in dev version (list related)
 		"benchmarks/sort":    "unsupported",
@@ -206,7 +205,7 @@ func TestX(t *testing.T) {
 	var version internal.EvaluatorVersion
 	version = internal.DevVersion // comment to use default implementation.
 	openGraph := true
-	// openGraph = false
+	openGraph = false
 
 	in := `
 -- cue.mod/module.cue --

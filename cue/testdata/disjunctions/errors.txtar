@@ -81,10 +81,7 @@ Result:
         result: (list){
         }
       }, (#struct){
-        result?: (_|_){
-          // [eval] issue570.#DecodeOutput.result: field not allowed:
-          //     ./in.cue:2:11
-          //     ./in.cue:12:3
+        result?: (list){
         }
         error: (string){ string }
       }) }
@@ -165,19 +162,7 @@ diff old new
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
-@@ -40,7 +37,10 @@
-         result: (list){
-         }
-       }, (#struct){
--        result?: (list){
-+        result?: (_|_){
-+          // [eval] issue570.#DecodeOutput.result: field not allowed:
-+          //     ./in.cue:2:11
-+          //     ./in.cue:12:3
-         }
-         error: (string){ string }
-       }) }
-@@ -57,22 +57,13 @@
+@@ -57,22 +54,13 @@
        }, (#struct){
        }) }
      x: (_|_){

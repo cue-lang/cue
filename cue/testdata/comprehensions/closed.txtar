@@ -104,6 +104,10 @@ Disjuncts:    71
 Errors:
 noEraseDefinition.a.0.b: field not allowed:
     ./in.cue:55:17
+disallowed.vErr.d: field not allowed:
+    ./in.cue:28:7
+    ./in.cue:28:4
+    ./in.cue:32:14
 
 Result:
 (_|_){
@@ -131,11 +135,18 @@ Result:
       d: (int){ 5 }
     }
   }
-  disallowed: (struct){
+  disallowed: (_|_){
+    // [eval]
     #D: (#struct){
     }
-    vErr: (#struct){
-      d: (int){ 5 }
+    vErr: (_|_){
+      // [eval]
+      d: (_|_){
+        // [eval] disallowed.vErr.d: field not allowed:
+        //     ./in.cue:28:7
+        //     ./in.cue:28:4
+        //     ./in.cue:32:14
+      }
     }
   }
   comprehensionIsEmbed: (struct){
@@ -206,49 +217,39 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,14 +1,5 @@
+@@ -1,15 +1,10 @@
  Errors:
--disallowed.vErr.d: field not allowed:
++noEraseDefinition.a.0.b: field not allowed:
++    ./in.cue:55:17
+ disallowed.vErr.d: field not allowed:
 -    ./in.cue:26:6
 -    ./in.cue:27:3
 -    ./in.cue:27:12
--    ./in.cue:28:4
++    ./in.cue:28:7
+     ./in.cue:28:4
 -    ./in.cue:32:8
--    ./in.cue:32:14
- noEraseDefinition.a.0.b: field not allowed:
+     ./in.cue:32:14
+-noEraseDefinition.a.0.b: field not allowed:
 -    ./in.cue:54:17
 -    ./in.cue:55:7
-     ./in.cue:55:17
+-    ./in.cue:55:17
  
  Result:
-@@ -37,21 +28,11 @@
-       d: (int){ 5 }
-     }
-   }
--  disallowed: (_|_){
--    // [eval]
--    #D: (#struct){
--    }
--    vErr: (_|_){
--      // [eval]
--      d: (_|_){
--        // [eval] disallowed.vErr.d: field not allowed:
+ (_|_){
+@@ -45,11 +40,8 @@
+       // [eval]
+       d: (_|_){
+         // [eval] disallowed.vErr.d: field not allowed:
 -        //     ./in.cue:26:6
 -        //     ./in.cue:27:3
 -        //     ./in.cue:27:12
--        //     ./in.cue:28:4
++        //     ./in.cue:28:7
+         //     ./in.cue:28:4
 -        //     ./in.cue:32:8
--        //     ./in.cue:32:14
--      }
-+  disallowed: (struct){
-+    #D: (#struct){
-+    }
-+    vErr: (#struct){
-+      d: (int){ 5 }
+         //     ./in.cue:32:14
+       }
      }
-   }
-   comprehensionIsEmbed: (struct){
-@@ -78,13 +59,11 @@
+@@ -78,13 +70,11 @@
        // [eval]
        0: (_|_){
          // [eval]
@@ -263,7 +264,7 @@ diff old new
        }
      }
    }
-@@ -109,7 +88,7 @@
+@@ -109,7 +99,7 @@
        c: (_){ _ }
      }
      out: (#struct){
@@ -272,8 +273,10 @@ diff old new
          n: (string){ "c" }
        }
        X: (#struct){
--- diff/todo/p0 --
-disallowed.vErr: Closedness in comprehensions
+-- diff/todo/p3 --
+Missing error positions.
+-- diff/explanation --
+dedupTodo.out: the new evaluator correctly marks this as closed.
 -- out/eval --
 Errors:
 disallowed.vErr.d: field not allowed:

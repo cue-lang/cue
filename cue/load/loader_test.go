@@ -40,6 +40,13 @@ func init() {
 	// Once we've called cueexperiment.Init, cueexperiment.Vars
 	// will not be touched again, so we can set fields in it for the tests.
 	cueexperiment.Init()
+
+	// The user running `go test` might have a broken environment,
+	// such as an invalid $CUE_REGISTRY like the one below,
+	// or a broken $DOCKER_CONFIG/config.json due to syntax errors.
+	// Go tests should be hermetic by explicitly setting load.Config.Env;
+	// catch any that do not by leaving a broken $CUE_REGISTRY in os.Environ.
+	os.Setenv("CUE_REGISTRY", "inline:{")
 }
 
 // TestLoad is an end-to-end test.

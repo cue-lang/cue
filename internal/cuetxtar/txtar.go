@@ -281,7 +281,8 @@ func (t *Test) RawInstances(args ...string) []*build.Instance {
 // files in the root directory. Relative files in the archive are given an
 // absolute location by prefixing it with dir.
 func Load(a *txtar.Archive, dir string, args ...string) []*build.Instance {
-	return loadWithConfig(a, dir, load.Config{}, args...)
+	// Don't let Env be nil, as the tests shouldn't depend on os.Environ.
+	return loadWithConfig(a, dir, load.Config{Env: []string{}}, args...)
 }
 
 func loadWithConfig(a *txtar.Archive, dir string, cfg load.Config, args ...string) []*build.Instance {
@@ -338,6 +339,10 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 				prefix:     path.Join("out", x.Name),
 				LoadConfig: x.LoadConfig,
+			}
+			// Don't let Env be nil, as the tests shouldn't depend on os.Environ.
+			if tc.LoadConfig.Env == nil {
+				tc.LoadConfig.Env = []string{}
 			}
 			if x.Fallback != "" {
 				tc.fallback = path.Join("out", x.Fallback)

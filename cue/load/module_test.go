@@ -89,9 +89,11 @@ func TestModuleFetch(t *testing.T) {
 		// We're testing that the default modconfig-based behavour works
 		// as expected when the modules experiment is enabled.
 		tmpDir := t.TempDir()
-		t.Setenv("CUE_CACHE_DIR", filepath.Join(tmpDir, "cache"))
-		t.Setenv("CUE_REGISTRY", r.Host()+"+insecure")
-		t.Setenv("CUE_CONFIG_DIR", filepath.Join(tmpDir, "config"))
+		t.LoadConfig.Env = []string{
+			"CUE_CACHE_DIR=" + filepath.Join(tmpDir, "cache"),
+			"CUE_REGISTRY=" + r.Host() + "+insecure",
+			"CUE_CONFIG_DIR=" + filepath.Join(tmpDir, "config"),
+		}
 		// The fetched files are read-only, so testing fails when trying
 		// to remove them.
 		defer modcache.RemoveAll(tmpDir)

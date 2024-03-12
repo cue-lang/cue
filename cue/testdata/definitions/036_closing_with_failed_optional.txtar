@@ -111,19 +111,11 @@ Disjuncts:    29
 (struct){
   #k1: (#struct){
     a: (int){ int }
-    b?: (_|_){
-      // [eval] #k1.b: field not allowed:
-      //     ./in.cue:1:26
-      //     ./in.cue:1:15
-    }
+    b?: (int){ int }
   }
   #k2: (#struct){
     a: (int){ int }
-    b?: (_|_){
-      // [eval] #k2.b: field not allowed:
-      //     ./in.cue:3:6
-      //     ./in.cue:3:20
-    }
+    b?: (int){ int }
   }
   o1: (struct){
     a?: (_|_){
@@ -162,29 +154,7 @@ Disjuncts:    29
 diff old new
 --- old
 +++ new
-@@ -1,11 +1,19 @@
- (struct){
-   #k1: (#struct){
-     a: (int){ int }
--    b?: (int){ int }
-+    b?: (_|_){
-+      // [eval] #k1.b: field not allowed:
-+      //     ./in.cue:1:26
-+      //     ./in.cue:1:15
-+    }
-   }
-   #k2: (#struct){
-     a: (int){ int }
--    b?: (int){ int }
-+    b?: (_|_){
-+      // [eval] #k2.b: field not allowed:
-+      //     ./in.cue:3:6
-+      //     ./in.cue:3:20
-+    }
-   }
-   o1: (struct){
-     a?: (_|_){
-@@ -32,7 +40,6 @@
+@@ -32,7 +32,6 @@
      a?: (_|_){
        // [eval] v1.a: conflicting values 2 and 3:
        //     ./in.cue:10:11
@@ -192,9 +162,8 @@ diff old new
        //     ./in.cue:12:16
      }
      b: (int){ 4 }
--- diff/todo/p0 --
-#k1.b: incorrect "field not allowed"
-    error passes through optional field.
+-- diff/todo/p3 --
+Missing error position.
 -- out/eval --
 (struct){
   #k1: (#struct){

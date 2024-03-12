@@ -152,6 +152,9 @@ const (
 	// before a node is evaluated.
 	EVAL
 
+	// COMP tracks pending arcs in comprehensions.
+	COMP
+
 	// ROOT dependencies are used to track that all nodes of parents are
 	// added to a tree.
 	ROOT // Always refers to self.
@@ -182,6 +185,8 @@ func (k depKind) String() string {
 		return "DISJUNCT"
 	case EVAL:
 		return "EVAL"
+	case COMP:
+		return "COMP"
 	case ROOT:
 		return "ROOT"
 
@@ -544,7 +549,7 @@ func (m *mermaidContext) cc(cc *closeContext) {
 				return
 			}
 			fallthrough
-		case ARC, NOTIFY, DISJUNCT:
+		case ARC, NOTIFY, DISJUNCT, COMP:
 			w = global
 			indentLevel = 1
 			name = m.pstr(d.dependency)

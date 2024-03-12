@@ -406,6 +406,8 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 
 		if a.ArcType == ArcPending {
 			// TODO: cancel tasks?
+			// TODO: is this ever run? Investigate once new evaluator work is
+			// complete.
 			a.ArcType = ArcNotPresent
 			continue
 		}

@@ -176,7 +176,8 @@ func (n *nodeContext) insertComprehension(
 					Syntax:  c.Syntax,
 					Clauses: c.Clauses,
 					Value:   f,
-					arcType: f.ArcType,
+					arcType: f.ArcType, // TODO: can be derived, remove this field.
+					cc:      ci.cc,
 
 					comp:   ec,
 					parent: c,
@@ -184,7 +185,14 @@ func (n *nodeContext) insertComprehension(
 				}
 
 				conjunct := MakeConjunct(env, c, ci)
-				n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
+				if n.ctx.isDevVersion() {
+					_, c.arcCC = n.node.state.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
+					c.cc = ci.cc
+					ci.cc.incDependent(COMP, c.arcCC)
+				} else {
+					n.node.state.insertFieldUnchecked(f.Label, ArcPending, conjunct)
+				}
+
 				fields = append(fields, f)
 
 			case *LetField:
@@ -393,6 +401,20 @@ func (n *nodeContext) injectSelfComprehensions(state vertexStatus) {
 // It returns an incomplete error if there was one. Fatal errors are
 // processed as a "successfully" completed computation.
 func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bottom {
+	err := n.processComprehensionInner(d, state)
+
+	// NOTE: we cannot move this to defer in processComprehensionInner, as we
+	// use panics to implement "yielding" (and possibly coroutines in the
+	// future).
+	cc := d.leaf.cc
+	if cc != nil {
+		cc.decDependent(n.ctx, COMP, d.leaf.arcCC)
+	}
+	d.leaf.cc = nil
+	return err
+}
+
+func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus) *Bottom {
 	ctx := n.ctx
 
 	// Compute environments, if needed.
@@ -431,11 +453,30 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	d.inserted = true
 
 	if len(d.envs) == 0 {
+		c := d.leaf
+		for p := c.arcCC; p != nil; p = p.parent {
+			// because the parent referrer will reach a zero count before this
+			// node will reach a zero count, we need to propagate the arcType.
+			p.updateArcType(ArcNotPresent)
+		}
 		return nil
 	}
 
 	v := n.node
+	f := v.Label
 	for c := d.leaf; c.parent != nil; c = c.parent {
+		// because the parent referrer will reach a zero count before this
+		// node will reach a zero count, we need to propagate the arcType.
+		for arc, p := c.arcCC, c.cc; p != nil; arc, p = arc.parent, p.parent {
+			// TODO: remove this line once we use the arcType of the
+			// closeContext in notAllowedError.
+			arc.src.updateArcType(c.arcType)
+			t := arc.arcType
+			arc.updateArcType(c.arcType)
+			if p.isClosed && t >= ArcPending && !matchPattern(ctx, p.Expr, f) {
+				ctx.notAllowedError(p.src, arc.src)
+			}
+		}
 		v.updateArcType(c.arcType)
 		if v.ArcType == ArcNotPresent {
 			parent := v.Parent

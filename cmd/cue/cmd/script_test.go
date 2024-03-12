@@ -18,8 +18,10 @@ import (
 	"bufio"
 	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"io/fs"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"os"
@@ -35,6 +37,7 @@ import (
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
+	"golang.org/x/oauth2"
 	"golang.org/x/tools/txtar"
 
 	"cuelang.org/go/cue/errors"
@@ -141,6 +144,18 @@ func TestScript(t *testing.T) {
 				srv := httptest.NewServer(registrytest.AuthHandler(ociserver.New(ocimem.New(), nil), auth))
 				u, _ := url.Parse(srv.URL)
 				ts.Setenv(args[0], u.Host)
+				ts.Defer(srv.Close)
+			},
+			// memregistry starts an HTTP server with enough endpoints to test `cue login`.
+			// It takes a single argument to describe the oauth server's behavior.
+			"oauthregistry": func(ts *testscript.TestScript, neg bool, args []string) {
+				if len(args) != 1 {
+					ts.Fatalf("usage: oauthregistry <mode>")
+				}
+				ts.Setenv("CUE_EXPERIMENT", "modules")
+				srv := newMockRegistryOauth(args[0])
+				u, _ := url.Parse(srv.URL)
+				ts.Setenv("CUE_REGISTRY", u.Host)
 				ts.Defer(srv.Close)
 			},
 		},
@@ -354,4 +369,89 @@ func testCmd() error {
 	default:
 		return fmt.Errorf("unknown command: %q\n", cmd)
 	}
+}
+
+// newMockRegistryOauth starts a test HTTP server with the OAuth2 device flow endpoints
+// used by `cue login` to obtain an access token.
+// Note that this HTTP server isn't an OCI registry yet, as that isn't needed for now.
+//
+// TODO: once we support refresh tokens, add those endpoints and test them too.
+func newMockRegistryOauth(mode string) *httptest.Server {
+	mux := http.NewServeMux()
+	ts := httptest.NewServer(mux)
+	const (
+		staticUserCode    = "user-code"
+		staticDeviceCode  = "device-code-longer-string"
+		staticAccessToken = "secret-access-token"
+		intervalSecs      = 1 // 1s to keep the tests fast
+	)
+	// OAuth2 Device Authorization Request endpoint: https://datatracker.ietf.org/doc/html/rfc8628#section-3.1
+	mux.HandleFunc("/login/device/code", func(w http.ResponseWriter, r *http.Request) {
+		writeJSON(w, http.StatusOK, oauth2.DeviceAuthResponse{
+			DeviceCode: staticDeviceCode,
+			UserCode:   staticUserCode,
+
+			VerificationURI:         ts.URL + "/login/device",
+			VerificationURIComplete: ts.URL + "/login/device?user_code=" + url.QueryEscape(staticUserCode),
+
+			Expiry:   time.Now().Add(time.Minute),
+			Interval: intervalSecs,
+		})
+	})
+	// OAuth2 Token endpoint: https://datatracker.ietf.org/doc/html/rfc6749#section-3.2
+	firstTokenRequest := true
+	mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
+		deviceCode := r.FormValue("device_code")
+		if deviceCode != staticDeviceCode {
+			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeDenied})
+			return
+		}
+		switch mode {
+		case "device-code-expired":
+			writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodeExpired})
+		case "pending-success":
+			if firstTokenRequest {
+				firstTokenRequest = false
+				writeJSON(w, http.StatusBadRequest, tokenError{ErrorCode: tokenErrorCodePending})
+				break
+			}
+			fallthrough
+		case "immediate-success":
+			writeJSON(w, http.StatusOK, oauth2.Token{
+				AccessToken: staticAccessToken,
+				TokenType:   "Bearer",
+				Expiry:      time.Now().Add(time.Hour),
+			})
+		default:
+			panic(fmt.Sprintf("unknown mode: %q", mode))
+		}
+	})
+	return ts
+}
+
+func writeJSON(w http.ResponseWriter, statusCode int, v any) {
+	b, err := json.Marshal(v)
+	if err != nil { // should never happen
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(append(b, '\n')) // to be nice to curl users
+}
+
+const (
+	// Device flow token error code strings from https://datatracker.ietf.org/doc/html/rfc8628#section-3.5
+	tokenErrorCodePending  = "authorization_pending" // waiting for user
+	tokenErrorCodeSlowDown = "slow_down"             // increase polling interval
+	tokenErrorCodeDenied   = "access_denied"         // the user denied the request
+	tokenErrorCodeExpired  = "expired_token"         // the device_code expired
+)
+
+// tokenError implements the error response structure defined by
+// https://datatracker.ietf.org/doc/html/rfc6749#section-5.2
+type tokenError struct {
+	ErrorCode        string `json:"error"` // one of the constants above
+	ErrorDescription string `json:"error_description,omitempty"`
+	ErrorURI         string `json:"error_uri,omitempty"`
 }

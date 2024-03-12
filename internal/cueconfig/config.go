@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"cuelang.org/go/internal/mod/modresolve"
 	"golang.org/x/oauth2"
 )
 
@@ -101,7 +102,7 @@ func WriteLogins(path string, logins *Logins) error {
 
 // RegistryOAuthConfig returns the oauth2 configuration
 // suitable for talking to the central registry.
-func RegistryOAuthConfig(host string) oauth2.Config {
+func RegistryOAuthConfig(host modresolve.Host) oauth2.Config {
 	// For now, we use the OAuth endpoints as implemented by registry.cue.works,
 	// but other OCI registries may support the OAuth device flow with different ones.
 	//
@@ -109,10 +110,14 @@ func RegistryOAuthConfig(host string) oauth2.Config {
 	// token_endpoint and device_authorization_endpoint per the Oauth RFCs:
 	// * https://datatracker.ietf.org/doc/html/rfc8414#section-3
 	// * https://datatracker.ietf.org/doc/html/rfc8628#section-4
+	scheme := "https://"
+	if host.Insecure {
+		scheme = "http://"
+	}
 	return oauth2.Config{
 		Endpoint: oauth2.Endpoint{
-			DeviceAuthURL: "https://" + host + "/login/device/code",
-			TokenURL:      "https://" + host + "/login/oauth/token",
+			DeviceAuthURL: scheme + host.Name + "/login/device/code",
+			TokenURL:      scheme + host.Name + "/login/oauth/token",
 		},
 	}
 }

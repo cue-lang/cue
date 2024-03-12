@@ -9,7 +9,8 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"sort"
+	"slices"
+	"strings"
 	"sync/atomic"
 	"testing"
 
@@ -108,9 +109,11 @@ package x
 	resolver, err := NewResolver(nil)
 	qt.Assert(t, qt.IsNil(err))
 	gotAllHosts := resolver.AllHosts()
-	wantAllHosts := []string{r1.Host(), r2.Host()}
-	sort.Strings(gotAllHosts)
-	sort.Strings(wantAllHosts)
+	wantAllHosts := []Host{{Name: r1.Host(), Insecure: true}, {Name: r2.Host(), Insecure: true}}
+
+	byHostname := func(a, b Host) int { return strings.Compare(a.Name, b.Name) }
+	slices.SortFunc(gotAllHosts, byHostname)
+	slices.SortFunc(wantAllHosts, byHostname)
 
 	qt.Assert(t, qt.DeepEquals(gotAllHosts, wantAllHosts))
 

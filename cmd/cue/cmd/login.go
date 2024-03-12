@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"io/fs"
 	"net/http"
 	"os"
 
@@ -80,16 +82,19 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 			if len(registryHosts) > 1 {
 				return fmt.Errorf("need a single CUE registry to log into")
 			}
-			registry := registryHosts[0]
+			host := registryHosts[0]
 			loginsPath, err := cueconfig.LoginConfigPath(os.Getenv)
 			if err != nil {
 				return fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
 			}
 			logins, err := cueconfig.ReadLogins(loginsPath)
-			if err != nil {
+			if errors.Is(err, fs.ErrNotExist) {
+				// No config file yet; create an empty one.
+				logins = &cueconfig.Logins{Registries: make(map[string]cueconfig.RegistryLogin)}
+			} else if err != nil {
 				return fmt.Errorf("cannot load CUE registry logins: %v", err)
 			}
-			oauthCfg := cueconfig.RegistryOAuthConfig(registry)
+			oauthCfg := cueconfig.RegistryOAuthConfig(host)
 
 			resp, err := oauthCfg.DeviceAuth(ctx)
 			if err != nil {
@@ -105,12 +110,12 @@ inside your user's config directory, such as $XDG_CONFIG_HOME or %AppData%.
 				return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
 			}
 
-			logins.Registries[registry] = cueconfig.LoginFromToken(tok)
+			logins.Registries[host.Name] = cueconfig.LoginFromToken(tok)
 
 			if err := cueconfig.WriteLogins(loginsPath, logins); err != nil {
 				return fmt.Errorf("cannot store CUE registry logins: %v", err)
 			}
-			fmt.Printf("Login for %s stored in %s\n", registry, loginsPath)
+			fmt.Printf("Login for %s stored in %s\n", host.Name, loginsPath)
 			// TODO: Once we support encryption, we should print a warning if it's not available.
 			return nil
 		}),

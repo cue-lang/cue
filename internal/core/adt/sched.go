@@ -391,6 +391,9 @@ processNextTask:
 		}
 
 		switch {
+		case t.defunct:
+			continue
+
 		case t.state == taskRUNNING:
 			// TODO: we could store the current referring node that caused
 			// the cycle and then proceed up the stack to mark all tasks
@@ -450,7 +453,7 @@ unblockTasks:
 	// Run the remaining blocked tasks.
 	numBlocked := len(c.blocking)
 	for _, t := range c.blocking {
-		if t.blockedOn != nil {
+		if t.blockedOn != nil && !t.defunct {
 			n, cond := t.blockedOn, t.blockCondition
 			t.blockedOn, t.blockCondition = nil, neverKnown
 			n.signal(cond)
@@ -572,6 +575,10 @@ type task struct {
 
 	completes condition // cycles may alter the completion mask. TODO: is this still true?
 
+	// defunct indicates that this task is no longer relevant. This is the case
+	// when it has not yet been run before it is copied into a disjunction.
+	defunct bool
+
 	// unblocked indicates this task was unblocked by force.
 	unblocked bool
 
@@ -647,6 +654,10 @@ func (s *scheduler) insertTask(t *task) {
 }
 
 func runTask(t *task, mode runMode) {
+	if t.defunct {
+		return
+	}
+	t.node.Logf("============ RUNTASK %v %v", t.run.name, t.x)
 	ctx := t.node.ctx
 
 	switch t.state {

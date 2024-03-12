@@ -90,6 +90,10 @@ func processExpr(ctx *OpContext, t *task, mode runMode) {
 func processResolver(ctx *OpContext, t *task, mode runMode) {
 	r := t.x.(Resolver)
 
+	// TODO(perf): if we are resolving a value where we know a scalar value can
+	// be conclusive, we could avoid triggering evaluating disjunctions. This
+	// would be a pretty significant rework, though.
+
 	arc := r.resolve(ctx, oldOnly(0))
 	if arc == nil {
 		// TODO: yield instead?
@@ -102,6 +106,10 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	// we are done computing and we can return the arc as is.
 	ci, skip := t.node.markCycle(arc, t.env, r, t.id)
 	if skip {
+		return
+	}
+
+	if t.defunct {
 		return
 	}
 

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "be5d7cda_45ac24c5",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T16:38:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9776ad7b_e1436410",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d1797038_8739c079",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-03-12T15:47:53Z",
       "side": 1,
       "message": "Maybe add +insecure just to make it clear?\n\n```suggestion\n\t\t\t\tts.Setenv(\"CUE_REGISTRY\", u.Host + \"+insecure\")\n```",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1e6d4a2_706a1322",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T16:38:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1797038_8739c079",
       "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ee87958_059baa42",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 413,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T16:38:21Z",
+      "side": 1,
+      "message": "with the device flow they must be sequential as there is an interval of at least 1s between requests, but I\u0027ll make this atomic just to be safe. made it a counter because with atomic that\u0027s easier than a boolean.",
+      "parentUuid": "e79d1540_dd64ea2e",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6e90b864_0755c0f4",
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e85a5c0c_e43975b2",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T16:38:21Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6e90b864_0755c0f4",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9d71261_02f8e564",
@@ -99,6 +171,24 @@
       "writtenOn": "2024-03-12T15:47:53Z",
       "side": 1,
       "message": "```suggestion\n// Host represents a registry host name and whether\n// it should be accessed via a secure connection or not.\n```\n\n?",
+      "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "508f7f25_2fc9c928",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T16:38:21Z",
+      "side": 1,
+      "message": "I copied this godoc from your original Host definition as-is :) done.",
+      "parentUuid": "e9d71261_02f8e564",
       "revId": "3df2f59f53caae994a9d23bef7b98df370bcc9ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

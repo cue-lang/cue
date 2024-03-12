@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "45409588_c0f94cbd",
+        "filename": "internal/cueversion/transport.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:12:46Z",
+      "side": 1,
+      "message": "For the record, I\u0027m not overly keen on \"next\" as a name. I wouldn\u0027t use it as the parameter name for a wrapper of an `io.Writer` for example (which follows essentially the same pattern), and I wouldn\u0027t really say it\u0027s called \"after\", just that it\u0027s called \"within\". But done anyway in the interests of consistency.",
+      "parentUuid": "344f26c4_1e733f7c",
+      "range": {
+        "startLine": 12,
+        "startChar": 37,
+        "endLine": 12,
+        "endChar": 38
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d12f862e_48ff8696",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-03-12T13:43:13Z",
       "side": 1,
       "message": "how about the default being `cuelang.org/go`? there may be other libraries in the future, so this would be better in terms of uniqueness. `cmd/cue` should remain unique I reckon.",
+      "range": {
+        "startLine": 52,
+        "startChar": 16,
+        "endLine": 52,
+        "endChar": 19
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afdb093a_7b09f8fd",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:12:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d12f862e_48ff8696",
       "range": {
         "startLine": 52,
         "startChar": 16,
@@ -96,6 +144,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "590671f6_98d9ace9",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:12:46Z",
+      "side": 1,
+      "message": "The reason I changed the order is that all the examples in https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/User-Agent seemed to have the parenthesized attributes after a non-parenthesized attribute, as if they\u0027re qualifying the term before. That\u0027s how I read the user agent strings, anyway, and that seems to make sense to me.\n\nSo it seems to me that the goos/arch is qualifying the Go attribute that goes before it (and the \"Go/\" prefix makes it clear how to parse the qualifier that follows it).\n\nOne possibility might be to put the OS/arch as a qualifier to the `Cue/` attribute (for example `Cue/v1.8.0 (cuelang.org/go; linux/amd64)`) but I think having it as a qualifier to `Go/` reads better.\n\nWDYT?",
+      "parentUuid": "43264a68_37b818a2",
+      "range": {
+        "startLine": 54,
+        "startChar": 33,
+        "endLine": 54,
+        "endChar": 38
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c84bc398_4bf8794f",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 3
@@ -107,6 +179,30 @@
       "writtenOn": "2024-03-12T13:43:13Z",
       "side": 1,
       "message": "I\u0027m not sure I agree with us skipping the user agent if the user provides their own transport. IMHO we should do:\n\n```suggestion\n\tif cfg.Transport \u003d\u003d nil {\n\t\tcfg.Transport \u003d http.DefaultTransport\n\t}\n\tcfg.Transport \u003d cueversion.NewTransport(\"\", cfg.Transport)\n```\n\nThat is, when someone provides their own transport, our user agent should be opt-out, not opt-in - they should opt out of it by setting a different user agent in their own transport, which runs after ours. otherwise the default once again is the Go user agent, which is useless.\n\n(and also, no need to repeat \"lib\", since it\u0027s the default)",
+      "range": {
+        "startLine": 88,
+        "startChar": 1,
+        "endLine": 90,
+        "endChar": 2
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e3b7282a_68947c3e",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-12T15:12:46Z",
+      "side": 1,
+      "message": "Yeah, I wondered about this quite a bit. The downside of doing that is that in the cmd/cue case, we\u0027ll end up with a redundant level of RoundTrip (not without cost, and a bit... icky) because it\u0027ll have to provide its own Transport to override the default client type used by `modconfig`. I suppose we could add a `ClientType` field to `modconfig.Config` though. WDYT?",
+      "parentUuid": "c84bc398_4bf8794f",
       "range": {
         "startLine": 88,
         "startChar": 1,

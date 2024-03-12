@@ -72,6 +72,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "43264a68_37b818a2",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T13:43:39Z",
+      "side": 1,
+      "message": "and in fact in the godoc it\u0027s the other way around :)",
+      "parentUuid": "9c2f91fb_e6729b85",
+      "range": {
+        "startLine": 54,
+        "startChar": 33,
+        "endLine": 54,
+        "endChar": 38
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c84bc398_4bf8794f",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 3

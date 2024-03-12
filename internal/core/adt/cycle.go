@@ -482,7 +482,12 @@ outer:
 
 	n.hasCycle = true
 	if !n.hasNonCycle && env != nil {
+		// TODO: investigate if we can get rid of cyclicConjuncts in the new
+		// evaluator.
 		v := Conjunct{env, x, ci}
+		if n.ctx.isDevVersion() {
+			n.node.cc.incDependent(DEFER, nil)
+		}
 		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
 		return ci, true
 	}
@@ -517,6 +522,7 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 				ci := c.c.CloseInfo
 				ci.cc = n.node.rootCloseContext()
 				n.scheduleVertexConjuncts(c.c, c.arc, ci)
+				n.node.cc.decDependent(n.ctx, DEFER, nil)
 			} else {
 				n.addVertexConjuncts(c.c, c.arc, false)
 			}
@@ -526,6 +532,14 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 }
 
 func assertStructuralCycle(n *nodeContext) bool {
+	// TODO: is this the right place to put it?
+	if n.ctx.isDevVersion() {
+		for range n.cyclicConjuncts {
+			n.node.cc.decDependent(n.ctx, DEFER, nil)
+		}
+		n.cyclicConjuncts = n.cyclicConjuncts[:0]
+	}
+
 	if n.hasCycle && !n.hasNonCycle {
 		n.reportCycleError()
 		return true

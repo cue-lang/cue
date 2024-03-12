@@ -1834,6 +1834,16 @@ type Comprehension struct {
 	// The type of field as which the comprehension is added.
 	arcType ArcType
 
+	// The closeContext into which the comprehension is added. Upon a successful
+	// completion of the comprehension, the arcType should be updated in this
+	// closeContext. After this is done, the corresponding parent closeContext
+	// must be closed.
+	arcCC *closeContext
+
+	// This is incremented by the Comprehension upon creation, and decremented
+	// once it is known whether the comprehension succeeded.
+	cc *closeContext
+
 	// Only used for partial comprehensions.
 	comp   *envComprehension
 	parent *Comprehension // comprehension from which this one was derived, if any

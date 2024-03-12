@@ -166,6 +166,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a250ae01_221b97b9",
+        "filename": "internal/cueversion/version.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T15:17:11Z",
+      "side": 1,
+      "message": "OK, sure. I don\u0027t hold a strong opinion here. Please make sure that the godoc is updated accordingly, and please leave a comment in the github issue with the reasoning above for the change, because otherwise the commit that \"Fixes\" the issue is actually doing something slightly different without any context or explanation.",
+      "parentUuid": "590671f6_98d9ace9",
+      "range": {
+        "startLine": 54,
+        "startChar": 33,
+        "endLine": 54,
+        "endChar": 38
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c84bc398_4bf8794f",
@@ -203,6 +227,30 @@
       "side": 1,
       "message": "Yeah, I wondered about this quite a bit. The downside of doing that is that in the cmd/cue case, we\u0027ll end up with a redundant level of RoundTrip (not without cost, and a bit... icky) because it\u0027ll have to provide its own Transport to override the default client type used by `modconfig`. I suppose we could add a `ClientType` field to `modconfig.Config` though. WDYT?",
       "parentUuid": "c84bc398_4bf8794f",
+      "range": {
+        "startLine": 88,
+        "startChar": 1,
+        "endLine": 90,
+        "endChar": 2
+      },
+      "revId": "d18346d2b84e39dd66b783766d5c99e03e454457",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a31a9026_639174a4",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 90,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-12T15:17:11Z",
+      "side": 1,
+      "message": "modconfig.Config.ClientType sounds good to me. Go API end users can also set that to whatever they want directly, if they don\u0027t want to replace the entire user agent string.\n\nand then yes, I\u0027d always insert the cueversion transport.",
+      "parentUuid": "e3b7282a_68947c3e",
       "range": {
         "startLine": 88,
         "startChar": 1,

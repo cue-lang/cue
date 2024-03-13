@@ -4,7 +4,6 @@ go 1.21
 
 require (
 	cuelang.org/go v0.0.0-00010101000000-000000000000
-	github.com/google/go-github/v56 v56.0.0
 	github.com/rogpeppe/go-internal v1.12.0
 )
 
@@ -13,7 +12,6 @@ require (
 	github.com/cockroachdb/apd/v3 v3.2.1 // indirect
 	github.com/emicklei/proto v1.10.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
-	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.2.0 // indirect
 	github.com/inconshreveable/mousetrap v1.1.0 // indirect
 	github.com/mitchellh/go-wordwrap v1.0.1 // indirect

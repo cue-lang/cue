@@ -158,24 +158,20 @@ Conjuncts:    66
 Disjuncts:    57
 -- out/evalalpha --
 Errors:
-issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
+issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+    ./in.cue:61:8
     ./in.cue:63:11
-    ./in.cue:63:15
 issue1972.err1.patchs: field not allowed:
     ./in.cue:63:3
-    ./in.cue:63:15
     ./in.cue:66:4
 issue1972.err1.someCondition: field not allowed:
     ./in.cue:62:3
-    ./in.cue:63:15
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
     ./in.cue:1:8
 wrongType: cannot use int (type int) as type bool:
     ./in.cue:10:2
     ./in.cue:1:14
-issue1972.err1: cannot use {} (type struct) as type bool:
-    ./in.cue:65:3
 
 Result:
 (_|_){
@@ -230,29 +226,23 @@ Result:
   issue1972: (_|_){
     // [eval]
     err1: (_|_){
-      // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
+      // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+      //     ./in.cue:61:8
       //     ./in.cue:63:11
-      //     ./in.cue:63:15
-      // issue1972.err1: cannot use {} (type struct) as type bool:
-      //     ./in.cue:65:3
       #patchs: (#list){
       }
       #someCondition: (_|_){
-        // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
+        // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+        //     ./in.cue:61:8
         //     ./in.cue:63:11
-        //     ./in.cue:63:15
-        // issue1972.err1: cannot use {} (type struct) as type bool:
-        //     ./in.cue:65:3
       }
       someCondition: (_|_){
         // [eval] issue1972.err1.someCondition: field not allowed:
         //     ./in.cue:62:3
-        //     ./in.cue:63:15
       }
       patchs: (_|_){
         // [eval] issue1972.err1.patchs: field not allowed:
         //     ./in.cue:63:3
-        //     ./in.cue:63:15
         //     ./in.cue:66:4
       }
     }
@@ -262,36 +252,31 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,14 @@
+@@ -1,7 +1,12 @@
  Errors:
 -issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -    ./in.cue:54:12
--    ./in.cue:61:8
-+issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
++issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+     ./in.cue:61:8
 +    ./in.cue:63:11
-+    ./in.cue:63:15
 +issue1972.err1.patchs: field not allowed:
 +    ./in.cue:63:3
-+    ./in.cue:63:15
 +    ./in.cue:66:4
 +issue1972.err1.someCondition: field not allowed:
 +    ./in.cue:62:3
-+    ./in.cue:63:15
  wrongConcreteType: cannot use 2 (type int) as type bool:
      ./in.cue:4:2
      ./in.cue:1:8
-@@ -8,8 +15,8 @@
+@@ -8,8 +13,6 @@
  wrongType: cannot use int (type int) as type bool:
      ./in.cue:10:2
      ./in.cue:1:14
 -issue1972.err1: invalid list index someCondition (type string):
 -    ./in.cue:65:6
-+issue1972.err1: cannot use {} (type struct) as type bool:
-+    ./in.cue:65:3
  
  Result:
  (_|_){
-@@ -31,8 +38,6 @@
+@@ -31,8 +34,6 @@
    incomplete: (_|_){
      // [incomplete] incomplete: undefined field: d:
      //     ./in.cue:16:7
@@ -300,20 +285,17 @@ diff old new
      list: (#list){
        0: (int){ 1 }
        1: (int){ 2 }
-@@ -66,17 +71,31 @@
+@@ -66,17 +67,25 @@
    issue1972: (_|_){
      // [eval]
      err1: (_|_){
 -      // [eval] issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -      //     ./in.cue:54:12
--      //     ./in.cue:61:8
++      // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
+       //     ./in.cue:61:8
 -      // issue1972.err1: invalid list index someCondition (type string):
 -      //     ./in.cue:65:6
-+      // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
 +      //     ./in.cue:63:11
-+      //     ./in.cue:63:15
-+      // issue1972.err1: cannot use {} (type struct) as type bool:
-+      //     ./in.cue:65:3
        #patchs: (#list){
        }
 -      someCondition: (_){ _ }
@@ -321,30 +303,26 @@ diff old new
 -      }
 -      #someCondition: (_){ _ }
 +      #someCondition: (_|_){
-+        // [eval] issue1972.err1: conflicting values [...{}] and {} (mismatched types list and struct):
++        // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
++        //     ./in.cue:61:8
 +        //     ./in.cue:63:11
-+        //     ./in.cue:63:15
-+        // issue1972.err1: cannot use {} (type struct) as type bool:
-+        //     ./in.cue:65:3
 +      }
 +      someCondition: (_|_){
 +        // [eval] issue1972.err1.someCondition: field not allowed:
 +        //     ./in.cue:62:3
-+        //     ./in.cue:63:15
 +      }
 +      patchs: (_|_){
 +        // [eval] issue1972.err1.patchs: field not allowed:
 +        //     ./in.cue:63:3
-+        //     ./in.cue:63:15
 +        //     ./in.cue:66:4
 +      }
      }
    }
  }
--- diff/todo/p0 --
-issue1972: incorrect errors: "field not allowed" when they are actually allowed.
--- diff/todo/p1 --
-incomplete: missing error (second incomplete block)
+-- diff/todo/p2 --
+issue1972: "field not allowed" are somewhat correct (it is also a list), but
+are already covered by the other error message and should be elided.
+This may lead to a large number of errors otherwise.
 -- out/eval --
 Errors:
 issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):

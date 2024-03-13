@@ -143,6 +143,14 @@ func matchPatternValue(ctx *OpContext, pattern Value, f Feature, label Value) (r
 		return true
 	}
 
+	k := IntKind
+	if label != nil {
+		k = label.Kind()
+	}
+	if !k.IsAnyOf(pattern.Kind()) {
+		return false
+	}
+
 	// Fast track for the majority of cases.
 	switch x := pattern.(type) {
 	case *Bottom:

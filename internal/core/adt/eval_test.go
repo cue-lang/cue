@@ -74,12 +74,14 @@ func TestEvalAlpha(t *testing.T) {
 
 	var todoAlpha = map[string]string{
 		// Crashes and hangs
-		"cycle/chain":              "hang",
-		"cycle/evaluate":           "hang",
-		"disjunctions/elimination": "panic (nil pointer)",
+		"cycle/chain":    "hang",
+		"cycle/evaluate": "hang",
 
 		// Later
 		"benchmarks/issue2176": "fails to remove errors",
+
+		// Performance
+		"disjunctions/elimination": "performance issue",
 	}
 
 	test := cuetxtar.TxTarTest{

@@ -182,45 +182,17 @@ Errors:
 xe1: conflicting values 8 and 9:
     ./in.cue:41:12
     ./in.cue:46:6
-xe3: conflicting values 7 and 6:
-    ./in.cue:43:6
-    ./in.cue:43:10
 
 Result:
 (_|_){
   // [eval]
   xa1: (int){ 8 }
   xa2: (int){ 8 }
-  xa3: (_|_){
-    // [incomplete] xa3: non-concrete value _ in operand to -:
-    //     ./in.cue:12:10
-    //     ./in.cue:10:6
-  }
+  xa3: (int){ 6 }
   xa4: (int){ 10 }
-  xb1: (_|_){
-    // [incomplete] xb3: non-concrete value _ in operand to -:
-    //     ./in.cue:17:12
-    //     ./in.cue:15:6
-    // xb3: non-concrete value _ in operand to +:
-    //     ./in.cue:18:6
-    //     ./in.cue:16:6
-  }
-  xb2: (_|_){
-    // [incomplete] xb3: non-concrete value _ in operand to -:
-    //     ./in.cue:17:12
-    //     ./in.cue:15:6
-    // xb3: non-concrete value _ in operand to +:
-    //     ./in.cue:18:6
-    //     ./in.cue:16:6
-  }
-  xb3: (_|_){
-    // [incomplete] xb3: non-concrete value _ in operand to -:
-    //     ./in.cue:17:12
-    //     ./in.cue:15:6
-    // xb3: non-concrete value _ in operand to +:
-    //     ./in.cue:18:6
-    //     ./in.cue:16:6
-  }
+  xb1: (int){ 8 }
+  xb2: (int){ 8 }
+  xb3: (int){ 6 }
   xb4: (_|_){
     // [incomplete] xb4: non-concrete value _ in operand to +:
     //     ./in.cue:18:6
@@ -228,11 +200,7 @@ Result:
   }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
-  xc3: (_|_){
-    // [incomplete] xc3: non-concrete value _ in operand to -:
-    //     ./in.cue:27:10
-    //     ./in.cue:25:6
-  }
+  xc3: (int){ 6 }
   xc4: (int){ 9 }
   xc5: (int){ 10 }
   xd1: (int){ 8 }
@@ -244,122 +212,73 @@ Result:
     // [eval] xe1: conflicting values 8 and 9:
     //     ./in.cue:41:12
     //     ./in.cue:46:6
-    // xe3: conflicting values 7 and 6:
-    //     ./in.cue:43:6
-    //     ./in.cue:43:10
   }
   xe2: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:43:6
-    //     ./in.cue:43:10
+    // [eval] xe1: conflicting values 8 and 9:
+    //     ./in.cue:41:12
+    //     ./in.cue:46:6
   }
   xe3: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:43:6
-    //     ./in.cue:43:10
+    // [eval] xe1: conflicting values 8 and 9:
+    //     ./in.cue:41:12
+    //     ./in.cue:46:6
   }
   xe4: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:43:6
-    //     ./in.cue:43:10
+    // [eval] xe1: conflicting values 8 and 9:
+    //     ./in.cue:41:12
+    //     ./in.cue:46:6
   }
   xe5: (_|_){
-    // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:43:6
-    //     ./in.cue:43:10
+    // [eval] xe1: conflicting values 8 and 9:
+    //     ./in.cue:41:12
+    //     ./in.cue:46:6
   }
-  xf1: (_|_){
-    // [incomplete] xf3: non-concrete value _ in operand to -:
-    //     ./in.cue:50:10
-    //     ./in.cue:48:6
-    // xf3: non-concrete value _ in operand to +:
-    //     ./in.cue:51:6
-    //     ./in.cue:49:6
-  }
-  xf2: (_|_){
-    // [incomplete] xf3: non-concrete value _ in operand to -:
-    //     ./in.cue:50:10
-    //     ./in.cue:48:6
-    // xf3: non-concrete value _ in operand to +:
-    //     ./in.cue:51:6
-    //     ./in.cue:49:6
-  }
-  xf3: (_|_){
-    // [incomplete] xf3: non-concrete value _ in operand to -:
-    //     ./in.cue:50:10
-    //     ./in.cue:48:6
-    // xf3: non-concrete value _ in operand to +:
-    //     ./in.cue:51:6
-    //     ./in.cue:49:6
-  }
+  xf1: (int){ 8 }
+  xf2: (int){ 8 }
+  xf3: (int){ 6 }
   xf4: (_|_){
     // [incomplete] xf4: non-concrete value _ in operand to +:
     //     ./in.cue:51:6
     //     ./in.cue:49:6
   }
-  z1: (int){ 11 }
+  z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
-  z3: (_|_){
-    // [incomplete] z3: non-concrete value _ in operand to -:
-    //     ./in.cue:55:5
-    //     ./in.cue:53:5
-  }
+  z3: (int){ 8 }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,7 @@
+@@ -1,7 +1,7 @@
  Errors:
+-xe3: conflicting values 7 and 6:
+-    ./in.cue:43:6
+-    ./in.cue:43:10
 +xe1: conflicting values 8 and 9:
 +    ./in.cue:41:12
 +    ./in.cue:46:6
- xe3: conflicting values 7 and 6:
-     ./in.cue:43:6
-     ./in.cue:43:10
-@@ -8,29 +11,47 @@
-   // [eval]
-   xa1: (int){ 8 }
+ 
+ Result:
+ (_|_){
+@@ -10,28 +10,17 @@
    xa2: (int){ 8 }
--  xa3: (int){ 6 }
-+  xa3: (_|_){
-+    // [incomplete] xa3: non-concrete value _ in operand to -:
-+    //     ./in.cue:12:10
-+    //     ./in.cue:10:6
-+  }
+   xa3: (int){ 6 }
    xa4: (int){ 10 }
-   xb1: (_|_){
+-  xb1: (_|_){
 -    // [incomplete] xb1: 2 errors in empty disjunction:
 -    // xb1: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:16:6
 -    // xb2: unresolved disjunction 6 | 9 (type int):
-+    // [incomplete] xb3: non-concrete value _ in operand to -:
-+    //     ./in.cue:17:12
-+    //     ./in.cue:15:6
-+    // xb3: non-concrete value _ in operand to +:
-+    //     ./in.cue:18:6
-     //     ./in.cue:16:6
-   }
-   xb2: (_|_){
+-    //     ./in.cue:16:6
+-  }
+-  xb2: (_|_){
 -    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:16:6
 -  }
 -  xb3: (int){ |((int){ 6 }, (int){ 9 }) }
-+    // [incomplete] xb3: non-concrete value _ in operand to -:
-+    //     ./in.cue:17:12
-+    //     ./in.cue:15:6
-+    // xb3: non-concrete value _ in operand to +:
-+    //     ./in.cue:18:6
-+    //     ./in.cue:16:6
-+  }
-+  xb3: (_|_){
-+    // [incomplete] xb3: non-concrete value _ in operand to -:
-+    //     ./in.cue:17:12
-+    //     ./in.cue:15:6
-+    // xb3: non-concrete value _ in operand to +:
-+    //     ./in.cue:18:6
-+    //     ./in.cue:16:6
-+  }
++  xb1: (int){ 8 }
++  xb2: (int){ 8 }
++  xb3: (int){ 6 }
    xb4: (_|_){
 -    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
 +    // [incomplete] xb4: non-concrete value _ in operand to +:
@@ -368,15 +287,15 @@ diff old new
    }
    xc1: (int){ |((int){ 8 }, (int){ 9 }) }
    xc2: (int){ 8 }
-   xc3: (_|_){
+-  xc3: (_|_){
 -    // [incomplete] xc3: unresolved disjunction 8 | 9 (type int):
-+    // [incomplete] xc3: non-concrete value _ in operand to -:
-     //     ./in.cue:27:10
-+    //     ./in.cue:25:6
-   }
+-    //     ./in.cue:27:10
+-  }
++  xc3: (int){ 6 }
    xc4: (int){ 9 }
    xc5: (int){ 10 }
-@@ -39,35 +60,68 @@
+   xd1: (int){ 8 }
+@@ -39,35 +28,40 @@
    xd3: (int){ 6 }
    xd4: (int){ 9 }
    xd5: (int){ 10 }
@@ -386,86 +305,66 @@ diff old new
 +    // [eval] xe1: conflicting values 8 and 9:
 +    //     ./in.cue:41:12
 +    //     ./in.cue:46:6
-+    // xe3: conflicting values 7 and 6:
-+    //     ./in.cue:43:6
-+    //     ./in.cue:43:10
 +  }
 +  xe2: (_|_){
-+    // [eval] xe3: conflicting values 7 and 6:
-+    //     ./in.cue:43:6
-+    //     ./in.cue:43:10
++    // [eval] xe1: conflicting values 8 and 9:
++    //     ./in.cue:41:12
++    //     ./in.cue:46:6
 +  }
    xe3: (_|_){
-     // [eval] xe3: conflicting values 7 and 6:
-     //     ./in.cue:43:6
-     //     ./in.cue:43:10
-   }
+-    // [eval] xe3: conflicting values 7 and 6:
+-    //     ./in.cue:43:6
+-    //     ./in.cue:43:10
+-  }
 -  xe4: (int){ 9 }
 -  xe5: (int){ 10 }
-+  xe4: (_|_){
-+    // [eval] xe3: conflicting values 7 and 6:
-+    //     ./in.cue:43:6
-+    //     ./in.cue:43:10
-+  }
-+  xe5: (_|_){
-+    // [eval] xe3: conflicting values 7 and 6:
-+    //     ./in.cue:43:6
-+    //     ./in.cue:43:10
-+  }
-   xf1: (_|_){
+-  xf1: (_|_){
 -    // [incomplete] xf1: 2 errors in empty disjunction:
 -    // xf1: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:49:6
 -    // xf2: unresolved disjunction 6 | 9 (type int):
-+    // [incomplete] xf3: non-concrete value _ in operand to -:
-+    //     ./in.cue:50:10
-+    //     ./in.cue:48:6
-+    // xf3: non-concrete value _ in operand to +:
-+    //     ./in.cue:51:6
-     //     ./in.cue:49:6
-   }
-   xf2: (_|_){
+-    //     ./in.cue:49:6
+-  }
+-  xf2: (_|_){
 -    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
 -    //     ./in.cue:49:6
 -  }
 -  xf3: (int){ |((int){ 6 }, (int){ 9 }) }
-+    // [incomplete] xf3: non-concrete value _ in operand to -:
-+    //     ./in.cue:50:10
-+    //     ./in.cue:48:6
-+    // xf3: non-concrete value _ in operand to +:
-+    //     ./in.cue:51:6
-+    //     ./in.cue:49:6
++    // [eval] xe1: conflicting values 8 and 9:
++    //     ./in.cue:41:12
++    //     ./in.cue:46:6
 +  }
-+  xf3: (_|_){
-+    // [incomplete] xf3: non-concrete value _ in operand to -:
-+    //     ./in.cue:50:10
-+    //     ./in.cue:48:6
-+    // xf3: non-concrete value _ in operand to +:
-+    //     ./in.cue:51:6
-+    //     ./in.cue:49:6
++  xe4: (_|_){
++    // [eval] xe1: conflicting values 8 and 9:
++    //     ./in.cue:41:12
++    //     ./in.cue:46:6
 +  }
++  xe5: (_|_){
++    // [eval] xe1: conflicting values 8 and 9:
++    //     ./in.cue:41:12
++    //     ./in.cue:46:6
++  }
++  xf1: (int){ 8 }
++  xf2: (int){ 8 }
++  xf3: (int){ 6 }
    xf4: (_|_){
 -    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
--    //     ./in.cue:49:6
--  }
--  z1: (int){ |((int){ 11 }, (int){ 13 }) }
 +    // [incomplete] xf4: non-concrete value _ in operand to +:
 +    //     ./in.cue:51:6
-+    //     ./in.cue:49:6
-+  }
-+  z1: (int){ 11 }
-   z2: (int){ 10 }
-   z3: (_|_){
--    // [incomplete] z3: unresolved disjunction 11 | 13 (type int):
-+    // [incomplete] z3: non-concrete value _ in operand to -:
-     //     ./in.cue:55:5
-+    //     ./in.cue:53:5
+     //     ./in.cue:49:6
    }
+   z1: (int){ |((int){ 11 }, (int){ 13 }) }
+   z2: (int){ 10 }
+-  z3: (_|_){
+-    // [incomplete] z3: unresolved disjunction 11 | 13 (type int):
+-    //     ./in.cue:55:5
+-  }
++  z3: (int){ 8 }
  }
--- diff/todo/p1 --
-xa*: should resolve
 -- diff/explanation --
 x(e|f)*: is better to have an error at each field.
+z3: include the "unchecked" validator.
+In general, new evaluator seems better.
 -- out/eval --
 Errors:
 xe3: conflicting values 7 and 6:

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f487aa3c_e7a1c4f7",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-13T18:23:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d2a23f7a_7d700e7b",
+      "revId": "4d6604f6acb969838b3116e5cbff3898feddb22f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "25941c99_2b1448a5",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-13T10:33:33Z",
       "side": 1,
       "message": "add a sentence to the commit message, e.g.\n\n\u003e Also clarify that CUE_EXPERIMENT does not support disabling experiments,\n\u003e as one disables an experiment by omitting the experiment name entirely.",
+      "revId": "4d6604f6acb969838b3116e5cbff3898feddb22f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6a541a6_2b144f3a",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-13T18:23:26Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "25941c99_2b1448a5",
       "revId": "4d6604f6acb969838b3116e5cbff3898feddb22f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

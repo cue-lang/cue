@@ -23,10 +23,29 @@ cmp stdout export.golden
 # TODO(mvdan): Use another registry token without access to this private repo
 # and check that they can list and fetch, but not publish, any versions.
 
+# Trying to publish the same version again with the same contents should succeed.
+cd ../publish
+exec cue mod publish ${VERSION}
+
+# Trying to publish the same version again with different contents should fail.
+# TODO: Note that the error does say the repository has enabled tag immutability,
+# but that error message comes from Google Cloud, not from our registry service,
+# so it's not a stable string. We should give the user a short and stable error,
+# and test for it here with a regular expression.
+cd ../publish-different
+exec cue mod init ${MODVER}
+! exec cue mod publish ${VERSION}
+stderr 'cannot tag.*400 Bad Request'
+
 -- publish/foo.cue --
 package publish
 
 foo: "foo value"
+
+-- publish-different/foo.cue --
+package publish
+
+foo: "different foo value"
 
 -- depend/out_foo.cue --
 package depend

@@ -149,7 +149,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			// We want to catch any data races they spot as soon as possible, and they aren't CPU-bound,
 			// so running them only with -race seems reasonable.
 			run: """
-				cd internal/e2e
+				cd internal/_e2e
 				go test -race
 				"""
 		},
@@ -161,19 +161,12 @@ workflows: trybot: _repo.bashWorkflow & {
 		// However, CUE does not have any such build tags yet, and we don't use
 		// dependencies that vary wildly between platforms.
 		// For now, to save CI resources, just run the checks on one matrix job.
-		// We loop over all Go modules and use a subshell to run the commands in each directory;
-		// note that this still makes the script stop at the first command failure.
 		// TODO: consider adding more checks as per https://github.com/golang/go/issues/42119.
 		if:   "\(_isLatestLinux)"
 		name: "Check"
 		run: """
-			for module in . internal/e2e; do
-				(
-					cd $module
-					go vet ./...
-					go mod tidy
-				)
-			done
+			go vet ./...
+			go mod tidy
 			"""
 	}
 

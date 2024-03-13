@@ -33,42 +33,6 @@ Retain: 0
 Unifications: 11
 Conjuncts:    17
 Disjuncts:    15
--- out/evalalpha --
-(struct){
-  somelist: (list){
-  }
-  foo: (#list){
-  }
-  otherlist: (#list){
-    0: (string){ "something" }
-  }
-  z: (#list){
-    0: (string){ "hello z: something" }
-  }
-  extlist: (list){ |(*(#list){
-      0: (string){ "something" }
-    }, (list){
-    }) }
-  bar: (#list){
-    0: (string){ "hello bar: something" }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -1,7 +1,6 @@
- (struct){
--  somelist: (list){ |(*(#list){
--    }, (list){
--    }) }
-+  somelist: (list){
-+  }
-   foo: (#list){
-   }
-   otherlist: (#list){
--- diff/todo/p0 --
-somelist: Dropped disjunction
 -- out/eval --
 (struct){
   somelist: (list){ |(*(#list){

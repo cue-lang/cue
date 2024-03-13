@@ -464,9 +464,7 @@ Result:
     // [eval]
     ok1: (_|_){
       // [eval]
-      #A: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      #A: (string){ string }
       x: ((string|list)){ |((string){ string }, (#list){
           0: (string){ string }
         }) }
@@ -501,14 +499,10 @@ Result:
       x: ((string|list)){ |((string){ string }, (#list){
           0: (string){ string }
         }) }
-      #A: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      #A: (string){ string }
     }
     ok3: (struct){
-      #A: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      #A: (string){ string }
       x: ((string|list)){ |((#list){
           0: (string){ string }
         }, (string){ string }) }
@@ -517,9 +511,7 @@ Result:
       x: ((string|list)){ |((#list){
           0: (string){ string }
         }, (string){ string }) }
-      #A: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      #A: (string){ string }
     }
   }
   name: (string){ "foo" }
@@ -581,33 +573,25 @@ Result:
           }
         }
       }
-      foo: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      foo: (string){ string }
     }
     ok2: (struct){
       x: ((string|list)){ |((string){ string }, (#list){
           0: (string){ string }
         }) }
-      foo: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      foo: (string){ string }
     }
     ok3: (struct){
       x: ((string|list)){ |((#list){
           0: (string){ string }
         }, (string){ string }) }
-      foo: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      foo: (string){ string }
     }
     ok4: (struct){
       x: ((string|list)){ |((#list){
           0: (string){ string }
         }, (string){ string }) }
-      foo: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      foo: (string){ string }
     }
   }
   dynamicPatternSelf: (struct){
@@ -682,28 +666,20 @@ Result:
   }
   valueList: (struct){
     ok1: (struct){
-      y: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      y: (string){ string }
       x: (string){ string }
     }
     ok2: (struct){
       x: (string){ string }
-      y: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      y: (string){ string }
     }
     ok3: (struct){
-      y: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      y: (string){ string }
       x: (string){ string }
     }
     ok4: (struct){
       x: (string){ string }
-      y: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      y: (string){ string }
     }
   }
   issue1729: (struct){
@@ -815,7 +791,7 @@ diff old new
        }
      }
    }
-@@ -186,31 +185,66 @@
+@@ -186,30 +185,57 @@
          }, (string){ string }) }
      }
    }
@@ -843,14 +819,11 @@ diff old new
 -    }
 -    ok4: (struct){
 -      x: (string){ string }
--      #A: (string){ string }
 +  disjList: (_|_){
 +    // [eval]
 +    ok1: (_|_){
 +      // [eval]
-+      #A: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
++      #A: (string){ string }
 +      x: ((string|list)){ |((string){ string }, (#list){
 +          0: (string){ string }
 +        }) }
@@ -885,14 +858,10 @@ diff old new
 +      x: ((string|list)){ |((string){ string }, (#list){
 +          0: (string){ string }
 +        }) }
-+      #A: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
++      #A: (string){ string }
 +    }
 +    ok3: (struct){
-+      #A: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
++      #A: (string){ string }
 +      x: ((string|list)){ |((#list){
 +          0: (string){ string }
 +        }, (string){ string }) }
@@ -901,13 +870,10 @@ diff old new
 +      x: ((string|list)){ |((#list){
 +          0: (string){ string }
 +        }, (string){ string }) }
-+      #A: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
+       #A: (string){ string }
      }
    }
-   name: (string){ "foo" }
-@@ -260,29 +294,45 @@
+@@ -260,28 +286,36 @@
    }
    dynamicList: (struct){
      ok1: (struct){
@@ -933,7 +899,6 @@ diff old new
 -    }
 -    ok4: (struct){
 -      x: (string){ string }
--      foo: (string){ string }
 +      x: ((string|list)){ |((string){ string }, (#list){
 +          0: (string){ string }
 +        }) }
@@ -946,79 +911,27 @@ diff old new
 +          }
 +        }
 +      }
-+      foo: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
++      foo: (string){ string }
 +    }
 +    ok2: (struct){
 +      x: ((string|list)){ |((string){ string }, (#list){
 +          0: (string){ string }
 +        }) }
-+      foo: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
++      foo: (string){ string }
 +    }
 +    ok3: (struct){
 +      x: ((string|list)){ |((#list){
 +          0: (string){ string }
 +        }, (string){ string }) }
-+      foo: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
++      foo: (string){ string }
 +    }
 +    ok4: (struct){
 +      x: ((string|list)){ |((#list){
 +          0: (string){ string }
 +        }, (string){ string }) }
-+      foo: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
+       foo: (string){ string }
      }
    }
-   dynamicPatternSelf: (struct){
-@@ -357,20 +407,28 @@
-   }
-   valueList: (struct){
-     ok1: (struct){
--      y: (string){ string }
--      x: (string){ string }
--    }
--    ok2: (struct){
--      x: (string){ string }
--      y: (string){ string }
--    }
--    ok3: (struct){
--      y: (string){ string }
--      x: (string){ string }
--    }
--    ok4: (struct){
--      x: (string){ string }
--      y: (string){ string }
-+      y: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
-+      x: (string){ string }
-+    }
-+    ok2: (struct){
-+      x: (string){ string }
-+      y: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
-+    }
-+    ok3: (struct){
-+      y: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
-+      x: (string){ string }
-+    }
-+    ok4: (struct){
-+      x: (string){ string }
-+      y: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
-     }
-   }
-   issue1729: (struct){
 -- diff/todo/p0 --
 disjList: y is not a nested list.
 -- diff/todo/p2 --

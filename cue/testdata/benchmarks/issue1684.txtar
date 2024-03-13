@@ -42,6 +42,107 @@ Retain: 0
 Unifications: 791999
 Conjuncts:    2479541
 Disjuncts:    1064043
+-- out/evalalpha --
+Errors:
+out.FOO: field not allowed:
+    ./in.cue:14:11
+    ./in.cue:4:22
+    ./in.cue:7:2
+    ./in.cue:17:2
+out.ONE: field not allowed:
+    ./in.cue:14:11
+    ./in.cue:4:22
+    ./in.cue:8:2
+    ./in.cue:18:2
+
+Result:
+(_|_){
+  // [eval]
+  #Secret: (#struct){
+    $secret: (#struct){
+      id: (string){ string }
+      _id: (string){ string }
+    }
+  }
+  #secrets: (#struct){ |((#struct){
+      $secret: (#struct){
+        id: (string){ string }
+        _id: (string){ string }
+      }
+    }, (#struct){
+    }) }
+  out: (_|_){
+    // [eval] out.FOO: field not allowed:
+    //     ./in.cue:14:11
+    //     ./in.cue:4:22
+    //     ./in.cue:7:2
+    //     ./in.cue:17:2
+    // out.ONE: field not allowed:
+    //     ./in.cue:14:11
+    //     ./in.cue:4:22
+    //     ./in.cue:8:2
+    //     ./in.cue:18:2
+    FOO: (#struct){
+      $secret: (#struct){
+        id: (string){ "100" }
+        _id: (string){ "100" }
+      }
+    }
+    ONE: (#struct){
+      TWO: (#struct){
+        THREE: (#struct){
+          $secret: (#struct){
+            id: (string){ "123" }
+            _id: (string){ "123" }
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,18 @@
+-(struct){
++Errors:
++out.FOO: field not allowed:
++    ./in.cue:14:11
++    ./in.cue:4:22
++    ./in.cue:7:2
++    ./in.cue:17:2
++out.ONE: field not allowed:
++    ./in.cue:14:11
++    ./in.cue:4:22
++    ./in.cue:8:2
++    ./in.cue:18:2
++
++Result:
++(_|_){
++  // [eval]
+   #Secret: (#struct){
+     $secret: (#struct){
+       id: (string){ string }
+@@ -12,7 +26,17 @@
+       }
+     }, (#struct){
+     }) }
+-  out: (#struct){
++  out: (_|_){
++    // [eval] out.FOO: field not allowed:
++    //     ./in.cue:14:11
++    //     ./in.cue:4:22
++    //     ./in.cue:7:2
++    //     ./in.cue:17:2
++    // out.ONE: field not allowed:
++    //     ./in.cue:14:11
++    //     ./in.cue:4:22
++    //     ./in.cue:8:2
++    //     ./in.cue:18:2
+     FOO: (#struct){
+       $secret: (#struct){
+         id: (string){ "100" }
 -- out/eval --
 (struct){
   #Secret: (#struct){

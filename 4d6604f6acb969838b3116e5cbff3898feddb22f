@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d2a23f7a_7d700e7b",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-13T10:33:33Z",
+      "side": 1,
+      "message": "clarify that these are in JSON format, one object per line.",
+      "revId": "4d6604f6acb969838b3116e5cbff3898feddb22f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "25941c99_2b1448a5",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 190,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-13T10:33:33Z",
+      "side": 1,
+      "message": "add a sentence to the commit message, e.g.\n\n\u003e Also clarify that CUE_EXPERIMENT does not support disabling experiments,\n\u003e as one disables an experiment by omitting the experiment name entirely.",
+      "revId": "4d6604f6acb969838b3116e5cbff3898feddb22f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

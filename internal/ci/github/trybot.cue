@@ -142,8 +142,7 @@ workflows: trybot: _repo.bashWorkflow & {
 			// on the entire cue-labs-modules-testing org. Note that porcuepine is also an org admin,
 			// since otherwise the repo admin access to create and delete repos does not work.
 			env: {
-				GITHUB_TOKEN: "${{ secrets.E2E_GITHUB_TOKEN }}"
-				CUE_LOGINS:   "${{ secrets.E2E_CUE_LOGINS }}"
+				CUE_LOGINS: "${{ secrets.E2E_CUE_LOGINS }}"
 			}
 			// Our regular tests run with both `go test ./...` and `go test -race ./...`.
 			// The end-to-end tests should only be run once, given the slowness and API rate limits.

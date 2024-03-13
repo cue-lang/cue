@@ -184,7 +184,6 @@ jobs:
           Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: End-to-end test
         env:
-          GITHUB_TOKEN: ${{ secrets.E2E_GITHUB_TOKEN }}
           CUE_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}
         run: |-
           cd internal/e2e

@@ -16,6 +16,24 @@
       "message": "\"withub\" typo?",
       "revId": "d6ff5c1f469d10d22c078384f05da6295fe8425d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4417c396_9bdd26b0",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-13T15:12:02Z",
+      "side": 1,
+      "message": "lol, I initially called this with-github-repo, and then renamed to github-repo-module, so I apparently merged \"with\" and \"github\" into \"withub\" in my brain.",
+      "parentUuid": "6607fa33_e4f27f94",
+      "revId": "d6ff5c1f469d10d22c078384f05da6295fe8425d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,17 +1,15 @@
-# Create a public GitHub repository in an organization
-# where the registry account owning $CUE_REGISTRY_TOKEN
-# has read-write access to all GitHub repositories.
+# Publish a CUE module under a public GitHub repository namespace
+# where the $CUE_LOGINS tokens have full read-write access.
 # Publish a version for this new repository with `cue mod publish`,
 # and then fetch the module as a dependency via cmd/cue.
 
-create-github-repo
+github-repo-module public
 env VERSION=v0.0.1
 env MODVER=${MODULE}@v0
 
 cd publish
 
 exec cue mod init ${MODVER}
-
 exec cue mod publish ${VERSION}
 
 cd ../depend
@@ -21,6 +19,9 @@ exec cue mod init depend.localhost
 exec cue mod tidy
 exec cue export
 cmp stdout export.golden
+
+# TODO(mvdan): Use another registry token without access to this private repo
+# and check that they can list and fetch, but not publish, any versions.
 
 -- publish/foo.cue --
 package publish

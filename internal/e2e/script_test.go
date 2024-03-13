@@ -16,18 +16,16 @@ package e2e_test
 
 import (
 	"bytes"
-	"context"
 	cryptorand "crypto/rand"
 	"fmt"
 	"os"
 	"os/exec"
+	"path"
 	"path/filepath"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
 
-	"github.com/google/go-github/v56/github"
 	"github.com/rogpeppe/go-internal/testscript"
 )
 
@@ -73,13 +71,15 @@ func TestMain(m *testing.M) {
 }
 
 var (
-	// githubOrg is a GitHub organization where the "CUE Module Publisher"
-	// GitHub App has been installed on all repositories.
-	// This is necessary since we will create a new repository per test,
-	// and there's no way to easily install the app on each repo via the API.
-	githubOrg = envOr("GITHUB_ORG", "cue-labs-modules-testing")
-	// githubKeep leaves the newly created repo around when set to true.
-	githubKeep = envOr("GITHUB_KEEP", "false")
+	// githubPublicRepo is a GitHub public repository
+	// with the "cue.works authz" GitHub App installed.
+	// The repository can be entirely empty, as it's only needed for authz.
+	githubPublicRepo = envOr("GITHUB_PUBLIC_REPO", "github.com/cue-labs-modules-testing/e2e-public")
+
+	// githubPublicRepo is a GitHub private repository
+	// with the "cue.works authz" GitHub App installed.
+	// The repository can be entirely empty, as it's only needed for authz.
+	githubPrivateRepo = envOr("GITHUB_PRIVATE_REPO", "github.com/cue-labs-modules-testing/e2e-private")
 
 	// gcloudRegistry is an existing Google Cloud Artifact Registry repository
 	// to publish module versions to via "cue mod publish",
@@ -115,64 +115,24 @@ func TestScript(t *testing.T) {
 			return nil
 		},
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){
-			// create-github-repo creates a unique repository under githubOrg
-			// and sets $MODULE to its resulting module path.
-			// TODO(mvdan): once we support nested modules,
-			// such as github.com/owner/repo/subpath@v1.2.3,
-			// we could rely on an existing github.com/owner/repo repository on GitHub
-			// and use unique subpaths for each test run,
-			// meaning that the e2e tests would no longer need a GitHub token.
-			"create-github-repo": func(ts *testscript.TestScript, neg bool, args []string) {
-				if neg {
-					ts.Fatalf("usage: create-github-repo [field=value...]")
+			// withub-repo-module sets $MODULE to a unique nested module under the given repository path.
+			"github-repo-module": func(ts *testscript.TestScript, neg bool, args []string) {
+				if neg || len(args) != 1 {
+					ts.Fatalf("usage: with-github-repo <public|private>")
 				}
-
-				// githubToken should have read and write access to repository
-				// administration and contents within githubOrg,
-				// to be able to create repositories under the org and git push to them.
-				// Not a global, since we only want to require GITHUB_TOKEN when needed.
-				githubToken := envMust(t, "GITHUB_TOKEN")
-
-				repoName := testModuleName(ts)
-				client := github.NewClient(nil).WithAuthToken(githubToken)
-				ctx := context.TODO()
-
-				repo := &github.Repository{
-					Name: github.String(repoName),
+				moduleName := testModuleName(ts)
+				var repo string
+				switch args[0] {
+				case "public":
+					repo = githubPublicRepo
+				case "private":
+					repo = githubPrivateRepo
+				default:
+					ts.Fatalf("usage: with-github-repo <public|private>")
 				}
-				for _, arg := range args {
-					field, value, ok := strings.Cut(arg, "=")
-					if !ok {
-						ts.Fatalf("invalid field=value arg: %q", arg)
-					}
-					switch field {
-					case "private":
-						b, err := strconv.ParseBool(value)
-						ts.Check(err)
-						repo.Private = addr(b)
-					default:
-						ts.Fatalf("unsupported field: %q", field)
-					}
-				}
-				_, _, err := client.Repositories.Create(ctx, githubOrg, repo)
-				ts.Check(err)
-
-				// Unless GITHUB_KEEP=true is set, delete the repo when we finish.
-				//
-				// TODO: It might be useful to leave the repo around when the test fails.
-				// We would need testscript.TestScript to expose T.Failed for this.
-				ts.Defer(func() {
-					if githubKeep == "true" {
-						return
-					}
-					_, err := client.Repositories.Delete(ctx, githubOrg, repoName)
-					ts.Check(err)
-				})
-
-				module := fmt.Sprintf("github.com/%s/%s", githubOrg, repoName)
+				module := path.Join(repo, moduleName)
 				ts.Setenv("MODULE", module)
-				ts.Setenv("GITHUB_TOKEN", githubToken) // needed for "git push"
-				ts.Logf("created github repo: https://%s", module)
+				ts.Logf("using module path %s", module)
 			},
 			// env-fill rewrites its argument files to replace any environment variable
 			// references with their values, using the same algorithm as cmpenv.
@@ -252,6 +212,6 @@ func testModuleName(ts *testscript.TestScript) string {
 	if _, err := cryptorand.Read(randomTrailer[:]); err != nil {
 		panic(err) // should typically not happen
 	}
-	return fmt.Sprintf("e2e-%s-%s-%x", ts.Name(),
+	return fmt.Sprintf("%s-%s-%x", ts.Name(),
 		time.Now().UTC().Format("2006.01.02-15.04.05"), randomTrailer)
 }

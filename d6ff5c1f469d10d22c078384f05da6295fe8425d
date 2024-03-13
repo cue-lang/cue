@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6607fa33_e4f27f94",
+        "filename": "internal/e2e/script_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-03-13T14:58:10Z",
+      "side": 1,
+      "message": "\"withub\" typo?",
+      "revId": "d6ff5c1f469d10d22c078384f05da6295fe8425d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

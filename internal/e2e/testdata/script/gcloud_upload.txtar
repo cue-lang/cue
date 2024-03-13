@@ -12,7 +12,6 @@ env MODVER=${MODULE}@v0
 cd publish
 
 exec cue mod init ${MODVER}
-
 exec cue mod publish ${VERSION}
 
 cd ../depend

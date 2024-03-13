@@ -110,6 +110,46 @@ loop2:
 		return false
 	}
 
+	// Note that this implementation of PatternConstraints are only used in the
+	// new evaluator. It is therefore okay to keep this on the main path, as it
+	// will not have an effect in the legacy evaluator.
+	xn, yn := x.PatternConstraints, y.PatternConstraints
+
+	if flags&CheckStructural == 0 {
+		goto checkTerminal
+	}
+
+	if xn == nil || yn == nil {
+		if xn != yn {
+			return false
+		}
+		goto checkTerminal
+	}
+
+	if len(xn.Pairs) != len(yn.Pairs) {
+		return false
+	}
+
+outerPair:
+	// XXX: add test cases, like [...string] | *[...int]
+	for _, x := range xn.Pairs {
+		for _, y := range yn.Pairs {
+			if Equal(ctx, x.Pattern, y.Pattern, flags) {
+				// These only need to be finalized for comparison.
+				x.Constraint.Finalize(ctx)
+				y.Constraint.Finalize(ctx)
+				if !equalVertex(ctx, x.Constraint, y.Constraint, flags) {
+					return false
+				}
+				continue outerPair
+			}
+		}
+		return false
+	}
+
+checkTerminal:
+
+	// TODO(perf): consider moving up.
 	v, ok1 := x.BaseValue.(Value)
 	w, ok2 := y.BaseValue.(Value)
 	if !ok1 && !ok2 {

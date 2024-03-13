@@ -13,7 +13,7 @@ cmd/cue/cue
 !**/*mod.test
 
 # Ignore generated credentials from google-github-actions/auth,
-# a GitHub Actions step used in CI for the tests in internal/e2e.
+# a GitHub Actions step used in CI for the tests in internal/_e2e.
 # Note that CI requires a clean git repo when it finishes,
 # so we don't want it to think the credentials file is untracked.
 gha-creds-*.json

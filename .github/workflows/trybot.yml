@@ -186,17 +186,12 @@ jobs:
         env:
           CUE_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}
         run: |-
-          cd internal/e2e
+          cd internal/_e2e
           go test -race
       - if: (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: Check
         run: |-
-          for module in . internal/e2e; do
-          	(
-          		cd $module
-          		go vet ./...
-          		go mod tidy
-          	)
-          done
+          go vet ./...
+          go mod tidy
       - name: Check that git is clean at the end of the job
         run: test -z "$(git status --porcelain)" || (git status; git diff; false)

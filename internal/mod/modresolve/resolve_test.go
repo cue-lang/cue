@@ -381,6 +381,11 @@ moduleRegistries: {
 				Repository: "repo/one/two/three",
 				Tag:        "v0.0.1",
 			},
+			"stripped.org/bar v0.0.1": {
+				Host:       "r3.example",
+				Repository: "repo",
+				Tag:        "v0.0.1",
+			},
 		},
 	}, {
 		testName: "InvalidModulePath",
@@ -428,6 +433,18 @@ moduleRegistries: {
 }
 `,
 		err: `registry host "ok.com" is specified both as secure and insecure`,
+	}, {
+		testName:        "StripPrefixWithNoRepo",
+		catchAllDefault: "c.example",
+		in: `
+moduleRegistries: {
+	"a.example/foo": {
+		registry: "foo.example"
+		stripPrefix: true
+	}
+}
+`,
+		err: `invalid registry configuration in "a.example/foo": use of stripPrefix requires a non-empty repository within the registry`,
 	}}
 
 	for _, tc := range testCases {

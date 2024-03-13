@@ -155,8 +155,16 @@ func (r *registryConfig) init() error {
 		// Shouldn't happen because default should apply.
 		return fmt.Errorf("empty pathEncoding")
 	}
-	if r.StripPrefix && r.PathEncoding != encPath {
-		return fmt.Errorf("cannot strip prefix unless using path encoding")
+	if r.StripPrefix {
+		if r.PathEncoding != encPath {
+			// TODO we could relax this to allow storing of naked tags
+			// when the module path matches exactly and hash tags
+			// otherwise.
+			return fmt.Errorf("cannot strip prefix unless using path encoding")
+		}
+		if r.repository == "" {
+			return fmt.Errorf("use of stripPrefix requires a non-empty repository within the registry")
+		}
 	}
 	return nil
 }
@@ -388,6 +396,7 @@ func (r *resolver) ResolveToLocation(mpath, vers string) (Location, bool) {
 	bestMatchReg := r.cfg.DefaultRegistry
 	for pat, reg := range r.cfg.ModuleRegistries {
 		if pat == mpath {
+			bestMatch = pat
 			bestMatchReg = reg
 			break
 		}

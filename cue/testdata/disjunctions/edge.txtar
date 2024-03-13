@@ -168,57 +168,36 @@ Disjuncts:    74
 (struct){
   cyclicalInsertInDisjunction: (struct){
     ok1: (struct){
-      c: (struct){ |((struct){
-          d: (int){ 1 }
-          e: (int){ 2 }
-        }, (struct){
-          d: (int){ 2 }
-          e: (int){ 2 }
-        }) }
+      c: (struct){
+        d: (int){ 2 }
+        e: (int){ 2 }
+      }
     }
     maybe1: (struct){
-      c: (struct){ |((struct){
-          d: (int){ 1 }
-          e: (int){ 2 }
-        }, (struct){
-          d: (int){ 2 }
-          e: (int){ 2 }
-        }) }
+      c: (struct){
+        d: (int){ 2 }
+        e: (int){ 2 }
+      }
     }
     err1: (struct){
-      x: (_){ _ }
-      c: (struct){ |((struct){
-          d: (int){ 1 }
-          e: (int){ 2 }
-        }, (struct){
-          d: (int){ 2 }
-          e: (int){ 2 }
-        }) }
+      x: (int){ 2 }
+      c: (struct){
+        d: (int){ 2 }
+        e: (int){ 2 }
+      }
     }
     err2: (struct){
-      x: (_|_){
-        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
-        //     ./in.cue:40:12
-        // cyclicalInsertInDisjunction.err2.x: cyclic reference to field e:
-        //     ./in.cue:40:12
-        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
-        //     ./in.cue:42:29
-      }
-      c: (_|_){
-        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
-        //     ./in.cue:40:12
-        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
-        //     ./in.cue:42:29
-        d: (_|_){
-          // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
-          //     ./in.cue:40:12
-          // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
-          //     ./in.cue:42:29
-        }
+      x: (int){ 1 }
+      c: (struct){
+        d: (int){ 1 }
+        e: (int){ 2 }
       }
     }
     err3: (struct){
-      x: (_){ _ }
+      x: (_|_){
+        // [incomplete] cyclicalInsertInDisjunction.err3.x: undefined field: e:
+        //     ./in.cue:49:8
+      }
       c: (struct){ |((struct){
           d: (int){ 1 }
           e: (int){ 2 }
@@ -256,88 +235,18 @@ Disjuncts:    74
 diff old new
 --- old
 +++ new
-@@ -1,36 +1,57 @@
- (struct){
-   cyclicalInsertInDisjunction: (struct){
-     ok1: (struct){
--      c: (struct){
--        d: (int){ 2 }
--        e: (int){ 2 }
--      }
-+      c: (struct){ |((struct){
-+          d: (int){ 1 }
-+          e: (int){ 2 }
-+        }, (struct){
-+          d: (int){ 2 }
-+          e: (int){ 2 }
-+        }) }
+@@ -28,8 +28,8 @@
      }
-     maybe1: (struct){
--      c: (struct){
--        d: (int){ 2 }
--        e: (int){ 2 }
--      }
-+      c: (struct){ |((struct){
-+          d: (int){ 1 }
-+          e: (int){ 2 }
-+        }, (struct){
-+          d: (int){ 2 }
-+          e: (int){ 2 }
-+        }) }
-     }
-     err1: (struct){
--      x: (int){ 2 }
--      c: (struct){
--        d: (int){ 2 }
--        e: (int){ 2 }
--      }
-+      x: (_){ _ }
-+      c: (struct){ |((struct){
-+          d: (int){ 1 }
-+          e: (int){ 2 }
-+        }, (struct){
-+          d: (int){ 2 }
-+          e: (int){ 2 }
-+        }) }
-     }
-     err2: (struct){
--      x: (int){ 1 }
--      c: (struct){
--        d: (int){ 1 }
--        e: (int){ 2 }
--      }
--    }
--    err3: (struct){
+     err3: (struct){
        x: (_|_){
 -        // [incomplete] cyclicalInsertInDisjunction.err3.x: unresolved disjunction {d:1,e:2} | {d:2,e:3} (type struct):
 -        //     ./in.cue:49:6
--      }
-+        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
-+        //     ./in.cue:40:12
-+        // cyclicalInsertInDisjunction.err2.x: cyclic reference to field e:
-+        //     ./in.cue:40:12
-+        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
-+        //     ./in.cue:42:29
-+      }
-+      c: (_|_){
-+        // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
-+        //     ./in.cue:40:12
-+        // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
-+        //     ./in.cue:42:29
-+        d: (_|_){
-+          // [incomplete] cyclicalInsertInDisjunction.err2.c.d: cyclic reference to field e:
-+          //     ./in.cue:40:12
-+          // cyclicalInsertInDisjunction.err2.c: cyclic reference to field e:
-+          //     ./in.cue:42:29
-+        }
-+      }
-+    }
-+    err3: (struct){
-+      x: (_){ _ }
++        // [incomplete] cyclicalInsertInDisjunction.err3.x: undefined field: e:
++        //     ./in.cue:49:8
+       }
        c: (struct){ |((struct){
            d: (int){ 1 }
-           e: (int){ 2 }
-@@ -48,7 +69,7 @@
+@@ -48,7 +48,7 @@
    }
    eliminateOpenVariant: (struct){
      ok: (struct){
@@ -346,7 +255,7 @@ diff old new
            a: (int){ 1 }
          }, (#struct){
            a: (int){ 1 }
-@@ -59,16 +80,8 @@
+@@ -59,16 +59,8 @@
      }
    }
    cyclicSelfElimination: (struct){
@@ -365,10 +274,8 @@ diff old new
      }
    }
  }
--- diff/todo/p1 --
-cyclicalInsertInDisjunction.ok1:   should eliminate disjunction.
-cyclicalInsertInDisjunction.maybe: discrepancy may be okay
 -- diff/todo/p2 --
+cyclicalInsertInDisjunction.maybe: discrepancy may be okay
 cyclicalInsertInDisjunction.err1: should be an err for the old and new evaluator.
 -- diff/todo/p3 --
 preseveBottomSemantics: both the old and new evaluator are incorrect here.

@@ -66,84 +66,9 @@ Conjuncts:    894
 Disjuncts:    447
 -- out/evalalpha --
 (struct){
-  #T: (#list){ |((#list){
-      0: (string){ "a" }
-      1: (#list){ |((#list){
-          0: (string){ "b" }
-          1: (#list){ |((#list){
-              0: (string){ "c" }
-              1: (list){
-                0: (string){ "d" }
-              }
-            }, (list){
-              0: (string){ "d" }
-            }) }
-        }, (#list){
-          0: (string){ "c" }
-          1: (#list){ |((#list){
-              0: (string){ "b" }
-              1: (list){
-                0: (string){ "d" }
-              }
-            }, (list){
-              0: (string){ "d" }
-            }) }
-        }, (list){
-          0: (string){ "d" }
-        }) }
-    }, (#list){
-      0: (string){ "b" }
-      1: (#list){ |((#list){
-          0: (string){ "a" }
-          1: (#list){ |((#list){
-              0: (string){ "c" }
-              1: (list){
-                0: (string){ "d" }
-              }
-            }, (list){
-              0: (string){ "d" }
-            }) }
-        }, (#list){
-          0: (string){ "c" }
-          1: (#list){ |((#list){
-              0: (string){ "a" }
-              1: (list){
-                0: (string){ "d" }
-              }
-            }, (list){
-              0: (string){ "d" }
-            }) }
-        }, (list){
-          0: (string){ "d" }
-        }) }
-    }, (#list){
-      0: (string){ "c" }
-      1: (#list){ |((#list){
-          0: (string){ "a" }
-          1: (#list){ |((#list){
-              0: (string){ "b" }
-              1: (list){
-                0: (string){ "d" }
-              }
-            }, (list){
-              0: (string){ "d" }
-            }) }
-        }, (#list){
-          0: (string){ "b" }
-          1: (#list){ |((#list){
-              0: (string){ "a" }
-              1: (list){
-                0: (string){ "d" }
-              }
-            }, (list){
-              0: (string){ "d" }
-            }) }
-        }, (list){
-          0: (string){ "d" }
-        }) }
-    }, (list){
-      0: (string){ "d" }
-    }) }
+  #T: (list){
+    0: (string){ "d" }
+  }
   x: (#list){ |((#list){
       0: (string){ "a" }
       1: (#list){ |((#list){
@@ -539,11 +464,10 @@ Disjuncts:    447
 diff old new
 --- old
 +++ new
-@@ -1,20 +1,470 @@
- (struct){
--  #T: (list){
--    0: (string){ "d" }
--  }
+@@ -2,19 +2,394 @@
+   #T: (list){
+     0: (string){ "d" }
+   }
 -  x: (list){
 -    0: (string){ "d" }
 -  }
@@ -559,84 +483,6 @@ diff old new
 -  #X: (list){
 -    0: (string){ "d" }
 -  }
-+  #T: (#list){ |((#list){
-+      0: (string){ "a" }
-+      1: (#list){ |((#list){
-+          0: (string){ "b" }
-+          1: (#list){ |((#list){
-+              0: (string){ "c" }
-+              1: (list){
-+                0: (string){ "d" }
-+              }
-+            }, (list){
-+              0: (string){ "d" }
-+            }) }
-+        }, (#list){
-+          0: (string){ "c" }
-+          1: (#list){ |((#list){
-+              0: (string){ "b" }
-+              1: (list){
-+                0: (string){ "d" }
-+              }
-+            }, (list){
-+              0: (string){ "d" }
-+            }) }
-+        }, (list){
-+          0: (string){ "d" }
-+        }) }
-+    }, (#list){
-+      0: (string){ "b" }
-+      1: (#list){ |((#list){
-+          0: (string){ "a" }
-+          1: (#list){ |((#list){
-+              0: (string){ "c" }
-+              1: (list){
-+                0: (string){ "d" }
-+              }
-+            }, (list){
-+              0: (string){ "d" }
-+            }) }
-+        }, (#list){
-+          0: (string){ "c" }
-+          1: (#list){ |((#list){
-+              0: (string){ "a" }
-+              1: (list){
-+                0: (string){ "d" }
-+              }
-+            }, (list){
-+              0: (string){ "d" }
-+            }) }
-+        }, (list){
-+          0: (string){ "d" }
-+        }) }
-+    }, (#list){
-+      0: (string){ "c" }
-+      1: (#list){ |((#list){
-+          0: (string){ "a" }
-+          1: (#list){ |((#list){
-+              0: (string){ "b" }
-+              1: (list){
-+                0: (string){ "d" }
-+              }
-+            }, (list){
-+              0: (string){ "d" }
-+            }) }
-+        }, (#list){
-+          0: (string){ "b" }
-+          1: (#list){ |((#list){
-+              0: (string){ "a" }
-+              1: (list){
-+                0: (string){ "d" }
-+              }
-+            }, (list){
-+              0: (string){ "d" }
-+            }) }
-+        }, (list){
-+          0: (string){ "d" }
-+        }) }
-+    }, (list){
-+      0: (string){ "d" }
-+    }) }
 +  x: (#list){ |((#list){
 +      0: (string){ "a" }
 +      1: (#list){ |((#list){
@@ -1030,6 +876,10 @@ diff old new
  }
 -- diff/todo/p0 --
 Structural cycles detected too late.
+-- diff/todo/p3 --
+The new evaluator, although different, seems to be okay, and arguably better.
+Verify. This will be a lot easier to answer once we have structure sharing,
+as the answer will be clearer in that case.
 -- out/eval --
 (struct){
   #T: (list){

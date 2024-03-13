@@ -399,6 +399,10 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 
 	v := d.node
 
+	saved := n.node.BaseValue
+	n.node.BaseValue = v
+	defer func() { n.node.BaseValue = saved }()
+
 	// Clear relevant scheduler states.
 	// TODO: do something more principled: just ensure that a node that has
 	// not all holes filled out yet is not finalized. This may require

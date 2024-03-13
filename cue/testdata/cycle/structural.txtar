@@ -660,13 +660,13 @@ e4.a.0.0: cannot combine regular field "c" with [1,&[&[{c:1} & (a|{}) & [{c:1}]]
     ./in.cue:399:11
     ./in.cue:398:6
     ./in.cue:399:6
-e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
+e4.a.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
     ./in.cue:399:11
 e4.b.0.0: cannot combine regular field "c" with [1,&[&[{c:1} & [{c:1}] & (b|{})]]]:
     ./in.cue:401:11
     ./in.cue:401:6
     ./in.cue:402:6
-e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
+e4.b.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
     ./in.cue:401:11
 nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
     ./in.cue:416:6
@@ -883,24 +883,10 @@ Result:
     a: (struct){
       f: (string){ string }
     }
-    b: ((string|struct)){ |((struct){
-        f: (string){ string }
-      }, (string){ string }) }
+    b: (string){ string }
   }
   b9: (struct){
     #a: ((string|struct)){ |((string){ string }, (#struct){
-        c: (#list){
-          0: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-          1: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-          2: ((string|struct)){ |((string){ string }, (#struct){
-              ref: (string){ string }
-            }) }
-        }
-      }, (#struct){
         ref: (string){ string }
       }) }
     #b: (#struct){
@@ -1563,7 +1549,7 @@ Result:
         //     ./in.cue:399:11
         //     ./in.cue:398:6
         //     ./in.cue:399:6
-        // e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
+        // e4.a.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
         //     ./in.cue:399:11
         0: (struct){
           c: (int){ 1 }
@@ -1593,7 +1579,7 @@ Result:
         //     ./in.cue:401:11
         //     ./in.cue:401:6
         //     ./in.cue:402:6
-        // e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
+        // e4.b.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
         //     ./in.cue:401:11
         0: (struct){
           c: (int){ 1 }
@@ -1603,14 +1589,10 @@ Result:
   }
   e5: (struct){
     a: (struct){
-      c: ((int|struct)){ |((struct){
-          c: (int){ int }
-        }, (int){ int }) }
+      c: (int){ int }
     }
     b: (struct){
-      c: ((int|struct)){ |((struct){
-          c: (int){ int }
-        }, (int){ int }) }
+      c: (int){ int }
     }
   }
   nestedList: (_|_){
@@ -2073,13 +2055,13 @@ diff old new
 +    ./in.cue:399:11
 +    ./in.cue:398:6
 +    ./in.cue:399:6
-+e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
++e4.a.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
 +    ./in.cue:399:11
 +e4.b.0.0: cannot combine regular field "c" with [1,&[&[{c:1} & [{c:1}] & (b|{})]]]:
 +    ./in.cue:401:11
 +    ./in.cue:401:6
 +    ./in.cue:402:6
-+e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
++e4.b.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
 +    ./in.cue:401:11
 +nestedList.v1e.y.0.0: incompatible list lengths (1 and 2):
 +    ./in.cue:416:6
@@ -2150,33 +2132,7 @@ diff old new
        }
      }
      a: (_|_){
-@@ -285,10 +334,24 @@
-     a: (struct){
-       f: (string){ string }
-     }
--    b: (string){ string }
-+    b: ((string|struct)){ |((struct){
-+        f: (string){ string }
-+      }, (string){ string }) }
-   }
-   b9: (struct){
-     #a: ((string|struct)){ |((string){ string }, (#struct){
-+        c: (#list){
-+          0: ((string|struct)){ |((string){ string }, (#struct){
-+              ref: (string){ string }
-+            }) }
-+          1: ((string|struct)){ |((string){ string }, (#struct){
-+              ref: (string){ string }
-+            }) }
-+          2: ((string|struct)){ |((string){ string }, (#struct){
-+              ref: (string){ string }
-+            }) }
-+        }
-+      }, (#struct){
-         ref: (string){ string }
-       }) }
-     #b: (#struct){
-@@ -307,7 +370,7 @@
+@@ -307,7 +356,7 @@
      #ref: (#struct){
        ref: (string){ string }
      }
@@ -2185,7 +2141,7 @@ diff old new
          c: (#list){
            0: ((string|struct)){ |((string){ string }, (#struct){
                ref: (string){ string }
-@@ -378,9 +441,14 @@
+@@ -378,9 +427,14 @@
        }
      }
      list1: (_|_){
@@ -2203,7 +2159,7 @@ diff old new
          }
        }
      }
-@@ -465,13 +533,51 @@
+@@ -465,13 +519,51 @@
      }
      a: (_|_){
        // [structural cycle]
@@ -2262,7 +2218,7 @@ diff old new
            }
          }
        }
-@@ -478,7 +584,7 @@
+@@ -478,7 +570,7 @@
      }
    }
    p3: (_|_){
@@ -2271,7 +2227,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (#struct){
-@@ -501,16 +607,14 @@
+@@ -501,16 +593,14 @@
        }
      }
      a: (_|_){
@@ -2296,7 +2252,7 @@ diff old new
        }
      }
    }
-@@ -552,11 +656,28 @@
+@@ -552,11 +642,28 @@
      }
      a: (_|_){
        // [structural cycle]
@@ -2330,7 +2286,7 @@ diff old new
                }
              }
            }
-@@ -565,7 +686,7 @@
+@@ -565,7 +672,7 @@
      }
    }
    p6: (_|_){
@@ -2339,7 +2295,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (list){
-@@ -588,16 +709,14 @@
+@@ -588,16 +695,14 @@
        }
      }
      a: (_|_){
@@ -2364,7 +2320,7 @@ diff old new
        }
      }
    }
-@@ -636,8 +755,7 @@
+@@ -636,8 +741,7 @@
        }
      }
      r: (_|_){
@@ -2374,7 +2330,7 @@ diff old new
      }
      x: (_|_){
        // [structural cycle] d1.a.b.c.d.t: structural cycle
-@@ -652,6 +770,16 @@
+@@ -652,6 +756,16 @@
          h: (int){ int }
          t: (_|_){
            // [structural cycle]
@@ -2391,7 +2347,7 @@ diff old new
          }
        }
      }
-@@ -668,8 +796,10 @@
+@@ -668,8 +782,10 @@
          }
        }
      }
@@ -2404,7 +2360,7 @@ diff old new
          c: (_|_){
            // [structural cycle]
            d: (_|_){
-@@ -685,31 +815,41 @@
+@@ -685,31 +801,41 @@
    }
    d3: (_|_){
      // [structural cycle]
@@ -2466,7 +2422,7 @@ diff old new
      }
    }
    shortPathFail: (_|_){
-@@ -716,7 +856,9 @@
+@@ -716,7 +842,9 @@
      // [structural cycle]
      doubleRef: (struct){
        a: (#struct){
@@ -2477,7 +2433,7 @@ diff old new
        }
        #List: (#struct){
          Next: (null){ null }
-@@ -726,9 +868,7 @@
+@@ -726,9 +854,7 @@
        // [structural cycle]
        t1: (struct){
          #Foo: (#struct){
@@ -2488,7 +2444,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -736,10 +876,7 @@
+@@ -736,10 +862,7 @@
          Foo: (_|_){
            // [structural cycle]
            ref: (_|_){
@@ -2500,7 +2456,7 @@ diff old new
            }
          }
        }
-@@ -831,11 +968,12 @@
+@@ -831,11 +954,12 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:390:5
        //     ./in.cue:391:5
@@ -2518,7 +2474,7 @@ diff old new
        }
      }
      b: (_|_){
-@@ -842,11 +980,12 @@
+@@ -842,11 +966,12 @@
        // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
        //     ./in.cue:393:5
        //     ./in.cue:394:5
@@ -2536,7 +2492,7 @@ diff old new
        }
      }
    }
-@@ -855,38 +994,58 @@
+@@ -855,38 +980,58 @@
      a: (_|_){
        // [eval]
        0: (_|_){
@@ -2585,7 +2541,7 @@ diff old new
 -        //     ./in.cue:401:7
 -        //     ./in.cue:402:5
 +        //     ./in.cue:399:6
-+        // e4.a.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
++        // e4.a.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
 +        //     ./in.cue:399:11
 +        0: (struct){
 +          c: (int){ 1 }
@@ -2616,31 +2572,12 @@ diff old new
 +        //     ./in.cue:401:6
          //     ./in.cue:402:6
 -        //     ./in.cue:402:10
-+        // e4.b.0.0.0: cannot combine regular field "c" with [1,&[&[&[{c:1}]]]]:
++        // e4.b.0.0.0: cannot combine regular field "c" with {c:1,0:&[&[&[{c:1}]]]}:
 +        //     ./in.cue:401:11
          0: (struct){
            c: (int){ 1 }
          }
-@@ -895,10 +1054,14 @@
-   }
-   e5: (struct){
-     a: (struct){
--      c: (int){ int }
--    }
--    b: (struct){
--      c: (int){ int }
-+      c: ((int|struct)){ |((struct){
-+          c: (int){ int }
-+        }, (int){ int }) }
-+    }
-+    b: (struct){
-+      c: ((int|struct)){ |((struct){
-+          c: (int){ int }
-+        }, (int){ int }) }
-     }
-   }
-   nestedList: (_|_){
-@@ -912,15 +1075,14 @@
+@@ -912,15 +1057,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2660,7 +2597,7 @@ diff old new
            0: (#list){
              0: (int){ 2 }
            }
-@@ -934,15 +1096,14 @@
+@@ -934,15 +1078,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2680,7 +2617,7 @@ diff old new
            0: (#list){
              0: (int){ 2 }
            }
-@@ -1051,7 +1212,10 @@
+@@ -1051,7 +1194,10 @@
        f: (_|_){
          // [structural cycle]
          h: (_|_){
@@ -2692,7 +2629,7 @@ diff old new
          }
        }
        g: (_|_){
-@@ -1199,19 +1363,19 @@
+@@ -1199,19 +1345,19 @@
      }
    }
    n4: (struct){

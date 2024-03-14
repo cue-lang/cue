@@ -160,6 +160,9 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.scheduleStruct(env, x, id)
 
 	case *ListLit:
+		// At this point we known we have at least an empty list.
+		n.updateCyclicStatus(id)
+
 		env := &Environment{
 			Up:     env,
 			Vertex: n.node,
@@ -486,6 +489,8 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 			panic(fmt.Sprintf("invalid type %T", x.BaseValue))
 
 		case *ListMarker:
+			n.updateCyclicStatus(id)
+
 			// TODO: arguably we know now that the type _must_ be a list.
 			n.scheduleTask(handleListVertex, env, x, id)
 

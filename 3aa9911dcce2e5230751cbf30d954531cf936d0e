@@ -16,6 +16,24 @@
       "message": "You could mention that this situation is currently exacerbated by https://github.com/cue-lang/cue/issues/2945.",
       "revId": "3aa9911dcce2e5230751cbf30d954531cf936d0e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33a68e70_f5bf6b8e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-14T15:30:34Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dac31638_ac52eacb",
+      "revId": "3aa9911dcce2e5230751cbf30d954531cf936d0e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

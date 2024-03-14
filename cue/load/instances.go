@@ -60,7 +60,15 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 	c = newC
 
-	pkgs, err := loadPackages(ctx, c)
+	// TODO: This requires packages to be placed before files. At some point this
+	// could be relaxed.
+	i := 0
+	for ; i < len(args) && filetypes.IsPackage(args[i]); i++ {
+	}
+	pkgArgs := args[:i]
+	otherArgs := args[i:]
+
+	pkgs, err := loadPackages(ctx, c, pkgArgs)
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(err)}
 	}
@@ -74,16 +82,9 @@ func Instances(args []string, c *Config) []*build.Instance {
 		)
 	}
 
-	// TODO: require packages to be placed before files. At some point this
-	// could be relaxed.
-	i := 0
-	for ; i < len(args) && filetypes.IsPackage(args[i]); i++ {
-	}
-
 	a := []*build.Instance{}
-
 	if len(args) == 0 || i > 0 {
-		for _, m := range l.importPaths(args[:i]) {
+		for _, m := range l.importPaths(pkgArgs) {
 			if m.Err != nil {
 				inst := c.newErrInstance(m.Err)
 				a = append(a, inst)
@@ -93,8 +94,8 @@ func Instances(args []string, c *Config) []*build.Instance {
 		}
 	}
 
-	if args = args[i:]; len(args) > 0 {
-		files, err := filetypes.ParseArgs(args)
+	if len(otherArgs) > 0 {
+		files, err := filetypes.ParseArgs(otherArgs)
 		if err != nil {
 			return []*build.Instance{c.newErrInstance(err)}
 		}
@@ -137,7 +138,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	return a
 }
 
-func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error) {
+func loadPackages(ctx context.Context, cfg *Config, extraPkgs []string) (*modpkgload.Packages, error) {
 	if cfg.Registry == nil || cfg.modFile == nil || cfg.modFile.Module == "" {
 		return nil, nil
 	}
@@ -155,6 +156,9 @@ func loadPackages(ctx context.Context, cfg *Config) (*modpkgload.Packages, error
 	if err != nil {
 		return nil, fmt.Errorf("cannot enumerate all module imports: %v", err)
 	}
+	// Add any packages specified on the command line so they're always
+	// available.
+	allImports = append(allImports, extraPkgs...)
 	return modpkgload.LoadPackages(
 		ctx,
 		cfg.Module,

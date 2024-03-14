@@ -331,7 +331,7 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	if l.cfg.ModuleRoot == "" {
 		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
 	}
-
+	origp := p
 	// Extract the package name.
 	parts := module.ParseImportPath(string(p))
 	name = parts.Qualifier
@@ -350,7 +350,11 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 			return "", name, errors.Newf(pos, "imports are unavailable because there is no cue.mod/module.cue file")
 		}
 		// TODO predicate registry-aware lookup on module.cue-declared CUE version?
-		pkg := l.pkgs.Pkg(parts.Canonical().String())
+
+		// Note: use the original form of the import path because
+		// that's the form passed to modpkgload.LoadPackages
+		// and hence it's available by that name via Pkg.
+		pkg := l.pkgs.Pkg(string(origp))
 		if pkg == nil {
 			return "", name, errors.Newf(pos, "no dependency found for package %q", p)
 		}

@@ -274,17 +274,6 @@ Conjuncts:    686
 Disjuncts:    439
 -- out/evalalpha --
 Errors:
-disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
-    ./in.cue:99:6
-    ./in.cue:103:5
-disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
-    ./in.cue:99:6
-    ./in.cue:103:6
-disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
-    ./in.cue:99:6
-    ./in.cue:103:7
-disjList.ok1.y.0.0.0: field not allowed:
-    ./in.cue:103:8
 expr.error1.a: conflicting values 4 and 3:
     ./in.cue:2:5
     ./in.cue:3:5
@@ -296,12 +285,6 @@ list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
 list.error2.a.0: conflicting values "3" and "1":
     ./in.cue:15:6
     ./in.cue:16:6
-disjList.ok1.y.0: field not allowed:
-    ./in.cue:103:5
-disjList.ok1.y.0.0: field not allowed:
-    ./in.cue:103:6
-disjList.ok1.y.0.0.0: field not allowed:
-    ./in.cue:103:7
 
 Result:
 (_|_){
@@ -460,32 +443,13 @@ Result:
         }, (string){ string }) }
     }
   }
-  disjList: (_|_){
-    // [eval]
-    ok1: (_|_){
-      // [eval]
+  disjList: (struct){
+    ok1: (struct){
       #A: (string){ string }
       x: ((string|list)){ |((string){ string }, (#list){
           0: (string){ string }
         }) }
-      y: (_|_){
-        // [eval] disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
-        //     ./in.cue:99:6
-        //     ./in.cue:103:5
-        // disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
-        //     ./in.cue:99:6
-        //     ./in.cue:103:6
-        // disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
-        //     ./in.cue:99:6
-        //     ./in.cue:103:7
-        // disjList.ok1.y.0.0.0: field not allowed:
-        //     ./in.cue:103:8
-        // disjList.ok1.y.0: field not allowed:
-        //     ./in.cue:103:5
-        // disjList.ok1.y.0.0: field not allowed:
-        //     ./in.cue:103:6
-        // disjList.ok1.y.0.0.0: field not allowed:
-        //     ./in.cue:103:7
+      y: (#list){
         0: (#list){
           0: (#list){
             0: (#list){
@@ -701,23 +665,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,15 @@
- Errors:
-+disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
-+    ./in.cue:99:6
-+    ./in.cue:103:5
-+disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
-+    ./in.cue:99:6
-+    ./in.cue:103:6
-+disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
-+    ./in.cue:99:6
-+    ./in.cue:103:7
-+disjList.ok1.y.0.0.0: field not allowed:
-+    ./in.cue:103:8
- expr.error1.a: conflicting values 4 and 3:
-     ./in.cue:2:5
-     ./in.cue:3:5
-@@ -5,23 +16,17 @@
+@@ -5,23 +5,11 @@
  expr.error2.a: conflicting values 4 and 3:
      ./in.cue:6:5
      ./in.cue:7:5
@@ -740,16 +688,10 @@ diff old new
 -list.error2.a.2: conflicting values "3" and "2":
 -    ./in.cue:15:6
 -    ./in.cue:16:11
-+disjList.ok1.y.0: field not allowed:
-+    ./in.cue:103:5
-+disjList.ok1.y.0.0: field not allowed:
-+    ./in.cue:103:6
-+disjList.ok1.y.0.0.0: field not allowed:
-+    ./in.cue:103:7
  
  Result:
  (_|_){
-@@ -50,16 +55,18 @@
+@@ -50,16 +38,18 @@
      error1: (_|_){
        // [eval]
        a: (_|_){
@@ -776,7 +718,7 @@ diff old new
          0: (_|_){
            // [eval] list.error2.a.0: conflicting values "3" and "1":
            //     ./in.cue:15:6
-@@ -73,14 +80,6 @@
+@@ -73,14 +63,6 @@
            //     ./in.cue:15:6
            //     ./in.cue:16:11
          }
@@ -791,13 +733,10 @@ diff old new
        }
      }
    }
-@@ -186,30 +185,57 @@
-         }, (string){ string }) }
-     }
-   }
--  disjList: (struct){
--    ok1: (struct){
--      #A: (string){ string }
+@@ -189,27 +171,35 @@
+   disjList: (struct){
+     ok1: (struct){
+       #A: (string){ string }
 -      x: (string){ string }
 -      y: (#list){
 -        0: (#list){
@@ -819,32 +758,10 @@ diff old new
 -    }
 -    ok4: (struct){
 -      x: (string){ string }
-+  disjList: (_|_){
-+    // [eval]
-+    ok1: (_|_){
-+      // [eval]
-+      #A: (string){ string }
 +      x: ((string|list)){ |((string){ string }, (#list){
 +          0: (string){ string }
 +        }) }
-+      y: (_|_){
-+        // [eval] disjList.ok1.y: conflicting values string and [[[[string]]]] (mismatched types string and list):
-+        //     ./in.cue:99:6
-+        //     ./in.cue:103:5
-+        // disjList.ok1.y.0: conflicting values string and [[[string]]] (mismatched types string and list):
-+        //     ./in.cue:99:6
-+        //     ./in.cue:103:6
-+        // disjList.ok1.y.0.0: conflicting values [[string]] and string (mismatched types list and string):
-+        //     ./in.cue:99:6
-+        //     ./in.cue:103:7
-+        // disjList.ok1.y.0.0.0: field not allowed:
-+        //     ./in.cue:103:8
-+        // disjList.ok1.y.0: field not allowed:
-+        //     ./in.cue:103:5
-+        // disjList.ok1.y.0.0: field not allowed:
-+        //     ./in.cue:103:6
-+        // disjList.ok1.y.0.0.0: field not allowed:
-+        //     ./in.cue:103:7
++      y: (#list){
 +        0: (#list){
 +          0: (#list){
 +            0: (#list){
@@ -873,7 +790,7 @@ diff old new
        #A: (string){ string }
      }
    }
-@@ -260,28 +286,36 @@
+@@ -260,28 +250,36 @@
    }
    dynamicList: (struct){
      ok1: (struct){
@@ -932,11 +849,6 @@ diff old new
        foo: (string){ string }
      }
    }
--- diff/todo/p0 --
-disjList: y is not a nested list.
--- diff/todo/p2 --
-disjList.ok2: cut off structural cycle earlier?
-dynamicEmbed.*: cut off structural cycle earlier?
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

@@ -38,7 +38,7 @@
 	//
 	// If there are multiple matching prefixes, the longest
 	// is chosen.
-	moduleRegistries: [#modulePath]: #registry
+	moduleRegistries?: [#modulePath]: #registry
 
 	// defaultRegistry specifies a fallback registry to be used if no
 	// prefix from moduleRegistry matches.

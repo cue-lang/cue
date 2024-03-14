@@ -107,6 +107,15 @@ Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
 	brew install cue-lang/tap/cue
 
+#### Install using MacPorts
+
+On macOS, you can also install `cue` using [MacPorts](https://www.macports.org):
+
+```
+sudo port selfupdate
+sudo port install cue
+```
+
 #### Install from Source
 
 You need Go 1.21 or later to build CUE from source; follow the instructions at https://go.dev/doc/install.

@@ -16,6 +16,23 @@
       "message": "I wrote this while we were trying to get pkg.go.dev to render godocs for Roger\u0027s unmerged mod APIs. Still useful to have, I think, and we can then lock down git push access to github entirely.",
       "revId": "179d0e44c484bd9674dac3a8f556f366bde6e83f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "032d8491_d155eaf2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-03-14T16:21:21Z",
+      "side": 1,
+      "message": "When we try this, it will help to verify whether the configuration we have with GerritHub is correct. They _should_ have configured force push for all refs for us.",
+      "revId": "179d0e44c484bd9674dac3a8f556f366bde6e83f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,7 +16,7 @@ import (
 //
 // TODO: remove once Go stamps local builds with a main module version
 // derived from the local VCS information per https://go.dev/issue/50603.
-const fallbackVersion = "v0.8.0"
+const fallbackVersion = "v0.9.0-0.dev"
 
 // Version returns the version of the cuelang.org/go module as best as can
 // reasonably be determined. The result is always a valid Go semver version.

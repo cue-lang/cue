@@ -76,16 +76,14 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 // is taken and works as well as `cue help topic`, which is unnecessary.
 // Consider removing support for the short form at some point.
 
-func newHelpTopics(c *Command) []*cobra.Command {
-	return []*cobra.Command{
-		inputsHelp,
-		environmentHelp,
-		flagsHelp,
-		filetypeHelp,
-		injectHelp,
-		commandsHelp,
-		registryConfigHelp,
-	}
+var helpTopics = []*cobra.Command{
+	inputsHelp,
+	environmentHelp,
+	flagsHelp,
+	filetypeHelp,
+	injectHelp,
+	commandsHelp,
+	registryConfigHelp,
 }
 
 var inputsHelp = &cobra.Command{

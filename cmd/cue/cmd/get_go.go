@@ -289,10 +289,10 @@ var (
 // They are not used by go/types.Implements.
 
 func typeMethod(name string, params, results []types.Type) *types.Func {
-	return types.NewFunc(token.NoPos, nil, name, typeSignature(name, params, results))
+	return types.NewFunc(token.NoPos, nil, name, typeSignature(params, results))
 }
 
-func typeSignature(name string, params, results []types.Type) *types.Signature {
+func typeSignature(params, results []types.Type) *types.Signature {
 	paramVars := make([]*types.Var, len(params))
 	for i, param := range params {
 		paramVars[i] = types.NewParam(token.NoPos, nil, "", param)
@@ -332,7 +332,7 @@ var toTop = []*types.Interface{
 	// yaml.Unmarshaler: interface { UnmarshalYAML(func(interface{}) error) error }
 	types.NewInterfaceType([]*types.Func{
 		typeMethod("UnmarshalYAML", []types.Type{
-			typeSignature("", []types.Type{typeAny}, []types.Type{typeError}),
+			typeSignature([]types.Type{typeAny}, []types.Type{typeError}),
 		}, []types.Type{typeError}),
 	}, nil).Complete(),
 }
@@ -1312,12 +1312,12 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		typeName := f.Type().String()
 		// simplify type names:
 		for path, info := range e.pkgNames {
-			typeName = strings.Replace(typeName, path+".", info.name+".", -1)
+			typeName = strings.ReplaceAll(typeName, path+".", info.name+".")
 		}
-		typeName = strings.Replace(typeName, e.pkg.Types.Path()+".", "", -1)
+		typeName = strings.ReplaceAll(typeName, e.pkg.Types.Path()+".", "")
 
-		cueStr := strings.Replace(cueType, "_#", "", -1)
-		cueStr = strings.Replace(cueStr, "#", "", -1)
+		cueStr := strings.ReplaceAll(cueType, "_#", "")
+		cueStr = strings.ReplaceAll(cueStr, "#", "")
 
 		// TODO: remove fields in @go attr that are the same as printed?
 		if name != f.Name() || typeName != cueStr {
@@ -1362,8 +1362,8 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 				tk := tags.Get("protobuf_key")
 				tv := tags.Get("protobuf_val")
 				if tk != "" && tv != "" {
-					tk = strings.SplitN(tk, ",", 2)[0]
-					tv = strings.SplitN(tv, ",", 2)[0]
+					tk, _, _ = strings.Cut(tk, ",")
+					tv, _, _ = strings.Cut(tv, ",")
 					split[1] = fmt.Sprintf("map[%s]%s", tk, tv)
 				}
 			}

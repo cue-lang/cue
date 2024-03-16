@@ -198,7 +198,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		newAddCmd(c),
 		newLoginCmd(c),
 	}
-	subCommands = append(subCommands, newHelpTopics(c)...)
+	subCommands = append(subCommands, helpTopics...)
 
 	addGlobalFlags(cmd.PersistentFlags())
 	// We add the injection flags to the root command for the sake of the short form "cue -t foo=bar mycmd".

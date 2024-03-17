@@ -16,6 +16,24 @@
       "message": "Thank you again for the patch, Thomas! I haven\u0027t heard back from you in some time, and I think this double fix is really valuable, so I\u0027ve taken the liberty of applying my",
       "revId": "bf5b7c56802456c0a08fd3933b2441a81d5c1db9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fb9f59ad_0e4a0dc1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-17T22:48:48Z",
+      "side": 1,
+      "message": "Not sure why Gerrit decided to send this as I was typing...\n\n... applying my last nits, mainly around the commit message, as you had already resolved my concern about the earlier func recursion. I\u0027ve also removed a debug Println which shouldn\u0027t be there.\n\nPaul, mind giving a +2? I already reviewed and verified this fix, but my +2 doesn\u0027t count, as I\u0027m the last uploader.",
+      "parentUuid": "967111f2_d64dc6e8",
+      "revId": "bf5b7c56802456c0a08fd3933b2441a81d5c1db9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,148 @@
+{
+  "comments": [],
+  "submitRequirementResults": [
+    {
+      "submitRequirement": {
+        "name": "Code-Review",
+        "description": {
+          "value": "At least one Code-Review+2 is required. Self review is not allowed, except for Marcel."
+        },
+        "applicabilityExpression": {},
+        "submittabilityExpression": {
+          "expressionString": "label:Code-Review\u003dMAX,user\u003dnon_uploader OR label:Code-Review\u003dMAX,user\u003dmpvl@gmail.com"
+        },
+        "overrideExpression": {},
+        "allowOverrideInChildProjects": true
+      },
+      "applicabilityExpressionResult": {},
+      "submittabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"label:Code-Review=MAX,user=non_uploader OR label:Code-Review=MAX,user=mpvl@gmail.com"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":["label:Code-Review=MAX,user=non_uploader"],"failingAtoms":["label:Code-Review=MAX,user=mpvl@gmail.com"]}
+      },
+      "overrideExpressionResult": {},
+      "patchSetCommitId": "852e017c46cccb89ed624f7535b180dbae13b858",
+      "legacy": {
+        "value": false
+      },
+      "forced": {},
+      "hidden": {}
+    },
+    {
+      "submitRequirement": {
+        "name": "Do-Not-Review",
+        "description": {
+          "value": "Changes that have DO NOT REVIEW in their commit message are not submittable."
+        },
+        "applicabilityExpression": {
+          "value": {
+            "expressionString": "message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (R|r)(E|e)(V|v)(I|i)(E|e)(W|w).*\""
+          }
+        },
+        "submittabilityExpression": {
+          "expressionString": "is:false"
+        },
+        "overrideExpression": {},
+        "allowOverrideInChildProjects": false
+      },
+      "applicabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (R|r)(E|e)(V|v)(I|i)(E|e)(W|w).*\""},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (R|r)(E|e)(V|v)(I|i)(E|e)(W|w).*\""]}
+      },
+      "submittabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"is:false"},"status":"NOT_EVALUATED","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":[]}
+      },
+      "overrideExpressionResult": {},
+      "patchSetCommitId": "852e017c46cccb89ed624f7535b180dbae13b858",
+      "legacy": {
+        "value": false
+      },
+      "forced": {},
+      "hidden": {}
+    },
+    {
+      "submitRequirement": {
+        "name": "Do-Not-Submit",
+        "description": {
+          "value": "Changes that have DO NOT SUBMIT in their commit message are not submittable."
+        },
+        "applicabilityExpression": {
+          "value": {
+            "expressionString": "message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (S|s)(U|u)(B|b)(M|m)(I|i)(T|t).*\""
+          }
+        },
+        "submittabilityExpression": {
+          "expressionString": "is:false"
+        },
+        "overrideExpression": {},
+        "allowOverrideInChildProjects": false
+      },
+      "applicabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (S|s)(U|u)(B|b)(M|m)(I|i)(T|t).*\""},"status":"FAIL","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["message:\"^.*(D|d)(O|o) (N|n)(O|o)(T|t) (S|s)(U|u)(B|b)(M|m)(I|i)(T|t).*\""]}
+      },
+      "submittabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"is:false"},"status":"NOT_EVALUATED","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":[]}
+      },
+      "overrideExpressionResult": {},
+      "patchSetCommitId": "852e017c46cccb89ed624f7535b180dbae13b858",
+      "legacy": {
+        "value": false
+      },
+      "forced": {},
+      "hidden": {}
+    },
+    {
+      "submitRequirement": {
+        "name": "No-Holds",
+        "description": {
+          "value": "Changes with a Hold+1 vote are not submittable."
+        },
+        "applicabilityExpression": {},
+        "submittabilityExpression": {
+          "expressionString": "NOT label:Hold\u003d1"
+        },
+        "overrideExpression": {},
+        "allowOverrideInChildProjects": false
+      },
+      "applicabilityExpressionResult": {},
+      "submittabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"NOT label:Hold=1"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["label:Hold=1"]}
+      },
+      "overrideExpressionResult": {},
+      "patchSetCommitId": "852e017c46cccb89ed624f7535b180dbae13b858",
+      "legacy": {
+        "value": false
+      },
+      "forced": {},
+      "hidden": {}
+    },
+    {
+      "submitRequirement": {
+        "name": "TryBot-Result",
+        "description": {
+          "value": "TryBot-Result+1 is required. Unity-Result is not, as intentional breakages can happen. Can be bypassed by Chief Cueckoo with Code-Review+2."
+        },
+        "applicabilityExpression": {
+          "value": {
+            "expressionString": "-branch:refs/meta/config"
+          }
+        },
+        "submittabilityExpression": {
+          "expressionString": "label:TryBot-Result\u003dMAX OR label:Code-Review\u003dMAX,user\u003dchief.cueckoo@gmail.com"
+        },
+        "overrideExpression": {},
+        "allowOverrideInChildProjects": true
+      },
+      "applicabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"-branch:refs/meta/config"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":[],"failingAtoms":["branch:refs/meta/config"]}
+      },
+      "submittabilityExpressionResult": {
+        "value": {"expression":{"expressionString":"label:TryBot-Result=MAX OR label:Code-Review=MAX,user=chief.cueckoo@gmail.com"},"status":"PASS","errorMessage":{"value":null},"passingAtoms":["label:TryBot-Result=MAX"],"failingAtoms":["label:Code-Review=MAX,user=chief.cueckoo@gmail.com"]}
+      },
+      "overrideExpressionResult": {},
+      "patchSetCommitId": "852e017c46cccb89ed624f7535b180dbae13b858",
+      "legacy": {
+        "value": false
+      },
+      "forced": {},
+      "hidden": {}
+    }
+  ]
+}

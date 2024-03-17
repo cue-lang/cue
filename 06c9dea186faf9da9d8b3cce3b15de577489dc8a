@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "beed8b02_8aa61c27",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-17T22:45:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a0237d49_2fe01bf2",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9f04009c_2dd8590e",
@@ -31,6 +49,24 @@
       "writtenOn": "2023-12-04T15:22:35Z",
       "side": 1,
       "message": "when you add a test case, you can simply say that the added test cases panic without the fix, meaning the commit is also self-contained without relying on github comments.",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "591e048b_4296775a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-17T22:45:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9f04009c_2dd8590e",
       "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcbad5c8_6eca5691",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-17T22:45:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0b1b0db_242df611",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f779fc6a_c367654e",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3cb608c5_cc7f830d",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 566,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-17T22:45:38Z",
+      "side": 1,
+      "message": "No longer relevant.",
+      "parentUuid": "f779fc6a_c367654e",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3b3d8694_c6937573",
@@ -82,6 +154,24 @@
       "writtenOn": "2023-12-04T15:22:35Z",
       "side": 1,
       "message": "note that this is DFS, not BFS, so you *are* recursing in the vast majority of cases. moreover, you might be recursing into the same package multiple times, since you don\u0027t deduplicate. I do think that the performance here will be relatively noticeable.\n\nrather than implement BFS by e.g. looping twice, or keeping track of what packages you\u0027ve already visited, I\u0027d personally go straight for a prebuilt map and solve both issues at once.",
+      "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "729f5f4c_49c1bc56",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 580,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-17T22:45:38Z",
+      "side": 1,
+      "message": "You\u0027ve done this; thank you!",
+      "parentUuid": "3b3d8694_c6937573",
       "revId": "06c9dea186faf9da9d8b3cce3b15de577489dc8a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

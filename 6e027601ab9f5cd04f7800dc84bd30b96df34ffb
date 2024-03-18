@@ -55,6 +55,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "e1d31dbc_bc62c97f",
+        "filename": "cmd/cue/cmd/testdata/script/registry_lazy_config.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-18T10:10:16Z",
+      "side": 1,
+      "message": "I\u0027ve raised an issue instead. I think there are probably lots of examples of this (but I\u0027ll also point to this particular example in the issue). https://github.com/cue-lang/cue/issues/2952",
+      "parentUuid": "02ed0677_1d31558b",
+      "revId": "6e027601ab9f5cd04f7800dc84bd30b96df34ffb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "2d02a13a_549d9bc8",
         "filename": "mod/modconfig/modconfig_test.go",
         "patchSetId": 2

@@ -3085,6 +3085,9 @@ func TestReferencePath(t *testing.T) {
 		input: "v: w: x: a.b.c, a: b: c: 1",
 		want:  "a.b.c",
 	}, {
+		input: "if true { v: w: x: a, a: 1 }",
+		want:  "",
+	}, {
 		input: "v: w: x: w.a.b.c, v: w: a: b: c: 1",
 		want:  "v.w.a.b.c",
 	}, {
@@ -3144,7 +3147,10 @@ func TestReferencePath(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			var r Runtime
-			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)
+			inst, err := r.Compile("in", tc.input) // getInstance(t, tc.input)
+			if err != nil {
+				t.Fatal(err)
+			}
 			v := inst.Lookup("v", "w", "x")
 
 			root, path := v.ReferencePath()
@@ -3723,6 +3729,9 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `v: {>30, <40}`,
 		want:  `&(>(30) <(40))`,
+	}, {
+		input: `a: string, if true { v: a }`,
+		want:  `if true a`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

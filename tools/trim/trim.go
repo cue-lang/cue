@@ -100,9 +100,10 @@ func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 			return true
 		},
 	}
-	for _, c := range v.Conjuncts {
+	v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		visitor.Elem(c.Elem())
-	}
+		return true
+	})
 
 	d, _, _, pickedDefault := t.addDominators(nil, v, false)
 	t.findSubordinates(d, v, pickedDefault)
@@ -178,16 +179,18 @@ func removable(c adt.Conjunct, v *adt.Vertex) bool {
 
 // Roots of constraints are not allowed to strip conjuncts by
 // themselves as it will eliminate the reason for the trigger.
-func (t *trimmer) allowRemove(v *adt.Vertex) bool {
-	for _, c := range v.Conjuncts {
+func (t *trimmer) allowRemove(v *adt.Vertex) (allow bool) {
+	v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		_, allowRemove := isDominator(c)
 		loc := c.CloseInfo.Location() != c.Elem()
 		isSpan := c.CloseInfo.RootSpanType() != adt.ConstraintSpan
 		if allowRemove && (loc || isSpan) {
-			return true
+			allow = true
+			return false
 		}
-	}
-	return false
+		return true
+	})
+	return allow
 }
 
 // A parent may be removed if there is not a `no` and there is at least one
@@ -228,7 +231,7 @@ func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *ad
 	}
 
 	hasDoms := false
-	for _, c := range v.Conjuncts {
+	v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		isDom, _ := isDominator(c)
 		switch {
 		case isDom:
@@ -238,15 +241,17 @@ func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *ad
 				x, _ := t.ctx.Resolve(c, r)
 				// Even if this is not a dominator now, descendants will be.
 				if x != nil && x.Label.IsDef() {
-					for _, c := range x.Conjuncts {
+					x.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 						doms.AddConjunct(c)
-					}
-					break
+						return true
+					})
+					return false
 				}
 			}
 			hasSubs = true
 		}
-	}
+		return true
+	})
 	doms.Finalize(t.ctx)
 
 	switch x := doms.Value().(type) {
@@ -271,9 +276,10 @@ func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (re
 	defer un(t.trace(v))
 	defer func() {
 		if result == no {
-			for _, c := range v.Conjuncts {
+			v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 				t.markKeep(c.Expr())
-			}
+				return true
+			})
 		}
 	}()
 
@@ -337,12 +343,13 @@ func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (re
 		}
 	}
 
-	for _, c := range v.Conjuncts {
+	v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		_, allowRemove := isDominator(c)
 		if !allowRemove && removable(c, v) {
 			t.markRemove(c)
 		}
-	}
+		return true
+	})
 
 	return yes
 }

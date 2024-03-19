@@ -28,7 +28,9 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	cueruntime "cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
@@ -95,6 +97,13 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		// Some init work, such as in internal/filetypes, evaluates CUE by design.
 		// We don't want that work to count towards $CUE_STATS.
 		adt.ResetStats()
+
+		// TODO: do not rely on a global variable here, as this API is also used
+		// in a non-tooling context.
+		if cueexperiment.Flags.EvalV3 {
+			const dev = internal.DevVersion
+			(*cueruntime.Runtime)(c.ctx).SetVersion(internal.EvaluatorVersion(dev))
+		}
 
 		err := f(c, args)
 

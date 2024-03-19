@@ -7,6 +7,13 @@ cmp stdout out/foo.textproto
 ! exec cue eval -d '#X' schema.cue foo.textproto -l c
 cmp stderr out/stderr3
 
+# This asserts the compatibility of Vertex.MatchAndInsert, which is only used
+# outside of the core evaluator.
+env CUE_EXPERIMENT=evalv3
+
+exec cue eval topschema.cue foo.textproto
+cmp stdout out/topfoo.textproto
+
 -- topschema.cue --
 a: int
 b: [...int]

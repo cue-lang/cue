@@ -10,6 +10,7 @@ import (
 // by Init.
 var Flags struct {
 	Modules bool
+	EvalV3  bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

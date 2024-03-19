@@ -95,6 +95,9 @@ type taskContext struct {
 }
 
 func (p *taskContext) current() *task {
+	if len(p.stack) == 0 {
+		return nil
+	}
 	return p.stack[len(p.stack)-1]
 }
 

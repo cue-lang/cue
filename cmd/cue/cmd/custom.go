@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
@@ -92,17 +93,22 @@ func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Co
 
 	// Ensure there is at least one tool file.
 	// TODO: remove this block to allow commands to be defined in any file.
-outer:
 	for _, v := range []cue.Value{tools.Lookup(typ), o} {
 		_, w := value.ToInternal(v)
-		for _, c := range w.Conjuncts {
+		hasToolFile := false
+		w.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 			src := c.Source()
 			if src == nil {
-				continue
+				return true
 			}
 			if strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
-				break outer
+				hasToolFile = true
+				return false
 			}
+			return true
+		})
+		if hasToolFile {
+			break
 		}
 		if err := v.Err(); err != nil {
 			return nil, err

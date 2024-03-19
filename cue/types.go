@@ -641,11 +641,15 @@ func newChildValue(o *structValue, i int) Value {
 // otherwise.
 func Dereference(v Value) Value {
 	n := v.v
-	if n == nil || len(n.Conjuncts) != 1 {
+	if n == nil {
 		return v
 	}
 
-	c := n.Conjuncts[0]
+	c, count := n.SingleConjunct()
+	if count != 1 {
+		return v
+	}
+
 	r, _ := c.Expr().(adt.Resolver)
 	if r == nil {
 		return v
@@ -1066,9 +1070,10 @@ func (v hiddenValue) Split() []Value {
 		return nil
 	}
 	a := []Value{}
-	for _, x := range v.v.Conjuncts {
+	v.v.VisitLeafConjuncts(func(x adt.Conjunct) bool {
 		a = append(a, remakeValue(v, x.Env, x.Expr()))
-	}
+		return true
+	})
 	return a
 }
 
@@ -1080,10 +1085,17 @@ func (v Value) Source() ast.Node {
 	if v.v == nil {
 		return nil
 	}
-	if len(v.v.Conjuncts) == 1 {
-		return v.v.Conjuncts[0].Source()
+	count := 0
+	var src ast.Node
+	v.v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+		src = c.Source()
+		count++
+		return true
+	})
+	if count > 1 || src == nil {
+		src = v.v.Value().Source()
 	}
-	return v.v.Value().Source()
+	return src
 }
 
 // If v exactly represents a package, BuildInstance returns
@@ -1121,18 +1133,19 @@ func (v Value) Pos() token.Pos {
 	}
 	// Pick the most-concrete field.
 	var p token.Pos
-	for _, c := range v.v.Conjuncts {
+	v.v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 		x := c.Elem()
 		pp := pos(x)
 		if pp == token.NoPos {
-			continue
+			return true
 		}
 		p = pp
 		// Prefer struct conjuncts with actual fields.
 		if s, ok := x.(*adt.StructLit); ok && len(s.Fields) > 0 {
-			break
+			return false
 		}
-	}
+		return true
+	})
 	return p
 }
 
@@ -1977,11 +1990,11 @@ func (v hiddenValue) Reference() (inst *Instance, path []string) {
 // is not a reference.
 func (v Value) ReferencePath() (root Value, p Path) {
 	// TODO: don't include references to hidden fields.
-	if v.v == nil || len(v.v.Conjuncts) != 1 {
+	c, count := v.v.SingleConjunct()
+	if count != 1 {
 		return Value{}, Path{}
 	}
 	ctx := v.ctx()
-	c := v.v.Conjuncts[0]
 
 	x, path := reference(v.idx, ctx, c.Env, c.Expr())
 	if x == nil {
@@ -2307,41 +2320,45 @@ func (v Value) Expr() (Op, []Value) {
 
 	if v.v.IsData() {
 		expr = v.v.Value()
+		goto process
 
-	} else {
-		switch len(v.v.Conjuncts) {
-		case 0:
-			if v.v.BaseValue == nil {
-				return NoOp, []Value{makeValue(v.idx, v.v, v.parent_)} // TODO: v?
-			}
-			expr = v.v.Value()
-
-		case 1:
-			// the default case, processed below.
-			c := v.v.Conjuncts[0]
-			env = c.Env
-			expr = c.Expr()
-			if w, ok := expr.(*adt.Vertex); ok {
-				return Value{v.idx, w, v.parent_}.Expr()
-			}
-
-		default:
-			a := []Value{}
-			ctx := v.ctx()
-			for _, c := range v.v.Conjuncts {
-				// Keep parent here. TODO: do we need remove the requirement
-				// from other conjuncts?
-				n := &adt.Vertex{
-					Parent: v.v.Parent,
-					Label:  v.v.Label,
-				}
-				n.AddConjunct(c)
-				n.Finalize(ctx)
-				a = append(a, makeValue(v.idx, n, v.parent_))
-			}
-			return adt.AndOp, a
-		}
 	}
+
+	switch c, count := v.v.SingleConjunct(); count {
+	case 0:
+		if v.v.BaseValue == nil {
+			return NoOp, []Value{makeValue(v.idx, v.v, v.parent_)} // TODO: v?
+		}
+		expr = v.v.Value()
+
+	case 1:
+		// the default case, processed below.
+		env = c.Env
+		expr = c.Expr()
+		if w, ok := expr.(*adt.Vertex); ok {
+			return Value{v.idx, w, v.parent_}.Expr()
+		}
+
+	default:
+		a := []Value{}
+		ctx := v.ctx()
+		v.v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
+			// Keep parent here. TODO: do we need remove the requirement
+			// from other conjuncts?
+			n := &adt.Vertex{
+				Parent: v.v.Parent,
+				Label:  v.v.Label,
+			}
+			n.AddConjunct(c)
+			n.Finalize(ctx)
+			a = append(a, makeValue(v.idx, n, v.parent_))
+			return true
+		})
+
+		return adt.AndOp, a
+	}
+
+process:
 
 	// TODO: replace appends with []Value{}. For not leave.
 	a := []Value{}

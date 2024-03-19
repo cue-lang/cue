@@ -102,9 +102,9 @@ type cacheKey struct {
 }
 
 func (e *Environment) up(ctx *OpContext, count int32) *Environment {
-	for ; count > 0; count-- {
+	for i := int32(0); i < count; i++ {
 		e = e.Up
-		ctx.Assertf(ctx.Pos(), e.Vertex != nil, "Environment.up encountered a nil vertex")
+		ctx.Assertf(ctx.Pos(), e.Vertex != nil, "Environment.up encountered a nil vertex at step %d out of %d", i+1, count)
 	}
 	return e
 }

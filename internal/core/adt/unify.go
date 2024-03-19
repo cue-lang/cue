@@ -163,6 +163,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 			// Should resolve with dereference.
 			v.Closed = true
 		}
+		v.status = w.status
 		v.ArcType = w.ArcType
 		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
 		v.Arcs = nil

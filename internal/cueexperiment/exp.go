@@ -14,6 +14,10 @@ var Flags struct {
 	// YAMLV3Decoder swaps the old internal/third_party/yaml decoder with the new
 	// decoder implemented in internal/encoding/yaml on top of yaml.v3.
 	YAMLV3Decoder bool `envflag:"default:true"`
+
+	// EvalV3 enables the new evaluator. The new evaluator addresses various
+	// performance concerns.
+	EvalV3 bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

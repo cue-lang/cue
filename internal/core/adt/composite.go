@@ -237,6 +237,10 @@ type Vertex struct {
 	//
 	// This value may be nil, in which case the Arcs are considered to define
 	// the final value of this Vertex.
+	//
+	// TODO: all access to Conjuncts should go through functions like
+	// VisitLeafConjuncts and VisitAllConjuncts. We should probably make this
+	// an unexported field.
 	Conjuncts []Conjunct
 
 	// Structs is a slice of struct literals that contributed to this value.
@@ -556,6 +560,65 @@ func (v *Vertex) setParentDone() {
 			a.setParentDone()
 		}
 	}
+}
+
+// VisitLeafConjuncts visits all conjuncts that are leafs of the ConjunctGroup tree.
+func (v *Vertex) VisitLeafConjuncts(f func(Conjunct) bool) {
+	visitConjuncts(v.Conjuncts, f)
+}
+
+func visitConjuncts(a []Conjunct, f func(Conjunct) bool) bool {
+	for _, c := range a {
+		switch x := c.x.(type) {
+		case *ConjunctGroup:
+			if !visitConjuncts(*x, f) {
+				return false
+			}
+		default:
+			if !f(c) {
+				return false
+			}
+		}
+	}
+	return true
+}
+
+// VisitAllConjuncts visits all conjuncts of v, including ConjunctGroups.
+// Note that ConjunctGroups do not have an Environment associated with them.
+func (v *Vertex) VisitAllConjuncts(f func(c Conjunct, isLeaf bool)) {
+	visitAllConjuncts(v.Conjuncts, f)
+}
+
+func visitAllConjuncts(a []Conjunct, f func(c Conjunct, isLeaf bool)) {
+	for _, c := range a {
+		switch x := c.x.(type) {
+		case *ConjunctGroup:
+			f(c, false)
+			visitAllConjuncts(*x, f)
+		default:
+			f(c, true)
+		}
+	}
+}
+
+// SingleConjunct reports whether there is a single leaf conjunct and returns 1
+// if so. It will return 0 if there are no conjuncts or 2 if there are more than
+// 1.
+//
+// This is an often-used operation.
+func (v *Vertex) SingleConjunct() (c Conjunct, count int) {
+	if v == nil {
+		return c, 0
+	}
+	v.VisitLeafConjuncts(func(x Conjunct) bool {
+		c = x
+		if count++; count > 1 {
+			return false
+		}
+		return true
+	})
+
+	return c, count
 }
 
 // Value returns the Value of v without definitions if it is a scalar

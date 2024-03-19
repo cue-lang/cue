@@ -183,10 +183,10 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 	if e.cfg.AddPackage {
 		pkgName := ""
 		pkg := &ast.Package{}
-		for _, c := range v.Conjuncts {
+		v.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 			f, _ := c.Source().(*ast.File)
 			if f == nil {
-				continue
+				return true
 			}
 
 			if _, name, _ := internal.PackageInfo(f); name != "" {
@@ -198,7 +198,8 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) *ast.File {
 					ast.AddComment(pkg, doc)
 				}
 			}
-		}
+			return true
+		})
 
 		if pkgName != "" {
 			pkg.Name = ast.NewIdent(pkgName)
@@ -389,9 +390,10 @@ func (e *exporter) markUsedFeatures(x adt.Expr) {
 		switch x := n.(type) {
 		case *adt.Vertex:
 			if !x.IsData() {
-				for _, c := range x.Conjuncts {
+				x.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 					w.Elem(c.Elem())
-				}
+					return true
+				})
 			}
 
 		case *adt.DynamicReference:
@@ -571,7 +573,8 @@ func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Exp
 
 			return e.expr(env, x.X)
 		}
-		return e.expr(ref.Conjuncts[0].EnvExpr())
+		c, _ := ref.SingleConjunct()
+		return e.expr(c.EnvExpr())
 
 	case let.Expr == nil:
 		label := e.uniqueLetIdent(x.Label, x.X)

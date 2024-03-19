@@ -102,11 +102,12 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	if result == nil {
 		// fall back to expression mode
 		a := []ast.Expr{}
-		for _, c := range n.Conjuncts {
+		n.VisitLeafConjuncts(func(c adt.Conjunct) bool {
 			if x := e.expr(c.Env, c.Elem()); x != dummyTop {
 				a = append(a, x)
 			}
-		}
+			return true
+		})
 		result = ast.NewBinExpr(token.AND, a...)
 	}
 

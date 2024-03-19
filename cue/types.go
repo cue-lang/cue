@@ -1983,7 +1983,7 @@ func (v Value) ReferencePath() (root Value, p Path) {
 	ctx := v.ctx()
 	c := v.v.Conjuncts[0]
 
-	x, path := reference(v.idx, ctx, c.Env, c.Expr())
+	x, path := reference(v.idx, ctx, c.Env, c.Elem())
 	if x == nil {
 		return Value{}, Path{}
 	}
@@ -1995,7 +1995,7 @@ func (v Value) ReferencePath() (root Value, p Path) {
 	return makeValue(v.idx, x, nil), Path{path: path}
 }
 
-func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Expr) (inst *adt.Vertex, path []Selector) {
+func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Elem) (inst *adt.Vertex, path []Selector) {
 	ctx := c
 	defer ctx.PopState(ctx.PushState(env, r.Source()))
 
@@ -2302,7 +2302,7 @@ func (v Value) Expr() (Op, []Value) {
 		return NoOp, nil
 	}
 
-	var expr adt.Expr
+	var expr adt.Elem
 	var env *adt.Environment
 
 	if v.v.IsData() {
@@ -2320,7 +2320,7 @@ func (v Value) Expr() (Op, []Value) {
 			// the default case, processed below.
 			c := v.v.Conjuncts[0]
 			env = c.Env
-			expr = c.Expr()
+			expr = c.Elem()
 			if w, ok := expr.(*adt.Vertex); ok {
 				return Value{v.idx, w, v.parent_}.Expr()
 			}

@@ -60,6 +60,12 @@ func NewVersioned(v internal.EvaluatorVersion) *Runtime {
 	return r
 }
 
+// SetVersion sets the version to use for the Runtime. This should only be set
+// before first use.
+func (r *Runtime) SetVersion(v internal.EvaluatorVersion) {
+	r.version = v
+}
+
 // IsInitialized reports whether the runtime has been initialized.
 func (r *Runtime) IsInitialized() bool {
 	return r.index != nil

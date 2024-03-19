@@ -281,9 +281,11 @@ func (e *extractor) usedPkg(pkg string) {
 }
 
 var (
-	typeAny   = types.NewInterfaceType(nil, nil).Complete() // interface{}
-	typeBytes = types.NewSlice(types.Typ[types.Byte])       // []byte
-	typeError = types.Universe.Lookup("error").Type()       // error
+	typeAny    = types.Universe.Lookup("any").Type()    // any or interface{}
+	typeByte   = types.Universe.Lookup("byte").Type()   // byte
+	typeBytes  = types.NewSlice(typeByte)               // []byte
+	typeString = types.Universe.Lookup("string").Type() // string
+	typeError  = types.Universe.Lookup("error").Type()  // error
 )
 
 // Note that we can leave positions, packages, and parameter/result names empty.
@@ -804,12 +806,13 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				}
 
 				typ := e.pkg.TypesInfo.TypeOf(name)
-				if s := typ.String(); !strings.Contains(s, "untyped") {
-					switch s {
-					case "byte", "string", "error":
-					default:
-						cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ), cv)
+				switch typ {
+				case typeByte, typeString, typeError:
+				default:
+					if basic, ok := typ.(*types.Basic); ok && basic.Info()&types.IsUntyped != 0 {
+						break // untyped basic types do not make valid identifiers
 					}
+					cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ), cv)
 				}
 
 				f.Value = cv
@@ -963,7 +966,7 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	t = t.Underlying()
 	switch x := t.(type) {
 	case *types.Basic:
-		return x.String() != "invalid type"
+		return x.Kind() != types.Invalid
 	case *types.Named:
 		return true
 	case *types.Pointer:
@@ -1042,9 +1045,8 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			return e.ident("_", false)
 		}
 		// Check for builtin packages.
-		// TODO: replace these literal types with a reference to the fixed
-		switch obj.Type().String() {
-		case "time.Time":
+		switch {
+		case obj.Pkg().Path() == "time" && obj.Name() == "Time":
 			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
 			var name *cueast.Ident
 			if ref.Name != "time" {
@@ -1053,7 +1055,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			ref.Node = cueast.NewImport(name, "time")
 			return cueast.NewSel(ref, obj.Name())
 
-		case "math/big.Int":
+		case obj.Pkg().Path() == "math/big" && obj.Name() == "Int":
 			return e.ident("int", false)
 
 		default:
@@ -1151,16 +1153,18 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		return st
 
 	case *types.Slice:
-		// TODO: should this be x.Elem().Underlying().String()? One could
-		// argue either way.
-		if x.Elem().String() == "byte" {
+		// Note that []byte is treated different from []uint8,
+		// even though byte is an alias for the basic type uint8.
+		// TODO: reconsider this; both encoding/json and the future v2
+		// encode []uint8, or anything assignable to []byte, as bytes.
+		if x.Elem() == typeByte {
 			return e.ident("bytes", false)
 		}
 		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(x.Elem())})
 
 	case *types.Array:
-		if x.Elem().String() == "byte" {
-			// TODO: no way to constraint lengths of bytes for now, as regexps
+		if x.Elem() == typeByte {
+			// TODO: no way to constrain lengths of bytes for now, as regexps
 			// operate on Unicode, not bytes. So we need
 			//     fmt.Fprint(e.w, fmt.Sprintf("=~ '^\C{%d}$'", x.Len())),
 			// but regexp does not support that.
@@ -1202,7 +1206,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		case types.Complex64, types.Complex128:
 			return e.ident("_", false)
 		}
-		return e.ident(x.String(), false)
+		return e.ident(x.Name(), false)
 
 	case *types.Union:
 		var exprs []cueast.Expr

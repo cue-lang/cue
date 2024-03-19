@@ -13,7 +13,5 @@ jobs:
         shell: bash
     if: ${{github.repository == 'cue-lang/cue'}}
     steps:
-      - name: Trigger tip.cuelang.org deploy
-        run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.CUECKOO_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail --request POST --data-binary "{\"ref\":\"master\"}" https://api.github.com/repos/cue-lang/cuelang.org/actions/workflows/update_tip.yml/dispatches'
       - name: Trigger unity build
         run: 'curl -s -L -H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${{ secrets.PORCUEPINE_GITHUB_PAT }}" -H "X-GitHub-Api-Version: 2022-11-28" --fail --request POST --data-binary "{\"event_type\":\"Check against ${GITHUB_SHA}\",\"client_payload\":{\"type\":\"unity\",\"payload\":{\"versions\":\"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-unity/unity-private/dispatches'

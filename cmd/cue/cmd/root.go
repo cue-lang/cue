@@ -30,7 +30,9 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/stats"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	cueruntime "cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/encoding"
@@ -108,6 +110,13 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 				return fmt.Errorf("could not start CPU profile: %v", err)
 			}
 			defer pprof.StopCPUProfile()
+		}
+
+		// TODO: do not rely on a global variable here, as this API is also used
+		// in a non-tooling context.
+		if cueexperiment.Flags.EvalV3 {
+			const dev = internal.DevVersion
+			(*cueruntime.Runtime)(c.ctx).SetVersion(internal.EvaluatorVersion(dev))
 		}
 
 		err := f(c, args)

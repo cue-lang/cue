@@ -250,6 +250,10 @@ func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 
 func (c *Context) make(v *adt.Vertex) Value {
 	opCtx := newContext(c.runtime())
+	// TODO: this is currently needed to ensure that node is properly recognized
+	// as evaluated. Not dereferencing nodes, however, will have the benefit of
+	// retaining more information. Remove the indirection when the code will be
+	// able to properly handle this.
 	x := newValueRoot(c.runtime(), opCtx, v)
 	adt.AddStats(opCtx)
 	return x

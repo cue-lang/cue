@@ -1,0 +1,13 @@
+env CUE_EXPERIMENT=evalv3
+exec cue eval
+cmp stdout out
+
+-- test.cue --
+package foo
+
+// This only works in the new evaluator as of this writing.
+y: 1 | {y: 1}
+y
+
+-- out --
+y: 1

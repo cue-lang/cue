@@ -490,7 +490,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 	}
 
 	// TODO: remove because unnecessary?
-	if task.state != taskRUNNING {
+	if task != nil && task.state != taskRUNNING {
 		return nil // abort, task is blocked or terminated in a cycle.
 	}
 
@@ -546,7 +546,9 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		switch runMode {
 		case ignore, attemptOnly:
 			// TODO: should we avoid notifying ArcPending vertices here?
-			arcState.addNotify2(task.node.node, task.id)
+			if task != nil {
+				arcState.addNotify2(task.node.node, task.id)
+			}
 			return arc
 
 		case yield:

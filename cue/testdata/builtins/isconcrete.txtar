@@ -1,0 +1,106 @@
+-- in.cue --
+a: {}
+b: int
+
+c: isconcrete(a)   // true
+d: isconcrete(b)   // false
+e: isconcrete(a.b) // false(b could still be defined)
+f: isconcrete(b.c) // fatal error (b.c can never be satisfied)
+
+foo: {
+    a?: string
+    b?: string
+    a: "test"
+}
+
+foo_a: isconcrete(foo.a) // true
+foo_b: isconcrete(foo.b) // false(b could still be defined)
+foo_c: isconcrete(foo.c)
+foo_a_x: isconcrete(foo.a.x) // fatal error (foo.a.x can never be satisfied)
+foo_b_x: isconcrete(foo.b.x) // fatal error (foo.b.x can never be satisfied)
+foo_c_x: isconcrete(foo.c.x)
+foo_e: isconcrete({a: 1, a: 2}.a) // fatal error (conflict values)
+
+-- out/compile --
+--- in.cue
+{
+  a: {}
+  b: int
+  c: isconcrete(〈0;a〉)
+  d: isconcrete(〈0;b〉)
+  e: isconcrete(〈0;a〉.b)
+  f: isconcrete(〈0;b〉.c)
+  foo: {
+    a?: string
+    b?: string
+    a: "test"
+  }
+  foo_a: isconcrete(〈0;foo〉.a)
+  foo_b: isconcrete(〈0;foo〉.b)
+  foo_c: isconcrete(〈0;foo〉.c)
+  foo_a_x: isconcrete(〈0;foo〉.a.x)
+  foo_b_x: isconcrete(〈0;foo〉.b.x)
+  foo_c_x: isconcrete(〈0;foo〉.c.x)
+  foo_e: isconcrete({
+    a: 1
+    a: 2
+  }.a)
+}
+-- out/eval/stats --
+Leaks:  2
+Freed:  17
+Reused: 15
+Allocs: 4
+Retain: 2
+
+Unifications: 19
+Conjuncts:    27
+Disjuncts:    18
+-- out/eval --
+Errors:
+a: conflicting values 2 and 1:
+    ./in.cue:21:23
+    ./in.cue:21:29
+f: invalid operand b (found int, want list or struct):
+    ./in.cue:7:15
+foo_a_x: invalid operand foo.a (found string, want list or struct):
+    ./in.cue:18:21
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+  }
+  b: (int){ int }
+  c: (bool){ true }
+  d: (bool){ false }
+  e: (bool){ false }
+  f: (_|_){
+    // [eval] f: invalid operand b (found int, want list or struct):
+    //     ./in.cue:7:15
+  }
+  foo: (struct){
+    a: (string){ "test" }
+    b?: (string){ string }
+  }
+  foo_a: (bool){ true }
+  foo_b: (bool){ false }
+  foo_c: (bool){ false }
+  foo_a_x: (_|_){
+    // [eval] foo_a_x: invalid operand foo.a (found string, want list or struct):
+    //     ./in.cue:18:21
+  }
+  foo_b_x: (_|_){
+    // [incomplete] foo_b_x: cannot reference optional field: b:
+    //     ./in.cue:19:25
+  }
+  foo_c_x: (_|_){
+    // [incomplete] foo_c_x: undefined field: c:
+    //     ./in.cue:20:25
+  }
+  foo_e: (_|_){
+    // [eval] a: conflicting values 2 and 1:
+    //     ./in.cue:21:23
+    //     ./in.cue:21:29
+  }
+}

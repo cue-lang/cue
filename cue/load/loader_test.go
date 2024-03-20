@@ -211,15 +211,35 @@ dir:    $CWD/testdata/testmod
 display:command-line-arguments
 files:
     -`}, {
-		// NOTE: dir should probably be set to $CWD/testdata, but either way.
 		cfg:  dirCfg,
-		args: []string{"non-existing"},
-		want: `err:    implied package identifier "non-existing" from import path "non-existing" is not valid
-path:   non-existing
+		args: []string{"foo.com/bad-identifier"},
+		want: `err:    implied package identifier "bad-identifier" from import path "foo.com/bad-identifier" is not valid
+path:   foo.com/bad-identifier
 module: mod.test/test
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/non-existing
-display:non-existing`,
+dir:    $CWD/testdata/testmod/cue.mod/gen/foo.com/bad-identifier
+display:foo.com/bad-identifier`,
+	}, {
+		cfg:  dirCfg,
+		args: []string{"nonexisting"},
+		want: `err:    cannot find package "nonexisting"
+path:   nonexisting
+module: mod.test/test
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/cue.mod/gen/nonexisting
+display:nonexisting`,
+	}, {
+		// TODO this should not work, as "strconv" is a standard library
+		// import and should always be treated as such.
+		cfg:  dirCfg,
+		args: []string{"strconv"},
+		want: `path:   strconv
+module: mod.test/test
+root:   $CWD/testdata/testmod
+dir:    $CWD/testdata/testmod/cue.mod/gen/strconv
+display:strconv
+files:
+    $CWD/testdata/testmod/cue.mod/pkg/strconv/strconv.cue`,
 	}, {
 		cfg:  dirCfg,
 		args: []string{"./empty"},

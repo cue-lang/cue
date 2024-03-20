@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90e082d1_88076543",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T12:28:35Z",
+      "side": 1,
+      "message": "this paragraph should be updated to reflect the other point I raised",
+      "revId": "c025a43ad8317241a578b7855c7cd8a31c444ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6f6030f6_b1985333",
+        "filename": "tools/flow/testdata/issue2517.txtar",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T12:28:35Z",
+      "side": 1,
+      "message": "I would personally do this as a new issue2965.txtar; not just to clearly reference the new bug report, but also because 2517 was about nested task dependencies, so I would rather keep the two reproducers isolated and untouched over time if we can.",
+      "revId": "c025a43ad8317241a578b7855c7cd8a31c444ff1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

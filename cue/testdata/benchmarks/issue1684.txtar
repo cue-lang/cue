@@ -88,17 +88,7 @@ Result:
         _id: (string){ "100" }
       }
     }
-    ONE: (_|_){
-      // [eval] out.FOO: field not allowed:
-      //     ./in.cue:14:11
-      //     ./in.cue:4:22
-      //     ./in.cue:7:2
-      //     ./in.cue:17:2
-      // out.ONE: field not allowed:
-      //     ./in.cue:14:11
-      //     ./in.cue:4:22
-      //     ./in.cue:8:2
-      //     ./in.cue:18:2
+    ONE: (struct){
       TWO: (struct){
         THREE: (struct){
           $secret: (struct){
@@ -134,7 +124,7 @@ diff old new
    #Secret: (#struct){
      $secret: (#struct){
        id: (string){ string }
-@@ -12,17 +26,37 @@
+@@ -12,17 +26,27 @@
        }
      }, (#struct){
      }) }
@@ -162,17 +152,7 @@ diff old new
 -      TWO: (#struct){
 -        THREE: (#struct){
 -          $secret: (#struct){
-+    ONE: (_|_){
-+      // [eval] out.FOO: field not allowed:
-+      //     ./in.cue:14:11
-+      //     ./in.cue:4:22
-+      //     ./in.cue:7:2
-+      //     ./in.cue:17:2
-+      // out.ONE: field not allowed:
-+      //     ./in.cue:14:11
-+      //     ./in.cue:4:22
-+      //     ./in.cue:8:2
-+      //     ./in.cue:18:2
++    ONE: (struct){
 +      TWO: (struct){
 +        THREE: (struct){
 +          $secret: (struct){

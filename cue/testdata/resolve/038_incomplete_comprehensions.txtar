@@ -57,46 +57,6 @@ Retain: 9
 Unifications: 11
 Conjuncts:    16
 Disjuncts:    16
--- out/evalalpha --
-(struct){
-  A: (_|_){
-    // [incomplete] A: cannot range over src (incomplete type _):
-    //     ./in.cue:2:11
-    src: (_){ _ }
-    baz: (_|_){
-      // [incomplete] A: cannot range over src (incomplete type _):
-      //     ./in.cue:2:11
-    }
-  }
-  B: (struct){
-    src: (#list){
-      0: (string){ "foo" }
-      1: (string){ "bar" }
-    }
-    baz: (string){ "baz" }
-    foo: (string){ "foo" }
-    bar: (string){ "bar" }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -3,7 +3,10 @@
-     // [incomplete] A: cannot range over src (incomplete type _):
-     //     ./in.cue:2:11
-     src: (_){ _ }
--    baz: (string){ "baz" }
-+    baz: (_|_){
-+      // [incomplete] A: cannot range over src (incomplete type _):
-+      //     ./in.cue:2:11
-+    }
-   }
-   B: (struct){
-     src: (#list){
--- diff/todo/p3 --
-A.baz: introduces incomplete error where it is not strictly appropriate.
-  This is not very serious in this case, though.
 -- out/eval --
 (struct){
   A: (_|_){

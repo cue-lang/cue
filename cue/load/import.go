@@ -213,13 +213,8 @@ func (l *loader) _loadFunc(pos token.Pos, path string) *build.Instance {
 		return l.cfg.newErrInstance(errors.Newf(pos, "relative import paths not allowed (%q)", path))
 	}
 
-	// is it a builtin?
-	if strings.IndexByte(strings.Split(path, "/")[0], '.') == -1 {
-		if l.cfg.StdRoot != "" {
-			p := l.newInstance(pos, impPath)
-			_ = l.importPkg(pos, p)
-			return p
-		}
+	if isStdlibPackage(path) {
+		// It looks like a builtin.
 		return nil
 	}
 
@@ -407,4 +402,10 @@ func absPathForSourceLoc(loc module.SourceLoc) (string, error) {
 		return "", fmt.Errorf("cannot get absolute path for FS of type %T", loc.FS)
 	}
 	return filepath.Join(osPath, loc.Dir), nil
+}
+
+// isStdlibPackage reports whether pkgPath looks like
+// an import from the standard library.
+func isStdlibPackage(pkgPath string) bool {
+	return strings.IndexByte(strings.Split(pkgPath, "/")[0], '.') == -1
 }

@@ -1,0 +1,6 @@
+env CUE_EXPERIMENT=modules
+exec cue mod init test.example
+! exec cue export anypath
+cmp stderr want-stderr
+-- want-stderr --
+"anypath" cannot be imported as CUE package

@@ -222,24 +222,21 @@ display:foo.com/bad-identifier`,
 	}, {
 		cfg:  dirCfg,
 		args: []string{"nonexisting"},
-		want: `err:    cannot find package "nonexisting"
+		want: `err:    "nonexisting" cannot be imported as CUE package
 path:   nonexisting
 module: mod.test/test
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/nonexisting
+dir:    ""
 display:nonexisting`,
 	}, {
-		// TODO this should not work, as "strconv" is a standard library
-		// import and should always be treated as such.
 		cfg:  dirCfg,
 		args: []string{"strconv"},
-		want: `path:   strconv
+		want: `err:    "strconv" cannot be imported as CUE package
+path:   strconv
 module: mod.test/test
 root:   $CWD/testdata/testmod
-dir:    $CWD/testdata/testmod/cue.mod/gen/strconv
-display:strconv
-files:
-    $CWD/testdata/testmod/cue.mod/pkg/strconv/strconv.cue`,
+dir:    ""
+display:strconv`,
 	}, {
 		cfg:  dirCfg,
 		args: []string{"./empty"},

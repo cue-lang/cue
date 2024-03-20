@@ -213,7 +213,7 @@ func (l *loader) _loadFunc(pos token.Pos, path string) *build.Instance {
 		return l.cfg.newErrInstance(errors.Newf(pos, "relative import paths not allowed (%q)", path))
 	}
 
-	if isStdlibImport(path) {
+	if isStdlibPackage(path) {
 		// It looks like a builtin.
 		return nil
 	}
@@ -326,6 +326,9 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	if l.cfg.ModuleRoot == "" {
 		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
 	}
+	if isStdlibPackage(string(p)) {
+		return "", "", errors.Newf(pos, "%q cannot be imported as CUE package", p)
+	}
 	origp := p
 	// Extract the package name.
 	parts := module.ParseImportPath(string(p))
@@ -407,5 +410,5 @@ func absPathForSourceLoc(loc module.SourceLoc) (string, error) {
 // isStdlibPackage reports whether pkgPath looks like
 // an import from the standard library.
 func isStdlibPackage(pkgPath string) bool {
-	return strings.IndexByte(strings.Split(path, "/")[0], '.') == -1
+	return strings.IndexByte(strings.Split(pkgPath, "/")[0], '.') == -1
 }

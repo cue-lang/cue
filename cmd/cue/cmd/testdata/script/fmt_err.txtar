@@ -11,6 +11,12 @@ exec cue fmt ./...
 cmp x.cue out/x_cue
 cd ..
 
+cd issue1938
+exec cue fmt x.cue y.cue
+cmp x.cue out/x_cue
+cmp y.cue out/y_cue
+cd ..
+
 -- cue.mod/module.cue --
 module: "mod.test/x"
 -- emptypkg/.empty --
@@ -40,3 +46,23 @@ package x
 import "mod.test/x/emptypkg"
 
 x: 5
+-- issue1938/x.cue --
+package x
+
+import   "mod.test/x/nosuchpkg"
+
+x: 5
+-- issue1938/out/x_cue --
+package x
+
+import "mod.test/x/nosuchpkg"
+
+x: 5
+-- issue1938/y.cue --
+package y
+
+y:      6
+-- issue1938/out/y_cue --
+package y
+
+y: 6

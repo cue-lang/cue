@@ -44,6 +44,7 @@ Available Commands:
   get            add dependencies to the current module
   help           Help about any command
   import         convert other formats to CUE files
+  login          log into a CUE registry
   mod            module maintenance
   trim           remove superfluous fields
   version        print CUE version

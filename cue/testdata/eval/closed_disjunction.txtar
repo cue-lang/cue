@@ -55,18 +55,8 @@ Result:
     // b.d: field not allowed:
     //     ./in.cue:13:2
     c: (int){ 3 }
-    d: (_|_){
-      // [eval] b.c: field not allowed:
-      //     ./in.cue:12:2
-      // b.d: field not allowed:
-      //     ./in.cue:13:2
-    }
-    b?: (_|_){
-      // [eval] b.c: field not allowed:
-      //     ./in.cue:12:2
-      // b.d: field not allowed:
-      //     ./in.cue:13:2
-    }
+    d: (int){ 4 }
+    b?: (int){ int }
   }
 }
 -- diff/-out/evalalpha<==>+out/eval --
@@ -90,7 +80,7 @@ diff old new
      ./in.cue:13:2
  
  Result:
-@@ -33,36 +24,22 @@
+@@ -33,36 +24,12 @@
      c: (int){ 3 }
    }
    b: (_|_){
@@ -108,7 +98,9 @@ diff old new
 -    //     ./in.cue:3:8
 -    //     ./in.cue:11:4
      //     ./in.cue:13:2
--    b?: (int){ int }
++    c: (int){ 3 }
++    d: (int){ 4 }
+     b?: (int){ int }
 -    c: (_|_){
 -      // [eval] b.c: field not allowed:
 -      //     ./in.cue:1:5
@@ -117,8 +109,7 @@ diff old new
 -      //     ./in.cue:11:4
 -      //     ./in.cue:12:2
 -    }
-+    c: (int){ 3 }
-     d: (_|_){
+-    d: (_|_){
 -      // [eval] b.d: field not allowed:
 -      //     ./in.cue:1:5
 -      //     ./in.cue:3:2
@@ -127,17 +118,6 @@ diff old new
 -      //     ./in.cue:13:2
 -    }
 -    e?: (int){ int }
-+      // [eval] b.c: field not allowed:
-+      //     ./in.cue:12:2
-+      // b.d: field not allowed:
-+      //     ./in.cue:13:2
-+    }
-+    b?: (_|_){
-+      // [eval] b.c: field not allowed:
-+      //     ./in.cue:12:2
-+      // b.d: field not allowed:
-+      //     ./in.cue:13:2
-+    }
    }
  }
 -- diff/todo/p3 --

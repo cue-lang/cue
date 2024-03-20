@@ -222,7 +222,7 @@ func (l *loader) importPaths(patterns []string) []*match {
 	return matches
 }
 
-// importPathsQuiet is like ImportPaths but does not warn about patterns with no matches.
+// importPathsQuiet is like importPaths but does not warn about patterns with no matches.
 func (l *loader) importPathsQuiet(patterns []string) []*match {
 	var out []*match
 	for _, a := range cleanPatterns(patterns) {

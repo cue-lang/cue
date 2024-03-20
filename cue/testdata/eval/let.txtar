@@ -159,15 +159,15 @@ keepDescending: t2: {
 }
 
 -- out/eval/stats --
-Leaks:  51
-Freed:  159
-Reused: 150
-Allocs: 60
-Retain: 188
+Leaks:  52
+Freed:  158
+Reused: 149
+Allocs: 61
+Retain: 184
 
 Unifications: 196
-Conjuncts:    373
-Disjuncts:    248
+Conjuncts:    365
+Disjuncts:    241
 -- out/eval --
 Errors:
 indirectReference.y: conflicting values 2 and 1:

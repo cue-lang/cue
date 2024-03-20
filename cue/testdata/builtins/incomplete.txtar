@@ -101,14 +101,14 @@ multipleErrors: {
 	}
 }
 -- out/eval/stats --
-Leaks:  6
-Freed:  123
-Reused: 118
-Allocs: 11
-Retain: 53
+Leaks:  8
+Freed:  121
+Reused: 116
+Allocs: 13
+Retain: 61
 
 Unifications: 109
-Conjuncts:    266
+Conjuncts:    264
 Disjuncts:    156
 -- out/eval --
 Errors:

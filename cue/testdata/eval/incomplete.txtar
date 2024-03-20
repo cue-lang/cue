@@ -44,15 +44,91 @@ issue1837: {
 	}
 }
 -- out/eval/stats --
-Leaks:  0
-Freed:  32
-Reused: 26
-Allocs: 6
-Retain: 96
+Leaks:  2
+Freed:  30
+Reused: 25
+Allocs: 7
+Retain: 80
 
 Unifications: 32
-Conjuncts:    172
-Disjuncts:    45
+Conjuncts:    156
+Disjuncts:    29
+-- out/eval --
+(struct){
+  s: (string){ string }
+  e1: (_|_){
+    // [incomplete] e1: non-concrete value string in operand to +:
+    //     ./in.cue:3:6
+    //     ./in.cue:1:4
+  }
+  e2: (string){ >"bar" }
+  e3: (_|_){
+    // [incomplete] e3: non-concrete value s for bound >:
+    //     ./in.cue:5:7
+  }
+  e3b: (_|_){
+    // [incomplete] e3b: non-concrete value s for bound >:
+    //     ./in.cue:6:7
+  }
+  e4: (_|_){
+    // [incomplete] e1: non-concrete value string in operand to +:
+    //     ./in.cue:3:6
+    //     ./in.cue:1:4
+  }
+  e5: (_|_){
+    // [cycle] cycle error
+  }
+  E: (struct){
+    a: (_|_){
+      // [cycle] cycle error:
+      //     ./in.cue:12:5
+    }
+    b: (_|_){
+      // [cycle] cycle error:
+      //     ./in.cue:13:5
+    }
+    c: (_|_){
+      // [cycle] cycle error:
+      //     ./in.cue:12:5
+      // cycle error:
+      //     ./in.cue:13:5
+    }
+  }
+  a: (int){ int }
+  okay: (_|_){
+    // [incomplete] non-concrete value a for bound <:
+    //     ./in.cue:18:15
+  }
+  issue1837: (struct){
+    p1: (struct){
+      context: (struct){
+      }
+      x: (_|_){
+        // [incomplete] issue1837.p1.x: undefined field: b:
+        //     ./in.cue:25:14
+      }
+      message: (string){ "a" }
+    }
+    p2: (struct){
+      message: (string){ "a" }
+      x: (_|_){
+        // [incomplete] issue1837.p2.x: undefined field: b:
+        //     ./in.cue:34:14
+      }
+      context: (struct){
+      }
+    }
+    p3: (struct){
+      message: (string){ "a" }
+      context: (struct){
+      }
+      x: (_|_){
+        // [incomplete] issue1837.p3.x: undefined field: b:
+        //     ./in.cue:42:14
+      }
+    }
+  }
+}
 -- out/evalalpha --
 (struct){
   s: (string){ string }
@@ -179,82 +255,6 @@ diff old new
    a: (int){ int }
 -- diff/explanation --
 Improved error messages.
--- out/eval --
-(struct){
-  s: (string){ string }
-  e1: (_|_){
-    // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:6
-    //     ./in.cue:1:4
-  }
-  e2: (string){ >"bar" }
-  e3: (_|_){
-    // [incomplete] e3: non-concrete value s for bound >:
-    //     ./in.cue:5:7
-  }
-  e3b: (_|_){
-    // [incomplete] e3b: non-concrete value s for bound >:
-    //     ./in.cue:6:7
-  }
-  e4: (_|_){
-    // [incomplete] e1: non-concrete value string in operand to +:
-    //     ./in.cue:3:6
-    //     ./in.cue:1:4
-  }
-  e5: (_|_){
-    // [cycle] cycle error
-  }
-  E: (struct){
-    a: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:12:5
-    }
-    b: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:13:5
-    }
-    c: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:12:5
-      // cycle error:
-      //     ./in.cue:13:5
-    }
-  }
-  a: (int){ int }
-  okay: (_|_){
-    // [incomplete] non-concrete value a for bound <:
-    //     ./in.cue:18:15
-  }
-  issue1837: (struct){
-    p1: (struct){
-      context: (struct){
-      }
-      x: (_|_){
-        // [incomplete] issue1837.p1.x: undefined field: b:
-        //     ./in.cue:25:14
-      }
-      message: (string){ "a" }
-    }
-    p2: (struct){
-      message: (string){ "a" }
-      x: (_|_){
-        // [incomplete] issue1837.p2.x: undefined field: b:
-        //     ./in.cue:34:14
-      }
-      context: (struct){
-      }
-    }
-    p3: (struct){
-      message: (string){ "a" }
-      context: (struct){
-      }
-      x: (_|_){
-        // [incomplete] issue1837.p3.x: undefined field: b:
-        //     ./in.cue:42:14
-      }
-    }
-  }
-}
 -- out/compile --
 --- in.cue
 {

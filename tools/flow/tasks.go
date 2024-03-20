@@ -91,10 +91,6 @@ func (c *Controller) findRootTasks(v cue.Value) {
 
 // getTask finds and marks tasks that are descendents of v.
 func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
-	if err := v.Err(); err != nil {
-		c.addErr(err, "invalid task")
-		return nil
-	}
 	// Look up cached node.
 	_, w := value.ToInternal(v)
 	if t, ok := c.nodes[w]; ok {

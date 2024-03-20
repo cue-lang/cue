@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a9bc279_98952871",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T16:31:14Z",
+      "side": 1,
+      "message": "Jesus, can I spell? I made this mistake twice!",
+      "parentUuid": "0d82b1b1_294c9874",
+      "revId": "e608fea0fba0cb43551fd26f0c3be8654e8273ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "77de0968_254d17be",
@@ -37,6 +55,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "e082a1d9_d785eafb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T16:31:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "77de0968_254d17be",
+      "revId": "e608fea0fba0cb43551fd26f0c3be8654e8273ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "1183f165_f459399a",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 1
@@ -48,6 +84,24 @@
       "writtenOn": "2024-03-20T16:20:14Z",
       "side": 1,
       "message": "LGTM (and good investigation skills!) although I have slight high level UX misgivings about the overall behaviour of merging files that are ostensibly in different packages. Still, I think what\u0027s happening here is as good as we can do for now.",
+      "revId": "e608fea0fba0cb43551fd26f0c3be8654e8273ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c1f0d434_4cfdef44",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T16:31:14Z",
+      "side": 1,
+      "message": "Yeah, I agree it\u0027s a bit awkward. My initial attempt was to make the \"load files\" func create multiple instances, one per package name, but I quickly broke a ton of other tests, so I opted for leaning into the current API design, even if it\u0027s a bit flawed.",
+      "parentUuid": "1183f165_f459399a",
       "revId": "e608fea0fba0cb43551fd26f0c3be8654e8273ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

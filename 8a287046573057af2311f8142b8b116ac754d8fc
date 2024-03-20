@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b55b7a8a_503b94d3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T15:57:35Z",
+      "side": 1,
+      "message": "Seems reasonable I guess, but is it really worth fixing this one kind of (probably relatively unusual) error rather than fixing the underlying issue that imports are being inappropriately resolved?",
+      "revId": "8a287046573057af2311f8142b8b116ac754d8fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dd7711c_d0b58c8e",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T15:57:35Z",
+      "side": 1,
+      "message": "or `new(*load.PackageError)` to make it clear the value isn\u0027t going to be used?",
+      "revId": "8a287046573057af2311f8142b8b116ac754d8fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -92,10 +92,7 @@ Result:
     // [eval] bar.c: field not allowed:
     //     ./in.cue:12:7
     c: (int){ 2 }
-    field: (_|_){
-      // [eval] bar.c: field not allowed:
-      //     ./in.cue:12:7
-    }
+    field: (int){ int }
   }
   baz: (#struct){
     b: (int){ 2 }
@@ -115,7 +112,7 @@ diff old new
      ./in.cue:12:7
  
  Result:
-@@ -16,28 +13,20 @@
+@@ -16,28 +13,17 @@
        b: (int){ 2 }
      }) }
    foo: (#struct){
@@ -131,16 +128,16 @@ diff old new
      //     ./in.cue:12:7
 -    field: (int){ int }
 -    c: (_|_){
-+    c: (int){ 2 }
-+    field: (_|_){
-       // [eval] bar.c: field not allowed:
+-      // [eval] bar.c: field not allowed:
 -      //     ./in.cue:1:7
 -      //     ./in.cue:4:2
 -      //     ./in.cue:5:2
 -      //     ./in.cue:11:6
-       //     ./in.cue:12:7
-     }
+-      //     ./in.cue:12:7
+-    }
 -    b: (int){ 2 }
++    c: (int){ 2 }
++    field: (int){ int }
    }
    baz: (#struct){
 -    field: (int){ int }
@@ -149,8 +146,6 @@ diff old new
 +    field: (int){ int }
    }
  }
--- diff/todo/p1 --
-bar.field: error reported in wrong node.
 -- diff/todo/p2 --
 Missing error positions and reorderings.
 -- diff/explanation --

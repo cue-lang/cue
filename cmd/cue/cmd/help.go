@@ -77,12 +77,13 @@ Simply type ` + c.Name() + ` help [path to command] for full details.`,
 // Consider removing support for the short form at some point.
 
 var helpTopics = []*cobra.Command{
-	inputsHelp,
-	environmentHelp,
-	flagsHelp,
-	filetypeHelp,
-	injectHelp,
 	commandsHelp,
+	environmentHelp,
+	filetypeHelp,
+	flagsHelp,
+	injectHelp,
+	inputsHelp,
+	modulesHelp,
 	registryConfigHelp,
 }
 
@@ -200,6 +201,35 @@ setting.
 		This variable specifies which registry or registries to use for
 		downloading and publishing modules. See "cue help registryconfig"
 		for details.
+`,
+}
+
+var modulesHelp = &cobra.Command{
+	Use:   "modules",
+	Short: "module support",
+	Long: `Modules are how CUE publishes packages and manages dependencies.
+
+NOTE: modules support is current experimental. To enable the
+experiment, you must enable the modules experiment by exporting this
+environment variable:
+
+	CUE_EXPERIMENT=modules
+
+A module is a collection of packages that are released, versioned, and
+distributed together. Modules are downloaded from OCI-compliant
+artifact registries.
+
+For a detailed reference on modules:
+
+	https://cuelang.org/docs/reference/modules/
+
+For a tutorial on how to work with a custom OCI registry for CUE modules:
+
+	https://cuelang.org/docs/tutorial/working-with-a-custom-module-registry/
+
+For information on how to specify the CUE registry:
+
+	cue help registryconfig
 `,
 }
 
@@ -741,5 +771,3 @@ func indent(s string) string {
 
 // TODO: filetypes:
 // - binpb
-
-// TODO: cue.mod help topic

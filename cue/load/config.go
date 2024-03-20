@@ -252,7 +252,7 @@ type Config struct {
 	DataFiles bool
 
 	// StdRoot specifies an alternative directory for standard libraries.
-	// This is mostly used for bootstrapping.
+	// Deprecated: this has no effect.
 	StdRoot string
 
 	// ParseFile is called to read and parse each file when preparing a
@@ -310,6 +310,7 @@ type fsPath string
 
 func addImportQualifier(pkg importPath, name string) (importPath, errors.Error) {
 	if name != "" {
+		// TODO use module.ParseImportPath
 		s := string(pkg)
 		if i := strings.LastIndexByte(s, '/'); i >= 0 {
 			s = s[i+1:]

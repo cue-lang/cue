@@ -56,6 +56,23 @@
       },
       "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d90bff6a_a1dcd3a2",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T12:17:16Z",
+      "side": 1,
+      "message": "\u003e \u0027cue mod\u0027 groups commands which operate on the current module.",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

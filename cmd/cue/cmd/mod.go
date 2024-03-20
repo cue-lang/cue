@@ -33,7 +33,13 @@ func newModCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mod <cmd> [arguments]",
 		Short: "module maintenance",
-		Long: `
+		Long: `Cue mod provides access to operations on modules.
+
+Note that support for modules is built into all the cue commands, not
+just 'cue mod'.
+
+See also:
+	cue help modules
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			stderr := cmd.Stderr()

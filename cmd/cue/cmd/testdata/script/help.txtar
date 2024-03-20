@@ -65,6 +65,7 @@ Additional help topics:
   cue flags          common flags for composing packages
   cue injection      inject files or values into specific fields for a build
   cue inputs         package list, patterns, and files
+  cue modules        module support
   cue registryconfig module registry configuration
 
 Use "cue [command] --help" for more information about a command.

@@ -948,7 +948,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, flags combinedFl
 		// As long as we have incomplete information, we cannot mark the
 		// inability to look up a field as "final", as it may resolve down the
 		// line.
-		permanent := x.status > conjuncts
+		permanent := x.status >= conjuncts
 		if m, _ := x.BaseValue.(*ListMarker); m != nil && !m.IsOpen {
 			permanent = true
 		}

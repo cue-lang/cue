@@ -746,11 +746,11 @@ Leaks:  15
 Freed:  394
 Reused: 388
 Allocs: 21
-Retain: 108
+Retain: 100
 
 Unifications: 395
-Conjuncts:    640
-Disjuncts:    472
+Conjuncts:    636
+Disjuncts:    464
 -- out/eval --
 Errors:
 embed.fail1.p: field not allowed:

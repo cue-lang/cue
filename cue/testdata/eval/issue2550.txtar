@@ -21,11 +21,25 @@ Leaks:  1
 Freed:  4
 Reused: 1
 Allocs: 4
-Retain: 5
+Retain: 2
 
 Unifications: 5
 Conjuncts:    5
-Disjuncts:    9
+Disjuncts:    6
+-- out/eval --
+Errors:
+undefined field: missing:
+    ./in.cue:4:8
+
+Result:
+(_|_){
+  // [eval] undefined field: missing:
+  //     ./in.cue:4:8
+  foo: (string){ string }
+  bar: (#struct){
+  }
+  let _bar#1 = (_){ _ }
+}
 -- out/evalalpha --
 (_|_){
   // [incomplete] undefined field: missing:
@@ -45,8 +59,21 @@ Disjuncts:    9
 diff old new
 --- old
 +++ new
-@@ -7,5 +7,8 @@
-   }
+@@ -1,13 +1,14 @@
+-Errors:
+-undefined field: missing:
+-    ./in.cue:4:8
+-
+-Result:
+ (_|_){
+-  // [eval] undefined field: missing:
++  // [incomplete] undefined field: missing:
+   //     ./in.cue:4:8
+-  foo: (string){ string }
++  foo: (_|_){
++    // [incomplete] undefined field: missing:
++    //     ./in.cue:4:8
++  }
    bar: (#struct){
    }
 -  let _bar#1 = (_){ _ }
@@ -57,15 +84,3 @@ diff old new
  }
 -- diff/todo/p2 --
 Let seems to have misplaced error, even though it does not affect outcome.
--- out/eval --
-(_|_){
-  // [incomplete] undefined field: missing:
-  //     ./in.cue:4:8
-  foo: (_|_){
-    // [incomplete] undefined field: missing:
-    //     ./in.cue:4:8
-  }
-  bar: (#struct){
-  }
-  let _bar#1 = (_){ _ }
-}

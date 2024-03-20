@@ -59,15 +59,48 @@ h: _|_ // invalid operation: [3].b (type list does not support selection)
   ].b
 }
 -- out/eval/stats --
-Leaks:  17
+Leaks:  9
 Freed:  10
 Reused: 8
-Allocs: 19
-Retain: 17
+Allocs: 11
+Retain: 9
 
-Unifications: 27
-Conjuncts:    35
-Disjuncts:    25
+Unifications: 19
+Conjuncts:    19
+Disjuncts:    17
+-- out/eval --
+Errors:
+e: invalid struct selector 4 (type int):
+    ./in.cue:4:16
+h: invalid list index b (type string):
+    ./in.cue:7:13
+
+Result:
+(_|_){
+  // [eval]
+  obj: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  index: (int){ 2 }
+  mulidx: (int){ 3 }
+  e: (_|_){
+    // [eval] e: invalid struct selector 4 (type int):
+    //     ./in.cue:4:16
+  }
+  f: (_|_){
+    // [incomplete] f: undefined field: b:
+    //     ./in.cue:5:16
+  }
+  g: (_|_){
+    // [incomplete] g: undefined field: b:
+    //     ./in.cue:6:16
+  }
+  h: (_|_){
+    // [eval] h: invalid list index b (type string):
+    //     ./in.cue:7:13
+  }
+}
 -- out/evalalpha --
 Errors:
 e: index out of range [4] with length 0:
@@ -136,36 +169,3 @@ diff old new
 -- diff/explanation --
 Better error message for undefined field in new.
 Other error got worse, but this is covered elsewhere.
--- out/eval --
-Errors:
-e: invalid struct selector 4 (type int):
-    ./in.cue:4:16
-h: invalid list index b (type string):
-    ./in.cue:7:13
-
-Result:
-(_|_){
-  // [eval]
-  obj: (struct){
-    a: (int){ 1 }
-    b: (int){ 2 }
-  }
-  index: (int){ 2 }
-  mulidx: (int){ 3 }
-  e: (_|_){
-    // [eval] e: invalid struct selector 4 (type int):
-    //     ./in.cue:4:16
-  }
-  f: (_|_){
-    // [incomplete] f: undefined field: b:
-    //     ./in.cue:5:16
-  }
-  g: (_|_){
-    // [incomplete] g: undefined field: b:
-    //     ./in.cue:6:16
-  }
-  h: (_|_){
-    // [eval] h: invalid list index b (type string):
-    //     ./in.cue:7:13
-  }
-}

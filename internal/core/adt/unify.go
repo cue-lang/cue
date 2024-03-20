@@ -192,22 +192,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	state := finalized
 	n.validateValue(state)
 
-	if err, ok := n.node.BaseValue.(*Bottom); ok {
-		for _, arc := range n.node.Arcs {
-			if arc.Label.IsLet() {
-				continue
-			}
-			c := MakeConjunct(nil, err, c.CloseInfo())
-			if arc.state != nil {
-				// TODO: should we do insert conjunct instead? that would also
-				// notify.
-				arc.getState(n.ctx)
-				// TODO: Maybe insert when not yet in progress?
-				arc.state.scheduleConjunct(c, c.CloseInfo)
-			}
-		}
-	}
-
 	if n.node.Label.IsLet() || n.meets(allAncestorsProcessed) {
 		if cc := v.rootCloseContext(); !cc.isDecremented { // TODO: use v.cc
 			cc.decDependent(c, ROOT, nil) // REF(decrement:nodeDone)
@@ -294,6 +278,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 			if n := src.src.getState(n.ctx); n != nil {
 				n.completeNodeConjuncts()
 			}
+			// FIXME: we should be careful to not evaluate parent nodes if we
+			// are inside a disjunction, or at least ensure that there are no
+			// disjunction values leaked into non-disjunction nodes through
+			// evaluating externalDeps.
 			src.src.unify(n.ctx, needTasksDone, attemptOnly)
 			a.cc.decDependent(c, a.kind, src) // REF(arcs)
 		}

@@ -371,8 +371,9 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	}
 
 	if o.src == nil {
-		// fall back to original vertex. We have only copied the vertices to
-		// catch the counts.
+		// fall back to original vertex.
+		// FIXME: this is incorrect, as it may lead to evaluating nodes that
+		// are not part of the disjunction with values of the disjunction.
 		// TODO: try eliminating EVAL dependencies of arcs that are the parent
 		// of the disjunction root.
 		o.src = x.src

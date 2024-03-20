@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "11bae109_4725b2d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T16:10:47Z",
+      "side": 1,
+      "message": "I think so. For one, NoFilesError can happen on packages directly given as arguments, so it\u0027s not specific to imports. And second, we\u0027ve already had the issue with fmt loading imports for years, so I don\u0027t think we should wait longer to fix these sharp edges. If there is low hanging fruit to pick while adding test cases, I would rather do it now, than leaving it broken and hoping that we\u0027ll find time for a proper fix in a few months.",
+      "parentUuid": "b55b7a8a_503b94d3",
+      "revId": "8a287046573057af2311f8142b8b116ac754d8fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6dd7711c_d0b58c8e",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-20T15:57:35Z",
       "side": 1,
       "message": "or `new(*load.PackageError)` to make it clear the value isn\u0027t going to be used?",
+      "revId": "8a287046573057af2311f8142b8b116ac754d8fc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43166c8b_94fbb3ec",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T16:10:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6dd7711c_d0b58c8e",
       "revId": "8a287046573057af2311f8142b8b116ac754d8fc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

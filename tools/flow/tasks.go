@@ -97,6 +97,11 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 		return t
 	}
 
+	if err := w.Err(c.opCtx); err != nil && err.Permanent {
+		c.addErr(err.Err, "invalid task")
+		return nil
+	}
+
 	// Look up cached task from previous evaluation.
 	p := v.Path()
 	key := p.String()

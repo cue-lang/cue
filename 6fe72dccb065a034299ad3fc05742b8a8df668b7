@@ -314,6 +314,24 @@
       "parentUuid": "d90bff6a_a1dcd3a2",
       "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa45ca67_1aaa679c",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T12:38:26Z",
+      "side": 1,
+      "message": "Good point, SGTM.",
+      "parentUuid": "e6f39b43_d8ad1c1e",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

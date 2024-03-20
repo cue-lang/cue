@@ -91,7 +91,7 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 	var (
 		mu         sync.Mutex
 		candidates []module.Version
-		queryErr   error
+		queryErrs  []error
 	)
 	logf("initial module path %q", parts.Path)
 	for prefix := parts.Path; prefix != "."; prefix = path.Dir(prefix) {
@@ -101,9 +101,7 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 			mu.Lock()
 			defer mu.Unlock()
 			if err != nil {
-				if queryErr == nil {
-					queryErr = err
-				}
+				queryErrs = append(queryErrs, err)
 				return
 			}
 			if v.IsValid() {
@@ -112,7 +110,12 @@ func (ld *loader) queryLatestModules(ctx context.Context, pkgPath string, rs *mo
 		})
 	}
 	<-work.Idle()
-	return candidates, parts.Version == "", queryErr
+
+	if len(candidates) > 0 {
+		// should ignore err when valid version resolved
+		return candidates, parts.Version == "", nil
+	}
+	return candidates, parts.Version == "", fmt.Errorf("resolve version of %s failed: %v", pkgPath, queryErrs)
 }
 
 // latestVersion returns the latest of any of the given versions,

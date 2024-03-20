@@ -231,11 +231,7 @@ Result:
       //     ./in.cue:63:11
       #patchs: (#list){
       }
-      #someCondition: (_|_){
-        // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-        //     ./in.cue:61:8
-        //     ./in.cue:63:11
-      }
+      #someCondition: (_){ _ }
       someCondition: (_|_){
         // [eval] issue1972.err1.someCondition: field not allowed:
         //     ./in.cue:62:3
@@ -285,7 +281,7 @@ diff old new
      list: (#list){
        0: (int){ 1 }
        1: (int){ 2 }
-@@ -66,17 +67,25 @@
+@@ -66,17 +67,21 @@
    issue1972: (_|_){
      // [eval]
      err1: (_|_){
@@ -301,12 +297,7 @@ diff old new
 -      someCondition: (_){ _ }
 -      patchs: (list){
 -      }
--      #someCondition: (_){ _ }
-+      #someCondition: (_|_){
-+        // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
-+        //     ./in.cue:61:8
-+        //     ./in.cue:63:11
-+      }
+       #someCondition: (_){ _ }
 +      someCondition: (_|_){
 +        // [eval] issue1972.err1.someCondition: field not allowed:
 +        //     ./in.cue:62:3

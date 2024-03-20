@@ -1,18 +1,11 @@
-# This test illustrates the problem demonstrated
-# in https://github.com/cue-lang/cue/issues/1581
-# TODO fix tools/flow so it fails in this case.
+! exec cue cmd tool
+stderr 'command.tool.bad: undefined field: DoesntExist'
 
-# TODO this should not succeed
-exec cue cmd tool
-# stderr 'command.tool.bad: undefined field: DoesntExist'
+! exec cue cmd builtin
+stderr 'command.builtin.bad: undefined field: DoesntExist'
 
-# TODO this should not succeed
-exec cue cmd builtin
-# stderr 'command.builtin.bad: undefined field: DoesntExist'
-
-# TODO this should not succeed
-exec cue cmd package
-# stderr 'command.package.bad: undefined field: DoesntExist'
+! exec cue cmd package
+stderr 'command.package.bad: undefined field: DoesntExist'
 -- cue.mod/module.cue --
 module: "mod.test/test"
 -- sub/sub.cue --

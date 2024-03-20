@@ -99,6 +99,10 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	}
 
 	fp := newFileProcessor(cfg, pkg, l.tagger)
+	if l.cfg.Package == "*" {
+		fp.allPackages = true
+		pkg.PkgName = "_"
+	}
 	for _, file := range files {
 		fp.add(cfg.Dir, file, allowAnonymous)
 	}
@@ -119,13 +123,12 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// 	bp.ImportPath = ModDirImportPath(dir)
 	// }
 
+	pkg.User = true
 	l.addFiles(cfg.Dir, pkg)
 
-	pkg.User = true
 	l.stk.Push("user")
 	_ = pkg.Complete()
 	l.stk.Pop()
-	pkg.User = true
 	//pkg.LocalPrefix = dirToImportPath(dir)
 	pkg.DisplayPath = "command-line-arguments"
 

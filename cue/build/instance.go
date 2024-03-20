@@ -240,7 +240,7 @@ func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
 		inst.Err = errors.Append(inst.Err, errors.Newf(pos, msg, args...))
 	})
 	_, pkg, pos := internal.PackageInfo(file)
-	if pkg != "" && pkg != "_" && !inst.setPkg(pkg) && pkg != inst.PkgName {
+	if pkg != "" && pkg != "_" && !inst.User && !inst.setPkg(pkg) && pkg != inst.PkgName {
 		err := errors.Newf(pos,
 			"package name %q conflicts with previous package name %q",
 			pkg, inst.PkgName)

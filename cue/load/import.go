@@ -326,6 +326,9 @@ func (l *loader) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	if l.cfg.ModuleRoot == "" {
 		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
 	}
+	if isStdlibPackage(string(p)) {
+		return "", "", errors.Newf(pos, "%q cannot be imported as CUE package", p)
+	}
 	origp := p
 	// Extract the package name.
 	parts := module.ParseImportPath(string(p))

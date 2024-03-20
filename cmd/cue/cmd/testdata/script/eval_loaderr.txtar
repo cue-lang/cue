@@ -3,4 +3,4 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-cannot find package "nonexisting"
+"nonexisting" cannot be imported as CUE package

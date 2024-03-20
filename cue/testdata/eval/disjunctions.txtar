@@ -183,14 +183,7 @@ Result:
     //     ./in.cue:9:8
     //     ./in.cue:15:27
     name: (string){ "str" }
-    val: (_|_){
-      // [eval] f: conflicting values "int" and "str":
-      //     ./in.cue:5:8
-      //     ./in.cue:15:15
-      // f: conflicting values 3 and string (mismatched types int and string):
-      //     ./in.cue:9:8
-      //     ./in.cue:15:27
-    }
+    val: (int){ 3 }
   }
   e1: (struct){
     a: ((null|struct)){ |((null){ null }, (struct){
@@ -328,7 +321,7 @@ diff old new
      ./in.cue:15:27
  
  Result:
-@@ -34,20 +31,19 @@
+@@ -34,22 +31,14 @@
      name: (string){ "str" }
    }
    f: (_|_){
@@ -344,18 +337,17 @@ diff old new
 -    //     ./in.cue:15:4
      //     ./in.cue:15:27
      name: (string){ "str" }
-     val: (_|_){
+-    val: (_|_){
 -      // [eval] f.val: conflicting values 3 and string (mismatched types int and string):
-+      // [eval] f: conflicting values "int" and "str":
-+      //     ./in.cue:5:8
-+      //     ./in.cue:15:15
-+      // f: conflicting values 3 and string (mismatched types int and string):
-       //     ./in.cue:9:8
+-      //     ./in.cue:9:8
 -      //     ./in.cue:15:4
-       //     ./in.cue:15:27
-     }
+-      //     ./in.cue:15:27
+-    }
++    val: (int){ 3 }
    }
-@@ -161,8 +157,8 @@
+   e1: (struct){
+     a: ((null|struct)){ |((null){ null }, (struct){
+@@ -161,8 +150,8 @@
      e: (struct){
        foobar: (#struct){
          b: (#struct){

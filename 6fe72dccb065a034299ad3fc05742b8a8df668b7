@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ff57f59d_10fff3de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T12:15:28Z",
+      "side": 1,
+      "message": "cc Paul for another set of eyes given how this will be an entrypoint for lots of people.",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "189483a5_854bb518",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T12:15:28Z",
+      "side": 1,
+      "message": "how about:\n\n\u003e publishing packages and managing dependencies\n\nI think that\u0027s a lot more intuitive as a one-liner to anyone not familiar with CUE or Go modules.",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "87e66cd6_bf831cf0",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-20T12:15:28Z",
+      "side": 1,
+      "message": "I think it\u0027s a mistake to mention containers; how about this, from the modules reference doc:\n\n\u003e Modules are downloaded from OCI-compliant artifact registries.",
+      "range": {
+        "startLine": 218,
+        "startChar": 54,
+        "endLine": 218,
+        "endChar": 63
+      },
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

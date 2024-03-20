@@ -1,23 +1,42 @@
-# ignore certain errors for cue fmt
+# Ignore certain package loading errors in cue fmt.
+cd issue644
 exec cue fmt x.cue
-
-# Issue #644
 exec cue fmt ./...
-
 cmp x.cue out/x_cue
+cd ..
+
+cd issue728
+exec cue fmt x.cue
+exec cue fmt ./...
+cmp x.cue out/x_cue
+cd ..
+
 -- cue.mod/module.cue --
 module: "mod.test/x"
--- x.cue --
+-- emptypkg/.empty --
+-- issue644/x.cue --
 package x
 
-import   "blah.com/rubbish"
+import   "blah.com/nosuchpkg"
 
 x: 5
 y: unresolved
--- out/x_cue --
+-- issue644/out/x_cue --
 package x
 
-import "blah.com/rubbish"
+import "blah.com/nosuchpkg"
 
 x: 5
 y: unresolved
+-- issue728/x.cue --
+package x
+
+import   "mod.test/x/emptypkg"
+
+x: 5
+-- issue728/out/x_cue --
+package x
+
+import "mod.test/x/emptypkg"
+
+x: 5

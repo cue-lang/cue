@@ -102,7 +102,6 @@ type fileProcessor struct {
 	firstCommentFile string
 	imported         map[string][]token.Pos
 	allTags          map[string]bool
-	allFiles         bool
 	ignoreOther      bool // ignore files from other packages
 	allPackages      bool
 
@@ -183,7 +182,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		return true
 	}
 
-	match, data, err := matchFile(fp.c, file, true, fp.allFiles, fp.allTags)
+	match, data, err := matchFile(fp.c, file, true, fp.allTags)
 	switch {
 	case match:
 
@@ -264,11 +263,13 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 				p.IgnoredFiles = append(p.IgnoredFiles, file)
 				return false
 			}
-			return badFile(&MultiplePackageError{
-				Dir:      p.Dir,
-				Packages: []string{p.PkgName, pkg},
-				Files:    []string{fp.firstFile, base},
-			})
+			if !fp.allPackages {
+				return badFile(&MultiplePackageError{
+					Dir:      p.Dir,
+					Packages: []string{p.PkgName, pkg},
+					Files:    []string{fp.firstFile, base},
+				})
+			}
 		}
 	}
 

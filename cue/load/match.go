@@ -49,7 +49,7 @@ func (e excludeError) Is(err error) bool { return err == errExclude }
 // considers text until the first non-comment.
 // If allTags is non-nil, matchFile records any encountered build tag
 // by setting allTags[tag] = true.
-func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, err errors.Error) {
+func matchFile(cfg *Config, file *build.File, returnImports bool, allTags map[string]bool) (match bool, data []byte, err errors.Error) {
 	if fi := cfg.fileSystem.getOverlay(file.Filename); fi != nil {
 		if fi.file != nil {
 			file.Source = fi.file

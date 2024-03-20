@@ -80,7 +80,6 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 
 	if p.PkgName == "" {
 		if l.cfg.Package == "*" {
-			fp.ignoreOther = true
 			fp.allPackages = true
 			p.PkgName = "_"
 		} else {

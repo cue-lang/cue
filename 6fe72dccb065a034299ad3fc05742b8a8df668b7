@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b36393ab_9ab15ca1",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 209,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T12:35:19Z",
+      "side": 1,
+      "message": "I went with Go\u0027s phrasing here, but sure.",
+      "parentUuid": "189483a5_854bb518",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bd7e1216_0885e482",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-03-20T12:19:22Z",
       "side": 1,
       "message": "I would personally have the environment variable with clear lines above and below.",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72bf79da_161066a0",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T12:35:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bd7e1216_0885e482",
       "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -116,6 +152,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fce6e5a6_78bc5dae",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 218,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T12:35:19Z",
+      "side": 1,
+      "message": "Personally I\u0027d never heard of OCI registries before encountering them recently, so I think it might be worth going with the slightly more verbose but more self-explanatory version suggested by Daniel. (In the modules doc, the mention of \"OCI registries\" is a link to make it a bit clearer)",
+      "parentUuid": "6e499608_536a5081",
+      "range": {
+        "startLine": 218,
+        "startChar": 54,
+        "endLine": 218,
+        "endChar": 63
+      },
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a791aa96_18cfc1b5",
@@ -129,6 +189,24 @@
       "writtenOn": "2024-03-20T12:19:22Z",
       "side": 1,
       "message": "Clear line above.",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad919861_82accd9e",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 222,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T12:35:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a791aa96_18cfc1b5",
       "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -150,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0954b955_d8704055",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T12:35:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "179b5d38_266f88eb",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8fcfa900_872d5ac9",
@@ -167,6 +263,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "af1f4244_835d051b",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 228,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T12:35:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8fcfa900_872d5ac9",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d90bff6a_a1dcd3a2",
@@ -180,6 +294,24 @@
       "writtenOn": "2024-03-20T12:17:16Z",
       "side": 1,
       "message": "\u003e \u0027cue mod\u0027 groups commands which operate on the current module.",
+      "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6f39b43_d8ad1c1e",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 36,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-20T12:35:19Z",
+      "side": 1,
+      "message": "I went with the phrasing used by Go\u0027s `go help mod` but we can go with your suggestion instead. For the record, I\u0027m not sure that _all_ `cue mod` commands will operate on the current module. For example, `cue mod registry` doesn\u0027t.\n\nHow about:\n\n    Cue mod groups commands which operate on CUE modules.\n?\nI\u0027ve gone with that for now.",
+      "parentUuid": "d90bff6a_a1dcd3a2",
       "revId": "6fe72dccb065a034299ad3fc05742b8a8df668b7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

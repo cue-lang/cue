@@ -68,11 +68,11 @@ Leaks:  16
 Freed:  117
 Reused: 108
 Allocs: 25
-Retain: 123
+Retain: 53
 
 Unifications: 107
-Conjuncts:    295
-Disjuncts:    240
+Conjuncts:    243
+Disjuncts:    170
 -- out/eval --
 Errors:
 #Configure.service.description.role: undefined field: role:

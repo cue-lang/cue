@@ -43,6 +43,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f710181c_41698242",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-21T13:37:17Z",
+      "side": 1,
+      "message": "That\u0027s a bug :) It should have been `logins`.",
+      "parentUuid": "c8b297e2_d5c6922e",
+      "range": {
+        "startLine": 280,
+        "startChar": 41,
+        "endLine": 280,
+        "endChar": 49
+      },
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3750eb40_b87d7738",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 2
@@ -60,6 +84,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c713c4cc_11a6b48a",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-21T13:37:17Z",
+      "side": 1,
+      "message": "We don\u0027t want faster here, we want other calls to wait while the token is being refreshed. But current solution is also not waiting, so I might as well go for the pointer solution.",
+      "parentUuid": "3750eb40_b87d7738",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f55946d0_50d11bc9",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 2
@@ -71,6 +113,24 @@
       "writtenOn": "2024-03-21T12:51:28Z",
       "side": 1,
       "message": "this is a public package, so please don\u0027t expose API unless we have to - in this case I don\u0027t think we need to.",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "12d124f6_a96546ac",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-21T13:37:17Z",
+      "side": 1,
+      "message": "I thought to reuse it in `integration_test.go`. Happy to remove here. Please confirm.",
+      "parentUuid": "f55946d0_50d11bc9",
       "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

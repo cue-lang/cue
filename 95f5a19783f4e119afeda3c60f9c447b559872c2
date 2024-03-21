@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "da4ea8bb_aafda1af",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-21T13:37:17Z",
+      "side": 1,
+      "message": "Don\u0027t think so. If `t.logins` is nil, it is never written again since `updateLogin` is possible iff `t.logins` is not nil.",
+      "parentUuid": "62f5b9f1_94163415",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e12f5d49_da39e515",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 1
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-21T12:51:28Z",
       "side": 1,
       "message": "FYI we already have code for this, grep for `lockedfile` in the cue repo - it\u0027s borrwed from the main Go repo, as cmd/go also needs file locking at the FS level.",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a1f4d25d_b81ad3c2",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-21T13:37:17Z",
+      "side": 1,
+      "message": "I can\u0027t say I like the implementation in `lockedfile`. If the process panics or is killed, the lock file will remain forever. Is there any reason we went with a custom solution instead of using a dedicated package that relies on `flock`, like e.g. https://github.com/dolthub/fslock ?",
+      "parentUuid": "e12f5d49_da39e515",
       "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

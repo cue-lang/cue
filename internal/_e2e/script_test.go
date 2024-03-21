@@ -102,9 +102,9 @@ func TestScript(t *testing.T) {
 			configDir := filepath.Join(env.WorkDir, "tmp/configdir")
 			env.Setenv("CUE_CONFIG_DIR", configDir)
 
-			// CUE_LOGINS is a secret used by the scripts publishing to registry.cue.works.
+			// CUE_TEST_LOGINS is a secret used by the scripts publishing to registry.cue.works.
 			// When unset, those tests would fail with an auth error.
-			if logins := os.Getenv("CUE_LOGINS"); logins != "" {
+			if logins := os.Getenv("CUE_TEST_LOGINS"); logins != "" {
 				if err := os.MkdirAll(configDir, 0o777); err != nil {
 					return err
 				}

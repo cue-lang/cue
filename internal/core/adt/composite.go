@@ -1164,10 +1164,37 @@ func (c *Conjunct) Elem() Elem {
 	}
 }
 
-// Expr retrieves the expression form of the contained conjunct.
-// If it is a field or comprehension, it will return its associated value.
+// Expr retrieves the expression form of the contained conjunct. If it is a
+// field or comprehension, it will return its associated value. This is only to
+// be used for syntactic operations where evaluation of the expression is not
+// required. To get an expression paired with the correct environment, use
+// EnvExpr.
+//
+// TODO: rename to RawExpr.
 func (c *Conjunct) Expr() Expr {
 	return ToExpr(c.x)
+}
+
+// EnvExpr returns the expression form of the contained conjunct alongside an
+// Environment in which this expression should be evaluated.
+func (c Conjunct) EnvExpr() (*Environment, Expr) {
+	return EnvExpr(c.Env, c.Elem())
+}
+
+// EnvExpr returns the expression represented by Elem alongside an Environment
+// with the necessary adjustments in which the resulting expression can be
+// evaluated.
+func EnvExpr(env *Environment, elem Elem) (*Environment, Expr) {
+	for {
+		if c, ok := elem.(*Comprehension); ok {
+			env = linkChildren(env, c)
+			c := MakeConjunct(env, c.Value, CloseInfo{})
+			elem = c.Elem()
+			continue
+		}
+		break
+	}
+	return env, ToExpr(elem)
 }
 
 // ToExpr extracts the underlying expression for a Node. If something is already

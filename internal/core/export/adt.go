@@ -263,7 +263,7 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 	case *adt.ConjunctGroup:
 		a := []ast.Expr{}
 		for _, c := range *x {
-			v := e.expr(env, c.Expr())
+			v := e.expr(c.EnvExpr())
 			a = append(a, v)
 		}
 		return ast.NewBinExpr(token.AND, a...)
@@ -293,6 +293,7 @@ func (e *exporter) adt(env *adt.Environment, expr adt.Elem) ast.Expr {
 			env = &adt.Environment{Up: env, Vertex: empty}
 		}
 
+		// TODO: consider using adt.EnvExpr.
 		return e.adt(env, adt.ToExpr(x.Value))
 
 	default:
@@ -704,6 +705,7 @@ func (e *exporter) comprehension(env *adt.Environment, comp *adt.Comprehension) 
 		env = &adt.Environment{Up: env, Vertex: empty}
 	}
 
+	// TODO: consider using adt.EnvExpr.
 	v := e.expr(env, adt.ToExpr(comp.Value))
 	if _, ok := v.(*ast.StructLit); !ok {
 		v = ast.NewStruct(ast.Embed(v))

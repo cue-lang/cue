@@ -621,6 +621,7 @@ func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) 
 	for i := y.Nest(); i > 0; i-- {
 		env = &adt.Environment{Up: env, Vertex: empty}
 	}
+	// TODO: consider using adt.EnvExpr and remove the above loop.
 	c.markExpr(env, adt.ToExpr(y.Value))
 }
 

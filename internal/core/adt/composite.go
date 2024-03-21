@@ -532,7 +532,11 @@ func (v *Vertex) IsUnprocessed() bool {
 }
 
 func (v *Vertex) updateStatus(s vertexStatus) {
-	Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+	if !isCyclePlaceholder(v.BaseValue) {
+		if _, ok := v.BaseValue.(*Bottom); !ok {
+			Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+		}
+	}
 
 	if s == finalized && v.BaseValue == nil {
 		// TODO: for debugging.

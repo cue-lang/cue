@@ -91,6 +91,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "99c74215_9ad09a3d",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-21T16:23:08Z",
+      "side": 1,
+      "message": "The idea here is to never modify the map after it\u0027s created, so it\u0027s read-only and safe to use without locking. When it needs to change, a new map is created and \"published\" via `t.logins`. So once I get the pointer from `t.logins`, it\u0027s safe to dereference into the map.",
+      "parentUuid": "4f2da32a_a0d12bfb",
+      "range": {
+        "startLine": 280,
+        "startChar": 41,
+        "endLine": 280,
+        "endChar": 49
+      },
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3750eb40_b87d7738",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 2
@@ -191,6 +215,24 @@
       "side": 1,
       "message": "I see; I\u0027m not opposed to that per se, but this being the main cue repo, I think we need to meet the bar of \"we think users will want this API\" when we expose stuff - and I don\u0027t think any CUE Go API user will need something like this.\n\nIf anything, from the user\u0027s PoV, upstream\u0027s oauth2 repo should provide something like it for convenience, e.g. https://github.com/golang/oauth2/pull/683\n\nI\u0027m not sure if there\u0027s a better solution than copy-pasting for now. at least once it\u0027s working, I doubt we will need to touch it much.",
       "parentUuid": "12d124f6_a96546ac",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d6791b4_7d55df70",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-21T16:23:08Z",
+      "side": 1,
+      "message": "Ok that makes sense, will remove this public API for now.",
+      "parentUuid": "10f0ffd7_1ac242a0",
       "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -318,6 +318,10 @@ func processListVertex(c *OpContext, t *task, mode runMode) {
 }
 
 func (n *nodeContext) updateListType(list Expr, id CloseInfo, isClosed bool, ellipsis Node) {
+	if n.kind == 0 {
+		n.node.updateStatus(finalized) // TODO(neweval): remove once transitioned.
+		return
+	}
 	m, ok := n.node.BaseValue.(*ListMarker)
 	if !ok {
 		m = &ListMarker{

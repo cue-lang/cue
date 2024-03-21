@@ -645,11 +645,16 @@ func Dereference(v Value) Value {
 		return v
 	}
 
-	c := n.Conjuncts[0]
-	r, _ := c.Expr().(adt.Resolver)
+	env, expr := n.Conjuncts[0].EnvExpr()
+
+	// TODO: consider supporting unwrapping of structs or comprehensions around
+	// a single embedded reference.
+	r, _ := expr.(adt.Resolver)
 	if r == nil {
 		return v
 	}
+
+	c := adt.MakeRootConjunct(env, expr)
 
 	ctx := v.ctx()
 	n, b := ctx.Resolve(c, r)
@@ -1067,7 +1072,8 @@ func (v hiddenValue) Split() []Value {
 	}
 	a := []Value{}
 	for _, x := range v.v.Conjuncts {
-		a = append(a, remakeValue(v, x.Env, x.Expr()))
+		env, expr := x.EnvExpr()
+		a = append(a, remakeValue(v, env, expr))
 	}
 	return a
 }
@@ -1983,7 +1989,9 @@ func (v Value) ReferencePath() (root Value, p Path) {
 	ctx := v.ctx()
 	c := v.v.Conjuncts[0]
 
-	x, path := reference(v.idx, ctx, c.Env, c.Expr())
+	env, expr := c.EnvExpr()
+
+	x, path := reference(v.idx, ctx, env, expr)
 	if x == nil {
 		return Value{}, Path{}
 	}
@@ -2319,8 +2327,7 @@ func (v Value) Expr() (Op, []Value) {
 		case 1:
 			// the default case, processed below.
 			c := v.v.Conjuncts[0]
-			env = c.Env
-			expr = c.Expr()
+			env, expr = c.EnvExpr()
 			if w, ok := expr.(*adt.Vertex); ok {
 				return Value{v.idx, w, v.parent_}.Expr()
 			}

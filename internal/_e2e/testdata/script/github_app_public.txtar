@@ -1,5 +1,5 @@
 # Publish a CUE module under a public GitHub repository namespace
-# where the $CUE_LOGINS tokens have full read-write access.
+# where the $CUE_TEST_LOGINS tokens have full read-write access.
 # Publish a version for this new repository with `cue mod publish`,
 # and then fetch the module as a dependency via cmd/cue.
 

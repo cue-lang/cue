@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62f5b9f1_94163415",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T12:51:28Z",
+      "side": 1,
+      "message": "this `t.logins` read is racy now, since it doesn\u0027t hold the mutex but `updateLogin` may change the pointer in the field value",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e12f5d49_da39e515",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T12:51:28Z",
+      "side": 1,
+      "message": "FYI we already have code for this, grep for `lockedfile` in the cue repo - it\u0027s borrwed from the main Go repo, as cmd/go also needs file locking at the FS level.",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

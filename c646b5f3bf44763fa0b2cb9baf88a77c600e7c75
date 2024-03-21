@@ -1,0 +1,84 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4c06a934_61f22cbc",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:32:07Z",
+      "side": 1,
+      "message": "can you add context to this commit message? For example:\n\n* what went wrong, as I think https://cuelang.org/cl/529517 introduced this panic regression\n* summarize why we need to adjust environments for comprehensions\n* we are adding the EnvExpr method and func for that reason",
+      "revId": "c646b5f3bf44763fa0b2cb9baf88a77c600e7c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "995ddcb7_83473def",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:32:07Z",
+      "side": 1,
+      "message": "Nice, thanks!",
+      "revId": "c646b5f3bf44763fa0b2cb9baf88a77c600e7c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f179728e_079254e9",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:32:07Z",
+      "side": 1,
+      "message": "remove this word?",
+      "range": {
+        "startLine": 1169,
+        "startChar": 36,
+        "endLine": 1169,
+        "endChar": 40
+      },
+      "revId": "c646b5f3bf44763fa0b2cb9baf88a77c600e7c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79fb8c89_7d765db2",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1171,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:32:07Z",
+      "side": 1,
+      "message": "do you mean EnvExpr here?",
+      "range": {
+        "startLine": 1171,
+        "startChar": 3,
+        "endLine": 1171,
+        "endChar": 9
+      },
+      "revId": "c646b5f3bf44763fa0b2cb9baf88a77c600e7c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

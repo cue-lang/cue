@@ -571,7 +571,7 @@ func (e *exporter) resolveLet(env *adt.Environment, x *adt.LetReference) ast.Exp
 
 			return e.expr(env, x.X)
 		}
-		return e.expr(env, ref.Conjuncts[0].Expr())
+		return e.expr(ref.Conjuncts[0].EnvExpr())
 
 	case let.Expr == nil:
 		label := e.uniqueLetIdent(x.Label, x.X)

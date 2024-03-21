@@ -3085,6 +3085,9 @@ func TestReferencePath(t *testing.T) {
 		input: "v: w: x: a.b.c, a: b: c: 1",
 		want:  "a.b.c",
 	}, {
+		input: "if true { v: w: x: a, a: 1 }",
+		want:  "a",
+	}, {
 		input: "v: w: x: w.a.b.c, v: w: a: b: c: 1",
 		want:  "v.w.a.b.c",
 	}, {
@@ -3447,6 +3450,38 @@ func TestPathCorrection(t *testing.T) {
 			v = v.Lookup("t")
 			return v
 		},
+	}, {
+		input: `
+		x: { if true { v: a } }
+		a: b
+		b: 2
+		`,
+		want: "b",
+		lookup: func(inst *Instance) Value {
+			v := inst.Value().LookupPath(ParsePath("x.v"))
+			v = Dereference(v)
+			return v
+		},
+	}, {
+		input: `
+		package foo
+
+		#A:{ if true { #B: #T } }
+
+		#T: {
+			a: #S.#U
+			#S: #U: {}
+		}
+		`,
+		want: "#T.#S.#U",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("#A")
+			f, _ = f.Value.LookupField("#B")
+			v := f.Value
+			v = Dereference(v)
+			v = v.Lookup("a")
+			return v
+		},
 	}}
 	for _, tc := range testCases {
 		if tc.skip {
@@ -3723,6 +3758,9 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `v: {>30, <40}`,
 		want:  `&(>(30) <(40))`,
+	}, {
+		input: `a: string, if true { v: a }`,
+		want:  `.(〈〉 "a")`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

@@ -34,6 +34,24 @@
       "parentUuid": "b849f045_8b50c212",
       "revId": "16aa84134ee3c3fe0f739ee28ce30c22c51ffa56",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "95b19c66_09cac232",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 107,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:26:51Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da4979ac_9ad16f85",
+      "revId": "16aa84134ee3c3fe0f739ee28ce30c22c51ffa56",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

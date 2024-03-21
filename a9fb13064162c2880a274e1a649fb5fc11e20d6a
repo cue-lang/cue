@@ -67,6 +67,30 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "4f2da32a_a0d12bfb",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:12:24Z",
+      "side": 1,
+      "message": "FWIW even if you don\u0027t access the field, you\u0027re still accessing the map contents, and I think that may still be racy. remember that a map value is effectively a pointer.",
+      "parentUuid": "f710181c_41698242",
+      "range": {
+        "startLine": 280,
+        "startChar": 41,
+        "endLine": 280,
+        "endChar": 49
+      },
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "3750eb40_b87d7738",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 2
@@ -102,6 +126,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "f6b7f80d_1eebe8a8",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:12:24Z",
+      "side": 1,
+      "message": "you\u0027re right. we _do_ want concurrent calls to wait between one another; getting more tokens would increase the load for registries, and possibly lead to errors such as rate limits or \"slow down\". surely x/oauth2 does this already, e.g. as part of the TokenSource used by its http.Client?",
+      "parentUuid": "c713c4cc_11a6b48a",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f55946d0_50d11bc9",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 2
@@ -131,6 +173,24 @@
       "side": 1,
       "message": "I thought to reuse it in `integration_test.go`. Happy to remove here. Please confirm.",
       "parentUuid": "f55946d0_50d11bc9",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "10f0ffd7_1ac242a0",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:12:24Z",
+      "side": 1,
+      "message": "I see; I\u0027m not opposed to that per se, but this being the main cue repo, I think we need to meet the bar of \"we think users will want this API\" when we expose stuff - and I don\u0027t think any CUE Go API user will need something like this.\n\nIf anything, from the user\u0027s PoV, upstream\u0027s oauth2 repo should provide something like it for convenience, e.g. https://github.com/golang/oauth2/pull/683\n\nI\u0027m not sure if there\u0027s a better solution than copy-pasting for now. at least once it\u0027s working, I doubt we will need to touch it much.",
+      "parentUuid": "12d124f6_a96546ac",
       "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

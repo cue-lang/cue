@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "b2220129_2c8de07a",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:12:24Z",
+      "side": 1,
+      "message": "But you do this nil check even when t.logins isn\u0027t nil. If logins.json as a file exists, and you get two concurrent calls into this func, then one might be doing the field nil check while the other holds the mutex and modifies the field. Hence, a race.",
+      "parentUuid": "da4ea8bb_aafda1af",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e12f5d49_da39e515",
         "filename": "mod/modconfig/modconfig.go",
         "patchSetId": 1
@@ -67,6 +85,24 @@
       "side": 1,
       "message": "I can\u0027t say I like the implementation in `lockedfile`. If the process panics or is killed, the lock file will remain forever. Is there any reason we went with a custom solution instead of using a dedicated package that relies on `flock`, like e.g. https://github.com/dolthub/fslock ?",
       "parentUuid": "e12f5d49_da39e515",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "aa77bf9d_aa1e40e5",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-21T14:12:24Z",
+      "side": 1,
+      "message": "it\u0027s borrowed from cmd/go, and they have done extensive testing on many platforms and millions of users for years, so for that reason alone it\u0027s good enough for us :) you don\u0027t have to use it in this CL, just a thought for a follow-up.\n\nNote that that fslock library doesn\u0027t seem to be maintained nor have many users, nor does it allow reporting issues, so that particular one definitely doesn\u0027t seem like a good option to me.",
+      "parentUuid": "a1f4d25d_b81ad3c2",
       "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

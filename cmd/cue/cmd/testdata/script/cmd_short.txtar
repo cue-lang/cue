@@ -1,0 +1,19 @@
+exec cue cmd hello
+stdout 'Hello world!'
+! stderr .
+
+exec cue hello
+stdout 'Hello world!'
+cmp stderr stderr-warning
+
+-- stderr-warning --
+The short-form 'cue hello' is deprecated; use 'cue cmd hello'.
+See: https://cuelang.org/issue/2519
+-- task_tool.cue --
+package home
+
+import "tool/cli"
+
+command: hello: cli.Print & {
+	text: "Hello world!"
+}

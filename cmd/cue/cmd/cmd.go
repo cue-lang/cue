@@ -175,6 +175,10 @@ Run "cue help commands" for more details on tasks and commands.
 			}
 			// Presumably the *cobra.Command argument should be cmd.Command,
 			// as that is the one which will have the right settings applied.
+			if isRootCmd {
+				cmd.PrintErrf("The short-form 'cue %[1]s' is deprecated; use 'cue cmd %[1]s'.\n", args[0])
+				cmd.PrintErrf("See: https://cuelang.org/issue/2519\n")
+			}
 			return sub.RunE(cmd.Command, args[1:])
 		}),
 	}

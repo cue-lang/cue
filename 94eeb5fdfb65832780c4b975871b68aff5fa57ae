@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3d0c9e28_6c20bb42",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-21T16:31:33Z",
+      "side": 1,
+      "message": "LGTM with one minor suggestion.",
+      "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "282d9134_53d7b9b2",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-21T16:31:33Z",
+      "side": 1,
+      "message": "Maybe add a comment saying that it\u0027s OK to compare the types with `\u003d\u003d` because they\u0027re named types?\nAlternatively, use https://pkg.go.dev/go/types#Identical",
+      "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "388ddd10_78b6fd36",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1159,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-21T16:31:33Z",
+      "side": 1,
+      "message": "Would that be the same as using `types.Identical(x.Elem(), typeByte)` ?\n\nFor the record, I\u0027d definitely support that.",
+      "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "607c80dc_10b76cbc",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-21T16:31:33Z",
+      "side": 1,
+      "message": "in passing, s/constraint/constrain/",
+      "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

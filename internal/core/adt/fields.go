@@ -1003,6 +1003,9 @@ func (ctx *OpContext) notAllowedError(v, arc *Vertex) {
 	// TODO: setting arc instead of n.node eliminates subfields. This may be
 	// desirable or not, but it differs, at least from <=v0.6 behavior.
 	arc.SetValue(ctx, ctx.NewErrf("field not allowed"))
+	if arc.state != nil {
+		arc.state.kind = 0
+	}
 
 	// TODO: remove? We are now setting it on both fields, which seems to be
 	// necessary for now. But we should remove this as it often results in

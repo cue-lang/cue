@@ -94,9 +94,14 @@ func WriteLogins(path string, logins *Logins) error {
 		return err
 	}
 	// Discourage other users from reading this file.
-	if err := os.WriteFile(path, body, 0o600); err != nil {
+	// Write to a temp file and then atomically rename to avoid races with parallel reading/writing.
+	if err := os.WriteFile(path+".tmp", body, 0o600); err != nil {
 		return err
 	}
+	if err := os.Rename(path+".tmp", path); err != nil {
+		return err
+	}
+
 	return nil
 }
 

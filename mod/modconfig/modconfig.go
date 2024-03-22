@@ -189,7 +189,11 @@ type cueLoginsTransport struct {
 	// initOnce guards initErr, logins, and transport.
 	initOnce sync.Once
 	initErr  error
-	logins   *cueconfig.Logins
+	// loginsMtx guards the logins pointer below.
+	// Note that an instance of cueconfig.Logins is read-only and
+	// does not have to be guarded.
+	loginsMtx sync.Mutex
+	logins    *cueconfig.Logins
 	// transport holds the underlying transport. This wraps
 	// t.cfg.Transport.
 	transport http.RoundTripper
@@ -211,14 +215,21 @@ func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error
 	if err := t.init(); err != nil {
 		return nil, err
 	}
-	if t.logins == nil {
+
+	// Make a copy of the logins pointer.
+	// Note that the logins map itself does not need locking.
+	t.loginsMtx.Lock()
+	logins := t.logins
+	t.loginsMtx.Unlock()
+
+	if logins == nil {
 		return t.transport.RoundTrip(req)
 	}
 	// TODO: note that a CUE registry may include a path prefix,
 	// so using solely the host will not work with such a path.
 	// Can we do better here, perhaps keeping the path prefix up to "/v2/"?
 	host := req.URL.Host
-	login, ok := t.logins.Registries[host]
+	login, ok := logins.Registries[host]
 	if !ok {
 		return t.transport.RoundTrip(req)
 	}
@@ -231,15 +242,22 @@ func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error
 			Name:     host,
 			Insecure: req.URL.Scheme == "http",
 		})
-		// TODO: When this client refreshes an access token,
-		// we should store the refreshed token on disk.
 
 		// Make the oauth client use the transport that was set up
 		// in init.
 		ctx := context.WithValue(req.Context(), oauth2.HTTPClient, &http.Client{
 			Transport: t.transport,
 		})
-		transport = oauthCfg.Client(ctx, tok).Transport
+		refreshTokenFunc := func(old, new *oauth2.Token) error {
+			return t.updateLogin(host, new)
+		}
+		transport = oauth2.NewClient(ctx,
+			&cachingTokenSource{
+				refreshHook: refreshTokenFunc,
+				base:        oauthCfg.TokenSource(ctx, tok),
+				t:           tok,
+			},
+		).Transport
 		t.cachedTransports[host] = transport
 	}
 	// Unlock immediately so we don't hold the lock for the entire
@@ -247,6 +265,30 @@ func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error
 	// making HTTP requests.
 	t.mu.Unlock()
 	return transport.RoundTrip(req)
+}
+
+func (t *cueLoginsTransport) updateLogin(host string, new *oauth2.Token) error {
+	// Lock the logins for the entire duration of the update, to avoid races
+	t.loginsMtx.Lock()
+	defer t.loginsMtx.Unlock()
+
+	// Reload the logins file, in case it changed in the meanwhile by another process.
+	loginsPath, err := cueconfig.LoginConfigPath(t.getenv)
+	if err != nil {
+		// TODO: this should never fail. Log a warning.
+		return nil
+	}
+	logins, err := cueconfig.ReadLogins(loginsPath)
+	if err != nil || logins == nil {
+		// TODO: Log a warning. There should be a logins file since we're in the refresh flow.
+		return nil
+	}
+
+	logins.Registries[host] = cueconfig.LoginFromToken(new)
+	t.logins = logins
+
+	// TODO: lock the logins file properly so that the update is atomic at FS level.
+	return cueconfig.WriteLogins(loginsPath, logins)
 }
 
 func (t *cueLoginsTransport) init() error {
@@ -270,10 +312,11 @@ func (t *cueLoginsTransport) _init() error {
 		Transport: t.cfg.Transport,
 	})
 
-	// If we can't locate a logins.json file at all, then we'll
+	// If we can't locate a logins.json file at all, then we'll continue.
 	// We only refuse to continue if we find an invalid logins.json file.
 	loginsPath, err := cueconfig.LoginConfigPath(t.getenv)
 	if err != nil {
+		// TODO: this should never fail. Log a warning.
 		return nil
 	}
 	logins, err := cueconfig.ReadLogins(loginsPath)
@@ -324,4 +367,39 @@ func newRef[T any](x *T) *T {
 		x1 = *x
 	}
 	return &x1
+}
+
+// cachingTokenSource works similar to oauth2.ReuseTokenSource, except that it
+// also exposes a hook to get a hold of the refreshed token, so that it can be
+// stored in persistent storage.
+type cachingTokenSource struct {
+	refreshHook refreshTokenHookFunc
+	base        oauth2.TokenSource // called when t is expired
+
+	mu sync.Mutex // guards t
+	t  *oauth2.Token
+}
+
+type refreshTokenHookFunc func(old, base *oauth2.Token) error
+
+func (s *cachingTokenSource) Token() (*oauth2.Token, error) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+
+	if s.t.Valid() {
+		return s.t, nil
+	}
+
+	t, err := s.base.Token()
+	if err != nil {
+		return nil, err
+	}
+
+	err = s.refreshHook(s.t, t)
+	if err != nil {
+		return nil, err
+	}
+	s.t = t
+
+	return t, nil
 }

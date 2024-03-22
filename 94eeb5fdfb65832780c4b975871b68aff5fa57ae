@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa306859_db2d6aa1",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 810,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-22T07:57:43Z",
+      "side": 1,
+      "message": "It\u0027s not really about named types, it\u0027s about these being the universe types which are shared between all packages. typeByte is a *types.Basic, for instance.\n\nBecause they are effectively shared globals, comparing with \u003d\u003d is perfectly fine. In fact I have rarely ever seen types.Identical be used when writing Go tools with go/types, so I don\u0027t think we need to say why we\u0027re not using it in each location.",
+      "parentUuid": "282d9134_53d7b9b2",
+      "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "388ddd10_78b6fd36",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "29f6a1e6_c6e79b2c",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1159,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-22T07:57:43Z",
+      "side": 1,
+      "message": "Not exactly; per json/v2, it would be using types.AssignableTo.",
+      "parentUuid": "388ddd10_78b6fd36",
+      "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "607c80dc_10b76cbc",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-03-21T16:31:33Z",
       "side": 1,
       "message": "in passing, s/constraint/constrain/",
+      "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0cceb33_80ed265d",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1167,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-22T07:57:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "607c80dc_10b76cbc",
       "revId": "94eeb5fdfb65832780c4b975871b68aff5fa57ae",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

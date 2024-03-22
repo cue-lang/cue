@@ -228,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0716f5a_95ffe57f",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T16:19:51Z",
+      "side": 1,
+      "message": "Ah, I missed that TODO. Maybe move the TODO to where we acquire the lock, as I\u0027d guess that\u0027s the natural place we\u0027d acquire a FS-based lock too?\n\nAlso, it _is_ possible within the same process, as it\u0027s entirely possible that several goroutines create their own Transport. It might even make sense to move `loginsMu` into a global variable, although better to use an FS-level lock I think and leave it for now.",
+      "parentUuid": "1136c90a_783a9699",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef3883e0_671bba92",

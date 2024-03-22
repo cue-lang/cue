@@ -1,0 +1,107 @@
+# verify that panic in internal/cmd/cue-ast-print/main.go is fixed
+
+exec cue-ast-print 2567.slice.1.cue
+cmp stdout 2567.slice.1.got.cue
+
+-- 2567.slice.1.cue --
+b:[
+    a[2:],   // third slice
+]
+a: [1,2,3,4,5]
+-- 2567.slice.1.got.cue --
+*ast.File{
+	Filename: "2567.slice.1.cue"
+	Decls: []ast.Decl{
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("2567.slice.1.cue:1:1")
+				Name: "b"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("2567.slice.1.cue:1:2")
+			Token: token.Token(":")
+			Value: *ast.ListLit{
+				Lbrack: token.Pos("2567.slice.1.cue:1:3")
+				Elts: []ast.Expr{
+					*ast.SliceExpr{
+						X: *ast.Ident{
+							NamePos: token.Pos("2567.slice.1.cue:2:5")
+							Name: "a"
+						}
+						Lbrack: token.Pos("2567.slice.1.cue:2:6")
+						Low: *ast.BasicLit{
+							ValuePos: token.Pos("2567.slice.1.cue:2:7")
+							Kind: token.Token("INT")
+							Value: "2"
+						}
+						High: nil
+						Rbrack: token.Pos("2567.slice.1.cue:2:9")
+						Comments: []*ast.CommentGroup{
+							*ast.CommentGroup{
+								Doc: false
+								Line: true
+								Position: 3
+								List: []*ast.Comment{
+									*ast.Comment{
+										Slash: token.Pos("2567.slice.1.cue:2:14")
+										Text: "// third slice"
+									}
+								}
+							}
+						}
+					}
+				}
+				Rbrack: token.Pos("2567.slice.1.cue:3:1")
+			}
+			Attrs: []*ast.Attribute{
+			}
+		}
+		*ast.Field{
+			Label: *ast.Ident{
+				NamePos: token.Pos("2567.slice.1.cue:4:1")
+				Name: "a"
+			}
+			Optional: token.Pos("-")
+			Constraint: token.Token("ILLEGAL")
+			TokenPos: token.Pos("2567.slice.1.cue:4:2")
+			Token: token.Token(":")
+			Value: *ast.ListLit{
+				Lbrack: token.Pos("2567.slice.1.cue:4:4")
+				Elts: []ast.Expr{
+					*ast.BasicLit{
+						ValuePos: token.Pos("2567.slice.1.cue:4:5")
+						Kind: token.Token("INT")
+						Value: "1"
+					}
+					*ast.BasicLit{
+						ValuePos: token.Pos("2567.slice.1.cue:4:7")
+						Kind: token.Token("INT")
+						Value: "2"
+					}
+					*ast.BasicLit{
+						ValuePos: token.Pos("2567.slice.1.cue:4:9")
+						Kind: token.Token("INT")
+						Value: "3"
+					}
+					*ast.BasicLit{
+						ValuePos: token.Pos("2567.slice.1.cue:4:11")
+						Kind: token.Token("INT")
+						Value: "4"
+					}
+					*ast.BasicLit{
+						ValuePos: token.Pos("2567.slice.1.cue:4:13")
+						Kind: token.Token("INT")
+						Value: "5"
+					}
+				}
+				Rbrack: token.Pos("2567.slice.1.cue:4:14")
+			}
+			Attrs: []*ast.Attribute{
+			}
+		}
+	}
+	Imports: []*ast.ImportSpec{
+	}
+}
+-- end --

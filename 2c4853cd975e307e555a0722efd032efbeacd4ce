@@ -246,6 +246,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dce6904_7b3c2a98",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T18:36:04Z",
+      "side": 1,
+      "message": "Ah right. Comment moved. Let\u0027s implement the FS lock asap in a follow-up CL.",
+      "parentUuid": "a0716f5a_95ffe57f",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ef3883e0_671bba92",

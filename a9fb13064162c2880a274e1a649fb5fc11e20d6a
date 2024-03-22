@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c37d755c_b32e318f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T12:17:46Z",
+      "side": 1,
+      "message": "PTAL.",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c8b297e2_d5c6922e",
@@ -113,6 +130,48 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5d87638b_5608ff26",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T12:17:46Z",
+      "side": 1,
+      "message": "Fixed.",
+      "parentUuid": "99c74215_9ad09a3d",
+      "range": {
+        "startLine": 280,
+        "startChar": 41,
+        "endLine": 280,
+        "endChar": 49
+      },
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "edee35e9_c724dcdb",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 280,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T12:17:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ed5ae01f_d899337f",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3750eb40_b87d7738",
@@ -162,6 +221,24 @@
       "side": 1,
       "message": "you\u0027re right. we _do_ want concurrent calls to wait between one another; getting more tokens would increase the load for registries, and possibly lead to errors such as rate limits or \"slow down\". surely x/oauth2 does this already, e.g. as part of the TokenSource used by its http.Client?",
       "parentUuid": "c713c4cc_11a6b48a",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b44f6055_58878a5d",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 370,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T12:17:46Z",
+      "side": 1,
+      "message": "In the same client instance, yes, but not between multiple instances.\nAdded a separate mutex to guard just the logins map update, should work better now.",
+      "parentUuid": "f6b7f80d_1eebe8a8",
       "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -233,6 +310,24 @@
       "side": 1,
       "message": "Ok that makes sense, will remove this public API for now.",
       "parentUuid": "10f0ffd7_1ac242a0",
+      "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "931f683c_27f51987",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T12:17:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3d6791b4_7d55df70",
       "revId": "a9fb13064162c2880a274e1a649fb5fc11e20d6a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

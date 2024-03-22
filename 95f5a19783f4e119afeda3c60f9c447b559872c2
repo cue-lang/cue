@@ -72,6 +72,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e36b67f_836a516a",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 215,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T12:17:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70c34d17_268e2827",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e12f5d49_da39e515",
@@ -139,6 +157,24 @@
       "side": 1,
       "message": "Yeah, create a file and hope for the best is a very popular locking strategy, case in point - cmd/go. Works 99.99% of the time. That doesn\u0027t make it right though. I\u0027ve had my share of dealing with stuck lock files in the past. On the other hand, `flock` API is fairly stable, so I can imagine that the fslock library is not updated because it\u0027s bug-free and entirely new OSes are a fairly rare occurrence. So if it were up to me, I\u0027d go for that 0.01% just to not have to worry about it going forward. Anyway, indeed there\u0027s a TODO in there already so it can be addressed in a follow-up CL.",
       "parentUuid": "aa77bf9d_aa1e40e5",
+      "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ab0ff51f_9b66d1d7",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T12:17:46Z",
+      "side": 1,
+      "message": "Will address in a follow-up CL.",
+      "parentUuid": "6b8458b5_33899931",
       "revId": "95f5a19783f4e119afeda3c60f9c447b559872c2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ec062ec_e843b317",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-22T18:22:06Z",
+      "side": 1,
+      "message": "I wonder if we should summarize why, e.g. \"no such standard library package\", or \"cannot load standard library packages in this context\", because I suspect that normal users may get really confused if they run into the error in this patch",
+      "revId": "1e7dcd0da009a5e4893f53874e6a6204ef58364f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "813a7bd9_7739f387",
+        "filename": "cue/load/import.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-22T18:22:06Z",
+      "side": 1,
+      "message": "as a?",
+      "range": {
+        "startLine": 330,
+        "startChar": 57,
+        "endLine": 330,
+        "endChar": 59
+      },
+      "revId": "1e7dcd0da009a5e4893f53874e6a6204ef58364f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "135da25e_516aca77",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdc77eb2_f4b5cb6f",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9fa51cf3_34c5df3f",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-03-22T13:57:13Z",
       "side": 1,
       "message": "nit: \"mu\" seems to be the common abbreviation for \"mutex\", so I\u0027d name this \"loginsMu\".",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5acab295_3d44038b",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9fa51cf3_34c5df3f",
       "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -69,6 +105,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d6a43bd3_5f8432f8",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3583eafc_5cd471fd",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "6d03b76d_49abc896",
@@ -82,6 +136,24 @@
       "writtenOn": "2024-03-22T13:57:13Z",
       "side": 1,
       "message": "```suggestion\n\t// Lock the logins for the entire duration of the update to avoid races\n```",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "21ca789f_9486dc0d",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6d03b76d_49abc896",
       "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +175,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cc767555_a8661368",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "eb19fe54_3b220d00",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f7905007_c90d14d0",
@@ -116,6 +206,24 @@
       "writtenOn": "2024-03-22T13:57:13Z",
       "side": 1,
       "message": "Hmm, we should really acquire a filesystem lock for this otherwise several concurrent module operations might well step on each others\u0027 toes.\n\nFor now it\u0027s probably OK as the likely scenario is that only one registry token expires at a given moment, so the resulting logins file still contains all the tokens needed even though the clients raced to create it.\n\nHowever, perhaps add a TODO to do that?",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1136c90a_783a9699",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "I think that\u0027s not possible within the same process as I hold the lock in updateLogin itself which is the only function that updates logins.json. It can happen between processes though and there\u0027s already a TODO for that.",
+      "parentUuid": "f7905007_c90d14d0",
       "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -137,6 +245,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7502185b_068828f3",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ef3883e0_671bba92",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "42fb7736_773271ef",
@@ -154,6 +280,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7b40ed0_7ff1d128",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "42fb7736_773271ef",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fbaa69c8_41475b5e",
@@ -167,6 +311,24 @@
       "writtenOn": "2024-03-22T13:57:13Z",
       "side": 1,
       "message": "Why bother passing in the old token if we\u0027re not going to use it?\n\nAlso, the fact that we\u0027re holding multiple mutexes simultaneously here makes me a little uneasy, especially when we might add a filesystem lock into the mix in the future. Perhaps we could invoke the callback after dropping s.mu ?",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "66fadaa6_fa4414ee",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-22T15:48:47Z",
+      "side": 1,
+      "message": "Good points. Updated.",
+      "parentUuid": "fbaa69c8_41475b5e",
       "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

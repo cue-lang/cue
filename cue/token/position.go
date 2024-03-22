@@ -123,16 +123,16 @@ const (
 	// not rendered at all.
 	Elided
 
-	// NoSpace indicates there is no whitespace after this token.
+	// NoSpace indicates there is no whitespace before this token.
 	NoSpace
 
-	// Blank means there is horizontal space after this token.
+	// Blank means there is horizontal space before this token.
 	Blank
 
-	// Newline means there is a single newline after this token.
+	// Newline means there is a single newline before this token.
 	Newline
 
-	// NewSection means there are two or more newlines after this token.
+	// NewSection means there are two or more newlines before this token.
 	NewSection
 
 	relMask  = 0xf
@@ -175,7 +175,7 @@ func (p Pos) IsValid() bool {
 }
 
 // IsNewline reports whether the relative information suggests this node should
-// be printed on a new lien.
+// be printed on a new line.
 func (p Pos) IsNewline() bool {
 	return p.RelPos() >= Newline
 }

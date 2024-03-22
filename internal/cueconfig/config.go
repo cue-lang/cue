@@ -94,9 +94,17 @@ func WriteLogins(path string, logins *Logins) error {
 		return err
 	}
 	// Discourage other users from reading this file.
-	if err := os.WriteFile(path, body, 0o600); err != nil {
+	// Write to a temp file and then try to atomically rename to avoid races
+	// with parallel reading/writing.
+	if err := os.WriteFile(path+".tmp", body, 0o600); err != nil {
 		return err
 	}
+	// TODO: on non-POSIX platforms os.Rename might not be atomic. Might need to
+	// find another solution. Note that Windows NTFS is also atomic.
+	if err := os.Rename(path+".tmp", path); err != nil {
+		return err
+	}
+
 	return nil
 }
 

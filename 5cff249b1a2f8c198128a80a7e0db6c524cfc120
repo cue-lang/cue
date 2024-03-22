@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "79862da2_5e7a105e",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-22T18:14:58Z",
+      "side": 1,
+      "message": "use strings.Cut rather than strings.Split - it means an extra statement, but you do save needing to allocate a slice and splitting the entire string on all slashes, rather than just the first.",
+      "range": {
+        "startLine": 410,
+        "startChar": 34,
+        "endLine": 410,
+        "endChar": 39
+      },
+      "revId": "5cff249b1a2f8c198128a80a7e0db6c524cfc120",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

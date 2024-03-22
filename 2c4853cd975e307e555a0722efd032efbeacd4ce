@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc7a6c5f_0f341ae9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "LGTM modulo a bunch of suggestions (mostly trivial nits), thanks!",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdc77eb2_f4b5cb6f",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 101,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "Unfortunately according to the os package docs, \"Even within the same directory, on non-Unix platforms Rename is not an atomic operation.\".\nMaybe add a TODO about that?",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9fa51cf3_34c5df3f",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "nit: \"mu\" seems to be the common abbreviation for \"mutex\", so I\u0027d name this \"loginsMu\".",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3583eafc_5cd471fd",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 251,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "or just inline?",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d03b76d_49abc896",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 271,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Lock the logins for the entire duration of the update to avoid races\n```",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb19fe54_3b220d00",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 275,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "```suggestion\n\t// Reload the logins file in case another process changed it in the meantime.\n```",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f7905007_c90d14d0",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 281,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "Hmm, we should really acquire a filesystem lock for this otherwise several concurrent module operations might well step on each others\u0027 toes.\n\nFor now it\u0027s probably OK as the likely scenario is that only one registry token expires at a given moment, so the resulting logins file still contains all the tokens needed even though the clients raced to create it.\n\nHowever, perhaps add a TODO to do that?",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ef3883e0_671bba92",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 376,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "I think I might name this \"update\" or \"updateFunc\" - \"func\" is perhaps a little more idiomatic than \"hook\" in Go ?",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "42fb7736_773271ef",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 383,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "I wouldn\u0027t bother with this type.",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbaa69c8_41475b5e",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 398,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-22T13:57:13Z",
+      "side": 1,
+      "message": "Why bother passing in the old token if we\u0027re not going to use it?\n\nAlso, the fact that we\u0027re holding multiple mutexes simultaneously here makes me a little uneasy, especially when we might add a filesystem lock into the mix in the future. Perhaps we could invoke the callback after dropping s.mu ?",
+      "revId": "2c4853cd975e307e555a0722efd032efbeacd4ce",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,10 +16,10 @@
 // programming language and basic operations on tokens (printing, predicates).
 package token // import "cuelang.org/go/cue/token"
 
-import "strconv"
-
 // Token is the set of lexical tokens of the CUE configuration language.
 type Token int
+
+//go:generate go run golang.org/x/tools/cmd/stringer -type=Token -linecomment
 
 // The list of tokens.
 const (
@@ -27,23 +27,30 @@ const (
 	ILLEGAL Token = iota
 	EOF
 	COMMENT
-	ATTRIBUTE // @foo(bar,baz=4)
+	// e.g. @foo(bar,baz=4)
+	ATTRIBUTE
 
-	literalBeg
 	// Identifiers and basic type literals
 	// (these tokens stand for classes of literals)
-	IDENT // main, _tmp
-	INT   // 12_345Mi, 0700, 0xdeadbeef, 1.2M
-	FLOAT // 123.45,
-	// DURATION // 3m4s TODO
-	STRING        // "abc"
-	INTERPOLATION // a part of a template string, e.g. `"age: \(`
-	BOTTOM        // _|_
+	literalBeg
+	// e.g. main, _tmp
+	IDENT
+	// e.g. 12_345Mi, 0700, 0xdeadbeef, 1.2M
+	INT
+	// e.g. 123.45
+	FLOAT
+	// e.g. 3m4s; TODO
+	// DURATION
+	// e.g. "abc"
+	STRING
+	// a part of a template string, e.g. `"age: \(`
+	INTERPOLATION
+	BOTTOM // _|_
 
 	literalEnd
 
-	operatorBeg
 	// Operators and delimiters
+	operatorBeg
 	ADD // +
 	SUB // -
 	MUL // *
@@ -92,105 +99,19 @@ const (
 
 	keywordBeg
 
-	IF
-	FOR
-	IN
-	LET
-	FUNC // experimental
+	IF  // if
+	FOR // for
+	IN  // in
+	LET // let
+	// experimental
+	FUNC // func
 
-	TRUE
-	FALSE
-	NULL
+	TRUE  // true
+	FALSE // false
+	NULL  // null
 
 	keywordEnd
 )
-
-var tokens = [...]string{
-	ILLEGAL: "ILLEGAL",
-
-	EOF:     "EOF",
-	COMMENT: "COMMENT",
-
-	IDENT:         "IDENT",
-	INT:           "INT",
-	FLOAT:         "FLOAT",
-	STRING:        "STRING",
-	INTERPOLATION: "INTERPOLATION",
-	ATTRIBUTE:     "ATTRIBUTE",
-
-	ADD: "+",
-	SUB: "-",
-	MUL: "*",
-	POW: "^",
-	QUO: "/",
-
-	IQUO: "quo",
-	IREM: "rem",
-	IDIV: "div",
-	IMOD: "mod",
-
-	AND: "&",
-	OR:  "|",
-
-	LAND: "&&",
-	LOR:  "||",
-
-	BIND:  "=",
-	EQL:   "==",
-	LSS:   "<",
-	GTR:   ">",
-	NOT:   "!",
-	ARROW: "<-",
-
-	NEQ: "!=",
-	LEQ: "<=",
-	GEQ: ">=",
-
-	MAT:  "=~",
-	NMAT: "!~",
-
-	LPAREN:   "(",
-	LBRACK:   "[",
-	LBRACE:   "{",
-	COMMA:    ",",
-	PERIOD:   ".",
-	ELLIPSIS: "...",
-
-	RPAREN:    ")",
-	RBRACK:    "]",
-	RBRACE:    "}",
-	SEMICOLON: ";",
-	COLON:     ":",
-	OPTION:    "?",
-
-	BOTTOM: "_|_",
-
-	FALSE: "false",
-	TRUE:  "true",
-	NULL:  "null",
-
-	FOR:  "for",
-	IF:   "if",
-	IN:   "in",
-	LET:  "let",
-	FUNC: "func",
-}
-
-// String returns the string corresponding to the token tok.
-// For operators, delimiters, and keywords the string is the actual
-// token character sequence (e.g., for the token ADD, the string is
-// "+"). For all other tokens the string corresponds to the token
-// constant name (e.g. for the token IDENT, the string is "IDENT").
-func (tok Token) String() string {
-	s := ""
-	if 0 <= tok && tok < Token(len(tokens)) {
-		s = tokens[tok]
-	}
-	if s == "" {
-		s = "token(" + strconv.Itoa(int(tok)) + ")"
-	}
-	return s
-}
 
 // A set of constants for precedence-based expression parsing.
 // Non-operators have lowest precedence, followed by operators
@@ -236,8 +157,8 @@ var keywords map[string]Token
 
 func init() {
 	keywords = make(map[string]Token)
-	for i := keywordBeg + 1; i < keywordEnd; i++ {
-		keywords[tokens[i]] = i
+	for tok := keywordBeg + 1; tok < keywordEnd; tok++ {
+		keywords[tok.String()] = tok
 	}
 }
 

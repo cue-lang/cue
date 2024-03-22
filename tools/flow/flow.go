@@ -316,6 +316,8 @@ func mermaidGraph(c *Controller) string {
 // tasks that send updates.
 type State int
 
+//go:generate go run golang.org/x/tools/cmd/stringer -type=State
+
 const (
 	// Waiting indicates a task is blocked on input from another task.
 	//
@@ -335,18 +337,6 @@ const (
 	// value of a Task indicates the reason for the termination.
 	Terminated
 )
-
-var stateStrings = map[State]string{
-	Waiting:    "Waiting",
-	Ready:      "Ready",
-	Running:    "Running",
-	Terminated: "Terminated",
-}
-
-// String reports a human readable string of status s.
-func (s State) String() string {
-	return stateStrings[s]
-}
 
 // A Task contains the context for a single task execution.
 // Tasks may be run concurrently.

@@ -51,6 +51,24 @@
       "parentUuid": "970a0e75_c0611326",
       "revId": "3b46bfeafa67d11932608032a32485e1afbb73dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "be0f52eb_645d367f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-22T07:46:43Z",
+      "side": 1,
+      "message": "I\u0027m sorry, I\u0027m not sure if this is done per se :) I see in PS2 you removed some changes, but PS3 re-added them. What I mean is two commits, where the first one changes the evaluator, and the second one changes tools/flow. Two commits with two different change-id git trailers should result in a stack of two Gerrit changes in a chain.\n\nFor example, see the stack of two commits I had here: https://review.gerrithub.io/c/cue-lang/cue/+/1185684",
+      "parentUuid": "690db3a3_4315d1b1",
+      "revId": "3b46bfeafa67d11932608032a32485e1afbb73dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -29,6 +29,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 	"unicode"
 
 	"github.com/spf13/cobra"
@@ -788,8 +789,23 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					}
 				}
 
+				typ := e.pkg.TypesInfo.TypeOf(name)
 				c := e.pkg.TypesInfo.Defs[v.Names[i]].(*types.Const)
 				sv := c.Val().ExactString()
+				switch t := typ.(type) {
+				case *types.Named:
+					if t.Obj().Pkg().Path() == "time" && t.Obj().Name() == "Duration" {
+						// time.Duration is an int64 representing nanoseconds,
+						// but CUE only accepts strings with units as accepted by time.ParseDuration.
+						durationWithUnit := sv + "ns"
+						// Roundtrip the constant through time.Duration.String for human readability.
+						duration, err := time.ParseDuration(durationWithUnit)
+						if err != nil {
+							panic(fmt.Errorf("time.ParseDuration(%s) failed: %v", durationWithUnit, err))
+						}
+						sv = `"` + duration.String() + `"`
+					}
+				}
 				cv, err := parser.ParseExpr("", sv)
 				if err != nil {
 					panic(fmt.Errorf("failed to parse %v: %v", sv, err))
@@ -805,7 +821,6 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					}
 				}
 
-				typ := e.pkg.TypesInfo.TypeOf(name)
 				switch typ {
 				case typeByte, typeString, typeError:
 				default:
@@ -1046,7 +1061,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 		// Check for builtin packages.
 		switch {
-		case obj.Pkg().Path() == "time" && obj.Name() == "Time":
+		case obj.Pkg().Path() == "time" && (obj.Name() == "Time" || obj.Name() == "Duration"):
 			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
 			var name *cueast.Ident
 			if ref.Name != "time" {

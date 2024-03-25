@@ -22,6 +22,30 @@
       },
       "revId": "5cff249b1a2f8c198128a80a7e0db6c524cfc120",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "df287ee1_0e51a021",
+        "filename": "cue/load/import.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 410,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-25T11:37:57Z",
+      "side": 1,
+      "message": "Yeah, I just copied the existing logic exactly, but `Cut` is better, as it so often is 😊",
+      "parentUuid": "79862da2_5e7a105e",
+      "range": {
+        "startLine": 410,
+        "startChar": 34,
+        "endLine": 410,
+        "endChar": 39
+      },
+      "revId": "5cff249b1a2f8c198128a80a7e0db6c524cfc120",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

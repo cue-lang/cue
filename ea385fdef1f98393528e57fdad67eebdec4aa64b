@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "63c3e0d3_b895ad28",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-25T10:17:59Z",
+      "side": 1,
+      "message": "In the future, please remember that reverting a commit should reopen the issue it fixed, because otherwise we might not track or even notice that we re-introduced a bug. I\u0027ve done this in https://github.com/cue-lang/cue/issues/1581#issuecomment-2017659069 now.",
+      "revId": "ea385fdef1f98393528e57fdad67eebdec4aa64b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

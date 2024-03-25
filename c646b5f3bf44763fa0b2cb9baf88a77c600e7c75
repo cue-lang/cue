@@ -75,6 +75,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "211f9ddb_cd6dda5e",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1169,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-25T17:17:24Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f179728e_079254e9",
+      "range": {
+        "startLine": 1169,
+        "startChar": 36,
+        "endLine": 1169,
+        "endChar": 40
+      },
+      "revId": "c646b5f3bf44763fa0b2cb9baf88a77c600e7c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "79fb8c89_7d765db2",
@@ -88,6 +112,30 @@
       "writtenOn": "2024-03-21T14:32:07Z",
       "side": 1,
       "message": "do you mean EnvExpr here?",
+      "range": {
+        "startLine": 1171,
+        "startChar": 3,
+        "endLine": 1171,
+        "endChar": 9
+      },
+      "revId": "c646b5f3bf44763fa0b2cb9baf88a77c600e7c75",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d3382426_45a6246f",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 1171,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-03-25T17:17:24Z",
+      "side": 1,
+      "message": "Yep, corrected.",
+      "parentUuid": "79fb8c89_7d765db2",
       "range": {
         "startLine": 1171,
         "startChar": 3,

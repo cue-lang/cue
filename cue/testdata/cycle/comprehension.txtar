@@ -321,8 +321,6 @@ Conjuncts:    2525
 Disjuncts:    1404
 -- out/evalalpha --
 Errors:
-issue1666.e.f1.a: field not allowed:
-    ./in.cue:63:11
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:117:14
 selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
@@ -418,8 +416,7 @@ Result:
       }
     }
   }
-  issue1666: (_|_){
-    // [eval]
+  issue1666: (struct){
     #E: (#struct){
       f1: (#struct){
       }
@@ -440,13 +437,13 @@ Result:
       f1: (#struct){
       }
     }
-    e: (_|_){
-      // [eval]
-      f1: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] issue1666.e.f1.a: field not allowed:
-          //     ./in.cue:63:11
+    e: (#struct){
+      f1: (#struct){
+        a: (#struct){
+          f1: (#struct){
+          }
+          f2: (#struct){
+          }
         }
       }
       f2: (#struct){
@@ -850,11 +847,9 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,55 @@
+@@ -1,5 +1,53 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
-+issue1666.e.f1.a: field not allowed:
-+    ./in.cue:63:11
 +selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +    ./in.cue:117:14
 +selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
@@ -907,7 +902,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -19,7 +69,9 @@
+@@ -19,7 +67,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -918,17 +913,7 @@ diff old new
        }
      }
    }
-@@ -44,7 +96,8 @@
-       }
-     }
-   }
--  issue1666: (struct){
-+  issue1666: (_|_){
-+    // [eval]
-     #E: (#struct){
-       f1: (#struct){
-       }
-@@ -52,26 +105,26 @@
+@@ -52,17 +102,17 @@
        }
      }
      _e: (#struct){
@@ -943,15 +928,6 @@ diff old new
 -            }
 -          }
 -        }
--      }
--    }
--    e: (#struct){
--      f1: (#struct){
--        a: (#struct){
--          f1: (#struct){
--          }
--          f2: (#struct){
--          }
 +      f2: (#struct){
 +        a: (#struct){
 +          t: (#struct){
@@ -963,19 +939,10 @@ diff old new
 +        }
 +      }
 +      f1: (#struct){
-+      }
-+    }
-+    e: (_|_){
-+      // [eval]
-+      f1: (_|_){
-+        // [eval]
-+        a: (_|_){
-+          // [eval] issue1666.e.f1.a: field not allowed:
-+          //     ./in.cue:63:11
-         }
        }
-       f2: (#struct){
-@@ -112,15 +165,14 @@
+     }
+     e: (#struct){
+@@ -112,15 +162,14 @@
        }
      }
      list: (struct){
@@ -994,7 +961,7 @@ diff old new
          }
        }
      }
-@@ -127,208 +179,284 @@
+@@ -127,208 +176,284 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1468,7 +1435,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +489,38 @@
+@@ -361,40 +486,38 @@
          }
        }
      }
@@ -1543,7 +1510,6 @@ diff old new
    }
  }
 -- diff/todo/p0 --
-issue1666.e.f1.a: invalid "field not allowed" error
 issue779.X: invalid cycle error.
 selfReferential.list.panels: invalid incomplete error.
 selfReferential.acrossOr: many errors

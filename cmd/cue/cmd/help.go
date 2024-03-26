@@ -591,15 +591,15 @@ The following variables are supported:
 var commandsHelp = &cobra.Command{
 	Use:   "commands",
 	Short: "user-defined commands",
-	Long: `Commands define actions on instances. For example, they may
-specify how to upload a configuration to Kubernetes. Commands are
-defined directly in tool files, which are regular CUE files
-within the same package with a filename ending in _tool.cue.
-These are typically defined at the module root so that they apply
-to all instances.
+	Long: `Workflow commands define actions on instances. For example, they
+may specify how to upload a configuration to Kubernetes. Workflow
+commands are defined directly in tool files, which are regular
+CUE files within the same package with a filename ending in
+_tool.cue.  These are typically defined at the module root so
+that they apply to all instances.
 
-Each command consists of one or more tasks. A task may, for
-example, load or write a file, consult a user on the command
+Each workflow command consists of one or more tasks. A task may,
+for example, load or write a file, consult a user on the command
 line, fetch a web page, and so on. Each task has inputs and
 outputs. Outputs are typically filled out by the task
 implementation as the task completes.
@@ -615,12 +615,10 @@ Available tasks can be found in the package documentation at
 
 	https://pkg.go.dev/cuelang.org/go/pkg/tool?tab=subdirectories
 
-More on tasks can be found in the commands help topic.
-
 Examples:
 
-In this simple example, we define a command called "hello",
-which declares a single task called "print" which uses
+In this simple example, we define a workflow command called
+"hello", which declares a single task called "print" which uses
 "tool/exec.Run" to execute a shell command that echos output to
 the terminal:
 
@@ -640,7 +638,7 @@ the terminal:
 	}
 	EOF
 
-We run the "hello" command like this:
+We run the "hello" workflow command like this:
 
 	$ cue cmd hello
 	Hello World! Welcome to Amsterdam.
@@ -649,12 +647,13 @@ We run the "hello" command like this:
 	Hello Jan! Welcome to Amsterdam.
 
 
-In this example we declare the "prompted" command which has four
-tasks. The first task prompts the user for a string input. The
-second task depends on the first, and echos the response back to
-the user with a friendly message. The third task pipes the output
-from the second to a file. The fourth task pipes the output from
-the second to standard output (i.e. it echos it again).
+In this example we declare the "prompted" workflow command which
+has four tasks. The first task prompts the user for a string
+input. The second task depends on the first, and echos the
+response back to the user with a friendly message. The third task
+pipes the output from the second to a file. The fourth task pipes
+the output from the second to standard output (i.e. it echos it
+again).
 
 	package foo
 

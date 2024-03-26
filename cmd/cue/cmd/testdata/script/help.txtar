@@ -34,7 +34,7 @@ Usage:
   cue [command]
 
 Available Commands:
-  cmd            run a user-defined shell command
+  cmd            run a user-defined workflow command
   completion     Generate completion script
   def            print consolidated definitions
   eval           evaluate and print a configuration

@@ -187,8 +187,6 @@ err: t8: {
 	V: #S
 	V: { c: e:  1 } // Should fail
 }
--- diff/explanation --
-ok.t5 and ok.t13 retain semantics of v0.6 for now.
 -- out/eval/stats --
 Leaks:  0
 Freed:  194
@@ -490,9 +488,12 @@ Result:
         }
       }
     }
-    t4: (struct){
-      a: (#struct){
-        b: (#struct){
+    t4: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval]
           h: (_|_){
             // [eval] err.t4.a.b.h: field not allowed:
             //     ./in.cue:154:8
@@ -848,20 +849,11 @@ diff old new
                //     ./in.cue:148:8
              }
            }
-@@ -330,60 +288,50 @@
-         }
-       }
-     }
--    t4: (_|_){
--      // [eval]
--      a: (_|_){
--        // [eval]
--        b: (_|_){
--          // [eval]
+@@ -336,54 +294,47 @@
+         // [eval]
+         b: (_|_){
+           // [eval]
 -          f: (int){ 1 }
-+    t4: (struct){
-+      a: (#struct){
-+        b: (#struct){
            h: (_|_){
              // [eval] err.t4.a.b.h: field not allowed:
 -            //     ./in.cue:152:5
@@ -945,7 +937,7 @@ diff old new
          }
        }
      }
-@@ -433,17 +381,12 @@
+@@ -433,17 +384,12 @@
                // [eval]
                e: (_|_){
                  // [eval]
@@ -965,7 +957,7 @@ diff old new
                }
              }
            }
-@@ -457,13 +400,12 @@
+@@ -457,13 +403,12 @@
        }
        a: (_|_){
          // [eval]
@@ -980,7 +972,7 @@ diff old new
        }
      }
      t8: (_|_){
-@@ -477,14 +419,11 @@
+@@ -477,14 +422,11 @@
          // [eval]
          c: (_|_){
            // [eval]
@@ -996,10 +988,17 @@ diff old new
          }
        }
      }
--- diff/todo/p1 --
-closedness incorrect.
 -- diff/todo/p2 --
-error positions and reordering.
+ok.t1.c.0: closedness probably incorrect: #R defines elements as type "top",
+which are not closed by definition. Probably does not matter for evaluation,
+as it will be determined to be "closed", but allowing all attributes.
+ok.t(9|10).c.0: same issue as ok.t1.c.0.
+ok.t2.l: same issue: top is marked as "closed", even though it will allow all
+values. Probably just a matter of difference in debugging output and not
+evaluation semantics.
+all: error positions and reordering.
+-- diff/explanation --
+ok.t5 and ok.t13 retain semantics of v0.6 for now.
 -- out/eval --
 Errors:
 err.t1.a.disallowed: field not allowed:

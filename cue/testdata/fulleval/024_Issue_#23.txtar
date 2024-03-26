@@ -38,10 +38,10 @@ Conjuncts:    15
 Disjuncts:    11
 -- out/evalalpha --
 Errors:
-y: conflicting values 1 and 3:
+y.a: conflicting values 1 and 3:
     ./in.cue:1:12
     ./in.cue:2:12
-y: conflicting values 2 and 3:
+y.a: conflicting values 2 and 3:
     ./in.cue:1:21
     ./in.cue:2:12
 
@@ -54,10 +54,10 @@ Result:
       a: (int){ 2 }
     }) }
   y: (_|_){
-    // [eval] y: conflicting values 1 and 3:
+    // [eval] y.a: conflicting values 1 and 3:
     //     ./in.cue:1:12
     //     ./in.cue:2:12
-    // y: conflicting values 2 and 3:
+    // y.a: conflicting values 2 and 3:
     //     ./in.cue:1:21
     //     ./in.cue:2:12
     a: (int){ 3 }
@@ -70,14 +70,11 @@ diff old new
 @@ -1,12 +1,9 @@
  Errors:
 -y: 2 errors in empty disjunction:
--y.a: conflicting values 1 and 3:
-+y: conflicting values 1 and 3:
+ y.a: conflicting values 1 and 3:
      ./in.cue:1:12
 -    ./in.cue:2:4
--    ./in.cue:2:12
--y.a: conflicting values 2 and 3:
-+    ./in.cue:2:12
-+y: conflicting values 2 and 3:
+     ./in.cue:2:12
+ y.a: conflicting values 2 and 3:
      ./in.cue:1:21
 -    ./in.cue:2:4
      ./in.cue:2:12
@@ -89,13 +86,11 @@ diff old new
    y: (_|_){
 -    // [eval] y: 2 errors in empty disjunction:
 -    // y.a: conflicting values 1 and 3:
-+    // [eval] y: conflicting values 1 and 3:
++    // [eval] y.a: conflicting values 1 and 3:
      //     ./in.cue:1:12
 -    //     ./in.cue:2:4
--    //     ./in.cue:2:12
--    // y.a: conflicting values 2 and 3:
-+    //     ./in.cue:2:12
-+    // y: conflicting values 2 and 3:
+     //     ./in.cue:2:12
+     // y.a: conflicting values 2 and 3:
      //     ./in.cue:1:21
 -    //     ./in.cue:2:4
 -    //     ./in.cue:2:12
@@ -109,8 +104,6 @@ diff old new
 +    a: (int){ 3 }
    }
  }
--- diff/todo/p1 --
-y: Incorrect path: must be y.a
 -- diff/todo/p3 --
 Missing "empty disjunction" error message.
 Missing error positions.

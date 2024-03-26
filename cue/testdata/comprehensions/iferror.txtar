@@ -161,9 +161,6 @@ Errors:
 issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
     ./in.cue:61:8
     ./in.cue:63:11
-issue1972.err1.patchs: field not allowed:
-    ./in.cue:63:3
-    ./in.cue:66:4
 issue1972.err1.someCondition: field not allowed:
     ./in.cue:62:3
 wrongConcreteType: cannot use 2 (type int) as type bool:
@@ -229,6 +226,8 @@ Result:
       // [eval] issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
       //     ./in.cue:61:8
       //     ./in.cue:63:11
+      // issue1972.err1.someCondition: field not allowed:
+      //     ./in.cue:62:3
       #patchs: (#list){
       }
       #someCondition: (_){ _ }
@@ -248,22 +247,19 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,7 +1,12 @@
+@@ -1,7 +1,9 @@
  Errors:
 -issue1972.err1: conflicting values [] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
 -    ./in.cue:54:12
 +issue1972.err1: conflicting values [...{}] and {someCondition:_,patchs:[...{}],patchs,if someCondition {patchs:_}} (mismatched types list and struct):
      ./in.cue:61:8
 +    ./in.cue:63:11
-+issue1972.err1.patchs: field not allowed:
-+    ./in.cue:63:3
-+    ./in.cue:66:4
 +issue1972.err1.someCondition: field not allowed:
 +    ./in.cue:62:3
  wrongConcreteType: cannot use 2 (type int) as type bool:
      ./in.cue:4:2
      ./in.cue:1:8
-@@ -8,8 +13,6 @@
+@@ -8,8 +10,6 @@
  wrongType: cannot use int (type int) as type bool:
      ./in.cue:10:2
      ./in.cue:1:14
@@ -272,7 +268,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -31,8 +34,6 @@
+@@ -31,8 +31,6 @@
    incomplete: (_|_){
      // [incomplete] incomplete: undefined field: d:
      //     ./in.cue:16:7
@@ -281,7 +277,7 @@ diff old new
      list: (#list){
        0: (int){ 1 }
        1: (int){ 2 }
-@@ -66,17 +67,21 @@
+@@ -66,17 +64,23 @@
    issue1972: (_|_){
      // [eval]
      err1: (_|_){
@@ -292,6 +288,8 @@ diff old new
 -      // issue1972.err1: invalid list index someCondition (type string):
 -      //     ./in.cue:65:6
 +      //     ./in.cue:63:11
++      // issue1972.err1.someCondition: field not allowed:
++      //     ./in.cue:62:3
        #patchs: (#list){
        }
 -      someCondition: (_){ _ }

@@ -323,7 +323,7 @@ Disjuncts:    1404
 Errors:
 issue1666.e.f1.a: field not allowed:
     ./in.cue:63:11
-selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle:
+selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
     ./in.cue:117:14
 selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
     ./in.cue:125:5
@@ -366,9 +366,9 @@ issue1881.p3.o.retry: field not allowed:
     ./in.cue:235:17
 issue1881.p3.2.retry: structural cycle:
     ./in.cue:231:14
-siblingInsertion.t2.p1.deployment: field logging not allowed by earlier comprehension or reference cycle:
+siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
     ./in.cue:277:21
-siblingInsertion.t2.p2.deployment: field logging not allowed by earlier comprehension or reference cycle:
+siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
     ./in.cue:292:21
 issue2367.0: structural cycle:
     ./in.cue:308:11
@@ -501,7 +501,7 @@ Result:
     insertionError: (_|_){
       // [eval]
       A: (_|_){
-        // [eval] selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle:
+        // [eval] selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
         //     ./in.cue:117:14
         foo: (int){ 1 }
       }
@@ -814,24 +814,24 @@ Result:
     t2: (_|_){
       // [eval]
       p1: (_|_){
-        // [eval] siblingInsertion.t2.p1.deployment: field logging not allowed by earlier comprehension or reference cycle:
+        // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
         //     ./in.cue:277:21
         D: (struct){
           logging: (_){ _ }
         }
         deployment: (_|_){
-          // [eval] siblingInsertion.t2.p1.deployment: field logging not allowed by earlier comprehension or reference cycle:
+          // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
           //     ./in.cue:277:21
         }
       }
       p2: (_|_){
-        // [eval] siblingInsertion.t2.p2.deployment: field logging not allowed by earlier comprehension or reference cycle:
+        // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
         //     ./in.cue:292:21
         D: (struct){
           logging: (_){ _ }
         }
         deployment: (_|_){
-          // [eval] siblingInsertion.t2.p2.deployment: field logging not allowed by earlier comprehension or reference cycle:
+          // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
           //     ./in.cue:292:21
         }
       }
@@ -855,7 +855,7 @@ diff old new
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
 +issue1666.e.f1.a: field not allowed:
 +    ./in.cue:63:11
-+selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle:
++selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +    ./in.cue:117:14
 +selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
 +    ./in.cue:125:5
@@ -898,9 +898,9 @@ diff old new
 +    ./in.cue:235:17
 +issue1881.p3.2.retry: structural cycle:
 +    ./in.cue:231:14
-+siblingInsertion.t2.p1.deployment: field logging not allowed by earlier comprehension or reference cycle:
++siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
 +    ./in.cue:277:21
-+siblingInsertion.t2.p2.deployment: field logging not allowed by earlier comprehension or reference cycle:
++siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
 +    ./in.cue:292:21
 +issue2367.0: structural cycle:
 +    ./in.cue:308:11
@@ -999,7 +999,7 @@ diff old new
        // [eval]
        A: (_|_){
 -        // [eval] selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
-+        // [eval] selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle:
++        // [eval] selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
 +        //     ./in.cue:117:14
          foo: (int){ 1 }
 -        foo3: (int){ 1 }
@@ -1510,24 +1510,24 @@ diff old new
 +    t2: (_|_){
 +      // [eval]
 +      p1: (_|_){
-+        // [eval] siblingInsertion.t2.p1.deployment: field logging not allowed by earlier comprehension or reference cycle:
++        // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
 +        //     ./in.cue:277:21
 +        D: (struct){
 +          logging: (_){ _ }
 +        }
 +        deployment: (_|_){
-+          // [eval] siblingInsertion.t2.p1.deployment: field logging not allowed by earlier comprehension or reference cycle:
++          // [eval] siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
 +          //     ./in.cue:277:21
 +        }
 +      }
 +      p2: (_|_){
-+        // [eval] siblingInsertion.t2.p2.deployment: field logging not allowed by earlier comprehension or reference cycle:
++        // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
 +        //     ./in.cue:292:21
 +        D: (struct){
 +          logging: (_){ _ }
 +        }
 +        deployment: (_|_){
-+          // [eval] siblingInsertion.t2.p2.deployment: field logging not allowed by earlier comprehension or reference cycle:
++          // [eval] siblingInsertion.t2.p2.deployment: adding field logging not allowed as field set was already referenced:
 +          //     ./in.cue:292:21
 +        }
 +      }

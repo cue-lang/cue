@@ -280,8 +280,8 @@ expr.error1.a: conflicting values 4 and 3:
 expr.error2.a: conflicting values 4 and 3:
     ./in.cue:6:5
     ./in.cue:7:5
-list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
-list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
+list.error1.a: adding field 2 not allowed as field set was already referenced
+list.error2.a: adding field 2 not allowed as field set was already referenced
 list.error2.a.0: conflicting values "3" and "1":
     ./in.cue:15:6
     ./in.cue:16:6
@@ -313,7 +313,7 @@ Result:
     error1: (_|_){
       // [eval]
       a: (_|_){
-        // [eval] list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
+        // [eval] list.error1.a: adding field 2 not allowed as field set was already referenced
         0: (string){ "1" }
         1: (string){ "2" }
       }
@@ -321,7 +321,7 @@ Result:
     error2: (_|_){
       // [eval]
       a: (_|_){
-        // [eval] list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
+        // [eval] list.error2.a: adding field 2 not allowed as field set was already referenced
         // list.error2.a.0: conflicting values "3" and "1":
         //     ./in.cue:15:6
         //     ./in.cue:16:6
@@ -671,8 +671,8 @@ diff old new
      ./in.cue:7:5
 -list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
 -list.error2.a: element at index 2 not allowed by earlier comprehension or reference cycle
-+list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
-+list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
++list.error1.a: adding field 2 not allowed as field set was already referenced
++list.error2.a: adding field 2 not allowed as field set was already referenced
  list.error2.a.0: conflicting values "3" and "1":
      ./in.cue:15:6
      ./in.cue:16:6
@@ -696,7 +696,7 @@ diff old new
        // [eval]
        a: (_|_){
 -        // [eval] list.error1.a: element at index 2 not allowed by earlier comprehension or reference cycle
-+        // [eval] list.error1.a: field 2 not allowed by earlier comprehension or reference cycle
++        // [eval] list.error1.a: adding field 2 not allowed as field set was already referenced
          0: (string){ "1" }
          1: (string){ "2" }
 -        2: (string){ "3" }
@@ -711,7 +711,7 @@ diff old new
 +    error2: (_|_){
 +      // [eval]
 +      a: (_|_){
-+        // [eval] list.error2.a: field 2 not allowed by earlier comprehension or reference cycle
++        // [eval] list.error2.a: adding field 2 not allowed as field set was already referenced
 +        // list.error2.a.0: conflicting values "3" and "1":
 +        //     ./in.cue:15:6
 +        //     ./in.cue:16:6

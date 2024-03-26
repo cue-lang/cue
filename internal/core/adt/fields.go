@@ -332,7 +332,7 @@ func (n *nodeContext) getArc(f Feature, mode ArcType) (arc *Vertex, isNew bool) 
 		nonRooted: v.IsDynamic || v.Label.IsLet() || v.nonRooted,
 	}
 	if n.scheduler.frozen&fieldSetKnown != 0 {
-		b := n.ctx.NewErrf("field %v not allowed by earlier comprehension or reference cycle", f)
+		b := n.ctx.NewErrf("adding field %v not allowed as field set was already referenced", f)
 		n.ctx.AddBottom(b)
 		// This may panic for list arithmetic. Safer to leave out for now.
 		arc.ArcType = ArcNotPresent
@@ -769,6 +769,8 @@ func (n *nodeContext) insertArcCC(f Feature, mode ArcType, c Conjunct, id CloseI
 	}
 
 	v, insertedArc := n.getArc(f, mode)
+
+	defer n.ctx.PopArc(n.ctx.PushArc(v))
 
 	// TODO: this block is not strictly needed. Removing it slightly changes the
 	// paths at which errors are reported, arguably, but not clearly, for the

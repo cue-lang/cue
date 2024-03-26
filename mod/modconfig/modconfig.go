@@ -265,26 +265,22 @@ func (t *cueLoginsTransport) RoundTrip(req *http.Request) (*http.Response, error
 }
 
 func (t *cueLoginsTransport) updateLogin(host string, new *oauth2.Token) error {
-	// Lock the logins for the entire duration of the update to avoid races
-	// TODO: lock the logins file properly so that the update is atomic at FS level.
-	t.loginsMu.Lock()
-	defer t.loginsMu.Unlock()
-
 	// Reload the logins file in case another process changed it in the meantime.
 	loginsPath, err := cueconfig.LoginConfigPath(t.getenv)
 	if err != nil {
 		// TODO: this should never fail. Log a warning.
 		return nil
 	}
-	t.logins, err = cueconfig.ReadLogins(loginsPath)
-	if err != nil || t.logins == nil {
-		// TODO: Log a warning. There should be a logins file since we're in the refresh flow.
-		return nil
+	logins, err := cueconfig.UpdateRegistryLogin(loginsPath, host, new)
+	if err != nil {
+		return err
 	}
 
-	t.logins.Registries[host] = cueconfig.LoginFromToken(new)
+	t.loginsMu.Lock()
+	t.logins = logins
+	t.loginsMu.Unlock()
 
-	return cueconfig.WriteLogins(loginsPath, t.logins)
+	return nil
 }
 
 func (t *cueLoginsTransport) init() error {

@@ -723,9 +723,12 @@ Result:
         }
       }
     }
-    t1: (struct){
-      err: (struct){
-        a: (#struct){
+    t1: (_|_){
+      // [eval]
+      err: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval]
           c: (_|_){
             // [eval] definition.t1.err.a.c: field not allowed:
             //     ./definition.cue:9:5
@@ -1079,8 +1082,8 @@ Result:
               a: (int){ 1 }
               b: (int){ 2 }
             }
-            b: (int){ 2 }
             a: (int){ 1 }
+            b: (int){ 2 }
           }
           y: (struct){
             c: (struct){
@@ -1128,32 +1131,18 @@ diff old new
        }
      }
      t2: (struct){
-@@ -61,25 +48,18 @@
+@@ -61,9 +48,7 @@
              // [eval]
              c: (_|_){
                // [eval] definition.t0.err.d1.env.c: field not allowed:
 -              //     ./definition.cue:2:12
                //     ./definition.cue:3:11
 -              //     ./definition.cue:4:6
--            }
--          }
--        }
--      }
--    }
--    t1: (_|_){
--      // [eval]
--      err: (_|_){
--        // [eval]
--        a: (_|_){
--          // [eval]
-+            }
-+          }
-+        }
-+      }
-+    }
-+    t1: (struct){
-+      err: (struct){
-+        a: (#struct){
+             }
+           }
+         }
+@@ -77,9 +62,7 @@
+           // [eval]
            c: (_|_){
              // [eval] definition.t1.err.a.c: field not allowed:
 -            //     ./definition.cue:8:5
@@ -1162,7 +1151,7 @@ diff old new
            }
          }
          #A: (#struct){
-@@ -93,32 +73,32 @@
+@@ -93,32 +76,32 @@
              a: (int){ int }
            }
            x: (#struct){
@@ -1221,7 +1210,7 @@ diff old new
            }
            #A: (#struct){
              a: (int){ int }
-@@ -196,8 +176,7 @@
+@@ -196,8 +179,7 @@
        }
      }
    }
@@ -1231,7 +1220,7 @@ diff old new
      t0: (struct){
        ok: (struct){
          c: (struct){
-@@ -264,134 +243,130 @@
+@@ -264,134 +246,130 @@
          }
        }
      }
@@ -1490,7 +1479,7 @@ diff old new
              }
            }
          }
-@@ -401,23 +376,23 @@
+@@ -401,23 +379,23 @@
                d: (struct){
                  b: (int){ 2 }
                }
@@ -1531,17 +1520,6 @@ diff old new
            }
          }
          check: (struct){
-@@ -435,8 +410,8 @@
-               a: (int){ 1 }
-               b: (int){ 2 }
-             }
--            a: (int){ 1 }
--            b: (int){ 2 }
-+            b: (int){ 2 }
-+            a: (int){ 1 }
-           }
-           y: (struct){
-             c: (struct){
 -- diff/explanation --
 Bug fixes
 -- diff/todo/p2 --

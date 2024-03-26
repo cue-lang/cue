@@ -22,8 +22,10 @@ a.c: field not allowed:
     ./in.cue:5:4
 
 Result:
-(struct){
-  a: (#struct){
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval]
     c: (_|_){
       // [eval] a.c: field not allowed:
       //     ./in.cue:5:4
@@ -38,7 +40,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,23 +1,15 @@
+@@ -1,9 +1,6 @@
  Errors:
  a.c: field not allowed:
 -    ./in.cue:1:4
@@ -47,13 +49,12 @@ diff old new
 -    ./in.cue:7:5
  
  Result:
--(_|_){
--  // [eval]
--  a: (_|_){
--    // [eval]
+ (_|_){
+@@ -10,14 +7,11 @@
+   // [eval]
+   a: (_|_){
+     // [eval]
 -    b: (int){ 1 }
-+(struct){
-+  a: (#struct){
      c: (_|_){
        // [eval] a.c: field not allowed:
 -      //     ./in.cue:1:4

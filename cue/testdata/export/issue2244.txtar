@@ -41,59 +41,6 @@ Retain: 30
 Unifications: 24
 Conjuncts:    58
 Disjuncts:    40
--- out/evalalpha --
-(struct){
-  _#matchPattern(:x): (_|_){
-    // [incomplete] _#matchPattern: error in call to strings.HasSuffix: non-concrete value string:
-    //     ./in.cue:11:6
-    //     ./in.cue:8:12
-    #pattern: (string){ string }
-  }
-  _#isReleaseTag(:x): (string){
-    "refs/tags/v"
-    #pattern: (string){ "refs/tags/v*" }
-    let prefix#1 = (string){ "refs/tags/v" }
-  }
-  #step: (#struct){
-    if: ((string|number)){ |((number){ number }, (string){ string }) }
-  }
-  m: (#struct){
-    if: ((string|number)){ |((number){
-        number
-        #pattern: (string){ "refs/tags/v*" }
-      }, (string){
-        string
-        #pattern: (string){ "refs/tags/v*" }
-      }) }
-  }
-}
--- diff/-out/evalalpha<==>+out/eval --
-diff old new
---- old
-+++ new
-@@ -14,10 +14,12 @@
-     if: ((string|number)){ |((number){ number }, (string){ string }) }
-   }
-   m: (#struct){
--    if: (string){
--      "refs/tags/v"
--      #pattern: (string){ "refs/tags/v*" }
--      let prefix#1 = (string){ "refs/tags/v" }
--    }
-+    if: ((string|number)){ |((number){
-+        number
-+        #pattern: (string){ "refs/tags/v*" }
-+      }, (string){
-+        string
-+        #pattern: (string){ "refs/tags/v*" }
-+      }) }
-   }
- }
--- diff/todo/p0 --
-disjunction with number is not properly eliminated. The issue seems to be that
-the embedded string scalar is not properly propagated. This, in turn, is related
-to tasks starting before, while ending after, the start of processing
-disjunctions.
 -- diff/explanation --
 New evaluator should ultimately disallow new definitions in closed structs
 and not allow #pattern in #step

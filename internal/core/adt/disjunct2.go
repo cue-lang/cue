@@ -257,7 +257,6 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	a := n.disjunctions
 	n.disjunctions = n.disjunctions[:0]
 
-	n.completeNodeConjuncts()
 	initArcs(n.ctx, n.node)
 
 	// TODO(perf): single pass for quick filter on all disjunctions.

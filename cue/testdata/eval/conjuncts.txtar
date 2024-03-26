@@ -105,12 +105,6 @@ Result:
     t3: (string){ |(*(string){
         "X"
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
-      }, *(string){
-        "X"
-        #early: (string){ |(*(string){ "X" }, (string){ string }) }
-      }, (string){
-        string
-        #early: (string){ |(*(string){ "X" }, (string){ string }) }
       }, (string){
         string
         #early: (string){ |(*(string){ "X" }, (string){ string }) }
@@ -172,7 +166,7 @@ diff old new
      ./issue2351.cue:4:19
  
  Result:
-@@ -22,14 +21,19 @@
+@@ -22,14 +21,13 @@
          string
          #early: (string){ |(*(string){ "X" }, (string){ string }) }
        }) }
@@ -187,12 +181,6 @@ diff old new
 +    t3: (string){ |(*(string){
 +        "X"
 +        #early: (string){ |(*(string){ "X" }, (string){ string }) }
-+      }, *(string){
-+        "X"
-+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
-+      }, (string){
-+        string
-+        #early: (string){ |(*(string){ "X" }, (string){ string }) }
 +      }, (string){
 +        string
 +        #early: (string){ |(*(string){ "X" }, (string){ string }) }
@@ -200,7 +188,7 @@ diff old new
    }
    handleComprehensions: (struct){
      #sub2: (int){ 2 }
-@@ -37,9 +41,8 @@
+@@ -37,9 +35,8 @@
    issue2351: (_|_){
      // [eval]
      let: (_|_){
@@ -211,7 +199,7 @@ diff old new
        //     ./issue2351.cue:4:19
        let _param#1 = (string){ "foo" }
      }
-@@ -67,7 +70,7 @@
+@@ -67,7 +64,7 @@
          }
        }
      }

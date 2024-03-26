@@ -404,19 +404,12 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 		}
 	}
 
-	if !n.node.nonRooted || n.node.IsDynamic {
-		if state := arc.getState(n.ctx); state != nil {
-			n.completeNodeTasks()
-
-		}
+	if state := arc.getBareState(n.ctx); state != nil {
+		n.toComplete = true
 	}
 }
 
 func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
-	if n.node.isInProgress() {
-		n.completeNodeTasks()
-	}
-
 	// No need to do the notification mechanism if we are already complete.
 	old := n.notify
 	switch {
@@ -448,9 +441,6 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 
 	if root.linkNotify(v, cc, c.CycleInfo) {
 		n.notify = append(n.notify, receiver{v, cc})
-		if n.node.isInProgress() {
-			n.completeNodeTasks()
-		}
 	}
 
 	return old

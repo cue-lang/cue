@@ -671,6 +671,11 @@ func runTask(t *task, mode runMode) {
 	}
 
 	defer func() {
+		if n := t.node; n.toComplete {
+			n.toComplete = false
+			n.completeNodeTasks(attemptOnly)
+		}
+
 		switch r := recover().(type) {
 		case nil:
 		case *scheduler:

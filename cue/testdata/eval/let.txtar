@@ -203,11 +203,11 @@ referencesForViaLet."2": conflicting values 12 and 4:
     ./incomprehension.cue:23:24
 referencesForViaLet."2": conflicting values 8 and 4:
     ./incomprehension.cue:23:24
-nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
+nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
     ./incomprehension.cue:55:5
     ./incomprehension.cue:53:15
     ./incomprehension.cue:53:18
-nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
+nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
     ./incomprehension.cue:55:5
     ./incomprehension.cue:53:15
     ./incomprehension.cue:53:18
@@ -404,14 +404,14 @@ Result:
       }
     }]]]]
     "0": (_|_){
-      // [eval] nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
+      // [eval] nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
       //     ./incomprehension.cue:55:5
       //     ./incomprehension.cue:53:15
       //     ./incomprehension.cue:53:18
       let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
     }
     "1": (_|_){
-      // [eval] nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
+      // [eval] nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
       //     ./incomprehension.cue:55:5
       //     ./incomprehension.cue:53:15
       //     ./incomprehension.cue:53:18
@@ -521,11 +521,11 @@ diff old new
 +    ./incomprehension.cue:23:24
 +referencesForViaLet."2": conflicting values 8 and 4:
 +    ./incomprehension.cue:23:24
-+nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
++nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +    ./incomprehension.cue:55:5
 +    ./incomprehension.cue:53:15
 +    ./incomprehension.cue:53:18
-+nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
++nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +    ./incomprehension.cue:55:5
 +    ./incomprehension.cue:53:15
 +    ./incomprehension.cue:53:18
@@ -730,14 +730,14 @@ diff old new
 -      "2": (int){ 2 }
 +    }]]]]
 +    "0": (_|_){
-+      // [eval] nestedFor."0".X: invalid interpolation: conflicting values 2 and 1:
++      // [eval] nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +      //     ./incomprehension.cue:55:5
 +      //     ./incomprehension.cue:53:15
 +      //     ./incomprehension.cue:53:18
 +      let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
 +    }
 +    "1": (_|_){
-+      // [eval] nestedFor."1".X: invalid interpolation: conflicting values 2 and 1:
++      // [eval] nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +      //     ./incomprehension.cue:55:5
 +      //     ./incomprehension.cue:53:15
 +      //     ./incomprehension.cue:53:18

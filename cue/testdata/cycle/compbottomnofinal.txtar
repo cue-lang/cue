@@ -481,10 +481,7 @@ Disjuncts:    215
     p1: (struct){
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p1.X: cyclic reference to field port:
-          //     ./in.cue:199:33
-        }
+        host: (string){ "mod.test" }
       }
       X: (_|_){
         // [incomplete] large.p1.X: cyclic reference to field port:
@@ -508,10 +505,7 @@ Disjuncts:    215
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p2.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-          //     ./in.cue:272:7
-        }
+        host: (string){ "mod.test" }
       }
       #X: (_|_){
         // [incomplete] large.p2.#X.port: cyclic reference to field port:
@@ -537,10 +531,7 @@ Disjuncts:    215
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p3.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-          //     ./in.cue:313:7
-        }
+        host: (string){ "mod.test" }
       }
       #Y: (_|_){
         // [incomplete] large.p3.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
@@ -564,10 +555,7 @@ Disjuncts:    215
       }
       Y: (struct){
         userinfo: (string){ "user" }
-        host: (_|_){
-          // [incomplete] large.p4.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-          //     ./in.cue:337:7
-        }
+        host: (string){ "mod.test" }
       }
     }
   }
@@ -782,7 +770,7 @@ diff old new
        }
      }
    }
-@@ -124,121 +110,94 @@
+@@ -124,122 +110,83 @@
    large: (struct){
      #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
      p1: (struct){
@@ -901,12 +889,10 @@ diff old new
 -        port*: (_|_){
 -          // [cycle] large.p4.Y: cycle error referencing port:
 -          //     ./in.cue:351:10
+-        }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p1.X: cyclic reference to field port:
-+          //     ./in.cue:199:33
-+        }
++        host: (string){ "mod.test" }
 +      }
 +      X: (_|_){
 +        // [incomplete] large.p1.X: cyclic reference to field port:
@@ -930,10 +916,7 @@ diff old new
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p2.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-+          //     ./in.cue:272:7
-+        }
++        host: (string){ "mod.test" }
 +      }
 +      #X: (_|_){
 +        // [incomplete] large.p2.#X.port: cyclic reference to field port:
@@ -959,10 +942,7 @@ diff old new
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p3.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-+          //     ./in.cue:313:7
-+        }
++        host: (string){ "mod.test" }
 +      }
 +      #Y: (_|_){
 +        // [incomplete] large.p3.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
@@ -986,12 +966,10 @@ diff old new
 +      }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
-+        host: (_|_){
-+          // [incomplete] large.p4.#Y: error in call to regexp.FindNamedSubmatch: non-concrete value _:
-+          //     ./in.cue:337:7
-         }
++        host: (string){ "mod.test" }
        }
      }
+   }
 -- diff/todo/p2 --
 error message: no mention of cycle path
 -- out/eval --

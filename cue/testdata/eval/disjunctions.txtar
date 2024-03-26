@@ -144,10 +144,10 @@ Conjuncts:    564
 Disjuncts:    304
 -- out/evalalpha --
 Errors:
-f: conflicting values "int" and "str":
+f.name: conflicting values "int" and "str":
     ./in.cue:5:8
     ./in.cue:15:15
-f: conflicting values 3 and string (mismatched types int and string):
+f.val: conflicting values 3 and string (mismatched types int and string):
     ./in.cue:9:8
     ./in.cue:15:27
 
@@ -176,10 +176,10 @@ Result:
     name: (string){ "str" }
   }
   f: (_|_){
-    // [eval] f: conflicting values "int" and "str":
+    // [eval] f.name: conflicting values "int" and "str":
     //     ./in.cue:5:8
     //     ./in.cue:15:15
-    // f: conflicting values 3 and string (mismatched types int and string):
+    // f.val: conflicting values 3 and string (mismatched types int and string):
     //     ./in.cue:9:8
     //     ./in.cue:15:27
     name: (string){ "str" }
@@ -309,13 +309,11 @@ diff old new
 @@ -1,12 +1,9 @@
  Errors:
 -f: 2 errors in empty disjunction:
--f.name: conflicting values "int" and "str":
-+f: conflicting values "int" and "str":
+ f.name: conflicting values "int" and "str":
      ./in.cue:5:8
 -    ./in.cue:15:4
      ./in.cue:15:15
--f.val: conflicting values 3 and string (mismatched types int and string):
-+f: conflicting values 3 and string (mismatched types int and string):
+ f.val: conflicting values 3 and string (mismatched types int and string):
      ./in.cue:9:8
 -    ./in.cue:15:4
      ./in.cue:15:27
@@ -327,12 +325,11 @@ diff old new
    f: (_|_){
 -    // [eval] f: 2 errors in empty disjunction:
 -    // f.name: conflicting values "int" and "str":
-+    // [eval] f: conflicting values "int" and "str":
++    // [eval] f.name: conflicting values "int" and "str":
      //     ./in.cue:5:8
 -    //     ./in.cue:15:4
      //     ./in.cue:15:15
--    // f.val: conflicting values 3 and string (mismatched types int and string):
-+    // f: conflicting values 3 and string (mismatched types int and string):
+     // f.val: conflicting values 3 and string (mismatched types int and string):
      //     ./in.cue:9:8
 -    //     ./in.cue:15:4
      //     ./in.cue:15:27

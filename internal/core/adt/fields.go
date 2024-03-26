@@ -608,12 +608,17 @@ func (c *closeContext) decDependent(ctx *OpContext, kind depKind, dependant *clo
 		p.hasNonTop = true
 	}
 
-	if !c.isEmbed && c.isClosed {
+	switch {
+	case c.isTotal:
+		if !p.isClosed {
+			p.isTotal = true
+		}
+	case !c.isEmbed && c.isClosed:
 		// Merge the two closeContexts and ensure that the patterns and fields
 		// are mutually compatible according to the closedness rules.
 		injectClosed(ctx, c, p)
 		p.Expr = mergeConjunctions(p.Expr, c.Expr)
-	} else {
+	default:
 		// Do not check closedness of fields for embeddings.
 		// The pattern constraints of the embedding still need to be added
 		// to the current context.

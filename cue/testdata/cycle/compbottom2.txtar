@@ -790,6 +790,7 @@ self.isConcreteFail: t1: int value is not an error.
 self.isNotConcrete: t1: int value is not an error.
 -- diff/todo/p3 --
 sameStruct.cycleFail: Harmonize and improve cycle errors
+cycleFail.t1.p1.raises?.a: error needs to be reported at parent node.
 -- out/eval --
 (struct){
   self: (struct){

@@ -105,7 +105,7 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 				// TODO: invalidate task instead?
 				continue
 			}
-			if d.kind == TASK && d.task.state == taskRUNNING {
+			if d.kind == TASK && d.task.state == taskRUNNING && !d.task.defunct {
 				cc.overlay.decDependent(ctx.ctx, TASK, nil)
 			}
 		}
@@ -435,6 +435,18 @@ func (ctx *overlayContext) cloneScheduler(dst, src *nodeContext) {
 		case taskREADY:
 			t.defunct = true
 			t := ctx.cloneTask(t, ds, ss)
+			ds.tasks = append(ds.tasks, t)
+
+		case taskRUNNING:
+			if t.run != handleResolver {
+				// TODO: consider whether this is also necessary for other
+				// types of tasks.
+				break
+			}
+
+			t.defunct = true
+			t := ctx.cloneTask(t, ds, ss)
+			t.state = taskREADY
 			ds.tasks = append(ds.tasks, t)
 		}
 	}

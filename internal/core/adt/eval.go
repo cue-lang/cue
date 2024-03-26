@@ -1062,6 +1062,14 @@ type nodeContextState struct {
 	// isInitialized indicates whether conjuncts have been inserted in the node.
 	isInitialized bool
 
+	// toComplete marks whether completeNodeTasks needs to be called on this
+	// node after a corresponding tasks has been completed.
+	toComplete bool
+
+	// isCompleting > 0 indicates whether a call to completeNodeTasks is in
+	// progress.
+	isCompleting int
+
 	// State info
 
 	hasTop      bool

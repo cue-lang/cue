@@ -268,24 +268,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if n.completed&(subFieldsProcessed) != 0 {
 		n.node.updateStatus(finalized)
 
-		for _, r := range n.node.cc.externalDeps {
-			src := r.src
-			a := &src.arcs[r.index]
-			if a.decremented {
-				continue
-			}
-			a.decremented = true
-			if n := src.src.getState(n.ctx); n != nil {
-				n.completeNodeConjuncts()
-			}
-			// FIXME: we should be careful to not evaluate parent nodes if we
-			// are inside a disjunction, or at least ensure that there are no
-			// disjunction values leaked into non-disjunction nodes through
-			// evaluating externalDeps.
-			src.src.unify(n.ctx, needTasksDone, attemptOnly)
-			a.cc.decDependent(c, a.kind, src) // REF(arcs)
-		}
-
 		if DebugDeps {
 			RecordDebugGraph(n.ctx, n.node, "Finalize")
 		}
@@ -320,7 +302,7 @@ func (n *nodeContext) completeNodeConjuncts() {
 	}
 
 	// This only attempts, but it ensures that all references are processed.
-	n.process(conjunctsKnown, attemptOnly)
+	// n.process(conjunctsKnown, attemptOnly)
 }
 
 // Goal:
@@ -328,8 +310,16 @@ func (n *nodeContext) completeNodeConjuncts() {
 // - decrement reference counts for root and notify.
 // NOT:
 // - complete value. That is reserved for Unify.
-func (n *nodeContext) completeNodeTasks() (ok bool) {
+func (n *nodeContext) completeNodeTasks(mode runMode) {
 	n.assertInitialized()
+
+	if n.isCompleting > 0 {
+		return
+	}
+	n.isCompleting++
+	defer func() {
+		n.isCompleting--
+	}()
 
 	v := n.node
 	c := n.ctx
@@ -343,7 +333,7 @@ func (n *nodeContext) completeNodeTasks() (ok bool) {
 
 	if p := v.Parent; p != nil && p.state != nil {
 		if !v.IsDynamic && n.completed&allAncestorsProcessed == 0 {
-			p.state.completeNodeTasks()
+			p.state.completeNodeTasks(mode)
 		}
 	}
 
@@ -355,8 +345,28 @@ func (n *nodeContext) completeNodeTasks() (ok bool) {
 		// TODO: do we need any more requirements here?
 		const needs = valueKnown | fieldConjunctsKnown
 
-		n.process(needs, attemptOnly)
+		n.process(needs, mode)
 		n.updateScalar()
+	}
+
+	// Check:
+	// - parents (done)
+	// - incoming notifications
+	// - pending arcs (or incoming COMPS)
+	for _, r := range v.cc.externalDeps {
+		src := r.src
+		a := &src.arcs[r.index]
+		if a.decremented || a.kind != NOTIFY {
+			continue
+		}
+		// openDebugGraph(n.ctx, src.src, "completeAllArcs")
+		if n := src.src.getState(n.ctx); n != nil {
+			n.completeNodeTasks(mode)
+		}
+		if !a.decremented {
+			// a.decremented = true
+			continue
+		}
 	}
 
 	// As long as ancestors are not processed, it is still possible for
@@ -364,8 +374,8 @@ func (n *nodeContext) completeNodeTasks() (ok bool) {
 	// theroot. It is not necessary to wait on tasks to complete, though,
 	// as pending tasks will have their own dependencies on root, meaning it
 	// is safe to decrement here.
-	if !n.meets(allAncestorsProcessed) && !n.node.Label.IsLet() {
-		return false
+	if !n.meets(allAncestorsProcessed) && !n.node.Label.IsLet() && mode != finalize {
+		return
 	}
 
 	// At this point, no more conjuncts will be added, so we could decrement
@@ -377,7 +387,7 @@ func (n *nodeContext) completeNodeTasks() (ok bool) {
 		cc.decDependent(n.ctx, ROOT, nil) // REF(decrement:nodeDone)
 	}
 
-	return true
+	return
 }
 
 func (n *nodeContext) updateScalar() {
@@ -415,6 +425,28 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		// status := n.underlying.status
 		// n.underlying.updateStatus(evaluatingArcs) defer func() {
 		// n.underlying.status = status }()
+	}
+
+	// TODO: this should only be done if n is not currently running tasks.
+	// Investigate how to work around this.
+	n.completeNodeTasks(finalize)
+
+	for _, r := range n.node.cc.externalDeps {
+		src := r.src
+		a := &src.arcs[r.index]
+		if a.decremented {
+			continue
+		}
+		a.decremented = true
+		if n := src.src.getState(n.ctx); n != nil {
+			n.completeNodeConjuncts()
+		}
+		// FIXME: we should be careful to not evaluate parent nodes if we
+		// are inside a disjunction, or at least ensure that there are no
+		// disjunction values leaked into non-disjunction nodes through
+		// evaluating externalDeps.
+		src.src.unify(n.ctx, needTasksDone, attemptOnly)
+		a.cc.decDependent(n.ctx, a.kind, src) // REF(arcs)
 	}
 
 	// XXX(0.7): only set success if needs complete arcs.
@@ -520,7 +552,10 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 		if state.hasErr() {
 			c.AddBottom(state.getErr())
 		}
-		state.completeNodeTasks()
+		// TODO: ideally this should not be run at this point. Consider under
+		// which circumstances this is still necessary, and find at least ensure
+		// this will not be run if node v currently has a running task.
+		state.completeNodeTasks(attemptOnly)
 	}
 
 	// TODO: remove because unnecessary?
@@ -565,7 +600,7 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 				break
 			}
 		}
-		arcState.completeNodeTasks()
+		arcState.completeNodeTasks(attemptOnly)
 
 		// Child nodes, if pending and derived from a comprehension, may
 		// still cause this arc to become not pending.

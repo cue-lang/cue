@@ -3,12 +3,15 @@ package cueconfig
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
 
 	"cuelang.org/go/internal/mod/modresolve"
+	"github.com/rogpeppe/go-internal/lockedfile"
 	"golang.org/x/oauth2"
 )
 
@@ -83,6 +86,16 @@ func ReadLogins(path string) (*Logins, error) {
 }
 
 func WriteLogins(path string, logins *Logins) error {
+	unlock, err := lockedfile.MutexAt(path + ".lock").Lock()
+	if err != nil {
+		return err
+	}
+	defer unlock()
+
+	return writeLoginsUnlocked(path, logins)
+}
+
+func writeLoginsUnlocked(path string, logins *Logins) error {
 	// Indenting and a trailing newline are not necessary, but nicer to humans.
 	body, err := json.MarshalIndent(logins, "", "\t")
 	if err != nil {
@@ -106,6 +119,36 @@ func WriteLogins(path string, logins *Logins) error {
 	}
 
 	return nil
+}
+
+// UpdateRegistryLogin atomically updates a single registry token in the logins.json file.
+func UpdateRegistryLogin(path string, key string, new *oauth2.Token) (*Logins, error) {
+	unlock, err := lockedfile.MutexAt(path + ".lock").Lock()
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+
+	return updateRegistryLoginUnlocked(path, key, new)
+}
+
+func updateRegistryLoginUnlocked(path string, key string, new *oauth2.Token) (*Logins, error) {
+	logins, err := ReadLogins(path)
+	if errors.Is(err, fs.ErrNotExist) {
+		// No config file yet; create an empty one.
+		logins = &Logins{Registries: make(map[string]RegistryLogin)}
+	} else if err != nil {
+		return nil, err
+	}
+
+	logins.Registries[key] = LoginFromToken(new)
+
+	err = writeLoginsUnlocked(path, logins)
+	if err != nil {
+		return nil, err
+	}
+
+	return logins, nil
 }
 
 // RegistryOAuthConfig returns the oauth2 configuration

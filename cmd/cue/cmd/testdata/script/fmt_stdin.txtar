@@ -8,4 +8,4 @@ a: {b: 3} // a comment
 -- expect-stdout --
 foo: 2
 a: {b: 3} // a comment
--- fmt/cue.mod --
+-- fmt/cue.mod/module.cue --

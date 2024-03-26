@@ -28,4 +28,4 @@ command: runtwo: {
 		text: "foo: \(foo.stdout)\nbar: \(bar.stdout)"
 	}
 }
--- cue.mod --
+-- cue.mod/module.cue --

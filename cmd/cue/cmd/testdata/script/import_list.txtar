@@ -53,7 +53,7 @@ deployment: [{
 [{"b": 2}]
 -- import3/data.json --
 [1]
--- cue.mod --
+-- cue.mod/module.cue --
 
 -- issue2721/empty.yaml --
 -- issue2721/empty.cue.golden --

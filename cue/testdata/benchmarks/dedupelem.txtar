@@ -36,12 +36,9 @@ Conjuncts:    94
 Disjuncts:    16
 -- out/evalalpha --
 Errors:
-foo.0: conflicting values "string" and "float":
-    ./in.cue:3:50
-    ./in.cue:5:14
 foo.0.type: conflicting values "string" and "float":
     ./in.cue:5:14
-    ./in.cue:12:14
+    ./in.cue:10:14
 
 Result:
 (_|_){
@@ -56,10 +53,7 @@ Result:
   foo: (_|_){
     // [eval]
     0: (_|_){
-      // [eval] foo.0: conflicting values "string" and "float":
-      //     ./in.cue:3:50
-      //     ./in.cue:5:14
-      // foo.0.type: conflicting values "string" and "float":
+      // [eval] foo.0.type: conflicting values "string" and "float":
       //     ./in.cue:5:14
       //     ./in.cue:10:14
       type: (_|_){
@@ -74,7 +68,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,10 @@
+@@ -1,10 +1,4 @@
  Errors:
 -foo.0: 2 errors in empty disjunction:
 -foo.0.type: conflicting values "int" and "float":
@@ -82,17 +76,10 @@ diff old new
 -    ./in.cue:5:14
 -    ./in.cue:5:27
 -    ./in.cue:5:30
-+foo.0: conflicting values "string" and "float":
-+    ./in.cue:3:50
-+    ./in.cue:5:14
  foo.0.type: conflicting values "string" and "float":
      ./in.cue:5:14
--    ./in.cue:10:14
-+    ./in.cue:12:14
- 
- Result:
- (_|_){
-@@ -22,12 +19,9 @@
+     ./in.cue:10:14
+@@ -22,13 +16,7 @@
    foo: (_|_){
      // [eval]
      0: (_|_){
@@ -102,15 +89,13 @@ diff old new
 -      //     ./in.cue:5:14
 -      //     ./in.cue:5:27
 -      //     ./in.cue:5:30
-+      // [eval] foo.0: conflicting values "string" and "float":
-+      //     ./in.cue:3:50
-+      //     ./in.cue:5:14
-       // foo.0.type: conflicting values "string" and "float":
+-      // foo.0.type: conflicting values "string" and "float":
++      // [eval] foo.0.type: conflicting values "string" and "float":
        //     ./in.cue:5:14
        //     ./in.cue:10:14
--- diff/todo/p2 --
-Missing "empty disjunction" error message.
-Missing error positions.
+       type: (_|_){
+-- diff/explanation --
+Improved and simplified error message which can be detected before disjunction.
 -- out/eval --
 Errors:
 foo.0: 2 errors in empty disjunction:

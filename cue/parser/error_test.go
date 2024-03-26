@@ -141,7 +141,7 @@ func compareErrors(t *testing.T, file *token.File, expected map[token.Pos]string
 
 func checkErrors(t *testing.T, filename string, input interface{}) {
 	t.Helper()
-	src, err := source.Read(filename, input)
+	src, err := source.ReadBytes(filename, input)
 	if err != nil {
 		t.Error(err)
 		return

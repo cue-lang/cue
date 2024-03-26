@@ -161,7 +161,7 @@ const (
 func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
 
 	// get source
-	text, err := source.Read(filename, src)
+	text, err := source.ReadBytes(filename, src)
 	if err != nil {
 		return nil, err
 	}
@@ -203,7 +203,7 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 // be nil.
 func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, error) {
 	// get source
-	text, err := source.Read(filename, src)
+	text, err := source.ReadBytes(filename, src)
 	if err != nil {
 		return nil, err
 	}

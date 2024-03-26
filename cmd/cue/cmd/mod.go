@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"fmt"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"strings"
@@ -119,19 +118,10 @@ func runModInit(cmd *Command, args []string) (err error) {
 	}
 
 	mod := filepath.Join(cwd, "cue.mod")
-
-	info, err := os.Stat(mod)
-
-	// Detect old setups and backport it if requested.
-	if err == nil && !info.IsDir() {
-		// This path backports
-		if !flagForce.Bool(cmd) {
-			return fmt.Errorf("detected old-style config file; use --force to upgrade")
+	if info, err := os.Stat(mod); err == nil {
+		if !info.IsDir() {
+			return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
 		}
-		return backport(mod, cwd)
-	}
-
-	if err == nil {
 		return fmt.Errorf("cue.mod directory already exists")
 	}
 	mf := &modfile.File{
@@ -164,40 +154,6 @@ func runModInit(cmd *Command, args []string) (err error) {
 	}
 
 	return err
-}
-
-// backport backports an old cue.mod setup to a new one.
-func backport(mod, cwd string) error {
-	tmp := filepath.Join(cwd, fmt.Sprintf("_%x_cue.mod", rand.Int()))
-	err := os.Rename(mod, tmp)
-	if err != nil {
-		return err
-	}
-
-	err = os.Mkdir(filepath.Join(cwd, "cue.mod"), 0755)
-	if err != nil {
-		os.Rename(tmp, mod)
-		return err
-	}
-
-	err = os.Rename(tmp, filepath.Join(cwd, "cue.mod", "module.cue"))
-	if err != nil {
-		return err
-	}
-
-	err = os.Rename(filepath.Join(cwd, "pkg"), filepath.Join(cwd, "cue.mod", "gen"))
-	if err != nil && !os.IsNotExist(err) {
-		return err
-	}
-
-	if err = os.Mkdir(filepath.Join(mod, "usr"), 0755); err != nil {
-		return err
-	}
-	if err = os.Mkdir(filepath.Join(mod, "pkg"), 0755); err != nil {
-		return err
-	}
-
-	return nil
 }
 
 func versionForModFile() string {

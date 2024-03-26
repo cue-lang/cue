@@ -131,4 +131,4 @@ group: {
 
 	comp: baz: {} // TODO: remove: implied by comprehension above
 }
--- cue.mod --
+-- cue.mod/module.cue --

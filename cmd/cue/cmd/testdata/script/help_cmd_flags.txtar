@@ -4,7 +4,7 @@ cmp stdout expect-stdout
 exec cue cmd --help
 cmp stdout expect-stdout
 
--- cue.mod --
+-- cue.mod/module.cue --
 -- task_tool.cue --
 package home
 

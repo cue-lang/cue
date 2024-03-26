@@ -1,13 +1,9 @@
 package yaml
 
 import (
-	"bytes"
 	"encoding/base64"
-	"errors"
 	"fmt"
-	"io"
 	"math"
-	"os"
 	"reflect"
 	"strconv"
 	"strings"
@@ -17,6 +13,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/source"
 )
 
 const (
@@ -52,32 +49,8 @@ type parser struct {
 	doneInit bool
 }
 
-func readSource(filename string, src interface{}) ([]byte, error) {
-	if src != nil {
-		switch s := src.(type) {
-		case string:
-			return []byte(s), nil
-		case []byte:
-			return s, nil
-		case *bytes.Buffer:
-			// is io.Reader, but src is already available in []byte form
-			if s != nil {
-				return s.Bytes(), nil
-			}
-		case io.Reader:
-			var buf bytes.Buffer
-			if _, err := io.Copy(&buf, s); err != nil {
-				return nil, err
-			}
-			return buf.Bytes(), nil
-		}
-		return nil, errors.New("invalid source")
-	}
-	return os.ReadFile(filename)
-}
-
 func newParser(filename string, src interface{}) (*parser, error) {
-	b, err := readSource(filename, src)
+	b, err := source.Read(filename, src)
 	if err != nil {
 		return nil, err
 	}

@@ -47,7 +47,7 @@ type parser struct {
 }
 
 func newParser(filename string, src interface{}) (*parser, error) {
-	b, err := source.Read(filename, src)
+	b, err := source.ReadBytes(filename, src)
 	if err != nil {
 		return nil, err
 	}

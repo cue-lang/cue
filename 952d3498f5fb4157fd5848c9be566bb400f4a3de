@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4ef4e87_306eaba1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-26T18:39:28Z",
+      "side": 1,
+      "message": "LGTM modulo the mutex issue and with a few other minor comments/suggestions, thanks!",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5e3e0490_ebde1370",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-26T18:39:28Z",
+      "side": 1,
+      "message": "Maybe this is redundant now?",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b2b66aab_37ff1b73",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-26T18:39:28Z",
+      "side": 1,
+      "message": "Or just inline? The extra function doesn\u0027t seem to pull its weight to me, and leaves the reader wondering if it\u0027s called independently somewhere else which I don\u0027t _think_ it is 😊",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2b99cdf6_a6366e86",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-26T18:39:28Z",
+      "side": 1,
+      "message": "Hmm, AFAICS this means that `t.logins` may not reflect the most recent updates to the login file. Let\u0027s say there are two concurrent calls to `updateLogin`, each with a different host. They both invoke `UpdateRegistryLogin`, resulting in a logins file that contains both hosts, but only one of the calls will return `logins` containing both of them. They then race on `loginsMu`, meaning that either might win and thus that one of the hosts might be \"lost\" from the p.o.v. of the caller.\n\nIn other words, I think we need to hold `loginsMu` while calling `UpdateRegistryLogin` (yes, it\u0027s a nested mutex but at least there are no callbacks involved 😊)",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4018ff4a_c86eb54d",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-26T18:39:28Z",
+      "side": 1,
+      "message": "Nice test!",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8470dd2_be149747",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-26T18:39:28Z",
+      "side": 1,
+      "message": "Why not start at zero?",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "776f91b3_5fc7eec9",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-03-26T18:39:28Z",
+      "side": 1,
+      "message": "Alternatively use https://pkg.go.dev/golang.org/x/sync/errgroup ?",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

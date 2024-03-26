@@ -23,7 +23,7 @@ command: dump: {
 		text: yaml.MarshalStream(objects)
 	}
 }
--- cue.mod --
+-- cue.mod/module.cue --
 
 -- expect-stdout --
 spec: {}

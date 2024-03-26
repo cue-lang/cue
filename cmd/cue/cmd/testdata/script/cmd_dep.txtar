@@ -30,4 +30,4 @@ command: do: {
     }
 }
 
--- cue.mod --
+-- cue.mod/module.cue --

@@ -218,4 +218,4 @@ message Timestamp {
   int32 nanos = 2;
 }
 
--- cue.mod --
+-- cue.mod/module.cue --

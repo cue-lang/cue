@@ -17,4 +17,4 @@ command: mkdirtmp: {
 		success: true
 	}
 }
--- cue.mod --
+-- cue.mod/module.cue --

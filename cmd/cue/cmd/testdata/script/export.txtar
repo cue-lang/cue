@@ -14,4 +14,4 @@ package hello
 
 $type:   "demo"
 message: "Hello \(#who)!" // who declared in data.cue
--- hello/cue.mod --
+-- hello/cue.mod/module.cue --

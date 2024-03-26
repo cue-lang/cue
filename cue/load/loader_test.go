@@ -394,7 +394,7 @@ func TestOverlays(t *testing.T) {
 	c := &Config{
 		Overlay: map[string]Source{
 			// Not necessary, but nice to add.
-			abs("cue.mod"): FromString(`module: "mod.test"`),
+			abs("cue.mod/module.cue"): FromString(`module: "mod.test"`),
 
 			abs("dir/top.cue"): FromBytes([]byte(`
 			   package top

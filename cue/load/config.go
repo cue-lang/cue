@@ -16,6 +16,7 @@ package load
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -407,11 +408,10 @@ func (c *Config) loadModule() error {
 	if cerr != nil {
 		return nil
 	}
-	// TODO remove support for legacy non-directory module.cue file
-	// by returning an error if info.IsDir is false.
-	if info.IsDir() {
-		mod = filepath.Join(mod, moduleFile)
+	if !info.IsDir() {
+		return fmt.Errorf("cue.mod files are no longer supported; use cue.mod/module.cue")
 	}
+	mod = filepath.Join(mod, moduleFile)
 	f, cerr := c.fileSystem.openFile(mod)
 	if cerr != nil {
 		return nil

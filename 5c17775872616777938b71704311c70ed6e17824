@@ -16,6 +16,23 @@
       "message": "Nice.",
       "revId": "5c17775872616777938b71704311c70ed6e17824",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0ca78c2e_b3fac2c7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-26T13:11:20Z",
+      "side": 1,
+      "message": "Thank you, Nick! LGTM too.",
+      "revId": "5c17775872616777938b71704311c70ed6e17824",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

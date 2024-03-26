@@ -4,10 +4,8 @@ import (
 	"encoding/base64"
 	"fmt"
 	"math"
-	"reflect"
 	"strconv"
 	"strings"
-	"time"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
@@ -45,7 +43,6 @@ type parser struct {
 	event    yaml_event_t
 	doc      *node
 	info     *token.File
-	last     *node
 	doneInit bool
 }
 
@@ -239,16 +236,8 @@ type decoder struct {
 	aliases      map[*node]bool
 	terrors      []string
 	prev         token.Pos
-	lastNode     ast.Node
 	forceNewline bool
 }
-
-var (
-	durationType   = reflect.TypeOf(time.Duration(0))
-	defaultMapType = reflect.TypeOf(map[interface{}]interface{}{})
-	timeType       = reflect.TypeOf(time.Time{})
-	ptrTimeType    = reflect.TypeOf(&time.Time{})
-)
 
 func newDecoder(p *parser) *decoder {
 	d := &decoder{p: p}
@@ -400,8 +389,6 @@ func (d *decoder) alias(n *node) ast.Expr {
 	delete(d.aliases, n)
 	return node
 }
-
-var zeroValue reflect.Value
 
 func (d *decoder) scalar(n *node) ast.Expr {
 	var tag string

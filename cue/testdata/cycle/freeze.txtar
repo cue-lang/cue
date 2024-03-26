@@ -138,11 +138,11 @@ Conjuncts:    119
 Disjuncts:    76
 -- out/evalalpha --
 Errors:
-comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle:
+comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
     ./comprehension.cue:71:13
-comprehension.t3.err.a: field xq not allowed by earlier comprehension or reference cycle:
+comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
     ./comprehension.cue:82:13
-comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle:
+comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
     ./comprehension.cue:114:9
 
 Result:
@@ -153,7 +153,7 @@ Result:
     t1: (struct){
       ok: (struct){
         p0: (_|_){
-          // [incomplete] comprehension.t1.ok.p0: cyclic reference to field z:
+          // [incomplete] comprehension.t1.ok.p0.x.z: cyclic reference to field z:
           //     ./comprehension.cue:9:3
           // comprehension.t1.ok.p0.x.z.a: cyclic reference to field z:
           //     ./comprehension.cue:12:3
@@ -163,7 +163,7 @@ Result:
           }
         }
         p1: (_|_){
-          // [incomplete] comprehension.t1.ok.p1: cyclic reference to field z:
+          // [incomplete] comprehension.t1.ok.p1.x.z: cyclic reference to field z:
           //     ./comprehension.cue:18:3
           // comprehension.t1.ok.p1.x.z.a: cyclic reference to field z:
           //     ./comprehension.cue:22:3
@@ -173,7 +173,7 @@ Result:
           }
         }
         p2: (_|_){
-          // [incomplete] comprehension.t1.ok.p2: cyclic reference to field z:
+          // [incomplete] comprehension.t1.ok.p2.x.z: cyclic reference to field z:
           //     ./comprehension.cue:28:3
           // comprehension.t1.ok.p2.x.z.a: cyclic reference to field z:
           //     ./comprehension.cue:31:3
@@ -185,7 +185,7 @@ Result:
         p3: (_|_){
           // [incomplete] comprehension.t1.ok.p3.x.z.a: cyclic reference to field z:
           //     ./comprehension.cue:39:3
-          // comprehension.t1.ok.p3: cyclic reference to field z:
+          // comprehension.t1.ok.p3.x.z: cyclic reference to field z:
           //     ./comprehension.cue:42:3
           x: (struct){
             y: (struct){
@@ -195,7 +195,7 @@ Result:
         p4: (_|_){
           // [incomplete] comprehension.t1.ok.p4.x.z.a: cyclic reference to field z:
           //     ./comprehension.cue:48:3
-          // comprehension.t1.ok.p4: cyclic reference to field z:
+          // comprehension.t1.ok.p4.x.z: cyclic reference to field z:
           //     ./comprehension.cue:52:3
           x: (struct){
             y: (struct){
@@ -205,7 +205,7 @@ Result:
         p5: (_|_){
           // [incomplete] comprehension.t1.ok.p5.x.z.a: cyclic reference to field z:
           //     ./comprehension.cue:58:3
-          // comprehension.t1.ok.p5: cyclic reference to field z:
+          // comprehension.t1.ok.p5.x.z: cyclic reference to field z:
           //     ./comprehension.cue:61:3
           x: (struct){
             y: (struct){
@@ -219,7 +219,7 @@ Result:
       err: (_|_){
         // [eval]
         a: (_|_){
-          // [eval] comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle:
+          // [eval] comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
           //     ./comprehension.cue:71:13
           x: (int){ 1 }
         }
@@ -230,7 +230,7 @@ Result:
       err: (_|_){
         // [eval]
         a: (_|_){
-          // [eval] comprehension.t3.err.a: field xq not allowed by earlier comprehension or reference cycle:
+          // [eval] comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
           //     ./comprehension.cue:82:13
           x: (int){ 1 }
         }
@@ -260,7 +260,7 @@ Result:
       err: (_|_){
         // [eval]
         a: (_|_){
-          // [eval] comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle:
+          // [eval] comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
           //     ./comprehension.cue:114:9
           x: (struct){
             y: (int){ 1 }
@@ -293,11 +293,11 @@ diff old new
 -comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle
 -comprehension.t3.err.b: field x not allowed by earlier comprehension or reference cycle
 -comprehension.t3.err.b: field yq not allowed by earlier comprehension or reference cycle
-+comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle:
++comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
 +    ./comprehension.cue:71:13
-+comprehension.t3.err.a: field xq not allowed by earlier comprehension or reference cycle:
++comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
 +    ./comprehension.cue:82:13
-+comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle:
++comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
 +    ./comprehension.cue:114:9
  
  Result:
@@ -321,7 +321,7 @@ diff old new
 -            z: (struct){
 -              a: (struct){
 -              }
-+          // [incomplete] comprehension.t1.ok.p0: cyclic reference to field z:
++          // [incomplete] comprehension.t1.ok.p0.x.z: cyclic reference to field z:
 +          //     ./comprehension.cue:9:3
 +          // comprehension.t1.ok.p0.x.z.a: cyclic reference to field z:
 +          //     ./comprehension.cue:12:3
@@ -339,7 +339,7 @@ diff old new
 -            z: (struct){
 -              a: (struct){
 -              }
-+          // [incomplete] comprehension.t1.ok.p1: cyclic reference to field z:
++          // [incomplete] comprehension.t1.ok.p1.x.z: cyclic reference to field z:
 +          //     ./comprehension.cue:18:3
 +          // comprehension.t1.ok.p1.x.z.a: cyclic reference to field z:
 +          //     ./comprehension.cue:22:3
@@ -387,7 +387,7 @@ diff old new
 -            z: (struct){
 -              a: (struct){
 -              }
-+          // [incomplete] comprehension.t1.ok.p2: cyclic reference to field z:
++          // [incomplete] comprehension.t1.ok.p2.x.z: cyclic reference to field z:
 +          //     ./comprehension.cue:28:3
 +          // comprehension.t1.ok.p2.x.z.a: cyclic reference to field z:
 +          //     ./comprehension.cue:31:3
@@ -399,7 +399,7 @@ diff old new
 +        p3: (_|_){
 +          // [incomplete] comprehension.t1.ok.p3.x.z.a: cyclic reference to field z:
 +          //     ./comprehension.cue:39:3
-+          // comprehension.t1.ok.p3: cyclic reference to field z:
++          // comprehension.t1.ok.p3.x.z: cyclic reference to field z:
 +          //     ./comprehension.cue:42:3
 +          x: (struct){
 +            y: (struct){
@@ -409,7 +409,7 @@ diff old new
 +        p4: (_|_){
 +          // [incomplete] comprehension.t1.ok.p4.x.z.a: cyclic reference to field z:
 +          //     ./comprehension.cue:48:3
-+          // comprehension.t1.ok.p4: cyclic reference to field z:
++          // comprehension.t1.ok.p4.x.z: cyclic reference to field z:
 +          //     ./comprehension.cue:52:3
 +          x: (struct){
 +            y: (struct){
@@ -419,7 +419,7 @@ diff old new
 +        p5: (_|_){
 +          // [incomplete] comprehension.t1.ok.p5.x.z.a: cyclic reference to field z:
 +          //     ./comprehension.cue:58:3
-+          // comprehension.t1.ok.p5: cyclic reference to field z:
++          // comprehension.t1.ok.p5.x.z: cyclic reference to field z:
 +          //     ./comprehension.cue:61:3
 +          x: (struct){
 +            y: (struct){
@@ -433,7 +433,7 @@ diff old new
 -          // [eval] comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle
 -          x: (int){ 1 }
 -          xq: (int){ 1 }
-+          // [eval] comprehension.t2.err.a: field xq not allowed by earlier comprehension or reference cycle:
++          // [eval] comprehension.t2.err.a: adding field xq not allowed as field set was already referenced:
 +          //     ./comprehension.cue:71:13
 +          x: (int){ 1 }
          }
@@ -451,7 +451,7 @@ diff old new
 -          // [eval] comprehension.t3.err.b: field x not allowed by earlier comprehension or reference cycle
 -          // comprehension.t3.err.b: field yq not allowed by earlier comprehension or reference cycle
 +        a: (_|_){
-+          // [eval] comprehension.t3.err.a: field xq not allowed by earlier comprehension or reference cycle:
++          // [eval] comprehension.t3.err.a: adding field xq not allowed as field set was already referenced:
 +          //     ./comprehension.cue:82:13
 +          x: (int){ 1 }
 +        }
@@ -467,7 +467,7 @@ diff old new
          // [eval]
          a: (_|_){
 -          // [eval] comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle
-+          // [eval] comprehension.moreSpecific.err.a: field z not allowed by earlier comprehension or reference cycle:
++          // [eval] comprehension.moreSpecific.err.a.x: adding field z not allowed as field set was already referenced:
 +          //     ./comprehension.cue:114:9
            x: (struct){
              y: (int){ 1 }

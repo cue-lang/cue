@@ -172,8 +172,10 @@ Result:
       b: (string){ "B" }
     }
   }
-  #D4: (#struct){
-    env: (#struct){
+  #D4: (_|_){
+    // [eval]
+    env: (_|_){
+      // [eval]
       b: (_|_){
         // [eval] #D4.env.b: field not allowed:
         //     ./in.cue:27:7
@@ -220,17 +222,11 @@ diff old new
      }
      #def: (#struct){
        a: (string){ "A" }
-@@ -51,17 +43,13 @@
-       b: (string){ "B" }
-     }
-   }
--  #D4: (_|_){
--    // [eval]
--    env: (_|_){
--      // [eval]
+@@ -55,13 +47,11 @@
+     // [eval]
+     env: (_|_){
+       // [eval]
 -      a: (int){ int }
-+  #D4: (#struct){
-+    env: (#struct){
        b: (_|_){
          // [eval] #D4.env.b: field not allowed:
 -        //     ./in.cue:26:7

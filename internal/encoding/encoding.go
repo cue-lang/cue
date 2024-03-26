@@ -18,11 +18,9 @@
 package encoding
 
 import (
-	"bytes"
 	"fmt"
 	"io"
 	"net/url"
-	"os"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -41,6 +39,7 @@ import (
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/internal/third_party/yaml"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
@@ -137,7 +136,9 @@ func (i *Decoder) Err() error {
 }
 
 func (i *Decoder) Close() {
-	i.closer.Close()
+	if i.closer != nil {
+		i.closer.Close()
+	}
 }
 
 type Config struct {
@@ -181,16 +182,22 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 
 	if file, ok := f.Source.(*ast.File); ok {
 		i.file = file
-		i.closer = io.NopCloser(strings.NewReader(""))
 		i.validate(file, f)
 		return i
 	}
 
-	rc, err := reader(f, cfg.Stdin)
-	i.closer = rc
-	i.err = err
-	if err != nil {
-		return i
+	var srcr io.Reader
+	if f.Source == nil && f.Filename == "-" {
+		// TODO: should we allow this?
+		srcr = cfg.Stdin
+	} else {
+		rc, err := source.Open(f.Filename, f.Source)
+		i.closer = rc
+		i.err = err
+		if i.err != nil {
+			return i
+		}
+		srcr = rc
 	}
 
 	// For now we assume that all encodings require UTF-8. This will not be the
@@ -199,7 +206,7 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	// TODO: this code also allows UTF16, which is too permissive for some
 	// encodings. Switch to unicode.UTF8Sig once available.
 	t := unicode.BOMOverride(unicode.UTF8.NewDecoder())
-	r := transform.NewReader(rc, t)
+	r := transform.NewReader(srcr, t)
 
 	switch f.Interpretation {
 	case "":
@@ -322,29 +329,6 @@ func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
 		}
 		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
 	}
-}
-
-func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {
-	switch s := f.Source.(type) {
-	case nil:
-		// Use the file name.
-	case string:
-		return io.NopCloser(strings.NewReader(s)), nil
-	case []byte:
-		return io.NopCloser(bytes.NewReader(s)), nil
-	case *bytes.Buffer:
-		// is io.Reader, but it needs to be readable repeatedly
-		if s != nil {
-			return io.NopCloser(bytes.NewReader(s.Bytes())), nil
-		}
-	default:
-		return nil, fmt.Errorf("invalid source type %T", f.Source)
-	}
-	// TODO: should we allow this?
-	if f.Filename == "-" {
-		return io.NopCloser(stdin), nil
-	}
-	return os.Open(f.Filename)
 }
 
 func shouldValidate(i *filetypes.FileInfo) bool {

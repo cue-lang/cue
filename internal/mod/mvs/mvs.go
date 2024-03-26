@@ -8,7 +8,7 @@ package mvs
 
 import (
 	"fmt"
-	"reflect"
+	"slices"
 	"sort"
 	"sync"
 
@@ -170,7 +170,7 @@ func buildList[V comparable](targets []V, reqs Reqs[V], upgrade func(V) (V, erro
 
 	// The final list is the minimum version of each module found in the graph.
 	list := g.BuildList()
-	if vs := list[:len(targets)]; !reflect.DeepEqual(vs, targets) {
+	if vs := list[:len(targets)]; !slices.Equal(vs, targets) {
 		// target.Version will be "" for modload, the main client of MVS.
 		// "" denotes the main module, which has no version. However, MVS treats
 		// version strings as opaque, so "" is not a special value here.

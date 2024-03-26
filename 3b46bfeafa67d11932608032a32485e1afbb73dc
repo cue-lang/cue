@@ -69,6 +69,24 @@
       "parentUuid": "690db3a3_4315d1b1",
       "revId": "3b46bfeafa67d11932608032a32485e1afbb73dc",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "85c4611a_c439ea62",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037647
+      },
+      "writtenOn": "2024-03-26T02:16:47Z",
+      "side": 1,
+      "message": "Whoops, sorry I\u0027m still figuring out how Gerrit works 😄. Thanks for the explanation - should be good now I think, but let me know if not!",
+      "parentUuid": "be0f52eb_645d367f",
+      "revId": "3b46bfeafa67d11932608032a32485e1afbb73dc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

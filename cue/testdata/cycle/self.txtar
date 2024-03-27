@@ -460,9 +460,7 @@ Result:
       }
     }
     ok2: (struct){
-      x: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      x: (string){ string }
       #A: (string){ string }
     }
     ok3: (struct){
@@ -472,9 +470,7 @@ Result:
         }, (string){ string }) }
     }
     ok4: (struct){
-      x: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      x: (string){ string }
       #A: (string){ string }
     }
   }
@@ -525,9 +521,7 @@ Result:
   }
   dynamicList: (struct){
     ok1: (struct){
-      x: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      x: (string){ string }
       y: (#list){
         0: (#list){
           0: (#list){
@@ -540,21 +534,15 @@ Result:
       foo: (string){ string }
     }
     ok2: (struct){
-      x: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      x: (string){ string }
       foo: (string){ string }
     }
     ok3: (struct){
-      x: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      x: (string){ string }
       foo: (string){ string }
     }
     ok4: (struct){
-      x: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      x: (string){ string }
       foo: (string){ string }
     }
   }
@@ -733,7 +721,7 @@ diff old new
        }
      }
    }
-@@ -189,27 +171,35 @@
+@@ -189,24 +171,28 @@
    disjList: (struct){
      ok1: (struct){
        #A: (string){ string }
@@ -755,9 +743,6 @@ diff old new
 -    ok3: (struct){
 -      #A: (string){ string }
 -      x: (string){ string }
--    }
--    ok4: (struct){
--      x: (string){ string }
 +      x: ((string|list)){ |((string){ string }, (#list){
 +          0: (string){ string }
 +        }) }
@@ -772,9 +757,7 @@ diff old new
 +      }
 +    }
 +    ok2: (struct){
-+      x: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
++      x: (string){ string }
 +      #A: (string){ string }
 +    }
 +    ok3: (struct){
@@ -782,73 +765,11 @@ diff old new
 +      x: ((string|list)){ |((#list){
 +          0: (string){ string }
 +        }, (string){ string }) }
-+    }
-+    ok4: (struct){
-+      x: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
-       #A: (string){ string }
      }
-   }
-@@ -260,28 +250,36 @@
-   }
-   dynamicList: (struct){
-     ok1: (struct){
--      x: (string){ string }
--      y: (#list){
--        0: (#list){
--          0: (#list){
--            0: (#list){
--              0: (string){ string }
--            }
--          }
--        }
--      }
--      foo: (string){ string }
--    }
--    ok2: (struct){
--      x: (string){ string }
--      foo: (string){ string }
--    }
--    ok3: (struct){
--      x: (string){ string }
--      foo: (string){ string }
--    }
--    ok4: (struct){
--      x: (string){ string }
-+      x: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
-+      y: (#list){
-+        0: (#list){
-+          0: (#list){
-+            0: (#list){
-+              0: (string){ string }
-+            }
-+          }
-+        }
-+      }
-+      foo: (string){ string }
-+    }
-+    ok2: (struct){
-+      x: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
-+      foo: (string){ string }
-+    }
-+    ok3: (struct){
-+      x: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
-+      foo: (string){ string }
-+    }
-+    ok4: (struct){
-+      x: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
-       foo: (string){ string }
-     }
-   }
+     ok4: (struct){
+       x: (string){ string }
+-- diff/todo/p2 --
+disjList.(ok1|ok3).x: cycle detected too late.
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

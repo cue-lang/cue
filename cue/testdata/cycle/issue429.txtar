@@ -89,7 +89,7 @@ Result:
   s1: (#struct){
     min: (int){ 5 }
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
+    max: (number){ |((number){ >5 }, (int){ 5 }) }
   }
   s2: (#struct){
     max: (int){ 5 }
@@ -183,9 +183,10 @@ diff old new
    s1: (#struct){
 -    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
 -    min: (int){ 5 }
+-    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
 +    min: (int){ 5 }
 +    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-     max: (number){ |(*(int){ 5 }, (number){ >5 }) }
++    max: (number){ |((number){ >5 }, (int){ 5 }) }
    }
    s2: (#struct){
 -    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
@@ -278,6 +279,11 @@ diff old new
 #nonEmptyRange: missing disjunction error, or at least missing validation.
 At least this seems more correct than the old evaluator. It is an
 incomplete error at best.
+-- diff/explanation --
+s1.max: the changes in default behavior as are shown here are according to spec,
+as is described in disjunctions/specdeviation.txtar. These changes may pose too
+much of a problem for the transition to the new evaluator, though.
+TODO: consider reintroducing bugs.
 -- diff/todo/p3 --
 Reordering.
 Missing empty disjunction message.

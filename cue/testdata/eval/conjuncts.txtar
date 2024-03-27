@@ -69,15 +69,15 @@ issue2355: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  234
-Freed:  42
-Reused: 42
-Allocs: 234
+Leaks:  236
+Freed:  38
+Reused: 38
+Allocs: 236
 Retain: 0
 
 Unifications: 46
-Conjuncts:    467
-Disjuncts:    184
+Conjuncts:    463
+Disjuncts:    180
 -- out/evalalpha --
 Errors:
 issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
@@ -163,18 +163,18 @@ diff old new
 -Reused: 59
 -Allocs: 18
 -Retain: 22
-+Leaks:  234
-+Freed:  42
-+Reused: 42
-+Allocs: 234
++Leaks:  236
++Freed:  38
++Reused: 38
++Allocs: 236
 +Retain: 0
  
 -Unifications: 45
 -Conjuncts:    135
 -Disjuncts:    86
 +Unifications: 46
-+Conjuncts:    467
-+Disjuncts:    184
++Conjuncts:    463
++Disjuncts:    180
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

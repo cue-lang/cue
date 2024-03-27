@@ -15,10 +15,13 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/go-quicktest/qt"
+	"golang.org/x/sync/errgroup"
 	"golang.org/x/tools/txtar"
 
+	"cuelang.org/go/internal/cueconfig"
 	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/internal/registrytest"
 	"cuelang.org/go/internal/txtarfs"
@@ -166,6 +169,120 @@ package x
 	qt.Assert(t, qt.IsTrue(checked))
 }
 
+// TestConcurrentTokenRefresh verifies that concurrent OAuth token refreshes,
+// including logins.json updates, are properly synchronized.
+func TestConcurrentTokenRefresh(t *testing.T) {
+	// Start N registry instances, each containing one CUE module and running
+	// in its own HTTP server instance. Each instance is protected with its
+	// own OAuth token, which is initially expired, requiring a refresh token
+	// request upon first invocation.
+	var registries [20]struct {
+		mod  string
+		host string
+	}
+	var counter int32 = 0
+	for i := range registries {
+		reg := &registries[i]
+		reg.mod = fmt.Sprintf("foo.mod%02d", i)
+		fsys := txtarfs.FS(txtar.Parse([]byte(fmt.Sprintf(`
+-- %s_v0.0.1/cue.mod/module.cue --
+module: "%s@v0"
+-- %s_v0.0.1/bar/bar.cue --
+package bar
+`, reg.mod, reg.mod, reg.mod))))
+		mux := http.NewServeMux()
+		rh, err := registrytest.NewHandler(fsys, "")
+		qt.Assert(t, qt.IsNil(err))
+		mux.HandleFunc("/v2/", func(w http.ResponseWriter, r *http.Request) {
+			auth := r.Header.Get("Authorization")
+			if !strings.HasPrefix(auth, fmt.Sprintf("Bearer access_%d_", i)) {
+				w.WriteHeader(401)
+				w.Write([]byte(fmt.Sprintf("server %d: unexpected auth header: %s", i, auth)))
+				return
+			}
+			rh.ServeHTTP(w, r)
+		})
+		mux.HandleFunc("/login/oauth/token", func(w http.ResponseWriter, r *http.Request) {
+			ctr := atomic.AddInt32(&counter, 1)
+			writeJSON(w, 200, wireToken{
+				AccessToken:  fmt.Sprintf("access_%d_%d", i, ctr),
+				TokenType:    "Bearer",
+				RefreshToken: fmt.Sprintf("refresh_%d", ctr),
+				ExpiresIn:    300,
+			})
+		})
+		srv := httptest.NewServer(mux)
+		t.Cleanup(srv.Close)
+		u, err := url.Parse(srv.URL)
+		qt.Assert(t, qt.IsNil(err))
+		reg.host = u.Host
+	}
+
+	expiry := time.Now()
+	logins := &cueconfig.Logins{
+		Registries: map[string]cueconfig.RegistryLogin{},
+	}
+	registryConf := ""
+	for i, reg := range registries {
+		logins.Registries[reg.host] = cueconfig.RegistryLogin{
+			AccessToken:  fmt.Sprintf("access_%d_x", i),
+			TokenType:    "Bearer",
+			RefreshToken: "refresh_x",
+			Expiry:       &expiry,
+		}
+		if registryConf != "" {
+			registryConf += ","
+		}
+		registryConf += fmt.Sprintf("%s=%s+insecure", reg.mod, reg.host)
+	}
+
+	dir := t.TempDir()
+	configDir := filepath.Join(dir, "config")
+	t.Setenv("CUE_CONFIG_DIR", configDir)
+	err := os.MkdirAll(configDir, 0o777)
+	qt.Assert(t, qt.IsNil(err))
+
+	// Check write-read round-trip.
+	err = cueconfig.WriteLogins(filepath.Join(configDir, "logins.json"), logins)
+	qt.Assert(t, qt.IsNil(err))
+	logins2, err := cueconfig.ReadLogins(filepath.Join(configDir, "logins.json"))
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(logins2, logins))
+
+	t.Setenv("CUE_REGISTRY", registryConf)
+	cacheDir := filepath.Join(dir, "cache")
+	t.Setenv("CUE_CACHE_DIR", cacheDir)
+	t.Cleanup(func() {
+		modcache.RemoveAll(cacheDir)
+	})
+
+	r, err := NewRegistry(nil)
+	qt.Assert(t, qt.IsNil(err))
+
+	g := new(errgroup.Group)
+	for i := range registries {
+		mod := registries[i].mod
+		g.Go(func() error {
+			ctx := context.Background()
+			loc, err := r.Fetch(ctx, module.MustNewVersion(mod+"@v0", "v0.0.1"))
+			if err != nil {
+				return err
+			}
+			data, err := fs.ReadFile(loc.FS, path.Join(loc.Dir, "bar/bar.cue"))
+			if err != nil {
+				return err
+			}
+			if string(data) != "package bar\n" {
+				return fmt.Errorf("unexpected data: %q", string(data))
+			}
+			return nil
+		})
+	}
+	err = g.Wait()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.Equals(int(counter), len(registries)))
+}
+
 // dockerConfig describes the minimal subset of the docker
 // configuration file necessary to check that authentication
 // is correction hooked up.
@@ -183,4 +300,24 @@ type roundTripperFunc func(*http.Request) (*http.Response, error)
 
 func (f roundTripperFunc) RoundTrip(req *http.Request) (*http.Response, error) {
 	return f(req)
+}
+
+func writeJSON(w http.ResponseWriter, statusCode int, v any) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		// should never happen
+		panic(err)
+	}
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(statusCode)
+	w.Write(b)
+}
+
+// wireToken describes the JSON encoding for an OAuth 2.0 token
+// as specified in the RFC 6749.
+type wireToken struct {
+	AccessToken  string `json:"access_token,omitempty"`
+	TokenType    string `json:"token_type,omitempty"`
+	RefreshToken string `json:"refresh_token,omitempty"`
+	ExpiresIn    int    `json:"expires_in,omitempty"`
 }

@@ -208,27 +208,21 @@ issue2052: full: {
 	d: #Depth & {#in: tree}
 }
 -- out/evalalpha/stats --
-Leaks:  9483
-Freed:  1488
-Reused: 1488
-Allocs: 9483
+Leaks:  22153
+Freed:  1990
+Reused: 1989
+Allocs: 22154
 Retain: 0
 
-Unifications: 4097
-Conjuncts:    54454
-Disjuncts:    6874
+Unifications: 8364
+Conjuncts:    121977
+Disjuncts:    15479
 -- out/evalalpha --
 Errors:
 issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
     ./issue2052.cue:8:20
 issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
     ./issue2052.cue:46:14
-issue2052.full.d.#funcs: field not allowed:
-    ./issue2052.cue:89:12
-    ./issue2052.cue:89:4
-    ./issue2052.cue:93:3
-#next: structural cycle:
-    ./issue2052.cue:89:21
 
 Result:
 (_|_){
@@ -421,8 +415,7 @@ Result:
         out: (int){ 1 }
       }
     }
-    full: (_|_){
-      // [eval]
+    full: (struct){
       #RecurseN: (#struct){
         #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
         #funcFactory: (#struct){
@@ -448,9 +441,7 @@ Result:
           }
         }
       }
-      #Depth: (_|_){
-        // [structural cycle] #next: structural cycle:
-        //     ./issue2052.cue:89:21
+      #Depth: (#struct){
         #maxiter: (int){ 11 }
         #funcFactory: (#struct){
           #next: (_){ _ }
@@ -463,8 +454,7 @@ Result:
             }
           }
         }
-        #funcs: (_|_){
-          // [structural cycle]
+        #funcs: (#struct){
           "11": (null){ null }
           "0": (#struct){
             #in: (_){ _ }
@@ -474,46 +464,92 @@ Result:
               let depths#1 = (_){ _ }
             }
           }
-          "1": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "1": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "2": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "2": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "3": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "3": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "4": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "4": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "5": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "5": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "6": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "6": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "7": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "7": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "8": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "8": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "9": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "9": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "10": (_|_){
-            // [structural cycle] #next: structural cycle:
-            //     ./issue2052.cue:89:21
+          "10": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
+        }
+        #in: (_){ _ }
+        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+        out: (int){
+          1
+          let depths#1 = (_){ _ }
         }
       }
       tree: (struct){
@@ -527,9 +563,7 @@ Result:
         }
         cow: (string){ "moo" }
       }
-      d: (_|_){
-        // [eval] #next: structural cycle:
-        //     ./issue2052.cue:89:21
+      d: (#struct){
         #in: (#struct){
           a: (#struct){
             foo: (string){ "bar" }
@@ -553,77 +587,128 @@ Result:
             }
           }
         }
-        #funcs: (_|_){
-          // [eval] issue2052.full.d.#funcs: field not allowed:
-          //     ./issue2052.cue:89:12
-          //     ./issue2052.cue:89:4
-          //     ./issue2052.cue:93:3
+        #funcs: (#struct){
           "11": (null){ null }
-          "0": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "0": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "1": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "1": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "2": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "2": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "3": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "3": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "4": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "4": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "5": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "5": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "6": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "6": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "7": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "7": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "8": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "8": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "9": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "9": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
-          "10": (_|_){
-            // [eval] issue2052.full.d.#funcs: field not allowed:
-            //     ./issue2052.cue:89:12
-            //     ./issue2052.cue:89:4
-            //     ./issue2052.cue:93:3
+          "10": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
+          }
+        }
+        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+        out: (int){
+          5
+          let depths#1 = (#list){
+            0: (int){
+              4
+              let depths#1 = (#list){
+                0: (int){
+                  1
+                  let depths#1 = (_){ _ }
+                }
+                1: (int){
+                  3
+                  let depths#1 = (#list){
+                    0: (int){
+                      2
+                      let depths#1 = (#list){
+                        0: (int){
+                          1
+                          let depths#1 = (_){ _ }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            1: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
           }
         }
       }
@@ -640,35 +725,29 @@ diff old new
 -Reused: 1801
 -Allocs: 84
 -Retain: 185
-+Leaks:  9483
-+Freed:  1488
-+Reused: 1488
-+Allocs: 9483
++Leaks:  22153
++Freed:  1990
++Reused: 1989
++Allocs: 22154
 +Retain: 0
  
 -Unifications: 800
 -Conjuncts:    3175
 -Disjuncts:    1974
-+Unifications: 4097
-+Conjuncts:    54454
-+Disjuncts:    6874
++Unifications: 8364
++Conjuncts:    121977
++Disjuncts:    15479
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,4 +1,18 @@
+@@ -1,4 +1,12 @@
 -(struct){
 +Errors:
 +issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
 +    ./issue2052.cue:8:20
 +issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
 +    ./issue2052.cue:46:14
-+issue2052.full.d.#funcs: field not allowed:
-+    ./issue2052.cue:89:12
-+    ./issue2052.cue:89:4
-+    ./issue2052.cue:93:3
-+#next: structural cycle:
-+    ./issue2052.cue:89:21
 +
 +Result:
 +(_|_){
@@ -676,7 +755,7 @@ diff old new
    chain: (struct){
      t1: (struct){
        #maxiter: (int){ 2 }
-@@ -47,148 +61,149 @@
+@@ -47,148 +55,148 @@
        }
      }
    }
@@ -815,13 +894,6 @@ diff old new
 -          }
 -        }
 -        #in: (string){ "bar" }
--        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
--        out: (int){ 1 }
--      }
--    }
--    full: (struct){
--      #RecurseN: (_){
--        _
 +  issue2052: (_|_){
 +    // [eval]
 +    t1: (_|_){
@@ -958,202 +1030,22 @@ diff old new
 +            out: (int){ 1 }
 +          }
 +        }
-+        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
-+        out: (int){ 1 }
-+      }
-+    }
-+    full: (_|_){
-+      // [eval]
+         #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+         out: (int){ 1 }
+       }
+     }
+     full: (struct){
+-      #RecurseN: (_){
+-        _
 +      #RecurseN: (#struct){
          #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
          #funcFactory: (#struct){
            #next: (_){ _ }
-@@ -213,115 +228,72 @@
-           }
+@@ -335,49 +343,7 @@
          }
-       }
--      #Depth: (#struct){
--        #maxiter: (int){ 11 }
--        #funcFactory: (#struct){
--          #next: (_){ _ }
--          #func: (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--        }
--        #funcs: (#struct){
--          "11": (null){ null }
--          "0": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "1": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "2": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "3": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "4": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "5": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "6": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "7": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "8": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "9": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--          "10": (#struct){
--            #in: (_){ _ }
--            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--            out: (int){
--              1
--              let depths#1 = (_){ _ }
--            }
--          }
--        }
--        #in: (_){ _ }
--        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
--        out: (int){
--          1
--          let depths#1 = (_){ _ }
-+      #Depth: (_|_){
-+        // [structural cycle] #next: structural cycle:
-+        //     ./issue2052.cue:89:21
-+        #maxiter: (int){ 11 }
-+        #funcFactory: (#struct){
-+          #next: (_){ _ }
-+          #func: (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1 = (_){ _ }
-+            }
-+          }
-+        }
-+        #funcs: (_|_){
-+          // [structural cycle]
-+          "11": (null){ null }
-+          "0": (#struct){
-+            #in: (_){ _ }
-+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
-+            out: (int){
-+              1
-+              let depths#1 = (_){ _ }
-+            }
-+          }
-+          "1": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "2": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "3": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "4": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "5": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "6": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "7": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "8": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "9": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-+          "10": (_|_){
-+            // [structural cycle] #next: structural cycle:
-+            //     ./issue2052.cue:89:21
-+          }
-         }
-       }
-       tree: (struct){
-@@ -336,48 +308,8 @@
          cow: (string){ "moo" }
        }
-       d: (_|_){
+-      d: (_|_){
 -        // [incomplete] issue2052.full.d: cannot add field #maxiter: was already used:
 -        //     ./issue2052.cue:119:23
 -        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
@@ -1196,12 +1088,11 @@ diff old new
 -            }
 -          }
 -        }
-+        // [eval] #next: structural cycle:
-+        //     ./issue2052.cue:89:21
++      d: (#struct){
          #in: (#struct){
            a: (#struct){
              foo: (string){ "bar" }
-@@ -389,6 +321,91 @@
+@@ -389,6 +355,142 @@
            }
            cow: (string){ "moo" }
          }
@@ -1217,77 +1108,128 @@ diff old new
 +            }
 +          }
 +        }
-+        #funcs: (_|_){
-+          // [eval] issue2052.full.d.#funcs: field not allowed:
-+          //     ./issue2052.cue:89:12
-+          //     ./issue2052.cue:89:4
-+          //     ./issue2052.cue:93:3
++        #funcs: (#struct){
 +          "11": (null){ null }
-+          "0": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "0": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "1": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "1": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "2": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "2": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "3": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "3": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "4": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "4": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "5": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "5": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "6": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "6": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "7": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "7": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "8": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "8": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "9": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "9": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
-+          "10": (_|_){
-+            // [eval] issue2052.full.d.#funcs: field not allowed:
-+            //     ./issue2052.cue:89:12
-+            //     ./issue2052.cue:89:4
-+            //     ./issue2052.cue:93:3
++          "10": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++        }
++        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++        out: (int){
++          5
++          let depths#1 = (#list){
++            0: (int){
++              4
++              let depths#1 = (#list){
++                0: (int){
++                  1
++                  let depths#1 = (_){ _ }
++                }
++                1: (int){
++                  3
++                  let depths#1 = (#list){
++                    0: (int){
++                      2
++                      let depths#1 = (#list){
++                        0: (int){
++                          1
++                          let depths#1 = (_){ _ }
++                        }
++                      }
++                    }
++                  }
++                }
++              }
++            }
++            1: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
 +          }
 +        }
        }

@@ -21,7 +21,7 @@ import (
 	"fmt"
 	"math/big"
 	"reflect"
-	"sort"
+	"slices"
 	"strconv"
 	"strings"
 
@@ -340,14 +340,15 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		return toUint(ctx, uint64(v))
 	case float64:
 		n := &adt.Num{Src: src, K: adt.FloatKind}
-		_, _, err := n.X.SetString(fmt.Sprint(v))
+		_, err := n.X.SetFloat64(v)
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "invalid float"))
 		}
 		return n
 	case float32:
 		n := &adt.Num{Src: src, K: adt.FloatKind}
-		_, _, err := n.X.SetString(fmt.Sprint(v))
+		// apd.Decimal has a SetFloat64 method, but no SetFloat32.
+		_, _, err := n.X.SetString(string(strconv.AppendFloat(nil, float64(v), 'E', -1, 32)))
 		if err != nil {
 			return ctx.AddErr(errors.Promote(err, "invalid float"))
 		}
@@ -479,12 +480,10 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 				reflect.Uint, reflect.Uint8, reflect.Uint16,
 				reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 
-				keys := value.MapKeys()
-				sort.Slice(keys, func(i, j int) bool {
-					return fmt.Sprint(keys[i]) < fmt.Sprint(keys[j])
-				})
-				for _, k := range keys {
-					val := value.MapIndex(k)
+				iter := value.MapRange()
+				for iter.Next() {
+					k := iter.Key()
+					val := iter.Value()
 					// if isNil(val) {
 					// 	continue
 					// }
@@ -513,6 +512,9 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 					}
 					v.Arcs = append(v.Arcs, arc)
 				}
+				slices.SortFunc(v.Arcs, func(a, b *adt.Vertex) int {
+					return strings.Compare(a.Label.IdentString(ctx), b.Label.IdentString(ctx))
+				})
 			}
 
 			return v

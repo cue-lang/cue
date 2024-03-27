@@ -356,6 +356,8 @@ issue1881.p1.0.reject: structural cycle:
     ./in.cue:205:14
 issue1881.p1.2.retry: structural cycle:
     ./in.cue:205:14
+issue1881.p1.2.retry.output: structural cycle:
+    ./in.cue:205:14
 issue1881.p2.o.retry: field not allowed:
     ./in.cue:219:11
     ./in.cue:217:17
@@ -515,7 +517,7 @@ Result:
             // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
             //     ./in.cue:133:11
             //     ./in.cue:125:17
-            // selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
+            // selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
             //     ./in.cue:133:14
             retry: (_|_){
               // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
@@ -547,7 +549,7 @@ Result:
             // [eval] selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
             //     ./in.cue:139:11
             //     ./in.cue:143:17
-            // selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
+            // selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
             //     ./in.cue:139:14
             retry: (_|_){
               // [eval] selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
@@ -688,7 +690,7 @@ Result:
       o: (_|_){
         // [eval] issue1881.p1.o.retry: field not allowed:
         //     ./in.cue:197:17
-        // issue1881.p1.0.reject: structural cycle:
+        // issue1881.p1.2.retry.output: structural cycle:
         //     ./in.cue:205:14
         retry: (_|_){
           // [eval] issue1881.p1.o.retry: field not allowed:
@@ -848,7 +850,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,55 @@
+@@ -1,5 +1,57 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
 +issue1881.p1.o.retry: field not allowed:
@@ -886,6 +888,8 @@ diff old new
 +    ./in.cue:205:14
 +issue1881.p1.2.retry: structural cycle:
 +    ./in.cue:205:14
++issue1881.p1.2.retry.output: structural cycle:
++    ./in.cue:205:14
 +issue1881.p2.o.retry: field not allowed:
 +    ./in.cue:219:11
 +    ./in.cue:217:17
@@ -905,7 +909,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -19,7 +69,9 @@
+@@ -19,7 +71,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -916,7 +920,7 @@ diff old new
        }
      }
    }
-@@ -52,17 +104,17 @@
+@@ -52,17 +106,17 @@
        }
      }
      _e: (#struct){
@@ -945,7 +949,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -112,15 +164,14 @@
+@@ -112,15 +166,14 @@
        }
      }
      list: (struct){
@@ -964,7 +968,7 @@ diff old new
          }
        }
      }
-@@ -127,208 +178,283 @@
+@@ -127,208 +180,283 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1092,7 +1096,7 @@ diff old new
 +            // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
 +            //     ./in.cue:133:11
 +            //     ./in.cue:125:17
-+            // selfReferential.acrossOr.t1.p1.0.reject: structural cycle:
++            // selfReferential.acrossOr.t1.p1.2.retry: structural cycle:
 +            //     ./in.cue:133:14
 +            retry: (_|_){
 +              // [eval] selfReferential.acrossOr.t1.p1.o.retry: field not allowed:
@@ -1124,7 +1128,7 @@ diff old new
 +            // [eval] selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
 +            //     ./in.cue:139:11
 +            //     ./in.cue:143:17
-+            // selfReferential.acrossOr.t1.p2.0.reject: structural cycle:
++            // selfReferential.acrossOr.t1.p2.2.retry: structural cycle:
 +            //     ./in.cue:139:14
 +            retry: (_|_){
 +              // [eval] selfReferential.acrossOr.t1.p2.o.retry: field not allowed:
@@ -1345,7 +1349,7 @@ diff old new
 +      o: (_|_){
 +        // [eval] issue1881.p1.o.retry: field not allowed:
 +        //     ./in.cue:197:17
-+        // issue1881.p1.0.reject: structural cycle:
++        // issue1881.p1.2.retry.output: structural cycle:
 +        //     ./in.cue:205:14
 +        retry: (_|_){
 +          // [eval] issue1881.p1.o.retry: field not allowed:
@@ -1437,7 +1441,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +487,38 @@
+@@ -361,40 +489,38 @@
          }
        }
      }

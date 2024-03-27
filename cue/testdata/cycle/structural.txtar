@@ -572,6 +572,12 @@ b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
     ./in.cue:98:5
 b7.b.0.0.0: structural cycle
 c1.a.c.c: structural cycle
+crossRefNoCycle.t4.C.y.x: structural cycle
+crossRefNoCycle.t4.C.y.y: structural cycle
+crossRefNoCycle.t4.C.y.z: structural cycle
+crossRefNoCycle.t4.C.z.x: structural cycle
+crossRefNoCycle.t4.C.z.y: structural cycle
+crossRefNoCycle.t4.C.z.z: structural cycle
 d1.a.b.c.d.t: structural cycle
 d1.r: structural cycle
 d2.a.b.c.d.t: structural cycle
@@ -634,7 +640,7 @@ nestedList.v2e.y.0.0: conflicting values int and [2] (mismatched types int and l
     ./in.cue:421:12
     ./in.cue:422:11
 p2.#T.a.b.link: structural cycle
-p2.a.a.b.link: structural cycle
+p2.a.a.b.link.a.b.link: structural cycle
 p2.a.a.one.link.a.b.link.a.b.link: structural cycle
 p2.a.a.one.link.a.two.link.a.b.link: structural cycle
 p3.#U.#T.a.b.link: structural cycle
@@ -1108,7 +1114,16 @@ Result:
         b: (_|_){
           // [structural cycle]
           link: (_|_){
-            // [structural cycle] p2.a.a.b.link: structural cycle
+            // [structural cycle]
+            a: (_|_){
+              // [structural cycle]
+              b: (_|_){
+                // [structural cycle]
+                link: (_|_){
+                  // [structural cycle] p2.a.a.b.link.a.b.link: structural cycle
+                }
+              }
+            }
           }
         }
       }
@@ -1387,9 +1402,7 @@ Result:
     // [structural cycle]
     doubleRef: (struct){
       a: (#struct){
-        Next: ((null|struct)){ |(*(null){ null }, (#struct){
-            Next: (null){ null }
-          }) }
+        Next: (null){ null }
       }
       #List: (#struct){
         Next: (null){ null }
@@ -1735,7 +1748,8 @@ Result:
       }
     }
   }
-  crossRefNoCycle: (struct){
+  crossRefNoCycle: (_|_){
+    // [structural cycle]
     t1: (struct){
       T: (struct){
         x: (_){ _ }
@@ -1792,13 +1806,15 @@ Result:
         }
       }
     }
-    t4: (struct){
+    t4: (_|_){
+      // [structural cycle]
       T: (struct){
         x: (_){ _ }
         y: (_){ _ }
         z: (_){ _ }
       }
-      C: (struct){
+      C: (_|_){
+        // [structural cycle]
         x: (struct){
           x: (struct){
             x: (_){ _ }
@@ -1816,38 +1832,28 @@ Result:
             z: (_){ _ }
           }
         }
-        y: (struct){
-          x: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
+        y: (_|_){
+          // [structural cycle]
+          x: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.y.x: structural cycle
           }
-          y: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
+          y: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.y.y: structural cycle
           }
-          z: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
+          z: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.y.z: structural cycle
           }
         }
-        z: (struct){
-          x: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
+        z: (_|_){
+          // [structural cycle]
+          x: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.z.x: structural cycle
           }
-          y: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
+          y: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.z.y: structural cycle
           }
-          z: (struct){
-            x: (_){ _ }
-            y: (_){ _ }
-            z: (_){ _ }
+          z: (_|_){
+            // [structural cycle] crossRefNoCycle.t4.C.z.z: structural cycle
           }
         }
       }
@@ -1892,7 +1898,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,24 +2,32 @@
+@@ -2,24 +2,38 @@
  a1.f.0: structural cycle
  a3.f.g: structural cycle
  b12b.#list.tail: structural cycle
@@ -1919,6 +1925,12 @@ diff old new
 +    ./in.cue:98:5
 +b7.b.0.0.0: structural cycle
  c1.a.c.c: structural cycle
++crossRefNoCycle.t4.C.y.x: structural cycle
++crossRefNoCycle.t4.C.y.y: structural cycle
++crossRefNoCycle.t4.C.y.z: structural cycle
++crossRefNoCycle.t4.C.z.x: structural cycle
++crossRefNoCycle.t4.C.z.y: structural cycle
++crossRefNoCycle.t4.C.z.z: structural cycle
  d1.a.b.c.d.t: structural cycle
 +d1.r: structural cycle
  d2.a.b.c.d.t: structural cycle
@@ -1928,7 +1940,7 @@ diff old new
  e1.a.c: structural cycle
  e1.b.c: structural cycle
  e2.a.c: structural cycle
-@@ -32,61 +40,85 @@
+@@ -32,61 +46,85 @@
      ./in.cue:393:5
      ./in.cue:394:5
  e3.b.c: structural cycle
@@ -1997,7 +2009,7 @@ diff old new
      ./in.cue:422:11
 -nestedList.v2e.y.0.0: incompatible list lengths (1 and 2)
  p2.#T.a.b.link: structural cycle
-+p2.a.a.b.link: structural cycle
++p2.a.a.b.link.a.b.link: structural cycle
 +p2.a.a.one.link.a.b.link.a.b.link: structural cycle
 +p2.a.a.one.link.a.two.link.a.b.link: structural cycle
  p3.#U.#T.a.b.link: structural cycle
@@ -2040,7 +2052,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -168,11 +200,17 @@
+@@ -168,11 +206,17 @@
      }
    }
    b4: (_|_){
@@ -2063,7 +2075,7 @@ diff old new
        }
      }
      x: (_|_){
-@@ -242,10 +280,9 @@
+@@ -242,10 +286,9 @@
          // [eval]
          0: (_|_){
            // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
@@ -2075,7 +2087,7 @@ diff old new
            0: (_|_){
              // [structural cycle] b6.b.a.0.0: structural cycle
            }
-@@ -263,12 +300,20 @@
+@@ -263,12 +306,20 @@
      }
    }
    b7: (_|_){
@@ -2102,7 +2114,7 @@ diff old new
        }
      }
      a: (_|_){
-@@ -307,7 +352,7 @@
+@@ -307,7 +358,7 @@
      #ref: (#struct){
        ref: (string){ string }
      }
@@ -2111,7 +2123,7 @@ diff old new
          c: (#list){
            0: ((string|struct)){ |((string){ string }, (#struct){
                ref: (string){ string }
-@@ -378,9 +423,14 @@
+@@ -378,9 +429,14 @@
        }
      }
      list1: (_|_){
@@ -2129,7 +2141,7 @@ diff old new
          }
        }
      }
-@@ -465,13 +515,51 @@
+@@ -465,11 +521,58 @@
      }
      a: (_|_){
        // [structural cycle]
@@ -2138,8 +2150,6 @@ diff old new
 -          link: (struct){
 -            a: (struct){
 -              two: (struct){
--              }
--            }
 +      a: (_|_){
 +        // [structural cycle]
 +        one: (_|_){
@@ -2184,11 +2194,18 @@ diff old new
 +        b: (_|_){
 +          // [structural cycle]
 +          link: (_|_){
-+            // [structural cycle] p2.a.a.b.link: structural cycle
++            // [structural cycle]
++            a: (_|_){
++              // [structural cycle]
++              b: (_|_){
++                // [structural cycle]
++                link: (_|_){
++                  // [structural cycle] p2.a.a.b.link.a.b.link: structural cycle
++                }
+               }
+             }
            }
-         }
-       }
-@@ -478,7 +566,7 @@
+@@ -478,7 +581,7 @@
      }
    }
    p3: (_|_){
@@ -2197,7 +2214,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (#struct){
-@@ -501,16 +589,14 @@
+@@ -501,16 +604,14 @@
        }
      }
      a: (_|_){
@@ -2222,7 +2239,7 @@ diff old new
        }
      }
    }
-@@ -552,11 +638,28 @@
+@@ -552,11 +653,28 @@
      }
      a: (_|_){
        // [structural cycle]
@@ -2256,7 +2273,7 @@ diff old new
                }
              }
            }
-@@ -565,7 +668,7 @@
+@@ -565,7 +683,7 @@
      }
    }
    p6: (_|_){
@@ -2265,7 +2282,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (list){
-@@ -588,16 +691,14 @@
+@@ -588,16 +706,14 @@
        }
      }
      a: (_|_){
@@ -2290,7 +2307,7 @@ diff old new
        }
      }
    }
-@@ -636,8 +737,7 @@
+@@ -636,8 +752,7 @@
        }
      }
      r: (_|_){
@@ -2300,7 +2317,7 @@ diff old new
      }
      x: (_|_){
        // [structural cycle] d1.a.b.c.d.t: structural cycle
-@@ -652,6 +752,16 @@
+@@ -652,6 +767,16 @@
          h: (int){ int }
          t: (_|_){
            // [structural cycle]
@@ -2317,7 +2334,7 @@ diff old new
          }
        }
      }
-@@ -668,8 +778,10 @@
+@@ -668,8 +793,10 @@
          }
        }
      }
@@ -2330,7 +2347,7 @@ diff old new
          c: (_|_){
            // [structural cycle]
            d: (_|_){
-@@ -685,31 +797,41 @@
+@@ -685,31 +812,41 @@
    }
    d3: (_|_){
      // [structural cycle]
@@ -2392,18 +2409,7 @@ diff old new
      }
    }
    shortPathFail: (_|_){
-@@ -716,7 +838,9 @@
-     // [structural cycle]
-     doubleRef: (struct){
-       a: (#struct){
--        Next: (null){ null }
-+        Next: ((null|struct)){ |(*(null){ null }, (#struct){
-+            Next: (null){ null }
-+          }) }
-       }
-       #List: (#struct){
-         Next: (null){ null }
-@@ -726,9 +850,7 @@
+@@ -726,9 +863,7 @@
        // [structural cycle]
        t1: (struct){
          #Foo: (#struct){
@@ -2414,7 +2420,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -736,10 +858,7 @@
+@@ -736,10 +871,7 @@
          Foo: (_|_){
            // [structural cycle]
            ref: (_|_){
@@ -2426,7 +2432,7 @@ diff old new
            }
          }
        }
-@@ -831,11 +950,12 @@
+@@ -831,11 +963,12 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:390:5
        //     ./in.cue:391:5
@@ -2444,7 +2450,7 @@ diff old new
        }
      }
      b: (_|_){
-@@ -842,11 +962,12 @@
+@@ -842,11 +975,12 @@
        // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
        //     ./in.cue:393:5
        //     ./in.cue:394:5
@@ -2462,7 +2468,7 @@ diff old new
        }
      }
    }
-@@ -855,41 +976,51 @@
+@@ -855,41 +989,51 @@
      a: (_|_){
        // [eval]
        0: (_|_){
@@ -2545,7 +2551,7 @@ diff old new
        }
      }
    }
-@@ -912,19 +1043,14 @@
+@@ -912,19 +1056,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2568,7 +2574,7 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -934,19 +1060,14 @@
+@@ -934,19 +1073,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2591,7 +2597,7 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -1051,7 +1172,10 @@
+@@ -1051,7 +1185,10 @@
        f: (_|_){
          // [structural cycle]
          h: (_|_){
@@ -2603,7 +2609,128 @@ diff old new
          }
        }
        g: (_|_){
-@@ -1199,19 +1323,19 @@
+@@ -1062,7 +1199,8 @@
+       }
+     }
+   }
+-  crossRefNoCycle: (struct){
++  crossRefNoCycle: (_|_){
++    // [structural cycle]
+     t1: (struct){
+       T: (struct){
+         x: (_){ _ }
+@@ -1119,62 +1257,54 @@
+         }
+       }
+     }
+-    t4: (struct){
+-      T: (struct){
+-        x: (_){ _ }
+-        y: (_){ _ }
+-        z: (_){ _ }
+-      }
+-      C: (struct){
+-        x: (struct){
+-          x: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-          y: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-          z: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-        }
+-        y: (struct){
+-          x: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-          y: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-          z: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-        }
+-        z: (struct){
+-          x: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-          y: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
+-          }
+-          z: (struct){
+-            x: (_){ _ }
+-            y: (_){ _ }
+-            z: (_){ _ }
++    t4: (_|_){
++      // [structural cycle]
++      T: (struct){
++        x: (_){ _ }
++        y: (_){ _ }
++        z: (_){ _ }
++      }
++      C: (_|_){
++        // [structural cycle]
++        x: (struct){
++          x: (struct){
++            x: (_){ _ }
++            y: (_){ _ }
++            z: (_){ _ }
++          }
++          y: (struct){
++            x: (_){ _ }
++            y: (_){ _ }
++            z: (_){ _ }
++          }
++          z: (struct){
++            x: (_){ _ }
++            y: (_){ _ }
++            z: (_){ _ }
++          }
++        }
++        y: (_|_){
++          // [structural cycle]
++          x: (_|_){
++            // [structural cycle] crossRefNoCycle.t4.C.y.x: structural cycle
++          }
++          y: (_|_){
++            // [structural cycle] crossRefNoCycle.t4.C.y.y: structural cycle
++          }
++          z: (_|_){
++            // [structural cycle] crossRefNoCycle.t4.C.y.z: structural cycle
++          }
++        }
++        z: (_|_){
++          // [structural cycle]
++          x: (_|_){
++            // [structural cycle] crossRefNoCycle.t4.C.z.x: structural cycle
++          }
++          y: (_|_){
++            // [structural cycle] crossRefNoCycle.t4.C.z.y: structural cycle
++          }
++          z: (_|_){
++            // [structural cycle] crossRefNoCycle.t4.C.z.z: structural cycle
+           }
+         }
+       }
+@@ -1199,19 +1329,19 @@
      }
    }
    n4: (struct){
@@ -2637,6 +2764,8 @@ diff old new
 e4.a.0: missing error
 e4.b.0: missing error
 -- diff/todo/p2 --
+TODO(share): fix the following bug once we have structure sharing.
+crossRefNoCycle.t4.C.*: incorrect structural cycle
 b4.b: Structural error converted to eval error.
 d2: structural cycle nested too deep.
 d3.config: should structural cycle be reported?

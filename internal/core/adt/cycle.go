@@ -296,7 +296,16 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 	depth := int32(0)
 	for r := ci.Refs; r != nil; r = r.Next {
 		if r.Ref != x {
-			continue
+			// TODO(share): this is a bit of a hack. We really should implement
+			// (*Vertex).cyclicReferences for the new evaluator. However,
+			// implementing cyclicReferences is somewhat tricky, as it requires
+			// referenced nodes to be evaluated, which is a guarantee we may not
+			// want to give. Moreover, it seems we can find a simpler solution
+			// based on structure sharing. So punt on this solution for now.
+			if r.Arc != arc || !n.ctx.isDevVersion() {
+				continue
+			}
+			found = true
 		}
 
 		// A reference that is within a graph that is being evaluated

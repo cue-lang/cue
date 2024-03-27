@@ -318,6 +318,7 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 	case 1:
 		d := cross[0].node
 		n.node.BaseValue = d
+		n.defaultMode = cross[0].defaultMode
 
 	default:
 		// append, rather than assign, to allow reusing the memory of
@@ -411,6 +412,8 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 
 	d := oc.cloneRoot(n)
 
+	d.defaultMode = combineDefault(m, n.defaultMode)
+
 	v := d.node
 
 	saved := n.node.BaseValue
@@ -425,7 +428,6 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 
 	d.overlays = n
 	d.disjunctCCs = append(d.disjunctCCs, holes...)
-	d.defaultMode = combineDefault(m, n.defaultMode)
 	d.disjunct = c
 	c.CloseInfo.cc = ccHole
 	d.scheduleConjunct(c, c.CloseInfo)

@@ -15,7 +15,7 @@
 package textproto
 
 import (
-	"fmt"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -179,7 +179,11 @@ func (e *encoder) encodeValue(n *pbast.Node, v cue.Value) {
 		n.Values = append(n.Values, sn.Values...)
 
 	case cue.BoolKind:
-		value = fmt.Sprint(v)
+		t, err := v.Bool()
+		if err != nil {
+			e.addErr(err)
+		}
+		value = strconv.FormatBool(t)
 		n.Values = append(n.Values, &pbast.Value{Value: value})
 
 	case cue.IntKind, cue.FloatKind, cue.NumberKind:

@@ -468,23 +468,6 @@ func (v Value) Uint64() (uint64, error) {
 	return i, nil
 }
 
-// trimZeros trims 0's for better JSON representations.
-func trimZeros(s string) string {
-	n1 := len(s)
-	s2 := strings.TrimRight(s, "0")
-	n2 := len(s2)
-	if p := strings.IndexByte(s2, '.'); p != -1 {
-		if p == n2-1 {
-			return s[:len(s2)+1]
-		}
-		return s2
-	}
-	if n1-n2 <= 4 {
-		return s
-	}
-	return fmt.Sprint(s2, "e+", n1-n2)
-}
-
 var (
 	smallestPosFloat64 *apd.Decimal
 	smallestNegFloat64 *apd.Decimal

@@ -312,19 +312,23 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 		cross, results = results, cross[:0]
 	}
 
-	switch len(cross) {
+	// Note it is under some circumstances possible that the disjunctions of a
+	// node are evaluated before all conjuncts are known. This could cause this
+	// method to be called more than once for a single node. In this case, we
+	// must properly merge disjuncts with existing disjunctions.
+	for _, x := range cross {
+		n.disjuncts = appendDisjunct(n.ctx, n.disjuncts, x)
+	}
+
+	switch a := n.disjuncts; len(a) {
 	case 0:
 		panic("unreachable: empty disjunction already handled above")
 
 	case 1:
-		d := cross[0].node
+		d := a[0].node
 		n.node.BaseValue = d
-		n.defaultMode = cross[0].defaultMode
-
-	default:
-		// append, rather than assign, to allow reusing the memory of
-		// a pre-existing slice.
-		n.disjuncts = append(n.disjuncts, cross...)
+		n.defaultMode = a[0].defaultMode
+		n.disjuncts = n.disjuncts[:0]
 	}
 
 	return nil
@@ -334,8 +338,6 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 // with an existing set of results.
 func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
 	for _, p := range cross {
-		// TODO: use a partial unify instead
-		// p.completeNodeConjuncts()
 		initArcs(n.ctx, p.node)
 
 		for j, d := range dn.disjuncts {
@@ -383,6 +385,9 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 	}
 	n.ctx.stats.Disjuncts++
 
+	// Be sure we use the dereferenced node. This was probably already done.
+	n = n.node.Indirect().state
+
 	oc := newOverlayContext(n.ctx)
 
 	var ccHole *closeContext
@@ -426,8 +431,6 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 	// not all holes filled out yet is not finalized. This may require
 	// a special mode, or evaluating more aggressively if finalize is not given.
 	v.status = unprocessed
-	// v.state.scheduler.completed &^= subFieldsProcessed
-	// v.state.scheduler.frozen &^= subFieldsProcessed
 
 	d.overlays = n
 	d.disjunctCCs = append(d.disjunctCCs, holes...)

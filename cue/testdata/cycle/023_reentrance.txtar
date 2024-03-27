@@ -76,10 +76,6 @@ Disjuncts:    0
 Errors:
 structural cycle:
     ./in.cue:3:25
-structural cycle:
-    ./in.cue:8:9
-structural cycle:
-    ./in.cue:8:38
 
 Result:
 (_|_){
@@ -100,28 +96,21 @@ Result:
     n: (int){ int }
   }
   fib1: (int){ 1 }
-  fib2: (int){ 1 }
+  fib2: (_|_){
+    // [structural cycle] structural cycle:
+    //     ./in.cue:3:25
+  }
   fib3: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
-    // structural cycle:
-    //     ./in.cue:8:38
   }
   fib7: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
-    // structural cycle:
-    //     ./in.cue:8:9
-    // structural cycle:
-    //     ./in.cue:8:38
   }
   fib12: (_|_){
     // [structural cycle] structural cycle:
     //     ./in.cue:3:25
-    // structural cycle:
-    //     ./in.cue:8:9
-    // structural cycle:
-    //     ./in.cue:8:38
   }
 }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -139,7 +128,7 @@ diff old new
 +Reused: 0
 +Allocs: 70
 +Retain: 0
-
+ 
 -Unifications: 196
 -Conjuncts:    464
 -Disjuncts:    268
@@ -150,7 +139,18 @@ diff old new
 diff old new
 --- old
 +++ new
-@@ -16,10 +16,6 @@
+@@ -1,10 +1,6 @@
+ Errors:
+ structural cycle:
+     ./in.cue:3:25
+-structural cycle:
+-    ./in.cue:8:9
+-structural cycle:
+-    ./in.cue:8:38
+ 
+ Result:
+ (_|_){
+@@ -16,10 +12,6 @@
        //     ./in.cue:7:5
        //     ./in.cue:3:35
        //     ./in.cue:5:5
@@ -161,7 +161,7 @@ diff old new
      }
    }
    fib: (_|_){
-@@ -26,9 +22,6 @@
+@@ -26,33 +18,23 @@
      // [incomplete] fib: non-concrete value int in operand to >=:
      //     ./in.cue:7:5
      //     ./in.cue:5:5
@@ -171,6 +171,36 @@ diff old new
      n: (int){ int }
    }
    fib1: (int){ 1 }
+-  fib2: (int){ 1 }
++  fib2: (_|_){
++    // [structural cycle] structural cycle:
++    //     ./in.cue:3:25
++  }
+   fib3: (_|_){
+     // [structural cycle] structural cycle:
+     //     ./in.cue:3:25
+-    // structural cycle:
+-    //     ./in.cue:8:38
+   }
+   fib7: (_|_){
+     // [structural cycle] structural cycle:
+     //     ./in.cue:3:25
+-    // structural cycle:
+-    //     ./in.cue:8:9
+-    // structural cycle:
+-    //     ./in.cue:8:38
+   }
+   fib12: (_|_){
+     // [structural cycle] structural cycle:
+     //     ./in.cue:3:25
+-    // structural cycle:
+-    //     ./in.cue:8:9
+-    // structural cycle:
+-    //     ./in.cue:8:38
+   }
+ }
+-- diff/todo/p3 --
+Note that it is okay for fib2 to fail.
 -- out/eval/stats --
 Leaks:  16
 Freed:  180
@@ -181,8 +211,6 @@ Retain: 148
 Unifications: 196
 Conjuncts:    464
 Disjuncts:    268
--- diff/todo/p3 --
-Note that it is okay for fib2 to fail.
 -- out/eval --
 Errors:
 structural cycle:

@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4820ac0_f50941cb",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 110,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-27T15:47:06Z",
+      "side": 1,
+      "message": "Good point. Updated the comment to explain why we still need the renaming.",
+      "parentUuid": "5e3e0490_ebde1370",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b2b66aab_37ff1b73",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3b83e43d_e8cefd23",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-27T15:47:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b2b66aab_37ff1b73",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2b99cdf6_a6366e86",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-03-26T18:39:28Z",
       "side": 1,
       "message": "Hmm, AFAICS this means that `t.logins` may not reflect the most recent updates to the login file. Let\u0027s say there are two concurrent calls to `updateLogin`, each with a different host. They both invoke `UpdateRegistryLogin`, resulting in a logins file that contains both hosts, but only one of the calls will return `logins` containing both of them. They then race on `loginsMu`, meaning that either might win and thus that one of the hosts might be \"lost\" from the p.o.v. of the caller.\n\nIn other words, I think we need to hold `loginsMu` while calling `UpdateRegistryLogin` (yes, it\u0027s a nested mutex but at least there are no callbacks involved 😊)",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f080ce30_281c7b84",
+        "filename": "mod/modconfig/modconfig.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-27T15:47:06Z",
+      "side": 1,
+      "message": "Hmm good catch, updated.",
+      "parentUuid": "2b99cdf6_a6366e86",
       "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -103,6 +157,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4c57701b_334f04c3",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 182,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-27T15:47:06Z",
+      "side": 1,
+      "message": "Ah yes it\u0027s a leftover from refactoring, was meaning to clean this up and forgot. Fixed now.",
+      "parentUuid": "b8470dd2_be149747",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "776f91b3_5fc7eec9",
@@ -116,6 +188,24 @@
       "writtenOn": "2024-03-26T18:39:28Z",
       "side": 1,
       "message": "Alternatively use https://pkg.go.dev/golang.org/x/sync/errgroup ?",
+      "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a8fd8c54_325eece3",
+        "filename": "mod/modconfig/modconfig_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 261,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-03-27T15:47:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "776f91b3_5fc7eec9",
       "revId": "952d3498f5fb4157fd5848c9be566bb400f4a3de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,9 +16,7 @@ package cmd
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	"io/fs"
 	"net/http"
 	"os"
 
@@ -83,13 +81,6 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 			if err != nil {
 				return fmt.Errorf("cannot find the path to store CUE registry logins: %v", err)
 			}
-			logins, err := cueconfig.ReadLogins(loginsPath)
-			if errors.Is(err, fs.ErrNotExist) {
-				// No config file yet; create an empty one.
-				logins = &cueconfig.Logins{Registries: make(map[string]cueconfig.RegistryLogin)}
-			} else if err != nil {
-				return fmt.Errorf("cannot load CUE registry logins: %v", err)
-			}
 			oauthCfg := cueconfig.RegistryOAuthConfig(host)
 
 			resp, err := oauthCfg.DeviceAuth(ctx)
@@ -106,9 +97,9 @@ inside $CUE_CONFIG_DIR; see 'cue help environment'.
 				return fmt.Errorf("cannot obtain the OAuth2 token: %v", err)
 			}
 
-			logins.Registries[host.Name] = cueconfig.LoginFromToken(tok)
+			_, err = cueconfig.UpdateRegistryLogin(loginsPath, host.Name, tok)
 
-			if err := cueconfig.WriteLogins(loginsPath, logins); err != nil {
+			if err != nil {
 				return fmt.Errorf("cannot store CUE registry logins: %v", err)
 			}
 			fmt.Printf("Login for %s stored in %s\n", host.Name, loginsPath)

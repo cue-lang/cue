@@ -3,12 +3,15 @@ package cueconfig
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io/fs"
 	"os"
 	"path/filepath"
 	"time"
 
 	"cuelang.org/go/internal/mod/modresolve"
+	"github.com/rogpeppe/go-internal/lockedfile"
 	"golang.org/x/oauth2"
 )
 
@@ -83,6 +86,20 @@ func ReadLogins(path string) (*Logins, error) {
 }
 
 func WriteLogins(path string, logins *Logins) error {
+	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
+		return err
+	}
+
+	unlock, err := lockedfile.MutexAt(path + ".lock").Lock()
+	if err != nil {
+		return err
+	}
+	defer unlock()
+
+	return writeLoginsUnlocked(path, logins)
+}
+
+func writeLoginsUnlocked(path string, logins *Logins) error {
 	// Indenting and a trailing newline are not necessary, but nicer to humans.
 	body, err := json.MarshalIndent(logins, "", "\t")
 	if err != nil {
@@ -90,12 +107,8 @@ func WriteLogins(path string, logins *Logins) error {
 	}
 	body = append(body, '\n')
 
-	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
-		return err
-	}
-	// Discourage other users from reading this file.
 	// Write to a temp file and then try to atomically rename to avoid races
-	// with parallel reading/writing.
+	// with parallel reading since we don't lock at FS level in ReadLogins.
 	if err := os.WriteFile(path+".tmp", body, 0o600); err != nil {
 		return err
 	}
@@ -106,6 +119,36 @@ func WriteLogins(path string, logins *Logins) error {
 	}
 
 	return nil
+}
+
+// UpdateRegistryLogin atomically updates a single registry token in the logins.json file.
+func UpdateRegistryLogin(path string, key string, new *oauth2.Token) (*Logins, error) {
+	if err := os.MkdirAll(filepath.Dir(path), 0o777); err != nil {
+		return nil, err
+	}
+
+	unlock, err := lockedfile.MutexAt(path + ".lock").Lock()
+	if err != nil {
+		return nil, err
+	}
+	defer unlock()
+
+	logins, err := ReadLogins(path)
+	if errors.Is(err, fs.ErrNotExist) {
+		// No config file yet; create an empty one.
+		logins = &Logins{Registries: make(map[string]RegistryLogin)}
+	} else if err != nil {
+		return nil, err
+	}
+
+	logins.Registries[key] = LoginFromToken(new)
+
+	err = writeLoginsUnlocked(path, logins)
+	if err != nil {
+		return nil, err
+	}
+
+	return logins, nil
 }
 
 // RegistryOAuthConfig returns the oauth2 configuration

@@ -3045,27 +3045,6 @@ func TestWalk(t *testing.T) {
 	}
 }
 
-func TestTrimZeros(t *testing.T) {
-	testCases := []struct {
-		in  string
-		out string
-	}{
-		{"", ""},
-		{"2", "2"},
-		{"2.0", "2.0"},
-		{"2.000000000000", "2.0"},
-		{"2000000000000", "2e+12"},
-		{"2000000", "2e+6"},
-	}
-	for _, tc := range testCases {
-		t.Run(tc.in, func(t *testing.T) {
-			if got := trimZeros(tc.in); got != tc.out {
-				t.Errorf("got %q; want %q", got, tc.out)
-			}
-		})
-	}
-}
-
 func TestReferencePath(t *testing.T) {
 	testCases := []struct {
 		input          string

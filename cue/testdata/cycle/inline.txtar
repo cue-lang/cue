@@ -304,7 +304,7 @@ Result:
       // [structural cycle]
       f2: (_|_){
         // [structural cycle] structural cycle:
-        //     ./x.cue:15:9
+        //     ./x.cue:12:24
       }
       fRec: (_|_){
         // [structural cycle]
@@ -411,6 +411,15 @@ diff old new
  
  Result:
  (_|_){
+@@ -28,7 +40,7 @@
+       // [structural cycle]
+       f2: (_|_){
+         // [structural cycle] structural cycle:
+-        //     ./x.cue:15:9
++        //     ./x.cue:12:24
+       }
+       fRec: (_|_){
+         // [structural cycle]
 @@ -35,7 +47,7 @@
          nn: (int){ int }
          out: (_|_){

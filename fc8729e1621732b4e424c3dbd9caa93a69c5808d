@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cb37dce1_12633ec5",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-28T01:03:57Z",
+      "side": 1,
+      "message": "LGTM; I find it much easier to convince myself that this new code is safe against memory and filesystem races.",
+      "revId": "fc8729e1621732b4e424c3dbd9caa93a69c5808d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

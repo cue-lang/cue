@@ -16,6 +16,24 @@
       "message": "LGTM but it\u0027s hard to have total confidence that the strings haven\u0027t changed. I\u0027ll presume you\u0027ve checked that manually.",
       "revId": "e8809f41d7259477de81f9173d7dc42bb15cd645",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6da714e1_e52b440b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-28T01:05:33Z",
+      "side": 1,
+      "message": "Yup. I double-checked again now just in case.",
+      "parentUuid": "16418613_44284ff9",
+      "revId": "e8809f41d7259477de81f9173d7dc42bb15cd645",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

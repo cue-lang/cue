@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"cuelang.org/go/internal/golangorgx/tools/robustio"
 	"cuelang.org/go/internal/mod/modresolve"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"golang.org/x/oauth2"
@@ -114,7 +115,7 @@ func writeLoginsUnlocked(path string, logins *Logins) error {
 	}
 	// TODO: on non-POSIX platforms os.Rename might not be atomic. Might need to
 	// find another solution. Note that Windows NTFS is also atomic.
-	if err := os.Rename(path+".tmp", path); err != nil {
+	if err := robustio.Rename(path+".tmp", path); err != nil {
 		return err
 	}
 

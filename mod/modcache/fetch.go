@@ -234,7 +234,7 @@ func (c *cache) downloadZip1(ctx context.Context, mod module.Version, zipfile st
 	if err := f.Close(); err != nil {
 		return err
 	}
-	if err := os.Rename(f.Name(), zipfile); err != nil {
+	if err := robustio.Rename(f.Name(), zipfile); err != nil {
 		return err
 	}
 	// TODO should we check the zip file for well-formedness?

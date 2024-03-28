@@ -44,7 +44,7 @@ import (
 // works as expected with the command-line tool.
 func TestMain(m *testing.M) {
 	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": cmd.MainTest,
+		"cue": cmd.Main,
 	}))
 }
 

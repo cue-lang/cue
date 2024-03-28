@@ -20,6 +20,7 @@ import (
 	"io"
 	"os"
 	"runtime"
+	"testing"
 
 	"github.com/spf13/cobra"
 
@@ -104,7 +105,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 			// due to the inherent behavior of memory pools like sync.Pool,
 			// we support supplying MemStats as a JSON file in the tests.
 			var m runtime.MemStats
-			if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" && inTest {
+			if name := os.Getenv("CUE_TEST_MEMSTATS"); name != "" && testing.Testing() {
 				bs, err := os.ReadFile(name)
 				if err != nil {
 					return err
@@ -223,17 +224,6 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	return c, nil
 }
 
-// MainTest is like Main, runs the cue tool and returns the code for passing to os.Exit.
-func MainTest() int {
-	// Setting inTest causes filenames printed in error messages
-	// to be normalized so the output looks the same on Unix
-	// as Windows.
-	// TODO: replace with testing.Testing once we can require Go 1.21 or later,
-	// per the accepted proposal at https://go.dev/issue/52600.
-	inTest = true
-	return Main()
-}
-
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
 	cwd, _ := os.Getwd()
@@ -242,7 +232,7 @@ func Main() int {
 		if err != ErrPrintedError {
 			errors.Print(os.Stderr, err, &errors.Config{
 				Cwd:     cwd,
-				ToSlash: inTest,
+				ToSlash: testing.Testing(),
 			})
 		}
 		return 1

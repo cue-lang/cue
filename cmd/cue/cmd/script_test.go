@@ -297,21 +297,21 @@ func TestX(t *testing.T) {
 
 func TestMain(m *testing.M) {
 	os.Exit(testscript.RunMain(m, map[string]func() int{
-		"cue": MainTest,
+		"cue": Main,
 		// Until https://github.com/rogpeppe/go-internal/issues/93 is fixed,
 		// or we have some other way to use "exec" without caring about success,
 		// this is an easy way for us to mimic `? exec cue`.
 		"cue_exitzero": func() int {
-			MainTest()
+			Main()
 			return 0
 		},
 		"cue_stdinpipe": func() int {
 			cwd, _ := os.Getwd()
-			if err := mainTestStdinPipe(); err != nil {
+			if err := mainStdinPipe(); err != nil {
 				if err != ErrPrintedError { // print errors like Main
 					errors.Print(os.Stderr, err, &errors.Config{
 						Cwd:     cwd,
-						ToSlash: inTest,
+						ToSlash: testing.Testing(),
 					})
 				}
 				return 1
@@ -334,10 +334,9 @@ func tsExpand(ts *testscript.TestScript, s string) string {
 	})
 }
 
-func mainTestStdinPipe() error {
-	// Like MainTest, but sets stdin to a pipe,
+func mainStdinPipe() error {
+	// Like Main, but sets stdin to a pipe,
 	// to emulate stdin reads like a terminal.
-	inTest = true
 	cmd, _ := New(os.Args[1:])
 	pr, pw, err := os.Pipe()
 	if err != nil {

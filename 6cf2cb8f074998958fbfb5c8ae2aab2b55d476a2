@@ -33,6 +33,24 @@
       "message": "Maybe fail if it\u0027s not a directory?",
       "revId": "6cf2cb8f074998958fbfb5c8ae2aab2b55d476a2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "70139df7_4684848c",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-28T12:29:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a34c5695_dff01f37",
+      "revId": "6cf2cb8f074998958fbfb5c8ae2aab2b55d476a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

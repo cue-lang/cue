@@ -33,6 +33,24 @@
       "message": "Maybe `ReadAll` to mirror `io.ReadAll` ?\n\"bytes\" doesn\u0027t really make it more specific, given that Read is conventionally about reading bytes anyway.",
       "revId": "bc5fe2b5f3d935456ba3ceec6121ee48b274b364",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b539020_111dabb1",
+        "filename": "internal/source/source.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-28T12:29:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e2c93d67_bd3abee8",
+      "revId": "bc5fe2b5f3d935456ba3ceec6121ee48b274b364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

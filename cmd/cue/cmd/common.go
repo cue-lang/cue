@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"testing"
 
 	"github.com/spf13/pflag"
 	"golang.org/x/text/language"
@@ -73,8 +74,6 @@ func defaultConfig() (*config, error) {
 	}, nil
 }
 
-var inTest = false
-
 func getLang() language.Tag {
 	loc := os.Getenv("LC_ALL")
 	if loc == "" {
@@ -101,7 +100,7 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 	errors.Print(w, err, &errors.Config{
 		Format:  format,
 		Cwd:     cwd,
-		ToSlash: inTest,
+		ToSlash: testing.Testing(),
 	})
 
 	b := w.Bytes()

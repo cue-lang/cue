@@ -21,6 +21,7 @@ import (
 	"os"
 	"runtime"
 	"runtime/debug"
+	"testing"
 
 	"github.com/spf13/cobra"
 
@@ -77,7 +78,7 @@ func runVersion(cmd *Command, args []string) error {
 // as can reasonably be determined. If no version can be
 // determined, it returns the empty string.
 func cueVersion() string {
-	if inTest {
+	if testing.Testing() {
 		if v := os.Getenv("CUE_VERSION_OVERRIDE"); v != "" {
 			return v
 		}
@@ -91,7 +92,7 @@ func cueVersion() string {
 
 func readBuildInfo() (*debug.BuildInfo, bool) {
 	bi, ok := debug.ReadBuildInfo()
-	if !ok || !inTest {
+	if !ok || !testing.Testing() {
 		return bi, ok
 	}
 	// test-based overrides

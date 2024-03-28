@@ -16,6 +16,24 @@
       "message": "```suggestion\n\t\t_, _, err :\u003d n.X.SetString(strconv.FormatFloat(float64(v), \u0027E\u0027, -1, 32)))\n```",
       "revId": "c23f47bfae7e5cf3c880ff5db25ae31235d6b863",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c64d4b84_9e40721b",
+        "filename": "internal/core/convert/go.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 351,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-28T12:29:41Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4ee5c95_3022b960",
+      "revId": "c23f47bfae7e5cf3c880ff5db25ae31235d6b863",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

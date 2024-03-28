@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"time"
 
+	"cuelang.org/go/internal/golangorgx/tools/robustio"
 	"cuelang.org/go/internal/mod/modresolve"
 	"github.com/rogpeppe/go-internal/lockedfile"
 	"golang.org/x/oauth2"
@@ -71,7 +72,9 @@ func CacheDir(getenv func(string) string) (string, error) {
 }
 
 func ReadLogins(path string) (*Logins, error) {
-	body, err := os.ReadFile(path)
+	// Note that we read logins.json without holding a file lock,
+	// as the file lock is only held for writes. Prevent ephemeral errors on Windows.
+	body, err := robustio.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
@@ -114,7 +117,7 @@ func writeLoginsUnlocked(path string, logins *Logins) error {
 	}
 	// TODO: on non-POSIX platforms os.Rename might not be atomic. Might need to
 	// find another solution. Note that Windows NTFS is also atomic.
-	if err := os.Rename(path+".tmp", path); err != nil {
+	if err := robustio.Rename(path+".tmp", path); err != nil {
 		return err
 	}
 

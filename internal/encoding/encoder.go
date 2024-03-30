@@ -46,6 +46,7 @@ type Encoder struct {
 	encFile      func(*ast.File) error
 	encValue     func(cue.Value) error
 	autoSimplify bool
+	check        bool
 	concrete     bool
 	instance     *cue.Instance
 }
@@ -161,6 +162,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 			if err != nil {
 				return err
 			}
+
 			_, err = w.Write(b)
 			return err
 		}

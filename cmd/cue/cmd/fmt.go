@@ -15,7 +15,10 @@
 package cmd
 
 import (
+	"bytes"
+	"fmt"
 	"github.com/spf13/cobra"
+	"os"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -56,6 +59,9 @@ func newFmtCmd(c *Command) *cobra.Command {
 			cfg.Format = opts
 			cfg.Force = true
 
+			check := flagCheck.Bool(cmd)
+			var modifiedFiles []string
+
 			for _, inst := range builds {
 				if inst.Err != nil {
 					switch {
@@ -67,7 +73,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 				}
 				for _, file := range inst.BuildFiles {
-					files := []*ast.File{}
+					var files []*ast.File
 					d := encoding.NewDecoder(file, &cfg)
 					for ; !d.Done(); d.Next() {
 						f := d.File()
@@ -86,6 +92,11 @@ func newFmtCmd(c *Command) *cobra.Command {
 						exitOnErr(cmd, err, true)
 					}
 
+					var formatted bytes.Buffer
+					if check {
+						cfg.Out = &formatted
+					}
+
 					e, err := encoding.NewEncoder(file, &cfg)
 					exitOnErr(cmd, err, true)
 
@@ -93,13 +104,44 @@ func newFmtCmd(c *Command) *cobra.Command {
 						err := e.EncodeFile(f)
 						exitOnErr(cmd, err, false)
 					}
+
+					if check {
+						var originalBytes []byte
+						if file.Filename != "-" {
+							originalBytes, err = os.ReadFile(file.Filename)
+							exitOnErr(cmd, err, true)
+						} else {
+							originalBytes = file.Source.([]byte)
+						}
+
+						if !bytes.Equal(formatted.Bytes(), originalBytes) {
+							modifiedFiles = append(modifiedFiles, file.Filename)
+						}
+					}
+
 					if err := e.Close(); err != nil {
 						exitOnErr(cmd, err, true)
 					}
 				}
 			}
+
+			if check {
+				if len(modifiedFiles) > 0 {
+					for _, f := range modifiedFiles {
+						if f != "-" {
+							fmt.Fprintln(cmd.OutOrStdout(), f)
+						}
+					}
+
+					os.Exit(1)
+				}
+			}
+
 			return nil
 		}),
 	}
+
+	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
+
 	return cmd
 }

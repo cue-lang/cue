@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7312ef15_06eba6d8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T08:53:50Z",
+      "side": 1,
+      "message": "This is my first code CL in cue (and TBH open source in general), so I\u0027d really appreciate to hear your thoughts about this change - I\u0027m very open to feedback. \n\nThank you!",
+      "revId": "402e3a176dad6137d3cc1b830d3b40097374783a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

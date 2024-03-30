@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b7d240d_91f801ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T13:34:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2add3726_6567e748",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7fcef361_5c619f8d",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-03-30T12:42:04Z",
       "side": 1,
       "message": "Fixes #363.",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97bfa7ba_845b5820",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T13:34:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7fcef361_5c619f8d",
       "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a78a8cbd_b4129399",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T13:34:18Z",
+      "side": 1,
+      "message": "100% agreed, I was missing a bit of the machinery for how the source was handled, and how I could get access to it - this clears it up",
+      "parentUuid": "1f064d8f_ff33a62c",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "950d1f04_e640cdd1",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-03-30T12:42:04Z",
       "side": 1,
       "message": "`stat` is not portable, e.g. it will not be installed on windows, so we can\u0027t use it like this.\n\nthere is a rather simple way to tell that modifications do not happen - run `cue fmt --check` twice on at least one file that is badly formatted, and you should see the same filenames in stdout both times. if we were modifying the files on disk, you would never see any filenames the second time.",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d319baac_8451adb8",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T13:34:18Z",
+      "side": 1,
+      "message": "got it, nice trick 😊",
+      "parentUuid": "950d1f04_e640cdd1",
       "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -88,6 +160,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a10807d8_b02e8449",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T13:34:18Z",
+      "side": 1,
+      "message": "I agree, my thinking here was that if for whatever reason the order of the output changes, this test could become unnecessarily noisy.\n\nDo you think it\u0027s worth sorting the modified file slice before printing, so this becomes more deterministic?",
+      "parentUuid": "64f41026_4efecbb3",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "73fb0dac_dc98f38a",
         "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
         "patchSetId": 6
@@ -99,6 +189,24 @@
       "writtenOn": "2024-03-30T12:42:04Z",
       "side": 1,
       "message": "FYI: `! stdout .` is enough to say \"stdout must be empty\"",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2ecbe279_0780b3ee",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T13:34:18Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "73fb0dac_dc98f38a",
       "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -116,6 +224,24 @@
       "writtenOn": "2024-03-30T12:42:04Z",
       "side": 1,
       "message": "I would say join the two txtar files - they are pretty similar, and you\u0027ll be able to deduplicate bits like formatted.cue",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f7bb55ae_9a4fb0a8",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-30T13:34:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "726eb7b9_f4f44a33",
       "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

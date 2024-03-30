@@ -1,0 +1,15 @@
+# succeeds when file is formatted
+exec cue fmt --check formatted.cue
+
+# files are not modified
+exec stat -f %c formatted.cue
+cp stdout formatted_time_before
+exec cue fmt formatted.cue
+exec stat -f %c formatted.cue
+cmp stdout formatted_time_before
+
+stdin formatted.cue
+exec cue fmt --check -
+
+-- formatted.cue --
+foo: "bar"

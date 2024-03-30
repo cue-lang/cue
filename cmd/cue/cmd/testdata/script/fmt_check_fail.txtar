@@ -1,0 +1,18 @@
+# fails and displays non formatted files
+! exec cue fmt --check not_formatted.cue another_not_formatted.cue
+stdout not_formatted.cue
+stdout another_not_formatted.cue
+! stdout correct.cue
+
+# stdin fails with no output
+stdin not_formatted.cue
+! exec cue fmt --check -
+! stdout .+
+
+-- correct.cue --
+foo: "bar"
+-- not_formatted.cue --
+foo:      "bar"
+-- another_not_formatted.cue --
+bar:   "baz"
+x:   1

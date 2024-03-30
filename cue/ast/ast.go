@@ -951,7 +951,7 @@ func (d *EmbedDecl) End() token.Pos { return d.Expr.End() }
 // ----------------------------------------------------------------------------
 // Files and packages
 
-// A File node represents a Go source file.
+// A File node represents a Cue source file.
 //
 // The Comments list contains all comments in the source file in order of
 // appearance, including the comments that are pointed to from other nodes

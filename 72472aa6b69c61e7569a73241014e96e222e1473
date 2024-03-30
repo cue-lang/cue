@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2add3726_6567e748",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-30T12:42:04Z",
+      "side": 1,
+      "message": "I would be clearer that this adds a flag, e.g.:\n\ncmd/cue: add a fmt --check flag to list badly formatted files",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fcef361_5c619f8d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-30T12:42:04Z",
+      "side": 1,
+      "message": "Fixes #363.",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1f064d8f_ff33a62c",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 111,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-30T12:42:04Z",
+      "side": 1,
+      "message": "it would be best to not re-read the file from disk here - not just because we duplicate work, but also because if the file on disk gets modified between the first read (in NewDecoder) and the second read here, we could get very confusing behavior.\n\nnote how build.File has a Source field which can take one of multiple values including nil, as you can see from internal/source.Open - in the case of fmt, it\u0027s either nil or []byte, and you already use some of it here.\n\nwhat I would do is begin the file loop with something like:\n\n```\nvar original []byte\nvar formatted bytes.Buffer\nif check {\n\tif bs, ok :\u003d file.Source.([]byte); ok {\n\t\toriginal \u003d bs\n\t} else {\n\t\toriginal, err \u003d source.ReadAll(file.Filename, file.Source)\n\t\texitOnErr(cmd, err, true)\n\t\tfile.Source \u003d original\n\t}\n\tcfg.Out \u003d \u0026formatted\n}\n```\n\nThis way, when the check mode is enabled, you buffer the entire original input as well as the formatted output, and you can compare them without reading a second time.",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "950d1f04_e640cdd1",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-30T12:42:04Z",
+      "side": 1,
+      "message": "`stat` is not portable, e.g. it will not be installed on windows, so we can\u0027t use it like this.\n\nthere is a rather simple way to tell that modifications do not happen - run `cue fmt --check` twice on at least one file that is badly formatted, and you should see the same filenames in stdout both times. if we were modifying the files on disk, you would never see any filenames the second time.",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "64f41026_4efecbb3",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-30T12:42:04Z",
+      "side": 1,
+      "message": "use `cmp`, e.g. `cmp stdout fmt-files.stdout`, which is easier to maintain long term and avoids edge cases like extra lines you did not expect and did not match via regular expressions. look for `cmp stdout` in other testscripts for ideas.",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "73fb0dac_dc98f38a",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-30T12:42:04Z",
+      "side": 1,
+      "message": "FYI: `! stdout .` is enough to say \"stdout must be empty\"",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "726eb7b9_f4f44a33",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-30T12:42:04Z",
+      "side": 1,
+      "message": "I would say join the two txtar files - they are pretty similar, and you\u0027ll be able to deduplicate bits like formatted.cue",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

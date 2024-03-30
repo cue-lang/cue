@@ -441,7 +441,7 @@ func TestOverlays(t *testing.T) {
 func TestLoadInstancesConcurrent(t *testing.T) {
 	// This test is designed to fail when run with the race detector
 	// if there's an underlying race condition.
-	// See https:/cuelang.org/issue/1746
+	// See https://cuelang.org/issue/1746
 	race(func() {
 		Instances([]string{"."}, nil)
 	})

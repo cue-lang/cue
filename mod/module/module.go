@@ -80,8 +80,9 @@ package module
 // security, network, and file system representations.
 
 import (
+	"cmp"
 	"fmt"
-	"sort"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/internal/mod/semver"
@@ -246,27 +247,25 @@ func NewVersion(path string, version string) (Version, error) {
 // optionally followed by a tie-breaking suffix introduced by a slash character,
 // like in "v0.0.1/module.cue".
 func Sort(list []Version) {
-	sort.Slice(list, func(i, j int) bool {
-		mi := list[i]
-		mj := list[j]
-		if mi.path != mj.path {
-			return mi.path < mj.path
+	slices.SortFunc(list, func(a, b Version) int {
+		if c := cmp.Compare(a.path, b.path); c != 0 {
+			return c
 		}
 		// To help go.sum formatting, allow version/file.
 		// Compare semver prefix by semver rules,
 		// file by string order.
-		vi := mi.version
-		vj := mj.version
-		var fi, fj string
-		if k := strings.Index(vi, "/"); k >= 0 {
-			vi, fi = vi[:k], vi[k:]
+		va := a.version
+		vb := b.version
+		var fa, fb string
+		if k := strings.Index(va, "/"); k >= 0 {
+			va, fa = va[:k], va[k:]
 		}
-		if k := strings.Index(vj, "/"); k >= 0 {
-			vj, fj = vj[:k], vj[k:]
+		if k := strings.Index(vb, "/"); k >= 0 {
+			vb, fb = vb[:k], vb[k:]
 		}
-		if vi != vj {
-			return semver.Compare(vi, vj) < 0
+		if c := semver.Compare(va, vb); c != 0 {
+			return c
 		}
-		return fi < fj
+		return cmp.Compare(fa, fb)
 	})
 }

@@ -1,5 +1,5 @@
 // Test various orders
-// https//cuelang.org/issues/2235
+// https://cuelang.org/issues/2235
 
 -- reductions.cue --
 // Each of these tests triggers a slightly different path.

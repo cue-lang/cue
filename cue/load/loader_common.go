@@ -16,8 +16,10 @@ package load
 
 import (
 	"bytes"
+	"cmp"
 	pathpkg "path"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strconv"
 	"strings"
@@ -58,16 +60,16 @@ func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 // normalizeFiles sorts the files so that files contained by a parent directory
 // always come before files contained in sub-directories, and that filenames in
 // the same directory are sorted lexically byte-wise, like Go's `<` operator.
-func normalizeFiles(a []*build.File) {
-	sort.Slice(a, func(i, j int) bool {
-		fi := a[i].Filename
-		fj := a[j].Filename
-		ci := strings.Count(fi, string(filepath.Separator))
-		cj := strings.Count(fj, string(filepath.Separator))
-		if ci != cj {
-			return ci < cj
+func normalizeFiles(files []*build.File) {
+	slices.SortFunc(files, func(a, b *build.File) int {
+		fa := a.Filename
+		fb := b.Filename
+		ca := strings.Count(fa, string(filepath.Separator))
+		cb := strings.Count(fb, string(filepath.Separator))
+		if c := cmp.Compare(ca, cb); c != 0 {
+			return c
 		}
-		return fi < fj
+		return cmp.Compare(fa, fb)
 	})
 }
 

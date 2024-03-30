@@ -15,11 +15,12 @@
 package load
 
 import (
+	"cmp"
 	"fmt"
 	"os"
 	pathpkg "path"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -199,8 +200,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		l.addFiles(cfg.ModuleRoot, p)
 		_ = p.Complete()
 	}
-	sort.Slice(all, func(i, j int) bool {
-		return all[i].Dir < all[j].Dir
+	slices.SortFunc(all, func(a, b *build.Instance) int {
+		return cmp.Compare(a.Dir, b.Dir)
 	})
 	return all
 }

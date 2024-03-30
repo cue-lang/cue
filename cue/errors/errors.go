@@ -26,7 +26,6 @@ import (
 	"io"
 	"path/filepath"
 	"slices"
-	"sort"
 	"strings"
 
 	"cuelang.org/go/cue/token"
@@ -356,59 +355,26 @@ func (p *list) Add(err Error) {
 // Reset resets an List to no errors.
 func (p *list) Reset() { *p = (*p)[:0] }
 
-// List implements the sort Interface.
-func (p list) Len() int      { return len(p) }
-func (p list) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
-
-func (p list) Less(i, j int) bool {
-	if c := comparePos(p[i].Position(), p[j].Position()); c != 0 {
-		return c == -1
-	}
-	// Note that it is not sufficient to simply compare file offsets because
-	// the offsets do not reflect modified line information (through //line
-	// comments).
-
-	if !equalPath(p[i].Path(), p[j].Path()) {
-		return lessPath(p[i].Path(), p[j].Path())
-	}
-	return p[i].Error() < p[j].Error()
-}
-
 func comparePos(a, b token.Pos) int {
-	if a.Filename() != b.Filename() {
-		return cmp.Compare(a.Filename(), b.Filename())
+	if c := cmp.Compare(a.Filename(), b.Filename()); c != 0 {
+		return c
 	}
-	if a.Line() != b.Line() {
-		return cmp.Compare(a.Line(), b.Line())
+	if c := cmp.Compare(a.Line(), b.Line()); c != 0 {
+		return c
 	}
-	if a.Column() != b.Column() {
-		return cmp.Compare(a.Column(), b.Column())
-	}
-	return 0
+	return cmp.Compare(a.Column(), b.Column())
 }
 
-func lessPath(a, b []string) bool {
+func comparePath(a, b []string) int {
 	for i, x := range a {
 		if i >= len(b) {
-			return false
+			break
 		}
-		if x != b[i] {
-			return x < b[i]
-		}
-	}
-	return len(a) < len(b)
-}
-
-func equalPath(a, b []string) bool {
-	if len(a) != len(b) {
-		return false
-	}
-	for i, x := range a {
-		if x != b[i] {
-			return false
+		if c := cmp.Compare(x, b[i]); c != 0 {
+			return c
 		}
 	}
-	return true
+	return cmp.Compare(len(a), len(b))
 }
 
 // Sanitize sorts multiple errors and removes duplicates on a best effort basis.
@@ -441,7 +407,19 @@ func (p list) sanitize() list {
 // other errors are sorted by error message, and before any *posError
 // entry.
 func (p list) Sort() {
-	sort.Sort(p)
+	slices.SortFunc(p, func(a, b Error) int {
+		if c := comparePos(a.Position(), b.Position()); c != 0 {
+			return c
+		}
+		// Note that it is not sufficient to simply compare file offsets because
+		// the offsets do not reflect modified line information (through //line
+		// comments).
+		if c := comparePath(a.Path(), b.Path()); c != 0 {
+			return c
+		}
+		return cmp.Compare(a.Error(), b.Error())
+
+	})
 }
 
 // RemoveMultiples sorts an List and removes all but the first error per line.
@@ -468,7 +446,7 @@ func approximateEqual(a, b Error) bool {
 	return aPos.Filename() == bPos.Filename() &&
 		aPos.Line() == bPos.Line() &&
 		aPos.Column() == bPos.Column() &&
-		equalPath(a.Path(), b.Path())
+		comparePath(a.Path(), b.Path()) == 0
 }
 
 // An List implements the error interface.

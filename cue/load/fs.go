@@ -16,12 +16,13 @@ package load
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"io"
 	iofs "io/fs"
 	"os"
 	"path/filepath"
-	"sort"
+	"slices"
 	"strings"
 	"time"
 
@@ -177,8 +178,8 @@ func (fs *fileSystem) readDir(path string) ([]iofs.DirEntry, errors.Error) {
 			items = append(items, iofs.FileInfoToDirEntry(o))
 		}
 	}
-	sort.Slice(items, func(i, j int) bool {
-		return items[i].Name() < items[j].Name()
+	slices.SortFunc(items, func(a, b iofs.DirEntry) int {
+		return cmp.Compare(a.Name(), b.Name())
 	})
 	return items, nil
 }

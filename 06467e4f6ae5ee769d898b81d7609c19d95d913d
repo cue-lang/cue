@@ -1,0 +1,78 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4ad10c1_45fd6b4e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-31T00:46:01Z",
+      "side": 1,
+      "message": "Nice, thanks! Just a couple of last nits. I will run CI as well.",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e28b5a15_b3724850",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-31T00:46:01Z",
+      "side": 1,
+      "message": "can you add a brief comment before this added code? like:\n\n// When using --check, we need to buffer the input and output bytes to compare them.",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c58ca95_a8b249b7",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-31T00:46:01Z",
+      "side": 1,
+      "message": "nit: move this stdin check to the append above",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "27eb0445_778df87d",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 954,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-31T00:46:01Z",
+      "side": 1,
+      "message": "nit: the spelling is usually CUE",
+      "range": {
+        "startLine": 954,
+        "startChar": 28,
+        "endLine": 954,
+        "endChar": 31
+      },
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

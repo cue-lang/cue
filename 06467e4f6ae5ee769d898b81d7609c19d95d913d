@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "49296e9c_e8baa05b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-31T06:24:47Z",
+      "side": 1,
+      "message": "note that you need cmpenv rather than cmp for this to work - did you try running go test? I am AFK right now so I can\u0027t run CI.",
+      "parentUuid": "b1d26bcf_5823beb5",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "e28b5a15_b3724850",
         "filename": "cmd/cue/cmd/fmt.go",
         "patchSetId": 9
@@ -118,6 +136,24 @@
       "side": 1,
       "message": "I did that originally, but moving it to the append would mean I\u0027d need an additional variable (something like checkFailed) to indicate whether the check should fail (because when just stdin is provided, badlyFormattedFiles would be empty).\nLet me know if you think it\u0027s worth adding the var (I just didn\u0027t think the check related code should \"polute\" the fmt function too much)",
       "parentUuid": "2c58ca95_a8b249b7",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2412c37_6b89e7b7",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-03-31T06:24:47Z",
+      "side": 1,
+      "message": "oh right - makes sense.",
+      "parentUuid": "07c4f42a_5e1f364d",
       "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

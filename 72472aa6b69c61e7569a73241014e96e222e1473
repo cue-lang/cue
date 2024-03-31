@@ -176,6 +176,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d6eb24d_529639a4",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_fail.txtar",
+        "patchSetId": 6
+      },
+      "lineNbr": 5,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-31T05:52:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "a10807d8_b02e8449",
+      "revId": "72472aa6b69c61e7569a73241014e96e222e1473",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "73fb0dac_dc98f38a",

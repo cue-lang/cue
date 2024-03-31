@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7cddb46a_44ef2262",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-31T05:52:57Z",
+      "side": 1,
+      "message": "thanks for the review - I have one small question about one of the nits",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e28b5a15_b3724850",
@@ -48,6 +65,24 @@
       "writtenOn": "2024-03-31T00:46:01Z",
       "side": 1,
       "message": "can you add a brief comment before this added code? like:\n\n// When using --check, we need to buffer the input and output bytes to compare them.",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "72eefe69_a69e4d49",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-31T05:52:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e28b5a15_b3724850",
       "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -71,6 +106,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "07c4f42a_5e1f364d",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 130,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-31T05:52:57Z",
+      "side": 1,
+      "message": "I did that originally, but moving it to the append would mean I\u0027d need an additional variable (something like checkFailed) to indicate whether the check should fail (because when just stdin is provided, badlyFormattedFiles would be empty).\nLet me know if you think it\u0027s worth adding the var (I just didn\u0027t think the check related code should \"polute\" the fmt function too much)",
+      "parentUuid": "2c58ca95_a8b249b7",
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "27eb0445_778df87d",
         "filename": "cue/ast/ast.go",
         "patchSetId": 9
@@ -82,6 +135,30 @@
       "writtenOn": "2024-03-31T00:46:01Z",
       "side": 1,
       "message": "nit: the spelling is usually CUE",
+      "range": {
+        "startLine": 954,
+        "startChar": 28,
+        "endLine": 954,
+        "endChar": 31
+      },
+      "revId": "06467e4f6ae5ee769d898b81d7609c19d95d913d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f839dce3_d81586a7",
+        "filename": "cue/ast/ast.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 954,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-03-31T05:52:57Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "27eb0445_778df87d",
       "range": {
         "startLine": 954,
         "startChar": 28,

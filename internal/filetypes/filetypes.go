@@ -12,8 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate go run gen.go
-
 package filetypes
 
 import (
@@ -96,7 +94,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 		}, nil
 	}
 
-	i, errs := update(nil, cuegenValue, cuegenValue, "modes", mode.String())
+	i, errs := update(nil, typesValue, typesValue, "modes", mode.String())
 	v := i.LookupDef("FileInfo")
 	v = v.Fill(b)
 
@@ -293,7 +291,7 @@ func toFile(i, v cue.Value, filename string) (*build.File, error) {
 }
 
 func parseType(s string, mode Mode) (inst, val cue.Value, err error) {
-	i := cuegenValue
+	i := typesValue
 	i = i.Unify(i.Lookup("modes", mode.String()))
 	v := i.LookupDef("File")
 

@@ -92,6 +92,9 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err := cuedebug.Init(); err != nil {
 			return err
 		}
+		// Some init work, such as in internal/filetypes, evaluates CUE by design.
+		// We don't want that work to count towards $CUE_STATS.
+		adt.ResetStats()
 
 		err := f(c, args)
 

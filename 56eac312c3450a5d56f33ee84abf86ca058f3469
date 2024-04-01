@@ -16,6 +16,57 @@
       "message": "Carrying this over from GitHub: https://github.com/cue-lang/cue/pull/2984",
       "revId": "56eac312c3450a5d56f33ee84abf86ca058f3469",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ac46e47e_002168bc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-01T01:14:19Z",
+      "side": 1,
+      "message": "Thanks! Just two last nits. Running CI as well.",
+      "revId": "56eac312c3450a5d56f33ee84abf86ca058f3469",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "910c3a7b_58f4eff4",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-01T01:14:19Z",
+      "side": 1,
+      "message": "perhaps add a third sentence now that you use String, like:\n\n\u003e // Roundtrip the constant through time.Duration.String for human readability.",
+      "revId": "56eac312c3450a5d56f33ee84abf86ca058f3469",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c64ba61e_386c409d",
+        "filename": "cmd/cue/cmd/testdata/script/issue2969.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-01T01:14:19Z",
+      "side": 1,
+      "message": "nit: remove this empty comment line",
+      "revId": "56eac312c3450a5d56f33ee84abf86ca058f3469",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

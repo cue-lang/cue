@@ -17,10 +17,8 @@ package build
 // This file describes how various cross-cutting modes influence default
 // settings.
 //
-// It is used by gen.go to compile the instance into Go data, which is then
+// It is used by types.go to compile a cue.Value, which is then
 // used by the rest of the package to determine settings.
-//
-// There
 
 // A File corresponds to a Go build.File.
 #File: {

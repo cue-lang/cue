@@ -36,13 +36,13 @@ contents overwritten
 -- out/stats.json --
 {
     "CUE": {
-        "Unifications": 4,
-        "Disjuncts": 6,
-        "Conjuncts": 8,
-        "Freed": 6,
-        "Reused": 2,
-        "Allocs": 4,
-        "Retained": 0
+        "Unifications": 666,
+        "Disjuncts": 1419,
+        "Conjuncts": 2723,
+        "Freed": 1372,
+        "Reused": 1354,
+        "Allocs": 18,
+        "Retained": 47
     },
     "Go": {
         "AllocBytes": 300456,
@@ -51,13 +51,13 @@ contents overwritten
 }
 -- out/stats.cue --
 CUE: {
-	Unifications: 4
-	Disjuncts:    6
-	Conjuncts:    8
-	Freed:        6
-	Reused:       2
-	Allocs:       4
-	Retained:     0
+	Unifications: 666
+	Disjuncts:    1419
+	Conjuncts:    2723
+	Freed:        1372
+	Reused:       1354
+	Allocs:       18
+	Retained:     47
 }
 Go: {
 	AllocBytes:   300456
@@ -65,26 +65,26 @@ Go: {
 }
 -- out/stats.yaml --
 CUE:
-  Unifications: 4
-  Disjuncts: 6
-  Conjuncts: 8
-  Freed: 6
-  Reused: 2
-  Allocs: 4
-  Retained: 0
+  Unifications: 666
+  Disjuncts: 1419
+  Conjuncts: 2723
+  Freed: 1372
+  Reused: 1354
+  Allocs: 18
+  Retained: 47
 Go:
   AllocBytes: 300456
   AllocObjects: 100123
 -- out/stderr --
 {
     "CUE": {
-        "Unifications": 4,
-        "Disjuncts": 6,
-        "Conjuncts": 8,
-        "Freed": 6,
-        "Reused": 2,
-        "Allocs": 4,
-        "Retained": 0
+        "Unifications": 666,
+        "Disjuncts": 1419,
+        "Conjuncts": 2723,
+        "Freed": 1372,
+        "Reused": 1354,
+        "Allocs": 18,
+        "Retained": 47
     },
     "Go": {
         "AllocBytes": 300456,

@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2dfaf0fe_da42f08c",
+        "filename": "cmd/cue/cmd/get_go.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 799,
+      "author": {
+        "id": 1037903
+      },
+      "writtenOn": "2024-04-01T02:19:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "910c3a7b_58f4eff4",
+      "revId": "56eac312c3450a5d56f33ee84abf86ca058f3469",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c64ba61e_386c409d",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-04-01T01:14:19Z",
       "side": 1,
       "message": "nit: remove this empty comment line",
+      "revId": "56eac312c3450a5d56f33ee84abf86ca058f3469",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e51cb553_aa5ec3a0",
+        "filename": "cmd/cue/cmd/testdata/script/issue2969.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1037903
+      },
+      "writtenOn": "2024-04-01T02:19:33Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c64ba61e_386c409d",
       "revId": "56eac312c3450a5d56f33ee84abf86ca058f3469",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

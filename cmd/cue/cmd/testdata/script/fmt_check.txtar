@@ -5,6 +5,11 @@ stdin formatted.cue
 exec cue fmt --check -
 
 # fails and displays non formatted files
+# TODO(mvdan): we should probably print the files in their original order
+# when they are explicitly listed as arguments.
+# cue/load "normalizes" the order of package files when loading,
+# but this should perhaps not happen when given a list of CUE files.
+# TODO(mvdan): the filenames should probably be printed relative to the current directory.
 ! exec cue fmt --check not_formatted.cue another_not_formatted.cue
 cmpenv stdout expected-output
 

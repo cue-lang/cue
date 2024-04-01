@@ -1,21 +1,13 @@
-# TODO(mvdan): once we have a "list" or "diff" fmt flag,
-# we can reuse the same files without worrying about modifying in-place.
-mkdir originals
-cp x.cue star.cue y.cue yb.cue originals/
+! exec cue fmt --check .
+cmpenv stdout stdout.golden
 
-exec cue fmt .
-cmp x.cue out/x.cue
-cmp star.cue out/star-cue
-cmp y.cue out/y-cue
-cmp yb.cue out/yb-cue
-
-cp originals/x.cue originals/star.cue originals/y.cue originals/yb.cue .
-
-exec cue fmt x.cue star.cue y.cue yb.cue
-cmp x.cue out/x.cue
-cmp star.cue out/star-cue
-cmp y.cue out/y-cue
-cmp yb.cue out/yb-cue
+! exec cue fmt --check x.cue star.cue y.cue yb.cue
+cmpenv stdout stdout.golden
+-- stdout.golden --
+$WORK${/}star.cue
+$WORK${/}x.cue
+$WORK${/}y.cue
+$WORK${/}yb.cue
 -- x.cue --
 // header
 

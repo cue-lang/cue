@@ -92,6 +92,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		if err := cuedebug.Init(); err != nil {
 			return err
 		}
+		adt.ResetStats()
 
 		err := f(c, args)
 

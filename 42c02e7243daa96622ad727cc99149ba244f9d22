@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fcd02fc4_91ac17c6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-01T10:40:03Z",
+      "side": 1,
+      "message": "Huh, I can\u0027t reproduce the failure with or without -race, and it only happened in one platform. Seems like we have a little bit of non-determinism somewhere. Will have to investigate beforew we can merge this.",
+      "revId": "42c02e7243daa96622ad727cc99149ba244f9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

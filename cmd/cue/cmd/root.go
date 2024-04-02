@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/interpreter/wasm"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuedebug"
@@ -173,7 +172,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	c := &Command{
 		Command: cmd,
 		root:    cmd,
-		ctx:     cuecontext.New(cuecontext.Interpreter(wasm.New())),
+		ctx:     cuecontext.New(rootContextOptions...),
 	}
 
 	cmdCmd := newCmdCmd(c)
@@ -222,6 +221,8 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	cmd.SetArgs(args)
 	return c, nil
 }
+
+var rootContextOptions []cuecontext.Option
 
 // MainTest is like Main, runs the cue tool and returns the code for passing to os.Exit.
 func MainTest() int {

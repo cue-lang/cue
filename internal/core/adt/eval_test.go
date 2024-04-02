@@ -77,7 +77,7 @@ func TestEvalAlpha(t *testing.T) {
 		// Crashes and hangs
 		"cycle/evaluate": "hang",
 
-		// Later
+		// Later: all good, just much cruft.
 		"benchmarks/issue2176": "fails to remove errors",
 
 		// Performance

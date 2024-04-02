@@ -16,6 +16,23 @@
       "message": "PS1 disabled wasm entirely, and PS2 uses a build tag instead to keep CI green.",
       "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "906d6365_44617301",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-02T04:18:11Z",
+      "side": 1,
+      "message": "Will leave to @mpvl@gmail.com to review, but my only thought would be that we actually cover this in CI else we more than likely bit rot the code away.",
+      "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

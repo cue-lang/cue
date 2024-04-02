@@ -989,6 +989,18 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 		}
 		s.MatchAndInsert(ctx, arc)
 	}
+
+	// This is the equivalent for the new implementation.
+	if pcs := v.PatternConstraints; pcs != nil {
+		for _, pc := range pcs.Pairs {
+			if matchPattern(ctx, pc.Pattern, arc.Label) {
+				for _, c := range pc.Constraint.Conjuncts {
+					root := arc.rootCloseContext()
+					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
+				}
+			}
+		}
+	}
 }
 
 func (v *Vertex) IsList() bool {

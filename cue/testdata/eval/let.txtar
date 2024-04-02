@@ -159,14 +159,14 @@ keepDescending: t2: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  227
+Leaks:  226
 Freed:  16
 Reused: 16
-Allocs: 227
+Allocs: 226
 Retain: 0
 
-Unifications: 211
-Conjuncts:    1367
+Unifications: 210
+Conjuncts:    1451
 Disjuncts:    32
 -- out/evalalpha --
 Errors:
@@ -203,11 +203,11 @@ referencesForViaLet."2": conflicting values 12 and 4:
     ./incomprehension.cue:23:24
 referencesForViaLet."2": conflicting values 8 and 4:
     ./incomprehension.cue:23:24
-nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
+nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
     ./incomprehension.cue:55:5
     ./incomprehension.cue:53:15
     ./incomprehension.cue:53:18
-nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
+nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
     ./incomprehension.cue:55:5
     ./incomprehension.cue:53:15
     ./incomprehension.cue:53:18
@@ -404,14 +404,14 @@ Result:
       }
     }]]]]
     "0": (_|_){
-      // [eval] nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
+      // [eval] nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
       //     ./incomprehension.cue:55:5
       //     ./incomprehension.cue:53:15
       //     ./incomprehension.cue:53:18
       let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
     }
     "1": (_|_){
-      // [eval] nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
+      // [eval] nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
       //     ./incomprehension.cue:55:5
       //     ./incomprehension.cue:53:15
       //     ./incomprehension.cue:53:18
@@ -489,17 +489,17 @@ diff old new
 -Reused: 149
 -Allocs: 61
 -Retain: 184
-+Leaks:  227
++Leaks:  226
 +Freed:  16
 +Reused: 16
-+Allocs: 227
++Allocs: 226
 +Retain: 0
  
 -Unifications: 196
 -Conjuncts:    365
 -Disjuncts:    241
-+Unifications: 211
-+Conjuncts:    1367
++Unifications: 210
++Conjuncts:    1451
 +Disjuncts:    32
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
@@ -543,11 +543,11 @@ diff old new
 +    ./incomprehension.cue:23:24
 +referencesForViaLet."2": conflicting values 8 and 4:
 +    ./incomprehension.cue:23:24
-+nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
++nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +    ./incomprehension.cue:55:5
 +    ./incomprehension.cue:53:15
 +    ./incomprehension.cue:53:18
-+nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
++nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +    ./incomprehension.cue:55:5
 +    ./incomprehension.cue:53:15
 +    ./incomprehension.cue:53:18
@@ -752,14 +752,14 @@ diff old new
 -      "2": (int){ 2 }
 +    }]]]]
 +    "0": (_|_){
-+      // [eval] nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
++      // [eval] nestedFor."0".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +      //     ./incomprehension.cue:55:5
 +      //     ./incomprehension.cue:53:15
 +      //     ./incomprehension.cue:53:18
 +      let X#1Fmulti = &[&[&[&[&[&[&[&[〈1;x〉]]]]]]]]
 +    }
 +    "1": (_|_){
-+      // [eval] nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
++      // [eval] nestedFor."1".X: invalid interpolation: invalid interpolation: invalid interpolation: conflicting values 2 and 1:
 +      //     ./incomprehension.cue:55:5
 +      //     ./incomprehension.cue:53:15
 +      //     ./incomprehension.cue:53:18

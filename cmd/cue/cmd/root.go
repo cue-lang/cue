@@ -26,7 +26,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/interpreter/wasm"
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/cuedebug"
@@ -173,7 +172,10 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	c := &Command{
 		Command: cmd,
 		root:    cmd,
-		ctx:     cuecontext.New(cuecontext.Interpreter(wasm.New())),
+		ctx:     cuecontext.New(),
+		// The wasm interpreter can be re-enabled once we are ready to ship the feature.
+		// For now, it's not ready, and makes cue binaries heavier by over 2MiB.
+		// ctx: cuecontext.New(cuecontext.Interpreter(wasm.New())),
 	}
 
 	cmdCmd := newCmdCmd(c)

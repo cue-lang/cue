@@ -51,6 +51,24 @@
       "parentUuid": "906d6365_44617301",
       "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3aca2209_fffe99da",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-04-02T07:52:11Z",
+      "side": 1,
+      "message": "yeah, let\u0027s test `cuewasm` in CI if we go this route. in principle LGTM.",
+      "parentUuid": "6ddfc44b_791bb175",
+      "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

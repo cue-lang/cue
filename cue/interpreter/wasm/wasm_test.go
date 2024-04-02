@@ -12,6 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TestExe expects cmd/cue to be configured with wasm support,
+// which it only is with the cuewasm build tag enabled.
+//go:build cuewasm
+
 package wasm_test
 
 import (

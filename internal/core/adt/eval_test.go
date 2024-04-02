@@ -78,7 +78,7 @@ func TestEvalAlpha(t *testing.T) {
 		"cycle/chain":    "hang",
 		"cycle/evaluate": "hang",
 
-		// Later
+		// Later: all good, just much cruft.
 		"benchmarks/issue2176": "fails to remove errors",
 
 		// Performance

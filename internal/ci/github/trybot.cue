@@ -75,6 +75,7 @@ workflows: trybot: _repo.bashWorkflow & {
 				_goTestRace & {
 					if: _isLatestLinux
 				},
+				_goTestWasm,
 				for v in _e2eTestSteps {v},
 				_goCheck,
 				_repo.checkGitClean,
@@ -174,5 +175,12 @@ workflows: trybot: _repo.bashWorkflow & {
 		name: "Test with -race"
 		env: GORACE: "atexit_sleep_ms=10" // Otherwise every Go package being tested sleeps for 1s; see https://go.dev/issues/20364.
 		run: "go test -race ./..."
+	}
+
+	_goTestWasm: json.#step & {
+		name: "Test with -tags=cuewasm"
+		// The wasm interpreter is only bundled into cmd/cue with the cuewasm build tag.
+		// Test the related packages with the build tag enabled as well.
+		run: "go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm"
 	}
 }

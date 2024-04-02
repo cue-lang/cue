@@ -166,6 +166,8 @@ jobs:
         run: go test -race ./...
         env:
           GORACE: atexit_sleep_ms=10
+      - name: Test with -tags=cuewasm
+        run: go test -tags cuewasm ./cmd/cue/cmd ./cue/interpreter/wasm
       - name: gcloud auth for end-to-end tests
         id: auth
         if: |-

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e51af72_46e0f866",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-02T07:39:37Z",
+      "side": 1,
+      "message": "I briefly showed PS1 of this CL to Paul and he agrees with the change in principle, and suggested perhaps resetting the stats counters after filetypes has initialized. I\u0027ve implemented one form of that in PS2.",
+      "revId": "67128a05e297129f3fed22b0a6221ac53dd6e03a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

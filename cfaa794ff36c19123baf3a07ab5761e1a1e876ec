@@ -69,6 +69,23 @@
       "parentUuid": "6ddfc44b_791bb175",
       "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da2c5464_cd9952ef",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-04-02T07:54:56Z",
+      "side": 1,
+      "message": "Note that this disables test completely by default. even the API tests, which don\u0027t use `cmd/cue`. I don\u0027t think we want to do that.",
+      "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

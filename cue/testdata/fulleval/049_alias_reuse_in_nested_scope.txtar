@@ -127,6 +127,7 @@ diff old new
    }
    #A: (#struct){
 -- diff/explanation --
+The new error is a correct error, as the pattern constraint is invalid.
 Seems reasonable to report error at connection as well.
 -- out/eval --
 (struct){

@@ -416,7 +416,14 @@ Disjuncts:    3258
           k: (string){ "simple" }
         }
       }
-      r2_r2_r1: (_){ _ }
+      r2_r2_r1: (#struct){
+        a: (#struct){
+          d: (#struct){
+            n: (string){ "c1" }
+          }
+          k: (string){ "simple" }
+        }
+      }
     }
     let subs#1multi = &[&[&[&[&[(〈3;#sub〉 & {
       #p: 〈2;rd〉.a
@@ -427,7 +434,7 @@ Disjuncts:    3258
 diff old new
 --- old
 +++ new
-@@ -47,201 +47,194 @@
+@@ -47,201 +47,201 @@
      }
      dict: (#struct){
      }
@@ -752,10 +759,14 @@ diff old new
 -          d: (#struct){
 -            n: (string){ "c1" }
 -          }
--        }
--      }
--      r2_r2_r1: (#struct){
--        a: (#struct){
++          d: (#struct){
++            n: (string){ "c1" }
++          }
++          k: (string){ "simple" }
+         }
+       }
+       r2_r2_r1: (#struct){
+         a: (#struct){
 -          k: (string){ "simple" }
 -          d: (#struct){
 -            n: (string){ "c1" }
@@ -772,15 +783,14 @@ diff old new
 +          k: (string){ "simple" }
 +        }
 +      }
-+      r2_r2_r1: (_){ _ }
 +    }
 +    let subs#1multi = &[&[&[&[&[(〈3;#sub〉 & {
 +      #p: 〈2;rd〉.a
 +    })]]]]]
    }
  }
--- diff/todo/p0 --
-out.#p.dict.r2_(r2_)_r1: missing structure!
+-- diff/todo/p3 --
+Reordering
 -- out/eval --
 (struct){
   #AC: (#struct){

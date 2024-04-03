@@ -80,9 +80,6 @@ func TestEvalAlpha(t *testing.T) {
 
 		// Later: all good, just much cruft.
 		"benchmarks/issue2176": "fails to remove errors",
-
-		// Performance
-		"disjunctions/elimination": "performance issue",
 	}
 
 	test := cuetxtar.TxTarTest{

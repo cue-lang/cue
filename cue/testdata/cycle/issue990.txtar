@@ -172,18 +172,24 @@ out: #sub & {#p: _test.s1}
     #p: 〈1;_test〉.s1
   })
 }
--- out/eval/stats --
-Leaks:  6
-Freed:  3232
-Reused: 3213
-Allocs: 25
-Retain: 26
+-- out/evalalpha/stats --
+Leaks:  2779
+Freed:  303
+Reused: 303
+Allocs: 2779
+Retain: 0
 
-Unifications: 2588
-Conjuncts:    12056
-Disjuncts:    3258
+Unifications: 330
+Conjuncts:    9613
+Disjuncts:    602
 -- out/evalalpha --
-(struct){
+Errors:
+out.subs.subs.#p: structural cycle:
+    ./in.cue:32:16
+
+Result:
+(_|_){
+  // [structural cycle]
   #AC: (#struct){
     k: (string){ "simple" }
     d: (#struct){
@@ -199,19 +205,12 @@ Disjuncts:    3258
     }
   }
   #R: (#struct){
-    a: (#struct){ |((#struct){
-        k: (string){ "simple" }
-        d: (#struct){
-          n: (string){ string }
-        }
-      }, (#struct){
-        k: (string){ "complex" }
-        d: (#struct){
-          n: (string){ string }
-          r: (#struct){
-          }
-        }
-      }) }
+    a: (#struct){
+      k: (string){ "simple" }
+      d: (#struct){
+        n: (string){ string }
+      }
+    }
   }
   #S: (#struct){
     n: (string){ string }
@@ -346,7 +345,9 @@ Disjuncts:    3258
       k: (string){ "complex" }
     }
   }
-  out: (#struct){
+  out: (_|_){
+    // [structural cycle] out.subs.subs.#p: structural cycle:
+    //     ./in.cue:32:16
     #p: (#struct){
       d: (#struct){
         n: (string){ "s1" }
@@ -408,33 +409,77 @@ Disjuncts:    3258
           k: (string){ "simple" }
         }
       }
-      r2_r1: (#struct){
-        a: (#struct){
-          d: (#struct){
-            n: (string){ "c1" }
-          }
-          k: (string){ "simple" }
-        }
-      }
-      r2_r2_r1: (#struct){
-        a: (#struct){
-          d: (#struct){
-            n: (string){ "c1" }
-          }
-          k: (string){ "simple" }
-        }
-      }
     }
     let subs#1multi = &[&[&[&[&[(〈3;#sub〉 & {
       #p: 〈2;rd〉.a
     })]]]]]
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  6
+-Freed:  3232
+-Reused: 3213
+-Allocs: 25
+-Retain: 26
++Leaks:  2779
++Freed:  303
++Reused: 303
++Allocs: 2779
++Retain: 0
+ 
+-Unifications: 2588
+-Conjuncts:    12056
+-Disjuncts:    3258
++Unifications: 330
++Conjuncts:    9613
++Disjuncts:    602
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -47,201 +47,201 @@
+@@ -1,4 +1,10 @@
+-(struct){
++Errors:
++out.subs.subs.#p: structural cycle:
++    ./in.cue:32:16
++
++Result:
++(_|_){
++  // [structural cycle]
+   #AC: (#struct){
+     k: (string){ "simple" }
+     d: (#struct){
+@@ -14,19 +20,12 @@
+     }
+   }
+   #R: (#struct){
+-    a: (#struct){ |((#struct){
+-        k: (string){ "simple" }
+-        d: (#struct){
+-          n: (string){ string }
+-        }
+-      }, (#struct){
+-        k: (string){ "complex" }
+-        d: (#struct){
+-          n: (string){ string }
+-          r: (#struct){
+-          }
+-        }
+-      }) }
++    a: (#struct){
++      k: (string){ "simple" }
++      d: (#struct){
++        n: (string){ string }
++      }
++    }
+   }
+   #S: (#struct){
+     n: (string){ string }
+@@ -47,201 +46,187 @@
      }
      dict: (#struct){
      }
@@ -585,60 +630,10 @@ diff old new
 -          }
 -        }
 -      }
-+      d: (#struct){
-+        n: (string){ "s1" }
-+        r: (#struct){
-+          r1: (#struct){
-+            a: (#struct){
-+              d: (#struct){
-+                n: (string){ "c1" }
-+              }
-+              k: (string){ "simple" }
-+            }
-+          }
-+          r2: (#struct){
-+            a: (#struct){
-+              d: (#struct){
-+                n: (string){ "s2" }
-+                r: (#struct){
-+                  r1: (#struct){
-+                    a: (#struct){
-+                      d: (#struct){
-+                        n: (string){ "c1" }
-+                      }
-+                      k: (string){ "simple" }
-+                    }
-+                  }
-+                  r2: (#struct){
-+                    a: (#struct){
-+                      d: (#struct){
-+                        n: (string){ "s3" }
-+                        r: (#struct){
-+                          r1: (#struct){
-+                            a: (#struct){
-+                              d: (#struct){
-+                                n: (string){ "c1" }
-+                              }
-+                              k: (string){ "simple" }
-+                            }
-+                          }
-+                        }
-+                      }
-+                      k: (string){ "complex" }
-+                    }
-+                  }
-+                }
-+              }
-+              k: (string){ "complex" }
-+            }
-+          }
-+        }
-+      }
-+      k: (string){ "complex" }
-     }
-   }
-   out: (#struct){
-     #p: (#struct){
+-    }
+-  }
+-  out: (#struct){
+-    #p: (#struct){
 -      k: (string){ "complex" }
 -      d: (#struct){
 -        n: (string){ "s1" }
@@ -739,6 +734,62 @@ diff old new
 +        }
 +      }
 +      k: (string){ "complex" }
++    }
++  }
++  out: (_|_){
++    // [structural cycle] out.subs.subs.#p: structural cycle:
++    //     ./in.cue:32:16
++    #p: (#struct){
++      d: (#struct){
++        n: (string){ "s1" }
++        r: (#struct){
++          r1: (#struct){
++            a: (#struct){
++              d: (#struct){
++                n: (string){ "c1" }
++              }
++              k: (string){ "simple" }
++            }
++          }
++          r2: (#struct){
++            a: (#struct){
++              d: (#struct){
++                n: (string){ "s2" }
++                r: (#struct){
++                  r1: (#struct){
++                    a: (#struct){
++                      d: (#struct){
++                        n: (string){ "c1" }
++                      }
++                      k: (string){ "simple" }
++                    }
++                  }
++                  r2: (#struct){
++                    a: (#struct){
++                      d: (#struct){
++                        n: (string){ "s3" }
++                        r: (#struct){
++                          r1: (#struct){
++                            a: (#struct){
++                              d: (#struct){
++                                n: (string){ "c1" }
++                              }
++                              k: (string){ "simple" }
++                            }
++                          }
++                        }
++                      }
++                      k: (string){ "complex" }
++                    }
++                  }
++                }
++              }
++              k: (string){ "complex" }
++            }
++          }
++        }
++      }
++      k: (string){ "complex" }
      }
      dict: (#struct){
        r1: (#struct){
@@ -747,26 +798,18 @@ diff old new
 -          d: (#struct){
 -            n: (string){ "c1" }
 -          }
-+          d: (#struct){
-+            n: (string){ "c1" }
-+          }
-+          k: (string){ "simple" }
-         }
-       }
-       r2_r1: (#struct){
-         a: (#struct){
+-        }
+-      }
+-      r2_r1: (#struct){
+-        a: (#struct){
 -          k: (string){ "simple" }
 -          d: (#struct){
 -            n: (string){ "c1" }
 -          }
-+          d: (#struct){
-+            n: (string){ "c1" }
-+          }
-+          k: (string){ "simple" }
-         }
-       }
-       r2_r2_r1: (#struct){
-         a: (#struct){
+-        }
+-      }
+-      r2_r2_r1: (#struct){
+-        a: (#struct){
 -          k: (string){ "simple" }
 -          d: (#struct){
 -            n: (string){ "c1" }
@@ -789,6 +832,19 @@ diff old new
 +    })]]]]]
    }
  }
+-- diff/todo/p0 --
+out.subs.subs.#p: invalid structural cycle
+
+-- out/eval/stats --
+Leaks:  6
+Freed:  3232
+Reused: 3213
+Allocs: 25
+Retain: 26
+
+Unifications: 2588
+Conjuncts:    12056
+Disjuncts:    3258
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

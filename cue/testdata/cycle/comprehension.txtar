@@ -321,6 +321,8 @@ Conjuncts:    2525
 Disjuncts:    1404
 -- out/evalalpha --
 Errors:
+issue1666._e.f2.a.t: structural cycle
+issue1666.e.f2.a.t: structural cycle
 issue1881.p1.o.retry: field not allowed:
     ./in.cue:197:17
 selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -418,43 +420,39 @@ Result:
       }
     }
   }
-  issue1666: (struct){
+  issue1666: (_|_){
+    // [structural cycle]
     #E: (#struct){
       f1: (#struct){
       }
       f2: (#struct){
       }
     }
-    _e: (#struct){
-      f2: (#struct){
-        a: (#struct){
-          t: (#struct){
-            f1: (#struct){
-            }
-            f2: (#struct){
-            }
+    _e: (_|_){
+      // [structural cycle]
+      f2: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          t: (_|_){
+            // [structural cycle] issue1666._e.f2.a.t: structural cycle
           }
         }
       }
       f1: (#struct){
       }
     }
-    e: (#struct){
-      f1: (#struct){
-        a: (#struct){
-          f1: (#struct){
-          }
-          f2: (#struct){
-          }
-        }
+    e: (_|_){
+      // [structural cycle]
+      f1: (_|_){
+        // [structural cycle] issue1666._e.f2.a.t: structural cycle
       }
-      f2: (#struct){
-        a: (#struct){
-          t: (#struct){
-            f1: (#struct){
-            }
-            f2: (#struct){
-            }
+      f2: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          t: (_|_){
+            // [structural cycle] issue1666.e.f2.a.t: structural cycle
           }
         }
       }
@@ -848,9 +846,11 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,55 @@
+@@ -1,5 +1,57 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
++issue1666._e.f2.a.t: structural cycle
++issue1666.e.f2.a.t: structural cycle
 +issue1881.p1.o.retry: field not allowed:
 +    ./in.cue:197:17
 +selfReferential.insertionError.A: adding field foo3 not allowed as field set was already referenced:
@@ -905,7 +905,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -19,7 +69,9 @@
+@@ -19,7 +71,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -916,10 +916,21 @@ diff old new
        }
      }
    }
-@@ -52,17 +104,17 @@
+@@ -44,7 +98,8 @@
        }
      }
-     _e: (#struct){
+   }
+-  issue1666: (struct){
++  issue1666: (_|_){
++    // [structural cycle]
+     #E: (#struct){
+       f1: (#struct){
+       }
+@@ -51,36 +106,31 @@
+       f2: (#struct){
+       }
+     }
+-    _e: (#struct){
 -      f1: (#struct){
 -      }
 -      f2: (#struct){
@@ -931,21 +942,53 @@ diff old new
 -            }
 -          }
 -        }
-+      f2: (#struct){
-+        a: (#struct){
-+          t: (#struct){
-+            f1: (#struct){
-+            }
-+            f2: (#struct){
-+            }
+-      }
+-    }
+-    e: (#struct){
+-      f1: (#struct){
+-        a: (#struct){
+-          f1: (#struct){
+-          }
+-          f2: (#struct){
+-          }
+-        }
+-      }
+-      f2: (#struct){
+-        a: (#struct){
+-          t: (#struct){
+-            f1: (#struct){
+-            }
+-            f2: (#struct){
+-            }
++    _e: (_|_){
++      // [structural cycle]
++      f2: (_|_){
++        // [structural cycle]
++        a: (_|_){
++          // [structural cycle]
++          t: (_|_){
++            // [structural cycle] issue1666._e.f2.a.t: structural cycle
 +          }
 +        }
 +      }
 +      f1: (#struct){
++      }
++    }
++    e: (_|_){
++      // [structural cycle]
++      f1: (_|_){
++        // [structural cycle] issue1666._e.f2.a.t: structural cycle
++      }
++      f2: (_|_){
++        // [structural cycle]
++        a: (_|_){
++          // [structural cycle]
++          t: (_|_){
++            // [structural cycle] issue1666.e.f2.a.t: structural cycle
+           }
+         }
        }
-     }
-     e: (#struct){
-@@ -112,15 +164,14 @@
+@@ -112,15 +162,14 @@
        }
      }
      list: (struct){
@@ -964,7 +1007,7 @@ diff old new
          }
        }
      }
-@@ -127,208 +178,283 @@
+@@ -127,208 +176,283 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1437,7 +1480,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +487,38 @@
+@@ -361,40 +485,38 @@
          }
        }
      }
@@ -1515,6 +1558,7 @@ diff old new
 issue779.X: invalid cycle error.
 selfReferential.list.panels: invalid incomplete error.
 selfReferential.acrossOr: many errors
+issue1666.*.f2.a.t: invalid structural cycle
 ...
 -- out/eval --
 Errors:

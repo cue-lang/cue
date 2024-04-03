@@ -1,5 +1,9 @@
+! exec cue cmd
+! stdout .
+cmp stderr cue-cmd.stderr
+
 exec cue help cmd
-cmp stdout expect-stdout
+cmp stdout cue-help-cmd.stdout
 
 -- cue.mod/module.cue --
 -- task_tool.cue --
@@ -23,7 +27,10 @@ command: echo: {
     }
 }
 
--- expect-stdout --
+-- cue-cmd.stderr --
+cmd must be run as one of its subcommands
+Run 'cue help cmd' for known subcommands.
+-- cue-help-cmd.stdout --
 cmd executes the named command for each of the named instances.
 
 Commands define actions on instances. For example, they may

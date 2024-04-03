@@ -139,7 +139,6 @@ Run "cue help commands" for more details on tasks and commands.
 			// depending on whether we ran via `cue cmd` or the `cue` shortcut.
 			isRootCmd := cmd.Command == cmd.root
 
-			// TODO(mvdan): test running `cue` and `cue cmd` via testscript as well
 			if len(args) == 0 {
 				// `cue` should print the top-level help like `cue -h`,
 				// but `cue cmd` should explain that a custom command is required.

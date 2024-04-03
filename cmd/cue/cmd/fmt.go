@@ -16,9 +16,7 @@ package cmd
 
 import (
 	"bytes"
-	"cuelang.org/go/internal/source"
 	"fmt"
-	"github.com/spf13/cobra"
 	"os"
 
 	"cuelang.org/go/cue/ast"
@@ -28,7 +26,10 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/source"
 	"cuelang.org/go/tools/fix"
+
+	"github.com/spf13/cobra"
 )
 
 func newFmtCmd(c *Command) *cobra.Command {
@@ -120,7 +121,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 
 					if check && !bytes.Equal(formatted.Bytes(), original) {
-						badlyFormattedFiles = append(badlyFormattedFiles, file.Filename)
+						badlyFormattedFiles = append(badlyFormattedFiles, inst.RelPath(file))
 					}
 				}
 			}

@@ -5,12 +5,12 @@ stdin formatted.cue
 exec cue fmt --check -
 
 # fails and displays non formatted files
-! exec cue fmt --check not_formatted.cue another_not_formatted.cue
+! exec cue fmt --check not_formatted.cue another/not_formatted.cue
 cmpenv stdout expected-output
 
 # files are not modified with --check
 # running twice returns the same file list
-! exec cue fmt --check not_formatted.cue another_not_formatted.cue
+! exec cue fmt --check not_formatted.cue another/not_formatted.cue
 cmpenv stdout expected-output
 
 # stdin fails with no output
@@ -22,9 +22,9 @@ stdin not_formatted.cue
 foo: "bar"
 -- not_formatted.cue --
 foo:      "bar"
--- another_not_formatted.cue --
+-- another/not_formatted.cue --
 bar:   "baz"
 x:   1
 -- expected-output --
-$WORK${/}another_not_formatted.cue
-$WORK${/}not_formatted.cue
+not_formatted.cue
+another${/}not_formatted.cue

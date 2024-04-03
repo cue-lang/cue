@@ -741,16 +741,16 @@ unifyDynamicReflectSuccess: {
 	}
 }
 
--- out/eval/stats --
-Leaks:  15
-Freed:  394
-Reused: 388
-Allocs: 21
-Retain: 100
+-- out/evalalpha/stats --
+Leaks:  513
+Freed:  2
+Reused: 2
+Allocs: 513
+Retain: 0
 
-Unifications: 395
-Conjuncts:    636
-Disjuncts:    464
+Unifications: 489
+Conjuncts:    2982
+Disjuncts:    22
 -- out/evalalpha --
 Errors:
 noStackOverflowStructCycle.#list.tail: structural cycle
@@ -1392,6 +1392,28 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  15
+-Freed:  394
+-Reused: 388
+-Allocs: 21
+-Retain: 100
++Leaks:  513
++Freed:  2
++Reused: 2
++Allocs: 513
++Retain: 0
+ 
+-Unifications: 395
+-Conjuncts:    636
+-Disjuncts:    464
++Unifications: 489
++Conjuncts:    2982
++Disjuncts:    22
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -1606,6 +1628,16 @@ diff old new
        y: (int){ 1 }
      }
    }
+-- out/eval/stats --
+Leaks:  15
+Freed:  394
+Reused: 388
+Allocs: 21
+Retain: 100
+
+Unifications: 395
+Conjuncts:    636
+Disjuncts:    464
 -- diff/todo/p1 --
 embed.fail1.p: error not propagated to parent.
 provideIncompleteSuccess.t2.a.c.d: missing error.

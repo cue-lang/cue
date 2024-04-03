@@ -487,25 +487,18 @@ issue2263: full: {
 	}
 }
 
--- out/eval/stats --
-Leaks:  4
-Freed:  2339
-Reused: 2323
-Allocs: 20
-Retain: 115
+-- out/evalalpha/stats --
+Leaks:  335635
+Freed:  148996
+Reused: 148996
+Allocs: 335635
+Retain: 0
 
-Unifications: 1260
-Conjuncts:    3417
-Disjuncts:    2454
+Unifications: 180683
+Conjuncts:    3377303
+Disjuncts:    174145
 -- out/evalalpha --
-Errors:
-preserveClosedness.small.p1.#A.a: field not allowed:
-    ./in.cue:145:3
-    ./in.cue:142:12
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   disambiguateClosed: (struct){
     b: (#struct){ |((#struct){
         x: (bool){ true }
@@ -543,13 +536,19 @@ Result:
     resolved: (struct){
       n1: (struct){
         x: ((null|struct)){ |((struct){
-            a: (struct){ struct.MinFields(2) }
+            a: (struct){
+              c: (int){ 1 }
+              d: (int){ 1 }
+            }
           }, (null){ null }) }
       }
       n2: (struct){
         x: ((null|struct)){ |((struct){
             a: (struct){
-              b: (struct){ struct.MinFields(2) }
+              b: (struct){
+                c: (int){ 1 }
+                d: (int){ 1 }
+              }
             }
           }, (null){ null }) }
       }
@@ -557,34 +556,18 @@ Result:
     eliminated: (struct){
       n1: (struct){
         p1: (struct){
-          x: ((null|struct)){ |((struct){
-              a: (struct){ struct.MaxFields(1) }
-            }, (null){ null }) }
+          x: (null){ null }
         }
         p2: (struct){
-          x: ((null|struct)){ |((struct){
-              a: (struct){
-                c: (int){ 1 }
-              }
-            }, (null){ null }) }
+          x: (null){ null }
         }
       }
       n2: (struct){
         p1: (struct){
-          x: ((null|struct)){ |((struct){
-              a: (struct){
-                b: (struct){ struct.MaxFields(1) }
-              }
-            }, (null){ null }) }
+          x: (null){ null }
         }
         p2: (struct){
-          x: ((null|struct)){ |((struct){
-              a: (struct){
-                b: (struct){
-                  c: (int){ 1 }
-                }
-              }
-            }, (null){ null }) }
+          x: (null){ null }
         }
       }
     }
@@ -592,30 +575,32 @@ Result:
       a: (struct){
         n1: (struct){
           p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){ struct.MinFields(2) }
-              }, (null){ null }) }
+            x: (null){ null }
           }
           p2: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  c: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
         }
         n2: (struct){
           p1: (struct){
             x: ((null|struct)){ |((struct){
                 a: (struct){
-                  b: (struct){ struct.MinFields(2) }
+                  b: (_|_){
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    //     ./in.cue:96:15
+                    //     ./in.cue:96:32
+                    c: (int){ 1 }
+                  }
                 }
               }, (null){ null }) }
           }
           p2: (struct){
             x: ((null|struct)){ |((struct){
                 a: (struct){
-                  b: (struct){
+                  b: (_|_){
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    //     ./in.cue:102:15
+                    //     ./in.cue:102:32
                     c: (int){ 1 }
                   }
                 }
@@ -626,30 +611,26 @@ Result:
       b: (struct){
         n1: (struct){
           p1: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){ struct.MinFields(3) }
-              }, (null){ null }) }
+            x: (null){ null }
           }
           p2: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  c: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
           p3: (struct){
-            x: ((null|struct)){ |((struct){
-                a: (struct){
-                  c: (int){ 1 }
-                }
-              }, (null){ null }) }
+            x: (null){ null }
           }
         }
         n2: (struct){
           p1: (struct){
             x: ((null|struct)){ |((struct){
                 a: (struct){
-                  b: (struct){ struct.MinFields(3) }
+                  b: (_|_){
+                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                    //     ./in.cue:138:15
+                    //     ./in.cue:138:32
+                    c: (int){ 1 }
+                    d: (int){ 1 }
+                  }
                 }
               }, (null){ null }) }
           }
@@ -657,25 +638,23 @@ Result:
       }
     }
   }
-  preserveClosedness: (_|_){
-    // [eval]
-    small: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
-        #A: (_|_){
-          // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
-          //     ./in.cue:145:3
-          //     ./in.cue:142:12
-          a: (_|_){
-            // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
-            //     ./in.cue:145:3
-            //     ./in.cue:142:12
-          }
-        }
-        #B: (#struct){ |(*(#struct){
+  preserveClosedness: (struct){
+    small: (struct){
+      p1: (struct){
+        #A: (#struct){ |(*(#struct){
+            a: (string){ string }
           }, (#struct){
             a: (string){ string }
+            b: (int){ int }
+          }) }
+        #B: (#struct){ |(*(#struct){
+          }, (#struct){
+            b: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (int){ int }
           }) }
       }
       p2: (struct){
@@ -688,6 +667,11 @@ Result:
         #B: (#struct){ |(*(#struct){
           }, (#struct){
             a: (string){ string }
+            b: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            b: (int){ int }
           }) }
       }
     }
@@ -697,13 +681,43 @@ Result:
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
             b: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+            d: (string){ string }
           }) }
         #B: (#struct){ |(*(#struct){
           }, (#struct){
+            c: (int){ int }
+          }, (#struct){
+            d: (string){ string }
+          }, (#struct){
             a: (string){ string }
           }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
             b: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            b: (string){ string }
+            d: (string){ string }
           }) }
       }
       p2: (struct){
@@ -711,13 +725,43 @@ Result:
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
             b: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+            d: (string){ string }
           }) }
         #B: (#struct){ |(*(#struct){
           }, (#struct){
             a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            c: (int){ int }
+          }, (#struct){
+            d: (string){ string }
           }, (#struct){
             b: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            b: (string){ string }
+            d: (string){ string }
           }) }
       }
       p3: (struct){
@@ -725,13 +769,43 @@ Result:
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
-            b: (string){ string }
-          }) }
-        #B: (#struct){ |(*(#struct){
+            c: (int){ int }
           }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
             b: (string){ string }
           }, (#struct){
             a: (string){ string }
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            b: (string){ string }
+            d: (string){ string }
+          }) }
+        #B: (#struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            b: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            c: (int){ int }
+          }, (#struct){
+            d: (string){ string }
           }) }
       }
     }
@@ -752,66 +826,57 @@ Result:
       }
       #subtype: ((string|struct)){ |((string){ string }, (#struct){
           foo: (string){ string }
-        }, (#struct){
-          bar: ((string|struct)){ |((string){ string }, (#struct){
-              foo: (string){ string }
-            }) }
         }) }
     }
     t1: (struct){
-      #D: (#struct){ |((#struct){
-          b: (string){ string }
-        }, (#struct){
-          c: (#struct){
-            b: (string){ string }
-          }
-        }) }
+      #D: (#struct){
+        b: (string){ string }
+      }
       o: (#struct){
         b: (string){ "test" }
       }
     }
     t2: (struct){
-      o: (#struct){
-        b: (string){ "test" }
-      }
-      #D: (#struct){ |((#struct){
-          b: (string){ string }
+      o: (#struct){ |((#struct){
+          b: (string){ "test" }
         }, (#struct){
+          b: (string){ "test" }
           c: (#struct){
             b: (string){ string }
           }
         }) }
+      #D: (#struct){
+        b: (string){ string }
+      }
     }
     t3: (struct){
       #D: (#struct){ |((#struct){
           a: (null){ null }
         }, (#struct){
           b: (string){ string }
-        }, (#struct){
-          c: (#struct){ |((#struct){
-              a: (null){ null }
-            }, (#struct){
-              b: (string){ string }
-            }) }
         }) }
       o: (#struct){
         b: (string){ "test" }
       }
     }
     t4: (struct){
-      o: (#struct){
-        b: (string){ "test" }
-      }
-      #D: (#struct){ |((#struct){
+      o: (#struct){ |((#struct){
+          b: (string){ "test" }
           a: (null){ null }
         }, (#struct){
-          b: (string){ string }
+          b: (string){ "test" }
         }, (#struct){
+          b: (string){ "test" }
           c: (#struct){ |((#struct){
               a: (null){ null }
             }, (#struct){
               b: (string){ string }
             }) }
+        }) }
+      #D: (#struct){ |((#struct){
+          a: (null){ null }
+        }, (#struct){
+          b: (string){ string }
         }) }
     }
   }
@@ -848,14 +913,9 @@ Result:
     }
   }
   noHang: (struct){
-    #T: (#list){ |((#list){
-        0: (string){ "a" }
-        1: (list){
-          0: (string){ "d" }
-        }
-      }, (list){
-        0: (string){ "d" }
-      }) }
+    #T: (list){
+      0: (string){ "d" }
+    }
     x: (#list){ |((#list){
         0: (string){ "a" }
         1: (list){
@@ -874,116 +934,11 @@ Result:
       }) }
   }
   issue1940: (struct){
-    #T: (#list){ |((#list){
-        0: (string){ "a" }
-        1: (#list){ |((#list){
-            0: (string){ "b" }
-            1: (#list){ |((#list){
-                0: (string){ "c" }
-                1: (#list){
-                  0: (string){ "d" }
-                  1: (list){
-                  }
-                }
-              }, (#list){
-                0: (string){ "d" }
-                1: (list){
-                }
-              }) }
-          }, (#list){
-            0: (string){ "c" }
-            1: (#list){ |((#list){
-                0: (string){ "b" }
-                1: (#list){
-                  0: (string){ "d" }
-                  1: (list){
-                  }
-                }
-              }, (#list){
-                0: (string){ "d" }
-                1: (list){
-                }
-              }) }
-          }, (#list){
-            0: (string){ "d" }
-            1: (list){
-            }
-          }) }
-      }, (#list){
-        0: (string){ "b" }
-        1: (#list){ |((#list){
-            0: (string){ "a" }
-            1: (#list){ |((#list){
-                0: (string){ "c" }
-                1: (#list){
-                  0: (string){ "d" }
-                  1: (list){
-                  }
-                }
-              }, (#list){
-                0: (string){ "d" }
-                1: (list){
-                }
-              }) }
-          }, (#list){
-            0: (string){ "c" }
-            1: (#list){ |((#list){
-                0: (string){ "a" }
-                1: (#list){
-                  0: (string){ "d" }
-                  1: (list){
-                  }
-                }
-              }, (#list){
-                0: (string){ "d" }
-                1: (list){
-                }
-              }) }
-          }, (#list){
-            0: (string){ "d" }
-            1: (list){
-            }
-          }) }
-      }, (#list){
-        0: (string){ "c" }
-        1: (#list){ |((#list){
-            0: (string){ "a" }
-            1: (#list){ |((#list){
-                0: (string){ "b" }
-                1: (#list){
-                  0: (string){ "d" }
-                  1: (list){
-                  }
-                }
-              }, (#list){
-                0: (string){ "d" }
-                1: (list){
-                }
-              }) }
-          }, (#list){
-            0: (string){ "b" }
-            1: (#list){ |((#list){
-                0: (string){ "a" }
-                1: (#list){
-                  0: (string){ "d" }
-                  1: (list){
-                  }
-                }
-              }, (#list){
-                0: (string){ "d" }
-                1: (list){
-                }
-              }) }
-          }, (#list){
-            0: (string){ "d" }
-            1: (list){
-            }
-          }) }
-      }, (#list){
-        0: (string){ "d" }
-        1: (list){
-        }
-      }) }
+    #T: (#list){
+      0: (string){ "d" }
+      1: (list){
+      }
+    }
     #A: (#struct){
       type: (#list){ |((#list){
           0: (string){ "a" }
@@ -1105,12 +1060,117 @@ Result:
             1: (#list){ |((#list){
                 0: (string){ "b" }
                 1: (#list){ |((#list){
+                    0: (string){ "a" }
+                    1: (#list){ |((#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "c" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
+                  }, (#list){
                     0: (string){ "c" }
-                    1: (#list){
-                      0: (string){ "d" }
-                      1: (list){
-                      }
-                    }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
                   }, (#list){
                     0: (string){ "d" }
                     1: (list){
@@ -1119,12 +1179,117 @@ Result:
               }, (#list){
                 0: (string){ "c" }
                 1: (#list){ |((#list){
+                    0: (string){ "a" }
+                    1: (#list){ |((#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "c" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
+                  }, (#list){
                     0: (string){ "b" }
-                    1: (#list){
-                      0: (string){ "d" }
-                      1: (list){
-                      }
-                    }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
                   }, (#list){
                     0: (string){ "d" }
                     1: (list){
@@ -1140,12 +1305,117 @@ Result:
             1: (#list){ |((#list){
                 0: (string){ "a" }
                 1: (#list){ |((#list){
+                    0: (string){ "b" }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "c" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
+                  }, (#list){
                     0: (string){ "c" }
-                    1: (#list){
-                      0: (string){ "d" }
-                      1: (list){
-                      }
-                    }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
                   }, (#list){
                     0: (string){ "d" }
                     1: (list){
@@ -1155,11 +1425,116 @@ Result:
                 0: (string){ "c" }
                 1: (#list){ |((#list){
                     0: (string){ "a" }
-                    1: (#list){
-                      0: (string){ "d" }
-                      1: (list){
-                      }
-                    }
+                    1: (#list){ |((#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
+                  }, (#list){
+                    0: (string){ "b" }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "c" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
                   }, (#list){
                     0: (string){ "d" }
                     1: (list){
@@ -1176,11 +1551,116 @@ Result:
                 0: (string){ "a" }
                 1: (#list){ |((#list){
                     0: (string){ "b" }
-                    1: (#list){
-                      0: (string){ "d" }
-                      1: (list){
-                      }
-                    }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
+                  }, (#list){
+                    0: (string){ "c" }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
                   }, (#list){
                     0: (string){ "d" }
                     1: (list){
@@ -1190,11 +1670,116 @@ Result:
                 0: (string){ "b" }
                 1: (#list){ |((#list){
                     0: (string){ "a" }
-                    1: (#list){
-                      0: (string){ "d" }
-                      1: (list){
-                      }
-                    }
+                    1: (#list){ |((#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "c" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "c" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "c" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){ |((#list){
+                                0: (string){ "b" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "b" }
+                            1: (#list){ |((#list){
+                                0: (string){ "a" }
+                                1: (#list){
+                                  0: (string){ "d" }
+                                  1: (list){
+                                  }
+                                }
+                              }, (#list){
+                                0: (string){ "d" }
+                                1: (list){
+                                }
+                              }) }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
+                  }, (#list){
+                    0: (string){ "c" }
+                    1: (#list){ |((#list){
+                        0: (string){ "a" }
+                        1: (#list){ |((#list){
+                            0: (string){ "b" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "b" }
+                        1: (#list){ |((#list){
+                            0: (string){ "a" }
+                            1: (#list){
+                              0: (string){ "d" }
+                              1: (list){
+                              }
+                            }
+                          }, (#list){
+                            0: (string){ "d" }
+                            1: (list){
+                            }
+                          }) }
+                      }, (#list){
+                        0: (string){ "d" }
+                        1: (list){
+                        }
+                      }) }
                   }, (#list){
                     0: (string){ "d" }
                     1: (list){
@@ -1232,20 +1817,37 @@ Result:
           }
         }
         out: (struct){ |((struct){
-            minBar: (int){ 1 }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
               }
             }
+            nullFoo: (null){ null }
             minFoo: (int){ int }
           }, (struct){
-            minBar: (int){ 1 }
+            minBar: (int){ int }
             X: (#struct){
               bar: (#struct){
                 min: (int){ 1 }
               }
             }
+            nullFoo: (null){ null }
+          }, (struct){
+            X: (#struct){
+              bar: (#struct){
+                min: (int){ 1 }
+              }
+            }
+            nullBar: (null){ null }
+            minFoo: (int){ int }
+          }, (struct){
+            minBar: (int){ int }
+            X: (#struct){
+              bar: (#struct){
+                min: (int){ 1 }
+              }
+            }
+            nullBar: (null){ null }
           }) }
       }
       t2: (_|_){
@@ -1260,52 +1862,65 @@ Result:
             x: (int){ 1 }
           }
         }
-        spec: (struct){ |(*(#struct){
-            bar: (_|_){
-              // [eval] issue2209.simplified.t2.spec.bar: field not allowed:
-              //     ./issue2209full.cue:22:8
-              //     ./issue2209full.cue:21:8
-            }
-            foo: (#struct){
-            }
-          }, (#struct){
-            bar: (#struct){
-              x: (int){ 1 }
-            }
-          }) }
-        BAZ: (_|_){
-          // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
-          //     ./issue2209full.cue:24:17
+        spec: (struct){
+          bar: (struct){
+          }
         }
+        BAZ: (_){ _ }
       }
       t3: (struct){ |((struct){
           #A: (#struct){
             v: (int){ 1 }
           }
           BAZ: (_){ _ }
-          S: (struct){ |(*(#struct){
-              x: (_|_){
-                // [eval] issue2209.simplified.t3.S.x: field not allowed:
-                //     ./issue2209full.cue:36:5
-                //     ./issue2209full.cue:38:5
-              }
-              v: (int){ 1 }
-            }, (#struct){
-              x: (int){ 1 }
-              y: (int){ 1 }
-            }) }
+          S: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
           #B: (#struct){
             x: (int){ 1 }
             y: (int){ 1 }
           }
+          f1: (int){ int }
           f2: (int){ int }
         }, (struct){
           #A: (#struct){
             v: (int){ 1 }
           }
           BAZ: (_){ _ }
-          S: (struct){
+          S: (#struct){
             x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          #B: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          f1: (int){ int }
+          b2: (int){ int }
+        }, (struct){
+          #A: (#struct){
+            v: (int){ 1 }
+          }
+          BAZ: (_){ _ }
+          S: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          #B: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
+          }
+          b2: (int){ int }
+          f2: (int){ int }
+        }, (struct){
+          #A: (#struct){
+            v: (int){ 1 }
+          }
+          BAZ: (_){ _ }
+          S: (#struct){
+            x: (int){ 1 }
+            y: (int){ 1 }
           }
           #B: (#struct){
             x: (int){ 1 }
@@ -1316,12 +1931,19 @@ Result:
     }
     full: (struct){
       Foo: (#struct){
-        spec: (#struct){
-          foo: (#struct){
-            min: (int){ |(*(int){ 10 }, (int){ int }) }
-            max: (int){ |(*(int){ 20 }, (int){ int }) }
-          }
-        }
+        spec: (#struct){ |(*(#struct){
+            foo: (#struct){
+              min: (int){ |(*(int){ 10 }, (int){ int }) }
+              max: (int){ |(*(int){ 20 }, (int){ int }) }
+            }
+          }, (#struct){
+            foo: (struct){
+            }
+            bar: (#struct){
+              min: (int){ |(*(int){ 30 }, (int){ int }) }
+              max: (int){ |(*(int){ 40 }, (int){ int }) }
+            }
+          }) }
         resource: (#struct){
           _X: (#struct){
             spec: (#struct){
@@ -1332,15 +1954,15 @@ Result:
             }
           }
           spec: (#struct){ |(*(#struct){
-              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
               minBar?: (null){ null }
               maxBar?: (null){ null }
               hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
               fuga?: (null){ null }
             }, (#struct){
-              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
               minBar?: (null){ null }
               maxBar?: (null){ null }
               hoge?: (null){ null }
@@ -1367,15 +1989,15 @@ Result:
           spec: (#struct){ |(*(#struct){
               minFoo?: (null){ null }
               maxFoo?: (null){ null }
-              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
+              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
               hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
               fuga?: (null){ null }
             }, (#struct){
               minFoo?: (null){ null }
               maxFoo?: (null){ null }
-              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
+              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
               hoge?: (null){ null }
               fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
             }) }
@@ -1408,15 +2030,15 @@ Result:
               }) }
           }
           spec: (#struct){ |(*(#struct){
-              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
               minBar?: (null){ null }
               maxBar?: (null){ null }
               hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
               fuga?: (null){ null }
             }, (#struct){
-              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
               minBar?: (null){ null }
               maxBar?: (null){ null }
               hoge?: (null){ null }
@@ -1449,36 +2071,64 @@ Result:
       }
       _Thing: (#struct){
         _X: (_){ _ }
-        spec: (#struct){ |((#struct){
-            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+        spec: (#struct){ |(*(#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
             minBar?: (null){ null }
             maxBar?: (null){ null }
             hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, *(#struct){
+            minFoo?: (null){ null }
+            maxFoo?: (null){ null }
+            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, (#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: (null){ null }
             fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
           }, (#struct){
             minFoo?: (null){ null }
             maxFoo?: (null){ null }
-            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+            hoge?: (null){ null }
             fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
           }) }
       }
       #Constrained: (#struct){
-        spec: (#struct){ |((#struct){
-            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
+        spec: (#struct){ |(*(#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
             minBar?: (null){ null }
             maxBar?: (null){ null }
             hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, *(#struct){
+            minFoo?: (null){ null }
+            maxFoo?: (null){ null }
+            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            fuga?: (null){ null }
+          }, (#struct){
+            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
+            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
+            minBar?: (null){ null }
+            maxBar?: (null){ null }
+            hoge?: (null){ null }
             fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
           }, (#struct){
             minFoo?: (null){ null }
             maxFoo?: (null){ null }
-            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
-            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
+            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
+            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
+            hoge?: (null){ null }
             fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
           }) }
       }
@@ -1526,10 +2176,7 @@ Result:
         }
       }
       form1040: (#list){
-        0: (_|_){
-          // [incomplete] issue2246.full.form1040.0: unresolved disjunction {fooID:"00-0000001",common:3} | {fooID:"00-0000001",barID:string,common:3} (type struct):
-          //     ./issue2246.cue:38:29
-        }
+        0: (int){ 3 }
       }
       #K1: (#struct){
         #_base: (#struct){
@@ -1581,6 +2228,11 @@ Result:
       }
       #Metric: (#struct){ |((#struct){
           id: (string){ string }
+          avg: (number){ number }
+        }, (#struct){
+          id: (string){ string }
+        }, (#struct){
+          avg: (number){ number }
         }, (#struct){
         }) }
       #IDSource: (#struct){
@@ -1598,37 +2250,42 @@ Result:
           }, (#struct){
             id: (string){ "foo" }
             avg: (int){ 60 }
+            value: (number){ number }
+          }, (#struct){
+            id: (string){ "foo" }
+            avg: (int){ 60 }
             uri: (string){ string }
-          }) }
-        1: (#struct){ |((#struct){
-            id: (string){ "bar" }
-            value: (int){ 80 }
           }, (#struct){
-            id: (string){ "bar" }
-            value: (int){ 80 }
+            id: (string){ "foo" }
+            avg: (int){ 60 }
             uri: (string){ string }
+            value: (number){ number }
           }) }
-        2: (#struct){ |((#struct){
-            uri: (string){ "baz" }
-            avg: (int){ 70 }
-            id: (string){ string }
-          }, (#struct){
-            uri: (string){ "baz" }
-            avg: (int){ 70 }
-          }) }
-        3: (#struct){ |((#struct){
-            uri: (string){ "qux" }
-            value: (int){ 90 }
-            id: (string){ string }
-          }, (#struct){
-            uri: (string){ "qux" }
-            value: (int){ 90 }
-          }) }
+        1: (#struct){
+          id: (string){ "bar" }
+          value: (int){ 80 }
+        }
+        2: (#struct){
+          uri: (string){ "baz" }
+          avg: (int){ 70 }
+        }
+        3: (#struct){
+          uri: (string){ "qux" }
+          value: (int){ 90 }
+        }
       }
       #Metric: (#struct){ |((#struct){
           id: (string){ string }
+          avg: (number){ number }
+        }, (#struct){
+          id: (string){ string }
+          value: (number){ number }
         }, (#struct){
           uri: (string){ string }
+          avg: (number){ number }
+        }, (#struct){
+          uri: (string){ string }
+          value: (number){ number }
         }) }
       #Source: (#struct){ |((#struct){
           id: (string){ string }
@@ -1655,12 +2312,34 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  4
+-Freed:  2339
+-Reused: 2323
+-Allocs: 20
+-Retain: 115
++Leaks:  335635
++Freed:  148996
++Reused: 148996
++Allocs: 335635
++Retain: 0
+ 
+-Unifications: 1260
+-Conjuncts:    3417
+-Disjuncts:    2454
++Unifications: 180683
++Conjuncts:    3377303
++Disjuncts:    174145
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,32 +1,7 @@
- Errors:
+@@ -1,36 +1,4 @@
+-Errors:
 -issue2209.full.Bar.resource.spec: 6 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: 2 errors in empty disjunction:
 -issue2209.full.Bar.resource.spec.minBar: conflicting values null and int (mismatched types null and int):
@@ -1689,175 +2368,37 @@ diff old new
 -    ./issue2209full.cue:35:9
 -issue2209.full.Bar.resource.spec.minBar: undefined field: min:
 -    ./issue2209full.cue:77:25
-+preserveClosedness.small.p1.#A.a: field not allowed:
-+    ./in.cue:145:3
-+    ./in.cue:142:12
- 
- Result:
- (_|_){
-@@ -68,19 +43,13 @@
-     resolved: (struct){
-       n1: (struct){
-         x: ((null|struct)){ |((struct){
--            a: (struct){
--              c: (int){ 1 }
--              d: (int){ 1 }
--            }
--          }, (null){ null }) }
--      }
--      n2: (struct){
--        x: ((null|struct)){ |((struct){
--            a: (struct){
--              b: (struct){
--                c: (int){ 1 }
--                d: (int){ 1 }
--              }
-+            a: (struct){ struct.MinFields(2) }
-+          }, (null){ null }) }
-+      }
-+      n2: (struct){
-+        x: ((null|struct)){ |((struct){
-+            a: (struct){
-+              b: (struct){ struct.MinFields(2) }
-             }
-           }, (null){ null }) }
-       }
-@@ -88,18 +57,34 @@
-     eliminated: (struct){
-       n1: (struct){
-         p1: (struct){
--          x: (null){ null }
--        }
--        p2: (struct){
--          x: (null){ null }
--        }
--      }
--      n2: (struct){
--        p1: (struct){
--          x: (null){ null }
--        }
--        p2: (struct){
--          x: (null){ null }
-+          x: ((null|struct)){ |((struct){
-+              a: (struct){ struct.MaxFields(1) }
-+            }, (null){ null }) }
-+        }
-+        p2: (struct){
-+          x: ((null|struct)){ |((struct){
-+              a: (struct){
-+                c: (int){ 1 }
-+              }
-+            }, (null){ null }) }
-+        }
-+      }
-+      n2: (struct){
-+        p1: (struct){
-+          x: ((null|struct)){ |((struct){
-+              a: (struct){
-+                b: (struct){ struct.MaxFields(1) }
-+              }
-+            }, (null){ null }) }
-+        }
-+        p2: (struct){
-+          x: ((null|struct)){ |((struct){
-+              a: (struct){
-+                b: (struct){
-+                  c: (int){ 1 }
-+                }
-+              }
-+            }, (null){ null }) }
-         }
-       }
-     }
-@@ -107,34 +92,30 @@
-       a: (struct){
-         n1: (struct){
-           p1: (struct){
--            x: (null){ null }
--          }
--          p2: (struct){
--            x: (null){ null }
--          }
--        }
--        n2: (struct){
--          p1: (struct){
--            x: ((null|struct)){ |((struct){
--                a: (struct){
--                  b: (_|_){
--                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
--                    //     ./in.cue:96:15
--                    //     ./in.cue:96:32
+-
+-Result:
+-(_|_){
+-  // [eval]
++(struct){
+   disambiguateClosed: (struct){
+     b: (#struct){ |((#struct){
+         x: (bool){ true }
+@@ -121,7 +89,6 @@
+                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                     //     ./in.cue:96:15
+                     //     ./in.cue:96:32
 -                    //     ./in.cue:97:12
--                    c: (int){ 1 }
--                  }
--                }
--              }, (null){ null }) }
--          }
--          p2: (struct){
--            x: ((null|struct)){ |((struct){
--                a: (struct){
--                  b: (_|_){
--                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
--                    //     ./in.cue:102:15
--                    //     ./in.cue:101:12
--                    //     ./in.cue:102:32
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){ struct.MinFields(2) }
-+              }, (null){ null }) }
-+          }
-+          p2: (struct){
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){
-+                  c: (int){ 1 }
-+                }
-+              }, (null){ null }) }
-+          }
-+        }
-+        n2: (struct){
-+          p1: (struct){
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){
-+                  b: (struct){ struct.MinFields(2) }
-+                }
-+              }, (null){ null }) }
-+          }
-+          p2: (struct){
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){
-+                  b: (struct){
                      c: (int){ 1 }
                    }
                  }
-@@ -145,75 +126,68 @@
-       b: (struct){
-         n1: (struct){
-           p1: (struct){
--            x: (null){ null }
--          }
--          p2: (struct){
--            x: (null){ null }
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){ struct.MinFields(3) }
-+              }, (null){ null }) }
-+          }
-+          p2: (struct){
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){
-+                  c: (int){ 1 }
-+                }
-+              }, (null){ null }) }
-           }
-           p3: (struct){
--            x: (null){ null }
--          }
--        }
--        n2: (struct){
--          p1: (struct){
--            x: ((null|struct)){ |((struct){
--                a: (struct){
--                  b: (_|_){
+@@ -133,7 +100,6 @@
+                   b: (_|_){
+                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                     //     ./in.cue:102:15
+-                    //     ./in.cue:101:12
+                     //     ./in.cue:102:32
+                     c: (int){ 1 }
+                   }
+@@ -159,16 +125,8 @@
+             x: ((null|struct)){ |((struct){
+                 a: (struct){
+                   b: (_|_){
 -                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1 & 1 & 1,d:1 & 1 & 1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
--                    //     ./in.cue:138:15
++                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                     //     ./in.cue:138:15
 -                    //     ./in.cue:124:15
 -                    //     ./in.cue:125:12
 -                    //     ./in.cue:126:12
@@ -1866,112 +2407,13 @@ diff old new
 -                    //     ./in.cue:132:12
 -                    //     ./in.cue:136:12
 -                    //     ./in.cue:137:12
--                    //     ./in.cue:138:32
--                    c: (int){ 1 }
--                    d: (int){ 1 }
--                  }
--                }
--              }, (null){ null }) }
--          }
--        }
--      }
--    }
--  }
--  preserveClosedness: (struct){
--    small: (struct){
--      p1: (struct){
--        #A: (#struct){ |(*(#struct){
--            a: (string){ string }
--          }, (#struct){
--            a: (string){ string }
--            b: (int){ int }
--          }) }
--        #B: (#struct){ |(*(#struct){
--          }, (#struct){
--            b: (int){ int }
--          }, (#struct){
--            a: (string){ string }
--          }, (#struct){
--            a: (string){ string }
--            b: (int){ int }
--          }) }
--      }
--      p2: (struct){
--        #A: (#struct){ |(*(#struct){
--            a: (string){ string }
--          }, (#struct){
--            a: (string){ string }
--            b: (int){ int }
--          }) }
--        #B: (#struct){ |(*(#struct){
--          }, (#struct){
--            a: (string){ string }
--            b: (int){ int }
--          }, (#struct){
--            a: (string){ string }
--          }, (#struct){
--            b: (int){ int }
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){
-+                  c: (int){ 1 }
-+                }
-+              }, (null){ null }) }
-+          }
-+        }
-+        n2: (struct){
-+          p1: (struct){
-+            x: ((null|struct)){ |((struct){
-+                a: (struct){
-+                  b: (struct){ struct.MinFields(3) }
-+                }
-+              }, (null){ null }) }
-+          }
-+        }
-+      }
-+    }
-+  }
-+  preserveClosedness: (_|_){
-+    // [eval]
-+    small: (_|_){
-+      // [eval]
-+      p1: (_|_){
-+        // [eval]
-+        #A: (_|_){
-+          // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
-+          //     ./in.cue:145:3
-+          //     ./in.cue:142:12
-+          a: (_|_){
-+            // [eval] preserveClosedness.small.p1.#A.a: field not allowed:
-+            //     ./in.cue:145:3
-+            //     ./in.cue:142:12
-+          }
-+        }
-+        #B: (#struct){ |(*(#struct){
-+          }, (#struct){
-+            a: (string){ string }
-+          }) }
-+      }
-+      p2: (struct){
-+        #A: (#struct){ |(*(#struct){
-+            a: (string){ string }
-+          }, (#struct){
-+            a: (string){ string }
-+            b: (int){ int }
-+          }) }
-+        #B: (#struct){ |(*(#struct){
-+          }, (#struct){
-+            a: (string){ string }
-           }) }
-       }
-     }
-@@ -223,65 +197,27 @@
-             a: (string){ string }
+                     //     ./in.cue:138:32
+                     c: (int){ 1 }
+                     d: (int){ 1 }
+@@ -227,38 +185,60 @@
            }, (#struct){
              a: (string){ string }
--            c: (int){ int }
--          }, (#struct){
--            a: (string){ string }
--            d: (string){ string }
+             d: (string){ string }
 -          }) }
 -        #B: (#struct){ |(*(#struct){
 -          }, (#struct){
@@ -2004,36 +2446,39 @@ diff old new
 -            c: (int){ int }
 -          }, (#struct){
 -            a: (string){ string }
--            d: (string){ string }
--          }) }
--        #B: (#struct){ |(*(#struct){
--          }, (#struct){
--            a: (string){ string }
--            c: (int){ int }
--          }, (#struct){
--            a: (string){ string }
--            d: (string){ string }
--          }, (#struct){
--            a: (string){ string }
--          }, (#struct){
--            c: (int){ int }
--          }, (#struct){
--            d: (string){ string }
--          }, (#struct){
--            b: (string){ string }
--          }, (#struct){
--            b: (string){ string }
--            c: (int){ int }
--          }, (#struct){
--            b: (string){ string }
--            d: (string){ string }
++          }, (#struct){
++            a: (string){ string }
 +            b: (string){ string }
++          }, (#struct){
++            a: (string){ string }
++            b: (string){ string }
++            c: (int){ int }
++          }, (#struct){
++            a: (string){ string }
++            b: (string){ string }
++            d: (string){ string }
 +          }) }
 +        #B: (#struct){ |(*(#struct){
 +          }, (#struct){
++            c: (int){ int }
++          }, (#struct){
++            d: (string){ string }
++          }, (#struct){
 +            a: (string){ string }
 +          }, (#struct){
++            a: (string){ string }
++            c: (int){ int }
++          }, (#struct){
++            a: (string){ string }
++            d: (string){ string }
++          }, (#struct){
 +            b: (string){ string }
++          }, (#struct){
++            b: (string){ string }
++            c: (int){ int }
++          }, (#struct){
++            b: (string){ string }
++            d: (string){ string }
 +          }) }
 +      }
 +      p2: (struct){
@@ -2041,161 +2486,92 @@ diff old new
 +            a: (string){ string }
 +          }, (#struct){
 +            a: (string){ string }
-+            b: (string){ string }
-+          }) }
-+        #B: (#struct){ |(*(#struct){
++            c: (int){ int }
 +          }, (#struct){
 +            a: (string){ string }
++            d: (string){ string }
 +          }, (#struct){
++            a: (string){ string }
 +            b: (string){ string }
++          }, (#struct){
++            a: (string){ string }
++            b: (string){ string }
++            c: (int){ int }
++          }, (#struct){
++            a: (string){ string }
++            b: (string){ string }
+             d: (string){ string }
            }) }
-       }
-       p3: (struct){
-@@ -289,32 +225,13 @@
-             a: (string){ string }
+         #B: (#struct){ |(*(#struct){
+@@ -293,6 +273,17 @@
            }, (#struct){
              a: (string){ string }
--            c: (int){ int }
--          }, (#struct){
--            a: (string){ string }
--            d: (string){ string }
--          }) }
--        #B: (#struct){ |(*(#struct){
--          }, (#struct){
--            a: (string){ string }
--            c: (int){ int }
--          }, (#struct){
--            a: (string){ string }
--            d: (string){ string }
--          }, (#struct){
--            b: (string){ string }
--          }, (#struct){
--            b: (string){ string }
--            c: (int){ int }
--          }, (#struct){
--            b: (string){ string }
--            d: (string){ string }
--          }, (#struct){
--            a: (string){ string }
--          }, (#struct){
--            c: (int){ int }
--          }, (#struct){
--            d: (string){ string }
-+            b: (string){ string }
-+          }) }
-+        #B: (#struct){ |(*(#struct){
+             d: (string){ string }
 +          }, (#struct){
++            a: (string){ string }
 +            b: (string){ string }
 +          }, (#struct){
 +            a: (string){ string }
++            b: (string){ string }
++            c: (int){ int }
++          }, (#struct){
++            a: (string){ string }
++            b: (string){ string }
++            d: (string){ string }
            }) }
+         #B: (#struct){ |(*(#struct){
+           }, (#struct){
+@@ -346,9 +337,14 @@
        }
      }
-@@ -335,29 +252,47 @@
+     t2: (struct){
+-      o: (#struct){
+-        b: (string){ "test" }
+-      }
++      o: (#struct){ |((#struct){
++          b: (string){ "test" }
++        }, (#struct){
++          b: (string){ "test" }
++          c: (#struct){
++            b: (string){ string }
++          }
++        }) }
+       #D: (#struct){
+         b: (string){ string }
        }
-       #subtype: ((string|struct)){ |((string){ string }, (#struct){
-           foo: (string){ string }
--        }) }
--    }
--    t1: (struct){
--      #D: (#struct){
--        b: (string){ string }
--      }
+@@ -364,9 +360,19 @@
+       }
+     }
+     t4: (struct){
 -      o: (#struct){
 -        b: (string){ "test" }
 -      }
--    }
--    t2: (struct){
--      o: (#struct){
--        b: (string){ "test" }
--      }
--      #D: (#struct){
--        b: (string){ string }
--      }
--    }
--    t3: (struct){
--      #D: (#struct){ |((#struct){
--          a: (null){ null }
--        }, (#struct){
--          b: (string){ string }
-+        }, (#struct){
-+          bar: ((string|struct)){ |((string){ string }, (#struct){
-+              foo: (string){ string }
-+            }) }
-+        }) }
-+    }
-+    t1: (struct){
-+      #D: (#struct){ |((#struct){
-+          b: (string){ string }
-+        }, (#struct){
-+          c: (#struct){
-+            b: (string){ string }
-+          }
-+        }) }
-+      o: (#struct){
-+        b: (string){ "test" }
-+      }
-+    }
-+    t2: (struct){
-+      o: (#struct){
-+        b: (string){ "test" }
-+      }
-+      #D: (#struct){ |((#struct){
-+          b: (string){ string }
-+        }, (#struct){
-+          c: (#struct){
-+            b: (string){ string }
-+          }
-+        }) }
-+    }
-+    t3: (struct){
-+      #D: (#struct){ |((#struct){
++      o: (#struct){ |((#struct){
++          b: (string){ "test" }
 +          a: (null){ null }
 +        }, (#struct){
-+          b: (string){ string }
++          b: (string){ "test" }
 +        }, (#struct){
++          b: (string){ "test" }
 +          c: (#struct){ |((#struct){
 +              a: (null){ null }
 +            }, (#struct){
 +              b: (string){ string }
 +            }) }
-         }) }
-       o: (#struct){
-         b: (string){ "test" }
-@@ -371,6 +306,12 @@
++        }) }
+       #D: (#struct){ |((#struct){
            a: (null){ null }
          }, (#struct){
-           b: (string){ string }
-+        }, (#struct){
-+          c: (#struct){ |((#struct){
-+              a: (null){ null }
-+            }, (#struct){
-+              b: (string){ string }
-+            }) }
-         }) }
+@@ -410,12 +416,22 @@
+     #T: (list){
+       0: (string){ "d" }
      }
-   }
-@@ -407,45 +348,373 @@
-     }
-   }
-   noHang: (struct){
--    #T: (list){
--      0: (string){ "d" }
--    }
 -    x: (list){
 -      0: (string){ "d" }
 -    }
 -    #X: (list){
 -      0: (string){ "d" }
 -    }
-+    #T: (#list){ |((#list){
-+        0: (string){ "a" }
-+        1: (list){
-+          0: (string){ "d" }
-+        }
-+      }, (list){
-+        0: (string){ "d" }
-+      }) }
 +    x: (#list){ |((#list){
 +        0: (string){ "a" }
 +        1: (list){
@@ -2214,121 +2590,10 @@ diff old new
 +      }) }
    }
    issue1940: (struct){
--    #T: (#list){
--      0: (string){ "d" }
--      1: (list){
--      }
--    }
-+    #T: (#list){ |((#list){
-+        0: (string){ "a" }
-+        1: (#list){ |((#list){
-+            0: (string){ "b" }
-+            1: (#list){ |((#list){
-+                0: (string){ "c" }
-+                1: (#list){
-+                  0: (string){ "d" }
-+                  1: (list){
-+                  }
-+                }
-+              }, (#list){
-+                0: (string){ "d" }
-+                1: (list){
-+                }
-+              }) }
-+          }, (#list){
-+            0: (string){ "c" }
-+            1: (#list){ |((#list){
-+                0: (string){ "b" }
-+                1: (#list){
-+                  0: (string){ "d" }
-+                  1: (list){
-+                  }
-+                }
-+              }, (#list){
-+                0: (string){ "d" }
-+                1: (list){
-+                }
-+              }) }
-+          }, (#list){
-+            0: (string){ "d" }
-+            1: (list){
-+            }
-+          }) }
-+      }, (#list){
-+        0: (string){ "b" }
-+        1: (#list){ |((#list){
-+            0: (string){ "a" }
-+            1: (#list){ |((#list){
-+                0: (string){ "c" }
-+                1: (#list){
-+                  0: (string){ "d" }
-+                  1: (list){
-+                  }
-+                }
-+              }, (#list){
-+                0: (string){ "d" }
-+                1: (list){
-+                }
-+              }) }
-+          }, (#list){
-+            0: (string){ "c" }
-+            1: (#list){ |((#list){
-+                0: (string){ "a" }
-+                1: (#list){
-+                  0: (string){ "d" }
-+                  1: (list){
-+                  }
-+                }
-+              }, (#list){
-+                0: (string){ "d" }
-+                1: (list){
-+                }
-+              }) }
-+          }, (#list){
-+            0: (string){ "d" }
-+            1: (list){
-+            }
-+          }) }
-+      }, (#list){
-+        0: (string){ "c" }
-+        1: (#list){ |((#list){
-+            0: (string){ "a" }
-+            1: (#list){ |((#list){
-+                0: (string){ "b" }
-+                1: (#list){
-+                  0: (string){ "d" }
-+                  1: (list){
-+                  }
-+                }
-+              }, (#list){
-+                0: (string){ "d" }
-+                1: (list){
-+                }
-+              }) }
-+          }, (#list){
-+            0: (string){ "b" }
-+            1: (#list){ |((#list){
-+                0: (string){ "a" }
-+                1: (#list){
-+                  0: (string){ "d" }
-+                  1: (list){
-+                  }
-+                }
-+              }, (#list){
-+                0: (string){ "d" }
-+                1: (list){
-+                }
-+              }) }
-+          }, (#list){
-+            0: (string){ "d" }
-+            1: (list){
-+            }
-+          }) }
-+      }, (#list){
-+        0: (string){ "d" }
-+        1: (list){
-+        }
-+      }) }
+     #T: (#list){
+@@ -424,28 +440,866 @@
+       }
+     }
      #A: (#struct){
 -      type: (#list){
 -        0: (string){ "d" }
@@ -2467,12 +2732,117 @@ diff old new
 +            1: (#list){ |((#list){
 +                0: (string){ "b" }
 +                1: (#list){ |((#list){
++                    0: (string){ "a" }
++                    1: (#list){ |((#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "c" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
++                  }, (#list){
 +                    0: (string){ "c" }
-+                    1: (#list){
-+                      0: (string){ "d" }
-+                      1: (list){
-+                      }
-+                    }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
 +                  }, (#list){
 +                    0: (string){ "d" }
 +                    1: (list){
@@ -2481,12 +2851,117 @@ diff old new
 +              }, (#list){
 +                0: (string){ "c" }
 +                1: (#list){ |((#list){
++                    0: (string){ "a" }
++                    1: (#list){ |((#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "c" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
++                  }, (#list){
 +                    0: (string){ "b" }
-+                    1: (#list){
-+                      0: (string){ "d" }
-+                      1: (list){
-+                      }
-+                    }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
 +                  }, (#list){
 +                    0: (string){ "d" }
 +                    1: (list){
@@ -2502,12 +2977,117 @@ diff old new
 +            1: (#list){ |((#list){
 +                0: (string){ "a" }
 +                1: (#list){ |((#list){
++                    0: (string){ "b" }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "c" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
++                  }, (#list){
 +                    0: (string){ "c" }
-+                    1: (#list){
-+                      0: (string){ "d" }
-+                      1: (list){
-+                      }
-+                    }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
 +                  }, (#list){
 +                    0: (string){ "d" }
 +                    1: (list){
@@ -2517,11 +3097,116 @@ diff old new
 +                0: (string){ "c" }
 +                1: (#list){ |((#list){
 +                    0: (string){ "a" }
-+                    1: (#list){
-+                      0: (string){ "d" }
-+                      1: (list){
-+                      }
-+                    }
++                    1: (#list){ |((#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
++                  }, (#list){
++                    0: (string){ "b" }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "c" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
 +                  }, (#list){
 +                    0: (string){ "d" }
 +                    1: (list){
@@ -2538,11 +3223,116 @@ diff old new
 +                0: (string){ "a" }
 +                1: (#list){ |((#list){
 +                    0: (string){ "b" }
-+                    1: (#list){
-+                      0: (string){ "d" }
-+                      1: (list){
-+                      }
-+                    }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
++                  }, (#list){
++                    0: (string){ "c" }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
 +                  }, (#list){
 +                    0: (string){ "d" }
 +                    1: (list){
@@ -2552,11 +3342,116 @@ diff old new
 +                0: (string){ "b" }
 +                1: (#list){ |((#list){
 +                    0: (string){ "a" }
-+                    1: (#list){
-+                      0: (string){ "d" }
-+                      1: (list){
-+                      }
-+                    }
++                    1: (#list){ |((#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "c" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "c" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "c" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){ |((#list){
++                                0: (string){ "b" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "b" }
++                            1: (#list){ |((#list){
++                                0: (string){ "a" }
++                                1: (#list){
++                                  0: (string){ "d" }
++                                  1: (list){
++                                  }
++                                }
++                              }, (#list){
++                                0: (string){ "d" }
++                                1: (list){
++                                }
++                              }) }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
++                  }, (#list){
++                    0: (string){ "c" }
++                    1: (#list){ |((#list){
++                        0: (string){ "a" }
++                        1: (#list){ |((#list){
++                            0: (string){ "b" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "b" }
++                        1: (#list){ |((#list){
++                            0: (string){ "a" }
++                            1: (#list){
++                              0: (string){ "d" }
++                              1: (list){
++                              }
++                            }
++                          }, (#list){
++                            0: (string){ "d" }
++                            1: (list){
++                            }
++                          }) }
++                      }, (#list){
++                        0: (string){ "d" }
++                        1: (list){
++                        }
++                      }) }
 +                  }, (#list){
 +                    0: (string){ "d" }
 +                    1: (list){
@@ -2580,76 +3475,24 @@ diff old new
        t1: (struct){
          #SpecFoo: (#struct){
            foo: (#struct){
-@@ -463,37 +732,20 @@
-           }
-         }
-         out: (struct){ |((struct){
--            X: (#struct){
--              bar: (#struct){
--                min: (int){ 1 }
--              }
--            }
--            nullFoo: (null){ null }
--            minFoo: (int){ int }
--          }, (struct){
--            minBar: (int){ int }
--            X: (#struct){
--              bar: (#struct){
--                min: (int){ 1 }
--              }
--            }
--            nullFoo: (null){ null }
--          }, (struct){
--            X: (#struct){
--              bar: (#struct){
--                min: (int){ 1 }
--              }
--            }
--            nullBar: (null){ null }
--            minFoo: (int){ int }
--          }, (struct){
--            minBar: (int){ int }
--            X: (#struct){
--              bar: (#struct){
--                min: (int){ 1 }
--              }
--            }
--            nullBar: (null){ null }
-+            minBar: (int){ 1 }
-+            X: (#struct){
-+              bar: (#struct){
-+                min: (int){ 1 }
-+              }
-+            }
-+            minFoo: (int){ int }
-+          }, (struct){
-+            minBar: (int){ 1 }
-+            X: (#struct){
-+              bar: (#struct){
-+                min: (int){ 1 }
-+              }
-+            }
-           }) }
-       }
-       t2: (_|_){
-@@ -508,8 +760,11 @@
+@@ -508,185 +1362,145 @@
              x: (int){ 1 }
            }
          }
 -        spec: (#struct){ |(*(#struct){
 -            bar: (struct){
-+        spec: (struct){ |(*(#struct){
-+            bar: (_|_){
-+              // [eval] issue2209.simplified.t2.spec.bar: field not allowed:
-+              //     ./issue2209full.cue:22:8
-+              //     ./issue2209full.cue:21:8
-             }
-             foo: (#struct){
-             }
-@@ -522,34 +777,44 @@
-           // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
-           //     ./issue2209full.cue:24:17
-         }
+-            }
+-            foo: (#struct){
+-            }
+-          }, (#struct){
+-            bar: (#struct){
+-              x: (int){ 1 }
+-            }
+-          }) }
+-        BAZ: (_|_){
+-          // [incomplete] issue2209.simplified.t2.BAZ: undefined field: x:
+-          //     ./issue2209full.cue:24:17
+-        }
 -        b2: (int){ int }
 -      }
 -      t3: (_|_){
@@ -2678,35 +3521,65 @@ diff old new
 -    }
 -    full: (_|_){
 -      // [eval]
++        spec: (struct){
++          bar: (struct){
++          }
++        }
++        BAZ: (_){ _ }
 +      }
 +      t3: (struct){ |((struct){
 +          #A: (#struct){
 +            v: (int){ 1 }
 +          }
 +          BAZ: (_){ _ }
-+          S: (struct){ |(*(#struct){
-+              x: (_|_){
-+                // [eval] issue2209.simplified.t3.S.x: field not allowed:
-+                //     ./issue2209full.cue:36:5
-+                //     ./issue2209full.cue:38:5
-+              }
-+              v: (int){ 1 }
-+            }, (#struct){
-+              x: (int){ 1 }
-+              y: (int){ 1 }
-+            }) }
++          S: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
 +          #B: (#struct){
 +            x: (int){ 1 }
 +            y: (int){ 1 }
 +          }
++          f1: (int){ int }
 +          f2: (int){ int }
 +        }, (struct){
 +          #A: (#struct){
 +            v: (int){ 1 }
 +          }
 +          BAZ: (_){ _ }
-+          S: (struct){
++          S: (#struct){
 +            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          #B: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          f1: (int){ int }
++          b2: (int){ int }
++        }, (struct){
++          #A: (#struct){
++            v: (int){ 1 }
++          }
++          BAZ: (_){ _ }
++          S: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          #B: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
++          }
++          b2: (int){ int }
++          f2: (int){ int }
++        }, (struct){
++          #A: (#struct){
++            v: (int){ 1 }
++          }
++          BAZ: (_){ _ }
++          S: (#struct){
++            x: (int){ 1 }
++            y: (int){ 1 }
 +          }
 +          #B: (#struct){
 +            x: (int){ 1 }
@@ -2717,12 +3590,13 @@ diff old new
 +    }
 +    full: (struct){
        Foo: (#struct){
-         spec: (#struct){
-           foo: (#struct){
-@@ -558,135 +823,62 @@
-           }
-         }
-         resource: (#struct){
+-        spec: (#struct){
+-          foo: (#struct){
+-            min: (int){ |(*(int){ 10 }, (int){ int }) }
+-            max: (int){ |(*(int){ 20 }, (int){ int }) }
+-          }
+-        }
+-        resource: (#struct){
 -          spec: (#struct){ |(*(#struct){
 -              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
 -              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
@@ -2852,6 +3726,20 @@ diff old new
 -                }
 -              }) }
 -          }
++        spec: (#struct){ |(*(#struct){
++            foo: (#struct){
++              min: (int){ |(*(int){ 10 }, (int){ int }) }
++              max: (int){ |(*(int){ 20 }, (int){ int }) }
++            }
++          }, (#struct){
++            foo: (struct){
++            }
++            bar: (#struct){
++              min: (int){ |(*(int){ 30 }, (int){ int }) }
++              max: (int){ |(*(int){ 40 }, (int){ int }) }
++            }
++          }) }
++        resource: (#struct){
 +          _X: (#struct){
 +            spec: (#struct){
 +              foo: (#struct){
@@ -2861,15 +3749,15 @@ diff old new
 +            }
 +          }
 +          spec: (#struct){ |(*(#struct){
-+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
 +              minBar?: (null){ null }
 +              maxBar?: (null){ null }
 +              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
 +              fuga?: (null){ null }
 +            }, (#struct){
-+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
 +              minBar?: (null){ null }
 +              maxBar?: (null){ null }
 +              hoge?: (null){ null }
@@ -2896,22 +3784,22 @@ diff old new
 +          spec: (#struct){ |(*(#struct){
 +              minFoo?: (null){ null }
 +              maxFoo?: (null){ null }
-+              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-+              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
++              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
 +              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
 +              fuga?: (null){ null }
 +            }, (#struct){
 +              minFoo?: (null){ null }
 +              maxFoo?: (null){ null }
-+              minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-+              maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
++              minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++              maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
 +              hoge?: (null){ null }
 +              fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
 +            }) }
          }
        }
        #Abstract: (#struct){
-@@ -702,34 +894,34 @@
+@@ -702,34 +1516,34 @@
              }
            }) }
          resource: (#struct){
@@ -2957,15 +3845,15 @@ diff old new
 +              }) }
 +          }
 +          spec: (#struct){ |(*(#struct){
-+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
 +              minBar?: (null){ null }
 +              maxBar?: (null){ null }
 +              hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
 +              fuga?: (null){ null }
 +            }, (#struct){
-+              minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-+              maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++              minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++              maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
 +              minBar?: (null){ null }
 +              maxBar?: (null){ null }
 +              hoge?: (null){ null }
@@ -2974,7 +3862,7 @@ diff old new
          }
        }
        _#Spec: (#struct){ |(*(#struct){
-@@ -756,65 +948,37 @@
+@@ -756,36 +1570,36 @@
          }
        }
        _Thing: (#struct){
@@ -3008,79 +3896,39 @@ diff old new
 -            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
 -          }) }
          _X: (_){ _ }
-+        spec: (#struct){ |((#struct){
-+            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-+            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
++        spec: (#struct){ |(*(#struct){
++            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
 +            minBar?: (null){ null }
 +            maxBar?: (null){ null }
 +            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: (null){ null }
++          }, *(#struct){
++            minFoo?: (null){ null }
++            maxFoo?: (null){ null }
++            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
++            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            fuga?: (null){ null }
++          }, (#struct){
++            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
++            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
++            minBar?: (null){ null }
++            maxBar?: (null){ null }
++            hoge?: (null){ null }
 +            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
 +          }, (#struct){
 +            minFoo?: (null){ null }
 +            maxFoo?: (null){ null }
-+            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-+            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
-+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
++            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
++            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
++            hoge?: (null){ null }
 +            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
 +          }) }
        }
        #Constrained: (#struct){
--        spec: (#struct){ |(*(#struct){
--            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
--            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
--            minBar?: (null){ null }
--            maxBar?: (null){ null }
--            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
--            fuga?: (null){ null }
--          }, *(#struct){
--            minFoo?: (null){ null }
--            maxFoo?: (null){ null }
--            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
--            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
--            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
--            fuga?: (null){ null }
--          }, (#struct){
--            minFoo: (int){ |(*(int){ 10 }, (int){ int }) }
--            maxFoo: (int){ |(*(int){ 20 }, (int){ int }) }
--            minBar?: (null){ null }
--            maxBar?: (null){ null }
--            hoge?: (null){ null }
--            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
--          }, (#struct){
--            minFoo?: (null){ null }
--            maxFoo?: (null){ null }
--            minBar: (int){ |(*(int){ 30 }, (int){ int }) }
--            maxBar: (int){ |(*(int){ 40 }, (int){ int }) }
--            hoge?: (null){ null }
-+        spec: (#struct){ |((#struct){
-+            minFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-+            maxFoo: ((null|int)){ |((null){ null }, (int){ int }) }
-+            minBar?: (null){ null }
-+            maxBar?: (null){ null }
-+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-+            fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-+          }, (#struct){
-+            minFoo?: (null){ null }
-+            maxFoo?: (null){ null }
-+            minBar: ((null|int)){ |((null){ null }, (int){ int }) }
-+            maxBar: ((null|int)){ |((null){ null }, (int){ int }) }
-+            hoge?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-             fuga?: ((null|bool)){ |((null){ null }, (bool){ bool }) }
-           }) }
-       }
-@@ -862,7 +1026,10 @@
-         }
-       }
-       form1040: (#list){
--        0: (int){ 3 }
-+        0: (_|_){
-+          // [incomplete] issue2246.full.form1040.0: unresolved disjunction {fooID:"00-0000001",common:3} | {fooID:"00-0000001",barID:string,common:3} (type struct):
-+          //     ./issue2246.cue:38:29
-+        }
-       }
-       #K1: (#struct){
-         #_base: (#struct){
-@@ -869,19 +1036,19 @@
+         spec: (#struct){ |(*(#struct){
+@@ -869,19 +1683,19 @@
            common: (int){ 3 }
          }
          #FormFoo: (#struct){
@@ -3107,19 +3955,7 @@ diff old new
            }) }
        }
        #Input: (#struct){
-@@ -914,11 +1081,6 @@
-       }
-       #Metric: (#struct){ |((#struct){
-           id: (string){ string }
--          avg: (number){ number }
--        }, (#struct){
--          id: (string){ string }
--        }, (#struct){
--          avg: (number){ number }
-         }, (#struct){
-         }) }
-       #IDSource: (#struct){
-@@ -930,35 +1092,43 @@
+@@ -930,10 +1744,23 @@
      }
      full: (struct){
        metrics: (#list){
@@ -3127,71 +3963,36 @@ diff old new
 -          id: (string){ "foo" }
 -          avg: (int){ 60 }
 -        }
--        1: (#struct){
--          id: (string){ "bar" }
--          value: (int){ 80 }
--        }
--        2: (#struct){
--          uri: (string){ "baz" }
--          avg: (int){ 70 }
--        }
--        3: (#struct){
--          uri: (string){ "qux" }
--          value: (int){ 90 }
--        }
--      }
--      #Metric: (#struct){ |((#struct){
--          id: (string){ string }
--          avg: (number){ number }
--        }, (#struct){
--          id: (string){ string }
--          value: (number){ number }
--        }, (#struct){
--          uri: (string){ string }
--          avg: (number){ number }
--        }, (#struct){
--          uri: (string){ string }
--          value: (number){ number }
 +        0: (#struct){ |((#struct){
 +            id: (string){ "foo" }
 +            avg: (int){ 60 }
 +          }, (#struct){
 +            id: (string){ "foo" }
 +            avg: (int){ 60 }
++            value: (number){ number }
++          }, (#struct){
++            id: (string){ "foo" }
++            avg: (int){ 60 }
 +            uri: (string){ string }
-+          }) }
-+        1: (#struct){ |((#struct){
-+            id: (string){ "bar" }
-+            value: (int){ 80 }
 +          }, (#struct){
-+            id: (string){ "bar" }
-+            value: (int){ 80 }
++            id: (string){ "foo" }
++            avg: (int){ 60 }
 +            uri: (string){ string }
++            value: (number){ number }
 +          }) }
-+        2: (#struct){ |((#struct){
-+            uri: (string){ "baz" }
-+            avg: (int){ 70 }
-+            id: (string){ string }
-+          }, (#struct){
-+            uri: (string){ "baz" }
-+            avg: (int){ 70 }
-+          }) }
-+        3: (#struct){ |((#struct){
-+            uri: (string){ "qux" }
-+            value: (int){ 90 }
-+            id: (string){ string }
-+          }, (#struct){
-+            uri: (string){ "qux" }
-+            value: (int){ 90 }
-+          }) }
-+      }
-+      #Metric: (#struct){ |((#struct){
-+          id: (string){ string }
-+        }, (#struct){
-+          uri: (string){ string }
-         }) }
-       #Source: (#struct){ |((#struct){
-           id: (string){ string }
+         1: (#struct){
+           id: (string){ "bar" }
+           value: (int){ 80 }
+-- out/eval/stats --
+Leaks:  4
+Freed:  2339
+Reused: 2323
+Allocs: 20
+Retain: 115
+
+Unifications: 1260
+Conjuncts:    3417
+Disjuncts:    2454
 -- diff/todo/p0 --
 Many errors. Fix cross product first.
 -- out/eval --

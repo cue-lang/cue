@@ -16,6 +16,40 @@
       "message": "Should be ready for a final review :)",
       "revId": "95039e3dfd0bdccb08cf68eece9448d4aae451f5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "05dbce72_87afd450",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-04-03T09:38:27Z",
+      "side": 1,
+      "message": "LGTM with one request.",
+      "revId": "95039e3dfd0bdccb08cf68eece9448d4aae451f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6d3e7a77_a77b5358",
+        "filename": "cue/interpreter/wasm/exe_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-04-03T09:38:27Z",
+      "side": 1,
+      "message": "Please separate the build tag by a newline.",
+      "revId": "95039e3dfd0bdccb08cf68eece9448d4aae451f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -443,11 +443,7 @@ Result:
     }
     e: (#struct){
       f1: (#struct){
-        a: (#struct){
-          f1: (#struct){
-          }
-          f2: (#struct){
-          }
+        a: (list){
         }
       }
       f2: (#struct){
@@ -920,7 +916,7 @@ diff old new
        }
      }
    }
-@@ -52,17 +106,17 @@
+@@ -52,26 +106,22 @@
        }
      }
      _e: (#struct){
@@ -949,7 +945,17 @@ diff old new
        }
      }
      e: (#struct){
-@@ -112,15 +166,14 @@
+       f1: (#struct){
+-        a: (#struct){
+-          f1: (#struct){
+-          }
+-          f2: (#struct){
+-          }
++        a: (list){
+         }
+       }
+       f2: (#struct){
+@@ -112,15 +162,14 @@
        }
      }
      list: (struct){
@@ -968,7 +974,7 @@ diff old new
          }
        }
      }
-@@ -127,208 +180,283 @@
+@@ -127,208 +176,283 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1441,7 +1447,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +489,38 @@
+@@ -361,40 +485,38 @@
          }
        }
      }

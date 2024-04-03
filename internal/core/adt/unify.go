@@ -268,6 +268,17 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if n.completed&(subFieldsProcessed) != 0 {
 		n.node.updateStatus(finalized)
 
+		// order matters
+		// c1: c: [string]: f2
+		// f2: c1
+		// Also: cycle/issue990
+
+		if pc := n.node.PatternConstraints; pc != nil {
+			for _, c := range pc.Pairs {
+				c.Constraint.Finalize(n.ctx)
+			}
+		}
+
 		if DebugDeps {
 			RecordDebugGraph(n.ctx, n.node, "Finalize")
 		}
@@ -334,6 +345,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	}
 
 	if p := v.Parent; p != nil && p.state != nil {
+		// p.cc.generation == n.node.cc.generation &&
 		if !v.IsDynamic && n.completed&allAncestorsProcessed == 0 {
 			p.state.completeNodeTasks(mode)
 		}
@@ -513,6 +525,16 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		}
 	}
 	n.node.Arcs = n.node.Arcs[:k]
+
+	// // This is necessary, but enables structural cycles.
+	// pc := n.node.PatternConstraints
+	// if pc == nil {
+	// 	return success
+	// }
+
+	// for _, c := range pc.Pairs {
+	// 	c.Constraint.Finalize(n.ctx)
+	// }
 
 	return success
 }

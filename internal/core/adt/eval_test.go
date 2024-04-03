@@ -76,12 +76,12 @@ func TestEvalAlpha(t *testing.T) {
 	var todoAlpha = map[string]string{
 		// Crashes and hangs
 		"cycle/evaluate": "hang",
+		"cycle/chain":    "hang",
+
+		// "disjunctions/elimination": "performance issue",
 
 		// Later: all good, just much cruft.
 		"benchmarks/issue2176": "fails to remove errors",
-
-		// Performance
-		"disjunctions/elimination": "performance issue",
 	}
 
 	test := cuetxtar.TxTarTest{

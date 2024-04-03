@@ -1,5 +1,8 @@
 # Verify that the various forms of requesting help work
 
+exec cue
+cmp stdout stdout.golden
+
 exec cue help
 cmp stdout stdout.golden
 

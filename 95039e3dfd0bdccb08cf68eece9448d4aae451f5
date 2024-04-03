@@ -50,6 +50,24 @@
       "message": "Please separate the build tag by a newline.",
       "revId": "95039e3dfd0bdccb08cf68eece9448d4aae451f5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4378312_1e983297",
+        "filename": "cue/interpreter/wasm/exe_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-03T09:53:35Z",
+      "side": 1,
+      "message": "Sure, done. FWIW I had done it on purpose as I meant the text above to be a \"godoc\" for the build tag, but I\u0027m not sure what is the convention for stuff like this.",
+      "parentUuid": "6d3e7a77_a77b5358",
+      "revId": "95039e3dfd0bdccb08cf68eece9448d4aae451f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

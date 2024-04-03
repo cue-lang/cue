@@ -88,6 +88,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e84f3c3_31ff2b78",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-03T09:06:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3aca2209_fffe99da",
+      "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5553aabd_092012e8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-03T09:06:25Z",
+      "side": 1,
+      "message": "Ack, done.",
+      "parentUuid": "d8c05062_ecf1c569",
+      "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "da2c5464_cd9952ef",
@@ -101,6 +137,24 @@
       "writtenOn": "2024-04-02T07:54:56Z",
       "side": 1,
       "message": "Note that this disables test completely by default. even the API tests, which don\u0027t use `cmd/cue`. I don\u0027t think we want to do that.",
+      "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "59ab8362_5be86e4a",
+        "filename": "cue/interpreter/wasm/wasm_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-03T09:06:25Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da2c5464_cd9952ef",
       "revId": "cfaa794ff36c19123baf3a07ab5761e1a1e876ec",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -137,7 +137,8 @@ func (ctx *overlayContext) unlinkOverlay() {
 // to eliminate disjunctions pre-copy based on discriminator fields and what
 // have you. This is not unlikely to eliminate
 func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
-	if o := x.cc.overlay; o != nil && o.src != nil {
+	xcc := x.rootCloseContext() // may be uninitialized for constraints.
+	if o := xcc.overlay; o != nil && o.src != nil {
 		// This path could happen with structure sharing or user-constructed
 		// values.
 		return o.src
@@ -167,14 +168,25 @@ func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
 
 	v.Structs = slices.Clone(v.Structs)
 
+	if pc := v.PatternConstraints; pc != nil {
+		npc := &Constraints{Allowed: pc.Allowed}
+		v.PatternConstraints = npc
+
+		npc.Pairs = make([]PatternConstraint, len(pc.Pairs))
+		for i, p := range pc.Pairs {
+			npc.Pairs[i] = PatternConstraint{
+				Pattern:    p.Pattern,
+				Constraint: ctx.cloneVertex(p.Constraint),
+			}
+		}
+	}
+
 	if v.state != nil {
 		v.state = ctx.cloneNodeContext(x.state)
 		v.state.node = v
 
 		ctx.cloneScheduler(v.state, x.state)
 	}
-
-	// TODO: clone the scheduler/tasks as well.
 
 	return v
 }
@@ -232,6 +244,11 @@ func (ctx *overlayContext) copyConjunct(c Conjunct) Conjunct {
 	if cc == nil {
 		return c
 	}
+	// TODO: see if we can avoid this allocation. It seems that this should
+	// not be necessary, and evaluation attains correct results without it.
+	// Removing this, though, will cause some of the assertions to fail. These
+	// assertions are overly strict and could be relaxed, but keeping them as
+	// they are makes reasoning about them easier.
 	overlay := ctx.allocCC(cc)
 	c.CloseInfo.cc = overlay
 	return c
@@ -319,11 +336,14 @@ func (ctx *overlayContext) initCloneCC(x *closeContext) {
 	o.Patterns = append(o.Patterns, x.Patterns...)
 
 	// child and next always point to completed closeContexts. Moreover, only
-	// fields that are immutable, such as Expr, are used. It is therefor not
+	// fields that are immutable, such as Expr, are used. It is therefore not
 	// necessary to use overlays.
 	o.child = x.child
 	if x.child != nil && x.child.overlay != nil {
-		panic("unexpected overlay in child")
+		// TODO: there seem to be situations where this is possible after all.
+		// See if this is really true, and we should remove this panic, or if
+		// this underlies a bug of sorts.
+		// panic("unexpected overlay in child")
 	}
 	o.next = x.next
 	if x.next != nil && x.next.overlay != nil {

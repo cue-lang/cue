@@ -68,6 +68,24 @@
       "parentUuid": "6d3e7a77_a77b5358",
       "revId": "95039e3dfd0bdccb08cf68eece9448d4aae451f5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bc14cce_bbeb6822",
+        "filename": "cue/interpreter/wasm/exe_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1003505
+      },
+      "writtenOn": "2024-04-03T10:23:34Z",
+      "side": 1,
+      "message": "In principle it sounds nice to have the comment tied to the build tag, but for me personally, I completely missed out the build tag in the colored noise (syntax highlighting strikes again) to the point where my initial comment was \"please add a build tag\". only then I saw it!",
+      "parentUuid": "c4378312_1e983297",
+      "revId": "95039e3dfd0bdccb08cf68eece9448d4aae451f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "My only slight reservation with this change is whether it might have some performance impact due to the fairly large size (17 words) of the goField struct - using SortFunc implies copying each element several times where the original left the elements in place. Probably not an issue in practice, but thought I\u0027d mention it anyway. I\u0027m suspecting that the reflecty overhead of sort.Slice overshadows the copying overhead of SortFunc, but perhaps worth a check if this might be performance sensitive.",
       "revId": "b1aaa321563e0bd61c89a4a09446fd0dbf1c68ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "30650930_1d23ae95",
+        "filename": "cue/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 615,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-03T12:28:17Z",
+      "side": 1,
+      "message": "Luckily, perf here is not really a concern - this work is done once, and then cached globally. We copied this mechanism from encoding/json :)",
+      "parentUuid": "ab2f1be0_e4638eb8",
+      "revId": "b1aaa321563e0bd61c89a4a09446fd0dbf1c68ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

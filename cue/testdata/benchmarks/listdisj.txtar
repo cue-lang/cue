@@ -54,16 +54,16 @@ v: #T
   #X: 〈0;v〉
   #X: 〈0;#T〉
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  447
-Reused: 439
-Allocs: 8
+-- out/evalalpha/stats --
+Leaks:  3340
+Freed:  771
+Reused: 771
+Allocs: 3340
 Retain: 0
 
-Unifications: 287
-Conjuncts:    894
-Disjuncts:    447
+Unifications: 2743
+Conjuncts:    16921
+Disjuncts:    1368
 -- out/evalalpha --
 (struct){
   #T: (list){
@@ -460,6 +460,27 @@ Disjuncts:    447
       0: (string){ "d" }
     }) }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  447
+-Reused: 439
+-Allocs: 8
++Leaks:  3340
++Freed:  771
++Reused: 771
++Allocs: 3340
+ Retain: 0
+ 
+-Unifications: 287
+-Conjuncts:    894
+-Disjuncts:    447
++Unifications: 2743
++Conjuncts:    16921
++Disjuncts:    1368
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -874,6 +895,16 @@ diff old new
 +      0: (string){ "d" }
 +    }) }
  }
+-- out/eval/stats --
+Leaks:  0
+Freed:  447
+Reused: 439
+Allocs: 8
+Retain: 0
+
+Unifications: 287
+Conjuncts:    894
+Disjuncts:    447
 -- diff/todo/p0 --
 Structural cycles detected too late.
 -- diff/todo/p3 --

@@ -289,6 +289,19 @@ func (f *File) MergeLine(line int) {
 	f.lines = f.lines[:len(f.lines)-1]
 }
 
+// Lines returns the effective line offset table of the form described by [File.SetLines].
+// Callers must not mutate the result.
+func (f *File) Lines() []int {
+	var lines []int
+	f.mutex.Lock()
+	// Unfortunate that we have to loop, but we use our own type.
+	for _, line := range f.lines {
+		lines = append(lines, int(line))
+	}
+	f.mutex.Unlock()
+	return lines
+}
+
 // SetLines sets the line offsets for a file and reports whether it succeeded.
 // The line offsets are the offsets of the first character of each line;
 // for instance for the content "ab\nc\n" the line offsets are {0, 3}.

@@ -16,6 +16,7 @@ package token
 
 import (
 	"fmt"
+	"slices"
 	"testing"
 )
 
@@ -69,6 +70,9 @@ func linecol(lines []int, offs int) (int, int) {
 }
 
 func verifyPositions(t *testing.T, f *File, lines []int) {
+	if got := f.Lines(); !slices.Equal(got, lines) {
+		t.Fatalf("File.Lines got %v instead of %v", got, lines)
+	}
 	for offs := 0; offs < f.Size(); offs++ {
 		p := f.Pos(offs, 0)
 		offs2 := f.Offset(p)

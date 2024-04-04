@@ -16,9 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
-	"os"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -28,6 +25,10 @@ import (
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/source"
 	"cuelang.org/go/tools/fix"
+	"fmt"
+	"io"
+	"os"
+	"path/filepath"
 
 	"github.com/spf13/cobra"
 )
@@ -121,18 +122,13 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 
 					if check && !bytes.Equal(formatted.Bytes(), original) {
-						badlyFormattedFiles = append(badlyFormattedFiles, inst.RelPath(file))
+						badlyFormattedFiles = append(badlyFormattedFiles, file.Filename)
 					}
 				}
 			}
 
 			if check && len(badlyFormattedFiles) > 0 {
-				stdout := cmd.OutOrStdout()
-				for _, f := range badlyFormattedFiles {
-					if f != "-" {
-						fmt.Fprintln(stdout, f)
-					}
-				}
+				printRelativePaths(badlyFormattedFiles, cmd.OutOrStdout())
 				os.Exit(1)
 			}
 
@@ -143,4 +139,17 @@ func newFmtCmd(c *Command) *cobra.Command {
 	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
 
 	return cmd
+}
+
+func printRelativePaths(files []string, stdout io.Writer) {
+	cwd, _ := os.Getwd()
+	for _, f := range files {
+		if f != "-" {
+			relPath, err := filepath.Rel(cwd, f)
+			if err != nil {
+				relPath = f
+			}
+			fmt.Fprintln(stdout, relPath)
+		}
+	}
 }

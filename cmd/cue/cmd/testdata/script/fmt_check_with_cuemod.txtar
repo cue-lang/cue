@@ -1,0 +1,11 @@
+# displays non-formatted files relative to CWD
+cd example
+! exec cue fmt --check ./...
+cmp stdout stdout.golden
+
+-- cue.mod/module.cue --
+module: "example.com"
+-- example/not_formatted.cue --
+foo:      "bar"
+-- example/stdout.golden --
+not_formatted.cue

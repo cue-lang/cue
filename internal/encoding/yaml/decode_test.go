@@ -28,8 +28,10 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
-	"cuelang.org/go/internal/third_party/yaml"
+	"cuelang.org/go/internal/encoding/yaml"
+	"github.com/google/go-cmp/cmp"
 )
 
 var unmarshalTests = []struct {
@@ -38,7 +40,7 @@ var unmarshalTests = []struct {
 }{
 	{
 		"",
-		"",
+		"null",
 	},
 	{
 		"{}",
@@ -234,7 +236,7 @@ apple: "newline"`,
 
 	\ttext
 
-	"""`,
+	""" // Comment`,
 	},
 
 	// Folded block scalar
@@ -249,7 +251,7 @@ apple: "newline"`,
 
 	last line
 
-	"""`,
+	""" // Comment`,
 	},
 
 	// Structs
@@ -375,7 +377,7 @@ Null: 1
 	},
 	{
 		"float32_maxuint64+1: 18446744073709551616",
-		`"float32_maxuint64+1": 18446744073709551616`,
+		`"float32_maxuint64+1": number & 18446744073709551616`,
 	},
 
 	// float64
@@ -391,9 +393,13 @@ Null: 1
 		"float64_maxuint64: 18446744073709551615",
 		"float64_maxuint64: 18446744073709551615",
 	},
+	// TODO(mvdan): yaml.v3 uses strconv APIs like ParseUint to try to detect
+	// whether a scalar should be considered a YAML integer or a float.
+	// Integers in CUE aren't limited to 64 bits, so we should arguably not decode
+	// large integers that don't fit in 64 bits as floats via `number &`.
 	{
 		"float64_maxuint64+1: 18446744073709551616",
-		`"float64_maxuint64+1": 18446744073709551616`,
+		`"float64_maxuint64+1": number & 18446744073709551616`,
 	},
 
 	// Overflow cases.
@@ -429,10 +435,10 @@ Null: 1
 		"v: 1.1",
 	}, {
 		"v: !!float 0",
-		"v: float & 0", // Should this be 0.0?
+		"v: number & 0",
 	}, {
 		"v: !!float -1",
-		"v: float & -1", // Should this be -1.0?
+		"v: number & -1",
 	}, {
 		"v: !!null ''",
 		"v: null",
@@ -444,8 +450,7 @@ Null: 1
 	// Non-specific tag (Issue #75)
 	{
 		`v: ! test`,
-		// TODO this should work and produce a string.
-		"",
+		`v: "test"`,
 	},
 
 	// Anchors and aliases.
@@ -567,12 +572,11 @@ d: [
 ]
 e: []
 `,
+		// TODO(mvdan): keep the separated opening/closing tokens once yaml.v3 exposes end positions.
 		`a: {}
 b: {}
-
 c: 1
-d: [
-]
+d: []
 e: []`,
 	},
 
@@ -675,14 +679,15 @@ a:
 	},
 
 	// Floating comments.
-	// TODO: avoid losing some of these.
+	// TODO(mvdan): all empty lines separating comments should stay in place.
+	// TODO(mvdan): avoid losing comments in empty lists and objects.
 	{
 		"# Start\n\na: 123\n\n# Middle\n\nb: 456\n\n# End",
-		"// Start\n\na: 123\n\n// Middle\n\nb: 456",
+		"// Start\na: 123\n\n// Middle\nb: 456\n// End",
 	},
 	{
 		"a: [\n\t# Comment\n]",
-		"a: [\n\n]",
+		"a: []",
 	},
 	{
 		"a: {\n\t# Comment\n}",
@@ -692,7 +697,7 @@ a:
 	// Attached comments.
 	{
 		"start: 100\n\n# Before\na: 123 # Inline\n# After\n\nend: 200",
-		"start: 100\n\n// Before\na: 123 // Inline\n// After\n\nend: 200",
+		"start: 100\n\n// Before\n// After\na:   123 // Inline\nend: 200",
 	},
 	{
 		"# One\none: null\n\n# Two\ntwo: [2, 2]\n\n# Three\nthree: {val: 3}",
@@ -755,6 +760,8 @@ a:
 "Reuse anchor":      "Bar"`,
 	},
 	// Single document with garbage following it.
+	// TODO(mvdan): This should work for a single Decoder.Decode call,
+	// but it should be an error with Unmarshal.
 	{
 		"---\nhello\n...\n}not yaml",
 		`"hello"`,
@@ -764,24 +771,22 @@ a:
 type M map[interface{}]interface{}
 
 func cueStr(node ast.Node) string {
-	if s, ok := node.(*ast.StructLit); ok {
-		node = &ast.File{
-			Decls: s.Elts,
-		}
+	if node == nil {
+		return ""
 	}
-	b, _ := format.Node(node)
+	b, _ := format.Node(internal.ToFile(node))
 	return strings.TrimSpace(string(b))
 }
 
 func newDecoder(t *testing.T, data string) *yaml.Decoder {
-	dec, err := yaml.NewDecoder("test.yaml", strings.NewReader(data))
-	if err != nil {
-		t.Fatal(err)
-	}
-	return dec
+	t.Helper()
+	t.Logf("input yaml:\n%s", data)
+	return yaml.NewDecoder("test.yaml", []byte(data))
 }
 
 func callUnmarshal(t *testing.T, data string) (ast.Expr, error) {
+	t.Helper()
+	t.Logf("  yaml:\n%s", data)
 	return yaml.Unmarshal("test.yaml", []byte(data))
 }
 
@@ -790,11 +795,11 @@ func TestUnmarshal(t *testing.T) {
 		t.Run(strconv.Itoa(i), func(t *testing.T) {
 			t.Logf("test %d: %q", i, item.data)
 			expr, err := callUnmarshal(t, item.data)
-			if _, ok := err.(*yaml.TypeError); !ok && err != nil {
+			if err != nil {
 				t.Fatal("expected error to be nil")
 			}
 			if got := cueStr(expr); got != item.want {
-				t.Errorf("\n got:\n%v\nwant:\n%v", got, item.want)
+				t.Errorf("\n    got:\n%v\n    want:\n%v", got, item.want)
 			}
 		})
 	}
@@ -810,7 +815,7 @@ func TestX(t *testing.T) {
 	}
 
 	expr, err := callUnmarshal(t, y)
-	if _, ok := err.(*yaml.TypeError); !ok && err != nil {
+	if err != nil {
 		t.Fatal(err)
 	}
 	t.Error(cueStr(expr))
@@ -826,11 +831,11 @@ func TestDecoderSingleDocument(t *testing.T) {
 				return
 			}
 			expr, err := newDecoder(t, item.data).Decode()
-			if _, ok := err.(*yaml.TypeError); !ok && err != nil {
+			if err != nil {
 				t.Errorf("err should be nil, was %v", err)
 			}
 			if got := cueStr(expr); got != item.want {
-				t.Errorf("\n got: %v;\nwant: %v", got, item.want)
+				t.Errorf("\n    got:\n%v\n    want:\n%v", got, item.want)
 			}
 		})
 	}
@@ -841,7 +846,7 @@ var decoderTests = []struct {
 	want string
 }{{
 	"",
-	"",
+	"null",
 }, {
 	"a: b",
 	`a: "b"`,
@@ -876,7 +881,7 @@ func TestDecoder(t *testing.T) {
 			}
 			got := strings.Join(values, "\n")
 			if got != item.want {
-				t.Errorf("\n got: %v;\nwant: %v", got, item.want)
+				t.Errorf("\n    got:\n%v\n    want:\n%v", got, item.want)
 			}
 		})
 	}
@@ -897,20 +902,20 @@ func TestUnmarshalNaN(t *testing.T) {
 var unmarshalErrorTests = []struct {
 	data, error string
 }{
-	{"\nv: !!float 'error'", "test.yaml:2: cannot decode !!str `error` as a !!float"},
-	{"\nv: !!int 'error'", "test.yaml:2: cannot decode !!str `error` as a !!int"},
-	{"\nv: !!int 123.456", "test.yaml:2: cannot decode !!float `123.456` as a !!int"},
+	{"\nv: !!float 'error'", `test.yaml:2: cannot decode "error" as !!float`},
+	{"\nv: !!int 'error'", `test.yaml:2: cannot decode "error" as !!int`},
+	{"\nv: !!int 123.456", `test.yaml:2: cannot decode "123.456" as !!int`},
 	{"v: [A,", "test.yaml:1: did not find expected node content"},
 	{"v:\n- [A,", "test.yaml:2: did not find expected node content"},
 	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},
-	{"a: *b\n", "test.yaml:1: unknown anchor 'b' referenced"},
-	{"a: &a\n  b: *a\n", "test.yaml:2: anchor 'a' value contains itself"},
-	{"value: -", "test.yaml:1: block sequence entries are not allowed in this context"},
+	{"a: *b\n", "test.yaml: unknown anchor 'b' referenced"},
+	{"a: &a\n  b: *a\n", `test.yaml:2: anchor "a" value contains itself`},
+	{"value: -", "test.yaml: block sequence entries are not allowed in this context"},
 	{"a: !!binary ==", "test.yaml:1: !!binary value contains invalid base64 data"},
-	{"{[.]}", `test.yaml:1: invalid map key: sequence`},
-	{"{{.}}", `test.yaml:1: invalid map key: map`},
-	{"b: *a\na: &a {c: 1}", `test.yaml:1: unknown anchor 'a' referenced`},
-	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", "test.yaml:1: did not find expected whitespace"},
+	{"{[.]}", `test.yaml:1: invalid map key: !!seq`},
+	{"{{.}}", `test.yaml:1: invalid map key: !!map`},
+	{"b: *a\na: &a {c: 1}", `test.yaml: unknown anchor 'a' referenced`},
+	{"%TAG !%79! tag:yaml.org,2002:\n---\nv: !%79!int '1'", "test.yaml: did not find expected whitespace"},
 }
 
 func TestUnmarshalErrors(t *testing.T) {
@@ -963,7 +968,7 @@ func TestFiles(t *testing.T) {
 				t.Fatal(err)
 			}
 			if want := string(b); got != want {
-				t.Errorf("\n got: %v;\nwant: %v", got, want)
+				t.Error(cmp.Diff(want, got))
 			}
 		})
 	}

@@ -57,4 +57,4 @@ deployment: [{
 
 -- issue2721/empty.yaml --
 -- issue2721/empty.cue.golden --
-[]
+[null]

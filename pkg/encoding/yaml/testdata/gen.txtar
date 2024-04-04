@@ -70,7 +70,7 @@ unmarshalStream: {
 	}, {
 		b: 2
 	}]
-	empty: []
+	empty: [null]
 	nums: [1, 2]
 	null1: [1, null, 2]
 	null2: [1, null, 2]

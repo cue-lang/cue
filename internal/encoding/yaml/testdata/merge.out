@@ -11,9 +11,7 @@ anchors: {
 		r: 1
 	}]
 }
-
 // All the following maps are equal:
-
 plain: {
 	// Explicit keys
 	x:     1
@@ -21,56 +19,48 @@ plain: {
 	r:     10
 	label: "center/big"
 }
-
 mergeOne: {
-	x: 1
-	y: 2
 	// Merge one map
-
+	x:     1
+	y:     2
 	r:     10
 	label: "center/big"
 }
-
 mergeMultiple: {
-	r: 10
-	x: 1
-	y: 2
 	// Merge multiple maps
-
-	label: "center/big"
-}
-
-override: {
 	r:     10
 	x:     1
 	y:     2
 	label: "center/big"
 }
-
+override: {
+	// Override
+	r:     10
+	x:     1
+	y:     2
+	label: "center/big"
+}
 shortTag: {
-	r: 10
-	x: 1
-	y: 2
 	// Explicit short merge tag
-
+	r:     10
+	x:     1
+	y:     2
 	label: "center/big"
 }
-
 longTag: {
-	r: 10
-	x: 1
-	y: 2
 	// Explicit merge long tag
-
+	r:     10
+	x:     1
+	y:     2
 	label: "center/big"
 }
-
 inlineMap: {
 	// Inlined map
-	x:     1, y: 2, r: 10
+	x:     1
+	y:     2
+	r:     10
 	label: "center/big"
 }
-
 inlineSequenceMap: {
 	// Inlined map in sequence
 	r:     10

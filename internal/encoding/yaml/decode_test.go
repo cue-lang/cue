@@ -649,6 +649,21 @@ a:
 		"a: []",
 	},
 
+	// Floating comments.
+	// TODO: avoid losing some of these.
+	{
+		"# Start\n\na: 123\n\n#End",
+		"// Start\n\na: 123",
+	},
+	{
+		"a: [\n\t# Comment\n]",
+		"a: [\n\n]",
+	},
+	{
+		"a: {\n\t# Comment\n}",
+		"a: {}",
+	},
+
 	// UTF-16-LE
 	{
 		"\xff\xfe\xf1\x00o\x00\xf1\x00o\x00:\x00 \x00v\x00e\x00r\x00y\x00 \x00y\x00e\x00s\x00\n\x00",
@@ -842,6 +857,8 @@ var unmarshalErrorTests = []struct {
 	data, error string
 }{
 	{"\nv: !!float 'error'", "test.yaml:2: cannot decode !!str `error` as a !!float"},
+	{"\nv: !!int 'error'", "test.yaml:2: cannot decode !!str `error` as a !!int"},
+	{"\nv: !!int 123.456", "test.yaml:2: cannot decode !!float `123.456` as a !!int"},
 	{"v: [A,", "test.yaml:1: did not find expected node content"},
 	{"v:\n- [A,", "test.yaml:2: did not find expected node content"},
 	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},

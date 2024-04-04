@@ -27,6 +27,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"net/http"
 	"strings"
 
 	"cuelabs.dev/go/oci/ociregistry"
@@ -107,10 +108,11 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 	}
 	rd, err := loc.Registry.GetTag(ctx, loc.Repository, loc.Tag)
 	if err != nil {
+		// TODO should we use isNotExist here too?
 		if errors.Is(err, ociregistry.ErrManifestUnknown) {
 			return nil, fmt.Errorf("module %v: %w", m, ErrNotFound)
 		}
-		return nil, fmt.Errorf("module %v: %v", m, err)
+		return nil, fmt.Errorf("module %v: %w", m, err)
 	}
 	defer rd.Close()
 	data, err := io.ReadAll(rd)
@@ -188,7 +190,7 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 		return true
 	})
 	if _err != nil && !isNotExist(_err) {
-		return nil, _err
+		return nil, fmt.Errorf("module %v: %w", m, _err)
 	}
 	semver.Sort(versions)
 	return versions, nil
@@ -403,7 +405,18 @@ func unmarshalManifest(ctx context.Context, data []byte, mediaType string) (*oci
 }
 
 func isNotExist(err error) bool {
-	return errors.Is(err, ociregistry.ErrNameUnknown) || errors.Is(err, ociregistry.ErrNameInvalid)
+	if errors.Is(err, ociregistry.ErrNameUnknown) ||
+		errors.Is(err, ociregistry.ErrNameInvalid) {
+		return true
+	}
+	// A 403 error might have been sent as a response
+	// without explicitly including a "denied" error code.
+	// We treat this as a "not found" error because there's
+	// nothing the user can do about it.
+	if herr := ociregistry.HTTPError(nil); errors.As(err, &herr) {
+		return herr.StatusCode() == http.StatusForbidden
+	}
+	return false
 }
 
 func isModule(m *ocispec.Manifest) bool {

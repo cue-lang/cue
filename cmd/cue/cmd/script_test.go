@@ -33,7 +33,6 @@ import (
 	"time"
 
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
-	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
@@ -142,9 +141,11 @@ func TestScript(t *testing.T) {
 					usage()
 				}
 
-				srv := httptest.NewServer(registrytest.AuthHandler(ociserver.New(ocimem.New(), nil), auth))
-				u, _ := url.Parse(srv.URL)
-				ts.Setenv(args[0], u.Host)
+				srv, err := registrytest.NewServer(ocimem.New(), auth)
+				if err != nil {
+					ts.Fatalf("cannot start registrytest server: %v", err)
+				}
+				ts.Setenv(args[0], srv.Host())
 				ts.Defer(srv.Close)
 			},
 			// memregistry starts an HTTP server with enough endpoints to test `cue login`.

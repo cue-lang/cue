@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"os"
+	"path/filepath"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -121,17 +122,24 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 
 					if check && !bytes.Equal(formatted.Bytes(), original) {
-						badlyFormattedFiles = append(badlyFormattedFiles, inst.RelPath(file))
+						badlyFormattedFiles = append(badlyFormattedFiles, file.Filename)
 					}
 				}
 			}
 
 			if check && len(badlyFormattedFiles) > 0 {
+				cwd, _ := os.Getwd()
 				stdout := cmd.OutOrStdout()
 				for _, f := range badlyFormattedFiles {
-					if f != "-" {
-						fmt.Fprintln(stdout, f)
+					if f == "-" {
+						continue
 					}
+
+					relPath, err := filepath.Rel(cwd, f)
+					if err != nil {
+						relPath = f
+					}
+					fmt.Fprintln(stdout, relPath)
 				}
 				os.Exit(1)
 			}

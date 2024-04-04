@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "81fda0bd_3494773d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-04T08:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ded58242_be997dad",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ec7283b3_c99af24b",
@@ -64,6 +82,54 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0fa8118f_eb8e3c29",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-04T08:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "76e035da_41b863c2",
+      "range": {
+        "startLine": 9,
+        "startChar": 24,
+        "endLine": 9,
+        "endChar": 31
+      },
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4beca86f_c7e745e7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-04T08:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ec7283b3_c99af24b",
+      "range": {
+        "startLine": 9,
+        "startChar": 6,
+        "endLine": 9,
+        "endChar": 9
+      },
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "04ee9c1b_79d020f6",
@@ -77,6 +143,24 @@
       "writtenOn": "2024-04-04T07:34:58Z",
       "side": 1,
       "message": "not sure what\u0027s going on with your IDE, but please keep the imports sorted in three groups :) both gopls and goimports should do it properly.",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9f2eda67_18a991fc",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-04T08:10:49Z",
+      "side": 1,
+      "message": "was an incorrect setting in my IDE - fixed",
+      "parentUuid": "04ee9c1b_79d020f6",
       "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -98,6 +182,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "54229c48_d3d52cb2",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-04T08:10:49Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "46d86a88_37b5ba50",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d53eff1d_63a0884d",
@@ -111,6 +213,24 @@
       "writtenOn": "2024-04-04T07:34:58Z",
       "side": 1,
       "message": "I would just expand fmt_check.txtar to be honest. You could put all existing files under `santdalone/`, and then have a `module/` directory with a CUE module. For the module, you could test both `cue fmt ./...` and `cd subpkg; cue fmt ./...`, checking that the paths are as expected.",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd8bac19_cd6d4656",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_with_cuemod.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-04T08:10:49Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "d53eff1d_63a0884d",
       "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

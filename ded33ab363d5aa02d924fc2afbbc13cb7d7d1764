@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4c4de79_b69dc7c0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T06:50:38Z",
+      "side": 1,
+      "message": "This is the only CL in the chain without a test, because there aren\u0027t any, and because the new yaml decoder tests will effectively act as a test.",
+      "revId": "ded33ab363d5aa02d924fc2afbbc13cb7d7d1764",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

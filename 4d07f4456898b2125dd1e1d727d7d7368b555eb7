@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e578a23_f9e7a006",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T15:14:16Z",
+      "side": 1,
+      "message": "I will continue tomorrow. A pair code review next week might be a good idea, depending on how I get on.",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5ad3d2a2_99116aaa",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 518,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T15:14:16Z",
+      "side": 1,
+      "message": "duplicate?",
+      "range": {
+        "startLine": 518,
+        "startChar": 15,
+        "endLine": 518,
+        "endChar": 21
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cbcca49_c00819b7",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T15:14:16Z",
+      "side": 1,
+      "message": "2024?",
+      "range": {
+        "startLine": 1,
+        "startChar": 13,
+        "endLine": 1,
+        "endChar": 17
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b13849cf_eb24a1ad",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 162,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T15:14:16Z",
+      "side": 1,
+      "message": "remember that we require Go 1.21 or later, so you can use https://pkg.go.dev/slices#Clone",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1011bcd8_03ca246a",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T15:14:16Z",
+      "side": 1,
+      "message": "did you mean to resolve this, or make it a TODO?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bafe963e_ccac1a1a",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T15:14:16Z",
+      "side": 1,
+      "message": "did you mean to resolve this, or make it a TODO?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

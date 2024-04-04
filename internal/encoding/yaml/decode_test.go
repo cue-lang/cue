@@ -539,12 +539,16 @@ b: {
 	{
 		`
 a: {}
+b: {
+}
 c: 1
 d: [
 ]
 e: []
 `,
 		`a: {}
+b: {}
+
 c: 1
 d: [
 ]
@@ -647,6 +651,31 @@ a:
 	{
 		"a: []",
 		"a: []",
+	},
+
+	// Floating comments.
+	// TODO: avoid losing some of these.
+	{
+		"# Start\n\na: 123\n\n# Middle\n\nb: 456\n\n# End",
+		"// Start\n\na: 123\n\n// Middle\n\nb: 456",
+	},
+	{
+		"a: [\n\t# Comment\n]",
+		"a: [\n\n]",
+	},
+	{
+		"a: {\n\t# Comment\n}",
+		"a: {}",
+	},
+
+	// Attached comments.
+	{
+		"start: 100\n\n# Before\na: 123 # Inline\n# After\n\nend: 200",
+		"start: 100\n\n// Before\na: 123 // Inline\n// After\n\nend: 200",
+	},
+	{
+		"# One\none: null\n\n# Two\ntwo: [2, 2]\n\n# Three\nthree: {val: 3}",
+		"// One\none: null\n\n// Two\ntwo: [2, 2]\n\n// Three\nthree: {val: 3}",
 	},
 
 	// UTF-16-LE
@@ -842,6 +871,8 @@ var unmarshalErrorTests = []struct {
 	data, error string
 }{
 	{"\nv: !!float 'error'", "test.yaml:2: cannot decode !!str `error` as a !!float"},
+	{"\nv: !!int 'error'", "test.yaml:2: cannot decode !!str `error` as a !!int"},
+	{"\nv: !!int 123.456", "test.yaml:2: cannot decode !!float `123.456` as a !!int"},
 	{"v: [A,", "test.yaml:1: did not find expected node content"},
 	{"v:\n- [A,", "test.yaml:2: did not find expected node content"},
 	{"a:\n- b: *,", "test.yaml:2: did not find expected alphabetic or numeric character"},

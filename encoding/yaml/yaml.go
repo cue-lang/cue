@@ -23,7 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
-	"cuelang.org/go/internal/third_party/yaml"
+	"cuelang.org/go/internal/source"
 	pkgyaml "cuelang.org/go/pkg/encoding/yaml"
 )
 
@@ -33,11 +33,12 @@ import (
 // src is nil, the result of reading the file specified by filename will
 // be used.
 func Extract(filename string, src interface{}) (*ast.File, error) {
-	a := []ast.Expr{}
-	d, err := yaml.NewDecoder(filename, src)
+	data, err := source.ReadAll(filename, src)
 	if err != nil {
 		return nil, err
 	}
+	a := []ast.Expr{}
+	d := cueyaml.NewDecoder(filename, data)
 	for {
 		expr, err := d.Decode()
 		if err != nil {

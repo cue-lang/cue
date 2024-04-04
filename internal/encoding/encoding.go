@@ -38,9 +38,9 @@ import (
 	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/source"
-	"cuelang.org/go/internal/third_party/yaml"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"
 )
@@ -251,9 +251,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		i.next = json.NewDecoder(nil, path, r).Extract
 		i.Next()
 	case build.YAML:
-		d, err := yaml.NewDecoder(path, r)
+		b, err := io.ReadAll(r)
 		i.err = err
-		i.next = d.Decode
+		i.next = yaml.NewDecoder(path, b).Decode
 		i.Next()
 	case build.Text:
 		b, err := io.ReadAll(r)

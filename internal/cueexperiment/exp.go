@@ -10,6 +10,10 @@ import (
 // by Init.
 var Flags struct {
 	Modules bool
+
+	// YAMLV3Decoder swaps the old internal/third_party/yaml decoder with the new
+	// decoder implemented in internal/encoding/yaml on top of yaml.v3.
+	YAMLV3Decoder bool
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

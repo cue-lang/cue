@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d4b6f8a0_6496a829",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-04T09:56:49Z",
+      "side": 1,
+      "message": "@mvdan@mvdan.cc - will ultimately ask Marcel to confirm this change, but your thoughts would be appreciated in the meantime.",
+      "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

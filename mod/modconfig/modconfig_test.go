@@ -17,6 +17,8 @@ import (
 	"testing"
 	"time"
 
+	"cuelabs.dev/go/oci/ociregistry/ocimem"
+	"cuelabs.dev/go/oci/ociregistry/ociserver"
 	"github.com/go-quicktest/qt"
 	"golang.org/x/sync/errgroup"
 	"golang.org/x/tools/txtar"
@@ -137,8 +139,11 @@ module: "bar.example@v0"
 -- bar.example_v0.0.1/x/x.cue --
 package x
 `))
-	rh, err := registrytest.NewHandler(txtarfs.FS(modules), "")
+	ctx := context.Background()
+	rmem := ocimem.New()
+	err := registrytest.Upload(ctx, rmem, txtarfs.FS(modules))
 	qt.Assert(t, qt.IsNil(err))
+	rh := ociserver.New(rmem, nil)
 	agent := cueversion.UserAgent("cuelang.org/go")
 	checked := false
 	checkUserAgentHandler := http.HandlerFunc(func(w http.ResponseWriter, req *http.Request) {
@@ -161,7 +166,6 @@ package x
 
 	r, err := NewRegistry(nil)
 	qt.Assert(t, qt.IsNil(err))
-	ctx := context.Background()
 	gotRequirements, err := r.Requirements(ctx, module.MustNewVersion("bar.example@v0", "v0.0.1"))
 	qt.Assert(t, qt.IsNil(err))
 	qt.Assert(t, qt.HasLen(gotRequirements, 0))

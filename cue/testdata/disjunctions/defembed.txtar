@@ -25,18 +25,20 @@ y4: x & {
 
 // Second disjunct in embedding is not possible because of previous declaration
 // of `b`, so it should be resolved to {a: 1}.
-b: (*"a" | "b") | "c"
-{a: b} | {b: int}
+z: {
+	b: (*"a" | "b") | "c"
+	{a: b} | {b: int}
+}
 -- out/eval/stats --
 Leaks:  0
-Freed:  306
-Reused: 296
-Allocs: 10
+Freed:  163
+Reused: 155
+Allocs: 8
 Retain: 0
 
-Unifications: 52
-Conjuncts:    373
-Disjuncts:    306
+Unifications: 29
+Conjuncts:    198
+Disjuncts:    163
 -- out/eval --
 (struct){
   x: (struct){
@@ -68,8 +70,10 @@ Disjuncts:    306
     m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
     m4: (int){ 6 }
   }
-  b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-  a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+  z: (struct){
+    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -101,10 +105,12 @@ Disjuncts:    306
       m4: ((〈2;y4〉.m1 + 〈2;y4〉.m2) + 〈2;y4〉.m3)
     }
   })
-  b: ((*"a"|"b")|"c")
-  ({
-    a: 〈1;b〉
-  }|{
-    b: int
-  })
+  z: {
+    b: ((*"a"|"b")|"c")
+    ({
+      a: 〈1;b〉
+    }|{
+      b: int
+    })
+  }
 }

@@ -318,18 +318,22 @@ func ToExpr(n ast.Node) ast.Expr {
 //
 // Adjusts the spacing of x when needed.
 func ToFile(n ast.Node) *ast.File {
-	switch x := n.(type) {
-	case nil:
+	if n == nil {
 		return nil
+	}
+	switch n := n.(type) {
 	case *ast.StructLit:
-		return &ast.File{Decls: x.Elts}
+		f := &ast.File{Decls: n.Elts}
+		// Ensure that the comments attached to the struct literal are not lost.
+		ast.SetComments(f, ast.Comments(n))
+		return f
 	case ast.Expr:
-		ast.SetRelPos(x, token.NoSpace)
-		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
+		ast.SetRelPos(n, token.NoSpace)
+		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: n}}}
 	case *ast.File:
-		return x
+		return n
 	default:
-		panic(fmt.Sprintf("Unsupported node type %T", x))
+		panic(fmt.Sprintf("Unsupported node type %T", n))
 	}
 }
 

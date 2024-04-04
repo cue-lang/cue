@@ -10,7 +10,7 @@ rm $CUE_CACHE_DIR
 env-fill dockerconfig/badpassword.json
 cp dockerconfig/badpassword.json dockerconfig/config.json
 ! exec cue export .
-stderr 'import failed: cannot find package "example.com/e": cannot fetch example.com/e@v0.0.1: module example.com/e@v0.0.1: error response: 401 Unauthorized; body: "invalid credentials'
+stderr 'import failed: cannot find package "example.com/e": cannot fetch example.com/e@v0.0.1: module example.com/e@v0.0.1: 401 Unauthorized: unauthorized: authentication required: invalid user-password credentials'
 
 # Sanity-check that a configured default helper which is not installed
 # is not treated as a fatal error. See https://cuelang.org/issue/2934.

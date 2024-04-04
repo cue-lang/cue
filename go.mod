@@ -3,7 +3,7 @@ module cuelang.org/go
 go 1.21
 
 require (
-	cuelabs.dev/go/oci/ociregistry v0.0.0-20240314152124-224736b49f2e
+	cuelabs.dev/go/oci/ociregistry v0.0.0-20240404174027-a39bec0462d2
 	github.com/cockroachdb/apd/v3 v3.2.1
 	github.com/emicklei/proto v1.10.0
 	github.com/go-quicktest/qt v1.101.0

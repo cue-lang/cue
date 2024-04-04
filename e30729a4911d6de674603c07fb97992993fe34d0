@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ded58242_be997dad",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T07:34:58Z",
+      "side": 1,
+      "message": "cmd/cue: print paths relative to the current directory in fmt --check",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ec7283b3_c99af24b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T07:34:58Z",
+      "side": 1,
+      "message": "nit: a bug",
+      "range": {
+        "startLine": 9,
+        "startChar": 6,
+        "endLine": 9,
+        "endChar": 9
+      },
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "76e035da_41b863c2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T07:34:58Z",
+      "side": 1,
+      "message": "make it clickable: https://cuelang.org/cl/1191220",
+      "range": {
+        "startLine": 9,
+        "startChar": 24,
+        "endLine": 9,
+        "endChar": 31
+      },
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "04ee9c1b_79d020f6",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 31,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T07:34:58Z",
+      "side": 1,
+      "message": "not sure what\u0027s going on with your IDE, but please keep the imports sorted in three groups :) both gopls and goimports should do it properly.",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46d86a88_37b5ba50",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T07:34:58Z",
+      "side": 1,
+      "message": "I would honestly inline this function given that it\u0027s only called once. I get that you want to avoid the many levels of indentation, but a separate short func is slightly worse.\n\nyou can unindent the Rel code by inverting and doing an early continue, like:\n\n```\nif f \u003d\u003d \"-\" {\n    continue\n}\n// filepath.Rel..\n```",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d53eff1d_63a0884d",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check_with_cuemod.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T07:34:58Z",
+      "side": 1,
+      "message": "I would just expand fmt_check.txtar to be honest. You could put all existing files under `santdalone/`, and then have a `module/` directory with a CUE module. For the module, you could test both `cue fmt ./...` and `cd subpkg; cue fmt ./...`, checking that the paths are as expected.",
+      "revId": "e30729a4911d6de674603c07fb97992993fe34d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

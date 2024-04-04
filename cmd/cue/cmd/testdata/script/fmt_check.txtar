@@ -1,3 +1,5 @@
+cd standalone
+
 # succeeds when file is formatted
 exec cue fmt --check formatted.cue
 
@@ -18,13 +20,30 @@ stdin not_formatted.cue
 ! exec cue fmt --check -
 ! stdout .
 
--- formatted.cue --
+cd ../module
+
+# files are printed relative to CWD
+! exec cue fmt --check ./...
+cmp stdout stdout.golden
+cd example
+! exec cue fmt --check ./...
+cmp stdout stdout.golden
+
+-- standalone/formatted.cue --
 foo: "bar"
--- not_formatted.cue --
+-- standalone/not_formatted.cue --
 foo:      "bar"
--- another/not_formatted.cue --
+-- standalone/another/not_formatted.cue --
 bar:   "baz"
 x:   1
--- expected-output --
+-- standalone/expected-output --
 not_formatted.cue
 another${/}not_formatted.cue
+-- module/cue.mod/module.cue --
+module: "example.com"
+-- module/stdout.golden --
+example/not_formatted.cue
+-- module/example/not_formatted.cue --
+foo:      "bar"
+-- module/example/stdout.golden --
+not_formatted.cue

@@ -1,0 +1,46 @@
+# Test that cue mod tidy works even when a registry
+# responds with a 401 error instead of a 403 error.
+# This is exactly the same as registry_token_auth_tidy.txtar
+# except for the presence of the "always401" field
+# in auth.json.
+
+env DOCKER_CONFIG=$WORK/dockerconfig
+env-fill $DOCKER_CONFIG/config.json
+exec cue mod tidy
+exec cue export .
+cmp stdout expect-stdout
+
+-- dockerconfig/config.json --
+{
+	"auths": {
+		"${DEBUG_REGISTRY_HOST}": {
+			"identitytoken": "registrytest-refresh"
+		}
+	}
+}
+-- expect-stdout --
+"ok"
+-- main.cue --
+package main
+import "example.com/e"
+
+e.foo
+
+-- cue.mod/module.cue --
+module: "test.org"
+-- _registry/auth.json --
+{
+	"useTokenServer": true,
+	"acl": {
+		"allow": ["^example\\.com/e$"]
+	},
+	"always401": true
+}
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+package e
+
+foo: "ok"
+

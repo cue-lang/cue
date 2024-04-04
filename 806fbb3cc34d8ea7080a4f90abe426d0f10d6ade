@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75cecb9e_376230bb",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 912,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T14:31:21Z",
+      "side": 1,
+      "message": "up to the caller?",
+      "range": {
+        "startLine": 912,
+        "startChar": 15,
+        "endLine": 912,
+        "endChar": 28
+      },
+      "revId": "806fbb3cc34d8ea7080a4f90abe426d0f10d6ade",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a77f3552_737b2d59",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 707,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T14:31:21Z",
+      "side": 1,
+      "message": "do you mean to fix this before submitting, or should this be a TODO?",
+      "revId": "806fbb3cc34d8ea7080a4f90abe426d0f10d6ade",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "60379c73_393392d8",
+        "filename": "internal/core/adt/context.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 832,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-04T14:31:21Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "806fbb3cc34d8ea7080a4f90abe426d0f10d6ade",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

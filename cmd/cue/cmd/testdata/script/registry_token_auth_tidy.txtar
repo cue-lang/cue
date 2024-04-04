@@ -1,0 +1,44 @@
+# Test that we can use cue mod tidy on a registry that
+# responds with 403 (forbidden) status codes
+# for some registry repositories.
+
+env DOCKER_CONFIG=$WORK/dockerconfig
+env-fill $DOCKER_CONFIG/config.json
+env CUE_DEBUG=http
+exec cue mod tidy
+exec cue export .
+cmp stdout expect-stdout
+
+-- dockerconfig/config.json --
+{
+	"auths": {
+		"${DEBUG_REGISTRY_HOST}": {
+			"identitytoken": "registrytest-refresh"
+		}
+	}
+}
+-- expect-stdout --
+"ok"
+-- main.cue --
+package main
+import "example.com/e"
+
+e.foo
+
+-- cue.mod/module.cue --
+module: "test.org"
+-- _registry/auth.json --
+{
+	"useTokenServer": true,
+	"acl": {
+		"allow": ["^example\\.com/e$"]
+	}
+}
+-- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
+module: "example.com/e@v0"
+
+-- _registry/example.com_e_v0.0.1/main.cue --
+package e
+
+foo: "ok"
+

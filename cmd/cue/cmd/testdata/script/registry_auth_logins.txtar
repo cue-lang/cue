@@ -11,7 +11,7 @@ env CUE_CACHE_DIR=$WORK/.tmp/different-cache
 env-fill cueconfig/badtoken.json
 cp cueconfig/badtoken.json cueconfig/logins.json
 ! exec cue export .
-stderr 'import failed: cannot find package .* 401 Unauthorized; body: "invalid credentials'
+stderr 'import failed: cannot find package .* 401 Unauthorized: unauthorized: authentication required: invalid bearer credentials'
 
 # An invalid logins.json should result in an immediate error.
 env CUE_CONFIG_DIR=$WORK/badconfig

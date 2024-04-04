@@ -16,6 +16,41 @@
       "message": "Huh, I can\u0027t reproduce the failure with or without -race, and it only happened in one platform. Seems like we have a little bit of non-determinism somewhere. Will have to investigate beforew we can merge this.",
       "revId": "42c02e7243daa96622ad727cc99149ba244f9d22",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af835480_fb10c0b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-04T15:19:59Z",
+      "side": 1,
+      "message": "Looks to me like it\u0027s not quite right to rely on order of build.Instance.BuildFiles: it\u0027s not documented that it\u0027s always\nin any particular order.\n\nSo I\u0027d suggest adding an explicit sort of badlyFormattedFiles before printing the result.",
+      "parentUuid": "fcd02fc4_91ac17c6",
+      "revId": "42c02e7243daa96622ad727cc99149ba244f9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4e646cb8_15902f8a",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_check.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 8,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-04T15:19:59Z",
+      "side": 1,
+      "message": "from my p.o.v. I think it\u0027s probably fine to print them in lexical order for consistency, particularly as the arguments can mix regular files and packages. I agree about printing them relative to the current directory though, or (perhaps better) printing them exactly as they were specified on the command line.",
+      "revId": "42c02e7243daa96622ad727cc99149ba244f9d22",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

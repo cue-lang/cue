@@ -16,6 +16,23 @@
       "message": "@mvdan@mvdan.cc - will ultimately ask Marcel to confirm this change, but your thoughts would be appreciated in the meantime.",
       "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c046622_8878f998",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-05T04:59:25Z",
+      "side": 1,
+      "message": "Fully approve this change. The only minor downside is that, if any CUE change were to break the tour, we would only notice once the change lands in master. But that seems fairly improbable, and should lead to us improving the \"core\" test suite in e.g. cmd/cue/cmd with regression tests.\n\nAnd, in the rare chance that it does happen, quickly fixing the bug in master shouldn\u0027t be difficult.\n\nOn the other side, deduplicating these tutorials and rendering them on the website is a huge benefit. I only wish you would move/remove the kubernetest tutorial very soon as well, given how darn slow it is on CI :)",
+      "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

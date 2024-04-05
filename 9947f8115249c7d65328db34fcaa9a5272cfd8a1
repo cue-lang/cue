@@ -72,6 +72,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2cd80b6_3cdbf0cf",
+        "filename": "internal/registrytest/registry.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-05T13:18:32Z",
+      "side": 1,
+      "message": "This particular code is in registrytest and is intended to simulate a third party registry server. So to my mind the question is about whether our client code _should_ be dealing with 403 responses, and if so how (hence my reply).",
+      "parentUuid": "400c084a_4b6a8a21",
+      "revId": "9947f8115249c7d65328db34fcaa9a5272cfd8a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35e80dd7_1b8d259e",

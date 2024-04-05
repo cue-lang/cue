@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "78c23998_80190fcf",
+        "filename": "internal/registrytest/registry.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-05T11:37:50Z",
+      "side": 1,
+      "message": "It is technically leaky, but 403 is still a legitimate error code for servers to return (also \"DENIED\" is one of the explicitly listed OCI error codes, which corresponds closely to a 403 error AFAICS), so I think we need to deal with it.\n\nHere\u0027s an example of where the Docker registry implementation appears to return a 403 error in response to inadequate authorization: https://github.com/distribution/distribution/blob/8d12329a8f2d4d0371eea2df2091f867d370dcb9/registry/handlers/manifests.go#L394\nIt could be argued that it\u0027s wrong to do so, but the fact remains that the possibility is there.\n\nFor the record, ISTM that another legitimate approach to avoid exposing module presence/absence might be to _always_ return 403 and never 404.",
+      "parentUuid": "2188950e_1f7798ab",
+      "revId": "9947f8115249c7d65328db34fcaa9a5272cfd8a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "35e80dd7_1b8d259e",
         "filename": "mod/modregistry/client.go",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-05T08:57:17Z",
       "side": 1,
       "message": "Does `%v` also wrap errors? If not, suggest using `%w`\n\n```suggestion\n\t\treturn nil, fmt.Errorf(\"module %v: %w\", m, _err)\n```",
+      "revId": "9947f8115249c7d65328db34fcaa9a5272cfd8a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3ed8ba8a_2287c811",
+        "filename": "mod/modregistry/client.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-05T11:37:50Z",
+      "side": 1,
+      "message": "I\u0027m usually in favour of hiding error causes, but I think there\u0027s a reasonable case for exposing it here, so done. I\u0027ve also changed an existing place that was using the same pattern and added a TODO about whether we should be using a less specific not-found check there too.",
+      "parentUuid": "35e80dd7_1b8d259e",
       "revId": "9947f8115249c7d65328db34fcaa9a5272cfd8a1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

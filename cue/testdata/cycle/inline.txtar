@@ -263,6 +263,8 @@ Result:
 }
 -- out/evalalpha --
 Errors:
+inline.acrossFields.fail1.k10: conflicting values 4 and 1:
+    ./x.cue:30:8
 structural cycle:
     ./x.cue:6:9
 structural cycle:
@@ -276,8 +278,6 @@ in: structural cycle:
 in: structural cycle:
     ./x.cue:35:17
 in: structural cycle:
-    ./x.cue:38:17
-in: structural cycle:
     ./x.cue:49:17
 in: structural cycle:
     ./x.cue:50:17
@@ -286,9 +286,9 @@ in: structural cycle:
 
 Result:
 (_|_){
-  // [structural cycle]
+  // [eval]
   inline: (_|_){
-    // [structural cycle]
+    // [eval]
     small: (_|_){
       // [structural cycle]
       f: (_|_){
@@ -334,9 +334,9 @@ Result:
       }
     }
     acrossFields: (_|_){
-      // [structural cycle]
+      // [eval]
       fail1: (_|_){
-        // [structural cycle]
+        // [eval]
         f: (struct){
           in: (number){ number }
           out: (_|_){
@@ -347,8 +347,8 @@ Result:
         }
         k00: (int){ 0 }
         k10: (_|_){
-          // [structural cycle] in: structural cycle:
-          //     ./x.cue:38:17
+          // [eval] inline.acrossFields.fail1.k10: conflicting values 4 and 1:
+          //     ./x.cue:30:8
         }
         k20: (_|_){
           // [structural cycle] in: structural cycle:
@@ -386,7 +386,10 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -2,11 +2,23 @@
+@@ -1,18 +1,30 @@
+ Errors:
++inline.acrossFields.fail1.k10: conflicting values 4 and 1:
++    ./x.cue:30:8
  structural cycle:
      ./x.cue:6:9
  structural cycle:
@@ -401,8 +404,6 @@ diff old new
 +in: structural cycle:
 +    ./x.cue:35:17
 +in: structural cycle:
-+    ./x.cue:38:17
-+in: structural cycle:
 +    ./x.cue:49:17
 +in: structural cycle:
 +    ./x.cue:50:17
@@ -411,6 +412,14 @@ diff old new
  
  Result:
  (_|_){
+-  // [structural cycle]
++  // [eval]
+   inline: (_|_){
+-    // [structural cycle]
++    // [eval]
+     small: (_|_){
+       // [structural cycle]
+       f: (_|_){
 @@ -28,7 +40,7 @@
        // [structural cycle]
        f2: (_|_){
@@ -429,10 +438,23 @@ diff old new
          }
        }
        f: (_|_){
-@@ -72,26 +84,36 @@
+@@ -58,9 +70,9 @@
+       }
+     }
+     acrossFields: (_|_){
+-      // [structural cycle]
++      // [eval]
+       fail1: (_|_){
+-        // [structural cycle]
++        // [eval]
+         f: (struct){
+           in: (number){ number }
+           out: (_|_){
+@@ -71,27 +83,37 @@
+         }
          k00: (int){ 0 }
          k10: (_|_){
-           // [structural cycle] in: structural cycle:
+-          // [structural cycle] in: structural cycle:
 -          //     ./x.cue:30:8
 -        }
 -        k20: (_|_){
@@ -445,7 +467,8 @@ diff old new
 -        }
 -      }
 -      ok1: (struct){
-+          //     ./x.cue:38:17
++          // [eval] inline.acrossFields.fail1.k10: conflicting values 4 and 1:
++          //     ./x.cue:30:8
 +        }
 +        k20: (_|_){
 +          // [structural cycle] in: structural cycle:

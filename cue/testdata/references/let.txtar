@@ -415,7 +415,7 @@ Disjuncts:    117
       }
       min: (int){ 1 }
       max: (_|_){
-        // [incomplete] incompleteLet.bar.max: undefined field: max:
+        // [incomplete] incompleteLet.bar.mx: undefined field: max:
         //     ./in.cue:54:17
       }
     }
@@ -485,6 +485,15 @@ Disjuncts:    117
 diff old new
 --- old
 +++ new
+@@ -118,7 +118,7 @@
+       }
+       min: (int){ 1 }
+       max: (_|_){
+-        // [incomplete] incompleteLet.bar.max: undefined field: max:
++        // [incomplete] incompleteLet.bar.mx: undefined field: max:
+         //     ./in.cue:54:17
+       }
+     }
 @@ -173,9 +173,9 @@
      }
      b: (string){

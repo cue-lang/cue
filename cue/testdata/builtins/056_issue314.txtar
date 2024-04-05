@@ -85,6 +85,51 @@ Retain: 17
 Unifications: 45
 Conjuncts:    77
 Disjuncts:    62
+-- out/evalalpha --
+(struct){
+  x: (#struct){
+    s: (string){ "myname" }
+    out: (string){ "myname" }
+  }
+  #T: (#struct){
+    s: (string){ string }
+    out: (_|_){
+      // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
+      //     ./in.cue:14:7
+      //     ./in.cue:13:2
+    }
+  }
+  #V: (#struct){
+    s: (string){ string }
+    out: (_|_){
+      // [incomplete] cannot convert incomplete value "string" to JSON:
+      //     ./in.cue:20:7
+    }
+  }
+  #U: (#struct){
+    s: (string){ string }
+    out: (_|_){
+      // [incomplete] #U.out: error in call to encoding/yaml.Marshal: incomplete value string:
+      //     ./in.cue:26:7
+      //     ./in.cue:25:7
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -8,7 +8,7 @@
+     out: (_|_){
+       // [incomplete] #T.out: error in call to text/template.Execute: cannot convert non-concrete value string:
+       //     ./in.cue:14:7
+-      //     ./in.cue:15:3
++      //     ./in.cue:13:2
+     }
+   }
+   #V: (#struct){
+-- diff/todo/p3 --
+Error positions.
 -- out/eval --
 (struct){
   x: (#struct){

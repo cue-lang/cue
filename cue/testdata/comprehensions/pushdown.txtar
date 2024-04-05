@@ -765,9 +765,6 @@ embed.fail4.p: field not allowed:
 fieldMismatch.a: cannot combine regular field "x" with 2:
     ./in.cue:139:7
     ./in.cue:137:3
-provideIncompleteSuccess.t2.a.c.d: field not allowed:
-    ./in.cue:190:11
-    ./in.cue:190:8
 
 Result:
 (_|_){
@@ -919,8 +916,7 @@ Result:
       }
     }
   }
-  provideIncompleteSuccess: (_|_){
-    // [eval]
+  provideIncompleteSuccess: (struct){
     t1: (struct){
       #a: (_|_){
         // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
@@ -936,23 +932,15 @@ Result:
         c: (int){ 4 }
       }
     }
-    t2: (_|_){
-      // [eval]
+    t2: (struct){
       #a: (#struct){
         c: (int){ 4 }
         b: (bool){ true }
       }
       #c: (#struct){
       }
-      a: (_|_){
-        // [eval]
-        c: (_|_){
-          // [eval]
-          d: (_|_){
-            // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
-            //     ./in.cue:190:11
-            //     ./in.cue:190:8
-          }
+      a: (struct){
+        c: (#struct){
         }
         b: (bool){ true }
       }
@@ -1134,7 +1122,7 @@ Result:
       E: (#struct){
         e: (bool){ bool }
         f: (_|_){
-          // [incomplete] voidEliminationSuccess.derefRef2.E.f: operand e of '!' not concrete (was bool):
+          // [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
           //     ./in.cue:389:7
         }
       }
@@ -1392,33 +1380,11 @@ Result:
     }
   }
 }
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  15
--Freed:  394
--Reused: 388
--Allocs: 21
--Retain: 100
-+Leaks:  513
-+Freed:  2
-+Reused: 2
-+Allocs: 513
-+Retain: 0
- 
--Unifications: 395
--Conjuncts:    636
--Disjuncts:    464
-+Unifications: 489
-+Conjuncts:    2982
-+Disjuncts:    22
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,27 +1,19 @@
+@@ -1,24 +1,13 @@
  Errors:
 +noStackOverflowStructCycle.#list.tail: structural cycle
 +noStackOverflowStructCycle.list.tail: structural cycle
@@ -1447,13 +1413,7 @@ diff old new
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:139:7
      ./in.cue:137:3
-+provideIncompleteSuccess.t2.a.c.d: field not allowed:
-+    ./in.cue:190:11
-+    ./in.cue:190:8
- 
- Result:
- (_|_){
-@@ -63,8 +55,8 @@
+@@ -63,8 +52,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1464,7 +1424,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -73,10 +65,7 @@
+@@ -73,10 +62,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -1476,7 +1436,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -97,10 +86,7 @@
+@@ -97,10 +83,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -1488,7 +1448,7 @@ diff old new
          //     ./in.cue:74:4
          q: (int){ 1 }
        }
-@@ -125,7 +111,6 @@
+@@ -125,7 +108,6 @@
          // [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
          //     ./in.cue:93:6
          //     ./in.cue:94:6
@@ -1496,7 +1456,17 @@ diff old new
        }
        q: (int){ int }
      }
-@@ -189,12 +174,12 @@
+@@ -180,8 +162,7 @@
+       }
+     }
+   }
+-  provideIncompleteSuccess: (_|_){
+-    // [eval]
++  provideIncompleteSuccess: (struct){
+     t1: (struct){
+       #a: (_|_){
+         // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
+@@ -189,16 +170,15 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1508,24 +1478,39 @@ diff old new
        y: (#struct){
 -        c: (int){ 4 }
 -        b: (bool){ true }
+-      }
+-    }
+-    t2: (_|_){
+-      // [eval]
 +        b: (bool){ true }
 +        c: (int){ 4 }
++      }
++    }
++    t2: (struct){
+       #a: (#struct){
+         c: (int){ 4 }
+         b: (bool){ true }
+@@ -205,17 +185,8 @@
        }
-     }
-     t2: (_|_){
-@@ -211,10 +196,8 @@
-           // [eval]
-           d: (_|_){
-             // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
+       #c: (#struct){
+       }
+-      a: (_|_){
+-        // [eval]
+-        c: (_|_){
+-          // [eval]
+-          d: (_|_){
+-            // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
 -            //     ./in.cue:187:7
 -            //     ./in.cue:189:4
-+            //     ./in.cue:190:11
-             //     ./in.cue:190:8
+-            //     ./in.cue:190:8
 -            //     ./in.cue:195:7
-           }
+-          }
++      a: (struct){
++        c: (#struct){
          }
          b: (bool){ true }
-@@ -245,17 +228,22 @@
+       }
+@@ -245,17 +216,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1552,7 +1537,16 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -412,17 +400,10 @@
+@@ -392,7 +368,7 @@
+       E: (#struct){
+         e: (bool){ bool }
+         f: (_|_){
+-          // [incomplete] voidEliminationSuccess.derefRef2.E.f: operand e of '!' not concrete (was bool):
++          // [incomplete] voidEliminationSuccess.derefRef2.#F.f: operand e of '!' not concrete (was bool):
+           //     ./in.cue:389:7
+         }
+       }
+@@ -412,17 +388,10 @@
          }
        }
        E: (_|_){
@@ -1571,7 +1565,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -433,17 +414,10 @@
+@@ -433,17 +402,10 @@
          }
        }
        E: (_|_){
@@ -1590,7 +1584,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -562,13 +536,13 @@
+@@ -562,13 +524,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1608,7 +1602,7 @@ diff old new
          }
        }
      }
-@@ -590,7 +564,7 @@
+@@ -590,7 +552,7 @@
        y: (int){ 1 }
      }
      a: (struct){
@@ -1617,7 +1611,7 @@ diff old new
      }
    }
    nestedWithEmbeddingOK: (struct){
-@@ -605,9 +579,7 @@
+@@ -605,9 +567,7 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1628,6 +1622,28 @@ diff old new
        y: (int){ 1 }
      }
    }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  15
+-Freed:  394
+-Reused: 388
+-Allocs: 21
+-Retain: 100
++Leaks:  513
++Freed:  2
++Reused: 2
++Allocs: 513
++Retain: 0
+ 
+-Unifications: 395
+-Conjuncts:    636
+-Disjuncts:    464
++Unifications: 489
++Conjuncts:    2982
++Disjuncts:    22
 -- out/eval/stats --
 Leaks:  15
 Freed:  394
@@ -1644,6 +1660,8 @@ provideIncompleteSuccess.t2.a.c.d: missing error.
 A bit esoteric, but should work.
 -- diff/todo/p2 --
 Missing empty disjunction message.
+provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.
+   A bit esoteric, but should probably work.
 -- diff/explanation --
 cyclicError: improved error message.
 nestedWithDynamicFieldOK: fixed bug.

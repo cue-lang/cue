@@ -51,12 +51,7 @@ Unifications: 52
 Conjuncts:    120
 Disjuncts:    66
 -- out/evalalpha --
-Errors:
-#f2.from: structural cycle
-
-Result:
-(_|_){
-  // [structural cycle]
+(struct){
   #d1: (#struct){
     as: (list){
     }
@@ -113,11 +108,12 @@ Result:
     as: (list){
     }
   }
-  #f2: (_|_){
-    // [structural cycle]
+  #f2: (#struct){
     do: (string){ "f2" }
-    from: (_|_){
-      // [structural cycle] #f2.from: structural cycle
+    from: (_){
+      _
+      #c: (list){
+      }
     }
   }
 }
@@ -125,16 +121,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,13 +1,18 @@
--(struct){
-+Errors:
-+#f2.from: structural cycle
-+
-+Result:
-+(_|_){
-+  // [structural cycle]
-   #d1: (#struct){
-     as: (list){
+@@ -4,10 +4,10 @@
      }
      #c: (#list){
        0: (#struct){
@@ -146,7 +133,7 @@ diff old new
        }
      }
    }
-@@ -15,21 +20,21 @@
+@@ -15,21 +15,21 @@
      p: (string){ |(*(string){ "." }, (string){ string }) }
      #c: (#list){
        0: (#struct){
@@ -174,25 +161,6 @@ diff old new
        }
      }
    }
-@@ -55,12 +60,11 @@
-     as: (list){
-     }
-   }
--  #f2: (#struct){
-+  #f2: (_|_){
-+    // [structural cycle]
-     do: (string){ "f2" }
--    from: (_){
--      _
--      #c: (list){
--      }
-+    from: (_|_){
-+      // [structural cycle] #f2.from: structural cycle
-     }
-   }
- }
--- diff/todo/p0 --
-#f2.from: incorrect structural cycle
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

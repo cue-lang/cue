@@ -168,6 +168,8 @@ diff old new
          metrics: (struct){
            foo: (struct){
            }
+-- diff/todo/p1 --
+issue570.results.result: Spurious error: field not allowed
 -- diff/todo/p3 --
 Missing empty disjunction message.
 Missing error positions.

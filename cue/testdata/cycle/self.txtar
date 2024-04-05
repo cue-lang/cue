@@ -446,9 +446,7 @@ Result:
   disjList: (struct){
     ok1: (struct){
       #A: (string){ string }
-      x: ((string|list)){ |((string){ string }, (#list){
-          0: (string){ string }
-        }) }
+      x: (string){ string }
       y: (#list){
         0: (#list){
           0: (#list){
@@ -465,9 +463,7 @@ Result:
     }
     ok3: (struct){
       #A: (string){ string }
-      x: ((string|list)){ |((#list){
-          0: (string){ string }
-        }, (string){ string }) }
+      x: (string){ string }
     }
     ok4: (struct){
       x: (string){ string }
@@ -721,55 +717,8 @@ diff old new
        }
      }
    }
-@@ -189,24 +171,28 @@
-   disjList: (struct){
-     ok1: (struct){
-       #A: (string){ string }
--      x: (string){ string }
--      y: (#list){
--        0: (#list){
--          0: (#list){
--            0: (#list){
--              0: (string){ string }
--            }
--          }
--        }
--      }
--    }
--    ok2: (struct){
--      x: (string){ string }
--      #A: (string){ string }
--    }
--    ok3: (struct){
--      #A: (string){ string }
--      x: (string){ string }
-+      x: ((string|list)){ |((string){ string }, (#list){
-+          0: (string){ string }
-+        }) }
-+      y: (#list){
-+        0: (#list){
-+          0: (#list){
-+            0: (#list){
-+              0: (string){ string }
-+            }
-+          }
-+        }
-+      }
-+    }
-+    ok2: (struct){
-+      x: (string){ string }
-+      #A: (string){ string }
-+    }
-+    ok3: (struct){
-+      #A: (string){ string }
-+      x: ((string|list)){ |((#list){
-+          0: (string){ string }
-+        }, (string){ string }) }
-     }
-     ok4: (struct){
-       x: (string){ string }
--- diff/todo/p2 --
-disjList.(ok1|ok3).x: cycle detected too late.
+-- diff/todo/p3 --
+list.error*: different error messages.
 -- out/eval --
 Errors:
 expr.error1.a: conflicting values 4 and 3:

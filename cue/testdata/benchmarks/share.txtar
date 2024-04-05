@@ -47,16 +47,16 @@ j: 1
   ]
   j: 1
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  3268
-Reused: 3258
-Allocs: 10
-Retain: 2803
+-- out/evalalpha/stats --
+Leaks:  34
+Freed:  0
+Reused: 0
+Allocs: 34
+Retain: 0
 
-Unifications: 3268
-Conjuncts:    6529
-Disjuncts:    3271
+Unifications: 34
+Conjuncts:    95
+Disjuncts:    0
 -- out/eval --
 (struct){
   f: (#list){
@@ -3793,3 +3793,35 @@ Disjuncts:    3271
   }
   j: (int){ 1 }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  3268
+-Reused: 3258
+-Allocs: 10
+-Retain: 2803
++Leaks:  34
++Freed:  0
++Reused: 0
++Allocs: 34
++Retain: 0
+ 
+-Unifications: 3268
+-Conjuncts:    6529
+-Disjuncts:    3271
++Unifications: 34
++Conjuncts:    95
++Disjuncts:    0
+-- out/eval/stats --
+Leaks:  0
+Freed:  3268
+Reused: 3258
+Allocs: 10
+Retain: 2803
+
+Unifications: 3268
+Conjuncts:    6529
+Disjuncts:    3271

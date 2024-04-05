@@ -71,17 +71,23 @@ var needFix = map[string]string{
 }
 
 func TestEvalAlpha(t *testing.T) {
-	adt.DebugDeps = false // check unmatched dependencies.
+	// TODO: remove use of externalDeps for processing. Currently, enabling
+	// this would fix some issues, but also introduce some closedness bugs.
+	// As a first step, we should ensure that the temporary hack of using
+	// externalDeps to agitate pending dependencies is replaced with a
+	// dedicated mechanism.
+	//
+	// adt.DebugDeps = true // check unmatched dependencies.
 
 	var todoAlpha = map[string]string{
 		// Crashes and hangs
 		"cycle/evaluate": "hang",
 		"cycle/chain":    "hang",
 
-		// "disjunctions/elimination": "performance issue",
+		"cycle/comprehension": "crash",
+		"cycle/structural":    "hang",
 
-		// Later: all good, just much cruft.
-		"benchmarks/issue2176": "fails to remove errors",
+		"benchmarks/issue2176": "too many errors",
 	}
 
 	test := cuetxtar.TxTarTest{

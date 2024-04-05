@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "400c084a_4b6a8a21",
+        "filename": "internal/registrytest/registry.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-05T12:35:56Z",
+      "side": 1,
+      "message": "Just observing, but given we are talking about code in the CUE repo here it\u0027s impossible for us to leak. We can inappropriately reclassify an error, but that\u0027s about it.",
+      "parentUuid": "4ec1f61c_53c3bc86",
+      "revId": "9947f8115249c7d65328db34fcaa9a5272cfd8a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35e80dd7_1b8d259e",

@@ -420,6 +420,43 @@ outer:
 	//      y: [string]: b: y
 	//      x: y
 	//      x: c: x
+	//
+	// ->
+	//          - in conjuncts
+	//             - out conjuncts: these count for cycle detection.
+	//      x: {
+	//          [string]: <1: y> b: y
+	//          c: x
+	//      }
+	//      x.c: {
+	//          <1: y> b: y
+	//          <2: x> y
+	//             [string]: <3: x, y> b: y
+	//          <2: x> c: x
+	//      }
+	//      x.c.b: {
+	//          <1: y> y
+	//             [string]: <4: y; Cyclic> b: y
+	//          <3: x, y> b: y
+	//      }
+	//      x.c.b.b: {
+	//          <3: x, y> y
+	//               [string]: <5: x, y, Cyclic> b: y
+	//          <4: y, Cyclic> y
+	//               [string]: <5: x, y, Cyclic> b: y
+	//      }
+	//      x.c.c: { // structural cycle
+	//          <3: x, y> b: y
+	//          <2: x> x
+	//               <6: x, Cyclic>: y
+	//                    [string]: <8: x, y; Cyclic> b: y
+	//               <7: x, Cyclic>: c: x
+	//      }
+	//      x.c.c.b: { // structural cycle
+	//          <3: x, y> y
+	//               [string]: <3: x, y; Cyclic> b: y
+	//          <8: x, y; Cyclic> y
+	//      }
 	// ->
 	//      x: [string]: b: y
 	//      x: c: b: y

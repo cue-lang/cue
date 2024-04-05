@@ -233,9 +233,10 @@ func (i *Iterator) Next() bool {
 	arc := i.arcs[i.p]
 	arc.Finalize(i.ctx)
 	p := linkParent(i.val.parent_, i.val.v, arc)
-	i.cur = makeValue(i.val.idx, arc, p)
 	i.f = arc.Label
 	i.arcType = arc.ArcType
+	arc = arc.Indirect()
+	i.cur = makeValue(i.val.idx, arc, p)
 	i.p++
 	return true
 }
@@ -617,6 +618,8 @@ func newValueRoot(idx *runtime.Runtime, ctx *adt.OpContext, x adt.Expr) Value {
 
 func newChildValue(o *structValue, i int) Value {
 	arc := o.at(i)
+	// TODO: fix linkage to parent.
+	arc = arc.Indirect()
 	return makeValue(o.v.idx, arc, linkParent(o.v.parent_, o.v.v, arc))
 }
 
@@ -1408,7 +1411,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		if f.IsHidden() && o.omitHidden {
 			continue
 		}
-		arc := obj.Lookup(f)
+		arc := obj.LookupRaw(f)
 		if arc == nil {
 			continue
 		}
@@ -1423,7 +1426,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 			// it avoids hiding errors in required fields.
 			if o.omitOptional || o.concrete || o.final {
 				arc = &adt.Vertex{
-					Label:     arc.Label,
+					Label:     f,
 					Parent:    arc.Parent,
 					Conjuncts: arc.Conjuncts,
 					BaseValue: adt.NewRequiredNotPresentError(ctx, arc),

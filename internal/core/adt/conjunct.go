@@ -138,30 +138,42 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		}
 
 	case *Vertex:
+		// TODO: move this logic to scheduleVertexConjuncts or at least ensure
+		// that we can also share data Vertices?
 		if x.IsData() {
+			n.unshare()
 			n.insertValueConjunct(env, x, id)
 		} else {
 			n.scheduleVertexConjuncts(c, x, id)
 		}
 
 	case Value:
+		// TODO: perhaps some values could be shared.
+		n.unshare()
 		n.insertValueConjunct(env, x, id)
 
 	case *BinaryExpr:
+		// NOTE: do not unshare: a conjunction could still allow structure
+		// sharing, such as in the case of `ref & ref`.
 		if x.Op == AndOp {
 			n.scheduleConjunct(MakeConjunct(env, x.X, id), id)
 			n.scheduleConjunct(MakeConjunct(env, x.Y, id), id)
 			return
 		}
+
+		n.unshare()
 		// Even though disjunctions and conjunctions are excluded, the result
 		// must may still be list in the case of list arithmetic. This could
 		// be a scalar value only once this is no longer supported.
 		n.scheduleTask(handleExpr, env, x, id)
 
 	case *StructLit:
+		n.unshare()
 		n.scheduleStruct(env, x, id)
 
 	case *ListLit:
+		n.unshare()
+
 		// At this point we known we have at least an empty list.
 		n.updateCyclicStatus(id)
 
@@ -172,6 +184,8 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.scheduleTask(handleListLit, env, x, id)
 
 	case *DisjunctionExpr:
+		n.unshare()
+
 		// TODO(perf): reuse envDisjunct values so that we can also reuse the
 		// disjunct slice.
 		d := envDisjunct{
@@ -197,6 +211,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		n.scheduleTask(handleResolver, env, x, id)
 
 	case Evaluator:
+		n.unshare()
 		// Interpolation, UnaryExpr, CallExpr
 		n.scheduleTask(handleExpr, env, x, id)
 
@@ -339,6 +354,11 @@ loop2:
 func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo CloseInfo) {
 	// disjunctions, we need to dereference he underlying node.
 	if deref(n.node) == deref(arc) {
+		return
+	}
+
+	if n.shareIfPossible(c, arc, closeInfo) {
+		arc.getState(n.ctx)
 		return
 	}
 
@@ -543,6 +563,9 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 		n.scheduleDisjunction(d)
 
 	case *Conjunction:
+		// TODO: consider sharing: conjunct could be `ref & ref`, for instance,
+		// in which case ref could still be shared.
+
 		for _, x := range x.Values {
 			n.insertValueConjunct(env, x, id)
 		}

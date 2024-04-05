@@ -60,101 +60,58 @@ issue1708: {
 }
 
 -- out/evalalpha/stats --
-Leaks:  209
+Leaks:  176
 Freed:  0
 Reused: 0
-Allocs: 209
+Allocs: 176
 Retain: 0
 
-Unifications: 194
-Conjuncts:    1122
+Unifications: 176
+Conjuncts:    929
 Disjuncts:    0
 -- out/evalalpha --
-Errors:
-structural cycle:
-    ./in.cue:10:8
-structural cycle:
-    ./in.cue:21:9
-structural cycle:
-    ./in.cue:32:15
-structural cycle:
-    ./in.cue:43:15
-structural cycle:
-    ./in.cue:56:8
-
-Result:
-(_|_){
-  // [structural cycle]
-  ok1: (_|_){
-    // [structural cycle]
+(struct){
+  ok1: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:10:8
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:10:8
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  ok2: (_|_){
-    // [structural cycle]
+  ok2: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:21:9
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:21:9
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  ok3: (_|_){
-    // [structural cycle]
+  ok3: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:32:15
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:32:15
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  ok4: (_|_){
-    // [structural cycle]
+  ok4: (struct){
     f: (struct){
       in: (number){ number }
       out: (number){ number }
     }
     k00: (int){ 0 }
     k10: (int){ 0 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:43:15
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:43:15
-    }
+    k20: (int){ 0 }
+    k30: (int){ 0 }
   }
-  issue1708: (_|_){
-    // [structural cycle]
+  issue1708: (struct){
     #add10: (#struct){
       in: (number){ number }
       a10: (#struct){
@@ -166,21 +123,15 @@ Result:
         }
       }
       out: (_|_){
-        // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
+        // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
         //     ./in.cue:52:20
         //     ./in.cue:51:7
       }
     }
     k00: (int){ 0 }
     k10: (int){ 10 }
-    k20: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
-    }
-    k30: (_|_){
-      // [structural cycle] structural cycle:
-      //     ./in.cue:56:8
-    }
+    k20: (int){ 20 }
+    k30: (int){ 30 }
   }
 }
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
@@ -193,154 +144,23 @@ diff old new
 -Reused: 379
 -Allocs: 301
 -Retain: 1047
-+Leaks:  209
++Leaks:  176
 +Freed:  0
 +Reused: 0
-+Allocs: 209
++Allocs: 176
 +Retain: 0
  
 -Unifications: 680
 -Conjuncts:    2709
 -Disjuncts:    1414
-+Unifications: 194
-+Conjuncts:    1122
++Unifications: 176
++Conjuncts:    929
 +Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,45 +1,88 @@
--(struct){
--  ok1: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  ok2: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  ok3: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  ok4: (struct){
--    f: (struct){
--      in: (number){ number }
--      out: (number){ number }
--    }
--    k00: (int){ 0 }
--    k10: (int){ 0 }
--    k20: (int){ 0 }
--    k30: (int){ 0 }
--  }
--  issue1708: (struct){
-+Errors:
-+structural cycle:
-+    ./in.cue:10:8
-+structural cycle:
-+    ./in.cue:21:9
-+structural cycle:
-+    ./in.cue:32:15
-+structural cycle:
-+    ./in.cue:43:15
-+structural cycle:
-+    ./in.cue:56:8
-+
-+Result:
-+(_|_){
-+  // [structural cycle]
-+  ok1: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:10:8
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:10:8
-+    }
-+  }
-+  ok2: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:21:9
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:21:9
-+    }
-+  }
-+  ok3: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:32:15
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:32:15
-+    }
-+  }
-+  ok4: (_|_){
-+    // [structural cycle]
-+    f: (struct){
-+      in: (number){ number }
-+      out: (number){ number }
-+    }
-+    k00: (int){ 0 }
-+    k10: (int){ 0 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:43:15
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:43:15
-+    }
-+  }
-+  issue1708: (_|_){
-+    // [structural cycle]
-     #add10: (#struct){
-       in: (number){ number }
-       a10: (#struct){
-@@ -48,7 +91,6 @@
+@@ -48,14 +48,12 @@
            // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
            //     ./in.cue:52:20
            //     ./in.cue:51:7
@@ -348,31 +168,17 @@ diff old new
          }
        }
        out: (_|_){
-@@ -55,12 +97,17 @@
-         // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
+-        // [incomplete] issue1708.#add10.out: non-concrete value number in operand to +:
++        // [incomplete] issue1708.#add10.a10.o: non-concrete value number in operand to +:
          //     ./in.cue:52:20
          //     ./in.cue:51:7
 -        //     ./in.cue:52:13
        }
      }
      k00: (int){ 0 }
-     k10: (int){ 10 }
--    k20: (int){ 20 }
--    k30: (int){ 30 }
-+    k20: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
-+    }
-+    k30: (_|_){
-+      // [structural cycle] structural cycle:
-+      //     ./in.cue:56:8
-+    }
-   }
- }
--- diff/todo/p2 --
-TODO(share)
-Fix spurious strcutural cycles once we have structure sharing.
-error positions
+-- diff/todo/p3 --
+Error positions.
+Incorrect path due to structure sharing.
 -- out/eval/stats --
 Leaks:  291
 Freed:  389

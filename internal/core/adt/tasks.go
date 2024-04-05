@@ -15,6 +15,8 @@
 package adt
 
 import (
+	"fmt"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 )
@@ -99,6 +101,7 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 		// TODO: yield instead?
 		return
 	}
+	ctx.Logf(t.node.node, "RESOLVED %v to %v %v", r, arc.Label, fmt.Sprintf("%p", arc))
 	// TODO: consider moving after markCycle or removing.
 	arc = arc.Indirect()
 

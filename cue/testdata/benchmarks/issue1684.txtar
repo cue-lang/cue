@@ -33,15 +33,15 @@ out: #secrets & {
 	ONE: TWO: THREE: $secret: _id: "123"
 }
 -- out/evalalpha/stats --
-Leaks:  2115
-Freed:  539
-Reused: 539
-Allocs: 2115
+Leaks:  1896
+Freed:  461
+Reused: 461
+Allocs: 1896
 Retain: 0
 
-Unifications: 614
-Conjuncts:    5842
-Disjuncts:    846
+Unifications: 533
+Conjuncts:    5254
+Disjuncts:    720
 -- out/eval --
 (struct){
   #Secret: (#struct){
@@ -85,18 +85,18 @@ diff old new
 -Freed:  1064043
 -Reused: 1063992
 -Allocs: 51
-+Leaks:  2115
-+Freed:  539
-+Reused: 539
-+Allocs: 2115
++Leaks:  1896
++Freed:  461
++Reused: 461
++Allocs: 1896
  Retain: 0
  
 -Unifications: 791999
 -Conjuncts:    2479541
 -Disjuncts:    1064043
-+Unifications: 614
-+Conjuncts:    5842
-+Disjuncts:    846
++Unifications: 533
++Conjuncts:    5254
++Disjuncts:    720
 -- out/eval/stats --
 Leaks:  0
 Freed:  1064043

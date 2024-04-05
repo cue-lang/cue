@@ -249,6 +249,7 @@ type Vertex struct {
 }
 
 func deref(v *Vertex) *Vertex {
+	v = v.Indirect()
 	n := v.state
 	if n != nil {
 		v = n.underlying
@@ -1018,6 +1019,22 @@ func (v *Vertex) Lookup(f Feature) *Vertex {
 			// We should leave it up to the user of Lookup at what point an
 			// indirection is necessary.
 			a = a.Indirect()
+			return a
+		}
+	}
+	return nil
+}
+
+// LookupRaw returns the Arc with label f if it exists or nil otherwise.
+//
+// TODO: with the introduction of structure sharing, it is not always correct
+// to indirect the arc. At the very least, this discards potential useful
+// information. We introduce LookupRaw to avoid having to delete the
+// information. Ultimately, this should become Lookup, or better, we should
+// have a higher-level API for accessing values.
+func (v *Vertex) LookupRaw(f Feature) *Vertex {
+	for _, a := range v.Arcs {
+		if a.Label == f {
 			return a
 		}
 	}

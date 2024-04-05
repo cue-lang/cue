@@ -68,6 +68,407 @@ Retain: 1359
 Unifications: 4161
 Conjuncts:    9489
 Disjuncts:    4804
+-- out/evalalpha --
+Errors:
+output."1".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
+    ./in.cue:23:9
+output."2".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
+    ./in.cue:23:9
+
+Result:
+(_|_){
+  // [eval]
+  #Datastream: (#struct){
+    message: (string){ strings.MinRunes(4) }
+    marker: (#struct){
+      length: (int){ int }
+      position: (_|_){
+        // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+        //     ./in.cue:14:21
+        //     ./in.cue:9:11
+        let characters#1 = (_|_){
+          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+          //     ./in.cue:14:21
+          //     ./in.cue:9:11
+        }
+        let unique_combinations#2 = (_|_){
+          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
+          //     ./in.cue:14:21
+          //     ./in.cue:9:11
+          let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+        }
+      }
+    }
+  }
+  input_short: (string){ "mjqjpqmgbljsphdztnvjfqwrcgsmlb" }
+  input_long: (string){ "qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw" }
+  input: (string){ |(*(string){ "mjqjpqmgbljsphdztnvjfqwrcgsmlb" }, (string){ "qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw" }) }
+  datastream: (#struct){
+    message: (string){ |(*(string){ "mjqjpqmgbljsphdztnvjfqwrcgsmlb" }, (string){ "qfmfhmhjmjggwbbvdvwvlvrrtsrsccwsslvlffjrrtprprjjvmmclmmghhddpvddclctcqtccgbgdbgdgsdgghqhtqtvvptvppwrwprpvrrrhpphththvhhrnnhnlnslnlhnhnhgnhnpnqqsmsgsllprlprrlzzqzffmzztctbtnbtthlttqvqcqmcmpcpbbczzbqbgghcghchhvwvllfrfnnbssfzsszpsplpglpprnpnfnbnhbnbtbzzvbvpbbhjjlzzbtbvbppczppbwppqwwnwlwccglgvgrgmmdwmwrmrppnfnhhhhqthqthqqrhrshhhqbhqqjgjvjllzvzbzhbbpttjsszvzqqtzzmbmddpldpdcdnccrmcrmmpwprplrrqssvddmpdmmwfwwlrljrrdsssmhsspnpffjggqllnzlnlhnnmddfrfpfbbvssjsrrznngcghgchcmhmrrrtzztjzzhchssslsmlmvvpwpqpjqjdddmsdmmtgtmgtglttfbbgrrcprrqffmmjnjttcmczzgbzggthhsttpggrmmgwwnpnqnqvnqvqppmlpmlpmpjpljljmmtpptfppfrppfdpfdppddmdttgzgzzdbzdzhzhnnsqssvmvbbpjjzwwvnwvvzmvzmzpmpttvrvccqddpgdppgmmthmthtggsfsbbvfbvfvhfvhvvpwpddqrqgqhghnnfmfbbwrbrgbgbvgbbdttffrddqbqpqzzmttlhhsqhsqhsqhhlplttpnpsstpthhpfhpfplprrgfrgffjppghgppghgdggjmmcgmccjvvsrvsrrwgrgmrrngrgttvbtbltthrthrttmfffjpfpssncnrngrrltrltlggjgcgllrzzllhwwjwrwgrgsrgrhrphrhhqwqsqmqlmqlmqmqrmrnnwnhwnhwhzwzjwwgbghhsjspszsznzfztfzfpzzlczztctsstctqtfqfqcfqqjrjccttmqqfpfdfnfwnffqbfbblpbpfpcfcwfccblbwwmqwqrrgprpccngnhghpppwmpplcppfrfjjgmmbzbhbcbzzgdgsdsvvqllzlppnfnlnlslsljlppcscqqfjjjwzwppfgfjjsvvsggjbjljpjpzjzrzjrzzfnfpnfpnfpnfnsnggmpggdllpmmrhhdqqppttgqqcsqsjsbjsjrsrqrbqqmbmcbmcbmbfmfvfqqdbdppmrprnrggmjjhnhbhdhbbfcbbcjjdhhwjwmjmssjswscswcwzccbgbqqmqgmmsdsjsbsdbsddvttjpppcqpcqcgqqslqsssczszrzvvrtvvjppswwhnnwlwtwhhwwzfwwpfpddlvvnvnnvlnntjtqjqjzzjttvvbqbhqbhbbbwnwhnwnppdbpdpvddrqdqjjlvlqqdfdhdjhdjdcjcrcjjggfmfvvfllvfvgglzllmhmzmdddfwddqjjqjfqfcfrrstrssptsstllrflfwwgswslwlbwbwjjvhvfvhfhffhsslwsllbnbblccbwwjqwqqdllrdrnrnffcbbqqpnqqdmdndtntvvrjvvsvmvgvnnmjlwgnjcwljgwnrwpqlztwrpmpgqtwlhrcwsrrhqhjhznrtpqfdnzbfqrzwslptdbdcnqvcllpjsfdvmzqwvzbpnmfcfcjnbmhtwhttjgtnczwctpdthhwmzvzrrgsnmbflgmszgsbvghbzgcmcmszgsbfmlmpbdspqlftmqrcjtmvgcrzznlfwjcbmddplsqrfflqnqfsldwhnncczdmfrrrsbjjqsdzrsgbdbwjbslfcqglsqfddhdsrcdrgqfqthgmfjvnfdfgdncfzpvqcpscnpmfgvqbfwszwzgmqvmcrdrwplfshdgqrchmccpqfznbmfvlhdpctlqgjslrwhjfjlmqfblgjrdlnzdtwlpwhnrhrcrpfwqpmjlgrdbgpbljntmbqlblqqqpgrnjtmjqvjpzvsqdpgtchmmwbhtmgcjqdplrtptqcvdjjpqdzsrcjhcwvdcghlwrdhtdfctmqfcjcqhcvvbzgsvlggcrdgqbtznwwmnbgsfrjprqgcmlswftlwpqqqvshdprldrsghmhrqvmqmvglbvzpvtrjbhcvhqmvdtcvsllznqzjmhpnlbhmlzthbwwhhvdtcdfdcdzhnbsrnqqjvzzsvfjhbsdlsbdlqjnlpnhfcjtdppzmphghltztzcdvzwbftbvwhvgmrllqfzrpbltptdtjjqtfwjfmczzgdvclqbsbftgtlhnhrrvbpvdltstdnhqvpvtjhmghptvsfnlspslmfsftzdrwljrgblgmcbmlszmhnlfdtmsrnjqwrfmsnfgpcqgzmlwppffrmbvhnlstfpgzw" }) }
+    marker: (#struct){
+      length: (int){ int }
+      position: (_|_){
+        // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
+        //     ./in.cue:17:36
+        //     ./in.cue:12:11
+        let characters#1 = (#list){
+          0: (string){ "m" }
+          1: (string){ "j" }
+          2: (string){ "q" }
+          3: (string){ "j" }
+          4: (string){ "p" }
+          5: (string){ "q" }
+          6: (string){ "m" }
+          7: (string){ "g" }
+          8: (string){ "b" }
+          9: (string){ "l" }
+          10: (string){ "j" }
+          11: (string){ "s" }
+          12: (string){ "p" }
+          13: (string){ "h" }
+          14: (string){ "d" }
+          15: (string){ "z" }
+          16: (string){ "t" }
+          17: (string){ "n" }
+          18: (string){ "v" }
+          19: (string){ "j" }
+          20: (string){ "f" }
+          21: (string){ "q" }
+          22: (string){ "w" }
+          23: (string){ "r" }
+          24: (string){ "c" }
+          25: (string){ "g" }
+          26: (string){ "s" }
+          27: (string){ "m" }
+          28: (string){ "l" }
+          29: (string){ "b" }
+        }
+        let unique_combinations#2 = (_|_){
+          // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
+          //     ./in.cue:17:36
+          //     ./in.cue:12:11
+          let combination#3multi = &[&[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]]
+        }
+      }
+    }
+  }
+  output: (_|_){
+    // [eval]
+    "1": (_|_){
+      // [eval] output."1".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
+      //     ./in.cue:23:9
+      let characters#1 = (#list){
+        0: (string){ "m" }
+        1: (string){ "j" }
+        2: (string){ "q" }
+        3: (string){ "j" }
+        4: (string){ "p" }
+        5: (string){ "q" }
+        6: (string){ "m" }
+        7: (string){ "g" }
+        8: (string){ "b" }
+        9: (string){ "l" }
+        10: (string){ "j" }
+        11: (string){ "s" }
+        12: (string){ "p" }
+        13: (string){ "h" }
+        14: (string){ "d" }
+        15: (string){ "z" }
+        16: (string){ "t" }
+        17: (string){ "n" }
+        18: (string){ "v" }
+        19: (string){ "j" }
+        20: (string){ "f" }
+        21: (string){ "q" }
+        22: (string){ "w" }
+        23: (string){ "r" }
+        24: (string){ "c" }
+        25: (string){ "g" }
+        26: (string){ "s" }
+        27: (string){ "m" }
+        28: (string){ "l" }
+        29: (string){ "b" }
+      }
+      let unique_combinations#2 = (_|_){
+        // [eval] output."1".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
+        //     ./in.cue:23:9
+        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+      }
+    }
+    "2": (_|_){
+      // [eval] output."2".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
+      //     ./in.cue:23:9
+      let characters#1 = (#list){
+        0: (string){ "m" }
+        1: (string){ "j" }
+        2: (string){ "q" }
+        3: (string){ "j" }
+        4: (string){ "p" }
+        5: (string){ "q" }
+        6: (string){ "m" }
+        7: (string){ "g" }
+        8: (string){ "b" }
+        9: (string){ "l" }
+        10: (string){ "j" }
+        11: (string){ "s" }
+        12: (string){ "p" }
+        13: (string){ "h" }
+        14: (string){ "d" }
+        15: (string){ "z" }
+        16: (string){ "t" }
+        17: (string){ "n" }
+        18: (string){ "v" }
+        19: (string){ "j" }
+        20: (string){ "f" }
+        21: (string){ "q" }
+        22: (string){ "w" }
+        23: (string){ "r" }
+        24: (string){ "c" }
+        25: (string){ "g" }
+        26: (string){ "s" }
+        27: (string){ "m" }
+        28: (string){ "l" }
+        29: (string){ "b" }
+      }
+      let unique_combinations#2 = (_|_){
+        // [eval] output."2".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
+        //     ./in.cue:23:9
+        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,12 @@
+-(struct){
++Errors:
++output."1".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
++    ./in.cue:23:9
++output."2".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
++    ./in.cue:23:9
++
++Result:
++(_|_){
++  // [eval]
+   #Datastream: (#struct){
+     message: (string){ strings.MinRunes(4) }
+     marker: (#struct){
+@@ -12,13 +20,11 @@
+           //     ./in.cue:14:21
+           //     ./in.cue:9:11
+         }
+-        let unique_combinations#2multi = {
+-          for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
+-            let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+-            if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
+-              "\((〈2;i〉 + 1))": 〈1;let combination#3〉
+-            }
+-          }
++        let unique_combinations#2 = (_|_){
++          // [incomplete] #Datastream.marker.position.characters: error in call to strings.Split: non-concrete value string:
++          //     ./in.cue:14:21
++          //     ./in.cue:9:11
++          let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+         }
+       }
+     }
+@@ -66,102 +72,97 @@
+           28: (string){ "l" }
+           29: (string){ "b" }
+         }
+-        let unique_combinations#2multi = {
+-          for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
+-            let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+-            if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
+-              "\((〈2;i〉 + 1))": 〈1;let combination#3〉
+-            }
+-          }
+-        }
+-      }
+-    }
+-  }
+-  output: (struct){
+-    "1": (string){
+-      "7"
+-      let characters#1 = (#list){
+-        0: (string){ "m" }
+-        1: (string){ "j" }
+-        2: (string){ "q" }
+-        3: (string){ "j" }
+-        4: (string){ "p" }
+-        5: (string){ "q" }
+-        6: (string){ "m" }
+-        7: (string){ "g" }
+-        8: (string){ "b" }
+-        9: (string){ "l" }
+-        10: (string){ "j" }
+-        11: (string){ "s" }
+-        12: (string){ "p" }
+-        13: (string){ "h" }
+-        14: (string){ "d" }
+-        15: (string){ "z" }
+-        16: (string){ "t" }
+-        17: (string){ "n" }
+-        18: (string){ "v" }
+-        19: (string){ "j" }
+-        20: (string){ "f" }
+-        21: (string){ "q" }
+-        22: (string){ "w" }
+-        23: (string){ "r" }
+-        24: (string){ "c" }
+-        25: (string){ "g" }
+-        26: (string){ "s" }
+-        27: (string){ "m" }
+-        28: (string){ "l" }
+-        29: (string){ "b" }
+-      }
+-      let unique_combinations#2multi = {
+-        for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
+-          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+-          if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
+-            "\((〈2;i〉 + 1))": 〈1;let combination#3〉
+-          }
+-        }
+-      }
+-    }
+-    "2": (string){
+-      "19"
+-      let characters#1 = (#list){
+-        0: (string){ "m" }
+-        1: (string){ "j" }
+-        2: (string){ "q" }
+-        3: (string){ "j" }
+-        4: (string){ "p" }
+-        5: (string){ "q" }
+-        6: (string){ "m" }
+-        7: (string){ "g" }
+-        8: (string){ "b" }
+-        9: (string){ "l" }
+-        10: (string){ "j" }
+-        11: (string){ "s" }
+-        12: (string){ "p" }
+-        13: (string){ "h" }
+-        14: (string){ "d" }
+-        15: (string){ "z" }
+-        16: (string){ "t" }
+-        17: (string){ "n" }
+-        18: (string){ "v" }
+-        19: (string){ "j" }
+-        20: (string){ "f" }
+-        21: (string){ "q" }
+-        22: (string){ "w" }
+-        23: (string){ "r" }
+-        24: (string){ "c" }
+-        25: (string){ "g" }
+-        26: (string){ "s" }
+-        27: (string){ "m" }
+-        28: (string){ "l" }
+-        29: (string){ "b" }
+-      }
+-      let unique_combinations#2multi = {
+-        for i, _ in 〈1;let characters#1〉 if (〈0;i〉 >= (〈3;length〉 - 1)) {
+-          let combination#3multi = 〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))
+-          if 〈import;list〉.UniqueItems(〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))) {
+-            "\((〈2;i〉 + 1))": 〈1;let combination#3〉
+-          }
+-        }
++        let unique_combinations#2 = (_|_){
++          // [incomplete] datastream.marker.position.unique_combinations: non-concrete value int in operand to -:
++          //     ./in.cue:17:36
++          //     ./in.cue:12:11
++          let combination#3multi = &[&[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]]
++        }
++      }
++    }
++  }
++  output: (_|_){
++    // [eval]
++    "1": (_|_){
++      // [eval] output."1".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
++      //     ./in.cue:23:9
++      let characters#1 = (#list){
++        0: (string){ "m" }
++        1: (string){ "j" }
++        2: (string){ "q" }
++        3: (string){ "j" }
++        4: (string){ "p" }
++        5: (string){ "q" }
++        6: (string){ "m" }
++        7: (string){ "g" }
++        8: (string){ "b" }
++        9: (string){ "l" }
++        10: (string){ "j" }
++        11: (string){ "s" }
++        12: (string){ "p" }
++        13: (string){ "h" }
++        14: (string){ "d" }
++        15: (string){ "z" }
++        16: (string){ "t" }
++        17: (string){ "n" }
++        18: (string){ "v" }
++        19: (string){ "j" }
++        20: (string){ "f" }
++        21: (string){ "q" }
++        22: (string){ "w" }
++        23: (string){ "r" }
++        24: (string){ "c" }
++        25: (string){ "g" }
++        26: (string){ "s" }
++        27: (string){ "m" }
++        28: (string){ "l" }
++        29: (string){ "b" }
++      }
++      let unique_combinations#2 = (_|_){
++        // [eval] output."1".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
++        //     ./in.cue:23:9
++        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
++      }
++    }
++    "2": (_|_){
++      // [eval] output."2".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
++      //     ./in.cue:23:9
++      let characters#1 = (#list){
++        0: (string){ "m" }
++        1: (string){ "j" }
++        2: (string){ "q" }
++        3: (string){ "j" }
++        4: (string){ "p" }
++        5: (string){ "q" }
++        6: (string){ "m" }
++        7: (string){ "g" }
++        8: (string){ "b" }
++        9: (string){ "l" }
++        10: (string){ "j" }
++        11: (string){ "s" }
++        12: (string){ "p" }
++        13: (string){ "h" }
++        14: (string){ "d" }
++        15: (string){ "z" }
++        16: (string){ "t" }
++        17: (string){ "n" }
++        18: (string){ "v" }
++        19: (string){ "j" }
++        20: (string){ "f" }
++        21: (string){ "q" }
++        22: (string){ "w" }
++        23: (string){ "r" }
++        24: (string){ "c" }
++        25: (string){ "g" }
++        26: (string){ "s" }
++        27: (string){ "m" }
++        28: (string){ "l" }
++        29: (string){ "b" }
++      }
++      let unique_combinations#2 = (_|_){
++        // [eval] output."2".unique_combinations: error in call to list.UniqueItems: not properly initialized (state: unprocessed, value: *adt.Vertex):
++        //     ./in.cue:23:9
++        let combination#3multi = &[&[&[&[&[&[&[&[〈import;list〉.Slice(〈3;let characters#1〉, ((〈1;i〉 - 〈4;length〉) + 1), (〈1;i〉 + 1))]]]]]]]]
+       }
+     }
+   }
 -- out/eval --
 (struct){
   #Datastream: (#struct){

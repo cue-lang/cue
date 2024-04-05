@@ -1076,6 +1076,11 @@ type nodeContextState struct {
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
 
+	isShared  bool      // set if we are currently structure sharing.
+	noSharing bool      // set if structure sharing is not allowed
+	shared    Conjunct  // the original conjunct that led to sharing
+	sharedID  CloseInfo // the original CloseInfo that led to sharing
+
 	depth       int32
 	defaultMode defaultMode
 

@@ -173,15 +173,15 @@ out: #sub & {#p: _test.s1}
   })
 }
 -- out/evalalpha/stats --
-Leaks:  2779
-Freed:  303
-Reused: 303
-Allocs: 2779
+Leaks:  2604
+Freed:  263
+Reused: 263
+Allocs: 2604
 Retain: 0
 
-Unifications: 330
-Conjuncts:    9613
-Disjuncts:    602
+Unifications: 239
+Conjuncts:    8656
+Disjuncts:    522
 -- out/evalalpha --
 Errors:
 out.subs.subs.#p: structural cycle:
@@ -425,18 +425,18 @@ diff old new
 -Reused: 3213
 -Allocs: 25
 -Retain: 26
-+Leaks:  2779
-+Freed:  303
-+Reused: 303
-+Allocs: 2779
++Leaks:  2604
++Freed:  263
++Reused: 263
++Allocs: 2604
 +Retain: 0
  
 -Unifications: 2588
 -Conjuncts:    12056
 -Disjuncts:    3258
-+Unifications: 330
-+Conjuncts:    9613
-+Disjuncts:    602
++Unifications: 239
++Conjuncts:    8656
++Disjuncts:    522
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -842,6 +842,8 @@ Retain: 26
 Unifications: 2588
 Conjuncts:    12056
 Disjuncts:    3258
+-- diff/todo/p0 --
+Spurious structural cycle error
 -- diff/todo/p3 --
 Reordering
 -- out/eval --

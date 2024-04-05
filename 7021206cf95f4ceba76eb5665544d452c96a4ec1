@@ -33,6 +33,23 @@
       "message": "Fully approve this change. The only minor downside is that, if any CUE change were to break the tour, we would only notice once the change lands in master. But that seems fairly improbable, and should lead to us improving the \"core\" test suite in e.g. cmd/cue/cmd with regression tests.\n\nAnd, in the rare chance that it does happen, quickly fixing the bug in master shouldn\u0027t be difficult.\n\nOn the other side, deduplicating these tutorials and rendering them on the website is a huge benefit. I only wish you would move/remove the kubernetest tutorial very soon as well, given how darn slow it is on CI :)",
       "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "70b34ba5_f5c7120a",
+        "filename": "doc/tutorial/basics/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-04-05T08:35:43Z",
+      "side": 1,
+      "message": "```suggestion\navailable under https://github.com/cue-lang/cuelang.org/tree/master/content/docs/tour.\n```",
+      "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

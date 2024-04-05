@@ -52,16 +52,32 @@ Disjuncts:    189
 -- out/evalalpha --
 (struct){
   p1: (struct){
-    #A: (#struct){
-      x?: (int){ int }
-      y?: (int){ int }
-      let list#1 = (#list){
-        0: (int){ int }
-        1: (int){ int }
-      }
-      all: (#list){
-      }
-    }
+    #A: (#struct){ |(*(#struct){
+        x?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./in.cue:10:8
+        }
+        y: (int){ 1 }
+        let list#1 = (#list){
+          0: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./in.cue:10:8
+          }
+          1: (int){ 1 }
+        }
+        all: (#list){
+          0: (int){ 1 }
+        }
+      }, (#struct){
+        x?: (int){ int }
+        y?: (int){ int }
+        let list#1 = (#list){
+          0: (int){ int }
+          1: (int){ int }
+        }
+        all: (#list){
+        }
+      }) }
     a: (#struct){
       x: (int){ 3 }
       y?: (int){ int }
@@ -86,16 +102,32 @@ Disjuncts:    189
     }
   }
   p2: (struct){
-    #A: (#struct){
-      x?: (int){ int }
-      y?: (int){ int }
-      let list#2 = (#list){
-        0: (int){ int }
-        1: (int){ int }
-      }
-      all: (#list){
-      }
-    }
+    #A: (#struct){ |(*(#struct){
+        x?: (_|_){
+          // [user] explicit error (_|_ literal) in source:
+          //     ./in.cue:27:8
+        }
+        y: (int){ 1 }
+        let list#2 = (#list){
+          0: (_|_){
+            // [user] explicit error (_|_ literal) in source:
+            //     ./in.cue:27:8
+          }
+          1: (int){ 1 }
+        }
+        all: (#list){
+          0: (int){ 1 }
+        }
+      }, (#struct){
+        x?: (int){ int }
+        y?: (int){ int }
+        let list#2 = (#list){
+          0: (int){ int }
+          1: (int){ int }
+        }
+        all: (#list){
+        }
+      }) }
     a: (#struct){
       x: (int){ 3 }
       y: (int){ 2 }
@@ -126,17 +158,10 @@ Disjuncts:    189
 diff old new
 --- old
 +++ new
-@@ -1,58 +1,33 @@
- (struct){
-   p1: (struct){
--    #A: (#struct){ |(*(#struct){
--        x?: (_|_){
--          // [user] explicit error (_|_ literal) in source:
--          //     ./in.cue:10:8
--        }
--        y: (int){ 1 }
--        let list#1 = (#list){
--          0: (_|_){
+@@ -8,51 +8,42 @@
+         y: (int){ 1 }
+         let list#1 = (#list){
+           0: (_|_){
 -            // [incomplete] p1.#A.list.0: cannot reference optional field: x:
 -            //     ./in.cue:6:15
 -          }
@@ -182,16 +207,24 @@ diff old new
 -        〈1;x〉,
 -        〈1;y〉,
 -      ]
-+    #A: (#struct){
-+      x?: (int){ int }
-+      y?: (int){ int }
-+      let list#1 = (#list){
-+        0: (int){ int }
-+        1: (int){ int }
-+      }
-+      all: (#list){
-+      }
-+    }
++            // [user] explicit error (_|_ literal) in source:
++            //     ./in.cue:10:8
++          }
++          1: (int){ 1 }
++        }
++        all: (#list){
++          0: (int){ 1 }
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#1 = (#list){
++          0: (int){ int }
++          1: (int){ int }
++        }
++        all: (#list){
++        }
++      }) }
 +    a: (#struct){
 +      x: (int){ 3 }
 +      y?: (int){ int }
@@ -213,18 +246,10 @@ diff old new
        all: (#list){
          0: (int){ 3 }
        }
-@@ -59,57 +34,35 @@
-     }
-   }
-   p2: (struct){
--    #A: (#struct){ |(*(#struct){
--        x?: (_|_){
--          // [user] explicit error (_|_ literal) in source:
--          //     ./in.cue:27:8
--        }
--        y: (int){ 1 }
--        let list#2 = (#list){
--          0: (_|_){
+@@ -67,49 +58,43 @@
+         y: (int){ 1 }
+         let list#2 = (#list){
+           0: (_|_){
 -            // [incomplete] p2.#A.list.0: cannot reference optional field: x:
 -            //     ./in.cue:23:15
 -          }
@@ -268,16 +293,24 @@ diff old new
 -        〈1;x〉,
 -        〈1;y〉,
 -      ]
-+    #A: (#struct){
-+      x?: (int){ int }
-+      y?: (int){ int }
-+      let list#2 = (#list){
-+        0: (int){ int }
-+        1: (int){ int }
-+      }
-+      all: (#list){
-+      }
-+    }
++            // [user] explicit error (_|_ literal) in source:
++            //     ./in.cue:27:8
++          }
++          1: (int){ 1 }
++        }
++        all: (#list){
++          0: (int){ 1 }
++        }
++      }, (#struct){
++        x?: (int){ int }
++        y?: (int){ int }
++        let list#2 = (#list){
++          0: (int){ int }
++          1: (int){ int }
++        }
++        all: (#list){
++        }
++      }) }
 +    a: (#struct){
 +      x: (int){ 3 }
 +      y: (int){ 2 }

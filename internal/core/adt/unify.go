@@ -153,10 +153,24 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		n.signal(allAncestorsProcessed)
 	}
 
-	defer c.PopArc(c.PushArc(v))
-
 	nodeOnlyNeeds := needs &^ (subFieldsProcessed)
 	n.process(nodeOnlyNeeds, mode)
+
+	if n.isShared {
+		// If there are any outstanding tasks,
+		w := n.node.BaseValue.(*Vertex)
+		if w.Closed {
+			// Should resolve with dereference.
+			v.Closed = true
+		}
+		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
+		v.Arcs = nil
+		n.node.updateStatus(finalized)
+		return w.unify(c, needs, mode)
+	}
+
+	defer c.PopArc(c.PushArc(v))
+
 	w := v.Indirect() // Dereference the disjunction result.
 	if w != v {
 		if w.Closed {

@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ec1f61c_53c3bc86",
+        "filename": "internal/registrytest/registry.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 187,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-04-05T11:55:27Z",
+      "side": 1,
+      "message": "SGTM. If the registry consistently returns a 403 or a 404 then there\u0027s no leakage possible.",
+      "parentUuid": "78c23998_80190fcf",
+      "revId": "9947f8115249c7d65328db34fcaa9a5272cfd8a1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35e80dd7_1b8d259e",

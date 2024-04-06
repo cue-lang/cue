@@ -279,7 +279,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	isTool := strings.HasSuffix(base, "_tool"+cueSuffix)
 
 	if mode&importComment != 0 {
-		qcom, line := findimportComment(data)
+		qcom, line := findImportComment(data)
 		if line != 0 {
 			com, err := strconv.Unquote(qcom)
 			if err != nil {
@@ -315,7 +315,7 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 	switch {
 	case isTest:
 		if fp.c.Tests {
-			p.BuildFiles = append(p.BuildFiles, file)
+			fp.appendBuildFile(p, file)
 		} else {
 			file.ExcludeReason = excludeError{errors.Newf(pos,
 				"_test.cue files excluded in non-test mode")}
@@ -323,19 +323,28 @@ func (fp *fileProcessor) add(root string, file *build.File, mode importMode) (ad
 		}
 	case isTool:
 		if fp.c.Tools {
-			p.BuildFiles = append(p.BuildFiles, file)
+			fp.appendBuildFile(p, file)
 		} else {
 			file.ExcludeReason = excludeError{errors.Newf(pos,
 				"_tool.cue files excluded in non-cmd mode")}
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		}
 	default:
-		p.BuildFiles = append(p.BuildFiles, file)
+		fp.appendBuildFile(p, file)
 	}
+
 	return true
 }
 
-func findimportComment(data []byte) (s string, line int) {
+func (fp *fileProcessor) appendBuildFile(p *build.Instance, file *build.File) {
+	p.BuildFiles = append(p.BuildFiles, file)
+
+	if fp.c.filesMode || file.Filename == "-" || filepath.Dir(file.Filename) == p.Dir {
+		p.DirectFiles = append(p.DirectFiles, file)
+	}
+}
+
+func findImportComment(data []byte) (s string, line int) {
 	// expect keyword package
 	word, data := parseWord(data)
 	if string(word) != "package" {

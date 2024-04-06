@@ -75,7 +75,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 						continue
 					}
 				}
-				for _, file := range inst.BuildFiles {
+				for _, file := range inst.DirectFiles {
 					// When using --check, we need to buffer the input and output bytes to compare them.
 					var original []byte
 					var formatted bytes.Buffer

@@ -231,7 +231,7 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 // Example:
 //
 //	cue eval -o yaml:foo.data
-func ParseFile(s string, mode Mode) (*build.File, error) {
+func ParseFile(s string, mode Mode) (_file *build.File, _err error) {
 	scope := ""
 	file := s
 
@@ -245,6 +245,25 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 
 	if file == "" {
 		return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
+	}
+	// Short-cut missing or unknown file extensions without needing to go through the evaluator.
+	// These cases are very common when loading `./...` in a large repository.
+	if scope == "" {
+		knownMode := knownTypes.SimpleModeFiles[mode.String()]
+		if file == "-" {
+			return &knownMode.Default, nil
+		}
+		ext := fileExt(file)
+		if f, ok := knownMode.ByExtension[ext]; ok {
+			f.Filename = file
+			return &f, nil
+		}
+		if ext == "" {
+			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", file)
+		}
+		if !knownTypes.KnownExtensions[ext] {
+			return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
+		}
 	}
 
 	inst, val, err := parseType(scope, mode)

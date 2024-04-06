@@ -19,6 +19,8 @@ package build
 //
 // It is used by types.go to compile a cue.Value, which is then
 // used by the rest of the package to determine settings.
+//
+// Keep the data at the end of types.go in sync as well.
 
 // A File corresponds to a Go build.File.
 #File: {
@@ -60,7 +62,11 @@ package build
 //
 // These templates are intended to be unified in at the root of this
 // configuration.
-modes: _
+modes: [string]: {
+	#Default: _
+	encodings: {}
+	extensions: {}
+}
 
 // input defines modes for input, such as import, eval, vet or def.
 // In input mode, settings flags are interpreted as what is allowed to occur
@@ -96,7 +102,11 @@ modes: export: {
 	}
 }
 
-modes: ouptut: {
+modes: output: {
+	#Default: {
+		encoding: *"cue" | _
+		...
+	}
 	#FileInfo: x, let x = {
 		docs:       true | *false
 		attributes: true | *false

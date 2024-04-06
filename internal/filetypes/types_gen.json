@@ -1,0 +1,266 @@
+{
+	"knownExtensions": {
+		".cue": true,
+		".json": true,
+		".jsonl": true,
+		".ldjson": true,
+		".ndjson": true,
+		".yaml": true,
+		".yml": true,
+		".txt": true,
+		".go": true,
+		".proto": true,
+		".textproto": true,
+		".textpb": true
+	},
+	"simpleModeFiles": {
+		"input": {
+			"default": {
+				"filename": "-",
+				"encoding": "cue"
+			},
+			"byExtension": {
+				".cue": {
+					"encoding": "cue"
+				},
+				".json": {
+					"encoding": "json",
+					"interpretation": "auto"
+				},
+				".jsonl": {
+					"encoding": "jsonl"
+				},
+				".ldjson": {
+					"encoding": "jsonl"
+				},
+				".ndjson": {
+					"encoding": "jsonl"
+				},
+				".yaml": {
+					"encoding": "yaml",
+					"interpretation": "auto"
+				},
+				".yml": {
+					"encoding": "yaml",
+					"interpretation": "auto"
+				},
+				".txt": {
+					"encoding": "text",
+					"form": "data"
+				},
+				".go": {
+					"encoding": "code",
+					"interpretation": "",
+					"tags": {
+						"lang": "go"
+					}
+				},
+				".proto": {
+					"encoding": "proto"
+				},
+				".textproto": {
+					"encoding": "textproto"
+				},
+				".textpb": {
+					"encoding": "textproto"
+				}
+			}
+		},
+		"export": {
+			"default": {
+				"filename": "-",
+				"encoding": "json"
+			},
+			"byExtension": {
+				".cue": {
+					"encoding": "cue"
+				},
+				".json": {
+					"encoding": "json"
+				},
+				".jsonl": {
+					"encoding": "jsonl"
+				},
+				".ldjson": {
+					"encoding": "jsonl"
+				},
+				".ndjson": {
+					"encoding": "jsonl"
+				},
+				".yaml": {
+					"encoding": "yaml"
+				},
+				".yml": {
+					"encoding": "yaml"
+				},
+				".txt": {
+					"encoding": "text",
+					"form": "data"
+				},
+				".go": {
+					"encoding": "code",
+					"interpretation": "",
+					"tags": {
+						"lang": "go"
+					}
+				},
+				".proto": {
+					"encoding": "proto"
+				},
+				".textproto": {
+					"encoding": "textproto"
+				},
+				".textpb": {
+					"encoding": "textproto"
+				}
+			}
+		},
+		"output": {
+			"default": {
+				"filename": "-",
+				"encoding": "cue"
+			},
+			"byExtension": {
+				".cue": {
+					"encoding": "cue"
+				},
+				".json": {
+					"encoding": "json"
+				},
+				".jsonl": {
+					"encoding": "jsonl"
+				},
+				".ldjson": {
+					"encoding": "jsonl"
+				},
+				".ndjson": {
+					"encoding": "jsonl"
+				},
+				".yaml": {
+					"encoding": "yaml"
+				},
+				".yml": {
+					"encoding": "yaml"
+				},
+				".txt": {
+					"encoding": "text",
+					"form": "data"
+				},
+				".go": {
+					"encoding": "code",
+					"interpretation": "",
+					"tags": {
+						"lang": "go"
+					}
+				},
+				".proto": {
+					"encoding": "proto"
+				},
+				".textproto": {
+					"encoding": "textproto"
+				},
+				".textpb": {
+					"encoding": "textproto"
+				}
+			}
+		},
+		"eval": {
+			"default": {
+				"filename": "-",
+				"encoding": "cue"
+			},
+			"byExtension": {
+				".cue": {
+					"encoding": "cue"
+				},
+				".json": {
+					"encoding": "json"
+				},
+				".jsonl": {
+					"encoding": "jsonl"
+				},
+				".ldjson": {
+					"encoding": "jsonl"
+				},
+				".ndjson": {
+					"encoding": "jsonl"
+				},
+				".yaml": {
+					"encoding": "yaml"
+				},
+				".yml": {
+					"encoding": "yaml"
+				},
+				".txt": {
+					"encoding": "text",
+					"form": "data"
+				},
+				".go": {
+					"encoding": "code",
+					"interpretation": "",
+					"tags": {
+						"lang": "go"
+					}
+				},
+				".proto": {
+					"encoding": "proto"
+				},
+				".textproto": {
+					"encoding": "textproto"
+				},
+				".textpb": {
+					"encoding": "textproto"
+				}
+			}
+		},
+		"def": {
+			"default": {
+				"filename": "-",
+				"encoding": "cue"
+			},
+			"byExtension": {
+				".cue": {
+					"encoding": "cue"
+				},
+				".json": {
+					"encoding": "json"
+				},
+				".jsonl": {
+					"encoding": "jsonl"
+				},
+				".ldjson": {
+					"encoding": "jsonl"
+				},
+				".ndjson": {
+					"encoding": "jsonl"
+				},
+				".yaml": {
+					"encoding": "yaml"
+				},
+				".yml": {
+					"encoding": "yaml"
+				},
+				".txt": {
+					"encoding": "text",
+					"form": "data"
+				},
+				".go": {
+					"encoding": "code",
+					"interpretation": "",
+					"tags": {
+						"lang": "go"
+					}
+				},
+				".proto": {
+					"encoding": "proto"
+				},
+				".textproto": {
+					"encoding": "textproto"
+				},
+				".textpb": {
+					"encoding": "textproto"
+				}
+			}
+		}
+	}
+}

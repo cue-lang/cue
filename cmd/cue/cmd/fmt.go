@@ -76,6 +76,11 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 				}
 				for _, file := range inst.BuildFiles {
+					//isInstanceFile := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
+					//if !isInstanceFile {
+					//	continue
+					//}
+
 					// When using --check, we need to buffer the input and output bytes to compare them.
 					var original []byte
 					var formatted bytes.Buffer

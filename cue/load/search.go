@@ -122,7 +122,7 @@ func (l *loader) matchPackages(pattern, pkgName string) *match {
 // matchPackagesInFS is like allPackages but is passed a pattern
 // beginning ./ or ../, meaning it should scan the tree rooted
 // at the given directory. There are ... in the pattern too.
-// (See go help packages for pattern syntax.)
+// (See cue help inputs for pattern syntax.)
 func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 	c := l.cfg
 	m := &match{

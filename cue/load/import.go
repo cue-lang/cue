@@ -137,6 +137,14 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		}
 	}
 
+	// Walk the parent directories up to the module root to add their files as well,
+	// since a package foo/bar/baz inherits from parent packages foo/bar and foo.
+	// See https://cuelang.org/docs/concept/modules-packages-instances/#instances.
+	//
+	// TODO(mvdan): Note that the work below, most notably readDir and ParseFile,
+	// is not cached or reused in any way. This causes slow-downs on big repos,
+	// for example `cue fmt --check ./...` on the cue repo inspects
+	// top-level files like README.md and LICENSE many dozens of times.
 	for _, d := range dirs {
 		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
 			files, err := ctxt.readDir(dir)

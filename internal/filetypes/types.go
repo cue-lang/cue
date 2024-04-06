@@ -12,12 +12,16 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:generate go run cuelang.org/go/cmd/cue cmd gen
+
 package filetypes
 
 import (
 	_ "embed"
+	"encoding/json"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 )
 
@@ -32,3 +36,20 @@ var typesValue = func() cue.Value {
 	}
 	return val
 }()
+
+//go:embed types_gen.json
+var knownTypesJSON string
+
+var knownTypes struct {
+	KnownExtensions map[string]bool
+	SimpleModeFiles map[string]struct {
+		Default     build.File
+		ByExtension map[string]build.File
+	}
+}
+
+func init() {
+	if err := json.Unmarshal([]byte(knownTypesJSON), &knownTypes); err != nil {
+		panic(err)
+	}
+}

@@ -60,7 +60,11 @@ package build
 //
 // These templates are intended to be unified in at the root of this
 // configuration.
-modes: _
+modes: [string]: {
+	#Default: _
+	encodings: {}
+	extensions: {}
+}
 
 // input defines modes for input, such as import, eval, vet or def.
 // In input mode, settings flags are interpreted as what is allowed to occur
@@ -96,7 +100,12 @@ modes: export: {
 	}
 }
 
-modes: ouptut: {
+// TODO(mvdan): this "output" mode appears to be unused at the moment.
+modes: output: {
+	#Default: {
+		encoding: *"cue" | _
+		...
+	}
 	#FileInfo: x, let x = {
 		docs:       true | *false
 		attributes: true | *false

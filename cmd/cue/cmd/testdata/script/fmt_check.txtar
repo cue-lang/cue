@@ -41,9 +41,14 @@ not_formatted.cue
 another${/}not_formatted.cue
 -- module/cue.mod/module.cue --
 module: "example.com"
+-- module/not_formatted.cue --
+package module
+foo:    "bar"
 -- module/stdout.golden --
+not_formatted.cue
 example${/}not_formatted.cue
 -- module/example/not_formatted.cue --
+package module
 foo:      "bar"
 -- module/example/stdout.golden --
 not_formatted.cue

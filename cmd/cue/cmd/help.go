@@ -104,7 +104,7 @@ that is a rooted path --one that begins with a "." or ".."
 element-- is interpreted as a file system path and denotes the
 package instance in that directory.
 
-Otherwise, the import path P denotes and external package found
+Otherwise, the import path P denotes an external package found
 in cue.mod/{pkg|gen|usr}/P.
 
 An import path may contain one or more "..." to match any

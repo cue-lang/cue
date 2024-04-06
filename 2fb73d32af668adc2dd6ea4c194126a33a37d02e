@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "33c4c4a0_4d9dcd6e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-06T07:41:30Z",
+      "side": 1,
+      "message": "This is modifying a core part of the loader, so I want to be sure this is the right approach.\n\nIf it\u0027s off the mark, I\u0027d appreciate a reference I can go over to better understand the structure of the loader",
+      "revId": "2fb73d32af668adc2dd6ea4c194126a33a37d02e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

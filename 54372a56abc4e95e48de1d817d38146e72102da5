@@ -1,0 +1,67 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b704ce0e_d313445f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-07T04:09:27Z",
+      "side": 1,
+      "message": "remove this word?",
+      "range": {
+        "startLine": 13,
+        "startChar": 17,
+        "endLine": 13,
+        "endChar": 20
+      },
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68e25a86_da8808fd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-07T04:09:27Z",
+      "side": 1,
+      "message": "nit: lowercase fmt, as the command isn\u0027t capitalized, or say \"cue fmt\".",
+      "range": {
+        "startLine": 14,
+        "startChar": 27,
+        "endLine": 14,
+        "endChar": 30
+      },
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c360962_afdd025c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-07T04:09:27Z",
+      "side": 1,
+      "message": "In your commit message, can you summarize what sort of speed-up this provides for \"cue fmt ./...\" on your codebase? I seem to recall it was significant, and it would be good to include for the sake of showing that it really does matter.\n\nLGTM, adding Paul as a second reviewer to see if he agrees with the new API as well.",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -50,6 +50,24 @@
       "message": "```suggestion\navailable under https://github.com/cue-lang/cuelang.org/tree/master/content/docs/tour.\n```",
       "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "439d1051_c46252b8",
+        "filename": "doc/tutorial/basics/README.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 4,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-07T19:39:45Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "70b34ba5_f5c7120a",
+      "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

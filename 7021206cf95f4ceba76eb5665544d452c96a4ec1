@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "60192634_30280b7a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-07T19:43:28Z",
+      "side": 1,
+      "message": "\u003e The only minor downside is that, if any CUE change were to break the tour, we would only notice once the change lands in master. But that seems fairly improbable, and should lead to us improving the \"core\" test suite in e.g. cmd/cue/cmd with regression tests.\n\nAgree with your analysis. https://cuelang.org/issue/2538 will re-add support for a tip version of cuelang.org as well, which will help to address this. What\u0027s tricky however, is working out when/where we need to acknowledge/other diffs that get introduced by changes in the main CUE repo. Perhaps we could use Unity here?\n\n\u003e I only wish you would move/remove the kubernetest tutorial very soon as well, given how darn slow it is on CI 😊\n\nGiven the changes to support it were trivial, please see the stack under https://cuelang.org/cl/1192689.",
+      "parentUuid": "9c046622_8878f998",
+      "revId": "7021206cf95f4ceba76eb5665544d452c96a4ec1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "70b34ba5_f5c7120a",

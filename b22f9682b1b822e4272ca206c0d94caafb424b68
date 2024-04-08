@@ -16,6 +16,23 @@
       "message": "Can\u0027t +2 quickly enough!",
       "revId": "b22f9682b1b822e4272ca206c0d94caafb424b68",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "43afbfb1_45882749",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-08T05:56:50Z",
+      "side": 1,
+      "message": "Now that https://cuelang.org/cl/1192689 is submitted, submitting here.",
+      "revId": "b22f9682b1b822e4272ca206c0d94caafb424b68",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

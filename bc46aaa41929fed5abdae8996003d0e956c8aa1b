@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8842dbf4_ce37ff0e",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 328,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:53:08Z",
+      "side": 1,
+      "message": "is this debugging, and should be removed, or some code that belongs as part of a TODO or FIXME comment?",
+      "revId": "bc46aaa41929fed5abdae8996003d0e956c8aa1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "981545bd_58235ad3",
+        "filename": "internal/core/adt/cycle.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 436,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:53:08Z",
+      "side": 1,
+      "message": "is this debugging, and should be removed, or some code that belongs as part of a TODO or FIXME comment?",
+      "revId": "bc46aaa41929fed5abdae8996003d0e956c8aa1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "809f344f_4990260b",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 379,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:53:08Z",
+      "side": 1,
+      "message": "is this word a typo for something else?",
+      "range": {
+        "startLine": 379,
+        "startChar": 46,
+        "endLine": 379,
+        "endChar": 51
+      },
+      "revId": "bc46aaa41929fed5abdae8996003d0e956c8aa1b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

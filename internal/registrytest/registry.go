@@ -261,7 +261,15 @@ func (h *registryHandler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		writeError(w, ociregistry.ErrUnauthorized)
 		return
 	}
-	h.registry.ServeHTTP(w, req)
+	// If the underlying registry returns a 401 error,
+	// we need to add the Www-Authenticate header.
+	// As there's no way to get ociserver to do it,
+	// we hack it by wrapping the ResponseWriter
+	// with an implementation that does.
+	h.registry.ServeHTTP(&authHeaderWriter{
+		wwwAuth:        wwwAuth,
+		ResponseWriter: w,
+	}, req)
 }
 
 func (h *registryHandler) serveDirectAuth(w http.ResponseWriter, req *http.Request) {
@@ -422,6 +430,18 @@ func (r *Registry) Close() {
 	if r.tokenSrv != nil {
 		r.tokenSrv.Close()
 	}
+}
+
+type authHeaderWriter struct {
+	wwwAuth string
+	http.ResponseWriter
+}
+
+func (w *authHeaderWriter) WriteHeader(code int) {
+	if code == http.StatusUnauthorized && w.Header().Get("Www-Authenticate") == "" {
+		w.Header().Set("Www-Authenticate", w.wwwAuth)
+	}
+	w.ResponseWriter.WriteHeader(code)
 }
 
 // Host returns the hostname for the registry server;

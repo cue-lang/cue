@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b117b681_1cd077f7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T14:01:18Z",
+      "side": 1,
+      "message": "because... :) It\u0027s obvious to you, and perhaps to anyone who has read the code a couple of times, but not to anyone seeing this commit in isolation.",
+      "revId": "9261474a1297a2e8755559467dd4357d6407b025",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

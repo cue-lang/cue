@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8e8113e5_2b4020ca",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:59:01Z",
+      "side": 1,
+      "message": "did you mean to leave this commented out? if so, perhaps add a TODO? although then the commit message seems slightly wrong, as with the panic commented out, we are not validating anything.",
+      "revId": "421c428cb3396511a7a5d310a4c89566c5c6462c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

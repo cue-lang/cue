@@ -21,7 +21,7 @@ jobs:
           - 1.22.x
         runner:
           - ubuntu-22.04
-          - macos-11
+          - macos-14
           - windows-2022
     runs-on: ${{ matrix.runner }}
     defaults:

@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5b10a81e_f7ee523e",
+        "filename": "cue/testdata/disjunctions/edge.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:57:07Z",
+      "side": 1,
+      "message": "incomplete paragraph/sentence?",
+      "revId": "642725f9793be7b83bf20ef98b35d43f07bf1003",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cda1312a_16093c91",
+        "filename": "cue/testdata/disjunctions/edge.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:57:07Z",
+      "side": 1,
+      "message": "I\u0027m confused by this wording :)",
+      "range": {
+        "startLine": 34,
+        "startChar": 42,
+        "endLine": 34,
+        "endChar": 58
+      },
+      "revId": "642725f9793be7b83bf20ef98b35d43f07bf1003",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

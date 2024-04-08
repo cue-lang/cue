@@ -16,6 +16,23 @@
       "message": "LGTM assuming trybots",
       "revId": "834a925f5b66e592cd793aac86b09654c7cedf1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2abcfdd0_522d85cc",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T12:02:55Z",
+      "side": 1,
+      "message": "The new macos also appears to be much faster, likely thanks to M1 - the runtime on go 1.21 and 1.22 went from 3-4m (https://github.com/cue-lang/cue-trybot/actions/runs/8582121698) to 1-2m (https://github.com/cue-lang/cue-trybot/actions/runs/8599557467).",
+      "revId": "834a925f5b66e592cd793aac86b09654c7cedf1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

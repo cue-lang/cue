@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "75ad4a63_8e5c5792",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-08T12:54:18Z",
+      "side": 1,
+      "message": "Verified that this is indeed the correct, or at least safe and better, thing to do, even though ParseNum does not reflect the token definition.",
+      "revId": "0b48a58e6547dc29a1e3639cbdc2e3a8516a8abc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

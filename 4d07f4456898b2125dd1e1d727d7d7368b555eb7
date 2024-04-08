@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d9b60cfa_efca5e9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "I\u0027ve done three passes on this, and so far SGTM. I will do a +2 tomorrow after one more read when I\u0027m not tired.",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ad3d2a2_99116aaa",
@@ -66,6 +83,371 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "bff5d23e_c4e4eeed",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "typo: Eliminate",
+      "range": {
+        "startLine": 37,
+        "startChar": 6,
+        "endLine": 37,
+        "endChar": 16
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b797954_2147f0a8",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "can you summarize why? do you mean because of the issues listed above, or for some other reason?",
+      "range": {
+        "startLine": 132,
+        "startChar": 3,
+        "endLine": 132,
+        "endChar": 77
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d4edd12_cbade802",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "logically identical?",
+      "range": {
+        "startLine": 155,
+        "startChar": 42,
+        "endLine": 155,
+        "endChar": 63
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7ebf79b_6e623167",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "did you mean to start this assumptions list with just one assumption?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c41ba86b_26c72e3e",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "typo: task",
+      "range": {
+        "startLine": 173,
+        "startChar": 61,
+        "endLine": 173,
+        "endChar": 66
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e40728e_caa13c35",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 178,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "nit: as _a_ list?",
+      "range": {
+        "startLine": 178,
+        "startChar": 6,
+        "endLine": 178,
+        "endChar": 10
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00a05b9f_03ef235f",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 185,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "nit: consistently capitalize and punctuate these bullet point sentences, and the same for the other lists above",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5919ac18_eeb837a9",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 197,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "as far as I can see, pos is set but never used? if it is needed, I would use a better name, like valuesIndex.",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1075f4ba_8a9b7e36",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "the fact that this function uses both `n.disjuncts` and `n.disjunctions` seems very confusing. can we give those fields better names? it seems like the fields come from different types, but if they\u0027re embedded or otherwise are used alongside each other, it\u0027s puzzling.",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "733e058b_2341d3e2",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "can we use better names than `a` and `d` for parameters? `a` tells me basically nothing, and `d` is usually used for e.g. numbers.",
+      "range": {
+        "startLine": 486,
+        "startChar": 36,
+        "endLine": 486,
+        "endChar": 37
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9acd7263_d7f6b43e",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 537,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "I imagine that complete nodes should be `xv.status \u003d\u003d finalized \u0026\u0026 nv.status \u003d\u003d finalized`, so shouldn\u0027t the `if` condition above at line 503 be the reverse, `xv.status !\u003d finalized || nv.status !\u003d finalized`?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "126c5867_bab33cbe",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 655,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "why do we need to mask the kind when it\u0027s a struct? can we not compare the kinds directly? at least the reason why isn\u0027t obvious to me, so I would briefly document it",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9cdd9cec_fc621786",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 1019,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "remove \"is\"?",
+      "range": {
+        "startLine": 1019,
+        "startChar": 47,
+        "endLine": 1019,
+        "endChar": 60
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ad06540_336d80e5",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 160,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "finish this sentence",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "99df27a9_c5e1c449",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 189,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "can we document this?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "80166158_6de92752",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 700,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "make this a TODO? perhaps also summarize why you suspect it might be wrong.",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "38ad2c3f_c209950a",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 33,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "cool ASCII art :)",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dd22ee14_3b8f71c6",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "document this field?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6b24bb6_39d12628",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 150,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "nit: consistently use the format `// TODO(perf):`",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "b13849cf_eb24a1ad",
         "filename": "internal/core/adt/overlay.go",
         "patchSetId": 2
@@ -94,6 +476,120 @@
       "writtenOn": "2024-04-04T15:14:16Z",
       "side": 1,
       "message": "did you mean to resolve this, or make it a TODO?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d1db3ea5_c0ef0846",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "summarize why or why not?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2967777d_7840a732",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "nit: usually the check is like `len(x) \u003e 0`",
+      "range": {
+        "startLine": 194,
+        "startChar": 24,
+        "endLine": 194,
+        "endChar": 26
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e7d06c88_32d62afd",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 212,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "stray line?",
+      "range": {
+        "startLine": 212,
+        "startChar": 0,
+        "endLine": 212,
+        "endChar": 28
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51fef672_6ff069ab",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "can you expand this a little bit?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "821f14f6_8963ef1c",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "shouldn\u0027t this use e.g. slices.SortFunc?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f89602bc_1d31753b",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T13:41:48Z",
+      "side": 1,
+      "message": "explain why it might not be?",
       "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

@@ -118,11 +118,11 @@ To download and install the `cue` command line tool, run:
 ### Learning CUE
 
 The fastest way to learn the basics is to follow the
-[tutorial on basic language constructs](./doc/tutorial/basics/Readme.md).
+[tutorial on basic language constructs](https://cuelang.org/docs/tour/).
 
 A more elaborate tutorial demonstrating how to convert and restructure
 an existing set of Kubernetes configurations is available in
-[written form](./doc/tutorial/kubernetes/README.md).
+[written form]( https://github.com/cue-labs/cue-by-example/tree/main/003_kubernetes_tutorial).
 
 ### References
 

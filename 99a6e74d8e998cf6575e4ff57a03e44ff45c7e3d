@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "321936af_02a8a69a",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-08T10:04:03Z",
+      "side": 1,
+      "message": "Ooops, forgot a license, including whatever upstream used.",
+      "revId": "99a6e74d8e998cf6575e4ff57a03e44ff45c7e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

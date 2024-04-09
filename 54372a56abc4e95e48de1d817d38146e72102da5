@@ -221,6 +221,24 @@
       "parentUuid": "29a425f5_b156c54d",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74ff960c_6ba2a67a",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-09T07:10:08Z",
+      "side": 1,
+      "message": "Personally, on the Go world I almost never, ever, use `go fmt` as it works on packages. I only use `gofmt` as it works on files and directories :) `go fmt ./foo/bar` or `go fmt ./...` still work with packages, and IMHO `gofmt -l -w foo/bar` or `gofmt -l -w .` are simply superior (and faster).\n\nWe could sidestep these package/instance loading issues if we taught `cue fmt` to have a \"files\" mode as well, but I think we need to fix the existing mode so that it\u0027s less wasteful and confusing first.\n\nYour last suggestion sounds good to me, Noam. We can always decide to add cue/load API later if others want something similar to what cue fmt does.",
+      "parentUuid": "3f6ebc4e_8d1c1ae4",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

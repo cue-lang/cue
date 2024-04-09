@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "93ff6121_47b4ca8d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T19:38:04Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "b704ce0e_d313445f",
+      "range": {
+        "startLine": 13,
+        "startChar": 17,
+        "endLine": 13,
+        "endChar": 20
+      },
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "68e25a86_da8808fd",
@@ -37,6 +61,30 @@
       "writtenOn": "2024-04-07T04:09:27Z",
       "side": 1,
       "message": "nit: lowercase fmt, as the command isn\u0027t capitalized, or say \"cue fmt\".",
+      "range": {
+        "startLine": 14,
+        "startChar": 27,
+        "endLine": 14,
+        "endChar": 30
+      },
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48b4c13d_e904a0ae",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T19:38:04Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "68e25a86_da8808fd",
       "range": {
         "startLine": 14,
         "startChar": 27,
@@ -111,6 +159,24 @@
       "writtenOn": "2024-04-09T12:25:13Z",
       "side": 1,
       "message": "Thanks for the exchange here, Noam!",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "67fe565c_4f14531c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T19:38:04Z",
+      "side": 1,
+      "message": "sure thing, added the info",
+      "parentUuid": "7c360962_afdd025c",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -272,6 +338,24 @@
       "side": 1,
       "message": "\u003e Your last suggestion sounds good to me, Noam. We can always decide to add cue/load API later if others want something similar to what cue fmt does.\n\nAgreed.",
       "parentUuid": "74ff960c_6ba2a67a",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea2b8e83_256e1a73",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T19:38:04Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "457ca0e5_5cd26f80",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

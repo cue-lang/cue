@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e9a7fc9_c02f618c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T19:38:04Z",
+      "side": 1,
+      "message": "thanks for the illuminating exchange, this turned into quite an interesting CL for me 😊",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

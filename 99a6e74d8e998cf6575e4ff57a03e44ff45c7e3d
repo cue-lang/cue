@@ -16,6 +16,24 @@
       "message": "Ooops, forgot a license, including whatever upstream used.",
       "revId": "99a6e74d8e998cf6575e4ff57a03e44ff45c7e3d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11813f9d_a27bec55",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T12:49:26Z",
+      "side": 1,
+      "message": "Maybe include some information about the history/provenance of these test cases too?",
+      "parentUuid": "321936af_02a8a69a",
+      "revId": "99a6e74d8e998cf6575e4ff57a03e44ff45c7e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

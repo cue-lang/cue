@@ -16,6 +16,23 @@
       "message": "Rog, can you help review this one?",
       "revId": "7df248c7c63964e6c521bd75335799c7178173d2",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e62a243_0e67eb2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T12:49:26Z",
+      "side": 1,
+      "message": "LGTM modulo your own TODO.",
+      "revId": "7df248c7c63964e6c521bd75335799c7178173d2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

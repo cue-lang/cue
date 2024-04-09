@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e826f280_dc69cde0",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-09T02:11:23Z",
+      "side": 1,
+      "message": "Marcel: number is more appropriate, as it means any number, whereas float means it can\u0027t be represented as an integer",
+      "revId": "5d50ab3db68ca141345fbc360f2453e9b18bffb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

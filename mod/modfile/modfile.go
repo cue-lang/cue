@@ -45,11 +45,19 @@ var moduleSchemaData []byte
 type File struct {
 	Module   string          `json:"module"`
 	Language *Language       `json:"language,omitempty"`
+	Source   *Source         `json:"source,omitempty"`
 	Deps     map[string]*Dep `json:"deps,omitempty"`
 	versions []module.Version
 	// defaultMajorVersions maps from module base path to the
 	// major version default for that path.
 	defaultMajorVersions map[string]string
+}
+
+// Source represents how to transform from a module's
+// source to its actual contents.
+type Source struct {
+	Kind string `json:"kind"`
+	VCS  string `json:"vcs,omitempty"`
 }
 
 // Format returns a formatted representation of f

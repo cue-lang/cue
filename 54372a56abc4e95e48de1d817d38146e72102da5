@@ -131,6 +131,24 @@
       "parentUuid": "4b6351de_46847abd",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "36e90379_23e8fe4c",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-09T07:01:21Z",
+      "side": 1,
+      "message": "I tend to agree with Noam here. Another way to think about this is - if I run `cd a \u0026\u0026 cue fmt ./...`, I would find it extremely surprising if any files in parent directories are formatted as well.\n\nThat said, I think we should have a few more test, for completeness. For example, like:\n\n```\ncue fmt a/b/c/p4.cue # should only format p4.cue\ncue fmt p1.cue a/b/c/p4.cue # should format p1.cue and p4.cue, but not p2.cue or p3.cue\ncue fmt ./a/b/... # should format p3.cue and p4.cue, but not p1.cue or p2.cue\n```\n\nI think we should copy a file/directory structure like what Paul shows, perhaps with names like `p_root.cue`, `a/p_a.cue`, `a/b/p_b.cue`, and `a/b/c/p_c.cue`, as that should make it easier to remember which file is which, and test more scenarios with nesting directories.",
+      "parentUuid": "a27f23b0_fbbffbcc",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -185,6 +185,24 @@
       "parentUuid": "36e90379_23e8fe4c",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3f6ebc4e_8d1c1ae4",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-09T07:04:13Z",
+      "side": 1,
+      "message": "\u003e I tend to agree with Noam here. Another way to think about this is - if I run cd a \u0026\u0026 cue fmt ./..., I would find it extremely surprising if any files in parent directories are formatted as well.\n\nThat\u0027s a good point with respect to `fmt`. That would tend to suggest (but this could be for a later CL) that `fmt` should only accept directory-based arguments.",
+      "parentUuid": "29a425f5_b156c54d",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

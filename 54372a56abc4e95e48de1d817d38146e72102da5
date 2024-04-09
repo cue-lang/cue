@@ -149,6 +149,24 @@
       "parentUuid": "a27f23b0_fbbffbcc",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5364b2ab_1c4c70ba",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-09T07:02:02Z",
+      "side": 1,
+      "message": "I think it gets tricky if the user were to run `cue fmt mod.example/a/b/c:p` in my example above. Because that is not a directory-based command argument. \n\nBut I think you\u0027re right that people will tend to run `cue fmt` with a directory argument, or a directory-based pattern like `./...`. \n\nSo I\u0027m happy with proceeding on that approach, I just don\u0027t think we need the new `DirectFiles` on a `cue/build.Instance`. Instead, you can check whether the `BuildFiles` belong to the directory on the instance?",
+      "parentUuid": "a27f23b0_fbbffbcc",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

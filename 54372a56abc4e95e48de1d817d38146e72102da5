@@ -203,6 +203,24 @@
       "parentUuid": "29a425f5_b156c54d",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59cbf65d_262fe311",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T07:07:10Z",
+      "side": 1,
+      "message": "So I suppose I\u0027ll remove the API change, localize the change in the cue fmt command itself, and add some more specific tests?",
+      "parentUuid": "29a425f5_b156c54d",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

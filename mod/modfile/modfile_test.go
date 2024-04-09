@@ -79,6 +79,63 @@ deps: "other.com/something@v0": v: "v0.2.3"
 		"example.com": "v1",
 	},
 }, {
+	testName: "WithSource",
+	parse:    Parse,
+	data: `
+language: version: "v0.4.3"
+module: "foo.com/bar@v0"
+source: kind: "git"
+`,
+	want: &File{
+		Language: &Language{
+			Version: "v0.4.3",
+		},
+		Module: "foo.com/bar@v0",
+		Source: &Source{
+			Kind: "git",
+		},
+	},
+	wantDefaults: map[string]string{
+		"foo.com/bar": "v0",
+	},
+}, {
+	testName: "WithExplicitSource",
+	parse:    Parse,
+	data: `
+language: version: "v0.4.3"
+module: "foo.com/bar@v0"
+source: kind: "none"
+`,
+	want: &File{
+		Language: &Language{
+			Version: "v0.4.3",
+		},
+		Module: "foo.com/bar@v0",
+		Source: &Source{
+			Kind: "none",
+		},
+	},
+	wantDefaults: map[string]string{
+		"foo.com/bar": "v0",
+	},
+}, {
+	testName: "WithUnknownSourceKind",
+	parse:    Parse,
+	data: `
+language: version: "v0.4.3"
+module: "foo.com/bar@v0"
+source: kind: "bad"
+`,
+	wantError: `source.kind: 2 errors in empty disjunction:
+source.kind: conflicting values "git" and "bad":
+    cuelang.org/go/mod/modfile/schema.cue:45:11
+    cuelang.org/go/mod/modfile/schema.cue:168:18
+    module.cue:4:15
+source.kind: conflicting values "none" and "bad":
+    cuelang.org/go/mod/modfile/schema.cue:45:11
+    cuelang.org/go/mod/modfile/schema.cue:168:9
+    module.cue:4:15`,
+}, {
 	testName: "AmbiguousDefaults",
 	parse:    Parse,
 	data: `

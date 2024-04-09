@@ -62,6 +62,40 @@
       "message": "In your commit message, can you summarize what sort of speed-up this provides for \"cue fmt ./...\" on your codebase? I seem to recall it was significant, and it would be good to include for the sake of showing that it really does matter.\n\nLGTM, adding Paul as a second reviewer to see if he agrees with the new API as well.",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8eecc9f3_737109b2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-09T05:03:46Z",
+      "side": 1,
+      "message": "Thanks for finding the problem here, Noam! \n\nI\u0027m not yet clear on how we should be fixing the problem so have replied with some questions to help get a better understanding.",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b6351de_46847abd",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-09T05:03:46Z",
+      "side": 1,
+      "message": "I\u0027m not clear on what \"in the package directory\" means here. But per below, I\u0027m not yet clear we need the new API.\n\nIf I\u0027ve understood the problem correctly (and please let me know if I haven\u0027t) the issue comes because in the following example, `cue fmt ./...` from the root causes `p1.cue` to be formatted four times?\n\n    cue fmt ./...\n\n    -- cue.mod/module.cue --\n    module: \"mod.example\"\n    language: {\n            version: \"v0.9.0-alpha.1\"\n    }\n    -- a/b/c/p4.cue --\n    package p\n\n    x: 5\n    -- a/b/p3.cue --\n    package p\n\n    x: 5\n    -- a/p2.cue --\n    package p\n\n    x: 5\n    -- p1.cue --\n    package p\n\n    x: 5\n\n\nIf so, can we not resolve this by only working with the `BuildFiles` that are in the same directory as the _instance_ (`cue/build.Instance.Dir`)?\n\nThat said, I\u0027m not sure if this \"solves\" this from the user perspective or not.\n\nConsider again the example above, running `cue fmt ./a/b/c`. Should that format `p1.cue`?",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

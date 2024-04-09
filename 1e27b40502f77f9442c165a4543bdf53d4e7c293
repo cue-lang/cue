@@ -1,0 +1,333 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48990243_ad457144",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "Oops, saw the \"DO NOT REVIEW\" commit message too late. Publishing comments anyway, as they might be helpful.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "21a9b893_317c402b",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "FWIW I was a little confused by this at first as I assumed it was the very last position in the file, but actually it\u0027s the most recent position AFAICS.\nMaybe just name it \"pos\" instead?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e92f1067_d661512f",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "FWIW I don\u0027t think this is a fundamental limitation. token.File already supplies AddLine for adding line info dynamically, and its Size method is _almost_ unused and could probably be deprecated entirely. I don\u0027t see any particular reason why we couldn\u0027t calculate line/col information on the fly as content is read.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bf3e8be7_01c173de",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "doc comments please.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "599c59fd_d14c125d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "Maybe also mention that we\u0027re stripping the leading \"#\" ?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5641d20c_83bf95e9",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "doc comments on these methods would be nice.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "648cd49e_292ddc6d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "I don\u0027t quite understand this comment. It sounds like it\u0027s saying we _could_ use code like this, but the code itself is live, so presumably that\u0027s what we are actually doing. Or is there a missing tail of the comment here?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bbf74477_e9c8fee0",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "debugging remnant?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b5cbd22a_13b44045",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "Why is 100 synonymous with \"at the very end\" ? What if the line is longer than that?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cd5e22be_46da1d39",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "delete",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc02e5e8_77500d1c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "Maybe add a comment to say what condition this signifies (i.e. why yn.Pos().Before(d.lastPos) indicates that there\u0027s no position?)",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5d561981_25fcfe61",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "At the very least, a comment saying what this implies would be good. When can len(yn.Content) not be exactly 1 ?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ded30b4_63b33ce7",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "```suggestion\nlist :\u003d \u0026ast.ListLit{\n    Lbrack: d.pos(yn).WithRel(token.Blank),\n}\n```",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 231,
+        "endChar": 0
+      },
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f9a7d3e_20745e29",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "A broad overview of what this logic is doing might be helpful for future readers here.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fa012c47_b6eebe2d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "Perhaps add a comment explaining why we\u0027re sufficiently satisfied that CUE\u0027s integer literal syntax is a superset of YAML\u0027s that we can use the CUE number parser?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5fbaa7a_ba6237a3",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "This isn\u0027t valid CUE. Maybe:\n\n    value +\u003d \".0\"\n\ninstead?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f27ae9f4_d4c0bef5",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "Maybe add a comment saying why we need to deal with an arbitrary number of \"-\" characters here, rather than using strings.CutPrefix, say?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "95ca623f_b910135d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "Is this comment a TODO?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ca3819e0_d08e791d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "FWIW this will unnecessary escape double-quotes. Perhaps add a comment explaining why that\u0027s not an issue in practice? It might also be worth explicitly stating that CUE\u0027s rules for string literals align closely enough with Go\u0027s that using strconv primitives is OK.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

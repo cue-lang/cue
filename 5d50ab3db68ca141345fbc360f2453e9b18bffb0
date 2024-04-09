@@ -16,6 +16,41 @@
       "message": "Marcel: number is more appropriate, as it means any number, whereas float means it can\u0027t be represented as an integer",
       "revId": "5d50ab3db68ca141345fbc360f2453e9b18bffb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8212212_4b77d00c",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "This is invalid CUE (https://cuelang.org/play/?id\u003dU789jn6Jwop#w\u003dfunction\u0026i\u003dcue\u0026f\u003dexport\u0026o\u003dcue). If the intention is to make the field unifiable with `float`, this could be written as `18446744073709551616.0` or maybe `18446744073709551616 + .0` if we wanted to keep the original literal token as close as possible.\n\nIt might also be nice to have a sanity check that all the CUE can be evaluated without errors, which would catch this issue.",
+      "parentUuid": "e826f280_dc69cde0",
+      "revId": "5d50ab3db68ca141345fbc360f2453e9b18bffb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "81aa2815_08d20348",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-09T14:00:57Z",
+      "side": 1,
+      "message": "ditto",
+      "revId": "5d50ab3db68ca141345fbc360f2453e9b18bffb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -81,6 +81,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dac9333a_1091709e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T06:13:48Z",
+      "side": 1,
+      "message": "I responded, it looks like it\u0027s worth discussing the expected behavior first before rushing to a solution",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4b6351de_46847abd",
@@ -94,6 +111,24 @@
       "writtenOn": "2024-04-09T05:03:46Z",
       "side": 1,
       "message": "I\u0027m not clear on what \"in the package directory\" means here. But per below, I\u0027m not yet clear we need the new API.\n\nIf I\u0027ve understood the problem correctly (and please let me know if I haven\u0027t) the issue comes because in the following example, `cue fmt ./...` from the root causes `p1.cue` to be formatted four times?\n\n    cue fmt ./...\n\n    -- cue.mod/module.cue --\n    module: \"mod.example\"\n    language: {\n            version: \"v0.9.0-alpha.1\"\n    }\n    -- a/b/c/p4.cue --\n    package p\n\n    x: 5\n    -- a/b/p3.cue --\n    package p\n\n    x: 5\n    -- a/p2.cue --\n    package p\n\n    x: 5\n    -- p1.cue --\n    package p\n\n    x: 5\n\n\nIf so, can we not resolve this by only working with the `BuildFiles` that are in the same directory as the _instance_ (`cue/build.Instance.Dir`)?\n\nThat said, I\u0027m not sure if this \"solves\" this from the user perspective or not.\n\nConsider again the example above, running `cue fmt ./a/b/c`. Should that format `p1.cue`?",
+      "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a27f23b0_fbbffbcc",
+        "filename": "cue/build/instance.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-09T06:13:48Z",
+      "side": 1,
+      "message": "The terminology in my comment was not accurate - you\u0027re right, I meant instance directory.\n\nMy thought was that from a user perspective, running either `cue fmt ./...` or, as in your example, `cue fmt ./a/b/c` should only cause files in the directories below the specified directory / pattern to be formatted.\n\nI think (and this might be wrong) that users see `cue fmt` as a command that is more file system based and not related to cue concepts like instance/pkg/module, so they wouldn\u0027t expect commands like `cue fmt ./a/b/c` to format all files in the instance - rather to format all files in the directory.",
+      "parentUuid": "4b6351de_46847abd",
       "revId": "54372a56abc4e95e48de1d817d38146e72102da5",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

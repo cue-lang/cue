@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c2902eaf_0d9294b8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-09T07:57:14Z",
+      "side": 1,
+      "message": "SGTM. I\u0027ll be AFK for a 14h flight in about 5h, so feel free to respond to these review comments as you see fit and merge, so we may continue. Any unresolved bits we can discuss after the fact or deal with in follow-up CLs.",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5ad3d2a2_99116aaa",
@@ -54,6 +71,23 @@
         "endLine": 518,
         "endChar": 21
       },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "419bf8a1_eceee62d",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-09T07:57:14Z",
+      "side": 1,
+      "message": "is this a bugfix that should be called out in the commit message or via a test?",
       "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -260,6 +294,24 @@
       "writtenOn": "2024-04-08T13:41:48Z",
       "side": 1,
       "message": "the fact that this function uses both `n.disjuncts` and `n.disjunctions` seems very confusing. can we give those fields better names? it seems like the fields come from different types, but if they\u0027re embedded or otherwise are used alongside each other, it\u0027s puzzling.",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "62a24f12_136993e9",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-09T07:57:14Z",
+      "side": 1,
+      "message": "re-reading this, I get that a disjunction is made up of disjuncts, but what confuses me is how a nodeContext can refer to both multiple disjunctions and multiple disjuncts. Without more context in the names, it\u0027s not clear what these fields at the same time are for.",
+      "parentUuid": "1075f4ba_8a9b7e36",
       "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

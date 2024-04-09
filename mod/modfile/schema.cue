@@ -40,6 +40,10 @@ let unimplemented = 1&2
 	// module indicates the module's path.
 	module?: #Module | ""
 
+	// source holds information about the source of the files within the
+	// module. This field is mandatory at publish time.
+	source?: #Source
+
 	// version indicates the language version used by the code
 	// in this module - the minimum version of CUE required
 	// to evaluate the code in this module. When a later version of CUE
@@ -150,4 +154,17 @@ let unimplemented = 1&2
 
 	// TODO require the CUE version?
 	// language!: version!: _
+}
+
+// #Source describes a source of truth for a module's content.
+#Source: {
+	// kind specifies the kind of source.
+	//
+	// The special value "none" signifies that the module that is
+	// standalone, associated with no particular source other than
+	// the contents of the module itself.
+	kind!: "none" | "git"
+
+	// TODO support for other VCSs:
+	// kind!: "none" | "git" | "bzr" | "hg" | "svn"
 }

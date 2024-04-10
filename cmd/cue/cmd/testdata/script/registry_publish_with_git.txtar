@@ -1,0 +1,78 @@
+# Check that we can use the cue mod publish command to publish to a registry
+# using the git VCS, and that it doesn't publish files that are git-ignored.
+
+[!exec:git] skip 'no git command found'
+memregistry MEMREGISTRY
+env CUE_EXPERIMENT=modules
+env CUE_REGISTRY=$MEMREGISTRY
+env CUE_CACHE_DIR=$WORK/.tmp/cache
+
+cd $WORK/example
+exec git init .
+exec git add .
+exec git commit -m 'initial commit'
+cd cuemodule
+exec cue mod publish v0.0.1
+cmp stdout $WORK/expect-publish-stdout
+cd $WORK/main
+exec cue eval .
+cmp stdout ../expect-eval-stdout
+
+# If the git directory is not clean, the publish should fail.
+# We can conveniently combine that check with the .gitignore
+# removal.
+cd $WORK/example
+rm .gitignore
+cd cuemodule
+! exec cue mod publish v0.0.2
+cmp stderr $WORK/expect-unclean-stderr
+
+# Sanity check that once the .gitignore file has
+# been removed, the published module does
+# actually contain the ignored content.
+cd $WORK/example
+exec git add .
+exec git commit -m 'commit with no .gitignore'
+cd cuemodule
+exec cue mod publish v0.0.2
+cd $WORK/main
+exec cue mod get x.example/e@v0.0.2
+exec cue eval .
+cmp stdout $WORK/expect-eval-stdout2
+
+-- expect-publish-stdout --
+published x.example/e@v0.0.1
+-- expect-eval-stdout --
+e: true
+-- expect-unclean-stderr --
+VCS state is not clean
+-- expect-eval-stdout2 --
+e:         true
+sensitive: true
+-- main/cue.mod/module.cue --
+module: "main.org@v0"
+
+source: kind: "none"
+
+deps: "x.example/e@v0": v: "v0.0.1"
+
+-- main/main.cue --
+package main
+import "x.example/e@v0"
+
+e
+
+-- example/cuemodule/cue.mod/module.cue --
+module: "x.example/e@v0"
+source: kind: "git"
+-- example/.gitignore --
+/cuemodule/ignored.cue
+-- example/cuemodule/e.cue --
+package e
+
+e: true
+
+-- example/cuemodule/ignored.cue --
+package e
+
+sensitive: true

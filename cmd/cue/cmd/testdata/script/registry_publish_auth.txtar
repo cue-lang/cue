@@ -44,6 +44,8 @@ main
 -- example/cue.mod/module.cue --
 module: "example.com@v0"
 
+source: kind: "self"
+
 -- example/top.cue --
 package main
 

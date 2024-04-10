@@ -1,0 +1,7 @@
+env CUE_EXPERIMENT=modules
+! exec cue mod publish v1.0.0
+stderr 'git VCS not found in any parent of ".+"'
+-- cue.mod/module.cue --
+module: "x.example@v1"
+
+source: kind: "git"

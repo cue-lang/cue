@@ -1,6 +1,69 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "41ffdf5a_5fdda554",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T04:06:06Z",
+      "side": 1,
+      "message": "did you mean \"then\" here? at least it reads better for me that way",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 4
+      },
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5381c73b_ab7b2111",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T04:06:06Z",
+      "side": 1,
+      "message": "This?",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 3
+      },
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bef0812d_753d02cb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T04:06:06Z",
+      "side": 1,
+      "message": "please reflow the text so it\u0027s under 76 columns",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "2e9a7fc9_c02f618c",
@@ -14,6 +77,57 @@
       "writtenOn": "2024-04-09T19:38:04Z",
       "side": 1,
       "message": "thanks for the illuminating exchange, this turned into quite an interesting CL for me 😊",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4b6b347_3ead5198",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T04:06:06Z",
+      "side": 1,
+      "message": "Thanks, looks great! Just some last nits.",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "185fc782_08c0a9af",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T04:06:06Z",
+      "side": 1,
+      "message": "technically all files in BuildFiles are instance files, so I think this name is slightly misleading.\n\nI don\u0027t think we can use dirFiles either, because when running `cue fmt a/a.cue b/b.cue`, they clearly do not share a directory.\n\nSo I think either `shouldFormat` or `directFile` makes more sense, I\u0027ll leave the choice up to you :)",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e9f513b1_c9860dd2",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T04:06:06Z",
+      "side": 1,
+      "message": "can you call this fmt_parent.txtar? that\u0027s a clearer name for what we\u0027re testing here, I think.",
       "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

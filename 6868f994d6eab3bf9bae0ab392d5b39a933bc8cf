@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "378abfc6_774c6ba5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-10T04:44:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "41ffdf5a_5fdda554",
+      "range": {
+        "startLine": 15,
+        "startChar": 0,
+        "endLine": 15,
+        "endChar": 4
+      },
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5381c73b_ab7b2111",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "328679eb_84a7425f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 18,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-10T04:44:16Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5381c73b_ab7b2111",
+      "range": {
+        "startLine": 18,
+        "startChar": 0,
+        "endLine": 18,
+        "endChar": 3
+      },
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bef0812d_753d02cb",
@@ -60,6 +108,24 @@
       "writtenOn": "2024-04-10T04:06:06Z",
       "side": 1,
       "message": "please reflow the text so it\u0027s under 76 columns",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "666e9f8f_f2a6c984",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 8
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-10T04:44:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bef0812d_753d02cb",
       "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -115,6 +181,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bfa6e400_7e020a21",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-10T04:44:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "185fc782_08c0a9af",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e9f513b1_c9860dd2",
@@ -128,6 +212,24 @@
       "writtenOn": "2024-04-10T04:06:06Z",
       "side": 1,
       "message": "can you call this fmt_parent.txtar? that\u0027s a clearer name for what we\u0027re testing here, I think.",
+      "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "496aea25_2420d6fc",
+        "filename": "cmd/cue/cmd/testdata/script/fmt_files.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-10T04:44:16Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e9f513b1_c9860dd2",
       "revId": "6868f994d6eab3bf9bae0ab392d5b39a933bc8cf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6280633e_8e114e67",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T14:11:17Z",
+      "side": 1,
+      "message": "can you expand on this a little? For example, does this help just with correctness, or also with performance? What types of bugs are fixed by this change?",
+      "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7fecd598_b1812fcf",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 762,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T14:11:17Z",
+      "side": 1,
+      "message": "GIVEN THAT WE DON\u0027T WANT XXX COMMENTS IN MASTER, IT DOES CAUSE A LITTLE BIT OF TROUBLE :P resolve or make it a TODO?",
+      "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2c73192_bed929e3",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T14:11:17Z",
+      "side": 1,
+      "message": "nit: I would leave this unrelated change out, to avoid noise and potential conflicts",
+      "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b3ab6bf2_59236dc3",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 909,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T14:11:17Z",
+      "side": 1,
+      "message": "is this `continue` helpful, versus joining the cases?",
+      "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

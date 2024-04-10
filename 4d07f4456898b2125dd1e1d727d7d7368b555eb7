@@ -151,6 +151,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e9f2ee9a_0dfd3aed",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T12:24:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "be19690e_35314786",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9cbcca49_c00819b7",
@@ -374,6 +392,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "35baa5ec_31f28b40",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T12:24:22Z",
+      "side": 1,
+      "message": "Acknowledged, and thanks for the TODO",
+      "parentUuid": "086e641b_3a53db4f",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c41ba86b_26c72e3e",
@@ -591,6 +627,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b2203133_810a40e1",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T12:24:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "77a95c71_c7702f40",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "733e058b_2341d3e2",
@@ -628,6 +682,30 @@
       "side": 1,
       "message": "I typically use `a` for a slice/ array. See for instance strconv.SearchInts.\n\nI renamed d to x, although I often use `d` for disjunct, using `x` might be okay in this case.",
       "parentUuid": "733e058b_2341d3e2",
+      "range": {
+        "startLine": 486,
+        "startChar": 36,
+        "endLine": 486,
+        "endChar": 37
+      },
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0616fdcb_da08c597",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 486,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T12:24:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "e9384526_5a924b83",
       "range": {
         "startLine": 486,
         "startChar": 36,
@@ -1248,6 +1326,24 @@
       "side": 1,
       "message": "In other words, it would change the algorithm from O(n), and near constant, to O(n log n), with probably a higher constant overhead as well.",
       "parentUuid": "843fb9d1_e716c1d0",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8269275d_069346e7",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T12:24:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "9eebcce8_44107664",
       "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

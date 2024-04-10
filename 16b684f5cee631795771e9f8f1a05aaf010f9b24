@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "08294486_9ead08e9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T16:52:34Z",
+      "side": 1,
+      "message": "expand a little bit, perhaps with a brief example?",
+      "revId": "16b684f5cee631795771e9f8f1a05aaf010f9b24",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

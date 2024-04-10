@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9e03fb0_b50c8c34",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T16:55:32Z",
+      "side": 1,
+      "message": "summarize why this matters, e.g. from the test changes this seems to fix a bug in how the new evaluator dropped/chose disjuncts.",
+      "revId": "db3a577d813005270878ee1d3615a6045c3b9dfd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

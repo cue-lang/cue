@@ -25,6 +25,9 @@ main:                   "main"
 "example.com@v0":       "v0.0.1"
 -- main/cue.mod/module.cue --
 module: "main.org@v0"
+
+source: kind: "none"
+
 deps: {
 	"bar.com@v0": v: "v0.5.0"
 	"baz.org@v0": v: "v0.10.1"
@@ -43,6 +46,7 @@ main
 
 -- example/cue.mod/module.cue --
 module: "example.com@v0"
+source: kind: "none"
 deps: {
 	"bar.com@v0": v: "v0.5.0"
 	"baz.org@v0": v: "v0.10.1"

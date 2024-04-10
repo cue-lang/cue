@@ -185,6 +185,10 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	}
 	n.updateScalar()
 
+	if n.aStruct != nil {
+		n.updateNodeType(StructKind, n.aStruct, n.aStructID)
+	}
+
 	// First process all but the subfields.
 	switch {
 	case n.meets(nodeOnlyNeeds):
@@ -198,9 +202,6 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	if isCyclePlaceholder(n.node.BaseValue) {
 		n.node.BaseValue = nil
-	}
-	if n.aStruct != nil {
-		n.updateNodeType(StructKind, n.aStruct, n.aStructID)
 	}
 
 	// TODO: rewrite to use mode when we get rid of old evaluator.

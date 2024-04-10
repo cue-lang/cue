@@ -62,15 +62,15 @@ nestedClosed: passing: {
 	D: {id: {}} | {[string]: D}
 }
 -- out/evalalpha/stats --
-Leaks:  5097
-Freed:  1396
-Reused: 1396
-Allocs: 5097
+Leaks:  2533
+Freed:  612
+Reused: 612
+Allocs: 2533
 Retain: 0
 
-Unifications: 1831
-Conjuncts:    13300
-Disjuncts:    2526
+Unifications: 707
+Conjuncts:    5878
+Disjuncts:    1102
 -- out/evalalpha --
 (struct){
   #Secret: (#struct){
@@ -149,18 +149,18 @@ diff old new
 -Freed:  1064333
 -Reused: 1064282
 -Allocs: 51
-+Leaks:  5097
-+Freed:  1396
-+Reused: 1396
-+Allocs: 5097
++Leaks:  2533
++Freed:  612
++Reused: 612
++Allocs: 2533
  Retain: 0
  
 -Unifications: 792123
 -Conjuncts:    2480117
 -Disjuncts:    1064333
-+Unifications: 1831
-+Conjuncts:    13300
-+Disjuncts:    2526
++Unifications: 707
++Conjuncts:    5878
++Disjuncts:    1102
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "921eec70_385c948b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 10
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-10T12:19:25Z",
+      "side": 1,
+      "message": "I don\u0027t mean to be a stickler, but... reformat this paragraph, it\u0027s way over 76 columns :)",
+      "revId": "60df6379469deb6e4e18d121e66c4bfcec1024af",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

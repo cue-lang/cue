@@ -1,0 +1,11 @@
+# Test that cue mod publish fails when there is no
+# explicit source field in module.cue.
+
+env CUE_EXPERIMENT=modules
+! exec cue mod publish v1.0.0
+env-fill want-stderr
+cmp stderr want-stderr
+-- want-stderr --
+no source field found in cue.mod/module.cue
+-- cue.mod/module.cue --
+module: "x.example@v1"

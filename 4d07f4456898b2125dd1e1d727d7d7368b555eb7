@@ -135,6 +135,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "be19690e_35314786",
+        "filename": "internal/core/adt/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 478,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-10T07:12:06Z",
+      "side": 1,
+      "message": "I do not fully recall, but I think this a new situation, as tasks can now be nil where they could not before.",
+      "parentUuid": "419bf8a1_eceee62d",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "9cbcca49_c00819b7",
         "filename": "internal/core/adt/disjunct2.go",
         "patchSetId": 2
@@ -557,6 +575,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "77a95c71_c7702f40",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 314,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-10T07:12:06Z",
+      "side": 1,
+      "message": "I\u0027ve added a comment to the disjuncts field. As these fields are also used in the old evaluator, it would currently result in an unnecessarily large diff.\n\nNote that many of the disjunction-related fields are changing between the old and new evaluator. So when we remove the old one would be a good moment to rename them.",
+      "parentUuid": "62a24f12_136993e9",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "733e058b_2341d3e2",
         "filename": "internal/core/adt/disjunct2.go",
         "patchSetId": 2
@@ -876,6 +912,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5373ad76_ab9a0e43",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-10T07:12:06Z",
+      "side": 1,
+      "message": "It turns out we do not need this field. Removed it.",
+      "parentUuid": "dd22ee14_3b8f71c6",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6b24bb6_39d12628",
@@ -998,6 +1052,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3ca552b_bab058e2",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 191,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-10T07:12:06Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d1db3ea5_c0ef0846",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2967777d_7840a732",
@@ -1109,6 +1181,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9d90cc44_6d5bc095",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 342,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-10T07:12:06Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "51fef672_6ff069ab",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "821f14f6_8963ef1c",
@@ -1146,6 +1236,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "9eebcce8_44107664",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 640,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-10T07:12:06Z",
+      "side": 1,
+      "message": "In other words, it would change the algorithm from O(n), and near constant, to O(n log n), with probably a higher constant overhead as well.",
+      "parentUuid": "843fb9d1_e716c1d0",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "f89602bc_1d31753b",
         "filename": "internal/core/adt/unify.go",
         "patchSetId": 2
@@ -1157,6 +1265,24 @@
       "writtenOn": "2024-04-08T13:41:48Z",
       "side": 1,
       "message": "explain why it might not be?",
+      "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "802e1107_cd5e8654",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 118,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-10T07:12:06Z",
+      "side": 1,
+      "message": "Theoretically, our node has not been completed yet: when mode is final, we guarantee it is done upon return from unify, but it is not yet at this point.\n\nThis should not matter, though. Changed the comment.",
+      "parentUuid": "f89602bc_1d31753b",
       "revId": "4d07f4456898b2125dd1e1d727d7d7368b555eb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

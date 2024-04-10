@@ -64,10 +64,6 @@ workflows: trybot: _repo.bashWorkflow & {
 					// so we only need to run them on one of the matrix jobs.
 					if: _isLatestLinux
 				},
-				json.#step & {
-					if:  "\(_repo.isProtectedBranch) || \(_isLatestLinux)"
-					run: "echo CUE_LONG=true >> $GITHUB_ENV"
-				},
 				_goGenerate,
 				_goTest & {
 					if: "\(_repo.isProtectedBranch) || !\(_isLatestLinux)"

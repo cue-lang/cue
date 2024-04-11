@@ -17,9 +17,11 @@ package cmd
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"io"
 	"os"
 	"runtime"
+	"runtime/pprof"
 	"testing"
 
 	"github.com/spf13/cobra"
@@ -96,7 +98,35 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		// We don't want that work to count towards $CUE_STATS.
 		adt.ResetStats()
 
+		if cpuprofile := flagCpuProfile.String(c); cpuprofile != "" {
+			println("cpu", cpuprofile)
+			f, err := os.Create(cpuprofile)
+			if err != nil {
+				return fmt.Errorf("could not create CPU profile: %v", err)
+			}
+			defer f.Close()
+			if err := pprof.StartCPUProfile(f); err != nil {
+				return fmt.Errorf("could not start CPU profile: %v", err)
+			}
+			defer pprof.StopCPUProfile()
+			defer func() { println("after") }()
+		}
+
 		err := f(c, args)
+
+		// TODO(mvdan): support -memprofilerate like `go help testflag`.
+		if memprofile := flagMemProfile.String(c); memprofile != "" {
+			println("mem", memprofile)
+			f, err := os.Create(memprofile)
+			if err != nil {
+				return fmt.Errorf("could not create memory profile: %v", err)
+			}
+			defer f.Close()
+			runtime.GC() // get up-to-date statistics
+			if err := pprof.WriteHeapProfile(f); err != nil {
+				return fmt.Errorf("could not write memory profile: %v", err)
+			}
+		}
 
 		if statsEnc != nil {
 			var stats Stats

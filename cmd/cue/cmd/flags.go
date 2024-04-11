@@ -50,6 +50,10 @@ const (
 	flagWithContext flagName = "with-context"
 	flagOut         flagName = "out"
 	flagOutFile     flagName = "outfile"
+
+	// Hidden flags.
+	flagCpuProfile flagName = "cpuprofile"
+	flagMemProfile flagName = "memprofile"
 )
 
 func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
@@ -74,6 +78,11 @@ func addGlobalFlags(f *pflag.FlagSet) {
 	f.BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")
+
+	f.String(string(flagCpuProfile), "", "write a CPU profile to the specified file before exiting")
+	f.MarkHidden(string(flagCpuProfile))
+	f.String(string(flagMemProfile), "", "write an allocation profile to the specified file before exiting")
+	f.MarkHidden(string(flagMemProfile))
 }
 
 func addOrphanFlags(f *pflag.FlagSet) {

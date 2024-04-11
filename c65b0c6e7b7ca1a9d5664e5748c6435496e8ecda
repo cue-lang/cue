@@ -37,6 +37,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c881f6cb_31b32720",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 762,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-11T11:29:57Z",
+      "side": 1,
+      "message": "This is indeed working as intended. There should be no XXX\u0027s left in code and I should indeed fix this. I should just be less sloppy and remove these earlier.\n\nIt is handy to keep them around at this stage, as sometimes I can only verify something down the line. IOW, allowing XXX in reviews allows reviews to be sent out earlier and allow the reviewing the be done in parallel. \nBut it would probably be good to prevent XXX notes from being submitable.\n\nI\u0027ve verified that this does not cause any changes down the line. I will keep it for now, but add a better TODO.",
+      "parentUuid": "7fecd598_b1812fcf",
+      "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c2c73192_bed929e3",
         "filename": "internal/core/adt/fields.go",
         "patchSetId": 3
@@ -48,6 +66,24 @@
       "writtenOn": "2024-04-10T14:11:17Z",
       "side": 1,
       "message": "nit: I would leave this unrelated change out, to avoid noise and potential conflicts",
+      "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2c9743b_bcf583e4",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 862,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-11T11:29:57Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2c73192_bed929e3",
       "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -65,6 +101,24 @@
       "writtenOn": "2024-04-10T14:11:17Z",
       "side": 1,
       "message": "is this `continue` helpful, versus joining the cases?",
+      "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a54c4884_c3258c69",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 909,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-11T11:29:57Z",
+      "side": 1,
+      "message": "Yes. It may cause errors to be elevated to permanent errors when they are actually allowed. Added comment.",
+      "parentUuid": "b3ab6bf2_59236dc3",
       "revId": "c65b0c6e7b7ca1a9d5664e5748c6435496e8ecda",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -106,18 +106,16 @@ Disjuncts:    163
     m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
     m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
   }
-  z: (struct){ |((struct){
-      b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-      a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-    }, (struct){
-      b: (int){ int }
-    }) }
+  z: (struct){
+    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -5,31 +5,33 @@
+@@ -5,28 +5,28 @@
      m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
    }
    y1: (struct){
@@ -155,26 +153,13 @@ diff old new
 -    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
 -    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
 -    m4: (int){ 6 }
--  }
--  z: (struct){
--    b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
--    a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
--  }
 +    m4: (int){ 6 }
 +    m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
 +    m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
 +    m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
-+  }
-+  z: (struct){ |((struct){
-+      b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-+      a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-+    }, (struct){
-+      b: (int){ int }
-+    }) }
- }
--- diff/todo/p1 --
-z: Implement cross product with type elimination. The original seems wrong
-as well.
+   }
+   z: (struct){
+     b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
 -- diff/todo/p3 --
 Reordering.
 -- out/compile --

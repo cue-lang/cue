@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "aa5ccb0f_102b8837",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-11T05:39:41Z",
+      "side": 1,
+      "message": "Perfect complement to the proposal, thank you!",
+      "revId": "7d5da7d050a2202dac9056223232158d54dbb4bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d64f9de_3e9e9169",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_source.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-11T05:39:41Z",
+      "side": 1,
+      "message": "Please document for a human what this test is intended to do.",
+      "revId": "7d5da7d050a2202dac9056223232158d54dbb4bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "783a9dca_ad599526",
+        "filename": "cmd/cue/cmd/testdata/script/modpublish_no_vcs_directory.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-11T05:39:41Z",
+      "side": 1,
+      "message": "Please document for a human what this test is intended to do.",
+      "revId": "7d5da7d050a2202dac9056223232158d54dbb4bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2f1a6c6_627f1311",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-11T05:39:41Z",
+      "side": 1,
+      "message": "Very nice test!",
+      "revId": "7d5da7d050a2202dac9056223232158d54dbb4bd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

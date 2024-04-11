@@ -141,7 +141,7 @@ func runTrim(cmd *Command, args []string) error {
 				diff.Print(os.Stdout, script)
 				fmt.Println("Aborting trim, output differs after trimming. This is a bug! Use -i to force trim.")
 				fmt.Println("You can file a bug here: https://cuelang.org/issues/new?assignees=&labels=NeedsInvestigation&template=bug_report.md&title=")
-				os.Exit(1)
+				return ErrPrintedError
 			}
 		}
 	}

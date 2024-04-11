@@ -328,6 +328,6 @@ type panicError struct {
 	Err error
 }
 
-func exit() {
+func panicExit() {
 	panic(panicError{ErrPrintedError})
 }

@@ -83,6 +83,12 @@ func getLang() language.Tag {
 	return language.Make(loc)
 }
 
+// exitOnErr uses cue/errors to print any error to stderr,
+// and if fatal is true, it causes the command's exit code to be 1.
+// Note that os.Exit is not called, as that would prevent defers from running.
+//
+// TODO(mvdan): can we avoid the panicError and recover shenanigans?
+// They work, but they make the code flow somewhat confusing to follow.
 func exitOnErr(cmd *Command, err error, fatal bool) {
 	if err == nil {
 		return
@@ -106,7 +112,7 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 	b := w.Bytes()
 	_, _ = cmd.Stderr().Write(b)
 	if fatal {
-		exit()
+		panicExit()
 	}
 }
 

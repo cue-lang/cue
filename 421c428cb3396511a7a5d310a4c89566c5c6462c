@@ -16,6 +16,24 @@
       "message": "did you mean to leave this commented out? if so, perhaps add a TODO? although then the commit message seems slightly wrong, as with the panic commented out, we are not validating anything.",
       "revId": "421c428cb3396511a7a5d310a4c89566c5c6462c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da5e995f_d1b861d8",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 503,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-11T07:59:31Z",
+      "side": 1,
+      "message": "It should be enabled, but I need to add a fix that if I rebase it to hear would cause a lot of diffs.\n\nI\u0027ll comment it as a TODO here and enable it later once this fix is in.",
+      "parentUuid": "8e8113e5_2b4020ca",
+      "revId": "421c428cb3396511a7a5d310a4c89566c5c6462c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

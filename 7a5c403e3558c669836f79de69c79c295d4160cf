@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b06c6112_40dba019",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-11T14:17:22Z",
+      "side": 1,
+      "message": "I mentioned this feature to Marcel briefly, so that users like Noam (whose `cue fmt --check ./...` on a monorepo takes... 90s!) can easily grab profiles and share them with us.\n\nWe briefly discussed alternative routes like CUE_DEBUG, but I lean towards a flag since this is really only useful for cmd/cue, and he seemed happy with that.\n\nI left the flags hidden, as they are only useful for debugging, and the majority of CUE users shouldn\u0027t be bothered by their presence. We can always un-hide them later if we wish to.",
+      "revId": "7a5c403e3558c669836f79de69c79c295d4160cf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

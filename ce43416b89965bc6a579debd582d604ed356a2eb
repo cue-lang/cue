@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3acec2cc_f8fa6d74",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 91,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-11T12:18:19Z",
+      "side": 1,
+      "message": "This was an artifact of excessive changing things around. Should have caught this and reverted in pre-reviewing this.",
+      "parentUuid": "91075f14_e8115146",
+      "revId": "ce43416b89965bc6a579debd582d604ed356a2eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "474989cd_d953fb19",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-10T16:51:16Z",
       "side": 1,
       "message": "ditto",
+      "revId": "ce43416b89965bc6a579debd582d604ed356a2eb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc3d4c9c_cdcde838",
+        "filename": "pkg/list/sort.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 170,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-11T12:18:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "474989cd_d953fb19",
       "revId": "ce43416b89965bc6a579debd582d604ed356a2eb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

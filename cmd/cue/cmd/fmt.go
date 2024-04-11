@@ -146,7 +146,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 					fmt.Fprintln(stdout, relPath)
 				}
-				os.Exit(1)
+				return ErrPrintedError
 			}
 
 			return nil

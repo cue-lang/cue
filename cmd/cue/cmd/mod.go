@@ -48,8 +48,7 @@ See also:
 				fmt.Fprintf(stderr, "mod must be run as one of its subcommands: unknown subcommand %q\n", args[0])
 			}
 			fmt.Fprintln(stderr, "Run 'cue help mod' for known subcommands.")
-			os.Exit(1) // TODO: get rid of this
-			return nil
+			return ErrPrintedError
 		}),
 	}
 
@@ -83,14 +82,6 @@ in the module.
 }
 
 func runModInit(cmd *Command, args []string) (err error) {
-	defer func() {
-		if err != nil {
-			// TODO: Refactor Cobra usage to do something more principled
-			fmt.Fprintln(cmd.OutOrStderr(), err)
-			os.Exit(1)
-		}
-	}()
-
 	modulePath := ""
 	if len(args) > 0 {
 		if len(args) != 1 {

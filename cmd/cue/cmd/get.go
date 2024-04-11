@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"fmt"
-	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -43,8 +42,7 @@ per language and are documented in the respective subcommands.
 				fmt.Fprintf(stderr, "get must be run as one of its subcommands: unknown subcommand %q\n", args[0])
 			}
 			fmt.Fprintln(stderr, "Run 'cue help get' for known subcommands.")
-			os.Exit(1) // TODO: get rid of this
-			return nil
+			return ErrPrintedError
 		}),
 	}
 	cmd.AddCommand(newGoCmd(c))

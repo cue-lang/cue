@@ -90,10 +90,6 @@ func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 		ctx.initCloneCC(cc)
 	}
 
-	// Note that this may trigger tasks to run, so it should be called after
-	// everything is initialized.
-	v.state.signal(allAncestorsProcessed)
-
 	// TODO: walk overlay vertices and decrement counters of non-disjunction
 	// running tasks?
 	// TODO: find a faster way to do this. Walking over vertices would

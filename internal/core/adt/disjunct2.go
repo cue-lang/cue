@@ -409,8 +409,6 @@ func (n *nodeContext) doDisjunct(c Conjunct, m defaultMode, mode runMode) (*node
 	// not all holes filled out yet is not finalized. This may require
 	// a special mode, or evaluating more aggressively if finalize is not given.
 	v.status = unprocessed
-	v.state.scheduler.completed &^= subFieldsProcessed
-	v.state.scheduler.frozen &^= subFieldsProcessed
 
 	d.overlays = n
 	d.disjunctCCs = append(d.disjunctCCs, holes...)

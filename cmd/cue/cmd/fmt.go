@@ -19,6 +19,8 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -65,6 +67,16 @@ func newFmtCmd(c *Command) *cobra.Command {
 			check := flagCheck.Bool(cmd)
 			var badlyFormattedFiles []string
 
+			slices.SortFunc(builds, func(a, b *build.Instance) int {
+				return strings.Compare(a.Dir, b.Dir)
+			})
+
+			for _, inst := range builds {
+				slices.SortFunc(inst.BuildFiles, func(a, b *build.File) int {
+					return strings.Compare(a.Filename, b.Filename)
+				})
+			}
+
 			for _, inst := range builds {
 				if inst.Err != nil {
 					switch {
@@ -75,6 +87,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 						continue
 					}
 				}
+
 				for _, file := range inst.BuildFiles {
 					shouldFormat := inst.User || file.Filename == "-" || filepath.Dir(file.Filename) == inst.Dir
 					if !shouldFormat {

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d4f03aaa_85c578e5",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 570,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-12T06:42:19Z",
+      "side": 1,
+      "message": "this has no need to be a method, right?",
+      "revId": "f21553f1a57bd07c592b1768e57ebacadce145e9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df4b9753_b4130aa2",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 592,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-12T06:42:19Z",
+      "side": 1,
+      "message": "this has no need to be a method, right?",
+      "revId": "f21553f1a57bd07c592b1768e57ebacadce145e9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

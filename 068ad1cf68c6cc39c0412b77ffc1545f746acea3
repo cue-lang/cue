@@ -22,6 +22,30 @@
       },
       "revId": "068ad1cf68c6cc39c0412b77ffc1545f746acea3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2b4895d_826dc57e",
+        "filename": "cmd/cue/cmd/fmt.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 81,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-12T09:07:47Z",
+      "side": 1,
+      "message": "and one more thought: I\u0027m wondering if this is just related to fmt, or if (as daniel has mentioned before) this should occur in all flows, e.g. at the loading phase?",
+      "parentUuid": "0744f6d2_ea72bd3c",
+      "range": {
+        "startLine": 72,
+        "startChar": 0,
+        "endLine": 81,
+        "endChar": 5
+      },
+      "revId": "068ad1cf68c6cc39c0412b77ffc1545f746acea3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

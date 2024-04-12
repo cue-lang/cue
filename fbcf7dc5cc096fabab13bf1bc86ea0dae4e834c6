@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "47d87337_7917aaff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-12T11:33:09Z",
+      "side": 1,
+      "message": "Thanks! LGTM with two nits",
+      "revId": "fbcf7dc5cc096fabab13bf1bc86ea0dae4e834c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01133c86_8c9b7347",
+        "filename": "cue/load/import.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 204,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-12T11:33:09Z",
+      "side": 1,
+      "message": "nit: name this \"c\", since \"i\" usually means an index.\n\nalso summarize the same you did in the commit message via a comment - that two instances may share the same directory.",
+      "range": {
+        "startLine": 204,
+        "startChar": 5,
+        "endLine": 204,
+        "endChar": 6
+      },
+      "revId": "fbcf7dc5cc096fabab13bf1bc86ea0dae4e834c6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

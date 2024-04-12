@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "797fae6f_ba821a37",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-12T10:23:56Z",
+      "side": 1,
+      "message": "nit: explain why the code is unnecessary?",
+      "revId": "d9583d8ef19fa8064794cde2d47fe8c9bb185680",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

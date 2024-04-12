@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8031f7ef_ceaa79c1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-12T14:33:17Z",
+      "side": 1,
+      "message": "LGTM but note that the commit message has two unresolved comments",
+      "revId": "6100974ccb28c5649f748a273d529d70dc4d9bdd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

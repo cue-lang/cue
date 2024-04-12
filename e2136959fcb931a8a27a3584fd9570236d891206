@@ -69,6 +69,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8b1262e0_e76233ce",
+        "filename": "cue/testdata/cycle/052_resolved_self-reference_cycles_with_disjunction_with_defaults.txtar",
+        "patchSetId": 7
+      },
+      "lineNbr": 263,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Fixed. Also in 051",
+      "parentUuid": "ac906573_b2e1dc7d",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "08057c9f_8f2d1a04",
@@ -82,6 +100,30 @@
       "writtenOn": "2024-04-11T17:11:18Z",
       "side": 1,
       "message": "\"no longer\"? since final means it can\u0027t be modified",
+      "range": {
+        "startLine": 589,
+        "startChar": 41,
+        "endLine": 589,
+        "endChar": 46
+      },
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa040ea1_791b8868",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 589,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "08057c9f_8f2d1a04",
       "range": {
         "startLine": 589,
         "startChar": 41,
@@ -109,6 +151,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e6da1d5e_17dfe890",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1069,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bde7aa95_df8848e4",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "208a263f_de874fe5",
@@ -122,6 +182,24 @@
       "writtenOn": "2024-04-11T17:11:18Z",
       "side": 1,
       "message": "did you mean to comment this out? at least I don\u0027t see any context in the comments/TODO around or the commit message.",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3599cf9b_25cfe2fe",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 427,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "208a263f_de874fe5",
       "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -143,6 +221,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8a3f5289_5e7e2cda",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 729,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cba1b049_9a0a6d3c",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "576539ed_1333f7da",
@@ -156,6 +252,24 @@
       "writtenOn": "2024-04-11T17:11:18Z",
       "side": 1,
       "message": "uncomment or leave a TODO?",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "de81457d_a6ed8fe0",
+        "filename": "internal/core/adt/fields.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 758,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "576539ed_1333f7da",
       "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -177,6 +291,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "88263463_314d1356",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 95,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Removed.",
+      "parentUuid": "31916ca4_16b965e6",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2267a761_9dc69459",
@@ -190,6 +322,24 @@
       "writtenOn": "2024-04-11T17:11:18Z",
       "side": 1,
       "message": "uncomment or add a TODO?",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d47936e1_7161ba5d",
+        "filename": "internal/core/adt/overlay.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2267a761_9dc69459",
       "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -211,6 +361,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e9855c1_7088a786",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 438,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7de8da02_4c4af69e",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b1ec1fd2_f56cebbb",
@@ -224,6 +392,24 @@
       "writtenOn": "2024-04-11T17:11:18Z",
       "side": 1,
       "message": "uncomment or add a TODO?",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbbda69a_095e194c",
+        "filename": "internal/core/adt/sched.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b1ec1fd2_f56cebbb",
       "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -251,6 +437,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "982d1e83_57fe942d",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 35,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "50632512_a6e7a160",
+      "range": {
+        "startLine": 35,
+        "startChar": 44,
+        "endLine": 35,
+        "endChar": 48
+      },
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97f920c7_83bcc777",
@@ -268,6 +478,42 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3e17d883_982d7523",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97f920c7_83bcc777",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d78c7e8_ab87c6e0",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 195,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "97f920c7_83bcc777",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "53d2c855_665016ce",
@@ -281,6 +527,42 @@
       "writtenOn": "2024-04-11T17:11:18Z",
       "side": 1,
       "message": "fix or TODO",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d94e841b_50594901",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53d2c855_665016ce",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5272c240_9b09ebcc",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 568,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T09:44:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "53d2c855_665016ce",
       "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

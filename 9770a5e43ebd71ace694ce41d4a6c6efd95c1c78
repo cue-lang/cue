@@ -16,6 +16,24 @@
       "message": "SGTM but perhaps clarify in the commit message that a later CL will start setting this field to true for some tasks. Otherwise it almost seems like an oversight that this feature isn\u0027t used at all (yet).",
       "revId": "9770a5e43ebd71ace694ce41d4a6c6efd95c1c78",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "903a4fc7_cb02a1ab",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T08:09:44Z",
+      "side": 1,
+      "message": "Merged the previously upcoming usage of the defunct field into this CL.",
+      "parentUuid": "78120ddb_53dd3f9a",
+      "revId": "9770a5e43ebd71ace694ce41d4a6c6efd95c1c78",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

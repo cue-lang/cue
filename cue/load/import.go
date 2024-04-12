@@ -201,7 +201,13 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		_ = p.Complete()
 	}
 	slices.SortFunc(all, func(a, b *build.Instance) int {
-		return cmp.Compare(a.Dir, b.Dir)
+		// Instances may share the same directory but have different package names.
+		// Sort by directory first, then by package name.
+		if c := cmp.Compare(a.Dir, b.Dir); c != 0 {
+			return c
+		}
+
+		return cmp.Compare(a.PkgName, b.PkgName)
 	})
 	return all
 }

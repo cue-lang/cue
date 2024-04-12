@@ -16,6 +16,24 @@
       "message": "Added some updates. Still investigating whether the cyclicConjuncts changes aren\u0027t better separated out.",
       "revId": "8e95b88bbf90e284748fad8da5f4dfee24b2fb0f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b497ac12_540eb23d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-12T08:06:33Z",
+      "side": 1,
+      "message": "Investigated, and these are indeed necessary for this change.",
+      "parentUuid": "4ce04923_5bee32b9",
+      "revId": "8e95b88bbf90e284748fad8da5f4dfee24b2fb0f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

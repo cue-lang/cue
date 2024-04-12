@@ -21,6 +21,7 @@ a${/}b${/}c${/}p_c.cue
 -- all-under-a.golden --
 a${/}p_a.cue
 a${/}b${/}p_b.cue
+a${/}d${/}p_d.cue
 a${/}b${/}c${/}p_c.cue
 -- multiple-instances.golden --
 x${/}p_x.cue
@@ -39,6 +40,10 @@ package p
 
 x:   5
 -- a/b/p_b.cue --
+package p
+
+x:   5
+-- a/d/p_d.cue --
 package p
 
 x:   5

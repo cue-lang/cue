@@ -16,9 +16,12 @@ package cmd
 
 import (
 	"bytes"
+	"cmp"
 	"fmt"
 	"os"
 	"path/filepath"
+	"slices"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -64,6 +67,18 @@ func newFmtCmd(c *Command) *cobra.Command {
 
 			check := flagCheck.Bool(cmd)
 			var badlyFormattedFiles []string
+
+			// Sort builds instances by instance dir to ensure deterministic output.
+			slices.SortFunc(builds, func(a, b *build.Instance) int {
+				da := a.Dir
+				db := b.Dir
+				ca := strings.Count(da, string(filepath.Separator))
+				cb := strings.Count(db, string(filepath.Separator))
+				if c := cmp.Compare(ca, cb); c != 0 {
+					return c
+				}
+				return cmp.Compare(da, db)
+			})
 
 			for _, inst := range builds {
 				if inst.Err != nil {

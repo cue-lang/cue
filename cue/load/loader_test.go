@@ -24,6 +24,8 @@ import (
 	"text/template"
 	"unicode"
 
+	"github.com/go-quicktest/qt"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
@@ -436,6 +438,28 @@ func TestOverlays(t *testing.T) {
 			t.Errorf("%s: got %s; want %s", inst.Dir, got, want[i])
 		}
 	}
+}
+
+func TestLoadOrder(t *testing.T) {
+	testDataDir := testdata("testsort")
+	insts := Instances([]string{"."}, &Config{
+		Package: "*",
+		Dir:     testDataDir,
+	})
+
+	var actualFiles = []string{}
+	for _, inst := range insts {
+		for _, f := range inst.BuildFiles {
+			if strings.Contains(f.Filename, testDataDir) {
+				actualFiles = append(actualFiles, filepath.Base(f.Filename))
+			}
+		}
+	}
+	var expectedFiles []string
+	for _, c := range "abcdefghij" {
+		expectedFiles = append(expectedFiles, string(c)+".cue")
+	}
+	qt.Assert(t, qt.DeepEquals(actualFiles, expectedFiles))
 }
 
 func TestLoadInstancesConcurrent(t *testing.T) {

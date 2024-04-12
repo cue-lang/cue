@@ -16,15 +16,15 @@ cmpenv stdout multiple-instances.golden
 -- single-file.golden --
 a${/}b${/}c${/}p_c.cue
 -- multi-file.golden --
-a${/}p_a.cue
 a${/}b${/}c${/}p_c.cue
+a${/}p_a.cue
 -- all-under-a.golden --
 a${/}p_a.cue
 a${/}b${/}p_b.cue
 a${/}b${/}c${/}p_c.cue
 -- multiple-instances.golden --
-x${/}p_x.cue
 a${/}b${/}c${/}p_c.cue
+x${/}p_x.cue
 -- cue.mod/module.cue --
 module: "mod.example"
 language: {

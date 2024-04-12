@@ -37,8 +37,8 @@ foo:      "bar"
 bar:   "baz"
 x:   1
 -- standalone/expected-output --
-not_formatted.cue
 another${/}not_formatted.cue
+not_formatted.cue
 -- module/cue.mod/module.cue --
 module: "example.com"
 -- module/not_formatted.cue --

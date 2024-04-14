@@ -1,0 +1,118 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d82fe68_8d14491a",
+        "filename": "cue/testdata/fulleval/046_non-structural_direct_cycles.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:45:30Z",
+      "side": 1,
+      "message": "should this be a `diff/explanation` then?",
+      "revId": "699dc9c8c2e5c511d3b9167612c801fbd0c8e786",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9e5a8c38_eaf4e4f1",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1066,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:45:30Z",
+      "side": 1,
+      "message": "did you mean this to be singular?",
+      "range": {
+        "startLine": 1066,
+        "startChar": 31,
+        "endLine": 1066,
+        "endChar": 36
+      },
+      "revId": "699dc9c8c2e5c511d3b9167612c801fbd0c8e786",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2347ec15_ebb23151",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 1070,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:45:30Z",
+      "side": 1,
+      "message": "can you expand this a bit to clarify what different values mean? because if it\u0027s just zero vs positive, I imagine a bool would suffice.",
+      "revId": "699dc9c8c2e5c511d3b9167612c801fbd0c8e786",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4b3beb4a_4daec5d1",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:45:30Z",
+      "side": 1,
+      "message": "remove or leave a TODO?",
+      "revId": "699dc9c8c2e5c511d3b9167612c801fbd0c8e786",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7c1804a6_6a97a67d",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 367,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:45:30Z",
+      "side": 1,
+      "message": "uncomment or make a TODO?",
+      "revId": "699dc9c8c2e5c511d3b9167612c801fbd0c8e786",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0066ca0b_d4306910",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 556,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:45:30Z",
+      "side": 1,
+      "message": "remove this word? otherwise it reads weirdly to me",
+      "range": {
+        "startLine": 556,
+        "startChar": 54,
+        "endLine": 556,
+        "endChar": 58
+      },
+      "revId": "699dc9c8c2e5c511d3b9167612c801fbd0c8e786",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

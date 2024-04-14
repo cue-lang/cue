@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "84104b34_d3d15163",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:48:40Z",
+      "side": 1,
+      "message": "SGTM but see my thoughts on the known breaking change.",
+      "revId": "e2f120902c2a46231f9a40275db138008e275586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbc928ed_e47c512b",
+        "filename": "cue/testdata/cycle/issue429.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-14T10:48:40Z",
+      "side": 1,
+      "message": "Given that the transition to the new evaluator is entirely about performance, and not correctness, I definitely think we should try to keep the known \"spec deviation\" bugs from the old evaluator where we can. Once the new evaluator is faster and stable enough to the point that we can turn it on by default and our users are no longer blocked by performance, we can start a transition with these behavior changes with further releases.",
+      "revId": "e2f120902c2a46231f9a40275db138008e275586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

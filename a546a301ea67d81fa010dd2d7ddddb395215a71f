@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "acf0bd84_40b11b46",
+        "filename": "cmd/cue/cmd/testdata/script/dev.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T17:31:14Z",
+      "side": 1,
+      "message": "validate what happens with `env CUE_EXPERIMENT\u003d`, i.e. that `exec cue eval` should fail?",
+      "revId": "a546a301ea67d81fa010dd2d7ddddb395215a71f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4eae0d03_5e25edd2",
+        "filename": "cue/context.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T17:31:14Z",
+      "side": 1,
+      "message": "this seems unrelated to exposing the evalv3 expeirment, no? Or, if this is needed so that an added test like dev.txtar doesn\u0027t fail, I would make that clear in the commit message.",
+      "revId": "a546a301ea67d81fa010dd2d7ddddb395215a71f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

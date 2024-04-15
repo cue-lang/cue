@@ -34,6 +34,24 @@
       "parentUuid": "321936af_02a8a69a",
       "revId": "99a6e74d8e998cf6575e4ff57a03e44ff45c7e3d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3116d9f9_ad725f66",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T09:16:49Z",
+      "side": 1,
+      "message": "Done; thankfully both the forked library and our project use Apache2, so all I had to do was include both copyright lines, and add a brief note about the history of the fork.",
+      "parentUuid": "11813f9d_a27bec55",
+      "revId": "99a6e74d8e998cf6575e4ff57a03e44ff45c7e3d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

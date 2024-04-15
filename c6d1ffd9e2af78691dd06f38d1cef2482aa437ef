@@ -39,6 +39,30 @@
       },
       "revId": "c6d1ffd9e2af78691dd06f38d1cef2482aa437ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc098d1a_26a7fbfb",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T07:33:35Z",
+      "side": 1,
+      "message": "Both read equally fine to me - I borrowed this sentence from `go help testflag`, so I lean towards the existing wording :)",
+      "parentUuid": "836e1d77_68e890a8",
+      "range": {
+        "startLine": 82,
+        "startChar": 39,
+        "endLine": 82,
+        "endChar": 95
+      },
+      "revId": "c6d1ffd9e2af78691dd06f38d1cef2482aa437ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

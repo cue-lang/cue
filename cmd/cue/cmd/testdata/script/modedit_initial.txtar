@@ -1,0 +1,41 @@
+exec cue mod edit --source git
+cmp cue.mod/module.cue want-module-1
+
+exec cue mod edit --dropsource
+cmp cue.mod/module.cue want-module-2
+
+exec cue mod edit --require foo.bar@v0.2.3
+cmp cue.mod/module.cue want-module-3
+
+! exec cue mod edit --require bad-module!
+cmp stderr want-stderr
+
+exec cue mod edit --droprequire foo.bar@v0
+cmp cue.mod/module.cue want-module-4
+
+exec cue mod edit --module othermain.org@v1
+cmp cue.mod/module.cue want-module-5
+
+
+-- cue.mod/module.cue --
+module: "main.org@v0"
+-- want-module-1 --
+module: "main.org@v0"
+source: {
+	kind: "git"
+}
+-- want-module-2 --
+module: "main.org@v0"
+-- want-module-3 --
+module: "main.org@v0"
+deps: {
+	"foo.bar@v0": {
+		v: "v0.2.3"
+	}
+}
+-- want-stderr --
+invalid argument "bad-module!" for "--require" flag: invalid module path@version "bad-module!"
+-- want-module-4 --
+module: "main.org@v0"
+-- want-module-5 --
+module: "othermain.org@v1"

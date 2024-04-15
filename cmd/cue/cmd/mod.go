@@ -52,6 +52,7 @@ See also:
 		}),
 	}
 
+	cmd.AddCommand(newModEditCmd(c))
 	cmd.AddCommand(newModGetCmd(c))
 	cmd.AddCommand(newModInitCmd(c))
 	cmd.AddCommand(newModRegistryCmd(c))

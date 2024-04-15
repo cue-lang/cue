@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c4616eef_2a794eaa",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-15T12:07:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5691454d_17b2df78",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35c910cd_e9976fb5",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-11T17:11:18Z",
       "side": 1,
       "message": "nit: reflow this paragraph under 76 columns",
+      "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4fa1de4e_a8093d1a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-15T12:07:56Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "35c910cd_e9976fb5",
       "revId": "e2136959fcb931a8a27a3584fd9570236d891206",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

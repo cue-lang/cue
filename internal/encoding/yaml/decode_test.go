@@ -80,6 +80,9 @@ var unmarshalTests = []struct {
 		"v: -10",
 		"v: -10",
 	}, {
+		"v: --10",
+		`v: "--10"`,
+	}, {
 		"v: -.1",
 		"v: -0.1",
 	},
@@ -845,6 +848,12 @@ var decoderTests = []struct {
 }, {
 	"---\na: b\n...\n",
 	`a: "b"`,
+}, {
+	"---\na: b\n---\n---\n",
+	"a: \"b\"\nnull\nnull",
+}, {
+	"---\n---\n---\na: b\n",
+	"null\nnull\na: \"b\"",
 }, {
 	"---\n'hello'\n...\n---\ngoodbye\n...\n",
 	`"hello"` + "\n" + `"goodbye"`,

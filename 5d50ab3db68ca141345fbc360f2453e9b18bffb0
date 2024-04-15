@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "825a5073_0952e4b1",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 359,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "The bug you spotted is solved by using `number \u0026` like Marcel suggested per my earlier comment.\n\nYou\u0027re right that a broader sanity check for these bugs would be nice. I added a top-level TODO to decode.go.",
+      "parentUuid": "a8212212_4b77d00c",
+      "revId": "5d50ab3db68ca141345fbc360f2453e9b18bffb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "81aa2815_08d20348",
@@ -49,6 +67,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "ditto",
+      "revId": "5d50ab3db68ca141345fbc360f2453e9b18bffb0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e36c0a7_b795fceb",
+        "filename": "internal/encoding/yaml/decode_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 377,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "81aa2815_08d20348",
       "revId": "5d50ab3db68ca141345fbc360f2453e9b18bffb0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

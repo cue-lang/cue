@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "69e7421d_020bde6b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Unfortunately you did indeed review way too early - I\u0027m going to simply \"ack\" a portion of your comments because they relate to stuff I already know is missing/unfinished. I did add a big DO NOT REVIEW line at the top, and I didn\u0027t ask for reviews, so I\u0027m honestly not sure what else I should have done :) I would hope that others review CLs starting from the commit message.",
+      "parentUuid": "48990243_ad457144",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21a9b893_317c402b",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "FWIW I was a little confused by this at first as I assumed it was the very last position in the file, but actually it\u0027s the most recent position AFAICS.\nMaybe just name it \"pos\" instead?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1615e757_d6dec95b",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "I tend to disagree; many parsers/decoders need to distinguish before \"current position\" and \"last position\", so I think calling this \"pos\" would make it seem like it\u0027s the current node\u0027s position when it\u0027s not. I added documentation instead, which I intended to do anyway.",
+      "parentUuid": "21a9b893_317c402b",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d99f86da_c72b5b23",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Ack. I don\u0027t intend to tackle io.Reader here, I have a separate item in the project board for this.",
+      "parentUuid": "e92f1067_d661512f",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bf3e8be7_01c173de",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "doc comments please.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3edfa9af_3c70f80f",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "bf3e8be7_01c173de",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "64dfe4d4_47c9ddaf",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "599c59fd_d14c125d",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5641d20c_83bf95e9",
@@ -99,6 +189,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "doc comments on these methods would be nice.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "192701e5_3037d09a",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "5641d20c_83bf95e9",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +228,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "78c1b3da_2358c74c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "This used to refer to a bit of commented out code that I then uncommented and refactored. Rewrote the TODO.",
+      "parentUuid": "648cd49e_292ddc6d",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bbf74477_e9c8fee0",
@@ -133,6 +259,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "debugging remnant?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ecfabb4_cb1ed4ba",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "bbf74477_e9c8fee0",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +298,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "65981286_78dc1656",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 180,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Clarified.",
+      "parentUuid": "b5cbd22a_13b44045",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cd5e22be_46da1d39",
@@ -167,6 +329,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "delete",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0f85c665_8465fc0d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cd5e22be_46da1d39",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -188,6 +368,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e4b7dd38_1e57bb71",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 213,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "This logic is carried over from the old decoder, and changing it breaks a couple of tests. I\u0027ve expanded the comment and added a TODO.",
+      "parentUuid": "bc02e5e8_77500d1c",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5d561981_25fcfe61",
@@ -201,6 +399,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "At the very least, a comment saying what this implies would be good. When can len(yn.Content) not be exactly 1 ?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "082baff7_f13315b8",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 225,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "This TODO and the behavior was entirely copied over from the old decoder. I have investigated that indeed the yaml decoder returns documents with a single child always. I\u0027ve made it an error when length is not 1.",
+      "parentUuid": "5d561981_25fcfe61",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -228,6 +444,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c77ddab_79a5d515",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 231,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1ded30b4_63b33ce7",
+      "range": {
+        "startLine": 229,
+        "startChar": 0,
+        "endLine": 231,
+        "endChar": 0
+      },
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5f9a7d3e_20745e29",
@@ -241,6 +481,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "A broad overview of what this logic is doing might be helpful for future readers here.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6afd4609_87350b1d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 237,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Made a bit clearer.",
+      "parentUuid": "5f9a7d3e_20745e29",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -262,6 +520,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d12041ae_72baf9e7",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 458,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "For now I added a note that we make this assumption. The old decoder used APIs like strconv.ParseInt and strconv.ParseFloat, which was clearly worse, because that logic came from decoding into Go types. So this is one of those bits where we are no worse than the old decoder, so I think we can leave it at that for a version 1 in master.",
+      "parentUuid": "fa012c47_b6eebe2d",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5fbaa7a_ba6237a3",
@@ -275,6 +551,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "This isn\u0027t valid CUE. Maybe:\n\n    value +\u003d \".0\"\n\ninstead?",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7eb0a98e_3108be27",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Marcel already noted that we should use `number \u0026` as it is more correct, and it does not have that issue. See my earlier comment in the test file.",
+      "parentUuid": "a5fbaa7a_ba6237a3",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -296,6 +590,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9c73a002_41221e71",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 483,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "We don\u0027t; this is again code carried from the old decoder. Rewrote it with a test.",
+      "parentUuid": "f27ae9f4_d4c0bef5",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "95ca623f_b910135d",
@@ -313,6 +625,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0e2b781_e92eba3e",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 487,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "Again carried over from the old decoder. Cleaned this up a bit, as planned.",
+      "parentUuid": "95ca623f_b910135d",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ca3819e0_d08e791d",
@@ -326,6 +656,24 @@
       "writtenOn": "2024-04-09T14:00:57Z",
       "side": 1,
       "message": "FWIW this will unnecessary escape double-quotes. Perhaps add a comment explaining why that\u0027s not an issue in practice? It might also be worth explicitly stating that CUE\u0027s rules for string literals align closely enough with Go\u0027s that using strconv primitives is OK.",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4a5adaa9_3dfb49c3",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 541,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:48:31Z",
+      "side": 1,
+      "message": "This is copied verbatim from the old decoder. I have added TODOs about moving this logic to cue/literal and not using Go\u0027s strconv.",
+      "parentUuid": "ca3819e0_d08e791d",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

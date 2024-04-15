@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8d63e2f3_c9a71709",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T17:45:06Z",
+      "side": 1,
+      "message": "I only have the CUE_EXPERIMENT bit left to do; the code should be otherwise ready to review now. I will do that last bit tomorrow morning.\n\nThe only behavior change that I\u0027m not sure about is the handling of empty input as null. It seems to me like the old decoder tried to do this, but because of the io.EOF interaction I mention in the commit message, we ended up treating empty inputs as zero/nil node instead.\n\nIf we prefer to keep the old behavior, I will tweak the code and tests. I don\u0027t have a strong opinion personally, other than trying to follow the old code\u0027s intent.",
+      "revId": "b4324b0af8959e2781bd9c1f799db210b8cbd2b8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

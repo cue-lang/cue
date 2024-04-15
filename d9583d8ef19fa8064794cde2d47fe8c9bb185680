@@ -16,6 +16,24 @@
       "message": "nit: explain why the code is unnecessary?",
       "revId": "d9583d8ef19fa8064794cde2d47fe8c9bb185680",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bdba5532_67a5285d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-15T12:01:46Z",
+      "side": 1,
+      "message": "This is now handled implicitly by having more correct control flow. We should not have to force this and explicitly forcing things is bug prone.",
+      "parentUuid": "797fae6f_ba821a37",
+      "revId": "d9583d8ef19fa8064794cde2d47fe8c9bb185680",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

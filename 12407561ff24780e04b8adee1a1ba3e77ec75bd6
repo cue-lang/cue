@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "37e1aeee_56be7616",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T12:05:03Z",
+      "side": 1,
+      "message": "Ran the copyright header by Marcel and Paul and they seemed OK with it.",
+      "revId": "12407561ff24780e04b8adee1a1ba3e77ec75bd6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

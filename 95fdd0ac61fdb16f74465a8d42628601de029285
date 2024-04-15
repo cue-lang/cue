@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fa267177_480988ad",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-15T14:49:24Z",
+      "side": 1,
+      "message": "To be abundantly clear, this is still not ready for review. I am removing you from CC until it is ready again, to avoid any possible confusion.",
+      "revId": "95fdd0ac61fdb16f74465a8d42628601de029285",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -63,6 +63,30 @@
       },
       "revId": "c6d1ffd9e2af78691dd06f38d1cef2482aa437ef",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dcc2f4b2_df6ebda5",
+        "filename": "cmd/cue/cmd/flags.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 82,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-15T07:35:31Z",
+      "side": 1,
+      "message": "cool, makes sense",
+      "parentUuid": "dc098d1a_26a7fbfb",
+      "range": {
+        "startLine": 82,
+        "startChar": 39,
+        "endLine": 82,
+        "endChar": 95
+      },
+      "revId": "c6d1ffd9e2af78691dd06f38d1cef2482aa437ef",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

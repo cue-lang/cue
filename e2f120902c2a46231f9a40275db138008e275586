@@ -51,6 +51,24 @@
       "parentUuid": "dbc928ed_e47c512b",
       "revId": "e2f120902c2a46231f9a40275db138008e275586",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "808e7a1c_2337b295",
+        "filename": "cue/testdata/cycle/issue429.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T13:31:41Z",
+      "side": 1,
+      "message": "If that\u0027s the case SGTM. The only input I would give is to document these \"known differences\" with the new evaluator so that we don\u0027t forget or get surprise by them. I suspect the ordering of fields or disjuncts may also change, for example. Perhaps a markdown file in the repo like a README?",
+      "parentUuid": "24a7de23_9a17140d",
+      "revId": "e2f120902c2a46231f9a40275db138008e275586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -62,16 +62,16 @@ fib12: (fib & {n: 12}).out // Error
     n: 12
   }).out
 }
--- out/eval/stats --
-Leaks:  16
-Freed:  180
-Reused: 170
-Allocs: 26
-Retain: 148
+-- out/evalalpha/stats --
+Leaks:  70
+Freed:  0
+Reused: 0
+Allocs: 70
+Retain: 0
 
-Unifications: 196
-Conjuncts:    464
-Disjuncts:    268
+Unifications: 62
+Conjuncts:    227
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 structural cycle:
@@ -124,6 +124,28 @@ Result:
     //     ./in.cue:8:38
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  16
+-Freed:  180
+-Reused: 170
+-Allocs: 26
+-Retain: 148
++Leaks:  70
++Freed:  0
++Reused: 0
++Allocs: 70
++Retain: 0
+
+-Unifications: 196
+-Conjuncts:    464
+-Disjuncts:    268
++Unifications: 62
++Conjuncts:    227
++Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -149,6 +171,18 @@ diff old new
      n: (int){ int }
    }
    fib1: (int){ 1 }
+-- out/eval/stats --
+Leaks:  16
+Freed:  180
+Reused: 170
+Allocs: 26
+Retain: 148
+
+Unifications: 196
+Conjuncts:    464
+Disjuncts:    268
+-- diff/todo/p3 --
+Note that it is okay for fib2 to fail.
 -- out/eval --
 Errors:
 structural cycle:

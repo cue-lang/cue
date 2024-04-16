@@ -158,16 +158,16 @@ keepDescending: t2: {
 	}
 }
 
--- out/eval/stats --
-Leaks:  52
-Freed:  158
-Reused: 149
-Allocs: 61
-Retain: 184
+-- out/evalalpha/stats --
+Leaks:  227
+Freed:  16
+Reused: 16
+Allocs: 227
+Retain: 0
 
-Unifications: 196
-Conjuncts:    365
-Disjuncts:    241
+Unifications: 211
+Conjuncts:    1367
+Disjuncts:    32
 -- out/evalalpha --
 Errors:
 indirectReference.y: conflicting values 2 and 1:
@@ -479,6 +479,28 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  52
+-Freed:  158
+-Reused: 149
+-Allocs: 61
+-Retain: 184
++Leaks:  227
++Freed:  16
++Reused: 16
++Allocs: 227
++Retain: 0
+ 
+-Unifications: 196
+-Conjuncts:    365
+-Disjuncts:    241
++Unifications: 211
++Conjuncts:    1367
++Disjuncts:    32
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -784,6 +806,16 @@ diff old new
      }
    }
  }
+-- out/eval/stats --
+Leaks:  52
+Freed:  158
+Reused: 149
+Allocs: 61
+Retain: 184
+
+Unifications: 196
+Conjuncts:    365
+Disjuncts:    241
 -- diff/todo/p0 --
 letWithDynamicInComprehension: LET BUG
 -- out/eval --

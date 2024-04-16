@@ -63,16 +63,16 @@
 }
 
 #ServiceManifest: #Manifest & {ref: kind: "service"}
--- out/eval/stats --
-Leaks:  16
-Freed:  117
-Reused: 108
-Allocs: 25
-Retain: 53
+-- out/evalalpha/stats --
+Leaks:  123
+Freed:  10
+Reused: 9
+Allocs: 124
+Retain: 0
 
-Unifications: 107
-Conjuncts:    243
-Disjuncts:    170
+Unifications: 95
+Conjuncts:    563
+Disjuncts:    30
 -- out/evalalpha --
 Errors:
 _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
@@ -274,6 +274,28 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  16
+-Freed:  117
+-Reused: 108
+-Allocs: 25
+-Retain: 53
++Leaks:  123
++Freed:  10
++Reused: 9
++Allocs: 124
++Retain: 0
+ 
+-Unifications: 107
+-Conjuncts:    243
+-Disjuncts:    170
++Unifications: 95
++Conjuncts:    563
++Disjuncts:    30
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -518,6 +540,16 @@ diff old new
        //     ./in.cue:5:28
      }
    }
+-- out/eval/stats --
+Leaks:  16
+Freed:  117
+Reused: 108
+Allocs: 25
+Retain: 53
+
+Unifications: 107
+Conjuncts:    243
+Disjuncts:    170
 -- diff/todo/p2 --
 Some incorrect error messages. The newly introduced error messages for hsize
 seem to be correct, though.

@@ -1,0 +1,153 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e87abdda_aeba7740",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 38,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:47:09Z",
+      "side": 1,
+      "message": "I think \"reads\" is slightly misleading as it also writes to it. How about \"It only interacts with that file\"?",
+      "range": {
+        "startLine": 38,
+        "startChar": 8,
+        "endLine": 38,
+        "endChar": 13
+      },
+      "revId": "0d2dfbfbe17ba541919e587b3bd3b3521eb578a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ce77224_08d911e1",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:47:09Z",
+      "side": 1,
+      "message": "🚔",
+      "range": {
+        "startLine": 47,
+        "startChar": 47,
+        "endLine": 47,
+        "endChar": 49
+      },
+      "revId": "0d2dfbfbe17ba541919e587b3bd3b3521eb578a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b9bd1365_3f75c8f8",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 51,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:47:09Z",
+      "side": 1,
+      "message": "is the double empty line intentional? it seems out of place",
+      "revId": "0d2dfbfbe17ba541919e587b3bd3b3521eb578a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "231cfdce_49466909",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:47:09Z",
+      "side": 1,
+      "message": "🚔",
+      "range": {
+        "startLine": 55,
+        "startChar": 28,
+        "endLine": 55,
+        "endChar": 30
+      },
+      "revId": "0d2dfbfbe17ba541919e587b3bd3b3521eb578a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2e7a9968_94b98e58",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:47:09Z",
+      "side": 1,
+      "message": "I would move this TODO out of the help text, otherwise users will see it.",
+      "revId": "0d2dfbfbe17ba541919e587b3bd3b3521eb578a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2cc4e845_8d5d795a",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:47:09Z",
+      "side": 1,
+      "message": "nit: the help text calls it --dropsource without camel casing, which is it?\n\nI would personally embrace the gnu-style flags we already use everywhere and split words with dashes, i.e. --drop-source, since elsewhere we already do this. For example, see `cue export --inject-vars` or `cue eval --all-errors`.",
+      "range": {
+        "startLine": 137,
+        "startChar": 34,
+        "endLine": 137,
+        "endChar": 44
+      },
+      "revId": "0d2dfbfbe17ba541919e587b3bd3b3521eb578a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dbbdce42_20af2934",
+        "filename": "cmd/cue/cmd/modedit.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 221,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:47:09Z",
+      "side": 1,
+      "message": "clever!",
+      "range": {
+        "startLine": 200,
+        "startChar": 0,
+        "endLine": 221,
+        "endChar": 55
+      },
+      "revId": "0d2dfbfbe17ba541919e587b3bd3b3521eb578a9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

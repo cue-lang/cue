@@ -13,16 +13,16 @@
 }
 x: #def
 x: c: "foo"
--- out/eval/stats --
-Leaks:  0
-Freed:  4674
-Reused: 3903
-Allocs: 771
+-- out/evalalpha/stats --
+Leaks:  147
+Freed:  2
+Reused: 2
+Allocs: 147
 Retain: 0
 
-Unifications: 2590
-Conjuncts:    13409
-Disjuncts:    4674
+Unifications: 17
+Conjuncts:    199
+Disjuncts:    76
 -- out/eval --
 (struct){
   #def: (#struct){ |((#struct){
@@ -41,6 +41,37 @@ Disjuncts:    4674
       a: (string){ string }
     }) }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  4674
+-Reused: 3903
+-Allocs: 771
++Leaks:  147
++Freed:  2
++Reused: 2
++Allocs: 147
+ Retain: 0
+ 
+-Unifications: 2590
+-Conjuncts:    13409
+-Disjuncts:    4674
++Unifications: 17
++Conjuncts:    199
++Disjuncts:    76
+-- out/eval/stats --
+Leaks:  0
+Freed:  4674
+Reused: 3903
+Allocs: 771
+Retain: 0
+
+Unifications: 2590
+Conjuncts:    13409
+Disjuncts:    4674
 -- out/compile --
 --- in.cue
 {

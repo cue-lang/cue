@@ -44,16 +44,16 @@ s2:  strings.ContainsAny("dd")
 s3:  strings.ContainsAny(str, "dd")
 -- out/legacy-debug --
 <0>{n1: <1>{min: <<2>.max, max: ><2>.min}, n2: -<3>.num, num: <4, n3: +<3>.num, n4: (<3>.num + <3>.num), n5: (<3>.num - <3>.num), n6: (<3>.num * <3>.num), n7: (<3>.num / <3>.num), b1: !<3>.is, is: bool, s1: ""+<3>.str+"", str: string, s2: strings.ContainsAny ("dd"), s3: <4>.ContainsAny (<3>.str,"dd")}
--- out/eval/stats --
-Leaks:  0
-Freed:  17
-Reused: 12
-Allocs: 5
-Retain: 75
+-- out/evalalpha/stats --
+Leaks:  17
+Freed:  0
+Reused: 0
+Allocs: 17
+Retain: 0
 
 Unifications: 17
-Conjuncts:    71
-Disjuncts:    82
+Conjuncts:    35
+Disjuncts:    0
 -- out/evalalpha --
 (struct){
   n1: (struct){
@@ -113,6 +113,27 @@ Disjuncts:    82
   num: (number){ <4 }
   is: (bool){ bool }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  17
+-Reused: 12
+-Allocs: 5
+-Retain: 75
++Leaks:  17
++Freed:  0
++Reused: 0
++Allocs: 17
++Retain: 0
+ 
+ Unifications: 17
+-Conjuncts:    71
+-Disjuncts:    82
++Conjuncts:    35
++Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -132,6 +153,16 @@ diff old new
      }
    }
    n2: (_|_){
+-- out/eval/stats --
+Leaks:  0
+Freed:  17
+Reused: 12
+Allocs: 5
+Retain: 75
+
+Unifications: 17
+Conjuncts:    71
+Disjuncts:    82
 -- diff/explanation --
 Improved error message.
 -- out/eval --

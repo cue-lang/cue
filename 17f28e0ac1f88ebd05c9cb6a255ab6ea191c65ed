@@ -1,0 +1,254 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "33e99dbd_b183205a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "perhaps explain that, day 1, implementing only git is good enough, but that we plan to add support for other VCSs as needed",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22f30d9a_471fa514",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "My only somewhat major worry is the iterator suggestion, otherwise SGTM.",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "59e4bc6d_d4897928",
+        "filename": "internal/vcs/copyfs_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "slightly adapted how? this will be important once we want to drop our copy.",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4976c7d6_65db1ddd",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "what do other projects like Rust do in that respect?",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7dd5d5c4_47ae888a",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "strings.Cut?",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a20c52bd_f28a2024",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "document the interface briefly? at least what VCS stands for, as it may not be obvious to some readers.",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ded1efd4_c495af09",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "from this description I wouldn\u0027t honestly know whether this means `/foo` or `/foo/.git` for a git clone.",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "553c6689_1c195df8",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "I\u0027m not sure if you considered this, but I would personally make this a func iterator - for some large repositories or monorepos, the total number of files may be surprisingly large, so waiting until the entire list is available seems unnecessary. On the Go repo with ~13k files, which isn\u0027t even that many, it already takes about 30ms for me to collect the entire list, so on truly large corporate monorepos you may block for hundreds of milliseconds before doing anything useful concurrently.\n\nThat is, I would implement a func iterator by starting the command with an os.Pipe, and then consuming the filenames as they come in by iterating.",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "176b01b0_f11becd9",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 23,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "\"the current state\" seems more useful",
+      "range": {
+        "startLine": 23,
+        "startChar": 19,
+        "endLine": 23,
+        "endChar": 29
+      },
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8392be2b_756cbfcd",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 24,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "as far as I can tell, no reason to split this line",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6677f2c3_3adf0081",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "godoc?",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "46747b52_63584f82",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 52,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "these five lines of godoc can easily be three lines",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3b68ffd_0102eae1",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "nit: `...string` for easier calls?",
+      "range": {
+        "startLine": 53,
+        "startChar": 36,
+        "endLine": 53,
+        "endChar": 44
+      },
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9f6a363_bdf877dc",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:35:48Z",
+      "side": 1,
+      "message": "use `os.Lstat` as you don\u0027t want/need to follow symlinks",
+      "revId": "17f28e0ac1f88ebd05c9cb6a255ab6ea191c65ed",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

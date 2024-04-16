@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63467aba_0b7b1d27",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:21:10Z",
+      "side": 1,
+      "message": "I would avoid markdown syntax for links, as it reads rather poorly in plaintext, and many readers will be using plaintext, e.g. `git log`.\n\nhow about a link as a separate line?",
+      "revId": "7f64897daa4c434f803b1ea639d6a505a491582c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e5431463_d9ab29c6",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 5
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:21:10Z",
+      "side": 1,
+      "message": "as far as I can tell this would fit perfectly fine in two lines",
+      "range": {
+        "startLine": 163,
+        "startChar": 1,
+        "endLine": 166,
+        "endChar": 38
+      },
+      "revId": "7f64897daa4c434f803b1ea639d6a505a491582c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

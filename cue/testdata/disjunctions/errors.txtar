@@ -50,6 +50,9 @@ issue516.x.match.metrics.foo: field not allowed:
 issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
     ./in.cue:3:19
     ./in.cue:12:12
+issue570.results.result: field not allowed:
+    ./in.cue:3:11
+    ./in.cue:12:3
 
 Result:
 (_|_){
@@ -60,6 +63,9 @@ Result:
       // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
       //     ./in.cue:3:19
       //     ./in.cue:12:12
+      // issue570.results.result: field not allowed:
+      //     ./in.cue:3:11
+      //     ./in.cue:12:3
       result: (string){ "hello" }
     }
     #Output: (#struct){ |((#struct){
@@ -111,7 +117,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,15 +1,9 @@
+@@ -1,17 +1,14 @@
  Errors:
 -issue516.x: 2 errors in empty disjunction:
  issue516.x.match: field not allowed:
@@ -126,8 +132,13 @@ diff old new
 -    ./in.cue:2:11
      ./in.cue:3:19
      ./in.cue:12:12
++issue570.results.result: field not allowed:
++    ./in.cue:3:11
++    ./in.cue:12:3
  
-@@ -20,16 +14,9 @@
+ Result:
+ (_|_){
+@@ -20,16 +17,12 @@
      // [eval]
      results: (_|_){
        // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
@@ -141,11 +152,14 @@ diff old new
 -        //     ./in.cue:12:12
 -      }
 -      error: (string){ string }
++      // issue570.results.result: field not allowed:
++      //     ./in.cue:3:11
++      //     ./in.cue:12:3
 +      result: (string){ "hello" }
      }
      #Output: (#struct){ |((#struct){
          result: (_){ _ }
-@@ -57,20 +44,11 @@
+@@ -57,20 +50,11 @@
        }, (#struct){
        }) }
      x: (_|_){

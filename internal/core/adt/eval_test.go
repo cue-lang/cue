@@ -77,7 +77,7 @@ func TestEvalAlpha(t *testing.T) {
 	// externalDeps to agitate pending dependencies is replaced with a
 	// dedicated mechanism.
 	//
-	// adt.DebugDeps = true // check unmatched dependencies.
+	adt.DebugDeps = true // check unmatched dependencies.
 
 	var todoAlpha = map[string]string{
 		// Crashes and hangs

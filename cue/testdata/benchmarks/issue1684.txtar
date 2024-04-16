@@ -32,16 +32,16 @@ out: #secrets & {
 	FOO: $secret: _id: "100"
 	ONE: TWO: THREE: $secret: _id: "123"
 }
--- out/eval/stats --
-Leaks:  0
-Freed:  1064043
-Reused: 1063992
-Allocs: 51
+-- out/evalalpha/stats --
+Leaks:  11862
+Freed:  2500
+Reused: 2497
+Allocs: 11865
 Retain: 0
 
-Unifications: 791999
-Conjuncts:    2479541
-Disjuncts:    1064043
+Unifications: 449
+Conjuncts:    22643
+Disjuncts:    4560
 -- out/evalalpha --
 Errors:
 out.FOO: field not allowed:
@@ -100,6 +100,27 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  1064043
+-Reused: 1063992
+-Allocs: 51
++Leaks:  11862
++Freed:  2500
++Reused: 2497
++Allocs: 11865
+ Retain: 0
+ 
+-Unifications: 791999
+-Conjuncts:    2479541
+-Disjuncts:    1064043
++Unifications: 449
++Conjuncts:    22643
++Disjuncts:    4560
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -159,6 +180,16 @@ diff old new
              id: (string){ "123" }
              _id: (string){ "123" }
            }
+-- out/eval/stats --
+Leaks:  0
+Freed:  1064043
+Reused: 1063992
+Allocs: 51
+Retain: 0
+
+Unifications: 791999
+Conjuncts:    2479541
+Disjuncts:    1064043
 -- diff/todo/p0 --
 out.FOO: incorrectly not allowed. This is a result of the overlay evaluating
 non-overlay Vertices during the evaluation of disjunctions. This should be fixed

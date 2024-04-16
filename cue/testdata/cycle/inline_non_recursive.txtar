@@ -59,16 +59,16 @@ issue1708: {
 	k30: (#add10 & {in: k20}).out
 }
 
--- out/eval/stats --
-Leaks:  291
-Freed:  389
-Reused: 379
-Allocs: 301
-Retain: 1047
+-- out/evalalpha/stats --
+Leaks:  209
+Freed:  0
+Reused: 0
+Allocs: 209
+Retain: 0
 
-Unifications: 680
-Conjuncts:    2709
-Disjuncts:    1414
+Unifications: 194
+Conjuncts:    1122
+Disjuncts:    0
 -- out/evalalpha --
 Errors:
 structural cycle:
@@ -183,6 +183,28 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  291
+-Freed:  389
+-Reused: 379
+-Allocs: 301
+-Retain: 1047
++Leaks:  209
++Freed:  0
++Reused: 0
++Allocs: 209
++Retain: 0
+ 
+-Unifications: 680
+-Conjuncts:    2709
+-Disjuncts:    1414
++Unifications: 194
++Conjuncts:    1122
++Disjuncts:    0
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -347,6 +369,16 @@ diff old new
 +    }
    }
  }
+-- out/eval/stats --
+Leaks:  291
+Freed:  389
+Reused: 379
+Allocs: 301
+Retain: 1047
+
+Unifications: 680
+Conjuncts:    2709
+Disjuncts:    1414
 -- diff/todo/p2 --
 TODO(share)
 Fix spurious strcutural cycles once we have structure sharing.

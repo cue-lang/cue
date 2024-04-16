@@ -32,16 +32,16 @@ C: #steps: #Script & {mount: [B]}
 }
 
 #ref: {a: 1} | {b: 2}
--- out/eval/stats --
-Leaks:  0
-Freed:  24096
-Reused: 24051
-Allocs: 45
-Retain: 1
+-- out/evalalpha/stats --
+Leaks:  12292
+Freed:  1364
+Reused: 1362
+Allocs: 12294
+Retain: 0
 
-Unifications: 18724
-Conjuncts:    100730
-Disjuncts:    24097
+Unifications: 2680
+Conjuncts:    47973
+Disjuncts:    3212
 -- out/eval --
 (struct){
   A: (#struct){ |((#struct){
@@ -206,6 +206,38 @@ Disjuncts:    24097
       b: (int){ 2 }
     }) }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  24096
+-Reused: 24051
+-Allocs: 45
+-Retain: 1
++Leaks:  12292
++Freed:  1364
++Reused: 1362
++Allocs: 12294
++Retain: 0
+ 
+-Unifications: 18724
+-Conjuncts:    100730
+-Disjuncts:    24097
++Unifications: 2680
++Conjuncts:    47973
++Disjuncts:    3212
+-- out/eval/stats --
+Leaks:  0
+Freed:  24096
+Reused: 24051
+Allocs: 45
+Retain: 1
+
+Unifications: 18724
+Conjuncts:    100730
+Disjuncts:    24097
 -- out/compile --
 --- in.cue
 {

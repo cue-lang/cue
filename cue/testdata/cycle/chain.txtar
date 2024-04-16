@@ -207,16 +207,16 @@ issue2052: full: {
 
 	d: #Depth & {#in: tree}
 }
--- out/eval/stats --
-Leaks:  70
-Freed:  1815
-Reused: 1801
-Allocs: 84
-Retain: 185
+-- out/evalalpha/stats --
+Leaks:  9483
+Freed:  1488
+Reused: 1488
+Allocs: 9483
+Retain: 0
 
-Unifications: 800
-Conjuncts:    3175
-Disjuncts:    1974
+Unifications: 4097
+Conjuncts:    54454
+Disjuncts:    6874
 -- out/evalalpha --
 Errors:
 issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
@@ -630,6 +630,28 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  70
+-Freed:  1815
+-Reused: 1801
+-Allocs: 84
+-Retain: 185
++Leaks:  9483
++Freed:  1488
++Reused: 1488
++Allocs: 9483
++Retain: 0
+ 
+-Unifications: 800
+-Conjuncts:    3175
+-Disjuncts:    1974
++Unifications: 4097
++Conjuncts:    54454
++Disjuncts:    6874
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -1271,6 +1293,16 @@ diff old new
        }
      }
    }
+-- out/eval/stats --
+Leaks:  70
+Freed:  1815
+Reused: 1801
+Allocs: 84
+Retain: 185
+
+Unifications: 800
+Conjuncts:    3175
+Disjuncts:    1974
 -- diff/todo/p1 --
 issue2052.*.#Depth: incorrect error message:
 	"adding field #basic not allowed as field set was already referenced"

@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -164,11 +165,37 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) (errorCoun
 		}
 	}
 
-	if version != internal.DevVersion {
-		stats := ctx.Stats()
+	switch counts := ctx.Stats(); {
+	case version == internal.DevVersion:
+		for _, f := range t.Archive.Files {
+			if f.Name != "out/eval/stats" {
+				continue
+			}
+			c := cuecontext.New()
+			v := c.CompileBytes(f.Data)
+			var orig stats.Counts
+			v.Decode(&orig)
+
+			// TODO: do something more principled.
+			switch {
+			case orig.Disjuncts < counts.Disjuncts,
+				orig.Disjuncts > counts.Disjuncts*5 &&
+					counts.Disjuncts > 20,
+				orig.Conjuncts > counts.Conjuncts*2:
+				// For now, we only care about disjuncts.
+				// TODO: add triggers once the disjunction issues have bene
+				// solved.
+				w := t.Writer("stats")
+				fmt.Fprintln(w, counts)
+			}
+			break
+		}
+
+	default:
 		w := t.Writer("stats")
-		fmt.Fprintln(w, stats)
+		fmt.Fprintln(w, counts)
 	}
+
 	// if n := stats.Leaks(); n > 0 {
 	// 	t.Skipf("%d leaks reported", n)
 	// }

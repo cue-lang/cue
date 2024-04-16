@@ -207,6 +207,1092 @@ issue2052: full: {
 
 	d: #Depth & {#in: tree}
 }
+-- out/evalalpha/stats --
+Leaks:  9483
+Freed:  1488
+Reused: 1488
+Allocs: 9483
+Retain: 0
+
+Unifications: 4097
+Conjuncts:    54454
+Disjuncts:    6874
+-- out/evalalpha --
+Errors:
+issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
+    ./issue2052.cue:8:20
+issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
+    ./issue2052.cue:46:14
+issue2052.full.d.#funcs: field not allowed:
+    ./issue2052.cue:89:12
+    ./issue2052.cue:89:4
+    ./issue2052.cue:93:3
+#next: structural cycle:
+    ./issue2052.cue:89:21
+
+Result:
+(_|_){
+  // [eval]
+  chain: (struct){
+    t1: (struct){
+      #maxiter: (int){ 2 }
+      x: (#struct){
+      }
+      a: (struct){
+        x2: (null){ null }
+        x0: (#struct){
+        }
+        x1: (#struct){
+        }
+      }
+      #DepthF: (#struct){
+        #in: (_){ _ }
+        #out: (#struct){
+        }
+      }
+    }
+    t2: (struct){
+      p1: (struct){
+        X: (int){ 1 }
+        x: (struct){
+          x0: (struct){
+          }
+          x1: (struct){
+          }
+        }
+      }
+      p2: (struct){
+        x: (struct){
+          x0: (struct){
+          }
+          x1: (struct){
+          }
+        }
+        X: (int){ 1 }
+      }
+    }
+    t3: (struct){
+      p1: (struct){
+        X: (int){ 1 }
+        x: (struct){
+          x0: (struct){
+          }
+        }
+      }
+    }
+  }
+  issue2052: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      #Depth: (_|_){
+        // [eval] issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
+        //     ./issue2052.cue:8:20
+        #maxiter: (int){ 4 }
+        #funcs: (#struct){
+          "4": (null){ null }
+          "0": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "1": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "2": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "3": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      tree: (string){ "bar" }
+      d: (#struct){
+        #in: (string){ "bar" }
+        #maxiter: (int){ 4 }
+        #funcs: (#struct){
+          "4": (null){ null }
+          "0": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "1": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "2": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "3": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+        out: (int){ 1 }
+      }
+    }
+    t2: (_|_){
+      // [eval]
+      #Depth: (_|_){
+        // [eval] issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
+        //     ./issue2052.cue:46:14
+        #maxiter: (int){ 4 }
+        #funcs: (#struct){
+          "4": (null){ null }
+          "0": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "1": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "2": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "3": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+          out: (int){ 1 }
+        }
+      }
+      tree: (string){ "bar" }
+      d: (#struct){
+        #in: (string){ "bar" }
+        #maxiter: (int){ 4 }
+        #funcs: (#struct){
+          "4": (null){ null }
+          "0": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "1": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "2": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+          "3": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+            out: (int){ 1 }
+          }
+        }
+        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+        out: (int){ 1 }
+      }
+    }
+    full: (_|_){
+      // [eval]
+      #RecurseN: (#struct){
+        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (_){ _ }
+        }
+        #funcs: (#struct){
+          "4": (null){ null }
+          "0": (_){ _ }
+          "1": (_){ _ }
+          "2": (_){ _ }
+          "3": (_){ _ }
+        }
+      }
+      #DepthF: (#struct){
+        #next: (_){ _ }
+        #func: (#struct){
+          #in: (_){ _ }
+          #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+          out: (int){
+            1
+            let depths#1 = (_){ _ }
+          }
+        }
+      }
+      #Depth: (_|_){
+        // [structural cycle] #next: structural cycle:
+        //     ./issue2052.cue:89:21
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
+          }
+        }
+        #funcs: (_|_){
+          // [structural cycle]
+          "11": (null){ null }
+          "0": (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
+          }
+          "1": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "2": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "3": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "4": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "5": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "6": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "7": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "8": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "9": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+          "10": (_|_){
+            // [structural cycle] #next: structural cycle:
+            //     ./issue2052.cue:89:21
+          }
+        }
+      }
+      tree: (struct){
+        a: (struct){
+          foo: (string){ "bar" }
+          a: (struct){
+            b: (struct){
+              c: (string){ "d" }
+            }
+          }
+        }
+        cow: (string){ "moo" }
+      }
+      d: (_|_){
+        // [eval] #next: structural cycle:
+        //     ./issue2052.cue:89:21
+        #in: (#struct){
+          a: (#struct){
+            foo: (string){ "bar" }
+            a: (#struct){
+              b: (#struct){
+                c: (string){ "d" }
+              }
+            }
+          }
+          cow: (string){ "moo" }
+        }
+        #maxiter: (int){ 11 }
+        #funcFactory: (#struct){
+          #next: (_){ _ }
+          #func: (#struct){
+            #in: (_){ _ }
+            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+            out: (int){
+              1
+              let depths#1 = (_){ _ }
+            }
+          }
+        }
+        #funcs: (_|_){
+          // [eval] issue2052.full.d.#funcs: field not allowed:
+          //     ./issue2052.cue:89:12
+          //     ./issue2052.cue:89:4
+          //     ./issue2052.cue:93:3
+          "11": (null){ null }
+          "0": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "1": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "2": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "3": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "4": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "5": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "6": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "7": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "8": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "9": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+          "10": (_|_){
+            // [eval] issue2052.full.d.#funcs: field not allowed:
+            //     ./issue2052.cue:89:12
+            //     ./issue2052.cue:89:4
+            //     ./issue2052.cue:93:3
+          }
+        }
+      }
+    }
+  }
+}
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  70
+-Freed:  1815
+-Reused: 1801
+-Allocs: 84
+-Retain: 185
++Leaks:  9483
++Freed:  1488
++Reused: 1488
++Allocs: 9483
++Retain: 0
+ 
+-Unifications: 800
+-Conjuncts:    3175
+-Disjuncts:    1974
++Unifications: 4097
++Conjuncts:    54454
++Disjuncts:    6874
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,4 +1,18 @@
+-(struct){
++Errors:
++issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
++    ./issue2052.cue:8:20
++issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
++    ./issue2052.cue:46:14
++issue2052.full.d.#funcs: field not allowed:
++    ./issue2052.cue:89:12
++    ./issue2052.cue:89:4
++    ./issue2052.cue:93:3
++#next: structural cycle:
++    ./issue2052.cue:89:21
++
++Result:
++(_|_){
++  // [eval]
+   chain: (struct){
+     t1: (struct){
+       #maxiter: (int){ 2 }
+@@ -47,148 +61,149 @@
+       }
+     }
+   }
+-  issue2052: (struct){
+-    t1: (struct){
+-      #Depth: (#struct){
+-        #maxiter: (int){ 4 }
+-        #funcs: (#struct){
+-          "4": (null){ null }
+-          "0": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "1": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "2": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "3": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-        }
+-        #in: (_){ _ }
+-        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-        out: (int){ 1 }
+-      }
+-      #DepthF: (#struct){
+-        #next: (_){ _ }
+-        #func: (#struct){
+-          #in: (_){ _ }
+-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-          out: (int){ 1 }
+-        }
+-      }
+-      tree: (string){ "bar" }
+-      d: (#struct){
+-        #maxiter: (int){ 4 }
+-        #funcs: (#struct){
+-          "4": (null){ null }
+-          "0": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "1": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "2": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "3": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-        }
+-        #in: (string){ "bar" }
+-        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-        out: (int){ 1 }
+-      }
+-    }
+-    t2: (struct){
+-      #Depth: (#struct){
+-        #maxiter: (int){ 4 }
+-        #funcs: (#struct){
+-          "4": (null){ null }
+-          "0": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "1": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "2": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "3": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-        }
+-        #in: (_){ _ }
+-        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-        out: (int){ 1 }
+-      }
+-      #DepthF: (#struct){
+-        #next: (_){ _ }
+-        #func: (#struct){
+-          #in: (_){ _ }
+-          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-          out: (int){ 1 }
+-        }
+-      }
+-      tree: (string){ "bar" }
+-      d: (#struct){
+-        #maxiter: (int){ 4 }
+-        #funcs: (#struct){
+-          "4": (null){ null }
+-          "0": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "1": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "2": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-          "3": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-            out: (int){ 1 }
+-          }
+-        }
+-        #in: (string){ "bar" }
+-        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
+-        out: (int){ 1 }
+-      }
+-    }
+-    full: (struct){
+-      #RecurseN: (_){
+-        _
++  issue2052: (_|_){
++    // [eval]
++    t1: (_|_){
++      // [eval]
++      #Depth: (_|_){
++        // [eval] issue2052.t1.#Depth: adding field #basic not allowed as field set was already referenced:
++        //     ./issue2052.cue:8:20
++        #maxiter: (int){ 4 }
++        #funcs: (#struct){
++          "4": (null){ null }
++          "0": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "1": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "2": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "3": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++        }
++      }
++      #DepthF: (#struct){
++        #next: (_){ _ }
++        #func: (#struct){
++          #in: (_){ _ }
++          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++          out: (int){ 1 }
++        }
++      }
++      tree: (string){ "bar" }
++      d: (#struct){
++        #in: (string){ "bar" }
++        #maxiter: (int){ 4 }
++        #funcs: (#struct){
++          "4": (null){ null }
++          "0": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "1": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "2": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "3": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++        }
++        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++        out: (int){ 1 }
++      }
++    }
++    t2: (_|_){
++      // [eval]
++      #Depth: (_|_){
++        // [eval] issue2052.t2.#Depth: adding field #basic not allowed as field set was already referenced:
++        //     ./issue2052.cue:46:14
++        #maxiter: (int){ 4 }
++        #funcs: (#struct){
++          "4": (null){ null }
++          "0": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "1": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "2": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "3": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++        }
++      }
++      #DepthF: (#struct){
++        #next: (_){ _ }
++        #func: (#struct){
++          #in: (_){ _ }
++          #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++          out: (int){ 1 }
++        }
++      }
++      tree: (string){ "bar" }
++      d: (#struct){
++        #in: (string){ "bar" }
++        #maxiter: (int){ 4 }
++        #funcs: (#struct){
++          "4": (null){ null }
++          "0": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "1": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "2": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++          "3": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++            out: (int){ 1 }
++          }
++        }
++        #basic: ((null|string)){ |((string){ string }, (null){ null }) }
++        out: (int){ 1 }
++      }
++    }
++    full: (_|_){
++      // [eval]
++      #RecurseN: (#struct){
+         #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+         #funcFactory: (#struct){
+           #next: (_){ _ }
+@@ -213,115 +228,72 @@
+           }
+         }
+       }
+-      #Depth: (#struct){
+-        #maxiter: (int){ 11 }
+-        #funcFactory: (#struct){
+-          #next: (_){ _ }
+-          #func: (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-        }
+-        #funcs: (#struct){
+-          "11": (null){ null }
+-          "0": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "1": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "2": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "3": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "4": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "5": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "6": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "7": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "8": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "9": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "10": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-        }
+-        #in: (_){ _ }
+-        #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-        out: (int){
+-          1
+-          let depths#1 = (_){ _ }
++      #Depth: (_|_){
++        // [structural cycle] #next: structural cycle:
++        //     ./issue2052.cue:89:21
++        #maxiter: (int){ 11 }
++        #funcFactory: (#struct){
++          #next: (_){ _ }
++          #func: (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++        }
++        #funcs: (_|_){
++          // [structural cycle]
++          "11": (null){ null }
++          "0": (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++          "1": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "2": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "3": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "4": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "5": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "6": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "7": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "8": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "9": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
++          "10": (_|_){
++            // [structural cycle] #next: structural cycle:
++            //     ./issue2052.cue:89:21
++          }
+         }
+       }
+       tree: (struct){
+@@ -336,48 +308,8 @@
+         cow: (string){ "moo" }
+       }
+       d: (_|_){
+-        // [incomplete] issue2052.full.d: cannot add field #maxiter: was already used:
+-        //     ./issue2052.cue:119:23
+-        #maxiter: (int){ |(*(int){ 4 }, (int){ &(>=0, int) }) }
+-        #funcFactory: (#struct){
+-          #next: (_){ _ }
+-          #func: (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-        }
+-        #funcs: (#struct){
+-          "4": (null){ null }
+-          "0": (_){ _ }
+-          "1": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "2": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-          "3": (#struct){
+-            #in: (_){ _ }
+-            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
+-            out: (int){
+-              1
+-              let depths#1 = (_){ _ }
+-            }
+-          }
+-        }
++        // [eval] #next: structural cycle:
++        //     ./issue2052.cue:89:21
+         #in: (#struct){
+           a: (#struct){
+             foo: (string){ "bar" }
+@@ -389,6 +321,91 @@
+           }
+           cow: (string){ "moo" }
+         }
++        #maxiter: (int){ 11 }
++        #funcFactory: (#struct){
++          #next: (_){ _ }
++          #func: (#struct){
++            #in: (_){ _ }
++            #basic: ((null|string|bytes|number)){ |((int){ int }, (number){ number }, (string){ string }, (bytes){ bytes }, (null){ null }) }
++            out: (int){
++              1
++              let depths#1 = (_){ _ }
++            }
++          }
++        }
++        #funcs: (_|_){
++          // [eval] issue2052.full.d.#funcs: field not allowed:
++          //     ./issue2052.cue:89:12
++          //     ./issue2052.cue:89:4
++          //     ./issue2052.cue:93:3
++          "11": (null){ null }
++          "0": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "1": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "2": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "3": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "4": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "5": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "6": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "7": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "8": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "9": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++          "10": (_|_){
++            // [eval] issue2052.full.d.#funcs: field not allowed:
++            //     ./issue2052.cue:89:12
++            //     ./issue2052.cue:89:4
++            //     ./issue2052.cue:93:3
++          }
++        }
+       }
+     }
+   }
 -- out/eval/stats --
 Leaks:  70
 Freed:  1815
@@ -217,6 +1303,11 @@ Retain: 185
 Unifications: 800
 Conjuncts:    3175
 Disjuncts:    1974
+-- diff/todo/p1 --
+issue2052.*.#Depth: incorrect error message:
+	"adding field #basic not allowed as field set was already referenced"
+OTOH: the old evaluator reported a related error here:
+issue2052.full.d: "cannot add field #maxiter: was already used"
 -- out/eval --
 (struct){
   chain: (struct){

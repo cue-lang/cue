@@ -33,6 +33,24 @@
       "message": "Given that the transition to the new evaluator is entirely about performance, and not correctness, I definitely think we should try to keep the known \"spec deviation\" bugs from the old evaluator where we can. Once the new evaluator is faster and stable enough to the point that we can turn it on by default and our users are no longer blocked by performance, we can start a transition with these behavior changes with further releases.",
       "revId": "e2f120902c2a46231f9a40275db138008e275586",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "24a7de23_9a17140d",
+        "filename": "cue/testdata/cycle/issue429.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 286,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-16T13:01:56Z",
+      "side": 1,
+      "message": "I generally agree with this. However, I also do not think we should go through too much effort to fix the new evaluator to replicate bugs. The default handling of the old evaluator is broken in quite complex way and I do not think we can mimic it easily with the new algorithm.",
+      "parentUuid": "dbc928ed_e47c512b",
+      "revId": "e2f120902c2a46231f9a40275db138008e275586",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

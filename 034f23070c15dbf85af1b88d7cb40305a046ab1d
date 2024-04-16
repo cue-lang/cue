@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3d6d8512_75d6a0c6",
+        "filename": "internal/envflag/flag.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-16T13:32:15Z",
+      "side": 1,
+      "message": "Or just:\n\n```suggestion\n\t\t// \"somename\" is short for \"somename\u003dtrue\"\n```\n?",
+      "revId": "034f23070c15dbf85af1b88d7cb40305a046ab1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

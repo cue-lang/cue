@@ -1,0 +1,89 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "16787ee5_45225aa6",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:40:13Z",
+      "side": 1,
+      "message": "https://cuelang.org/discussion/3017",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7ad5243d_0372c197",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:40:13Z",
+      "side": 1,
+      "message": "clarify that you mean in a follow-up CL?",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ba789c83_b48c74df",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:40:13Z",
+      "side": 1,
+      "message": "pretty sure this could be two lines",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d36424d_dd02fe31",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:40:13Z",
+      "side": 1,
+      "message": "can we also cover in this test what happens when there is a file on disk that is not gitignored, but not git-added nor git-committed either?",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d3b7d819_ae0f91ed",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-16T11:40:13Z",
+      "side": 1,
+      "message": "same as before, these comment blocks are very short, each one of them could easily be one line shorter and read more easily",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -32,16 +32,190 @@ out: #secrets & {
 	FOO: $secret: _id: "100"
 	ONE: TWO: THREE: $secret: _id: "123"
 }
+
+-- perf.cue --
+nestedCross: closed: {
+	#D: {id: string} | {[string]: #D}
+	#D: {id: string} | {[string]: #D}
+	#D: {id: string} | {[string]: #D}
+}
+
+nestedCross: open: {
+	D: {id: string} | {[string]: D}
+	D: {id: string} | {[string]: D}
+	D: {id: string} | {[string]: D}
+}
+
+// TODO(perf): support this case.  This is currently highly exponential.
+// The old evaluator solved this performance issue by simply ignoring equality
+// for patterns. This led to duplicate disjunctions and incorrect results.
+//
+// The new evaluator computes the correct result, but is highly exponential.
+// The solution is probably to limit structural cycle depth.
+//
+// An alternative would be to stop processing disjunctions if we see there are
+// more than two solutions. This might still result in exponential behavior,
+// but will limit it considerably.
+nestedClosed: passing: {
+	D: {id: {}} | {[string]: D}
+	D: {id: {}} | {[string]: D}
+	D: {id: {}} | {[string]: D}
+}
 -- out/evalalpha/stats --
-Leaks:  1896
-Freed:  461
-Reused: 461
-Allocs: 1896
+Leaks:  5097
+Freed:  1396
+Reused: 1396
+Allocs: 5097
 Retain: 0
 
-Unifications: 533
-Conjuncts:    5254
-Disjuncts:    720
+Unifications: 1831
+Conjuncts:    13300
+Disjuncts:    2526
+-- out/evalalpha --
+(struct){
+  #Secret: (#struct){
+    $secret: (#struct){
+      id: (string){ string }
+      _id: (string){ string }
+    }
+  }
+  #secrets: (#struct){ |((#struct){
+      $secret: (#struct){
+        id: (string){ string }
+        _id: (string){ string }
+      }
+    }, (#struct){
+    }) }
+  out: (#struct){
+    FOO: (#struct){
+      $secret: (#struct){
+        id: (string){ "100" }
+        _id: (string){ "100" }
+      }
+    }
+    ONE: (#struct){
+      TWO: (#struct){
+        THREE: (#struct){
+          $secret: (#struct){
+            id: (string){ "123" }
+            _id: (string){ "123" }
+          }
+        }
+      }
+    }
+  }
+  nestedCross: (struct){
+    closed: (struct){
+      #D: (#struct){ |((#struct){
+          id: (string){ string }
+        }, (#struct){
+        }) }
+    }
+    open: (struct){
+      D: (struct){ |((struct){
+          id: (string){ string }
+        }, (struct){
+        }) }
+    }
+  }
+  nestedClosed: (struct){
+    passing: (struct){
+      D: (struct){ |((struct){
+          id: (struct){
+          }
+        }, (struct){
+          id: (struct){ |((struct){
+              id: (struct){
+              }
+            }, (struct){
+              id: (struct){ |((struct){
+                  id: (struct){
+                  }
+                }, (struct){
+                }) }
+            }, (struct){
+            }) }
+        }, (struct){
+        }) }
+    }
+  }
+}
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  0
+-Freed:  1064333
+-Reused: 1064282
+-Allocs: 51
++Leaks:  5097
++Freed:  1396
++Reused: 1396
++Allocs: 5097
+ Retain: 0
+ 
+-Unifications: 792123
+-Conjuncts:    2480117
+-Disjuncts:    1064333
++Unifications: 1831
++Conjuncts:    13300
++Disjuncts:    2526
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -54,35 +54,11 @@
+               id: (struct){
+               }
+             }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
+-            }, (struct){
+-            }) }
+-        }, (struct){
+-          id: (struct){ |((struct){
+-              id: (struct){
+-              }
++              id: (struct){ |((struct){
++                  id: (struct){
++                  }
++                }, (struct){
++                }) }
+             }, (struct){
+             }) }
+         }, (struct){
+-- out/eval/stats --
+Leaks:  0
+Freed:  1064333
+Reused: 1064282
+Allocs: 51
+Retain: 0
+
+Unifications: 792123
+Conjuncts:    2480117
+Disjuncts:    1064333
 -- out/eval --
 (struct){
   #Secret: (#struct){
@@ -75,38 +249,66 @@ Disjuncts:    720
       }
     }
   }
+  nestedCross: (struct){
+    closed: (struct){
+      #D: (#struct){ |((#struct){
+          id: (string){ string }
+        }, (#struct){
+        }) }
+    }
+    open: (struct){
+      D: (struct){ |((struct){
+          id: (string){ string }
+        }, (struct){
+        }) }
+    }
+  }
+  nestedClosed: (struct){
+    passing: (struct){
+      D: (struct){ |((struct){
+          id: (struct){
+          }
+        }, (struct){
+          id: (struct){ |((struct){
+              id: (struct){
+              }
+            }, (struct){
+            }) }
+        }, (struct){
+          id: (struct){ |((struct){
+              id: (struct){
+              }
+            }, (struct){
+            }) }
+        }, (struct){
+          id: (struct){ |((struct){
+              id: (struct){
+              }
+            }, (struct){
+            }) }
+        }, (struct){
+          id: (struct){ |((struct){
+              id: (struct){
+              }
+            }, (struct){
+            }) }
+        }, (struct){
+          id: (struct){ |((struct){
+              id: (struct){
+              }
+            }, (struct){
+            }) }
+        }, (struct){
+          id: (struct){ |((struct){
+              id: (struct){
+              }
+            }, (struct){
+            }) }
+        }, (struct){
+        }) }
+    }
+  }
 }
--- diff/-out/evalalpha/stats<==>+out/eval/stats --
-diff old new
---- old
-+++ new
-@@ -1,9 +1,9 @@
--Leaks:  0
--Freed:  1064043
--Reused: 1063992
--Allocs: 51
-+Leaks:  1896
-+Freed:  461
-+Reused: 461
-+Allocs: 1896
- Retain: 0
- 
--Unifications: 791999
--Conjuncts:    2479541
--Disjuncts:    1064043
-+Unifications: 533
-+Conjuncts:    5254
-+Disjuncts:    720
--- out/eval/stats --
-Leaks:  0
-Freed:  1064043
-Reused: 1063992
-Allocs: 51
-Retain: 0
-
-Unifications: 791999
-Conjuncts:    2479541
-Disjuncts:    1064043
 -- out/compile --
 --- in.cue
 {
@@ -158,4 +360,64 @@ Disjuncts:    1064043
       }
     }
   })
+}
+--- perf.cue
+{
+  nestedCross: {
+    closed: {
+      #D: ({
+        id: string
+      }|{
+        [string]: 〈1;#D〉
+      })
+      #D: ({
+        id: string
+      }|{
+        [string]: 〈1;#D〉
+      })
+      #D: ({
+        id: string
+      }|{
+        [string]: 〈1;#D〉
+      })
+    }
+  }
+  nestedCross: {
+    open: {
+      D: ({
+        id: string
+      }|{
+        [string]: 〈1;D〉
+      })
+      D: ({
+        id: string
+      }|{
+        [string]: 〈1;D〉
+      })
+      D: ({
+        id: string
+      }|{
+        [string]: 〈1;D〉
+      })
+    }
+  }
+  nestedClosed: {
+    passing: {
+      D: ({
+        id: {}
+      }|{
+        [string]: 〈1;D〉
+      })
+      D: ({
+        id: {}
+      }|{
+        [string]: 〈1;D〉
+      })
+      D: ({
+        id: {}
+      }|{
+        [string]: 〈1;D〉
+      })
+    }
+  }
 }

@@ -9,6 +9,9 @@ import (
 type testFlags struct {
 	Foo    bool
 	BarBaz bool
+
+	DefaultFalse bool `envflag:"default:false"`
+	DefaultTrue  bool `envflag:"default:true"`
 }
 
 func success[T comparable](want T) func(t *testing.T) {
@@ -35,7 +38,9 @@ var tests = []struct {
 }{{
 	testName: "Empty",
 	envVal:   "",
-	test:     success(testFlags{}),
+	test: success(testFlags{
+		DefaultTrue: true,
+	}),
 }, {
 	testName: "Unknown",
 	envVal:   "ratchet",
@@ -44,13 +49,15 @@ var tests = []struct {
 	testName: "Set",
 	envVal:   "foo",
 	test: success(testFlags{
-		Foo: true,
+		Foo:         true,
+		DefaultTrue: true,
 	}),
 }, {
 	testName: "SetTwice",
 	envVal:   "foo,foo",
 	test: success(testFlags{
-		Foo: true,
+		Foo:         true,
+		DefaultTrue: true,
 	}),
 }, {
 	testName: "SetWithUnknown",
@@ -60,8 +67,21 @@ var tests = []struct {
 	testName: "TwoFlags",
 	envVal:   "barbaz,foo",
 	test: success(testFlags{
-		Foo:    true,
-		BarBaz: true,
+		Foo:         true,
+		BarBaz:      true,
+		DefaultTrue: true,
+	}),
+}, {
+	testName: "ToggleDefaultFieldsNumeric",
+	envVal:   "defaulttrue=0,defaultfalse=1",
+	test: success(testFlags{
+		DefaultFalse: true,
+	}),
+}, {
+	testName: "ToggleDefaultFieldsWords",
+	envVal:   "defaulttrue=false,defaultfalse=true",
+	test: success(testFlags{
+		DefaultFalse: true,
 	}),
 }}
 

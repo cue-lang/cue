@@ -68,16 +68,16 @@ issue2355: {
 	}
 }
 
--- out/eval/stats --
-Leaks:  9
-Freed:  68
-Reused: 59
-Allocs: 18
-Retain: 22
+-- out/evalalpha/stats --
+Leaks:  235
+Freed:  42
+Reused: 42
+Allocs: 235
+Retain: 0
 
-Unifications: 45
-Conjuncts:    135
-Disjuncts:    86
+Unifications: 47
+Conjuncts:    475
+Disjuncts:    184
 -- out/evalalpha --
 Errors:
 issue2351.let.param: conflicting values [{}] and "foo" (mismatched types list and string):
@@ -153,6 +153,28 @@ Result:
     }
   }
 }
+-- diff/-out/evalalpha/stats<==>+out/eval/stats --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,9 @@
+-Leaks:  9
+-Freed:  68
+-Reused: 59
+-Allocs: 18
+-Retain: 22
++Leaks:  235
++Freed:  42
++Reused: 42
++Allocs: 235
++Retain: 0
+ 
+-Unifications: 45
+-Conjuncts:    135
+-Disjuncts:    86
++Unifications: 47
++Conjuncts:    475
++Disjuncts:    184
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
@@ -208,6 +230,16 @@ diff old new
        let data#2 = (struct){
          f1: (string){ "foo" }
        }
+-- out/eval/stats --
+Leaks:  9
+Freed:  68
+Reused: 59
+Allocs: 18
+Retain: 22
+
+Unifications: 45
+Conjuncts:    135
+Disjuncts:    86
 -- diff/todo/p0 --
 conjunct.t3: Unexpanded disjunction.
 -- diff/todo/p3 --

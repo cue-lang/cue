@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd56fb3a_709160e3",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-16T13:52:44Z",
+      "side": 1,
+      "message": "LGTM modulo one caveat about the no-op `number \u0026 1` thing.",
+      "revId": "f82b22b0596f5788a0b992776bd0fe309cee7602",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

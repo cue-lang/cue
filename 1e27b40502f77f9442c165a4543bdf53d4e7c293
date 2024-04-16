@@ -36,6 +36,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3894702b_7fb31dca",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-16T13:52:44Z",
+      "side": 1,
+      "message": "It turns out that it was all pretty helpful anyway, so hopefully not too bad as result in the end.\n\nIt is possible to mark CLs as WIP, which I do sometimes, but asking people to expect to read the commit message _should_ be good enough, I agree 😊",
+      "parentUuid": "69e7421d_020bde6b",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "21a9b893_317c402b",
@@ -176,6 +194,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "449f9fe8_fe8e3f55",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-16T13:52:44Z",
+      "side": 1,
+      "message": "Not done?",
+      "parentUuid": "64dfe4d4_47c9ddaf",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5641d20c_83bf95e9",
@@ -207,6 +243,24 @@
       "side": 1,
       "message": "Acknowledged",
       "parentUuid": "5641d20c_83bf95e9",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6e924b5_ea6b781d",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-16T13:52:44Z",
+      "side": 1,
+      "message": "doc comments on these methods would be nice. 😊\nspecifically, the methods don\u0027t return anything and it\u0027s not immediately clear what the intended side-effects are.",
+      "parentUuid": "192701e5_3037d09a",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -569,6 +623,24 @@
       "side": 1,
       "message": "Marcel already noted that we should use `number \u0026` as it is more correct, and it does not have that issue. See my earlier comment in the test file.",
       "parentUuid": "a5fbaa7a_ba6237a3",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4da5ec9c_066dc3f5",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-16T13:52:44Z",
+      "side": 1,
+      "message": "Unfortunately \"number \u0026 1\" resolves to exactly the same thing as `1`, so this is a no-op.\n\nFor example, this fails:\n\n```\nx: number \u0026 1\nx: float\n```\n\nSo this decoding style will mean that if there\u0027s a schema derived from a Go type that contains a float field, a number in this style won\u0027t unify with such a field, even if there\u0027s an explicit `!!float` tag in the YAML.\n\nI\u0027m not sure there\u0027s any really good answer here. Least worst option is probably to actually use a float representation given that YAML thinks it\u0027s a float.",
+      "parentUuid": "7eb0a98e_3108be27",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

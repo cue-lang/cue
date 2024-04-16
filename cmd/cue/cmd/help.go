@@ -179,16 +179,16 @@ setting.
 			"%AppData%/cue" on Windows
 
 	CUE_DEBUG
-		Comma-separated list of debug flags to enable. Current possible
-		values are:
+		Comma-separated list of debug flags to enable or disable.
+		Current possible values are:
 			http
 				Print log messages in JSON format, one per line showing
 				HTTP requests and responses made when interacting with
 				module registries.
 
 	CUE_EXPERIMENT
-		Comma-separated list of experiments to enable. The
-		list of available experiments may change arbitrarily over time.
+		Comma-separated list of experiments to enable or disable.
+		The list of available experiments may change arbitrarily over time.
 		See exp.go in package cuelang.org/go/internal/cueexperiment for
 		currently valid values.
 

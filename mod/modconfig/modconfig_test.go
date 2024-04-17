@@ -248,11 +248,13 @@ package bar
 	err := os.MkdirAll(configDir, 0o777)
 	qt.Assert(t, qt.IsNil(err))
 
-	// Check write-read round-trip.
+	// Check write-read round-trip and logins cleanup
+	logins.Registries["blank"] = cueconfig.RegistryLogin{TokenType: "Bearer"}
 	err = cueconfig.WriteLogins(filepath.Join(configDir, "logins.json"), logins)
 	qt.Assert(t, qt.IsNil(err))
 	logins2, err := cueconfig.ReadLogins(filepath.Join(configDir, "logins.json"))
 	qt.Assert(t, qt.IsNil(err))
+	delete(logins.Registries, "blank")
 	qt.Assert(t, qt.DeepEquals(logins2, logins))
 
 	t.Setenv("CUE_REGISTRY", registryConf)

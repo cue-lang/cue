@@ -498,7 +498,7 @@ func (d *decoder) scalar(yn *yaml.Node) (ast.Expr, error) {
 		return &ast.BasicLit{
 			ValuePos: d.pos(yn),
 			Kind:     token.STRING,
-			Value:    quoteString(yn.Value),
+			Value:    literal.String.WithOptionalTabIndent(1).Quote(yn.Value),
 		}, nil
 
 	case binaryTag:
@@ -616,46 +616,6 @@ func (d *decoder) alias(yn *yaml.Node) (ast.Expr, error) {
 	node, err := d.extract(yn.Alias)
 	delete(d.extractingAliases, yn)
 	return node, err
-}
-
-// quoteString converts a string to a CUE multiline string if needed.
-// TODO(mvdan): this is brought over from the old decoder; we should consider
-// polishing this API and moving it someplace better like cue/literal.
-func quoteString(s string) string {
-	lines := []string{}
-	last := 0
-	for i, c := range s {
-		if c == '\n' {
-			lines = append(lines, s[last:i])
-			last = i + 1
-		}
-		if c == '\r' {
-			goto quoted
-		}
-	}
-	lines = append(lines, s[last:])
-	if len(lines) >= 2 {
-		buf := []byte{}
-		buf = append(buf, `"""`+"\n"...)
-		for _, l := range lines {
-			if l == "" {
-				// no indentation for empty lines
-				buf = append(buf, '\n')
-				continue
-			}
-			buf = append(buf, '\t')
-			p := len(buf)
-			// TODO(mvdan): do not use Go's strconv for CUE syntax.
-			buf = strconv.AppendQuote(buf, l)
-			// remove quotes
-			buf[p] = '\t'
-			buf[len(buf)-1] = '\n'
-		}
-		buf = append(buf, "\t\t"+`"""`...)
-		return string(buf)
-	}
-quoted:
-	return literal.String.Quote(s)
 }
 
 func labelStr(l ast.Label) string {

@@ -16,6 +16,24 @@
       "message": "Now we do not call it \"vcs\" anymore, the name \"none\" does not make much sense.\n\nPossible suggestions are \"fs\" or \"raw\".",
       "revId": "2a50fad9d07174a6e11ad1cb0feab5d62e73ee3e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6009ccd0_7ce49856",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 6
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-17T12:24:51Z",
+      "side": 1,
+      "message": "Of those two, I\u0027d probably opt for \"raw\". But I guess another possibility might be \"self\". As in \"the source of this module is itself\". WDYT about that?",
+      "parentUuid": "e25d87dc_cbe81b4b",
+      "revId": "2a50fad9d07174a6e11ad1cb0feab5d62e73ee3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -266,4 +266,7 @@ import "list"
     o: [ {}]
     o: [{} ]
     o: [ {} ]
+
+    a: 1
+    b: c & {noam: 1}
 }

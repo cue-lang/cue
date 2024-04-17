@@ -52,6 +52,24 @@
       "parentUuid": "6009ccd0_7ce49856",
       "revId": "2a50fad9d07174a6e11ad1cb0feab5d62e73ee3e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5f11b7f9_5bddb5ab",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 6
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:30:38Z",
+      "side": 1,
+      "message": "\"self\" is fine. I initially thought of \"asis\", or \"as_is\".",
+      "parentUuid": "3a863905_8f15a678",
+      "revId": "2a50fad9d07174a6e11ad1cb0feab5d62e73ee3e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

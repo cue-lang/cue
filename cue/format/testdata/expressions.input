@@ -3,267 +3,279 @@ package expressions
 import "list"
 
 {
-    a: 1 // comment
-    aaa: 22 // comment
+	a:   1  // comment
+	aaa: 22 // comment
 
-    "": 3
+	"": 3
 
-    b: 3
+	b: 3
 
-    c: b: a:  4
-    c?: bb?: aaa?: 5
-    c: b: [Name=string]: a: int
-    let alias = 3.14
-    "g\("en")"?: 4
+	c: b: a:       4
+	c?: bb?: aaa?: 5
+	c: b: [Name=string]: a: int
+	let alias = 3.14
+	"g\("en")"?: 4
 
-    let alias2 = foo // with comment
-    let aaalias = foo
-    b: bar
+	let alias2 = foo // with comment
+	let aaalias = foo
+	b: bar
 
-    bottom: _|_
+	bottom: _|_
 
-    a:
-    b:
-    c: 2
+	a:
+		b:
+			c: 2
 
-    req!: int
+	req!: int
 
-    a: bbbb: c: 3
-    a: b: 3
-    a: bb: cc: 3
+	a: bbbb: c: 3
+	a: b: 3
+	a: bb: cc: 3
 
-    empty: {}
-    emptyNewLine: {
+	empty: {}
+	emptyNewLine: {
 
-    }
-    someObject: {
-        a: 8
-        aa: 9
-        aaa: 10
-    }
+	}
+	someObject: {
+		a:   8
+		aa:  9
+		aaa: 10
+	}
 
-    #someDefinition: {
-        embedding
+	#someDefinition: {
+		embedding
 
-        field: 2
-    }
+		field: 2
+	}
 
-    #openDef: {
-        a: int
-        ...
-    }
+	#openDef: {
+		a: int
+		...
+	}
 
-    attrs: {
-        a: 8 @go(A) // comment
-        aa: 8 @go(A) // comment
-        bb: 9
-        bbb: 10 @go(Bbb) @xml(,attr) // comment
-        bbbb: 100 @go(Bbbb) @xml(,attr) // comment
-    }
+	attrs: {
+		a:    8 @go(A) // comment
+		aa:   8 @go(A) // comment
+		bb:   9
+		bbb:  10  @go(Bbb) @xml(,attr)  // comment
+		bbbb: 100 @go(Bbbb) @xml(,attr) // comment
+	}
 
-    foo: bar: string @go(-)
+	foo: {
+		bar: string @go(-)
+	}
 
-    e: 1+2*3
-    e: 1*2*3 // error
-    e: >=2 & <=3
-    e: >2 & <=(3 + 4)
-    ex: >2 & <=(3 + 4*5)
-    e: >2 & <=3 & <=4
-    e: 1 + 2 + 3 // error
+	e:  1 + 2*3
+	e:  1 * 2 * 3 // error
+	e:  >=2 & <=3
+	e:  >2 & <=(3 + 4)
+	ex: >2 & <=(3 + 4*5)
+	e:  >2 & <=3 & <=4
+	e:  1 + 2 + 3 // error
 
-    e: s[1+2]
-    e: s[1:2]
-    e: s[1+2:2+4]
-    e: s[2]
-    e: s[2*3]
-    e: s[1+2*3]
+	e: s[1+2]
+	e: s[1:2]
+	e: s[1+2 : 2+4]
+	e: s[2]
+	e: s[2*3]
+	e: s[1+2*3]
 
-    e: a |
-    b|
-    c
+	e: a |
+		b |
+		c
 
-    e:
-    a|
-    b| c |
-    d
+	e:
+		a |
+		b | c |
+		d
 
-    e: f(3+4+5)
-    e: f(3*4*5)
-    e: f(3+4*5)
+	e: f(3 + 4 + 5)
+	e: f(3 * 4 * 5)
+	e: f(3 + 4*5)
 
-    e: f(3 + 4 div 5)
+	e: f(3 + __div(4, 5))
 
-    e: 3<4&&5>4
-    e: a || b && c || d
+	e: 3 < 4 && 5 > 4
+	e: a || b && c || d
 
-    e: a + +b * 3
-    e: -a - -b
+	e: a + +b*3
+	e: -a - -b
 
-    e: b + c
-    e: b*c + d
-    e: a*b + c
-    e: a - b - c
-    e: a - (b - c)
-    e: a - b*c
-    e: a - (b * c)
-    e: a * b / c
-    e: a div b + 5
-    e: a / b
-    e: x[a|b]
-    e: x[a /b]
-    e: a & b
-    e: a + +b
-    e: a - -b
-    e: a div - b
-    e: x[a*-b]
-    e: x[a + +b]
-    e: len(longVariableName) * 2
+	e: b + c
+	e: b*c + d
+	e: a*b + c
+	e: a - b - c
+	e: a - (b - c)
+	e: a - b*c
+	e: a - (b * c)
+	e: a * b / c
+	e: __div(a, b) + 5
+	e: a / b
+	e: x[a | b]
+	e: x[a/b]
+	e: a & b
+	e: a + +b
+	e: a - -b
+	e: __div(a, -b)
+	e: x[a*-b]
+	e: x[a + +b]
+	e: len(longVariableName) * 2
 
-    e: "\(a)"
-    e: 'aa \(aaa) aa'
-    e: "aa \(aaa)"
+	e: "\(a)"
+	e: 'aa \(aaa) aa'
+	e: "aa \(aaa)"
 
-    e: [1, 2
-    ]
-    e: [1, 2]
-       e: [1, 2, 3, 4,
-    5, 6, 7, 8]
-    e: [1, 2, 3, 4,
-    5, 6, 7, 8 // maybe force additional comma
-    ]
-    e: [...]
-    e: [
-        ...]
-    e: [...
-    ]
-    e: [1, 2, ...]
-    e: [1, 2,
-    ...]
-    e: [...int]
-    e: [...int,]
-    e: [...int | float]
-    e: [for x in someObject if x > 9 {
-        x
-    }]
-    e: [for x in someObject if x > 9 {x}]
-    e: [
-    for x in someObject
-    if x > 9 {x}]
-   e: [
-    for x in someObject
-    if x > 9
-    {x}]
+	e: [1, 2,
+	]
+	e: [1, 2]
+	e: [1, 2, 3, 4,
+		5, 6, 7, 8]
+	e: [1, 2, 3, 4,
+		5, 6, 7, 8, // maybe force additional comma
+	]
+	e: [...]
+	e: [
+		...]
+	e: [...,
+	]
+	e: [1, 2, ...]
+	e: [1, 2,
+		...]
+	e: [...int]
+	e: [...int]
+	e: [...int | float]
+	e: [for x in someObject if x > 9 {
+		x
+	}]
+	e: [for x in someObject if x > 9 {x}]
+	e: [
+		for x in someObject
+		if x > 9 {x}]
+	e: [
+		for x in someObject
+		if x > 9 {x}]
 
-    e: [
-        if x > 1 {},
-        if x > 1 {},
-        for x in src {},
-    ]
+	e: [
+		if x > 1 {},
+		if x > 1 {},
+		for x in src {},
+	]
 
-    for k, v in someObject {
-        "\(k)": v
-    }
-    for k, v in someObject {
-        "\(k)": v
-    }
+	for k, v in someObject {
+		"\(k)": v
+	}
+	for k, v in someObject {
+		"\(k)": v
+	}
 
-    e: {
-        for k, v in someObject
-        if k > "a" {
-            "\(k)":v
-        }
-    }
+	e: {
+		for k, v in someObject
+		if k > "a" {
+			"\(k)": v
+		}
+	}
 
-    e: { for k, v in someObject if k > "a" {"\(k)":v} }
-    e: { for k, v in someObject if k > "a" {
-        "\(k)":v }}
+	e: {for k, v in someObject if k > "a" {"\(k)": v}}
+	e: {for k, v in someObject if k > "a" {
+		"\(k)": v
+	}}
 
-    e: {
-    for k, v in someObject
-    let x = v
-    if k > "a" {
-        "\(k)":x}}
+	e: {
+		for k, v in someObject
+		let x = v
+		if k > "a" {
+			"\(k)": x
+		}}
 
-    if a |
-    b {
-        c: d
-    }
+	if a |
+		b {
+		c: d
+	}
 
-    e: [{
-        a: 1, b: 2,
-    }]
+	e: [{
+		a: 1, b: 2
+	}]
 
-    e: [{
-        a: 1, b: 2,
-    },
-    ]
+	e: [{
+		a: 1, b: 2
+	},
+	]
 
-   e: [{
-        a: 1, b: 2,
-    }, {
-        c: 1, d: 2,
-    }]
+	e: [{
+		a: 1, b: 2
+	}, {
+		c: 1, d: 2
+	}]
 
-    e: [{
-        a: 1, b: 2,
-    },
-        3,
-        4,
-    ]
+	e: [{
+		a: 1, b: 2
+	},
+		3,
+		4,
+	]
 
-    e: e.f(1, 2)
+	e: e.f(1, 2)
 
-    e: ((3 + 4))
+	e: (3 + 4)
 
-    // field before list
-    f: 3
-    a: [1, 2 // add comma
-    ]
+	// field before list
+	f: 3
+	a: [1, 2, // add comma
+	]
 
-    foo : bar
+	foo: bar
 
-    a: "foo-bar": 3
-    b: a."foo-bar"
-    c: a. "foo-bar" . b
-    d: a.
-        "foo-bar"
-    e: a.
-        "foo-bar".
-                b
-    f: 2
+	a: "foo-bar": 3
+	b: a."foo-bar"
+	c: a."foo-bar".b
+	d: a.
+		"foo-bar"
+	e: a.
+		"foo-bar".
+		b
+	f: 2
 
-    "contains		tabs": 123
-    @jsonschema(foo="contains		tabs")
+	"contains		tabs": 123
+	@jsonschema(foo="contains		tabs")
 
-    j: cueckoo: _ | [
-        1,
+	j: cueckoo: _ | [
+		1,
 
-        2,
-    ]
-    k: cueckoo: *[
-        1,
+		2,
+	]
+	k: cueckoo: *[
+		1,
 
-        2,
-    ]
-    l: cueckoo: list.Concat([
-        1,
+		2,
+	]
+	l: cueckoo: list.Concat([
+		1,
 
-        2,
-    ])
+		2,
+	])
 
-    m: [1, 2, 3]
-    m: [1, 2, 3,]
-    m: [ 1, 2, 3, ]
-    m: [    1, 2, 3,]
-    m: [     1, 2, 3,]
-    m: [ 1, 2, 3]
-    m: [ 1, 2, 3,]
-    m: [ 1, 2, 3, ]
-    m: [ 1, 2, 3 ]
-    m: [ if true { 1 }, 2, 3]
-    n: [ 1]
-    o: [{}]
-    o: [ {}]
-    o: [{} ]
-    o: [ {} ]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [1, 2, 3]
+	m: [if true {1}, 2, 3]
+	n: [1]
+	o: [{}]
+	o: [{}]
+	o: [{}]
+	o: [{}]
+
+	p:         1
+	p: p & {p: 2}
+	q:         1
+	q: q | {q: 2}
+	r:                1
+	r: b & [1, 2, {a: 4}]
+	s: [string]: [string]: a
+	s: [string]: {s:       string}
 }

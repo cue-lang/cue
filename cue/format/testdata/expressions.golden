@@ -93,7 +93,7 @@ import "list"
 	e: f(3 * 4 * 5)
 	e: f(3 + 4*5)
 
-	e: f(3 + 4 div 5)
+	e: f(3 + __div(4, 5))
 
 	e: 3 < 4 && 5 > 4
 	e: a || b && c || d
@@ -109,14 +109,14 @@ import "list"
 	e: a - b*c
 	e: a - (b * c)
 	e: a * b / c
-	e: a div b + 5
+	e: __div(a, b) + 5
 	e: a / b
 	e: x[a | b]
 	e: x[a/b]
 	e: a & b
 	e: a + +b
 	e: a - -b
-	e: a div -b
+	e: __div(a, -b)
 	e: x[a*-b]
 	e: x[a + +b]
 	e: len(longVariableName) * 2
@@ -269,4 +269,13 @@ import "list"
 	o: [{}]
 	o: [{}]
 	o: [{}]
+
+	p: 1
+	p: p & {p: 2}
+	q: 1
+	q: q | {q: 2}
+	r: 1
+	r: b & [1, 2, {a: 4}]
+	s: [string]: [string]: a
+	s: [string]: {s: string}
 }

@@ -16,6 +16,24 @@
       "message": "Hmm, isn\u0027t this diff backwards? evalalpha/stats went down, not eval/stats, yet the diff seems to say the opposite. There might be a bug in the earlier CL that added the new evalalpha stats with diffing.",
       "revId": "e9579bb0c4f6387e62b226ffe0ecd4f3e5cf1364",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d7542dc5_d3690243",
+        "filename": "cue/testdata/benchmarks/issue1684.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:15:40Z",
+      "side": 1,
+      "message": "This is correct. Plus here means \"new evaluator\". Those numbers went down compared to previous.",
+      "parentUuid": "01624d6c_477e4ddb",
+      "revId": "e9579bb0c4f6387e62b226ffe0ecd4f3e5cf1364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

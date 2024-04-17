@@ -94,35 +94,36 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 		}, nil
 	}
 
-	i, errs := update(nil, typesValue, typesValue, "modes", mode.String())
-	v := i.LookupDef("FileInfo")
-	v = v.Fill(b)
+	modeVal := typesValue.Lookup("modes", mode.String())
+	fileVal := modeVal.Lookup("FileInfo")
+	fileVal = fileVal.Fill(b)
 
 	if b.Encoding == "" {
-		ext := i.Lookup("extensions", fileExt(b.Filename))
+		ext := modeVal.Lookup("extensions", fileExt(b.Filename))
 		if ext.Exists() {
-			v = v.Unify(ext)
+			fileVal = fileVal.Unify(ext)
 		}
 	}
+	var errs errors.Error
 
-	interpretation, _ := v.Lookup("interpretation").String()
+	interpretation, _ := fileVal.Lookup("interpretation").String()
 	if b.Form != "" {
-		v, errs = update(errs, v, i, "forms", string(b.Form))
+		fileVal, errs = update(errs, fileVal, typesValue, "forms", string(b.Form))
 		// may leave some encoding-dependent options open in data mode.
 	} else if interpretation != "" {
 		// always sets schema form.
-		v, errs = update(errs, v, i, "interpretations", interpretation)
+		fileVal, errs = update(errs, fileVal, typesValue, "interpretations", interpretation)
 	}
 	if interpretation == "" {
-		s, err := v.Lookup("encoding").String()
+		s, err := fileVal.Lookup("encoding").String()
 		if err != nil {
 			return nil, err
 		}
-		v, errs = update(errs, v, i, "encodings", s)
+		fileVal, errs = update(errs, fileVal, modeVal, "encodings", s)
 	}
 
 	fi := &FileInfo{}
-	if err := v.Decode(fi); err != nil {
+	if err := fileVal.Decode(fi); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos, "could not parse arguments")
 	}
 	return fi, errs
@@ -155,7 +156,7 @@ func update(errs errors.Error, v, i cue.Value, field, value string) (cue.Value, 
 //
 //	json: foo.data bar.data json+schema: bar.schema
 func ParseArgs(args []string) (files []*build.File, err error) {
-	var inst, v cue.Value
+	var modeVal, fileVal cue.Value
 
 	qualifier := ""
 	hasFiles := false
@@ -164,7 +165,7 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 		a := strings.Split(s, ":")
 		switch {
 		case len(a) == 1 || len(a[0]) == 1: // filename
-			if !v.Exists() {
+			if !fileVal.Exists() {
 				if len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
 					// Handle majority case.
 					files = append(files, &build.File{
@@ -186,12 +187,12 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 					continue
 				}
 
-				inst, v, err = parseType("", Input)
+				modeVal, fileVal, err = parseType("", Input)
 				if err != nil {
 					return nil, err
 				}
 			}
-			f, err := toFile(inst, v, s)
+			f, err := toFile(modeVal, fileVal, s)
 			if err != nil {
 				return nil, err
 			}
@@ -213,7 +214,7 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 			case qualifier != "" && !hasFiles:
 				return nil, errors.Newf(token.NoPos, "scoped qualifier %q without file", qualifier+":")
 			}
-			inst, v, err = parseType(a[0], Input)
+			modeVal, fileVal, err = parseType(a[0], Input)
 			if err != nil {
 				return nil, err
 			}
@@ -246,12 +247,11 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 	if file == "" {
 		return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
 	}
-
-	inst, val, err := parseType(scope, mode)
+	modeVal, fileVal, err := parseType(scope, mode)
 	if err != nil {
 		return nil, err
 	}
-	return toFile(inst, val, file)
+	return toFile(modeVal, fileVal, file)
 }
 
 func hasEncoding(v cue.Value) (concrete, hasDefault bool) {
@@ -260,18 +260,19 @@ func hasEncoding(v cue.Value) (concrete, hasDefault bool) {
 	return enc.IsConcrete(), d.IsConcrete()
 }
 
-func toFile(i, v cue.Value, filename string) (*build.File, error) {
-	v = v.Fill(filename, "filename")
+func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
+	fileVal = fileVal.Fill(filename, "filename")
 
-	if concrete, hasDefault := hasEncoding(v); !concrete {
+	if concrete, hasDefault := hasEncoding(fileVal); !concrete {
 		if filename == "-" {
 			if !hasDefault {
-				v = v.Unify(i.LookupDef("Default"))
+				// TODO(mvdan): unused?
+				fileVal = fileVal.Unify(modeVal.Lookup("Default"))
 			}
 		} else if ext := fileExt(filename); ext != "" {
-			if x := i.Lookup("extensions", ext); x.Exists() || !hasDefault {
-				v = v.Unify(x)
-				if err := v.Err(); err != nil {
+			if x := modeVal.Lookup("extensions", ext); x.Exists() || !hasDefault {
+				fileVal = fileVal.Unify(x)
+				if err := fileVal.Err(); err != nil {
 					return nil, errors.Newf(token.NoPos,
 						"unknown file extension %s", ext)
 				}
@@ -283,34 +284,33 @@ func toFile(i, v cue.Value, filename string) (*build.File, error) {
 	}
 
 	f := &build.File{}
-	if err := v.Decode(&f); err != nil {
+	if err := fileVal.Decode(&f); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos,
 			"could not determine file type")
 	}
 	return f, nil
 }
 
-func parseType(s string, mode Mode) (inst, val cue.Value, err error) {
-	i := typesValue
-	i = i.Unify(i.Lookup("modes", mode.String()))
-	v := i.LookupDef("File")
+func parseType(s string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
+	modeVal = typesValue.Lookup("modes", mode.String())
+	fileVal = modeVal.Lookup("File")
 
 	if s != "" {
 		for _, t := range strings.Split(s, "+") {
 			if p := strings.IndexByte(t, '='); p >= 0 {
-				v = v.Fill(t[p+1:], "tags", t[:p])
+				fileVal = fileVal.Fill(t[p+1:], "tags", t[:p])
 			} else {
-				info := i.Lookup("tags", t)
+				info := modeVal.Lookup("tags", t)
 				if !info.Exists() {
-					return inst, val, errors.Newf(token.NoPos,
+					return cue.Value{}, cue.Value{}, errors.Newf(token.NoPos,
 						"unknown filetype %s", t)
 				}
-				v = v.Unify(info)
+				fileVal = fileVal.Unify(info)
 			}
 		}
 	}
 
-	return i, v, nil
+	return modeVal, fileVal, nil
 }
 
 // fileExt is like filepath.Ext except we don't treat file names starting with "." as having an extension

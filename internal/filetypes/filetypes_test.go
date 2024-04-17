@@ -43,7 +43,7 @@ func TestFromFile(t *testing.T) {
 	}{{
 		name: "must specify encoding",
 		in:   build.File{},
-		out:  `#FileInfo.encoding: non-concrete value string`,
+		out:  `modes.input.FileInfo: field not found: encoding`,
 	}, {
 		// Default without any
 		name: "cue",
@@ -77,7 +77,7 @@ func TestFromFile(t *testing.T) {
 			Filename: ".json",
 		},
 		mode: Def,
-		out:  "#FileInfo.encoding: non-concrete value string",
+		out:  "modes.def.FileInfo: field not found: encoding",
 	}, {
 		name: "yaml",
 		mode: Def,

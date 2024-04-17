@@ -212,6 +212,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8f159f5a_ebd0682c",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T11:13:16Z",
+      "side": 1,
+      "message": "Done now.",
+      "parentUuid": "449f9fe8_fe8e3f55",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "5641d20c_83bf95e9",
@@ -261,6 +279,24 @@
       "side": 1,
       "message": "doc comments on these methods would be nice. 😊\nspecifically, the methods don\u0027t return anything and it\u0027s not immediately clear what the intended side-effects are.",
       "parentUuid": "192701e5_3037d09a",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7bfec338_ac0b97bb",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 139,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T11:13:16Z",
+      "side": 1,
+      "message": "done, and also gave them slightly better names.",
+      "parentUuid": "c6e924b5_ea6b781d",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -641,6 +677,24 @@
       "side": 1,
       "message": "Unfortunately \"number \u0026 1\" resolves to exactly the same thing as `1`, so this is a no-op.\n\nFor example, this fails:\n\n```\nx: number \u0026 1\nx: float\n```\n\nSo this decoding style will mean that if there\u0027s a schema derived from a Go type that contains a float field, a number in this style won\u0027t unify with such a field, even if there\u0027s an explicit `!!float` tag in the YAML.\n\nI\u0027m not sure there\u0027s any really good answer here. Least worst option is probably to actually use a float representation given that YAML thinks it\u0027s a float.",
       "parentUuid": "7eb0a98e_3108be27",
+      "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "18ed4c89_1e595322",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 464,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T11:13:16Z",
+      "side": 1,
+      "message": "We had a discussion on this last week and Marcel had a strong opinion in favor of `number \u0026`, and it\u0027s no worse than `float \u0026` in that it doesn\u0027t error, so I\u0027ll leave as is for now to not block on a merge - and add a TODO to revisit this tricky choice next time we discuss encodings with Marcel.",
+      "parentUuid": "4da5ec9c_066dc3f5",
       "revId": "1e27b40502f77f9442c165a4543bdf53d4e7c293",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

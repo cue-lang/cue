@@ -1,0 +1,146 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "74775cb8_1ead3c84",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "out of all the recent CLs, this one feels like the most important to contain some context in the commit message. Does structure sharing help with just performance, or also bugfixing? Is it complete? Does it help with just CPU time, or also peak memory usage?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3a0813a_132ae94c",
+        "filename": "cue/testdata/comprehensions/issue837.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "bad merge conflict?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a87e6c2d_f5eda8cf",
+        "filename": "cue/testdata/comprehensions/issue837.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "this seems like a bad rebase/merge conflict result. the p2 section is partly duplicated, and you have a `\u003e\u003e\u003e\u003e\u003e\u003e\u003e` line left over.",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "365b778c_ad7fc594",
+        "filename": "cue/testdata/eval/let.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1017,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "partly duplicate p0 section?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f9eeb96a_c5742223",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "incomplete?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8755e48f_5b2e9c5c",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "remove or TODO?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df2e1843_7cce958d",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 1079,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "can this not be based on either shared or sharedID being set/valid?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "13bf9b7f_b79c767f",
+        "filename": "internal/core/adt/share.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:47:51Z",
+      "side": 1,
+      "message": "intuitively I would expect both of these \"return false\" conditions to be part of canShare. If there\u0027s a very good reason to not have them there, I would make that clear in a comment above them.\n\nAlso, should we have TODOs to hopefully resolve these \"cannot share\" edge cases?",
+      "range": {
+        "startLine": 69,
+        "startChar": 1,
+        "endLine": 88,
+        "endChar": 2
+      },
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

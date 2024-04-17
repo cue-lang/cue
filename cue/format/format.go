@@ -262,13 +262,6 @@ func (f *formatter) formfeed() whiteSpace {
 	return formfeed
 }
 
-func (f *formatter) wsOverride(def whiteSpace) whiteSpace {
-	if f.current.override == ignore {
-		return def
-	}
-	return f.current.override
-}
-
 func (f *formatter) onOneLine(node ast.Node) bool {
 	a := node.Pos()
 	b := node.End()

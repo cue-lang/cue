@@ -70,6 +70,24 @@
       "parentUuid": "2c889ce5_1b6ef9da",
       "revId": "e9579bb0c4f6387e62b226ffe0ecd4f3e5cf1364",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e77019e0_032ea509",
+        "filename": "cue/testdata/benchmarks/issue1684.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:45:51Z",
+      "side": 1,
+      "message": "That is indeed very confusing.",
+      "parentUuid": "d9915002_3338d22b",
+      "revId": "e9579bb0c4f6387e62b226ffe0ecd4f3e5cf1364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

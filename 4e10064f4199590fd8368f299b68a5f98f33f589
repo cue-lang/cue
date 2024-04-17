@@ -1,0 +1,61 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4d8da274_a379d9b9",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:26:44Z",
+      "side": 1,
+      "message": "do you really mean \"the next\", i.e. the one exposing the experiment, or do you mean one later?",
+      "range": {
+        "startLine": 10,
+        "startChar": 51,
+        "endLine": 10,
+        "endChar": 55
+      },
+      "revId": "4e10064f4199590fd8368f299b68a5f98f33f589",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b518535d_9e3b9ec0",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:26:44Z",
+      "side": 1,
+      "message": "but without it...? incomplete sentence?",
+      "revId": "4e10064f4199590fd8368f299b68a5f98f33f589",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca446975_110f2e1b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:26:44Z",
+      "side": 1,
+      "message": "As discussed, it would be hours of work to rebase the stack so that the right tests are moved here, so we are choosing to give that up to release soon.",
+      "revId": "4e10064f4199590fd8368f299b68a5f98f33f589",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

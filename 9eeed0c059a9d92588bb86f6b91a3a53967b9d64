@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3af85e07_a7a650bb",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 330,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:34:23Z",
+      "side": 1,
+      "message": "TODO or remove?",
+      "revId": "9eeed0c059a9d92588bb86f6b91a3a53967b9d64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c78e2a64_5f49e03c",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 517,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:34:23Z",
+      "side": 1,
+      "message": "TODO or remove?",
+      "revId": "9eeed0c059a9d92588bb86f6b91a3a53967b9d64",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

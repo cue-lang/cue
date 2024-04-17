@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6b7c9940_229e92aa",
+        "filename": "internal/core/adt/equality.go",
+        "patchSetId": 11
+      },
+      "lineNbr": 134,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T10:36:30Z",
+      "side": 1,
+      "message": "fix or TODO?",
+      "revId": "1707a1b646d1732c563d3c912ea0a2a5bfc3e558",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

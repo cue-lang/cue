@@ -16,6 +16,24 @@
       "message": "Why does this matter? I would expect a summary in the commit message.\n\nI also assume this needs some form of test.",
       "revId": "8708f226d5a96a6078099065ed56a1d23bd4679c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cccf297d_445d36b0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T10:36:30Z",
+      "side": 1,
+      "message": "If this is another case where the tests come later, and adding/moving the test here would be too much work, at the very least explain that in the commit message.",
+      "parentUuid": "bb4f0297_0eca7044",
+      "revId": "8708f226d5a96a6078099065ed56a1d23bd4679c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

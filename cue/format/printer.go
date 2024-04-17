@@ -45,7 +45,8 @@ type printer struct {
 	indent      int
 	spaceBefore bool
 
-	errs errors.Error
+	errs       errors.Error
+	lbraceLine bool
 }
 
 type line int
@@ -269,17 +270,17 @@ func (p *printer) writeWhitespace(ws whiteSpace) {
 	case ws&newsection != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\f', 2)
-		p.lineout += 2
+		p.incrementLine(2)
 		p.spaceBefore = true
 	case ws&formfeed != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\f', 1)
-		p.lineout++
+		p.incrementLine(1)
 		p.spaceBefore = true
 	case ws&newline != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\n', 1)
-		p.lineout++
+		p.incrementLine(1)
 		p.spaceBefore = true
 	case ws&declcomma != 0:
 		p.writeByte(',', 1)
@@ -293,6 +294,11 @@ func (p *printer) writeWhitespace(ws whiteSpace) {
 		p.writeByte(' ', 1)
 		p.spaceBefore = true
 	}
+}
+
+func (p *printer) incrementLine(n int) {
+	p.lbraceLine = false
+	p.lineout += line(n)
 }
 
 func (p *printer) markLineIndent(ws whiteSpace) {

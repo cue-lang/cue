@@ -46,7 +46,7 @@ func printNode(node interface{}, f *printer) error {
 		if f.cfg.simplify {
 			ls.markReferences(x)
 		}
-		s.decl(x)
+		s.decl(x, nil)
 	// case ast.Node: // TODO: do we need this?
 	// 	s.walk(x)
 	case []ast.Decl:
@@ -105,6 +105,20 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 	f.before(nil)
 	d := 0
 	hasEllipsis := false
+
+	if len(list) > 0 {
+		if i, ok := list[0].(*ast.Field); ok {
+			if x, ok := i.Label.(*ast.Ident); ok && x.Name == "noam" {
+				fmt.Println(x.Name)
+				fmt.Println(f.lastTok)
+				fmt.Println(f.pos.Line)
+				fmt.Println(x.Pos().Line())
+			}
+		}
+	}
+	inStruct := f.lastTok == token.LBRACE
+	structLine := f.pos.Line
+
 	for i, x := range list {
 		if i > 0 {
 			f.print(declcomma)
@@ -131,7 +145,12 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 			hasEllipsis = true
 			continue
 		}
-		f.decl(x)
+
+		var opts declOpts
+		if inStruct && x.Pos().Line() == structLine {
+			opts.skipTabs = true
+		}
+		f.decl(x, &opts)
 		d = 0
 		if f, ok := x.(*ast.Field); ok {
 			d = nestDepth(f)
@@ -157,7 +176,7 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 		f.print(f.current.parentSep)
 	}
 	if hasEllipsis {
-		f.decl(&ast.Ellipsis{})
+		f.decl(&ast.Ellipsis{}, nil)
 		f.print(f.current.parentSep)
 	}
 	f.after(nil)
@@ -235,7 +254,7 @@ func (f *formatter) inlineField(n *ast.Field) *ast.Field {
 	regular := internal.IsRegularField(n)
 	// shortcut single-element structs.
 	// If the label has a valid position, we assume that an unspecified
-	// Lbrace signals the intend to collapse fields.
+	// Lbrace signals the intent to collapse fields.
 	if !n.Label.Pos().IsValid() && !(f.printer.cfg.simplify && regular) {
 		return nil
 	}
@@ -264,7 +283,14 @@ func (f *formatter) inlineField(n *ast.Field) *ast.Field {
 	return mem
 }
 
-func (f *formatter) decl(decl ast.Decl) {
+type declOpts struct {
+	skipTabs bool
+}
+
+func (f *formatter) decl(decl ast.Decl, opts *declOpts) {
+	if opts == nil {
+		opts = &declOpts{}
+	}
 	if decl == nil {
 		return
 	}
@@ -292,11 +318,11 @@ func (f *formatter) decl(decl ast.Decl) {
 
 			case regular && f.cfg.simplify:
 				f.print(blank, nooverride)
-				f.decl(mem)
+				f.decl(mem, nil)
 
 			case mem.Label.Pos().IsNewline():
 				f.print(indent, formfeed)
-				f.decl(mem)
+				f.decl(mem, nil)
 				f.indent--
 			}
 			return
@@ -304,7 +330,8 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		nextFF := f.nextNeedsFormfeed(n.Value)
 		tab := vtab
-		if nextFF {
+
+		if nextFF || f.lbraceLine {
 			tab = blank
 		}
 
@@ -525,7 +552,6 @@ func (f *formatter) expr1(expr ast.Expr, prec1, depth int) {
 }
 
 func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
-
 	switch x := expr.(type) {
 	case *ast.BadExpr:
 		f.print(x.From, "_|_")
@@ -645,6 +671,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 			ws |= newline | nooverride
 		}
 		f.print(x.Lbrace, token.LBRACE, &l, ws, ff, indent)
+		f.lbraceLine = l == f.lineout
 
 		f.walkDeclList(x.Elts)
 		f.matchUnindent()
@@ -849,7 +876,7 @@ func (f *formatter) binaryExpr(x *ast.BinaryExpr, prec1, cutoff, depth int) {
 	prec := x.Op.Precedence()
 	if prec < prec1 {
 		// parenthesis needed
-		// Note: The parser inserts an syntax.ParenExpr node; thus this case
+		// Note: The parser inserts a syntax.ParenExpr node; thus this case
 		//       can only occur if the AST is created in a different way.
 		// defer p.pushComment(nil).pop()
 		f.print(token.LPAREN, nooverride)

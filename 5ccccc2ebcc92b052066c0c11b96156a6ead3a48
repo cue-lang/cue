@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea0b6a94_004e09c8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T17:12:57Z",
+      "side": 1,
+      "message": "I started by trying to make a more generic codegen/export version of https://review.gerrithub.io/c/cue-lang/cue/+/1192184, and got myself tangled up with test failures.\n\nThen I started trying to refactor the CUE so that I could actually comprehend what was going on. The first thing I did was get rid of the unification with the top level value, and... it was already really fast? This surprised me, but I guess such huge unifications aren\u0027t a good idea.\n\nI thought to myself that we should check this in first, and only consider codegen with shortcuts as an incremental step _if_ it still helps considerably enough.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

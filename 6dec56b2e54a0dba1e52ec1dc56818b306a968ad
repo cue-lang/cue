@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2f86b5ee_8109efe2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 5
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:17:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "74775cb8_1ead3c84",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c3a0813a_132ae94c",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-17T08:47:51Z",
       "side": 1,
       "message": "bad merge conflict?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba4b8d10_8e3a8649",
+        "filename": "cue/testdata/comprehensions/issue837.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 529,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:17:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c3a0813a_132ae94c",
       "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "979407c5_1f28afbc",
+        "filename": "cue/testdata/comprehensions/issue837.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 751,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:17:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a87e6c2d_f5eda8cf",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "365b778c_ad7fc594",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-04-17T08:47:51Z",
       "side": 1,
       "message": "partly duplicate p0 section?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0661dcaf_10ede86c",
+        "filename": "cue/testdata/eval/let.txtar",
+        "patchSetId": 5
+      },
+      "lineNbr": 1017,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:17:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "365b778c_ad7fc594",
       "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f70950a2_62f4332b",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 40,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:17:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f9eeb96a_c5742223",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "8755e48f_5b2e9c5c",
@@ -99,6 +189,24 @@
       "writtenOn": "2024-04-17T08:47:51Z",
       "side": 1,
       "message": "remove or TODO?",
+      "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "25bff345_28563326",
+        "filename": "internal/core/adt/conjunct.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 364,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T13:17:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8755e48f_5b2e9c5c",
       "revId": "6dec56b2e54a0dba1e52ec1dc56818b306a968ad",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

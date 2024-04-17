@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2422a53e_deccf9cd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-17T09:45:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "16787ee5_45225aa6",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7ad5243d_0372c197",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-16T11:40:13Z",
       "side": 1,
       "message": "clarify that you mean in a follow-up CL?",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74129a39_65a971b5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-17T09:45:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7ad5243d_0372c197",
       "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "63fa761b_c5f2daae",
+        "filename": "cmd/cue/cmd/modpublish.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 144,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-17T09:45:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ba789c83_b48c74df",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d36424d_dd02fe31",
@@ -69,6 +123,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "659b8225_1786fccf",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-17T09:45:53Z",
+      "side": 1,
+      "message": "That\u0027s the \"If the git directory is not clean\" test. By definition the files that were git-ignored were not added or committed, so as the comment suggests, removing .gitignore results in those files (not added, committed or ignored) causing a \"not clean\" status.",
+      "parentUuid": "2d36424d_dd02fe31",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d3b7d819_ae0f91ed",
@@ -82,6 +154,24 @@
       "writtenOn": "2024-04-16T11:40:13Z",
       "side": 1,
       "message": "same as before, these comment blocks are very short, each one of them could easily be one line shorter and read more easily",
+      "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e04ccec_13c5c541",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 9
+      },
+      "lineNbr": 32,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-17T09:45:53Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3b7d819_ae0f91ed",
       "revId": "4721d5d91bb1245fa77943ec711f7e222e0ab080",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

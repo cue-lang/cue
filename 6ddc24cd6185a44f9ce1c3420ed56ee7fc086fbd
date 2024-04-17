@@ -92,6 +92,30 @@
       },
       "revId": "6ddc24cd6185a44f9ce1c3420ed56ee7fc086fbd",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0128fab6_ea5fedee",
+        "filename": "cue/testdata/cycle/constraints.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 958,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:44:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d3a53f2e_2605e038",
+      "range": {
+        "startLine": 958,
+        "startChar": 0,
+        "endLine": 958,
+        "endChar": 23
+      },
+      "revId": "6ddc24cd6185a44f9ce1c3420ed56ee7fc086fbd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

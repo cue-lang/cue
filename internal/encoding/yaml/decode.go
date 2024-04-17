@@ -158,15 +158,23 @@ func (d *decoder) Decode() (ast.Expr, error) {
 // Unmarshal parses a single YAML value to a CUE expression.
 func Unmarshal(filename string, data []byte) (ast.Expr, error) {
 	d := NewDecoder(filename, data)
-	x, err := d.Decode()
+	n, err := d.Decode()
 	if err != nil {
 		if err == io.EOF {
 			return nil, nil // empty input
 		}
 		return nil, err
 	}
-	// TODO(mvdan): fail if there are more documents or garbage in the input
-	return x, nil
+	// TODO(mvdan): decoding the entire next value is unnecessary;
+	// consider either a "More" or "Done" method to tell if we are at EOF,
+	// or splitting the Decode method into two variants.
+	// This should use proper error values with positions as well.
+	if n2, err := d.Decode(); err == nil {
+		return nil, fmt.Errorf("%s: expected a single YAML document", n2.Pos())
+	} else if err != io.EOF {
+		return nil, fmt.Errorf("expected a single YAML document: %v", err)
+	}
+	return n, nil
 }
 
 func (d *decoder) extract(yn *yaml.Node) (ast.Expr, error) {

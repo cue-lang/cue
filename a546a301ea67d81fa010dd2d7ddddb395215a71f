@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "3b7bdca4_97d56d60",
+        "filename": "cmd/cue/cmd/testdata/script/dev.txtar",
+        "patchSetId": 8
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T11:31:21Z",
+      "side": 1,
+      "message": "It\u0027s worse, exec cue eval outputs nothing and without error.",
+      "parentUuid": "acf0bd84_40b11b46",
+      "revId": "a546a301ea67d81fa010dd2d7ddddb395215a71f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "4eae0d03_5e25edd2",
         "filename": "cue/context.go",
         "patchSetId": 8
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-15T17:31:14Z",
       "side": 1,
       "message": "this seems unrelated to exposing the evalv3 expeirment, no? Or, if this is needed so that an added test like dev.txtar doesn\u0027t fail, I would make that clear in the commit message.",
+      "revId": "a546a301ea67d81fa010dd2d7ddddb395215a71f",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "90f185be_c2638ede",
+        "filename": "cue/context.go",
+        "patchSetId": 8
+      },
+      "lineNbr": 258,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T11:31:21Z",
+      "side": 1,
+      "message": "It is. The API requires a Value to be finalized. For the new evaluator, this was not always the case.\n\nFixed the underlying root cause in the new evaluator, instead of doing this patch.",
+      "parentUuid": "4eae0d03_5e25edd2",
       "revId": "a546a301ea67d81fa010dd2d7ddddb395215a71f",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

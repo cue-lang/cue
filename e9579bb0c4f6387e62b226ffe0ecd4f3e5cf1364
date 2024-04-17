@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "01624d6c_477e4ddb",
+        "filename": "cue/testdata/benchmarks/issue1684.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T08:53:09Z",
+      "side": 1,
+      "message": "Hmm, isn\u0027t this diff backwards? evalalpha/stats went down, not eval/stats, yet the diff seems to say the opposite. There might be a bug in the earlier CL that added the new evalalpha stats with diffing.",
+      "revId": "e9579bb0c4f6387e62b226ffe0ecd4f3e5cf1364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -52,6 +52,24 @@
       "parentUuid": "d7542dc5_d3690243",
       "revId": "e9579bb0c4f6387e62b226ffe0ecd4f3e5cf1364",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d9915002_3338d22b",
+        "filename": "cue/testdata/benchmarks/issue1684.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-17T13:21:20Z",
+      "side": 1,
+      "message": "OK, but look at the diff header:\n\n    -- diff/-out/evalalpha/stats\u003c\u003d\u003d\u003e+out/eval/stats --\n\nFrom that, my undersanding is that `-` is `out/evalalpha/stats`, and `+` is `out/eval/stats`. I don\u0027t see how anyone could read it any other way.",
+      "parentUuid": "2c889ce5_1b6ef9da",
+      "revId": "e9579bb0c4f6387e62b226ffe0ecd4f3e5cf1364",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

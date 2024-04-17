@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c502d487_8f83a683",
+        "filename": "internal/vcs/copyfs_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:26:49Z",
+      "side": 1,
+      "message": "No license.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9ef67e9c_1cad2577",
+        "filename": "internal/vcs/copyfs_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:26:49Z",
+      "side": 1,
+      "message": "We should then include licenses.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7715d07_716b4b5a",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:26:49Z",
+      "side": 1,
+      "message": "license header.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0a9330ee_e598e87e",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:26:49Z",
+      "side": 1,
+      "message": "doc comment.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1b200478_299e3eff",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:26:49Z",
+      "side": 1,
+      "message": "doc comment.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f044b3a3_d27bb37f",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:26:49Z",
+      "side": 1,
+      "message": "Would Source not be a more general name?\n\nI could imagine using the same interface to implement \"fs\". It does not really matter whether the underlying system is a VCS or not.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e9346b5_f9782333",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-17T12:26:49Z",
+      "side": 1,
+      "message": "license header",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

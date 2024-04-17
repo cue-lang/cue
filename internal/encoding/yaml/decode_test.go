@@ -26,13 +26,15 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/go-quicktest/qt"
+	"github.com/google/go-cmp/cmp"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/encoding/yaml"
-	"github.com/google/go-cmp/cmp"
 )
 
 // These tests are only for the new YAML decoder.
@@ -764,13 +766,6 @@ a:
 "Override anchor":   "Bar"
 "Reuse anchor":      "Bar"`,
 	},
-	// Single document with garbage following it.
-	// TODO(mvdan): This should work for a single Decoder.Decode call,
-	// but it should be an error with Unmarshal.
-	{
-		"---\nhello\n...\n}not yaml",
-		`"hello"`,
-	},
 }
 
 type M map[interface{}]interface{}
@@ -785,7 +780,7 @@ func cueStr(node ast.Node) string {
 
 func newDecoder(t *testing.T, data string) yaml.Decoder {
 	t.Helper()
-	t.Logf("input yaml:\n%s", data)
+	t.Logf("  yaml:\n%s", data)
 	return yaml.NewDecoder("test.yaml", []byte(data))
 }
 
@@ -977,4 +972,27 @@ func TestFiles(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestTrailingInput(t *testing.T) {
+	for _, input := range []string{
+		"---\nfirst\n...\n}invalid yaml",
+		"---\nfirst\n---\nsecond\n",
+	} {
+		t.Run("", func(t *testing.T) {
+			// Unmarshal should fail as it expects one value.
+			wantErr := ".*expected a single YAML document.*"
+			_, err := callUnmarshal(t, input)
+			qt.Assert(t, qt.ErrorMatches(err, wantErr))
+
+			// A single Decode call should succeed, no matter whether there is any valid or invalid trailing input.
+			wantFirst := `"first"`
+			dec := newDecoder(t, input)
+			expr, err := dec.Decode()
+			qt.Assert(t, qt.IsNil(err))
+			gotFirst := cueStr(expr)
+			qt.Assert(t, qt.Equals(gotFirst, wantFirst))
+		})
+	}
+
 }

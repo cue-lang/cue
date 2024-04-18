@@ -85,6 +85,12 @@ func ReadLogins(path string) (*Logins, error) {
 	if err := json.Unmarshal(body, logins); err != nil {
 		return nil, err
 	}
+	// Sanity-check the read data.
+	for regName, regLogin := range logins.Registries {
+		if regLogin.AccessToken == "" {
+			return nil, fmt.Errorf("invalid %s: missing access_token for registry %s", path, regName)
+		}
+	}
 	return logins, nil
 }
 

@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9cf121b6_e5cd397a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:48:56Z",
+      "side": 1,
+      "message": "SGTM except the last comment, I think there\u0027s a minor mistake in the comment or schema",
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "39d7effd_7f4e752e",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:48:56Z",
+      "side": 1,
+      "message": "can you briefly document why these are not required fields?",
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "11201ce7_b260b227",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:48:56Z",
+      "side": 1,
+      "message": "why not `#File!: #BaseFile`?",
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f5fb35f_e71cb04b",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:48:56Z",
+      "side": 1,
+      "message": "central registry, presumably? or should we say \"for publishing the module\"?",
+      "range": {
+        "startLine": 47,
+        "startChar": 34,
+        "endLine": 47,
+        "endChar": 42
+      },
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d9f36ff_140046e1",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:48:56Z",
+      "side": 1,
+      "message": "but you are declaring v0.8.0 here. I\u0027m confused",
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

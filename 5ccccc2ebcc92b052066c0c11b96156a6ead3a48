@@ -16,6 +16,176 @@
       "message": "I started by trying to make a more generic codegen/export version of https://review.gerrithub.io/c/cue-lang/cue/+/1192184, and got myself tangled up with test failures.\n\nThen I started trying to refactor the CUE so that I could actually comprehend what was going on. The first thing I did was get rid of the unification with the top level value, and... it was already really fast? This surprised me, but I guess such huge unifications aren\u0027t a good idea.\n\nI thought to myself that we should check this in first, and only consider codegen with shortcuts as an incremental step _if_ it still helps considerably enough.",
       "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bd7ee4d9_2e1a62d7",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "LGTM modulo a bunch of minor comments and suggestions.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "df3190dc_131a31fa",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "As an aside, I don\u0027t quite see how this potentially concurrent use of the global `typesValue` variable squares with the fact that technically we disallow any concurrent use of any cue.Value derived from the same context.\n\nNote that it\u0027s potentially concurrent because it\u0027s invoked indirectly from `load.Instances`, and there is no convention or documentation that states that that should not be invoked concurrently.\n\nPerhaps it\u0027s OK because we manage to avoid that pitfall somehow, but it\u0027s a nice example of why users might want to do this kind of thing, only to be told \"don\u0027t do that - it\u0027s not supported\", and could potentially use a comment at least to say why it\u0027s OK in this particular instance.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "847c6dea_143dd998",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "Another aside: we should probably stop using deprecated methods like Lookup.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "488e47a9_412ce0bf",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "Just to save peering at the logic:\n\n// update returns the equivalent of v \u0026 i[field][value]\n\n?",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "31854230_4c0c982d",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "Should these actually be required? It seems like that corresponds a bit better to the way that the regular fields were used previously.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6dd5d885_4c71367d",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "Is this actually true still? Are these templates actually unified into the root of this configuration with these changes in place?",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d07b14ea_5e7cc833",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "It would be great to have doc comments for these fields.\n\nAlso, I\u0027m wondering why they are capitalized when some other regular fields at the same level (e.g. `encodings`) are not.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cb61f608_9ef34bd5",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "I think that three above fields should probably be required rather than regular.\n\nISTM that it\u0027s the responsibility of each mod to fill in FileInfo and Default, and it\u0027s the responsibility of the caller to fill in File.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d64023ac_7bf485f0",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "No need for this \"...\" now it\u0027s not a definition?\n\nAlso applies to a bunch of other places below.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "ac474f2a_728ff49f",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:12:45Z",
+      "side": 1,
+      "message": "I know this comment was like this before, but while we\u0027re here: this doesn\u0027t seem to relate well to the CUE it\u0027s commenting.\n\nI\u0027d move it down to just before \"extensions:\" and say:\n\n// extensions maps a file extension to its associated default file properties.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

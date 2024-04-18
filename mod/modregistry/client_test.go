@@ -43,6 +43,7 @@ func TestPutGetModule(t *testing.T) {
 	const testMod = `
 -- cue.mod/module.cue --
 module: "example.com/module@v1"
+language: version: "v0.8.0"
 
 -- x.cue --
 x: 42
@@ -74,6 +75,7 @@ func TestModuleVersions(t *testing.T) {
 		modContents := fmt.Sprintf(`
 -- cue.mod/module.cue --
 module: %q
+language: version: "v0.8.0"
 
 -- x.cue --
 x: 42
@@ -93,6 +95,7 @@ func TestPutGetWithDependencies(t *testing.T) {
 	const testMod = `
 -- cue.mod/module.cue --
 module: "foo.com/bar@v0"
+language: version: "v0.8.0"
 deps: "example.com@v1": v: "v1.2.3"
 deps: "other.com/something@v0": v: "v0.2.3"
 
@@ -128,6 +131,7 @@ func TestGetModuleWithManifest(t *testing.T) {
 	const testMod = `
 -- cue.mod/module.cue --
 module: "foo.com/bar@v0"
+language: version: "v0.8.0"
 deps: "example.com@v1": v: "v1.2.3"
 deps: "other.com/something@v0": v: "v0.2.3"
 
@@ -172,6 +176,7 @@ func TestPutWithInvalidDependencyVersion(t *testing.T) {
 	const testMod = `
 -- cue.mod/module.cue --
 module: "foo.com/bar@v0"
+language: version: "v0.8.0"
 deps: "example.com@v1": v: "v1.2"
 
 -- x.cue --
@@ -195,6 +200,7 @@ var checkModuleTests = []struct {
 	content: `
 -- cue.mod/module.cue --
 module: "foo.com/bar@v0"
+language: version: "v0.8.0"
 `,
 }, {
 	testName: "MismatchedMajorVersion",
@@ -202,6 +208,7 @@ module: "foo.com/bar@v0"
 	content: `
 -- cue.mod/module.cue --
 module: "foo.com/bar@v1"
+language: version: "v0.8.0"
 `,
 	wantError: `module.cue file check failed: module path "foo.com/bar@v1" found in cue.mod/module.cue does not match module path being published "foo.com/bar@v0"`,
 }, {
@@ -210,6 +217,7 @@ module: "foo.com/bar@v1"
 	content: `
 -- cue.mod/module.cue --
 module: "foo@v1.2.3"
+language: version: "v0.8.0"
 `,
 	wantError: `module.cue file check failed: module path foo@v1.2.3 in "cue.mod/module.cue" should contain the major version only`,
 }, {
@@ -218,6 +226,7 @@ module: "foo@v1.2.3"
 	content: `
 -- cue.mod/module.cue --
 module: "foo@v1"
+language: version: "v0.8.0"
 deps: "foo.com/bar@v2": v: "invalid"
 `,
 	wantError: `module.cue file check failed: invalid module.cue file cue.mod/module.cue: cannot make version from module "foo.com/bar@v2", version "invalid": version "invalid" \(of module "foo.com/bar@v2"\) is not well formed`,

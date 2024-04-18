@@ -1,14 +1,12 @@
-# Test that a version is added if not present
+# Test that it fails if a version isn't already present.
 -- cue-version --
 v1.2.3
--- tidy-check-error --
-no language version found in cue.mod/module.cue
 -- want --
-module: "main.org@v0"
-language: {
-	version: "v1.2.3"
-}
+error: no language version declared in module.cue
+-- tidy-check-error --
+no language version declared in module.cue
 -- cue.mod/module.cue --
 module: "main.org@v0"
+
 -- main.cue --
 package main

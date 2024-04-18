@@ -10,7 +10,7 @@ error: failed to resolve "example.com/foo": cannot find module providing package
 module is not tidy: cannot find module providing package example.com/bar@v1
 -- cue.mod/module.cue --
 module: "main.org@v0"
-language: version: "v0.99.99"
+language: version: "v0.8.0"
 -- main.cue --
 package main
 
@@ -24,12 +24,14 @@ import "example.com/foo"
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_v0.0.1/foo/foo.cue --
 package foo
 
 -- _registry/example.com_v1.0.0/cue.mod/module.cue --
 module: "example.com@v1"
+language: version: "v0.8.0"
 
 -- _registry/example.com_v1.0.0/bar/bar.cue --
 package bar

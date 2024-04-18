@@ -8,6 +8,9 @@ cmp stdout want-stdout
 
 -- want-module --
 module: "main.example@v0"
+language: {
+	version: "v0.8.0"
+}
 deps: {
 	"foo.org/bar@v2": {
 		v: "v2.0.0"
@@ -19,6 +22,7 @@ deps: {
 }
 -- cue.mod/module.cue --
 module: "main.example"
+language: version: "v0.8.0"
 -- main.cue --
 package main
 import "foo.org/bar"
@@ -26,6 +30,7 @@ bar
 
 -- _registry/foo.org_bar_v2.0.0/cue.mod/module.cue --
 module: "foo.org/bar@v2"
+language: version: "v0.8.0"
 
 -- _registry/foo.org_bar_v2.0.0/bar.cue --
 package bar
@@ -33,6 +38,7 @@ package bar
 
 -- _registry/foo.org_bar_v1.0.0/cue.mod/module.cue --
 module: "foo.org/bar@v1"
+language: version: "v0.8.0"
 
 -- _registry/foo.org_bar_v1.0.0/bar.cue --
 package bar
@@ -40,6 +46,7 @@ package bar
 
 -- _registry/foo.org_bar_v1.1.0/cue.mod/module.cue --
 module: "foo.org/bar@v1"
+language: version: "v0.8.0"
 
 -- _registry/foo.org_bar_v1.1.0/bar.cue --
 package bar

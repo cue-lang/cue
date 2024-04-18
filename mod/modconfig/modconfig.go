@@ -156,9 +156,12 @@ func (r *Resolver) ResolveToLocation(mpath string, version string) (HostLocation
 func (r *Resolver) ResolveToRegistry(mpath string, version string) (modregistry.RegistryLocation, error) {
 	loc, ok := r.resolver.ResolveToLocation(mpath, version)
 	if !ok {
-		// This can only happen when mpath is invalid, which should not
+		// This can happen when mpath is invalid, which should not
 		// happen in practice, as the only caller is modregistry which
 		// vets module paths before calling Resolve.
+		//
+		// It can also happen when the user has explicitly configured a "none"
+		// registry to avoid falling back to a default registry.
 		return modregistry.RegistryLocation{}, fmt.Errorf("cannot resolve %s (version %s) to registry", mpath, version)
 	}
 	r.mu.Lock()

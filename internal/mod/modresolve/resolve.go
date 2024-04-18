@@ -134,6 +134,7 @@ type registryConfig struct {
 	StripPrefix   bool         `json:"stripPrefix,omitempty"`
 
 	// The following fields are filled in from Registry after parsing.
+	none       bool
 	host       string
 	repository string
 	insecure   bool
@@ -144,7 +145,7 @@ func (r *registryConfig) init() error {
 	if err != nil {
 		return err
 	}
-	r.host, r.repository, r.insecure = r1.host, r1.repository, r1.insecure
+	r.none, r.host, r.repository, r.insecure = r1.none, r1.host, r1.repository, r1.insecure
 
 	if r.PrefixForTags != "" {
 		if !ociref.IsValidTag(r.PrefixForTags) {
@@ -348,6 +349,9 @@ type resolver struct {
 func (r *resolver) initHosts() error {
 	hosts := make(map[string]bool)
 	addHost := func(reg *registryConfig) error {
+		if reg.none {
+			return nil
+		}
 		if insecure, ok := hosts[reg.host]; ok {
 			if insecure != reg.insecure {
 				return fmt.Errorf("registry host %q is specified both as secure and insecure", reg.host)
@@ -416,10 +420,10 @@ func (r *resolver) ResolveToLocation(mpath, vers string) (Location, bool) {
 		// It's a possible match but not necessarily the longest one.
 		bestMatch, bestMatchReg = pat, reg
 	}
-	if bestMatchReg == nil {
+	reg := bestMatchReg
+	if reg == nil || reg.none {
 		return Location{}, false
 	}
-	reg := bestMatchReg
 	loc := Location{
 		Host:     reg.host,
 		Insecure: reg.insecure,
@@ -448,6 +452,12 @@ func (r *resolver) ResolveToLocation(mpath, vers string) (Location, bool) {
 }
 
 func parseRegistry(env0 string) (*registryConfig, error) {
+	if env0 == "none" {
+		return &registryConfig{
+			Registry: env0,
+			none:     true,
+		}, nil
+	}
 	env := env0
 	var suffix string
 	if i := strings.LastIndex(env, "+"); i > 0 {

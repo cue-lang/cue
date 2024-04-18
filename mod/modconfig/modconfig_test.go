@@ -248,6 +248,14 @@ package bar
 	err := os.MkdirAll(configDir, 0o777)
 	qt.Assert(t, qt.IsNil(err))
 
+	// Check logins.json validation.
+	logins.Registries["blank"] = cueconfig.RegistryLogin{TokenType: "Bearer"}
+	err = cueconfig.WriteLogins(filepath.Join(configDir, "logins.json"), logins)
+	delete(logins.Registries, "blank")
+	qt.Assert(t, qt.IsNil(err))
+	_, err = cueconfig.ReadLogins(filepath.Join(configDir, "logins.json"))
+	qt.Assert(t, qt.ErrorMatches(err, "missing access_token for registry blank in .*/logins.json"))
+
 	// Check write-read round-trip.
 	err = cueconfig.WriteLogins(filepath.Join(configDir, "logins.json"), logins)
 	qt.Assert(t, qt.IsNil(err))

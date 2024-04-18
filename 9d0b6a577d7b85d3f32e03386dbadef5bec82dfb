@@ -33,6 +33,24 @@
       "message": "Given that we\u0027ve got a function just above that does just that,\nwhy not use it (and put the TODO there instead) ?\n\nf.indent \u003d tabs(ntabs) ?",
       "revId": "9d0b6a577d7b85d3f32e03386dbadef5bec82dfb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8171177c_19d5bba1",
+        "filename": "cue/literal/quote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:29:17Z",
+      "side": 1,
+      "message": "I\u0027ll simplify all of this when the time for the TODO comes in a few months, so I would honestly not add git log noise. It shouldn\u0027t matter either way given that this code has been like this for a while.",
+      "parentUuid": "abc45a79_94054561",
+      "revId": "9d0b6a577d7b85d3f32e03386dbadef5bec82dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

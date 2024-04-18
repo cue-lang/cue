@@ -23,148 +23,123 @@
 // to be lost. See https://github.com/cue-lang/cue/issues/2319.
 let unimplemented = 1&2
 
+// versions holds an element for each supported version
+// of the schema. The version key specifies that
+// the schema covers all versions from then until the
+// next version present in versions, or until the current CUE version,
+// whichever is earlier.
+versions: [string]: {
+	// #File represents the overarching module file schema.
+	#File!: {
+		// We always require the language version, as we use
+		// that to determine how to parse the file itself.
+		// Note that this schema is not used by [ParseLegacy]
+		// because legacy module.cue files did not support
+		// language.version field.
+		language!: version!: string
+	}
+	// #Strict can be unified with the top level schema to enforce the strict version
+	// of the schema required when publishing a module.
+	#Strict!: _
+}
 
-// #File represents the overarching module file schema.
-#File: {
-	// Reserve fields that are unimplemented for now.
-	{
-		deprecated?: unimplemented
-		retract?:    unimplemented
-		publish?:    unimplemented
+versions: "v0.0.0": {
+	// Historically all fields were allowed.
+	#File: {
+		module?: string
+		...
+	}
+	#Strict: #File
+}
+
+// earliestClosedSchemaVersion holds the earliest module.cue schema version
+// that excludes unknown fields.
+earliestClosedSchemaVersion: "v0.8.0"
+
+versions: (earliestClosedSchemaVersion): {
+	// Define this version in terms of the later versions
+	// rather than the other way around, so that
+	// the latest version is clearest.
+	versions["v0.9.0-alpha.0"]
+
+	// The source field was added in v0.9.0, so "remove"
+	// it here by marking it as unimplemented.
+	#File: source?: unimplemented
+}
+
+versions: "v0.9.0-alpha.0": {
+	#File: {
+		// module indicates the module's path.
+		module?: #Module | ""
+
+		// source holds information about the source of the files within the
+		// module. This field is mandatory at publish time.
+		source?: #Source
+
+		// version indicates the language version used by the code
+		// in this module - the minimum version of CUE required
+		// to evaluate the code in this module. When a later version of CUE
+		// is evaluating code in this module, this will be used to
+		// choose version-specific behavior. If an earlier version of CUE
+		// is used, an error will be given.
+		language?: version?: #Semver
+
+		// description describes the purpose of this module.
+		description?: string
+
+		// deps holds dependency information for modules, keyed by module path.
+		deps?: [#Module]: #Dep
+
 		#Dep: {
-			exclude?:    unimplemented
-			replace?:    unimplemented
-			replaceAll?: unimplemented
+			// v indicates the minimum required version of the module.
+			// This can be null if the version is unknown and the module
+			// entry is only present to be replaced.
+			v!: #Semver | null
+
+			// default indicates this module is used as a default in case
+			// more than one major version is specified for the same module
+			// path. Imports must specify the exact major version for a
+			// module path if there is more than one major version for that
+			// path and default is not set for exactly one of them.
+			// TODO implement this.
+			default?: bool
 		}
-	}
-	// module indicates the module's path.
-	module?: #Module | ""
 
-	// source holds information about the source of the files within the
-	// module. This field is mandatory at publish time.
-	source?: #Source
+		// #Module constrains a module path.
+		// The major version indicator is optional, but should always be present
+		// in a normalized module.cue file.
+		#Module: string
 
-	// version indicates the language version used by the code
-	// in this module - the minimum version of CUE required
-	// to evaluate the code in this module. When a later version of CUE
-	// is evaluating code in this module, this will be used to
-	// choose version-specific behavior. If an earlier version of CUE
-	// is used, an error will be given.
-	language?: version?: #Semver
-
-	// description describes the purpose of this module.
-	description?: string
-
-	// When present, deprecated indicates that the module
-	// is deprecated and includes information about that deprecation, ideally
-	// mentioning an alternative that can be used instead.
-	// TODO implement this.
-	deprecated?: string
-
-	// deps holds dependency information for modules, keyed by module path.
-	deps?: [#Module]: #Dep
-
-	#Dep: {
-		// TODO use the below when mustexist is implemented.
-		// replace and replaceAll are mutually exclusive.
-		//mustexist(<=1, replace, replaceAll)
-		// There must be at least one field specified for a given module.
-		//mustexist(>=1, v, exclude, replace, replaceAll)
-
-		// v indicates the minimum required version of the module.
-		// This can be null if the version is unknown and the module
-		// entry is only present to be replaced.
-		v!: #Semver | null
-
-		// default indicates this module is used as a default in case
-		// more than one major version is specified for the same module
-		// path. Imports must specify the exact major version for a
-		// module path if there is more than one major version for that
-		// path and default is not set for exactly one of them.
-		// TODO implement this.
-		default?: bool
-
-		// exclude excludes a set of versions of the module
-		// TODO implement this.
-		exclude?: [#Semver]: true
-
-		// replace specifies replacements for specific versions of
-		// the module. This field is exclusive with replaceAll.
-		// TODO implement this.
-		replace?: [#Semver]: #Replacement
-
-		// replaceAll specifies a replacement for all versions of the module.
-		// This field is exclusive with replace.
-		// TODO implement this.
-		replaceAll?: #Replacement
+		// #Semver constrains a semantic version.
+		#Semver: =~"."
 	}
 
-	// retract specifies a set of previously published versions to retract.
-	// TODO implement this.
-	retract?: [... #RetractedVersion]
+	// #Strict can be unified with the top level schema to enforce the strict version
+	// of the schema required by the registry.
+	#Strict: #File & {
+		// This regular expression is taken from https://semver.org/spec/v2.0.0.html
+		#Semver: =~#"^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"#
 
-	// The publish section can be used to restrict the scope of a module to prevent
-	// accidental publishing.
-	// TODO complete the definition of this and implement it.
-	publish?: _
+		// WIP: (([\-_~a-zA-Z0-9][.\-_~a-zA-Z0-9]*[\-_~a-zA-Z0-9])|([\-_~a-zA-Z0-9]))(/([\-_~a-zA-Z0-9][.\-_~a-zA-Z0-9]*[\-_~a-zA-Z0-9])|([\-_~a-zA-Z0-9]))*
+		#Module: =~#"^[^@]+(@v(0|[1-9]\d*))$"#
 
-	// #RetractedVersion specifies either a single version
-	// to retract, or an inclusive range of versions to retract.
-	#RetractedVersion: #Semver | {
-		from!: #Semver
-		// TODO constrain to to be after from?
-		to!: #Semver
+		// The module declaration is required.
+		module!: #Module
+
+		// No null versions, because no replacements yet.
+		#Dep: v!: #Semver
 	}
 
-	// #Replacement specifies a replacement for a module. It can either
-	// be a reference to a local directory or an alternative module with associated
-	// version.
-	#Replacement: string | {
-		m!: #Module
-		v!: #Semver
+	// #Source describes a source of truth for a module's content.
+	#Source: {
+		// kind specifies the kind of source.
+		//
+		// The special value "none" signifies that the module that is
+		// standalone, associated with no particular source other than
+		// the contents of the module itself.
+		kind!: "self" | "git"
+
+		// TODO support for other VCSs:
+		// kind!: "self" | "git" | "bzr" | "hg" | "svn"
 	}
-
-	// #Module constrains a module path.
-	// The major version indicator is optional, but should always be present
-	// in a normalized module.cue file.
-	#Module: string
-
-	// #Semver constrains a semantic version.
-	#Semver: =~"."
-}
-
-// _#Strict can be unified with the top level schema to enforce the strict version
-// of the schema required by the registry.
-#Strict: #File & {
-	// This regular expression is taken from https://semver.org/spec/v2.0.0.html
-	#Semver: =~#"^v(?P<major>0|[1-9]\d*)\.(?P<minor>0|[1-9]\d*)\.(?P<patch>0|[1-9]\d*)(?:-(?P<prerelease>(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+(?P<buildmetadata>[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*))?$"#
-
-	// WIP: (([\-_~a-zA-Z0-9][.\-_~a-zA-Z0-9]*[\-_~a-zA-Z0-9])|([\-_~a-zA-Z0-9]))(/([\-_~a-zA-Z0-9][.\-_~a-zA-Z0-9]*[\-_~a-zA-Z0-9])|([\-_~a-zA-Z0-9]))*
-	#Module: =~#"^[^@]+(@v(0|[1-9]\d*))$"#
-
-	// We don't yet implement local file replacement (specified as a string)
-	// so require a struct, thus allowing only replacement by some other module.
-	#Replacement: {...}
-
-	// The module declaration is required.
-	module!: #Module
-
-	// No null versions, because no replacements yet.
-	#Dep: v!: #Semver
-
-	// TODO require the CUE version?
-	// language!: version!: _
-}
-
-// #Source describes a source of truth for a module's content.
-#Source: {
-	// kind specifies the kind of source.
-	//
-	// The special value "none" signifies that the module that is
-	// standalone, associated with no particular source other than
-	// the contents of the module itself.
-	kind!: "self" | "git"
-
-	// TODO support for other VCSs:
-	// kind!: "self" | "git" | "bzr" | "hg" | "svn"
 }

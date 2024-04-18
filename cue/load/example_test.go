@@ -127,6 +127,7 @@ func setUpModulesExample() (env []string, cleanup func()) {
 	registryArchive := txtar.Parse([]byte(`
 -- foo.example_v0.0.1/cue.mod/module.cue --
 module: "foo.example@v0"
+language: version: "v0.8.0"
 -- foo.example_v0.0.1/bar/bar.cue --
 package bar
 

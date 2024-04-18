@@ -3,6 +3,9 @@
 bar.com
 -- want --
 module: "main.org@v0"
+language: {
+	version: "v0.8.0"
+}
 deps: {
 	"bar.com@v0": {
 		v: "v0.5.0"
@@ -10,6 +13,7 @@ deps: {
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"
+language: version: "v0.8.0"
 deps: {
 	"bar.com@v0": {
 		v: "v0.0.2"
@@ -20,12 +24,14 @@ package main
 
 -- _registry/bar.com_v0.0.2/cue.mod/module.cue --
 module: "bar.com@v0"
+language: version: "v0.8.0"
 
 -- _registry/bar.com_v0.0.2/bar/x.cue --
 package bar
 
 -- _registry/bar.com_v0.5.0/cue.mod/module.cue --
 module: "bar.com@v0"
+language: version: "v0.8.0"
 
 -- _registry/bar.com_v0.5.0/bar/x.cue --
 package bar

@@ -151,6 +151,7 @@ func (n *nodeContext) insertComprehension(
 	}
 
 	if ec.done && len(ec.envs) == 0 {
+		n.decComprehension(c)
 		return
 	}
 
@@ -408,12 +409,19 @@ func (n *nodeContext) processComprehension(d *envYield, state vertexStatus) *Bot
 	// NOTE: we cannot move this to defer in processComprehensionInner, as we
 	// use panics to implement "yielding" (and possibly coroutines in the
 	// future).
-	cc := d.leaf.cc
-	if cc != nil {
-		cc.decDependent(n.ctx, COMP, d.leaf.arcCC)
-	}
-	d.leaf.cc = nil
+	n.decComprehension(d.leaf)
+
 	return err
+}
+
+func (n *nodeContext) decComprehension(p *Comprehension) {
+	for ; p != nil; p = p.parent {
+		cc := p.cc
+		if cc != nil {
+			cc.decDependent(n.ctx, COMP, p.arcCC)
+		}
+		p.cc = nil
+	}
 }
 
 func (n *nodeContext) processComprehensionInner(d *envYield, state vertexStatus) *Bottom {

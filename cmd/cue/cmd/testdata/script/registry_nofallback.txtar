@@ -1,0 +1,28 @@
+# Check that we can explicitly avoid falling back to the default registry.
+env CUE_REGISTRY=foo.com=$CUE_REGISTRY1,none
+! exec cue eval .
+cmp stderr expect-stderr
+
+-- expect-stderr --
+import failed: cannot find package "example.com@v0": cannot fetch example.com@v0.0.1: cannot resolve example.com (version v0.0.1) to registry:
+    ./main.cue:2:8
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+deps: {
+	"example.com@v0": {
+		v: "v0.0.1"
+	}
+}
+-- main.cue --
+package main
+import "example.com@v0:main"
+
+main
+
+-- _registry1/example.com_v0.0.1/cue.mod/module.cue --
+module: "example.com@v0"
+language: version: "v0.8.0"
+
+-- _registry1/example.com_v0.0.1/top.cue --
+package main

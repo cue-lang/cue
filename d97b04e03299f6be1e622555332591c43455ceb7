@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e8c55990_f9720ab8",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 30,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T16:24:42Z",
+      "side": 1,
+      "message": "I made them required fields 😊",
+      "parentUuid": "39d7effd_7f4e752e",
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "11201ce7_b260b227",
@@ -48,6 +66,24 @@
       "writtenOn": "2024-04-18T15:48:56Z",
       "side": 1,
       "message": "why not `#File!: #BaseFile`?",
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03f6a5c0_96a4ca59",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T16:24:42Z",
+      "side": 1,
+      "message": "Yeah. Actually I realised that #BaseFile doesn\u0027t really add much value, so I just inlined it.",
+      "parentUuid": "11201ce7_b260b227",
       "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +111,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a97b7c83_8f338960",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 47,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T16:24:42Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8f5fb35f_e71cb04b",
+      "range": {
+        "startLine": 47,
+        "startChar": 34,
+        "endLine": 47,
+        "endChar": 42
+      },
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2d9f36ff_140046e1",
@@ -88,6 +148,24 @@
       "writtenOn": "2024-04-18T15:48:56Z",
       "side": 1,
       "message": "but you are declaring v0.8.0 here. I\u0027m confused",
+      "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "99e7feca_3d104ced",
+        "filename": "mod/modfile/schema.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T16:24:42Z",
+      "side": 1,
+      "message": "We\u0027re defining v0.8.0 in terms of v0.9.0 by declaring the new optional field as unimplemented so it\u0027s an error if used.\n\nAn alternative would be to define v0.9.0 in terms of v0.8.0, so in practice every subsequent version will be defined in terms of a chain of schemas leading back to the first one. But doing it that way makes the final schema harder to read because it\u0027s defined in terms of the earlier schemas.\n\nThis approach was informed by previous experiences of implementing new versions in a versioned-API context, where it\u0027s better to define the old version in terms of the new rather than the other way around, because eventually you can remove the old versions when they\u0027re finally deprecated without any other changes.\n\nOf course, this approach won\u0027t work if we make backwardly incompatible changes to the schema, but I\u0027m hoping we don\u0027t have to do that.\n\nI\u0027ll update the comment to make this a bit clearer.",
+      "parentUuid": "2d9f36ff_140046e1",
       "revId": "d97b04e03299f6be1e622555332591c43455ceb7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

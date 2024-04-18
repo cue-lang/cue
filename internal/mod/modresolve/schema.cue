@@ -65,9 +65,15 @@
 	// repoPrefix is used to determine the repository to use for a
 	// specific module.
 	//
+	// As a special case, the registry may be "none", indicating
+	// that there is no registry for its associated modules.
+	// If a module resolves to a "none" registry, the resolver
+	// will return an error.
+	//
 	// Examples:
 	//	"localhost:1234"
 	//	"myregistry.example/my-modules+secure"
+	//	"none"
 	registry!: string
 
 	// pathEncoding specifies how module versions map to

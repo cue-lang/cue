@@ -32,6 +32,7 @@ main:             "main"
 "example.com@v0": "v0.0.1"
 -- main/cue.mod/module.cue --
 module: "main.org"
+language: version: "v0.9.0-alpha.0"
 deps: "example.com@v0": v: "v0.0.1"
 
 -- main/main.cue --
@@ -43,6 +44,7 @@ main
 
 -- example/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.9.0-alpha.0"
 
 source: kind: "self"
 

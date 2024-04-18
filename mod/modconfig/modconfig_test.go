@@ -39,11 +39,13 @@ func TestNewRegistry(t *testing.T) {
 	modules := txtar.Parse([]byte(`
 -- r1/foo.example_v0.0.1/cue.mod/module.cue --
 module: "foo.example@v0"
+language: version: "v0.8.0"
 deps: "bar.example@v0": v: "v0.0.1"
 -- r1/foo.example_v0.0.1/bar/bar.cue --
 package bar
 -- r1/bar.example_v0.0.1/cue.mod/module.cue --
 module: "bar.example@v0"
+language: version: "v0.8.0"
 -- r1/bar.example_v0.0.1/y/y.cue --
 package y
 
@@ -54,6 +56,7 @@ package y
 }
 -- r2/bar.example_v0.0.1/cue.mod/module.cue --
 module: "bar.example@v0"
+language: version: "v0.8.0"
 -- r2/bar.example_v0.0.1/x/x.cue --
 package x
 `))
@@ -136,6 +139,7 @@ func TestDefaultTransportSetsUserAgent(t *testing.T) {
 	modules := txtar.Parse([]byte(`
 -- bar.example_v0.0.1/cue.mod/module.cue --
 module: "bar.example@v0"
+language: version: "v0.8.0"
 -- bar.example_v0.0.1/x/x.cue --
 package x
 `))
@@ -191,6 +195,7 @@ func TestConcurrentTokenRefresh(t *testing.T) {
 		fsys := txtarfs.FS(txtar.Parse([]byte(fmt.Sprintf(`
 -- %s_v0.0.1/cue.mod/module.cue --
 module: "%s@v0"
+language: version: "v0.8.0"
 -- %s_v0.0.1/bar/bar.cue --
 package bar
 `, reg.mod, reg.mod, reg.mod))))

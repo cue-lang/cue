@@ -14,6 +14,7 @@ cmp stdout ../../expect-publish-stdout
 published example.com@v0.0.1
 -- example/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.9.0-alpha.0"
 
 source: kind: "self"
 

@@ -1,27 +1,12 @@
-# Check that cue mod tidy adds the language version to the
-# module.cue file when there is one. Note that because
-# the version is taken from the build info, we need to use
-# the CUE_VERSION_OVERRIDE environment variable.
-# We get confidence in the actual buildinfo logic because exactly
-# the same code is used behind the scenes for the `cue version`
-# implementation too.
+# Check that cue mod tidy fails when there is no version
+# present in the module.cue file.
 
-env CUE_VERSION_OVERRIDE=v0.1.2
-exec cue mod tidy
-cmp cue.mod/module.cue want-module
+env CUE_VERSION_OVERRIDE=v0.8.100
+! exec cue mod tidy
+cmp stderr want-stderr
 
-# Check that the resulting module evaluates as expected.
-exec cue export .
-cmp stdout want-stdout
--- want-stdout --
-{
-    "x": 1
-}
--- want-module --
-module: "main.org@v0"
-language: {
-	version: "v0.1.2"
-}
+-- want-stderr --
+no language version declared in module.cue
 -- cue.mod/module.cue --
 module: "main.org@v0"
 
@@ -31,6 +16,6 @@ x: 1
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
-
+language: version: "v0.8.0"
 -- _registry/example.com_v0.0.1/top.cue --
 package main

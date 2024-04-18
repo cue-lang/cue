@@ -85,6 +85,12 @@ func ReadLogins(path string) (*Logins, error) {
 	if err := json.Unmarshal(body, logins); err != nil {
 		return nil, err
 	}
+	// Sanity-check the read data.
+	for k, v := range logins.Registries {
+		if v.AccessToken == "" && v.RefreshToken == "" {
+			delete(logins.Registries, k)
+		}
+	}
 	return logins, nil
 }
 

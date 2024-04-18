@@ -2,7 +2,7 @@
 # run in the module's root directory.
 
 cd x/y
-env CUE_VERSION_OVERRIDE=v0.1.2
+env CUE_VERSION_OVERRIDE=v0.8.100
 exec cue mod tidy
 cd $WORK
 cmp cue.mod/module.cue want-module
@@ -10,12 +10,14 @@ cmp cue.mod/module.cue want-module
 -- want-module --
 module: "main.org@v0"
 language: {
-	version: "v0.1.2"
+	version: "v0.8.0"
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"
+language: version: "v0.8.0"
 -- x/y/z.cue --
 package y
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 // This file is just here to ensure that CUE_REGISTRY etc is set.
 module: "example.com@v0"
+language: version: "v0.8.0"

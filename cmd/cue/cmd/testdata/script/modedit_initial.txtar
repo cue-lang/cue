@@ -19,15 +19,25 @@ cmp cue.mod/module.cue want-module-5
 
 -- cue.mod/module.cue --
 module: "main.org@v0"
+language: version: "v0.9.0-alpha.0"
 -- want-module-1 --
 module: "main.org@v0"
+language: {
+	version: "v0.9.0-alpha.0"
+}
 source: {
 	kind: "git"
 }
 -- want-module-2 --
 module: "main.org@v0"
+language: {
+	version: "v0.9.0-alpha.0"
+}
 -- want-module-3 --
 module: "main.org@v0"
+language: {
+	version: "v0.9.0-alpha.0"
+}
 deps: {
 	"foo.bar@v0": {
 		v: "v0.2.3"
@@ -37,5 +47,11 @@ deps: {
 invalid argument "bad-module!" for "--require" flag: invalid module path@version "bad-module!"
 -- want-module-4 --
 module: "main.org@v0"
+language: {
+	version: "v0.9.0-alpha.0"
+}
 -- want-module-5 --
 module: "othermain.org@v1"
+language: {
+	version: "v0.9.0-alpha.0"
+}

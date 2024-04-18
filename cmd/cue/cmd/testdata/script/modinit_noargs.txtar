@@ -1,6 +1,6 @@
 # TODO we might want to deprecate or remove the ability to create
 # module file with an empty module directive.
-env CUE_VERSION_OVERRIDE=v0.1.2
+env CUE_VERSION_OVERRIDE=v0.8.100
 exec cue mod init
 cmp cue.mod/module.cue want-module.cue
 exists cue.mod/usr
@@ -9,5 +9,5 @@ exists cue.mod/pkg
 -- want-module.cue --
 module: ""
 language: {
-	version: "v0.1.2"
+	version: "v0.8.100"
 }

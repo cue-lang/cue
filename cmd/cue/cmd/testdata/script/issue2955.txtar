@@ -29,6 +29,7 @@ e.foo
 
 -- cue.mod/module.cue --
 module: "test.org"
+language: version: "v0.8.0"
 -- _registry/auth.json --
 {
 	"useTokenServer": true,
@@ -39,6 +40,7 @@ module: "test.org"
 }
 -- _registry/example.com_e_v0.0.1/cue.mod/module.cue --
 module: "example.com/e@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_e_v0.0.1/main.cue --
 package e

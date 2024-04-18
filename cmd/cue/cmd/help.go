@@ -255,6 +255,9 @@ Examples:
 	CUE_REGISTRY=localhost:5000
 	CUE_REGISTRY='[::1]:5000'
 
+The special name "none" can be used to indicate that no registry
+should be used.
+
 If a path is present too, all modules will be stored under that path.
 
 For example:
@@ -290,6 +293,18 @@ the registry at localhost:5000. All other modules will be fetched from
 Note that the syntax above implies that the ordering of the elements in
 CUE_REGISTRY isn't important because the resolution algorithm is
 order-independent.
+
+To specify that no registry should be used for a given module prefix,
+the special name "none" can be used.
+
+For example:
+
+	CUE_REGISTRY='foo.example/bar=none,myregistry.example'
+
+In the above example, any attempt to fetch a module under "foo.example/bar"
+will result in a failure to fetch from the registry. Note that this will not
+take effect if the module is already present in the on-disk cache,
+which is consulted before looking at CUE_REGISTRY.
 
 
 Customizing Name Resolution

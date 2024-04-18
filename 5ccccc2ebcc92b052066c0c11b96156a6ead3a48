@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "75d0e3c2_4b37ad14",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 97,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "I\u0027m not sure it\u0027s OK either to be honest. I\u0027ve added a TODO.",
+      "parentUuid": "df3190dc_131a31fa",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "847c6dea_143dd998",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-04-18T14:12:45Z",
       "side": 1,
       "message": "Another aside: we should probably stop using deprecated methods like Lookup.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "22c60945_7dbd1ff9",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 102,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "Indeed, this file is swimming in deprecations, but I want to tackle one issue at a time.",
+      "parentUuid": "847c6dea_143dd998",
       "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a4c7071e_482d8779",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 132,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "Done, and renamed to unifyWith so it\u0027s clearer too.",
+      "parentUuid": "488e47a9_412ce0bf",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "31854230_4c0c982d",
@@ -99,6 +153,24 @@
       "writtenOn": "2024-04-18T14:12:45Z",
       "side": 1,
       "message": "Should these actually be required? It seems like that corresponds a bit better to the way that the regular fields were used previously.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "301105f9_1957dc68",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 25,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "Good point, and this gives slightly better error messages for a missing value too. done",
+      "parentUuid": "31854230_4c0c982d",
       "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +192,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c926a8cd_7a5f0422",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 61,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "Well spotted, the entire point of this change is to remove this root-level unification.",
+      "parentUuid": "6dd5d885_4c71367d",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d07b14ea_5e7cc833",
@@ -133,6 +223,24 @@
       "writtenOn": "2024-04-18T14:12:45Z",
       "side": 1,
       "message": "It would be great to have doc comments for these fields.\n\nAlso, I\u0027m wondering why they are capitalized when some other regular fields at the same level (e.g. `encodings`) are not.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "48543b94_6d7c6e1d",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 64,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "I would document them if I fully understood their purpose, but I\u0027m not quite there yet. I only named them this to keep the changes in this CL to an absolute minimum. Note how e.g. `LookupDef(\"Default\")` is now `Lookup(\"Default\")`. Added a TODO.",
+      "parentUuid": "d07b14ea_5e7cc833",
       "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +262,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eadb8a6_b44ad77d",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "Not quite - note how FileInfo is filled from both the Go API and each mode, and File is not declared anywhere else. I\u0027ve left a TODO about making them required, because I\u0027m not sure it\u0027s actually best to do that.",
+      "parentUuid": "cb61f608_9ef34bd5",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d64023ac_7bf485f0",
@@ -171,6 +297,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1a7b5450_a6606c6b",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 75,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d64023ac_7bf485f0",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "ac474f2a_728ff49f",
@@ -184,6 +328,24 @@
       "writtenOn": "2024-04-18T14:12:45Z",
       "side": 1,
       "message": "I know this comment was like this before, but while we\u0027re here: this doesn\u0027t seem to relate well to the CUE it\u0027s commenting.\n\nI\u0027d move it down to just before \"extensions:\" and say:\n\n// extensions maps a file extension to its associated default file properties.",
+      "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d84e8997_94a044fe",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 156,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:20:15Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "ac474f2a_728ff49f",
       "revId": "5ccccc2ebcc92b052066c0c11b96156a6ead3a48",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

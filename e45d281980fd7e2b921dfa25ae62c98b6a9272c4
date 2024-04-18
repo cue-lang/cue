@@ -16,6 +16,24 @@
       "message": "add a TODO to include a file position here and use proper cue errors that allow those positions to be found?",
       "revId": "e45d281980fd7e2b921dfa25ae62c98b6a9272c4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6c4f6aa_b07d8b1f",
+        "filename": "internal/encoding/yaml/decode.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 174,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:31:55Z",
+      "side": 1,
+      "message": "Done; for better or worse the entire decoder uses plain errors for now, it\u0027s rather limited by yaml.v3.",
+      "parentUuid": "6440e588_fa2f4e67",
+      "revId": "e45d281980fd7e2b921dfa25ae62c98b6a9272c4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

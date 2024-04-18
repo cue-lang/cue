@@ -112,7 +112,7 @@ func (f *File) Format() ([]byte, error) {
 		// it's almost certainly a bogus version because all versions
 		// we care about fail when there are unknown fields, but the
 		// original schema allowed all fields.
-		return nil, fmt.Errorf("language version %v is too early for module.cue (need at least %v)", f.Language.Version, earliestClosedSchemaVersion())
+		return nil, fmt.Errorf("language version %v is too early for module.cue (need at least %v)", f.Language.Version, EarliestClosedSchemaVersion())
 	}
 	return data, err
 }
@@ -160,7 +160,11 @@ func lookup(v cue.Value, sels ...cue.Selector) cue.Value {
 	return v.LookupPath(cue.MakePath(sels...))
 }
 
-func earliestClosedSchemaVersion() string {
+// EarliestClosedSchemaVersion returns the earliest module.cue schema version
+// that excludes unknown fields. Any version declared in a module.cue file
+// should be at least this, because that's when we added the language.version
+// field itself.
+func EarliestClosedSchemaVersion() string {
 	v, _ := moduleSchemaDo(func(ctx *cue.Context, info *schemaInfo) (string, error) {
 		return info.EarliestClosedSchemaVersion, nil
 	})

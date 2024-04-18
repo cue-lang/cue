@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3877a002_4e42bc9b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:17:23Z",
+      "side": 1,
+      "message": "Nice, with one tiny suggestion.",
+      "revId": "9d0b6a577d7b85d3f32e03386dbadef5bec82dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "abc45a79_94054561",
+        "filename": "cue/literal/quote.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 69,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T14:17:23Z",
+      "side": 1,
+      "message": "Given that we\u0027ve got a function just above that does just that,\nwhy not use it (and put the TODO there instead) ?\n\nf.indent \u003d tabs(ntabs) ?",
+      "revId": "9d0b6a577d7b85d3f32e03386dbadef5bec82dfb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

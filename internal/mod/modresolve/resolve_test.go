@@ -164,6 +164,30 @@ func TestParseCUERegistry(t *testing.T) {
 			},
 		},
 	}, {
+		testName:        "PrefixWithCatchAllDefaultAndExplicitNoneFallback",
+		in:              "example.com=registry.example.com/offset,none",
+		catchAllDefault: "registry.somewhere",
+		wantAllHosts:    []Host{{"registry.example.com", false}},
+		lookups: map[string]*Location{
+			"fruit.com/apple": nil,
+			"example.com/blah": {
+				Host:       "registry.example.com",
+				Repository: "offset/example.com/blah",
+			},
+		},
+	}, {
+		testName:        "PrefixWithExplicitNone",
+		in:              "example.com=none",
+		catchAllDefault: "registry.somewhere",
+		wantAllHosts:    []Host{{"registry.somewhere", false}},
+		lookups: map[string]*Location{
+			"fruit.com/apple": {
+				Host:       "registry.somewhere",
+				Repository: "fruit.com/apple",
+			},
+			"example.com/blah": nil,
+		},
+	}, {
 		testName:     "LocalhostIsInsecure",
 		in:           "localhost:5000",
 		wantAllHosts: []Host{{"localhost:5000", true}},
@@ -330,6 +354,9 @@ moduleRegistries: {
 		registry: "r3.example/repo"
 		stripPrefix: true
 	}
+	"badmodules.org": {
+		registry: "none"
+	}
 }
 `,
 		wantAllHosts: []Host{{
@@ -386,6 +413,8 @@ moduleRegistries: {
 				Repository: "repo",
 				Tag:        "v0.0.1",
 			},
+			"badmodules.org/something v1.2.3": nil,
+			"badmodules.org v1.2.3":           nil,
 		},
 	}, {
 		testName: "InvalidModulePath",

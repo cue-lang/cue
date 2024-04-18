@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7a4b0c59_942351fe",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-18T15:51:32Z",
+      "side": 1,
+      "message": "I would personally remove this part; you\u0027re not fetching from any registry, which is the entire point. You just result in... a failure.",
+      "range": {
+        "startLine": 305,
+        "startChar": 24,
+        "endLine": 305,
+        "endChar": 51
+      },
+      "revId": "47437a534ce970593e88837e6c49738f4b6d503d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -33,6 +33,24 @@
       "message": "Seems reasonable, but I do wonder if we shouldn\u0027t just reject a manifestly bad configuration like this, as it\u0027s perhaps more likely to represent a mistake than genuine intent. WDYT?",
       "revId": "30acd5bfe92f72564c3f9edd1c500d6a9621c901",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0e77987d_f89c967a",
+        "filename": "internal/cueconfig/config.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 88,
+      "author": {
+        "id": 1037639
+      },
+      "writtenOn": "2024-04-18T13:36:44Z",
+      "side": 1,
+      "message": "Good point, updated.",
+      "parentUuid": "9094dad6_7a9236ba",
+      "revId": "30acd5bfe92f72564c3f9edd1c500d6a9621c901",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

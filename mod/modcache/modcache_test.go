@@ -27,6 +27,7 @@ func TestRequirements(t *testing.T) {
 	r := newRegistry(t, `
 -- example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
+language: version: "v0.8.0"
 deps: {
 	"foo.com/bar/hello@v0": v: "v0.2.3"
 	"bar.com@v0": v: "v0.5.0"
@@ -84,6 +85,7 @@ func TestFetch(t *testing.T) {
 	registryContents := `
 -- example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
+language: version: "v0.8.0"
 deps: {
 	"foo.com/bar/hello@v0": v: "v0.2.3"
 	"bar.com@v0": v: "v0.5.0"

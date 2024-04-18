@@ -1,8 +1,8 @@
-# Check that cue mod tidy chooses a correct base version
+# Check that cue mod init chooses a correct base version
 # when provided with a pseudo-version.
 
-env CUE_VERSION_OVERRIDE=v0.7.1-0.20240130142347-7855e15cb701
-exec cue mod tidy
+env CUE_VERSION_OVERRIDE=v0.8.20-0.20240130142347-7855e15cb701
+exec cue mod init main.org
 cmp cue.mod/module.cue want-module
 
 # Check that the resulting module evaluates as expected.
@@ -15,17 +15,14 @@ cmp stdout want-stdout
 -- want-module --
 module: "main.org@v0"
 language: {
-	version: "v0.7.0"
+	version: "v0.8.19"
 }
--- cue.mod/module.cue --
-module: "main.org@v0"
-
 -- main.cue --
 package main
 x: 1
-
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_v0.0.1/top.cue --
 package main

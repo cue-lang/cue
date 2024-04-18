@@ -35,6 +35,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cueversion"
 	"cuelang.org/go/mod/module"
 )
 
@@ -51,6 +52,19 @@ type File struct {
 	// defaultMajorVersions maps from module base path to the
 	// major version default for that path.
 	defaultMajorVersions map[string]string
+	// actualSchemaVersion holds the actual schema version
+	// that was used to validate the file. This will be one of the
+	// entries in the versions field in schema.cue and
+	// is set by the Parse functions.
+	actualSchemaVersion string
+}
+
+// baseFileVersion is used to decode the language version
+// to decide how to decode the rest of the file.
+type baseFileVersion struct {
+	Language struct {
+		Version string `json:"version"`
+	} `json:"language"`
 }
 
 // Source represents how to transform from a module's
@@ -88,8 +102,17 @@ func (f *File) Format() ([]byte, error) {
 	// Sanity check that it can be parsed.
 	// TODO this could be more efficient by checking all the file fields
 	// before formatting the output.
-	if _, err := ParseNonStrict(data, "-"); err != nil {
+	f1, err := ParseNonStrict(data, "-")
+	if err != nil {
 		return nil, fmt.Errorf("cannot round-trip module file: %v", strings.TrimSuffix(errors.Details(err, nil), "\n"))
+	}
+	if f.Language != nil && f1.actualSchemaVersion == "v0.0.0" {
+		// It's not a legacy module file (because the language field is present)
+		// but we've used the legacy schema to parse it, which means that
+		// it's almost certainly a bogus version because all versions
+		// we care about fail when there are unknown fields, but the
+		// original schema allowed all fields.
+		return nil, fmt.Errorf("language version %v is too early for module.cue (need at least %v)", f.Language.Version, earliestClosedSchemaVersion())
 	}
 	return data, err
 }
@@ -111,27 +134,37 @@ var (
 	moduleSchemaOnce sync.Once // guards the creation of _moduleSchema
 	// TODO remove this mutex when https://cuelang.org/issue/2733 is fixed.
 	moduleSchemaMutex sync.Mutex // guards any use of _moduleSchema
-	_moduleSchema     cue.Value
+	_schemas          schemaInfo
+	_cueContext       *cue.Context
 )
 
-func moduleSchemaDo[T any](f func(moduleSchema cue.Value) (T, error)) (T, error) {
+type schemaInfo struct {
+	Versions                    map[string]cue.Value `json:"versions"`
+	EarliestClosedSchemaVersion string               `json:"earliestClosedSchemaVersion"`
+}
+
+func moduleSchemaDo[T any](f func(*cue.Context, *schemaInfo) (T, error)) (T, error) {
 	moduleSchemaOnce.Do(func() {
-		ctx := cuecontext.New()
-		schemav := ctx.CompileBytes(moduleSchemaData, cue.Filename("cuelang.org/go/mod/modfile/schema.cue"))
-		schemav = lookup(schemav, cue.Def("#File"))
-		//schemav = schemav.Unify(lookup(schemav, cue.Hid("#Strict", "_")))
-		if err := schemav.Validate(); err != nil {
+		_cueContext = cuecontext.New()
+		schemav := _cueContext.CompileBytes(moduleSchemaData, cue.Filename("cuelang.org/go/mod/modfile/schema.cue"))
+		if err := schemav.Decode(&_schemas); err != nil {
 			panic(fmt.Errorf("internal error: invalid CUE module.cue schema: %v", errors.Details(err, nil)))
 		}
-		_moduleSchema = schemav
 	})
 	moduleSchemaMutex.Lock()
 	defer moduleSchemaMutex.Unlock()
-	return f(_moduleSchema)
+	return f(_cueContext, &_schemas)
 }
 
 func lookup(v cue.Value, sels ...cue.Selector) cue.Value {
 	return v.LookupPath(cue.MakePath(sels...))
+}
+
+func earliestClosedSchemaVersion() string {
+	v, _ := moduleSchemaDo(func(ctx *cue.Context, info *schemaInfo) (string, error) {
+		return info.EarliestClosedSchemaVersion, nil
+	})
+	return v
 }
 
 // Parse verifies that the module file has correct syntax.
@@ -147,8 +180,8 @@ func Parse(modfile []byte, filename string) (*File, error) {
 // that only supports the single field "module" and ignores all other
 // fields.
 func ParseLegacy(modfile []byte, filename string) (*File, error) {
-	return moduleSchemaDo(func(schema cue.Value) (*File, error) {
-		v := schema.Context().CompileBytes(modfile, cue.Filename(filename))
+	return moduleSchemaDo(func(ctx *cue.Context, _ *schemaInfo) (*File, error) {
+		v := ctx.CompileBytes(modfile, cue.Filename(filename))
 		if err := v.Err(); err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file")
 		}
@@ -157,7 +190,8 @@ func ParseLegacy(modfile []byte, filename string) (*File, error) {
 			return nil, newCUEError(err, filename)
 		}
 		return &File{
-			Module: f.Module,
+			Module:              f.Module,
+			actualSchemaVersion: "v0.0.0",
 		}, nil
 	})
 }
@@ -178,19 +212,69 @@ func parse(modfile []byte, filename string, strict bool) (*File, error) {
 	}
 	// TODO disallow non-data-mode CUE.
 
-	mf, err := moduleSchemaDo(func(schema cue.Value) (*File, error) {
-		v := schema.Context().BuildFile(file)
+	mf, err := moduleSchemaDo(func(ctx *cue.Context, schemas *schemaInfo) (*File, error) {
+		v := ctx.BuildFile(file)
 		if err := v.Validate(cue.Concrete(true)); err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid module.cue file value")
 		}
-		v = v.Unify(schema)
+		// First determine the declared version of the module file.
+		var base baseFileVersion
+		if err := v.Decode(&base); err != nil {
+			return nil, errors.Wrapf(err, token.NoPos, "cannot determine language version")
+		}
+		if base.Language.Version == "" {
+			// TODO is something different we could do here?
+			return nil, fmt.Errorf("no language version declared in module.cue")
+		}
+		if !semver.IsValid(base.Language.Version) {
+			return nil, fmt.Errorf("language version %q in module.cue is not valid semantic version", base.Language.Version)
+		}
+		if semver.Compare(base.Language.Version, cueversion.Version()) > 0 {
+			return nil, fmt.Errorf("language version %q declared in module.cue is too new for current version %q", base.Language.Version, cueversion.Version())
+		}
+		// Now that we're happy we're within bounds, find the latest
+		// schema that applies to the declared version.
+		latest := ""
+		var latestSchema cue.Value
+		for vers, schema := range schemas.Versions {
+			if semver.Compare(vers, base.Language.Version) > 0 {
+				continue
+			}
+			if latest == "" || semver.Compare(vers, latest) > 0 {
+				latest = vers
+				latestSchema = schema
+			}
+		}
+		if latest == "" {
+			// Should never happen, because there should always
+			// be some applicable schema.
+			return nil, fmt.Errorf("cannot find schema suitable for reading module file with language version %q", base.Language.Version)
+		}
+		schema := latestSchema
+		v = v.Unify(lookup(schema, cue.Def("#File")))
 		if err := v.Validate(); err != nil {
 			return nil, newCUEError(err, filename)
+		}
+		if latest == "v0.0.0" {
+			// The chosen schema is the earliest schema which allowed
+			// all fields. We don't actually want a module.cue file with
+			// an old version to treat those fields as special, so don't try
+			// to decode into *File because that will do so.
+			// This mirrors the behavior of [ParseLegacy].
+			var f noDepsFile
+			if err := v.Decode(&f); err != nil {
+				return nil, newCUEError(err, filename)
+			}
+			return &File{
+				Module:              f.Module,
+				actualSchemaVersion: "v0.0.0",
+			}, nil
 		}
 		var mf File
 		if err := v.Decode(&mf); err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "internal error: cannot decode into modFile struct")
 		}
+		mf.actualSchemaVersion = latest
 		return &mf, nil
 	})
 	if err != nil {

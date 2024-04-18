@@ -6,6 +6,7 @@ baz.org@v0.0.2
 error: other requirements prevent changing module baz.org@v0 to version v0.0.2 (actual selected version: v0.5.0)
 -- cue.mod/module.cue --
 module: "main.org@v0"
+language: version: "v0.8.0"
 deps: {
 	"bar.com@v0": v: "v0.5.0"
 	"baz.org@v0": v: "v0.5.0"
@@ -15,6 +16,7 @@ package main
 
 -- _registry/bar.com_v0.0.2/cue.mod/module.cue --
 module: "bar.com@v0"
+language: version: "v0.8.0"
 deps: "baz.org@v0": v: "v0.0.2"
 
 -- _registry/bar.com_v0.0.2/bar/x.cue --
@@ -26,6 +28,7 @@ a
 
 -- _registry/bar.com_v0.5.0/cue.mod/module.cue --
 module: "bar.com@v0"
+language: version: "v0.8.0"
 deps: "baz.org@v0": v: "v0.5.0"
 
 -- _registry/bar.com_v0.5.0/bar/x.cue --
@@ -37,6 +40,7 @@ a
 
 -- _registry/baz.org_v0.0.2/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 
 -- _registry/baz.org_v0.0.2/baz.cue --
 package baz
@@ -45,6 +49,7 @@ package baz
 
 -- _registry/baz.org_v0.1.2/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 
 -- _registry/baz.org_v0.1.2/baz.cue --
 package baz
@@ -53,6 +58,7 @@ package baz
 
 -- _registry/baz.org_v0.5.0/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 
 -- _registry/baz.org_v0.5.0/baz.cue --
 package baz
@@ -61,6 +67,7 @@ package baz
 
 -- _registry/baz.org_v0.10.1/cue.mod/module.cue --
 module: "baz.org@v0"
+language: version: "v0.8.0"
 
 -- _registry/baz.org_v0.10.1/baz.cue --
 package baz

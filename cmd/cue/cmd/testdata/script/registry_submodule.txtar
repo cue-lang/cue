@@ -9,6 +9,7 @@ a: {
 }
 -- cue.mod/module.cue --
 module: "main.org"
+language: version: "v0.8.0"
 
 deps: {
 	"example.com@v0": {
@@ -32,6 +33,7 @@ a: {
 }
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_v0.0.1/top.cue --
 package example
@@ -39,6 +41,7 @@ package example
 e: true
 -- _registry/example.com_foo_v0.0.1/cue.mod/module.cue --
 module: "example.com/foo@v0"
+language: version: "v0.8.0"
 -- _registry/example.com_foo_v0.0.1/foo.cue --
 package foo
 f: true

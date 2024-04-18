@@ -1,4 +1,4 @@
-env CUE_VERSION_OVERRIDE=v0.1.2
+env CUE_VERSION_OVERRIDE=v0.8.0
 
 # Without the experiment, we use the module path as-is.
 exec cue mod init foo.com/bar
@@ -17,10 +17,10 @@ exists cue.mod/pkg
 -- want-module.cue --
 module: "foo.com/bar"
 language: {
-	version: "v0.1.2"
+	version: "v0.8.0"
 }
 -- want-module-experiment.cue --
 module: "foo.com/bar@v0"
 language: {
-	version: "v0.1.2"
+	version: "v0.8.0"
 }

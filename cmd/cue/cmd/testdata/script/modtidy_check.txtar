@@ -6,7 +6,7 @@ exec cue mod tidy --check
 
 -- cue.mod/module.cue --
 module: "main.org@v0"
-language: version: "v0.99.99"
+language: version: "v0.8.100"
 
 // A comment.
 deps: "example.com@v0": v: "v0.0.1"
@@ -19,6 +19,7 @@ main
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 
 -- _registry/example.com_v0.0.1/top.cue --
 package main

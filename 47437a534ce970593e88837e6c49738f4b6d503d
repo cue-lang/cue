@@ -22,6 +22,30 @@
       },
       "revId": "47437a534ce970593e88837e6c49738f4b6d503d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "743087b5_fa14b1d9",
+        "filename": "cmd/cue/cmd/help.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 305,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T16:24:42Z",
+      "side": 1,
+      "message": "Yeah, reasonable point. Done.",
+      "parentUuid": "7a4b0c59_942351fe",
+      "range": {
+        "startLine": 305,
+        "startChar": 24,
+        "endLine": 305,
+        "endChar": 51
+      },
+      "revId": "47437a534ce970593e88837e6c49738f4b6d503d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

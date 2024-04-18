@@ -10,13 +10,13 @@ import (
 	"sync"
 )
 
-// fallbackVersion is used when there isn't a recorded main module version,
+// FallbackVersion is used when there isn't a recorded main module version,
 // for example when building via `go install ./cmd/cue`.
 // It should reflect the last release in the current branch.
 //
 // TODO: remove once Go stamps local builds with a main module version
 // derived from the local VCS information per https://go.dev/issue/50603.
-const fallbackVersion = "v0.9.0-alpha.2"
+const FallbackVersion = "v0.9.0-alpha.2"
 
 // Version returns the version of the cuelang.org/go module as best as can
 // reasonably be determined. The result is always a valid Go semver version.
@@ -27,7 +27,7 @@ func Version() string {
 var versionOnce = sync.OnceValue(func() string {
 	bi, ok := debug.ReadBuildInfo()
 	if !ok {
-		return fallbackVersion
+		return FallbackVersion
 	}
 	switch bi.Main.Version {
 	case "": // missing version
@@ -36,7 +36,7 @@ var versionOnce = sync.OnceValue(func() string {
 	default:
 		return bi.Main.Version
 	}
-	return fallbackVersion
+	return FallbackVersion
 })
 
 // UserAgent returns a string suitable for adding as the User-Agent

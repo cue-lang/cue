@@ -12,12 +12,14 @@ env MODVER=${MODULE}@v0
 cd publish
 
 exec cue mod init ${MODVER}
+exec cue mod edit --source self
 exec cue mod publish ${VERSION}
 
 cd ../depend
 
 env-fill out_foo.cue
 exec cue mod init depend.localhost
+exec cue mod edit --source self
 exec cue mod tidy
 exec cue export
 cmp stdout export.golden

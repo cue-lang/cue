@@ -108,7 +108,7 @@ func (c *modEditCmd) addEdit(f func(*modfile.File) error) {
 }
 
 func (c *modEditCmd) flagSource(arg string) error {
-	if arg != "git" && arg != "none" {
+	if arg != "git" && arg != "self" {
 		return fmt.Errorf("unrecognized source kind %q", arg)
 	}
 	c.addEdit(func(f *modfile.File) error {

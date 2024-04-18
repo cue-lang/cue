@@ -28,6 +28,7 @@ import "example.com/blah"
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 deps: {
 	"foo.com/bar/hello@v0": v: "v0.2.3"
 	"bar.com@v0": v: "v0.5.0"

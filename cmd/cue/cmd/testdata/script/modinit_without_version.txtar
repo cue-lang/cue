@@ -1,15 +1,10 @@
-# Check that cue mod init skips the language version
-# when it lacks any version information at all.
+# Check that cue mod init fails when it lacks any version
+# information at all.
 # A zero pseudo-version is one such case, as there are no semver numbers.
 env CUE_EXPERIMENT=modules
 env CUE_VERSION_OVERRIDE=v0.0.0-00010101000000-000000000000
-exec cue mod init foo.example
-cmp cue.mod/module.cue want-module
+! exec cue mod init foo.example
+cmp stderr want-stderr
 
-# cue mod tidy should be a no-op after cue mod init
-env CUE_CACHE_DIR=$WORK/.tmp/cache
-exec cue mod tidy
-cmp cue.mod/module.cue want-module
-
--- want-module --
-module: "foo.example@v0"
+-- want-stderr --
+cannot round-trip module file: no language version declared in module.cue

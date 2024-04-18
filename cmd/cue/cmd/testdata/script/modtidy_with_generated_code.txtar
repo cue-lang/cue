@@ -3,7 +3,7 @@
 # dependencies, and that it removes dependencies that
 # aren't needed any more.
 
-env CUE_VERSION_OVERRIDE=v0.1.2
+env CUE_VERSION_OVERRIDE=v0.8.100
 exec cue mod tidy
 cmp cue.mod/module.cue want-module
 
@@ -13,7 +13,7 @@ cmp stdout want-stdout
 -- want-module --
 module: "main.org@v0"
 language: {
-	version: "v0.1.2"
+	version: "v0.8.0"
 }
 deps: {
 	"example.com@v0": {
@@ -27,6 +27,7 @@ deps: {
 }
 -- cue.mod/module.cue --
 module: "main.org@v0"
+language: version: "v0.8.0"
 -- cue.mod/gen/foo.com/bar/x.cue --
 package bar
 bar: "local"
@@ -42,6 +43,7 @@ bar
 
 -- _registry/example.com_v0.0.1/cue.mod/module.cue --
 module: "example.com@v0"
+language: version: "v0.8.0"
 -- _registry/example.com_v0.0.1/top.cue --
 package main
 "example.com": "v0.0.1"

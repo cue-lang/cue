@@ -1,0 +1,9 @@
+TryBot-Result+1: CUEcueckoo <cueckoo@cuelang.org>
+Unity-Result+1: CUE porcuepine <cue.porcuepine@gmail.com>
+Code-Review+2: Roger Peppe <rogpeppe@gmail.com>
+Submitted-by: Rustam Abdullaev <rustam@cue.works>
+Submitted-at: Thu, 18 Apr 2024 14:20:23 +0000
+Reviewed-on: https://review.gerrithub.io/c/cue-lang/cue/+/1193244
+Comments-Total: 3
+Project: cue-lang/cue
+Branch: refs/heads/master

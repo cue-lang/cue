@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "8edd0af2_173257ba",
+        "filename": "internal/vcs/copyfs_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T10:04:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c502d487_8f83a683",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9ef67e9c_1cad2577",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-17T12:26:49Z",
       "side": 1,
       "message": "We should then include licenses.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bc79d775_afb8b530",
+        "filename": "internal/vcs/copyfs_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T10:04:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9ef67e9c_1cad2577",
       "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -52,6 +88,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea5ef649_6ea4e6a6",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T10:04:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b7715d07_716b4b5a",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0a9330ee_e598e87e",
@@ -65,6 +119,24 @@
       "writtenOn": "2024-04-17T12:26:49Z",
       "side": 1,
       "message": "doc comment.",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3553b1c9_b1b47c36",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 34,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T10:04:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0a9330ee_e598e87e",
       "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +158,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "15120d7a_082bc476",
+        "filename": "internal/vcs/git.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T10:04:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "1b200478_299e3eff",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f044b3a3_d27bb37f",
@@ -103,6 +193,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "648eee3b_50f05067",
+        "filename": "internal/vcs/vcs.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T10:04:48Z",
+      "side": 1,
+      "message": "Given that this is an internal package and the interface is VCS-oriented, I think we can probably leave this until we have some actual non-VCS source kinds to drive the API/naming.",
+      "parentUuid": "f044b3a3_d27bb37f",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e9346b5_f9782333",
@@ -116,6 +224,24 @@
       "writtenOn": "2024-04-17T12:26:49Z",
       "side": 1,
       "message": "license header",
+      "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "41dd2d0e_ecb7c31c",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-18T10:04:48Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e9346b5_f9782333",
       "revId": "ce59489192c05651f1eea48d0799a2e1f9420dcf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

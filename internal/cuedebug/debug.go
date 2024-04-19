@@ -7,7 +7,9 @@ import (
 )
 
 // Flags holds the set of CUE_DEBUG flags. It is initialized by Init.
-var Flags struct {
+var Flags Config
+
+type Config struct {
 	HTTP bool
 }
 

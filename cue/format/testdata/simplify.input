@@ -57,3 +57,27 @@ x: {
     [baz3="bar"]: name: baz3
     "Time": time.Time
 }
+
+y: {
+    "a": {
+        "bar": "a-value"
+        [!="bar"]: {}
+    }
+
+    "b": {
+        "x": {
+            bar: "bar"
+            baz: "baz"
+            [!={
+                "a": "baz"
+            }.a & !="bar"]: {}
+        }
+
+        "y": {
+            "bar": "a-value"
+            ({
+                "a": "bar"
+            }.a): {}
+        }
+    }
+}

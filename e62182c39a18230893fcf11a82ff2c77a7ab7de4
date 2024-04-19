@@ -106,6 +106,24 @@
       "parentUuid": "9b3ea097_7ccee21a",
       "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4ce91980_c754b699",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-19T12:35:38Z",
+      "side": 1,
+      "message": "I started off doing that, but the API in question runs commands itself, so that approach doesn\u0027t work.",
+      "parentUuid": "f69c1a84_7472349d",
+      "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

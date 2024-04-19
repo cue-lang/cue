@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "82a8d49c_a4c112ed",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T07:57:18Z",
+      "side": 1,
+      "message": "SGTM except the part where you rely more heavily on fallbackVersion.",
+      "revId": "efd27dc9b5460d2651113b1d9e426a122ae36d13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a435209c_5df4f14b",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 169,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T07:57:18Z",
+      "side": 1,
+      "message": "Note that FallbackVersion will be deleted as soon as https://github.com/golang/go/issues/50603 is resolved, so I\u0027m a bit worried about writing our `cue mod init` logic in terms of that. What will your plan B be once we delete FallbackVersion, hopefully in six months or so?\n\nAt the very least this needs a TODO, but ideally I would prefer to not export FallbackVersion and rely on it at all.\n\nThe simplest solution that comes to mind is using earliestPossibleVersion here, which will be older, but at least we don\u0027t plan on deleting it.",
+      "revId": "efd27dc9b5460d2651113b1d9e426a122ae36d13",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

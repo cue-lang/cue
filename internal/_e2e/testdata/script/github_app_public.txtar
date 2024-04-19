@@ -36,6 +36,7 @@ exec cue mod publish ${VERSION}
 # and test for it here with a regular expression.
 cd ../publish-different
 exec cue mod init ${MODVER}
+exec cue mod edit --source self
 ! exec cue mod publish ${VERSION}
 stderr 'cannot tag.*400 Bad Request'
 

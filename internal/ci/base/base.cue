@@ -42,11 +42,11 @@ gerritHubRepositoryURL: *("https://\(gerritHubHostname)/a/" + githubRepositoryPa
 trybotRepositoryPath:   *(githubRepositoryPath + "-" + trybot.key) | string
 trybotRepositoryURL:    *("https://github.com/" + trybotRepositoryPath) | string
 
-defaultBranch:           *"master" | string
-testDefaultBranch:       *"ci/test" | _
+defaultBranch:     *"master" | string
+testDefaultBranch: *"ci/test" | _
 protectedBranchPatterns: *[defaultBranch] | [...string]
-releaseTagPrefix:        *"v" | string
-releaseTagPattern:       *(releaseTagPrefix + "*") | string
+releaseTagPrefix:  *"v" | string
+releaseTagPattern: *(releaseTagPrefix + "*") | string
 
 botGitHubUser:                      string
 botGitHubUserTokenSecretsKey:       *(strings.ToUpper(botGitHubUser) + "_GITHUB_PAT") | string

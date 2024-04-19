@@ -18,6 +18,6 @@ deps?: [#Module]: {
 // #Module constraints a module path.
 // TODO encode the module path rules as regexp:
 // WIP: (([\-_~a-zA-Z0-9][.\-_~a-zA-Z0-9]*[\-_~a-zA-Z0-9])|([\-_~a-zA-Z0-9]))(/([\-_~a-zA-Z0-9][.\-_~a-zA-Z0-9]*[\-_~a-zA-Z0-9])|([\-_~a-zA-Z0-9]))*
-#Module:            =~"^[^@]+$"
+#Module: =~"^[^@]+$"
 
 // TODO add the rest of the module schema definition.

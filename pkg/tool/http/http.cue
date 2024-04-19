@@ -14,9 +14,9 @@
 
 package http
 
-Get:    Do & {method: "GET"}
-Post:   Do & {method: "POST"}
-Put:    Do & {method: "PUT"}
+Get: Do & {method: "GET"}
+Post: Do & {method: "POST"}
+Put: Do & {method: "PUT"}
 Delete: Do & {method: "DELETE"}
 
 Do: {
@@ -35,7 +35,7 @@ Do: {
 
 	request: {
 		body?: bytes | string
-		header: [string]:  string | [...string]
+		header: [string]: string | [...string]
 		trailer: [string]: string | [...string]
 	}
 	response: {
@@ -43,7 +43,7 @@ Do: {
 		statusCode: int
 
 		body: *bytes | string
-		header: [string]:  string | [...string]
+		header: [string]: string | [...string]
 		trailer: [string]: string | [...string]
 	}
 }

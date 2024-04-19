@@ -65,7 +65,7 @@ command: gen: {
 }
 
 command: gen: codereviewcfg: file.Create & {
-	_dir:     path.FromSlash("../../", path.Unix)
+	_dir: path.FromSlash("../../", path.Unix)
 	filename: path.Join([_dir, "codereview.cfg"], _goos)
 	let res = repo.toCodeReviewCfg & {#input: repo.codeReview, _}
 	let donotedit = repo.doNotEditMessage & {#generatedBy: "internal/ci/ci_tool.cue", _}

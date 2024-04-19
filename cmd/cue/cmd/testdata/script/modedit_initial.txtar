@@ -1,3 +1,6 @@
+exec cue mod edit --source self
+cmp cue.mod/module.cue want-module-0
+
 exec cue mod edit --source git
 cmp cue.mod/module.cue want-module-1
 
@@ -20,6 +23,14 @@ cmp cue.mod/module.cue want-module-5
 -- cue.mod/module.cue --
 module: "main.org@v0"
 language: version: "v0.9.0-alpha.0"
+-- want-module-0 --
+module: "main.org@v0"
+language: {
+	version: "v0.9.0-alpha.0"
+}
+source: {
+	kind: "self"
+}
 -- want-module-1 --
 module: "main.org@v0"
 language: {

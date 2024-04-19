@@ -52,6 +52,24 @@
       "parentUuid": "a20dc98d_cb479b1d",
       "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9b3ea097_7ccee21a",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-19T12:20:01Z",
+      "side": 1,
+      "message": "tbh I don\u0027t know what the git command does under the hood. For all I know it does gate some behaviour on the presence/absence of an environment variable.\n\nAlso in general it seems cleaner to remove all the env vars rather than having them all present with empty strings.\n\nIn this case I\u0027d use t.Unsetenv if it existed, but it doesn\u0027t (partly because when t.Setenv was added I argued that simply calling os.Unsetenv after t.Setenv was a sufficiently simple workaround that the functionality was unnecessary).",
+      "parentUuid": "045bf299_c66919b6",
+      "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

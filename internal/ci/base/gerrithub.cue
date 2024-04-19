@@ -45,7 +45,7 @@ trybotDispatchWorkflow: bashWorkflow & {
 		(trybot.key): {
 			"runs-on": linuxMachine
 
-			let goodDummyData = [ if encjson.Marshal(#dummyDispatch) != _|_ {true}, false][0]
+			let goodDummyData = [if encjson.Marshal(#dummyDispatch) != _|_ {true}, false][0]
 
 			// We set the "on" conditions above, but this would otherwise mean we
 			// run for all dispatch events.

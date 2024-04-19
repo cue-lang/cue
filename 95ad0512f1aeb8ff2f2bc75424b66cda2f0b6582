@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e0405c8_7ff7e1c4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T12:54:07Z",
+      "side": 1,
+      "message": "Green here: https://github.com/cue-lang/cue/actions/runs/8753781548/job/24024178559",
+      "revId": "95ad0512f1aeb8ff2f2bc75424b66cda2f0b6582",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

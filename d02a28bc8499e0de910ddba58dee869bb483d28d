@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d78fcbb3_bc0c21ce",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T12:14:07Z",
+      "side": 1,
+      "message": "I wonder if we should support `cue mod init --source\u003dself foo.bar/baz`.",
+      "revId": "d02a28bc8499e0de910ddba58dee869bb483d28d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

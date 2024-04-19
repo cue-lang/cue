@@ -112,7 +112,7 @@ func (f *File) Format() ([]byte, error) {
 		// it's almost certainly a bogus version because all versions
 		// we care about fail when there are unknown fields, but the
 		// original schema allowed all fields.
-		return nil, fmt.Errorf("language version %v is too early for module.cue (need at least %v)", f.Language.Version, earliestClosedSchemaVersion())
+		return nil, fmt.Errorf("language version %v is too early for module.cue (need at least %v)", f.Language.Version, EarliestClosedSchemaVersion())
 	}
 	return data, err
 }
@@ -160,12 +160,36 @@ func lookup(v cue.Value, sels ...cue.Selector) cue.Value {
 	return v.LookupPath(cue.MakePath(sels...))
 }
 
-func earliestClosedSchemaVersion() string {
-	v, _ := moduleSchemaDo(func(ctx *cue.Context, info *schemaInfo) (string, error) {
-		return info.EarliestClosedSchemaVersion, nil
-	})
-	return v
+// EarliestClosedSchemaVersion returns the earliest module.cue schema version
+// that excludes unknown fields. Any version declared in a module.cue file
+// should be at least this, because that's when we added the language.version
+// field itself.
+func EarliestClosedSchemaVersion() string {
+	return schemaVersionLimits()[0]
 }
+
+// LatestKnownSchemaVersion returns the language version
+// associated with the most recent known schema.
+func LatestKnownSchemaVersion() string {
+	return schemaVersionLimits()[1]
+}
+
+var schemaVersionLimits = sync.OnceValue(func() [2]string {
+	limits, _ := moduleSchemaDo(func(_ *cue.Context, info *schemaInfo) ([2]string, error) {
+		earliest := ""
+		latest := ""
+		for v := range info.Versions {
+			if earliest == "" || semver.Compare(v, earliest) < 0 {
+				earliest = v
+			}
+			if latest == "" || semver.Compare(v, latest) > 0 {
+				latest = v
+			}
+		}
+		return [2]string{earliest, latest}, nil
+	})
+	return limits
+})
 
 // Parse verifies that the module file has correct syntax.
 // The file name is used for error messages.

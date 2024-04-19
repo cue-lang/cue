@@ -355,7 +355,7 @@ language: {
 				Version: "v0.4.3",
 			},
 		},
-		wantError: `language version v0.4.3 is too early for module.cue \(need at least v0.8.0\)`,
+		wantError: `cannot round-trip module file: cannot find schema suitable for reading module file with language version "v0.4.3"`,
 	}, {
 		name: "WithInvalidModuleVersion",
 		file: &File{
@@ -394,6 +394,14 @@ language: {
 		qt.Assert(t, qt.IsNil(err))
 		qt.Assert(t, qt.CmpEquals(f, test.file, cmpopts.IgnoreUnexported(File{}), cmpopts.EquateEmpty()))
 	})
+}
+
+func TestEarliestClosedSchemaVersion(t *testing.T) {
+	qt.Assert(t, qt.Equals(EarliestClosedSchemaVersion(), "v0.8.0"))
+}
+
+func TestLatestKnownSchemaVersion(t *testing.T) {
+	qt.Assert(t, qt.Equals(LatestKnownSchemaVersion(), "v0.9.0-alpha.0"))
 }
 
 func parseVersions(vs ...string) []module.Version {

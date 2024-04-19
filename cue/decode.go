@@ -102,7 +102,7 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	switch x.Kind() {
 	case reflect.Ptr, reflect.Map, reflect.Slice, reflect.Interface:
 		// nullable types
-		if v.Null() == nil || !v.IsConcrete() {
+		if v.IsNull() || !v.IsConcrete() {
 			d.clear(x)
 			return
 		}
@@ -115,7 +115,7 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 		}
 	}
 
-	ij, it, x := indirect(x, v.Null() == nil)
+	ij, it, x := indirect(x, v.IsNull())
 
 	if ij != nil {
 		b, err := v.marshalJSON()

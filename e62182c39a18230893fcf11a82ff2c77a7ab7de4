@@ -70,6 +70,24 @@
       "parentUuid": "045bf299_c66919b6",
       "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f0079f12_af9c322b",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-19T12:22:01Z",
+      "side": 1,
+      "message": "I think I\u0027ll leave it like this for now, as it seems clearly the safer of the two options and it\u0027s only one line of code.",
+      "parentUuid": "9b3ea097_7ccee21a",
+      "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

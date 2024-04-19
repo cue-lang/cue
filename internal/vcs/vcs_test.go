@@ -16,8 +16,11 @@ package vcs
 
 import (
 	"context"
+	"os"
 	"os/exec"
 	"path/filepath"
+	"runtime"
+	"strings"
 	"testing"
 	"time"
 
@@ -44,6 +47,7 @@ func TestGit(t *testing.T) {
 	_, err = New("git", filepath.Join(dir, "subdir"))
 	qt.Assert(t, qt.ErrorMatches(err, `git VCS not found in any parent of ".+"`))
 
+	initTestEnv(t)
 	mustRunCmd(t, dir, "git", "init")
 	v, err := New("git", filepath.Join(dir, "subdir"))
 	qt.Assert(t, qt.IsNil(err))
@@ -81,6 +85,26 @@ func TestGit(t *testing.T) {
 	}))
 }
 
+// initTestEnv sets up the environment so that
+// any executed VCS command won't be affected
+// by the outer level environment.
+func initTestEnv(t *testing.T) {
+	path := os.Getenv("PATH")
+	systemRoot := os.Getenv("SYSTEMROOT")
+	// First unset all environment variables to make a pristine environment.
+	for _, kv := range os.Environ() {
+		key, _, _ := strings.Cut(kv, "=")
+		t.Setenv(key, "")
+		os.Unsetenv(key)
+	}
+	os.Setenv("PATH", path)
+	os.Setenv(homeEnvName(), "/no-home")
+	// Must preserve SYSTEMROOT on Windows: https://github.com/golang/go/issues/25513 et al
+	if runtime.GOOS == "windows" {
+		os.Setenv("SYSTEMROOT", systemRoot)
+	}
+}
+
 func mustRunCmd(t *testing.T, dir string, exe string, args ...string) {
 	c := exec.Command(exe, args...)
 	c.Dir = dir
@@ -91,5 +115,16 @@ func mustRunCmd(t *testing.T, dir string, exe string, args ...string) {
 func skipIfNoExecutable(t *testing.T, exeName string) {
 	if _, err := exec.LookPath(exeName); err != nil {
 		t.Skipf("cannot find %q executable: %v", exeName, err)
+	}
+}
+
+func homeEnvName() string {
+	switch runtime.GOOS {
+	case "windows":
+		return "USERPROFILE"
+	case "plan9":
+		return "home"
+	default:
+		return "HOME"
 	}
 }

@@ -239,7 +239,7 @@ type ccDep struct {
 	taskID int
 }
 
-func (c *closeContext) addDependent(kind depKind, dependant *closeContext) *ccDep {
+func (c *closeContext) addDependent(ctx *OpContext, kind depKind, dependant *closeContext) *ccDep {
 	if !DebugDeps {
 		return nil
 	}
@@ -249,17 +249,7 @@ func (c *closeContext) addDependent(kind depKind, dependant *closeContext) *ccDe
 	}
 
 	if Verbosity > 1 {
-		var state *nodeContext
-		if c.src != nil && c.src.state != nil {
-			state = c.src.state
-		} else if dependant != nil && dependant.src != nil && dependant.src.state != nil {
-			state = dependant.src.state
-		}
-		if state != nil {
-			state.Logf("INC(%s, %d) %v; %p (parent: %p) <= %p\n", kind, c.conjunctCount, c.Label(), c, c.parent, dependant)
-		} else {
-			log.Printf("INC(%s) %v %p parent: %p %d\n", kind, c.Label(), c, c.parent, c.conjunctCount)
-		}
+		ctx.Logf(ctx.vertex, "INC(%s) %v %p parent: %p %d\n", kind, c.Label(), c, c.parent, c.conjunctCount)
 	}
 
 	dep := &ccDep{kind: kind, dependency: dependant}
@@ -269,7 +259,7 @@ func (c *closeContext) addDependent(kind depKind, dependant *closeContext) *ccDe
 }
 
 // matchDecrement checks that this decrement matches a previous increment.
-func (c *closeContext) matchDecrement(v *Vertex, kind depKind, dependant *closeContext) {
+func (c *closeContext) matchDecrement(ctx *OpContext, v *Vertex, kind depKind, dependant *closeContext) {
 	if !DebugDeps {
 		return
 	}
@@ -279,11 +269,7 @@ func (c *closeContext) matchDecrement(v *Vertex, kind depKind, dependant *closeC
 	}
 
 	if Verbosity > 1 {
-		if v.state != nil {
-			v.state.Logf("DEC(%s) %v %p %d\n", kind, c.Label(), c, c.conjunctCount)
-		} else {
-			log.Printf("DEC(%s) %v %p %d\n", kind, c.Label(), c, c.conjunctCount)
-		}
+		ctx.Logf(ctx.vertex, "DEC(%s) %v %p %d\n", kind, c.Label(), c, c.conjunctCount)
 	}
 
 	for _, d := range c.dependencies {
@@ -420,7 +406,7 @@ func CreateMermaidGraph(ctx *OpContext, v *Vertex, all bool) (graph string, hasE
 //
 //	 Each closeContext has the following info: ptr(cc); cc.count
 func (m *mermaidContext) vertex(v *Vertex) *mermaidVertex {
-	root := v.rootCloseContext()
+	root := v.rootCloseContext(m.ctx)
 
 	vc := m.roots[root]
 	if vc != nil {

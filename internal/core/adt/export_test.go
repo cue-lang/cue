@@ -42,7 +42,7 @@ func NewFieldTester(r Runtime) *FieldTester {
 	return &FieldTester{
 		OpContext: ctx,
 		n:         n,
-		cc:        v.rootCloseContext(),
+		cc:        v.rootCloseContext(ctx),
 		Root:      v,
 	}
 }
@@ -64,7 +64,7 @@ type declaration func(cc *closeContext)
 
 // Run simulates a CUE evaluation of the given declarations.
 func (x *FieldTester) Run(sub ...declaration) {
-	x.cc.incDependent(TEST, nil)
+	x.cc.incDependent(x.n.ctx, TEST, nil)
 	for i, s := range sub {
 		// We want to have i around for debugging purposes. Use i to avoid
 		// compiler error.
@@ -91,9 +91,9 @@ func (x *FieldTester) Def(sub ...declaration) declaration {
 func (x *FieldTester) spawn(t closeNodeType, sub ...declaration) declaration {
 	return func(cc *closeContext) {
 		ci := CloseInfo{cc: cc}
-		ci, dc := ci.spawnCloseContext(t)
+		ci, dc := ci.spawnCloseContext(x.n.ctx, t)
 
-		dc.incDependent(TEST, nil)
+		dc.incDependent(x.n.ctx, TEST, nil)
 		for _, sfn := range sub {
 			sfn(dc)
 		}

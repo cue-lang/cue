@@ -635,7 +635,7 @@ func (s *scheduler) insertTask(t *task) {
 	s.incrementCounts(completes)
 	if cc := t.id.cc; cc != nil {
 		// may be nil for "group" tasks, such as processLists.
-		dep := cc.incDependent(TASK, nil)
+		dep := cc.incDependent(t.node.ctx, TASK, nil)
 		if dep != nil {
 			dep.taskID = len(s.tasks)
 			dep.task = t

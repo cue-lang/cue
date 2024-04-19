@@ -227,7 +227,7 @@ func (n *nodeContext) scheduleDisjunction(d envDisjunct) {
 	// as the result will either be an error, a single disjunct, in which
 	// case mergeVertex will override the original value, or multiple disjuncts,
 	// in which case the original is set to the disjunct itself.
-	ccHole.incDisjunct(DISJUNCT)
+	ccHole.incDisjunct(n.ctx, DISJUNCT)
 
 	n.disjunctions = append(n.disjunctions, d)
 

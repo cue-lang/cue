@@ -107,4 +107,4 @@
 
 // TODO more specific schemas below
 #modulePath: string
-#tag: string
+#tag:        string

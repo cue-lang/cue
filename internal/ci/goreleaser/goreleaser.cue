@@ -38,7 +38,7 @@ config: {
 	}]
 
 	builds: [
-		{main: "./cmd/cue", binary:    "cue"},
+		{main: "./cmd/cue", binary: "cue"},
 		{main: "./cmd/cuepls", binary: "cuepls"},
 	]
 

@@ -106,8 +106,8 @@ func (n *nodeContext) scheduleConjuncts() {
 
 	defer ctx.PopArc(ctx.PushArc(v))
 
-	root := n.node.rootCloseContext()
-	root.incDependent(INIT, nil) // decremented below
+	root := n.node.rootCloseContext(n.ctx)
+	root.incDependent(n.ctx, INIT, nil) // decremented below
 
 	for _, c := range v.Conjuncts {
 		ci := c.CloseInfo
@@ -209,7 +209,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	n.validateValue(state)
 
 	if n.node.Label.IsLet() || n.meets(allAncestorsProcessed) {
-		if cc := v.rootCloseContext(); !cc.isDecremented { // TODO: use v.cc
+		if cc := v.rootCloseContext(n.ctx); !cc.isDecremented { // TODO: use v.cc
 			cc.decDependent(c, ROOT, nil) // REF(decrement:nodeDone)
 			cc.isDecremented = true
 		}
@@ -389,7 +389,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	// At this point, no more conjuncts will be added, so we could decrement
 	// the notification counters.
 
-	if cc := v.rootCloseContext(); !cc.isDecremented { // TODO: use v.cc
+	if cc := v.rootCloseContext(n.ctx); !cc.isDecremented { // TODO: use v.cc
 		cc.isDecremented = true
 
 		cc.decDependent(n.ctx, ROOT, nil) // REF(decrement:nodeDone)

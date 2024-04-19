@@ -91,7 +91,6 @@ func TestValueX(t *testing.T) {
 	in := `
 -- in.cue --
 	`
-
 	adt.Verbosity = 1
 	t.Cleanup(func() { adt.Verbosity = 0 })
 

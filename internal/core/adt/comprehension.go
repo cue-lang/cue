@@ -189,7 +189,7 @@ func (n *nodeContext) insertComprehension(
 					n.assertInitialized()
 					_, c.arcCC = n.insertArcCC(f.Label, ArcPending, conjunct, conjunct.CloseInfo, false)
 					c.cc = ci.cc
-					ci.cc.incDependent(COMP, c.arcCC)
+					ci.cc.incDependent(n.ctx, COMP, c.arcCC)
 				} else {
 					n.insertFieldUnchecked(f.Label, ArcPending, conjunct)
 				}

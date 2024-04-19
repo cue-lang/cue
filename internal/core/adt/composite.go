@@ -266,7 +266,7 @@ func equalDeref(a, b *Vertex) bool {
 
 // rootCloseContext creates a closeContext for this Vertex or returns the
 // existing one.
-func (v *Vertex) rootCloseContext() *closeContext {
+func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 	if v.cc == nil {
 		v.cc = &closeContext{
 			group:           (*ConjunctGroup)(&v.Conjuncts),
@@ -274,7 +274,7 @@ func (v *Vertex) rootCloseContext() *closeContext {
 			src:             v,
 			parentConjuncts: v,
 		}
-		v.cc.incDependent(ROOT, nil) // matched in REF(decrement:nodeDone)
+		v.cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
 	return v.cc
 }
@@ -996,7 +996,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 		for _, pc := range pcs.Pairs {
 			if matchPattern(ctx, pc.Pattern, arc.Label) {
 				for _, c := range pc.Constraint.Conjuncts {
-					root := arc.rootCloseContext()
+					root := arc.rootCloseContext(ctx)
 					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
 				}
 			}

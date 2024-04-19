@@ -1,0 +1,124 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d0fc72ee_fd7fc497",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T08:36:58Z",
+      "side": 1,
+      "message": "\u003e vertically align values via text/tabwriter.",
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3e537c5a_18ac22f1",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T08:36:58Z",
+      "side": 1,
+      "message": "nit: \"might\" or \"could\", because it\u0027s not always.",
+      "range": {
+        "startLine": 13,
+        "startChar": 43,
+        "endLine": 13,
+        "endChar": 48
+      },
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0746dc3f_f1d6d0bd",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T08:36:58Z",
+      "side": 1,
+      "message": "Trying to read this commit message as if I didn\u0027t understand the bug, I don\u0027t think this would clarify it for me.\n\nHow about explaining why Thomas\u0027s example caused bad indentation, and how your patch fixes that scenario? i.e. the issue was that the `\u0026` binary expression caused the first field to not include a vtab, but then the second field after `{` did have a vtab before, causing misalignment. You now prevent any field after `{` to have a vtab.",
+      "range": {
+        "startLine": 14,
+        "startChar": 38,
+        "endLine": 17,
+        "endChar": 13
+      },
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89d9c09e_ed7aaa3d",
+        "filename": "cue/format/node.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T08:36:58Z",
+      "side": 1,
+      "message": "please avoid unrelated whitespace changes, as they might cause more git noise/conflicts.",
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3cbb9695_5111f007",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T08:36:58Z",
+      "side": 1,
+      "message": "\"has been written on the current line\" - we are the writer",
+      "range": {
+        "startLine": 47,
+        "startChar": 40,
+        "endLine": 48,
+        "endChar": 1
+      },
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc4106be_82e937d9",
+        "filename": "cue/format/testdata/expressions.input",
+        "patchSetId": 12
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T08:36:58Z",
+      "side": 1,
+      "message": "I would say leave the input well formatted, without any extra alignment, as otherwise it seems like we somehow _want_ or intended this alignment.\n\nAlso, can you add these test changes in a commit _before_ the fix? Then it will be abundantly clear how the fix improves the broken formatting.",
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

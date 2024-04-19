@@ -172,7 +172,7 @@ type Runtime interface {
 
 type Config struct {
 	Runtime
-	Format func(Node) string
+	Format func(Runtime, Node) string
 }
 
 // New creates an operation context.
@@ -205,7 +205,7 @@ func (c *OpContext) isDevVersion() bool {
 // use an OpContext at a time.
 type OpContext struct {
 	Runtime
-	Format func(Node) string
+	Format func(Runtime, Node) string
 
 	cuedebug.Config
 	Version internal.EvaluatorVersion // Copied from Runtime
@@ -1388,7 +1388,7 @@ func (c *OpContext) Str(x Node) string {
 	if c.Format == nil {
 		return fmt.Sprintf("%T", x)
 	}
-	return c.Format(x)
+	return c.Format(c.Runtime, x)
 }
 
 // NewList returns a new list for the given values.

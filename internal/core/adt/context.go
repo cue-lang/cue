@@ -30,21 +30,8 @@ import (
 	"cuelang.org/go/cue/stats"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cuedebug"
 )
-
-type DebugFlags struct {
-	// Strict sets whether extra aggressive checking should be done.
-	// This should typically default to true for pre-releases and default to
-	// false otherwise.
-	Strict bool
-
-	// LogEval sets the log level for the evaluator.
-	// There are currently only two levels:
-	//
-	//	0: no logging
-	//	1: logging
-	LogEval int
-}
 
 // DebugSort specifies that arcs be sorted consistently between implementations.
 //
@@ -218,7 +205,7 @@ type OpContext struct {
 	Runtime
 	Format func(Node) string
 
-	DebugFlags
+	cuedebug.Config
 	Version internal.EvaluatorVersion // Copied from Runtime
 
 	taskContext

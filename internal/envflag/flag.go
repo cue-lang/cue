@@ -39,8 +39,8 @@ func Init[T any](flags *T, envVar string) error {
 				return fmt.Errorf("invalid default bool value for %s: %v", field.Name, err)
 			}
 			defaultValue = v
+			fv.Field(i).SetBool(defaultValue)
 		}
-		fv.Field(i).SetBool(defaultValue)
 		indexByName[strings.ToLower(field.Name)] = i
 	}
 

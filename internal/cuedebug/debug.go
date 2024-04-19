@@ -11,6 +11,18 @@ var Flags Config
 
 type Config struct {
 	HTTP bool
+
+	// Strict sets whether extra aggressive checking should be done.
+	// This should typically default to true for pre-releases and default to
+	// false otherwise.
+	Strict bool
+
+	// LogEval sets the log level for the evaluator.
+	// There are currently only two levels:
+	//
+	//	0: no logging
+	//	1: logging
+	LogEval int
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

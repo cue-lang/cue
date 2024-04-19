@@ -33,16 +33,17 @@ import (
 )
 
 type DebugFlags struct {
-	// Debug sets whether extra aggressive checking should be done.
+	// Strict sets whether extra aggressive checking should be done.
 	// This should typically default to true for pre-releases and default to
 	// false otherwise.
-	Debug bool
+	Strict bool
 
-	// Verbosity sets the log level. There are currently only two levels:
+	// LogEval sets the log level for the evaluator.
+	// There are currently only two levels:
 	//
 	//	0: no logging
 	//	1: logging
-	Verbosity int
+	LogEval int
 }
 
 // DebugSort specifies that arcs be sorted consistently between implementations.
@@ -96,7 +97,7 @@ func DebugSortFields(c *OpContext, a []Feature) {
 // It is advisable for each use of Assert to document how the error is expected
 // to be handled down the line.
 func Assertf(c *OpContext, b bool, format string, args ...interface{}) {
-	if c.Debug && !b {
+	if c.Strict && !b {
 		panic(fmt.Sprintf("assertion failed: "+format, args...))
 	}
 }
@@ -104,7 +105,7 @@ func Assertf(c *OpContext, b bool, format string, args ...interface{}) {
 // Assertf either panics or reports an error to c if the condition is not met.
 func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...interface{}) {
 	if !b {
-		if c.Debug {
+		if c.Strict {
 			panic(fmt.Sprintf("assertion failed: "+format, args...))
 		}
 		c.addErrf(0, pos, format, args...)
@@ -118,7 +119,7 @@ func init() {
 var pMap = map[*Vertex]int{}
 
 func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
-	if c.Verbosity == 0 {
+	if c.LogEval == 0 {
 		return
 	}
 	if v == nil {

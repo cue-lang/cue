@@ -1197,7 +1197,7 @@ func (n *nodeContext) notifyConjunct(c Conjunct) {
 				// TODO: continuing here is likely to result in a faulty
 				// (incomplete) configuration. But this may be okay. The
 				// CUE_DEBUG=0 flag disables this assertion.
-				n.ctx.Assertf(n.ctx.pos(), !n.ctx.Debug, "unexpected nil state")
+				n.ctx.Assertf(n.ctx.pos(), !n.ctx.Strict, "unexpected nil state")
 				n.ctx.addErrf(0, n.ctx.pos(), "cannot add to field %v", arc.Label)
 				continue
 			}

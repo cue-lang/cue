@@ -167,19 +167,19 @@ jobs:
       - name: gcloud auth for end-to-end tests
         id: auth
         if: |-
-          github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         uses: google-github-actions/auth@v2
         with:
           credentials_json: ${{ secrets.E2E_GCLOUD_KEY }}
       - if: |-
-          github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: gcloud setup for end-to-end tests
         uses: google-github-actions/setup-gcloud@v2
       - if: |-
-          github.repository == 'cue-lang/cue' && ((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
-          Dispatch-Trailer: {"type":"')))) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
+          github.repository == 'cue-lang/cue' && (((github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/release-branch.')) && (! (contains(github.event.head_commit.message, '
+          Dispatch-Trailer: {"type":"')))) || (github.ref == 'refs/heads/ci/test')) && (matrix.go-version == '1.22.x' && matrix.runner == 'ubuntu-22.04')
         name: End-to-end test
         env:
           CUE_TEST_LOGINS: ${{ secrets.E2E_CUE_LOGINS }}

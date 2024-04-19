@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4f77df0_9132088e",
+        "filename": "cue/format/simplify.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T13:15:21Z",
+      "side": 1,
+      "message": "no unrelated whitespace changes please :)",
+      "revId": "5175e6ff39fc362c986cd8b80326ae3747e1a467",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2bde1158_707849aa",
+        "filename": "cue/format/simplify.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T13:15:21Z",
+      "side": 1,
+      "message": "can you briefly document what\u0027s going on here?",
+      "revId": "5175e6ff39fc362c986cd8b80326ae3747e1a467",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c22b5466_71fe9570",
+        "filename": "cue/format/testdata/simplify.golden",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T13:15:21Z",
+      "side": 1,
+      "message": "just like the other patch, can you add the test before the fix, so that we can see the broken output and the change with the fix in a second commit?",
+      "revId": "5175e6ff39fc362c986cd8b80326ae3747e1a467",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

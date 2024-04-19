@@ -112,7 +112,7 @@ type decl struct{}
 
 func (decl) declNode() {}
 
-// A Label is any production that can be used as a LHS label.
+// A Label is any production that can be used as an LHS label.
 type Label interface {
 	Node
 	labelNode()
@@ -394,7 +394,7 @@ type BottomLit struct {
 	expr
 }
 
-// An Ident node represents an left-hand side identifier,
+// An Ident node represents a left-hand side identifier,
 // including the underscore "_" identifier to represent top.
 type Ident struct {
 	NamePos token.Pos // identifier position

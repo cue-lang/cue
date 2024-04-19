@@ -1144,7 +1144,7 @@ func (v Value) Pos() token.Pos {
 
 // TODO: IsFinal: this value can never be changed.
 
-// IsClosed reports whether a list of struct is closed. It reports false when
+// IsClosed reports whether a list or struct is closed. It reports false when
 // the value is not a list or struct.
 //
 // Deprecated: use Allows(AnyString) and Allows(AnyIndex) or Kind/IncompleteKind.

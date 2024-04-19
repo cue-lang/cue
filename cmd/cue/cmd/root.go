@@ -116,7 +116,7 @@ func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 		// in a non-tooling context.
 		if cueexperiment.Flags.EvalV3 {
 			const dev = internal.DevVersion
-			(*cueruntime.Runtime)(c.ctx).SetVersion(internal.EvaluatorVersion(dev))
+			(*cueruntime.Runtime)(c.ctx).SetSettings(internal.EvaluatorVersion(dev), cuedebug.Flags)
 		}
 
 		err := f(c, args)

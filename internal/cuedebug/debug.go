@@ -23,6 +23,9 @@ type Config struct {
 	//	0: no logging
 	//	1: logging
 	LogEval int
+
+	// Sharing disables structure sharing.
+	Sharing bool `envflag:"default:true"`
 }
 
 // Init initializes Flags. Note: this isn't named "init" because we

@@ -52,7 +52,7 @@ func (s *labelSimplifier) processDecls(decls []ast.Decl) {
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			x.Label = astutil.Apply(x.Label, sc.replace, nil).(ast.Label)
+			x.Label = astutil.Apply(x, sc.replace, nil).(*ast.Field).Label
 		}
 	}
 }
@@ -80,6 +80,7 @@ func (s *labelSimplifier) markReferences(n ast.Node) bool {
 			}
 		}
 	}
+
 	return true
 }
 
@@ -104,6 +105,13 @@ func (s *labelSimplifier) markStrings(n ast.Node) bool {
 func (s *labelSimplifier) replace(c astutil.Cursor) bool {
 	switch x := c.Node().(type) {
 	case *ast.BasicLit:
+		if c.Parent() == nil {
+			return false
+		}
+		if f, ok := c.Parent().Node().(*ast.Field); !ok || f.Label != x {
+			return false
+		}
+
 		str, err := strconv.Unquote(x.Value)
 		if err == nil && s.scope[str] && !internal.IsDefOrHidden(str) {
 			c.Replace(ast.NewIdent(str))

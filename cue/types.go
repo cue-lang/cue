@@ -1223,7 +1223,7 @@ func (v Value) checkKind(ctx *adt.OpContext, want adt.Kind) *adt.Bottom {
 	if want != adt.BottomKind {
 		if k&want == adt.BottomKind {
 			return mkErr(v.idx, x, "cannot use value %v (type %s) as %s",
-				ctx.Str(x), k, want)
+				ctx.LazyStr(x), k, want)
 		}
 		if !adt.IsConcrete(x) {
 			return mkErr(v.idx, x, adt.IncompleteError, "non-concrete value %v", k)

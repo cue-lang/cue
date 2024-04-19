@@ -1376,6 +1376,18 @@ func (c *OpContext) Str(x Node) string {
 	return c.Format(x)
 }
 
+type stringerFunc func() string
+
+func (s stringerFunc) String() string { return s() }
+
+// LazyStr is like Str but delays formatting the node until the result
+// is formatted as a string, for example as %s in an error message.
+func (c *OpContext) LazyStr(x Node) fmt.Stringer {
+	return stringerFunc(func() string {
+		return c.Str(x)
+	})
+}
+
 // NewList returns a new list for the given values.
 func (c *OpContext) NewList(values ...Value) *Vertex {
 	// TODO: consider making this a literal list instead.

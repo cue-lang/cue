@@ -88,6 +88,24 @@
       "parentUuid": "9b3ea097_7ccee21a",
       "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f69c1a84_7472349d",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-19T12:24:57Z",
+      "side": 1,
+      "message": "Why are mutating the environment? Why not do this in the style of testscript, and craft a custom environment that is passed to the commands that need to run?",
+      "parentUuid": "9b3ea097_7ccee21a",
+      "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ],
   "submitRequirementResults": [

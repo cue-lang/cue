@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "6d01367b_4abef21b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-19T10:09:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fffc9cc0_d40b97d1",
+      "range": {
+        "startLine": 7,
+        "startChar": 14,
+        "endLine": 7,
+        "endChar": 33
+      },
+      "revId": "00ce65fc78dfa17592baf382612579d0804b84f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c1e61ab5_8e584fe1",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7e48a3d1_28401834",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-19T10:09:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1e61ab5_8e584fe1",
+      "range": {
+        "startLine": 9,
+        "startChar": 23,
+        "endLine": 9,
+        "endChar": 25
+      },
+      "revId": "00ce65fc78dfa17592baf382612579d0804b84f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a92e636a_16a0bfc6",
@@ -60,6 +108,30 @@
       "writtenOn": "2024-04-19T10:06:07Z",
       "side": 1,
       "message": "ditto\n\nalso, consistently use `cue.Value.Decimal` when referring to the Decimal method, as hiddenValue is an implementation detail",
+      "range": {
+        "startLine": 15,
+        "startChar": 13,
+        "endLine": 15,
+        "endChar": 15
+      },
+      "revId": "00ce65fc78dfa17592baf382612579d0804b84f5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7b0944b2_a36f6e47",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-19T10:09:14Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a92e636a_16a0bfc6",
       "range": {
         "startLine": 15,
         "startChar": 13,

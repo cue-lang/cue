@@ -21,12 +21,9 @@ import (
 )
 
 func Evaluate(r adt.Runtime, v *adt.Vertex) {
-	format := func(n adt.Node) string {
-		return debug.NodeString(r, n, printConfig)
-	}
 	c := adt.New(v, &adt.Config{
 		Runtime: r,
-		Format:  format,
+		Format:  nodeFormat,
 	})
 	v.Finalize(c)
 }
@@ -47,12 +44,9 @@ func (e *Unifier) Stats() *stats.Counts {
 // TODO: Note: NewContext takes essentially a cue.Value. By making this
 // type more central, we can perhaps avoid context creation.
 func NewContext(r adt.Runtime, v *adt.Vertex) *adt.OpContext {
-	format := func(n adt.Node) string {
-		return debug.NodeString(r, n, printConfig)
-	}
 	return adt.New(v, &adt.Config{
 		Runtime: r,
-		Format:  format,
+		Format:  nodeFormat,
 	})
 }
 
@@ -61,3 +55,7 @@ func (e *Unifier) NewContext(v *adt.Vertex) *adt.OpContext {
 }
 
 var printConfig = &debug.Config{Compact: true}
+
+func nodeFormat(r adt.Runtime, n adt.Node) string {
+	return debug.NodeString(r, n, printConfig)
+}

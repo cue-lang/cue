@@ -658,8 +658,14 @@ func TestNull(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Lookup("v").Null()
+			v := getInstance(t, tc.value).Lookup("v")
+			err := v.Null()
 			checkErr(t, err, tc.err, "init")
+			wantBool := err == nil
+			gotBool := v.IsNull()
+			if wantBool != gotBool {
+				t.Fatalf("IsNull reported %v, but Null reported: %v", gotBool, err)
+			}
 		})
 	}
 }

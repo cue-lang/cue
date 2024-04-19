@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/validate"
+	"cuelang.org/go/internal/cuedebug"
 	"cuelang.org/go/internal/cuetxtar"
 	_ "cuelang.org/go/pkg"
 )
@@ -58,7 +59,7 @@ func TestEval(t *testing.T) {
 	}
 
 	test.Run(t, func(tc *cuetxtar.Test) {
-		runEvalTest(tc, internal.DefaultVersion)
+		runEvalTest(tc, internal.DefaultVersion, cuedebug.Config{})
 	})
 }
 
@@ -78,6 +79,10 @@ func TestEvalAlpha(t *testing.T) {
 	// dedicated mechanism.
 	//
 	// adt.DebugDeps = true // check unmatched dependencies.
+
+	flags := cuedebug.Config{
+		Sharing: true,
+	}
 
 	var todoAlpha = map[string]string{
 		// Crashes and hangs
@@ -111,7 +116,7 @@ func TestEvalAlpha(t *testing.T) {
 		}
 		ran++
 
-		errorCount += runEvalTest(t, internal.DevVersion)
+		errorCount += runEvalTest(t, internal.DevVersion, flags)
 	})
 
 	t.Logf("todo: %d, ran: %d, skipped: %d, nodeErrors: %d",
@@ -140,9 +145,9 @@ func skipFiles(a ...*ast.File) (reason string) {
 	return reason
 }
 
-func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) (errorCount int) {
+func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion, flags cuedebug.Config) (errorCount int) {
 	a := t.Instance()
-	r := runtime.NewVersioned(version)
+	r := runtime.NewWithSettings(version, flags)
 
 	v, err := r.Build(nil, a)
 	if err != nil {
@@ -153,6 +158,7 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) (errorCoun
 	e := eval.New(r)
 	ctx := e.NewContext(v)
 	ctx.Version = version
+	ctx.Config = flags
 	v.Finalize(ctx)
 
 	// Print discrepancies in dependencies.
@@ -227,11 +233,13 @@ func runEvalTest(t *cuetxtar.Test, version internal.EvaluatorVersion) (errorCoun
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
-	var verbosity int
-	verbosity = 1 // comment to turn logging off.
-
 	adt.DebugDeps = true
 	// adt.OpenGraphs = true
+
+	flags := cuedebug.Config{
+		Sharing: true, // Uncomment to turn sharing off.
+		LogEval: 1,    // Uncomment to turn logging off
+	}
 
 	var version internal.EvaluatorVersion
 	version = internal.DevVersion // comment to use default implementation.
@@ -253,7 +261,7 @@ module: "mod.test"
 		t.Fatal(instance.Err)
 	}
 
-	r := runtime.NewVersioned(version)
+	r := runtime.NewWithSettings(version, flags)
 
 	v, err := r.Build(nil, instance)
 	if err != nil {
@@ -262,7 +270,7 @@ module: "mod.test"
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)
-	ctx.LogEval = verbosity
+	ctx.Config = flags
 	v.Finalize(ctx)
 
 	out := debug.NodeString(r, v, nil)

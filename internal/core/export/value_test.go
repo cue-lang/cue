@@ -101,7 +101,7 @@ func TestValueX(t *testing.T) {
 	}
 
 	ctx := eval.NewContext(r, v)
-	ctx.Verbosity = 1
+	ctx.LogEval = 1
 	v.Finalize(ctx)
 
 	p := export.All

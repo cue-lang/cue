@@ -160,7 +160,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 	}
 
 	// defer c.PopVertex(c.PushVertex(v))
-	if c.Debug {
+	if c.LogEval > 0 {
 		c.nest++
 		c.Logf(v, "Unify")
 		defer func() {

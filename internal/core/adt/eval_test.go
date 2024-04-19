@@ -262,7 +262,7 @@ module: "mod.test"
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)
-	ctx.Verbosity = verbosity
+	ctx.LogEval = verbosity
 	v.Finalize(ctx)
 
 	out := debug.NodeString(r, v, nil)

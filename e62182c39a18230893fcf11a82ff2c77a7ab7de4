@@ -16,6 +16,24 @@
       "message": "is Unsetenv necessary? if it is for any specific reason I\u0027d document it.",
       "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a20dc98d_cb479b1d",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-19T12:14:30Z",
+      "side": 1,
+      "message": "We want to end up with a pristine environment. The only way I know to do that is to use Unsetenv. Is that unusual?",
+      "parentUuid": "296218e2_6f63d774",
+      "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

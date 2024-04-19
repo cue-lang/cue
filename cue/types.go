@@ -1210,6 +1210,26 @@ func (v Value) Exists() bool {
 	return true
 }
 
+func (v Value) isKind(ctx *adt.OpContext, want adt.Kind) bool {
+	if v.v == nil {
+		return false
+	}
+	x := v.eval(ctx)
+	if _, ok := x.(*adt.Bottom); ok {
+		return false
+	}
+	k := x.Kind()
+	if want != adt.BottomKind {
+		if k&want == adt.BottomKind {
+			return false
+		}
+		if !adt.IsConcrete(x) {
+			return false
+		}
+	}
+	return true
+}
+
 func (v Value) checkKind(ctx *adt.OpContext, want adt.Kind) *adt.Bottom {
 	if v.v == nil {
 		return errNotExists
@@ -1311,10 +1331,11 @@ func (v Value) Null() error {
 	return nil
 }
 
-// // IsNull reports whether v is null.
-// func (v Value) IsNull() bool {
-// 	return v.Null() == nil
-// }
+// IsNull reports whether v is null.
+func (v Value) IsNull() bool {
+	v, _ = v.Default()
+	return v.isKind(v.ctx(), adt.NullKind)
+}
 
 // Bool returns the bool value of v or false and an error if v is not a boolean.
 func (v Value) Bool() (bool, error) {

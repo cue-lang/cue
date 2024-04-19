@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "42bd3fa8_32fe9fb3",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-19T12:30:46Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c1c6735f_37264280",
+      "range": {
+        "startLine": 166,
+        "startChar": 5,
+        "endLine": 166,
+        "endChar": 12
+      },
+      "revId": "e15488c11dad1df421fabe00eda0e6bbc55f225e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "97a50197_b747d1db",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-04-19T12:17:57Z",
       "side": 1,
       "message": "what about using `onceValues` with two results, e.g. `var earliestClosedSchemaVersion, latestKnownSchemaVersion \u003d sync.OnceValues(...)`",
+      "revId": "e15488c11dad1df421fabe00eda0e6bbc55f225e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5e205e87_f04a4346",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-19T12:30:46Z",
+      "side": 1,
+      "message": "Seems like a good idea but actually it makes the code a little longer and not much clearer (a lower and upper limit seems quite nicely represented by `[2]string`), so I\u0027ve stayed with it as is for now.\n\nNote that we can\u0027t do exactly as you suggest because sync.OnceValues returns a func not a pair of values.",
+      "parentUuid": "97a50197_b747d1db",
       "revId": "e15488c11dad1df421fabe00eda0e6bbc55f225e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

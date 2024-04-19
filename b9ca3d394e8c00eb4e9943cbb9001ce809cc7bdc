@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ccae3b63_96a32ec2",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 8
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T13:52:57Z",
+      "side": 1,
+      "message": "Thanks! Just two nits.",
+      "revId": "b9ca3d394e8c00eb4e9943cbb9001ce809cc7bdc",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

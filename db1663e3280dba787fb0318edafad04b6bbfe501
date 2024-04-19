@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2feb5d22_e036e9c8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 7
+      },
+      "lineNbr": 58,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T13:52:57Z",
+      "side": 1,
+      "message": "can you indent the code blocks? this way they are still readable in plaintext, but render as code blocks in markdown.",
+      "revId": "db1663e3280dba787fb0318edafad04b6bbfe501",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4ce1784a_ff868495",
+        "filename": "cue/format/simplify.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T13:52:57Z",
+      "side": 1,
+      "message": "could this not be `x \u003d astutil.Apply(x, sc.replace, nil).(*ast.Field)`? a tiny bit simpler that way.",
+      "revId": "db1663e3280dba787fb0318edafad04b6bbfe501",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

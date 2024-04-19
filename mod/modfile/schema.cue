@@ -21,7 +21,7 @@
 // Note: we're using 1&2 rather than _|_ because
 // use of _|_ causes the source location of the errors
 // to be lost. See https://github.com/cue-lang/cue/issues/2319.
-let unimplemented = 1&2
+let unimplemented = 1 & 2
 
 // versions holds an element for each supported version
 // of the schema. The version key specifies that
@@ -38,6 +38,7 @@ versions: [string]: {
 		// language.version field.
 		language!: version!: string
 	}
+
 	// #Strict can be unified with the top level schema to enforce the strict version
 	// of the schema required when publishing a module.
 	#Strict!: _

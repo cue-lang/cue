@@ -1,0 +1,44 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c1c6735f_37264280",
+        "filename": "cmd/cue/cmd/mod.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 166,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T12:17:57Z",
+      "side": 1,
+      "message": "duplicate word",
+      "range": {
+        "startLine": 166,
+        "startChar": 5,
+        "endLine": 166,
+        "endChar": 12
+      },
+      "revId": "e15488c11dad1df421fabe00eda0e6bbc55f225e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "97a50197_b747d1db",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 192,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T12:17:57Z",
+      "side": 1,
+      "message": "what about using `onceValues` with two results, e.g. `var earliestClosedSchemaVersion, latestKnownSchemaVersion \u003d sync.OnceValues(...)`",
+      "revId": "e15488c11dad1df421fabe00eda0e6bbc55f225e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -167,7 +167,7 @@ type Runtime interface {
 	// type if available.
 	LoadType(t reflect.Type) (src ast.Expr, expr Expr, ok bool)
 
-	EvaluatorVersion() internal.EvaluatorVersion
+	Settings() (internal.EvaluatorVersion, cuedebug.Config)
 }
 
 type Config struct {
@@ -180,11 +180,13 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	if cfg.Runtime == nil {
 		panic("nil Runtime")
 	}
+	version, flags := cfg.Runtime.Settings()
 	ctx := &OpContext{
 		Runtime:     cfg.Runtime,
 		Format:      cfg.Format,
 		vertex:      v,
-		Version:     cfg.Runtime.EvaluatorVersion(),
+		Version:     version,
+		Config:      flags,
 		taskContext: schedConfig,
 	}
 	if v != nil {

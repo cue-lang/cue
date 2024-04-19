@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "296218e2_6f63d774",
+        "filename": "internal/vcs/vcs_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 98,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-19T12:13:04Z",
+      "side": 1,
+      "message": "is Unsetenv necessary? if it is for any specific reason I\u0027d document it.",
+      "revId": "e62182c39a18230893fcf11a82ff2c77a7ab7de4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

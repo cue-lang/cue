@@ -21,11 +21,12 @@ import (
 	"strings"
 
 	"github.com/spf13/cobra"
+	gomodule "golang.org/x/mod/module"
+	"golang.org/x/mod/semver"
 
 	"cuelang.org/go/internal/cueexperiment"
 	"cuelang.org/go/mod/modfile"
 	"cuelang.org/go/mod/module"
-	gomodule "golang.org/x/mod/module"
 )
 
 func newModCmd(c *Command) *cobra.Command {
@@ -119,10 +120,14 @@ func runModInit(cmd *Command, args []string) (err error) {
 	mf := &modfile.File{
 		Module: modulePath,
 	}
-	if vers := versionForModFile(); vers != "" {
-		mf.Language = &modfile.Language{
-			Version: vers,
-		}
+	vers := versionForModFile()
+	if vers == "" {
+		// Shouldn't happen because we should use the
+		// fallback version if we can't the version otherwise.
+		return fmt.Errorf("cannot determine language version for module")
+	}
+	mf.Language = &modfile.Language{
+		Version: vers,
 	}
 
 	err = os.Mkdir(mod, 0755)
@@ -150,13 +155,27 @@ func runModInit(cmd *Command, args []string) (err error) {
 
 func versionForModFile() string {
 	version := cueVersion()
+	earliestPossibleVersion := modfile.EarliestClosedSchemaVersion()
+	if semver.Compare(version, earliestPossibleVersion) < 0 {
+		// The reported version is earlier than it should be,
+		// which can occur for some pseudo versions, or
+		// potentially the cue command has been forked and
+		// published under an independent version numbering.
+		//
+		// In this case, we use the fallback version as the best
+		// guess as to a version that actually reflects the
+		// capabilities of the module file.
+		version = modfile.LatestKnownSchemaVersion()
+	}
 	if gomodule.IsPseudoVersion(version) {
 		// If we have a version like v0.7.1-0.20240130142347-7855e15cb701
 		// we want it to turn into the base version (v0.7.0 in that example).
-		// If there's no base version (e.g. v0.0.0-...) then PseudoVersionBase
-		// will return the empty string, which is exactly what we want
-		// because we don't want to put v0.0.0 in a module.cue file.
-		version, _ = gomodule.PseudoVersionBase(version)
+		// Subject the resulting base version to the same sanity check
+		// as above.
+		pv, _ := gomodule.PseudoVersionBase(version)
+		if pv != "" && semver.Compare(pv, earliestPossibleVersion) >= 0 {
+			version = pv
+		}
 	}
 	return version
 }

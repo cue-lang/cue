@@ -43,20 +43,7 @@ versions: [string]: {
 	#Strict!: _
 }
 
-versions: "v0.0.0": {
-	// Historically all fields were allowed.
-	#File: {
-		module?: string
-		...
-	}
-	#Strict: #File
-}
-
-// earliestClosedSchemaVersion holds the earliest module.cue schema version
-// that excludes unknown fields.
-earliestClosedSchemaVersion: "v0.8.0"
-
-versions: (earliestClosedSchemaVersion): {
+versions: "v0.8.0": {
 	// Define this version in terms of the later versions
 	// rather than the other way around, so that
 	// the latest version is clearest.

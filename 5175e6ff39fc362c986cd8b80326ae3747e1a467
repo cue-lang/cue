@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cf3c732e_8740ef4f",
+        "filename": "cue/format/simplify.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 83,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-19T13:36:39Z",
+      "side": 1,
+      "message": "sorry about that, will pay attention next ime",
+      "parentUuid": "e4f77df0_9132088e",
+      "revId": "5175e6ff39fc362c986cd8b80326ae3747e1a467",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "2bde1158_707849aa",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0866bf78_8db330b8",
+        "filename": "cue/format/simplify.go",
+        "patchSetId": 5
+      },
+      "lineNbr": 113,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-19T13:36:39Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2bde1158_707849aa",
+      "revId": "5175e6ff39fc362c986cd8b80326ae3747e1a467",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c22b5466_71fe9570",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-04-19T13:15:21Z",
       "side": 1,
       "message": "just like the other patch, can you add the test before the fix, so that we can see the broken output and the change with the fix in a second commit?",
+      "revId": "5175e6ff39fc362c986cd8b80326ae3747e1a467",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "09065802_000dbe3b",
+        "filename": "cue/format/testdata/simplify.golden",
+        "patchSetId": 5
+      },
+      "lineNbr": 79,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-19T13:36:39Z",
+      "side": 1,
+      "message": "as discussed offline, this is not possible because the current state results in invalid cue.\nI added more context in the commit message",
+      "parentUuid": "c22b5466_71fe9570",
       "revId": "5175e6ff39fc362c986cd8b80326ae3747e1a467",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

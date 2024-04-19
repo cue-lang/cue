@@ -16,6 +16,24 @@
       "message": "I wonder if we should support `cue mod init --source\u003dself foo.bar/baz`.",
       "revId": "d02a28bc8499e0de910ddba58dee869bb483d28d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e7c3593_56e41d10",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-19T12:15:18Z",
+      "side": 1,
+      "message": "Yeah, possibly. Wana raise an issue?",
+      "parentUuid": "d78fcbb3_bc0c21ce",
+      "revId": "d02a28bc8499e0de910ddba58dee869bb483d28d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

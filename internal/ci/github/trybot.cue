@@ -116,7 +116,7 @@ workflows: trybot: _repo.bashWorkflow & {
 		// The end-to-end tests require a github token secret and are a bit slow,
 		// so we only run them on pushes to protected branches and on one
 		// environment in the source repo.
-		if: "github.repository == '\(_repo.githubRepositoryPath)' && \(_repo.isProtectedBranch) && \(_isLatestLinux)"
+		if: "github.repository == '\(_repo.githubRepositoryPath)' && (\(_repo.isProtectedBranch) || \(_repo.isTestDefaultBranch)) && \(_isLatestLinux)"
 	}] & [
 		// Two setup steps per the upstream docs:
 		// https://github.com/google-github-actions/setup-gcloud#service-account-key-json

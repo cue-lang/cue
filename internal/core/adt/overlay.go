@@ -137,7 +137,7 @@ func (ctx *overlayContext) unlinkOverlay() {
 // to eliminate disjunctions pre-copy based on discriminator fields and what
 // have you. This is not unlikely to eliminate
 func (ctx *overlayContext) cloneVertex(x *Vertex) *Vertex {
-	xcc := x.rootCloseContext() // may be uninitialized for constraints.
+	xcc := x.rootCloseContext(ctx.ctx) // may be uninitialized for constraints.
 	if o := xcc.overlay; o != nil && o.src != nil {
 		// This path could happen with structure sharing or user-constructed
 		// values.

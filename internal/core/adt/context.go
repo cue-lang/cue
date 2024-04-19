@@ -17,7 +17,6 @@ package adt
 import (
 	"fmt"
 	"log"
-	"os"
 	"reflect"
 	"regexp"
 	"sort"
@@ -33,16 +32,18 @@ import (
 	"cuelang.org/go/internal"
 )
 
-// Debug sets whether extra aggressive checking should be done.
-// This should typically default to true for pre-releases and default to
-// false otherwise.
-var Debug bool = os.Getenv("CUE_DEBUG") != "0"
+type DebugFlags struct {
+	// Debug sets whether extra aggressive checking should be done.
+	// This should typically default to true for pre-releases and default to
+	// false otherwise.
+	Debug bool
 
-// Verbosity sets the log level. There are currently only two levels:
-//
-//	0: no logging
-//	1: logging
-var Verbosity int
+	// Verbosity sets the log level. There are currently only two levels:
+	//
+	//	0: no logging
+	//	1: logging
+	Verbosity int
+}
 
 // DebugSort specifies that arcs be sorted consistently between implementations.
 //
@@ -50,6 +51,8 @@ var Verbosity int
 //	1: sort by Feature: this should be consistent between implementations where
 //		   there is no change in the compiler and indexing code.
 //	2: alphabetical
+//
+// TODO: move to DebugFlags
 var DebugSort int
 
 func DebugSortArcs(c *OpContext, n *Vertex) {
@@ -92,8 +95,8 @@ func DebugSortFields(c *OpContext, a []Feature) {
 //
 // It is advisable for each use of Assert to document how the error is expected
 // to be handled down the line.
-func Assertf(b bool, format string, args ...interface{}) {
-	if Debug && !b {
+func Assertf(c *OpContext, b bool, format string, args ...interface{}) {
+	if c.Debug && !b {
 		panic(fmt.Sprintf("assertion failed: "+format, args...))
 	}
 }
@@ -101,7 +104,7 @@ func Assertf(b bool, format string, args ...interface{}) {
 // Assertf either panics or reports an error to c if the condition is not met.
 func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...interface{}) {
 	if !b {
-		if Debug {
+		if c.Debug {
 			panic(fmt.Sprintf("assertion failed: "+format, args...))
 		}
 		c.addErrf(0, pos, format, args...)
@@ -115,7 +118,7 @@ func init() {
 var pMap = map[*Vertex]int{}
 
 func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
-	if Verbosity == 0 {
+	if c.Verbosity == 0 {
 		return
 	}
 	if v == nil {
@@ -214,6 +217,7 @@ type OpContext struct {
 	Runtime
 	Format func(Node) string
 
+	DebugFlags
 	Version internal.EvaluatorVersion // Copied from Runtime
 
 	taskContext
@@ -628,7 +632,7 @@ func (c *OpContext) evaluateRec(v Conjunct, state combinedFlags) Value {
 	val := c.evalState(x, state)
 	if val == nil {
 		// Be defensive: this never happens, but just in case.
-		Assertf(false, "nil return value: unspecified error")
+		Assertf(c, false, "nil return value: unspecified error")
 		val = &Bottom{
 			Code: IncompleteError,
 			Err:  c.Newf("UNANTICIPATED ERROR"),

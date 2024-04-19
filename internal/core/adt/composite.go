@@ -266,7 +266,7 @@ func equalDeref(a, b *Vertex) bool {
 
 // rootCloseContext creates a closeContext for this Vertex or returns the
 // existing one.
-func (v *Vertex) rootCloseContext() *closeContext {
+func (v *Vertex) rootCloseContext(ctx *OpContext) *closeContext {
 	if v.cc == nil {
 		v.cc = &closeContext{
 			group:           (*ConjunctGroup)(&v.Conjuncts),
@@ -274,7 +274,7 @@ func (v *Vertex) rootCloseContext() *closeContext {
 			src:             v,
 			parentConjuncts: v,
 		}
-		v.cc.incDependent(ROOT, nil) // matched in REF(decrement:nodeDone)
+		v.cc.incDependent(ctx, ROOT, nil) // matched in REF(decrement:nodeDone)
 	}
 	return v.cc
 }
@@ -534,8 +534,8 @@ func (v *Vertex) IsUnprocessed() bool {
 
 func (v *Vertex) updateStatus(s vertexStatus) {
 	if !isCyclePlaceholder(v.BaseValue) {
-		if _, ok := v.BaseValue.(*Bottom); !ok {
-			Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+		if _, ok := v.BaseValue.(*Bottom); !ok && v.state != nil {
+			Assertf(v.state.ctx, v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
 		}
 	}
 
@@ -996,7 +996,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 		for _, pc := range pcs.Pairs {
 			if matchPattern(ctx, pc.Pattern, arc.Label) {
 				for _, c := range pc.Constraint.Conjuncts {
-					root := arc.rootCloseContext()
+					root := arc.rootCloseContext(ctx)
 					root.insertConjunct(ctx, root, c, c.CloseInfo, ArcMember, true, false)
 				}
 			}
@@ -1197,7 +1197,7 @@ func (n *nodeContext) notifyConjunct(c Conjunct) {
 				// TODO: continuing here is likely to result in a faulty
 				// (incomplete) configuration. But this may be okay. The
 				// CUE_DEBUG=0 flag disables this assertion.
-				n.ctx.Assertf(n.ctx.pos(), Debug, "unexpected nil state")
+				n.ctx.Assertf(n.ctx.pos(), !n.ctx.Debug, "unexpected nil state")
 				n.ctx.addErrf(0, n.ctx.pos(), "cannot add to field %v", arc.Label)
 				continue
 			}

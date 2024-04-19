@@ -360,7 +360,7 @@ func (n *nodeContext) expandDisjuncts(
 					m = combineDefault(m, info.nestedMode)
 
 				case hasDefaults && !used:
-					Assertf(parent == notDefault, "unexpected default mode")
+					Assertf(n.ctx, parent == notDefault, "unexpected default mode")
 				}
 			}
 			d.defaultMode = m

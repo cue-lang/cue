@@ -531,7 +531,7 @@ outer:
 		// evaluator.
 		v := Conjunct{env, x, ci}
 		if n.ctx.isDevVersion() {
-			n.node.cc.incDependent(DEFER, nil)
+			n.node.cc.incDependent(n.ctx, DEFER, nil)
 		}
 		n.cyclicConjuncts = append(n.cyclicConjuncts, cyclicConjunct{v, arc})
 		return ci, true
@@ -565,7 +565,7 @@ func (n *nodeContext) updateCyclicStatus(c CloseInfo) {
 		for _, c := range n.cyclicConjuncts {
 			if n.ctx.isDevVersion() {
 				ci := c.c.CloseInfo
-				ci.cc = n.node.rootCloseContext()
+				ci.cc = n.node.rootCloseContext(n.ctx)
 				n.scheduleVertexConjuncts(c.c, c.arc, ci)
 				n.node.cc.decDependent(n.ctx, DEFER, nil)
 			} else {

@@ -69,7 +69,7 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 		// conjunct represents an embedding or definition, we need to create a
 		// new closeContext to represent this.
 		if id.cc == nil {
-			id.cc = n.node.rootCloseContext()
+			id.cc = n.node.rootCloseContext(n.ctx)
 		}
 		if id.cc == cc {
 			panic("inconsistent state: same closeContext")
@@ -82,10 +82,10 @@ func (n *nodeContext) scheduleConjunct(c Conjunct, id CloseInfo) {
 			t |= closeEmbed
 		}
 		if t != 0 {
-			id, _ = id.spawnCloseContext(t)
+			id, _ = id.spawnCloseContext(n.ctx, t)
 		}
 		if !id.cc.done {
-			id.cc.incDependent(DEFER, nil)
+			id.cc.incDependent(n.ctx, DEFER, nil)
 			defer id.cc.decDependent(n.ctx, DEFER, nil)
 		}
 
@@ -274,7 +274,7 @@ loop2:
 				// for files.
 				// TODO: set this as a flag in StructLit so as to not have to
 				// do the somewhat dangerous cast here.
-				ci, _ = ci.spawnCloseContext(0)
+				ci, _ = ci.spawnCloseContext(n.ctx, 0)
 			}
 			// Note: adding a count is not needed here, as there will be an
 			// embed spawn below.
@@ -300,8 +300,8 @@ loop2:
 			n.insertArc(x.Label, ArcMember, lc, ci, true)
 
 		case *Comprehension:
-			ci, cc := ci.spawnCloseContext(closeEmbed)
-			cc.incDependent(DEFER, nil)
+			ci, cc := ci.spawnCloseContext(n.ctx, closeEmbed)
+			cc.incDependent(n.ctx, DEFER, nil)
 			defer cc.decDependent(n.ctx, DEFER, nil)
 			n.insertComprehension(childEnv, x, ci)
 			hasEmbed = true
@@ -325,10 +325,10 @@ loop2:
 
 		case Expr:
 			// TODO: perhaps special case scalar Values to avoid creating embedding.
-			ci, cc := ci.spawnCloseContext(closeEmbed)
+			ci, cc := ci.spawnCloseContext(n.ctx, closeEmbed)
 
 			// TODO: do we need to increment here?
-			cc.incDependent(DEFER, nil) // decrement deferred below
+			cc.incDependent(n.ctx, DEFER, nil) // decrement deferred below
 			defer cc.decDependent(n.ctx, DEFER, nil)
 
 			ec := MakeConjunct(childEnv, x, ci)
@@ -394,10 +394,10 @@ func (n *nodeContext) scheduleVertexConjuncts(c Conjunct, arc *Vertex, closeInfo
 
 	if IsDef(c.Expr()) {
 		// TODO: or should we always insert the wrapper (for errors)?
-		ci, dc := closeInfo.spawnCloseContext(closeDef)
+		ci, dc := closeInfo.spawnCloseContext(n.ctx, closeDef)
 		closeInfo = ci
 
-		dc.incDependent(DEFER, nil) // decrement deferred below
+		dc.incDependent(n.ctx, DEFER, nil) // decrement deferred below
 		defer dc.decDependent(n.ctx, DEFER, nil)
 	}
 
@@ -446,7 +446,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 
 	// TODO: dedup: only add if t does not already exist. First check if this
 	// is even possible by adding a panic.
-	root := n.node.rootCloseContext()
+	root := n.node.rootCloseContext(n.ctx)
 	if root.isDecremented {
 		return old
 	}
@@ -459,7 +459,7 @@ func (n *nodeContext) addNotify2(v *Vertex, c CloseInfo) []receiver {
 
 	cc := c.cc
 
-	if root.linkNotify(v, cc, c.CycleInfo) {
+	if root.linkNotify(n.ctx, v, cc, c.CycleInfo) {
 		n.notify = append(n.notify, receiver{v, cc})
 	}
 
@@ -485,7 +485,7 @@ func (n *nodeContext) insertValueConjunct(env *Environment, v Value, id CloseInf
 				id.IsClosed = true
 				if ctx.isDevVersion() {
 					var cc *closeContext
-					id, cc = id.spawnCloseContext(0)
+					id, cc = id.spawnCloseContext(n.ctx, 0)
 					cc.isClosedOnce = true
 				}
 			}

@@ -1513,6 +1513,10 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 
 		case *Bottom:
 			// TODO(errors): consider adding an argument index for this errors.
+			if b.AllowErrors {
+				args = append(args, expr)
+				continue
+			}
 			c.errs = CombineErrors(a.Source(), c.errs, v)
 
 		default:
@@ -1520,7 +1524,7 @@ func (x *CallExpr) evaluate(c *OpContext, state combinedFlags) Value {
 		}
 		c.errs = CombineErrors(a.Source(), saved, c.errs)
 	}
-	if c.HasErr() {
+	if c.HasErr() && (b == nil || !b.AllowErrors) {
 		return nil
 	}
 	if b.IsValidator(len(args)) {
@@ -1540,8 +1544,9 @@ type Builtin struct {
 	Result Kind
 	Func   func(c *OpContext, args []Value) Expr
 
-	Package Feature
-	Name    string
+	Package     Feature
+	Name        string
+	AllowErrors bool
 }
 
 type Param struct {

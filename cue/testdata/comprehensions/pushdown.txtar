@@ -784,6 +784,9 @@ embed.fail4.p: field not allowed:
 fieldMismatch.a: cannot combine regular field "x" with 2:
     ./in.cue:139:7
     ./in.cue:137:3
+structShare.err1.x.d.e: field not allowed:
+    ./in.cue:578:12
+    ./in.cue:578:9
 
 Result:
 (_|_){
@@ -1280,16 +1283,30 @@ Result:
       }
     }
   }
-  structShare: (struct){
+  structShare: (_|_){
+    // [eval]
     ok1: (struct){
       a: (struct){
+        d: (struct){
+          e: (bool){ true }
+        }
       }
       E: (struct){
       }
     }
-    err1: (struct){
-      x: (struct){
+    err1: (_|_){
+      // [eval]
+      x: (_|_){
+        // [eval]
         #E: (#struct){
+        }
+        d: (_|_){
+          // [eval]
+          e: (_|_){
+            // [eval] structShare.err1.x.d.e: field not allowed:
+            //     ./in.cue:578:12
+            //     ./in.cue:578:9
+          }
         }
       }
     }
@@ -1417,7 +1434,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,29 +1,13 @@
+@@ -1,32 +1,19 @@
  Errors:
 +noStackOverflowStructCycle.#list.tail: structural cycle
 +noStackOverflowStructCycle.list.tail: structural cycle
@@ -1451,7 +1468,13 @@ diff old new
  fieldMismatch.a: cannot combine regular field "x" with 2:
      ./in.cue:139:7
      ./in.cue:137:3
-@@ -68,8 +52,8 @@
++structShare.err1.x.d.e: field not allowed:
++    ./in.cue:578:12
++    ./in.cue:578:9
+ 
+ Result:
+ (_|_){
+@@ -68,8 +55,8 @@
    }
    fail: (struct){
      a: (_|_){
@@ -1462,7 +1485,7 @@ diff old new
      }
    }
    embed: (_|_){
-@@ -78,10 +62,7 @@
+@@ -78,10 +65,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail1.p: field not allowed:
@@ -1474,7 +1497,7 @@ diff old new
          //     ./in.cue:46:4
          //     ./in.cue:49:9
        }
-@@ -102,10 +83,7 @@
+@@ -102,10 +86,7 @@
        // [eval]
        p: (_|_){
          // [eval] embed.fail4.p: field not allowed:
@@ -1486,7 +1509,7 @@ diff old new
          //     ./in.cue:74:4
          q: (int){ 1 }
        }
-@@ -130,7 +108,6 @@
+@@ -130,7 +111,6 @@
          // [incomplete] embed.incomplete7.p: non-concrete value int in operand to +:
          //     ./in.cue:93:6
          //     ./in.cue:94:6
@@ -1494,7 +1517,7 @@ diff old new
        }
        q: (int){ int }
      }
-@@ -185,8 +162,7 @@
+@@ -185,8 +165,7 @@
        }
      }
    }
@@ -1504,7 +1527,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -194,16 +170,15 @@
+@@ -194,16 +173,15 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1528,7 +1551,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -210,17 +185,8 @@
+@@ -210,17 +188,8 @@
        }
        #c: (#struct){
        }
@@ -1548,7 +1571,7 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -250,17 +216,22 @@
+@@ -250,17 +219,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
@@ -1576,7 +1599,7 @@ diff old new
      }
    }
    midwayReferences: (struct){
-@@ -397,7 +368,7 @@
+@@ -397,7 +371,7 @@
        E: (#struct){
          e: (bool){ bool }
          f: (_|_){
@@ -1585,7 +1608,7 @@ diff old new
            //     ./in.cue:389:7
          }
        }
-@@ -417,17 +388,10 @@
+@@ -417,17 +391,10 @@
          }
        }
        E: (_|_){
@@ -1604,7 +1627,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -438,17 +402,10 @@
+@@ -438,17 +405,10 @@
          }
        }
        E: (_|_){
@@ -1623,48 +1646,18 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -550,33 +507,17 @@
-       }
-     }
-   }
--  structShare: (_|_){
--    // [eval]
-+  structShare: (struct){
-     ok1: (struct){
-       a: (struct){
--        d: (struct){
--          e: (bool){ true }
--        }
--      }
--      E: (struct){
--      }
--    }
--    err1: (_|_){
--      // [eval]
--      x: (_|_){
--        // [eval]
-+      }
-+      E: (struct){
-+      }
-+    }
-+    err1: (struct){
-+      x: (struct){
-         #E: (#struct){
-         }
--        d: (_|_){
--          // [eval]
--          e: (_|_){
--            // [eval] structShare.err1.x.d.e: field not allowed:
+@@ -571,9 +531,7 @@
+           // [eval]
+           e: (_|_){
+             // [eval] structShare.err1.x.d.e: field not allowed:
 -            //     ./in.cue:575:15
 -            //     ./in.cue:576:9
 -            //     ./in.cue:577:2
--            //     ./in.cue:578:9
--          }
--        }
-       }
-     }
-   }
-@@ -597,13 +538,13 @@
++            //     ./in.cue:578:12
+             //     ./in.cue:578:9
+           }
+         }
+@@ -597,13 +555,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1682,7 +1675,7 @@ diff old new
          }
        }
      }
-@@ -625,7 +566,7 @@
+@@ -625,7 +583,7 @@
        y: (int){ 1 }
      }
      a: (struct){
@@ -1691,7 +1684,7 @@ diff old new
      }
    }
    nestedWithEmbeddingOK: (struct){
-@@ -640,9 +581,7 @@
+@@ -640,9 +598,7 @@
      _c: (struct){
        y: (int){ 1 }
      }

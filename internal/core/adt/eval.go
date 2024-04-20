@@ -614,7 +614,7 @@ func (n *nodeContext) validateValue(state vertexStatus) {
 	} else if len(n.node.Structs) > 0 {
 		markStruct = n.kind&StructKind != 0 && !n.hasTop
 	}
-	v := n.node.Value()
+	v := n.node.Indirect().Value()
 	if n.node.BaseValue == nil && markStruct {
 		n.node.BaseValue = &StructMarker{}
 		v = n.node
@@ -1076,10 +1076,11 @@ type nodeContextState struct {
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
 
-	isShared  bool      // set if we are currently structure sharing.
-	noSharing bool      // set if structure sharing is not allowed
-	shared    Conjunct  // the original conjunct that led to sharing
-	sharedID  CloseInfo // the original CloseInfo that led to sharing
+	isShared      bool      // set if we are currently structure sharing.
+	noSharing     bool      // set if structure sharing is not allowed
+	shared        Conjunct  // the original conjunct that led to sharing
+	sharedID      CloseInfo // the original CloseInfo that led to sharing
+	origBaseValue BaseValue // the BaseValue that structure sharing replaces.
 
 	depth       int32
 	defaultMode defaultMode

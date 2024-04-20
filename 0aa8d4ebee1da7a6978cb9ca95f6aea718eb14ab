@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "289d3264_fbe806bf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-20T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "d0fc72ee_fd7fc497",
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "3e537c5a_18ac22f1",
@@ -31,6 +49,30 @@
       "writtenOn": "2024-04-19T08:36:58Z",
       "side": 1,
       "message": "nit: \"might\" or \"could\", because it\u0027s not always.",
+      "range": {
+        "startLine": 13,
+        "startChar": 43,
+        "endLine": 13,
+        "endChar": 48
+      },
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "af667629_0dd19338",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-20T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3e537c5a_18ac22f1",
       "range": {
         "startLine": 13,
         "startChar": 43,
@@ -64,6 +106,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "4d4f8afe_65ea657a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-20T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "0746dc3f_f1d6d0bd",
+      "range": {
+        "startLine": 14,
+        "startChar": 38,
+        "endLine": 17,
+        "endChar": 13
+      },
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "89d9c09e_ed7aaa3d",
@@ -77,6 +143,24 @@
       "writtenOn": "2024-04-19T08:36:58Z",
       "side": 1,
       "message": "please avoid unrelated whitespace changes, as they might cause more git noise/conflicts.",
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6ab1b0fc_1973e2ac",
+        "filename": "cue/format/node.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-20T07:57:09Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "89d9c09e_ed7aaa3d",
       "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -104,6 +188,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5724a66d_9b76f3c0",
+        "filename": "cue/format/printer.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-20T07:57:09Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3cbb9695_5111f007",
+      "range": {
+        "startLine": 47,
+        "startChar": 40,
+        "endLine": 48,
+        "endChar": 1
+      },
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "bc4106be_82e937d9",
@@ -117,6 +225,24 @@
       "writtenOn": "2024-04-19T08:36:58Z",
       "side": 1,
       "message": "I would say leave the input well formatted, without any extra alignment, as otherwise it seems like we somehow _want_ or intended this alignment.\n\nAlso, can you add these test changes in a commit _before_ the fix? Then it will be abundantly clear how the fix improves the broken formatting.",
+      "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "093165d3_83a8908a",
+        "filename": "cue/format/testdata/expressions.input",
+        "patchSetId": 12
+      },
+      "lineNbr": 277,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-20T07:57:09Z",
+      "side": 1,
+      "message": "agreed, I was trying to find a way to show what the incorrect formatting looked like before this fix - but the separate commit approach is better",
+      "parentUuid": "bc4106be_82e937d9",
       "revId": "0aa8d4ebee1da7a6978cb9ca95f6aea718eb14ab",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

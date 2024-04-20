@@ -39,7 +39,10 @@ func (n *nodeContext) unshare() {
 	n.isShared = false
 
 	v := n.node.BaseValue.(*Vertex)
-	n.node.BaseValue = cycle
+
+	// TODO: the use of cycle for BaseValue is getting increasingly outdated.
+	// Find another mechanism once we get rid of the old evaluator.
+	n.node.BaseValue = n.origBaseValue
 
 	n.scheduleVertexConjuncts(n.shared, v, n.sharedID)
 }
@@ -48,6 +51,7 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	if n.isShared {
 		panic("already sharing")
 	}
+	n.origBaseValue = n.node.BaseValue
 	n.node.BaseValue = arc
 	n.isShared = true
 	n.shared = c
@@ -92,4 +96,20 @@ func (n *nodeContext) shareIfPossible(c Conjunct, arc *Vertex, id CloseInfo) boo
 
 	n.share(c, arc, id)
 	return true
+}
+
+// IndirectNonShared finds the indirection of an arc that is not the result of
+// structure sharing. This is especially relevant when indirecting disjunction
+// values.
+func (v *Vertex) IndirectNonShared() *Vertex {
+	if v.state != nil && v.state.isShared {
+		return v
+	}
+	for {
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok {
+			return v
+		}
+		v = arc
+	}
 }

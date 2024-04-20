@@ -235,7 +235,7 @@ func (f *formatter) inlineField(n *ast.Field) *ast.Field {
 	regular := internal.IsRegularField(n)
 	// shortcut single-element structs.
 	// If the label has a valid position, we assume that an unspecified
-	// Lbrace signals the intend to collapse fields.
+	// Lbrace signals the intent to collapse fields.
 	if !n.Label.Pos().IsValid() && !(f.printer.cfg.simplify && regular) {
 		return nil
 	}
@@ -304,7 +304,7 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		nextFF := f.nextNeedsFormfeed(n.Value)
 		tab := vtab
-		if nextFF {
+		if nextFF || f.prevLbraceOnLine {
 			tab = blank
 		}
 
@@ -645,6 +645,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 			ws |= newline | nooverride
 		}
 		f.print(x.Lbrace, token.LBRACE, &l, ws, ff, indent)
+		f.prevLbraceOnLine = l == f.lineout
 
 		f.walkDeclList(x.Elts)
 		f.matchUnindent()
@@ -849,7 +850,7 @@ func (f *formatter) binaryExpr(x *ast.BinaryExpr, prec1, cutoff, depth int) {
 	prec := x.Op.Precedence()
 	if prec < prec1 {
 		// parenthesis needed
-		// Note: The parser inserts an syntax.ParenExpr node; thus this case
+		// Note: The parser inserts a syntax.ParenExpr node; thus this case
 		//       can only occur if the AST is created in a different way.
 		// defer p.pushComment(nil).pop()
 		f.print(token.LPAREN, nooverride)

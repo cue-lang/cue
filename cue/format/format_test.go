@@ -229,7 +229,7 @@ func init() {
 	}
 }
 
-// TestNodes tests nodes that are that are invalid CUE, but are accepted by
+// TestNodes tests nodes that are invalid CUE, but are accepted by
 // format.
 func TestNodes(t *testing.T) {
 	testCases := []struct {

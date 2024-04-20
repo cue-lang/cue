@@ -270,12 +270,12 @@ import "list"
 	o: [{}]
 	o: [{}]
 
-	p:         1
+	p: 1
 	p: p & {p: 2}
-	q:         1
+	q: 1
 	q: q | {q: 2}
-	r:                1
+	r: 1
 	r: b & [1, 2, {a: 4}]
 	s: [string]: [string]: a
-	s: [string]: {s:       string}
+	s: [string]: {s: string}
 }

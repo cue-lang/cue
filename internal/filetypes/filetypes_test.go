@@ -333,6 +333,20 @@ func TestParseFile(t *testing.T) {
 	}, {
 		in:  "file.bar",
 		out: `unknown file extension .bar`,
+	}, {
+		in:   "-",
+		mode: Input,
+		out: &build.File{
+			Filename: "-",
+			Encoding: "cue",
+		},
+	}, {
+		in:   "-",
+		mode: Export,
+		out: &build.File{
+			Filename: "-",
+			Encoding: "json",
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.in, func(t *testing.T) {

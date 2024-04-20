@@ -299,13 +299,18 @@ func (v *Vertex) updateArcType(t ArcType) {
 	if v.ArcType == ArcNotPresent {
 		return
 	}
-	if s := v.state; (s != nil || v.isFinal()) && s.ctx.isDevVersion() {
+	s := v.state
+	if (s != nil || v.isFinal()) && s.ctx.isDevVersion() {
 		c := s.ctx
 		if s.scheduler.frozen.meets(arcTypeKnown) {
 			parent := v.Parent
 			parent.reportFieldCycleError(c, c.Source().Pos(), v.Label)
 			return
 		}
+	}
+	if v.Parent != nil && v.Parent.ArcType == ArcPending && v.Parent.state != nil && v.Parent.state.ctx.isDevVersion() {
+		// TODO: check that state is always non-nil.
+		v.Parent.state.unshare()
 	}
 	v.ArcType = t
 }

@@ -271,7 +271,6 @@ func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 	if concrete, hasDefault := hasEncoding(fileVal); !concrete {
 		if filename == "-" {
 			if !hasDefault {
-				// TODO(mvdan): unused?
 				fileVal = fileVal.Unify(modeVal.LookupPath(cue.MakePath(cue.Str("Default"))))
 			}
 		} else if ext := fileExt(filename); ext != "" {

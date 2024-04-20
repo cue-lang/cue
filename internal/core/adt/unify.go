@@ -156,29 +156,15 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	nodeOnlyNeeds := needs &^ (subFieldsProcessed)
 	n.process(nodeOnlyNeeds, mode)
 
-	if n.isShared {
-		// If there are any outstanding tasks,
-		w := n.node.BaseValue.(*Vertex)
-		if w.Closed {
-			// Should resolve with dereference.
-			v.Closed = true
-		}
-		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
-		v.Arcs = nil
-		n.node.updateStatus(finalized)
-		return w.unify(c, needs, mode)
-	}
-
 	defer c.PopArc(c.PushArc(v))
 
-	w := v.Indirect() // Dereference the disjunction result.
+	w := v.IndirectNonShared() // Dereference the disjunction result.
 	if w != v {
 		if w.Closed {
 			// Should resolve with dereference.
 			v.Closed = true
 		}
 		v.status = w.status
-		v.ArcType = w.ArcType
 		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
 		v.Arcs = nil
 		return w.state.meets(needs)
@@ -200,13 +186,20 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 		return false
 	}
 
-	if isCyclePlaceholder(n.node.BaseValue) {
+	if n.isShared {
+		if isCyclePlaceholder(n.origBaseValue) {
+			n.origBaseValue = nil
+		}
+	} else if isCyclePlaceholder(n.node.BaseValue) {
 		n.node.BaseValue = nil
 	}
-
-	// TODO: rewrite to use mode when we get rid of old evaluator.
-	state := finalized
-	n.validateValue(state)
+	if !n.isShared {
+		// TODO(sharewithval): allow structure sharing if we only have validator
+		// and references.
+		// TODO: rewrite to use mode when we get rid of old evaluator.
+		state := finalized
+		n.validateValue(state)
+	}
 
 	if n.node.Label.IsLet() || n.meets(allAncestorsProcessed) {
 		if cc := v.rootCloseContext(n.ctx); !cc.isDecremented { // TODO: use v.cc
@@ -279,6 +272,21 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	}
 
 	n.finalizeDisjunctions()
+
+	w = v.Indirect() // Dereference the disjunction result.
+	if w != v {
+		if w.Closed {
+			// Should resolve with dereference.
+			v.Closed = true
+		}
+		v.status = w.status
+		// v.ArcType = w.ArcType
+		v.ChildErrors = CombineErrors(nil, v.ChildErrors, w.ChildErrors)
+		v.Arcs = nil
+		// n.node.updateStatus(finalized)
+		return w.unify(c, needs, mode)
+		// return w.state.meets(needs)
+	}
 
 	// validationCompleted
 	if n.completed&(subFieldsProcessed) != 0 {

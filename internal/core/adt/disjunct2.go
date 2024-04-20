@@ -590,9 +590,18 @@ func isPartialNode(d *nodeContext) bool {
 // Tradeoffs: if we do not go up enough, the two nodes may not be equal and we
 // miss the opportunity to filter. On the other hand, if we go up too far, we
 // end up comparing more arcs than potentially necessary.
+//
+// TODO: Add a unit test when this function is fully implemented.
 func findIntersections(x, y *closeContext) (cx, cy *closeContext) {
 	cx = x.parent
 	cy = y.parent
+
+	// TODO: why could this happen? Investigate. Note that it is okay to just
+	// return x and y. In the worst case we will just miss some possible
+	// deduplication.
+	if cx == nil || cy == nil {
+		return x, y
+	}
 
 	return cx, cy
 }

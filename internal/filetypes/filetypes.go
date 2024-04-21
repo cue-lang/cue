@@ -259,31 +259,26 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 	return toFile(modeVal, fileVal, file)
 }
 
-func hasEncoding(v cue.Value) (concrete, hasDefault bool) {
+func hasEncoding(v cue.Value) bool {
 	enc := v.LookupPath(cue.MakePath(cue.Str("encoding")))
 	d, _ := enc.Default()
-	return enc.IsConcrete(), d.IsConcrete()
+	return d.IsConcrete()
 }
 
 func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 	fileVal = fileVal.Fill(filename, "filename")
 
-	if concrete, hasDefault := hasEncoding(fileVal); !concrete {
+	if !hasEncoding(fileVal) {
 		if filename == "-" {
-			if !hasDefault {
-				fileVal = fileVal.Unify(modeVal.LookupPath(cue.MakePath(cue.Str("Default"))))
-			}
+			fileVal = fileVal.Unify(modeVal.LookupPath(cue.MakePath(cue.Str("Default"))))
 		} else if ext := fileExt(filename); ext != "" {
-			if x := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(ext))); x.Exists() || !hasDefault {
-				fileVal = fileVal.Unify(x)
-				if err := fileVal.Err(); err != nil {
-					return nil, errors.Newf(token.NoPos,
-						"unknown file extension %s", ext)
-				}
+			extFile := modeVal.LookupPath(cue.MakePath(cue.Str("extensions"), cue.Str(ext)))
+			fileVal = fileVal.Unify(extFile)
+			if err := fileVal.Err(); err != nil {
+				return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
 			}
-		} else if !hasDefault {
-			return nil, errors.Newf(token.NoPos,
-				"no encoding specified for file %q", filename)
+		} else {
+			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", filename)
 		}
 	}
 
@@ -295,19 +290,19 @@ func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 	return f, nil
 }
 
-func parseType(s string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
+func parseType(scope string, mode Mode) (modeVal, fileVal cue.Value, _ error) {
 	modeVal = typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
 	fileVal = modeVal.LookupPath(cue.MakePath(cue.Str("File")))
 
-	if s != "" {
-		for _, t := range strings.Split(s, "+") {
-			if p := strings.IndexByte(t, '='); p >= 0 {
-				fileVal = fileVal.Fill(t[p+1:], "tags", t[:p])
+	if scope != "" {
+		for _, tag := range strings.Split(scope, "+") {
+			tagName, tagVal, ok := strings.Cut(tag, "=")
+			if ok {
+				fileVal = fileVal.Fill(tagVal, "tags", tagName)
 			} else {
-				info := modeVal.LookupPath(cue.MakePath(cue.Str("tags"), cue.Str(t)))
+				info := typesValue.LookupPath(cue.MakePath(cue.Str("tags"), cue.Str(tag)))
 				if !info.Exists() {
-					return cue.Value{}, cue.Value{}, errors.Newf(token.NoPos,
-						"unknown filetype %s", t)
+					return cue.Value{}, cue.Value{}, errors.Newf(token.NoPos, "unknown filetype %s", tag)
 				}
 				fileVal = fileVal.Unify(info)
 			}

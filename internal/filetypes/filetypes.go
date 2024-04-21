@@ -266,8 +266,6 @@ func hasEncoding(v cue.Value) bool {
 }
 
 func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
-	fileVal = fileVal.Fill(filename, "filename")
-
 	if !hasEncoding(fileVal) {
 		if filename == "-" {
 			fileVal = fileVal.Unify(modeVal.LookupPath(cue.MakePath(cue.Str("Default"))))
@@ -282,7 +280,9 @@ func toFile(modeVal, fileVal cue.Value, filename string) (*build.File, error) {
 		}
 	}
 
-	f := &build.File{}
+	// Note that the filename is only filled in the Go value, and not the CUE value.
+	// This makes no difference to the logic, but saves a non-trivial amount of evaluator work.
+	f := &build.File{Filename: filename}
 	if err := fileVal.Decode(&f); err != nil {
 		return nil, errors.Wrapf(err, token.NoPos,
 			"could not determine file type")

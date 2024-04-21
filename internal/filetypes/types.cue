@@ -22,7 +22,7 @@ package build
 
 // A File corresponds to a Go build.File.
 #File: {
-	filename!:       string
+	filename?:       string // not always filled from Go values
 	encoding!:       #Encoding
 	interpretation?: #Interpretation
 	form?:           #Form

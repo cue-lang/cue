@@ -168,63 +168,6 @@ modes: [string]: {
 		// ".pb":        tags.binpb // binarypb
 	}
 
-	// tags maps command line tags to file properties.
-	tags: {
-		schema: form: "schema"
-		graph: form:  "graph"
-		dag: form:    "dag"
-		data: form:   "data"
-
-		cue: encoding: "cue"
-
-		json: encoding:      "json"
-		jsonl: encoding:     "jsonl"
-		yaml: encoding:      "yaml"
-		proto: encoding:     "proto"
-		textproto: encoding: "textproto"
-		// "binpb":  encodings.binproto
-
-		// pb is used either to indicate binary encoding, or to indicate
-		pb: *{
-			encoding:       "binarypb"
-			interpretation: ""
-		} | {
-			encoding:       !="binarypb"
-			interpretation: "pb"
-		}
-
-		text: {
-			encoding: "text"
-			form:     "data"
-		}
-		binary: {
-			encoding: "binary"
-			form:     "data"
-		}
-		go: {
-			encoding:       "code"
-			interpretation: ""
-			tags: lang: "go"
-		}
-		code: {
-			encoding:       "code"
-			interpretation: ""
-			tags: lang: *"" | string
-		}
-
-		auto: {
-			interpretation: "auto"
-			encoding:       *"json" | _
-		}
-		jsonschema: {
-			interpretation: "jsonschema"
-			encoding:       *"json" | _
-		}
-		openapi: {
-			interpretation: "openapi"
-			encoding:       *"json" | _
-		}
-	}
 	// encodings: "": error("no encoding specified")
 
 	encodings: cue: {
@@ -364,4 +307,62 @@ interpretations: openapi: {
 interpretations: pb: {
 	forms.data
 	stream: true
+}
+
+// tags maps command line tags to file properties.
+tags: {
+	schema: form: "schema"
+	graph: form:  "graph"
+	dag: form:    "dag"
+	data: form:   "data"
+
+	cue: encoding: "cue"
+
+	json: encoding:      "json"
+	jsonl: encoding:     "jsonl"
+	yaml: encoding:      "yaml"
+	proto: encoding:     "proto"
+	textproto: encoding: "textproto"
+	// "binpb":  encodings.binproto
+
+	// pb is used either to indicate binary encoding, or to indicate
+	pb: *{
+		encoding:       "binarypb"
+		interpretation: ""
+	} | {
+		encoding:       !="binarypb"
+		interpretation: "pb"
+	}
+
+	text: {
+		encoding: "text"
+		form:     "data"
+	}
+	binary: {
+		encoding: "binary"
+		form:     "data"
+	}
+	go: {
+		encoding:       "code"
+		interpretation: ""
+		tags: lang: "go"
+	}
+	code: {
+		encoding:       "code"
+		interpretation: ""
+		tags: lang: *"" | string
+	}
+
+	auto: {
+		interpretation: "auto"
+		encoding:       *"json" | _
+	}
+	jsonschema: {
+		interpretation: "jsonschema"
+		encoding:       *"json" | _
+	}
+	openapi: {
+		interpretation: "openapi"
+		encoding:       *"json" | _
+	}
 }

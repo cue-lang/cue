@@ -71,6 +71,24 @@ func TestFromFile(t *testing.T) {
 			Attributes:   true,
 		},
 	}, {
+		name: "data: cue",
+		in: build.File{
+			Filename: "",
+			Form:     build.Data,
+			Encoding: build.CUE,
+		},
+		mode: Input,
+		out: &FileInfo{
+			File: &build.File{
+				Filename: "",
+				Encoding: "cue",
+				Form:     "data",
+			},
+			Data:       true,
+			Docs:       true,
+			Attributes: true,
+		},
+	}, {
 		// Filename starting with a . but no other extension.
 		name: "filename-with-dot",
 		in: build.File{

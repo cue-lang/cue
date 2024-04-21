@@ -24,11 +24,32 @@ import (
 //go:embed types.cue
 var typesCUE string
 
-var typesValue = func() cue.Value {
+var typesValue cue.Value
+var knownExtensions map[string]bool
+
+// TODO(mvdan): consider delaying this init work until it's needed
+func init() {
 	ctx := cuecontext.New()
-	val := ctx.CompileString(typesCUE, cue.Filename("types.cue"))
-	if err := val.Err(); err != nil {
+	typesValue = ctx.CompileString(typesCUE, cue.Filename("types.cue"))
+	if err := typesValue.Err(); err != nil {
 		panic(err)
 	}
-	return val
-}()
+	knownExtensions = make(map[string]bool)
+	modes := typesValue.LookupPath(cue.MakePath(cue.Str("modes")))
+	modesIter, err := modes.Fields()
+	if err != nil {
+		panic(err)
+	}
+	for modesIter.Next() {
+		mode := modesIter.Value()
+		exts := mode.LookupPath(cue.MakePath(cue.Str("extensions")))
+		extsIter, err := exts.Fields()
+		if err != nil {
+			panic(err)
+		}
+		for extsIter.Next() {
+			ext := extsIter.Selector().Unquoted()
+			knownExtensions[ext] = true
+		}
+	}
+}

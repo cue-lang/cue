@@ -252,6 +252,18 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 	if file == "" {
 		return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
 	}
+	// Quickly discard files which we aren't interested in.
+	// These cases are very common when loading `./...` in a large repository.
+	if scope == "" {
+		ext := fileExt(file)
+		if file == "-" {
+			// not handled here
+		} else if ext == "" {
+			return nil, errors.Newf(token.NoPos, "no encoding specified for file %q", file)
+		} else if !knownExtensions[ext] {
+			return nil, errors.Newf(token.NoPos, "unknown file extension %s", ext)
+		}
+	}
 	modeVal, fileVal, err := parseType(scope, mode)
 	if err != nil {
 		return nil, err

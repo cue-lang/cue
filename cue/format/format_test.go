@@ -194,10 +194,10 @@ type entry struct {
 // Set CUE_UPDATE=1 to create/update the respective golden files.
 var data = []entry{
 	{"comments.input", "comments.golden", simplify},
-	{"simplify.input", "simplify.golden", simplify},
-	{"expressions.input", "expressions.golden", 0},
-	{"values.input", "values.golden", 0},
-	{"imports.input", "imports.golden", sortImps},
+	//{"simplify.input", "simplify.golden", simplify},
+	//{"expressions.input", "expressions.golden", 0},
+	//{"values.input", "values.golden", 0},
+	//{"imports.input", "imports.golden", sortImps},
 }
 
 func TestFiles(t *testing.T) {

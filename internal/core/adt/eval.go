@@ -160,7 +160,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 	}
 
 	// defer c.PopVertex(c.PushVertex(v))
-	if Debug {
+	if c.Debug {
 		c.nest++
 		c.Logf(v, "Unify")
 		defer func() {
@@ -194,7 +194,7 @@ func (c *OpContext) unify(v *Vertex, flags combinedFlags) {
 		return
 
 	case evaluatingArcs:
-		Assertf(v.status > 0, "unexpected status %d", v.status)
+		Assertf(c, v.status > 0, "unexpected status %d", v.status)
 		return
 
 	case 0:

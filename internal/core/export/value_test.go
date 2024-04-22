@@ -91,9 +91,6 @@ func TestValueX(t *testing.T) {
 	in := `
 -- in.cue --
 	`
-	adt.Verbosity = 1
-	t.Cleanup(func() { adt.Verbosity = 0 })
-
 	archive := txtar.Parse([]byte(in))
 	a := cuetxtar.Load(archive, t.TempDir())
 
@@ -104,6 +101,7 @@ func TestValueX(t *testing.T) {
 	}
 
 	ctx := eval.NewContext(r, v)
+	ctx.Verbosity = 1
 	v.Finalize(ctx)
 
 	p := export.All

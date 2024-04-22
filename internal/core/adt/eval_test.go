@@ -260,15 +260,10 @@ module: "mod.test"
 		t.Fatal(err)
 	}
 
-	// t.Error(debug.NodeString(r, v, nil))
-	// eval.Debug = true
-	adt.Verbosity = verbosity
-	t.Cleanup(func() { adt.Verbosity = 0 })
-
 	e := eval.New(r)
 	ctx := e.NewContext(v)
+	ctx.Verbosity = verbosity
 	v.Finalize(ctx)
-	adt.Verbosity = 0
 
 	out := debug.NodeString(r, v, nil)
 	if adt.OpenGraphs {

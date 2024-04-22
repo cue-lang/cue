@@ -25,7 +25,6 @@ import (
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
@@ -167,15 +166,10 @@ module: "mod.test/a"
 	self.SelfContained = true
 	self.InlineImports = true
 
-	adt.Verbosity = 1
-	t.Cleanup(func() { adt.Verbosity = 0 })
-
 	file, errs := self.Def(tValue.R, "", tValue.V)
 	if errs != nil {
 		t.Fatal(errs)
 	}
-
-	adt.Verbosity = 0
 
 	b, _ := format.Node(file)
 	t.Error(string(b))

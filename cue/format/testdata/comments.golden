@@ -90,6 +90,23 @@ list3: [
 	// bar
 ]
 
+list4: [1, // omitting comma okay
+		a.b,                  // selector
+		(a),                  // paren
+		+1,                   // unary
+		a[0],                 // index
+		strings.Sort([1, 2]), // call
+
+	a.b,
+	// under selector
+
+	a.b,
+	// multiple
+	// under
+
+	// selector
+]
+
 funcArg1: foo(
 		// Comment1
 

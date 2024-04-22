@@ -50,15 +50,25 @@ The -d can be used to only verify files against the result of an expression
 evaluated within the CUE files. This can be useful if the CUE files contain
 a set of definitions to pick from.
 
-Examples:
+Examples of checking non-CUE files against:
 
-  # Check files against a CUE file:
-  cue vet foo.yaml foo.cue
+  # ... the entire contents of a CUE file
+  cue vet schema.cue data.yaml
 
-  # Check files against a particular expression
-  cue vet translations/*.yaml foo.cue -d '#Translation'
+  # ... one particular expression defined in a single CUE file
+  cue vet schema.cue data/*.yaml -d '#SomeConstraint'
 
-If more than one expression is given, all must match all values.
+  # ... an expression defined in the CUE package in the current directory
+  cue vet . data/*.yaml -d '#SomeConstraint'
+
+  # ... an expression defined in the CUE package in the "schema" directory
+  cue vet ./schema data/*.yaml -d '#SomeConstraint'
+
+  # ... an expression defined in the named CUE package
+  cue vet cue.example/schema data/*.yaml -d '#SomeConstraint'
+
+More than one expression may be given using multiple -d flags. Each non-CUE
+file must match all expressions given.
 `
 
 func newVetCmd(c *Command) *cobra.Command {

@@ -98,6 +98,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 		}, nil
 	}
 
+	typesInit()
 	modeVal := typesValue.LookupPath(cue.MakePath(cue.Str("modes"), cue.Str(mode.String())))
 	fileVal := modeVal.LookupPath(cue.MakePath(cue.Str("FileInfo")))
 	fileVal = fileVal.Fill(b)
@@ -161,6 +162,7 @@ func unifyWith(errs errors.Error, v1, v2 cue.Value, field, value string) (cue.Va
 //
 //	json: foo.data bar.data json+schema: bar.schema
 func ParseArgs(args []string) (files []*build.File, err error) {
+	typesInit()
 	var modeVal, fileVal cue.Value
 
 	qualifier := ""
@@ -254,6 +256,7 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 	}
 	// Quickly discard files which we aren't interested in.
 	// These cases are very common when loading `./...` in a large repository.
+	typesInit()
 	if scope == "" {
 		ext := fileExt(file)
 		if file == "-" {

@@ -46,6 +46,7 @@ import (
 )
 
 type Decoder struct {
+	ctx            *cue.Context
 	cfg            *Config
 	closer         io.Closer
 	next           func() (ast.Expr, error)
@@ -60,7 +61,7 @@ type Decoder struct {
 	err            error
 }
 
-type interpretFunc func(*cue.Instance) (file *ast.File, id string, err error)
+type interpretFunc func(cue.Value) (file *ast.File, id string, err error)
 type rewriteFunc func(*ast.File) (file *ast.File, err error)
 
 // ID returns a canonical identifier for the decoded object or "" if no such
@@ -102,30 +103,21 @@ func (i *Decoder) doInterpret() {
 		}
 	}
 	if i.interpretFunc != nil {
-		var r cue.Runtime
 		i.file = i.File()
-		inst, err := r.CompileFile(i.file)
-		if err != nil {
+		v := i.ctx.BuildFile(i.file)
+		if err := v.Err(); err != nil {
 			i.err = err
 			return
 		}
-		i.file, i.id, i.err = i.interpretFunc(inst)
+		i.file, i.id, i.err = i.interpretFunc(v)
 	}
-}
-
-func toFile(x ast.Expr) *ast.File {
-	return internal.ToFile(x)
-}
-
-func valueToFile(v cue.Value) *ast.File {
-	return internal.ToFile(v.Syntax())
 }
 
 func (i *Decoder) File() *ast.File {
 	if i.file != nil {
 		return i.file
 	}
-	return toFile(i.expr)
+	return internal.ToFile(i.expr)
 }
 
 func (i *Decoder) Err() error {
@@ -168,11 +160,11 @@ type Config struct {
 // NewDecoder returns a stream of non-rooted data expressions. The encoding
 // type of f must be a data type, but does not have to be an encoding that
 // can stream. stdin is used in case the file is "-".
-func NewDecoder(f *build.File, cfg *Config) *Decoder {
+func NewDecoder(ctx *cue.Context, f *build.File, cfg *Config) *Decoder {
 	if cfg == nil {
 		cfg = &Config{}
 	}
-	i := &Decoder{filename: f.Filename, cfg: cfg}
+	i := &Decoder{filename: f.Filename, ctx: ctx, cfg: cfg}
 	i.next = func() (ast.Expr, error) {
 		if i.err != nil {
 			return nil, i.err
@@ -213,12 +205,12 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	case build.Auto:
 		openAPI := openAPIFunc(cfg, f)
 		jsonSchema := jsonSchemaFunc(cfg, f)
-		i.interpretFunc = func(inst *cue.Instance) (file *ast.File, id string, err error) {
-			switch i.interpretation = Detect(inst.Value()); i.interpretation {
+		i.interpretFunc = func(v cue.Value) (file *ast.File, id string, err error) {
+			switch i.interpretation = Detect(v); i.interpretation {
 			case build.JSONSchema:
-				return jsonSchema(inst)
+				return jsonSchema(v)
 			case build.OpenAPI:
-				return openAPI(inst)
+				return openAPI(v)
 			}
 			return i.file, "", i.err
 		}
@@ -285,10 +277,10 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 }
 
 func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
-	return func(i *cue.Instance) (file *ast.File, id string, err error) {
+	return func(v cue.Value) (file *ast.File, id string, err error) {
 		id = f.Tags["id"]
 		if id == "" {
-			id, _ = i.Lookup("$id").String()
+			id, _ = v.LookupPath(cue.MakePath(cue.Str("$id"))).String()
 		}
 		if id != "" {
 			u, err := url.Parse(id)
@@ -304,7 +296,7 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 
 			Strict: cfg.Strict,
 		}
-		file, err = jsonschema.Extract(i, cfg)
+		file, err = jsonschema.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
 		return file, id, err
@@ -313,8 +305,8 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 
 func openAPIFunc(c *Config, f *build.File) interpretFunc {
 	cfg := &openapi.Config{PkgName: c.PkgName}
-	return func(i *cue.Instance) (file *ast.File, id string, err error) {
-		file, err = openapi.Extract(i, cfg)
+	return func(v cue.Value) (file *ast.File, id string, err error) {
+		file, err = openapi.Extract(v, cfg)
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
 		return file, "", err

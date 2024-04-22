@@ -35,21 +35,21 @@ func Detect(v cue.Value) (i build.Interpretation) {
 }
 
 func isOpenAPI(v cue.Value) bool {
-	s, _ := v.Lookup("openapi").String()
+	s, _ := v.LookupPath(cue.MakePath(cue.Str("openapi"))).String()
 	if !strings.HasPrefix(s, "3.") {
 		return false
 	}
-	if _, err := v.Lookup("info", "title").String(); err != nil {
+	if _, err := v.LookupPath(cue.MakePath(cue.Str("info"), cue.Str("title"))).String(); err != nil {
 		return false
 	}
-	if _, err := v.Lookup("info", "version").String(); err != nil {
+	if _, err := v.LookupPath(cue.MakePath(cue.Str("info"), cue.Str("version"))).String(); err != nil {
 		return false
 	}
 	return true
 }
 
 func isJSONSchema(v cue.Value) bool {
-	s, err := v.Lookup("$schema").String()
+	s, err := v.LookupPath(cue.MakePath(cue.Str("$schema"))).String()
 	if err != nil {
 		return false
 	}

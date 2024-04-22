@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
@@ -137,7 +138,8 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 
 func (l *loader) addFiles(dir string, p *build.Instance) {
 	for _, f := range p.BuildFiles {
-		d := encoding.NewDecoder(f, &encoding.Config{
+		// TODO(mvdan): reuse the same context for an entire loader
+		d := encoding.NewDecoder(cuecontext.New(), f, &encoding.Config{
 			Stdin:     l.cfg.stdin(),
 			ParseFile: l.cfg.ParseFile,
 		})

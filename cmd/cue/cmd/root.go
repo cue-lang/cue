@@ -62,7 +62,7 @@ func statsEncoder(cmd *Command) *encoding.Encoder {
 	stats, err := filetypes.ParseFile(file, filetypes.Export)
 	exitOnErr(cmd, err, true)
 
-	statsEnc, err := encoding.NewEncoder(stats, &encoding.Config{
+	statsEnc, err := encoding.NewEncoder(cmd.ctx, stats, &encoding.Config{
 		Stdout: cmd.OutOrStderr(),
 		Force:  true,
 	})

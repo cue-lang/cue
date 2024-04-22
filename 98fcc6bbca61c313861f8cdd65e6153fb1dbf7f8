@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a02323f9_c5fa8de8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-22T16:02:27Z",
+      "side": 1,
+      "message": "It would be nice to be a bit more explicit about why\nthe latter isn\u0027t necessary, given that the current logic\ndoes seem to use the hasDefault value.\n\nIs it that hasEncoding always returns either (false, false) or (true, true) in practice ?",
+      "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d84eba1c_a8acce06",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-22T16:02:27Z",
+      "side": 1,
+      "message": "LGTM modulo a few nits.",
+      "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "605b1e3e_0f54529a",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-22T16:02:27Z",
+      "side": 1,
+      "message": "Either use FillPath or add a TODO to avoid using the deprecated Fill method?",
+      "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a7e0ef55_831e0450",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-22T16:02:27Z",
+      "side": 1,
+      "message": "This change isn\u0027t mentioned in the commit message and maybe should be?",
+      "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -16,6 +16,24 @@
       "message": "I\u0027m thinking that would be gated on fixing #2733, given that some loading happens concurrently.",
       "revId": "0a86de1ab1bd24bc7ca03fa80ebe92bf436ee77a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c62c01b_b3093aaf",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 141,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T09:28:39Z",
+      "side": 1,
+      "message": "possibly. I thought about trying it as part of this CL but I didn\u0027t see the need to be overly ambitious :)",
+      "parentUuid": "fe8c3d92_76172d72",
+      "revId": "0a86de1ab1bd24bc7ca03fa80ebe92bf436ee77a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

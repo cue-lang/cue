@@ -46,7 +46,7 @@ in the module.
 	}
 
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force moving old-style cue.mod file")
-
+	cmd.Flags().String(string(flagSource), "", "set the source field")
 	return cmd
 }
 
@@ -86,6 +86,14 @@ func runModInit(cmd *Command, args []string) (err error) {
 	}
 	mf := &modfile.File{
 		Module: modulePath,
+	}
+	if s := flagSource.String(cmd); s != "" {
+		mf.Source = &modfile.Source{
+			Kind: s,
+		}
+		if err := mf.Source.Validate(); err != nil {
+			return err
+		}
 	}
 	vers := versionForModFile()
 	if vers == "" {

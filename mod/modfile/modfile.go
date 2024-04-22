@@ -73,6 +73,15 @@ type Source struct {
 	Kind string `json:"kind"`
 }
 
+// Validate checks that src is well formed.
+func (src *Source) Validate() error {
+	switch src.Kind {
+	case "git", "self":
+		return nil
+	}
+	return fmt.Errorf("unrecognized source kind %q", src.Kind)
+}
+
 // Format returns a formatted representation of f
 // in CUE syntax.
 func (f *File) Format() ([]byte, error) {

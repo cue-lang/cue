@@ -1,0 +1,45 @@
+# Test that we can use the --source flag to cue mod init.
+
+env CUE_VERSION_OVERRIDE=v0.9.0-alpha.2
+
+mkdir $WORK/test0
+cd $WORK/test0
+exec cue mod init --source self test.example
+cmp cue.mod/module.cue $WORK/want-module.cue-0
+
+mkdir $WORK/test1
+cd $WORK/test1
+exec cue mod init --source git test.example
+cmp cue.mod/module.cue $WORK/want-module.cue-1
+
+mkdir $WORK/test2
+cd $WORK/test2
+! exec cue mod init --source bad test.example
+cmp stderr $WORK/want-stderr
+
+-- want-module.cue-0 --
+module: "test.example"
+language: {
+	version: "v0.9.0-alpha.2"
+}
+source: {
+	kind: "self"
+}
+-- want-module.cue-0 --
+module: "test.example"
+language: {
+	version: "v0.9.0-alpha.2"
+}
+source: {
+	kind: "self"
+}
+-- want-module.cue-1 --
+module: "test.example"
+language: {
+	version: "v0.9.0-alpha.2"
+}
+source: {
+	kind: "git"
+}
+-- want-stderr --
+unrecognized source kind "bad"

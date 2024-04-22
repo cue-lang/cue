@@ -45,6 +45,7 @@ const (
 	flagRecursive     flagName = "recursive"
 	flagSchema        flagName = "schema"
 	flagSimplify      flagName = "simplify"
+	flagSource        flagName = "source"
 	flagStrict        flagName = "strict"
 	flagTrace         flagName = "trace"
 	flagVerbose       flagName = "verbose"

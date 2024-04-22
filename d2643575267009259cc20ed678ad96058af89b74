@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5217bc65_60f19b79",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1221,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T13:21:17Z",
+      "side": 1,
+      "message": "I thought about this for a bit and I think it\u0027s OK for the sake of mirroring checkKind directly. I\u0027ve documented both methods better.",
+      "parentUuid": "fd7b57d4_6e1c888f",
+      "revId": "d2643575267009259cc20ed678ad96058af89b74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4220bd11_74c84562",
@@ -65,6 +83,24 @@
       "writtenOn": "2024-04-22T09:41:51Z",
       "side": 1,
       "message": "This should probably have at least one unit test. Perhaps piggyback on the existing TestNull test?",
+      "revId": "d2643575267009259cc20ed678ad96058af89b74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2a55413d_66a39f8f",
+        "filename": "cue/types.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 1339,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T13:21:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4220bd11_74c84562",
       "revId": "d2643575267009259cc20ed678ad96058af89b74",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

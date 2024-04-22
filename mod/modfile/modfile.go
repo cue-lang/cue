@@ -73,6 +73,12 @@ type Source struct {
 	Kind string `json:"kind"`
 }
 
+// IsValidSourceKind reports whether s holds a
+// valid value for the source.kind field.
+func IsValidSourceKind(s string) bool {
+	return s == "git" || s == "self"
+}
+
 // Format returns a formatted representation of f
 // in CUE syntax.
 func (f *File) Format() ([]byte, error) {

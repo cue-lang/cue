@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "27766776_0a277c38",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-22T16:12:36Z",
+      "side": 1,
+      "message": "LGTM with one thought.",
+      "revId": "4942c5f2195ec604eb9c83c19df26bdf39f4fc92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8327900_e0eb67ae",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-22T16:12:36Z",
+      "side": 1,
+      "message": "An alternative to writing this entirely in CUE might be to write a little bit of extra CUE in types.cue, something like:\n\n```\n// knownExtensions derives all the known file extensions\n// from those that are mentioned in modes.\nknownExtensions: {\n\tfor mode in modes\n\tfor ext, _ in mode.extensions {\n\t\t(ext): true\n\t}\n}\n```\n\nThen you could do something like:\n\n```\nerr :\u003d typesValue.LookupPath(cue.MakePath(cue.Str(\"knownExtensions\"))).Decode(\u0026knownExtensions)\n```\n\nMaybe too costly? But worth considering anyway.",
+      "revId": "4942c5f2195ec604eb9c83c19df26bdf39f4fc92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

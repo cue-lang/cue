@@ -119,7 +119,7 @@ func (n *nodeContext) scheduleConjuncts() {
 }
 
 func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
-	if Debug {
+	if c.Debug {
 		c.nest++
 		c.Logf(v, "Unify %v", fmt.Sprintf("%p", v))
 		defer func() {
@@ -335,7 +335,7 @@ func (n *nodeContext) completeNodeTasks(mode runMode) {
 	v := n.node
 	c := n.ctx
 
-	if Debug {
+	if n.ctx.Debug {
 		c.nest++
 		defer func() {
 			c.nest--

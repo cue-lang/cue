@@ -534,8 +534,8 @@ func (v *Vertex) IsUnprocessed() bool {
 
 func (v *Vertex) updateStatus(s vertexStatus) {
 	if !isCyclePlaceholder(v.BaseValue) {
-		if _, ok := v.BaseValue.(*Bottom); !ok {
-			Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+		if _, ok := v.BaseValue.(*Bottom); !ok && v.state != nil {
+			Assertf(v.state.ctx, v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
 		}
 	}
 
@@ -1197,7 +1197,7 @@ func (n *nodeContext) notifyConjunct(c Conjunct) {
 				// TODO: continuing here is likely to result in a faulty
 				// (incomplete) configuration. But this may be okay. The
 				// CUE_DEBUG=0 flag disables this assertion.
-				n.ctx.Assertf(n.ctx.pos(), Debug, "unexpected nil state")
+				n.ctx.Assertf(n.ctx.pos(), !n.ctx.Debug, "unexpected nil state")
 				n.ctx.addErrf(0, n.ctx.pos(), "cannot add to field %v", arc.Label)
 				continue
 			}

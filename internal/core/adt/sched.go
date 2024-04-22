@@ -367,7 +367,7 @@ func (s *scheduler) process(needs condition, mode runMode) bool {
 		s.signal(f(s))
 	}
 
-	if Debug && len(s.tasks) > 0 {
+	if s.ctx.Debug && len(s.tasks) > 0 {
 		if v := s.tasks[0].node.node; v != nil {
 			c.nest++
 			c.Logf(v, "START Process %v -- mode: %v", v.Label, mode)

@@ -248,7 +248,7 @@ func (c *closeContext) addDependent(ctx *OpContext, kind depKind, dependant *clo
 		dependant = c
 	}
 
-	if Verbosity > 1 {
+	if ctx.Verbosity > 1 {
 		ctx.Logf(ctx.vertex, "INC(%s) %v %p parent: %p %d\n", kind, c.Label(), c, c.parent, c.conjunctCount)
 	}
 
@@ -268,7 +268,7 @@ func (c *closeContext) matchDecrement(ctx *OpContext, v *Vertex, kind depKind, d
 		dependant = c
 	}
 
-	if Verbosity > 1 {
+	if ctx.Verbosity > 1 {
 		ctx.Logf(ctx.vertex, "DEC(%s) %v %p %d\n", kind, c.Label(), c, c.conjunctCount)
 	}
 

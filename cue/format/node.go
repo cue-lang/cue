@@ -187,7 +187,25 @@ func (f *formatter) walkClauseList(list []ast.Clause, ws whiteSpace) {
 func (f *formatter) walkListElems(list []ast.Expr) {
 	f.before(nil)
 	for _, x := range list {
+		// This is a hack to ensure that comments are printed correctly in lists.
+		// A comment must be printed after each element in a list, but we can't
+		// print a comment at the end of a comment because it will be considered
+		// part of the comment and ignored.
+		// To fix this we remove all comments that appear after the element, and
+		// handle them after it is formatted.
+		originalComments := ast.Comments(x)
+		var commentsBefore, commentsAfter []*ast.CommentGroup
+		for _, cg := range originalComments {
+			if x.Pos().Before(cg.Pos()) {
+				commentsAfter = append(commentsAfter, cg)
+			} else {
+				commentsBefore = append(commentsBefore, cg)
+			}
+		}
+		ast.SetComments(x, commentsBefore)
 		f.before(x)
+		ast.SetComments(x, originalComments)
+
 		switch n := x.(type) {
 		case *ast.Comprehension:
 			f.walkClauseList(n.Clauses, blank)
@@ -208,6 +226,8 @@ func (f *formatter) walkListElems(list []ast.Expr) {
 			f.exprRaw(n, token.LowestPrec, 1)
 		}
 		f.print(comma, blank)
+
+		f.current.cg = commentsAfter
 		f.after(x)
 	}
 	f.after(nil)

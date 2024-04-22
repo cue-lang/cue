@@ -126,3 +126,20 @@ funcArg3: foo(
 )
 
 //	comment including		some tabs
+
+list4: [
+  a.b, // selector
+  (a), // paren
+  +1, // unary
+  a[0], // index
+  strings.Sort([1, 2]), // call
+
+  a.b,
+  // under selector
+
+  a.b,
+  // multiple
+  // under
+
+  // selector
+]

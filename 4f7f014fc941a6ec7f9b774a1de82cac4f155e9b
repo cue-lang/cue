@@ -33,6 +33,24 @@
       "message": "Please add a comment about the test to match the other test cases and so it\u0027s clear what the intention of the test is.",
       "revId": "4f7f014fc941a6ec7f9b774a1de82cac4f155e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fbae4527_6742fa50",
+        "filename": "internal/filetypes/filetypes_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 74,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T13:21:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "7237e28b_7dac33c5",
+      "revId": "4f7f014fc941a6ec7f9b774a1de82cac4f155e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

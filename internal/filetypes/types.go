@@ -16,6 +16,7 @@ package filetypes
 
 import (
 	_ "embed"
+	"sync"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
@@ -27,8 +28,7 @@ var typesCUE string
 var typesValue cue.Value
 var knownExtensions map[string]bool
 
-// TODO(mvdan): consider delaying this init work until it's needed
-func init() {
+var typesInit = sync.OnceFunc(func() {
 	ctx := cuecontext.New()
 	typesValue = ctx.CompileString(typesCUE, cue.Filename("types.cue"))
 	if err := typesValue.Err(); err != nil {
@@ -37,4 +37,4 @@ func init() {
 	if err := typesValue.LookupPath(cue.MakePath(cue.Str("knownExtensions"))).Decode(&knownExtensions); err != nil {
 		panic(err)
 	}
-}
+})

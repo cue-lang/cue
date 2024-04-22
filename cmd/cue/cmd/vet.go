@@ -53,12 +53,13 @@ a set of definitions to pick from.
 Examples:
 
   # Check files against a CUE file:
-  cue vet foo.yaml foo.cue
+  cue vet foo.cue foo.yaml
 
   # Check files against a particular expression
-  cue vet translations/*.yaml foo.cue -d '#Translation'
+  cue vet foo.cue translations/*.yaml -d '#Translation'
 
-If more than one expression is given, all must match all values.
+More than one expression may be given using multiple -d flags. Each non-CUE
+file must match all expressions given.
 `
 
 func newVetCmd(c *Command) *cobra.Command {

@@ -16,6 +16,24 @@
       "message": "Per my offline comments, I don\u0027t think this is the right place to address this.\n\nPlease can we iterate on the \"best\" location via docs-and-content.",
       "revId": "8f3a54467f1b655f96dd1ec6887fb1f3db64fe1d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eca154c3_16ad7f0d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-04-22T13:19:12Z",
+      "side": 1,
+      "message": "Tracked in https://github.com/cue-lang/docs-and-content/issues/125.\n\nI\u0027ve reduced the scope of this CL to make a strict improvement to the help text.",
+      "parentUuid": "56ea2d89_2176c583",
+      "revId": "8f3a54467f1b655f96dd1ec6887fb1f3db64fe1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

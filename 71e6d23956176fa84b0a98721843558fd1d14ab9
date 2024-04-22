@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "5d482d28_1407513d",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-22T10:32:17Z",
+      "side": 1,
+      "message": "yep, completely forgot about the Fixes part...",
+      "parentUuid": "2d775600_dcc549f8",
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a0b232d6_1dab966f",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 4
@@ -58,6 +76,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f221192a_b72c862a",
+        "filename": "cue/format/node.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-22T10:32:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "dc0b1c3b_14941380",
+      "range": {
+        "startLine": 194,
+        "startChar": 13,
+        "endLine": 194,
+        "endChar": 20
+      },
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f23cbd17_03fbe7a9",
@@ -81,6 +123,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1ee4e19_2bb74146",
+        "filename": "cue/format/node.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-22T10:32:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f23cbd17_03fbe7a9",
+      "range": {
+        "startLine": 200,
+        "startChar": 2,
+        "endLine": 200,
+        "endChar": 22
+      },
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "922a9386_15038f9f",
@@ -94,6 +160,24 @@
       "writtenOn": "2024-04-22T09:20:45Z",
       "side": 1,
       "message": "please avoid changing this as it\u0027s unrelated",
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1e19a158_e0a8968c",
+        "filename": "cue/format/testdata/comments.input",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-22T10:32:17Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "922a9386_15038f9f",
       "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

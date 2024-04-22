@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dbbdac98_1c162643",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T13:21:57Z",
+      "side": 1,
+      "message": "For future reference, I showed this to both Paul and Marcel, and got the OK that adding this API and mirroring a bit of logic from checkKind is fine.",
+      "parentUuid": "fb0cc2da_86586653",
+      "revId": "d2643575267009259cc20ed678ad96058af89b74",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd7b57d4_6e1c888f",

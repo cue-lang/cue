@@ -90,9 +90,6 @@ func (c Context) Sqrt(d, x *apd.Decimal) (apd.Condition, error) {
 // incomplete.
 var ErrIncomplete = errors.New("incomplete value")
 
-// MakeInstance makes a new instance from a value.
-var MakeInstance func(value interface{}) (instance interface{})
-
 // BaseContext is used as CUE's default context for arbitrary-precision decimals.
 var BaseContext = Context{*apd.BaseContext.WithPrecision(34)}
 

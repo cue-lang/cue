@@ -18,7 +18,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/runtime"
@@ -136,21 +135,6 @@ func getImportFromPath(x *runtime.Runtime, id string) *Instance {
 		}
 	}
 	return inst
-}
-
-func init() {
-	internal.MakeInstance = func(value interface{}) interface{} {
-		v := value.(Value)
-		x := v.eval(v.ctx())
-		st, ok := x.(*adt.Vertex)
-		if !ok {
-			st = &adt.Vertex{}
-			st.AddConjunct(adt.MakeRootConjunct(nil, x))
-		}
-		return addInst(v.idx, &Instance{
-			root: st,
-		})
-	}
 }
 
 // newInstance creates a new instance. Use Insert to populate the instance.

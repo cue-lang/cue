@@ -75,6 +75,11 @@ list1: [
 
 	// Another comment
 	{
+		// Comment1
+
+		// Comment2
+
+		// Another comment
 	},
 
 	// Comment 3
@@ -88,6 +93,24 @@ list3: [
 	// foo
 
 	// bar
+]
+
+list4: [
+	1,                    // number
+	a.b,                  // selector
+	(a),                  // paren
+	+1,                   // unary
+	a[0],                 // index
+	strings.Sort([1, 2]), // call
+
+	a.b,
+	// under selector
+
+	a.b,
+	// multiple
+	// under
+
+	// selector
 ]
 
 funcArg1: foo(

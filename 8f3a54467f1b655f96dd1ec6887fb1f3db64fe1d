@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56ea2d89_2176c583",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-22T12:28:53Z",
+      "side": 1,
+      "message": "Per my offline comments, I don\u0027t think this is the right place to address this.\n\nPlease can we iterate on the \"best\" location via docs-and-content.",
+      "revId": "8f3a54467f1b655f96dd1ec6887fb1f3db64fe1d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

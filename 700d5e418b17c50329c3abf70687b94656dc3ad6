@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bba88506_1d910f4e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T21:16:22Z",
+      "side": 1,
+      "message": "SGTM given that this is all internal. If/when we want to expose knobs via the public Go API, we\u0027ll want something a little bit nicer than a \"",
+      "revId": "700d5e418b17c50329c3abf70687b94656dc3ad6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b63b156b_b03bd26d",
+        "filename": "internal/cuedebug/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T21:16:22Z",
+      "side": 1,
+      "message": "This seems backwards. Sharing _enables_ structure sharing, and is on by default.",
+      "revId": "700d5e418b17c50329c3abf70687b94656dc3ad6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

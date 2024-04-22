@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 )
 
 func TestDetect(t *testing.T) {
@@ -87,12 +88,12 @@ func TestDetect(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			var r cue.Runtime
-			inst, err := r.Compile(tc.name, tc.in)
-			if err != nil {
+			ctx := cuecontext.New()
+			v := ctx.CompileString(tc.in, cue.Filename(tc.name))
+			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
-			got := Detect(inst.Value())
+			got := Detect(v)
 			if got != tc.out {
 				t.Errorf("got %v; want %v", got, tc.out)
 			}

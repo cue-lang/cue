@@ -96,7 +96,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 
 					var files []*ast.File
-					d := encoding.NewDecoder(file, &cfg)
+					d := encoding.NewDecoder(cmd.ctx, file, &cfg)
 					for ; !d.Done(); d.Next() {
 						f := d.File()
 
@@ -114,7 +114,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 						exitOnErr(cmd, err, true)
 					}
 
-					e, err := encoding.NewEncoder(file, &cfg)
+					e, err := encoding.NewEncoder(cmd.ctx, file, &cfg)
 					exitOnErr(cmd, err, true)
 
 					for _, f := range files {

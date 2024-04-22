@@ -445,7 +445,7 @@ type decoderInfo struct {
 
 func (d *decoderInfo) dec(b *buildPlan) *encoding.Decoder {
 	if d.d == nil {
-		d.d = encoding.NewDecoder(d.file, b.encConfig)
+		d.d = encoding.NewDecoder(b.cmd.ctx, d.file, b.encConfig)
 	}
 	return d.d
 }
@@ -493,7 +493,7 @@ func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderIn
 		if b.Module != "" {
 			c.ProtoPath = append(c.ProtoPath, b.Root)
 		}
-		d := encoding.NewDecoder(f, &c)
+		d := encoding.NewDecoder(p.cmd.ctx, f, &c)
 
 		fi, err := filetypes.FromFile(f, p.cfg.outMode)
 		if err != nil {

@@ -1,0 +1,101 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2d775600_dcc549f8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 56,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T09:20:45Z",
+      "side": 1,
+      "message": "Perhaps make a brief mention that a larger refactor is avoided for the time being as an overhaul in cue/format is due.\n\nAlso, doesn\u0027t this miss a \"Fixes #NNN\" line? At least it should fix one of the bugs, but I also wonder if it\u0027s fixing the other related bugs.",
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a0b232d6_1dab966f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T09:20:45Z",
+      "side": 1,
+      "message": "Thanks! Just minor input. I agree this fix is a bit hacky, but it\u0027s exactly the kind of thing I imagined. Now that we have test cases in place, when we rewrite cue/format, we can make sure to handle this scenario properly.",
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dc0b1c3b_14941380",
+        "filename": "cue/format/node.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 194,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T09:20:45Z",
+      "side": 1,
+      "message": "comma?",
+      "range": {
+        "startLine": 194,
+        "startChar": 13,
+        "endLine": 194,
+        "endChar": 20
+      },
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f23cbd17_03fbe7a9",
+        "filename": "cue/format/node.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 200,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T09:20:45Z",
+      "side": 1,
+      "message": "how about `splitComments`?",
+      "range": {
+        "startLine": 200,
+        "startChar": 2,
+        "endLine": 200,
+        "endChar": 22
+      },
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "922a9386_15038f9f",
+        "filename": "cue/format/testdata/comments.input",
+        "patchSetId": 4
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-22T09:20:45Z",
+      "side": 1,
+      "message": "please avoid changing this as it\u0027s unrelated",
+      "revId": "71e6d23956176fa84b0a98721843558fd1d14ab9",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

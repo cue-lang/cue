@@ -147,11 +147,17 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	// top-level files like README.md and LICENSE many dozens of times.
 	for _, d := range dirs {
 		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
-			files, err := ctxt.readDir(dir)
-			if err != nil && !os.IsNotExist(err) {
-				return retErr(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
+			dirRead, ok := l.dirReadCache[dir]
+			if !ok {
+				files, err := ctxt.readDir(dir)
+				dirRead.files = files
+				dirRead.err = err
+				l.dirReadCache[dir] = dirRead
 			}
-			for _, f := range files {
+			if err := dirRead.err; err != nil && !os.IsNotExist(err) {
+				return retErr(errors.Wrapf(dirRead.err, pos, "import failed reading dir %v", dirs[0][1]))
+			}
+			for _, f := range dirRead.files {
 				if f.IsDir() {
 					continue
 				}
@@ -160,15 +166,26 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 						continue
 					}
 				}
-				file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
-				if err != nil {
+
+				pf, ok := l.parsedFileCache[f.Name()]
+				if !ok {
+					file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
+					pf.err = err
+					if err == nil {
+						pf.file = *file
+					}
+					l.parsedFileCache[f.Name()] = pf
+				}
+
+				if pf.err != nil {
 					p.UnknownFiles = append(p.UnknownFiles, &build.File{
 						Filename:      f.Name(),
 						ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
 					})
 					continue // skip unrecognized file types
 				}
-				fp.add(dir, file, importComment)
+				file := pf.file
+				fp.add(dir, &file, importComment)
 			}
 
 			if p.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {

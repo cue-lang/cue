@@ -20,8 +20,10 @@ package load
 //    - go/build
 
 import (
+	iofs "io/fs"
 	"path/filepath"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -42,13 +44,38 @@ type loader struct {
 	stk      importStack
 	loadFunc build.LoadFunc
 	pkgs     *modpkgload.Packages
+
+	dirReadCache     map[string]dirReadResult
+	parsedFileCache  map[string]parsedFile
+	decodedFileCache map[string]decodedBuildFile
 }
+
+type (
+	dirReadResult struct {
+		files []iofs.DirEntry
+		err   error
+	}
+
+	parsedFile struct {
+		file build.File
+		err  error
+	}
+
+	decodedBuildFile struct {
+		files []*ast.File
+		err   error
+	}
+)
 
 func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
 	l := &loader{
 		cfg:    c,
 		tagger: tg,
 		pkgs:   pkgs,
+
+		dirReadCache:     map[string]dirReadResult{},
+		parsedFileCache:  map[string]parsedFile{},
+		decodedFileCache: map[string]decodedBuildFile{},
 	}
 	l.loadFunc = l._loadFunc
 	return l
@@ -138,17 +165,28 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 
 func (l *loader) addFiles(dir string, p *build.Instance) {
 	for _, f := range p.BuildFiles {
-		// TODO(mvdan): reuse the same context for an entire loader
-		d := encoding.NewDecoder(cuecontext.New(), f, &encoding.Config{
-			Stdin:     l.cfg.stdin(),
-			ParseFile: l.cfg.ParseFile,
-		})
-		for ; !d.Done(); d.Next() {
-			_ = p.AddSyntax(d.File())
+		decoded, ok := l.decodedFileCache[f.Filename]
+		if !ok {
+			decoded = decodedBuildFile{}
+			// TODO(mvdan): reuse the same context for an entire loader
+			d := encoding.NewDecoder(cuecontext.New(), f, &encoding.Config{
+				Stdin:     l.cfg.stdin(),
+				ParseFile: l.cfg.ParseFile,
+			})
+			for ; !d.Done(); d.Next() {
+				decoded.files = append(decoded.files, d.File())
+			}
+			decoded.err = d.Err()
+			d.Close()
+			l.decodedFileCache[f.Filename] = decoded
 		}
-		if err := d.Err(); err != nil {
+
+		for _, file := range decoded.files {
+			_ = p.AddSyntax(file)
+		}
+
+		if err := decoded.err; err != nil {
 			p.ReportError(errors.Promote(err, "load"))
 		}
-		d.Close()
 	}
 }

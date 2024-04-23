@@ -20,8 +20,10 @@ package load
 //    - go/build
 
 import (
+	iofs "io/fs"
 	"path/filepath"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -37,12 +39,32 @@ import (
 )
 
 type loader struct {
-	cfg      *Config
-	tagger   *tagger
-	stk      importStack
-	loadFunc build.LoadFunc
-	pkgs     *modpkgload.Packages
+	cfg            *Config
+	tagger         *tagger
+	stk            importStack
+	loadFunc       build.LoadFunc
+	pkgs           *modpkgload.Packages
+	dirCache       map[string]dirCacheEntry
+	parseFileCache map[string]parseFileCacheEntry
+	syntaxCache    map[string]syntaxCacheEntry
 }
+
+type (
+	dirCacheEntry struct {
+		files []iofs.DirEntry
+		err   error
+	}
+
+	parseFileCacheEntry struct {
+		file build.File
+		err  error
+	}
+
+	syntaxCacheEntry struct {
+		files []*ast.File
+		err   error
+	}
+)
 
 func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
 	l := &loader{
@@ -137,18 +159,33 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 }
 
 func (l *loader) addFiles(dir string, p *build.Instance) {
+	if l.syntaxCache == nil {
+		l.syntaxCache = map[string]syntaxCacheEntry{}
+	}
+
 	for _, f := range p.BuildFiles {
-		// TODO(mvdan): reuse the same context for an entire loader
-		d := encoding.NewDecoder(cuecontext.New(), f, &encoding.Config{
-			Stdin:     l.cfg.stdin(),
-			ParseFile: l.cfg.ParseFile,
-		})
-		for ; !d.Done(); d.Next() {
-			_ = p.AddSyntax(d.File())
+		ent, ok := l.syntaxCache[f.Filename]
+		if !ok {
+			ent = syntaxCacheEntry{}
+			// TODO(mvdan): reuse the same context for an entire loader
+			d := encoding.NewDecoder(cuecontext.New(), f, &encoding.Config{
+				Stdin:     l.cfg.stdin(),
+				ParseFile: l.cfg.ParseFile,
+			})
+			for ; !d.Done(); d.Next() {
+				ent.files = append(ent.files, d.File())
+			}
+			ent.err = d.Err()
+			d.Close()
+			l.syntaxCache[f.Filename] = ent
 		}
-		if err := d.Err(); err != nil {
+
+		for _, file := range ent.files {
+			_ = p.AddSyntax(file)
+		}
+
+		if err := ent.err; err != nil {
 			p.ReportError(errors.Promote(err, "load"))
 		}
-		d.Close()
 	}
 }

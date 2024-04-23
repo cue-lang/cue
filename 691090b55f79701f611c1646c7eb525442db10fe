@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f37208c4_adcf5f6f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T13:25:38Z",
+      "side": 1,
+      "message": "maybe I misunderstand; rather than three caches (one from dir to dir entries, one from file to build.File, one from file to ast.File), why not a single cache from dir to []ast.File? because each iteration of that loop basically does all this work to load all CUE files from each parent directory; the input is the directory path, and the result is a list of ast.Files to add to the instance.\n\nnot only should that be simpler, but it would also mean we hold onto way fewer allocated objects during the lifetime of the cache.",
+      "revId": "691090b55f79701f611c1646c7eb525442db10fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

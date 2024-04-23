@@ -16,6 +16,24 @@
       "message": "unindent?",
       "revId": "0c8ef7d4b24179a9ec94c65d0aef134938bda534",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f8ecd7d6_cac1fa74",
+        "filename": "pkg/math/testdata/mult.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-23T13:22:46Z",
+      "side": 1,
+      "message": "I believe it\u0027s a bug in `cue fmt`, and if I modify this manually the test will break - should I just remove the comment?",
+      "parentUuid": "1f79b488_556ff449",
+      "revId": "0c8ef7d4b24179a9ec94c65d0aef134938bda534",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -18,6 +18,13 @@ cd $WORK/main
 exec cue eval .
 cmp stdout ../expect-eval-stdout
 
+# Check that the manifest contains the expected git metadata
+# Note: we use cue vet rather than cmp because the
+# manifest contains information that's tricky to control/predict
+# in a test, such as git commit times and commit hashes.
+get-manifest $MEMREGISTRY/x.example/e:v0.0.1 $WORK/manifest0.json
+exec cue vet $WORK/manifest-schema.cue $WORK/manifest0.json
+
 # If the git directory is not clean, the publish should fail. We can
 # conveniently combine that check with the .gitignore removal.
 cd $WORK/example
@@ -38,6 +45,14 @@ exec cue mod get x.example/e@v0.0.2
 exec cue eval .
 cmp stdout $WORK/expect-eval-stdout2
 
+-- manifest-schema.cue --
+import "time"
+
+annotations!: {
+	"org.cuelang.vcs-type"!: "git"
+	"org.cuelang.vcs-commit-time"!: time.Time
+	"org.cuelang.vcs-commit"!: =~"^[a-f0-9]+$"
+}
 -- expect-publish-stdout --
 published x.example/e@v0.0.1
 -- expect-eval-stdout --

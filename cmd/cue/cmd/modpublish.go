@@ -92,7 +92,7 @@ func runModUpload(cmd *Command, args []string) error {
 
 	// TODO verify that all dependencies exist in the registry.
 
-	var vcsStatus vcs.Status
+	var meta *modregistry.Metadata
 
 	switch mf.Source.Kind {
 	case "self":
@@ -121,7 +121,11 @@ func runModUpload(cmd *Command, args []string) error {
 		}); err != nil {
 			return err
 		}
-		vcsStatus = status
+		meta = &modregistry.Metadata{
+			VCSType:       mf.Source.Kind,
+			VCSCommit:     status.Revision,
+			VCSCommitTime: status.CommitTime,
+		}
 	}
 	info, err := zf.Stat()
 	if err != nil {
@@ -129,8 +133,7 @@ func runModUpload(cmd *Command, args []string) error {
 	}
 
 	rclient := modregistry.NewClientWithResolver(resolver)
-	_ = vcsStatus // TODO attach vcsStatus to PutModule metadata
-	if err := rclient.PutModule(backgroundContext(), mv, zf, info.Size()); err != nil {
+	if err := rclient.PutModuleWithMetadata(backgroundContext(), mv, zf, info.Size(), meta); err != nil {
 		return fmt.Errorf("cannot put module: %v", err)
 	}
 	fmt.Printf("published %s\n", mv)

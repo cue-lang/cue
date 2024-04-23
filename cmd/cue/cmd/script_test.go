@@ -20,6 +20,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/fs"
 	"net/http"
 	"net/http/httptest"
@@ -32,7 +33,9 @@ import (
 	"testing"
 	"time"
 
+	"cuelabs.dev/go/oci/ociregistry/ociclient"
 	"cuelabs.dev/go/oci/ociregistry/ocimem"
+	"cuelabs.dev/go/oci/ociregistry/ociref"
 	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
@@ -111,6 +114,36 @@ func TestScript(t *testing.T) {
 					data = tsExpand(ts, data)
 					ts.Check(os.WriteFile(path, []byte(data), 0o666))
 				}
+			},
+			// get-manifest writes the manifest for a given reference within an OCI
+			// registry to a file in JSON format.
+			"get-manifest": func(ts *testscript.TestScript, neg bool, args []string) {
+				usage := func() {
+					ts.Fatalf("usage: get-metadata OCI-ref@tag dest-file")
+				}
+				if neg {
+					usage()
+				}
+				if len(args) != 2 {
+					usage()
+				}
+				ref, err := ociref.Parse(args[0])
+				if err != nil {
+					ts.Fatalf("invalid OCI reference %q: %v", args[0], err)
+				}
+				if ref.Tag == "" {
+					ts.Fatalf("no tag in OCI reference %q", args[0])
+				}
+				client, err := ociclient.New(ref.Host, &ociclient.Options{
+					Insecure: true,
+				})
+				ts.Check(err)
+				r, err := client.GetTag(context.Background(), ref.Repository, ref.Tag)
+				ts.Check(err)
+				data, err := io.ReadAll(r)
+				ts.Check(err)
+				err = os.WriteFile(ts.MkAbs(args[1]), data, 0o666)
+				ts.Check(err)
 			},
 			// memregistry starts an in-memory OCI server and sets the argument
 			// environment variable name to its hostname.

@@ -13,10 +13,10 @@ f2: math.MultipleOf(100.01, 4)
 
 -- out/math --
 	// should be true
-t1: false
-t2: false
-t3: false
-t4: false
+t1: true
+t2: true
+t3: true
+t4: true
 
 // should be false
 f1: false

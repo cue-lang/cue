@@ -38,7 +38,7 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 	if err != nil {
 		return nil, fmt.Errorf("unexpected error on Config.complete: %v", err)
 	}
-	l := loader{cfg: c}
+	l := newLoader(c, nil, nil)
 	inst := l.newRelInstance(token.NoPos, pkg, c.Package)
 	p := l.importPkg(token.NoPos, inst)[0]
 	return p, p.Err
@@ -51,7 +51,7 @@ func TestEmptyImport(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	l := loader{cfg: c}
+	l := newLoader(c, nil, nil)
 	inst := l.newInstance(token.NoPos, "")
 	p := l.importPkg(token.NoPos, inst)[0]
 	if p.Err == nil {

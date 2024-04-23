@@ -156,6 +156,24 @@
       "parentUuid": "22b8484f_0c5376f3",
       "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f3f766de_2587c3e5",
+        "filename": "pkg/math/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-23T14:09:01Z",
+      "side": 1,
+      "message": "sure, I opened an issue + added a TODO.",
+      "parentUuid": "7867145c_bd250ddd",
+      "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

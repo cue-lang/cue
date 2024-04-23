@@ -614,7 +614,8 @@ diff old new
    }
  }
 -- diff/todo/p0 --
-Spurious structural cycle.
+out.subs.subs.#p: invalid structural cycle
+This seems to be the result of incorrect handling of disjunctions.
 -- out/eval/stats --
 Leaks:  6
 Freed:  3232

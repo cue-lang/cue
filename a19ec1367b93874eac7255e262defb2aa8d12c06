@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "26e2cbeb_b6ce6ffb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-23T17:17:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c9d1b97f_a55f4d91",
+      "range": {
+        "startLine": 11,
+        "startChar": 17,
+        "endLine": 11,
+        "endChar": 22
+      },
+      "revId": "a19ec1367b93874eac7255e262defb2aa8d12c06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "179edddb_6f861f88",
@@ -47,6 +71,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b34fab6_0c6bebda",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-23T17:17:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "179edddb_6f861f88",
+      "range": {
+        "startLine": 12,
+        "startChar": 52,
+        "endLine": 12,
+        "endChar": 61
+      },
+      "revId": "a19ec1367b93874eac7255e262defb2aa8d12c06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "152ffdf8_b6253e79",
@@ -60,6 +108,24 @@
       "writtenOn": "2024-04-23T14:46:56Z",
       "side": 1,
       "message": "can you choose a slightly longer label name, like closeVerted or endVertex, that doesn\u0027t shadow a builtin?",
+      "revId": "a19ec1367b93874eac7255e262defb2aa8d12c06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f609940_4441195f",
+        "filename": "internal/core/debug/debug.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 279,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-23T17:17:01Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "152ffdf8_b6253e79",
       "revId": "a19ec1367b93874eac7255e262defb2aa8d12c06",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

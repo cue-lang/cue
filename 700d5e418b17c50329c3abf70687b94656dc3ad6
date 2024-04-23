@@ -51,6 +51,24 @@
       "message": "This seems backwards. Sharing _enables_ structure sharing, and is on by default.",
       "revId": "700d5e418b17c50329c3abf70687b94656dc3ad6",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c298625b_52dc0ef4",
+        "filename": "internal/cuedebug/debug.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-23T08:54:19Z",
+      "side": 1,
+      "message": "Good catch. Originally this was called NoSharing. But with the default mechanism you added, this seemed like a nicer solution.",
+      "parentUuid": "b63b156b_b03bd26d",
+      "revId": "700d5e418b17c50329c3abf70687b94656dc3ad6",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -17,11 +17,9 @@ cmp go.mod go.mod.golden
 
 # Verify that all transitive dependencies are generated properly as well.
 # If any are missing, the evaluation would fail to load them.
-# TODO: broken due to https://cuelang.org/issue/3033.
 go get externalmod.test/imports/root@v1.0.0
 exec cue get go externalmod.test/imports/root
-! exec cue eval uses_imports_root.cue
-stderr 'cannot find package "externalmod.test/imports/sub1"'
+exec cue eval uses_imports_root.cue
 
 -- cue.mod/module.cue --
 module: "mod.test/local"

@@ -565,7 +565,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	for path := range e.usedPkgs {
 		if !e.done[path] {
 			e.done[path] = true
-			if err := e.extractPkg(root, e.allPkgs[p.PkgPath]); err != nil {
+			if err := e.extractPkg(root, e.allPkgs[path]); err != nil {
 				return err
 			}
 		}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "eb0470b8_92960bb1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T09:41:38Z",
+      "side": 1,
+      "message": "Summarize in the commit message what these are relevant for? For example, do they show broken behavior that will be fixed in the coming CLs?",
+      "revId": "45349822677429b0d44e3f999e936bd648cc0bab",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

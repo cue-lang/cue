@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "31ea15de_21040c4a",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 11,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:08:53Z",
+      "side": 1,
+      "message": "It does return `(false, true)` in a few edge cases already covered by the tests, but they don\u0027t change behavior with the patch. This is rather unscientific, but I\u0027m leaning on the entire test suite to yell at me if the actual logic we rely on is broken, within reason. I\u0027ve mentioned in the new commit message that the two-bool result was added in https://cue-review.googlesource.com/c/cue/+/5410, and that all of those test cases still pass.",
+      "parentUuid": "a02323f9_c5fa8de8",
+      "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "d84eba1c_a8acce06",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1bd47f3b_37f2f30b",
+        "filename": "internal/filetypes/filetypes.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 301,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:08:53Z",
+      "side": 1,
+      "message": "We already have the deprecation warnings from e.g. staticcheck, so I don\u0027t think we need TODOs for each of them. There\u0027s too many warnings for now, at least :)",
+      "parentUuid": "605b1e3e_0f54529a",
+      "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a7e0ef55_831e0450",
@@ -65,6 +101,24 @@
       "writtenOn": "2024-04-22T16:02:27Z",
       "side": 1,
       "message": "This change isn\u0027t mentioned in the commit message and maybe should be?",
+      "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9569bde8_5531c7c6",
+        "filename": "internal/filetypes/types.cue",
+        "patchSetId": 2
+      },
+      "lineNbr": 313,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:08:53Z",
+      "side": 1,
+      "message": "Good catch, I meant to mention this and forgot.",
+      "parentUuid": "a7e0ef55_831e0450",
       "revId": "98fcc6bbca61c313861f8cdd65e6153fb1dbf7f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

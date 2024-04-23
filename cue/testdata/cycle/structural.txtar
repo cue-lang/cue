@@ -2599,18 +2599,22 @@ Reducer:
 	a: c: r
 -- diff/todo/p2 --
 TODO(share): fix the following bug once we have structure sharing.
-b4.b: Structural error converted to eval error.
 d3.config: should structural cycle be reported?
-b7.b.0.0: sructural cycle nested one too deep.
-b12b: structural cycle nested too deep.
 p3.a.a: field not allowed incorrect?
-p2.#T.a.b.link: error not propagated up. Could be a structure sharing
-   artifact, though, in which case it is probably okay.
+p2.a.a.one.link.a.two.link: error not propagated up. Could be a structure
+   sharing artifact, though, in which case it is probably okay.
 -- diff/todo/p3 --
 n4: Reordering.
+b12b: reported at correct level, but investigate if it is not processing
+    too deep anyway.
 -- diff/explanation --
 Structural cycles are reported in all chains. compared to old implementation.
 d3.config: reports cycle at correct position.
+b4.b: Structural error converted to eval error: there is both a structural and
+   eval error at this field. The newly reported error is correct.
+b7.b.0.0: structural cycle nested one too deep: the eval error takes precedence.
+   The cycle is reported at the correct level according to the spec.
+
 -- out/eval --
 Errors:
 a1.f.0: structural cycle

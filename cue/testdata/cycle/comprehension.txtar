@@ -1506,11 +1506,9 @@ Unifications: 832
 Conjuncts:    2525
 Disjuncts:    1404
 -- diff/todo/p0 --
-issue779.X: invalid cycle error.
-selfReferential.list.panels: invalid incomplete error.
-selfReferential.acrossOr: many errors
-issue1666.*.f2.a.t: invalid structural cycle
-issue1881: differences
+selfReferential.list.panels: invalid incomplete error: related to "or" builtin
+selfReferential.acrossOr: many errors: related to "or" builtin
+issue1881: differences: related to "or" builtin
 ...
 -- out/eval --
 Errors:

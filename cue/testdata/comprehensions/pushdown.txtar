@@ -1720,10 +1720,6 @@ Retain: 101
 Unifications: 406
 Conjuncts:    652
 Disjuncts:    476
--- diff/todo/p1 --
-embed.fail1.p: error not propagated to parent.
-provideIncompleteSuccess.t2.a.c.d: missing error.
-A bit esoteric, but should work.
 -- diff/todo/p2 --
 Missing empty disjunction message.
 provideIncompleteSuccess.t2.a.c.d: missing error: probably correct.

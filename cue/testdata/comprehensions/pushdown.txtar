@@ -927,15 +927,9 @@ Result:
     // [structural cycle]
     #list: (_|_){
       // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
-      tail: (_|_){
-        // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
-      }
     }
     list: (_|_){
       // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
-      tail: (_|_){
-        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
-      }
     }
   }
   provideIncompleteSuccess: (struct){
@@ -1517,8 +1511,8 @@ diff old new
        }
        q: (int){ int }
      }
-@@ -185,8 +165,7 @@
-       }
+@@ -179,8 +159,7 @@
+       // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
      }
    }
 -  provideIncompleteSuccess: (_|_){
@@ -1527,7 +1521,7 @@ diff old new
      t1: (struct){
        #a: (_|_){
          // [incomplete] provideIncompleteSuccess.t1.#a: incomplete bool: bool:
-@@ -194,16 +173,15 @@
+@@ -188,16 +167,15 @@
          b: (bool){ bool }
        }
        x: (#struct){
@@ -1551,7 +1545,7 @@ diff old new
        #a: (#struct){
          c: (int){ 4 }
          b: (bool){ true }
-@@ -210,17 +188,8 @@
+@@ -204,17 +182,8 @@
        }
        #c: (#struct){
        }
@@ -1571,35 +1565,33 @@ diff old new
          }
          b: (bool){ true }
        }
-@@ -250,17 +219,22 @@
+@@ -244,9 +213,22 @@
    }
    cyclicError: (struct){
      a: (_|_){
 -      // [cycle] cycle error
--      x: (_|_){
--        // [cycle] cycle error
+-    }
+-    c: (struct){
 +      // [incomplete] cyclicError.a: incomplete bool: bool:
 +      //     ./in.cue:232:6
 +      x: (_|_){
 +        // [incomplete] cyclicError.a: incomplete bool: bool:
 +        //     ./in.cue:232:6
-       }
-       y: (_|_){
--        // [cycle] cycle error
++      }
++      y: (_|_){
 +        // [incomplete] cyclicError.a: incomplete bool: bool:
 +        //     ./in.cue:232:6
-       }
-       b: (struct){
-       }
-     }
--    c: (struct){
++      }
++      b: (struct){
++      }
++    }
 +    c: (_|_){
 +      // [incomplete] cyclicError.a: incomplete bool: bool:
 +      //     ./in.cue:232:6
      }
    }
    midwayReferences: (struct){
-@@ -397,7 +371,7 @@
+@@ -383,7 +365,7 @@
        E: (#struct){
          e: (bool){ bool }
          f: (_|_){
@@ -1608,7 +1600,7 @@ diff old new
            //     ./in.cue:389:7
          }
        }
-@@ -417,17 +391,10 @@
+@@ -403,17 +385,10 @@
          }
        }
        E: (_|_){
@@ -1627,7 +1619,7 @@ diff old new
        }
      }
      derefDisj2: (struct){
-@@ -438,17 +405,10 @@
+@@ -424,17 +399,10 @@
          }
        }
        E: (_|_){
@@ -1646,7 +1638,7 @@ diff old new
        }
      }
      bulk1: (struct){
-@@ -571,9 +531,7 @@
+@@ -557,9 +525,7 @@
            // [eval]
            e: (_|_){
              // [eval] structShare.err1.x.d.e: field not allowed:
@@ -1657,7 +1649,7 @@ diff old new
              //     ./in.cue:578:9
            }
          }
-@@ -597,13 +555,13 @@
+@@ -583,13 +549,13 @@
        }
        envs: (struct){
          e1: (#struct){
@@ -1675,7 +1667,7 @@ diff old new
          }
        }
      }
-@@ -625,7 +583,7 @@
+@@ -611,7 +577,7 @@
        y: (int){ 1 }
      }
      a: (struct){
@@ -1684,7 +1676,7 @@ diff old new
      }
    }
    nestedWithEmbeddingOK: (struct){
-@@ -640,9 +598,7 @@
+@@ -626,9 +592,8 @@
      _c: (struct){
        y: (int){ 1 }
      }
@@ -1692,9 +1684,10 @@ diff old new
 -      // [cycle] nestedWithDynamicFieldOK.a: circular dependency in evaluation of conditionals: "\(〈1;k〉)" changed after evaluation:
 -      //     ./issue2113.cue:19:7
 +    a: (struct){
-       y: (int){ 1 }
++      y: (int){ 1 }
      }
    }
+   errorPropagation: (_|_){
 -- diff/-out/evalalpha/stats<==>+out/eval/stats --
 diff old new
 --- old
@@ -1915,15 +1908,9 @@ Result:
     // [structural cycle]
     #list: (_|_){
       // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
-      tail: (_|_){
-        // [structural cycle] noStackOverflowStructCycle.#list.tail: structural cycle
-      }
     }
     list: (_|_){
       // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
-      tail: (_|_){
-        // [structural cycle] noStackOverflowStructCycle.list.tail: structural cycle
-      }
     }
   }
   provideIncompleteSuccess: (_|_){
@@ -1992,14 +1979,6 @@ Result:
   cyclicError: (struct){
     a: (_|_){
       // [cycle] cycle error
-      x: (_|_){
-        // [cycle] cycle error
-      }
-      y: (_|_){
-        // [cycle] cycle error
-      }
-      b: (struct){
-      }
     }
     c: (struct){
     }
@@ -2384,7 +2363,6 @@ Result:
     a: (_|_){
       // [cycle] nestedWithDynamicFieldOK.a: circular dependency in evaluation of conditionals: "\(〈1;k〉)" changed after evaluation:
       //     ./issue2113.cue:19:7
-      y: (int){ 1 }
     }
   }
   errorPropagation: (_|_){

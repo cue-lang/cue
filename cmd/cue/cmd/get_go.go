@@ -29,7 +29,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 	"unicode"
 
 	"github.com/spf13/cobra"
@@ -792,20 +791,6 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				typ := e.pkg.TypesInfo.TypeOf(name)
 				c := e.pkg.TypesInfo.Defs[v.Names[i]].(*types.Const)
 				sv := c.Val().ExactString()
-				switch t := typ.(type) {
-				case *types.Named:
-					if t.Obj().Pkg().Path() == "time" && t.Obj().Name() == "Duration" {
-						// time.Duration is an int64 representing nanoseconds,
-						// but CUE only accepts strings with units as accepted by time.ParseDuration.
-						durationWithUnit := sv + "ns"
-						// Roundtrip the constant through time.Duration.String for human readability.
-						duration, err := time.ParseDuration(durationWithUnit)
-						if err != nil {
-							panic(fmt.Errorf("time.ParseDuration(%s) failed: %v", durationWithUnit, err))
-						}
-						sv = `"` + duration.String() + `"`
-					}
-				}
 				cv, err := parser.ParseExpr("", sv)
 				if err != nil {
 					panic(fmt.Errorf("failed to parse %v: %v", sv, err))
@@ -1061,7 +1046,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 		// Check for builtin packages.
 		switch {
-		case obj.Pkg().Path() == "time" && (obj.Name() == "Time" || obj.Name() == "Duration"):
+		case obj.Pkg().Path() == "time" && obj.Name() == "Time":
 			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
 			var name *cueast.Ident
 			if ref.Name != "time" {
@@ -1069,6 +1054,24 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			}
 			ref.Node = cueast.NewImport(name, "time")
 			return cueast.NewSel(ref, obj.Name())
+
+		case obj.Pkg().Path() == "time" && obj.Name() == "Duration":
+			// Go's time.Duration is an int64 to represent nanoseconds,
+			// and even though most Go users would find the string representation
+			// like "3s" or "40m" most reasonable and readable for constant values,
+			// encoding/json is bound via Go's compatibility promise to encoding as integers.
+			//
+			// Since compatibility with JSON encoding and decoding in Go
+			// is more important than readability, we use integers as well here.
+			// Note that this means we aren't compatible with CUE's own time.Duration,
+			// which is rather unfortunate, but we have to choose one or the other.
+			//
+			// TODO(mvdan): reconsider once 'cue get go' is more configurable,
+			// and especially once encoding/json/v2 becomes a reality,
+			// as it does encode time.Duration via strings rather than integers.
+			// For example, could we generate types like 'int | *time.Duration'
+			// and constants like '300 | *"300ns"' to support both at the same time?
+			return e.ident("int", false)
 
 		case obj.Pkg().Path() == "math/big" && obj.Name() == "Int":
 			return e.ident("int", false)

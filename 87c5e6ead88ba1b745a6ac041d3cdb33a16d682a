@@ -138,6 +138,24 @@
       "parentUuid": "e8e76bd3_46f1a4d9",
       "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7867145c_bd250ddd",
+        "filename": "pkg/math/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T13:50:20Z",
+      "side": 1,
+      "message": "I see. Can you add a TODO about it, and perhaps raise an issue upstream? We don\u0027t have to wait for upstream to respond to merge this patch, but at least I want to leave a note that we want to use Rem but cannot.",
+      "parentUuid": "22b8484f_0c5376f3",
+      "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -16,6 +16,24 @@
       "message": "should this be an assertion?",
       "revId": "596f1f5d7701c365a61e1fc7e957affb8190f004",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a6b63955_cc12d714",
+        "filename": "internal/core/adt/disjunct2.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 612,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-23T11:43:27Z",
+      "side": 1,
+      "message": "was for debugging. Removed it as it will panic anyway in the next line if this still were to happen.",
+      "parentUuid": "3d7c47e5_5cad1ec4",
+      "revId": "596f1f5d7701c365a61e1fc7e957affb8190f004",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

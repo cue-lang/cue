@@ -140,35 +140,20 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	// Walk the parent directories up to the module root to add their files as well,
 	// since a package foo/bar/baz inherits from parent packages foo/bar and foo.
 	// See https://cuelang.org/docs/concept/modules-packages-instances/#instances.
-	//
-	// TODO(mvdan): Note that the work below, most notably readDir and ParseFile,
-	// is not cached or reused in any way. This causes slow-downs on big repos,
-	// for example `cue fmt --check ./...` on the cue repo inspects
-	// top-level files like README.md and LICENSE many dozens of times.
 	for _, d := range dirs {
 		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
-			files, err := ctxt.readDir(dir)
-			if err != nil && !os.IsNotExist(err) {
-				return retErr(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
+			sd, ok := l.dirCachedBuildFiles[dir]
+			if !ok {
+				sd = l.scanDir(dir)
+				l.dirCachedBuildFiles[dir] = sd
 			}
-			for _, f := range files {
-				if f.IsDir() {
-					continue
-				}
-				if f.Name() == "-" {
-					if _, err := cfg.fileSystem.stat("-"); !os.IsNotExist(err) {
-						continue
-					}
-				}
-				file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
-				if err != nil {
-					p.UnknownFiles = append(p.UnknownFiles, &build.File{
-						Filename:      f.Name(),
-						ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
-					})
-					continue // skip unrecognized file types
-				}
-				fp.add(dir, file, importComment)
+			if err := sd.err; err != nil {
+				return retErr(errors.Wrapf(err, token.NoPos, "import failed reading dir %v", dir))
+			}
+			p.UnknownFiles = append(p.UnknownFiles, sd.unknownFiles...)
+			for _, f := range sd.buildFiles {
+				bf := *f
+				fp.add(dir, &bf, importComment)
 			}
 
 			if p.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {
@@ -218,6 +203,36 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 		return cmp.Compare(a.PkgName, b.PkgName)
 	})
 	return all
+}
+
+func (l *loader) scanDir(dir string) cachedFileFiles {
+	sd := cachedFileFiles{}
+	files, err := l.cfg.fileSystem.readDir(dir)
+	if err != nil && !os.IsNotExist(err) {
+		sd.err = err
+		return sd
+	}
+	for _, f := range files {
+		if f.IsDir() {
+			continue
+		}
+		if f.Name() == "-" {
+			if _, err := l.cfg.fileSystem.stat("-"); !os.IsNotExist(err) {
+				continue
+			}
+		}
+		file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
+		if err != nil {
+			sd.unknownFiles = append(sd.unknownFiles, &build.File{
+				Filename:      f.Name(),
+				ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
+			})
+			continue // skip unrecognized file types
+		}
+
+		sd.buildFiles = append(sd.buildFiles, file)
+	}
+	return sd
 }
 
 // _loadFunc is the method used for the value of l.loadFunc.

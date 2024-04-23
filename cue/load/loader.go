@@ -22,6 +22,7 @@ package load
 import (
 	"path/filepath"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
@@ -42,13 +43,36 @@ type loader struct {
 	stk      importStack
 	loadFunc build.LoadFunc
 	pkgs     *modpkgload.Packages
+
+	// When we descend into subdirectories to load patterns such as ./...
+	// we often end up loading parent directories many times over; cache that work by directory.
+	dirCachedBuildFiles map[string]cachedFileFiles
+
+	// The same file may be decoded into an *ast.File multiple times, e.g. when it is present in
+	// multiple different build instances in the same directory hierarchy; cache that work by file name.
+	fileCachedSyntaxFiles map[string]cachedSyntaxFiles
 }
+
+type (
+	cachedFileFiles struct {
+		err          errors.Error
+		buildFiles   []*build.File
+		unknownFiles []*build.File
+	}
+
+	cachedSyntaxFiles struct {
+		err   error
+		files []*ast.File
+	}
+)
 
 func newLoader(c *Config, tg *tagger, pkgs *modpkgload.Packages) *loader {
 	l := &loader{
-		cfg:    c,
-		tagger: tg,
-		pkgs:   pkgs,
+		cfg:                   c,
+		tagger:                tg,
+		pkgs:                  pkgs,
+		dirCachedBuildFiles:   map[string]cachedFileFiles{},
+		fileCachedSyntaxFiles: map[string]cachedSyntaxFiles{},
 	}
 	l.loadFunc = l._loadFunc
 	return l
@@ -137,18 +161,28 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 }
 
 func (l *loader) addFiles(dir string, p *build.Instance) {
-	for _, f := range p.BuildFiles {
-		// TODO(mvdan): reuse the same context for an entire loader
-		d := encoding.NewDecoder(cuecontext.New(), f, &encoding.Config{
-			Stdin:     l.cfg.stdin(),
-			ParseFile: l.cfg.ParseFile,
-		})
-		for ; !d.Done(); d.Next() {
-			_ = p.AddSyntax(d.File())
+	for _, bf := range p.BuildFiles {
+		syntax, ok := l.fileCachedSyntaxFiles[bf.Filename]
+		if !ok {
+			syntax = cachedSyntaxFiles{}
+			// TODO(mvdan): reuse the same context for an entire loader
+			d := encoding.NewDecoder(cuecontext.New(), bf, &encoding.Config{
+				Stdin:     l.cfg.stdin(),
+				ParseFile: l.cfg.ParseFile,
+			})
+			for ; !d.Done(); d.Next() {
+				syntax.files = append(syntax.files, d.File())
+			}
+			syntax.err = d.Err()
+			d.Close()
+			l.fileCachedSyntaxFiles[bf.Filename] = syntax
 		}
-		if err := d.Err(); err != nil {
+
+		if err := syntax.err; err != nil {
 			p.ReportError(errors.Promote(err, "load"))
 		}
-		d.Close()
+		for _, f := range syntax.files {
+			_ = p.AddSyntax(f)
+		}
 	}
 }

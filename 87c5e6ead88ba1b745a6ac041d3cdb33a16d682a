@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "63fffb7e_6acadcda",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 16,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-23T13:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e548ae5f_a07e87b9",
+      "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "820d5a7a_c34213ef",
         "filename": "/COMMIT_MSG",
         "patchSetId": 2
@@ -54,6 +72,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "2d92ded9_5fdc30a4",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 27,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-23T13:41:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "36167a84_ea71ef6a",
+      "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9455e63d_1417eeb9",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 2
@@ -82,6 +118,24 @@
       "writtenOn": "2024-04-23T13:22:16Z",
       "side": 1,
       "message": "Rather than Quo plus Modf, can we not use https://pkg.go.dev/github.com/cockroachdb/apd/v3#Context.Rem as a single operation, checking that the result is exactly zero?",
+      "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "22b8484f_0c5376f3",
+        "filename": "pkg/math/manual.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 126,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-23T13:41:07Z",
+      "side": 1,
+      "message": "I tried this out originally, and for some reason (not at all sure what the difference is yet), the tests failed for the case `math.MultipleOf(100E100, 10)`. The error is: `mul6: error in call to math.MultipleOf: division impossible`\n\nI tried to investigate and it probably requires diving in to the `apd` implementation - do you think it\u0027s worth it?",
+      "parentUuid": "e8e76bd3_46f1a4d9",
       "revId": "87c5e6ead88ba1b745a6ac041d3cdb33a16d682a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

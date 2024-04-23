@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d1a7d976_db577f8b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:10:54Z",
+      "side": 1,
+      "message": "at times I thought that they were separated by e.g. global/shared flags vs command specific flags, but you\u0027re right that that\u0027s not really the case.",
+      "revId": "693f3d7bfe0a76be89668a936c312512742876b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

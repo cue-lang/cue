@@ -564,23 +564,18 @@ Disjuncts:    215
 diff old new
 --- old
 +++ new
-@@ -1,42 +1,34 @@
+@@ -1,35 +1,34 @@
  (struct){
    minimal: (struct){
      a: (_|_){
 -      // [cycle] minimal.b: cycle with field a.port:
 -      //     ./in.cue:18:6
--      port: (string){ "" }
 +      // [incomplete] minimal.a.port: cyclic reference to field port:
 +      //     ./in.cue:12:3
      }
      b: (_|_){
 -      // [cycle] minimal.b: cycle with field a.port:
 -      //     ./in.cue:18:6
--      port*: (_|_){
--        // [cycle] minimal.b: cycle with field a.port:
--        //     ./in.cue:18:6
--      }
 +      // [incomplete] minimal.b.port: cyclic reference to field port:
 +      //     ./in.cue:18:3
      }
@@ -596,14 +591,12 @@ diff old new
 -        //     ./in.cue:31:7
 -        // small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
 -        //     ./in.cue:34:7
--        port: (string){ "" }
 -      }
 -    }
 -    p2: (struct){
 -      #X: (_|_){
 -        // [cycle] small.p2.#Y: cycle with field #X.port:
 -        //     ./in.cue:50:47
--        port: (string){ "" }
 -      }
 -      #Y: (_|_){
 -        // [cycle] small.p2.#Y: cycle with field #X.port:
@@ -628,7 +621,7 @@ diff old new
        }
      }
    }
-@@ -43,66 +35,61 @@
+@@ -36,65 +35,61 @@
    medium: (struct){
      #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
      p1: (struct){
@@ -732,7 +725,6 @@ diff old new
        #X: (_|_){
 -        // [cycle] medium.p5.#Y: cycle with field #X.port:
 -        //     ./in.cue:158:47
--        port: (string){ "" }
 -      }
 -      #Y: (_|_){
 -        // [cycle] medium.p5.#Y: cycle with field #X.port:
@@ -746,13 +738,12 @@ diff old new
        }
        Y: (struct){
        }
-@@ -109,15 +96,14 @@
+@@ -101,14 +96,14 @@
      }
      p6: (struct){
        #X: (_|_){
 -        // [cycle] medium.p6.#Y: cycle with field #X.port:
 -        //     ./in.cue:186:47
--        port: (string){ "" }
 -      }
 -      Y: (struct){
 -      }
@@ -770,15 +761,13 @@ diff old new
        }
      }
    }
-@@ -124,122 +110,83 @@
+@@ -115,81 +110,83 @@
    large: (struct){
      #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
      p1: (struct){
 -      Y: (_|_){
 -        // [cycle] large.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
 -        //     ./in.cue:226:7
--        userinfo: (string){ "user" }
--        host: (string){ "mod.test" }
 -      }
 -      X: (string){ "user@mod.test" }
 -      #X: (_|_){
@@ -786,9 +775,6 @@ diff old new
 -        //     ./in.cue:202:7
 -        // large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
 -        //     ./in.cue:205:7
--        userinfo: (string){ "user@" }
--        host: (string){ "mod.test" }
--        port: (string){ "" }
 -      }
 -      #Y: (#struct){
 -        host: (string){ "mod.test" }
@@ -801,12 +787,6 @@ diff old new
 -      Y: (_|_){
 -        // [cycle] large.p2.Y: cycle error referencing port:
 -        //     ./in.cue:267:10
--        userinfo: (string){ "user" }
--        host: (string){ "mod.test" }
--        port*: (_|_){
--          // [cycle] large.p2.Y: cycle error referencing port:
--          //     ./in.cue:267:10
--        }
 -      }
 -      #X: (_|_){
 -        // [cycle] large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
@@ -815,12 +795,6 @@ diff old new
 -        //     ./in.cue:246:7
 -        // large.p2.Y: cycle error referencing port:
 -        //     ./in.cue:267:10
--        userinfo: (string){ "user@" }
--        host: (string){ "mod.test" }
--        port: (_|_){
--          // [cycle] large.p2.Y: cycle error referencing port:
--          //     ./in.cue:267:10
--        }
 -      }
 -      #Y: (#struct){
 -        host: (string){ "mod.test" }
@@ -837,22 +811,10 @@ diff old new
 -        //     ./in.cue:282:7
 -        // large.p3.Y: cycle error referencing port:
 -        //     ./in.cue:308:10
--        userinfo: (string){ "user@" }
--        host: (string){ "mod.test" }
--        port: (_|_){
--          // [cycle] large.p3.Y: cycle error referencing port:
--          //     ./in.cue:308:10
--        }
 -      }
 -      Y: (_|_){
 -        // [cycle] large.p3.Y: cycle error referencing port:
 -        //     ./in.cue:308:10
--        userinfo: (string){ "user" }
--        host: (string){ "mod.test" }
--        port*: (_|_){
--          // [cycle] large.p3.Y: cycle error referencing port:
--          //     ./in.cue:308:10
--        }
 -      }
 -      #Y: (#struct){
 -        host: (string){ "mod.test" }
@@ -869,12 +831,6 @@ diff old new
 -        //     ./in.cue:323:7
 -        // large.p4.Y: cycle error referencing port:
 -        //     ./in.cue:351:10
--        userinfo: (string){ "user@" }
--        host: (string){ "mod.test" }
--        port: (_|_){
--          // [cycle] large.p4.Y: cycle error referencing port:
--          //     ./in.cue:351:10
--        }
 -      }
 -      #Y: (#struct){
 -        host: (string){ "mod.test" }
@@ -884,12 +840,6 @@ diff old new
 -      Y: (_|_){
 -        // [cycle] large.p4.Y: cycle error referencing port:
 -        //     ./in.cue:351:10
--        userinfo: (string){ "user" }
--        host: (string){ "mod.test" }
--        port*: (_|_){
--          // [cycle] large.p4.Y: cycle error referencing port:
--          //     ./in.cue:351:10
--        }
 +      Y: (struct){
 +        userinfo: (string){ "user" }
 +        host: (string){ "mod.test" }
@@ -978,15 +928,10 @@ error message: no mention of cycle path
     a: (_|_){
       // [cycle] minimal.b: cycle with field a.port:
       //     ./in.cue:18:6
-      port: (string){ "" }
     }
     b: (_|_){
       // [cycle] minimal.b: cycle with field a.port:
       //     ./in.cue:18:6
-      port*: (_|_){
-        // [cycle] minimal.b: cycle with field a.port:
-        //     ./in.cue:18:6
-      }
     }
   }
   small: (struct){
@@ -1000,14 +945,12 @@ error message: no mention of cycle path
         //     ./in.cue:31:7
         // small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
         //     ./in.cue:34:7
-        port: (string){ "" }
       }
     }
     p2: (struct){
       #X: (_|_){
         // [cycle] small.p2.#Y: cycle with field #X.port:
         //     ./in.cue:50:47
-        port: (string){ "" }
       }
       #Y: (_|_){
         // [cycle] small.p2.#Y: cycle with field #X.port:
@@ -1073,7 +1016,6 @@ error message: no mention of cycle path
       #X: (_|_){
         // [cycle] medium.p5.#Y: cycle with field #X.port:
         //     ./in.cue:158:47
-        port: (string){ "" }
       }
       #Y: (_|_){
         // [cycle] medium.p5.#Y: cycle with field #X.port:
@@ -1086,7 +1028,6 @@ error message: no mention of cycle path
       #X: (_|_){
         // [cycle] medium.p6.#Y: cycle with field #X.port:
         //     ./in.cue:186:47
-        port: (string){ "" }
       }
       Y: (struct){
       }
@@ -1102,8 +1043,6 @@ error message: no mention of cycle path
       Y: (_|_){
         // [cycle] large.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
         //     ./in.cue:226:7
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
       }
       X: (string){ "user@mod.test" }
       #X: (_|_){
@@ -1111,9 +1050,6 @@ error message: no mention of cycle path
         //     ./in.cue:202:7
         // large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
         //     ./in.cue:205:7
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-        port: (string){ "" }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -1126,12 +1062,6 @@ error message: no mention of cycle path
       Y: (_|_){
         // [cycle] large.p2.Y: cycle error referencing port:
         //     ./in.cue:267:10
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-        port*: (_|_){
-          // [cycle] large.p2.Y: cycle error referencing port:
-          //     ./in.cue:267:10
-        }
       }
       #X: (_|_){
         // [cycle] large.p2.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
@@ -1140,12 +1070,6 @@ error message: no mention of cycle path
         //     ./in.cue:246:7
         // large.p2.Y: cycle error referencing port:
         //     ./in.cue:267:10
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-        port: (_|_){
-          // [cycle] large.p2.Y: cycle error referencing port:
-          //     ./in.cue:267:10
-        }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -1162,22 +1086,10 @@ error message: no mention of cycle path
         //     ./in.cue:282:7
         // large.p3.Y: cycle error referencing port:
         //     ./in.cue:308:10
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-        port: (_|_){
-          // [cycle] large.p3.Y: cycle error referencing port:
-          //     ./in.cue:308:10
-        }
       }
       Y: (_|_){
         // [cycle] large.p3.Y: cycle error referencing port:
         //     ./in.cue:308:10
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-        port*: (_|_){
-          // [cycle] large.p3.Y: cycle error referencing port:
-          //     ./in.cue:308:10
-        }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -1194,12 +1106,6 @@ error message: no mention of cycle path
         //     ./in.cue:323:7
         // large.p4.Y: cycle error referencing port:
         //     ./in.cue:351:10
-        userinfo: (string){ "user@" }
-        host: (string){ "mod.test" }
-        port: (_|_){
-          // [cycle] large.p4.Y: cycle error referencing port:
-          //     ./in.cue:351:10
-        }
       }
       #Y: (#struct){
         host: (string){ "mod.test" }
@@ -1209,12 +1115,6 @@ error message: no mention of cycle path
       Y: (_|_){
         // [cycle] large.p4.Y: cycle error referencing port:
         //     ./in.cue:351:10
-        userinfo: (string){ "user" }
-        host: (string){ "mod.test" }
-        port*: (_|_){
-          // [cycle] large.p4.Y: cycle error referencing port:
-          //     ./in.cue:351:10
-        }
       }
     }
   }

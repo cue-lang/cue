@@ -86,7 +86,7 @@ Disjuncts:    7
 diff old new
 --- old
 +++ new
-@@ -5,11 +5,13 @@
+@@ -5,7 +5,13 @@
      a: (int){ 3 }
    }
    d: (_|_){
@@ -94,12 +94,11 @@ diff old new
 +    // [incomplete] d: non-concrete value int in operand to >:
      //     ./in.cue:14:5
 +    //     ./in.cue:13:5
-     a: (_|_){
--      // [cycle] cycle error:
++    a: (_|_){
 +      // [incomplete] d: non-concrete value int in operand to >:
-       //     ./in.cue:14:5
++      //     ./in.cue:14:5
 +      //     ./in.cue:13:5
-     }
++    }
    }
  }
 -- diff/explanation --
@@ -114,9 +113,5 @@ Improved error message.
   d: (_|_){
     // [cycle] cycle error:
     //     ./in.cue:14:5
-    a: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:14:5
-    }
   }
 }

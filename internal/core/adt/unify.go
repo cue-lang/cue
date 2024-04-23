@@ -427,6 +427,9 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		// TODO: make uniform error messages
 		// see compbottom2.cue:
 		n.ctx.addErrf(CycleError, pos(n.node), "mutual dependency")
+		// Consider using this, although not all
+		// mutual dependencies are irrecoverable.
+		// n.reportCycleError()
 	}
 
 	n.node.updateStatus(evaluatingArcs)

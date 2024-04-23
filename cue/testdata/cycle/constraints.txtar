@@ -933,8 +933,8 @@ diff old new
                  }
                }
              }
--- diff/todo/p1 --
-issue1503: cycle detected too late
+-- diff/todo/p2 --
+issue1503: cycle detected too late (but not super late)
 selfTriggerCycle.t1.a.b.b: cycle detected slightly too late
 -- out/eval --
 Errors:

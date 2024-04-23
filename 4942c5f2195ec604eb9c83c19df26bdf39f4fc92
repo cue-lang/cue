@@ -33,6 +33,24 @@
       "message": "An alternative to writing this entirely in CUE might be to write a little bit of extra CUE in types.cue, something like:\n\n```\n// knownExtensions derives all the known file extensions\n// from those that are mentioned in modes.\nknownExtensions: {\n\tfor mode in modes\n\tfor ext, _ in mode.extensions {\n\t\t(ext): true\n\t}\n}\n```\n\nThen you could do something like:\n\n```\nerr :\u003d typesValue.LookupPath(cue.MakePath(cue.Str(\"knownExtensions\"))).Decode(\u0026knownExtensions)\n```\n\nMaybe too costly? But worth considering anyway.",
       "revId": "4942c5f2195ec604eb9c83c19df26bdf39f4fc92",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9860e939_3f2614c3",
+        "filename": "internal/filetypes/types.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 37,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:08:53Z",
+      "side": 1,
+      "message": "Good point - this is nicer, as we have less logic in CUE, and also shorter, given the verbosity of the Go API. I\u0027m not worried about the performance given that types.cue will only be computed on first use after the next CL.",
+      "parentUuid": "a8327900_e0eb67ae",
+      "revId": "4942c5f2195ec604eb9c83c19df26bdf39f4fc92",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

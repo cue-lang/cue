@@ -16,6 +16,24 @@
       "message": "maybe I misunderstand; rather than three caches (one from dir to dir entries, one from file to build.File, one from file to ast.File), why not a single cache from dir to []ast.File? because each iteration of that loop basically does all this work to load all CUE files from each parent directory; the input is the directory path, and the result is a list of ast.Files to add to the instance.\n\nnot only should that be simpler, but it would also mean we hold onto way fewer allocated objects during the lifetime of the cache.",
       "revId": "691090b55f79701f611c1646c7eb525442db10fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4b7c46b6_4561c906",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-23T13:57:37Z",
+      "side": 1,
+      "message": "So just to clarify:\n\n1. Are you saying that the cache should instead be from dir to all files (including ancestor files) to be added to the instance? I agree with that part\n\n2. If I\u0027m not mistaken (please correct me if I am), we need the `*build.File` to add to the instance in addition to the `ast.File` - so even if we restructure the cache, we would still need to store both types",
+      "parentUuid": "f37208c4_adcf5f6f",
+      "revId": "691090b55f79701f611c1646c7eb525442db10fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

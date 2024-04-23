@@ -114,11 +114,18 @@ func RoundToEven(x *internal.Decimal) (*big.Int, error) {
 	return toInt(&d), err
 }
 
-var mulContext = internal.BaseContext.WithPrecision(1)
-
 // MultipleOf reports whether x is a multiple of y.
 func MultipleOf(x, y *internal.Decimal) (bool, error) {
 	var d apd.Decimal
-	cond, err := mulContext.Quo(&d, x, y)
-	return !cond.Inexact(), err
+
+	// TODO: It would be preferable to use internal.BaseContext.Rem here, and directly
+	//       check the result for 0. However, this currently fails with "division impossible".
+	//       Fix this when https://github.com/cockroachdb/apd/issues/134 is resolved.
+	_, err := internal.BaseContext.Quo(&d, x, y)
+	if err != nil {
+		return false, err
+	}
+	var frac apd.Decimal
+	d.Modf(nil, &frac)
+	return frac.IsZero(), nil
 }

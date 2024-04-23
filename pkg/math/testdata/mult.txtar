@@ -1,0 +1,23 @@
+-- in.cue --
+import "math"
+
+// should be true
+t1: math.MultipleOf(99*99, 99)
+t2: math.MultipleOf(100010, 10)
+t3: math.MultipleOf(22, 2)
+t4: math.MultipleOf(11, 1)
+
+// should be false
+f1: math.MultipleOf(5555555, 2)
+f2: math.MultipleOf(100.01, 4)
+
+-- out/math --
+	// should be true
+t1: false
+t2: false
+t3: false
+t4: false
+
+// should be false
+f1: false
+f2: false

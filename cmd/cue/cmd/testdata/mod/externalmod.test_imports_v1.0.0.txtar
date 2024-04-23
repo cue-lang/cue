@@ -1,0 +1,31 @@
+-- .mod --
+module externalmod.test/imports
+
+-- .info --
+{"Version":"v1.0.0","Time":"2018-10-22T18:45:39Z"}
+
+-- go.mod --
+module externalmod.test/imports
+
+-- root/p.go --
+package root
+
+import "externalmod.test/imports/sub1"
+
+type Type struct {
+	Sub1 sub1.Type
+}
+-- sub1/p.go --
+package sub1
+
+import "externalmod.test/imports/sub2"
+
+type Type struct {
+	Sub2 sub2.Type
+}
+-- sub2/p.go --
+package sub2
+
+type Type struct {
+	Leaf int
+}

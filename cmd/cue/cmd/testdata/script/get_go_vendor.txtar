@@ -5,9 +5,7 @@ cmp x/x_go_gen.cue x_go_gen.cue.golden
 
 # Verify that all transitive dependencies were generated properly.
 # If any are missing, the evaluation would fail to load them.
-# TODO: broken due to https://cuelang.org/issue/3033.
-! exec cue eval ./x
-stderr 'no CUE files in mod.test/z'
+exec cue eval ./x
 
 -- go.mod --
 module mod.test

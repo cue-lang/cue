@@ -89,8 +89,6 @@ func TestEvalAlpha(t *testing.T) {
 		"cycle/evaluate": "hang",
 		"cycle/chain":    "hang",
 
-		"cycle/structural": "hang",
-
 		"benchmarks/issue2176": "too many errors",
 	}
 

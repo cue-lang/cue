@@ -130,10 +130,15 @@ func readModuleFile(ctx context.Context, fsys fs.FS, modRoot string) (module.Ver
 }
 
 func modfileFromRequirements(old *modfile.File, rs *modrequirements.Requirements, cueVers string) *modfile.File {
+	// TODO it would be nice to have some way of automatically including new
+	// fields by default when they're added to modfile.File, but we don't
+	// want to just copy the entire of old because that includes
+	// private fields too.
 	mf := &modfile.File{
 		Module:   old.Module,
 		Language: old.Language,
 		Deps:     make(map[string]*modfile.Dep),
+		Source:   old.Source,
 	}
 	if cueVers != "" && (mf.Language == nil || mf.Language.Version == "") {
 		mf.Language = &modfile.Language{
@@ -669,4 +674,8 @@ func logf(f string, a ...any) {
 	if logging {
 		log.Printf(f, a...)
 	}
+}
+
+func ref[T any](x T) *T {
+	return &x
 }

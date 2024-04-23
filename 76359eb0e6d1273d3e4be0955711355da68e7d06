@@ -1,0 +1,95 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "058082b8_d5fbb2c7",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T17:05:10Z",
+      "side": 1,
+      "message": "For #3034?",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "92186b7a_df431fd3",
+        "filename": "mod/modregistry/client_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T17:05:10Z",
+      "side": 1,
+      "message": "nit: inline like the others?",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "4a68824d_2cfa3ba2",
+        "filename": "mod/modregistry/client_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T17:05:10Z",
+      "side": 1,
+      "message": "nit: inline like the others?",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "da014901_9c660487",
+        "filename": "mod/modregistry/metadata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T17:05:10Z",
+      "side": 1,
+      "message": "to not repeat, how about \"extra information\" or \"key-value pairs\"?",
+      "range": {
+        "startLine": 9,
+        "startChar": 22,
+        "endLine": 9,
+        "endChar": 30
+      },
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e17f2e84_8de968e7",
+        "filename": "mod/modregistry/metadata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T17:05:10Z",
+      "side": 1,
+      "message": "do we want to add a TODO or a note comment about avoiding the somewhat unnecessary JSON roundtrip? For example, I imagine that this could be a little bit of reflect code given that this is a `map[string]string`, but perhaps it\u0027s not important if this code never runs in any hot path.\n\nditto for the method below, so perhaps a TODO/note above both methods.",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

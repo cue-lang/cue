@@ -16,6 +16,29 @@
       "message": "PTAL.",
       "revId": "d24e4521c21dc163a6f57fdf05e0abecb04434f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "7760f81d_58b35349",
+        "filename": "cmd/cue/cmd/vet.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-23T05:08:29Z",
+      "side": 1,
+      "message": "\"expression values\"\n\nI always find wording here tough: but it is not matching the expression itself, instead the value of the expression.",
+      "range": {
+        "startLine": 62,
+        "startChar": 20,
+        "endLine": 62,
+        "endChar": 37
+      },
+      "revId": "d24e4521c21dc163a6f57fdf05e0abecb04434f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

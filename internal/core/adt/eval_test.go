@@ -87,7 +87,6 @@ func TestEvalAlpha(t *testing.T) {
 	var todoAlpha = map[string]string{
 		// Crashes and hangs
 		"cycle/evaluate": "hang",
-		"cycle/chain":    "hang",
 
 		"benchmarks/issue2176": "too many errors",
 	}

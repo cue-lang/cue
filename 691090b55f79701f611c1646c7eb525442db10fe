@@ -34,6 +34,24 @@
       "parentUuid": "f37208c4_adcf5f6f",
       "revId": "691090b55f79701f611c1646c7eb525442db10fe",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "abb93cd4_c3e8b22d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T14:06:41Z",
+      "side": 1,
+      "message": "1 - that would work, or excluding ancestor files would still also work, as long as you still walk upwards through all the parents rather than just the first parent.\n\n2 - you\u0027re right, we do need to cache both `[]*build.File` and `[]*ast.File`, that seems fine to me. the directory entries we can discard for sure. a single cache map may mean a slightly larger refactor, but it should also be easier to grok and maintain.",
+      "parentUuid": "4b7c46b6_4561c906",
+      "revId": "691090b55f79701f611c1646c7eb525442db10fe",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

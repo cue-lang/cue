@@ -217,29 +217,6 @@ func (inst *hiddenInstance) Eval(expr ast.Expr) Value {
 	return v.Context().BuildExpr(expr, Scope(v), InferBuiltins(true))
 }
 
-// DO NOT USE.
-//
-// Deprecated: do not use.
-func Merge(inst ...*Instance) *Instance {
-	v := &adt.Vertex{}
-
-	i := inst[0]
-	ctx := newContext(i.index)
-
-	// TODO: interesting test: use actual unification and then on K8s corpus.
-
-	for _, i := range inst {
-		w := i.Value()
-		v.AddConjunct(adt.MakeRootConjunct(nil, w.v.ToDataAll(ctx)))
-	}
-	v.Finalize(ctx)
-
-	p := addInst(i.index, &Instance{
-		root: v,
-	})
-	return p
-}
-
 // Build creates a new instance from the build instances, allowing unbound
 // identifier to bind to the top-level field in inst. The top-level fields in
 // inst take precedence over predeclared identifier and builtin functions.

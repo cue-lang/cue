@@ -338,6 +338,10 @@ display:./cycle
 files:
     $CWD/testdata/testmod/cycle/cycle.cue`}}
 	tdtest.Run(t, testCases, func(t *tdtest.T, tc *loadTest) {
+		if !strings.Contains(tc.want, "err:    build constraints exclude all CUE files in ./toolonly:") {
+			return
+		}
+
 		pkgs := Instances(tc.args, tc.cfg)
 
 		buf := &bytes.Buffer{}

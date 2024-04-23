@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4808921_f13ccc21",
+        "filename": "cmd/cue/cmd/testdata/script/registry_publish_with_git.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T17:06:45Z",
+      "side": 1,
+      "message": "perhaps mention why you use `cue vet` rather than `cmp`, presumabl that the commit and commit-time fields aren\u0027t deterministic by nature",
+      "revId": "ce313ab10e4e9012e71aa6a3790bab9dc02905a8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

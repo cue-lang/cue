@@ -114,11 +114,14 @@ func RoundToEven(x *internal.Decimal) (*big.Int, error) {
 	return toInt(&d), err
 }
 
-var mulContext = internal.BaseContext.WithPrecision(1)
-
 // MultipleOf reports whether x is a multiple of y.
 func MultipleOf(x, y *internal.Decimal) (bool, error) {
 	var d apd.Decimal
-	cond, err := mulContext.Quo(&d, x, y)
-	return !cond.Inexact(), err
+	_, err := internal.BaseContext.Quo(&d, x, y)
+	if err != nil {
+		return false, err
+	}
+	var frac apd.Decimal
+	d.Modf(&d, &frac)
+	return frac.IsZero(), nil
 }

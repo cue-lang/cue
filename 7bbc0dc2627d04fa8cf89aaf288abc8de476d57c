@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a0e43dc_69023b27",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T15:46:50Z",
+      "side": 1,
+      "message": "FYI Greg as you sent the earlier patch to `cue get go` relating to `time.Duration`.",
+      "revId": "7bbc0dc2627d04fa8cf89aaf288abc8de476d57c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

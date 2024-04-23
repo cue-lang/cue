@@ -34,6 +34,24 @@
       "parentUuid": "1f79b488_556ff449",
       "revId": "0c8ef7d4b24179a9ec94c65d0aef134938bda534",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "bf0a56d1_26517c08",
+        "filename": "pkg/math/testdata/mult.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T13:23:31Z",
+      "side": 1,
+      "message": "Agh, yes, yes it is a bug in cue fmt. I actually have an incomplete CL for it. Leave as is.",
+      "parentUuid": "f8ecd7d6_cac1fa74",
+      "revId": "0c8ef7d4b24179a9ec94c65d0aef134938bda534",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -77,101 +77,6 @@ _test: {
 //  Test
 
 out: #sub & {#p: _test.s1}
--- out/compile --
---- in.cue
-{
-  #AC: {
-    k: "simple"
-    d: 〈1;#C〉
-  }
-  #AS: {
-    k: "complex"
-    d: 〈1;#S〉
-  }
-  #R: {
-    a: (〈1;#AC〉|〈1;#AS〉)
-  }
-  #S: {
-    n: string
-    r: {
-      [string]: 〈2;#R〉
-    }
-  }
-  #C: {
-    n: string
-  }
-  #sub: {
-    #p: 〈1;#AS〉
-    dict: {
-      [string]: _
-    }
-    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "complex") {
-      let subs#1multi = (〈3;#sub〉 & {
-        #p: 〈2;rd〉.a
-      })
-      for sn, sd in 〈0;let subs#1〉.dict {
-        dict: {
-          "\(〈4;rn〉)_\(〈2;sn〉)": 〈2;sd〉
-        }
-      }
-    }
-    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "simple") {
-      dict: {
-        "\(〈2;rn〉)": 〈2;rd〉
-      }
-    }
-  }
-  _test: {
-    c1: 〈1;#AC〉
-    c1: {
-      d: {
-        n: "c1"
-      }
-    }
-    s3: 〈1;#AS〉
-    s3: {
-      d: {
-        n: "s3"
-        r: {
-          r1: {
-            a: 〈4;c1〉
-          }
-        }
-      }
-    }
-    s2: 〈1;#AS〉
-    s2: {
-      d: {
-        n: "s2"
-        r: {
-          r1: {
-            a: 〈4;c1〉
-          }
-          r2: {
-            a: 〈4;s3〉
-          }
-        }
-      }
-    }
-    s1: 〈1;#AS〉
-    s1: {
-      d: {
-        n: "s1"
-        r: {
-          r1: {
-            a: 〈4;c1〉
-          }
-          r2: {
-            a: 〈4;s2〉
-          }
-        }
-      }
-    }
-  }
-  out: (〈0;#sub〉 & {
-    #p: 〈1;_test〉.s1
-  })
-}
 -- out/evalalpha --
 Errors:
 out.subs.subs.#p: structural cycle:
@@ -1490,4 +1395,99 @@ Disjuncts:    3258
       #p: 〈2;rd〉.a
     })
   }
+}
+-- out/compile --
+--- in.cue
+{
+  #AC: {
+    k: "simple"
+    d: 〈1;#C〉
+  }
+  #AS: {
+    k: "complex"
+    d: 〈1;#S〉
+  }
+  #R: {
+    a: (〈1;#AC〉|〈1;#AS〉)
+  }
+  #S: {
+    n: string
+    r: {
+      [string]: 〈2;#R〉
+    }
+  }
+  #C: {
+    n: string
+  }
+  #sub: {
+    #p: 〈1;#AS〉
+    dict: {
+      [string]: _
+    }
+    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "complex") {
+      let subs#1multi = (〈3;#sub〉 & {
+        #p: 〈2;rd〉.a
+      })
+      for sn, sd in 〈0;let subs#1〉.dict {
+        dict: {
+          "\(〈4;rn〉)_\(〈2;sn〉)": 〈2;sd〉
+        }
+      }
+    }
+    for rn, rd in 〈0;#p〉.d.r if (〈0;rd〉.a.k == "simple") {
+      dict: {
+        "\(〈2;rn〉)": 〈2;rd〉
+      }
+    }
+  }
+  _test: {
+    c1: 〈1;#AC〉
+    c1: {
+      d: {
+        n: "c1"
+      }
+    }
+    s3: 〈1;#AS〉
+    s3: {
+      d: {
+        n: "s3"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+        }
+      }
+    }
+    s2: 〈1;#AS〉
+    s2: {
+      d: {
+        n: "s2"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+          r2: {
+            a: 〈4;s3〉
+          }
+        }
+      }
+    }
+    s1: 〈1;#AS〉
+    s1: {
+      d: {
+        n: "s1"
+        r: {
+          r1: {
+            a: 〈4;c1〉
+          }
+          r2: {
+            a: 〈4;s2〉
+          }
+        }
+      }
+    }
+  }
+  out: (〈0;#sub〉 & {
+    #p: 〈1;_test〉.s1
+  })
 }

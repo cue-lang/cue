@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "75c51d85_84202e2b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:16:10Z",
+      "side": 1,
+      "message": "Just to double check, did you run the e2e tests via ci/test? The changes LGTM but one can never be too safe.",
+      "revId": "c0b5b230cf7c343fb3793b3215425be4415ad928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c12baf68_32989788",
+        "filename": "cmd/cue/cmd/testdata/script/modinit_withsource.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 2,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:16:10Z",
+      "side": 1,
+      "message": "is this TODO relevant in this file, given that you don\u0027t actually create any module.cue file with an empty module path?",
+      "revId": "c0b5b230cf7c343fb3793b3215425be4415ad928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9331de2a_e9c78d68",
+        "filename": "mod/modfile/modfile.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 80,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T08:16:10Z",
+      "side": 1,
+      "message": "Is it worth doing something a little bit more generic for the sake of future proofing the API? For example, `func (Source) IsValid() bool` or `func (Source) Validate() error` can be used to check other fields as well in the future, and prevents the footgun of checking one field but forgetting about another, which can easily happen in existing code if we add more fields in the future.",
+      "revId": "c0b5b230cf7c343fb3793b3215425be4415ad928",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

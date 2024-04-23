@@ -1,0 +1,98 @@
+# Test cue cmd's behavior when given multiple packages.
+# Note that we're not sure if this is the behavior we want long term,
+# but it is the behavior we have had for some time, and some users
+# are currently reliant on it. See https://cuelang.org/issue/1325.
+
+# Export with itemsList_tool.cue in place.
+exec cue export ./...
+cmp stdout stdout.export-pre.golden
+
+# Verify that cue cmd ls ./... works.
+# Note that a single ls command is run with a single package value
+# reuslting from the unification of all packages in ./...
+exec cue cmd ls ./...
+cmp stdout stdout.ls-pre.golden
+
+# Now rename itemsList_tool.cue to itemsList.cue.
+mv itemsList_tool.cue itemsList.cue
+
+# Export with itemsList.cue in place.
+exec cue export ./...
+cmp stdout stdout.export-post.golden
+
+# Attempt to ls in this state, which fails, as each of the CUE packages
+# hold an items list with different lengths.
+! exec cue cmd ls ./...
+stderr 'itemsList: incompatible list lengths \(0 and 1\)'
+
+-- cue.mod/module.cue --
+module: "mod.com"
+-- x.cue --
+package x
+
+items: {}
+-- ls_tool.cue --
+package x
+
+import (
+	"tool/cli"
+	"strings"
+)
+
+command: ls: cli.Print & {
+	text: "ls: " + strings.Join(itemsList, " ") + "\n"
+}
+-- itemsList_tool.cue --
+package x
+
+itemsList: [for _, v in items {v}]
+-- a/x.cue --
+package x
+
+items: {
+	a: "a"
+}
+-- b/x.cue --
+package x
+
+items: {
+	b: "b"
+}
+-- stdout.export-pre.golden --
+{
+    "items": {}
+}
+{
+    "items": {
+        "a": "a"
+    }
+}
+{
+    "items": {
+        "b": "b"
+    }
+}
+-- stdout.ls-pre.golden --
+ls: a b
+
+-- stdout.export-post.golden --
+{
+    "itemsList": [],
+    "items": {}
+}
+{
+    "itemsList": [
+        "a"
+    ],
+    "items": {
+        "a": "a"
+    }
+}
+{
+    "itemsList": [
+        "b"
+    ],
+    "items": {
+        "b": "b"
+    }
+}

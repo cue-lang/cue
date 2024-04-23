@@ -200,6 +200,15 @@ func (w *printer) node(n adt.Node) {
 					w.string(" ")
 					w.string(msg)
 				}
+
+				// TODO: we could consider removing CycleError here. It does
+				// seem safer, however, as sometimes structural cycles are
+				// detected as regular cycles.
+				// Alternatively, we could consider to never report arcs if
+				// there is any error.
+				if v.Code == adt.CycleError || v.Code == adt.StructuralCycleError {
+					goto close
+				}
 			}
 			w.indent = saved
 
@@ -266,6 +275,8 @@ func (w *printer) node(n adt.Node) {
 				w.node(c.Elem()) // TODO: also include env?
 			}
 		}
+
+	close:
 
 		w.indent = saved
 		w.string("\n")

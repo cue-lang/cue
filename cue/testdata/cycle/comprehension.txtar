@@ -624,7 +624,6 @@ Result:
           o: (_|_){
             // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
             //     ./in.cue:167:8
-            b: (int){ 2 }
           }
           #A: (_|_){
             // [structural cycle]
@@ -644,7 +643,6 @@ Result:
           o: (_|_){
             // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
             //     ./in.cue:178:8
-            b: (int){ 2 }
           }
           d: (_){ _ }
           #A: (_|_){
@@ -665,7 +663,6 @@ Result:
           o: (_|_){
             // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
             //     ./in.cue:193:8
-            b: (int){ 2 }
           }
           #A: (_|_){
             // [structural cycle]
@@ -986,7 +983,7 @@ diff old new
          }
        }
      }
-@@ -127,208 +171,302 @@
+@@ -127,208 +171,299 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1230,7 +1227,6 @@ diff old new
 +          o: (_|_){
 +            // [structural cycle] selfReferential.acrossOr.t2.p1.2.b: structural cycle:
 +            //     ./in.cue:167:8
-+            b: (int){ 2 }
 +          }
 +          #A: (_|_){
 +            // [structural cycle]
@@ -1250,7 +1246,6 @@ diff old new
 +          o: (_|_){
 +            // [structural cycle] selfReferential.acrossOr.t2.p2.2.b: structural cycle:
 +            //     ./in.cue:178:8
-+            b: (int){ 2 }
 +          }
 +          d: (_){ _ }
 +          #A: (_|_){
@@ -1271,7 +1266,6 @@ diff old new
 +          o: (_|_){
 +            // [structural cycle] selfReferential.acrossOr.t2.p3.2.b: structural cycle:
 +            //     ./in.cue:193:8
-+            b: (int){ 2 }
 +          }
 +          #A: (_|_){
 +            // [structural cycle]
@@ -1478,7 +1472,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,35 +499,28 @@
+@@ -361,35 +496,28 @@
          }
        }
      }

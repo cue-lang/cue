@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d48acc20_fa34a114",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T16:32:42Z",
+      "side": 1,
+      "message": "I actually think this isn\u0027t quite right - we only check if the result is an integral number, by checking that the fractional part is 0.",
+      "revId": "24dfca38e7f6ca629cab88c954235b667765f1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "03c4535d_04a228de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-23T16:32:42Z",
+      "side": 1,
+      "message": "Thanks! Just one last nit about the commit message.",
+      "revId": "24dfca38e7f6ca629cab88c954235b667765f1d0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

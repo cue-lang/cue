@@ -210,7 +210,15 @@ type checkedModule struct {
 
 // putCheckedModule is like [Client.PutModule] except that it allows the
 // caller to do some additional checks (see [CheckModule] for more info).
-func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule) error {
+func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule, meta *Metadata) error {
+	var annotations map[string]string
+	if meta != nil {
+		annotations0, err := meta.annotations()
+		if err != nil {
+			return fmt.Errorf("invalid metadata: %v", err)
+		}
+		annotations = annotations0
+	}
 	loc, err := c.resolve(m.mv)
 	if err != nil {
 		return err
@@ -241,6 +249,7 @@ func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule) error {
 			MediaType: moduleFileMediaType,
 			Size:      int64(len(m.modFileContent)),
 		}},
+		Annotations: annotations,
 	}
 
 	if _, err := loc.Registry.PushBlob(ctx, loc.Repository, manifest.Layers[0], io.NewSectionReader(m.blobr, 0, m.size)); err != nil {
@@ -262,15 +271,20 @@ func (c *Client) putCheckedModule(ctx context.Context, m *checkedModule) error {
 // PutModule puts a module whose contents are held as a zip archive inside f.
 // It assumes all the module dependencies are correctly resolved and present
 // inside the cue.mod/module.cue file.
-//
-// TODO check deps are resolved correctly? Or is that too domain-specific for this package?
-// Is it a problem to call zip.CheckZip twice?
 func (c *Client) PutModule(ctx context.Context, m module.Version, r io.ReaderAt, size int64) error {
+	return c.PutModuleWithMetadata(ctx, m, r, size, nil)
+}
+
+// PutModuleWithMetadata is like [Client.PutModule] except that it also
+// includes the given metadata inside the module's manifest.
+// If meta is nil, no metadata will be included, otherwise
+// all fields in meta must be valid and non-empty.
+func (c *Client) PutModuleWithMetadata(ctx context.Context, m module.Version, r io.ReaderAt, size int64, meta *Metadata) error {
 	cm, err := checkModule(m, r, size)
 	if err != nil {
 		return err
 	}
-	return c.putCheckedModule(ctx, cm)
+	return c.putCheckedModule(ctx, cm, meta)
 }
 
 // checkModule checks a module's zip file before uploading it.
@@ -360,6 +374,12 @@ func (m *Module) ModuleFile(ctx context.Context) ([]byte, error) {
 	}
 	defer r.Close()
 	return io.ReadAll(r)
+}
+
+// Metadata returns the metadata associated with the module.
+// If there is none, it returns (nil, nil).
+func (m *Module) Metadata() (*Metadata, error) {
+	return newMetadataFromAnnotations(m.manifest.Annotations)
 }
 
 // GetZip returns a reader that can be used to read the contents of the zip

@@ -127,6 +127,59 @@ x: a.foo + something.bar
 	qt.Assert(t, qt.DeepEquals(tags, []string{"v0.5.100"}))
 }
 
+func TestPutWithMetadata(t *testing.T) {
+	const testMod = `
+-- cue.mod/module.cue --
+module: "foo.com/bar@v0"
+language: version: "v0.8.0"
+
+-- x.cue --
+package bar
+`
+	ctx := context.Background()
+	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
+	c := newTestClient(t)
+	zipData := createZip(t, mv, testMod)
+	commitTime := time.Date(2024, 4, 23, 15, 16, 17, 0, time.UTC)
+	meta := &Metadata{
+		VCSType:       "git",
+		VCSCommit:     "2ff5afa7cda41bf030654ab03caeba3fadf241ae",
+		VCSCommitTime: commitTime,
+	}
+	err := c.PutModuleWithMetadata(context.Background(), mv, bytes.NewReader(zipData), int64(len(zipData)), meta)
+	qt.Assert(t, qt.IsNil(err))
+
+	m, err := c.GetModule(ctx, mv)
+	qt.Assert(t, qt.IsNil(err))
+
+	gotMeta, err := m.Metadata()
+	qt.Assert(t, qt.IsNil(err))
+	qt.Assert(t, qt.DeepEquals(gotMeta, meta))
+}
+
+func TestPutWithInvalidMetadata(t *testing.T) {
+	const testMod = `
+-- cue.mod/module.cue --
+module: "foo.com/bar@v0"
+language: version: "v0.8.0"
+
+-- x.cue --
+package bar
+`
+	ctx := context.Background()
+	mv := module.MustParseVersion("foo.com/bar@v0.5.100")
+	c := newTestClient(t)
+	zipData := createZip(t, mv, testMod)
+	commitTime := time.Date(2024, 4, 23, 15, 16, 17, 0, time.UTC)
+	meta := &Metadata{
+		// Missing VCSType field.
+		VCSCommit:     "2ff5afa7cda41bf030654ab03caeba3fadf241ae",
+		VCSCommitTime: commitTime,
+	}
+	err := c.PutModuleWithMetadata(ctx, mv, bytes.NewReader(zipData), int64(len(zipData)), meta)
+	qt.Assert(t, qt.ErrorMatches(err, `invalid metadata: empty metadata value for field "org.cuelang.vcs-type"`))
+}
+
 func TestGetModuleWithManifest(t *testing.T) {
 	const testMod = `
 -- cue.mod/module.cue --

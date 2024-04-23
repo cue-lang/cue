@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ca327515_12352c68",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-23T12:53:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "88eacfc9_25e51739",
+      "revId": "6ed64f81884e111590eb5f3c6dae6ceb988dbe37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "467e672e_ff7852d1",
@@ -31,6 +49,24 @@
       "writtenOn": "2024-04-23T12:26:43Z",
       "side": 1,
       "message": "this bit of added code has three commented out lines; why? are they TODOs, should they be uncommented, or deleted entirely?",
+      "revId": "6ed64f81884e111590eb5f3c6dae6ceb988dbe37",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5ba28ee_a197876d",
+        "filename": "internal/core/adt/unify.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 288,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2024-04-23T12:53:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "467e672e_ff7852d1",
       "revId": "6ed64f81884e111590eb5f3c6dae6ceb988dbe37",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

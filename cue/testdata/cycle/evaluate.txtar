@@ -106,16 +106,23 @@ closeFail: {
 	x: b: "foo"
 }
 
+printCycle: {
+	a: {
+		X: a
+		if X {
+		}
+	}
+}
 -- out/eval/stats --
-Leaks:  57
-Freed:  90
-Reused: 86
-Allocs: 61
-Retain: 126
+Leaks:  59
+Freed:  92
+Reused: 89
+Allocs: 62
+Retain: 129
 
-Unifications: 135
-Conjuncts:    269
-Disjuncts:    156
+Unifications: 139
+Conjuncts:    274
+Disjuncts:    160
 -- out/evalalpha --
 Errors:
 letCycleOK.t2.a.X: structural cycle:
@@ -144,6 +151,8 @@ closeFail.x.b: field not allowed:
     ./in.cue:103:6
     ./in.cue:102:6
     ./in.cue:105:5
+printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
+    ./in.cue:111:3
 
 Result:
 (_|_){
@@ -359,12 +368,20 @@ Result:
       a: (string){ string }
     }
   }
+  printCycle: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
+      //     ./in.cue:111:3
+      X: ~(printCycle.a)
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,74 +1,66 @@
+@@ -1,76 +1,68 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -416,6 +433,8 @@ diff old new
 -listMulCycle.c: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
 -    ./in.cue:95:5
 -    ./in.cue:95:9
+-printCycle.a.X.X: structural cycle:
+-    ./in.cue:111:6
 +listAddCycle.0: structural cycle:
 +    ./in.cue:89:5
 +listAddCycle.0: structural cycle:
@@ -426,6 +445,8 @@ diff old new
 +    ./in.cue:103:6
 +    ./in.cue:102:6
 +    ./in.cue:105:5
++printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
++    ./in.cue:111:3
  
  Result:
  (_|_){
@@ -479,7 +500,7 @@ diff old new
          }
        }
      }
-@@ -89,49 +81,65 @@
+@@ -91,49 +83,65 @@
        }
      }
    }
@@ -573,7 +594,7 @@ diff old new
        }
      }
    }
-@@ -138,33 +146,31 @@
+@@ -140,33 +148,31 @@
    closeCycle: (_|_){
      // [structural cycle]
      a: (_|_){
@@ -627,7 +648,7 @@ diff old new
      }
    }
    embedCycle: (_|_){
-@@ -185,43 +191,36 @@
+@@ -187,43 +193,36 @@
    listAddCycle: (_|_){
      // [structural cycle]
      a: (_|_){
@@ -698,7 +719,7 @@ diff old new
        //     ./in.cue:95:9
      }
    }
-@@ -232,14 +231,13 @@
+@@ -234,21 +233,21 @@
      }
      x: (_|_){
        // [eval]
@@ -712,6 +733,18 @@ diff old new
          //     ./in.cue:105:5
        }
 +      a: (string){ string }
+     }
+   }
+   printCycle: (_|_){
+-    // [structural cycle]
+-    a: (_|_){
+-      // [structural cycle] printCycle.a.X.X: structural cycle:
+-      //     ./in.cue:111:6
++    // [eval]
++    a: (_|_){
++      // [eval] printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
++      //     ./in.cue:111:3
++      X: ~(printCycle.a)
      }
    }
  }
@@ -761,6 +794,8 @@ listMulCycle.b: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
 listMulCycle.c: invalid operands 3 and [{a:{b:c}}] to '+' (type int and list):
     ./in.cue:95:5
     ./in.cue:95:9
+printCycle.a.X.X: structural cycle:
+    ./in.cue:111:6
 
 Result:
 (_|_){
@@ -966,6 +1001,13 @@ Result:
       }
     }
   }
+  printCycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle] printCycle.a.X.X: structural cycle:
+      //     ./in.cue:111:6
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -1092,6 +1134,12 @@ Result:
     x: 〈0;#T〉
     x: {
       b: "foo"
+    }
+  }
+  printCycle: {
+    a: {
+      X: 〈1;a〉
+      if 〈0;X〉 {}
     }
   }
 }

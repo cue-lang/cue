@@ -175,10 +175,7 @@ Result:
         3
         #foo: (int){ 4 }
       }
-      w: (int){
-        3
-        #foo: (int){ 4 }
-      }
+      w: ~(intEmbed.a2.v)
       x: (int){ 4 }
     }
     a3: (int){ 5 }
@@ -384,7 +381,19 @@ diff old new
      ./in.cue:28:9
  
  Result:
-@@ -36,7 +36,7 @@
+@@ -12,10 +12,7 @@
+         3
+         #foo: (int){ 4 }
+       }
+-      w: (int){
+-        3
+-        #foo: (int){ 4 }
+-      }
++      w: ~(intEmbed.a2.v)
+       x: (int){ 4 }
+     }
+     a3: (int){ 5 }
+@@ -36,7 +33,7 @@
      }
      b5: (int){ 2 }
      b6: (_|_){
@@ -393,7 +402,7 @@ diff old new
        //     ./in.cue:28:9
      }
      b7: (int){ 1 }
-@@ -69,9 +69,9 @@
+@@ -69,9 +66,9 @@
        #b: (int){ int }
      }
      used: (struct){

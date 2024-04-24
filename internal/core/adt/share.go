@@ -37,6 +37,7 @@ func (n *nodeContext) unshare() {
 		return
 	}
 	n.isShared = false
+	n.node.IsShared = false
 
 	v := n.node.BaseValue.(*Vertex)
 
@@ -53,6 +54,7 @@ func (n *nodeContext) share(c Conjunct, arc *Vertex, id CloseInfo) {
 	}
 	n.origBaseValue = n.node.BaseValue
 	n.node.BaseValue = arc
+	n.node.IsShared = true
 	n.isShared = true
 	n.shared = c
 	n.sharedID = id

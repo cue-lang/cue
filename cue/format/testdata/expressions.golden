@@ -33,9 +33,7 @@ import "list"
 	a: bb: cc: 3
 
 	empty: {}
-	emptyNewLine: {
-
-	}
+	emptyNewLine: {}
 	someObject: {
 		a:   8
 		aa:  9

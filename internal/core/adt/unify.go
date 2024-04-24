@@ -138,6 +138,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	}
 	defer n.free()
 
+	defer n.unmarkDepth(n.markDepth())
+
 	// Typically a node processes all conjuncts before processing its fields.
 	// So this condition is very likely to trigger. If for some reason the
 	// parent has not been processed yet, we could attempt to process more
@@ -294,6 +296,8 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 	if n.completed&(subFieldsProcessed) != 0 {
 		n.node.updateStatus(finalized)
 
+		defer n.unmarkOptional(n.markOptional())
+
 		// The next piece of code addresses the following case.
 		// order matters
 		// c1: c: [string]: f2
@@ -432,7 +436,9 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		// n.reportCycleError()
 	}
 
+	// TODO: remove the use of updateStatus as a cycle detection mechanism.
 	n.node.updateStatus(evaluatingArcs)
+
 	if n.underlying != nil {
 		// References within the disjunct may end up referencing the layer that
 		// this node overlays. Also for these nodes we want to be able to detect
@@ -467,6 +473,8 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		src.src.unify(n.ctx, needTasksDone, attemptOnly)
 		a.cc.decDependent(n.ctx, a.kind, src) // REF(arcs)
 	}
+
+	n.incDepth()
 
 	// XXX(0.7): only set success if needs complete arcs.
 	success := true
@@ -524,6 +532,8 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 			// 	}
 		}
 	}
+
+	n.decDepth()
 
 	k := 0
 	for _, a := range n.node.Arcs {

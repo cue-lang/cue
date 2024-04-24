@@ -913,7 +913,9 @@ Result:
         }) }
     }
     c: (#struct){
-      d: (string){ string }
+      d: ((string|struct)){ |((string){ string }, (#struct){
+          b: (string){ string }
+        }) }
     }
     d: (struct){
       d: (struct){
@@ -2031,7 +2033,18 @@ diff old new
          c: (#list){
            0: ((string|struct)){ |((string){ string }, (#struct){
                ref: (string){ string }
-@@ -372,7 +409,7 @@
+@@ -327,7 +364,9 @@
+         }) }
+     }
+     c: (#struct){
+-      d: (string){ string }
++      d: ((string|struct)){ |((string){ string }, (#struct){
++          b: (string){ string }
++        }) }
+     }
+     d: (struct){
+       d: (struct){
+@@ -372,7 +411,7 @@
        // [structural cycle] b12b.#list.tail: structural cycle
      }
      list1: (_|_){
@@ -2040,7 +2053,7 @@ diff old new
      }
    }
    b13: (_|_){
-@@ -453,13 +490,52 @@
+@@ -453,13 +492,52 @@
          }
        }
      }
@@ -2100,7 +2113,7 @@ diff old new
                }
              }
            }
-@@ -468,7 +544,7 @@
+@@ -468,7 +546,7 @@
      }
    }
    p3: (_|_){
@@ -2109,7 +2122,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (#struct){
-@@ -491,7 +567,15 @@
+@@ -491,7 +569,15 @@
        }
      }
      a: (_|_){
@@ -2126,7 +2139,7 @@ diff old new
      }
    }
    p4: (struct){
-@@ -530,13 +614,24 @@
+@@ -530,13 +616,24 @@
          }
        }
      }
@@ -2158,7 +2171,7 @@ diff old new
                }
              }
            }
-@@ -545,7 +640,7 @@
+@@ -545,7 +642,7 @@
      }
    }
    p6: (_|_){
@@ -2167,7 +2180,7 @@ diff old new
      #S: (#struct){
        #T: (#struct){
          a: (list){
-@@ -568,7 +663,15 @@
+@@ -568,7 +665,15 @@
        }
      }
      a: (_|_){
@@ -2184,7 +2197,7 @@ diff old new
      }
    }
    c1: (_|_){
-@@ -578,77 +681,49 @@
+@@ -578,77 +683,49 @@
        b: (struct){
        }
        c: (_|_){
@@ -2298,7 +2311,7 @@ diff old new
          }
        }
      }
-@@ -655,31 +730,37 @@
+@@ -655,31 +732,37 @@
    }
    d3: (_|_){
      // [structural cycle]
@@ -2356,7 +2369,7 @@ diff old new
      }
    }
    shortPathFail: (_|_){
-@@ -696,9 +777,7 @@
+@@ -696,9 +779,7 @@
        // [structural cycle]
        t1: (struct){
          #Foo: (#struct){
@@ -2367,7 +2380,7 @@ diff old new
          }
        }
        t2: (_|_){
-@@ -706,10 +785,7 @@
+@@ -706,10 +787,7 @@
          Foo: (_|_){
            // [structural cycle]
            ref: (_|_){
@@ -2379,7 +2392,7 @@ diff old new
            }
          }
        }
-@@ -801,11 +877,12 @@
+@@ -801,11 +879,12 @@
        // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
        //     ./in.cue:390:5
        //     ./in.cue:391:5
@@ -2397,7 +2410,7 @@ diff old new
        }
      }
      b: (_|_){
-@@ -812,11 +889,12 @@
+@@ -812,11 +891,12 @@
        // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
        //     ./in.cue:393:5
        //     ./in.cue:394:5
@@ -2415,7 +2428,7 @@ diff old new
        }
      }
    }
-@@ -825,41 +903,51 @@
+@@ -825,41 +905,51 @@
      a: (_|_){
        // [eval]
        0: (_|_){
@@ -2498,7 +2511,7 @@ diff old new
        }
      }
    }
-@@ -882,19 +970,14 @@
+@@ -882,19 +972,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2521,7 +2534,7 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -904,19 +987,14 @@
+@@ -904,19 +989,14 @@
        y: (_|_){
          // [eval]
          0: (_|_){
@@ -2544,7 +2557,7 @@ diff old new
          }
          1: (int){ 1 }
        }
-@@ -1018,10 +1096,12 @@
+@@ -1018,10 +1098,12 @@
      }
      z: (_|_){
        // [structural cycle]
@@ -2561,7 +2574,7 @@ diff old new
          }
        }
        g: (_|_){
-@@ -1169,19 +1249,19 @@
+@@ -1169,19 +1251,19 @@
      }
    }
    n4: (struct){

@@ -50,7 +50,7 @@ for this command to work.
 		RunE: mkRunE(c, runModTidy),
 		Args: cobra.ExactArgs(0),
 	}
-	cmd.Flags().Bool(string(flagCheck), false, "check for tidiness only; do not update module.cue file")
+	cmd.Flags().BoolP(string(flagCheck), "c", false, "check for tidiness only; do not update module.cue file")
 
 	return cmd
 }

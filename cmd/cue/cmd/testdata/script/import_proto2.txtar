@@ -14,10 +14,6 @@ Skipping file "cue.mod/gen/googleapis.com/acme/test/test/test_proto_gen.cue": al
 Use -Rf to override.
 -- root/cue.mod/module.cue --
 module: "acme.test/api"
-
--- root/cue.mod/module.cue --
-module: "acme.test/api"
-
 -- root/cue.mod/gen/googleapis.com/acme/test/test/test_proto_gen.cue --
 package test_test
 

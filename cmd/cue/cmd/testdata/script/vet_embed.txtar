@@ -42,9 +42,3 @@ d: field not allowed:
     ./schema.cue:3:7
     ./schema.cue:7:1
     ./stream.yaml:2:1
--- expect-stream --
-d: field not allowed:
-    ./schema.cue:1:1
-    ./schema.cue:3:7
-    ./schema.cue:7:1
-    ./stream.yaml:2:1

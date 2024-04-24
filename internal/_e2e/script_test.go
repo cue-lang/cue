@@ -91,6 +91,7 @@ func TestScript(t *testing.T) {
 	p := testscript.Params{
 		Dir:                 filepath.Join("testdata", "script"),
 		RequireExplicitExec: true,
+		RequireUniqueNames:  true,
 		Setup: func(env *testscript.Env) error {
 			env.Setenv("CUE_EXPERIMENT", "modules")
 			env.Setenv("CUE_REGISTRY", "registry.cue.works")

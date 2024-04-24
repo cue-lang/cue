@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b417f1fb_3342d028",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-24T09:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "058082b8_d5fbb2c7",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92186b7a_df431fd3",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "2d2950d6_b7149596",
+        "filename": "mod/modregistry/client_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 143,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-24T09:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "92186b7a_df431fd3",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "4a68824d_2cfa3ba2",
@@ -48,6 +84,24 @@
       "writtenOn": "2024-04-23T17:05:10Z",
       "side": 1,
       "message": "nit: inline like the others?",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd1ee160_12d28a09",
+        "filename": "mod/modregistry/client_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 173,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-24T09:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "4a68824d_2cfa3ba2",
       "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -75,6 +129,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee37f1d7_c467ccbf",
+        "filename": "mod/modregistry/metadata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-24T09:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "da014901_9c660487",
+      "range": {
+        "startLine": 9,
+        "startChar": 22,
+        "endLine": 9,
+        "endChar": 30
+      },
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e17f2e84_8de968e7",
@@ -88,6 +166,24 @@
       "writtenOn": "2024-04-23T17:05:10Z",
       "side": 1,
       "message": "do we want to add a TODO or a note comment about avoiding the somewhat unnecessary JSON roundtrip? For example, I imagine that this could be a little bit of reflect code given that this is a `map[string]string`, but perhaps it\u0027s not important if this code never runs in any hot path.\n\nditto for the method below, so perhaps a TODO/note above both methods.",
+      "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "42625af9_0b13daf0",
+        "filename": "mod/modregistry/metadata.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 29,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-24T09:17:19Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e17f2e84_8de968e7",
       "revId": "76359eb0e6d1273d3e4be0955711355da68e7d06",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

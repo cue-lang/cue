@@ -106,6 +106,13 @@ closeFail: {
 	x: b: "foo"
 }
 
+printCycle: {
+	a: {
+		X: a
+		if X {
+		}
+	}
+}
 -- out/eval/stats --
 Leaks:  57
 Freed:  90
@@ -144,6 +151,8 @@ closeFail.x.b: field not allowed:
     ./in.cue:103:6
     ./in.cue:102:6
     ./in.cue:105:5
+printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
+    ./in.cue:111:3
 
 Result:
 (_|_){
@@ -359,12 +368,20 @@ Result:
       a: (string){ string }
     }
   }
+  printCycle: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
+      //     ./in.cue:111:3
+      X: ~(printCycle.a)
+    }
+  }
 }
 -- diff/-out/evalalpha<==>+out/eval --
 diff old new
 --- old
 +++ new
-@@ -1,74 +1,66 @@
+@@ -1,74 +1,68 @@
  Errors:
 -closeCycle.a: structural cycle
 -closeCycle.b.d: structural cycle
@@ -426,6 +443,8 @@ diff old new
 +    ./in.cue:103:6
 +    ./in.cue:102:6
 +    ./in.cue:105:5
++printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
++    ./in.cue:111:3
  
  Result:
  (_|_){
@@ -479,7 +498,7 @@ diff old new
          }
        }
      }
-@@ -89,49 +81,65 @@
+@@ -89,49 +83,65 @@
        }
      }
    }
@@ -573,7 +592,7 @@ diff old new
        }
      }
    }
-@@ -138,33 +146,31 @@
+@@ -138,33 +148,31 @@
    closeCycle: (_|_){
      // [structural cycle]
      a: (_|_){
@@ -627,7 +646,7 @@ diff old new
      }
    }
    embedCycle: (_|_){
-@@ -185,43 +191,36 @@
+@@ -185,43 +193,36 @@
    listAddCycle: (_|_){
      // [structural cycle]
      a: (_|_){
@@ -698,7 +717,7 @@ diff old new
        //     ./in.cue:95:9
      }
    }
-@@ -232,14 +231,13 @@
+@@ -232,14 +233,21 @@
      }
      x: (_|_){
        // [eval]
@@ -712,6 +731,14 @@ diff old new
          //     ./in.cue:105:5
        }
 +      a: (string){ string }
++    }
++  }
++  printCycle: (_|_){
++    // [eval]
++    a: (_|_){
++      // [eval] printCycle.a: cannot use {X:~(printCycle.a)} (type struct) as type bool:
++      //     ./in.cue:111:3
++      X: ~(printCycle.a)
      }
    }
  }

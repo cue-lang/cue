@@ -369,6 +369,12 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 		break
 	}
 
+	if arc.state != nil {
+		if d := arc.state.evalDepth; d > 0 && d >= n.ctx.optionalMark {
+			arc.IsCyclic = true
+		}
+	}
+
 	// The code in this switch statement registers structural cycles caught
 	// through EvaluatingArcs to the root of the cycle. This way, any node
 	// referencing this value can track these nodes early. This is mostly an

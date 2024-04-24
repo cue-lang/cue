@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "69950d32_7860741b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 9
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T04:52:09Z",
+      "side": 1,
+      "message": "I played around with this, and I\u0027m pretty sure that we\u0027ll need two separate caches:\n - one for abs file path -\u003e ast files\n - one for abs dir -\u003e build files\n\nSince in l.addFiles we\u0027re looping over a []*build.File, a cache keyed by dir would become awkward and inefficient. Intuitively I thought that the syntax could be added right after a *build.File is added to the package, but that breaks everything - it looks like (at least atm) the syntax adding must happen at the end of the *build.Instance loading phase.\n\nPlease let me know if I\u0027m missing something basic",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

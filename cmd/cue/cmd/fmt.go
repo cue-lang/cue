@@ -62,8 +62,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 			cfg.Format = opts
 			cfg.Force = true
 
+			var foundBadlyFormatted bool
 			check := flagCheck.Bool(cmd)
-			var badlyFormattedFiles []string
+			cwd, _ := os.Getwd()
+			stdout := cmd.OutOrStdout()
 
 			for _, inst := range builds {
 				if inst.Err != nil {
@@ -127,25 +129,22 @@ func newFmtCmd(c *Command) *cobra.Command {
 					}
 
 					if check && !bytes.Equal(formatted.Bytes(), original) {
-						badlyFormattedFiles = append(badlyFormattedFiles, file.Filename)
+						foundBadlyFormatted = true
+
+						if file.Filename != "-" {
+							f := file.Filename
+							var path string
+							path, err = filepath.Rel(cwd, f)
+							if err != nil {
+								path = f
+							}
+							fmt.Fprintln(stdout, path)
+						}
 					}
 				}
 			}
 
-			if check && len(badlyFormattedFiles) > 0 {
-				cwd, _ := os.Getwd()
-				stdout := cmd.OutOrStdout()
-				for _, f := range badlyFormattedFiles {
-					if f == "-" {
-						continue
-					}
-
-					relPath, err := filepath.Rel(cwd, f)
-					if err != nil {
-						relPath = f
-					}
-					fmt.Fprintln(stdout, relPath)
-				}
+			if check && foundBadlyFormatted {
 				return ErrPrintedError
 			}
 

@@ -15,10 +15,15 @@ cmpenv stdout expected-output
 ! exec cue fmt --check not_formatted.cue another/not_formatted.cue
 cmpenv stdout expected-output
 
-# stdin fails with no output
+# stdin fails with indicative output
 stdin not_formatted.cue
 ! exec cue fmt --check -
-! stdout .
+cmp stdout stdin-expected-output
+
+# fails with indicative output when both stdin and files provided
+stdin not_formatted.cue
+! exec cue fmt --check - another/not_formatted.cue
+cmpenv stdout stdin-mixed-expected-output
 
 cd ../module
 
@@ -38,6 +43,11 @@ bar:   "baz"
 x:   1
 -- standalone/expected-output --
 not_formatted.cue
+another${/}not_formatted.cue
+-- standalone/stdin-expected-output --
+-
+-- standalone/stdin-mixed-expected-output --
+-
 another${/}not_formatted.cue
 -- module/cue.mod/module.cue --
 module: "example.com"

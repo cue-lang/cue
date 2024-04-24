@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/internal/source"
 	"cuelang.org/go/tools/fix"
 
+	"github.com/rogpeppe/go-internal/diff"
 	"github.com/spf13/cobra"
 )
 
@@ -64,6 +65,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 
 			var foundBadlyFormatted bool
 			check := flagCheck.Bool(cmd)
+			doDiff := flagDiff.Bool(cmd)
 			cwd, _ := os.Getwd()
 			stdout := cmd.OutOrStdout()
 
@@ -83,10 +85,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 						continue
 					}
 
-					// When using --check, we need to buffer the input and output bytes to compare them.
+					// When using --check and --diff, we need to buffer the input and output bytes to compare them.
 					var original []byte
 					var formatted bytes.Buffer
-					if check {
+					if doDiff || check {
 						if bs, ok := file.Source.([]byte); ok {
 							original = bs
 						} else {
@@ -128,16 +130,21 @@ func newFmtCmd(c *Command) *cobra.Command {
 						exitOnErr(cmd, err, true)
 					}
 
-					if check && !bytes.Equal(formatted.Bytes(), original) {
+					if (doDiff || check) && !bytes.Equal(formatted.Bytes(), original) {
 						foundBadlyFormatted = true
-
 						var path string
 						f := file.Filename
 						path, err = filepath.Rel(cwd, f)
 						if err != nil {
 							path = f
 						}
-						fmt.Fprintln(stdout, path)
+
+						if doDiff {
+							d := diff.Diff(path+".orig", original, path, formatted.Bytes())
+							fmt.Fprintln(stdout, string(d))
+						} else {
+							fmt.Fprintln(stdout, path)
+						}
 					}
 				}
 			}
@@ -151,6 +158,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 	}
 
 	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
+	cmd.Flags().Bool(string(flagDiff), false, "display diffs instead of rewriting files")
 
 	return cmd
 }

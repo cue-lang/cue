@@ -23,6 +23,7 @@ const (
 	flagAll           flagName = "all"
 	flagAllErrors     flagName = "all-errors"
 	flagCheck         flagName = "check"
+	flagDiff          flagName = "diff"
 	flagDryrun        flagName = "dryrun"
 	flagEscape        flagName = "escape"
 	flagExpression    flagName = "expression"

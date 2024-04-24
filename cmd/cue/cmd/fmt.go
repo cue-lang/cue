@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/internal/source"
 	"cuelang.org/go/tools/fix"
 
+	"github.com/rogpeppe/go-internal/diff"
 	"github.com/spf13/cobra"
 )
 
@@ -64,6 +65,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 
 			var foundBadlyFormatted bool
 			check := flagCheck.Bool(cmd)
+			doDiff := flagDiff.Bool(cmd)
 			cwd, _ := os.Getwd()
 			stdout := cmd.OutOrStdout()
 
@@ -83,19 +85,17 @@ func newFmtCmd(c *Command) *cobra.Command {
 						continue
 					}
 
-					// When using --check, we need to buffer the input and output bytes to compare them.
+					// When using --check and --diff, we need to buffer the input and output bytes to compare them.
 					var original []byte
 					var formatted bytes.Buffer
-					if check {
-						if bs, ok := file.Source.([]byte); ok {
-							original = bs
-						} else {
-							original, err = source.ReadAll(file.Filename, file.Source)
-							exitOnErr(cmd, err, true)
-							file.Source = original
-						}
-						cfg.Out = &formatted
+					if bs, ok := file.Source.([]byte); ok {
+						original = bs
+					} else {
+						original, err = source.ReadAll(file.Filename, file.Source)
+						exitOnErr(cmd, err, true)
+						file.Source = original
 					}
+					cfg.Out = &formatted
 
 					var files []*ast.File
 					d := encoding.NewDecoder(cmd.ctx, file, &cfg)
@@ -128,16 +128,33 @@ func newFmtCmd(c *Command) *cobra.Command {
 						exitOnErr(cmd, err, true)
 					}
 
-					if check && !bytes.Equal(formatted.Bytes(), original) {
-						foundBadlyFormatted = true
+					// File is already well formatted; we can stop here.
+					if bytes.Equal(formatted.Bytes(), original) {
+						continue
+					}
 
-						var path string
-						f := file.Filename
-						path, err = filepath.Rel(cwd, f)
-						if err != nil {
-							path = f
-						}
+					foundBadlyFormatted = true
+					var path string
+					f := file.Filename
+					path, err = filepath.Rel(cwd, f)
+					if err != nil {
+						path = f
+					}
+
+					switch {
+					case doDiff:
+						d := diff.Diff(path+".orig", original, path, formatted.Bytes())
+						fmt.Fprintln(stdout, string(d))
+					case check:
 						fmt.Fprintln(stdout, path)
+					case file.Filename == "-":
+						if _, err := fmt.Fprint(stdout, formatted.String()); err != nil {
+							exitOnErr(cmd, err, false)
+						}
+					default:
+						if err := os.WriteFile(file.Filename, formatted.Bytes(), 0644); err != nil {
+							exitOnErr(cmd, err, false)
+						}
 					}
 				}
 			}
@@ -151,6 +168,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 	}
 
 	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
+	cmd.Flags().BoolP(string(flagDiff), "d", false, "display diffs instead of rewriting files")
 
 	return cmd
 }

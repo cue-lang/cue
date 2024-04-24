@@ -360,10 +360,14 @@ issue1881.p2.o.retry: field not allowed:
     ./in.cue:217:17
 issue1881.p2.2.retry: structural cycle:
     ./in.cue:219:14
+issue1881.p2.2.retry.output: structural cycle:
+    ./in.cue:219:14
 issue1881.p3.o.retry: field not allowed:
     ./in.cue:231:11
     ./in.cue:235:17
 issue1881.p3.2.retry: structural cycle:
+    ./in.cue:231:14
+issue1881.p3.2.retry.output: structural cycle:
     ./in.cue:231:14
 siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
     ./in.cue:277:21
@@ -717,7 +721,7 @@ Result:
         // [eval] issue1881.p2.o.retry: field not allowed:
         //     ./in.cue:219:11
         //     ./in.cue:217:17
-        // issue1881.p2.2.retry: structural cycle:
+        // issue1881.p2.2.retry.output: structural cycle:
         //     ./in.cue:219:14
         retry: (_|_){
           // [eval] issue1881.p2.o.retry: field not allowed:
@@ -750,7 +754,7 @@ Result:
         // [eval] issue1881.p3.o.retry: field not allowed:
         //     ./in.cue:231:11
         //     ./in.cue:235:17
-        // issue1881.p3.2.retry: structural cycle:
+        // issue1881.p3.2.retry.output: structural cycle:
         //     ./in.cue:231:14
         retry: (_|_){
           // [eval] issue1881.p3.o.retry: field not allowed:
@@ -829,7 +833,7 @@ Result:
 diff old new
 --- old
 +++ new
-@@ -1,5 +1,54 @@
+@@ -1,5 +1,58 @@
  Errors:
 -selfReferential.insertionError.A: field foo3 not allowed by earlier comprehension or reference cycle
 +issue1881.p1.o.retry: field not allowed:
@@ -871,10 +875,14 @@ diff old new
 +    ./in.cue:217:17
 +issue1881.p2.2.retry: structural cycle:
 +    ./in.cue:219:14
++issue1881.p2.2.retry.output: structural cycle:
++    ./in.cue:219:14
 +issue1881.p3.o.retry: field not allowed:
 +    ./in.cue:231:11
 +    ./in.cue:235:17
 +issue1881.p3.2.retry: structural cycle:
++    ./in.cue:231:14
++issue1881.p3.2.retry.output: structural cycle:
 +    ./in.cue:231:14
 +siblingInsertion.t2.p1.deployment: adding field logging not allowed as field set was already referenced:
 +    ./in.cue:277:21
@@ -885,7 +893,7 @@ diff old new
  
  Result:
  (_|_){
-@@ -19,7 +68,9 @@
+@@ -19,7 +72,9 @@
    B: (struct){
      a: (struct){
        parent: (string){ "" }
@@ -896,7 +904,7 @@ diff old new
        }
      }
    }
-@@ -52,17 +103,17 @@
+@@ -52,17 +107,17 @@
        }
      }
      _e: (#struct){
@@ -925,7 +933,7 @@ diff old new
        }
      }
      e: (#struct){
-@@ -112,15 +163,14 @@
+@@ -112,15 +167,14 @@
        }
      }
      list: (struct){
@@ -944,7 +952,7 @@ diff old new
          }
        }
      }
-@@ -127,208 +177,269 @@
+@@ -127,208 +181,269 @@
      insertionError: (_|_){
        // [eval]
        A: (_|_){
@@ -1355,7 +1363,7 @@ diff old new
 +        // [eval] issue1881.p2.o.retry: field not allowed:
 +        //     ./in.cue:219:11
 +        //     ./in.cue:217:17
-+        // issue1881.p2.2.retry: structural cycle:
++        // issue1881.p2.2.retry.output: structural cycle:
 +        //     ./in.cue:219:14
 +        retry: (_|_){
 +          // [eval] issue1881.p2.o.retry: field not allowed:
@@ -1388,7 +1396,7 @@ diff old new
 +        // [eval] issue1881.p3.o.retry: field not allowed:
 +        //     ./in.cue:231:11
 +        //     ./in.cue:235:17
-+        // issue1881.p3.2.retry: structural cycle:
++        // issue1881.p3.2.retry.output: structural cycle:
 +        //     ./in.cue:231:14
 +        retry: (_|_){
 +          // [eval] issue1881.p3.o.retry: field not allowed:
@@ -1403,7 +1411,7 @@ diff old new
      t1: (struct){
        p1: (struct){
          D: (struct){
-@@ -361,40 +472,34 @@
+@@ -361,40 +476,34 @@
          }
        }
      }

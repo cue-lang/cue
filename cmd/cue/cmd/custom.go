@@ -43,7 +43,7 @@ import (
 const commandSection = "command"
 
 func lookupString(obj cue.Value, key, def string) string {
-	str, err := obj.LookupPath(cue.MakePath(cue.Str(key))).String()
+	str, err := obj.Lookup(key).String()
 	if err == nil {
 		def = str
 	}
@@ -62,8 +62,8 @@ func splitLine(s string) (line, tail string) {
 // addCustomCommands iterates over all commands defined under field typ
 // and adds them as cobra subcommands to cmd.
 // The func is only used in `cue help cmd`, which doesn't show errors.
-func addCustomCommands(c *Command, cmd *cobra.Command, typ string, tools cue.Value) {
-	commands := tools.LookupPath(cue.MakePath(cue.Str(typ)))
+func addCustomCommands(c *Command, cmd *cobra.Command, typ string, tools *cue.Instance) {
+	commands := tools.Lookup(typ)
 	if !commands.Exists() {
 		return
 	}
@@ -80,7 +80,11 @@ func addCustomCommands(c *Command, cmd *cobra.Command, typ string, tools cue.Val
 }
 
 // customCommand creates a cobra.Command out of a CUE command definition.
-func customCommand(c *Command, typ, name string, tools cue.Value) (*cobra.Command, error) {
+func customCommand(c *Command, typ, name string, tools *cue.Instance) (*cobra.Command, error) {
+	if tools == nil {
+		return nil, errors.New("no commands defined")
+	}
+
 	// TODO: validate allowing incomplete.
 	o := tools.Lookup(typ, name)
 	if !o.Exists() {
@@ -145,7 +149,7 @@ func customCommand(c *Command, typ, name string, tools cue.Value) (*cobra.Comman
 	return sub, nil
 }
 
-func doTasks(cmd *Command, typ, command string, root cue.Value) error {
+func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 	cfg := &flow.Config{
 		Root:           cue.MakePath(cue.Str(commandSection), cue.Str(command)),
 		InferTasks:     true,

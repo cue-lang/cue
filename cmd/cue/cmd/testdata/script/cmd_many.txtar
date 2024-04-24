@@ -20,9 +20,10 @@ mv itemsList_tool.cue itemsList.cue
 exec cue export ./...
 cmp stdout stdout.export-post.golden
 
-# Verify that cue cmd ls ./... still works the same.
-exec cue cmd ls ./...
-cmp stdout stdout.ls-pre.golden
+# Attempt to ls in this state, which fails, as each of the CUE packages
+# hold an items list with different lengths.
+! exec cue cmd ls ./...
+stderr 'itemsList: incompatible list lengths \(0 and 1\)'
 
 -- cue.mod/module.cue --
 module: "mod.com"

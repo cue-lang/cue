@@ -39,6 +39,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/value"
 )
 
 var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
@@ -764,30 +765,80 @@ func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []
 	return insts
 }
 
-func buildTools(cmd *Command, args []string) (cue.Value, error) {
+func buildToolInstances(binst []*build.Instance) ([]*cue.Instance, error) {
+	instances := cue.Build(binst)
+	for _, inst := range instances {
+		if inst.Err != nil {
+			return nil, inst.Err
+		}
+	}
+
+	// TODO check errors after the fact in case of ignore.
+	for _, inst := range instances {
+		if err := inst.Value().Validate(); err != nil {
+			return nil, err
+		}
+	}
+	return instances, nil
+}
+
+func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	cfg, err := defaultConfig()
 	if err != nil {
-		return cue.Value{}, err
+		return nil, err
 	}
 	loadCfg := *cfg.loadCfg
 	loadCfg.Tools = true
 	f := cmd.cmd.Flags()
 	setTags(&loadCfg, f, cmd.cmd.Parent().Flags())
 
-	builds := loadFromArgs(args, &loadCfg)
+	binst := loadFromArgs(args, &loadCfg)
+	if len(binst) == 0 {
+		return nil, nil
+	}
+	included := map[string]bool{}
 
-	values, err := cmd.ctx.BuildInstances(builds)
+	ti := binst[0].Context().NewInstance(binst[0].Root, nil)
+	for _, inst := range binst {
+		k := 0
+		for _, f := range inst.Files {
+			if strings.HasSuffix(f.Filename, "_tool.cue") {
+				if !included[f.Filename] {
+					_ = ti.AddSyntax(f)
+					included[f.Filename] = true
+				}
+				continue
+			}
+			inst.Files[k] = f
+			k++
+		}
+		inst.Files = inst.Files[:k]
+	}
+
+	insts, err := buildToolInstances(binst)
 	if err != nil {
-		return cue.Value{}, err
+		return nil, err
 	}
-	// 'cue cmd' with multiple package arguments, such as './...',
-	// currently runs a single command on the unification of all given packages.
-	// See https://cuelang.org/issue/1325.
-	v := values[0]
-	for _, v2 := range values[1:] {
-		v = v.Unify(v2)
+
+	inst := insts[0]
+	if len(insts) > 1 {
+		inst = cue.Merge(insts...)
 	}
-	return v, nil
+
+	r := value.ConvertToRuntime(inst.Value().Context())
+	for _, b := range binst {
+		for _, i := range b.Imports {
+			if _, err := r.Build(i); err != nil {
+				return nil, err
+			}
+		}
+	}
+
+	// Set path equal to the package from which it is loading.
+	ti.ImportPath = binst[0].ImportPath
+
+	inst = inst.Build(ti)
+	return inst, inst.Err
 }
 
 func shortFile(root string, f *build.File) string {

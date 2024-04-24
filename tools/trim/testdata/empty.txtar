@@ -13,8 +13,7 @@ deployment: alertmanager: {
 }
 -- out/trim --
 == in.cue
-deployment: [ID=string]: {
-}
+deployment: [ID=string]: {}
 
 deployment: alertmanager: {
 	empty: {}

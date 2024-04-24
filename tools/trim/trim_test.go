@@ -17,6 +17,8 @@ package trim
 import (
 	"testing"
 
+	"golang.org/x/tools/txtar"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/cuecontext"
@@ -24,7 +26,6 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetxtar"
-	"golang.org/x/tools/txtar"
 )
 
 func TestFiles(t *testing.T) {
@@ -196,8 +197,7 @@ service: a: {
 		out: `service: [string]: {
 	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
 }
-service: a: {
-}
+service: a: {}
 `,
 	}, {
 		name: "do not overmark comprehension",

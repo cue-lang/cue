@@ -160,7 +160,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	defer c.PopArc(c.PushArc(v))
 
-	w := v.IndirectNonShared() // Dereference the disjunction result.
+	w := v.DerefNonShared() // Dereference the disjunction result.
 	if w != v {
 		if w.Closed {
 			// Should resolve with dereference.

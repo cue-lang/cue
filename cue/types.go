@@ -235,6 +235,10 @@ func (i *Iterator) Next() bool {
 	p := linkParent(i.val.parent_, i.val.v, arc)
 	i.f = arc.Label
 	i.arcType = arc.ArcType
+	// TODO: this should not indirect disjunctions, as this will cause losing
+	// information, which is now available in the new evaluator. Find a safe
+	// way to preserve disjunction information while keeping backward
+	// compatibility in the API.
 	arc = arc.Indirect()
 	i.cur = makeValue(i.val.idx, arc, p)
 	i.p++

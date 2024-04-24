@@ -103,11 +103,11 @@ func processResolver(ctx *OpContext, t *task, mode runMode) {
 	}
 	ctx.Logf(t.node.node, "RESOLVED %v to %v %v", r, arc.Label, fmt.Sprintf("%p", arc))
 	// TODO: consider moving after markCycle or removing.
-	arc = arc.Indirect()
+	d := arc.DerefDisjunct()
 
 	// A reference that points to itself indicates equality. In that case
 	// we are done computing and we can return the arc as is.
-	ci, skip := t.node.markCycle(arc, t.env, r, t.id)
+	ci, skip := t.node.markCycle(d, t.env, r, t.id)
 	if skip {
 		return
 	}

@@ -940,7 +940,12 @@ func (x *LetReference) resolve(ctx *OpContext, state combinedFlags) *Vertex {
 		e.cache[key] = n
 		if ctx.isDevVersion() {
 			nc := n.getState(ctx)
-			nc.hasNonCycle = true // Allow a first cycle to be skipped.
+			// TODO: unlike with the old evaluator, we do not allow the first
+			// cycle to be skipped. Doing so can lead to hanging evaluation.
+			// As the cycle detection works slightly differently in the new
+			// evaluator (and is not entirely completed), this can be. We should
+			// revisit this once we have completed the structural cycle detection.
+			// nc.hasNonCycle = true // Allow a first cycle to be skipped.
 			nc.free()
 			n.unify(ctx, allKnown, finalize)
 		} else {

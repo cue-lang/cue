@@ -41,9 +41,6 @@ example.com/blah
 	example.com@v0 v0.0.1 (_registry/example.com_v0.0.1/blah)
 	local (cue.mod/gen/example.com/blah)
 	missing: false
--- main.cue --
-package main
-import "example.com/blah"
 -- cue.mod/gen/example.com/blah/x.cue --
 package blah
 -- main.cue --

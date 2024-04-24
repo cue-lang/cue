@@ -47,6 +47,7 @@ func TestExe(t *testing.T) {
 		Dir:                 "testdata/cue",
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
 		RequireExplicitExec: true,
+		RequireUniqueNames:  true,
 		Setup: func(e *testscript.Env) error {
 			copyWasmFiles(t, e.WorkDir, wasmFiles)
 			return nil

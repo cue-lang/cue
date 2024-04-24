@@ -101,6 +101,7 @@ func TestScript(t *testing.T) {
 		Dir:                 filepath.Join("testdata", "script"),
 		UpdateScripts:       cuetest.UpdateGoldenFiles,
 		RequireExplicitExec: true,
+		RequireUniqueNames:  true,
 		Cmds: map[string]func(ts *testscript.TestScript, neg bool, args []string){
 			// env-fill rewrites its argument files to replace any environment variable
 			// references with their values, using the same algorithm as cmpenv.

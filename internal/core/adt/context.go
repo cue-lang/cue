@@ -496,7 +496,9 @@ func (c *OpContext) resolveState(x Conjunct, r Resolver, state combinedFlags) (*
 		return nil, arc.ChildErrors
 	}
 
-	arc = arc.Indirect()
+	if !c.isDevVersion() {
+		arc = arc.Indirect()
+	}
 
 	return arc, err
 }
@@ -707,8 +709,9 @@ func (c *OpContext) evalState(v Expr, state combinedFlags) (result Value) {
 			return nil
 		}
 		// TODO: consider moving this after markCycle, depending on how we
-		// implement markCycle.
-		arc = arc.Indirect()
+		// implement markCycle, or whether we need it at all.
+		// TODO: is this indirect necessary?
+		// arc = arc.Indirect()
 
 		// Save the old CloseInfo and restore after evaluate to avoid detecting
 		// spurious cycles.
@@ -834,8 +837,9 @@ func (c *OpContext) unifyNode(v Expr, state combinedFlags) (result Value) {
 			return nil
 		}
 		// TODO: consider moving this after markCycle, depending on how we
-		// implement markCycle.
-		v = v.Indirect()
+		// implement markCycle, or whether we need it at all.
+		// TODO: is this indirect necessary?
+		// v = v.Indirect()
 
 		if c.isDevVersion() {
 			if n := v.getState(c); n != nil {

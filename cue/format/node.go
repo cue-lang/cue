@@ -655,16 +655,14 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 		switch {
 		case len(x.Elts) == 0:
-			if !x.Rbrace.HasRelPos() {
-				// collapse curly braces if the body is empty.
-				ffAlt := blank | nooverride
-				for _, c := range x.Comments() {
-					if c.Position == 1 {
-						ffAlt = ff
-					}
+			// collapse curly braces if the body is empty.
+			ffAlt := blank | nooverride
+			for _, c := range x.Comments() {
+				if c.Position == 1 {
+					ffAlt = ff
 				}
-				ff = ffAlt
 			}
+			ff = ffAlt
 		case !x.Rbrace.HasRelPos() || !x.Elts[0].Pos().HasRelPos():
 			ws |= newline | nooverride
 		}
@@ -684,11 +682,24 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		f.print(ws, x.Rbrace, token.RBRACE)
 
 	case *ast.ListLit:
-		f.print(x.Lbrack, token.LBRACK, noblank, indent)
+		ws := noblank | indent
+		if len(x.Elts) == 0 {
+			// collapse square brackets if the body is empty.
+			collapseWs := blank | nooverride
+			for _, c := range x.Comments() {
+				if c.Position == 1 {
+					collapseWs = ws
+				}
+			}
+			ws |= collapseWs
+		}
+
+		f.print(x.Lbrack, token.LBRACK, ws)
 		f.walkListElems(x.Elts)
 		f.print(trailcomma, noblank)
 		f.visitComments(f.current.pos)
 		f.matchUnindent()
+
 		f.print(noblank, x.Rbrack, token.RBRACK)
 
 	case *ast.Ellipsis:

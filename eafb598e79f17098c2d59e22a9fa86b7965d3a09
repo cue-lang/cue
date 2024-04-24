@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "95317831_b9d19037",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T09:20:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "8df8ad18_cba253f3",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f260c963_f3c5b3e7",
@@ -64,6 +82,54 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e769487c_ad0f0097",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T09:20:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "109f3632_5c0ccf6b",
+      "range": {
+        "startLine": 13,
+        "startChar": 29,
+        "endLine": 13,
+        "endChar": 36
+      },
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "57b184a9_7d0aa90b",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 13,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T09:20:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "f260c963_f3c5b3e7",
+      "range": {
+        "startLine": 13,
+        "startChar": 21,
+        "endLine": 13,
+        "endChar": 25
+      },
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "1efea901_faef6293",
@@ -77,6 +143,30 @@
       "writtenOn": "2024-04-24T08:47:12Z",
       "side": 1,
       "message": "\u003e ... as we descend into subdirectories.",
+      "range": {
+        "startLine": 15,
+        "startChar": 2,
+        "endLine": 15,
+        "endChar": 43
+      },
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "999f9398_17ea4585",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T09:20:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "1efea901_faef6293",
       "range": {
         "startLine": 15,
         "startChar": 2,
@@ -104,6 +194,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "bebb7a17_06299b7f",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 17,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T09:20:22Z",
+      "side": 1,
+      "message": "Acknowledged",
+      "parentUuid": "173e4100_de0c0663",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "7837cccf_702055d6",
@@ -117,6 +225,24 @@
       "writtenOn": "2024-04-24T08:47:12Z",
       "side": 1,
       "message": "can you clarify that what we cache is the build.File and ast.File, since those are what need to get returned as part of the cue/load API?",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fd8409cb_6328bceb",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 9
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T09:20:22Z",
+      "side": 1,
+      "message": "sure thing, added",
+      "parentUuid": "7837cccf_702055d6",
       "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -186,6 +312,24 @@
       "writtenOn": "2024-04-24T08:47:12Z",
       "side": 1,
       "message": "I would make these field and type names more explicit, for instance:\n\n```\ndirCachedBuildFiles map[string]cachedBuildFiles\ndirCachedSyntaxFiles map[string]cachedSyntaxFiles\n```\n\nThe types are small as well, so there\u0027s really no point in using pointers. Not using pointers will mean you have to rewrite the code slightly to only insert into the map once each cached value is finished, but that\u0027s fine.\n\nPlease also add a brief comment above the two fields, like:\n\n\u003e // When we descend into subdirectories to load patterns such as ./...\n\u003e // we often end up loading parent directories many times over; cache that work by directory.",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "362769b5_287ad52f",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1037843
+      },
+      "writtenOn": "2024-04-24T09:20:22Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3fd3c060_c1fa0f9e",
       "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

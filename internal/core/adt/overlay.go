@@ -79,6 +79,7 @@ type overlayContext struct {
 func (ctx *overlayContext) cloneRoot(root *nodeContext) *nodeContext {
 	// Clone all vertices that need to be cloned to support the overlay.
 	v := ctx.cloneVertex(root.node)
+	v.IsDisjunct = true
 
 	// TODO: patch notifications to any node that is within the disjunct to
 	// point to the new vertex instead.

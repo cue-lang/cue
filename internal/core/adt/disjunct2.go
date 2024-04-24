@@ -332,6 +332,9 @@ func (n *nodeContext) processDisjunctions() *Bottom {
 // crossProduct computes the cross product of the disjuncts of a disjunction
 // with an existing set of results.
 func (n *nodeContext) crossProduct(dst, cross []*nodeContext, dn *envDisjunct, mode runMode) []*nodeContext {
+	defer n.unmarkDepth(n.markDepth())
+	defer n.unmarkOptional(n.markOptional())
+
 	for _, p := range cross {
 		// TODO: use a partial unify instead
 		// p.completeNodeConjuncts()

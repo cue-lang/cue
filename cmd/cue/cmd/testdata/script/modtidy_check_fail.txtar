@@ -3,6 +3,9 @@
 ! exec cue mod tidy --check
 cmp stderr want-stderr
 
+! exec cue mod tidy -c
+cmp stderr want-stderr
+
 -- want-stderr --
 module is not tidy: cannot find module providing package example.com@v0:main
 -- cue.mod/module.cue --

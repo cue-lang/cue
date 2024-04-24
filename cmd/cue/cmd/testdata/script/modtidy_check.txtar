@@ -3,6 +3,7 @@
 # e.g. language.version in a single line.
 
 exec cue mod tidy --check
+exec cue mod tidy -c
 
 -- cue.mod/module.cue --
 module: "main.org@v0"

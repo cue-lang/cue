@@ -49,6 +49,5 @@ service: a: {
 }
 
 service: a: {
-	ports: [{
-	}]
+	ports: [{}]
 }

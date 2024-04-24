@@ -37,8 +37,7 @@ a: b: c: 2
 // rewrite okay
 a: b: c: d: 2
 
-m: {
-}
+m: {}
 m: {
 	// empty with comment
 }
@@ -51,8 +50,7 @@ struct1: {
 
 	// Another comment
 
-	something: {
-	}
+	something: {}
 	// extra comment
 }
 
@@ -62,8 +60,7 @@ struct2: {
 	// This is a comment
 
 	// Another comment
-	something: {
-	}
+	something: {}
 
 	// extra comment
 }
@@ -74,8 +71,7 @@ list1: [
 	// Comment2
 
 	// Another comment
-	{
-	},
+	{},
 
 	// Comment 3
 ]

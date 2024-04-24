@@ -131,15 +131,17 @@ func newFmtCmd(c *Command) *cobra.Command {
 					if check && !bytes.Equal(formatted.Bytes(), original) {
 						foundBadlyFormatted = true
 
+						var path string
 						if file.Filename != "-" {
 							f := file.Filename
-							var path string
 							path, err = filepath.Rel(cwd, f)
 							if err != nil {
 								path = f
 							}
-							fmt.Fprintln(stdout, path)
+						} else {
+							path = "<standard input>"
 						}
+						fmt.Fprintln(stdout, path)
 					}
 				}
 			}

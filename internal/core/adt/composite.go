@@ -210,6 +210,16 @@ type Vertex struct {
 	// disjunction evaluation.
 	IsDisjunct bool
 
+	// IsShared is true if BaseValue holds a Vertex of a node of another path.
+	// If a node is shared, the user should be careful with traversal.
+	// The debug printer, for instance, takes extra care not to print in a loop.
+	IsShared bool
+
+	// IsCyclic is true if a node is cyclic, for instance if its value is
+	// a cyclic reference to a shared node or if the value is a conjunction
+	// of which at least one value is cyclic (not yet supported).
+	IsCyclic bool
+
 	// ArcType indicates the level of optionality of this arc.
 	ArcType ArcType
 

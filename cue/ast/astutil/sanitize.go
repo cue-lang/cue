@@ -317,7 +317,7 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 }
 
 // uniqueName returns a new name globally unique name of the form
-// base_XX ... base_XXXXXXXXXXXXXX or _base or the same pattern with a '_'
+// base_NN ... base_NNNNNNNNNNNNNN or _base or the same pattern with a '_'
 // prefix if hidden is true.
 //
 // It prefers short extensions over large ones, while ensuring the likelihood of

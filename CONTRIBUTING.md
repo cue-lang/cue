@@ -800,7 +800,7 @@ If you see something like...
 remote: Processing changes: refs: 1, done
 remote:
 remote: ERROR:  In commit ab13517fa29487dcf8b0d48916c51639426c5ee9
-remote: ERROR:  author email address XXXXXXXXXXXXXXXXXXX
+remote: ERROR:  author email address your.email@domain.com
 remote: ERROR:  does not match your user account.
 ```
 

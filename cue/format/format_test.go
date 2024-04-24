@@ -281,7 +281,7 @@ func TestNodes(t *testing.T) {
 
 }
 
-// Verify that the printer doesn't crash if the AST contains BadXXX nodes.
+// Verify that the printer doesn't crash if the AST contains Bad... nodes.
 func TestBadNodes(t *testing.T) {
 	const src = "package p\n("
 	const res = "package p\n\n(_|_)\n"

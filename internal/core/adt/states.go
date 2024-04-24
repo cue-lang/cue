@@ -126,7 +126,7 @@ const (
 	// This is a signal condition that is reached when:
 	//    - a node is set to a concrete scalar value
 	//    - a node is set to an error
-	//    - or if XXXstate is reached.
+	//    - or if ...state is reached.
 	//
 	// TODO: rename to something better?
 	scalarKnown

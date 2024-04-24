@@ -636,7 +636,7 @@ func (e *exporter) makeFeature(s string) (f adt.Feature, ok bool) {
 
 // uniqueFeature returns a name for an identifier that uniquely identifies
 // the given expression. If the preferred name is already taken, a new globally
-// unique name of the form base_X ... base_XXXXXXXXXXXXXX is generated.
+// unique name of the form base_N ... base_NNNNNNNNNNNNNN is generated.
 //
 // It prefers short extensions over large ones, while ensuring the likelihood of
 // fast termination is high. There are at least two digits to make it visually

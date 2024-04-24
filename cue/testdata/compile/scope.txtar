@@ -87,6 +87,72 @@ Retain: 8
 Unifications: 50
 Conjuncts:    102
 Disjuncts:    54
+-- out/evalalpha --
+(struct){
+  a: (struct){
+    d: (struct){
+    }
+    e: (struct){
+    }
+    c: (struct){
+    }
+  }
+  b: (struct){
+  }
+  s: (string){ "foo" }
+  c: (string){ "foo" }
+  d: (struct){
+  }
+  e: (struct){
+  }
+  let B#1 = (struct){
+    open: (int){ int }
+  }
+  f: (struct){
+    open: (int){ int }
+  }
+  schema: (struct){
+    next: (_|_){
+      // [structural cycle] _schema_1: structural cycle:
+      //     ./in.cue:32:8
+    }
+  }
+  let _schema_1#2 = (_|_){
+    // [structural cycle] _schema_1: structural cycle:
+    //     ./in.cue:32:8
+  }
+}
+-- diff/-out/evalalpha<==>+out/eval --
+diff old new
+--- old
++++ new
+@@ -1,9 +1,4 @@
+-Errors:
+-schema.next: structural cycle
+-
+-Result:
+-(_|_){
+-  // [structural cycle]
++(struct){
+   a: (struct){
+     d: (struct){
+     }
+@@ -26,10 +21,10 @@
+   f: (struct){
+     open: (int){ int }
+   }
+-  schema: (_|_){
+-    // [structural cycle]
++  schema: (struct){
+     next: (_|_){
+-      // [structural cycle] schema.next: structural cycle
++      // [structural cycle] _schema_1: structural cycle:
++      //     ./in.cue:32:8
+     }
+   }
+   let _schema_1#2 = (_|_){
+-- diff/todo/p1 --
+schema: structural cycle not propagated up. This causes the error to be missed.
 -- out/eval --
 Errors:
 schema.next: structural cycle

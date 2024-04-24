@@ -123,6 +123,11 @@ import "list"
     e: 'aa \(aaa) aa'
     e: "aa \(aaa)"
 
+    e: [
+    ]
+    e: [
+
+    ]
     e: [1, 2
     ]
     e: [1, 2]

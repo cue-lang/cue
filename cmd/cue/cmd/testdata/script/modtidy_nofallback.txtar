@@ -1,0 +1,26 @@
+# Check that we can tidy a module when using a no-fallback
+# "none" registry.
+
+env CUE_REGISTRY=foo.com/bar=$CUE_REGISTRY1,none
+exec cue mod tidy
+exec cue eval .
+cmp stdout want-stdout
+
+-- want-stdout --
+x: "hello"
+-- cue.mod/module.cue --
+module: "main.org@v0"
+language: version: "v0.8.0"
+-- main.cue --
+package main
+import "foo.com/bar/baz@v0"
+
+baz
+
+-- _registry1/foo.com_bar_v0.0.1/cue.mod/module.cue --
+module: "foo.com/bar@v0"
+language: version: "v0.8.0"
+
+-- _registry1/foo.com_bar_v0.0.1/baz/baz.cue --
+package baz
+x: "hello"

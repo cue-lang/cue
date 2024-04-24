@@ -152,7 +152,7 @@ func (r *Resolver) ResolveToLocation(mpath string, version string) (HostLocation
 	return r.resolver.ResolveToLocation(mpath, version)
 }
 
-// Resolve implements modregistry.Resolver.Resolve.
+// ResolveToRegistry implements [modregistry.Resolver.ResolveToRegistry].
 func (r *Resolver) ResolveToRegistry(mpath string, version string) (modregistry.RegistryLocation, error) {
 	loc, ok := r.resolver.ResolveToLocation(mpath, version)
 	if !ok {
@@ -162,7 +162,7 @@ func (r *Resolver) ResolveToRegistry(mpath string, version string) (modregistry.
 		//
 		// It can also happen when the user has explicitly configured a "none"
 		// registry to avoid falling back to a default registry.
-		return modregistry.RegistryLocation{}, fmt.Errorf("cannot resolve %s (version %s) to registry", mpath, version)
+		return modregistry.RegistryLocation{}, fmt.Errorf("cannot resolve %s (version %q) to registry: %w", mpath, version, modregistry.ErrRegistryNotFound)
 	}
 	r.mu.Lock()
 	defer r.mu.Unlock()

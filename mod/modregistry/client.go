@@ -59,8 +59,15 @@ type Resolver interface {
 	// will hold the prefix that all versions of the module in its
 	// repository have. That prefix will be followed by the version
 	// itself.
+	//
+	// If there is no registry configured for the module, it returns
+	// an [ErrRegistryNotFound] error.
 	ResolveToRegistry(mpath, vers string) (RegistryLocation, error)
 }
+
+// ErrRegistryNotFound is returned by [Resolver.ResolveToRegistry]
+// when there is no registry configured for a module.
+var ErrRegistryNotFound = fmt.Errorf("no registry configured for module")
 
 // RegistryLocation holds a registry and a location within it
 // that a specific module (or set of versions for a module)
@@ -104,6 +111,9 @@ func NewClientWithResolver(resolver Resolver) *Client {
 func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, error) {
 	loc, err := c.resolve(m)
 	if err != nil {
+		if errors.Is(err, ErrRegistryNotFound) {
+			return nil, ErrNotFound
+		}
 		return nil, err
 	}
 	rd, err := loc.Registry.GetTag(ctx, loc.Repository, loc.Tag)
@@ -130,6 +140,10 @@ func (c *Client) GetModule(ctx context.Context, m module.Version) (*Module, erro
 func (c *Client) GetModuleWithManifest(ctx context.Context, m module.Version, contents []byte, mediaType string) (*Module, error) {
 	loc, err := c.resolve(m)
 	if err != nil {
+		// Note: don't return [ErrNotFound] here because if we've got the
+		// manifest we should be pretty sure that the module actually
+		// exists, so it's a harder error than if we're getting the module
+		// by tag.
 		return nil, err
 	}
 
@@ -168,6 +182,9 @@ func (c *Client) ModuleVersions(ctx context.Context, m string) ([]string, error)
 	}
 	loc, err := c.resolver.ResolveToRegistry(mpath, "")
 	if err != nil {
+		if errors.Is(err, ErrRegistryNotFound) {
+			return nil, nil
+		}
 		return nil, err
 	}
 	versions := []string{}

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c6103f0d_6ff6b693",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-04-24T12:57:15Z",
+      "side": 1,
+      "message": "PTAL. I can\u0027t trigger trybots in this repo.",
+      "revId": "d2c417c54179bfd59353de305bb5f3b819210311",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

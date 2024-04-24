@@ -2,12 +2,15 @@ cd standalone
 
 # succeeds when file is formatted
 exec cue fmt --check formatted.cue
+exec cue fmt -c formatted.cue
 
 stdin formatted.cue
 exec cue fmt --check -
 
 # fails and displays non formatted files
 ! exec cue fmt --check not_formatted.cue another/not_formatted.cue
+cmpenv stdout expected-output
+! exec cue fmt -c not_formatted.cue another/not_formatted.cue
 cmpenv stdout expected-output
 
 # files are not modified with --check

@@ -332,6 +332,24 @@
       "parentUuid": "3fd3c060_c1fa0f9e",
       "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "07b77741_512bbbc7",
+        "filename": "cue/load/loader.go",
+        "patchSetId": 9
+      },
+      "lineNbr": 48,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T09:23:30Z",
+      "side": 1,
+      "message": "Ah, so the second cache was by file name, not by directory name - I had missed that entirely in the older field names :)",
+      "parentUuid": "362769b5_287ad52f",
+      "revId": "eafb598e79f17098c2d59e22a9fa86b7965d3a09",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

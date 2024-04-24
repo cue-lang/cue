@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1ee4c41c_5bb11332",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2024-04-24T06:55:14Z",
+      "side": 1,
+      "message": "Please can you be specific, in which CUE version was it first marked as deprecated?",
+      "revId": "7e261b378edaf828a8a675c6790c6595d281014b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

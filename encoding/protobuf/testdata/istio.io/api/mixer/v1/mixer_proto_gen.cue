@@ -258,5 +258,4 @@ import (
 }
 
 // Used to carry responses to telemetry reports
-#ReportResponse: {
-}
+#ReportResponse: {}

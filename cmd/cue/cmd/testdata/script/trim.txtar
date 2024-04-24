@@ -43,8 +43,7 @@ foo: multipath: {
 		x: >=5 & <=8 & int
 	}
 
-	t: u: {
-	}
+	t: u: {}
 }
 
 group: {

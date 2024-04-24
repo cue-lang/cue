@@ -401,8 +401,7 @@ _#internalIdentifier: #Identifier & "internal"
 
 #CustomJSON: _
 
-#CustomYAML: {
-}
+#CustomYAML: {}
 
 _#localType: int
 

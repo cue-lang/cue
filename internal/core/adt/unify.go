@@ -160,7 +160,7 @@ func (v *Vertex) unify(c *OpContext, needs condition, mode runMode) bool {
 
 	defer c.PopArc(c.PushArc(v))
 
-	w := v.DerefNonShared() // Dereference the disjunction result.
+	w := v.DerefDisjunct()
 	if w != v {
 		if w.Closed {
 			// Should resolve with dereference.
@@ -431,6 +431,7 @@ func (n *nodeContext) completeAllArcs(needs condition, mode runMode) bool {
 		// TODO: make uniform error messages
 		// see compbottom2.cue:
 		n.ctx.addErrf(CycleError, pos(n.node), "mutual dependency")
+		n.node.IsCyclic = true
 		// Consider using this, although not all
 		// mutual dependencies are irrecoverable.
 		// n.reportCycleError()
@@ -605,7 +606,12 @@ func (v *Vertex) lookup(c *OpContext, pos token.Pos, f Feature, flags combinedFl
 
 	// TODO: verify lookup types.
 
-	arc := v.Lookup(f)
+	arc := v.LookupRaw(f)
+	if arc != nil {
+		// TODO: ideally we should leave the dereferencing up to the caller.
+		arc = arc.DerefNonDisjunct()
+	}
+
 	// TODO: clean up this logic:
 	// - signal arcTypeKnown when ArcMember or ArcNotPresent is set,
 	//   similarly to scalarKnown.

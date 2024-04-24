@@ -377,6 +377,10 @@ func (n *nodeContext) markCycle(arc *Vertex, env *Environment, x Resolver, ci Cl
 outer:
 	switch arc.status {
 	case evaluatingArcs: // also  Evaluating?
+		if arc.state.evalDepth < n.ctx.optionalMark {
+			break
+		}
+
 		// The reference may already be there if we had no-cyclic structure
 		// invalidating the cycle.
 		for r := arc.cyclicReferences; r != nil; r = r.Next {
@@ -492,6 +496,14 @@ outer:
 		// No cycle.
 		return ci, false
 	}
+
+	// TODO: consider if we should bail if a cycle is detected using this
+	// mechanism. Ultimately, especially when the old evaluator is removed
+	// and the status field purged, this should be used instead of the above.
+	// if !found && arc.state.evalDepth < n.ctx.optionalMark {
+	// 	// No cycle.
+	// 	return ci, false
+	// }
 
 	alreadyCycle := ci.IsCyclic
 	ci.IsCyclic = true
@@ -616,4 +628,63 @@ func makeAnonymousConjunct(env *Environment, x Expr, refs *RefNode) Conjunct {
 			Refs:   refs,
 		}},
 	}
+}
+
+// incDepth increments the evaluation depth. This should typically be called
+// before descending into a child node.
+func (n *nodeContext) incDepth() {
+	n.ctx.evalDepth++
+}
+
+// decDepth decrements the evaluation depth. It should be paired with a call to
+// incDepth and be called after the processing of child nodes is done.
+func (n *nodeContext) decDepth() {
+	n.ctx.evalDepth--
+}
+
+// markOptional marks that we are about to process an "optional element" that
+// allows errors. In these cases, structural cycles are not "terminal".
+//
+// Examples of such constructs are:
+//
+// Optional fields:
+//
+//	a: b?: a
+//
+// Pattern constraints:
+//
+//	a: [string]: a
+//
+// Disjunctions:
+//
+//	a: b: null | a
+//
+// A call to markOptional should be paired with a call to unmarkOptional.
+func (n *nodeContext) markOptional() (saved int) {
+	saved = n.ctx.evalDepth
+	n.ctx.optionalMark = n.ctx.evalDepth
+	return saved
+}
+
+// See markOptional.
+func (n *nodeContext) unmarkOptional(saved int) {
+	n.ctx.optionalMark = saved
+}
+
+// markDepth assigns the current evaluation depth to the receiving node.
+// Any previously assigned depth is saved and returned and should be restored
+// using unmarkDepth after processing n.
+//
+// When a node is encountered with a depth set to a non-zero value this
+// indicates a cycle. The cycle is an evaluation cycle when the node's depth
+// is equal to the current depth and a structural cycle otherwise.
+func (n *nodeContext) markDepth() (saved int) {
+	saved = n.evalDepth
+	n.evalDepth = n.ctx.evalDepth
+	return saved
+}
+
+// See markDepth.
+func (n *nodeContext) unmarkDepth(saved int) {
+	n.evalDepth = saved
 }

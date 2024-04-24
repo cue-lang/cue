@@ -240,6 +240,15 @@ type OpContext struct {
 	closed     map[*closeInfo]*closeStats
 	todo       *closeStats
 
+	// evalDepth indicates the current depth of evaluation. It is used to
+	// detect structural cycles and their severity.s
+	evalDepth int
+
+	// optionalMark indicates the evalDepth at which the last optional field,
+	// pattern constraint or other construct that may contain errors was
+	// encountered. A value of 0 indicates we are not within such field.
+	optionalMark int
+
 	// inDisjunct indicates that non-monotonic checks should be skipped.
 	// This is used if we want to do some extra work to eliminate disjunctions
 	// early. The result of unification should be thrown away if this check is

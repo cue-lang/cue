@@ -1,0 +1,27 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3ad54c4b_c317e04c",
+        "filename": "cue/format/node.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 687,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T14:51:53Z",
+      "side": 1,
+      "message": "square brackets?",
+      "range": {
+        "startLine": 687,
+        "startChar": 15,
+        "endLine": 687,
+        "endChar": 21
+      },
+      "revId": "5bb9de01da22851877e9fd1c07719415a2e79993",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

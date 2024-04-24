@@ -1,9 +1,13 @@
 # no output when file is formatted
 exec cue fmt --diff formatted.cue
 ! stdout .
+exec cue fmt -d formatted.cue
+! stdout .
 
 # displays diff when file is not formatted
 exec cue fmt --diff not-formatted.cue
+cmp stdout not-formatted-diff.golden
+exec cue fmt -d not-formatted.cue
 cmp stdout not-formatted-diff.golden
 
 # exits with error when --check is set

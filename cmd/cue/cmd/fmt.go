@@ -162,7 +162,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 	}
 
 	cmd.Flags().Bool(string(flagCheck), false, "exits with non-zero status if any files are not formatted")
-	cmd.Flags().Bool(string(flagDiff), false, "display diffs instead of rewriting files")
+	cmd.Flags().BoolP(string(flagDiff), "d", false, "display diffs instead of rewriting files")
 
 	return cmd
 }

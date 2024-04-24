@@ -33,6 +33,24 @@
       "message": "Nice. I think the same bug is present in import_proto2.txtar.\n\nHow about setting RequireUniqueNames in https://pkg.go.dev/github.com/rogpeppe/go-internal/testscript#Params everywhere, so that we can make sure these mistakes don\u0027t slip in again?",
       "revId": "d2c417c54179bfd59353de305bb5f3b819210311",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "15c744db_726bc190",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1021694
+      },
+      "writtenOn": "2024-04-24T13:39:40Z",
+      "side": 1,
+      "message": "Ah, nice - I didn\u0027t know that was an option as I generally only interact with the `testscript` binary, where it isn\u0027t exposed.\n\nI\u0027ve made this change, and am waiting on https://www.githubstatus.com/incidents/7txcg0j03kkg to get resolved before I can be granted access to trigger the trybots on this repo.",
+      "parentUuid": "1a668d3a_666597d3",
+      "revId": "d2c417c54179bfd59353de305bb5f3b819210311",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

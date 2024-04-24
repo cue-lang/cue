@@ -1,0 +1,41 @@
+# no output when file is formatted
+exec cue fmt --diff formatted.cue
+! stdout .
+exec cue fmt -d formatted.cue
+! stdout .
+
+# displays diff when file is not formatted
+exec cue fmt --diff not-formatted.cue
+cmp stdout not-formatted-diff.golden
+exec cue fmt -d not-formatted.cue
+cmp stdout not-formatted-diff.golden
+
+# exits with error when --check is set
+! exec cue fmt --check --diff not-formatted.cue
+cmp stdout not-formatted-diff.golden
+
+# displays diff when file is stdin (-)
+stdin not-formatted.cue
+exec cue fmt --diff -
+cmp stdout not-formatted-stdin.golden
+
+-- formatted.cue --
+foo: "bar"
+-- not-formatted.cue --
+foo:   "bar"
+-- not-formatted-diff.golden --
+diff not-formatted.cue.orig not-formatted.cue
+--- not-formatted.cue.orig
++++ not-formatted.cue
+@@ -1,1 +1,1 @@
+-foo:   "bar"
++foo: "bar"
+
+-- not-formatted-stdin.golden --
+diff -.orig -
+--- -.orig
++++ -
+@@ -1,1 +1,1 @@
+-foo:   "bar"
++foo: "bar"
+

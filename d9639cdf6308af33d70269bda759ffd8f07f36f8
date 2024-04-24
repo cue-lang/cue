@@ -24,6 +24,30 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ba33af64_fdc8d1b1",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 135,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-24T08:21:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "414c5c1c_7efb8b6b",
+      "range": {
+        "startLine": 135,
+        "startChar": 26,
+        "endLine": 135,
+        "endChar": 32
+      },
+      "revId": "d9639cdf6308af33d70269bda759ffd8f07f36f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f3b7fd9f_ec3a3019",
@@ -37,6 +61,24 @@
       "writtenOn": "2024-04-23T16:51:11Z",
       "side": 1,
       "message": "is this unused?",
+      "revId": "d9639cdf6308af33d70269bda759ffd8f07f36f8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d62e541d_d38c9b86",
+        "filename": "internal/mod/modload/tidy.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 681,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2024-04-24T08:21:47Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f3b7fd9f_ec3a3019",
       "revId": "d9639cdf6308af33d70269bda759ffd8f07f36f8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

@@ -16,6 +16,23 @@
       "message": "thanks for the review!",
       "revId": "85094169558f67bb345edc94839eec0982230e86",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c99cde1d_ac4c74aa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2024-04-24T09:25:10Z",
+      "side": 1,
+      "message": "For some more data, `cue fmt --check ./...` on the cue repo drops from ~120ms to ~75ms, so even for moderately sized repos, this still helps noticeably.",
+      "revId": "85094169558f67bb345edc94839eec0982230e86",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
